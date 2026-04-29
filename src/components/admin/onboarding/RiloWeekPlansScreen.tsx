@@ -641,24 +641,24 @@ function PulsingOrb() {
         transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
         className="absolute inset-0 rounded-full"
         style={{
-          background: 'radial-gradient(circle, rgba(169,138,240,0.45) 0%, rgba(169,138,240,0) 70%)',
+          background: 'radial-gradient(circle, rgba(255,170,150,0.5) 0%, rgba(255,170,150,0) 70%)',
         }}
       />
       {/* Soft ring */}
       <div
         className="absolute h-[130px] w-[130px] rounded-full"
         style={{
-          background: 'radial-gradient(circle, rgba(214,201,255,0.9) 0%, rgba(214,201,255,0.3) 60%, transparent 80%)',
+          background: 'radial-gradient(circle, rgba(255,214,224,0.9) 0%, rgba(255,214,224,0.3) 60%, transparent 80%)',
         }}
       />
       {/* Core orb */}
       <motion.div
         animate={{ scale: [1, 1.04, 1] }}
         transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-        className="relative h-[110px] w-[110px] rounded-full shadow-[0_10px_30px_-8px_rgba(120,90,200,0.5)]"
+        className="relative h-[110px] w-[110px] rounded-full shadow-[0_10px_30px_-8px_rgba(220,120,140,0.45)]"
         style={{
           background:
-            'radial-gradient(circle at 35% 30%, #D6C9FF 0%, #B8A4F2 45%, #9C82E8 100%)',
+            'radial-gradient(circle at 35% 30%, #FFE0CC 0%, #FFB6C7 45%, #E8A4D8 100%)',
         }}
       />
     </div>
