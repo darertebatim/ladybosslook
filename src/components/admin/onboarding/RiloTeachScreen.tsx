@@ -252,42 +252,133 @@ function LaunchOverlay() {
   );
 }
 
-/* ---------- Visual 1: Planner with 3 colored task blocks ---------- */
+/* ---------- Visual 1: Cinematic Rilo intro — R-bloom + sunrise card ---------- */
 function PlannerVisual() {
   const blocks = [
-    { time: '8:00', title: 'Morning stretch', color: '#FFD6A5', dot: '#F08A3E' },
+    { time: '8:00',  title: 'Morning stretch', color: '#FFD6A5', dot: '#F08A3E' },
     { time: '12:30', title: 'Gratitude break', color: '#CDE7FF', dot: '#3E8AF0' },
-    { time: '20:00', title: 'Wind-down read', color: '#E5D6FF', dot: '#8A5CF0' },
+    { time: '20:00', title: 'Wind-down read',  color: '#E5D6FF', dot: '#8A5CF0' },
   ];
+
+  // Timing baseline (seconds):
+  // 0.0–0.6  R-mark blooms in
+  // 0.5      R-mark eases up to header position
+  // 0.7–1.1  Card rises like a sunrise
+  // 1.1+     Tasks fade in one by one, dots ignite
   return (
-    <div className="w-full max-w-[300px] mx-auto">
-      <div className="bg-white rounded-3xl shadow-[0_20px_60px_-20px_rgba(26,31,61,0.25)] p-5 border border-black/5">
+    <div className="relative w-full max-w-[300px] mx-auto h-[360px] flex items-center justify-center">
+      {/* Soft sun glow behind everything (sunrise feel) */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 0.7, scale: 1 }}
+        transition={{ duration: 1.2, ease: 'easeOut' }}
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(circle at 50% 45%, rgba(255,214,165,0.55) 0%, rgba(255,182,193,0.25) 45%, transparent 70%)',
+          filter: 'blur(8px)',
+        }}
+      />
+
+      {/* Phase 1: Rilo "R" mark blooms center, then settles into card header */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.2 }}
+        animate={{
+          opacity: [0, 1, 1, 1],
+          scale: [0.2, 1.6, 1.6, 0.36],
+          x: [0, 0, 0, 110],
+          y: [0, 0, 0, -110],
+        }}
+        transition={{
+          duration: 1.1,
+          times: [0, 0.4, 0.55, 1],
+          ease: [0.25, 0.1, 0.25, 1],
+        }}
+        className="absolute z-20 w-16 h-16 rounded-full bg-gradient-to-br from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] flex items-center justify-center shadow-[0_20px_50px_-10px_rgba(138,92,240,0.55)]"
+      >
+        <span className="text-white font-bold text-[28px] leading-none">R</span>
+        {/* Outward bloom rings */}
+        {[0, 1].map((i) => (
+          <motion.span
+            key={i}
+            initial={{ scale: 0.6, opacity: 0.7 }}
+            animate={{ scale: 2.4, opacity: 0 }}
+            transition={{ duration: 1.0, delay: 0.15 + i * 0.25, ease: 'easeOut' }}
+            className="absolute inset-0 rounded-full border-2 border-[#EC4899]"
+          />
+        ))}
+      </motion.div>
+
+      {/* Phase 2: Planner card rises from below (sunrise) */}
+      <motion.div
+        initial={{ opacity: 0, y: 80, scale: 0.9 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.65, delay: 0.85, ease: [0.22, 1, 0.36, 1] }}
+        className="relative w-full bg-white rounded-3xl shadow-[0_24px_70px_-20px_rgba(26,31,61,0.3)] p-5 border border-white/80 z-10"
+      >
         <div className="flex items-center justify-between mb-4">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#1a1f3d]/50">Today</p>
+          <motion.div
+            initial={{ opacity: 0, x: -6 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 1.1 }}
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#1a1f3d]/50">
+              Today
+            </p>
             <p className="text-[18px] font-bold text-[#1a1f3d]">Wed, Apr 29</p>
-          </div>
-          <div className="w-9 h-9 rounded-full bg-[#1a1f3d] text-white flex items-center justify-center text-[14px] font-bold">R</div>
+          </motion.div>
+          {/* Reserved spot for the R-mark to land into (visual placeholder, real R is the floating one above) */}
+          <div className="w-9 h-9 rounded-full bg-transparent" />
         </div>
+
         <div className="space-y-2.5">
-          {blocks.map((b, i) => (
-            <motion.div
-              key={b.title}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.25 + i * 0.12, duration: 0.35 }}
-              className="flex items-center gap-3 rounded-2xl px-3.5 py-3"
-              style={{ background: b.color }}
-            >
-              <span className="w-2 h-2 rounded-full shrink-0" style={{ background: b.dot }} />
-              <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-semibold text-[#1a1f3d]/60">{b.time}</p>
-                <p className="text-[14px] font-semibold text-[#1a1f3d] truncate">{b.title}</p>
-              </div>
-            </motion.div>
-          ))}
+          {blocks.map((b, i) => {
+            const taskDelay = 1.3 + i * 0.22;
+            return (
+              <motion.div
+                key={b.title}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: taskDelay, duration: 0.35, ease: 'easeOut' }}
+                className="relative flex items-center gap-3 rounded-2xl px-3.5 py-3 overflow-hidden"
+                style={{ background: b.color }}
+              >
+                {/* Sweep highlight as the task lands */}
+                <motion.span
+                  initial={{ x: '-110%', opacity: 0.55 }}
+                  animate={{ x: '110%', opacity: 0 }}
+                  transition={{ delay: taskDelay + 0.05, duration: 0.55, ease: 'easeOut' }}
+                  className="absolute inset-y-0 w-1/2 pointer-events-none"
+                  style={{
+                    background:
+                      'linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)',
+                  }}
+                />
+                {/* Colored dot — ignites after the task lands */}
+                <motion.span
+                  initial={{ scale: 0.4, opacity: 0.4, boxShadow: '0 0 0 transparent' }}
+                  animate={{
+                    scale: [0.4, 1.4, 1],
+                    opacity: [0.4, 1, 1],
+                    boxShadow: [
+                      '0 0 0 0 rgba(0,0,0,0)',
+                      `0 0 12px 2px ${b.dot}`,
+                      `0 0 6px 0 ${b.dot}`,
+                    ],
+                  }}
+                  transition={{ delay: taskDelay + 0.15, duration: 0.55, ease: 'easeOut' }}
+                  className="w-2.5 h-2.5 rounded-full shrink-0"
+                  style={{ background: b.dot }}
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-semibold text-[#1a1f3d]/60">{b.time}</p>
+                  <p className="text-[14px] font-semibold text-[#1a1f3d] truncate">{b.title}</p>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
