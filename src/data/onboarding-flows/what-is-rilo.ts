@@ -130,5 +130,10 @@ export const whatIsRiloFlow: OnboardingFlow = {
       title: 'Any other plans this week?',
       buttonLabel: 'Build my week',
     },
+    {
+      id: 'wir-commit',
+      type: 'rilo-commit',
+      title: 'Lastly, commit to get this done!',
+    },
   ],
 };
