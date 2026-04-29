@@ -52,6 +52,7 @@ import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
 import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { HomeSpotlightIntro } from '@/components/app/home/HomeSpotlightIntro';
+import { TaskCoachOverlay } from '@/components/app/home/TaskCoachOverlay';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
