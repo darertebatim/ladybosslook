@@ -427,19 +427,20 @@ function PlannerVisual() {
 
 /* ---------- Visual 2: Routine with 3 mini-tasks ticking off ---------- */
 function RoutineVisual() {
+  // Cravable mini-routine — the kind women save on TikTok
   const tasks = [
-    { emoji: '💧', title: 'Drink a glass of water' },
-    { emoji: '🧘', title: '2 min of deep breathing' },
-    { emoji: '📝', title: 'Write one good thing' },
+    { emoji: '☕', title: 'Slow morning coffee' },
+    { emoji: '🌸', title: '5-step skincare' },
+    { emoji: '👟', title: 'Get-ready playlist on' },
   ];
   return (
     <div className="w-full max-w-[300px] mx-auto">
       <div className="bg-white rounded-3xl shadow-[0_20px_60px_-20px_rgba(26,31,61,0.25)] p-5 border border-black/5">
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-[20px]">🌅</span>
+          <Emoji3D char="🌅" size={22} />
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-wider text-[#1a1f3d]/50">Morning routine</p>
-            <p className="text-[16px] font-bold text-[#1a1f3d]">3 small wins</p>
+            <p className="text-[16px] font-bold text-[#1a1f3d]">Soft-girl morning</p>
           </div>
         </div>
         <div className="space-y-2.5">
@@ -465,7 +466,7 @@ function RoutineVisual() {
                   <Check className="w-4 h-4 text-white" strokeWidth={3} />
                 </motion.span>
               </motion.div>
-              <span className="text-[18px]">{t.emoji}</span>
+              <Emoji3D char={t.emoji} size={20} />
               <motion.p
                 initial={{ opacity: 1 }}
                 animate={{ opacity: 0.55 }}
@@ -537,8 +538,8 @@ function SuggestVisual() {
                 className="relative flex items-center gap-3 rounded-2xl px-3.5 py-3 border border-white/60"
                 style={{ background: s.bg }}
               >
-                <span className="w-8 h-8 rounded-xl bg-white/70 flex items-center justify-center text-[16px]">
-                  {s.emoji}
+                <span className="w-8 h-8 rounded-xl bg-white/70 flex items-center justify-center">
+                  <Emoji3D char={s.emoji} size={20} />
                 </span>
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-[#1a1f3d]/60">
@@ -594,8 +595,8 @@ function SuggestVisual() {
                 'linear-gradient(135deg, #FFF1E0 0%, #FFE6F0 50%, #F0E6FF 100%)',
             }}
           >
-            <span className="w-8 h-8 rounded-xl bg-white/80 flex items-center justify-center text-[16px]">
-              🪄
+            <span className="w-8 h-8 rounded-xl bg-white/80 flex items-center justify-center">
+              <Emoji3D char="🪄" size={20} />
             </span>
             <div className="flex-1 min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-wider text-[#1a1f3d]/60">
@@ -608,9 +609,8 @@ function SuggestVisual() {
             <motion.span
               animate={{ rotate: [0, 15, -10, 0] }}
               transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-              className="text-[16px]"
             >
-              ✨
+              <Emoji3D char="✨" size={18} />
             </motion.span>
           </div>
         </motion.div>
@@ -633,15 +633,15 @@ function SuggestVisual() {
 function TaskDetailsVisual() {
   const colors = ['#F08A3E', '#3E8AF0', '#8A5CF0', '#22C55E', '#EC4899'];
   const settings = [
-    { icon: '🕗', label: 'Time', value: '8:00 AM', bg: '#FFE6C9' },
+    { icon: '🕗', label: 'Time', value: '7:30 AM', bg: '#FFE6C9' },
     { icon: '📅', label: 'Date', value: 'Today', bg: '#D7E9FF' },
     { icon: '🔁', label: 'Repeat', value: 'Weekdays', bg: '#E0FBB8' },
     { icon: '🔔', label: 'Reminder', value: '10 min before', bg: '#F0E3FF' },
   ];
   const subtasks = [
-    { title: 'Neck rolls', done: true },
-    { title: 'Shoulder stretch', done: true },
-    { title: 'Touch your toes', done: false },
+    { title: 'Cleanser',  done: true },
+    { title: 'Vitamin C', done: true },
+    { title: 'SPF 50',    done: false },
   ];
   return (
     <div className="w-full max-w-[300px] mx-auto">
@@ -652,12 +652,12 @@ function TaskDetailsVisual() {
             initial={{ scale: 0.7, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.1, duration: 0.35, type: 'spring' }}
-            className="w-11 h-11 rounded-2xl bg-[#FFD6A5] flex items-center justify-center text-[22px]"
+            className="w-11 h-11 rounded-2xl bg-[#FFD9E5] flex items-center justify-center"
           >
-            🧘
+            <Emoji3D char="🌸" size={26} />
           </motion.div>
           <div className="flex-1 min-w-0">
-            <p className="text-[15px] font-bold text-[#1a1f3d] truncate">Morning stretch</p>
+            <p className="text-[15px] font-bold text-[#1a1f3d] truncate">Skincare ritual</p>
             <div className="flex items-center gap-1 mt-1">
               {colors.map((c, i) => (
                 <motion.span
@@ -687,7 +687,7 @@ function TaskDetailsVisual() {
               className="flex items-center gap-2.5 rounded-xl px-2.5 py-2"
               style={{ background: s.bg }}
             >
-              <span className="text-[14px]">{s.icon}</span>
+              <Emoji3D char={s.icon} size={16} />
               <span className="text-[11px] font-semibold text-[#1a1f3d]/70 flex-1">{s.label}</span>
               <span className="text-[12px] font-bold text-[#1a1f3d]">{s.value}</span>
             </motion.div>
@@ -731,8 +731,8 @@ function TaskDetailsVisual() {
           transition={{ delay: 0.95, duration: 0.3 }}
           className="mt-2 flex items-center gap-2 rounded-xl px-3 py-2 bg-[#FFF7E6] border border-[#F0C674]/40"
         >
-          <span className="text-[14px]">📝</span>
-          <span className="text-[11px] text-[#8B6914] italic truncate">Felt lighter after this 🌟</span>
+          <Emoji3D char="📝" size={16} />
+          <span className="text-[11px] text-[#8B6914] italic truncate">Glowy skin = mood lifted ✨</span>
         </motion.div>
 
         {/* Floating "all yours" badge */}
@@ -838,10 +838,10 @@ function ToolsHubVisual({ collapsing = false }: { collapsing?: boolean }) {
             >
               <div className="flex items-center gap-2">
                 <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center text-[18px] shrink-0"
+                  className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                   style={{ background: c.bg }}
                 >
-                  {c.emoji}
+                  <Emoji3D char={c.emoji} size={22} />
                 </div>
                 <p className="text-[11.5px] font-bold text-[#1a1f3d] leading-tight">
                   {c.title}
@@ -866,7 +866,7 @@ function ToolsHubVisual({ collapsing = false }: { collapsing?: boolean }) {
         className="mt-3 flex items-center justify-center"
       >
         <div className="px-3.5 py-1.5 rounded-full bg-[#1a1f3d] text-white text-[12px] font-bold flex items-center gap-1.5 shadow-lg">
-          <span>🎁</span> 8 apps. One Rilo. Free.
+          <Emoji3D char="🎁" size={14} /> 8 apps. One Rilo. Free.
         </div>
       </motion.div>
     </div>
