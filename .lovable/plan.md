@@ -1,61 +1,58 @@
-# Bundle Home Spotlights Behind an Intro Popup
+# Add "What is Rilo?" Teach Flow
 
-## Problem
-The 3 new-user home coach marks (mark first task → tap task → tap +) currently fire on independent timers (3s, 5s, 2s after sheet close). If the user scrolls before the timer fires, the spotlight target is offscreen and they only see a black overlay. They also feel disconnected from each other.
+A new 3-screen explainer flow that tells users exactly what Rilo is **before** any quiz or question. Lives in `/admin/onboarding` so you can preview, iterate, and decide whether to make it the new default first-run experience.
 
-The old `AppTour` / `useAppTour` / `TourBanner` system is unrelated and should be left alone.
+## Goal
 
-## Solution
+Solve the "people don't get the app" problem by leading with a clear promise:
+**Rilo = a planner + a self-care core that helps you build a routine you actually follow.**
 
-### 1. New intro popup: `HomeSpotlightIntro`
-Create `src/components/app/home/HomeSpotlightIntro.tsx` — a Dear-Me-style bottom sheet with:
-- Cream background, rounded top
-- Title: "Let's take a quick tour!"
-- Body: "We'll show you 3 quick things — how to complete a task, view its details, and add a new one."
-- Primary button: "Show me" (dark navy, full width)
-- Secondary text button: "Skip"
-- Dismissible by tapping Skip only (no backdrop dismiss to avoid accidental skip)
-- Optional small mascot/illustration area at top (use existing emoji or skip if no asset handy)
+No questions. No commitment. Just three quick "aha" screens, then a single CTA into the existing flow (Quick Start → Auth → Self-Care Quiz).
 
-### 2. Orchestrate the 3 spotlights as a sequence
-In `src/pages/app/AppHome.tsx`:
+## The 3 screens
 
-- **Remove** the 3 independent auto-show timers (the `useEffect` blocks at ~lines 768, 793, 812 that set `showFirstCoachMark`, `showTapCoachMark`, `showAddCoachMark` on timers).
-- **Add** new state `showSpotlightIntro` plus an orchestrator state `spotlightStep: 'idle' | 'intro' | 'first' | 'tap' | 'add' | 'done'`.
-- **Trigger intro** for new users when:
-  - `!homeDataLoading && totalCompletions === 0 && tasks.length > 0`
-  - `localStorage.getItem('simora_spotlight_tour_done') !== 'true'`
-  - After a 1s delay (for layout settle)
-- **On "Show me" tap**:
-  1. Scroll the home scroll container to top (smooth) and wait ~400ms.
-  2. Set `spotlightStep = 'first'` → renders existing first coach mark spotlight on the first task.
-- **On task completion** (existing effect at ~787): advance `spotlightStep` to `'tap'` after a brief delay; before showing, scroll to top again.
-- **On task detail close** (existing logic at ~812 using `tapCoachMarkTriggeredRef`): advance to `'add'`; scroll to top again.
-- **On + button shown / dismissed**: set `spotlightStep = 'done'` and write `localStorage.setItem('simora_spotlight_tour_done', 'true')`.
-- Each step also writes its existing legacy localStorage key so we don't break re-entry logic.
+**Screen 1 — What Rilo is**
+- Title: "Meet Rilo"
+- Subtitle: "Your self-care planner — built to help you actually show up for yourself."
+- Visual: existing `mascot-planner` asset
+- Single CTA: "Show me how"
 
-Scroll-to-top: locate the scrollable home container (the main content `div` inside the home layout) via a `ref`, and call `containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })`. If the page uses `window` scroll, use `window.scrollTo` instead — confirm during implementation.
+**Screen 2 — The core idea (Planner + Self-Care)**
+- Title: "Plan it. Do it. Feel it."
+- Subtitle: "Rilo turns self-care into a simple daily routine — one you'll actually keep."
+- Visual: 3-row mini illustration (emoji + one-liner each):
+  - 📋 Plan your day in seconds
+  - ✅ Tick off tiny self-care tasks
+  - 🔥 Build a streak that sticks
+- CTA: "What's in it for me?"
 
-### 3. Keep spotlight rendering unchanged
-The existing render conditions at lines 1210, 1268, 1417 stay the same — they already key off `showFirstCoachMark` / `showTapCoachMark` / `showAddCoachMark`. The orchestrator just sets those flags one at a time after the intro and after scrolling.
+**Screen 3 — The promise**
+- Title: "In 7 days you'll have a routine"
+- Subtitle: "No overwhelm. No 50-step morning rituals. Just the few things that move your day."
+- Small social proof line: "Join 3,000+ women already using Rilo."
+- CTA: "Let's set yours up" → completes the flow
 
-### 4. Don't touch the old tour
-`useAppTour`, `AppTour`, `TourBanner`, `TourOverlay` — leave as-is. Already disabled per `useAppTour.tsx` comment.
+## Where it lives
 
-### 5. Admin reset button
-In `src/pages/admin/System.tsx`, add a new card "Reset Home Spotlight Tour":
-- Description: "Clears the new-user spotlight flags so the intro popup + 3-step spotlight sequence plays again on next visit to /app/home."
-- Button "Reset Spotlight Tour" that on click:
-  - Removes localStorage keys: `simora_spotlight_tour_done`, `simora_first_action_celebrated`, `simora_tap_coach_shown`, `simora_add_coach_shown`
-  - Sets `simora_force_new_user = 'true'` (already supported in AppHome at line 259)
-  - Toasts "Spotlight tour reset — open /app/home to test"
+- New file: `src/data/onboarding-flows/what-is-rilo.ts` — exports `whatIsRiloFlow` with `id: 'what-is-rilo'`
+- Registered in two places (same pattern as every other flow):
+  - `src/pages/admin/Onboarding.tsx` — add to `flows` array so it appears as a card
+  - `src/pages/app/AppOnboarding.tsx` — add to `allFlows` so `/app/onboarding/what-is-rilo` renders
+- Uses existing step types only (`welcome` for screen 1, `motivational` for screens 2 & 3) — **no new step renderers needed**
+- On completion: navigate to `/auth?mode=signup` (same as Quick Start), so the flow is wired correctly for when you decide to make it the entry point
 
-## Files to Edit
-- `src/pages/app/AppHome.tsx` — remove 3 auto-timers, add orchestrator + scroll-to-top, render intro
-- `src/components/app/home/HomeSpotlightIntro.tsx` — NEW intro popup component
-- `src/pages/admin/System.tsx` — add reset card/button
+## What this is NOT (yet)
 
-## Out of Scope
-- Old `AppTour` / `TourBanner` system
-- Visual restyle of the existing spotlight rings/hint hands (keep as-is)
-- Translations (use English strings; matches current coach mark copy)
+- Not made the default flow — you'll see it as just another card in the admin list with a "Set Default" button
+- No starter-routine generator yet (that was step 2 of the bigger plan; we'll add it after you approve the teach screens)
+- No changes to Quick Start, Self-Care Quiz, or the auth flow
+
+## After you preview
+
+Once you like the screens, the next step is to chain them: **What is Rilo? → Auth → Quick Start (3 questions max) → Starter Routine → Home**. That requires touching the first-run routing in `Index.tsx` / `Auth.tsx`, which we'll do as a separate change.
+
+## Technical notes
+
+- Reuses `cheerful-bird.png` and `mascot-planner.png` already imported elsewhere — zero new assets
+- `motivational` step type already supports title + subtitle + image + button, so screens 2 & 3 fit cleanly
+- The flow card will show in `/admin/onboarding` with a "Preview" button and step-by-step expansion, matching every other flow
