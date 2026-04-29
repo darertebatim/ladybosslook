@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, Sparkles, ArrowUp, RotateCcw, Pencil, Check, ChevronLeft } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
@@ -56,6 +57,7 @@ interface ExtractedTask {
  */
 export default function AppAIPlanner() {
   const goBack = useGoBack('/app/home');
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   const [stage, setStage] = useState<Stage>('input');
@@ -284,8 +286,8 @@ export default function AppAIPlanner() {
     }
 
     setStage('success');
-    // After the green banner shows, reset back to input so the user can plan again.
-    setTimeout(() => resetAll(), 1800);
+    // After the green banner shows, send the user to Home to see their new tasks.
+    setTimeout(() => navigate('/app/home'), 1500);
   };
 
   const selectedCount = selectedIds.size;
