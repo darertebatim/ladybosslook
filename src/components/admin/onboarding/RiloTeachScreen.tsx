@@ -3,6 +3,33 @@ import { Check, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { OnboardingStep } from '@/types/onboarding';
 import { haptic } from '@/lib/haptics';
+import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
+import riloAppIcon from '@/assets/rilo-app-icon.png';
+
+/** Small inline 3D emoji (Fluent Emoji 3D via CDN). Falls back to native emoji if image fails. */
+function Emoji3D({ char, size = 20, className = '' }: { char: string; size?: number; className?: string }) {
+  return (
+    <img
+      src={getFluentEmojiUrl(char)}
+      alt={char}
+      width={size}
+      height={size}
+      loading="eager"
+      decoding="async"
+      className={`inline-block object-contain select-none ${className}`}
+      style={{ width: size, height: size }}
+      onError={(e) => {
+        // Fallback to native glyph
+        const target = e.currentTarget as HTMLImageElement;
+        const span = document.createElement('span');
+        span.textContent = char;
+        span.style.fontSize = `${size}px`;
+        span.style.lineHeight = '1';
+        target.replaceWith(span);
+      }}
+    />
+  );
+}
 
 interface Props {
   step: OnboardingStep;
