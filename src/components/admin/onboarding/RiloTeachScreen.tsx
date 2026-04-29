@@ -18,7 +18,10 @@ interface Props {
 export function RiloTeachScreen({ step, onNext }: Props) {
   const variant = step.illustrationLabel || 'planner';
   const isSuggest = variant === 'suggest';
+  const isToolsHub = variant === 'tools-hub';
   const [launching, setLaunching] = useState(false);
+  const [collapsing, setCollapsing] = useState(false);
+  const [inkExpanding, setInkExpanding] = useState(false);
 
   const handleTap = () => {
     haptic.light();
@@ -26,6 +29,14 @@ export function RiloTeachScreen({ step, onNext }: Props) {
       // Dramatic "we're building something" transition before moving on
       setLaunching(true);
       setTimeout(() => onNext(), 1400);
+      return;
+    }
+    if (isToolsHub) {
+      // 3-phase transition: cards collapse → button ink floods → advance
+      setCollapsing(true);
+      // start ink expansion partway through the collapse
+      setTimeout(() => setInkExpanding(true), 650);
+      setTimeout(() => onNext(), 1500);
       return;
     }
     onNext();
@@ -39,7 +50,7 @@ export function RiloTeachScreen({ step, onNext }: Props) {
         {variant === 'planner' && <PlannerVisual />}
         {variant === 'routine' && <RoutineVisual />}
         {variant === 'task-details' && <TaskDetailsVisual />}
-        {variant === 'tools-hub' && <ToolsHubVisual />}
+        {variant === 'tools-hub' && <ToolsHubVisual collapsing={collapsing} />}
         {variant === 'suggest' && <SuggestVisual />}
       </div>
 
@@ -89,15 +100,27 @@ export function RiloTeachScreen({ step, onNext }: Props) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.28 }}
           onClick={handleTap}
-          disabled={launching}
+          disabled={launching || collapsing}
           className={`mt-7 w-full h-[56px] rounded-2xl text-white font-semibold text-[16px] active:opacity-80 transition-opacity ${
             isSuggest
               ? 'bg-gradient-to-r from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] shadow-[0_12px_30px_-8px_rgba(138,92,240,0.55)]'
               : 'bg-[#1a1f3d]'
-          }`}
+          } relative overflow-visible`}
           style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
-          {step.buttonLabel || 'Continue'}
+          <span className={collapsing ? 'opacity-0 transition-opacity' : 'transition-opacity'}>
+            {step.buttonLabel || 'Continue'}
+          </span>
+          {/* Black ink that floods from the button outward */}
+          {isToolsHub && inkExpanding && (
+            <motion.span
+              initial={{ scale: 0, opacity: 1 }}
+              animate={{ scale: 60, opacity: 1 }}
+              transition={{ duration: 0.85, ease: [0.65, 0, 0.35, 1] }}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-[#1a1f3d] pointer-events-none"
+              style={{ zIndex: 60 }}
+            />
+          )}
         </motion.button>
       </div>
 
