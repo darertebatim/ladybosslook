@@ -36,34 +36,36 @@ export function RiloCommitScreen({ step, onNext }: Props) {
         // Idempotent — returns the same routineId on repeat calls.
         const result = await provisionRiloPicks(user.id, {});
         const routineId = result?.routineId;
-        if (!routineId) {
-          if (!cancelled) setRows([]);
-          return;
-        }
-        const [launcherRes, childRes, aiRes] = await Promise.all([
-          supabase
-            .from('user_tasks')
-            .select('id, title, emoji')
-            .eq('user_id', user.id)
-            .eq('pro_link_type', 'routine')
-            .eq('pro_link_value', routineId)
-            .limit(1),
-          supabase
-            .from('user_tasks')
-            .select('id, title, emoji, order_index')
-            .eq('user_id', user.id)
-            .eq('source_routine_id', routineId)
-            .order('order_index', { ascending: true }),
-          // AI-extracted plans inserted from RiloWeekPlansScreen — they have
-          // negative order_index and no source_routine_id.
-          supabase
-            .from('user_tasks')
-            .select('id, title, emoji, order_index, source_routine_id')
-            .eq('user_id', user.id)
-            .is('source_routine_id', null)
-            .lt('order_index', 0)
-            .order('order_index', { ascending: true }),
-        ]);
+        // Always pull the AI-extracted "My Week" tasks too — the user may have
+        // skipped the picker buckets entirely, in which case there's no
+        // routineId but still real onboarding tasks to commit to.
+        const launcherP = routineId
+          ? supabase
+              .from('user_tasks')
+              .select('id, title, emoji')
+              .eq('user_id', user.id)
+              .eq('pro_link_type', 'routine')
+              .eq('pro_link_value', routineId)
+              .limit(1)
+          : Promise.resolve({ data: [] as any[] } as any);
+        const childP = routineId
+          ? supabase
+              .from('user_tasks')
+              .select('id, title, emoji, order_index')
+              .eq('user_id', user.id)
+              .eq('source_routine_id', routineId)
+              .order('order_index', { ascending: true })
+          : Promise.resolve({ data: [] as any[] } as any);
+        // AI-extracted plans from RiloWeekPlansScreen — tagged 'My Week',
+        // inserted with negative order_index and no source_routine_id.
+        const aiP = supabase
+          .from('user_tasks')
+          .select('id, title, emoji, order_index, source_routine_id, tag')
+          .eq('user_id', user.id)
+          .eq('tag', 'My Week')
+          .is('source_routine_id', null)
+          .order('order_index', { ascending: true });
+        const [launcherRes, childRes, aiRes] = await Promise.all([launcherP, childP, aiP]);
         if (cancelled) return;
         const out: Row[] = [];
         const launcher = launcherRes.data?.[0] as any;
