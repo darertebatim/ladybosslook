@@ -84,6 +84,7 @@ const SortableTaskItem = ({
       style={style}
       {...attributes}
       {...listeners}
+      data-task-id={task.id}
       className={cn(
         'touch-manipulation',
         isSortableDragging && 'opacity-50 scale-[1.02]'

@@ -1,6 +1,6 @@
-import { AlarmClock } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface HomeSpotlightIntroProps {
   isOpen: boolean;
@@ -31,42 +31,48 @@ export function HomeSpotlightIntro({ isOpen, onStart, onSkip }: HomeSpotlightInt
       {/* Dim backdrop (non-dismissible, blocks taps under the sheet) */}
       <div className="absolute inset-0 bg-black/50 pointer-events-auto" />
 
-      {/* Sheet */}
+      {/* Sheet — Rilo onboarding aesthetic */}
       <div
         className={cn(
-          'relative w-full max-w-md mx-auto rounded-t-3xl pointer-events-auto',
+          'relative w-full max-w-md mx-auto rounded-t-[28px] pointer-events-auto',
           'bg-[#FBF3D8] text-[#1a1a2e]',
           'animate-in slide-in-from-bottom duration-300',
-          'shadow-[0_-8px_32px_rgba(0,0,0,0.15)]'
+          'shadow-[0_-12px_40px_rgba(0,0,0,0.18)]'
         )}
-        style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}
+        style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}
       >
-        <div className="px-6 pt-7 pb-4 text-center">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-100 mb-4">
-            <AlarmClock className="w-7 h-7 text-indigo-600" />
+        {/* Drag handle */}
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1.5 rounded-full bg-[#1a1a2e]/15" />
+        </div>
+
+        <div className="px-6 pt-4 pb-2 text-center">
+          {/* Big 3D emoji — matches Rilo onboarding */}
+          <div className="flex justify-center mb-5">
+            <FluentEmoji emoji="👋" size={84} />
           </div>
 
-          <h2 className="text-2xl font-bold mb-2">
-            Let's take a quick tour!
+          <h2 className="text-[28px] leading-[1.15] font-extrabold tracking-tight mb-3">
+            Welcome to your<br />Home planner
           </h2>
 
-          <p className="text-base text-[#1a1a2e]/70 leading-relaxed mb-6">
-            We'll show you 3 quick things — how to complete a task,
-            view its details, and add a new one.
+          <p className="text-[15px] text-[#1a1a2e]/65 leading-relaxed mb-7 px-2">
+            A 20‑second tour. We'll show you how to open a task,
+            add a new one, and check it off.
           </p>
 
           <button
             onClick={handleStart}
-            className="w-full bg-[#1a1a2e] text-white font-semibold py-4 rounded-2xl active:scale-[0.98] transition-transform"
+            className="w-full bg-[#1a1a2e] text-white text-[16px] font-semibold py-[18px] rounded-2xl active:scale-[0.98] transition-transform"
           >
-            Show me
+            Show me around
           </button>
 
           <button
             onClick={handleSkip}
-            className="w-full mt-3 py-2 text-sm font-medium text-[#1a1a2e]/50 active:text-[#1a1a2e]/80 transition-colors"
+            className="w-full mt-3 py-2.5 text-[14px] font-medium text-[#1a1a2e]/55 active:text-[#1a1a2e]/80 transition-colors"
           >
-            Skip
+            I'll explore on my own
           </button>
         </div>
       </div>

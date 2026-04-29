@@ -52,6 +52,7 @@ import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
 import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { HomeSpotlightIntro } from '@/components/app/home/HomeSpotlightIntro';
+import { TaskCoachOverlay } from '@/components/app/home/TaskCoachOverlay';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
@@ -809,39 +810,8 @@ const AppHome = () => {
     return () => clearTimeout(t);
   }, [homeDataLoading, tasksLoading, tasks.length, completedTaskIds.size, totalCompletions, showStreakModal, showSpotlightIntro]);
 
-  // Dismiss first coach mark when user completes a task
-  useEffect(() => {
-    if (showFirstCoachMark && completedTaskIds.size > 0) {
-      setShowFirstCoachMark(false);
-    }
-  }, [showFirstCoachMark, completedTaskIds.size]);
-
-  // Step 2 of the bundled tour: when the first task is completed during the tour,
-  // wait for the celebration to settle, scroll to top, then show the tap spotlight.
-  useEffect(() => {
-    if (
-      !spotlightTourActiveRef.current ||
-      localStorage.getItem('simora_tap_coach_shown') === 'true' ||
-      tasksLoading ||
-      tasks.length === 0 ||
-      completedTaskIds.size === 0 ||
-      showTapCoachMark ||
-      showStreakModal
-    ) {
-      return;
-    }
-    const t = setTimeout(() => {
-      scrollHomeToTop();
-      setTimeout(() => {
-        setShowTapCoachMark(true);
-        localStorage.setItem('simora_tap_coach_shown', 'true');
-      }, 450);
-    }, 1200);
-    return () => clearTimeout(t);
-  }, [tasksLoading, tasks.length, completedTaskIds.size, showTapCoachMark, showStreakModal, scrollHomeToTop]);
-
-  // Step 3 of the bundled tour: when the task detail sheet closes after the tap
-  // coach mark, scroll to top and show the + button spotlight.
+  // Step 2 of the bundled tour: when the user opens & closes a task detail,
+  // wait a beat then show the "+ add a new task" spotlight.
   useEffect(() => {
     if (
       !selectedTask &&
@@ -854,15 +824,45 @@ const AppHome = () => {
         setTimeout(() => {
           setShowAddCoachMark(true);
           localStorage.setItem('simora_add_coach_shown', 'true');
-          // Tour complete after the final spotlight is shown
-          localStorage.setItem(SPOTLIGHT_TOUR_KEY, 'true');
-          spotlightTourActiveRef.current = false;
-          localStorage.removeItem('simora_force_new_user');
         }, 450);
-      }, 1500);
+      }, 900);
       return () => clearTimeout(t);
     }
   }, [selectedTask, scrollHomeToTop]);
+
+  // Step 3 of the bundled tour: once the + add coach mark has been seen and
+  // dismissed, surface the "complete a task" spotlight as the natural finale.
+  useEffect(() => {
+    if (
+      !spotlightTourActiveRef.current ||
+      localStorage.getItem('simora_add_coach_shown') !== 'true' ||
+      localStorage.getItem('simora_first_action_celebrated') === 'true' ||
+      showAddCoachMark ||
+      showFirstCoachMark ||
+      tasksLoading ||
+      tasks.length === 0 ||
+      completedTaskIds.size > 0 ||
+      showStreakModal
+    ) {
+      return;
+    }
+    const t = setTimeout(() => {
+      scrollHomeToTop();
+      setTimeout(() => setShowFirstCoachMark(true), 400);
+    }, 600);
+    return () => clearTimeout(t);
+  }, [showAddCoachMark, showFirstCoachMark, tasksLoading, tasks.length, completedTaskIds.size, showStreakModal, scrollHomeToTop]);
+
+  // Finale: dismiss "complete a task" spotlight when the user actually does it,
+  // and mark the whole bundled tour complete.
+  useEffect(() => {
+    if (showFirstCoachMark && completedTaskIds.size > 0) {
+      setShowFirstCoachMark(false);
+      localStorage.setItem(SPOTLIGHT_TOUR_KEY, 'true');
+      spotlightTourActiveRef.current = false;
+      localStorage.removeItem('simora_force_new_user');
+    }
+  }, [showFirstCoachMark, completedTaskIds.size]);
   const handleDateSelect = useCallback((date: Date) => {
     setSelectedDate(date);
     setShowCalendar(false);
@@ -1248,135 +1248,57 @@ const AppHome = () => {
                   ) : (
                     <>
                       {/* Coach mark spotlight for first-ever action — delayed via state */}
-                      {(() => {
-                        const hintTask = filteredTasks.find(t => !t.pro_link_type);
-                        return showFirstCoachMark && hintTask ? (
-                          <>
-                            {/* Dark overlay behind everything */}
-                            <div className="fixed inset-0 bg-black/60 z-[100] animate-fade-in" onClick={() => setShowFirstCoachMark(false)} />
-                            
-                            {/* Spotlighted task card + hint — disable body tap so only checkbox works */}
-                            <div className="relative z-[101]">
-                              <div className="relative">
-                                <SortableTaskList tasks={[hintTask!]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
-                              
-                                {/* Glowing ring around the checkbox */}
-                                <div
-                                  className="absolute pointer-events-none"
-                                  style={{
-                                    top: '50%',
-                                    right: '10px',
-                                    width: '48px',
-                                    height: '48px',
-                                    transform: 'translateY(-50%)',
-                                    borderRadius: '50%',
-                                    boxShadow: '0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35)',
-                                    animation: 'checkboxGlow 1.6s ease-in-out infinite',
-                                  }}
-                                />
-
-                                {/* Bouncing hand hint pointing at the checkbox — positioned relative to the card */}
-                                <div
-                                  className="absolute pointer-events-none"
-                                  style={{
-                                    top: '50%',
-                                    right: '52px',
-                                    transform: 'translateY(-100%) rotate(-45deg)',
-                                    filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
-                                    animation: 'coachHandBounce 1.4s ease-in-out infinite',
-                                  }}
-                                >
-                                  <FluentEmoji emoji="👇" size={64} />
-                                </div>
-                              </div>
-                              <style>{`
-                                @keyframes coachHandBounce {
-                                  0%   { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
-                                  40%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
-                                  55%  { transform: translateY(-100%) rotate(-45deg) translateY(5px); }
-                                  70%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
-                                  100% { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
-                                }
-                                @keyframes checkboxGlow {
-                                  0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
-                                  50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
-                                }
-                              `}</style>
-                              
-                              <p className="text-center text-sm text-white/90 mt-5 mb-2 animate-fade-in font-medium">
-                                Mark off your first task to start your journey! 💪
-                              </p>
-                            </div>
-                          </>
-                        ) : showTapCoachMark ? (
-                          <>
-                            {/* Dark overlay for "tap to manage" coach mark */}
-                            <div className="fixed inset-0 bg-black/60 z-[100] animate-fade-in" onClick={() => setShowTapCoachMark(false)} />
-                            
-                            {/* Spotlight the first UNCOMPLETED action, fallback to first task */}
-                            {filteredTasks.length > 0 && (() => {
-                              const spotlightTask = filteredTasks.find(t => !completedTaskIds.has(t.id)) || filteredTasks[0];
-                              return (
-                              <div className="relative z-[101]">
-                                <div className="relative">
-                                  <SortableTaskList tasks={[spotlightTask]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); tapCoachMarkTriggeredRef.current = true; handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
-                                  
-                                  {/* Glowing highlight around the action name area */}
-                                  <div
-                                    className="absolute pointer-events-none"
-                                    style={{
-                                      top: '50%',
-                                      left: '50px',
-                                      width: '160px',
-                                      height: '36px',
-                                      transform: 'translateY(-50%)',
-                                      borderRadius: '12px',
-                                      boxShadow: '0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35)',
-                                      animation: 'checkboxGlow 1.6s ease-in-out infinite',
-                                    }}
-                                  />
-
-                                  {/* Bouncing hand hint pointing at the action name — same style as first spotlight */}
-                                  <div
-                                    className="absolute pointer-events-none"
-                                    style={{
-                                      top: '50%',
-                                      left: '70px',
-                                      transform: 'translateY(-100%) rotate(-45deg)',
-                                      filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
-                                      animation: 'tapCoachBounce 1.4s ease-in-out infinite',
-                                    }}
-                                  >
-                                    <FluentEmoji emoji="👇" size={64} />
-                                  </div>
-                                </div>
-                                <style>{`
-                                  @keyframes tapCoachBounce {
-                                    0%   { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
-                                    40%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
-                                    55%  { transform: translateY(-100%) rotate(-45deg) translateY(5px); }
-                                    70%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
-                                    100% { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
-                                  }
-                                  @keyframes checkboxGlow {
-                                    0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
-                                    50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
-                                  }
-                                `}</style>
-                                <p className="text-center text-sm text-white/90 mt-3 mb-2 animate-fade-in font-medium">
-                                  Tap on an action to edit, skip, or delete it
-                                </p>
-                              </div>
-                              );
-                            })()}
-                            {/* Remaining tasks behind the overlay */}
-                            {filteredTasks.length > 1 && (
-                              <div className="relative z-[1]">
-                                <SortableTaskList tasks={filteredTasks.slice(1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
-                              </div>
-                            )}
-                          </>
-                        ) : (
+                       {(() => {
+                         const hintTask =
+                           filteredTasks.find(t => !completedTaskIds.has(t.id) && !t.pro_link_type) ||
+                           filteredTasks.find(t => !completedTaskIds.has(t.id)) ||
+                           filteredTasks[0];
+                         const tapHintTask =
+                           filteredTasks.find(t => !completedTaskIds.has(t.id)) || filteredTasks[0];
+                         return (showFirstCoachMark || showTapCoachMark) && filteredTasks.length > 0 ? (
+                           <>
+                             {/* Dim backdrop — tasks remain visible underneath */}
+                             <div
+                               className="fixed inset-0 bg-black/55 z-[100] animate-fade-in"
+                               onClick={() => {
+                                 if (showFirstCoachMark) setShowFirstCoachMark(false);
+                                 if (showTapCoachMark) setShowTapCoachMark(false);
+                               }}
+                             />
+                             {/* Full task list, elevated above the dim layer so every task stays readable */}
+                             <div className="relative z-[101]">
+                               <SortableTaskList
+                                 tasks={filteredTasks}
+                                 date={selectedDate}
+                                 completedTaskIds={completedTaskIds}
+                                 completedSubtaskIds={completedSubtaskIds}
+                                 goalProgressMap={goalProgressMap}
+                                 onTaskTap={(task) => {
+                                   if (showTapCoachMark) {
+                                     setShowTapCoachMark(false);
+                                     tapCoachMarkTriggeredRef.current = true;
+                                   }
+                                   handleTaskTap(task);
+                                 }}
+                                 onStreakIncrease={handleStreakIncrease}
+                                 onStepUnlocked={handleStepUnlocked}
+                                 onOpenGoalInput={handleOpenGoalInput}
+                                 onOpenTimer={handleOpenTimer}
+                                 hideQuickAdd
+                               />
+                               <p className="text-center text-[15px] text-white mt-5 mb-2 animate-fade-in font-semibold tracking-tight">
+                                 {showTapCoachMark
+                                   ? 'Tap a task to open its details'
+                                   : 'Tap the circle to check off your task'}
+                               </p>
+                             </div>
+                             {/* Spotlight ring + hand anchored to the chosen task */}
+                             <TaskCoachOverlay
+                               taskId={(showTapCoachMark ? tapHintTask?.id : hintTask?.id) || null}
+                               variant={showTapCoachMark ? 'tap' : 'check'}
+                             />
+                           </>
+                         ) : (
                           <>
                             <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenTaskSheet={handleOpenTaskSheet} hideQuickAdd={taskFilter === 'all-routines' || taskFilter.startsWith('routine:')} defaultRepeatOverride={homeView === 'one-time' ? 'No' : undefined} />
                             {(taskFilter === 'all-routines' || taskFilter.startsWith('routine:')) && (
@@ -1456,15 +1378,16 @@ const AppHome = () => {
           <div style={{ height: isKeyboardOpen ? '24px' : '120px' }} />
         </div>
 
-        {/* Bundled spotlight intro popup (Dear Me-style) */}
+        {/* Bundled spotlight intro popup (Rilo-style) */}
         <HomeSpotlightIntro
           isOpen={showSpotlightIntro}
           onStart={() => {
             setShowSpotlightIntro(false);
             spotlightTourActiveRef.current = true;
             scrollHomeToTop();
+            // New order: 1) tap a task → 2) tap + to add → 3) complete a task
             setTimeout(() => {
-              setShowFirstCoachMark(true);
+              setShowTapCoachMark(true);
             }, 500);
           }}
           onSkip={() => {
@@ -1525,10 +1448,10 @@ const AppHome = () => {
               </div>
               {/* Label */}
               <p
-                className="fixed z-[102] text-sm text-white/90 font-medium whitespace-nowrap pointer-events-none"
-                style={{ left: cx - 80, top: rect.bottom + 18 }}
+                className="fixed z-[102] text-[15px] text-white font-semibold tracking-tight whitespace-nowrap pointer-events-none"
+                style={{ left: cx - 110, top: rect.bottom + 18 }}
               >
-                Tap + to add a new task
+                Tap + to add your own task
               </p>
               <style>{`
                 @keyframes addCoachBounce {
