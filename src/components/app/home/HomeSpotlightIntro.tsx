@@ -1,5 +1,4 @@
 import { haptic } from '@/lib/haptics';
-import { cn } from '@/lib/utils';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface HomeSpotlightIntroProps {
