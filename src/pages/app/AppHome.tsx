@@ -1247,67 +1247,49 @@ const AppHome = () => {
                   ) : (
                     <>
                       {/* Coach mark spotlight for first-ever action — delayed via state */}
-                      {(() => {
-                        const hintTask = filteredTasks.find(t => !t.pro_link_type);
-                        return showFirstCoachMark && hintTask ? (
-                          <>
-                            {/* Dark overlay behind everything */}
-                            <div className="fixed inset-0 bg-black/60 z-[100] animate-fade-in" onClick={() => setShowFirstCoachMark(false)} />
-                            
-                            {/* Spotlighted task card + hint — disable body tap so only checkbox works */}
-                            <div className="relative z-[101]">
-                              <div className="relative">
-                                <SortableTaskList tasks={[hintTask!]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
-                              
-                                {/* Glowing ring around the checkbox */}
-                                <div
-                                  className="absolute pointer-events-none"
-                                  style={{
-                                    top: '50%',
-                                    right: '10px',
-                                    width: '48px',
-                                    height: '48px',
-                                    transform: 'translateY(-50%)',
-                                    borderRadius: '50%',
-                                    boxShadow: '0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35)',
-                                    animation: 'checkboxGlow 1.6s ease-in-out infinite',
-                                  }}
-                                />
+                       {(() => {
+                         const hintTask = filteredTasks.find(t => !completedTaskIds.has(t.id) && !t.pro_link_type) || filteredTasks.find(t => !completedTaskIds.has(t.id));
+                         return showFirstCoachMark && hintTask ? (
+                           <>
+                             {/* Dim overlay — does NOT hide tasks, they stay visible underneath */}
+                             <div className="fixed inset-0 bg-black/55 z-[100] animate-fade-in" onClick={() => setShowFirstCoachMark(false)} />
 
-                                {/* Bouncing hand hint pointing at the checkbox — positioned relative to the card */}
-                                <div
-                                  className="absolute pointer-events-none"
-                                  style={{
-                                    top: '50%',
-                                    right: '52px',
-                                    transform: 'translateY(-100%) rotate(-45deg)',
-                                    filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
-                                    animation: 'coachHandBounce 1.4s ease-in-out infinite',
-                                  }}
-                                >
-                                  <FluentEmoji emoji="👇" size={64} />
-                                </div>
-                              </div>
-                              <style>{`
-                                @keyframes coachHandBounce {
-                                  0%   { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
-                                  40%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
-                                  55%  { transform: translateY(-100%) rotate(-45deg) translateY(5px); }
-                                  70%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
-                                  100% { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
-                                }
-                                @keyframes checkboxGlow {
-                                  0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
-                                  50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
-                                }
-                              `}</style>
-                              
-                              <p className="text-center text-sm text-white/90 mt-5 mb-2 animate-fade-in font-medium">
-                                Mark off your first task to start your journey! 💪
-                              </p>
-                            </div>
-                          </>
-                        ) : showTapCoachMark ? (
+                             {/* Render the FULL task list above the dim layer so all tasks remain visible.
+                                 Only the hint task's checkbox is interactive (others are pointer-events-none). */}
+                             <div className="relative z-[101]">
+                               <SortableTaskList
+                                 tasks={filteredTasks}
+                                 date={selectedDate}
+                                 completedTaskIds={completedTaskIds}
+                                 completedSubtaskIds={completedSubtaskIds}
+                                 goalProgressMap={goalProgressMap}
+                                 onTaskTap={() => {}}
+                                 onStreakIncrease={handleStreakIncrease}
+                                 onStepUnlocked={handleStepUnlocked}
+                                 onOpenGoalInput={handleOpenGoalInput}
+                                 onOpenTimer={handleOpenTimer}
+                                 hideQuickAdd
+                                 spotlightTaskId={hintTask.id}
+                               />
+                               <style>{`
+                                 @keyframes coachHandBounce {
+                                   0%   { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
+                                   40%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
+                                   55%  { transform: translateY(-100%) rotate(-45deg) translateY(5px); }
+                                   70%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
+                                   100% { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
+                                 }
+                                 @keyframes checkboxGlow {
+                                   0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
+                                   50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
+                                 }
+                               `}</style>
+                               <p className="text-center text-sm text-white/95 mt-5 mb-2 animate-fade-in font-medium">
+                                 Tap the circle to check it off ✨
+                               </p>
+                             </div>
+                           </>
+                         ) : showTapCoachMark ? (
                           <>
                             {/* Dark overlay for "tap to manage" coach mark */}
                             <div className="fixed inset-0 bg-black/60 z-[100] animate-fade-in" onClick={() => setShowTapCoachMark(false)} />
