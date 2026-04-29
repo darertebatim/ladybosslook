@@ -28,6 +28,8 @@ import { SelfCareReflectionStep } from '@/components/app/selfcare-quiz/SelfCareR
 import { PersianFlag } from '@/components/ui/PersianFlag';
 import { computeTopCluster } from '@/utils/selfcare-scoring';
 import { RiloTeachScreen } from '@/components/admin/onboarding/RiloTeachScreen';
+import { RiloPickTasksScreen } from '@/components/admin/onboarding/RiloPickTasksScreen';
+import { RiloWeekPlansScreen } from '@/components/admin/onboarding/RiloWeekPlansScreen';
 
 function OptionEmoji({ emoji, size }: { emoji: string; size: number }) {
   if (emoji === 'flag:persian') return <PersianFlag size={size} />;
@@ -59,6 +61,10 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <WelcomeScreen step={step} onNext={onNext} />;
     case 'rilo-teach':
       return <RiloTeachScreen step={step} onNext={onNext} />;
+    case 'rilo-pick-tasks':
+      return <RiloPickTasksScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'rilo-week-plans':
+      return <RiloWeekPlansScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
     case 'greeting':
       return <GreetingScreen step={step} onNext={onNext} />;
     case 'multi-select':
