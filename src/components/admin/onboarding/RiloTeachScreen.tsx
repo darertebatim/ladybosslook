@@ -212,79 +212,120 @@ function SuggestVisual() {
   );
 }
 
-/* ---------- Visual 3 (A): Task with rich details inside ---------- */
+/* ---------- Visual 3 (A): Task settings (control your routine) ---------- */
 function TaskDetailsVisual() {
-  const chips = [
-    { emoji: '🌬️', label: 'Breathe', bg: '#D7E9FF', fg: '#1E5BB8' },
-    { emoji: '🎧', label: 'Listen', bg: '#F0E3FF', fg: '#6A2FB8' },
-    { emoji: '✏️', label: 'Reflect', bg: '#E0FBB8', fg: '#3E7A1E' },
-    { emoji: '⏱️', label: 'Timer', bg: '#FFE6C9', fg: '#B8590E' },
+  const colors = ['#F08A3E', '#3E8AF0', '#8A5CF0', '#22C55E', '#EC4899'];
+  const settings = [
+    { icon: '🕗', label: 'Time', value: '8:00 AM', bg: '#FFE6C9' },
+    { icon: '📅', label: 'Date', value: 'Today', bg: '#D7E9FF' },
+    { icon: '🔁', label: 'Repeat', value: 'Weekdays', bg: '#E0FBB8' },
+    { icon: '🔔', label: 'Reminder', value: '10 min before', bg: '#F0E3FF' },
+  ];
+  const subtasks = [
+    { title: 'Neck rolls', done: true },
+    { title: 'Shoulder stretch', done: true },
+    { title: 'Touch your toes', done: false },
   ];
   return (
     <div className="w-full max-w-[300px] mx-auto">
-      <div className="relative bg-white rounded-3xl shadow-[0_20px_60px_-20px_rgba(26,31,61,0.25)] p-5 border border-black/5">
-        {/* The task header */}
-        <div className="flex items-center gap-3 rounded-2xl px-3.5 py-3 bg-[#FFD6A5]">
-          <span className="text-[22px]">🧘</span>
-          <div className="flex-1 min-w-0">
-            <p className="text-[11px] font-semibold text-[#1a1f3d]/60">8:00 · 5 min</p>
-            <p className="text-[14px] font-bold text-[#1a1f3d] truncate">Morning stretch</p>
-          </div>
+      <div className="relative bg-white rounded-3xl shadow-[0_20px_60px_-20px_rgba(26,31,61,0.25)] p-4 border border-black/5">
+        {/* Header: emoji + title + color dots */}
+        <div className="flex items-center gap-3 mb-3">
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.3 }}
-            className="w-7 h-7 rounded-full border-2 border-[#1a1f3d]/20"
-          />
+            initial={{ scale: 0.7, rotate: -10 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 0.1, duration: 0.35, type: 'spring' }}
+            className="w-11 h-11 rounded-2xl bg-[#FFD6A5] flex items-center justify-center text-[22px]"
+          >
+            🧘
+          </motion.div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[15px] font-bold text-[#1a1f3d] truncate">Morning stretch</p>
+            <div className="flex items-center gap-1 mt-1">
+              {colors.map((c, i) => (
+                <motion.span
+                  key={c}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.25 + i * 0.05, duration: 0.25 }}
+                  className="w-3 h-3 rounded-full"
+                  style={{
+                    background: c,
+                    boxShadow: i === 0 ? '0 0 0 2px white, 0 0 0 3.5px #1a1f3d' : undefined,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* Divider hint that it expands */}
-        <motion.div
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35, duration: 0.3 }}
-          className="flex items-center gap-2 mt-4 mb-3"
-        >
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#1a1f3d]/50">Inside this task</span>
-          <div className="flex-1 h-px bg-[#1a1f3d]/10" />
-        </motion.div>
-
-        {/* Action chips */}
-        <div className="grid grid-cols-2 gap-2">
-          {chips.map((c, i) => (
+        {/* Settings rows */}
+        <div className="space-y-1.5">
+          {settings.map((s, i) => (
             <motion.div
-              key={c.label}
-              initial={{ opacity: 0, scale: 0.85, y: 6 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ delay: 0.45 + i * 0.08, duration: 0.3 }}
-              className="flex items-center gap-2 rounded-2xl px-3 py-2.5"
-              style={{ background: c.bg }}
+              key={s.label}
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 + i * 0.08, duration: 0.28 }}
+              className="flex items-center gap-2.5 rounded-xl px-2.5 py-2"
+              style={{ background: s.bg }}
             >
-              <span className="text-[18px]">{c.emoji}</span>
-              <span className="text-[13px] font-semibold" style={{ color: c.fg }}>{c.label}</span>
+              <span className="text-[14px]">{s.icon}</span>
+              <span className="text-[11px] font-semibold text-[#1a1f3d]/70 flex-1">{s.label}</span>
+              <span className="text-[12px] font-bold text-[#1a1f3d]">{s.value}</span>
             </motion.div>
           ))}
         </div>
 
-        {/* Note row */}
+        {/* Subtasks */}
         <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.85, duration: 0.3 }}
-          className="mt-2 flex items-center gap-2 rounded-2xl px-3 py-2.5 bg-[#F4F2EF]"
+          transition={{ delay: 0.75, duration: 0.3 }}
+          className="mt-3 rounded-xl bg-[#F4F2EF] px-3 py-2.5"
         >
-          <span className="text-[16px]">📝</span>
-          <span className="text-[12px] text-[#1a1f3d]/70 italic truncate">Add a quick note…</span>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[#1a1f3d]/50 mb-1.5">Subtasks</p>
+          <div className="space-y-1.5">
+            {subtasks.map((st, i) => (
+              <div key={st.title} className="flex items-center gap-2">
+                <div
+                  className="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
+                  style={{
+                    background: st.done ? '#22C55E' : 'transparent',
+                    border: st.done ? '0' : '1.5px solid rgba(26,31,61,0.3)',
+                  }}
+                >
+                  {st.done && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3.5} />}
+                </div>
+                <span
+                  className={`text-[12px] font-medium text-[#1a1f3d] ${st.done ? 'line-through opacity-50' : ''}`}
+                >
+                  {st.title}
+                </span>
+              </div>
+            ))}
+          </div>
         </motion.div>
 
-        {/* Tap hint */}
+        {/* Note */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1.0, duration: 0.4, type: 'spring' }}
-          className="absolute -right-2 -top-2 px-3 py-1.5 rounded-full bg-[#1a1f3d] text-white text-[11px] font-bold shadow-lg flex items-center gap-1"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.95, duration: 0.3 }}
+          className="mt-2 flex items-center gap-2 rounded-xl px-3 py-2 bg-[#FFF7E6] border border-[#F0C674]/40"
         >
-          <span>👆</span> Tap to open
+          <span className="text-[14px]">📝</span>
+          <span className="text-[11px] text-[#8B6914] italic truncate">Felt lighter after this 🌟</span>
+        </motion.div>
+
+        {/* Floating "all yours" badge */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8, rotate: -8 }}
+          animate={{ opacity: 1, scale: 1, rotate: -6 }}
+          transition={{ delay: 1.1, duration: 0.4, type: 'spring' }}
+          className="absolute -right-2 -top-2 px-2.5 py-1 rounded-full bg-[#1a1f3d] text-white text-[10px] font-bold shadow-lg"
+        >
+          ✨ All yours
         </motion.div>
       </div>
     </div>
