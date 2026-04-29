@@ -334,172 +334,98 @@ function TaskDetailsVisual() {
 
 /* ---------- Visual 4 (B): "5 apps in one" — outcome orbit ---------- */
 function ToolsHubVisual() {
-  // Each card = an outcome people download separate apps for.
-  // Positioned around a central Rilo badge. Bobbing motion adds life.
+/* ---------- Visual 4 (B): "8 apps in one" — outcome cascade ---------- */
+function ToolsHubVisual() {
+  // Each card = a real outcome people download a separate paid app for.
   const cards = [
-    {
-      emoji: '🧘',
-      title: 'Calmer mind',
-      sub: 'Meditations & breathing',
-      replaces: 'instead of Calm',
-      bg: '#E5D6FF',
-      fg: '#5B2BB8',
-      // grid placement
-      style: { top: '0%', left: '0%' },
-      rotate: -6,
-      delay: 0.15,
-    },
-    {
-      emoji: '💪',
-      title: 'Stronger body',
-      sub: 'Workouts & movement',
-      replaces: 'instead of Nike',
-      bg: '#FFD9E5',
-      fg: '#B8295C',
-      style: { top: '4%', right: '0%' },
-      rotate: 5,
-      delay: 0.28,
-    },
-    {
-      emoji: '🌙',
-      title: 'Better sleep',
-      sub: 'Soundscapes & wind-down',
-      replaces: 'instead of Headspace',
-      bg: '#CDE7FF',
-      fg: '#1E5BB8',
-      style: { bottom: '8%', left: '-2%' },
-      rotate: -8,
-      delay: 0.41,
-    },
-    {
-      emoji: '✏️',
-      title: 'Clearer thoughts',
-      sub: 'Journal & reflection',
-      replaces: 'instead of Stoic',
-      bg: '#E0FBB8',
-      fg: '#3E7A1E',
-      style: { bottom: '4%', right: '-2%' },
-      rotate: 7,
-      delay: 0.54,
-    },
-    {
-      emoji: '💼',
-      title: 'Focused work',
-      sub: 'Goals & deep work',
-      replaces: 'instead of Notion',
-      bg: '#FFE6C9',
-      fg: '#B8590E',
-      style: { top: '46%', left: '50%', transform: 'translate(-50%, -50%)' },
-      rotate: -3,
-      delay: 0.67,
-    },
+    { emoji: '🧘', title: 'Calmer mind',     replaces: 'Calm',         bg: '#E5D6FF', fg: '#5B2BB8' },
+    { emoji: '💪', title: 'Stronger body',   replaces: 'Nike Training', bg: '#FFD9E5', fg: '#B8295C' },
+    { emoji: '🌙', title: 'Better sleep',    replaces: 'Headspace',     bg: '#CDE7FF', fg: '#1E5BB8' },
+    { emoji: '✏️', title: 'Clearer mind',    replaces: 'Stoic',         bg: '#E0FBB8', fg: '#3E7A1E' },
+    { emoji: '📅', title: 'Synced days',     replaces: 'Apple Calendar', bg: '#FFE6C9', fg: '#B8590E' },
+    { emoji: '✅', title: 'Built habits',    replaces: 'TickTick',      bg: '#D4F1F4', fg: '#0E7C8F' },
+    { emoji: '💼', title: 'Career growth',   replaces: 'Notion',        bg: '#F4F2EF', fg: '#1a1f3d' },
+    { emoji: '💰', title: 'Money goals',     replaces: 'YNAB',          bg: '#FFF492', fg: '#8B6914' },
   ];
+
+  // Slight rotation per card for the "scattered polaroids" feel
+  const rotations = [-5, 4, -3, 6, -6, 3, -4, 5];
 
   return (
     <div className="w-full max-w-[320px] mx-auto">
-      {/* Outcome orbit */}
-      <div className="relative w-full aspect-[1/1.05]">
-        {/* Soft radial glow */}
+      {/* Soft warm halo behind everything */}
+      <div className="relative">
         <div
-          className="absolute inset-0 rounded-full blur-2xl opacity-60"
+          className="absolute -inset-4 rounded-[40px] blur-2xl opacity-60 pointer-events-none"
           style={{
             background:
-              'radial-gradient(circle at 50% 50%, #FFE6C9 0%, #FFD6E8 35%, transparent 70%)',
+              'radial-gradient(circle at 50% 40%, #FFE6C9 0%, #FFD6E8 40%, transparent 75%)',
           }}
         />
 
-        {/* Cards */}
-        {cards.map((c, i) => (
-          <motion.div
-            key={c.title}
-            initial={{ opacity: 0, scale: 0.6, rotate: 0, y: 20 }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              rotate: c.rotate,
-              y: [0, -4, 0],
-            }}
-            transition={{
-              opacity: { delay: c.delay, duration: 0.4 },
-              scale: { delay: c.delay, duration: 0.45, type: 'spring', stiffness: 180 },
-              rotate: { delay: c.delay, duration: 0.45 },
-              y: {
-                delay: c.delay + 0.6,
-                duration: 3 + i * 0.3,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              },
-            }}
-            className="absolute w-[44%] rounded-2xl bg-white shadow-[0_12px_30px_-10px_rgba(26,31,61,0.25)] border border-black/5 p-2.5"
-            style={c.style as React.CSSProperties}
-          >
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-[20px] mb-1.5"
-              style={{ background: c.bg }}
+        {/* 2-column staggered grid */}
+        <div className="relative grid grid-cols-2 gap-2.5">
+          {cards.map((c, i) => (
+            <motion.div
+              key={c.title}
+              initial={{ opacity: 0, scale: 0.6, y: 20, rotate: 0 }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                y: [0, -3, 0],
+                rotate: rotations[i],
+              }}
+              transition={{
+                opacity: { delay: 0.1 + i * 0.07, duration: 0.35 },
+                scale: {
+                  delay: 0.1 + i * 0.07,
+                  duration: 0.4,
+                  type: 'spring',
+                  stiffness: 200,
+                },
+                rotate: { delay: 0.1 + i * 0.07, duration: 0.4 },
+                y: {
+                  delay: 0.7 + i * 0.1,
+                  duration: 3 + (i % 3) * 0.4,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                },
+              }}
+              className={`relative rounded-2xl bg-white shadow-[0_10px_24px_-10px_rgba(26,31,61,0.25)] border border-black/5 p-2.5 ${
+                i % 2 === 0 ? 'mt-0' : 'mt-3'
+              }`}
             >
-              {c.emoji}
-            </div>
-            <p className="text-[12px] font-bold text-[#1a1f3d] leading-tight">{c.title}</p>
-            <p className="text-[9.5px] text-[#1a1f3d]/55 mt-0.5 leading-tight">{c.sub}</p>
-            <p
-              className="text-[8.5px] font-semibold mt-1 italic"
-              style={{ color: c.fg }}
-            >
-              {c.replaces}
-            </p>
-          </motion.div>
-        ))}
-
-        {/* Connecting dotted lines from center outward (subtle) */}
-        <svg
-          className="absolute inset-0 w-full h-full pointer-events-none opacity-25"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-        >
-          {[
-            { x: 22, y: 18 },
-            { x: 78, y: 20 },
-            { x: 18, y: 80 },
-            { x: 82, y: 78 },
-          ].map((p, i) => (
-            <motion.line
-              key={i}
-              x1="50"
-              y1="50"
-              x2={p.x}
-              y2={p.y}
-              stroke="#1a1f3d"
-              strokeWidth="0.4"
-              strokeDasharray="1 2"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ delay: 0.9 + i * 0.1, duration: 0.6 }}
-            />
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-[18px] shrink-0"
+                  style={{ background: c.bg }}
+                >
+                  {c.emoji}
+                </div>
+                <p className="text-[11.5px] font-bold text-[#1a1f3d] leading-tight">
+                  {c.title}
+                </p>
+              </div>
+              <p
+                className="text-[9.5px] font-semibold mt-1.5 italic truncate"
+                style={{ color: c.fg }}
+              >
+                instead of {c.replaces}
+              </p>
+            </motion.div>
           ))}
-        </svg>
+        </div>
       </div>
 
-      {/* Tagline strip below */}
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.1, duration: 0.4 }}
-        className="mt-2 flex items-center justify-center gap-2"
-      >
-        <span className="text-[12px] text-[#1a1f3d]/40 line-through">Calm</span>
-        <span className="text-[12px] text-[#1a1f3d]/40 line-through">Headspace</span>
-        <span className="text-[12px] text-[#1a1f3d]/40 line-through">Stoic</span>
-        <span className="text-[14px] font-bold text-[#1a1f3d]">→ Rilo</span>
-      </motion.div>
-
+      {/* "Free" pill */}
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 1.25, duration: 0.4, type: 'spring' }}
-        className="mt-2 flex items-center justify-center"
+        transition={{ delay: 1.0, duration: 0.4, type: 'spring' }}
+        className="mt-3 flex items-center justify-center"
       >
-        <div className="px-3 py-1 rounded-full bg-[#1a1f3d] text-white text-[11px] font-bold flex items-center gap-1.5">
-          <span>🎁</span> 5 apps. One Rilo. Free.
+        <div className="px-3.5 py-1.5 rounded-full bg-[#1a1f3d] text-white text-[12px] font-bold flex items-center gap-1.5 shadow-lg">
+          <span>🎁</span> 8 apps. One Rilo. Free.
         </div>
       </motion.div>
     </div>
