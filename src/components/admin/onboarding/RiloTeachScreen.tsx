@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { OnboardingStep } from '@/types/onboarding';
 import { haptic } from '@/lib/haptics';
 import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
@@ -77,7 +77,10 @@ export function RiloTeachScreen({ step, onNext }: Props) {
     if (isSuggest) {
       // Dramatic "we're building something" transition before moving on
       setLaunching(true);
-      setTimeout(() => onNext(), 1400);
+      // Total dwell ≈ 3.6s so the rotating subtexts each get ~900ms
+      // to read — the previous 1.4s flashed by before the user could
+      // see them.
+      setTimeout(() => onNext(), 3600);
       return;
     }
     if (isToolsHub) {
