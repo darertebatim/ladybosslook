@@ -332,7 +332,7 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
       style={{
         background:
           stage === 'input'
-            ? 'linear-gradient(170deg, #FFE4D6 0%, #FFE9DC 35%, #FFF1E6 65%, #FFF8F1 100%)'
+            ? 'linear-gradient(160deg, #FFD6C2 0%, #FFC9D9 30%, #F5D4F0 60%, #E8D9FF 100%)'
             : stage === 'success'
               ? 'linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 100%)'
               : '#FFFFFF',
