@@ -21,6 +21,7 @@ import meplusPaywall2 from '@/assets/meplus-paywall-2.png';
 import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
 import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
 import { Analytics } from '@/lib/firebaseAnalytics';
+import { provisionRiloPicks } from '@/lib/onboarding/provisionRiloPicks';
 const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow, quickStartV2Flow, weeklyReviewFlow, selfcareQuizFlow, selfcareWeeklyReviewFlow, whatIsRiloFlow];
 
 function preloadImages(srcs: string[]) {
@@ -206,6 +207,14 @@ export default function AppOnboarding() {
       } else if (flowId === 'selfcare-quiz') {
         navigate('/app/home');
       } else if (flowId === 'what-is-rilo') {
+        // Persist the user's morning / afternoon / evening picks as real
+        // recurring tasks on their planner. Fire-and-forget so navigation
+        // is never blocked.
+        if (user?.id) {
+          provisionRiloPicks(user.id, answers).catch((err) =>
+            console.warn('[Onboarding] provisionRiloPicks failed:', err)
+          );
+        }
         navigate('/app/home');
       } else {
         navigate('/auth?mode=signup');
