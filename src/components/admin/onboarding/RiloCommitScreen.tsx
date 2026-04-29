@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { provisionRiloPicks } from '@/lib/onboarding/provisionRiloPicks';
+import confetti from 'canvas-confetti';
 import type { OnboardingStep } from '@/types/onboarding';
 
 interface Props {
@@ -121,33 +122,87 @@ export function RiloCommitScreen({ step, onNext }: Props) {
   const triggerCelebrate = () => {
     setStage('celebrate');
     haptic.light();
-    // Auto-advance to Home after the celebration plays
+    // Confetti burst from bottom-center, slightly delayed so the bubbles bloom first.
+    setTimeout(() => {
+      try {
+        confetti({
+          particleCount: 90,
+          spread: 75,
+          startVelocity: 55,
+          gravity: 0.9,
+          ticks: 220,
+          origin: { x: 0.5, y: 0.65 },
+          colors: ['#A98AF0', '#F08AB5', '#FFB347', '#5BB7F0', '#5BD0A8', '#FFD86B'],
+          scalar: 0.95,
+        });
+      } catch {}
+    }, 350);
+    setTimeout(() => {
+      try {
+        confetti({
+          particleCount: 50,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.7 },
+          colors: ['#A98AF0', '#F08AB5', '#FFD86B'],
+        });
+        confetti({
+          particleCount: 50,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.7 },
+          colors: ['#5BB7F0', '#5BD0A8', '#FFB347'],
+        });
+      } catch {}
+      haptic.medium();
+    }, 900);
+    // Auto-advance to Home after the celebration fully plays
     setTimeout(() => {
       haptic.medium();
       onNext();
-    }, 1900);
+    }, 3400);
   };
 
-  // Build a small bubble cluster from the picked emojis (repeat to fill)
+  // Build a fountain of emoji bubbles. Each one starts at the bottom-center,
+  // launches upward along an arc, and settles in a soft cluster near the top.
   const bubbles = useMemo(() => {
     if (rows.length === 0) return [];
-    const palette = ['#A98AF0', '#F08AB5', '#FFB347', '#5BB7F0', '#5BD0A8'];
-    const items: { emoji: string; left: number; top: number; size: number; delay: number; color: string }[] = [];
-    const count = 22;
+    const palette = ['#A98AF0', '#F08AB5', '#FFB347', '#5BB7F0', '#5BD0A8', '#FFD86B'];
+    const count = 18;
+    type B = {
+      emoji: string;
+      // resting position (% of container)
+      left: number;
+      top: number;
+      size: number;
+      delay: number;
+      color: string;
+      // launch trajectory
+      fromX: number; // px offset from rest
+      fromY: number;
+      rotate: number;
+      floatPhase: number;
+    };
+    const items: B[] = [];
     for (let i = 0; i < count; i++) {
       const r = rows[i % rows.length];
-      // Cluster around top-center, ~ 60% width / 35% height area
-      const angle = Math.random() * Math.PI * 2;
-      const radius = 30 + Math.random() * 110;
-      const left = 50 + Math.cos(angle) * (radius / 3.2);
-      const top = 28 + Math.sin(angle) * (radius / 5);
+      // Spread roughly across a 70%-wide × 45%-tall area near the top
+      const t = i / Math.max(1, count - 1);
+      const ringAngle = Math.PI * (0.15 + t * 0.7) + (Math.random() - 0.5) * 0.4;
+      const ringRadius = 90 + Math.random() * 70;
+      const left = 50 + Math.cos(ringAngle) * (ringRadius / 4.2);
+      const top = 32 - Math.sin(ringAngle) * (ringRadius / 7) + (Math.random() - 0.5) * 6;
       items.push({
         emoji: r.emoji,
-        left,
-        top,
-        size: 38 + Math.random() * 18,
-        delay: Math.random() * 0.35,
+        left: Math.max(8, Math.min(92, left)),
+        top: Math.max(6, Math.min(58, top)),
+        size: 44 + Math.random() * 22,
+        delay: 0.05 + Math.random() * 0.45,
         color: palette[i % palette.length],
+        fromX: (Math.random() - 0.5) * 80,
+        fromY: 320 + Math.random() * 80,
+        rotate: (Math.random() - 0.5) * 90,
+        floatPhase: Math.random() * Math.PI * 2,
       });
     }
     return items;
