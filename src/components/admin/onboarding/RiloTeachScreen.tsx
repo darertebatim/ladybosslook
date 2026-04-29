@@ -18,7 +18,10 @@ interface Props {
 export function RiloTeachScreen({ step, onNext }: Props) {
   const variant = step.illustrationLabel || 'planner';
   const isSuggest = variant === 'suggest';
+  const isToolsHub = variant === 'tools-hub';
   const [launching, setLaunching] = useState(false);
+  const [collapsing, setCollapsing] = useState(false);
+  const [inkExpanding, setInkExpanding] = useState(false);
 
   const handleTap = () => {
     haptic.light();
@@ -26,6 +29,14 @@ export function RiloTeachScreen({ step, onNext }: Props) {
       // Dramatic "we're building something" transition before moving on
       setLaunching(true);
       setTimeout(() => onNext(), 1400);
+      return;
+    }
+    if (isToolsHub) {
+      // 3-phase transition: cards collapse → button ink floods → advance
+      setCollapsing(true);
+      // start ink expansion partway through the collapse
+      setTimeout(() => setInkExpanding(true), 650);
+      setTimeout(() => onNext(), 1500);
       return;
     }
     onNext();
@@ -39,7 +50,7 @@ export function RiloTeachScreen({ step, onNext }: Props) {
         {variant === 'planner' && <PlannerVisual />}
         {variant === 'routine' && <RoutineVisual />}
         {variant === 'task-details' && <TaskDetailsVisual />}
-        {variant === 'tools-hub' && <ToolsHubVisual />}
+        {variant === 'tools-hub' && <ToolsHubVisual collapsing={collapsing} />}
         {variant === 'suggest' && <SuggestVisual />}
       </div>
 
@@ -89,15 +100,27 @@ export function RiloTeachScreen({ step, onNext }: Props) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.28 }}
           onClick={handleTap}
-          disabled={launching}
+          disabled={launching || collapsing}
           className={`mt-7 w-full h-[56px] rounded-2xl text-white font-semibold text-[16px] active:opacity-80 transition-opacity ${
             isSuggest
               ? 'bg-gradient-to-r from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] shadow-[0_12px_30px_-8px_rgba(138,92,240,0.55)]'
               : 'bg-[#1a1f3d]'
-          }`}
+          } relative overflow-visible`}
           style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
-          {step.buttonLabel || 'Continue'}
+          <span className={collapsing ? 'opacity-0 transition-opacity' : 'transition-opacity'}>
+            {step.buttonLabel || 'Continue'}
+          </span>
+          {/* Black ink that floods from the button outward */}
+          {isToolsHub && inkExpanding && (
+            <motion.span
+              initial={{ scale: 0, opacity: 1 }}
+              animate={{ scale: 60, opacity: 1 }}
+              transition={{ duration: 0.85, ease: [0.65, 0, 0.35, 1] }}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-[#1a1f3d] pointer-events-none"
+              style={{ zIndex: 60 }}
+            />
+          )}
         </motion.button>
       </div>
 
@@ -564,9 +587,8 @@ function TaskDetailsVisual() {
   );
 }
 
-/* ---------- Visual 4 (B): "5 apps in one" — outcome orbit ---------- */
 /* ---------- Visual 4 (B): "8 apps in one" — outcome cascade ---------- */
-function ToolsHubVisual() {
+function ToolsHubVisual({ collapsing = false }: { collapsing?: boolean }) {
   // Each card = a real outcome people download a separate paid app for.
   const cards = [
     { emoji: '🧘', title: 'Calmer mind',     replaces: 'Calm',         bg: '#E5D6FF', fg: '#5B2BB8' },
@@ -581,6 +603,20 @@ function ToolsHubVisual() {
 
   // Slight rotation per card for the "scattered polaroids" feel
   const rotations = [-5, 4, -3, 6, -6, 3, -4, 5];
+
+  // When collapsing: each card flies down toward the CTA button (bottom-center).
+  // Left column (i % 2 === 0) drifts right toward center; right column drifts left.
+  // All cards push downward beyond the visual area.
+  const collapseTarget = (i: number) => {
+    const isLeft = i % 2 === 0;
+    return {
+      x: isLeft ? 80 : -80,
+      y: 320 + (i % 4) * 8, // dive down toward button
+      scale: 0.15,
+      rotate: isLeft ? 25 : -25,
+      opacity: 0,
+    };
+  };
 
   return (
     <div className="w-full max-w-[320px] mx-auto">
@@ -600,28 +636,40 @@ function ToolsHubVisual() {
             <motion.div
               key={c.title}
               initial={{ opacity: 0, scale: 0.6, y: 20, rotate: 0 }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                y: [0, -3, 0],
-                rotate: rotations[i],
-              }}
-              transition={{
-                opacity: { delay: 0.1 + i * 0.07, duration: 0.35 },
-                scale: {
-                  delay: 0.1 + i * 0.07,
-                  duration: 0.4,
-                  type: 'spring',
-                  stiffness: 200,
-                },
-                rotate: { delay: 0.1 + i * 0.07, duration: 0.4 },
-                y: {
-                  delay: 0.7 + i * 0.1,
-                  duration: 3 + (i % 3) * 0.4,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                },
-              }}
+              animate={
+                collapsing
+                  ? collapseTarget(i)
+                  : {
+                      opacity: 1,
+                      scale: 1,
+                      y: [0, -3, 0],
+                      rotate: rotations[i],
+                    }
+              }
+              transition={
+                collapsing
+                  ? {
+                      duration: 0.7,
+                      delay: i * 0.04,
+                      ease: [0.55, 0, 0.85, 0.4], // accelerate down (gravity-ish)
+                    }
+                  : {
+                      opacity: { delay: 0.1 + i * 0.07, duration: 0.35 },
+                      scale: {
+                        delay: 0.1 + i * 0.07,
+                        duration: 0.4,
+                        type: 'spring',
+                        stiffness: 200,
+                      },
+                      rotate: { delay: 0.1 + i * 0.07, duration: 0.4 },
+                      y: {
+                        delay: 0.7 + i * 0.1,
+                        duration: 3 + (i % 3) * 0.4,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                      },
+                    }
+              }
               className={`relative rounded-2xl bg-white shadow-[0_10px_24px_-10px_rgba(26,31,61,0.25)] border border-black/5 p-2.5 ${
                 i % 2 === 0 ? 'mt-0' : 'mt-3'
               }`}
@@ -651,8 +699,8 @@ function ToolsHubVisual() {
       {/* "Free" pill */}
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 1.0, duration: 0.4, type: 'spring' }}
+        animate={collapsing ? { opacity: 0, scale: 0.6, y: 220 } : { opacity: 1, scale: 1 }}
+        transition={collapsing ? { duration: 0.5, ease: 'easeIn' } : { delay: 1.0, duration: 0.4, type: 'spring' }}
         className="mt-3 flex items-center justify-center"
       >
         <div className="px-3.5 py-1.5 rounded-full bg-[#1a1f3d] text-white text-[12px] font-bold flex items-center gap-1.5 shadow-lg">
