@@ -431,3 +431,158 @@ function ToolsHubVisual() {
     </div>
   );
 }
+
+/* ---------- Visual 4 (B-v2): "Delete 8 apps" — phone declutter ---------- */
+function ToolsHubVisualV2() {
+  // 8 real apps people pay for, getting "absorbed" into Rilo.
+  const apps = [
+    { name: 'Calm',         emoji: '🧘', bg: '#5B2BB8' },
+    { name: 'Headspace',    emoji: '🌙', bg: '#F47B27' },
+    { name: 'Nike Training',emoji: '💪', bg: '#1a1f3d' },
+    { name: 'Stoic',        emoji: '✏️', bg: '#2E7D6B' },
+    { name: 'Calendar',     emoji: '📅', bg: '#E63946' },
+    { name: 'TickTick',     emoji: '✅', bg: '#3E8AF0' },
+    { name: 'Notion',       emoji: '💼', bg: '#111111' },
+    { name: 'YNAB',         emoji: '💰', bg: '#1AA2D9' },
+  ];
+
+  return (
+    <div className="w-full max-w-[300px] mx-auto">
+      {/* Phone frame */}
+      <div
+        className="relative mx-auto rounded-[36px] p-4 pt-5 pb-6 shadow-[0_20px_60px_-20px_rgba(26,31,61,0.35)] border border-black/10"
+        style={{
+          background: 'linear-gradient(180deg, #FFE6C9 0%, #FFD6E8 50%, #E5D6FF 100%)',
+        }}
+      >
+        {/* status bar */}
+        <div className="flex items-center justify-between px-1 mb-3">
+          <span className="text-[10px] font-bold text-[#1a1f3d]/70">9:41</span>
+          <div className="flex items-center gap-1">
+            <span className="w-3 h-1.5 rounded-sm bg-[#1a1f3d]/60" />
+            <span className="w-3 h-1.5 rounded-sm bg-[#1a1f3d]/60" />
+            <span className="w-4 h-1.5 rounded-sm bg-[#1a1f3d]/80" />
+          </div>
+        </div>
+
+        {/* 4x2 grid of "old" apps — fade + shrink + drift toward Rilo */}
+        <div className="grid grid-cols-4 gap-3 mb-5">
+          {apps.map((a, i) => {
+            // crude "pull toward bottom-center" vector
+            const col = i % 4;
+            const row = Math.floor(i / 4);
+            const dx = (1.5 - col) * -18; // pull horizontally toward center
+            const dy = (1 - row) * 30 + 40; // pull down toward Rilo
+            return (
+              <motion.div
+                key={a.name}
+                initial={{ opacity: 0, scale: 0.6, y: -10 }}
+                animate={{
+                  opacity: [0, 1, 1, 0.15],
+                  scale: [0.6, 1, 1, 0.4],
+                  x: [0, 0, 0, dx],
+                  y: [-10, 0, 0, dy],
+                }}
+                transition={{
+                  delay: 0.1 + i * 0.05,
+                  duration: 3.2,
+                  times: [0, 0.15, 0.55, 1],
+                  repeat: Infinity,
+                  repeatDelay: 1.2,
+                  ease: 'easeInOut',
+                }}
+                className="flex flex-col items-center gap-1"
+              >
+                <div
+                  className="w-11 h-11 rounded-[12px] flex items-center justify-center text-[20px] shadow-md relative overflow-hidden"
+                  style={{ background: a.bg }}
+                >
+                  <span className="relative z-10">{a.emoji}</span>
+                  {/* shine */}
+                  <span className="absolute inset-x-0 top-0 h-1/2 bg-white/15" />
+                </div>
+                <span className="text-[8.5px] font-semibold text-[#1a1f3d] truncate max-w-full">
+                  {a.name}
+                </span>
+                {/* delete badge */}
+                <motion.span
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: [0, 0, 1, 0], scale: [0, 0, 1, 0.5] }}
+                  transition={{
+                    delay: 0.1 + i * 0.05,
+                    duration: 3.2,
+                    times: [0, 0.5, 0.65, 0.95],
+                    repeat: Infinity,
+                    repeatDelay: 1.2,
+                  }}
+                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-white text-[#1a1f3d] text-[10px] font-bold flex items-center justify-center shadow-md border border-black/10"
+                  style={{ position: 'absolute' }}
+                >
+                  −
+                </motion.span>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Rilo "hero" icon at bottom — pulses + absorbs */}
+        <div className="flex flex-col items-center">
+          <motion.div
+            initial={{ scale: 0.85 }}
+            animate={{ scale: [0.95, 1.08, 0.95] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+            className="relative"
+          >
+            {/* glow */}
+            <div
+              className="absolute -inset-3 rounded-[28px] blur-xl opacity-70"
+              style={{
+                background:
+                  'radial-gradient(circle, #FFB37A 0%, #FF8FA8 50%, transparent 75%)',
+              }}
+            />
+            <div
+              className="relative w-16 h-16 rounded-[20px] flex items-center justify-center text-white text-[26px] font-black shadow-[0_10px_30px_-5px_rgba(26,31,61,0.5)]"
+              style={{
+                background: 'linear-gradient(135deg, #1a1f3d 0%, #4B3A8C 100%)',
+              }}
+            >
+              R
+              {/* sparkles */}
+              <motion.span
+                animate={{ opacity: [0, 1, 0], scale: [0.6, 1.2, 0.6] }}
+                transition={{ duration: 1.8, repeat: Infinity }}
+                className="absolute -top-1 -right-1 text-[12px]"
+              >
+                ✨
+              </motion.span>
+              <motion.span
+                animate={{ opacity: [0, 1, 0], scale: [0.6, 1.2, 0.6] }}
+                transition={{ duration: 1.8, repeat: Infinity, delay: 0.6 }}
+                className="absolute -bottom-1 -left-1 text-[10px]"
+              >
+                ✨
+              </motion.span>
+            </div>
+          </motion.div>
+          <p className="mt-2 text-[12px] font-bold text-[#1a1f3d]">Rilo</p>
+        </div>
+
+        {/* home indicator */}
+        <div className="mt-3 mx-auto w-20 h-1 rounded-full bg-[#1a1f3d]/30" />
+      </div>
+
+      {/* Storage saved pill */}
+      <motion.div
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8, duration: 0.4 }}
+        className="mt-3 flex items-center justify-center"
+      >
+        <div className="px-3.5 py-1.5 rounded-full bg-[#1a1f3d] text-white text-[12px] font-bold flex items-center gap-1.5 shadow-lg">
+          <span>📱</span> 8 apps lighter. Free.
+        </div>
+      </motion.div>
+    </div>
+  );
+}
