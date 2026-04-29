@@ -860,6 +860,14 @@ const AppHome = () => {
       localStorage.setItem(SPOTLIGHT_TOUR_KEY, 'true');
       spotlightTourActiveRef.current = false;
       localStorage.removeItem('simora_force_new_user');
+      // Bonus: briefly pulse the streak pill so the user sees the connection
+      // between completing a task and starting their streak.
+      setTimeout(() => {
+        const el = document.querySelector('.tour-streak') as HTMLElement | null;
+        if (!el) return;
+        el.classList.add('streak-tour-pulse');
+        setTimeout(() => el.classList.remove('streak-tour-pulse'), 2400);
+      }, 600);
     }
   }, [showFirstCoachMark, completedTaskIds.size]);
   const handleDateSelect = useCallback((date: Date) => {
