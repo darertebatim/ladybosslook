@@ -153,6 +153,15 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
     if (!trimmed) return;
     haptic.medium();
     setStage('building');
+    setDialogueIdx(0);
+    setRevealedCount(0);
+    const startedAt = Date.now();
+
+    // Cycle through dialogue messages while the AI works.
+    const dialogueTimer = setInterval(() => {
+      setDialogueIdx((i) => Math.min(i + 1, LOADING_DIALOGUES.length - 1));
+      haptic.light();
+    }, DIALOGUE_INTERVAL_MS);
 
     // Visual stage transition shortly before the network call resolves.
     const matchingTimer = setTimeout(() => setStage('matching'), 1400);
@@ -195,12 +204,28 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
         });
       }
 
+      // Make sure we don't blow past the dialogues — wait until they're done.
+      const elapsed = Date.now() - startedAt;
+      const remaining = Math.max(0, MIN_LOADING_MS - elapsed);
+      await new Promise((r) => setTimeout(r, remaining));
+      clearInterval(dialogueTimer);
+
       setTasks(extracted);
       setSelectedIds(new Set(extracted.map((t) => t.id)));
+      setRevealedCount(0);
       setStage('picker');
-      haptic.light();
+      haptic.medium();
+
+      // Reveal task rows one-by-one (~180ms apart) with a soft tap each.
+      extracted.forEach((_, i) => {
+        setTimeout(() => {
+          haptic.light();
+          setRevealedCount((c) => Math.max(c, i + 1));
+        }, 220 + i * 180);
+      });
     } catch (e: any) {
       clearTimeout(matchingTimer);
+      clearInterval(dialogueTimer);
       console.error('[RiloWeekPlans] extract failed', e);
       toast.error(e?.message || 'Could not build your tasks. Try again.');
       setStage('input');
