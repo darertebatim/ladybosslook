@@ -119,6 +119,12 @@ export const whatIsRiloFlow: OnboardingFlow = {
       buttonLabel: 'Continue',
     },
     {
+      id: 'wir-building-plan',
+      type: 'rilo-building-plan',
+      title: 'Building your plan…',
+      subtitle: 'We\u2019re folding your picks into a routine that fits your day.',
+    },
+    {
       id: 'wir-week-plans',
       type: 'rilo-week-plans',
       title: 'Any other plans this week?',
