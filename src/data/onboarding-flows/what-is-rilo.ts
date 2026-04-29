@@ -25,8 +25,8 @@ export const whatIsRiloFlow: OnboardingFlow = {
       id: 'wir-task-details',
       type: 'rilo-teach',
       illustrationLabel: 'task-details',
-      title: 'Tap any task. There’s more inside.',
-      subtitle: 'Breathing, audio, journaling — built into every task.',
+      title: 'Every task, exactly how you want it.',
+      subtitle: 'Time, repeat, reminders, color, subtasks, notes — small details that keep your routine on track.',
       buttonLabel: 'Next',
     },
     {
