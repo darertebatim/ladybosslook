@@ -100,6 +100,7 @@ const AppReflectionNoteDetail = lazy(() => import("@/pages/app/AppReflectionNote
 const AppFreeFormReflection = lazy(() => import("@/pages/app/AppFreeFormReflection"));
 const AppFreeFormNoteDetail = lazy(() => import("@/pages/app/AppFreeFormNoteDetail"));
 const AppAICoach = lazy(() => import("@/pages/app/AppAICoach"));
+const AppAIPlanner = lazy(() => import("@/pages/app/AppAIPlanner"));
 const AppTasksBank = lazy(() => import("@/pages/app/AppTasksBank"));
 const AppTasksBankCategory = lazy(() => import("@/pages/app/AppTasksBankCategory"));
 const AppTaskDrafts = lazy(() => import("@/pages/app/AppTaskDrafts"));
@@ -518,6 +519,7 @@ const App = () => (
                     <Route path="/app/reflections/free-form" element={<ProtectedRoute><AppFreeFormReflection /></ProtectedRoute>} />
                     <Route path="/app/reflections/:reflectionId" element={<ProtectedRoute><AppReflectionFlow /></ProtectedRoute>} />
                     <Route path="/app/ai" element={<ProtectedRoute><AppAICoach /></ProtectedRoute>} />
+                    <Route path="/app/aiplanner" element={<ProtectedRoute><AppAIPlanner /></ProtectedRoute>} />
                     <Route path="/app/read/:id" element={<ProtectedRoute><AppReadDetail /></ProtectedRoute>} />
                     <Route path="/app/read/:id/reader" element={<ProtectedRoute><AppReadReader /></ProtectedRoute>} />
                     <Route path="/app/quiz/:slug" element={<ProtectedRoute><QuizDetail /></ProtectedRoute>} />
