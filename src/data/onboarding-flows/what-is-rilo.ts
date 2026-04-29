@@ -11,7 +11,8 @@ export const whatIsRiloFlow: OnboardingFlow = {
       id: 'wir-planner',
       type: 'rilo-teach',
       illustrationLabel: 'planner',
-      title: 'Rilo is your self-care planner.',
+      title: 'Meet Rilo.',
+      subtitle: 'Your self-care planner — built so you actually keep it.',
       buttonLabel: 'Next',
     },
     {
