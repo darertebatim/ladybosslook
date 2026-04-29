@@ -273,25 +273,44 @@ export default function AppOnboarding() {
       )}
 
       {/* Step content - full screen with slide transition */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative bg-black">
         <AnimatePresence mode="wait" custom={direction}>
-          <motion.div
-            key={step.id}
-            custom={direction}
-            initial={{ opacity: 0, x: direction * 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: direction * -40 }}
-            transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
-            className="h-full"
-          >
-            <OnboardingStepRenderer
-              step={step}
-              onNext={goNext}
-              onMilestone={handleMilestone}
-              onAnswer={handleAnswer}
-              answers={answers}
-            />
-          </motion.div>
+          {step.type === 'rilo-week-plans' ? (
+            <motion.div
+              key={step.id}
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute inset-0 h-full"
+            >
+              <OnboardingStepRenderer
+                step={step}
+                onNext={goNext}
+                onMilestone={handleMilestone}
+                onAnswer={handleAnswer}
+                answers={answers}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key={step.id}
+              custom={direction}
+              initial={{ opacity: 0, x: direction * 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: direction * -40 }}
+              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+              className="absolute inset-0 h-full"
+            >
+              <OnboardingStepRenderer
+                step={step}
+                onNext={goNext}
+                onMilestone={handleMilestone}
+                onAnswer={handleAnswer}
+                answers={answers}
+              />
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
     </div>
