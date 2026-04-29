@@ -100,22 +100,29 @@ export async function provisionRiloPicks(
   }
   const routineId = (newRoutine as any).routine_id as string;
 
-  // 2) Determine starting order_index so new tasks land at the bottom
-  let startOrder = 0;
+  // 2) Determine starting order_index so new tasks land at the TOP of the
+  //    planner — above any existing Daily Reset tasks. We do this by taking
+  //    the current minimum order_index and placing our launcher first, then
+  //    its child tasks just below, all with negative offsets.
+  let minOrder = 0;
   try {
-    const { data: maxRow } = await supabase
+    const { data: minRow } = await supabase
       .from('user_tasks')
       .select('order_index')
       .eq('user_id', userId)
-      .order('order_index', { ascending: false })
+      .order('order_index', { ascending: true })
       .limit(1)
       .maybeSingle();
-    startOrder = (maxRow?.order_index ?? -1) + 1;
+    minOrder = minRow?.order_index ?? 0;
   } catch (_) {
-    startOrder = 0;
+    minOrder = 0;
   }
+  // Reserve slots: launcher at minOrder - (rows.length + 1), children below
+  const launcherOrder = minOrder - (rows.length + 1);
+  const childStartOrder = minOrder - rows.length;
 
-  // 3) Insert child tasks (linked via source_routine_id)
+  // 3) Insert child tasks (linked via source_routine_id) — placed above all
+  //    existing planner tasks (negative offsets relative to current min).
   const childInserts = rows.map((r, i) => ({
     user_id: userId,
     title: r.title,
@@ -125,7 +132,7 @@ export async function provisionRiloPicks(
     time_period: r.time_period,
     tag: MY_RILO_TITLE,
     is_active: true,
-    order_index: startOrder + i,
+    order_index: childStartOrder + i,
     source_routine_id: routineId,
   }));
 
@@ -136,7 +143,8 @@ export async function provisionRiloPicks(
     console.warn('[provisionRiloPicks] Child task insert failed:', childErr.message);
   }
 
-  // 4) Insert the routine-launcher task that appears in the planner
+  // 4) Insert the routine-launcher task that appears in the planner — first
+  //    item, sitting above its own child tasks and any pre-existing tasks.
   const { error: launcherErr } = await supabase.from('user_tasks').insert({
     user_id: userId,
     title: MY_RILO_TITLE,
@@ -147,7 +155,7 @@ export async function provisionRiloPicks(
     pro_link_type: 'routine',
     pro_link_value: routineId,
     is_active: true,
-    order_index: startOrder + rows.length,
+    order_index: launcherOrder,
     source_routine_id: null,
   } as any);
   if (launcherErr) {
