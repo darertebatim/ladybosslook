@@ -9,8 +9,9 @@ interface Props {
 }
 
 /**
- * Custom 3-screen "What is Rilo?" teach flow.
- * Variant is encoded in `step.illustrationLabel`: 'planner' | 'routine' | 'suggest'.
+ * Custom "What is Rilo?" teach flow screens.
+ * Variant is encoded in `step.illustrationLabel`:
+ *   'planner' | 'routine' | 'task-details' | 'tools-hub' | 'suggest'
  * No inputs, no questions — single tap to advance.
  */
 export function RiloTeachScreen({ step, onNext }: Props) {
@@ -27,6 +28,8 @@ export function RiloTeachScreen({ step, onNext }: Props) {
       <div className="flex-1 flex items-center justify-center px-6 pt-6 pb-4">
         {variant === 'planner' && <PlannerVisual />}
         {variant === 'routine' && <RoutineVisual />}
+        {variant === 'task-details' && <TaskDetailsVisual />}
+        {variant === 'tools-hub' && <ToolsHubVisual />}
         {variant === 'suggest' && <SuggestVisual />}
       </div>
 
