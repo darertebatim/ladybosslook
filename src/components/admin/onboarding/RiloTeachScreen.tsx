@@ -30,6 +30,7 @@ export function RiloTeachScreen({ step, onNext }: Props) {
         {variant === 'routine' && <RoutineVisual />}
         {variant === 'task-details' && <TaskDetailsVisual />}
         {variant === 'tools-hub' && <ToolsHubVisual />}
+        {variant === 'tools-hub-v2' && <ToolsHubVisualV2 />}
         {variant === 'suggest' && <SuggestVisual />}
       </div>
 
