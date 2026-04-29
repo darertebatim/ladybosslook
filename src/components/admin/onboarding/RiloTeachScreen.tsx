@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Check, Sparkles } from 'lucide-react';
+import { useState } from 'react';
 import { OnboardingStep } from '@/types/onboarding';
 import { haptic } from '@/lib/haptics';
 
@@ -16,16 +17,25 @@ interface Props {
  */
 export function RiloTeachScreen({ step, onNext }: Props) {
   const variant = step.illustrationLabel || 'planner';
+  const isSuggest = variant === 'suggest';
+  const [launching, setLaunching] = useState(false);
 
   const handleTap = () => {
     haptic.light();
+    if (isSuggest) {
+      // Dramatic "we're building something" transition before moving on
+      setLaunching(true);
+      setTimeout(() => onNext(), 1400);
+      return;
+    }
     onNext();
   };
 
   return (
-    <div className="h-full w-full flex flex-col bg-gradient-to-b from-[#FFF7F0] to-white">
+    <div className={`h-full w-full flex flex-col ${isSuggest ? 'bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]' : 'bg-gradient-to-b from-[#FFF7F0] to-white'} relative overflow-hidden`}>
+      {isSuggest && <SuggestAmbientGlow />}
       {/* Visual area */}
-      <div className="flex-1 flex items-center justify-center px-6 pt-6 pb-4">
+      <div className="flex-1 flex items-center justify-center px-6 pt-6 pb-4 relative z-10">
         {variant === 'planner' && <PlannerVisual />}
         {variant === 'routine' && <RoutineVisual />}
         {variant === 'task-details' && <TaskDetailsVisual />}
@@ -34,7 +44,17 @@ export function RiloTeachScreen({ step, onNext }: Props) {
       </div>
 
       {/* Text + CTA */}
-      <div className="shrink-0 px-6 pb-10">
+      <div className="shrink-0 px-6 pb-10 relative z-10">
+        {isSuggest && (
+          <motion.p
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.05 }}
+            className="text-center text-[11px] font-bold uppercase tracking-[0.18em] text-[#B8590E] mb-2"
+          >
+            ✨ Your curated planner
+          </motion.p>
+        )}
         <motion.h1
           key={`title-${step.id}`}
           initial={{ opacity: 0, y: 8 }}
@@ -54,18 +74,129 @@ export function RiloTeachScreen({ step, onNext }: Props) {
             {step.subtitle}
           </motion.p>
         )}
+        {isSuggest && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.35 }}
+            className="mt-3 text-center text-[12px] font-semibold text-[#1a1f3d]/60"
+          >
+            Built from <span className="text-[#1a1f3d]">3,000+</span> routines that actually stuck.
+          </motion.p>
+        )}
         <motion.button
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.28 }}
           onClick={handleTap}
-          className="mt-7 w-full h-[56px] rounded-2xl bg-[#1a1f3d] text-white font-semibold text-[16px] active:opacity-80 transition-opacity"
+          disabled={launching}
+          className={`mt-7 w-full h-[56px] rounded-2xl text-white font-semibold text-[16px] active:opacity-80 transition-opacity ${
+            isSuggest
+              ? 'bg-gradient-to-r from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] shadow-[0_12px_30px_-8px_rgba(138,92,240,0.55)]'
+              : 'bg-[#1a1f3d]'
+          }`}
           style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           {step.buttonLabel || 'Continue'}
         </motion.button>
       </div>
+
+      {/* Launch transition overlay */}
+      {launching && <LaunchOverlay />}
     </div>
+  );
+}
+
+/* ---------- Ambient background sparkles for the suggest screen ---------- */
+function SuggestAmbientGlow() {
+  const sparkles = Array.from({ length: 14 });
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div
+        className="absolute -top-24 left-1/2 -translate-x-1/2 w-[420px] h-[420px] rounded-full blur-3xl opacity-60"
+        style={{ background: 'radial-gradient(circle, #FFD6A5 0%, transparent 70%)' }}
+      />
+      <div
+        className="absolute top-1/3 -right-20 w-[260px] h-[260px] rounded-full blur-3xl opacity-50"
+        style={{ background: 'radial-gradient(circle, #CDE7FF 0%, transparent 70%)' }}
+      />
+      <div
+        className="absolute bottom-10 -left-16 w-[300px] h-[300px] rounded-full blur-3xl opacity-50"
+        style={{ background: 'radial-gradient(circle, #E5D6FF 0%, transparent 70%)' }}
+      />
+      {sparkles.map((_, i) => {
+        const left = (i * 37) % 100;
+        const top = (i * 53) % 100;
+        const delay = (i % 7) * 0.3;
+        return (
+          <motion.span
+            key={i}
+            initial={{ opacity: 0, scale: 0.4 }}
+            animate={{ opacity: [0, 0.9, 0], scale: [0.4, 1, 0.4] }}
+            transition={{ duration: 2.2, delay, repeat: Infinity, repeatDelay: 1.5 }}
+            className="absolute text-[10px] text-[#1a1f3d]/60"
+            style={{ left: `${left}%`, top: `${top}%` }}
+          >
+            ✨
+          </motion.span>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ---------- Launch overlay: dramatic "building your day" loader ---------- */
+function LaunchOverlay() {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.25 }}
+      className="absolute inset-0 z-50 flex flex-col items-center justify-center"
+      style={{
+        background:
+          'radial-gradient(circle at 50% 45%, rgba(255,255,255,0.97) 0%, rgba(255,247,240,0.97) 50%, rgba(240,230,255,0.97) 100%)',
+      }}
+    >
+      {/* Pulsing rings */}
+      <div className="relative w-[180px] h-[180px] flex items-center justify-center">
+        {[0, 1, 2].map((i) => (
+          <motion.div
+            key={i}
+            initial={{ scale: 0.4, opacity: 0.7 }}
+            animate={{ scale: 1.6, opacity: 0 }}
+            transition={{ duration: 1.4, delay: i * 0.35, repeat: Infinity, ease: 'easeOut' }}
+            className="absolute inset-0 rounded-full border-2"
+            style={{ borderColor: ['#F08A3E', '#EC4899', '#8A5CF0'][i] }}
+          />
+        ))}
+        <motion.div
+          initial={{ scale: 0.6, rotate: -10 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ duration: 0.5, type: 'spring' }}
+          className="relative w-20 h-20 rounded-3xl bg-gradient-to-br from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] flex items-center justify-center shadow-[0_20px_50px_-10px_rgba(138,92,240,0.6)]"
+        >
+          <Sparkles className="w-10 h-10 text-white" strokeWidth={2.5} />
+        </motion.div>
+      </div>
+
+      <motion.p
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.4 }}
+        className="mt-8 text-[18px] font-bold text-[#1a1f3d]"
+      >
+        Building your day…
+      </motion.p>
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5, duration: 0.4 }}
+        className="mt-1 text-[13px] text-[#1a1f3d]/60"
+      >
+        Morning → Day → Evening → Week
+      </motion.p>
+    </motion.div>
   );
 }
 
