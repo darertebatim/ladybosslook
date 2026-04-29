@@ -48,6 +48,7 @@ interface SortableTaskItemProps {
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
   isDragging?: boolean;
+  coachHighlight?: 'on' | 'off' | null;
 }
 
 const SortableTaskItem = ({
@@ -63,6 +64,7 @@ const SortableTaskItem = ({
   onOpenTimer,
   onOpenWaterTracking,
   isDragging,
+  coachHighlight,
 }: SortableTaskItemProps) => {
   const {
     attributes,
@@ -87,7 +89,9 @@ const SortableTaskItem = ({
       data-task-id={task.id}
       className={cn(
         'touch-manipulation',
-        isSortableDragging && 'opacity-50 scale-[1.02]'
+        isSortableDragging && 'opacity-50 scale-[1.02]',
+        coachHighlight === 'off' && 'opacity-30 pointer-events-none transition-opacity duration-300',
+        coachHighlight === 'on' && 'transition-transform duration-300'
       )}
     >
       <TaskCard
