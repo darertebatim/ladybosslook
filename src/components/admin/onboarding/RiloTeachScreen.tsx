@@ -76,11 +76,12 @@ export function RiloTeachScreen({ step, onNext }: Props) {
         isSuggest
           ? 'bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]'
           : isPlanner
-          ? 'bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F4ECFF]'
+          ? 'bg-gradient-to-b from-[#FFF4DC] via-[#FFE0E6] to-[#FBD4E2]'
           : 'bg-gradient-to-b from-[#FFF7F0] to-white'
       }`}
     >
-      {(isSuggest || isPlanner) && <SuggestAmbientGlow />}
+      {isSuggest && <SuggestAmbientGlow />}
+      {isPlanner && <PlannerAmbientGlow />}
       {/* Visual area */}
       <div className="flex-1 flex items-center justify-center px-6 pt-6 pb-4 relative z-10">
         {variant === 'planner' && <PlannerVisual />}
@@ -126,7 +127,11 @@ export function RiloTeachScreen({ step, onNext }: Props) {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: isPlanner ? 1.65 : 0.18 }}
-            className="mt-3 text-[15px] leading-snug text-[#1a1f3d]/70 text-center"
+            className={`mt-3 leading-snug text-center ${
+              isPlanner
+                ? 'text-[20px] font-bold text-black'
+                : 'text-[15px] text-[#1a1f3d]/70'
+            }`}
           >
             {step.subtitle}
           </motion.p>
