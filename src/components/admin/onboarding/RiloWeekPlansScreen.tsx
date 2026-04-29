@@ -360,14 +360,7 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
       {/* ── INPUT stage (original UI) ───────────────────────── */}
       {stage === 'input' && (
         <>
-          <div className="shrink-0 px-6 pt-2 flex justify-end">
-            <button
-              onClick={handleSkip}
-              className="text-[14px] font-medium text-[#1a1f3d]/70 active:opacity-60 px-2 py-1.5"
-            >
-              Skip
-            </button>
-          </div>
+          <div className="shrink-0" style={{ paddingTop: 'env(safe-area-inset-top, 44px)' }} />
           <div className="flex-1" />
           <div className="shrink-0 px-6 pb-4">
             <motion.h1
@@ -411,6 +404,13 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
                 rows={4}
                 className="w-full rounded-2xl bg-white/70 backdrop-blur-sm border border-white/60 px-4 py-3.5 pr-14 text-[15px] text-[#1a1f3d] placeholder:text-[#1a1f3d]/40 outline-none focus:bg-white/90 transition-colors resize-none"
               />
+              <button
+                type="button"
+                onClick={handleSkip}
+                className="absolute left-3 bottom-3 h-10 px-3 rounded-full text-[13px] font-semibold text-[#1a1f3d]/70 active:opacity-60"
+              >
+                Skip
+              </button>
               {text.trim() ? (
                 <button
                   type="button"
