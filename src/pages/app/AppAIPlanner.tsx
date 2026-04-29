@@ -604,7 +604,7 @@ export default function AppAIPlanner() {
           </AnimatePresence>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
