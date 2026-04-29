@@ -33,8 +33,8 @@ export const whatIsRiloFlow: OnboardingFlow = {
       id: 'wir-tools-hub',
       type: 'rilo-teach',
       illustrationLabel: 'tools-hub',
-      title: 'Everything you’d download 5 apps for.',
-      subtitle: 'Calmer mind, stronger body, better sleep, clearer thoughts — already inside Rilo. Free.',
+      title: 'Everything you’d download 8 apps for.',
+      subtitle: 'Calm, sleep, workouts, journal, calendar, habits, career, money — all already inside Rilo. Free.',
       buttonLabel: 'Next',
     },
     {
