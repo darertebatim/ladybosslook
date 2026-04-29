@@ -5,6 +5,9 @@ import riloAppIcon from '@/assets/rilo-app-icon.png';
 import { whatIsRiloFlow } from '@/data/onboarding-flows/what-is-rilo';
 import type { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { haptic } from '@/lib/haptics';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { provisionRiloPicks } from '@/lib/onboarding/provisionRiloPicks';
 
 interface Props {
   step: OnboardingStep;
@@ -15,6 +18,17 @@ interface Props {
 const BUCKET_IDS = ['wir-pick-morning', 'wir-pick-afternoon', 'wir-pick-evening'] as const;
 const PALETTE = ['#FFB347', '#F08AB5', '#8A5CF0']; // morning, midday, evening
 
+// Map our task `color` token names to display hex used inside the planner card
+const TOKEN_TO_HEX: Record<string, string> = {
+  sky: '#5BB7F0',
+  mint: '#5BD0A8',
+  lavender: '#A98AF0',
+  pink: '#F08AB5',
+  lime: '#B6D34A',
+  yellow: '#F5C842',
+  peach: '#FFB347',
+};
+
 /**
  * Reassurance screen shown after the 3 task pickers, before the AI step.
  * Renders 3 chips picked from the user's selections (one per bucket when
@@ -22,6 +36,54 @@ const PALETTE = ['#FFB347', '#F08AB5', '#8A5CF0']; // morning, midday, evening
  * planner card's rows. Auto-advances after the animation completes.
  */
 export function RiloBuildingPlanScreen({ step, onNext, answers }: Props) {
+  const { user } = useAuth();
+  // Tasks that already exist for this user (e.g. Daily Reset) — shown as
+  // "already in your routine" rows under the new picks.
+  const [existingTasks, setExistingTasks] = useState<
+    { title: string; emoji: string; color: string }[]
+  >([]);
+
+  // Kick off provisioning + load existing routine tasks as soon as we land
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    (async () => {
+      // Fire-and-forget: persist the picks NOW so they really make it into
+      // the planner before the user reaches the home screen.
+      provisionRiloPicks(user.id, answers || {}).catch((err) =>
+        console.warn('[BuildingPlan] provisionRiloPicks failed:', err)
+      );
+      // Pull a few of their existing routine player tasks (Daily Reset etc.)
+      try {
+        const { data } = await supabase
+          .from('user_tasks')
+          .select('title, emoji, color')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .neq('pro_link_type', 'routine')
+          .order('order_index', { ascending: true })
+          .limit(4);
+        if (!cancelled && data) {
+          setExistingTasks(
+            data
+              .filter((r: any) => r.title)
+              .map((r: any) => ({
+                title: r.title,
+                emoji: r.emoji || '✨',
+                color: TOKEN_TO_HEX[r.color] || '#5BB7F0',
+              }))
+          );
+        }
+      } catch (e) {
+        // ignore — fallback is just an empty list
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
   // Build label -> emoji lookup from the picker step definitions
   const labelEmoji = useMemo(() => {
     const map: Record<string, string> = {};
@@ -76,14 +138,14 @@ export function RiloBuildingPlanScreen({ step, onNext, answers }: Props) {
     }, 500 + 800 + chips.length * 220);
     const t3 = setTimeout(() => {
       onNext();
-    }, 500 + 800 + chips.length * 220 + 900);
+    }, 500 + 800 + chips.length * 220 + 1400);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [chips.length]);
 
   const handleTap = () => {
     haptic.light();
@@ -124,7 +186,47 @@ export function RiloBuildingPlanScreen({ step, onNext, answers }: Props) {
             </span>
           </div>
 
-          {/* Three rows; each shows a faint slot then the chip "clicks" in */}
+          {/* Existing routine player tasks (already provisioned via Daily Reset) */}
+          {existingTasks.length > 0 && (
+            <div className="px-3 pt-3 pb-1 space-y-1.5">
+              <div className="px-1 text-[9px] font-bold uppercase tracking-wider text-black/40">
+                Already in your routine
+              </div>
+              {existingTasks.map((t, i) => (
+                <motion.div
+                  key={`ex-${t.title}-${i}`}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.35, delay: 0.15 + i * 0.06 }}
+                  className="h-9 flex items-center gap-2 px-3 rounded-xl bg-black/[0.03] border border-black/5"
+                >
+                  <span
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ background: t.color }}
+                  />
+                  <img
+                    src={getFluentEmojiUrl(t.emoji)}
+                    alt=""
+                    className="w-4 h-4 shrink-0"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                  <span className="text-[12px] font-semibold text-black/70 truncate">
+                    {t.title}
+                  </span>
+                  <span className="ml-auto text-[10px] text-black/30">✓</span>
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {/* Three rows for new picks; each shows a faint slot then the chip "clicks" in */}
+          {existingTasks.length > 0 && (
+            <div className="px-4 pt-2 pb-1 text-[9px] font-bold uppercase tracking-wider text-[#A0123F]">
+              + Adding now
+            </div>
+          )}
           <div className="px-3 py-3 space-y-2 min-h-[180px]">
             {chips.map((c, i) => {
               const dropDelay = i * 0.22;
