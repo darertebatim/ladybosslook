@@ -163,16 +163,20 @@ export function RiloCommitScreen({ step, onNext }: Props) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -40 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="flex-1 flex flex-col px-7 pt-20 pb-8"
+            className="flex-1 flex flex-col px-7 min-h-0"
+            style={{
+              paddingTop: 'max(env(safe-area-inset-top, 0px), 56px)',
+              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
+            }}
           >
             <h1
-              className="text-[40px] leading-[1.05] font-bold text-black mb-8"
+              className="text-[34px] leading-[1.05] font-bold text-black mb-5 shrink-0"
               style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
             >
               {step.title || 'Lastly, commit to get this done!'}
             </h1>
 
-            <div className="flex-1 overflow-y-auto -mx-2 px-2">
+            <div className="flex-1 min-h-0 overflow-y-auto -mx-2 px-2">
               <ul className="space-y-3">
                 {rows.map((r, i) => (
                   <motion.li
@@ -180,9 +184,9 @@ export function RiloCommitScreen({ step, onNext }: Props) {
                     initial={{ opacity: 0, x: -12 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.32, delay: 0.08 + i * 0.05 }}
-                    className="flex items-center gap-3 text-[20px] text-black"
+                    className="flex items-center gap-3 text-[18px] text-black"
                   >
-                    <FluentEmoji emoji={r.emoji} size={26} />
+                    <FluentEmoji emoji={r.emoji} size={24} />
                     <span className="font-medium">{r.title}</span>
                   </motion.li>
                 ))}
@@ -192,7 +196,7 @@ export function RiloCommitScreen({ step, onNext }: Props) {
             {/* Swipe-to-confirm pill */}
             <div
               ref={trackRef}
-              className="relative h-[64px] w-full rounded-full bg-black mt-6 select-none"
+              className="relative h-[64px] w-full rounded-full bg-black mt-4 shrink-0 select-none"
               style={{ touchAction: 'pan-y' }}
             >
               <motion.div
