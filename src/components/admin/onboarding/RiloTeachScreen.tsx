@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { OnboardingStep } from '@/types/onboarding';
 import { haptic } from '@/lib/haptics';
 import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
@@ -77,7 +77,10 @@ export function RiloTeachScreen({ step, onNext }: Props) {
     if (isSuggest) {
       // Dramatic "we're building something" transition before moving on
       setLaunching(true);
-      setTimeout(() => onNext(), 1400);
+      // Total dwell ≈ 3.6s so the rotating subtexts each get ~900ms
+      // to read — the previous 1.4s flashed by before the user could
+      // see them.
+      setTimeout(() => onNext(), 3600);
       return;
     }
     if (isToolsHub) {
@@ -275,6 +278,20 @@ function AmbientGlowBase({ palette }: { palette: 'suggest' | 'planner' }) {
 
 /* ---------- Launch overlay: dramatic "building your day" loader ---------- */
 function LaunchOverlay() {
+  // Rotating subtexts — each gets ~900ms so the user actually reads them.
+  const lines = [
+    'Morning → Day → Evening',
+    'Picking the right rituals…',
+    'Shaping your week…',
+    'Almost ready ✨',
+  ];
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => {
+      setIdx((i) => (i + 1 < lines.length ? i + 1 : i));
+    }, 850);
+    return () => clearInterval(t);
+  }, []);
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -316,14 +333,20 @@ function LaunchOverlay() {
       >
         Building your day…
       </motion.p>
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5, duration: 0.4 }}
-        className="mt-1 text-[13px] text-[#1a1f3d]/60"
-      >
-        Morning → Day → Evening → Week
-      </motion.p>
+      <div className="mt-1 h-5 relative w-[260px] overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={idx}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.35 }}
+            className="absolute inset-0 text-center text-[13px] text-[#1a1f3d]/60"
+          >
+            {lines[idx]}
+          </motion.p>
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 }
