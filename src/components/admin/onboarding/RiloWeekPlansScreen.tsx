@@ -54,6 +54,73 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { user } = useAuth();
 
+  // ── Voice input (Web Speech API) ────────────────────────────
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const speechSupported =
+    typeof window !== 'undefined' &&
+    !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+
+  const stopListening = () => {
+    try {
+      recognitionRef.current?.stop();
+    } catch {}
+    setIsListening(false);
+  };
+
+  const startListening = () => {
+    if (!speechSupported) {
+      toast.error("Voice input isn't supported on this device");
+      return;
+    }
+    if (isListening) {
+      stopListening();
+      return;
+    }
+    haptic.light();
+    const SR =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const rec = new SR();
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.lang = (navigator.language || 'en-US');
+
+    const baseText = text;
+    rec.onresult = (e: any) => {
+      let interim = '';
+      let final = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const transcript = e.results[i][0].transcript;
+        if (e.results[i].isFinal) final += transcript;
+        else interim += transcript;
+      }
+      const combined = [baseText, final, interim].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+      setText(combined);
+    };
+    rec.onerror = (e: any) => {
+      setIsListening(false);
+      if (e?.error === 'not-allowed' || e?.error === 'service-not-allowed') {
+        toast.error('Microphone permission denied');
+      } else if (e?.error !== 'aborted' && e?.error !== 'no-speech') {
+        toast.error('Voice input failed');
+      }
+    };
+    rec.onend = () => setIsListening(false);
+    recognitionRef.current = rec;
+    try {
+      rec.start();
+      setIsListening(true);
+    } catch {
+      setIsListening(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      try { recognitionRef.current?.stop(); } catch {}
+    };
+  }, []);
+
   // ── Submit / sequence ───────────────────────────────────────
   const startSequence = async (raw: string) => {
     const trimmed = raw.trim();
@@ -305,9 +372,13 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
               ) : (
                 <button
                   type="button"
-                  disabled
-                  className="absolute right-3 bottom-3 h-10 w-10 rounded-full bg-black/80 flex items-center justify-center opacity-90"
-                  aria-label="Voice input (coming soon)"
+                  onClick={startListening}
+                  className={cn(
+                    'absolute right-3 bottom-3 h-10 w-10 rounded-full flex items-center justify-center active:scale-95 transition-all',
+                    isListening ? 'bg-red-500 animate-pulse' : 'bg-black',
+                    !speechSupported && 'opacity-50',
+                  )}
+                  aria-label={isListening ? 'Stop voice input' : 'Start voice input'}
                 >
                   <Mic className="h-4 w-4 text-white" />
                 </button>
