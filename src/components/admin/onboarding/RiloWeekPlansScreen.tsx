@@ -4,6 +4,10 @@ import { Mic, Sparkles, ArrowUp, RotateCcw, Pencil, Check } from 'lucide-react';
 import { OnboardingStep } from '@/types/onboarding';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { getLocalDateStr } from '@/lib/localDate';
+import { toast } from 'sonner';
 
 interface Props {
   step: OnboardingStep;
@@ -20,11 +24,17 @@ const HINTS: { emoji: string; label: string }[] = [
 
 type Stage = 'input' | 'building' | 'matching' | 'picker' | 'success';
 
+type TaskKind = 'event' | 'recurring' | 'todo';
+
 interface ExtractedTask {
   id: string;
   label: string;
   emoji: string;
-  kind: string;
+  kind: TaskKind;
+  date?: string;            // YYYY-MM-DD
+  time?: string;            // HH:MM
+  duration_minutes?: number;
+  recurrence?: 'daily' | 'weekdays' | 'weekly';
 }
 
 /**
@@ -42,22 +52,66 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
   const [tasks, setTasks] = useState<ExtractedTask[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { user } = useAuth();
 
   // ── Submit / sequence ───────────────────────────────────────
-  const startSequence = (raw: string) => {
+  const startSequence = async (raw: string) => {
     const trimmed = raw.trim();
     if (!trimmed) return;
     haptic.medium();
     setStage('building');
-    // Building → Matching → Picker (fake AI; UI-only for now)
-    setTimeout(() => setStage('matching'), 1600);
-    setTimeout(() => {
-      const extracted = fakeExtract(trimmed);
+
+    // Visual stage transition shortly before the network call resolves.
+    const matchingTimer = setTimeout(() => setStage('matching'), 1400);
+
+    try {
+      const today = getLocalDateStr();
+      const timezone =
+        Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Los_Angeles';
+
+      const { data, error } = await supabase.functions.invoke('extract-week-tasks', {
+        body: { text: trimmed, today, timezone },
+      });
+
+      clearTimeout(matchingTimer);
+
+      if (error) throw error;
+      const aiTasks: any[] = Array.isArray(data?.tasks) ? data.tasks : [];
+
+      const extracted: ExtractedTask[] = aiTasks
+        .filter((t) => t && typeof t.title === 'string')
+        .slice(0, 8)
+        .map((t, i) => ({
+          id: `ai-${i}-${Date.now()}`,
+          label: t.title,
+          emoji: typeof t.emoji === 'string' && t.emoji ? t.emoji : '✨',
+          kind: (['event', 'recurring', 'todo'].includes(t.kind) ? t.kind : 'todo') as TaskKind,
+          date: t.date,
+          time: t.time,
+          duration_minutes: typeof t.duration_minutes === 'number' ? t.duration_minutes : undefined,
+          recurrence: ['daily', 'weekdays', 'weekly'].includes(t.recurrence) ? t.recurrence : undefined,
+        }));
+
+      if (extracted.length === 0) {
+        // Graceful fallback: still let the user proceed with one to-do
+        extracted.push({
+          id: `ai-fb-${Date.now()}`,
+          label: trimmed.slice(0, 40),
+          emoji: '📝',
+          kind: 'todo',
+        });
+      }
+
       setTasks(extracted);
       setSelectedIds(new Set(extracted.map((t) => t.id)));
       setStage('picker');
       haptic.light();
-    }, 3200);
+    } catch (e: any) {
+      clearTimeout(matchingTimer);
+      console.error('[RiloWeekPlans] extract failed', e);
+      toast.error(e?.message || 'Could not build your tasks. Try again.');
+      setStage('input');
+    }
   };
 
   const handleReset = () => {
@@ -84,13 +138,64 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
     });
   };
 
-  const handleAddTasks = () => {
+  const handleAddTasks = async () => {
     if (selectedIds.size === 0) return;
     haptic.medium();
     const chosen = tasks
       .filter((t) => selectedIds.has(t.id))
-      .map((t) => t.label);
-    if (onAnswer) onAnswer(step.id, chosen);
+      ;
+    if (onAnswer) onAnswer(step.id, chosen.map((t) => t.label));
+
+    // Persist to user_tasks so they appear on the planner immediately.
+    if (user?.id && chosen.length > 0) {
+      try {
+        // Place above existing tasks, like provisionRiloPicks does.
+        const { data: minRow } = await supabase
+          .from('user_tasks')
+          .select('order_index')
+          .eq('user_id', user.id)
+          .order('order_index', { ascending: true })
+          .limit(1)
+          .maybeSingle();
+        const minOrder = (minRow?.order_index as number | null | undefined) ?? 0;
+        const startOrder = minOrder - chosen.length;
+
+        const COLORS = ['sky', 'mint', 'lavender', 'pink', 'lime', 'yellow', 'peach'];
+
+        const rows = chosen.map((t, i) => {
+          const base: any = {
+            user_id: user.id,
+            title: t.label,
+            emoji: t.emoji,
+            color: COLORS[i % COLORS.length],
+            tag: 'My Week',
+            is_active: true,
+            order_index: startOrder + i,
+          };
+          if (t.duration_minutes) base.duration_minutes = t.duration_minutes;
+
+          if (t.kind === 'event') {
+            base.scheduled_date = t.date || getLocalDateStr();
+            if (t.time) base.scheduled_time = t.time.length === 5 ? `${t.time}:00` : t.time;
+            base.repeat_pattern = 'none';
+          } else if (t.kind === 'recurring') {
+            base.repeat_pattern = t.recurrence || 'daily';
+            if (t.time) base.scheduled_time = t.time.length === 5 ? `${t.time}:00` : t.time;
+          } else {
+            // todo
+            base.repeat_pattern = 'none';
+            base.scheduled_date = getLocalDateStr();
+          }
+          return base;
+        });
+
+        const { error: insErr } = await supabase.from('user_tasks').insert(rows);
+        if (insErr) console.warn('[RiloWeekPlans] insert error', insErr.message);
+      } catch (e) {
+        console.warn('[RiloWeekPlans] persist failed', e);
+      }
+    }
+
     setStage('success');
     setTimeout(() => onNext(), 1700);
   };
@@ -315,8 +420,8 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
                             {task.label}
                           </p>
                           <p className="text-[12px] text-[#1a1f3d]/50 mt-0.5 flex items-center gap-1">
-                            <span>📅</span>
-                            <span>{task.kind}</span>
+                            <span>{task.kind === 'recurring' ? '🔁' : '📅'}</span>
+                            <span>{describeSchedule(task)}</span>
                           </p>
                         </div>
                         <div
