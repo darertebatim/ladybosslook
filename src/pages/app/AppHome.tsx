@@ -836,7 +836,6 @@ const AppHome = () => {
     if (
       !spotlightTourActiveRef.current ||
       localStorage.getItem('simora_add_coach_shown') !== 'true' ||
-      localStorage.getItem('simora_first_action_celebrated') === 'true' ||
       showAddCoachMark ||
       showFirstCoachMark ||
       tasksLoading ||
