@@ -5,6 +5,9 @@ import riloAppIcon from '@/assets/rilo-app-icon.png';
 import { whatIsRiloFlow } from '@/data/onboarding-flows/what-is-rilo';
 import type { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { haptic } from '@/lib/haptics';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { provisionRiloPicks } from '@/lib/onboarding/provisionRiloPicks';
 
 interface Props {
   step: OnboardingStep;
@@ -15,6 +18,17 @@ interface Props {
 const BUCKET_IDS = ['wir-pick-morning', 'wir-pick-afternoon', 'wir-pick-evening'] as const;
 const PALETTE = ['#FFB347', '#F08AB5', '#8A5CF0']; // morning, midday, evening
 
+// Map our task `color` token names to display hex used inside the planner card
+const TOKEN_TO_HEX: Record<string, string> = {
+  sky: '#5BB7F0',
+  mint: '#5BD0A8',
+  lavender: '#A98AF0',
+  pink: '#F08AB5',
+  lime: '#B6D34A',
+  yellow: '#F5C842',
+  peach: '#FFB347',
+};
+
 /**
  * Reassurance screen shown after the 3 task pickers, before the AI step.
  * Renders 3 chips picked from the user's selections (one per bucket when
@@ -22,6 +36,54 @@ const PALETTE = ['#FFB347', '#F08AB5', '#8A5CF0']; // morning, midday, evening
  * planner card's rows. Auto-advances after the animation completes.
  */
 export function RiloBuildingPlanScreen({ step, onNext, answers }: Props) {
+  const { user } = useAuth();
+  // Tasks that already exist for this user (e.g. Daily Reset) — shown as
+  // "already in your routine" rows under the new picks.
+  const [existingTasks, setExistingTasks] = useState<
+    { title: string; emoji: string; color: string }[]
+  >([]);
+
+  // Kick off provisioning + load existing routine tasks as soon as we land
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    (async () => {
+      // Fire-and-forget: persist the picks NOW so they really make it into
+      // the planner before the user reaches the home screen.
+      provisionRiloPicks(user.id, answers || {}).catch((err) =>
+        console.warn('[BuildingPlan] provisionRiloPicks failed:', err)
+      );
+      // Pull a few of their existing routine player tasks (Daily Reset etc.)
+      try {
+        const { data } = await supabase
+          .from('user_tasks')
+          .select('title, emoji, color')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .neq('pro_link_type', 'routine')
+          .order('order_index', { ascending: true })
+          .limit(4);
+        if (!cancelled && data) {
+          setExistingTasks(
+            data
+              .filter((r: any) => r.title)
+              .map((r: any) => ({
+                title: r.title,
+                emoji: r.emoji || '✨',
+                color: TOKEN_TO_HEX[r.color] || '#5BB7F0',
+              }))
+          );
+        }
+      } catch (e) {
+        // ignore — fallback is just an empty list
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
   // Build label -> emoji lookup from the picker step definitions
   const labelEmoji = useMemo(() => {
     const map: Record<string, string> = {};
