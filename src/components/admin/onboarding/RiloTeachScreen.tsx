@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Check, Sparkles } from 'lucide-react';
+import { useState } from 'react';
 import { OnboardingStep } from '@/types/onboarding';
 import { haptic } from '@/lib/haptics';
 
@@ -16,16 +17,25 @@ interface Props {
  */
 export function RiloTeachScreen({ step, onNext }: Props) {
   const variant = step.illustrationLabel || 'planner';
+  const isSuggest = variant === 'suggest';
+  const [launching, setLaunching] = useState(false);
 
   const handleTap = () => {
     haptic.light();
+    if (isSuggest) {
+      // Dramatic "we're building something" transition before moving on
+      setLaunching(true);
+      setTimeout(() => onNext(), 1400);
+      return;
+    }
     onNext();
   };
 
   return (
-    <div className="h-full w-full flex flex-col bg-gradient-to-b from-[#FFF7F0] to-white">
+    <div className={`h-full w-full flex flex-col ${isSuggest ? 'bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]' : 'bg-gradient-to-b from-[#FFF7F0] to-white'} relative overflow-hidden`}>
+      {isSuggest && <SuggestAmbientGlow />}
       {/* Visual area */}
-      <div className="flex-1 flex items-center justify-center px-6 pt-6 pb-4">
+      <div className="flex-1 flex items-center justify-center px-6 pt-6 pb-4 relative z-10">
         {variant === 'planner' && <PlannerVisual />}
         {variant === 'routine' && <RoutineVisual />}
         {variant === 'task-details' && <TaskDetailsVisual />}
@@ -34,7 +44,17 @@ export function RiloTeachScreen({ step, onNext }: Props) {
       </div>
 
       {/* Text + CTA */}
-      <div className="shrink-0 px-6 pb-10">
+      <div className="shrink-0 px-6 pb-10 relative z-10">
+        {isSuggest && (
+          <motion.p
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.05 }}
+            className="text-center text-[11px] font-bold uppercase tracking-[0.18em] text-[#B8590E] mb-2"
+          >
+            ✨ Your curated planner
+          </motion.p>
+        )}
         <motion.h1
           key={`title-${step.id}`}
           initial={{ opacity: 0, y: 8 }}
@@ -54,18 +74,129 @@ export function RiloTeachScreen({ step, onNext }: Props) {
             {step.subtitle}
           </motion.p>
         )}
+        {isSuggest && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.35 }}
+            className="mt-3 text-center text-[12px] font-semibold text-[#1a1f3d]/60"
+          >
+            Built from <span className="text-[#1a1f3d]">3,000+</span> routines that actually stuck.
+          </motion.p>
+        )}
         <motion.button
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.28 }}
           onClick={handleTap}
-          className="mt-7 w-full h-[56px] rounded-2xl bg-[#1a1f3d] text-white font-semibold text-[16px] active:opacity-80 transition-opacity"
+          disabled={launching}
+          className={`mt-7 w-full h-[56px] rounded-2xl text-white font-semibold text-[16px] active:opacity-80 transition-opacity ${
+            isSuggest
+              ? 'bg-gradient-to-r from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] shadow-[0_12px_30px_-8px_rgba(138,92,240,0.55)]'
+              : 'bg-[#1a1f3d]'
+          }`}
           style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           {step.buttonLabel || 'Continue'}
         </motion.button>
       </div>
+
+      {/* Launch transition overlay */}
+      {launching && <LaunchOverlay />}
     </div>
+  );
+}
+
+/* ---------- Ambient background sparkles for the suggest screen ---------- */
+function SuggestAmbientGlow() {
+  const sparkles = Array.from({ length: 14 });
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div
+        className="absolute -top-24 left-1/2 -translate-x-1/2 w-[420px] h-[420px] rounded-full blur-3xl opacity-60"
+        style={{ background: 'radial-gradient(circle, #FFD6A5 0%, transparent 70%)' }}
+      />
+      <div
+        className="absolute top-1/3 -right-20 w-[260px] h-[260px] rounded-full blur-3xl opacity-50"
+        style={{ background: 'radial-gradient(circle, #CDE7FF 0%, transparent 70%)' }}
+      />
+      <div
+        className="absolute bottom-10 -left-16 w-[300px] h-[300px] rounded-full blur-3xl opacity-50"
+        style={{ background: 'radial-gradient(circle, #E5D6FF 0%, transparent 70%)' }}
+      />
+      {sparkles.map((_, i) => {
+        const left = (i * 37) % 100;
+        const top = (i * 53) % 100;
+        const delay = (i % 7) * 0.3;
+        return (
+          <motion.span
+            key={i}
+            initial={{ opacity: 0, scale: 0.4 }}
+            animate={{ opacity: [0, 0.9, 0], scale: [0.4, 1, 0.4] }}
+            transition={{ duration: 2.2, delay, repeat: Infinity, repeatDelay: 1.5 }}
+            className="absolute text-[10px] text-[#1a1f3d]/60"
+            style={{ left: `${left}%`, top: `${top}%` }}
+          >
+            ✨
+          </motion.span>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ---------- Launch overlay: dramatic "building your day" loader ---------- */
+function LaunchOverlay() {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.25 }}
+      className="absolute inset-0 z-50 flex flex-col items-center justify-center"
+      style={{
+        background:
+          'radial-gradient(circle at 50% 45%, rgba(255,255,255,0.97) 0%, rgba(255,247,240,0.97) 50%, rgba(240,230,255,0.97) 100%)',
+      }}
+    >
+      {/* Pulsing rings */}
+      <div className="relative w-[180px] h-[180px] flex items-center justify-center">
+        {[0, 1, 2].map((i) => (
+          <motion.div
+            key={i}
+            initial={{ scale: 0.4, opacity: 0.7 }}
+            animate={{ scale: 1.6, opacity: 0 }}
+            transition={{ duration: 1.4, delay: i * 0.35, repeat: Infinity, ease: 'easeOut' }}
+            className="absolute inset-0 rounded-full border-2"
+            style={{ borderColor: ['#F08A3E', '#EC4899', '#8A5CF0'][i] }}
+          />
+        ))}
+        <motion.div
+          initial={{ scale: 0.6, rotate: -10 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ duration: 0.5, type: 'spring' }}
+          className="relative w-20 h-20 rounded-3xl bg-gradient-to-br from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] flex items-center justify-center shadow-[0_20px_50px_-10px_rgba(138,92,240,0.6)]"
+        >
+          <Sparkles className="w-10 h-10 text-white" strokeWidth={2.5} />
+        </motion.div>
+      </div>
+
+      <motion.p
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.4 }}
+        className="mt-8 text-[18px] font-bold text-[#1a1f3d]"
+      >
+        Building your day…
+      </motion.p>
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5, duration: 0.4 }}
+        className="mt-1 text-[13px] text-[#1a1f3d]/60"
+      >
+        Morning → Day → Evening → Week
+      </motion.p>
+    </motion.div>
   );
 }
 
@@ -166,48 +297,149 @@ function RoutineVisual() {
   );
 }
 
-/* ---------- Visual 3: Suggested first routine + swap chip ---------- */
+/* ---------- Visual: 4-slot day skeleton (Morning · Day · Evening · Week) ---------- */
 function SuggestVisual() {
+  // Each slot maps 1:1 to one of the next 4 onboarding screens.
+  const slots = [
+    { label: 'Morning',   emoji: '🌅', bg: '#FFE6C9', dot: '#F08A3E', glow: 'rgba(240,138,62,0.55)' },
+    { label: 'Daytime',   emoji: '☀️', bg: '#D7E9FF', dot: '#3E8AF0', glow: 'rgba(62,138,240,0.55)' },
+    { label: 'Evening',   emoji: '🌙', bg: '#E5D6FF', dot: '#8A5CF0', glow: 'rgba(138,92,240,0.55)' },
+  ];
+
   return (
     <div className="w-full max-w-[300px] mx-auto">
-      <div className="relative bg-white rounded-3xl shadow-[0_20px_60px_-20px_rgba(26,31,61,0.25)] p-5 border border-black/5">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FFE6CC] text-[#B8590E] text-[10px] font-bold uppercase tracking-wider">
-            ✨ Suggested
-          </span>
+      <motion.div
+        initial={{ opacity: 0, y: 14, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+        className="relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-[0_24px_70px_-20px_rgba(26,31,61,0.3)] p-5 border border-white/80"
+      >
+        {/* Card header */}
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#1a1f3d]/50">
+              Your day
+            </p>
+            <p className="text-[16px] font-bold text-[#1a1f3d]">Coming together…</p>
+          </div>
+          <motion.div
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+            className="w-9 h-9 rounded-full bg-gradient-to-br from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] flex items-center justify-center"
+          >
+            <Sparkles className="w-4 h-4 text-white" strokeWidth={2.5} />
+          </motion.div>
         </div>
-        <p className="text-[18px] font-bold text-[#1a1f3d] leading-tight">Your first routine</p>
-        <p className="text-[12px] text-[#1a1f3d]/60 mt-0.5">Morning · 5 min</p>
 
-        <div className="mt-4 space-y-2">
-          {[
-            { emoji: '💧', title: 'Drink water' },
-            { emoji: '🧘', title: 'Deep breathing' },
-            { emoji: '📝', title: 'One good thing' },
-          ].map((t, i) => (
+        {/* 3 day slots — Morning / Daytime / Evening */}
+        <div className="space-y-2.5">
+          {slots.map((s, i) => (
             <motion.div
-              key={t.title}
-              initial={{ opacity: 0, x: -8 }}
+              key={s.label}
+              initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 + i * 0.1, duration: 0.3 }}
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 bg-[#F4F2EF]"
+              transition={{ delay: 0.25 + i * 0.13, duration: 0.4 }}
+              className="relative rounded-2xl overflow-hidden"
             >
-              <span className="text-[18px]">{t.emoji}</span>
-              <p className="flex-1 text-[14px] font-semibold text-[#1a1f3d]">{t.title}</p>
+              {/* Pulsing glow behind the slot */}
+              <motion.div
+                animate={{ opacity: [0.35, 0.75, 0.35] }}
+                transition={{ duration: 2.4, repeat: Infinity, delay: i * 0.4, ease: 'easeInOut' }}
+                className="absolute inset-0 blur-md"
+                style={{ background: s.glow }}
+              />
+              <div
+                className="relative flex items-center gap-3 rounded-2xl px-3.5 py-3 border border-white/60"
+                style={{ background: s.bg }}
+              >
+                <span className="w-8 h-8 rounded-xl bg-white/70 flex items-center justify-center text-[16px]">
+                  {s.emoji}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#1a1f3d]/60">
+                    {s.label}
+                  </p>
+                  {/* Empty placeholder bars (about to be filled) */}
+                  <div className="mt-1 flex items-center gap-1">
+                    <motion.span
+                      animate={{ opacity: [0.25, 0.6, 0.25] }}
+                      transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.2 }}
+                      className="h-1.5 w-12 rounded-full"
+                      style={{ background: s.dot }}
+                    />
+                    <motion.span
+                      animate={{ opacity: [0.15, 0.4, 0.15] }}
+                      transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.2 + 0.3 }}
+                      className="h-1.5 w-8 rounded-full"
+                      style={{ background: s.dot }}
+                    />
+                  </div>
+                </div>
+                <motion.span
+                  animate={{ scale: [1, 1.25, 1], opacity: [0.6, 1, 0.6] }}
+                  transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.3 }}
+                  className="w-2.5 h-2.5 rounded-full shrink-0"
+                  style={{ background: s.dot, boxShadow: `0 0 12px ${s.dot}` }}
+                />
+              </div>
             </motion.div>
           ))}
         </div>
 
-        {/* Swap chip floating */}
+        {/* 4th slot: This week (AI plan) — visually distinct */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.85, y: 8 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ delay: 0.7, duration: 0.4, type: 'spring' }}
-          className="absolute -right-2 -bottom-2 px-3 py-2 rounded-full bg-[#1a1f3d] text-white text-[12px] font-semibold shadow-lg flex items-center gap-1.5"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.45 }}
+          className="relative mt-3 rounded-2xl overflow-hidden"
         >
-          <span>🔄</span> Swap any task
+          <motion.div
+            animate={{ opacity: [0.4, 0.85, 0.4] }}
+            transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute inset-0 blur-md"
+            style={{
+              background:
+                'linear-gradient(90deg, rgba(240,138,62,0.5), rgba(236,72,153,0.5), rgba(138,92,240,0.5))',
+            }}
+          />
+          <div
+            className="relative flex items-center gap-3 rounded-2xl px-3.5 py-3 border border-white/60"
+            style={{
+              background:
+                'linear-gradient(135deg, #FFF1E0 0%, #FFE6F0 50%, #F0E6FF 100%)',
+            }}
+          >
+            <span className="w-8 h-8 rounded-xl bg-white/80 flex items-center justify-center text-[16px]">
+              🪄
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#1a1f3d]/60">
+                This week · AI
+              </p>
+              <p className="text-[12px] font-bold text-[#1a1f3d] truncate">
+                Built from your plans
+              </p>
+            </div>
+            <motion.span
+              animate={{ rotate: [0, 15, -10, 0] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+              className="text-[16px]"
+            >
+              ✨
+            </motion.span>
+          </div>
         </motion.div>
-      </div>
+
+        {/* "4 quick steps" floating badge */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8, y: 6 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ delay: 0.95, duration: 0.4, type: 'spring' }}
+          className="absolute -right-2 -top-2 px-2.5 py-1 rounded-full bg-[#1a1f3d] text-white text-[10px] font-bold shadow-lg flex items-center gap-1"
+        >
+          <span>⚡</span> 4 quick steps
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
