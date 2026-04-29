@@ -372,9 +372,13 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
               ) : (
                 <button
                   type="button"
-                  disabled
-                  className="absolute right-3 bottom-3 h-10 w-10 rounded-full bg-black/80 flex items-center justify-center opacity-90"
-                  aria-label="Voice input (coming soon)"
+                  onClick={startListening}
+                  className={cn(
+                    'absolute right-3 bottom-3 h-10 w-10 rounded-full flex items-center justify-center active:scale-95 transition-all',
+                    isListening ? 'bg-red-500 animate-pulse' : 'bg-black',
+                    !speechSupported && 'opacity-50',
+                  )}
+                  aria-label={isListening ? 'Stop voice input' : 'Start voice input'}
                 >
                   <Mic className="h-4 w-4 text-white" />
                 </button>
