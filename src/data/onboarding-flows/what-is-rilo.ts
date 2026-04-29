@@ -12,7 +12,7 @@ export const whatIsRiloFlow: OnboardingFlow = {
       type: 'rilo-teach',
       illustrationLabel: 'planner',
       title: 'Meet Rilo.',
-      subtitle: 'Your self-care planner — built so you actually keep it.',
+      subtitle: 'Your FREE self-care planner',
       buttonLabel: 'Next',
     },
     {
