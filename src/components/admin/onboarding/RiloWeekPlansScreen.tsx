@@ -412,9 +412,16 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
             transition={{ duration: 0.35 }}
             className="shrink-0"
           >
-            <div className="w-full rounded-2xl bg-white border border-black/10 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)] px-4 py-3 flex items-center gap-2.5">
-              <Sparkles className="h-[18px] w-[18px] text-[#A98AF0] shrink-0" />
-              <p className="text-[16px] font-semibold text-[#1a1f3d] truncate">
+            <div className="w-full rounded-2xl bg-white border border-black/10 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)] px-4 py-3 flex items-start gap-2.5">
+              <Sparkles className="h-[18px] w-[18px] text-[#A98AF0] shrink-0 mt-0.5" />
+              <p
+                className="text-[15px] font-semibold text-[#1a1f3d] leading-snug overflow-hidden"
+                style={{
+                  display: '-webkit-box',
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: 'vertical',
+                }}
+              >
                 {text}
               </p>
             </div>
