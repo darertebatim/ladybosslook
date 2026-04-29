@@ -38,14 +38,6 @@ export const whatIsRiloFlow: OnboardingFlow = {
       buttonLabel: 'Next',
     },
     {
-      id: 'wir-tools-hub-v2',
-      type: 'rilo-teach',
-      illustrationLabel: 'tools-hub-v2',
-      title: 'Delete 8 apps. Keep one.',
-      subtitle: 'Calm, sleep, workouts, journal, calendar, habits, career, money — Rilo replaces them all. Free.',
-      buttonLabel: 'Next',
-    },
-    {
       id: 'wir-suggest',
       type: 'rilo-teach',
       illustrationLabel: 'suggest',
