@@ -6,6 +6,27 @@ import { haptic } from '@/lib/haptics';
 import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
 import riloAppIcon from '@/assets/rilo-app-icon.png';
 
+/** Today's label in the user's local timezone (fallback: America/Los_Angeles). */
+function formatTodayLabel(): string {
+  const tz =
+    Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Los_Angeles';
+  try {
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      timeZone: tz,
+    }).format(new Date());
+  } catch {
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      timeZone: 'America/Los_Angeles',
+    }).format(new Date());
+  }
+}
+
 /** Small inline 3D emoji (Fluent Emoji 3D via CDN). Falls back to native emoji if image fails. */
 function Emoji3D({ char, size = 20, className = '' }: { char: string; size?: number; className?: string }) {
   return (
