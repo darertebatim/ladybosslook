@@ -61,6 +61,7 @@ export default function AppAIPlanner() {
   const { user } = useAuth();
 
   const [stage, setStage] = useState<Stage>('input');
+  const [isClosing, setIsClosing] = useState(false);
   const [text, setText] = useState('');
   const [tasks, setTasks] = useState<ExtractedTask[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
