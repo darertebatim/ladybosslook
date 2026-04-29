@@ -54,6 +54,73 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { user } = useAuth();
 
+  // ── Voice input (Web Speech API) ────────────────────────────
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const speechSupported =
+    typeof window !== 'undefined' &&
+    !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+
+  const stopListening = () => {
+    try {
+      recognitionRef.current?.stop();
+    } catch {}
+    setIsListening(false);
+  };
+
+  const startListening = () => {
+    if (!speechSupported) {
+      toast.error("Voice input isn't supported on this device");
+      return;
+    }
+    if (isListening) {
+      stopListening();
+      return;
+    }
+    haptic.light();
+    const SR =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const rec = new SR();
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.lang = (navigator.language || 'en-US');
+
+    const baseText = text;
+    rec.onresult = (e: any) => {
+      let interim = '';
+      let final = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const transcript = e.results[i][0].transcript;
+        if (e.results[i].isFinal) final += transcript;
+        else interim += transcript;
+      }
+      const combined = [baseText, final, interim].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+      setText(combined);
+    };
+    rec.onerror = (e: any) => {
+      setIsListening(false);
+      if (e?.error === 'not-allowed' || e?.error === 'service-not-allowed') {
+        toast.error('Microphone permission denied');
+      } else if (e?.error !== 'aborted' && e?.error !== 'no-speech') {
+        toast.error('Voice input failed');
+      }
+    };
+    rec.onend = () => setIsListening(false);
+    recognitionRef.current = rec;
+    try {
+      rec.start();
+      setIsListening(true);
+    } catch {
+      setIsListening(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      try { recognitionRef.current?.stop(); } catch {}
+    };
+  }, []);
+
   // ── Submit / sequence ───────────────────────────────────────
   const startSequence = async (raw: string) => {
     const trimmed = raw.trim();
