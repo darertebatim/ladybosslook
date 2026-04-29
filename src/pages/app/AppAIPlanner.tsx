@@ -293,8 +293,12 @@ export default function AppAIPlanner() {
   const selectedCount = selectedIds.size;
 
   return (
-    <div
-      className="fixed inset-0 w-full flex flex-col overflow-hidden"
+    <motion.div
+      initial={{ y: '100%' }}
+      animate={{ y: 0 }}
+      exit={{ y: '100%' }}
+      transition={{ type: 'spring', stiffness: 320, damping: 32, mass: 0.9 }}
+      className="fixed inset-0 w-full flex flex-col overflow-hidden z-[10001]"
       style={{
         background:
           stage === 'input'
