@@ -18,6 +18,7 @@ interface Props {
 export function RiloTeachScreen({ step, onNext }: Props) {
   const variant = step.illustrationLabel || 'planner';
   const isSuggest = variant === 'suggest';
+  const isPlanner = variant === 'planner';
   const isToolsHub = variant === 'tools-hub';
   const [launching, setLaunching] = useState(false);
   const [collapsing, setCollapsing] = useState(false);
@@ -43,8 +44,16 @@ export function RiloTeachScreen({ step, onNext }: Props) {
   };
 
   return (
-    <div className={`h-full w-full flex flex-col ${isSuggest ? 'bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]' : 'bg-gradient-to-b from-[#FFF7F0] to-white'} relative overflow-hidden`}>
-      {isSuggest && <SuggestAmbientGlow />}
+    <div
+      className={`h-full w-full flex flex-col relative overflow-hidden ${
+        isSuggest
+          ? 'bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]'
+          : isPlanner
+          ? 'bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F4ECFF]'
+          : 'bg-gradient-to-b from-[#FFF7F0] to-white'
+      }`}
+    >
+      {(isSuggest || isPlanner) && <SuggestAmbientGlow />}
       {/* Visual area */}
       <div className="flex-1 flex items-center justify-center px-6 pt-6 pb-4 relative z-10">
         {variant === 'planner' && <PlannerVisual />}
@@ -66,11 +75,21 @@ export function RiloTeachScreen({ step, onNext }: Props) {
             ✨ Your curated planner
           </motion.p>
         )}
+        {isPlanner && (
+          <motion.p
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 1.4 }}
+            className="text-center text-[11px] font-bold uppercase tracking-[0.18em] text-[#B8590E] mb-2"
+          >
+            ✨ Welcome
+          </motion.p>
+        )}
         <motion.h1
           key={`title-${step.id}`}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.1 }}
+          transition={{ duration: 0.45, delay: isPlanner ? 1.5 : 0.1 }}
           className="text-[26px] leading-[1.2] font-bold text-[#1a1f3d] text-center"
         >
           {step.title}
@@ -79,7 +98,7 @@ export function RiloTeachScreen({ step, onNext }: Props) {
           <motion.p
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.18 }}
+            transition={{ duration: 0.4, delay: isPlanner ? 1.65 : 0.18 }}
             className="mt-3 text-[15px] leading-snug text-[#1a1f3d]/70 text-center"
           >
             {step.subtitle}
@@ -95,10 +114,20 @@ export function RiloTeachScreen({ step, onNext }: Props) {
             Built from <span className="text-[#1a1f3d]">3,000+</span> routines that actually stuck.
           </motion.p>
         )}
+        {isPlanner && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 1.85 }}
+            className="mt-3 text-center text-[12px] font-semibold text-[#1a1f3d]/60"
+          >
+            <span className="text-[#1a1f3d]">3,000+</span> women already plan their day here.
+          </motion.p>
+        )}
         <motion.button
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.28 }}
+          transition={{ duration: 0.4, delay: isPlanner ? 2.05 : 0.28 }}
           onClick={handleTap}
           disabled={launching || collapsing}
           className={`mt-7 w-full h-[56px] rounded-2xl text-white font-semibold text-[16px] active:opacity-80 transition-opacity ${
