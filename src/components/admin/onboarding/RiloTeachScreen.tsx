@@ -17,7 +17,7 @@ export function RiloTeachScreen({ step, onNext }: Props) {
   const variant = step.illustrationLabel || 'planner';
 
   const handleTap = () => {
-    haptic('light');
+    haptic.light();
     onNext();
   };
 
