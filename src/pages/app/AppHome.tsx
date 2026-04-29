@@ -836,7 +836,6 @@ const AppHome = () => {
     if (
       !spotlightTourActiveRef.current ||
       localStorage.getItem('simora_add_coach_shown') !== 'true' ||
-      localStorage.getItem('simora_first_action_celebrated') === 'true' ||
       showAddCoachMark ||
       showFirstCoachMark ||
       tasksLoading ||
@@ -861,6 +860,14 @@ const AppHome = () => {
       localStorage.setItem(SPOTLIGHT_TOUR_KEY, 'true');
       spotlightTourActiveRef.current = false;
       localStorage.removeItem('simora_force_new_user');
+      // Bonus: briefly pulse the streak pill so the user sees the connection
+      // between completing a task and starting their streak.
+      setTimeout(() => {
+        const el = document.querySelector('.tour-streak') as HTMLElement | null;
+        if (!el) return;
+        el.classList.add('streak-tour-pulse');
+        setTimeout(() => el.classList.remove('streak-tour-pulse'), 2400);
+      }, 600);
     }
   }, [showFirstCoachMark, completedTaskIds.size]);
   const handleDateSelect = useCallback((date: Date) => {
@@ -1255,46 +1262,45 @@ const AppHome = () => {
                            filteredTasks[0];
                          const tapHintTask =
                            filteredTasks.find(t => !completedTaskIds.has(t.id)) || filteredTasks[0];
-                         return (showFirstCoachMark || showTapCoachMark) && filteredTasks.length > 0 ? (
+                         const coachActive =
+                           (showFirstCoachMark || showTapCoachMark) && filteredTasks.length > 0;
+                         const highlightedId = coachActive
+                           ? (showTapCoachMark ? tapHintTask?.id : hintTask?.id) || null
+                           : null;
+                         return coachActive ? (
                            <>
-                             {/* Dim backdrop — tasks remain visible underneath */}
-                             <div
-                               className="fixed inset-0 bg-black/55 z-[100] animate-fade-in"
-                               onClick={() => {
-                                 if (showFirstCoachMark) setShowFirstCoachMark(false);
-                                 if (showTapCoachMark) setShowTapCoachMark(false);
+                             {/* Tasks stay in place — only the highlighted one is fully visible */}
+                             <SortableTaskList
+                               tasks={filteredTasks}
+                               date={selectedDate}
+                               completedTaskIds={completedTaskIds}
+                               completedSubtaskIds={completedSubtaskIds}
+                               goalProgressMap={goalProgressMap}
+                               onTaskTap={(task) => {
+                                 if (showTapCoachMark) {
+                                   setShowTapCoachMark(false);
+                                   tapCoachMarkTriggeredRef.current = true;
+                                 }
+                                 handleTaskTap(task);
                                }}
+                               onStreakIncrease={handleStreakIncrease}
+                               onStepUnlocked={handleStepUnlocked}
+                               onOpenGoalInput={handleOpenGoalInput}
+                               onOpenTimer={handleOpenTimer}
+                               hideQuickAdd
+                               coachHighlightTaskId={highlightedId}
                              />
-                             {/* Full task list, elevated above the dim layer so every task stays readable */}
-                             <div className="relative z-[101]">
-                               <SortableTaskList
-                                 tasks={filteredTasks}
-                                 date={selectedDate}
-                                 completedTaskIds={completedTaskIds}
-                                 completedSubtaskIds={completedSubtaskIds}
-                                 goalProgressMap={goalProgressMap}
-                                 onTaskTap={(task) => {
-                                   if (showTapCoachMark) {
-                                     setShowTapCoachMark(false);
-                                     tapCoachMarkTriggeredRef.current = true;
-                                   }
-                                   handleTaskTap(task);
-                                 }}
-                                 onStreakIncrease={handleStreakIncrease}
-                                 onStepUnlocked={handleStepUnlocked}
-                                 onOpenGoalInput={handleOpenGoalInput}
-                                 onOpenTimer={handleOpenTimer}
-                                 hideQuickAdd
-                               />
-                               <p className="text-center text-[15px] text-white mt-5 mb-2 animate-fade-in font-semibold tracking-tight">
+                             {/* Inline pill label — no full-screen dim */}
+                             <div className="flex justify-center mt-4 mb-1 animate-fade-in pointer-events-none">
+                               <span className="px-4 py-2 rounded-full bg-[#1a1a2e] text-white text-[13.5px] font-semibold tracking-tight shadow-[0_8px_24px_rgba(26,26,46,0.28)]">
                                  {showTapCoachMark
-                                   ? 'Tap a task to open its details'
-                                   : 'Tap the circle to check off your task'}
-                               </p>
+                                   ? '👆 Tap this task to open its details'
+                                   : '✅ Tap the circle to check it off'}
+                               </span>
                              </div>
-                             {/* Spotlight ring + hand anchored to the chosen task */}
+                             {/* Spotlight ring + hand anchored to the highlighted task */}
                              <TaskCoachOverlay
-                               taskId={(showTapCoachMark ? tapHintTask?.id : hintTask?.id) || null}
+                               taskId={highlightedId}
                                variant={showTapCoachMark ? 'tap' : 'check'}
                              />
                            </>
@@ -1446,13 +1452,19 @@ const AppHome = () => {
               >
                 <FluentEmoji emoji="👇" size={56} />
               </div>
-              {/* Label */}
-              <p
-                className="fixed z-[102] text-[15px] text-white font-semibold tracking-tight whitespace-nowrap pointer-events-none"
-                style={{ left: cx - 110, top: rect.bottom + 18 }}
+              {/* Label — pill, anchored under the FAB but constrained to viewport */}
+              <div
+                className="fixed z-[102] flex justify-end pointer-events-none px-4"
+                style={{
+                  right: 0,
+                  left: 0,
+                  top: rect.bottom + 14,
+                }}
               >
-                Tap + to add your own task
-              </p>
+                <span className="px-4 py-2 rounded-full bg-[#1a1a2e] text-white text-[13.5px] font-semibold tracking-tight shadow-[0_8px_24px_rgba(26,26,46,0.28)] max-w-[80vw] text-center">
+                  👆 Tap + to add your own task
+                </span>
+              </div>
               <style>{`
                 @keyframes addCoachBounce {
                   0%   { transform: translateY(0px); }

@@ -48,6 +48,7 @@ interface SortableTaskItemProps {
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
   isDragging?: boolean;
+  coachHighlight?: 'on' | 'off' | null;
 }
 
 const SortableTaskItem = ({
@@ -63,6 +64,7 @@ const SortableTaskItem = ({
   onOpenTimer,
   onOpenWaterTracking,
   isDragging,
+  coachHighlight,
 }: SortableTaskItemProps) => {
   const {
     attributes,
@@ -87,7 +89,9 @@ const SortableTaskItem = ({
       data-task-id={task.id}
       className={cn(
         'touch-manipulation',
-        isSortableDragging && 'opacity-50 scale-[1.02]'
+        isSortableDragging && 'opacity-50 scale-[1.02]',
+        coachHighlight === 'off' && 'opacity-30 pointer-events-none transition-opacity duration-300',
+        coachHighlight === 'on' && 'transition-transform duration-300'
       )}
     >
       <TaskCard
@@ -122,6 +126,8 @@ interface SortableTaskListProps {
   hideQuickAdd?: boolean;
   defaultRepeatOverride?: 'Daily' | 'No' | 'Weekly';
   onOpenTaskSheet?: (params: { editTaskId?: string; createParams?: Record<string, string> }) => void;
+  /** When set, only this task is highlighted; others are dimmed and non-interactive. */
+  coachHighlightTaskId?: string | null;
 }
 
 export const SortableTaskList = ({
@@ -139,6 +145,7 @@ export const SortableTaskList = ({
   hideQuickAdd = false,
   defaultRepeatOverride,
   onOpenTaskSheet,
+  coachHighlightTaskId,
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
@@ -248,6 +255,13 @@ export const SortableTaskList = ({
       onOpenTimer={onOpenTimer}
       onOpenWaterTracking={onOpenWaterTracking}
       isDragging={activeId === task.id}
+      coachHighlight={
+        coachHighlightTaskId
+          ? coachHighlightTaskId === task.id
+            ? 'on'
+            : 'off'
+          : null
+      }
     />
   );
 
