@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
 import riloAppIcon from '@/assets/rilo-app-icon.png';
-import { whatIsRiloFlow } from '@/data/onboarding-flows/what-is-rilo';
 import type { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { haptic } from '@/lib/haptics';
 import { supabase } from '@/integrations/supabase/client';
