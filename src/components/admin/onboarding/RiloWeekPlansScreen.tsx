@@ -36,6 +36,18 @@ const HINTS: { emoji: string; label: string }[] = [
 
 type Stage = 'input' | 'building' | 'matching' | 'picker' | 'success';
 
+// Rotating loading dialogues — shown one after another while the AI works.
+// Total minimum dwell time ≈ 5 × 750ms = 3.75s so it feels powerful, not casual.
+const LOADING_DIALOGUES = [
+  'Reading your plans…',
+  'Picking the right times…',
+  'Building your tasks…',
+  'Matching the right titles…',
+  'Fine-tuning the colors…',
+];
+const DIALOGUE_INTERVAL_MS = 750;
+const MIN_LOADING_MS = LOADING_DIALOGUES.length * DIALOGUE_INTERVAL_MS;
+
 type TaskKind = 'event' | 'recurring' | 'todo';
 
 interface ExtractedTask {
@@ -63,6 +75,8 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
   const [text, setText] = useState('');
   const [tasks, setTasks] = useState<ExtractedTask[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [dialogueIdx, setDialogueIdx] = useState(0);
+  const [revealedCount, setRevealedCount] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { user } = useAuth();
 
@@ -139,6 +153,15 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
     if (!trimmed) return;
     haptic.medium();
     setStage('building');
+    setDialogueIdx(0);
+    setRevealedCount(0);
+    const startedAt = Date.now();
+
+    // Cycle through dialogue messages while the AI works.
+    const dialogueTimer = setInterval(() => {
+      setDialogueIdx((i) => Math.min(i + 1, LOADING_DIALOGUES.length - 1));
+      haptic.light();
+    }, DIALOGUE_INTERVAL_MS);
 
     // Visual stage transition shortly before the network call resolves.
     const matchingTimer = setTimeout(() => setStage('matching'), 1400);
@@ -181,12 +204,28 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
         });
       }
 
+      // Make sure we don't blow past the dialogues — wait until they're done.
+      const elapsed = Date.now() - startedAt;
+      const remaining = Math.max(0, MIN_LOADING_MS - elapsed);
+      await new Promise((r) => setTimeout(r, remaining));
+      clearInterval(dialogueTimer);
+
       setTasks(extracted);
       setSelectedIds(new Set(extracted.map((t) => t.id)));
+      setRevealedCount(0);
       setStage('picker');
-      haptic.light();
+      haptic.medium();
+
+      // Reveal task rows one-by-one (~180ms apart) with a soft tap each.
+      extracted.forEach((_, i) => {
+        setTimeout(() => {
+          haptic.light();
+          setRevealedCount((c) => Math.max(c, i + 1));
+        }, 220 + i * 180);
+      });
     } catch (e: any) {
       clearTimeout(matchingTimer);
+      clearInterval(dialogueTimer);
       console.error('[RiloWeekPlans] extract failed', e);
       toast.error(e?.message || 'Could not build your tasks. Try again.');
       setStage('input');
@@ -293,7 +332,7 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
       style={{
         background:
           stage === 'input'
-            ? 'linear-gradient(170deg, #FFE4D6 0%, #FFE9DC 35%, #FFF1E6 65%, #FFF8F1 100%)'
+            ? 'linear-gradient(160deg, #FFD6C2 0%, #FFC9D9 30%, #F5D4F0 60%, #E8D9FF 100%)'
             : stage === 'success'
               ? 'linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 100%)'
               : '#FFFFFF',
@@ -459,14 +498,15 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
               >
                 <PulsingOrb />
                 <motion.h2
-                  key={stage}
+                  key={`dlg-${dialogueIdx}`}
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.4 }}
                   className="mt-10 text-[24px] font-bold text-[#1a1f3d]"
                   style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
                 >
-                  {stage === 'building' ? 'Building your tasks…' : 'Matching the right titles…'}
+                  {LOADING_DIALOGUES[dialogueIdx]}
                 </motion.h2>
               </motion.div>
             )}
@@ -490,13 +530,22 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
                   {tasks.map((task, idx) => {
                     const isSelected = selectedIds.has(task.id);
                     const chipBg = BRAND_TASK_COLORS[idx % BRAND_TASK_COLORS.length];
+                    const visible = idx < revealedCount;
                     return (
-                      <button
+                      <motion.button
                         key={task.id}
+                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                        animate={
+                          visible
+                            ? { opacity: 1, y: 0, scale: 1 }
+                            : { opacity: 0, y: 10, scale: 0.98 }
+                        }
+                        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                         onClick={() => toggleSelect(task.id)}
                         className={cn(
                           'w-full flex items-center gap-3 rounded-2xl border bg-white px-3 py-2.5 text-left active:scale-[0.99] transition-all',
                           isSelected ? 'border-black/10' : 'border-black/5 opacity-60',
+                          !visible && 'pointer-events-none',
                         )}
                       >
                         {/* Emoji chip */}
@@ -540,7 +589,7 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
                         >
                           {isSelected && <Check className="h-4 w-4 text-white" strokeWidth={3} />}
                         </div>
-                      </button>
+                      </motion.button>
                     );
                   })}
                 </div>
@@ -601,24 +650,24 @@ function PulsingOrb() {
         transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
         className="absolute inset-0 rounded-full"
         style={{
-          background: 'radial-gradient(circle, rgba(169,138,240,0.45) 0%, rgba(169,138,240,0) 70%)',
+          background: 'radial-gradient(circle, rgba(255,170,150,0.5) 0%, rgba(255,170,150,0) 70%)',
         }}
       />
       {/* Soft ring */}
       <div
         className="absolute h-[130px] w-[130px] rounded-full"
         style={{
-          background: 'radial-gradient(circle, rgba(214,201,255,0.9) 0%, rgba(214,201,255,0.3) 60%, transparent 80%)',
+          background: 'radial-gradient(circle, rgba(255,214,224,0.9) 0%, rgba(255,214,224,0.3) 60%, transparent 80%)',
         }}
       />
       {/* Core orb */}
       <motion.div
         animate={{ scale: [1, 1.04, 1] }}
         transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-        className="relative h-[110px] w-[110px] rounded-full shadow-[0_10px_30px_-8px_rgba(120,90,200,0.5)]"
+        className="relative h-[110px] w-[110px] rounded-full shadow-[0_10px_30px_-8px_rgba(220,120,140,0.45)]"
         style={{
           background:
-            'radial-gradient(circle at 35% 30%, #D6C9FF 0%, #B8A4F2 45%, #9C82E8 100%)',
+            'radial-gradient(circle at 35% 30%, #FFE0CC 0%, #FFB6C7 45%, #E8A4D8 100%)',
         }}
       />
     </div>
