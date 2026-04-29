@@ -41,7 +41,6 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
   const [text, setText] = useState('');
   const [tasks, setTasks] = useState<ExtractedTask[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [editing, setEditing] = useState<Record<string, string>>({});
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // ── Submit / sequence ───────────────────────────────────────
@@ -66,7 +65,6 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
     setStage('input');
     setTasks([]);
     setSelectedIds(new Set());
-    setEditing({});
     setTimeout(() => textareaRef.current?.focus(), 50);
   };
 
@@ -91,7 +89,7 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
     haptic.medium();
     const chosen = tasks
       .filter((t) => selectedIds.has(t.id))
-      .map((t) => editing[t.id]?.trim() || t.label);
+      .map((t) => t.label);
     if (onAnswer) onAnswer(step.id, chosen);
     setStage('success');
     setTimeout(() => onNext(), 1700);
