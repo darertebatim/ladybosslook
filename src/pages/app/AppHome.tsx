@@ -1248,14 +1248,23 @@ const AppHome = () => {
                     <>
                       {/* Coach mark spotlight for first-ever action — delayed via state */}
                        {(() => {
-                         const hintTask = filteredTasks.find(t => !completedTaskIds.has(t.id) && !t.pro_link_type) || filteredTasks.find(t => !completedTaskIds.has(t.id));
-                         return showFirstCoachMark && hintTask ? (
+                         const hintTask =
+                           filteredTasks.find(t => !completedTaskIds.has(t.id) && !t.pro_link_type) ||
+                           filteredTasks.find(t => !completedTaskIds.has(t.id)) ||
+                           filteredTasks[0];
+                         const tapHintTask =
+                           filteredTasks.find(t => !completedTaskIds.has(t.id)) || filteredTasks[0];
+                         return (showFirstCoachMark || showTapCoachMark) && filteredTasks.length > 0 ? (
                            <>
-                             {/* Dim overlay — does NOT hide tasks, they stay visible underneath */}
-                             <div className="fixed inset-0 bg-black/55 z-[100] animate-fade-in" onClick={() => setShowFirstCoachMark(false)} />
-
-                             {/* Render the FULL task list above the dim layer so all tasks remain visible.
-                                 Only the hint task's checkbox is interactive (others are pointer-events-none). */}
+                             {/* Dim backdrop — tasks remain visible underneath */}
+                             <div
+                               className="fixed inset-0 bg-black/55 z-[100] animate-fade-in"
+                               onClick={() => {
+                                 if (showFirstCoachMark) setShowFirstCoachMark(false);
+                                 if (showTapCoachMark) setShowTapCoachMark(false);
+                               }}
+                             />
+                             {/* Full task list, elevated above the dim layer so every task stays readable */}
                              <div className="relative z-[101]">
                                <SortableTaskList
                                  tasks={filteredTasks}
@@ -1263,101 +1272,32 @@ const AppHome = () => {
                                  completedTaskIds={completedTaskIds}
                                  completedSubtaskIds={completedSubtaskIds}
                                  goalProgressMap={goalProgressMap}
-                                 onTaskTap={() => {}}
+                                 onTaskTap={(task) => {
+                                   if (showTapCoachMark) {
+                                     setShowTapCoachMark(false);
+                                     tapCoachMarkTriggeredRef.current = true;
+                                   }
+                                   handleTaskTap(task);
+                                 }}
                                  onStreakIncrease={handleStreakIncrease}
                                  onStepUnlocked={handleStepUnlocked}
                                  onOpenGoalInput={handleOpenGoalInput}
                                  onOpenTimer={handleOpenTimer}
                                  hideQuickAdd
-                                 spotlightTaskId={hintTask.id}
                                />
-                               <style>{`
-                                 @keyframes coachHandBounce {
-                                   0%   { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
-                                   40%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
-                                   55%  { transform: translateY(-100%) rotate(-45deg) translateY(5px); }
-                                   70%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
-                                   100% { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
-                                 }
-                                 @keyframes checkboxGlow {
-                                   0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
-                                   50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
-                                 }
-                               `}</style>
-                               <p className="text-center text-sm text-white/95 mt-5 mb-2 animate-fade-in font-medium">
-                                 Tap the circle to check it off ✨
+                               <p className="text-center text-[15px] text-white mt-5 mb-2 animate-fade-in font-semibold tracking-tight">
+                                 {showTapCoachMark
+                                   ? 'Tap a task to open its details'
+                                   : 'Tap the circle to check off your task'}
                                </p>
                              </div>
+                             {/* Spotlight ring + hand anchored to the chosen task */}
+                             <TaskCoachOverlay
+                               taskId={(showTapCoachMark ? tapHintTask?.id : hintTask?.id) || null}
+                               variant={showTapCoachMark ? 'tap' : 'check'}
+                             />
                            </>
-                         ) : showTapCoachMark ? (
-                          <>
-                            {/* Dark overlay for "tap to manage" coach mark */}
-                            <div className="fixed inset-0 bg-black/60 z-[100] animate-fade-in" onClick={() => setShowTapCoachMark(false)} />
-                            
-                            {/* Spotlight the first UNCOMPLETED action, fallback to first task */}
-                            {filteredTasks.length > 0 && (() => {
-                              const spotlightTask = filteredTasks.find(t => !completedTaskIds.has(t.id)) || filteredTasks[0];
-                              return (
-                              <div className="relative z-[101]">
-                                <div className="relative">
-                                  <SortableTaskList tasks={[spotlightTask]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={(task) => { setShowTapCoachMark(false); tapCoachMarkTriggeredRef.current = true; handleTaskTap(task); }} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
-                                  
-                                  {/* Glowing highlight around the action name area */}
-                                  <div
-                                    className="absolute pointer-events-none"
-                                    style={{
-                                      top: '50%',
-                                      left: '50px',
-                                      width: '160px',
-                                      height: '36px',
-                                      transform: 'translateY(-50%)',
-                                      borderRadius: '12px',
-                                      boxShadow: '0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35)',
-                                      animation: 'checkboxGlow 1.6s ease-in-out infinite',
-                                    }}
-                                  />
-
-                                  {/* Bouncing hand hint pointing at the action name — same style as first spotlight */}
-                                  <div
-                                    className="absolute pointer-events-none"
-                                    style={{
-                                      top: '50%',
-                                      left: '70px',
-                                      transform: 'translateY(-100%) rotate(-45deg)',
-                                      filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
-                                      animation: 'tapCoachBounce 1.4s ease-in-out infinite',
-                                    }}
-                                  >
-                                    <FluentEmoji emoji="👇" size={64} />
-                                  </div>
-                                </div>
-                                <style>{`
-                                  @keyframes tapCoachBounce {
-                                    0%   { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
-                                    40%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
-                                    55%  { transform: translateY(-100%) rotate(-45deg) translateY(5px); }
-                                    70%  { transform: translateY(-100%) rotate(-45deg) translateY(10px); }
-                                    100% { transform: translateY(-100%) rotate(-45deg) translateY(0px); }
-                                  }
-                                  @keyframes checkboxGlow {
-                                    0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
-                                    50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
-                                  }
-                                `}</style>
-                                <p className="text-center text-sm text-white/90 mt-3 mb-2 animate-fade-in font-medium">
-                                  Tap on an action to edit, skip, or delete it
-                                </p>
-                              </div>
-                              );
-                            })()}
-                            {/* Remaining tasks behind the overlay */}
-                            {filteredTasks.length > 1 && (
-                              <div className="relative z-[1]">
-                                <SortableTaskList tasks={filteredTasks.slice(1)} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
-                              </div>
-                            )}
-                          </>
-                        ) : (
+                         ) : (
                           <>
                             <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenTaskSheet={handleOpenTaskSheet} hideQuickAdd={taskFilter === 'all-routines' || taskFilter.startsWith('routine:')} defaultRepeatOverride={homeView === 'one-time' ? 'No' : undefined} />
                             {(taskFilter === 'all-routines' || taskFilter.startsWith('routine:')) && (
