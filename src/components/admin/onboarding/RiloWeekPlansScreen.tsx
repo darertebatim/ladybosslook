@@ -75,6 +75,8 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
   const [text, setText] = useState('');
   const [tasks, setTasks] = useState<ExtractedTask[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [dialogueIdx, setDialogueIdx] = useState(0);
+  const [revealedCount, setRevealedCount] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { user } = useAuth();
 
