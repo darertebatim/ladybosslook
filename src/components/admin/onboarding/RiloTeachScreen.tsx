@@ -281,10 +281,11 @@ function LaunchOverlay() {
 
 /* ---------- Visual 1: Cinematic Rilo intro — R-bloom + sunrise card ---------- */
 function PlannerVisual() {
+  // Cravable, "main character" tasks women actually want in their day.
   const blocks = [
-    { time: '8:00',  title: 'Morning stretch', color: '#FFD6A5', dot: '#F08A3E' },
-    { time: '12:30', title: 'Gratitude break', color: '#CDE7FF', dot: '#3E8AF0' },
-    { time: '20:00', title: 'Wind-down read',  color: '#E5D6FF', dot: '#8A5CF0' },
+    { time: '7:30',  emoji: '🍵', title: 'Iced matcha + journal', color: '#E0FBB8', dot: '#3E7A1E' },
+    { time: '12:30', emoji: '👟', title: 'Hot girl walk',          color: '#FFD9E5', dot: '#EC4899' },
+    { time: '21:00', emoji: '🛁', title: 'Skincare + slow read',   color: '#E5D6FF', dot: '#8A5CF0' },
   ];
 
   // Timing baseline (seconds):
@@ -307,7 +308,7 @@ function PlannerVisual() {
         }}
       />
 
-      {/* Phase 1: Rilo "R" mark blooms center, then settles into card header */}
+      {/* Phase 1: Rilo app icon blooms center, then settles into card header */}
       <motion.div
         initial={{ opacity: 0, scale: 0.2 }}
         animate={{
@@ -321,9 +322,14 @@ function PlannerVisual() {
           times: [0, 0.4, 0.55, 1],
           ease: [0.25, 0.1, 0.25, 1],
         }}
-        className="absolute z-20 w-16 h-16 rounded-full bg-gradient-to-br from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] flex items-center justify-center shadow-[0_20px_50px_-10px_rgba(138,92,240,0.55)]"
+        className="absolute z-20 w-16 h-16 rounded-[18px] overflow-hidden shadow-[0_20px_50px_-10px_rgba(138,92,240,0.55)]"
       >
-        <span className="text-white font-bold text-[28px] leading-none">R</span>
+        <img
+          src={riloAppIcon}
+          alt="Rilo"
+          className="w-full h-full object-cover select-none"
+          draggable={false}
+        />
         {/* Outward bloom rings */}
         {[0, 1].map((i) => (
           <motion.span
@@ -331,7 +337,7 @@ function PlannerVisual() {
             initial={{ scale: 0.6, opacity: 0.7 }}
             animate={{ scale: 2.4, opacity: 0 }}
             transition={{ duration: 1.0, delay: 0.15 + i * 0.25, ease: 'easeOut' }}
-            className="absolute inset-0 rounded-full border-2 border-[#EC4899]"
+            className="absolute inset-0 rounded-[18px] border-2 border-[#EC4899]"
           />
         ))}
       </motion.div>
@@ -397,6 +403,15 @@ function PlannerVisual() {
                   className="w-2.5 h-2.5 rounded-full shrink-0"
                   style={{ background: b.dot }}
                 />
+                {/* 3D emoji badge */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.6, rotate: -8 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  transition={{ delay: taskDelay + 0.2, duration: 0.4, type: 'spring' }}
+                  className="w-8 h-8 rounded-xl bg-white/70 flex items-center justify-center shrink-0"
+                >
+                  <Emoji3D char={b.emoji} size={20} />
+                </motion.div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[11px] font-semibold text-[#1a1f3d]/60">{b.time}</p>
                   <p className="text-[14px] font-semibold text-[#1a1f3d] truncate">{b.title}</p>
