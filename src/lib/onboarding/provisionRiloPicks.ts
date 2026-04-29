@@ -15,6 +15,13 @@ const MY_RILO_TITLE = 'My Rilo';
 const MY_RILO_EMOJI = '🔥';
 const MY_RILO_COLOR = 'pink';
 
+// Module-level in-flight map. Multiple callers (AppOnboarding,
+// RiloBuildingPlanScreen, RiloCommitScreen) and React StrictMode double
+// mounts can otherwise race past the existence check below and create
+// duplicate "My Rilo" routines. Coalesce all concurrent calls per user
+// into a single promise.
+const inflight = new Map<string, Promise<{ inserted: number; skipped: number; routineId?: string }>>();
+
 /**
  * Build a label -> emoji lookup from the picker step definitions in the flow.
  */
@@ -42,6 +49,11 @@ export async function provisionRiloPicks(
 ): Promise<{ inserted: number; skipped: number; routineId?: string }> {
   if (!userId) return { inserted: 0, skipped: 0 };
 
+  // Coalesce concurrent calls for the same user.
+  const existing = inflight.get(userId);
+  if (existing) return existing;
+
+  const run = (async () => {
   const labelEmoji = buildLabelEmojiMap();
 
   // Flatten picks in display order: morning -> afternoon -> evening
@@ -60,7 +72,28 @@ export async function provisionRiloPicks(
     }
   }
 
-  if (rows.length === 0) return { inserted: 0, skipped: 0 };
+  if (rows.length === 0) {
+    // Even with no picker answers, still return any existing routineId
+    // so callers (e.g. RiloCommitScreen) can find it.
+    try {
+      const { data: existingRoutine } = await supabase
+        .from('user_routines_bank')
+        .select('routine_id')
+        .eq('user_id', userId)
+        .eq('title', MY_RILO_TITLE)
+        .eq('is_user_created', true)
+        .order('routine_id', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      return {
+        inserted: 0,
+        skipped: 0,
+        routineId: existingRoutine?.routine_id,
+      };
+    } catch {
+      return { inserted: 0, skipped: 0 };
+    }
+  }
 
   // Idempotency: if "My Rilo" already exists, return its id without inserting
   try {
@@ -70,6 +103,7 @@ export async function provisionRiloPicks(
       .eq('user_id', userId)
       .eq('title', MY_RILO_TITLE)
       .eq('is_user_created', true)
+      .order('routine_id', { ascending: true })
       .limit(1)
       .maybeSingle();
     if (existingRoutine?.routine_id) {
@@ -163,4 +197,12 @@ export async function provisionRiloPicks(
   }
 
   return { inserted: rows.length, skipped: 0, routineId };
+  })();
+
+  inflight.set(userId, run);
+  try {
+    return await run;
+  } finally {
+    inflight.delete(userId);
+  }
 }
