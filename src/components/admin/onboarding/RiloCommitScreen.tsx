@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
+import { provisionRiloPicks } from '@/lib/onboarding/provisionRiloPicks';
 import type { OnboardingStep } from '@/types/onboarding';
 
 interface Props {
@@ -31,36 +32,42 @@ export function RiloCommitScreen({ step, onNext }: Props) {
     if (!user?.id) return;
     let cancelled = false;
     (async () => {
-      // Pull every task created during onboarding for this user. We rely on
-      // the routine launcher (pro_link_type='routine') + its child tasks
-      // (source_routine_id set) which both belong to the user.
-      const { data } = await supabase
-        .from('user_tasks')
-        .select('id, title, emoji, order_index, pro_link_type, source_routine_id, created_at')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: true })
-        .limit(40);
-      if (cancelled) return;
-      const list = (data || []) as any[];
-      // Show launcher first, then its children in stored order.
-      const launchers = list.filter((r) => r.pro_link_type === 'routine');
-      const launcher = launchers[launchers.length - 1]; // most recent "My Rilo"
-      const out: Row[] = [];
-      if (launcher) {
-        out.push({ id: launcher.id, title: launcher.title, emoji: launcher.emoji || '🔥' });
-        const children = list
-          .filter((r) => r.source_routine_id && r.source_routine_id === launcher.pro_link_value)
-          .sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0));
-        for (const c of children) {
+      try {
+        // Idempotent — returns the same routineId on repeat calls.
+        const result = await provisionRiloPicks(user.id, {});
+        const routineId = result?.routineId;
+        if (!routineId) {
+          if (!cancelled) setRows([]);
+          return;
+        }
+        const [launcherRes, childRes] = await Promise.all([
+          supabase
+            .from('user_tasks')
+            .select('id, title, emoji')
+            .eq('user_id', user.id)
+            .eq('pro_link_type', 'routine')
+            .eq('pro_link_value', routineId)
+            .limit(1),
+          supabase
+            .from('user_tasks')
+            .select('id, title, emoji, order_index')
+            .eq('user_id', user.id)
+            .eq('source_routine_id', routineId)
+            .order('order_index', { ascending: true }),
+        ]);
+        if (cancelled) return;
+        const out: Row[] = [];
+        const launcher = launcherRes.data?.[0] as any;
+        if (launcher) {
+          out.push({ id: launcher.id, title: launcher.title, emoji: launcher.emoji || '🔥' });
+        }
+        for (const c of (childRes.data || []) as any[]) {
           out.push({ id: c.id, title: c.title, emoji: c.emoji || '✨' });
         }
-      } else {
-        // Fallback: show whatever child tasks exist
-        for (const r of list.slice(0, 10)) {
-          out.push({ id: r.id, title: r.title, emoji: r.emoji || '✨' });
-        }
+        setRows(out);
+      } catch (err) {
+        console.warn('[RiloCommitScreen] failed to load tasks:', err);
       }
-      setRows(out);
     })();
     return () => {
       cancelled = true;
