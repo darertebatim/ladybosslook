@@ -1448,10 +1448,10 @@ const AppHome = () => {
               </div>
               {/* Label */}
               <p
-                className="fixed z-[102] text-sm text-white/90 font-medium whitespace-nowrap pointer-events-none"
-                style={{ left: cx - 80, top: rect.bottom + 18 }}
+                className="fixed z-[102] text-[15px] text-white font-semibold tracking-tight whitespace-nowrap pointer-events-none"
+                style={{ left: cx - 110, top: rect.bottom + 18 }}
               >
-                Tap + to add a new task
+                Tap + to add your own task
               </p>
               <style>{`
                 @keyframes addCoachBounce {
