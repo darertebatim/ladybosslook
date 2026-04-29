@@ -6,6 +6,27 @@ import { haptic } from '@/lib/haptics';
 import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
 import riloAppIcon from '@/assets/rilo-app-icon.png';
 
+/** Today's label in the user's local timezone (fallback: America/Los_Angeles). */
+function formatTodayLabel(): string {
+  const tz =
+    Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Los_Angeles';
+  try {
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      timeZone: tz,
+    }).format(new Date());
+  } catch {
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      timeZone: 'America/Los_Angeles',
+    }).format(new Date());
+  }
+}
+
 /** Small inline 3D emoji (Fluent Emoji 3D via CDN). Falls back to native emoji if image fails. */
 function Emoji3D({ char, size = 20, className = '' }: { char: string; size?: number; className?: string }) {
   return (
@@ -386,7 +407,7 @@ function PlannerVisual() {
             <p className="text-[11px] font-semibold uppercase tracking-wider text-[#1a1f3d]/50">
               Today
             </p>
-            <p className="text-[18px] font-bold text-[#1a1f3d]">Wed, Apr 29</p>
+            <p className="text-[18px] font-bold text-[#1a1f3d]">{formatTodayLabel()}</p>
           </motion.div>
           {/* Reserved spot for the R-mark to land into (visual placeholder, real R is the floating one above) */}
           <div className="w-9 h-9 rounded-full bg-transparent" />
