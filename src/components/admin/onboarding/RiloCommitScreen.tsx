@@ -40,7 +40,7 @@ export function RiloCommitScreen({ step, onNext }: Props) {
           if (!cancelled) setRows([]);
           return;
         }
-        const [launcherRes, childRes] = await Promise.all([
+        const [launcherRes, childRes, aiRes] = await Promise.all([
           supabase
             .from('user_tasks')
             .select('id, title, emoji')
@@ -54,6 +54,15 @@ export function RiloCommitScreen({ step, onNext }: Props) {
             .eq('user_id', user.id)
             .eq('source_routine_id', routineId)
             .order('order_index', { ascending: true }),
+          // AI-extracted plans inserted from RiloWeekPlansScreen — they have
+          // negative order_index and no source_routine_id.
+          supabase
+            .from('user_tasks')
+            .select('id, title, emoji, order_index, source_routine_id')
+            .eq('user_id', user.id)
+            .is('source_routine_id', null)
+            .lt('order_index', 0)
+            .order('order_index', { ascending: true }),
         ]);
         if (cancelled) return;
         const out: Row[] = [];
@@ -63,6 +72,12 @@ export function RiloCommitScreen({ step, onNext }: Props) {
         }
         for (const c of (childRes.data || []) as any[]) {
           out.push({ id: c.id, title: c.title, emoji: c.emoji || '✨' });
+        }
+        const seen = new Set(out.map((r) => r.id));
+        for (const a of (aiRes.data || []) as any[]) {
+          if (seen.has(a.id)) continue;
+          out.push({ id: a.id, title: a.title, emoji: a.emoji || '✨' });
+          seen.add(a.id);
         }
         setRows(out);
       } catch (err) {
