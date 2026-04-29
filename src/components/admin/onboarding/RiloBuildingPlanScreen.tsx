@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
 import riloAppIcon from '@/assets/rilo-app-icon.png';
-import { whatIsRiloFlow } from '@/data/onboarding-flows/what-is-rilo';
 import type { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { haptic } from '@/lib/haptics';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,9 +14,6 @@ interface Props {
   answers?: OnboardingAnswers;
 }
 
-const BUCKET_IDS = ['wir-pick-morning', 'wir-pick-afternoon', 'wir-pick-evening'] as const;
-const PALETTE = ['#FFB347', '#F08AB5', '#8A5CF0']; // morning, midday, evening
-
 // Map our task `color` token names to display hex used inside the planner card
 const TOKEN_TO_HEX: Record<string, string> = {
   sky: '#5BB7F0',
@@ -29,6 +25,14 @@ const TOKEN_TO_HEX: Record<string, string> = {
   peach: '#FFB347',
 };
 
+type PlannerRow = {
+  id: string;
+  title: string;
+  emoji: string;
+  color: string; // hex
+  isLauncher: boolean;
+};
+
 /**
  * Reassurance screen shown after the 3 task pickers, before the AI step.
  * Renders 3 chips picked from the user's selections (one per bucket when
@@ -37,45 +41,68 @@ const TOKEN_TO_HEX: Record<string, string> = {
  */
 export function RiloBuildingPlanScreen({ step, onNext, answers }: Props) {
   const { user } = useAuth();
-  // Tasks that already exist for this user (e.g. Daily Reset) — shown as
-  // "already in your routine" rows under the new picks.
-  const [existingTasks, setExistingTasks] = useState<
-    { title: string; emoji: string; color: string }[]
-  >([]);
+  // Real planner rows belonging to the freshly-created "My Rilo" routine
+  const [rows, setRows] = useState<PlannerRow[]>([]);
+  const [ready, setReady] = useState(false);
 
-  // Kick off provisioning + load existing routine tasks as soon as we land
+  // Provision the routine FIRST, then read back its tasks
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      setReady(true);
+      return;
+    }
     let cancelled = false;
     (async () => {
-      // Fire-and-forget: persist the picks NOW so they really make it into
-      // the planner before the user reaches the home screen.
-      provisionRiloPicks(user.id, answers || {}).catch((err) =>
-        console.warn('[BuildingPlan] provisionRiloPicks failed:', err)
-      );
-      // Pull a few of their existing routine player tasks (Daily Reset etc.)
       try {
-        const { data } = await supabase
-          .from('user_tasks')
-          .select('title, emoji, color')
-          .eq('user_id', user.id)
-          .eq('is_active', true)
-          .neq('pro_link_type', 'routine')
-          .order('order_index', { ascending: true })
-          .limit(4);
-        if (!cancelled && data) {
-          setExistingTasks(
-            data
-              .filter((r: any) => r.title)
-              .map((r: any) => ({
-                title: r.title,
-                emoji: r.emoji || '✨',
-                color: TOKEN_TO_HEX[r.color] || '#5BB7F0',
-              }))
-          );
+        const result = await provisionRiloPicks(user.id, answers || {});
+        const routineId = result.routineId;
+        if (!routineId) {
+          if (!cancelled) setReady(true);
+          return;
         }
-      } catch (e) {
-        // ignore — fallback is just an empty list
+        // Pull the routine launcher + child tasks (max 6 to keep the card tidy)
+        const [launcherRes, childRes] = await Promise.all([
+          supabase
+            .from('user_tasks')
+            .select('id, title, emoji, color')
+            .eq('user_id', user.id)
+            .eq('pro_link_type', 'routine')
+            .eq('pro_link_value', routineId)
+            .limit(1),
+          supabase
+            .from('user_tasks')
+            .select('id, title, emoji, color, order_index')
+            .eq('user_id', user.id)
+            .eq('source_routine_id', routineId)
+            .order('order_index', { ascending: true })
+            .limit(5),
+        ]);
+        if (cancelled) return;
+        const out: PlannerRow[] = [];
+        const launcher = launcherRes.data?.[0] as any;
+        if (launcher) {
+          out.push({
+            id: launcher.id,
+            title: launcher.title,
+            emoji: launcher.emoji || '🔥',
+            color: TOKEN_TO_HEX[launcher.color] || '#F08AB5',
+            isLauncher: true,
+          });
+        }
+        for (const r of (childRes.data || []) as any[]) {
+          out.push({
+            id: r.id,
+            title: r.title,
+            emoji: r.emoji || '✨',
+            color: TOKEN_TO_HEX[r.color] || '#5BB7F0',
+            isLauncher: false,
+          });
+        }
+        setRows(out);
+      } catch (err) {
+        console.warn('[BuildingPlan] provision/load failed:', err);
+      } finally {
+        if (!cancelled) setReady(true);
       }
     })();
     return () => {
@@ -84,68 +111,22 @@ export function RiloBuildingPlanScreen({ step, onNext, answers }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  // Build label -> emoji lookup from the picker step definitions
-  const labelEmoji = useMemo(() => {
-    const map: Record<string, string> = {};
-    for (const s of whatIsRiloFlow.steps as any[]) {
-      if (s.type === 'rilo-pick-tasks' && Array.isArray(s.pickerTasks)) {
-        for (const t of s.pickerTasks) map[t.label] = t.emoji;
-      }
-    }
-    return map;
-  }, []);
-
-  // Pick exactly 3 chips: prefer one per bucket; pad from any bucket; then fallbacks
-  const chips = useMemo(() => {
-    const picks: { label: string; emoji: string; color: string }[] = [];
-    BUCKET_IDS.forEach((id, i) => {
-      const a = answers?.[id];
-      const arr = Array.isArray(a) ? a : a ? [a] : [];
-      if (arr.length > 0) {
-        const label = arr[0];
-        picks.push({ label, emoji: labelEmoji[label] || '✨', color: PALETTE[i] });
-      }
-    });
-    if (picks.length < 3) {
-      const leftover: { label: string; bucketIdx: number }[] = [];
-      BUCKET_IDS.forEach((id, i) => {
-        const a = answers?.[id];
-        const arr = Array.isArray(a) ? a : a ? [a] : [];
-        arr.slice(1).forEach((l) => leftover.push({ label: l, bucketIdx: i }));
-      });
-      while (picks.length < 3 && leftover.length > 0) {
-        const l = leftover.shift()!;
-        picks.push({ label: l.label, emoji: labelEmoji[l.label] || '✨', color: PALETTE[l.bucketIdx] });
-      }
-    }
-    const fallbacks = [
-      { label: 'Morning routine', emoji: '🌅', color: PALETTE[0] },
-      { label: 'Midday reset', emoji: '🥗', color: PALETTE[1] },
-      { label: 'Wind down', emoji: '🌙', color: PALETTE[2] },
-    ];
-    while (picks.length < 3) picks.push(fallbacks[picks.length]);
-    return picks.slice(0, 3);
-  }, [answers, labelEmoji]);
-
-  // Phases: 0 = card rises, 1 = chips drop into rows one-by-one, 2 = settled
-  const [phase, setPhase] = useState<0 | 1 | 2>(0);
-
+  // Drop animation: rows reveal one-by-one once they're loaded
+  const [phase, setPhase] = useState<0 | 1>(0);
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase(1), 500);
-    const t2 = setTimeout(() => {
-      haptic.light();
-      setPhase(2);
-    }, 500 + 800 + chips.length * 220);
-    const t3 = setTimeout(() => {
-      onNext();
-    }, 500 + 800 + chips.length * 220 + 1400);
+    if (!ready) return;
+    const t1 = setTimeout(() => setPhase(1), 200);
+    const visibleCount = Math.max(rows.length, 1);
+    const settleMs = 200 + visibleCount * 200 + 600;
+    const tHaptic = setTimeout(() => haptic.light(), settleMs);
+    const tNext = setTimeout(() => onNext(), settleMs + 1100);
     return () => {
       clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
+      clearTimeout(tHaptic);
+      clearTimeout(tNext);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chips.length]);
+  }, [ready, rows.length]);
 
   const handleTap = () => {
     haptic.light();
@@ -186,90 +167,66 @@ export function RiloBuildingPlanScreen({ step, onNext, answers }: Props) {
             </span>
           </div>
 
-          {/* Existing routine player tasks (already provisioned via Daily Reset) */}
-          {existingTasks.length > 0 && (
-            <div className="px-3 pt-3 pb-1 space-y-1.5">
-              <div className="px-1 text-[9px] font-bold uppercase tracking-wider text-black/40">
-                Already in your routine
-              </div>
-              {existingTasks.map((t, i) => (
-                <motion.div
-                  key={`ex-${t.title}-${i}`}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.35, delay: 0.15 + i * 0.06 }}
-                  className="h-9 flex items-center gap-2 px-3 rounded-xl bg-black/[0.03] border border-black/5"
-                >
-                  <span
-                    className="w-2 h-2 rounded-full shrink-0"
-                    style={{ background: t.color }}
-                  />
-                  <img
-                    src={getFluentEmojiUrl(t.emoji)}
-                    alt=""
-                    className="w-4 h-4 shrink-0"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                  <span className="text-[12px] font-semibold text-black/70 truncate">
-                    {t.title}
-                  </span>
-                  <span className="ml-auto text-[10px] text-black/30">✓</span>
-                </motion.div>
-              ))}
-            </div>
-          )}
-
-          {/* Three rows for new picks; each shows a faint slot then the chip "clicks" in */}
-          {existingTasks.length > 0 && (
-            <div className="px-4 pt-2 pb-1 text-[9px] font-bold uppercase tracking-wider text-[#A0123F]">
-              + Adding now
-            </div>
-          )}
+          {/* Routine launcher + its child tasks — exactly what shows up in the planner */}
           <div className="px-3 py-3 space-y-2 min-h-[180px]">
-            {chips.map((c, i) => {
-              const dropDelay = i * 0.22;
+            {rows.map((r, i) => {
               const dropped = phase >= 1;
+              const dropDelay = i * 0.18;
               return (
                 <div
-                  key={c.label + i}
+                  key={r.id}
                   className="relative h-11 rounded-xl bg-black/5 overflow-visible"
                 >
                   <motion.div
-                    initial={{ opacity: 0, y: -90, scale: 0.85 }}
+                    initial={{ opacity: 0, y: -70, scale: 0.85 }}
                     animate={
                       dropped
                         ? { opacity: 1, y: 0, scale: 1 }
-                        : { opacity: 0, y: -90, scale: 0.85 }
+                        : { opacity: 0, y: -70, scale: 0.85 }
                     }
                     transition={{
-                      duration: 0.55,
+                      duration: 0.5,
                       delay: dropDelay,
-                      ease: [0.34, 1.56, 0.64, 1], // overshoot for "click"
+                      ease: [0.34, 1.56, 0.64, 1],
                     }}
-                    className="absolute inset-0 flex items-center gap-2 px-3 rounded-xl bg-white shadow-[0_4px_12px_-4px_rgba(0,0,0,0.18)] border"
-                    style={{ borderColor: `${c.color}66` }}
+                    className={`absolute inset-0 flex items-center gap-2 px-3 rounded-xl bg-white shadow-[0_4px_12px_-4px_rgba(0,0,0,0.18)] border ${
+                      r.isLauncher ? 'ring-2 ring-[#E84A6F]/30' : ''
+                    }`}
+                    style={{ borderColor: `${r.color}66` }}
                   >
                     <span
                       className="w-2.5 h-2.5 rounded-full shrink-0"
-                      style={{ background: c.color }}
+                      style={{ background: r.color }}
                     />
                     <img
-                      src={getFluentEmojiUrl(c.emoji)}
+                      src={getFluentEmojiUrl(r.emoji)}
                       alt=""
                       className="w-5 h-5 shrink-0"
                       onError={(e) => {
                         (e.currentTarget as HTMLImageElement).style.display = 'none';
                       }}
                     />
-                    <span className="text-[13px] font-semibold text-black truncate">
-                      {c.label}
+                    <span
+                      className={`text-[13px] truncate ${
+                        r.isLauncher ? 'font-bold text-black' : 'font-semibold text-black/80'
+                      }`}
+                    >
+                      {r.title}
                     </span>
+                    {r.isLauncher && (
+                      <span className="ml-auto text-[9px] font-bold uppercase tracking-wider text-[#A0123F]">
+                        Routine
+                      </span>
+                    )}
                   </motion.div>
                 </div>
               );
             })}
+            {ready && rows.length === 0 && (
+              <div className="h-11 rounded-xl bg-black/5 flex items-center justify-center text-[12px] text-black/40">
+                Setting things up…
+              </div>
+            )}
           </div>
 
           {/* Progress shimmer */}
