@@ -1444,13 +1444,19 @@ const AppHome = () => {
               >
                 <FluentEmoji emoji="👇" size={56} />
               </div>
-              {/* Label */}
-              <p
-                className="fixed z-[102] text-[15px] text-white font-semibold tracking-tight whitespace-nowrap pointer-events-none"
-                style={{ left: cx - 110, top: rect.bottom + 18 }}
+              {/* Label — pill, anchored under the FAB but constrained to viewport */}
+              <div
+                className="fixed z-[102] flex justify-end pointer-events-none px-4"
+                style={{
+                  right: 0,
+                  left: 0,
+                  top: rect.bottom + 14,
+                }}
               >
-                Tap + to add your own task
-              </p>
+                <span className="px-4 py-2 rounded-full bg-[#1a1a2e] text-white text-[13.5px] font-semibold tracking-tight shadow-[0_8px_24px_rgba(26,26,46,0.28)] max-w-[80vw] text-center">
+                  👆 Tap + to add your own task
+                </span>
+              </div>
               <style>{`
                 @keyframes addCoachBounce {
                   0%   { transform: translateY(0px); }
