@@ -1018,7 +1018,7 @@ const AppHome = () => {
                             ? 'bg-[hsl(var(--brand-primary))] text-white scale-105 shadow-[0_4px_12px_hsl(var(--brand-primary)/0.35)]'
                             : isTodayDate
                               ? 'border border-foreground/15 text-foreground'
-                              : 'text-muted-foreground/60',
+                              : 'text-fg-warm-muted',
                           hasBadge && isSelected && 'ring-2 ring-[hsl(var(--brand-primary)/0.3)] ring-offset-0'
                         )}>
                           {hasProgramEvents && (
@@ -1032,7 +1032,7 @@ const AppHome = () => {
                             />
                           ) : (
                             <>
-                              <span className={cn('text-[10px] font-medium leading-none', isSelected ? 'text-white/85' : 'text-muted-foreground')}>
+                              <span className={cn('text-[10px] font-medium leading-none', isSelected ? 'text-white/85' : 'text-fg-warm-muted')}>
                                 {format(day, 'EEE')}
                               </span>
                               <span className={cn('text-sm font-bold leading-none', isSelected && 'text-white')}>
