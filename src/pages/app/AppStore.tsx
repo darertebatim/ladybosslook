@@ -265,15 +265,15 @@ const AppStore = () => {
   const comingSoonTools = getVisibleComingSoon();
 
   return (
-    <div className="h-full overflow-hidden flex flex-col bg-bg-warm">
+    <div className="h-full overflow-hidden flex flex-col bg-background">
       <SEOHead 
         title="Explore - Rilo"
         description="Explore tools, audio experiences, and educational programs"
       />
 
-      {/* Sticky translucent header — matches Home language */}
+      {/* Glassy rounded header — matches Home */}
       <header 
-        className="shrink-0 z-40 bg-[hsl(var(--bg-warm)/0.85)] backdrop-blur-xl shadow-ios"
+        className="shrink-0 z-40 bg-white/35 dark:bg-black/20 backdrop-blur-xl rounded-b-2xl shadow-[0_2px_10px_rgba(0,0,0,0.06)]"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center justify-between px-4 pt-3 pb-3 min-h-[52px]">

@@ -44,14 +44,14 @@ export function PageHeader({
 
   const surface =
     variant === "dark"
-      ? "bg-black/30 backdrop-blur-xl text-white"
-      : "bg-[hsl(var(--bg-warm)/0.85)] backdrop-blur-xl text-[hsl(var(--fg-warm))]";
+      ? "bg-black/20 backdrop-blur-xl text-white shadow-[0_2px_10px_rgba(0,0,0,0.18)]"
+      : "bg-white/35 dark:bg-black/20 backdrop-blur-xl text-[hsl(var(--fg-warm))] shadow-[0_2px_10px_rgba(0,0,0,0.06)]";
 
   return (
     <header
       className={cn(
         sticky ? "sticky top-0 z-30" : "",
-        "px-4 pt-safe pb-3 shadow-ios",
+        "px-4 pt-safe pb-3 rounded-b-2xl",
         surface,
         className
       )}

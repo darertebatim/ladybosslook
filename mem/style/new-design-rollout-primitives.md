@@ -21,7 +21,7 @@ All in-app pages (`/app/*`) follow the iOS 18 / Liquid Glass language establishe
 - Cards/list rows: `bg-card-warm shadow-card-warm` (light) or `bg-white/10 backdrop-blur-md shadow-ios` (dark/cinematic).
 - Active tab/chip: `bg-[hsl(var(--brand-primary))] text-white shadow-ios`.
 - Inactive chip: `bg-[hsl(var(--tint-peach))] text-[hsl(var(--fg-warm-muted))]` (light) or `bg-white/10 text-white/70` (dark).
-- Page bg: `bg-bg-warm` for light pages. Listen keeps cloud/storm video and uses **dark variant** of all primitives.
+- Page bg: **`bg-background`** for all light pages (matches Home). Do NOT use `bg-bg-warm` as the page surface. Listen keeps cloud/storm video and uses **dark variant** of all primitives.
 - White-circle FABs: `bg-white text-[hsl(var(--brand-primary))] shadow-ios` (use `IOSIconButton`).
 - Search inputs: pill-shaped, `shadow-ios`, `border-0`, no focus ring (`focus-visible:ring-0`).
 - Primary CTAs over images: `bg-white/95 text-[hsl(var(--brand-primary))]` pill (e.g. "Tap to enroll").
@@ -39,13 +39,13 @@ All in-app pages (`/app/*`) follow the iOS 18 / Liquid Glass language establishe
 
 `rg "shadow-sm|ring-1 ring-(black|white)" src/pages/app/ src/components/app/` should return no hits for floating-UI elevation.
 
-## Page-level header pattern (CANONICAL)
+## Page-level header pattern (CANONICAL — matches Home exactly)
 
-Until every app page is migrated to `<PageHeader>`, the inline equivalent is:
+Headers must be **glassy AND rounded at the bottom corners**. Inline pattern:
 
 ```tsx
 <header
-  className="sticky top-0 z-30 bg-[hsl(var(--bg-warm)/0.85)] backdrop-blur-xl shadow-ios"
+  className="sticky top-0 z-30 bg-white/35 dark:bg-black/20 backdrop-blur-xl rounded-b-2xl shadow-[0_2px_10px_rgba(0,0,0,0.06)]"
   style={{ paddingTop: 'env(safe-area-inset-top)' }}
 >
   <div className="px-4 pt-3 pb-3 flex items-center justify-between min-h-[52px]">
@@ -55,7 +55,13 @@ Until every app page is migrated to `<PageHeader>`, the inline equivalent is:
 </header>
 ```
 
-Dark variant (Listen and other photo-bg pages) uses `bg-black/25 backdrop-blur-xl` and `text-white`, with `<IOSIconButton variant="dark">` for actions.
+Required ingredients (do not omit any):
+- `bg-white/35 dark:bg-black/20` — translucent (NOT solid `bg-bg-warm`).
+- `backdrop-blur-xl` — glass effect.
+- `rounded-b-2xl` — rounded bottom corners (this is the Home look).
+- Soft drop shadow `shadow-[0_2px_10px_rgba(0,0,0,0.06)]` (NOT `shadow-ios` — Home uses this softer one for headers).
+
+Dark variant (Listen / cinematic photo-bg pages): `bg-black/20 backdrop-blur-xl rounded-b-2xl shadow-[0_2px_10px_rgba(0,0,0,0.18)]`, white text, `<IOSIconButton variant="dark">`.
 
 ## Channel/list rows pattern
 
