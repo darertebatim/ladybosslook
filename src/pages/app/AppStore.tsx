@@ -398,8 +398,8 @@ const AppStore = () => {
               <ActiveRoundsCarousel activeRounds={activeRounds} nextSessionMap={nextSessionMap} programImageMap={programImageMap} />
             )}
 
-            {/* My Shortcuts - right after tools */}
-            {!searchQuery && (
+            {/* My Shortcuts — temporarily hidden, will be restored later */}
+            {false && !searchQuery && (
               <ToolShortcuts />
             )}
 
