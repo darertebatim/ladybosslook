@@ -1059,7 +1059,7 @@ const AppHome = () => {
               setSelectedDate(new Date());
               setCurrentMonth(startOfMonth(new Date()));
               haptic.light();
-            }} className={cn("absolute flex items-center gap-0.5 px-3 py-0.5 text-sm font-semibold text-violet-700 bg-violet-200 dark:bg-violet-700 dark:text-violet-100 rounded-full shadow-sm active:scale-95 transition-transform", isFutureDate ? "right-2" : "left-2")}>
+            }} className={cn("absolute flex items-center gap-0.5 px-3 py-0.5 text-sm font-semibold text-white bg-gradient-to-br from-[hsl(var(--brand-primary-light))] to-[hsl(var(--brand-primary))] rounded-full shadow-sm active:scale-95 transition-transform", isFutureDate ? "right-2" : "left-2")}>
                   {isFutureDate && <ChevronLeft className="h-3.5 w-3.5" />}
                   Today
                   {!isFutureDate && <ChevronRight className="h-3.5 w-3.5" />}
