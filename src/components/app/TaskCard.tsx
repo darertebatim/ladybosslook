@@ -262,7 +262,7 @@ export const TaskCard = memo(function TaskCard({
   };
 
   const colorClass = TASK_COLOR_CLASSES[task.color] || TASK_COLOR_CLASSES.yellow;
-  const tintClass = TASK_TINT_CLASSES[task.color] || TASK_TINT_CLASSES.yellow;
+  const lightTintClass = TASK_TINT_CLASSES[task.color] || TASK_TINT_CLASSES.yellow;
   const midClass = TASK_MID_CLASSES[task.color] || TASK_MID_CLASSES.yellow;
   // Completed cards use the primary (light) task color, matching the emoji circle tint
   const primaryClass = TASK_COLOR_CLASSES[task.color] || TASK_COLOR_CLASSES.yellow;
@@ -272,6 +272,8 @@ export const TaskCard = memo(function TaskCard({
   const cardSurfaceClass = isVisuallyDone
     ? cn(primaryClass, 'shadow-card-warm')
     : 'bg-card-warm shadow-card-warm';
+  // Emoji circle: light tint when incomplete, secondary planner mid-tone when completed
+  const tintClass = isVisuallyDone ? midClass : lightTintClass;
 
   const routineBorderClass = '';
   
