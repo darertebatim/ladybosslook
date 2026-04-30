@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 import OnboardingAnswers from './OnboardingAnswers';
 
 export default function Onboarding() {
-  const flows = [whatIsRiloFlow, dearMeFlow, mePlusFlow, quickStartFlow, quickStartV2Flow, weeklyReviewFlow, selfcareQuizFlow, selfcareWeeklyReviewFlow];
+  const flows = [whatIsRiloFlow, preAuthWelcomeFlow, dearMeFlow, mePlusFlow, quickStartFlow, weeklyReviewFlow, selfcareQuizFlow, selfcareWeeklyReviewFlow];
   const { flowId: defaultFlowId } = useDefaultOnboarding();
   const setDefaultMutation = useSetDefaultOnboarding();
 
