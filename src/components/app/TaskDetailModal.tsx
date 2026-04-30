@@ -7,8 +7,6 @@ import { cn } from '@/lib/utils';
 import { 
   UserTask, 
   TASK_COLOR_CLASSES,
-  TASK_TINT_CLASSES,
-  TASK_MID_CLASSES,
   useSubtasks,
   useCompleteSubtask,
   useUncompleteSubtask,
@@ -170,13 +168,6 @@ export const TaskDetailModal = ({
 
   const colorClass = TASK_COLOR_CLASSES[task.color] || TASK_COLOR_CLASSES.yellow;
   const darkColorClass = TASK_COLOR_DARK_CLASSES[task.color] || 'bg-black/10';
-  const lightTintClass = TASK_TINT_CLASSES[task.color] || TASK_TINT_CLASSES.yellow;
-  const midClass = TASK_MID_CLASSES[task.color] || TASK_MID_CLASSES.yellow;
-  // Match TaskCard pattern: completed = MID surface; incomplete = LIGHT surface.
-  // Emoji circle uses the OPPOSITE tone so the icon always stands out on the card.
-  const isVisuallyDone = hasGoal ? goalReached : isCompletedState;
-  const surfaceClass = isVisuallyDone ? midClass : lightTintClass;
-  const emojiCircleClass = isVisuallyDone ? lightTintClass : midClass;
   const repeatLabel = getRepeatLabel();
   const reminderText = getReminderText();
   const footerText = [
@@ -191,15 +182,12 @@ export const TaskDetailModal = ({
         className="w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none flex flex-col"
       >
         {/* Task card */}
-        <div className={cn('rounded-3xl overflow-hidden', surfaceClass)}>
+        <div className={cn('rounded-3xl overflow-hidden', colorClass)}>
 
           {/* Task header - primary color */}
           <div className="px-4 pt-4 pb-3">
             <div className="flex items-center gap-2">
-              <div className={cn(
-                'w-10 h-10 rounded-full flex items-center justify-center shrink-0',
-                emojiCircleClass
-              )}>
+              <div className="w-10 h-10 flex items-center justify-center shrink-0">
                 <TaskIcon iconName={task.emoji} size={32} className="text-black/80" />
               </div>
               
