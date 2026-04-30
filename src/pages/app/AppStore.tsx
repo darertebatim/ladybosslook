@@ -10,6 +10,7 @@ import { useEnrollments, useInvalidateAllEnrollmentData } from '@/hooks/useAppDa
 import { ProgramCard } from '@/components/app/ProgramCard';
 import { ToolCard } from '@/components/app/ToolCard';
 import { Input } from '@/components/ui/input';
+import { IOSIconButton } from '@/components/app/ui/IOSIconButton';
 import { wellnessTools, audioTools, getVisibleComingSoon } from '@/lib/toolsConfig';
 import { PromoBanner } from '@/components/app/PromoBanner';
 import { HomeBanner } from '@/components/app/HomeBanner';
@@ -264,18 +265,18 @@ const AppStore = () => {
   const comingSoonTools = getVisibleComingSoon();
 
   return (
-    <div className="h-full overflow-hidden flex flex-col bg-background">
+    <div className="h-full overflow-hidden flex flex-col bg-bg-warm">
       <SEOHead 
         title="Explore - Rilo"
         description="Explore tools, audio experiences, and educational programs"
       />
 
-      {/* Fixed Header */}
+      {/* Sticky translucent header — matches Home language */}
       <header 
-        className="shrink-0 z-40 bg-gradient-to-b from-violet-50 to-background dark:from-violet-950/20 dark:to-background"
+        className="shrink-0 z-40 bg-[hsl(var(--bg-warm)/0.85)] backdrop-blur-xl shadow-ios"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="flex items-center justify-between px-4 pt-3 pb-4">
+        <div className="flex items-center justify-between px-4 pt-3 pb-3 min-h-[52px]">
           {showSearch ? (
             <div className="flex-1 flex items-center gap-2">
               <Input
@@ -283,32 +284,35 @@ const AppStore = () => {
                 placeholder="Search tools & programs..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 h-10 bg-white/80 dark:bg-black/20 border-border/50 rounded-xl"
+                className="flex-1 h-10 bg-white/90 dark:bg-black/30 border-0 rounded-full shadow-ios focus-visible:ring-0"
                 autoFocus
               />
-              <button 
+              <IOSIconButton
+                size="sm"
                 onClick={() => {
                   setShowSearch(false);
                   setSearchQuery('');
                 }}
-                className="p-2 rounded-full transition-transform active:scale-95"
+                aria-label="Close search"
               >
-                <X className="h-5 w-5 text-muted-foreground" />
-              </button>
+                <X className="h-5 w-5" />
+              </IOSIconButton>
             </div>
           ) : (
             <>
-              <h1 className="text-xl font-bold text-foreground">Self-Care Tools</h1>
-              <div className="flex items-center">
+              <h1 className="text-2xl font-bold text-fg-warm">Self-Care Tools</h1>
+              <div className="flex items-center gap-2">
                 {startTour && (
                   <TourHelpButton onClick={startTour} />
                 )}
-                <button 
+                <IOSIconButton
+                  size="sm"
                   onClick={() => setShowSearch(true)}
-                  className="tour-search-button p-2 rounded-full transition-transform active:scale-95"
+                  className="tour-search-button"
+                  aria-label="Search"
                 >
-                  <Search className="h-5 w-5 text-muted-foreground" />
-                </button>
+                  <Search className="h-5 w-5" />
+                </IOSIconButton>
               </div>
             </>
           )}
@@ -336,7 +340,7 @@ const AppStore = () => {
             {/* Tools Section */}
             {(!searchQuery || filteredWellnessTools.length > 0 || filteredAudioTools.length > 0) && (
               <section className="tour-tools-section">
-                <h2 className="text-sm font-semibold text-foreground mb-2 px-1">
+                <h2 className="text-base font-bold text-fg-warm mb-2 px-1">
                   All Tools
                 </h2>
                 {/* All tools in single scrollable row */}
@@ -366,7 +370,7 @@ const AppStore = () => {
             {!searchQuery && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-sm font-semibold text-foreground">Self-Care Goals</h2>
+                  <h2 className="text-base font-bold text-fg-warm">Self-Care Goals</h2>
                   <Link to="/app/tasksbank" className="text-xs text-primary font-medium flex items-center gap-0.5">
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
@@ -378,7 +382,7 @@ const AppStore = () => {
             {!searchQuery && displayRoutines.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-sm font-semibold text-foreground">Routines Templates</h2>
+                  <h2 className="text-base font-bold text-fg-warm">Routines Templates</h2>
                   <Link to="/app/routines" className="text-xs text-primary font-medium flex items-center gap-0.5">
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
@@ -414,7 +418,7 @@ const AppStore = () => {
             {(!searchQuery || hasProgramMatches) && allBrowsePrograms.length > 0 && (
               <section className="tour-programs-section">
                 <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="tour-programs-section-header text-sm font-semibold text-foreground">
+                  <h2 className="tour-programs-section-header text-base font-bold text-fg-warm">
                     Academy Programs
                   </h2>
                   <Link to="/app/academy" className="text-xs text-primary font-medium flex items-center gap-0.5">
@@ -482,7 +486,7 @@ const AppStore = () => {
             {!searchQuery && reflections && reflections.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-sm font-semibold text-foreground">Guided Reflections</h2>
+                  <h2 className="text-base font-bold text-fg-warm">Guided Reflections</h2>
                   <Link to="/app/reflections" className="text-xs text-primary font-medium flex items-center gap-0.5">
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
@@ -523,7 +527,7 @@ const AppStore = () => {
             {!searchQuery && breathingExercises && breathingExercises.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-sm font-semibold text-foreground">Breathe Practice</h2>
+                  <h2 className="text-base font-bold text-fg-warm">Breathe Practice</h2>
                   <Link to="/app/breathe" className="text-xs text-primary font-medium flex items-center gap-0.5">
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
@@ -551,7 +555,7 @@ const AppStore = () => {
             {!searchQuery && meditatePlaylists.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-sm font-semibold text-foreground">Guided Meditation</h2>
+                  <h2 className="text-base font-bold text-fg-warm">Guided Meditation</h2>
                   <Link to="/app/player?category=meditate" className="text-xs text-primary font-medium flex items-center gap-0.5">
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
@@ -594,7 +598,7 @@ const AppStore = () => {
             {!searchQuery && soundscapePlaylists.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-sm font-semibold text-foreground">Sound Scapes</h2>
+                  <h2 className="text-base font-bold text-fg-warm">Sound Scapes</h2>
                   <Link to="/app/player?category=soundscape" className="text-xs text-primary font-medium flex items-center gap-0.5">
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>

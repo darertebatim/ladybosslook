@@ -4,6 +4,7 @@ import { Loader2, Megaphone, Users, GraduationCap, MessageSquare, ChevronRight, 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { IOSIconButton } from '@/components/app/ui/IOSIconButton';
 import { useChannels, useChannelSummaries } from '@/hooks/useFeed';
 import { useFeedRealtime } from '@/hooks/useFeedRealtime';
 import { SEOHead } from '@/components/SEOHead';
@@ -109,26 +110,21 @@ export default function AppChannelsList() {
   const isLoading = channelsLoading || summariesLoading;
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-bg-warm">
       <SEOHead 
         title="Channels" 
         description="Stay connected with announcements, content updates, and community discussions"
       />
 
-      {/* Header */}
+      {/* Sticky translucent header — iOS 18 PageHeader pattern */}
       <header 
-        className="sticky top-0 z-10 bg-accent dark:bg-accent rounded-b-3xl shadow-ios"
+        className="sticky top-0 z-30 bg-[hsl(var(--bg-warm)/0.85)] backdrop-blur-xl shadow-ios"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="px-4 pt-3 pb-4 flex items-end justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">Channels</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Your community spaces
-            </p>
-          </div>
+        <div className="px-4 pt-3 pb-3 flex items-center justify-between min-h-[52px]">
+          <h1 className="text-2xl font-bold text-fg-warm">Channels</h1>
           {/* Actions: Add to routines + Admin */}
-          <div className="flex gap-1.5 pb-0.5">
+          <div className="flex items-center gap-2">
             <AddedToRoutineButton
               isAdded={isAddedToRoutines}
               onAddClick={() => {
@@ -138,73 +134,71 @@ export default function AppChannelsList() {
               iconOnly
             />
             {canAccessAdminPage('support') && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 rounded-xl bg-background/60"
+              <IOSIconButton
+                size="sm"
                 onClick={() => navigate('/app/support', { state: { from: '/app/channels' } })}
+                aria-label="Support inbox"
               >
                 <Headset className="h-4 w-4" />
-              </Button>
+              </IOSIconButton>
             )}
             {canAccessAdminPage('community') && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 rounded-xl bg-background/60"
+              <IOSIconButton
+                size="sm"
                 onClick={() => navigate('/app/channels/new', { state: { from: '/app/channels' } })}
+                aria-label="New channel"
               >
                 <Megaphone className="h-4 w-4" />
-              </Button>
+              </IOSIconButton>
             )}
           </div>
         </div>
       </header>
 
       {/* Channel list */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto px-3 pt-3">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : channels && channels.length > 0 ? (<>
-          <div className="divide-y divide-border/50">
+          <div className="flex flex-col gap-2">
             {/* Coach Chat - only shown when user has access */}
             {hasCoachAccess && (
             <button
               onClick={handleCoachClick}
-              className="w-full flex items-center gap-3 px-4 py-3 active:bg-muted transition-colors text-left bg-primary/[0.03] border-b-2 border-primary/10"
+              className="w-full flex items-center gap-3 p-3 rounded-2xl bg-card-warm shadow-card-warm text-left transition-transform active:scale-[0.99]"
             >
-              <div className="h-12 w-12 rounded-full flex items-center justify-center shrink-0 bg-primary/10 text-primary">
+              <div className="h-12 w-12 rounded-full flex items-center justify-center shrink-0 bg-[hsl(var(--brand-primary)/0.12)] text-[hsl(var(--brand-primary))]">
                 <GraduationCap className="h-5 w-5" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-foreground truncate">Coach</span>
+                  <span className="font-semibold text-fg-warm truncate">Coach</span>
                 </div>
                 {coachSummary?.lastMessage ? (
-                  <p className="text-sm text-muted-foreground truncate mt-0.5">
+                  <p className="text-sm text-fg-warm-muted truncate mt-0.5">
                     {coachSummary.lastMessage.sender_type === 'user' ? 'You' : 'Coach'}: {coachSummary.lastMessage.content}
                   </p>
                 ) : (
-                  <p className="text-sm text-muted-foreground/60 mt-0.5">
+                  <p className="text-sm text-fg-warm-muted/70 mt-0.5">
                     Chat with your coach
                   </p>
                 )}
               </div>
               <div className="flex flex-col items-end gap-1 shrink-0">
                 {coachSummary?.lastMessage?.created_at && (
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-fg-warm-muted">
                     {formatLastMessageTime(new Date(coachSummary.lastMessage.created_at))}
                   </span>
                 )}
                 {coachUnreadCount > 0 && (
-                  <Badge className="h-5 min-w-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-xs font-semibold">
+                  <Badge className="h-5 min-w-5 px-1.5 rounded-full bg-[hsl(var(--brand-primary))] text-white text-xs font-semibold shadow-ios">
                     {coachUnreadCount > 99 ? '99+' : coachUnreadCount}
                   </Badge>
                 )}
               </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground/50 shrink-0" />
+              <ChevronRight className="h-4 w-4 text-fg-warm-muted/60 shrink-0" />
             </button>
             )}
 
@@ -231,14 +225,14 @@ export default function AppChannelsList() {
                 <button
                   key={channel.id}
                   onClick={() => handleChannelClick(channel.slug)}
-                  className="w-full flex items-center gap-3 px-4 py-3 active:bg-muted transition-colors text-left"
+                  className="w-full flex items-center gap-3 p-3 rounded-2xl bg-card-warm shadow-card-warm text-left transition-transform active:scale-[0.99]"
                 >
                   <div className={cn(
                     "h-12 w-12 rounded-full flex items-center justify-center shrink-0 overflow-hidden",
-                    channel.type === 'general' && "bg-primary/10 text-primary",
-                    channel.type === 'program' && "bg-accent/10 text-accent-foreground",
-                    channel.type === 'round' && "bg-muted text-muted-foreground",
-                    !['general', 'program', 'round'].includes(channel.type) && "bg-muted text-muted-foreground"
+                    channel.type === 'general' && "bg-[hsl(var(--brand-primary)/0.12)] text-[hsl(var(--brand-primary))]",
+                    channel.type === 'program' && "bg-[hsl(var(--tint-peach))] text-fg-warm",
+                    channel.type === 'round' && "bg-[hsl(var(--tint-peach))] text-fg-warm",
+                    !['general', 'program', 'round'].includes(channel.type) && "bg-[hsl(var(--tint-peach))] text-fg-warm"
                   )}>
                     {isEmojiCover(channel.cover_image_url) ? (
                       <FluentEmoji emoji={getEmojiFromCover(channel.cover_image_url)} size={28} />
@@ -256,20 +250,20 @@ export default function AppChannelsList() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-foreground truncate">
+                      <span className="font-semibold text-fg-warm truncate">
                         {channel.name}
                       </span>
                       {channel.allow_comments && (
-                        <MessageSquare className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                        <MessageSquare className="h-3.5 w-3.5 text-fg-warm-muted shrink-0" />
                       )}
                     </div>
                     {lastMessage && (
-                      <p className="text-sm text-muted-foreground truncate mt-0.5">
+                      <p className="text-sm text-fg-warm-muted truncate mt-0.5">
                         {lastMessage.display_name || lastMessage.author?.full_name || 'Admin'}: {lastMessage.content}
                       </p>
                     )}
                     {!lastMessage && (
-                      <p className="text-sm text-muted-foreground/60 mt-0.5">
+                      <p className="text-sm text-fg-warm-muted/70 mt-0.5">
                         No messages yet
                       </p>
                     )}
@@ -277,18 +271,18 @@ export default function AppChannelsList() {
 
                   <div className="flex flex-col items-end gap-1 shrink-0">
                     {lastMessageTime && (
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-fg-warm-muted">
                         {lastMessageTime}
                       </span>
                     )}
                     {unreadCount > 0 && (
-                      <Badge className="h-5 min-w-5 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
+                      <Badge className="h-5 min-w-5 px-1.5 rounded-full bg-[hsl(var(--brand-primary))] text-white text-xs font-semibold shadow-ios">
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </Badge>
                     )}
                   </div>
 
-                  <ChevronRight className="h-4 w-4 text-muted-foreground/50 shrink-0" />
+                  <ChevronRight className="h-4 w-4 text-fg-warm-muted/60 shrink-0" />
                 </button>
               );
             })}
@@ -298,39 +292,39 @@ export default function AppChannelsList() {
             {/* Support Chat - Last in the list */}
             <button
               onClick={handleSupportClick}
-              className="w-full flex items-center gap-3 px-4 py-3 active:bg-muted transition-colors text-left bg-primary/[0.03] border-b-2 border-primary/10"
+              className="w-full flex items-center gap-3 p-3 rounded-2xl bg-card-warm shadow-card-warm text-left transition-transform active:scale-[0.99]"
             >
-              <div className="h-12 w-12 rounded-full flex items-center justify-center shrink-0 bg-orange-500 text-white">
+              <div className="h-12 w-12 rounded-full flex items-center justify-center shrink-0 bg-[hsl(var(--brand-primary))] text-white shadow-ios">
                 <Headset className="h-5 w-5" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-foreground truncate">Support</span>
-                  <span className="text-[10px] font-bold uppercase tracking-wide bg-orange-500 text-white px-1.5 py-0.5 rounded">Private</span>
+                  <span className="font-semibold text-fg-warm truncate">Support</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wide bg-[hsl(var(--brand-primary))] text-white px-2 py-0.5 rounded-full shadow-ios">Private</span>
                 </div>
                 {supportSummary?.lastMessage ? (
-                  <p className="text-sm text-muted-foreground truncate mt-0.5">
+                  <p className="text-sm text-fg-warm-muted truncate mt-0.5">
                     {supportSummary.lastMessage.sender_type === 'user' ? 'You' : 'Support'}: {supportSummary.lastMessage.content}
                   </p>
                 ) : (
-                  <p className="text-sm text-foreground mt-0.5">
+                  <p className="text-sm text-fg-warm mt-0.5">
                     Chat with our team (Private)
                   </p>
                 )}
               </div>
               <div className="flex flex-col items-end gap-1 shrink-0">
                 {supportSummary?.lastMessage?.created_at && (
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-fg-warm-muted">
                     {formatLastMessageTime(new Date(supportSummary.lastMessage.created_at))}
                   </span>
                 )}
                 {supportUnreadCount > 0 && (
-                  <Badge className="h-5 min-w-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-xs font-semibold">
+                  <Badge className="h-5 min-w-5 px-1.5 rounded-full bg-[hsl(var(--brand-primary))] text-white text-xs font-semibold shadow-ios">
                     {supportUnreadCount > 99 ? '99+' : supportUnreadCount}
                   </Badge>
                 )}
               </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground/50 shrink-0" />
+              <ChevronRight className="h-4 w-4 text-fg-warm-muted/60 shrink-0" />
             </button>
           </div>
           {/* Feedback encouragement in white space */}

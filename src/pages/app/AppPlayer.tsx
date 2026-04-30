@@ -23,6 +23,7 @@ import heroStormVideo from "@/assets/watch-hero-storm.mp4";
 import { WatchCategoryPill } from "@/components/video/WatchCategoryPill";
 import { useUserPreferredLanguage, preferredLanguageSorter } from "@/hooks/useUserPreferredLanguage";
 import { LanguagePreferencePopup, shouldShowLanguagePopup } from "@/components/app/LanguagePreferencePopup";
+import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
 
 const LANGUAGE_OPTIONS = [
   { value: 'all', label: 'All', flag: '🌐' },
@@ -283,17 +284,17 @@ export default function AppPlayer() {
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
       {/* Hero Video Background */}
-      <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 h-[420px] overflow-hidden" style={{ transform: `translateY(${-scrollY * 0.4}px)` }}>
-        <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-50" src={heroStormVideo} />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 30%, rgba(19,34,64,0.5) 60%, #132240 100%)' }} />
+      <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 h-[640px] overflow-hidden" style={{ transform: `translateY(${-scrollY * 0.35}px)` }}>
+        <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-55" src={heroStormVideo} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 35%, rgba(19,34,64,0.45) 65%, #132240 95%)' }} />
         <div className="absolute inset-0 bg-white/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
       </div>
 
-      {/* Glass Header */}
-      <div className="fixed top-0 left-0 right-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      {/* Glass Header — dark variant of the iOS 18 PageHeader */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-black/25 backdrop-blur-xl shadow-ios" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="relative z-10">
           {/* Title bar */}
-          <div className="h-12 flex items-center justify-between px-4">
+          <div className="min-h-[52px] flex items-center justify-between px-4 pt-2 pb-1">
             {showSearch ? (
               <div className="flex-1 flex items-center gap-2">
                 <div className="relative flex-1">
@@ -306,18 +307,18 @@ export default function AppPlayer() {
                     autoFocus
                   />
                 </div>
-                <button onClick={() => { setShowSearch(false); setSearchQuery(""); }} className="p-2 -mr-2">
+                <IOSIconButton variant="dark" size="sm" onClick={() => { setShowSearch(false); setSearchQuery(""); }} aria-label="Close search">
                   <X className="h-5 w-5 text-white/70" />
-                </button>
+                </IOSIconButton>
               </div>
             ) : (
               <>
-                <h1 className="text-xl font-bold text-white tracking-tight">Listen</h1>
-                <div className="flex items-center">
+                <h1 className="text-2xl font-bold text-white tracking-tight">Listen</h1>
+                <div className="flex items-center gap-2">
                   {startTour && <TourHelpButton onClick={startTour} />}
-                  <button onClick={() => setShowSearch(true)} className="tour-player-search p-2 -mr-2">
+                  <IOSIconButton variant="dark" size="sm" onClick={() => setShowSearch(true)} className="tour-player-search" aria-label="Search">
                     <Search className="h-5 w-5 text-white/70" />
-                  </button>
+                  </IOSIconButton>
                 </div>
               </>
             )}
@@ -382,12 +383,12 @@ export default function AppPlayer() {
             {/* Language Selector */}
             <Popover>
               <PopoverTrigger asChild>
-                <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium bg-white/15 text-white backdrop-blur-md shadow-ios active:scale-95">
+                <IOSIconButton variant="dark" size="sm" aria-label="Language">
                   {selectedLang.value === 'persian'
                     ? <PersianFlag size={14} />
-                    : <span className="text-sm">{selectedLang.flag}</span>
+                    : <span className="text-base leading-none">{selectedLang.flag}</span>
                   }
-                </button>
+                </IOSIconButton>
               </PopoverTrigger>
               <PopoverContent align="end" className="w-40 p-1 bg-[#1a2d4a]/95 backdrop-blur-xl border-white/10">
                 {LANGUAGE_OPTIONS.map((lang) => (
