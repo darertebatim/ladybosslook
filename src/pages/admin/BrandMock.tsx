@@ -914,13 +914,13 @@ function ListenPhoneFrame({ darkMode, clouds = false }: { darkMode: boolean; clo
         </div>
       </div>
 
-      {/* Glassy rounded header — matches AppHome */}
+      {/* Glassy rounded header — matches AppHome. Fully transparent in cloud mode. */}
       <div
         className="px-4 pt-2 pb-3 rounded-b-2xl"
         style={{
-          background: glassBg,
-          backdropFilter: 'blur(20px)',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
+          background: clouds ? 'transparent' : glassBg,
+          backdropFilter: clouds ? 'none' : 'blur(20px)',
+          boxShadow: clouds ? 'none' : '0 2px 10px rgba(0,0,0,0.06)',
         }}
       >
         <div className="flex items-center justify-between min-h-[44px]">
