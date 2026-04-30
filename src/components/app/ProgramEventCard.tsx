@@ -223,7 +223,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
       <div
         onClick={handleCardClick}
         className={cn(
-          'rounded-3xl pl-3 pr-4 py-5 transition-all duration-200 cursor-pointer active:scale-[0.98] shadow-card-warm',
+          'rounded-3xl pl-3 pr-4 py-7 transition-all duration-200 cursor-pointer active:scale-[0.98] shadow-card-warm',
           event.isCompleted ? style.tintBg : 'bg-card-warm'
         )}
       >
@@ -231,10 +231,10 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
         <div className="flex items-center gap-2">
           {/* 3D Emoji icon in colored circle (matches TaskCard mock) */}
           <div className={cn(
-            'w-10 h-10 rounded-full flex items-center justify-center shrink-0',
+            'w-12 h-12 rounded-full flex items-center justify-center shrink-0',
             event.isCompleted ? style.doneBg : style.tintBg
           )}>
-            <FluentEmoji emoji={style.emoji} size={26} />
+            <FluentEmoji emoji={style.emoji} size={30} />
           </div>
 
           {/* Content */}
