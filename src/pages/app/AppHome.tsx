@@ -1178,24 +1178,33 @@ const AppHome = () => {
                       >
                         My Routines
                       </button>
-                      <button
-                        ref={btnTasksRef}
-                        onClick={() => { haptic.selection(); setHomeView('tasks'); setTaskFilter('all'); }}
-                        className={cn(
-                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors flex items-center gap-1 whitespace-nowrap",
-                          homeView === 'tasks' ? 'text-foreground' : 'text-muted-foreground'
-                        )}
-                      >
-                        <Zap className="h-3 w-3 fill-amber-400 text-amber-400 shrink-0" /> My Tasks
-                      </button>
-                    </div>
-                    <button
-                      onClick={handleFabClick}
-                      className="coach-add-btn w-8 h-8 rounded-full bg-urgency text-urgency-foreground shadow-sm flex items-center justify-center active:scale-90 transition-transform mr-2"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </button>
-                  </div>
+                       <button
+                         ref={btnTasksRef}
+                         onClick={() => { haptic.selection(); setHomeView('tasks'); setTaskFilter('all'); }}
+                         className={cn(
+                           "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors flex items-center gap-1 whitespace-nowrap",
+                           homeView === 'tasks' ? 'text-foreground' : 'text-muted-foreground'
+                         )}
+                       >
+                         <Zap className="h-3 w-3 fill-amber-400 text-amber-400 shrink-0" /> My Tasks
+                       </button>
+                     </div>
+                     <div className="flex items-center gap-2 mr-2">
+                       {/* Task completion counter chip — mirrors mock */}
+                       {homeView === 'tasks' && filteredTasks.length > 0 && (
+                         <div className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[hsl(var(--brand-tint-peach))] text-[hsl(var(--brand-primary))]">
+                           {filteredTasks.filter(t => completedTaskIds.has(t.id)).length}/{filteredTasks.length}
+                         </div>
+                       )}
+                       <button
+                         onClick={handleFabClick}
+                         aria-label="Add task"
+                         className="coach-add-btn w-7 h-7 rounded-full bg-[hsl(var(--brand-primary))] text-white shadow-[0_2px_6px_hsl(var(--brand-primary)/0.35)] flex items-center justify-center active:scale-90 transition-transform"
+                       >
+                         <Plus className="h-4 w-4" strokeWidth={2.5} />
+                       </button>
+                     </div>
+                   </div>
 
                   {homeView === 'routines' ? (
                     <>
