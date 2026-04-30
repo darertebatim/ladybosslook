@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 import { 
   UserTask, 
   TASK_COLOR_CLASSES,
+  TASK_TINT_CLASSES,
+  TASK_MID_CLASSES,
   useSubtasks,
   useCompleteSubtask,
   useUncompleteSubtask,
