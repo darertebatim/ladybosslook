@@ -818,6 +818,21 @@ export default function BrandMock() {
         </div>
       </div>
 
+      {/* ──────────────────────────────────────────────────────────── */}
+      {/* ── Listen page (proposed redesign)                       ── */}
+      {/* ──────────────────────────────────────────────────────────── */}
+      <div className="pt-8">
+        <h2 className="text-lg font-bold text-foreground mb-1">🎧 Listen — proposed redesign</h2>
+        <p className="text-muted-foreground text-xs mb-4">
+          Drops storm/cloud video & dark <code>#132240</code> bg. Pure white surface (matches Home <code>--background</code>),
+          glassy rounded header, light filter pills, white playlist cards. Toggles with the dark-mode button above.
+        </p>
+      </div>
+
+      <div className="flex justify-center">
+        <ListenPhoneFrame darkMode={darkMode} />
+      </div>
+
       {/* Color reference */}
       <div className="text-center text-xs text-muted-foreground pt-4">
         All colors sourced from the <span className="font-mono font-medium">App Orange Palette</span> defined above
