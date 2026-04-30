@@ -632,7 +632,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
                     if (e.key === 'Escape') handleClose();
                   }}
                   placeholder="Type task name..."
-                  className="flex-1 bg-transparent text-[15px] font-semibold text-black placeholder:text-black/40 outline-none"
+                  className="flex-1 bg-transparent text-[15px] font-semibold text-black placeholder:text-fg-warm-muted outline-none"
                   enterKeyHint="done"
                   autoComplete="off"
                   autoCorrect="on"
@@ -772,7 +772,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
                         <FluentEmoji emoji={template.emoji || '📝'} size={28} className="shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-[14px] text-black truncate">{template.title}</p>
-                          <p className="text-[11px] text-black/60 truncate">
+                          <p className="text-[11px] text-fg-warm-muted truncate">
                             {template.category}
                             {template.repeat_pattern && template.repeat_pattern !== 'none' && (
                               <span>
