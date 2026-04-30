@@ -1,135 +1,76 @@
-## What went wrong last time
+## Why the page still looks wrong
 
-The previous pass only did a global find-and-replace of `shadow-sm` → `shadow-ios`. The actual structural elements you can see broken in your screenshots — the boxed Tools card, the cropped Listen hero, the inconsistent Chats header — were never touched.
+You're right: I've been editing the old `AppPlayer.tsx` piece by piece (changing colors, swapping tokens) while keeping the legacy structure underneath. That's why details keep slipping — the mock and the live page have *different bones*, not just different paint.
 
-This plan goes page by page and rewrites the header + first screen layout to match the Home language: warm full-bleed background, sticky translucent header with `shadow-ios`, white-circle `IOSIconButton`s, `bg-card-warm` rows, `TabPills` switcher, no hairline rings.
+Concretely the live page still has:
 
-## The Home reference (what every page must match)
+- A **fixed header** (`fixed top-0`) with a 190px spacer below it, so the header floats over the clouds instead of scrolling like in the mock
+- A **parallax transform** on the cloud strip (`translateY(-scrollY * 0.25)`) that the mock does not have
+- A **mask-image** fade at the top of the scroll area that creates a faint dark band
+- A **PlaylistCard** that uses 96×96 thumbnails, image covers, badges row, language flags inline — totally different from the mock's compact 64×64 colored emoji tile
+- Leftover sections: "Continue Learning" with a clock icon, a "Tell us what you want" CTA, promo banners injected mid-list, language popover with a different layout
 
-- Page bg: `bg-bg-warm` full-bleed, no inner rounded card wrapping the content.
-- Header: `fixed top-0` translucent `bg-white/35 dark:bg-black/20 backdrop-blur-xl rounded-b-2xl shadow-ios`. Title is `text-xl font-bold`, right-side actions are `IOSIconButton` (white circle, brand-orange icon, no ring).
-- Switcher: `TabPills` (pill track + sliding knob, `shadow-ios`).
-- Cards / list rows: `bg-card-warm shadow-card-warm rounded-2xl`, no borders/dividers.
+The mock instead has: status bar simulated → header in normal flow → pills → status row + globe → "ALL PLAYLISTS" caption → simple cards. No fixed positioning. No parallax. No mask.
 
----
+## Plan: rebuild, don't patch
 
-## Page 1 — Tools (`AppStore.tsx`)
+### 1. Replace `src/pages/app/AppPlayer.tsx` with a 1:1 port of `ListenPhoneFrame` from `BrandMock.tsx`
 
-**Issues in screenshot:** whole content sits inside a big rounded card wrapper; header is plain inside that card; "FREE" chips on tool tiles have a heavy old-style shape; section titles use small uppercase muted text instead of warm bold.
+Structure (top to bottom, all in normal document flow — no `fixed`, no spacer, no mask):
 
-**Changes:**
-1. Remove the outer rounded-card visual. Page becomes `bg-bg-warm` full-bleed like Home.
-2. Replace header (lines 274–316) with `<PageHeader title="Self-Care Tools" right={<IOSIconButton onClick={...}><Search/></IOSIconButton>} />`. Search-mode keeps the same pattern but inline.
-3. Section titles: bump from `text-sm font-semibold` → `text-base font-bold text-fg-warm` to match Home's "Today's Tasks" style. "All →" links use `IOSIconButton size="sm"` only when it's an icon, otherwise plain text.
-4. Tool tiles (`ToolCard size="compact"`): swap container to `bg-card-warm shadow-card-warm rounded-2xl`, remove any `border`/`ring`. The "FREE 🔥" chip becomes a small `bg-[hsl(var(--tint-peach))] text-fg-warm` pill with `shadow-ios`.
-5. Routine template horizontal cards already use `bg-card-warm`-ish surfaces — sweep their border/ring usage.
-6. Promo + emotion banner stay (they're already on-brand).
+```text
+<div bg-background, scroll container>
+  ├─ Cloud hero strip (absolute, top 0, h-300, z-0, no parallax)
+  │   └─ video + seamless gradient → background
+  │
+  └─ Content (relative, z-10, scrolls naturally)
+      ├─ Header block (transparent, no glass, no shadow)
+      │   ├─ Title "Listen" + Search icon button (orange)
+      │   ├─ Category pills row (orange active / peach inactive)
+      │   └─ Status filters + Language globe (right-aligned)
+      ├─ "ALL PLAYLISTS" caption (warm-muted, 11px, tracked)
+      └─ Playlist cards list
+```
 
-**File:** `src/pages/app/AppStore.tsx` + `src/components/app/ToolCard.tsx`.
+Wire real data into this shell:
+- `availableCategories` → category pills
+- `progressFilter` → status pills  
+- `preferredLanguage` → globe popover
+- `filteredPlaylists` → cards
 
----
+Keep all existing data hooks (`usePlayerData`, `useSubscription`, `useUserPreferredLanguage`, scroll restore, language popup, paywall, tour). Only the JSX shell is rebuilt.
 
-## Page 2 — Listen (`AppPlayer.tsx`)
+Drop from the old page:
+- `fixed` header + 190px spacer → use normal flow like the mock
+- Parallax `translateY` on the cloud strip
+- `maskImage` fade on the scroll container
+- Mid-list `PromoBanner` / `HomeBanner` (move to bottom or remove — confirm below)
+- "Continue Learning" with clock icon (mock has no such section — confirm below)
+- "Tell us what you want" CTA at the bottom (confirm below)
 
-**Issues in screenshot:** the cloud hero is clipped inside a rounded rectangle (because it lives inside the same outer card wrapper from the layout); header looks flat; only ~half the page feels "dark mode" — bottom is just navy.
+### 2. Rewrite `PlaylistCard.tsx` to match mock card exactly
 
-**Changes:**
-1. Make hero truly full-bleed. Today the wrapper is `flex flex-col h-full overflow-hidden` with a fixed video at `top-0`. The visible "rounded box" around the page is coming from `NativeAppLayout` / `AppProvidersLayout` adding a card frame — verify and remove the rounded container around the `<Outlet/>` for the Listen route only (or via a `bleed` prop).
-2. Header (lines 293–415): replace with `<PageHeader variant="dark" title="Listen" right={<IOSIconButton variant="dark"><Search/></IOSIconButton>} subRow={<>category pills + filters</>} />`. Drop the bespoke `h-12` row.
-3. Category pills row: replace the `WatchCategoryPill`-on-track approach with `<TabPills variant="dark" />` for the `availableCategories` (All/Podcast/Course/Audiobooks). The locked Soundscape Crown overlay stays as a small badge attached to the pill.
-4. Progress filter row (`all / in_progress / completed`): also `<TabPills variant="dark" />`. Already has dark tokens — just standardize.
-5. Language selector → `IOSIconButton variant="dark"` containing the flag emoji.
-6. "ALL PLAYLISTS" label keeps `text-white/60 uppercase tracking-wider`.
-7. PlaylistCard already uses `bg-white/10 backdrop-blur-md shadow-ios` — leave it.
-8. Bottom dark fade: extend the storm gradient further down so the page doesn't visually "end" at the hero — keep the dark navy as the canonical Listen background and sweep storm/cloud opacity down to ~70vh instead of 420px.
+Mock card spec:
+- 64×64 rounded-xl tile with **solid pastel color** (per category) + large fluent emoji centered, NOT the cover image
+- Locked → small lock badge bottom-left of the tile
+- Right side: category · duration (warm-muted 11px) → bold title 14px (2 lines) → small badges row (FREE pill green, flag emoji)
+- Locked rows get a full-width `bg-peach text-brand` "Tap to enroll ›" footer with top border
 
-**Files:** `src/pages/app/AppPlayer.tsx`, possibly `src/layouts/NativeAppLayout.tsx` (for the bleed container fix).
+Map category → tile color using the existing `O.lavender / pink / peach / mint` palette from BrandMock so cards visually match the mock immediately.
 
----
+### 3. Verify nav bar parity
 
-## Page 3 — Chats list (`AppChannelsList.tsx`)
+Already fixed in the previous turn (removed `/app/player` from `isOverlayContext`). Confirm post-rebuild that the nav bar renders identical to Home.
 
-**Issues in screenshot:** old-style "Channels / Your community spaces" card header with mixed orange + white circle buttons (calendar is filled orange, headphones + megaphone are plain white). List rows have hairline dividers, no card style. Support row uses a flat orange icon next to plain text.
+## Open questions (need your call before I rebuild)
 
-**Changes:**
-1. Replace the header card with `<PageHeader title="Channels" right={<><IOSIconButton><CalendarPlus/></IOSIconButton><IOSIconButton><Headset/></IOSIconButton><IOSIconButton><Megaphone/></IOSIconButton></>} />`. All three become identical white-circle `IOSIconButton`s for visual consistency. (You can keep the calendar action distinct via a small dot badge if needed, but don't paint the button orange — the orange compose FAB is already the primary action.)
-2. Drop "Your community spaces" subtitle, or move it to `text-fg-warm-muted text-xs` under the title.
-3. Channel rows: wrap each in `bg-card-warm shadow-card-warm rounded-2xl p-3` with `gap-3` between rows. Remove the hairline divider line. Unread count badge becomes `bg-[hsl(var(--brand-primary))] text-white rounded-full text-xs px-2 py-0.5 shadow-ios`.
-4. Avatar container: keep emoji circles but standardize size to 44px and use `bg-tint-peach` instead of plain `bg-muted`.
-5. "Support PRIVATE" row: same card treatment; PRIVATE chip becomes `bg-[hsl(var(--brand-primary))] text-white shadow-ios` pill.
-6. Empty state ("We'd love to hear from you") stays.
+These exist on the live page but NOT in the mock. Tell me what to do with each:
 
-**File:** `src/pages/app/AppChannelsList.tsx`.
+1. **"Continue Learning" section** at the top when no filter is active — keep it (styled like a card row above "ALL PLAYLISTS"), or remove it entirely?
+2. **Promo / Home banners** injected between the heading and the card list — keep, move below cards, or remove?
+3. **"Not any playlists you want above? Tell us what you want →"** CTA at the bottom — keep or remove?
+4. **Card thumbnails** — mock uses solid color tile + emoji. Cards in the DB do have `cover_image_url`. Should I:
+   - (a) Always use mock-style colored tile + category emoji (ignore cover images), or
+   - (b) Use cover image when present, fall back to colored tile + emoji?
 
----
-
-## Page 4 — Chat thread (`AppChat.tsx`)
-
-**Changes:**
-1. Header (lines 509–538): replace with `<PageHeader back title={<div><div>Support</div><div className="text-xs text-fg-warm-muted">Private conversation</div></div>} right={<presence dot>} />`. Remove `border-b border-border/30` (rings/borders rule).
-2. Conversation-starter buttons (lines 588–600): swap `bg-muted/50 border border-border/30` → `bg-card-warm shadow-card-warm` (no border).
-3. Date separator pill: keep, but use `bg-card-warm shadow-ios`.
-4. Input area footer (line 671): drop `border-t border-border/30`, replace with `shadow-ios` (top-shadow effect).
-5. Loading-state header (lines 461–484): same `PageHeader` swap.
-
-**File:** `src/pages/app/AppChat.tsx`.
-
----
-
-## Page 5 — Profile (`AppProfile.tsx`)
-
-**Changes (sweep + restructure):**
-1. Header → `<PageHeader title="You" right={<IOSIconButton onClick={settings}><Settings/></IOSIconButton>} />`.
-2. Avatar/name hero block: `bg-card-warm shadow-card-warm rounded-3xl p-5` instead of any current ring/border framing.
-3. Settings groups: render as iOS-style grouped cards — wrap each section in `bg-card-warm rounded-2xl shadow-card-warm divide-y divide-fg-warm/5` (the only allowed hairline is intra-group dividers; no external border).
-4. Streak / badge / stats tiles inside profile keep their current emoji art, just swap `shadow-sm` → `shadow-ios` and remove rings.
-
-**File:** `src/pages/app/AppProfile.tsx`.
-
----
-
-## Page 6 — Settings (`AppSettings.tsx`)
-
-Same pattern as Profile: `PageHeader back title="Settings"`, grouped `bg-card-warm` cards, no hairlines for elevation, destructive "Delete account" sits in its own red-tinted card.
-
-**File:** `src/pages/app/AppSettings.tsx`.
-
----
-
-## Page 7 — Presence (`AppPresence.tsx`)
-
-**Changes:**
-1. Header → `PageHeader title="Presence" subRow={<TabPills options=[Streak/Calendar/Badges] />}`.
-2. Calendar grid: warm tints (`bg-card-warm` for completed days, `bg-tint-peach` for partial). Already mostly on-brand — sweep shadows.
-3. Badge cards (Bronze/Silver/Gold): wrap in `bg-card-warm shadow-card-warm`, no ring.
-
-**File:** `src/pages/app/AppPresence.tsx`.
-
----
-
-## Layout-level fix (root cause of the "boxed" look)
-
-In your Tools and Listen screenshots there is a visible **rounded outer card** around the whole page. Home doesn't have it because Home uses a fixed translucent header that floats over a full-bleed bg. I'll inspect `NativeAppLayout.tsx` / `AppProvidersLayout.tsx` to find the shared wrapper that adds `rounded-2xl bg-card` around the route outlet and either:
-- remove it globally now that every page brings its own bg, or
-- add a `bleed` prop the page can opt into (Home, Listen, Tools all opt in).
-
-Without this fix, no amount of per-page edits will make Tools/Listen look full-bleed like Home.
-
----
-
-## Order of execution
-
-1. **Layout bleed fix** (so subsequent pages actually go edge-to-edge).
-2. **Tools** — biggest visual delta, validates the pattern.
-3. **Listen** — dark variant + true full-bleed hero.
-4. **Chats list** + **Chat thread**.
-5. **Profile** + **Settings**.
-6. **Presence**.
-7. Sweep tool detail pages (Reflections, Breathe, Fasting, Period, Mood, Emotion) — header + buttons only, inner UIs untouched.
-8. Update memory `mem://style/new-design-rollout-primitives` with the layout-bleed rule and the "FREE chip = peach pill" rule.
-
-I'll show a screenshot after each major page (Tools → Listen → Chats) so you can course-correct before the next one.
-
-## Out of scope
-
-Inner tool UIs (timer rings, breath circle, mesh gradients), admin pages, marketing pages, onboarding hero/sheet flows.
+Once you answer, I'll do a single clean rewrite of both files instead of more patches.
