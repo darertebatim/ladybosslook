@@ -27,6 +27,7 @@ import { usePushPermission } from '@/hooks/usePushPermission';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useAppReview } from '@/hooks/useAppReview';
 import { SoftReviewPrompt } from '@/components/app/SoftReviewPrompt';
+import { canShowSoftReviewPrompt, markSoftReviewPromptShown } from '@/lib/appReview';
 import { Capacitor } from '@capacitor/core';
 import type { UserTask, TaskTemplate } from '@/hooks/useTaskPlanner';
 import type { BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
@@ -172,17 +173,11 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
   } = props;
   const { maybeRequestReviewAndroidOnly, openIOSReviewSoftLink } = useAppReview();
   const [showIOSSoftReview, setShowIOSSoftReview] = useState(false);
-  const IOS_SOFT_REVIEW_KEY = 'simora_ios_softreview_last';
-  const IOS_SOFT_REVIEW_COOLDOWN_DAYS = 14;
 
   const maybeShowIOSSoftReviewOnGold = () => {
     if (Capacitor.getPlatform() !== 'ios') return;
-    const last = localStorage.getItem(IOS_SOFT_REVIEW_KEY);
-    if (last) {
-      const days = (Date.now() - parseInt(last)) / (1000 * 60 * 60 * 24);
-      if (days < IOS_SOFT_REVIEW_COOLDOWN_DAYS) return;
-    }
-    localStorage.setItem(IOS_SOFT_REVIEW_KEY, String(Date.now()));
+    if (!canShowSoftReviewPrompt()) return;
+    markSoftReviewPromptShown();
     // Slight delay so it doesn't collide with gold streak celebration
     setTimeout(() => setShowIOSSoftReview(true), 1200);
   };

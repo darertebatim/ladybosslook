@@ -67,10 +67,10 @@ export function SoftReviewPrompt({ isOpen, onClose, onAccept }: SoftReviewPrompt
         {/* Close button */}
         <button
           onClick={handleNotNow}
-          className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-full active:bg-gray-100 transition-colors"
           aria-label="Close"
         >
-          <X className="w-5 h-5 text-gray-400" />
+          <X className="w-5 h-5 text-black" strokeWidth={2.5} />
         </button>
 
         {/* Content */}
@@ -85,28 +85,28 @@ export function SoftReviewPrompt({ isOpen, onClose, onAccept }: SoftReviewPrompt
           </div>
 
           <h2 className="text-xl font-bold text-gray-900 mb-2">
-            Enjoying Rilo?
+            Loving Rilo so far?
           </h2>
           
-          <p className="text-gray-500 text-sm mb-6 leading-relaxed">
-            Your feedback helps us improve and reach{'\n'}
-            more people who could benefit.
+          <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+            If Rilo&rsquo;s helping you, a quick 5-star rating means the world —
+            and helps more women discover it. 💛
           </p>
 
           {/* Action buttons */}
           <div className="space-y-3">
             <Button
               onClick={handleYes}
-              className="w-full bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500 text-white font-semibold py-3 rounded-xl h-auto"
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-400 active:from-orange-600 active:to-orange-500 text-white font-semibold py-3 rounded-xl h-auto"
             >
-              Yes, I'll Rate It! ⭐
+              Rate Rilo 5 ⭐
             </Button>
             
             <button
               onClick={handleNotNow}
-              className="w-full text-gray-400 text-sm font-medium py-2 hover:text-gray-600 transition-colors"
+              className="w-full text-gray-500 text-sm font-medium py-2 active:text-gray-700 transition-colors"
             >
-              Not Now
+              Maybe later
             </button>
           </div>
         </div>
