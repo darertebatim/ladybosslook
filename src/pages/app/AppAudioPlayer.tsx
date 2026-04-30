@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
 
 import { CachedImage } from "@/components/ui/CachedImage";
-import heroStormVideo from "@/assets/watch-hero-storm.mp4";
+
 import { useShareContent } from "@/hooks/useShareContent";
 
 export default function AppAudioPlayer() {
@@ -431,21 +431,21 @@ export default function AppAudioPlayer() {
 
   if (isLoading) {
     return (
-      <div className="h-[100dvh] flex flex-col overflow-hidden" style={{ background: '#132240' }}>
+      <div className="h-[100dvh] flex flex-col overflow-hidden" >
         <div 
           className="fixed top-0 left-0 right-0 z-50"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="pt-3 pb-2 px-4 flex items-center gap-3">
-            <Skeleton className="h-10 w-10 rounded-full bg-white/10" />
-            <Skeleton className="h-5 w-32 bg-white/10" />
+            <Skeleton className="h-10 w-10 rounded-full bg-foreground/10" />
+            <Skeleton className="h-5 w-32 bg-foreground/10" />
           </div>
         </div>
         <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
         <div className="flex-1 flex flex-col items-center justify-center p-4">
-          <Skeleton className="aspect-square w-full max-w-[220px] rounded-2xl mb-6 bg-white/10" />
-          <Skeleton className="h-6 w-3/4 mb-2 bg-white/10" />
-          <Skeleton className="h-4 w-1/2 mb-8 bg-white/10" />
+          <Skeleton className="aspect-square w-full max-w-[220px] rounded-2xl mb-6 bg-foreground/10" />
+          <Skeleton className="h-6 w-3/4 mb-2 bg-foreground/10" />
+          <Skeleton className="h-4 w-1/2 mb-8 bg-foreground/10" />
         </div>
         <div className="pb-safe" />
       </div>
@@ -454,20 +454,20 @@ export default function AppAudioPlayer() {
 
   if (!audio) {
     return (
-      <div className="h-[100dvh] flex flex-col overflow-hidden" style={{ background: '#132240' }}>
+      <div className="h-[100dvh] flex flex-col overflow-hidden" >
         <div 
           className="fixed top-0 left-0 right-0 z-50"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="pt-1 pb-2 px-4">
-            <BackButton to="/app/player" label="Library" className="text-white" />
+            <BackButton to="/app/player" label="Library" className="text-fg-warm" />
           </div>
         </div>
         <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center">
-            <p className="text-white/60 mb-4">Audio not found</p>
-            <Button onClick={() => navigate('/app/player')} className="bg-white text-[#132240] hover:bg-white/90">
+            <p className="text-fg-warm-muted mb-4">Audio not found</p>
+            <Button onClick={() => navigate('/app/player')} className="bg-brand text-white active:bg-brand/90">
               Back to Library
             </Button>
           </div>
@@ -478,7 +478,7 @@ export default function AppAudioPlayer() {
   }
 
   return (
-    <div className="h-[100dvh] relative overflow-hidden flex flex-col" style={{ background: '#132240' }}>
+    <div className="h-[100dvh] relative overflow-hidden flex flex-col" >
       {/* Track Completion Celebration */}
       <TrackCompletionCelebration
         isOpen={showCelebration}
@@ -500,7 +500,7 @@ export default function AppAudioPlayer() {
             alt=""
             className="w-full h-full object-cover scale-110 blur-3xl opacity-15"
           />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(19,34,64,0.3) 0%, rgba(19,34,64,0.7) 50%, #132240 100%)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, hsl(var(--background) / 0.3) 0%, hsl(var(--background) / 0.7) 50%, hsl(var(--background)) 100%)' }} />
         </div>
       )}
 
@@ -519,9 +519,9 @@ export default function AppAudioPlayer() {
                 navigate('/app/player');
               }
             }}
-            className="flex items-center gap-0.5 min-h-[44px] min-w-[44px] px-1 -ml-1 text-white hover:bg-transparent active:opacity-70 transition-opacity"
+            className="flex items-center gap-0.5 min-h-[44px] min-w-[44px] px-1 -ml-1 text-fg-warm hover:bg-transparent active:opacity-70 transition-opacity"
           >
-            <ChevronDown className="h-7 w-7 shrink-0 text-white" />
+            <ChevronDown className="h-7 w-7 shrink-0 text-fg-warm" />
           </button>
           
           <div className="flex-1 min-w-0 flex items-center gap-2">
@@ -531,15 +531,15 @@ export default function AppAudioPlayer() {
                   const navPlaylistId = isModuleMode ? contextPlaylistId : playlistInfo?.playlist_id;
                   if (navPlaylistId) navigate(`/app/player/playlist/${navPlaylistId}`);
                 }}
-                className="text-sm font-medium text-white hover:text-white/80 transition-colors truncate"
+                className="text-sm font-medium text-fg-warm hover:text-fg-warm transition-colors truncate"
               >
                 {isModuleMode ? modulePlaylistInfo?.name : playlistInfo?.audio_playlists.name}
               </button>
             ) : (
-              <span className="text-sm font-medium text-white">Now Playing</span>
+              <span className="text-sm font-medium text-fg-warm">Now Playing</span>
             )}
             {currentTrackIndex >= 0 && (
-              <span className="text-xs text-white/50 shrink-0">
+              <span className="text-xs text-fg-warm-muted shrink-0">
                 • {currentTrackIndex + 1}/{isModuleMode ? modulePlaylist?.length : playlistTracks?.length}
               </span>
             )}
@@ -550,7 +550,7 @@ export default function AppAudioPlayer() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 text-white hover:bg-white/10"
+              className="h-10 w-10 text-fg-warm hover:bg-foreground/10"
               onClick={handleShare}
               aria-label="Share"
             >
@@ -563,7 +563,7 @@ export default function AppAudioPlayer() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 text-white hover:bg-white/10"
+              className="h-10 w-10 text-fg-warm hover:bg-foreground/10"
               onClick={() => {
                 if (existingTask) {
                   haptic.light();
@@ -589,8 +589,8 @@ export default function AppAudioPlayer() {
             (!isModuleMode && playlistTracks && playlistTracks.length > 1)) && (
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full shrink-0 text-white hover:bg-white/10">
-                  <List className="h-5 w-5 text-white" />
+                <Button variant="ghost" size="icon" className="rounded-full shrink-0 text-fg-warm hover:bg-foreground/10">
+                  <List className="h-5 w-5 text-fg-warm" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="bottom" className="h-[70vh]">
@@ -729,9 +729,9 @@ export default function AppAudioPlayer() {
 
           {/* Title & Description - Compact */}
           <div className="text-center shrink-0">
-            <h1 className="text-lg font-bold leading-tight line-clamp-2 text-white">{audio.title}</h1>
+            <h1 className="text-lg font-bold leading-tight line-clamp-2 text-fg-warm">{audio.title}</h1>
             {audio.description && (
-              <p className="text-white/50 text-sm line-clamp-1 mt-1">{audio.description}</p>
+              <p className="text-fg-warm-muted text-sm line-clamp-1 mt-1">{audio.description}</p>
             )}
             {isTrackCompleted && (
               <Badge variant="secondary" className="mt-2 gap-1 bg-emerald-500/20 text-emerald-300 border-emerald-500/30">
@@ -774,11 +774,11 @@ export default function AppAudioPlayer() {
                 onClick={() => navigate(`/app/player/${nextTrack.id}`)}
                 className={cn(
                   "w-full mt-2 p-3 rounded-xl",
-                  "bg-white/10 hover:bg-white/15 transition-colors",
-                  "border border-white/10"
+                  "bg-foreground/10 hover:bg-foreground/15 transition-colors",
+                  "border border-border"
                 )}
               >
-                <p className="text-xs text-white/50 mb-2 text-left">Up Next</p>
+                <p className="text-xs text-fg-warm-muted mb-2 text-left">Up Next</p>
                 <div className="flex items-center gap-3">
                   {nextTrack.coverImageUrl ? (
                     <img
@@ -787,19 +787,19 @@ export default function AppAudioPlayer() {
                       className="h-10 w-10 rounded-lg object-cover"
                     />
                   ) : (
-                    <div className="h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center">
-                      <Play className="h-4 w-4 text-white/50" />
+                    <div className="h-10 w-10 rounded-lg bg-foreground/10 flex items-center justify-center">
+                      <Play className="h-4 w-4 text-fg-warm-muted" />
                     </div>
                   )}
                   <div className="flex-1 min-w-0 text-left">
-                    <p className="text-sm font-medium truncate text-white">{nextTrack.title}</p>
+                    <p className="text-sm font-medium truncate text-fg-warm">{nextTrack.title}</p>
                     {nextTrack.duration && (
-                      <p className="text-xs text-white/50">
+                      <p className="text-xs text-fg-warm-muted">
                         {formatDuration(nextTrack.duration)}
                       </p>
                     )}
                   </div>
-                  <Play className="h-4 w-4 text-white/50" />
+                  <Play className="h-4 w-4 text-fg-warm-muted" />
                 </div>
               </button>
             )}
