@@ -8,6 +8,8 @@ import { CircleProgressButton } from './CircleProgressButton';
 import { 
   UserTask, 
   TASK_COLOR_CLASSES,
+  TASK_TINT_CLASSES,
+  TASK_MID_CLASSES,
   useSubtasks,
   useCompleteTask,
   useUncompleteTask,
