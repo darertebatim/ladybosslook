@@ -262,6 +262,13 @@ export const TaskCard = memo(function TaskCard({
   };
 
   const colorClass = TASK_COLOR_CLASSES[task.color] || TASK_COLOR_CLASSES.yellow;
+  const tintClass = TASK_TINT_CLASSES[task.color] || TASK_TINT_CLASSES.yellow;
+  const midClass = TASK_MID_CLASSES[task.color] || TASK_MID_CLASSES.yellow;
+  // Mock visual rule: completed = mid-tone full fill; incomplete = white card + warm shadow + colored emoji circle
+  const isVisuallyDone = hasGoal ? goalReached : (isCompleted || (isRoutineLauncher && isRoutineComplete));
+  const cardSurfaceClass = isVisuallyDone
+    ? cn(midClass, 'shadow-card-warm')
+    : 'bg-card-warm shadow-card-warm';
   const isRoutineLauncher = proLinkType === 'routine' && !!(proLinkValue || task.source_routine_id);
 
   const routineBorderClass = '';
