@@ -54,7 +54,13 @@ export default function Auth() {
   // Redirect if already authenticated, or to onboarding if not seen yet
   useEffect(() => {
     if (user) {
-      navigate(redirectPath);
+      const hasSeenWhatIsRilo = localStorage.getItem('simora_onboarding_completed_what-is-rilo') === 'true';
+      // First sign-in/up: show "What is Rilo?" teach onboarding once
+      if (!hasSeenWhatIsRilo && !hasCustomRedirect) {
+        navigate('/app/onboarding/what-is-rilo', { replace: true });
+      } else {
+        navigate(redirectPath);
+      }
     } else if (!authLoading) {
       // First-time users should see onboarding before auth
       const hasSeenOnboarding = localStorage.getItem('simora_onboarding_completed_quick-start-v2') === 'true';
