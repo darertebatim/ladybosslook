@@ -231,7 +231,7 @@ export default function AppPlayer() {
 
         {/* Content (z-10) — header in normal flow, scrolls with cards */}
         <div className="relative z-10" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-          {/* Header — sticks to top of scroll container */}
+          {/* Header — only the title row sticks to top */}
           <div
             className="sticky z-20 px-4 pt-3 pb-2"
             style={{ top: 'env(safe-area-inset-top)', background: 'transparent' }}
@@ -265,7 +265,10 @@ export default function AppPlayer() {
                 </>
               )}
             </div>
+          </div>
 
+          {/* Scrolls away with content */}
+          <div className="px-4 pb-2">
             {/* Category pills */}
             <div className="tour-player-categories flex gap-2 overflow-x-auto pb-1 mt-2 scrollbar-hide">
               {availableCategories.map((cat) => {
