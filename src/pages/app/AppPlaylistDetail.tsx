@@ -1000,6 +1000,10 @@ export default function AppPlaylistDetail() {
             isCompleted: selectedSupplement ? getModuleProgress(selectedSupplement.id, null).viewed : false,
             onComplete: (moduleId) => {
               markModuleViewedMutation.mutate(moduleId);
+              // High-satisfaction moment → ask for a 5-star review (cooldown-protected)
+              import('@/lib/appReview').then(({ triggerSoftReview }) =>
+                setTimeout(() => triggerSoftReview('module_complete'), 1200)
+              );
             },
             onNavigate: (module, index) => {
               // For audio modules, navigate to player
