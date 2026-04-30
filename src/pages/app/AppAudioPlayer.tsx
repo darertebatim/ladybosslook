@@ -467,7 +467,7 @@ export default function AppAudioPlayer() {
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center">
             <p className="text-fg-warm-muted mb-4">Audio not found</p>
-            <Button onClick={() => navigate('/app/player')} className="bg-card text-[hsl(var(--background))] hover:bg-foreground/90">
+            <Button onClick={() => navigate('/app/player')} className="bg-brand text-white active:bg-brand/90">
               Back to Library
             </Button>
           </div>
@@ -500,7 +500,7 @@ export default function AppAudioPlayer() {
             alt=""
             className="w-full h-full object-cover scale-110 blur-3xl opacity-15"
           />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(19,34,64,0.3) 0%, rgba(19,34,64,0.7) 50%, hsl(var(--background)) 100%)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, hsl(var(--background) / 0.3) 0%, hsl(var(--background) / 0.7) 50%, hsl(var(--background)) 100%)' }} />
         </div>
       )}
 
