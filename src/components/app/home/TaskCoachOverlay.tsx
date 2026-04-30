@@ -74,7 +74,7 @@ export function TaskCoachOverlay({ taskId, variant }: TaskCoachOverlayProps) {
           height: ringHeight,
           borderRadius: variant === 'check' ? '50%' : '12px',
           boxShadow:
-            '0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35)',
+            '0 0 14px 6px rgba(0,0,0,0.7), 0 0 28px 12px rgba(0,0,0,0.35)',
           animation: 'taskCoachGlow 1.6s ease-in-out infinite',
         }}
       />
@@ -101,8 +101,8 @@ export function TaskCoachOverlay({ taskId, variant }: TaskCoachOverlayProps) {
           100% { transform: rotate(-25deg) translateY(0px); }
         }
         @keyframes taskCoachGlow {
-          0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
-          50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
+          0%, 100% { box-shadow: 0 0 14px 6px rgba(0,0,0,0.7), 0 0 28px 12px rgba(0,0,0,0.35); }
+          50%      { box-shadow: 0 0 22px 10px rgba(0,0,0,0.9), 0 0 40px 18px rgba(0,0,0,0.45); }
         }
       `}</style>
     </>
