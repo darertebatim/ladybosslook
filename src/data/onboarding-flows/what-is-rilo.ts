@@ -38,6 +38,20 @@ export const whatIsRiloFlow: OnboardingFlow = {
       subtitle: 'Calm, sleep, workouts, journal, calendar, habits, career, money — all already inside Rilo. Free.',
       buttonLabel: 'Next',
     },
+    // Language preference — quick personalization tap
+    {
+      id: 'wir-second-language',
+      type: 'single-select',
+      title: 'Do you speak a\nsecond language?',
+      subtitle: 'We have content in multiple languages.',
+      illustrationLabel: 'Mascot with languages',
+      options: [
+        { label: 'English only', emoji: '🇺🇸' },
+        { label: 'Persian', emoji: 'flag:persian' },
+        { label: 'Turkish', emoji: '🇹🇷' },
+        { label: 'Spanish', emoji: '🇪🇸' },
+      ],
+    },
     {
       id: 'wir-suggest',
       type: 'rilo-teach',
@@ -129,6 +143,24 @@ export const whatIsRiloFlow: OnboardingFlow = {
       type: 'rilo-week-plans',
       title: 'Any other plans this week?',
       buttonLabel: 'Build my week',
+    },
+    // Daily Reset prompt — peak-motivation moment, right before commit
+    {
+      id: 'wir-daily-reset-prompt',
+      type: 'daily-reset-prompt',
+      title: 'Enable Daily Reset?',
+      subtitle: 'Your routine resets every morning so you can start each day fresh.',
+      buttonLabel: 'Yes, enable it',
+      secondaryButtonLabel: 'Maybe later',
+    },
+    // Push permission — last gate before commit
+    {
+      id: 'wir-push-permission',
+      type: 'welcome-aboard',
+      title: 'With reminders, routines feel 80% easier.',
+      subtitle: 'Get gentle nudges to keep your daily reset on track.',
+      buttonLabel: 'Turn on notifications',
+      secondaryButtonLabel: 'Maybe later',
     },
     {
       id: 'wir-commit',
