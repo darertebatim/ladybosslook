@@ -4077,20 +4077,26 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
           </h1>
         </FadeUp>
         <FadeUp delay={0.08}>
-          <p className="mt-2 text-[14px] text-[#1a1f3d]/65 text-center leading-snug">
-            We picked the 3 most popular self-care tools — Mood, Breathe & Journal — for your daily reset.
+          <p className="mt-3 text-[15.5px] text-[#1a1f3d]/75 text-center leading-[1.45] font-medium">
+            We picked the 3 most popular self-care tools to anchor your day.
           </p>
         </FadeUp>
 
         <FadeUp delay={0.16}>
-          <div className="mt-4 bg-[#f5f3ff] rounded-2xl px-4 py-2.5">
-            <p className="text-[12px] text-[#1a1f3d]/70 text-center italic leading-snug">
-              &ldquo;Like a little reset button in my pocket.&rdquo; — Yalda-M ⭐⭐⭐⭐⭐
-            </p>
+          <div className="mt-4 flex items-center justify-center gap-2">
+            <span className="px-3 py-1.5 rounded-full bg-[#FFE8EC] text-[#C2185B] text-[13px] font-bold flex items-center gap-1.5">
+              <span>💗</span> Mood
+            </span>
+            <span className="px-3 py-1.5 rounded-full bg-[#E0F2FE] text-[#0369A1] text-[13px] font-bold flex items-center gap-1.5">
+              <span>🌬️</span> Breathe
+            </span>
+            <span className="px-3 py-1.5 rounded-full bg-[#FEF3C7] text-[#92400E] text-[13px] font-bold flex items-center gap-1.5">
+              <span>📓</span> Journal
+            </span>
           </div>
         </FadeUp>
 
-        <FadeUp delay={0.24} className="mt-5">
+        <FadeUp delay={0.24} className="mt-6">
           {!added ? (
             <NavyButton onClick={handleAdd}>Add to my daily routine</NavyButton>
           ) : (
