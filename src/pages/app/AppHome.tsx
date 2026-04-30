@@ -1017,41 +1017,48 @@ const AppHome = () => {
                     className={cn("flex justify-center", isWeekStart && "snap-start")}
                     style={{ minWidth: 'calc(100% / 7)' }}
                   >
-                        <div className={cn(
-                          'w-11 h-11 rounded-full flex flex-col items-center justify-center gap-0.5 transition-all relative',
-                          isSelected
-                            ? 'bg-[hsl(var(--brand-primary))] text-white scale-105 shadow-[0_4px_12px_hsl(var(--brand-primary)/0.35)]'
-                            : isTodayDate
-                              ? 'border border-foreground/15 text-foreground'
-                              : 'text-fg-warm-muted'
-                        )}>
-                          {hasProgramEvents && (
-                            <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5 z-20", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />
-                          )}
-                          {hasBadge && !isSelected && !isTodayDate && (
-                            <img
-                              src={BADGE_IMAGES[badgeLevel]}
-                              alt={`${badgeLevel} badge`}
-                              className="absolute inset-0 w-full h-full object-contain opacity-60 pointer-events-none"
-                            />
-                          )}
-                          <span className={cn('relative z-10 text-[10px] font-medium leading-none', isSelected ? 'text-white/85' : 'text-fg-warm-muted')}>
+                        <div className="flex flex-col items-center gap-1">
+                          {/* Day-of-week letter on top */}
+                          <span className={cn(
+                            'text-[11px] font-semibold leading-none uppercase tracking-wide',
+                            isSelected || isTodayDate ? 'text-fg-warm' : 'text-fg-warm-muted'
+                          )}>
                             {format(day, 'EEE')}
                           </span>
-                          <span className={cn(
-                            'relative z-10 text-sm font-bold leading-none',
-                            isSelected && 'text-white',
-                            hasBadge && !isSelected && !isTodayDate && 'text-fg-warm drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
+                          {/* Circle wraps just the number */}
+                          <div className={cn(
+                            'w-9 h-9 rounded-full flex items-center justify-center transition-all relative',
+                            isSelected
+                              ? 'bg-[hsl(var(--brand-primary))] text-white shadow-[0_4px_12px_hsl(var(--brand-primary)/0.35)]'
+                              : isTodayDate
+                                ? 'border border-foreground/20'
+                                : 'border border-foreground/10'
                           )}>
-                            {format(day, 'd')}
-                          </span>
-                          {hasBadge && isTodayDate && (
-                            <img
-                              src={BADGE_IMAGES[badgeLevel]}
-                              alt={`${badgeLevel} badge`}
-                              className="absolute inset-0 w-full h-full object-contain z-20 pointer-events-none drop-shadow-sm"
-                            />
-                          )}
+                            {hasProgramEvents && (
+                              <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5 z-20", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />
+                            )}
+                            {hasBadge && !isSelected && !isTodayDate && (
+                              <img
+                                src={BADGE_IMAGES[badgeLevel]}
+                                alt={`${badgeLevel} badge`}
+                                className="absolute inset-0 w-full h-full object-contain opacity-60 pointer-events-none rounded-full"
+                              />
+                            )}
+                            <span className={cn(
+                              'relative z-10 text-sm font-bold leading-none',
+                              isSelected ? 'text-white' : 'text-fg-warm',
+                              hasBadge && !isSelected && !isTodayDate && 'drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
+                            )}>
+                              {format(day, 'd')}
+                            </span>
+                            {hasBadge && isTodayDate && (
+                              <img
+                                src={BADGE_IMAGES[badgeLevel]}
+                                alt={`${badgeLevel} badge`}
+                                className="absolute inset-0 w-full h-full object-contain z-20 pointer-events-none drop-shadow-sm rounded-full"
+                              />
+                            )}
+                          </div>
                         </div>
                       </button>;
                 })}
