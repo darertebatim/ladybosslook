@@ -51,8 +51,8 @@ export const whatIsRiloFlow: OnboardingFlow = {
     {
       id: 'wir-second-language',
       type: 'rilo-language-bubbles',
-      title: 'Which language\nspeaks to you?',
-      subtitle: 'Tap a bubble — Rilo will greet you in it.',
+      title: 'In which language\nshould we serve content?',
+      subtitle: 'Audio, articles & guided sessions — in a language that feels like home.',
       options: [
         { label: 'English only', emoji: '🇺🇸' },
         { label: 'Persian', emoji: 'flag:persian' },
