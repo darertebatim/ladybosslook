@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { haptic } from '@/lib/haptics';
-import { Home, MessageCircle, Compass, Music, Users, Flame, CalendarPlus, Play, Plus } from 'lucide-react';
+import { Home, MessageCircle, Compass, Music, Users, Flame, CalendarPlus, Play, Sparkles } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, LayoutGroup } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
@@ -336,7 +336,7 @@ const NativeAppLayout = () => {
               'flex items-center justify-center',
             )}
           >
-            <Plus className="w-6 h-6 text-white relative z-10" strokeWidth={2.5} />
+            <Sparkles className="w-6 h-6 text-white relative z-10" strokeWidth={2.2} />
             {/* Glass shine */}
             <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
               <span className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full bg-gradient-to-b from-white/35 to-transparent" />
