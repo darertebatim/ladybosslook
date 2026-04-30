@@ -483,7 +483,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         onClose={() => setShowIOSSoftReview(false)}
         onAccept={async () => {
           setShowIOSSoftReview(false);
-          await openIOSReviewSoftLink('gold_badge_ios_softlink');
+          await openIOSReviewSoftLink(softReviewTrigger);
         }}
       />
     </OverlayPortal>
