@@ -282,15 +282,15 @@ export default function AppPlayer() {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-background">
-      {/* Cloud hero strip — finite height, fades seamlessly into the page background */}
-      <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 h-[420px] overflow-hidden pointer-events-none" style={{ transform: `translateY(${-scrollY * 0.25}px)` }}>
-        <video autoPlay muted loop playsInline className="w-full h-full object-cover" src={heroStormVideo} style={{ opacity: 0.85 }} />
+    <div className="relative flex flex-col h-full overflow-hidden bg-background">
+      {/* Cloud hero strip — sticks to the top of the page, scrolls away with content */}
+      <div ref={heroRef} className="absolute top-0 left-0 right-0 z-0 h-[340px] overflow-hidden pointer-events-none" style={{ transform: `translateY(${-scrollY * 0.25}px)` }}>
+        <video autoPlay muted loop playsInline className="w-full h-full object-cover" src={heroStormVideo} style={{ opacity: 0.9 }} />
         {/* Seamless fade: transparent → background. No dark band. */}
         <div
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(180deg, hsl(var(--background) / 0) 0%, hsl(var(--background) / 0) 55%, hsl(var(--background) / 0.6) 80%, hsl(var(--background)) 100%)`,
+            background: `linear-gradient(180deg, hsl(var(--background) / 0) 0%, hsl(var(--background) / 0) 55%, hsl(var(--background) / 0.6) 82%, hsl(var(--background)) 100%)`,
           }}
         />
       </div>

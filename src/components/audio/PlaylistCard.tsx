@@ -84,7 +84,7 @@ export const PlaylistCard = memo(function PlaylistCard({
     <button
       className={cn(
         "relative w-full text-left rounded-2xl overflow-hidden cursor-pointer transition-all active:scale-[0.98]",
-        "bg-white/10 backdrop-blur-md shadow-ios",
+        "bg-card shadow-ios",
         tourClass
       )}
       onClick={handleClick}
@@ -101,8 +101,8 @@ export const PlaylistCard = memo(function PlaylistCard({
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-white/10 flex items-center justify-center">
-              <Music className="h-8 w-8 text-white/30" />
+            <div className="w-full h-full bg-bg-warm flex items-center justify-center">
+              <Music className="h-8 w-8 text-muted-foreground" />
             </div>
           )}
 
@@ -117,7 +117,7 @@ export const PlaylistCard = memo(function PlaylistCard({
 
           {/* Progress bar on thumbnail */}
           {(!isLocked || isFree) && progressPercentage > 0 && (
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/15">
               <div 
                 className="h-full bg-primary transition-all duration-300"
                 style={{ width: `${progressPercentage}%` }}
@@ -129,7 +129,7 @@ export const PlaylistCard = memo(function PlaylistCard({
         {/* Content */}
         <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
           {/* Meta line: category + duration */}
-          <div className="flex items-center gap-1.5 text-[11px] text-white/70">
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
             {category && (
               <span className="capitalize">{category}</span>
             )}
@@ -140,7 +140,7 @@ export const PlaylistCard = memo(function PlaylistCard({
           </div>
 
           {/* Title */}
-          <h3 className="font-bold text-sm text-white line-clamp-2 leading-snug">
+          <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
             {name}
           </h3>
 
@@ -153,8 +153,8 @@ export const PlaylistCard = memo(function PlaylistCard({
               </Badge>
             )}
             {isFree && !isLocked && !requiresSubscription && (
-              <Badge className="bg-white hover:bg-white text-[#132240] rounded-full text-[10px] px-1.5 py-0 shadow-ios h-4 font-semibold">
-                FREE
+              <Badge className="bg-emerald-100 hover:bg-emerald-100 text-emerald-700 rounded-full text-[10px] px-1.5 py-0 shadow-ios h-4 font-semibold gap-0.5">
+                🔥 FREE
               </Badge>
             )}
             {language && language !== 'all' && (
@@ -163,7 +163,7 @@ export const PlaylistCard = memo(function PlaylistCard({
                 : LANG_FLAGS[language] && <span className="text-[10px] flex-shrink-0 leading-none">{LANG_FLAGS[language]}</span>
             )}
             {(!isLocked || isFree) && progressPercentage > 0 && (
-              <span className="flex items-center gap-0.5 text-[10px] text-white/70 font-medium">
+              <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground font-medium">
                 <CheckCircle2 className="h-3 w-3" />
                 {Math.round(progressPercentage)}%
               </span>
@@ -177,7 +177,7 @@ export const PlaylistCard = memo(function PlaylistCard({
 
       {/* Enroll CTA for locked playlists */}
       {isLocked && !isFree && programSlug && (
-        <div className="flex items-center justify-center gap-1.5 py-2.5 px-3 bg-white/95 text-[hsl(var(--brand-primary))] text-xs font-semibold">
+        <div className="flex items-center justify-center gap-1.5 py-2.5 px-3 bg-bg-warm text-primary text-xs font-semibold border-t border-border">
           <span>Tap to enroll</span>
           <ChevronRight className="h-3.5 w-3.5" />
         </div>
