@@ -1886,6 +1886,159 @@ function DiscountOfferScreen({ step, onNext }: Props) {
   );
 }
 
+// ─── Rilo Language Bubbles ─────────────────────────────────────
+
+const LANG_BUBBLES: Record<string, {
+  greeting: string;
+  sub: string;
+  bg: string;
+  tail: string;
+  text: string;
+  align: 'left' | 'right';
+  rtl?: boolean;
+}> = {
+  'English only': {
+    greeting: 'Hi, friend!',
+    sub: 'English',
+    bg: 'bg-[#FFF492]',
+    tail: 'bg-[#FFF492]',
+    text: 'text-[#1a1f3d]',
+    align: 'left',
+  },
+  'Persian': {
+    greeting: 'سلام عزیزم',
+    sub: 'فارسی',
+    bg: 'bg-[#E0FBB8]',
+    tail: 'bg-[#E0FBB8]',
+    text: 'text-[#1a1f3d]',
+    align: 'right',
+    rtl: true,
+  },
+  'Turkish': {
+    greeting: 'Merhaba!',
+    sub: 'Türkçe',
+    bg: 'bg-[#D7E9FF]',
+    tail: 'bg-[#D7E9FF]',
+    text: 'text-[#1a1f3d]',
+    align: 'left',
+  },
+  'Spanish': {
+    greeting: '¡Hola, amiga!',
+    sub: 'Español',
+    bg: 'bg-[#FFD9E0]',
+    tail: 'bg-[#FFD9E0]',
+    text: 'text-[#1a1f3d]',
+    align: 'right',
+  },
+};
+
+function RiloLanguageBubblesScreen({ step, onNext, onAnswer }: Props) {
+  const [picked, setPicked] = useState<number | null>(null);
+
+  const select = (i: number) => {
+    if (picked !== null) return;
+    setPicked(i);
+    haptic.success();
+    const label = step.options?.[i]?.label || '';
+    onAnswer?.(step.id, label);
+    setTimeout(onNext, 550);
+  };
+
+  return (
+    <ScreenWrapper>
+      {/* Header */}
+      <FadeUp>
+        <h1 className="text-[26px] font-extrabold text-[#1a1f3d] leading-tight">
+          {step.title?.split('\n').map((line, i) => (
+            <span key={i} className="block">{line}</span>
+          ))}
+        </h1>
+      </FadeUp>
+      {step.subtitle && (
+        <FadeUp delay={0.08}>
+          <p className="mt-2 text-[15px] text-[#1a1f3d]/65 leading-relaxed">
+            {step.subtitle}
+          </p>
+        </FadeUp>
+      )}
+
+      {/* Bubble stack */}
+      <StaggerContainer className="mt-6 flex-1 flex flex-col justify-center gap-3" staggerDelay={0.08}>
+        {step.options?.map((opt, i) => {
+          const cfg = LANG_BUBBLES[opt.label];
+          if (!cfg) return null;
+          const isPicked = picked === i;
+          const isDimmed = picked !== null && !isPicked;
+          const alignRight = cfg.align === 'right';
+          return (
+            <StaggerItem key={i} className={alignRight ? 'self-end' : 'self-start'}>
+              <motion.button
+                onClick={() => select(i)}
+                animate={{
+                  scale: isPicked ? 1.06 : 1,
+                  opacity: isDimmed ? 0.35 : 1,
+                }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                className={`relative max-w-[78%] active:scale-[0.97] transition-transform`}
+                style={{ filter: isDimmed ? 'grayscale(0.6)' : undefined }}
+              >
+                <div
+                  className={`relative ${cfg.bg} ${cfg.text} px-4 py-3 rounded-3xl shadow-[0_6px_18px_-8px_rgba(26,31,61,0.25)] flex items-center gap-3 ${
+                    alignRight ? 'rounded-br-md' : 'rounded-bl-md'
+                  }`}
+                  dir={cfg.rtl ? 'rtl' : 'ltr'}
+                >
+                  {/* Flag chip */}
+                  <div className="w-9 h-9 rounded-full bg-white/70 backdrop-blur flex items-center justify-center shrink-0 shadow-sm">
+                    {opt.emoji && <OptionEmoji emoji={opt.emoji} size={22} />}
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className={`text-[17px] font-extrabold leading-tight ${cfg.rtl ? 'text-right w-full' : ''}`}>
+                      {cfg.greeting}
+                    </span>
+                    <span className="text-[11px] font-semibold text-[#1a1f3d]/50 mt-0.5">
+                      {cfg.sub}
+                    </span>
+                  </div>
+                </div>
+                {/* Tail */}
+                <div
+                  className={`absolute bottom-0 ${cfg.tail} ${
+                    alignRight ? 'right-3 translate-x-1/2' : 'left-3 -translate-x-1/2'
+                  } w-3 h-3 rotate-45`}
+                  style={{ marginBottom: -2 }}
+                />
+
+                {/* Picked checkmark */}
+                {isPicked && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 18 }}
+                    className={`absolute -top-2 ${alignRight ? '-left-2' : '-right-2'} w-7 h-7 rounded-full bg-[#1a1f3d] flex items-center justify-center shadow-md`}
+                  >
+                    <SealCheck className="w-4 h-4 text-white" />
+                  </motion.div>
+                )}
+              </motion.button>
+            </StaggerItem>
+          );
+        })}
+      </StaggerContainer>
+
+      {/* Skip */}
+      <FadeUp delay={0.4}>
+        <button
+          onClick={onNext}
+          className="w-full text-center text-sm text-[#1a1f3d]/40 mt-4 py-2 active:opacity-60"
+        >
+          Skip this question
+        </button>
+      </FadeUp>
+    </ScreenWrapper>
+  );
+}
+
 function WelcomeAboardScreen({ step, onNext }: Props) {
   const handleEnable = async () => {
     try {
