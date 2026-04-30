@@ -1226,6 +1226,23 @@ const AppHome = () => {
                   ) : (
                   <>
 
+                  {/* Program Events Section - rendered inside My Tasks view */}
+                  {programEvents.length > 0 && (
+                    <div className="mb-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <CalendarDays className="h-4 w-4 text-foreground" />
+                        <h2 className="text-sm font-semibold text-foreground">
+                          Program Events
+                        </h2>
+                      </div>
+                      <div className="space-y-3">
+                        {programEvents.map(event => (
+                          <ProgramEventCard key={`${event.type}-${event.id}`} event={event} date={selectedDate} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {filteredTasks.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-10 gap-3">
                       {homeView === 'one-time' && (
