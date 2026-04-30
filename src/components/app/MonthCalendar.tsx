@@ -107,7 +107,7 @@ export const MonthCalendar = ({
                       isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500"
                     )} />
                   )}
-                  {hasBadge && isCurrentMonth && !isSelected && (
+                  {hasBadge && isCurrentMonth && !isSelected && !isTodayDate && (
                     <img
                       src={BADGE_IMAGES[badgeLevel]}
                       alt={`${badgeLevel} badge`}
@@ -118,10 +118,17 @@ export const MonthCalendar = ({
                     'relative z-10 text-[15px] font-bold leading-none',
                     isSelected && 'text-white',
                     !isCurrentMonth && 'text-fg-warm-muted/50',
-                    hasBadge && !isSelected && isCurrentMonth && 'text-fg-warm drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
+                    hasBadge && !isSelected && !isTodayDate && isCurrentMonth && 'text-fg-warm drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
                   )}>
                     {format(dateItem, 'd')}
                   </span>
+                  {hasBadge && isCurrentMonth && !isSelected && isTodayDate && (
+                    <img
+                      src={BADGE_IMAGES[badgeLevel]}
+                      alt={`${badgeLevel} badge`}
+                      className="absolute inset-0 w-full h-full object-contain z-20 pointer-events-none drop-shadow-sm"
+                    />
+                  )}
                 </div>
               </button>
             );
