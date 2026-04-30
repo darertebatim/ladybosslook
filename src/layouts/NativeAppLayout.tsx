@@ -228,7 +228,7 @@ const NativeAppLayout = () => {
               'flex-1 rounded-[28px] px-2 py-2',
               'border-[0.5px] shadow-card-warm',
               'backdrop-blur-2xl backdrop-saturate-150',
-              (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
+              location.pathname.startsWith('/app/watch')
                 ? 'bg-[#0F1A33]/65 border-white/15'
                 : 'bg-gradient-to-b from-white/65 to-bg-warm/75 border-white/65 dark:from-[#3C2819]/55 dark:to-[#28190F]/65 dark:border-[hsl(var(--brand-primary)/0.18)]',
             )}
@@ -239,7 +239,7 @@ const NativeAppLayout = () => {
                   (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
                 const Icon = item.icon;
                 const showChatBadge = item.path === '/app/chat' && unreadCount > 0;
-                const isOverlayContext = location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player');
+                const isOverlayContext = location.pathname.startsWith('/app/watch');
 
                 return (
                   <Link
