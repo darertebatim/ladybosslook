@@ -2,6 +2,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { haptic } from '@/lib/haptics';
 import { Home, MessageCircle, Compass, Music, Users, Flame, CalendarPlus, Play } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import { motion, LayoutGroup } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useRef, useState } from 'react';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
@@ -213,77 +214,105 @@ const NativeAppLayout = () => {
 
       {/* Bottom Navigation - hidden on chat page for full-screen experience */}
       {!isOnChatPage && !isFullScreenTool && !isKeyboardOpen && (
-      <nav className={cn(
-        "fixed bottom-0 left-0 right-0 z-50 shadow-lg pb-safe",
-        (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
-          ? "bg-[#132240]/80 backdrop-blur-xl border-t border-white/10"
-          : "bg-background border-t"
-      )}>
-        <div className="grid grid-cols-4 pt-1.5 pb-1.5">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path || 
-              (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
-            const Icon = item.icon;
-            const showChatBadge = item.path === '/app/chat' && unreadCount > 0;
-            
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={(e) => {
-                    if (isActive && item.path === '/app/home') {
-                      e.preventDefault();
-                      haptic.medium();
-                      window.dispatchEvent(new CustomEvent('home-tab-retap'));
-                    } else {
-                      haptic.light();
-                    }
-                  }}
-                  className={cn(
-                    'flex flex-col items-center justify-center gap-0.5 min-h-[44px] transition-colors',
-                    item.tourClass
-                  )}
-                >
-                  <div className="relative flex flex-col items-center">
-                      <Icon 
+      <nav
+        className={cn(
+          'fixed left-3 right-3 z-50',
+          'bottom-[calc(12px+env(safe-area-inset-bottom))]',
+        )}
+      >
+        <LayoutGroup id="nav-active-pill">
+          <div
+            className={cn(
+              'rounded-[28px] overflow-hidden',
+              'border shadow-card-warm',
+              (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
+                ? 'bg-[#0F1A33]/70 backdrop-blur-2xl backdrop-saturate-150 border-white/10'
+                : 'bg-card-warm/70 backdrop-blur-2xl backdrop-saturate-150 border-border-warm/40',
+            )}
+          >
+            <div className="grid grid-cols-4 px-1.5 pt-1.5 pb-1.5">
+              {navItems.map((item) => {
+                const isActive = location.pathname === item.path ||
+                  (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
+                const Icon = item.icon;
+                const showChatBadge = item.path === '/app/chat' && unreadCount > 0;
+                const isOverlayContext = location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player');
+
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={(e) => {
+                      if (isActive && item.path === '/app/home') {
+                        e.preventDefault();
+                        haptic.medium();
+                        window.dispatchEvent(new CustomEvent('home-tab-retap'));
+                      } else {
+                        haptic.light();
+                      }
+                    }}
+                    className={cn(
+                      'relative flex flex-col items-center justify-center gap-0.5 min-h-[52px] rounded-[22px] transition-colors',
+                      item.tourClass,
+                    )}
+                  >
+                    {/* Animated active pill */}
+                    {isActive && (
+                      <motion.span
+                        layoutId="nav-active-pill"
                         className={cn(
-                          'h-6 w-6',
-                           (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
-                            ? (isActive ? 'text-white' : 'text-white/50')
-                            : (isActive ? 'text-foreground' : 'text-muted-foreground')
+                          'absolute inset-0 rounded-[22px] -z-0',
+                          isOverlayContext ? 'bg-white/15' : 'bg-peach',
                         )}
-                      strokeWidth={isActive ? 2.5 : 1.5}
-                    />
-                    
-                    {/* Badges */}
-                    {showChatBadge && (
-                      <span className="absolute -top-1 -right-2 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
-                        {unreadCount > 99 ? '99+' : unreadCount}
+                        transition={{ type: 'spring', mass: 0.6, stiffness: 380, damping: 30 }}
+                      />
+                    )}
+
+                    <div className="relative z-10 flex flex-col items-center">
+                      <div className="relative">
+                        <Icon
+                          className={cn(
+                            'h-6 w-6 transition-colors',
+                            isOverlayContext
+                              ? (isActive ? 'text-white' : 'text-white/55')
+                              : (isActive ? 'text-brand' : 'text-fg-warm-muted'),
+                          )}
+                          strokeWidth={isActive ? 2.4 : 1.75}
+                        />
+
+                        {/* Badges */}
+                        {showChatBadge && (
+                          <span className="absolute -top-1 -right-2 bg-brand text-white text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5 ring-2 ring-card-warm">
+                            {unreadCount > 99 ? '99+' : unreadCount}
+                          </span>
+                        )}
+                        {item.showBadge && !showChatBadge && item.badgeCount && (
+                          <span className="absolute -top-1 -right-2 bg-brand text-white text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5 ring-2 ring-card-warm">
+                            {item.badgeCount > 9 ? '9+' : item.badgeCount}
+                          </span>
+                        )}
+                        {item.showBadge && !showChatBadge && !item.badgeCount && (
+                          <span className="absolute -top-0.5 -right-0.5 bg-brand w-2 h-2 rounded-full ring-2 ring-card-warm" />
+                        )}
+                      </div>
+
+                      <span
+                        className={cn(
+                          'text-[10px] mt-0.5 transition-colors',
+                          isOverlayContext
+                            ? (isActive ? 'text-white font-semibold' : 'text-white/55 font-medium')
+                            : (isActive ? 'text-fg-warm font-semibold' : 'text-fg-warm-muted font-medium'),
+                        )}
+                      >
+                        {item.label}
                       </span>
-                    )}
-                    {item.showBadge && !showChatBadge && item.badgeCount && (
-                      <span className="absolute -top-1 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5">
-                        {item.badgeCount > 9 ? '9+' : item.badgeCount}
-                      </span>
-                    )}
-                    {item.showBadge && !showChatBadge && !item.badgeCount && (
-                      <span className="absolute -top-0.5 -right-0.5 bg-primary w-2 h-2 rounded-full" />
-                    )}
-                    
-                  </div>
-                  
-                  <span className={cn(
-                    'text-[10px]',
-                    (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
-                      ? (isActive ? 'text-white font-semibold' : 'text-white/50 font-medium')
-                      : (isActive ? 'text-foreground font-semibold' : 'text-muted-foreground font-medium')
-                  )}>
-                    {item.label}
-                  </span>
-                </Link>
-            );
-          })}
-        </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </LayoutGroup>
       </nav>
       )}
 
