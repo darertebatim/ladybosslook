@@ -218,7 +218,7 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
         return (
           <div
             key={banner.id}
-            className={`relative bg-white dark:bg-card rounded-2xl shadow-sm border border-border/50 overflow-hidden ${hasDestination && !banner.video_url ? 'active:scale-[0.98] transition-transform cursor-pointer' : ''}`}
+            className={`relative bg-card-warm rounded-2xl shadow-card-warm overflow-hidden ${hasDestination && !banner.video_url ? 'active:scale-[0.98] transition-transform cursor-pointer' : ''}`}
             onClick={hasDestination && !banner.video_url ? () => handleBannerClick(banner) : undefined}
           >
             {/* Dismiss button */}
