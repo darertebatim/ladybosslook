@@ -1028,7 +1028,7 @@ const AppHome = () => {
                           {hasProgramEvents && (
                             <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5 z-20", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />
                           )}
-                          {hasBadge && !isSelected && (
+                          {hasBadge && !isSelected && !isTodayDate && (
                             <img
                               src={BADGE_IMAGES[badgeLevel]}
                               alt={`${badgeLevel} badge`}
@@ -1041,10 +1041,17 @@ const AppHome = () => {
                           <span className={cn(
                             'relative z-10 text-sm font-bold leading-none',
                             isSelected && 'text-white',
-                            hasBadge && !isSelected && 'text-fg-warm drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
+                            hasBadge && !isSelected && !isTodayDate && 'text-fg-warm drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
                           )}>
                             {format(day, 'd')}
                           </span>
+                          {hasBadge && isTodayDate && !isSelected && (
+                            <img
+                              src={BADGE_IMAGES[badgeLevel]}
+                              alt={`${badgeLevel} badge`}
+                              className="absolute inset-0 w-full h-full object-contain z-20 pointer-events-none drop-shadow-sm"
+                            />
+                          )}
                         </div>
                       </button>;
                 })}
