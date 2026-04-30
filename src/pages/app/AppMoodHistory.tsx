@@ -91,7 +91,7 @@ export default function AppMoodHistory() {
           )}
 
           {/* Legend */}
-          <div className="bg-card rounded-2xl p-4 shadow-sm border border-border/50">
+          <div className="bg-card rounded-2xl p-4 shadow-ios border border-border/50">
             <h3 className="text-sm font-medium text-muted-foreground mb-3">Mood Legend</h3>
             <div className="flex flex-wrap gap-2">
               {Object.entries(MOOD_LABELS).map(([value, label]) => (

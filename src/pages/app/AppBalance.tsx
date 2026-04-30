@@ -74,7 +74,7 @@ const AppBalance = () => {
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {/* Week scrubber */}
-          <div className="flex items-center justify-between bg-white rounded-2xl p-2 shadow-sm">
+          <div className="flex items-center justify-between bg-white rounded-2xl p-2 shadow-ios">
             <button
               onClick={goPrev}
               className="w-10 h-10 rounded-full flex items-center justify-center active:scale-95 transition-transform"
@@ -106,7 +106,7 @@ const AppBalance = () => {
           </div>
 
           {/* Big bar chart */}
-          <section className="bg-white rounded-2xl p-4 shadow-sm">
+          <section className="bg-white rounded-2xl p-4 shadow-ios">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-semibold text-orange-900/60 uppercase tracking-wide">
                 Your balance
@@ -177,7 +177,7 @@ const AppBalance = () => {
 
           {/* Per-cluster task breakdown */}
           {hasData && (
-            <section className="bg-white rounded-2xl p-4 shadow-sm">
+            <section className="bg-white rounded-2xl p-4 shadow-ios">
               <h2 className="text-sm font-semibold text-orange-900/60 uppercase tracking-wide mb-3">
                 What you did
               </h2>
@@ -232,7 +232,7 @@ const AppBalance = () => {
           )}
 
           {/* 4-week trend sparklines */}
-          <section className="bg-white rounded-2xl p-4 shadow-sm">
+          <section className="bg-white rounded-2xl p-4 shadow-ios">
             <div className="flex items-center gap-2 mb-3">
               <TrendingUp className="h-4 w-4 text-orange-700" />
               <h2 className="text-sm font-semibold text-orange-900/60 uppercase tracking-wide">

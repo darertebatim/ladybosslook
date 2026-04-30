@@ -235,7 +235,7 @@ const TimePickerSheet = ({
                         "relative flex flex-col items-center justify-center py-5 rounded-2xl transition-all border outline-none",
                         "bg-muted/30 border-border",
                         localPeriod === period.id &&
-                          "bg-background shadow-sm border-primary ring-2 ring-primary ring-offset-2 ring-offset-background",
+                          "bg-background shadow-ios border-primary ring-2 ring-primary ring-offset-2 ring-offset-background",
                         "focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       )}
                       aria-pressed={localPeriod === period.id}
@@ -1281,7 +1281,7 @@ const AppTaskCreate = ({
       </div>
 
       {/* Settings Card - White rounded card with list */}
-      <div className="mx-4 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm">
+      <div className="mx-4 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-ios">
         {/* Date */}
         <button
           onClick={() => setShowDatePicker(true)}
@@ -1402,7 +1402,7 @@ const AppTaskCreate = ({
       </div>
 
       {/* Goal - Separate card */}
-      <div className="mx-4 mt-2 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm">
+      <div className="mx-4 mt-2 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-ios">
         <button
           onClick={() => setShowGoalSettings(true)}
           className={cn(
@@ -1422,7 +1422,7 @@ const AppTaskCreate = ({
       </div>
 
       {/* Pro Task Link - Separate card */}
-      <div className="mx-4 mt-2 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm">
+      <div className="mx-4 mt-2 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-ios">
         <button
           onClick={() => setShowProLinkPicker(true)}
           className={cn(
@@ -1451,7 +1451,7 @@ const AppTaskCreate = ({
       {/* Subtasks - Opens sub-sheet */}
       <button
         onClick={() => setShowSubtaskEditor(true)}
-        className="mx-4 mt-2 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm px-4 py-3.5 flex items-center gap-3 w-[calc(100%-2rem)] active:scale-[0.98] transition-transform"
+        className="mx-4 mt-2 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-ios px-4 py-3.5 flex items-center gap-3 w-[calc(100%-2rem)] active:scale-[0.98] transition-transform"
       >
         <Plus className="h-5 w-5 text-muted-foreground shrink-0" />
         <span className={cn(
@@ -1900,7 +1900,7 @@ const AppTaskCreate = ({
                         className={cn(
                           'flex-1 py-3 rounded-lg text-sm font-medium transition-all capitalize',
                           repeatPattern === pattern
-                            ? 'bg-[#E8F4FD] text-foreground shadow-sm'
+                            ? 'bg-[#E8F4FD] text-foreground shadow-ios'
                             : 'text-muted-foreground'
                         )}
                       >

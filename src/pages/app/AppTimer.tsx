@@ -492,7 +492,7 @@ function AppTimerInner() {
           {/* Hand-drawn ellipse */}
           <div className="relative">
             {/* SVG Ellipse */}
-            <svg width="280" height="280" viewBox="0 0 280 280" className="drop-shadow-sm">
+            <svg width="280" height="280" viewBox="0 0 280 280" className="drop-shadow-ios">
               <ellipse
                 cx="140" cy="140" rx="125" ry="125"
                 fill="none"

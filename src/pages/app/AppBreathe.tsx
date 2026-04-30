@@ -182,7 +182,7 @@ export default function AppBreathe() {
                 className={cn(
                   'px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0',
                   selectedCategory === cat.value
-                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    ? 'bg-primary text-primary-foreground shadow-ios'
                     : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 )}
               >

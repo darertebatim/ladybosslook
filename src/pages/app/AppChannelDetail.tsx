@@ -238,7 +238,7 @@ export default function AppChannelDetail() {
 
       {/* Header */}
       <header 
-        className="sticky top-0 z-10 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
+        className="sticky top-0 z-10 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-ios"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center gap-2 px-2 pt-2 pb-3">
@@ -294,7 +294,7 @@ export default function AppChannelDetail() {
                   <div className="flex justify-center py-3">
                     <Badge 
                       variant="secondary" 
-                      className="bg-background/80 backdrop-blur-sm shadow-sm border text-xs font-normal"
+                      className="bg-background/80 backdrop-blur-sm shadow-ios border text-xs font-normal"
                     >
                       {group.dateLabel}
                     </Badge>

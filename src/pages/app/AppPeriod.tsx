@@ -229,7 +229,7 @@ const AppPeriod = () => {
 
           {/* Calendar */}
           <div className="relative z-10 flex-1 px-4 flex flex-col">
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-3 shadow-sm flex-1">
+            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-3 shadow-ios flex-1">
               <PeriodCalendar
                 currentMonth={currentMonth}
                 loggedPeriodDays={loggedPeriodDays}

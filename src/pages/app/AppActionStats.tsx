@@ -147,7 +147,7 @@ const AppActionStats = () => {
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {/* Progress Badge Info */}
-          <div className="bg-white rounded-2xl p-5 shadow-sm mb-6 mt-2 text-center">
+          <div className="bg-white rounded-2xl p-5 shadow-ios mb-6 mt-2 text-center">
             <div className="flex items-center justify-center gap-2 mb-3">
               <img src={coinGold} alt="Gold" className="w-10 h-10 object-contain" />
               <img src={coinSilver} alt="Silver" className="w-10 h-10 object-contain" />
@@ -161,7 +161,7 @@ const AppActionStats = () => {
 
           {/* Task Stats Calendar */}
           <h3 className="text-base font-bold text-foreground mb-3">Task Stats</h3>
-          <div className="bg-white rounded-2xl p-4 shadow-sm mb-6">
+          <div className="bg-white rounded-2xl p-4 shadow-ios mb-6">
             {/* Month navigation */}
             <div className="flex items-center justify-between mb-4">
               <button onClick={() => setCurrentMonth(m => subMonths(m, 1))} className="p-1 active:scale-90 transition-transform">
@@ -224,7 +224,7 @@ const AppActionStats = () => {
           </div>
 
           {/* Badge Summary */}
-          <div className="bg-white rounded-2xl p-5 shadow-sm mb-6">
+          <div className="bg-white rounded-2xl p-5 shadow-ios mb-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-border/50 pb-3">
                 <div className="flex items-center gap-3">
@@ -261,7 +261,7 @@ const AppActionStats = () => {
 
           {/* Data this year - Heatmap */}
           <h3 className="text-base font-bold text-foreground mb-3">Data this year</h3>
-          <div className="bg-white rounded-2xl p-4 shadow-sm mb-6">
+          <div className="bg-white rounded-2xl p-4 shadow-ios mb-6">
             <div className="flex items-center justify-between mb-4">
               <button onClick={() => setCurrentYear(y => subYears(y, 1))} className="p-1 active:scale-90 transition-transform">
                 <ChevronLeft className="h-5 w-5 text-muted-foreground" />
@@ -299,7 +299,7 @@ const AppActionStats = () => {
 
           {/* Record */}
           <h3 className="text-base font-bold text-foreground mb-3">Record</h3>
-          <div className="bg-white rounded-2xl p-5 shadow-sm mb-6">
+          <div className="bg-white rounded-2xl p-5 shadow-ios mb-6">
             <div className="space-y-4">
               <RecordRow label="Perfect Days" value={yearRecords.perfectDays} unit="days" />
               <RecordRow label="Best Streaks" value={yearRecords.bestStreak} unit="days" />

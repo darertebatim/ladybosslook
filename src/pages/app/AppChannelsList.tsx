@@ -117,7 +117,7 @@ export default function AppChannelsList() {
 
       {/* Header */}
       <header 
-        className="sticky top-0 z-10 bg-accent dark:bg-accent rounded-b-3xl shadow-sm"
+        className="sticky top-0 z-10 bg-accent dark:bg-accent rounded-b-3xl shadow-ios"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="px-4 pt-3 pb-4 flex items-end justify-between">

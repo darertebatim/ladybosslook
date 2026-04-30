@@ -39,7 +39,7 @@ export default function QuizLibrary() {
           <button
             key={q.id}
             onClick={() => navigate(`/app/quiz/${q.slug}`)}
-            className="rounded-2xl overflow-hidden text-left shadow-sm border bg-card hover:shadow-md transition-shadow"
+            className="rounded-2xl overflow-hidden text-left shadow-ios border bg-card hover:shadow-md transition-shadow"
           >
             <div className="aspect-[6/4] overflow-hidden" style={{ backgroundColor: q.theme_color }}>
               {q.cover_url ? (

@@ -82,7 +82,7 @@ function AppReflectionsInner() {
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <header
-        className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg rounded-b-3xl shadow-sm"
+        className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg rounded-b-3xl shadow-ios"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center justify-between pt-1 pb-2 px-4">
@@ -313,7 +313,7 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
               </div>
             )}
             {isPremium && (
-              <span className="absolute -top-2 -left-1.5 flex items-center gap-0.5 bg-amber-200 text-amber-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+              <span className="absolute -top-2 -left-1.5 flex items-center gap-0.5 bg-amber-200 text-amber-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-ios">
                 <Crown className="h-2.5 w-2.5" />
                 PLUS
               </span>

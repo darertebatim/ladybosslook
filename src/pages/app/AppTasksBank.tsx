@@ -215,7 +215,7 @@ export default function AppTasksBank() {
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
       <header
-        className="fixed top-0 left-0 right-0 z-50 bg-[#FFF8E1] dark:bg-amber-950/90 rounded-b-3xl shadow-sm"
+        className="fixed top-0 left-0 right-0 z-50 bg-[#FFF8E1] dark:bg-amber-950/90 rounded-b-3xl shadow-ios"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center justify-between px-4 pt-3 pb-2">
