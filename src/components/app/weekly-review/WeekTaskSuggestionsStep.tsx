@@ -327,6 +327,10 @@ export function WeekTaskSuggestionsStep({ step, onNext, answers }: Props) {
       toast.success('Routine added to your planner!');
       setShowPreview(false);
       onNext();
+      // High-satisfaction moment → ask for a 5-star review (cooldown-protected)
+      import('@/lib/appReview').then(({ triggerSoftReview }) =>
+        setTimeout(() => triggerSoftReview('weekly_review_complete'), 1500)
+      );
     } catch (err) {
       console.error('Failed to save routine:', err);
       toast.error('Failed to save routine');
