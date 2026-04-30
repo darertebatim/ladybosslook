@@ -1045,7 +1045,7 @@ const AppHome = () => {
                           )}>
                             {format(day, 'd')}
                           </span>
-                          {hasBadge && isTodayDate && !isSelected && (
+                          {hasBadge && isTodayDate && (
                             <img
                               src={BADGE_IMAGES[badgeLevel]}
                               alt={`${badgeLevel} badge`}
