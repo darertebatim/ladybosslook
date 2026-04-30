@@ -1029,7 +1029,7 @@ const AppHome = () => {
                           <div className={cn(
                             'w-9 h-9 rounded-full flex items-center justify-center transition-all relative',
                             isSelected
-                              ? 'bg-[hsl(var(--brand-primary))] text-white shadow-[0_4px_12px_hsl(var(--brand-primary)/0.35)]'
+                              ? 'border-2 border-[hsl(var(--brand-primary))] text-fg-warm'
                               : isTodayDate
                                 ? 'border border-foreground/20'
                                 : 'border border-foreground/10'
@@ -1037,17 +1037,20 @@ const AppHome = () => {
                             {hasProgramEvents && (
                               <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5 z-20", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />
                             )}
-                            {hasBadge && !isSelected && !isTodayDate && (
+                            {hasBadge && !isTodayDate && (
                               <img
                                 src={BADGE_IMAGES[badgeLevel]}
                                 alt={`${badgeLevel} badge`}
-                                className="absolute inset-0 w-full h-full object-contain opacity-60 pointer-events-none rounded-full"
+                                className={cn(
+                                  "absolute inset-0 w-full h-full object-contain pointer-events-none rounded-full",
+                                  isSelected ? "opacity-100" : "opacity-60"
+                                )}
                               />
                             )}
                             <span className={cn(
                               'relative z-10 text-sm font-bold leading-none',
-                              isSelected ? 'text-white' : 'text-fg-warm',
-                              hasBadge && !isSelected && !isTodayDate && 'drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
+                              'text-fg-warm',
+                              hasBadge && !isTodayDate && 'drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
                             )}>
                               {format(day, 'd')}
                             </span>
