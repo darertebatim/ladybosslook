@@ -305,7 +305,8 @@ export default {
 				'luxury-glow': 'var(--shadow-luxury-glow)',
 				'urgency': 'var(--shadow-urgency)',
 				'cta': 'var(--shadow-cta)',
-				'card-warm': 'var(--shadow-card-warm)'
+				'card-warm': 'var(--shadow-card-warm)',
+				'ios': 'var(--shadow-ios)'
 			}
 		}
 	},
