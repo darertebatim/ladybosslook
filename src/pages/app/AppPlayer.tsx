@@ -275,10 +275,10 @@ export default function AppPlayer() {
                         }
                       }}
                       className={cn(
-                        'shrink-0 px-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all active:scale-95',
+                        'shrink-0 px-3.5 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95',
                         active
                           ? 'bg-brand text-white shadow-ios'
-                          : 'bg-card text-fg-warm-muted shadow-ios'
+                          : 'bg-peach text-fg-warm-muted'
                       )}
                     >
                       {config.name}
