@@ -233,11 +233,8 @@ export default function AppPlayer() {
         <div className="relative z-10" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
           {/* Header — sticks to top of scroll container */}
           <div
-            className="sticky z-20 px-4 pt-3 pb-2 backdrop-blur-md"
-            style={{
-              top: 'env(safe-area-inset-top)',
-              background: 'hsl(var(--background) / 0.72)',
-            }}
+            className="sticky z-20 px-4 pt-3 pb-2"
+            style={{ top: 'env(safe-area-inset-top)', background: 'transparent' }}
           >
             <div className="min-h-[44px] flex items-center justify-between">
               {showSearch ? (
