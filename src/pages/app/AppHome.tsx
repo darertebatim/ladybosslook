@@ -1187,7 +1187,7 @@ const AppHome = () => {
                         <button
                           onClick={handleFabClick}
                           aria-label="Add task"
-                          className="coach-add-btn w-6 h-6 rounded-full bg-brand text-white shadow-ios flex items-center justify-center active:scale-90 transition-transform"
+                          className="coach-add-btn w-6 h-6 rounded-full bg-brand text-white shadow-[0_4px_12px_hsl(var(--brand-primary)/0.4)] flex items-center justify-center active:scale-90 transition-transform"
                         >
                           <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
                         </button>
