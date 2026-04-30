@@ -1896,11 +1896,13 @@ type LangCfg = {
   rtl?: boolean;
 };
 
-const LANG_CARDS: Record<string, LangCfg> = {
+const LANG_CARDS: Record<string, LangCfg & { accent: string; ring: string }> = {
   'English only': {
     name: 'English',
     greeting: 'Hi, friend!',
     bg: 'bg-[#FFF492]',
+    accent: '#F59E0B',
+    ring: 'rgba(245,158,11,0.45)',
   },
   'Persian': {
     name: 'فارسی',
@@ -1908,21 +1910,28 @@ const LANG_CARDS: Record<string, LangCfg> = {
     bg: 'bg-[#E0FBB8]',
     fontClass: 'font-farsi',
     rtl: true,
+    accent: '#65A30D',
+    ring: 'rgba(101,163,13,0.45)',
   },
   'Turkish': {
     name: 'Türkçe',
     greeting: 'Merhaba!',
     bg: 'bg-[#D7E9FF]',
+    accent: '#2563EB',
+    ring: 'rgba(37,99,235,0.45)',
   },
   'Spanish': {
     name: 'Español',
     greeting: '¡Hola, amiga!',
     bg: 'bg-[#FFD9E0]',
+    accent: '#E11D48',
+    ring: 'rgba(225,29,72,0.45)',
   },
 };
 
 function RiloLanguageBubblesScreen({ step, onNext, onAnswer }: Props) {
   const [picked, setPicked] = useState<number | null>(null);
+  const pickedCfg = picked !== null ? LANG_CARDS[step.options?.[picked]?.label || ''] : null;
 
   const select = (i: number) => {
     if (picked !== null) return;
@@ -1930,7 +1939,7 @@ function RiloLanguageBubblesScreen({ step, onNext, onAnswer }: Props) {
     haptic.success();
     const label = step.options?.[i]?.label || '';
     onAnswer?.(step.id, label);
-    setTimeout(onNext, 550);
+    setTimeout(onNext, 750);
   };
 
   return (
@@ -1951,75 +1960,140 @@ function RiloLanguageBubblesScreen({ step, onNext, onAnswer }: Props) {
         </FadeUp>
       )}
 
-      {/* 2×2 card grid */}
-      <StaggerContainer className="mt-6 grid grid-cols-2 gap-3" staggerDelay={0.07}>
-        {step.options?.map((opt, i) => {
-          const cfg = LANG_CARDS[opt.label];
-          if (!cfg) return null;
-          const isPicked = picked === i;
-          const isDimmed = picked !== null && !isPicked;
-          return (
-            <StaggerItem key={i}>
-              <motion.button
-                onClick={() => select(i)}
-                animate={{
-                  scale: isPicked ? 1.04 : 1,
-                  opacity: isDimmed ? 0.35 : 1,
-                  y: isPicked ? -4 : 0,
-                }}
-                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                className={`relative w-full overflow-hidden rounded-3xl border-2 bg-white text-left active:scale-[0.97] transition-transform ${
-                  isPicked
-                    ? 'border-[#1a1f3d] shadow-[0_14px_30px_-14px_rgba(26,31,61,0.4)]'
-                    : 'border-black/5 shadow-[0_6px_16px_-10px_rgba(26,31,61,0.25)]'
-                }`}
+      {/* Globe spotlight stage */}
+      <FadeUp delay={0.12}>
+        <div className="relative mt-6 mx-auto w-full aspect-square max-w-[320px]">
+          {/* Soft spotlight glow that takes accent color when picked */}
+          <motion.div
+            aria-hidden
+            className="absolute inset-0 rounded-full blur-3xl"
+            animate={{
+              backgroundColor: pickedCfg?.ring || 'rgba(26,31,61,0.18)',
+              scale: picked !== null ? 1.05 : 1,
+            }}
+            transition={{ duration: 0.5 }}
+          />
+
+          {/* Rotating dashed orbit */}
+          <motion.div
+            aria-hidden
+            className="absolute inset-[8%] rounded-full border-2 border-dashed border-[#1a1f3d]/15"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
+          />
+          <motion.div
+            aria-hidden
+            className="absolute inset-[18%] rounded-full border border-dashed border-[#1a1f3d]/10"
+            animate={{ rotate: -360 }}
+            transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+          />
+
+          {/* Globe core */}
+          <motion.div
+            className="absolute inset-[28%] rounded-full bg-gradient-to-br from-[#1a1f3d] to-[#2d3566] flex items-center justify-center shadow-[0_20px_50px_-15px_rgba(26,31,61,0.6)] overflow-hidden"
+            animate={{ scale: picked !== null ? 0.92 : 1 }}
+            transition={{ duration: 0.4 }}
+          >
+            <motion.span
+              className="text-[64px] leading-none"
+              animate={{ rotate: [0, 8, -8, 0] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              🌍
+            </motion.span>
+
+            {/* Picked greeting bubble inside spotlight */}
+            {pickedCfg && (
+              <motion.div
+                key={pickedCfg.name}
+                initial={{ opacity: 0, y: 8, scale: 0.8 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: 'spring', stiffness: 320, damping: 20 }}
+                className={`absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-white shadow-lg whitespace-nowrap ${pickedCfg.fontClass || ''}`}
+                dir={pickedCfg.rtl ? 'rtl' : 'ltr'}
               >
-                {/* Colored greeting stripe */}
-                <div
-                  className={`${cfg.bg} px-4 pt-4 pb-3 min-h-[88px] flex items-center justify-center`}
-                  dir={cfg.rtl ? 'rtl' : 'ltr'}
+                <span className="text-[13px] font-bold text-black">{pickedCfg.greeting}</span>
+              </motion.div>
+            )}
+          </motion.div>
+
+          {/* Orbiting flag pills (positioned at N, E, S, W) */}
+          {step.options?.map((opt, i) => {
+            const cfg = LANG_CARDS[opt.label];
+            if (!cfg) return null;
+            const positions = [
+              { top: '0%', left: '50%', x: '-50%', y: '0%' },           // N
+              { top: '50%', left: '100%', x: '-100%', y: '-50%' },      // E
+              { top: '100%', left: '50%', x: '-50%', y: '-100%' },      // S
+              { top: '50%', left: '0%', x: '0%', y: '-50%' },           // W
+            ];
+            const pos = positions[i] || positions[0];
+            const isPicked = picked === i;
+            const isDimmed = picked !== null && !isPicked;
+            return (
+              <motion.button
+                key={i}
+                onClick={() => select(i)}
+                style={{
+                  top: pos.top,
+                  left: pos.left,
+                  transform: `translate(${pos.x}, ${pos.y})`,
+                }}
+                className="absolute active:scale-95"
+                initial={{ opacity: 0, scale: 0.6 }}
+                animate={{
+                  opacity: isDimmed ? 0.3 : 1,
+                  scale: isPicked ? 1.18 : 1,
+                }}
+                transition={{
+                  delay: 0.18 + i * 0.08,
+                  duration: 0.4,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+              >
+                <motion.div
+                  animate={isPicked ? {} : { y: [0, -4, 0] }}
+                  transition={{
+                    duration: 3 + i * 0.3,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: i * 0.4,
+                  }}
+                  className={`flex flex-col items-center gap-1`}
                 >
-                  {/* Flag floating */}
-                  <div className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/85 backdrop-blur flex items-center justify-center shadow-sm">
-                    {opt.emoji && <OptionEmoji emoji={opt.emoji} size={18} />}
+                  <div
+                    className={`relative w-[58px] h-[58px] rounded-full ${cfg.bg} flex items-center justify-center shadow-[0_8px_20px_-8px_rgba(26,31,61,0.4)] border-[3px] ${
+                      isPicked ? 'border-[#1a1f3d]' : 'border-white'
+                    }`}
+                  >
+                    {opt.emoji && <OptionEmoji emoji={opt.emoji} size={28} />}
+                    {isPicked && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 380, damping: 18 }}
+                        className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#1a1f3d] flex items-center justify-center shadow-md"
+                      >
+                        <SealCheck className="w-3 h-3 text-white" />
+                      </motion.div>
+                    )}
                   </div>
                   <span
-                    className={`text-[20px] font-extrabold text-[#1a1f3d] text-center leading-snug ${cfg.fontClass || ''}`}
-                  >
-                    {cfg.greeting}
-                  </span>
-                </div>
-
-                {/* Big language name */}
-                <div className="px-3 py-3 flex items-center justify-center">
-                  <span
-                    className={`text-[18px] font-extrabold text-black ${cfg.fontClass || ''}`}
+                    className={`text-[13px] font-extrabold text-black px-2 py-0.5 rounded-md bg-white/90 backdrop-blur ${cfg.fontClass || ''}`}
                     dir={cfg.rtl ? 'rtl' : 'ltr'}
                   >
                     {cfg.name}
                   </span>
-                </div>
-
-                {/* Picked badge */}
-                {isPicked && (
-                  <motion.div
-                    initial={{ scale: 0, rotate: -20 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ type: 'spring', stiffness: 380, damping: 18 }}
-                    className="absolute top-2 left-2 w-7 h-7 rounded-full bg-[#1a1f3d] flex items-center justify-center shadow-md"
-                  >
-                    <SealCheck className="w-4 h-4 text-white" />
-                  </motion.div>
-                )}
+                </motion.div>
               </motion.button>
-            </StaggerItem>
-          );
-        })}
-      </StaggerContainer>
+            );
+          })}
+        </div>
+      </FadeUp>
 
       {/* Helper note */}
       <FadeUp delay={0.35}>
-        <p className="mt-5 text-center text-[12px] text-[#1a1f3d]/50">
+        <p className="mt-4 text-center text-[12px] text-[#1a1f3d]/50">
           You can change this anytime in Settings.
         </p>
       </FadeUp>
