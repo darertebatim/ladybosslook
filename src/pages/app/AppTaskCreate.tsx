@@ -70,7 +70,6 @@ const COLOR_OPTIONS: { name: TaskColor; hex: string }[] = [
   { name: 'peach', hex: '#FFE6C9' },
   { name: 'yellow', hex: '#FFF492' },
   { name: 'mint', hex: '#E2F9F0' },
-  { name: 'sky', hex: '#F0E3FF' },
   { name: 'lavender', hex: '#F0E3FF' },
 ];
 
