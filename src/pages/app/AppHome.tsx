@@ -958,7 +958,7 @@ const AppHome = () => {
                 onClick={() => navigate('/app/presence')}
                 className={cn(
                   "tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full shadow-sm active:scale-95 transition-all",
-                  (streak?.current_streak || 0) > 0
+                  hasAnyCompletionToday
                     ? "bg-gradient-to-br from-[hsl(var(--brand-primary-light))] to-[hsl(var(--brand-primary))] text-white"
                     : "bg-[hsl(var(--tint-peach))] text-[hsl(var(--fg-warm-muted))]"
                 )}
