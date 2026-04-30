@@ -1048,7 +1048,7 @@ const AppHome = () => {
                               />
                             )}
                             <span className={cn(
-                              'relative z-10 text-sm font-bold leading-none',
+                              'relative z-10 text-sm font-bold leading-none translate-y-[0.5px]',
                               'text-fg-warm',
                               hasBadge && !isTodayDate && 'drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
                             )}>
