@@ -282,7 +282,7 @@ export default function AppPlayer() {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-background">
+    <div className="relative flex flex-col h-full overflow-hidden bg-background">
       {/* Cloud hero strip — sticks to the top of the page, scrolls away with content */}
       <div ref={heroRef} className="absolute top-0 left-0 right-0 z-0 h-[340px] overflow-hidden pointer-events-none" style={{ transform: `translateY(${-scrollY * 0.25}px)` }}>
         <video autoPlay muted loop playsInline className="w-full h-full object-cover" src={heroStormVideo} style={{ opacity: 0.9 }} />
