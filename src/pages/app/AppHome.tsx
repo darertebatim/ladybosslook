@@ -1178,12 +1178,12 @@ const AppHome = () => {
                      </div>
                       <div className="flex items-center gap-2 mr-2">
                         <button
-                         onClick={handleFabClick}
-                         aria-label="Add task"
-                         className="coach-add-btn w-7 h-7 rounded-full bg-[hsl(var(--brand-primary))] text-white shadow-[0_2px_6px_hsl(var(--brand-primary)/0.35)] flex items-center justify-center active:scale-90 transition-transform"
-                       >
-                         <Plus className="h-4 w-4" strokeWidth={2.5} />
-                       </button>
+                          onClick={handleFabClick}
+                          aria-label="Add task"
+                          className="coach-add-btn w-7 h-7 rounded-full bg-white text-[hsl(var(--brand-primary))] shadow-[0_2px_6px_rgba(0,0,0,0.08)] ring-1 ring-black/5 flex items-center justify-center active:scale-90 transition-transform"
+                        >
+                          <Plus className="h-4 w-4" strokeWidth={2.75} />
+                        </button>
                      </div>
                    </div>
 
