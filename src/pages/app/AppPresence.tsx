@@ -126,7 +126,7 @@ const AppPresence = () => {
               <div className="flex items-center gap-3 mb-6">
                 {/* Left: stacked stat cards */}
                 <div className="flex flex-col gap-2 w-[28%] shrink-0">
-                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-sm text-center">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-ios text-center">
                     {isLoading ? (
                       <Skeleton className="h-7 w-10 mx-auto mb-1 bg-white/30" />
                     ) : (
@@ -137,7 +137,7 @@ const AppPresence = () => {
                     )}
                     <div className="text-xs text-orange-700/60 font-medium">Days Streak</div>
                   </div>
-                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-sm text-center">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-ios text-center">
                     {isLoading ? (
                       <Skeleton className="h-7 w-10 mx-auto mb-1 bg-white/30" />
                     ) : (
@@ -217,7 +217,7 @@ const AppPresence = () => {
             <SelfCareBalanceCard />
 
             {/* All-Time Activity Stats */}
-            <section className="bg-white rounded-2xl p-4 shadow-sm">
+            <section className="bg-white rounded-2xl p-4 shadow-ios">
               <h3 className="text-sm font-semibold text-orange-900/60 mb-3">
                 Activity Stats
               </h3>
@@ -338,7 +338,7 @@ const AppPresence = () => {
             </section>
             
             {/* Achievements */}
-            <section className="bg-white rounded-2xl p-4 shadow-sm">
+            <section className="bg-white rounded-2xl p-4 shadow-ios">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-orange-900/60">
                   Awards
@@ -444,7 +444,7 @@ interface StatCardProps {
 
 function StatCard({ icon: Icon, label, value, iconColor, isLoading }: StatCardProps) {
   return (
-    <div className="bg-white rounded-2xl p-4 shadow-sm text-center">
+    <div className="bg-white rounded-2xl p-4 shadow-ios text-center">
       <Icon className={cn('h-5 w-5 mx-auto mb-2', iconColor)} />
       {isLoading ? (
         <Skeleton className="h-7 w-10 mx-auto mb-1" />

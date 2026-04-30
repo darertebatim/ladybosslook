@@ -188,7 +188,7 @@ export default function AppFasting() {
         {/* Protocol pill */}
         <button
           onClick={() => setProtocolOpen(true)}
-          className="rounded-full px-6 py-3 h-auto flex items-center justify-center text-foreground text-base font-semibold active:scale-95 transition-transform shadow-sm border border-border/30"
+          className="rounded-full px-6 py-3 h-auto flex items-center justify-center text-foreground text-base font-semibold active:scale-95 transition-transform shadow-ios border border-border/30"
           style={{ backgroundColor: currentProtocol?.color || '#FFF59D' }}
         >
           {currentProtocol?.label || '16h'}
@@ -215,7 +215,7 @@ export default function AppFasting() {
         {/* Settings button */}
         <button
           onClick={() => setSettingsOpen(true)}
-          className="w-12 h-12 rounded-full flex items-center justify-center active:scale-95 transition-transform shadow-sm border border-border/30 bg-white/60 dark:bg-white/10 text-amber-600 dark:text-amber-400"
+          className="w-12 h-12 rounded-full flex items-center justify-center active:scale-95 transition-transform shadow-ios border border-border/30 bg-white/60 dark:bg-white/10 text-amber-600 dark:text-amber-400"
         >
           <Settings className="w-5 h-5" />
         </button>

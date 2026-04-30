@@ -144,7 +144,7 @@ function RoutineCardContent({
           ) : (
             <button
               onClick={(e) => { e.stopPropagation(); onOpenAddSheet(routine); }}
-              className="w-9 h-9 rounded-full bg-urgency flex items-center justify-center active:scale-95 transition-transform shadow-sm"
+              className="w-9 h-9 rounded-full bg-urgency flex items-center justify-center active:scale-95 transition-transform shadow-ios"
               title="Add to planner"
             >
               <CalendarPlus className="w-4 h-4 text-urgency-foreground" />
@@ -1396,7 +1396,7 @@ export default function AppRoutinePlayer() {
               {!addedRoutineIds.has(preStartRoutine.routine_id) && (
                 <button
                   onClick={() => { haptic.light(); handleOpenAddSheet(preStartRoutine); }}
-                  className="w-8 h-8 rounded-full bg-urgency flex items-center justify-center active:scale-95 transition-transform shadow-sm"
+                  className="w-8 h-8 rounded-full bg-urgency flex items-center justify-center active:scale-95 transition-transform shadow-ios"
                   title="Add to planner"
                 >
                   <CalendarPlus className="w-3.5 h-3.5 text-urgency-foreground" />

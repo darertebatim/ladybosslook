@@ -302,7 +302,7 @@ export default function AppPlayer() {
                     placeholder="Search audio..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 h-9 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus-visible:ring-white/20"
+                    className="pl-9 h-9 bg-white/15 backdrop-blur-md border-0 text-white placeholder:text-white/40 focus-visible:ring-0 shadow-ios rounded-full"
                     autoFocus
                   />
                 </div>
@@ -368,10 +368,10 @@ export default function AppPlayer() {
                   key={filter}
                   onClick={() => setProgressFilter(filter)}
                   className={cn(
-                    'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
+                    'px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95',
                     progressFilter === filter
-                      ? 'bg-white/20 text-white backdrop-blur-sm'
-                      : 'text-white/50 hover:text-white/70'
+                      ? 'bg-white/95 text-[hsl(var(--fg-warm))] shadow-ios'
+                      : 'bg-white/10 text-white/70 backdrop-blur-md'
                   )}
                 >
                   {filter === 'all' ? 'All' : filter === 'in_progress' ? 'In Progress' : 'Completed'}
@@ -382,7 +382,7 @@ export default function AppPlayer() {
             {/* Language Selector */}
             <Popover>
               <PopoverTrigger asChild>
-                <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium bg-white/10 text-white/70 backdrop-blur-sm">
+                <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium bg-white/15 text-white backdrop-blur-md shadow-ios active:scale-95">
                   {selectedLang.value === 'persian'
                     ? <PersianFlag size={14} />
                     : <span className="text-sm">{selectedLang.flag}</span>

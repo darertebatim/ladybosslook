@@ -86,13 +86,13 @@ const AcademyProgramCard = ({ title, image, type, language, isFree, isEnrolled, 
           </div>
           {/* Enrolled badge */}
           {isEnrolled && (
-            <div className="absolute -top-2 -left-1 z-10 bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+            <div className="absolute -top-2 -left-1 z-10 bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
               <CheckCircle2 className="h-2.5 w-2.5" /> Enrolled
             </div>
           )}
           {/* FREE badge */}
           {isFree && !isEnrolled && (
-            <div className="absolute -top-2 -left-1 z-10 bg-white text-[#132240] text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+            <div className="absolute -top-2 -left-1 z-10 bg-white text-[#132240] text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-ios">
               FREE
             </div>
           )}

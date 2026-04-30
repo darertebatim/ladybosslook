@@ -87,7 +87,7 @@ export default function AppReadDetail() {
 
       {/* Info Card */}
       <div className="px-4 -mt-3 relative z-10">
-        <div className="bg-card rounded-2xl p-5 shadow-sm border">
+        <div className="bg-card rounded-2xl p-5 shadow-ios border">
           {content.description && (
             <p className="text-sm text-black mb-4 leading-relaxed">{content.description}</p>
           )}
