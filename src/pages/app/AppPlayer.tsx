@@ -290,8 +290,8 @@ export default function AppPlayer() {
         <div className="absolute inset-0 bg-white/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
       </div>
 
-      {/* Glass Header — dark variant of the iOS 18 PageHeader */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-black/25 backdrop-blur-xl shadow-ios" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      {/* Glass Header — dark variant, rounded like Home */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-xl rounded-b-2xl shadow-[0_2px_10px_rgba(0,0,0,0.18)]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="relative z-10">
           {/* Title bar */}
           <div className="min-h-[52px] flex items-center justify-between px-4 pt-2 pb-1">

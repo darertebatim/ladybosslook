@@ -110,15 +110,15 @@ export default function AppChannelsList() {
   const isLoading = channelsLoading || summariesLoading;
 
   return (
-    <div className="flex flex-col h-full bg-bg-warm">
+    <div className="flex flex-col h-full bg-background">
       <SEOHead 
         title="Channels" 
         description="Stay connected with announcements, content updates, and community discussions"
       />
 
-      {/* Sticky translucent header — iOS 18 PageHeader pattern */}
+      {/* Glassy rounded header — matches Home */}
       <header 
-        className="sticky top-0 z-30 bg-[hsl(var(--bg-warm)/0.85)] backdrop-blur-xl shadow-ios"
+        className="sticky top-0 z-30 bg-white/35 dark:bg-black/20 backdrop-blur-xl rounded-b-2xl shadow-[0_2px_10px_rgba(0,0,0,0.06)]"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="px-4 pt-3 pb-3 flex items-center justify-between min-h-[52px]">
