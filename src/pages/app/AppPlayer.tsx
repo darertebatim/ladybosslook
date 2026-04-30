@@ -322,7 +322,7 @@ export default function AppPlayer() {
                 <div className="flex items-center gap-2">
                   {startTour && <TourHelpButton onClick={startTour} />}
                   <IOSIconButton size="sm" onClick={() => setShowSearch(true)} className="tour-player-search" aria-label="Search">
-                    <Search className="h-5 w-5 text-primary" />
+                    <Search className="h-5 w-5 text-brand" />
                   </IOSIconButton>
                 </div>
               </>
@@ -354,10 +354,10 @@ export default function AppPlayer() {
                         }
                       }}
                       className={cn(
-                        'px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all active:scale-95',
+                        'shrink-0 px-3.5 py-1.5 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all active:scale-95',
                         active
-                          ? 'bg-primary text-primary-foreground shadow-ios'
-                          : 'bg-bg-warm text-foreground'
+                          ? 'bg-brand text-white shadow-ios'
+                          : 'bg-peach text-muted-foreground'
                       )}
                     >
                       {config.name}
@@ -381,10 +381,10 @@ export default function AppPlayer() {
                   key={filter}
                   onClick={() => setProgressFilter(filter)}
                   className={cn(
-                    'px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95',
+                    'px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all active:scale-95',
                     progressFilter === filter
                       ? 'bg-card text-foreground shadow-ios'
-                      : 'bg-bg-warm text-muted-foreground'
+                      : 'bg-transparent text-muted-foreground'
                   )}
                 >
                   {filter === 'all' ? 'All' : filter === 'in_progress' ? 'In Progress' : 'Completed'}
@@ -398,7 +398,9 @@ export default function AppPlayer() {
                 <IOSIconButton size="sm" aria-label="Language">
                   {selectedLang.value === 'persian'
                     ? <PersianFlag size={14} />
-                    : <span className="text-base leading-none">{selectedLang.flag}</span>
+                    : selectedLang.value === 'all'
+                      ? <Globe className="h-4 w-4 text-brand" />
+                      : <span className="text-base leading-none">{selectedLang.flag}</span>
                   }
                 </IOSIconButton>
               </PopoverTrigger>
@@ -469,7 +471,7 @@ export default function AppPlayer() {
 
           {/* All Playlists Section */}
           <div className="space-y-3 tour-playlists">
-            <h2 className="tour-playlists-header text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+            <h2 className="tour-playlists-header text-[11px] font-bold text-muted-foreground uppercase tracking-[0.12em]">
               {selectedCategory === 'all' ? 'All Playlists' : categoryConfig[selectedCategory]?.name || selectedCategory}
             </h2>
             
