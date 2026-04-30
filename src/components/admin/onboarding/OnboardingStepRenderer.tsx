@@ -4061,58 +4061,57 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
   }, []);
 
   return (
-    <BottomSheetWrapper bgImage={meplusMascotBg} headerHeight={140}>
-      {/* Celebration badge */}
-      <FadeUp>
-        <div className="flex flex-col items-center mb-3">
-          <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-2">
-            <FluentEmoji emoji="🎉" size={32} />
-          </div>
-          <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center leading-tight">
-            Your first<br />Daily Reset!
+    <div className="h-full w-full flex flex-col relative overflow-hidden bg-gradient-to-b from-[#F4FBF6] via-white to-[#F5F0FF]">
+      {/* ───── Visual: Living Cycle ───── */}
+      <div className="flex-1 flex items-center justify-center px-6 pt-6 pb-2 relative z-10 min-h-0">
+        <FadeUp delay={0.15}>
+          <LoopWheel size={260} />
+        </FadeUp>
+      </div>
+
+      {/* ───── Text + CTA (RiloTeach pattern) ───── */}
+      <div className="shrink-0 px-6 pb-8 relative z-10">
+        <FadeUp>
+          <h1 className="text-[26px] leading-[1.2] font-extrabold text-[#1a1f3d] text-center">
+            Your first Daily Reset
           </h1>
-        </div>
-      </FadeUp>
-
-      {/* Description */}
-      <FadeUp delay={0.1}>
-        <p className="text-[16px] text-[#1a1f3d] leading-relaxed text-center mb-3">
-          A simple daily routine to help you<br />take control of your life.
-        </p>
-      </FadeUp>
-
-      {/* Loop Wheel */}
-      <FadeUp delay={0.15}>
-        <LoopWheel />
-      </FadeUp>
-
-      {/* Testimony */}
-      <FadeUp delay={0.25}>
-        <div className="bg-[#f5f3ff] rounded-2xl px-4 py-3 mt-2 mb-1">
-          <p className="text-[13px] text-[#1a1f3d]/70 text-center italic">
-            "It feels like having a little daily reset button in my pocket." — Yalda-M ⭐⭐⭐⭐⭐
+        </FadeUp>
+        <FadeUp delay={0.08}>
+          <p className="mt-2 text-[14px] text-[#1a1f3d]/65 text-center leading-snug">
+            A simple daily routine to help you take control of your life.
           </p>
-        </div>
-      </FadeUp>
+        </FadeUp>
 
-      {/* Bottom button */}
-      <FadeUp delay={0.5} className="mt-auto pt-2 sticky bottom-0 bg-white pb-1">
-        {!added ? (
-          <NavyButton onClick={handleAdd}>
-            Add to my daily routine
-          </NavyButton>
-        ) : (
-          <motion.div
-            initial={{ scale: 0.95 }}
-            animate={{ scale: 1 }}
-            className="w-full py-4 rounded-2xl bg-emerald-500 text-white font-bold text-base flex items-center justify-center gap-2"
+        <FadeUp delay={0.16}>
+          <div className="mt-4 bg-[#f5f3ff] rounded-2xl px-4 py-2.5">
+            <p className="text-[12px] text-[#1a1f3d]/70 text-center italic leading-snug">
+              &ldquo;Like a little reset button in my pocket.&rdquo; — Yalda-M ⭐⭐⭐⭐⭐
+            </p>
+          </div>
+        </FadeUp>
+
+        <FadeUp delay={0.24} className="mt-5">
+          {!added ? (
+            <NavyButton onClick={handleAdd}>Add to my daily routine</NavyButton>
+          ) : (
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              className="w-full py-4 rounded-2xl bg-emerald-500 text-white font-bold text-base flex items-center justify-center gap-2"
+            >
+              <SealCheck className="w-5 h-5" />
+              Added to your routine!
+            </motion.div>
+          )}
+          <button
+            onClick={onNext}
+            className="w-full py-3 text-sm text-[#1a1f3d]/50 font-medium active:opacity-60 mt-2"
           >
-            <SealCheck className="w-5 h-5" />
-            Added to your routine!
-          </motion.div>
-        )}
-      </FadeUp>
-    </BottomSheetWrapper>
+            Skip
+          </button>
+        </FadeUp>
+      </div>
+    </div>
   );
 }
 
