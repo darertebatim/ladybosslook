@@ -67,10 +67,10 @@ export function SelfCareQuizBanner({ className, onVisibilityChange }: SelfCareQu
         {/* Dismiss */}
         <button
           onClick={handleDismiss}
-          className="absolute top-1.5 right-1.5 z-10 p-1 rounded-full bg-black/25 active:bg-black/40 transition-colors"
+          className="absolute top-1.5 right-1.5 z-10 p-1 rounded-full bg-white active:bg-white/80 transition-colors"
           aria-label="Dismiss"
         >
-          <X className="h-3.5 w-3.5 text-white" />
+          <X className="h-3.5 w-3.5 text-black" strokeWidth={2.5} />
         </button>
 
         <div className="relative z-[1] flex items-center gap-3 pr-5">
