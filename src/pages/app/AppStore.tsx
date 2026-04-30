@@ -10,6 +10,7 @@ import { useEnrollments, useInvalidateAllEnrollmentData } from '@/hooks/useAppDa
 import { ProgramCard } from '@/components/app/ProgramCard';
 import { ToolCard } from '@/components/app/ToolCard';
 import { Input } from '@/components/ui/input';
+import { IOSIconButton } from '@/components/app/ui/IOSIconButton';
 import { wellnessTools, audioTools, getVisibleComingSoon } from '@/lib/toolsConfig';
 import { PromoBanner } from '@/components/app/PromoBanner';
 import { HomeBanner } from '@/components/app/HomeBanner';
@@ -264,18 +265,18 @@ const AppStore = () => {
   const comingSoonTools = getVisibleComingSoon();
 
   return (
-    <div className="h-full overflow-hidden flex flex-col bg-background">
+    <div className="h-full overflow-hidden flex flex-col bg-bg-warm">
       <SEOHead 
         title="Explore - Rilo"
         description="Explore tools, audio experiences, and educational programs"
       />
 
-      {/* Fixed Header */}
+      {/* Sticky translucent header — matches Home language */}
       <header 
-        className="shrink-0 z-40 bg-gradient-to-b from-violet-50 to-background dark:from-violet-950/20 dark:to-background"
+        className="shrink-0 z-40 bg-[hsl(var(--bg-warm)/0.85)] backdrop-blur-xl shadow-ios"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="flex items-center justify-between px-4 pt-3 pb-4">
+        <div className="flex items-center justify-between px-4 pt-3 pb-3 min-h-[52px]">
           {showSearch ? (
             <div className="flex-1 flex items-center gap-2">
               <Input
@@ -283,32 +284,35 @@ const AppStore = () => {
                 placeholder="Search tools & programs..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 h-10 bg-white/80 dark:bg-black/20 border-border/50 rounded-xl"
+                className="flex-1 h-10 bg-white/90 dark:bg-black/30 border-0 rounded-full shadow-ios focus-visible:ring-0"
                 autoFocus
               />
-              <button 
+              <IOSIconButton
+                size="sm"
                 onClick={() => {
                   setShowSearch(false);
                   setSearchQuery('');
                 }}
-                className="p-2 rounded-full transition-transform active:scale-95"
+                aria-label="Close search"
               >
-                <X className="h-5 w-5 text-muted-foreground" />
-              </button>
+                <X className="h-5 w-5" />
+              </IOSIconButton>
             </div>
           ) : (
             <>
-              <h1 className="text-xl font-bold text-foreground">Self-Care Tools</h1>
-              <div className="flex items-center">
+              <h1 className="text-2xl font-bold text-fg-warm">Self-Care Tools</h1>
+              <div className="flex items-center gap-2">
                 {startTour && (
                   <TourHelpButton onClick={startTour} />
                 )}
-                <button 
+                <IOSIconButton
+                  size="sm"
                   onClick={() => setShowSearch(true)}
-                  className="tour-search-button p-2 rounded-full transition-transform active:scale-95"
+                  className="tour-search-button"
+                  aria-label="Search"
                 >
-                  <Search className="h-5 w-5 text-muted-foreground" />
-                </button>
+                  <Search className="h-5 w-5" />
+                </IOSIconButton>
               </div>
             </>
           )}
