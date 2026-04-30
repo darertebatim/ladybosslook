@@ -218,6 +218,13 @@ export default function AppAIPlanner() {
     setTimeout(() => textareaRef.current?.focus(), 50);
   };
 
+  // Slide the sheet down before navigating back, mirroring the success exit
+  const handleBack = () => {
+    haptic.light();
+    setIsClosing(true);
+    setTimeout(() => goBack(), 320);
+  };
+
   const toggleSelect = (id: string) => {
     haptic.light();
     setSelectedIds((prev) => {
@@ -315,7 +322,7 @@ export default function AppAIPlanner() {
         style={{ paddingTop: 'env(safe-area-inset-top, 44px)' }}
       >
         <button
-          onClick={goBack}
+          onClick={handleBack}
           className="h-9 w-9 rounded-full bg-white/70 backdrop-blur-sm flex items-center justify-center active:opacity-60"
           aria-label="Back"
         >
