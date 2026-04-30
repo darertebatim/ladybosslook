@@ -7,6 +7,7 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { provisionRiloPicks } from '@/lib/onboarding/provisionRiloPicks';
 import confetti from 'canvas-confetti';
+import { requestAppReview } from '@/lib/appReview';
 import type { OnboardingStep } from '@/types/onboarding';
 
 interface Props {
@@ -161,6 +162,13 @@ export function RiloCommitScreen({ step, onNext }: Props) {
       haptic.medium();
       onNext();
     }, 3400);
+
+    // Fire native iOS/Android review prompt at peak satisfaction —
+    // after the confetti bursts but before auto-advance to Home.
+    // No-ops on web; system-throttled on native (3x/year on iOS).
+    setTimeout(() => {
+      requestAppReview('onboarding_commit').catch(() => {});
+    }, 1800);
   };
 
   // Build a fountain of emoji bubbles. Each one starts at the bottom-center,
