@@ -61,11 +61,11 @@ export const MonthCalendar = ({
   }, [currentMonth]);
 
   return (
-    <div className="animate-in slide-in-from-top-2 duration-200">
+    <div className="animate-in slide-in-from-top-2 duration-200 px-1">
       {/* Day-of-week headers */}
-      <div className="flex mb-1">
+      <div className="flex mb-2">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-          <div key={d} className="flex-1 text-center text-[10px] font-medium text-muted-foreground/60">
+          <div key={d} className="flex-1 text-center text-[12px] font-medium text-fg-warm-muted">
             {d}
           </div>
         ))}
@@ -73,7 +73,7 @@ export const MonthCalendar = ({
 
       {/* Week rows - matching collapsed week strip styling */}
       {weeks.map((week, weekIdx) => (
-        <div key={weekIdx} className="flex mt-1.5">
+        <div key={weekIdx} className="flex mt-2">
           {week.map((dateItem) => {
             const isCurrentMonth = isSameMonth(dateItem, currentMonth);
             const isSelected = isSameDay(dateItem, selectedDate);
@@ -94,12 +94,12 @@ export const MonthCalendar = ({
               >
                 <div
                   className={cn(
-                    'w-11 h-11 rounded-xl flex flex-col items-center justify-center transition-all relative',
+                    'w-11 h-11 rounded-2xl flex flex-col items-center justify-center transition-all relative',
                     !isCurrentMonth && 'opacity-30',
-                    isCurrentMonth && !isSelected && !isTodayDate && !hasBadge && 'text-muted-foreground hover:bg-muted/50',
-                    isSelected && !hasBadge && 'bg-chip-lavender text-foreground scale-105',
-                    !isSelected && isTodayDate && isCurrentMonth && !hasBadge && 'border border-background text-muted-foreground',
-                    hasBadge && isSelected && 'ring-2 ring-chip-lavender ring-offset-0'
+                    isCurrentMonth && !isSelected && !isTodayDate && !hasBadge && 'text-fg-warm active:bg-bg-warm',
+                    isSelected && !hasBadge && 'bg-lavender text-fg-warm scale-105',
+                    !isSelected && isTodayDate && isCurrentMonth && !hasBadge && 'text-brand',
+                    hasBadge && isSelected && 'ring-2 ring-lavender ring-offset-0'
                   )}
                 >
                   {hasProgramEvents && isCurrentMonth && (
@@ -116,9 +116,9 @@ export const MonthCalendar = ({
                     />
                   ) : (
                     <span className={cn(
-                      'text-sm font-bold leading-none',
-                      isSelected && 'text-foreground',
-                      !isCurrentMonth && 'text-muted-foreground/40'
+                      'text-[15px] font-bold leading-none',
+                      isSelected && 'text-fg-warm',
+                      !isCurrentMonth && 'text-fg-warm-muted/50'
                     )}>
                       {format(dateItem, 'd')}
                     </span>
