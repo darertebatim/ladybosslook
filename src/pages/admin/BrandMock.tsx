@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Flame, Calendar, Headphones, BookOpen, Heart, Sparkles, ChevronRight, Check, Sun, Moon, Droplets, Wind, Home, Compass, CalendarPlus, Music, Users, Menu, Headset, Star, Zap, Settings2, Search } from 'lucide-react';
+import { Globe, Lock } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import appIcon from '@/assets/app-icon.png';
 
