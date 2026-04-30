@@ -38,6 +38,15 @@ export const whatIsRiloFlow: OnboardingFlow = {
       subtitle: 'Calm, sleep, workouts, journal, calendar, habits, career, money — all already inside Rilo. Free.',
       buttonLabel: 'Next',
     },
+    // Push permission — ask before language so reminders are set up early
+    {
+      id: 'wir-push-permission',
+      type: 'welcome-aboard',
+      title: 'With reminders, routines feel 80% easier.',
+      subtitle: 'Get gentle nudges to keep your daily reset on track.',
+      buttonLabel: 'Turn on notifications',
+      secondaryButtonLabel: 'Maybe later',
+    },
     // Language preference — quick personalization tap
     {
       id: 'wir-second-language',
@@ -132,6 +141,15 @@ export const whatIsRiloFlow: OnboardingFlow = {
       ],
       buttonLabel: 'Continue',
     },
+    // Daily Reset prompt — placed right before the AI building step
+    {
+      id: 'wir-daily-reset-prompt',
+      type: 'daily-reset-prompt',
+      title: 'Enable Daily Reset?',
+      subtitle: 'Your routine resets every morning so you can start each day fresh.',
+      buttonLabel: 'Yes, enable it',
+      secondaryButtonLabel: 'Maybe later',
+    },
     {
       id: 'wir-building-plan',
       type: 'rilo-building-plan',
@@ -143,24 +161,6 @@ export const whatIsRiloFlow: OnboardingFlow = {
       type: 'rilo-week-plans',
       title: 'Any other plans this week?',
       buttonLabel: 'Build my week',
-    },
-    // Daily Reset prompt — peak-motivation moment, right before commit
-    {
-      id: 'wir-daily-reset-prompt',
-      type: 'daily-reset-prompt',
-      title: 'Enable Daily Reset?',
-      subtitle: 'Your routine resets every morning so you can start each day fresh.',
-      buttonLabel: 'Yes, enable it',
-      secondaryButtonLabel: 'Maybe later',
-    },
-    // Push permission — last gate before commit
-    {
-      id: 'wir-push-permission',
-      type: 'welcome-aboard',
-      title: 'With reminders, routines feel 80% easier.',
-      subtitle: 'Get gentle nudges to keep your daily reset on track.',
-      buttonLabel: 'Turn on notifications',
-      secondaryButtonLabel: 'Maybe later',
     },
     {
       id: 'wir-commit',
