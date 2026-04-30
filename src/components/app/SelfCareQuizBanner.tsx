@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
-import { X, ChevronRight, Sparkles } from 'lucide-react';
+import { X, Sparkles } from 'lucide-react';
 import { useSpecialBannerSettings } from '@/hooks/useSpecialBannerSettings';
+import selfcareQuizHero from '@/assets/selfcare-quiz-hero.png';
 
 const SELFCARE_QUIZ_COMPLETED_KEY = 'simora_onboarding_completed_selfcare-quiz';
 const SELFCARE_QUIZ_DISMISSED_KEY = 'simora_selfcare_quiz_banner_dismissed';
@@ -75,20 +76,29 @@ export function SelfCareQuizBanner({ className, onVisibilityChange }: SelfCareQu
 
         <div className="relative z-[1] flex items-center gap-3 pr-5">
           <div
-            className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
+            className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden"
             style={{ background: 'rgba(255,255,255,0.25)' }}
           >
-            <Sparkles className="w-5 h-5 text-white" />
+            <img
+              src={selfcareQuizHero}
+              alt=""
+              className="w-full h-full object-cover"
+              draggable={false}
+            />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-white text-[13px] font-bold leading-tight">
-              What's missing in your self-care?
+              Discover your self-care gaps in 1 min
             </p>
-            <p className="text-white/80 text-[10px] mt-0.5">
-              Take the 2-min Self-Care Quiz
-            </p>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); handleTap(); }}
+              className="mt-1.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white text-[#EB5E33] text-[10px] font-bold active:scale-95 transition-transform"
+            >
+              <Sparkles className="w-3 h-3" />
+              AI Powered Analyze
+            </button>
           </div>
-          <ChevronRight className="w-4 h-4 text-white/90 shrink-0" />
         </div>
       </div>
   );
