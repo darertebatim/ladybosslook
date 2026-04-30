@@ -147,13 +147,13 @@ export const PlaylistCard = memo(function PlaylistCard({
           {/* Badges row */}
           <div className="flex items-center gap-1.5 mt-0.5">
             {requiresSubscription && (
-              <Badge className="bg-amber-200 text-amber-700 hover:bg-amber-200 rounded-full text-[10px] px-1.5 py-0 gap-0.5 shadow-sm h-4">
+              <Badge className="bg-amber-200 text-amber-700 hover:bg-amber-200 rounded-full text-[10px] px-1.5 py-0 gap-0.5 shadow-ios h-4">
                 <Crown className="h-2.5 w-2.5" />
                 PLUS
               </Badge>
             )}
             {isFree && !isLocked && !requiresSubscription && (
-              <Badge className="bg-white hover:bg-white text-[#132240] rounded-full text-[10px] px-1.5 py-0 shadow-sm h-4 font-semibold">
+              <Badge className="bg-white hover:bg-white text-[#132240] rounded-full text-[10px] px-1.5 py-0 shadow-ios h-4 font-semibold">
                 FREE
               </Badge>
             )}
