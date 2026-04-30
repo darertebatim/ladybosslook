@@ -320,8 +320,8 @@ export default function AppPlayer() {
                       className={cn(
                         'px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all active:scale-95',
                         active
-                          ? 'bg-white/70 backdrop-blur-md text-fg-warm shadow-ios'
-                          : 'bg-transparent text-fg-warm-muted'
+                          ? 'bg-brand text-white shadow-ios'
+                          : 'bg-white/35 backdrop-blur-md text-fg-warm-muted'
                       )}
                     >
                       {filter === 'all' ? 'All' : filter === 'in_progress' ? 'In Progress' : 'Completed'}
