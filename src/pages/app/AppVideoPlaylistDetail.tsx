@@ -166,23 +166,23 @@ export default function AppVideoPlaylistDetail() {
 
   if (plLoading || trLoading) {
     return (
-      <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
+      <div className="flex flex-col h-full overflow-hidden" >
         <div className="p-4 space-y-4" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 16px)' }}>
-          <Skeleton className="h-8 w-48 bg-white/10" />
-          <Skeleton className="h-4 w-full bg-white/10" />
-          <Skeleton className="aspect-[3/4] w-full rounded-xl bg-white/10" />
+          <Skeleton className="h-8 w-48 bg-foreground/10" />
+          <Skeleton className="h-4 w-full bg-foreground/10" />
+          <Skeleton className="aspect-[3/4] w-full rounded-xl bg-foreground/10" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
+    <div className="flex flex-col h-full overflow-hidden" >
       {/* Hero Video Background */}
       <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 h-[350px] overflow-hidden" style={{ transform: `translateY(${-scrollY * 0.4}px)` }}>
         <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-40" src={heroStormVideo} />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 30%, rgba(19,34,64,0.5) 60%, #132240 100%)' }} />
-        <div className="absolute inset-0 bg-white/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 30%, rgba(19,34,64,0.5) 60%, hsl(var(--background)) 100%)' }} />
+        <div className="absolute inset-0 bg-foreground/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
       </div>
 
       {/* Fixed header */}
@@ -190,11 +190,11 @@ export default function AppVideoPlaylistDetail() {
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 h-12"
         style={{ paddingTop: 'env(safe-area-inset-top)', height: 'calc(48px + env(safe-area-inset-top))' }}
       >
-        <BackButton className="text-white" />
+        <BackButton className="text-fg-warm" />
         <div className="flex items-center gap-1">
           <button
             onClick={handleShare}
-            className="h-10 w-10 flex items-center justify-center rounded-full text-white active:scale-95 transition-transform"
+            className="h-10 w-10 flex items-center justify-center rounded-full text-fg-warm active:scale-95 transition-transform"
             aria-label="Share"
           >
             <Share2 className="h-5 w-5" />
@@ -217,25 +217,25 @@ export default function AppVideoPlaylistDetail() {
         {playlist?.cover_image_url ? (
           <div className="relative aspect-[3/4] w-full overflow-hidden mx-4 rounded-2xl" style={{ maxHeight: '50vh' }}>
             <img src={playlist.cover_image_url} alt="" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#132240] via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--background))] via-transparent to-transparent" />
           </div>
         ) : (
-          <div className="mx-4 aspect-[3/4] rounded-2xl bg-white/5" style={{ maxHeight: '40vh' }} />
+          <div className="mx-4 aspect-[3/4] rounded-2xl bg-foreground/5" style={{ maxHeight: '40vh' }} />
         )}
 
         <div className="px-4 mt-4 space-y-4 pb-safe">
           <div>
-            <h1 className="text-2xl font-bold text-white">{playlist?.name}</h1>
-            {playlist?.description && <p className="text-sm text-white/60 mt-1">{playlist.description}</p>}
+            <h1 className="text-2xl font-bold text-fg-warm">{playlist?.name}</h1>
+            {playlist?.description && <p className="text-sm text-fg-warm-muted mt-1">{playlist.description}</p>}
           </div>
 
           {/* Progress */}
           <div className="space-y-2">
-            <div className="flex justify-between text-xs text-white/50">
+            <div className="flex justify-between text-xs text-fg-warm-muted">
               <span>{completedCount} of {totalTracks} completed</span>
               <span>{Math.round(overallProgress)}%</span>
             </div>
-            <Progress value={overallProgress} className="h-2 bg-white/10" />
+            <Progress value={overallProgress} className="h-2 bg-foreground/10" />
           </div>
 
           {/* Promo Banner - Video Player */}
@@ -256,35 +256,35 @@ export default function AppVideoPlaylistDetail() {
                   onClick={() => handlePlay(i)}
                   disabled={locked}
                   className={cn(
-                    "w-full flex items-center gap-3 p-3 rounded-xl border border-white/10 transition-colors text-left",
+                    "w-full flex items-center gap-3 p-3 rounded-xl border border-border transition-colors text-left",
                     locked ? "opacity-50 cursor-not-allowed" : "active:scale-[0.99]",
-                    completed && "bg-white/5 border-white/20"
+                    completed && "bg-foreground/5 border-border"
                   )}
                 >
                   {/* Portrait thumbnail */}
-                  <div className="relative w-14 h-[4.5rem] rounded-lg overflow-hidden bg-white/10 flex-shrink-0 flex items-center justify-center">
+                  <div className="relative w-14 h-[4.5rem] rounded-lg overflow-hidden bg-foreground/10 flex-shrink-0 flex items-center justify-center">
                     {vc.thumbnail_url ? (
                       <img src={vc.thumbnail_url} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-lg font-bold text-white/40">{i + 1}</span>
+                      <span className="text-lg font-bold text-fg-warm-muted">{i + 1}</span>
                     )}
-                    {locked && <div className="absolute inset-0 bg-black/60 flex items-center justify-center"><Lock className="h-4 w-4 text-white/70" /></div>}
-                    {!locked && !completed && <div className="absolute inset-0 bg-black/30 flex items-center justify-center"><Play className="h-4 w-4 text-white fill-white" /></div>}
+                    {locked && <div className="absolute inset-0 bg-black/60 flex items-center justify-center"><Lock className="h-4 w-4 text-fg-warm-muted" /></div>}
+                    {!locked && !completed && <div className="absolute inset-0 bg-black/30 flex items-center justify-center"><Play className="h-4 w-4 text-fg-warm fill-white" /></div>}
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate text-white">{vc.title}</p>
-                    <div className="flex items-center gap-2 text-xs text-white/50 mt-0.5">
+                    <p className="font-medium text-sm truncate text-fg-warm">{vc.title}</p>
+                    <div className="flex items-center gap-2 text-xs text-fg-warm-muted mt-0.5">
                       {vc.duration_seconds > 0 && <span>{formatDuration(vc.duration_seconds)}</span>}
-                      <Badge variant="outline" className="text-[9px] px-1 py-0 border-white/20 text-white/50">{vc.video_type}</Badge>
+                      <Badge variant="outline" className="text-[9px] px-1 py-0 border-border text-fg-warm-muted">{vc.video_type}</Badge>
                     </div>
                     {pct > 0 && !completed && (
-                      <Progress value={pct} className="h-1 mt-1.5 bg-white/10" />
+                      <Progress value={pct} className="h-1 mt-1.5 bg-foreground/10" />
                     )}
                   </div>
 
                   <div className="flex-shrink-0">
-                    {completed ? <CheckCircle2 className="h-5 w-5 text-sky-400" /> : <Circle className="h-5 w-5 text-white/20" />}
+                    {completed ? <CheckCircle2 className="h-5 w-5 text-sky-400" /> : <Circle className="h-5 w-5 text-fg-warm-muted" />}
                   </div>
                 </button>
               );
