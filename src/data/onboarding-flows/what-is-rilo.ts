@@ -38,28 +38,6 @@ export const whatIsRiloFlow: OnboardingFlow = {
       subtitle: 'Calm, sleep, workouts, journal, calendar, habits, career, money — all already inside Rilo. Free.',
       buttonLabel: 'Next',
     },
-    // Push permission — ask before language so reminders are set up early
-    {
-      id: 'wir-push-permission',
-      type: 'welcome-aboard',
-      title: 'With reminders, routines feel 80% easier.',
-      subtitle: 'Get gentle nudges to keep your daily reset on track.',
-      buttonLabel: 'Turn on notifications',
-      secondaryButtonLabel: 'Maybe later',
-    },
-    // Language preference — quick personalization tap
-    {
-      id: 'wir-second-language',
-      type: 'rilo-language-bubbles',
-      title: 'In which language\nshould we serve content?',
-      subtitle: 'Audio, articles & guided sessions — in a language that feels like home.',
-      options: [
-        { label: 'English only', emoji: '🇺🇸' },
-        { label: 'Persian', emoji: 'flag:persian' },
-        { label: 'Turkish', emoji: '🇹🇷' },
-        { label: 'Spanish', emoji: '🇪🇸' },
-      ],
-    },
     {
       id: 'wir-suggest',
       type: 'rilo-teach',
@@ -148,6 +126,28 @@ export const whatIsRiloFlow: OnboardingFlow = {
       subtitle: 'Your routine resets every morning so you can start each day fresh.',
       buttonLabel: 'Yes, enable it',
       secondaryButtonLabel: 'Maybe later',
+    },
+    // Push permission — after Daily Reset so reminders reinforce the new ritual
+    {
+      id: 'wir-push-permission',
+      type: 'welcome-aboard',
+      title: 'With reminders, routines feel 80% easier.',
+      subtitle: 'Get gentle nudges to keep your daily reset on track.',
+      buttonLabel: 'Turn on notifications',
+      secondaryButtonLabel: 'Maybe later',
+    },
+    // Language preference — quick personalization tap
+    {
+      id: 'wir-second-language',
+      type: 'rilo-language-bubbles',
+      title: 'In which language\nshould we serve content?',
+      subtitle: 'Audio, articles & guided sessions — in a language that feels like home.',
+      options: [
+        { label: 'English only', emoji: '🇺🇸' },
+        { label: 'Persian', emoji: 'flag:persian' },
+        { label: 'Turkish', emoji: '🇹🇷' },
+        { label: 'Spanish', emoji: '🇪🇸' },
+      ],
     },
     {
       id: 'wir-building-plan',
