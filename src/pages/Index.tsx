@@ -22,11 +22,11 @@ const Index = () => {
         navigate('/app/home', { replace: true });
       } else {
         // First-time users see onboarding; returning users go to auth
-        const hasSeenOnboarding = localStorage.getItem('simora_onboarding_completed_quick-start-v2') === 'true';
+        const hasSeenOnboarding = localStorage.getItem('simora_onboarding_completed_pre-auth-welcome') === 'true';
         if (hasSeenOnboarding) {
           navigate('/auth', { replace: true });
         } else {
-          navigate('/app/onboarding/quick-start-v2', { replace: true });
+          navigate('/app/onboarding/pre-auth-welcome', { replace: true });
         }
       }
     }
