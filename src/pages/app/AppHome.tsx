@@ -1157,9 +1157,9 @@ const AppHome = () => {
               <div>
                   {/* Shared animated 2-pill switcher */}
                   <div className="flex items-center justify-between mb-3">
-                    <div className="relative inline-flex bg-muted rounded-full p-0.5">
-                      <motion.div
-                        className="absolute top-0.5 bottom-0.5 rounded-full bg-background shadow-sm"
+                     <div className="relative inline-flex bg-foreground/[0.06] dark:bg-white/[0.08] rounded-full p-0.5">
+                       <motion.div
+                         className="absolute top-0.5 bottom-0.5 rounded-full bg-card shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
                         animate={{ 
                           width: homeView === 'routines' ? btnRoutinesRef.current?.offsetWidth 
                             : btnTasksRef.current?.offsetWidth,
