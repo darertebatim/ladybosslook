@@ -491,9 +491,9 @@ const AppStore = () => {
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 -my-2">
                   {[0, 1].map((rowIdx) => (
-                    <div key={rowIdx} className="flex gap-2 overflow-x-auto overflow-y-visible -mx-4 px-4 py-2 scrollbar-hide">
+                    <div key={rowIdx} className="flex gap-2 overflow-x-auto -mx-4 px-4 py-3 scrollbar-hide" style={{ scrollbarGutter: 'stable' }}>
                       {reflections.slice(rowIdx * 4, rowIdx * 4 + 4).map((r) => (
                         <button
                           key={r.id}
@@ -532,7 +532,7 @@ const AppStore = () => {
                     All <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-                <div className="flex gap-3 overflow-x-auto overflow-y-visible -mx-4 px-4 py-2 scrollbar-hide">
+                <div className="flex gap-3 overflow-x-auto -mx-4 px-4 py-3 -my-1 scrollbar-hide">
                   {breathingExercises.filter(e => e.is_active).slice(0, 8).map((exercise) => (
                     <button
                       key={exercise.id}
