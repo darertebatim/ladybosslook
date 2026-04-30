@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Menu, Compass, Music, Users, Headset,
-  BookOpen, Wind, Droplets, HeartHandshake, Heart, CalendarPlus, GraduationCap, User, HelpCircle, LogOut, Zap, Settings
+  BookOpen, Wind, Droplets, HeartHandshake, Heart, CalendarPlus, GraduationCap, User, HelpCircle, LogOut, Zap, Settings, Moon, Sun
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { haptic } from '@/lib/haptics';
@@ -49,6 +49,25 @@ export function HomeMenu({ onStartTour }: HomeMenuProps) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { signOut } = useAuth();
+  const [isDark, setIsDark] = useState(() =>
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const saved = localStorage.getItem('rilo_theme');
+    if (saved === 'dark') {
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    haptic.light();
+    const next = !isDark;
+    setIsDark(next);
+    document.documentElement.classList.toggle('dark', next);
+    localStorage.setItem('rilo_theme', next ? 'dark' : 'light');
+  };
 
   const handleNavClick = (route: string) => {
     haptic.light();
@@ -148,6 +167,23 @@ export function HomeMenu({ onStartTour }: HomeMenuProps) {
               </button>
             </section>
           )}
+
+          {/* Dark Mode Toggle */}
+          <section className="pt-2 border-t border-border/40">
+            <button
+              onClick={toggleDarkMode}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-full',
+                'text-[13px] font-medium transition-all active:scale-95',
+                isDark
+                  ? 'text-amber-600 bg-amber-100'
+                  : 'text-indigo-600 bg-indigo-100'
+              )}
+            >
+              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              <span>{isDark ? 'Light Mode' : 'Dark Mode'}</span>
+            </button>
+          </section>
 
           {/* Sign Out */}
           <section className="pt-2 border-t border-border/40">
