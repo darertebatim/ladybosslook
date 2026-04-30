@@ -50,10 +50,9 @@ export const whatIsRiloFlow: OnboardingFlow = {
     // Language preference — quick personalization tap
     {
       id: 'wir-second-language',
-      type: 'single-select',
-      title: 'Do you speak a\nsecond language?',
-      subtitle: 'We have content in multiple languages.',
-      illustrationLabel: 'Mascot with languages',
+      type: 'rilo-language-bubbles',
+      title: 'Which language\nspeaks to you?',
+      subtitle: 'Tap a bubble — Rilo will greet you in it.',
       options: [
         { label: 'English only', emoji: '🇺🇸' },
         { label: 'Persian', emoji: 'flag:persian' },
