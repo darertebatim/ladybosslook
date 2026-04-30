@@ -1,6 +1,5 @@
 import { memo } from 'react';
-import { Badge } from "@/components/ui/badge";
-import { Clock, Music, Lock, CheckCircle2, ChevronRight, Crown } from "lucide-react";
+import { Lock, ChevronRight, Crown } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -13,6 +12,18 @@ const LANG_FLAGS: Record<string, string> = {
   american: '🇺🇸',
   turkish: '🇹🇷',
   spanish: '🇪🇸',
+};
+
+// Pastel tile palette (mirrors BrandMock O.* tokens) — keyed by category
+const CATEGORY_TILE: Record<string, { bg: string; emoji: string }> = {
+  meditate:    { bg: '#F0E3FF', emoji: '🧘‍♀️' }, // lavender
+  workout:     { bg: '#FFE6C9', emoji: '💪'   }, // peach
+  soundscape:  { bg: '#E2F9F0', emoji: '🌊'   }, // mint
+  affirmation: { bg: '#FFE0F5', emoji: '💖'   }, // pink
+  audiobook:   { bg: '#F0E3FF', emoji: '📖'   }, // lavender
+  course:      { bg: '#FFE0F5', emoji: '🌟'   }, // pink
+  podcast:     { bg: '#E2F9F0', emoji: '🎙️'  }, // mint
+  default:     { bg: '#FFE6C9', emoji: '🎧'   },
 };
 
 interface PlaylistCardProps {
@@ -35,7 +46,6 @@ interface PlaylistCardProps {
 export const PlaylistCard = memo(function PlaylistCard({
   id,
   name,
-  description,
   coverImageUrl,
   category,
   language,
@@ -52,7 +62,7 @@ export const PlaylistCard = memo(function PlaylistCard({
   const location = useLocation();
   const from = location.pathname;
   const progressPercentage = trackCount > 0 ? (completedTracks / trackCount) * 100 : 0;
-  
+
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
@@ -62,22 +72,14 @@ export const PlaylistCard = memo(function PlaylistCard({
 
   const handleClick = () => {
     haptic.light();
-    if (isFree) {
-      navigate(`/app/player/playlist/${id}`, { state: { from } });
-      return;
-    }
-    if (requiresSubscription) {
-      navigate(`/app/player/playlist/${id}`, { state: { from } });
-      return;
-    }
-    if (isLocked && programSlug) {
-      navigate(`/app/course/${programSlug}`, { state: { from } });
-      return;
-    }
+    if (isFree) return navigate(`/app/player/playlist/${id}`, { state: { from } });
+    if (requiresSubscription) return navigate(`/app/player/playlist/${id}`, { state: { from } });
+    if (isLocked && programSlug) return navigate(`/app/course/${programSlug}`, { state: { from } });
     if (isLocked) return;
     navigate(`/app/player/playlist/${id}`, { state: { from } });
   };
 
+  const tile = CATEGORY_TILE[category || 'default'] || CATEGORY_TILE.default;
   const tourClass = isFree && !isLocked ? 'tour-free-playlist' : isLocked ? 'tour-locked-playlist' : '';
 
   return (
@@ -89,37 +91,34 @@ export const PlaylistCard = memo(function PlaylistCard({
       )}
       onClick={handleClick}
     >
-      <div className="flex gap-3 p-3">
-        {/* Square thumbnail */}
-        <div className="relative h-24 w-24 flex-shrink-0 rounded-xl overflow-hidden">
+      <div className="flex items-center gap-3 p-3">
+        {/* 64×64 tile — cover image when present, else solid color + emoji */}
+        <div
+          className="relative h-16 w-16 shrink-0 rounded-xl overflow-hidden flex items-center justify-center"
+          style={{ background: tile.bg }}
+        >
           {coverImageUrl ? (
             <CachedImage
               src={coverImageUrl}
               alt={name}
               loading="lazy"
               decoding="async"
-              className="w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-bg-warm flex items-center justify-center">
-              <Music className="h-8 w-8 text-muted-foreground" />
-            </div>
+            <FluentEmoji emoji={tile.emoji} size={36} />
           )}
 
-          {/* Lock icon on thumbnail */}
           {isLocked && !isFree && (
-            <div className="absolute bottom-1.5 left-1.5">
-              <div className="w-6 h-6 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-                <Lock className="h-3 w-3 text-white/80" />
-              </div>
+            <div className="absolute bottom-1 left-1 z-10 h-5 w-5 rounded-full bg-black/55 flex items-center justify-center">
+              <Lock className="h-2.5 w-2.5 text-white" />
             </div>
           )}
 
-          {/* Progress bar on thumbnail */}
           {(!isLocked || isFree) && progressPercentage > 0 && (
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/15">
-              <div 
-                className="h-full bg-primary transition-all duration-300"
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/15 z-10">
+              <div
+                className="h-full bg-brand transition-all duration-300"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
@@ -127,59 +126,46 @@ export const PlaylistCard = memo(function PlaylistCard({
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-          {/* Meta line: category + duration */}
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 text-[11px] text-fg-warm-muted">
-            {category && (
-              <span className="capitalize">{category}</span>
-            )}
+            {category && <span className="font-medium capitalize">{category}</span>}
             {category && totalDuration > 0 && <span>·</span>}
-            {totalDuration > 0 && (
-              <span>{formatDuration(totalDuration)}</span>
-            )}
+            {totalDuration > 0 && <span>{formatDuration(totalDuration)}</span>}
           </div>
 
-          {/* Title */}
-          <h3 className="font-bold text-sm text-fg-warm line-clamp-2 leading-snug">
+          <h3 className="text-[14px] font-bold leading-tight mt-0.5 line-clamp-2 text-fg-warm">
             {name}
           </h3>
 
-          {/* Badges row */}
-          <div className="flex items-center gap-1.5 mt-0.5">
+          <div className="mt-1 flex items-center gap-1.5">
             {requiresSubscription && (
-              <Badge className="bg-amber-200 text-amber-700 hover:bg-amber-200 rounded-full text-[10px] px-1.5 py-0 gap-0.5 shadow-ios h-4">
-                <Crown className="h-2.5 w-2.5" />
-                PLUS
-              </Badge>
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-200 text-amber-700">
+                <Crown className="h-2.5 w-2.5" /> PLUS
+              </span>
             )}
             {isFree && !isLocked && !requiresSubscription && (
-              <Badge className="bg-emerald-100 hover:bg-emerald-100 text-emerald-700 rounded-full text-[10px] px-1.5 py-0 shadow-ios h-4 font-semibold gap-0.5">
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#E2F9F0] text-[#065F46]">
                 🔥 FREE
-              </Badge>
+              </span>
             )}
             {language && language !== 'all' && (
               language === 'persian'
-                ? <PersianFlag size={10} />
-                : LANG_FLAGS[language] && <span className="text-[10px] flex-shrink-0 leading-none">{LANG_FLAGS[language]}</span>
+                ? <PersianFlag size={12} />
+                : LANG_FLAGS[language] && <span className="text-[13px] leading-none">{LANG_FLAGS[language]}</span>
             )}
             {(!isLocked || isFree) && progressPercentage > 0 && (
-              <span className="flex items-center gap-0.5 text-[10px] text-fg-warm-muted font-medium">
-                <CheckCircle2 className="h-3 w-3" />
+              <span className="text-[10px] text-fg-warm-muted font-medium">
                 {Math.round(progressPercentage)}%
               </span>
-            )}
-            {(requiresSubscription && !isSubscribed) && (
-              <FluentEmoji emoji="🔒" size={12} />
             )}
           </div>
         </div>
       </div>
 
-      {/* Enroll CTA for locked playlists */}
+      {/* Locked CTA footer — peach bg, brand text */}
       {isLocked && !isFree && programSlug && (
-        <div className="flex items-center justify-center gap-1.5 py-2.5 px-3 bg-peach text-brand text-xs font-semibold border-t border-border">
-          <span>Tap to enroll</span>
-          <ChevronRight className="h-3.5 w-3.5" />
+        <div className="w-full py-2.5 text-[12px] font-bold flex items-center justify-center gap-1 bg-peach text-brand border-t border-border">
+          Tap to enroll <ChevronRight className="h-3.5 w-3.5" />
         </div>
       )}
     </button>
