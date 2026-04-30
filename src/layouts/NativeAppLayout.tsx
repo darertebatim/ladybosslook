@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { haptic } from '@/lib/haptics';
-import { Home, MessageCircle, Compass, Music, Users, Flame, CalendarPlus, Play } from 'lucide-react';
+import { Home, MessageCircle, Compass, Music, Users, Flame, CalendarPlus, Play, Plus } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, LayoutGroup } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
@@ -218,19 +218,22 @@ const NativeAppLayout = () => {
         className={cn(
           'fixed left-3 right-3 z-50',
           'bottom-[calc(12px+env(safe-area-inset-bottom))]',
+          'flex items-end gap-2',
         )}
       >
+        {/* Main nav pill (4 items) */}
         <LayoutGroup id="nav-active-pill">
           <div
             className={cn(
-              'rounded-[28px] overflow-hidden',
-              'border shadow-card-warm',
+              'flex-1 rounded-[28px] px-2 py-2',
+              'border-[0.5px] shadow-card-warm',
+              'backdrop-blur-2xl backdrop-saturate-150',
               (location.pathname.startsWith('/app/watch') || location.pathname.startsWith('/app/player'))
-                ? 'bg-[#0F1A33]/70 backdrop-blur-2xl backdrop-saturate-150 border-white/10'
-                : 'bg-card-warm/70 backdrop-blur-2xl backdrop-saturate-150 border-border-warm/40',
+                ? 'bg-[#0F1A33]/65 border-white/15'
+                : 'bg-gradient-to-b from-white/65 to-bg-warm/75 border-white/65 dark:from-[#3C2819]/55 dark:to-[#28190F]/65 dark:border-[hsl(var(--brand-primary)/0.18)]',
             )}
           >
-            <div className="grid grid-cols-4 px-1.5 pt-1.5 pb-1.5">
+            <div className="grid grid-cols-4 items-center">
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path ||
                   (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
@@ -252,67 +255,94 @@ const NativeAppLayout = () => {
                       }
                     }}
                     className={cn(
-                      'relative flex flex-col items-center justify-center gap-0.5 min-h-[52px] rounded-[22px] transition-colors',
+                      'relative flex flex-col items-center gap-0.5',
                       item.tourClass,
                     )}
                   >
-                    {/* Animated active pill */}
-                    {isActive && (
-                      <motion.span
-                        layoutId="nav-active-pill"
-                        className={cn(
-                          'absolute inset-0 rounded-[22px] -z-0',
-                          isOverlayContext ? 'bg-white/15' : 'bg-peach',
-                        )}
-                        transition={{ type: 'spring', mass: 0.6, stiffness: 380, damping: 30 }}
-                      />
-                    )}
-
-                    <div className="relative z-10 flex flex-col items-center">
-                      <div className="relative">
-                        <Icon
+                    {/* Icon container with active halo */}
+                    <div className="relative w-10 h-10 flex items-center justify-center">
+                      {isActive && (
+                        <motion.span
+                          layoutId="nav-active-pill"
                           className={cn(
-                            'h-6 w-6 transition-colors',
+                            'absolute inset-0 rounded-2xl',
                             isOverlayContext
-                              ? (isActive ? 'text-white' : 'text-white/55')
-                              : (isActive ? 'text-brand' : 'text-fg-warm-muted'),
+                              ? 'bg-white/15 border-[0.5px] border-white/25'
+                              : 'bg-[hsl(var(--brand-primary)/0.10)] border-[0.5px] border-[hsl(var(--brand-primary)/0.25)] shadow-[0_0_12px_hsl(var(--brand-primary)/0.15)]',
                           )}
-                          strokeWidth={isActive ? 2.4 : 1.75}
+                          transition={{ type: 'spring', mass: 0.6, stiffness: 380, damping: 30 }}
                         />
-
-                        {/* Badges */}
-                        {showChatBadge && (
-                          <span className="absolute -top-1 -right-2 bg-brand text-white text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5 ring-2 ring-card-warm">
-                            {unreadCount > 99 ? '99+' : unreadCount}
-                          </span>
-                        )}
-                        {item.showBadge && !showChatBadge && item.badgeCount && (
-                          <span className="absolute -top-1 -right-2 bg-brand text-white text-[10px] font-bold rounded-full min-w-[14px] h-3.5 flex items-center justify-center px-0.5 ring-2 ring-card-warm">
-                            {item.badgeCount > 9 ? '9+' : item.badgeCount}
-                          </span>
-                        )}
-                        {item.showBadge && !showChatBadge && !item.badgeCount && (
-                          <span className="absolute -top-0.5 -right-0.5 bg-brand w-2 h-2 rounded-full ring-2 ring-card-warm" />
-                        )}
-                      </div>
-
-                      <span
+                      )}
+                      <Icon
                         className={cn(
-                          'text-[10px] mt-0.5 transition-colors',
+                          'relative z-10 h-[22px] w-[22px] transition-colors',
                           isOverlayContext
-                            ? (isActive ? 'text-white font-semibold' : 'text-white/55 font-medium')
-                            : (isActive ? 'text-fg-warm font-semibold' : 'text-fg-warm-muted font-medium'),
+                            ? (isActive ? 'text-white' : 'text-white/55')
+                            : (isActive ? 'text-brand' : 'text-fg-warm-muted'),
                         )}
-                      >
-                        {item.label}
-                      </span>
+                        strokeWidth={isActive ? 2.2 : 1.6}
+                      />
+
+                      {/* Badges */}
+                      {showChatBadge && (
+                        <span className="absolute -top-0.5 -right-0.5 z-20 bg-brand-rose text-white text-[9px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 shadow-[0_1px_4px_hsl(var(--brand-accent-rose)/0.4)]">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </span>
+                      )}
+                      {item.showBadge && !showChatBadge && item.badgeCount && (
+                        <span className="absolute -top-0.5 -right-0.5 z-20 bg-brand-rose text-white text-[9px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 shadow-[0_1px_4px_hsl(var(--brand-accent-rose)/0.4)]">
+                          {item.badgeCount > 9 ? '9+' : item.badgeCount}
+                        </span>
+                      )}
+                      {item.showBadge && !showChatBadge && !item.badgeCount && (
+                        <span className="absolute top-0 right-0 z-20 bg-brand-rose w-2 h-2 rounded-full" />
+                      )}
                     </div>
+
+                    <span
+                      className={cn(
+                        'text-[10px] leading-tight transition-colors',
+                        isOverlayContext
+                          ? (isActive ? 'text-white font-semibold' : 'text-white/55 font-normal')
+                          : (isActive ? 'text-brand font-semibold' : 'text-fg-warm-muted font-normal'),
+                      )}
+                    >
+                      {item.label}
+                    </span>
                   </Link>
                 );
               })}
             </div>
           </div>
         </LayoutGroup>
+
+        {/* Detached FAB → AI Planner */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
+          className="shrink-0"
+        >
+          <Link
+            to="/app/aiplanner"
+            onClick={() => haptic.medium()}
+            aria-label="Open AI Planner"
+            className={cn(
+              'block w-[60px] h-[60px] rounded-full relative',
+              'bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-primary-dark))]',
+              'border-[0.5px] border-white/70 dark:border-[hsl(var(--brand-primary)/0.25)]',
+              'shadow-[0_8px_24px_-4px_hsl(var(--brand-primary)/0.5),0_3px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.28)]',
+              'active:scale-95 transition-transform',
+              'flex items-center justify-center',
+            )}
+          >
+            <Plus className="w-6 h-6 text-white relative z-10" strokeWidth={2.5} />
+            {/* Glass shine */}
+            <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+              <span className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full bg-gradient-to-b from-white/35 to-transparent" />
+            </span>
+          </Link>
+        </motion.div>
       </nav>
       )}
 
