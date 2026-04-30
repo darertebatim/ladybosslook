@@ -242,7 +242,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
           <div className="flex-1 min-w-0">
             {/* Top line: time + badge + settings */}
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[11px] text-black">
+              <span className="text-[11px] text-black/60">
                 {event.time || 'Anytime'}
               </span>
               
@@ -278,7 +278,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
             </p>
             
             {/* Subtitle */}
-            <p className="text-[11px] text-black truncate">
+            <p className="text-[11px] text-black/60 truncate">
               {isEnrollment ? 'Tap to explore your program →' :
                isRoundUpdate ? 'Tap to see changes →' :
                isPlaylistSave ? 'Tap to start listening →' :
