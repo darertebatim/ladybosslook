@@ -18,7 +18,7 @@ import { useExistingVideoPlaylistTask } from "@/hooks/useVideoRoutine";
 import { useAddRoutinePlan, RoutinePlanTask } from "@/hooks/useRoutinePlans";
 import { haptic } from "@/lib/haptics";
 import { toast } from "sonner";
-import heroStormVideo from "@/assets/watch-hero-storm.mp4";
+
 import { useShareContent } from "@/hooks/useShareContent";
 import { PromoBanner } from "@/components/app/PromoBanner";
 import { HomeBanner } from "@/components/app/HomeBanner";
@@ -177,17 +177,10 @@ export default function AppVideoPlaylistDetail() {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden" >
-      {/* Hero Video Background */}
-      <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 h-[350px] overflow-hidden" style={{ transform: `translateY(${-scrollY * 0.4}px)` }}>
-        <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-40" src={heroStormVideo} />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 30%, rgba(19,34,64,0.5) 60%, hsl(var(--background)) 100%)' }} />
-        <div className="absolute inset-0 bg-foreground/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
-      </div>
-
+    <div ref={heroRef} className="flex flex-col h-full overflow-hidden bg-background">
       {/* Fixed header */}
       <div
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 h-12"
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 h-12 bg-background"
         style={{ paddingTop: 'env(safe-area-inset-top)', height: 'calc(48px + env(safe-area-inset-top))' }}
       >
         <BackButton className="text-fg-warm" />
