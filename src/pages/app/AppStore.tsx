@@ -504,7 +504,7 @@ const AppStore = () => {
                             {r.cover_image_url ? (
                               <CachedImage src={r.cover_image_url} alt={r.title} className="h-12 w-12 rounded-xl object-cover" />
                             ) : (
-                              <div className="h-12 w-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: r.cover_color || 'hsl(var(--tint-peach))' }}>
+                              <div className="h-12 w-12 rounded-xl flex items-center justify-center bg-[hsl(var(--tint-peach))]">
                                 <FluentEmoji emoji={r.emoji || '🪞'} size={26} />
                               </div>
                             )}
