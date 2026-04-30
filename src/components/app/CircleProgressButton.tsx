@@ -39,8 +39,7 @@ export const CircleProgressButton = memo(function CircleProgressButton({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          fill="white"
-          stroke="black"
+          className="fill-card-warm stroke-fg-warm"
           strokeWidth={strokeWidth}
         />
         {/* Progress arc */}
