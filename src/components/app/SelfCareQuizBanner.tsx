@@ -82,11 +82,17 @@ export function SelfCareQuizBanner({ className, onVisibilityChange }: SelfCareQu
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-white text-[13px] font-bold leading-tight">
-              What's missing in your self-care?
+              Discover your self-care gaps in 1 min
             </p>
-            <p className="text-white/80 text-[10px] mt-0.5">
-              Take the 2-min Self-Care Quiz
-            </p>
+            <div
+              className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full"
+              style={{ background: 'rgba(255,255,255,0.22)' }}
+            >
+              <Sparkles className="w-2.5 h-2.5 text-white" />
+              <span className="text-white text-[9px] font-semibold tracking-wide">
+                AI Powered Analyze
+              </span>
+            </div>
           </div>
           <ChevronRight className="w-4 h-4 text-white/90 shrink-0" />
         </div>
