@@ -27,7 +27,7 @@ import { usePushPermission } from '@/hooks/usePushPermission';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useAppReview } from '@/hooks/useAppReview';
 import { SoftReviewPrompt } from '@/components/app/SoftReviewPrompt';
-import { canShowSoftReviewPrompt, markSoftReviewPromptShown } from '@/lib/appReview';
+import { canShowSoftReviewPrompt, markSoftReviewPromptShown, SOFT_REVIEW_EVENT } from '@/lib/appReview';
 import { Capacitor } from '@capacitor/core';
 import type { UserTask, TaskTemplate } from '@/hooks/useTaskPlanner';
 import type { BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
@@ -171,8 +171,31 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
     stepCelebration, onCloseStepCelebration,
     projectCompletion, onCloseProjectCompletion,
   } = props;
-  const { maybeRequestReviewAndroidOnly, openIOSReviewSoftLink } = useAppReview();
+  const { maybeRequestReviewAndroidOnly, openIOSReviewSoftLink, openAndroidReviewSoftLink } = useAppReview();
   const [showIOSSoftReview, setShowIOSSoftReview] = useState(false);
+  const [softReviewTrigger, setSoftReviewTrigger] = useState<string>('soft_review');
+
+  // Global listener: any feature can dispatch SOFT_REVIEW_EVENT to ask for a
+  // 5-star review at a high-satisfaction moment. iOS shows the in-app sheet
+  // (which deep-links to App Store), Android jumps straight to Play Store.
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail || {};
+      const trigger = detail.trigger || 'soft_review';
+      const platform = Capacitor.getPlatform();
+      if (platform === 'ios') {
+        setSoftReviewTrigger(trigger);
+        setTimeout(() => setShowIOSSoftReview(true), 800);
+      } else if (platform === 'android') {
+        // Android: try native first, fallback to Play Store soft-link
+        maybeRequestReviewAndroidOnly(trigger).then((shown) => {
+          if (!shown) openAndroidReviewSoftLink(trigger);
+        });
+      }
+    };
+    window.addEventListener(SOFT_REVIEW_EVENT, handler);
+    return () => window.removeEventListener(SOFT_REVIEW_EVENT, handler);
+  }, [maybeRequestReviewAndroidOnly, openAndroidReviewSoftLink]);
 
   const maybeShowIOSSoftReviewOnGold = () => {
     if (Capacitor.getPlatform() !== 'ios') return;
