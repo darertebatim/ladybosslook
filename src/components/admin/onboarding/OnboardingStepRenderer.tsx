@@ -71,6 +71,8 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <RiloBuildingPlanScreen step={step} onNext={onNext} answers={answers} />;
     case 'rilo-commit':
       return <RiloCommitScreen step={step} onNext={onNext} />;
+    case 'rilo-language-bubbles':
+      return <RiloLanguageBubblesScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
     case 'greeting':
       return <GreetingScreen step={step} onNext={onNext} />;
     case 'multi-select':
