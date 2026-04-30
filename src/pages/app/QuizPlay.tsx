@@ -93,6 +93,10 @@ export default function QuizPlay() {
       const total = Object.values(scores).reduce((s, v) => s + v, 0);
       const matched = quizResults.find(r => total >= r.score_min && total <= r.score_max) || quizResults[0];
       setMatchedResult(matched || null);
+      // High-satisfaction moment → ask for a 5-star review (cooldown-protected)
+      import('@/lib/appReview').then(({ triggerSoftReview }) =>
+        setTimeout(() => triggerSoftReview('quiz_complete'), 2500)
+      );
 
       // Save submission
       if (quiz) {
