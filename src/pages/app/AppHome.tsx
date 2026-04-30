@@ -1173,7 +1173,7 @@ const AppHome = () => {
                         onClick={() => { haptic.selection(); setHomeView('routines'); setTaskFilter('all'); }}
                         className={cn(
                           "relative z-10 px-3 py-1 rounded-full text-[11px] font-semibold transition-colors whitespace-nowrap",
-                          homeView === 'routines' ? 'text-foreground-warm' : 'text-foreground-warm/50 dark:text-white/40'
+                          homeView === 'routines' ? 'text-foreground' : 'text-foreground-warm/50 dark:text-white/40'
                         )}
                       >
                         My Routines
@@ -1183,7 +1183,7 @@ const AppHome = () => {
                          onClick={() => { haptic.selection(); setHomeView('tasks'); setTaskFilter('all'); }}
                          className={cn(
                           "relative z-10 px-3 py-1 rounded-full text-[11px] font-semibold transition-colors flex items-center gap-1 whitespace-nowrap",
-                           homeView === 'tasks' ? 'text-foreground-warm' : 'text-foreground-warm/50 dark:text-white/40'
+                           homeView === 'tasks' ? 'text-foreground' : 'text-foreground-warm/50 dark:text-white/40'
                          )}
                        >
                         <Zap className="h-2.5 w-2.5 fill-amber-400 text-amber-400 shrink-0" /> My Tasks
