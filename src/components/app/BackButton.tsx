@@ -3,6 +3,7 @@ import { ChevronLeft } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
+import { useSlideClose } from '@/components/app/SlideUpPage';
 
 interface BackButtonProps {
   /** Fallback navigation path if no history state. If not provided, uses browser history */
@@ -38,6 +39,7 @@ export function BackButton({
 
   let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
   try { routinePlayer = useRoutinePlayerContext(); } catch { /* provider not available */ }
+  const slideCtx = useSlideClose();
 
   const handleClick = () => {
     haptic.light();
@@ -50,6 +52,12 @@ export function BackButton({
     if (routinePlayer?.isActive && routinePlayer?.isMinimized) {
       navigate('/app/home');
       routinePlayer.maximize();
+      return;
+    }
+
+    // If wrapped in a SlideUpPage, animate the slide-down exit before navigating
+    if (slideCtx) {
+      slideCtx.slideClose(from || to);
       return;
     }
     
@@ -104,6 +112,7 @@ export function BackButtonCircle({
 
   let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
   try { routinePlayer = useRoutinePlayerContext(); } catch { /* provider not available */ }
+  const slideCtx = useSlideClose();
 
   const handleClick = () => {
     haptic.light();
@@ -116,6 +125,11 @@ export function BackButtonCircle({
     if (routinePlayer?.isActive && routinePlayer?.isMinimized) {
       navigate('/app/home');
       routinePlayer.maximize();
+      return;
+    }
+
+    if (slideCtx) {
+      slideCtx.slideClose(from || to);
       return;
     }
     
