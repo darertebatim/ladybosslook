@@ -2038,7 +2038,7 @@ function RiloLanguageBubblesScreen({ step, onNext, onAnswer }: Props) {
                   }`}
                 >
                   {/* Flag chip */}
-                  <div className={`shrink-0 w-11 h-11 rounded-full ${cfg.bg} flex items-center justify-center`}>
+                  <div className="shrink-0 w-11 h-11 rounded-full flex items-center justify-center">
                     {opt.emoji && <OptionEmoji emoji={opt.emoji} size={22} />}
                   </div>
                   {/* Name + greeting */}
