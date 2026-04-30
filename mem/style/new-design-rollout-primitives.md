@@ -38,3 +38,27 @@ All in-app pages (`/app/*`) follow the iOS 18 / Liquid Glass language establishe
 ## How to verify
 
 `rg "shadow-sm|ring-1 ring-(black|white)" src/pages/app/ src/components/app/` should return no hits for floating-UI elevation.
+
+## Page-level header pattern (CANONICAL)
+
+Until every app page is migrated to `<PageHeader>`, the inline equivalent is:
+
+```tsx
+<header
+  className="sticky top-0 z-30 bg-[hsl(var(--bg-warm)/0.85)] backdrop-blur-xl shadow-ios"
+  style={{ paddingTop: 'env(safe-area-inset-top)' }}
+>
+  <div className="px-4 pt-3 pb-3 flex items-center justify-between min-h-[52px]">
+    <h1 className="text-2xl font-bold text-fg-warm">{title}</h1>
+    <div className="flex items-center gap-2">{/* IOSIconButton actions */}</div>
+  </div>
+</header>
+```
+
+Dark variant (Listen and other photo-bg pages) uses `bg-black/25 backdrop-blur-xl` and `text-white`, with `<IOSIconButton variant="dark">` for actions.
+
+## Channel/list rows pattern
+
+Drop `divide-y` lists. Use a vertical stack of cards: `flex flex-col gap-2` containing
+`bg-card-warm shadow-card-warm rounded-2xl p-3` rows. No hairline borders/dividers.
+Unread count badges use `bg-[hsl(var(--brand-primary))] text-white shadow-ios`.
