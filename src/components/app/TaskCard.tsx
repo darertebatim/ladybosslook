@@ -462,7 +462,7 @@ export const TaskCard = memo(function TaskCard({
               
               {/* Title - strike through when goal reached or completed (including derived routine completion) */}
               <p className={cn(
-                'text-black text-[15px] font-semibold leading-tight transition-all',
+                'text-fg-warm text-[15px] font-semibold leading-tight transition-all',
                 (hasGoal ? goalReached : (isCompleted || (isRoutineLauncher && isRoutineComplete))) && 'line-through'
               )}>
                 {task.title}
@@ -480,7 +480,7 @@ export const TaskCard = memo(function TaskCard({
                 className="w-12 h-12 -m-1.5 flex items-center justify-center shrink-0"
               >
                 {goalReached ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
-                  <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center">
+                  <span className="w-9 h-9 rounded-full border-2 border-fg-warm bg-card-warm flex items-center justify-center text-fg-warm">
                     <Play className="h-4 w-4 ml-0.5" />
                   </span>
                 )}
@@ -519,7 +519,7 @@ export const TaskCard = memo(function TaskCard({
                   className="w-12 h-12 -m-1.5 flex items-center justify-center"
                 >
                   {(isCompleted || (isRoutineLauncher && isRoutineComplete)) ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
-                    <span className="w-9 h-9 rounded-full border-[2.5px] border-black bg-white flex items-center justify-center">
+                    <span className="w-9 h-9 rounded-full border-[2.5px] border-fg-warm bg-card-warm flex items-center justify-center text-fg-warm">
                       {isRoutineLauncher ? <Play className="h-4 w-4 ml-0.5" /> : <ProIcon className={cn("h-4 w-4", proConfig.iconColorClass)} />}
                     </span>
                   )}
@@ -599,7 +599,7 @@ export const TaskCard = memo(function TaskCard({
           tintClass,
           isAnimating && "animate-emoji-bounce [animation-delay:0.8s]"
         )}>
-          <TaskIcon iconName={task.emoji} size={26} className="text-black/80" />
+          <TaskIcon iconName={task.emoji} size={26} className="text-foreground/80" />
         </div>
 
         {/* Content */}
@@ -607,7 +607,7 @@ export const TaskCard = memo(function TaskCard({
           {/* Top line: subtask count + time/goal */}
           <div className="flex items-center gap-2">
             {hasSubtasks && (
-              <span className="font-semibold bg-black/[0.06] px-1.5 py-0.5 rounded text-xs text-black">
+              <span className="font-semibold bg-foreground/[0.08] px-1.5 py-0.5 rounded text-xs text-fg-warm">
                 {completedCount}/{totalSubtasks}
               </span>
             )}
@@ -625,7 +625,7 @@ export const TaskCard = memo(function TaskCard({
           
           {/* Title - for goal tasks, only strike when goal reached; for regular tasks, when completed */}
           <p className={cn(
-            'text-black text-[15px] font-semibold leading-tight transition-all',
+            'text-fg-warm text-[15px] font-semibold leading-tight transition-all',
             (hasGoal ? goalReached : isCompleted) && 'line-through'
           )}>
             {task.title}
@@ -639,8 +639,8 @@ export const TaskCard = memo(function TaskCard({
             className="w-12 h-12 -m-1.5 flex items-center justify-center shrink-0"
           >
             {goalReached ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
-              <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center">
-                <Play className="h-5 w-5 text-foreground/70 ml-0.5" fill="currentColor" />
+              <span className="w-9 h-9 rounded-full border-2 border-fg-warm bg-card-warm flex items-center justify-center">
+                <Play className="h-5 w-5 text-fg-warm ml-0.5" fill="currentColor" />
               </span>
             )}
           </button>
@@ -681,7 +681,7 @@ export const TaskCard = memo(function TaskCard({
             className="w-12 h-12 -m-1.5 flex items-center justify-center shrink-0"
           >
             {isCompleted ? <SealCheck showParticles={isAnimating} className={cn("w-9 h-9 text-teal-400", isAnimating && "animate-seal-pop")} /> : (
-              <span className="w-9 h-9 rounded-full border-2 border-black bg-white flex items-center justify-center" />
+              <span className="w-9 h-9 rounded-full border-2 border-fg-warm bg-card-warm flex items-center justify-center" />
             )}
           </button>
         )}
