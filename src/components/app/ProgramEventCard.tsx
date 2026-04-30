@@ -24,57 +24,57 @@ interface ProgramEventCardProps {
 
 const EVENT_STYLES = {
   session: {
-    tintBg: 'bg-[#F0E3FF]',           // light lavender circle
-    doneBg: 'bg-[#DEC1FF]',           // planner secondary lavender
-    settingsBg: 'bg-[#DEC1FF]',
+    tintBg: 'bg-lavender',
+    doneBg: 'bg-lavender-mid',
+    settingsBg: 'bg-lavender-mid',
     emoji: '📡',
     badge: 'Live Session',
-    badgeClass: 'bg-[#DEC1FF] text-purple-900',
+    badgeClass: 'bg-lavender-mid text-fg-warm',
   },
   module: {
-    tintBg: 'bg-[#F0E3FF]',
-    doneBg: 'bg-[#DEC1FF]',
-    settingsBg: 'bg-[#DCC8F0]',
+    tintBg: 'bg-lavender',
+    doneBg: 'bg-lavender-mid',
+    settingsBg: 'bg-lavender-mid',
     emoji: '📖',
     badge: 'Module',
     badgeClass: 'bg-secondary text-secondary-foreground',
   },
   track: {
-    tintBg: 'bg-[#E2F9F0]',
-    doneBg: 'bg-[#C3F1E1]',
-    settingsBg: 'bg-[#C5EDDa]',
+    tintBg: 'bg-lime',
+    doneBg: 'bg-lime-mid',
+    settingsBg: 'bg-lime-mid',
     emoji: '🎵',
     badge: 'Audio',
     badgeClass: 'bg-secondary text-secondary-foreground',
   },
   enrollment: {
-    tintBg: 'bg-[#FFF492]',
-    doneBg: 'bg-[#FFEA4E]',
-    settingsBg: 'bg-[#F0E46E]',
+    tintBg: 'bg-yellow',
+    doneBg: 'bg-yellow-mid',
+    settingsBg: 'bg-yellow-mid',
     emoji: '🎓',
     badge: 'New Program',
     badgeClass: 'bg-secondary text-secondary-foreground',
   },
   round_update: {
-    tintBg: 'bg-[#D7E9FF]',
-    doneBg: 'bg-[#B9D6FF]',
-    settingsBg: 'bg-[#B8D4F5]',
+    tintBg: 'bg-sky',
+    doneBg: 'bg-sky-mid',
+    settingsBg: 'bg-sky-mid',
     emoji: '🔄',
     badge: 'Changes in Program',
     badgeClass: 'bg-secondary text-secondary-foreground',
   },
   playlist_save: {
-    tintBg: 'bg-[#DEF5EC]',
-    doneBg: 'bg-[#C3F1E1]',
-    settingsBg: 'bg-[#C8EBDD]',
+    tintBg: 'bg-lime',
+    doneBg: 'bg-lime-mid',
+    settingsBg: 'bg-lime-mid',
     emoji: '🎧',
     badge: 'New Playlist',
     badgeClass: 'bg-secondary text-secondary-foreground',
   },
   playlist_update: {
-    tintBg: 'bg-[#DEF5EC]',
-    doneBg: 'bg-[#C3F1E1]',
-    settingsBg: 'bg-[#C8EBDD]',
+    tintBg: 'bg-lime',
+    doneBg: 'bg-lime-mid',
+    settingsBg: 'bg-lime-mid',
     emoji: '🆕',
     badge: 'New Audio',
     badgeClass: 'bg-secondary text-secondary-foreground',
@@ -258,7 +258,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
                   onClick={handleSettingsClick}
                   className={cn("p-1 rounded-full transition-colors", style.settingsBg)}
                 >
-                  <Settings2 className="h-3 w-3 text-black" />
+                  <Settings2 className="h-3 w-3 text-fg-warm" />
                 </button>
               )}
               
@@ -270,7 +270,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
             
             {/* Title */}
             <p className={cn(
-              'text-black text-[15px] font-semibold leading-tight transition-all truncate',
+              'text-fg-warm text-[15px] font-semibold leading-tight transition-all truncate',
               event.isCompleted && 'line-through'
             )}>
               {isPlaylistUpdate && event.audioTitle ? event.audioTitle : event.title}
