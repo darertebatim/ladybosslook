@@ -97,7 +97,7 @@ export const MonthCalendar = ({
                     'w-11 h-11 rounded-2xl flex flex-col items-center justify-center transition-all relative',
                     !isCurrentMonth && 'opacity-30',
                     isCurrentMonth && !isSelected && !isTodayDate && 'text-fg-warm active:bg-bg-warm',
-                    isSelected && 'bg-brand text-white scale-105',
+                    isSelected && 'border-2 border-brand text-fg-warm',
                     !isSelected && isTodayDate && isCurrentMonth && !hasBadge && 'text-brand'
                   )}
                 >
@@ -107,18 +107,20 @@ export const MonthCalendar = ({
                       isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500"
                     )} />
                   )}
-                  {hasBadge && isCurrentMonth && !isSelected && !isTodayDate && (
+                  {hasBadge && isCurrentMonth && !isTodayDate && (
                     <img
                       src={BADGE_IMAGES[badgeLevel]}
                       alt={`${badgeLevel} badge`}
-                      className="absolute inset-0 w-full h-full object-contain opacity-60 pointer-events-none"
+                      className={cn(
+                        "absolute inset-0 w-full h-full object-contain pointer-events-none",
+                        isSelected ? "opacity-100" : "opacity-60"
+                      )}
                     />
                   )}
                   <span className={cn(
                     'relative z-10 text-[15px] font-bold leading-none',
-                    isSelected && 'text-white',
                     !isCurrentMonth && 'text-fg-warm-muted/50',
-                    hasBadge && !isSelected && !isTodayDate && isCurrentMonth && 'text-fg-warm drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
+                    hasBadge && !isTodayDate && isCurrentMonth && 'text-fg-warm drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
                   )}>
                     {format(dateItem, 'd')}
                   </span>
