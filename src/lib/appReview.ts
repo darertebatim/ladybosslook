@@ -11,6 +11,56 @@ const REVIEW_COOLDOWN_DAYS = 30;
 const SOFT_PROMPT_KEY = 'simora_soft_review_prompt_last';
 const SOFT_PROMPT_COOLDOWN_DAYS = 30;
 
+/** Global event name used to ask the app to show the soft review prompt. */
+export const SOFT_REVIEW_EVENT = 'simora:soft-review-request';
+
+/**
+ * Universal entry point for any feature that wants to request a 5-star review
+ * at a high-satisfaction moment. Centralizes:
+ *   - 30-day global cooldown (canShowSoftReviewPrompt)
+ *   - Native-only gating (no-op on web)
+ *   - Per-trigger one-shot key (so the same milestone never re-fires)
+ *   - Marks cooldown immediately to prevent double-fires across siblings
+ *
+ * The actual UI is rendered by a global listener (HomeCelebrations) that
+ * shows SoftReviewPrompt on iOS and opens the Play Store on Android.
+ *
+ * @param trigger Short slug identifying the source (e.g. 'audio_80', 'weekly_review')
+ * @param options.oneShotKey If set, only fire ONCE ever for this localStorage key.
+ */
+export function triggerSoftReview(
+  trigger: string,
+  options: { oneShotKey?: string } = {}
+): boolean {
+  try {
+    // Web: no app store to send them to
+    if (typeof window === 'undefined') return false;
+    // Lazy import Capacitor to avoid SSR issues
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { Capacitor } = require('@capacitor/core');
+    if (!Capacitor.isNativePlatform?.()) return false;
+
+    if (options.oneShotKey) {
+      if (localStorage.getItem(options.oneShotKey) === 'true') return false;
+    }
+    if (!canShowSoftReviewPrompt()) return false;
+
+    // Mark cooldown immediately so simultaneous triggers don't double-fire
+    markSoftReviewPromptShown();
+    if (options.oneShotKey) {
+      localStorage.setItem(options.oneShotKey, 'true');
+    }
+
+    window.dispatchEvent(
+      new CustomEvent(SOFT_REVIEW_EVENT, { detail: { trigger } })
+    );
+    return true;
+  } catch (e) {
+    console.warn('[Review] triggerSoftReview failed', e);
+    return false;
+  }
+}
+
 /**
  * Whether we're allowed to show the in-app "Enjoying Rilo?" pre-prompt.
  * Shared across every caller (streak, gold badge, audio finish, etc.)
