@@ -50,8 +50,8 @@ export const MiniPlayer = () => {
       className={cn(
         "fixed left-2 right-2 z-40",
         routineMinimized
-          ? "bottom-[calc(64px+env(safe-area-inset-bottom)+60px)]"
-          : "bottom-[calc(64px+env(safe-area-inset-bottom))]",
+          ? "bottom-[calc(88px+env(safe-area-inset-bottom)+60px)]"
+          : "bottom-[calc(88px+env(safe-area-inset-bottom))]",
         "rounded-xl overflow-hidden cursor-pointer",
         "animate-in slide-in-from-bottom-4 duration-300",
         "bg-card/95 backdrop-blur-lg",
