@@ -415,19 +415,23 @@ export const TaskCard = memo(function TaskCard({
         <div
           onClick={handleCardClick}
           className={cn(
-            'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
-            colorClass,
+            'rounded-3xl pl-3 pr-4 py-5 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+            cardSurfaceClass,
             routineBorderClass
           )}
         >
           {/* Main row */}
           <div className="flex items-center gap-2">
-            {/* Icon - use 3D emoji if available, else Lucide icon */}
-            <div className={cn("w-10 h-10 flex items-center justify-center shrink-0", isAnimating && "animate-emoji-bounce [animation-delay:0.8s]")}>
+            {/* Icon — colored circle holding the emoji or pro icon (mock spec) */}
+            <div className={cn(
+              "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
+              tintClass,
+              isAnimating && "animate-emoji-bounce [animation-delay:0.8s]"
+            )}>
               {hasTaskEmoji ? (
-                <FluentEmoji emoji={task.emoji} size={32} />
+                <FluentEmoji emoji={task.emoji} size={26} />
               ) : (
-                <ProIcon className={cn('h-6 w-6', proConfig.iconColorClass)} />
+                <ProIcon className={cn('h-5 w-5', proConfig.iconColorClass)} />
               )}
             </div>
 
@@ -435,10 +439,10 @@ export const TaskCard = memo(function TaskCard({
             <div className={cn("flex-1 min-w-0", isAnimating && "animate-ripple-wave [animation-delay:0.6s]")}>
               {/* Top line: Time + Goal (if applicable) */}
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[11px] text-black/80">{formatTime(task)}</span>
-                <span className="text-[11px] text-black/80">• {repeatLabel}</span>
+                <span className="text-[11px] text-black/60">{formatTime(task)}</span>
+                <span className="text-[11px] text-black/60">• {repeatLabel}</span>
                 {hasGoal && (
-                  <span className="text-[11px] text-black/80 font-medium">• {(() => {
+                  <span className="text-[11px] text-black/60 font-medium">• {(() => {
                     const label = formatProGoalLabel();
                     if (typeof label === 'string') return label;
                     if (label) return <>{label.prefix}<AnimatedProgress value={label.progress} />{label.suffix}</>;
