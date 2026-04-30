@@ -20,7 +20,7 @@ import { haptic } from "@/lib/haptics";
 import { PersianFlag } from "@/components/ui/PersianFlag";
 import { useScrollRestore } from "@/hooks/useScrollRestore";
 import heroStormVideo from "@/assets/watch-hero-storm.mp4";
-import { WatchCategoryPill } from "@/components/video/WatchCategoryPill";
+// WatchCategoryPill removed — Listen now uses light-mode pills inline (matches Home/mock).
 import { useUserPreferredLanguage, preferredLanguageSorter } from "@/hooks/useUserPreferredLanguage";
 import { LanguagePreferencePopup, shouldShowLanguagePopup } from "@/components/app/LanguagePreferencePopup";
 import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
@@ -224,7 +224,7 @@ export default function AppPlayer() {
 
     if (items.length === 0) {
       return (
-        <div className="text-center py-12 text-white/60">
+        <div className="text-center py-12 text-muted-foreground">
           <p className="text-base">No playlists found</p>
         </div>
       );
@@ -261,20 +261,20 @@ export default function AppPlayer() {
   // Show skeleton while loading
   if (isLoading) {
     return (
-      <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
+      <div className="flex flex-col h-full overflow-hidden bg-background">
         <div className="fixed top-0 left-0 right-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-          <div className="h-12 flex items-center px-4"><Skeleton className="h-6 w-24 bg-white/10" /></div>
+          <div className="h-12 flex items-center px-4"><Skeleton className="h-6 w-24" /></div>
           <div className="px-4 pb-3 flex gap-2">
-            {[...Array(4)].map((_, i) => <Skeleton key={i} className="w-16 h-8 rounded-full bg-white/10" />)}
+            {[...Array(4)].map((_, i) => <Skeleton key={i} className="w-16 h-8 rounded-full" />)}
           </div>
           <div className="px-4 pb-3 flex gap-2">
-            {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-7 w-20 rounded-full bg-white/10" />)}
+            {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-7 w-20 rounded-full" />)}
           </div>
         </div>
         <div style={{ height: 'calc(160px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
         <div className="flex-1 overflow-y-auto p-4">
           <div className="grid grid-cols-2 gap-4">
-            {[...Array(4)].map((_, i) => <Skeleton key={i} className="aspect-square rounded-2xl bg-white/10" />)}
+            {[...Array(4)].map((_, i) => <Skeleton key={i} className="aspect-square rounded-2xl" />)}
           </div>
         </div>
       </div>
@@ -282,54 +282,60 @@ export default function AppPlayer() {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
-      {/* Hero Video Background */}
-      <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 h-[640px] overflow-hidden" style={{ transform: `translateY(${-scrollY * 0.35}px)` }}>
-        <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-55" src={heroStormVideo} />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 35%, rgba(19,34,64,0.45) 65%, #132240 95%)' }} />
-        <div className="absolute inset-0 bg-white/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
+    <div className="flex flex-col h-full overflow-hidden bg-background">
+      {/* Cloud hero strip — finite height, fades seamlessly into the page background */}
+      <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 h-[420px] overflow-hidden pointer-events-none" style={{ transform: `translateY(${-scrollY * 0.25}px)` }}>
+        <video autoPlay muted loop playsInline className="w-full h-full object-cover" src={heroStormVideo} style={{ opacity: 0.85 }} />
+        {/* Seamless fade: transparent → background. No dark band. */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(180deg, hsl(var(--background) / 0) 0%, hsl(var(--background) / 0) 55%, hsl(var(--background) / 0.6) 80%, hsl(var(--background)) 100%)`,
+          }}
+        />
       </div>
 
-      {/* Glass Header — dark variant, rounded like Home */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-xl rounded-b-2xl shadow-[0_2px_10px_rgba(0,0,0,0.18)]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      {/* Transparent header — sits on top of clouds, no glass tint, no shadow */}
+      <div className="fixed top-0 left-0 right-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="relative z-10">
           {/* Title bar */}
           <div className="min-h-[52px] flex items-center justify-between px-4 pt-2 pb-1">
             {showSearch ? (
               <div className="flex-1 flex items-center gap-2">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search audio..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 h-9 bg-white/15 backdrop-blur-md border-0 text-white placeholder:text-white/40 focus-visible:ring-0 shadow-ios rounded-full"
+                    className="pl-9 h-9 bg-card border-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0 shadow-ios rounded-full"
                     autoFocus
                   />
                 </div>
-                <IOSIconButton variant="dark" size="sm" onClick={() => { setShowSearch(false); setSearchQuery(""); }} aria-label="Close search">
-                  <X className="h-5 w-5 text-white/70" />
+                <IOSIconButton size="sm" onClick={() => { setShowSearch(false); setSearchQuery(""); }} aria-label="Close search">
+                  <X className="h-5 w-5 text-foreground" />
                 </IOSIconButton>
               </div>
             ) : (
               <>
-                <h1 className="text-2xl font-bold text-white tracking-tight">Listen</h1>
+                <h1 className="text-2xl font-bold text-foreground tracking-tight">Listen</h1>
                 <div className="flex items-center gap-2">
                   {startTour && <TourHelpButton onClick={startTour} />}
-                  <IOSIconButton variant="dark" size="sm" onClick={() => setShowSearch(true)} className="tour-player-search" aria-label="Search">
-                    <Search className="h-5 w-5 text-white/70" />
+                  <IOSIconButton size="sm" onClick={() => setShowSearch(true)} className="tour-player-search" aria-label="Search">
+                    <Search className="h-5 w-5 text-primary" />
                   </IOSIconButton>
                 </div>
               </>
             )}
           </div>
 
-          {/* Category pills */}
+          {/* Category pills — orange (active) / peach (inactive) to match Home */}
           <div className="tour-player-categories px-4 pb-2">
             <div className="flex gap-2 overflow-x-auto py-1.5 scrollbar-hide">
               {availableCategories.map((cat) => {
                 const config = categoryConfig[cat] || { name: cat, icon: 'Sparkles', color: 'purple' };
                 const isSoundscapeLocked = cat === 'soundscape' && !hasSoundscapeAccess;
+                const active = selectedCategory === cat;
                 return (
                   <div key={cat} className="relative">
                     {isSoundscapeLocked && (
@@ -337,9 +343,7 @@ export default function AppPlayer() {
                         <Crown className="h-2.5 w-2.5" /> PLUS
                       </div>
                     )}
-                    <WatchCategoryPill
-                      name={config.name}
-                      isSelected={selectedCategory === cat}
+                    <button
                       onClick={() => {
                         if (isSoundscapeLocked) {
                           haptic.light();
@@ -349,7 +353,15 @@ export default function AppPlayer() {
                           setSelectedCategory(cat);
                         }
                       }}
-                    />
+                      className={cn(
+                        'px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all active:scale-95',
+                        active
+                          ? 'bg-primary text-primary-foreground shadow-ios'
+                          : 'bg-bg-warm text-foreground'
+                      )}
+                    >
+                      {config.name}
+                    </button>
                     {isSoundscapeLocked && (
                       <div className="absolute -bottom-0.5 -right-0.5 z-10 w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center">
                         <FluentEmoji emoji="🔒" size={12} />
@@ -371,8 +383,8 @@ export default function AppPlayer() {
                   className={cn(
                     'px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95',
                     progressFilter === filter
-                      ? 'bg-white/95 text-[hsl(var(--fg-warm))] shadow-ios'
-                      : 'bg-white/10 text-white/70 backdrop-blur-md'
+                      ? 'bg-card text-foreground shadow-ios'
+                      : 'bg-bg-warm text-muted-foreground'
                   )}
                 >
                   {filter === 'all' ? 'All' : filter === 'in_progress' ? 'In Progress' : 'Completed'}
@@ -383,14 +395,14 @@ export default function AppPlayer() {
             {/* Language Selector */}
             <Popover>
               <PopoverTrigger asChild>
-                <IOSIconButton variant="dark" size="sm" aria-label="Language">
+                <IOSIconButton size="sm" aria-label="Language">
                   {selectedLang.value === 'persian'
                     ? <PersianFlag size={14} />
                     : <span className="text-base leading-none">{selectedLang.flag}</span>
                   }
                 </IOSIconButton>
               </PopoverTrigger>
-              <PopoverContent align="end" className="w-40 p-1 bg-[#1a2d4a]/95 backdrop-blur-xl border-white/10">
+              <PopoverContent align="end" className="w-40 p-1">
                 {LANGUAGE_OPTIONS.map((lang) => (
                   <button
                     key={lang.value}
@@ -398,8 +410,8 @@ export default function AppPlayer() {
                     className={cn(
                       'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors',
                       preferredLanguage === lang.value
-                        ? 'bg-white/15 text-white font-medium'
-                        : 'text-white/70 hover:bg-white/10'
+                        ? 'bg-bg-warm text-foreground font-medium'
+                        : 'text-foreground active:bg-bg-warm'
                     )}
                   >
                     {lang.value === 'persian'
@@ -425,8 +437,8 @@ export default function AppPlayer() {
           {progressFilter === "all" && selectedCategory === "all" && !searchQuery && continueListening.length > 0 && (
             <div className="space-y-3 tour-continue-listening">
               <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-sky-400" />
-                <h2 className="text-lg font-semibold text-white">Continue Learning</h2>
+                <Clock className="h-5 w-5 text-primary" />
+                <h2 className="text-lg font-semibold text-foreground">Continue Learning</h2>
               </div>
               <div className="flex flex-col gap-3">
                 {continueListening.slice(0, 4).map((playlist) => {
@@ -457,7 +469,7 @@ export default function AppPlayer() {
 
           {/* All Playlists Section */}
           <div className="space-y-3 tour-playlists">
-            <h2 className="tour-playlists-header text-sm font-semibold text-white/70 uppercase tracking-wider">
+            <h2 className="tour-playlists-header text-sm font-semibold text-muted-foreground uppercase tracking-wider">
               {selectedCategory === 'all' ? 'All Playlists' : categoryConfig[selectedCategory]?.name || selectedCategory}
             </h2>
             
@@ -469,10 +481,10 @@ export default function AppPlayer() {
 
             {/* CTA to support chat */}
             <div className="pt-4 pb-2">
-              <p className="text-sm text-white/50">Not any playlists you want above?</p>
+              <p className="text-sm text-muted-foreground">Not any playlists you want above?</p>
               <button
                 onClick={() => navigate('/app/chat?draft=' + encodeURIComponent("Hi! I'd love to have a playlist for: "))}
-                className="text-sm text-blue-400 font-medium flex items-center gap-1 mt-1"
+                className="text-sm text-primary font-medium flex items-center gap-1 mt-1"
               >
                 Tell us what you want <ChevronRight className="h-4 w-4" />
               </button>
