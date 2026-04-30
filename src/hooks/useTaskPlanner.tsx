@@ -194,15 +194,16 @@ export const TASK_COLORS: Record<TaskColor, string> = {
 };
 
 export const TASK_COLOR_CLASSES: Record<TaskColor, string> = {
+  // "Primary" / completed-card surface = LIGHT tint (matches event card pattern)
   pink: 'bg-pink',
   peach: 'bg-peach',
   yellow: 'bg-yellow',
   lime: 'bg-mint',
-  sky: 'bg-sky-mid',
-  mint: 'bg-lime-mid',
+  sky: 'bg-lavender',
+  mint: 'bg-mint',
   lavender: 'bg-lavender',
   purple: 'bg-lavender',
-  blue: 'bg-sky-mid',
+  blue: 'bg-lavender',
   red: 'bg-pink',
   orange: 'bg-peach',
   green: 'bg-mint',
@@ -210,15 +211,16 @@ export const TASK_COLOR_CLASSES: Record<TaskColor, string> = {
 
 // Light tint for the emoji circle on incomplete cards (matches mock)
 export const TASK_TINT_CLASSES: Record<TaskColor, string> = {
+  // Same as light tint above — emoji circle on INCOMPLETE cards
   pink: 'bg-pink',
   peach: 'bg-peach',
   yellow: 'bg-yellow',
   lime: 'bg-mint',
-  sky: 'bg-sky-mid',
-  mint: 'bg-lime-mid',
+  sky: 'bg-lavender',
+  mint: 'bg-mint',
   lavender: 'bg-lavender',
   purple: 'bg-lavender',
-  blue: 'bg-sky-mid',
+  blue: 'bg-lavender',
   red: 'bg-pink',
   orange: 'bg-peach',
   green: 'bg-mint',
@@ -226,15 +228,16 @@ export const TASK_TINT_CLASSES: Record<TaskColor, string> = {
 
 // Mid-tone fully-tinted color for COMPLETED cards (matches mock O.peachMid family)
 export const TASK_MID_CLASSES: Record<TaskColor, string> = {
+  // "Secondary" / mid tone — emoji circle on COMPLETED cards
   pink: 'bg-pink-mid',
   peach: 'bg-peach-mid',
   yellow: 'bg-yellow-mid',
   lime: 'bg-mint-mid',
-  sky: 'bg-sky-mid',
-  mint: 'bg-lime-mid',
+  sky: 'bg-lavender-mid',
+  mint: 'bg-mint-mid',
   lavender: 'bg-lavender-mid',
   purple: 'bg-lavender-mid',
-  blue: 'bg-sky-mid',
+  blue: 'bg-lavender-mid',
   red: 'bg-pink-mid',
   orange: 'bg-peach-mid',
   green: 'bg-mint-mid',
