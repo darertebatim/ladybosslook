@@ -312,6 +312,12 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       }, {
         onConflict: "user_id,audio_id",
       });
+
+      // Fire 5-star review request when user completes ≥80% of an audio track
+      if (duration > 0 && currentTime / duration >= 0.8) {
+        const { triggerSoftReview } = await import('@/lib/appReview');
+        triggerSoftReview('audio_80_percent');
+      }
     };
     
     saveProgressTimeoutRef.current = setInterval(saveProgress, 5000);

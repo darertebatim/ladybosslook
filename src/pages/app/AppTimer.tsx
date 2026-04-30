@@ -244,6 +244,10 @@ export default function AppTimer() {
         });
         setScreen('completed');
         fireConfetti();
+        // High-satisfaction moment → ask for a 5-star review (cooldown-protected)
+        import('@/lib/appReview').then(({ triggerSoftReview }) =>
+          setTimeout(() => triggerSoftReview('focus_pomodoro_complete'), 2000)
+        );
       } else {
         setScreen('pomodoroRoundDone');
       }
