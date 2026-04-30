@@ -957,7 +957,7 @@ const AppHome = () => {
               <button
                 onClick={() => navigate('/app/presence')}
                 className={cn(
-                  "tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full shadow-sm active:scale-95 transition-all",
+                  "tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_14px_rgba(0,0,0,0.10)] active:scale-95 transition-all",
                   hasAnyCompletionToday
                     ? "bg-gradient-to-br from-[hsl(var(--brand-primary-light))] to-[hsl(var(--brand-primary))] text-white"
                     : "bg-[hsl(var(--tint-peach))] text-[hsl(var(--fg-warm-muted))]"
@@ -1064,7 +1064,7 @@ const AppHome = () => {
               setSelectedDate(new Date());
               setCurrentMonth(startOfMonth(new Date()));
               haptic.light();
-            }} className={cn("absolute flex items-center gap-0.5 px-3 py-0.5 text-sm font-semibold text-white bg-gradient-to-br from-[hsl(var(--brand-primary-light))] to-[hsl(var(--brand-primary))] rounded-full shadow-sm active:scale-95 transition-transform", isFutureDate ? "right-2" : "left-2")}>
+            }} className={cn("absolute flex items-center gap-0.5 px-3 py-0.5 text-sm font-semibold text-white bg-gradient-to-br from-[hsl(var(--brand-primary-light))] to-[hsl(var(--brand-primary))] rounded-full shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_14px_rgba(0,0,0,0.10)] active:scale-95 transition-transform", isFutureDate ? "right-2" : "left-2")}>
                   {isFutureDate && <ChevronLeft className="h-3.5 w-3.5" />}
                   Today
                   {!isFutureDate && <ChevronRight className="h-3.5 w-3.5" />}
