@@ -1909,19 +1909,59 @@ function WelcomeAboardScreen({ step, onNext }: Props) {
 
   return (
     <ScreenWrapper>
-      <div className="flex-1 flex flex-col items-center justify-center px-2">
-        <FadeUp>
-          <FluentEmoji emoji="🔔" size={64} className="mb-6" />
-        </FadeUp>
-        <FadeUp delay={0.1}>
-          <h1 className="text-[26px] font-extrabold text-[#1a1f3d] text-center mb-3 leading-tight">
-            With reminders,{'\n'}routines feel 80% easier.
+      <div className="flex-1 flex flex-col px-1 pt-2">
+        {/* Headline + sub */}
+        <FadeUp delay={0.05}>
+          <h1 className="text-[30px] leading-[1.1] font-extrabold text-[#1a1f3d] tracking-tight">
+            Never miss a task.
           </h1>
         </FadeUp>
-        <FadeUp delay={0.2}>
-          <p className="text-[15px] text-[#1a1f3d]/70 text-center leading-relaxed max-w-[280px]">
-            Get gentle nudges to keep your daily reset on track. You can customize or turn them off anytime.
+        <FadeUp delay={0.12}>
+          <p className="mt-3 text-[15px] text-[#1a1f3d]/70 leading-relaxed max-w-[320px]">
+            We&apos;ll send gentle, tailored nudges so you stay on top of even the most hectic days.
           </p>
+        </FadeUp>
+
+        {/* Phone mockup with notification */}
+        <FadeUp delay={0.22} className="flex-1 flex items-center justify-center mt-4">
+          <div className="relative w-[240px] aspect-[9/18.5]">
+            {/* Phone frame */}
+            <div className="absolute inset-0 rounded-[36px] bg-[#1a1f3d] shadow-[0_30px_60px_-20px_rgba(26,31,61,0.45)]" />
+            <div className="absolute inset-[6px] rounded-[30px] bg-gradient-to-b from-[#EEF1FA] via-[#F5F0FB] to-[#FBE9EE] overflow-hidden">
+              {/* Notch */}
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[80px] h-[20px] rounded-full bg-[#1a1f3d]" />
+
+              {/* Lock-screen time */}
+              <div className="pt-12 text-center">
+                <p className="text-[11px] font-medium text-[#1a1f3d]/60">Monday, June 6</p>
+                <p className="text-[44px] font-light text-[#1a1f3d] leading-none mt-1">9:41</p>
+              </div>
+
+              {/* Notification card */}
+              <motion.div
+                initial={{ y: 24, opacity: 0, scale: 0.96 }}
+                animate={{ y: 0, opacity: 1, scale: 1 }}
+                transition={{ delay: 0.55, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute left-3 right-3 bottom-6 bg-white/90 backdrop-blur-md rounded-[18px] px-3 py-2.5 shadow-[0_8px_20px_-8px_rgba(0,0,0,0.15)] flex items-start gap-2.5"
+              >
+                <div className="w-7 h-7 rounded-[8px] bg-[#1a1f3d] flex items-center justify-center shrink-0">
+                  <FluentEmoji emoji="🔔" size={16} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-[11px] font-semibold text-[#1a1f3d] truncate">Rilo</p>
+                    <p className="text-[9px] text-[#1a1f3d]/50">now</p>
+                  </div>
+                  <p className="text-[11px] font-semibold text-[#1a1f3d] mt-0.5 leading-tight">
+                    Time for your morning reset ☀️
+                  </p>
+                  <p className="text-[10px] text-[#1a1f3d]/70 leading-snug mt-0.5">
+                    A quick 2-min check-in to start your day calm.
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+          </div>
         </FadeUp>
       </div>
       <FadeUp delay={0.3} className="mt-auto sticky bottom-0 bg-white pb-1">
