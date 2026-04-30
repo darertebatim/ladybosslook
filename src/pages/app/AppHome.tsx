@@ -1486,22 +1486,7 @@ const AppHome = () => {
           );
         })()}
 
-        {/* FAB */}
-        {!isKeyboardOpen && (
-          <button
-            onClick={() => navigate('/app/aiplanner')}
-            aria-label="AI Planner"
-            className="tour-add-task fixed right-4 w-14 h-14 rounded-full bg-urgency text-urgency-foreground shadow-cta flex items-center justify-center active:scale-95 transition-all z-50"
-            style={{
-          bottom: activeMiniPlayerCount >= 2
-            ? 'calc(196px + env(safe-area-inset-bottom))'
-            : activeMiniPlayerCount === 1
-              ? 'calc(136px + env(safe-area-inset-bottom))'
-              : 'calc(72px + env(safe-area-inset-bottom))'
-        }}>
-            <Sparkles className="h-6 w-6" />
-          </button>
-        )}
+        {/* FAB removed — AI Planner is now in the bottom nav */}
 
         {/* All celebrations, modals, and sheets */}
         <HomeCelebrations
