@@ -18,6 +18,7 @@ import { FocusStatsScreen } from '@/components/app/FocusStatsScreen';
 import { FocusShareButton } from '@/components/app/FocusShareButton';
 import { useSaveFocusSession } from '@/hooks/useFocusSessions';
 import { scheduleFocusTimerNotification, cancelFocusTimerNotification } from '@/lib/routineTaskNotification';
+import { SlideUpPage, useSlideClose } from '@/components/app/SlideUpPage';
 
 type Screen = 'setup' | 'adjustTime' | 'pickTheme' | 'running' | 'completed' | 'stopped' | 'pomodoroRoundDone' | 'pomodoroBreak' | 'pomodoroBreakDone' | 'settings' | 'stats';
 
@@ -40,7 +41,16 @@ const SYNTHETIC_TIMER_TASK: RoutinePlanTask = {
 };
 
 export default function AppTimer() {
+  return (
+    <SlideUpPage defaultBack="/app/home">
+      <AppTimerInner />
+    </SlideUpPage>
+  );
+}
+
+function AppTimerInner() {
   const navigate = useNavigate();
+  const slideCtx = useSlideClose();
   const [screen, setScreen] = useState<Screen>('setup');
   const [minutes, setMinutes] = useState(25);
   const [selectedTheme, setSelectedTheme] = useState('Focus');
@@ -367,7 +377,8 @@ export default function AppTimer() {
 
   const goBack = () => {
     haptic.light();
-    navigate(-1);
+    if (slideCtx) slideCtx.slideClose();
+    else navigate(-1);
   };
 
   // Ruler scroll helpers
