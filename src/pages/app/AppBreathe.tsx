@@ -240,6 +240,6 @@ export default function AppBreathe() {
         onSave={handleSaveRoutine}
         isSaving={addRoutinePlan.isPending}
       />
-    </>
+    </SlideUpPage>
   );
 }
