@@ -224,8 +224,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
         onClick={handleCardClick}
         className={cn(
           'rounded-3xl pl-3 pr-4 py-5 transition-all duration-200 cursor-pointer active:scale-[0.98] shadow-card-warm',
-          event.isCompleted ? style.doneBg : 'bg-card-warm',
-          event.isCompleted && 'opacity-60'
+          event.isCompleted ? style.doneBg : 'bg-card-warm'
         )}
       >
         {/* Main row */}
