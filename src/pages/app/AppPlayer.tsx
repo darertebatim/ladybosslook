@@ -231,8 +231,14 @@ export default function AppPlayer() {
 
         {/* Content (z-10) — header in normal flow, scrolls with cards */}
         <div className="relative z-10" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-          {/* Header — transparent, no glass, no shadow */}
-          <div className="px-4 pt-3 pb-2">
+          {/* Header — sticks to top of scroll container */}
+          <div
+            className="sticky z-20 px-4 pt-3 pb-2 backdrop-blur-md"
+            style={{
+              top: 'env(safe-area-inset-top)',
+              background: 'hsl(var(--background) / 0.72)',
+            }}
+          >
             <div className="min-h-[44px] flex items-center justify-between">
               {showSearch ? (
                 <div className="flex-1 flex items-center gap-2">
