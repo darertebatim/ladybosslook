@@ -45,44 +45,51 @@ export function SelfCareQuizBanner({ className, onVisibilityChange }: SelfCareQu
   };
 
   return (
-    <div
-      role="button"
-      onClick={handleTap}
-      className={cn(
-        "relative w-full bg-white dark:bg-card rounded-2xl shadow-sm border border-border/50 overflow-hidden",
-        "active:scale-[0.98] transition-transform cursor-pointer animate-fade-in",
-        className
-      )}
-    >
-      {/* Dismiss */}
-      <button
-        onClick={handleDismiss}
-        className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-black/40 active:bg-black/60 transition-colors"
-        aria-label="Dismiss"
+      <div
+        role="button"
+        onClick={handleTap}
+        className={cn(
+          "relative w-full rounded-3xl p-3.5 overflow-hidden",
+          "active:scale-[0.98] transition-transform cursor-pointer animate-fade-in",
+          className
+        )}
+        style={{
+          background: 'linear-gradient(135deg, #EB5E33 0%, #F5A623 100%)',
+          boxShadow: '0 4px 14px rgba(235,94,51,0.25)',
+        }}
       >
-        <X className="h-4 w-4 text-white" />
-      </button>
+        {/* Decorative bubble */}
+        <div
+          className="absolute -top-4 -right-4 w-20 h-20 rounded-full opacity-20 pointer-events-none"
+          style={{ background: '#fff' }}
+        />
 
-      {/* Content — same writings as the previous image */}
-      <div className="p-4">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#D94B2B]/10 flex items-center justify-center flex-shrink-0">
-            <Sparkles className="h-5 w-5 text-[#D94B2B]" />
+        {/* Dismiss */}
+        <button
+          onClick={handleDismiss}
+          className="absolute top-1.5 right-1.5 z-10 p-1 rounded-full bg-black/25 active:bg-black/40 transition-colors"
+          aria-label="Dismiss"
+        >
+          <X className="h-3.5 w-3.5 text-white" />
+        </button>
+
+        <div className="relative z-[1] flex items-center gap-3 pr-5">
+          <div
+            className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
+            style={{ background: 'rgba(255,255,255,0.25)' }}
+          >
+            <Sparkles className="w-5 h-5 text-white" />
           </div>
-          <div className="flex-1 min-w-0 pr-6">
-            <h3 className="font-semibold text-foreground leading-snug">
-              Discover your <span className="text-[#D94B2B]">self-care gaps</span> in 1 min
-            </h3>
-            <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#D94B2B]/10">
-              <Sparkles className="h-3 w-3 text-[#D94B2B]" />
-              <span className="text-[11px] font-semibold text-[#D94B2B] tracking-wide">
-                AI Powered Analyze
-              </span>
-            </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-white text-[13px] font-bold leading-tight">
+              What's missing in your self-care?
+            </p>
+            <p className="text-white/80 text-[10px] mt-0.5">
+              Take the 2-min Self-Care Quiz
+            </p>
           </div>
-          <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-2" />
+          <ChevronRight className="w-4 h-4 text-white/90 shrink-0" />
         </div>
       </div>
-    </div>
   );
 }
