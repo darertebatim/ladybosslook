@@ -210,30 +210,13 @@ export default function AppPlayer() {
 
   return (
     <div className="relative flex flex-col h-full overflow-hidden bg-background">
-      {/* Single scroll container — header + content scroll together (mock parity) */}
+      {/* Single scroll container */}
       <div ref={listenScrollRef} className="flex-1 overflow-y-auto overscroll-contain relative">
-        {/* Cloud hero strip — absolute, top of scroll container, fades into bg seamlessly */}
-        <div className="absolute top-0 left-0 right-0 h-[300px] overflow-hidden pointer-events-none z-0">
-          <video
-            autoPlay muted loop playsInline
-            src={heroStormVideo}
-            className="w-full h-full object-cover"
-            style={{ opacity: 0.9 }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(180deg, hsl(var(--background) / 0) 0%, hsl(var(--background) / 0) 60%, hsl(var(--background) / 0.6) 85%, hsl(var(--background)) 100%)`,
-            }}
-          />
-        </div>
-
-        {/* Content (z-10) — header in normal flow, scrolls with cards */}
-        <div className="relative z-10" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <div className="relative" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
           {/* Header — only the title row sticks to top */}
           <div
-            className="sticky z-20 px-4 pt-3 pb-2"
-            style={{ top: 'env(safe-area-inset-top)', background: 'transparent' }}
+            className="sticky z-20 px-4 pt-3 pb-2 bg-background"
+            style={{ top: 'env(safe-area-inset-top)' }}
           >
             <div className="min-h-[44px] flex items-center justify-between">
               {showSearch ? (
@@ -292,10 +275,10 @@ export default function AppPlayer() {
                         }
                       }}
                       className={cn(
-                        'shrink-0 px-3.5 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95',
+                        'shrink-0 px-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all active:scale-95',
                         active
                           ? 'bg-brand text-white shadow-ios'
-                          : 'bg-white/35 backdrop-blur-md text-fg-warm-muted'
+                          : 'bg-card text-fg-warm-muted shadow-ios'
                       )}
                     >
                       {config.name}
@@ -320,10 +303,10 @@ export default function AppPlayer() {
                       key={filter}
                       onClick={() => setProgressFilter(filter)}
                       className={cn(
-                        'px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all active:scale-95',
+                        'px-3.5 py-1.5 rounded-full text-[12px] font-semibold transition-all active:scale-95',
                         active
-                          ? 'bg-brand text-white shadow-ios'
-                          : 'bg-white/35 backdrop-blur-md text-fg-warm-muted'
+                          ? 'bg-card text-fg-warm shadow-ios'
+                          : 'text-fg-warm-muted'
                       )}
                     >
                       {filter === 'all' ? 'All' : filter === 'in_progress' ? 'In Progress' : 'Completed'}
