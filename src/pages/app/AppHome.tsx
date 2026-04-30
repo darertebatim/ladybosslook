@@ -1176,14 +1176,8 @@ const AppHome = () => {
                         <Zap className="h-2.5 w-2.5 fill-amber-400 text-amber-400 shrink-0" /> My Tasks
                        </button>
                      </div>
-                     <div className="flex items-center gap-2 mr-2">
-                       {/* Task completion counter chip — mirrors mock */}
-                       {homeView === 'tasks' && filteredTasks.length > 0 && (
-                         <div className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[hsl(var(--tint-peach))] text-[hsl(var(--brand-primary))]">
-                           {filteredTasks.filter(t => completedTaskIds.has(t.id)).length}/{filteredTasks.length}
-                         </div>
-                       )}
-                       <button
+                      <div className="flex items-center gap-2 mr-2">
+                        <button
                          onClick={handleFabClick}
                          aria-label="Add task"
                          className="coach-add-btn w-7 h-7 rounded-full bg-[hsl(var(--brand-primary))] text-white shadow-[0_2px_6px_hsl(var(--brand-primary)/0.35)] flex items-center justify-center active:scale-90 transition-transform"
