@@ -283,7 +283,7 @@ const AppSettings = () => {
 
         {/* Password */}
         <Collapsible open={openSections.has('password')} onOpenChange={() => toggleSection('password')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Lock className="h-4 w-4 text-primary" />
@@ -293,7 +293,7 @@ const AppSettings = () => {
             <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('password') ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-1">
-            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+            <Card className="rounded-2xl shadow-ios border-0 bg-card">
               <CardContent className="space-y-3 pt-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="newPassword" className="text-xs text-muted-foreground">New Password</Label>
@@ -315,7 +315,7 @@ const AppSettings = () => {
         {/* Push Notifications - Native only */}
         {showNativeSettings && (
           <Collapsible open={openSections.has('push')} onOpenChange={() => toggleSection('push')}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
               <div className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Bell className="h-4 w-4 text-primary" />
@@ -328,7 +328,7 @@ const AppSettings = () => {
               </div>
             </CollapsibleTrigger>
             <CollapsibleContent className="mt-1">
-              <Card className="rounded-2xl shadow-sm border-0 bg-card">
+              <Card className="rounded-2xl shadow-ios border-0 bg-card">
                 <CardContent className="space-y-3 pt-4">
                   <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
                     <div className="flex items-center gap-2">
@@ -384,7 +384,7 @@ const AppSettings = () => {
 
         {/* Notification Preferences */}
         <Collapsible open={openSections.has('prefs')} onOpenChange={() => toggleSection('prefs')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Settings className="h-4 w-4 text-primary" />
@@ -404,7 +404,7 @@ const AppSettings = () => {
         {/* Calendar Sync - Native only */}
         {showNativeSettings && (
           <Collapsible open={openSections.has('calendar')} onOpenChange={() => toggleSection('calendar')}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
               <div className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Calendar className="h-4 w-4 text-primary" />
@@ -417,7 +417,7 @@ const AppSettings = () => {
               </div>
             </CollapsibleTrigger>
             <CollapsibleContent className="mt-1">
-              <Card className="rounded-2xl shadow-sm border-0 bg-card">
+              <Card className="rounded-2xl shadow-ios border-0 bg-card">
                 <CardContent className="space-y-3 pt-4">
                   <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
                     <div className="flex items-center gap-2">
@@ -459,7 +459,7 @@ const AppSettings = () => {
 
         {/* Support */}
         <Collapsible open={openSections.has('support')} onOpenChange={() => toggleSection('support')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <MessageCircle className="h-4 w-4 text-primary" />
@@ -474,7 +474,7 @@ const AppSettings = () => {
             </div>
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-1">
-            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+            <Card className="rounded-2xl shadow-ios border-0 bg-card">
               <CardContent className="space-y-3 pt-4">
                 <Button className="w-full relative" onClick={() => navigate('/app/chat')}>
                   <MessageCircle className="mr-2 h-4 w-4" />Chat with Support
@@ -523,7 +523,7 @@ const AppSettings = () => {
         {/* Admin Tools */}
         {(canAccessAdminPage('support') || canAccessAdminPage('community')) && (
           <Collapsible open={openSections.has('admin')} onOpenChange={() => toggleSection('admin')}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
               <div className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Settings className="h-4 w-4 text-primary" />
@@ -533,7 +533,7 @@ const AppSettings = () => {
               <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('admin') ? 'rotate-180' : ''}`} />
             </CollapsibleTrigger>
             <CollapsibleContent className="mt-1">
-              <Card className="rounded-2xl shadow-sm border-0 bg-card">
+              <Card className="rounded-2xl shadow-ios border-0 bg-card">
                 <CardContent className="space-y-2 pt-4">
                   {canAccessAdminPage('support') && (
                     <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/app/support', { state: { from: '/app/settings' } })}>
@@ -557,7 +557,7 @@ const AppSettings = () => {
             const url = 'https://apps.apple.com/redeem?ctx=offercodes&id=6755076134';
             window.open(url, '_blank');
           }}
-          className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors"
+          className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors"
         >
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
@@ -570,7 +570,7 @@ const AppSettings = () => {
 
         {/* Rate Rilo - Native only */}
         {showNativeSettings && (
-          <button onClick={() => navigate('/app/rate')} className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+          <button onClick={() => navigate('/app/rate')} className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                 <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
@@ -583,7 +583,7 @@ const AppSettings = () => {
 
         {/* Account Actions */}
         <Collapsible open={openSections.has('actions')} onOpenChange={() => toggleSection('actions')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-xl bg-muted flex items-center justify-center">
                 <LogOut className="h-4 w-4 text-muted-foreground" />
@@ -593,7 +593,7 @@ const AppSettings = () => {
             <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('actions') ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-1">
-            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+            <Card className="rounded-2xl shadow-ios border-0 bg-card">
               <CardContent className="space-y-2 pt-4">
                 <Button variant="ghost" className="w-full justify-start h-12 rounded-xl bg-muted/30" onClick={() => {
                   resetAllTours();

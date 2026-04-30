@@ -373,7 +373,7 @@ const AppProfile = () => {
 
       {/* Hero Header */}
       <header
-        className="shrink-0 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-sm"
+        className="shrink-0 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-ios"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="pt-3 pb-1 px-4 flex items-center">
@@ -438,7 +438,7 @@ const AppProfile = () => {
         <SubscriptionCard />
 
         {/* Profile Info Card */}
-        <Card className="rounded-2xl shadow-sm border-0 bg-card">
+        <Card className="rounded-2xl shadow-ios border-0 bg-card">
           <CardContent className="space-y-3 pt-4">
             {isEditing ? (
               <>
@@ -610,7 +610,7 @@ const AppProfile = () => {
 
         {/* Journal Stats */}
         <Collapsible open={openSections.has('journal')} onOpenChange={() => toggleSection('journal')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <BookOpen className="h-4 w-4 text-primary" />
@@ -620,13 +620,13 @@ const AppProfile = () => {
             <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('journal') ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-1">
-            <JournalStats className="rounded-2xl shadow-sm border-0" />
+            <JournalStats className="rounded-2xl shadow-ios border-0" />
           </CollapsibleContent>
         </Collapsible>
 
         {/* My Programs */}
         <Collapsible open={openSections.has('programs')} onOpenChange={() => toggleSection('programs')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <BookOpen className="h-4 w-4 text-primary" />
@@ -639,7 +639,7 @@ const AppProfile = () => {
             </div>
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-1">
-            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+            <Card className="rounded-2xl shadow-ios border-0 bg-card">
               <CardContent className="pt-4">
                 {enrollments && enrollments.length > 0 ? (
                   <div className="space-y-2">
@@ -670,7 +670,7 @@ const AppProfile = () => {
 
         {/* Wallet & Credits */}
         <Collapsible open={openSections.has('wallet')} onOpenChange={() => toggleSection('wallet')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Wallet className="h-4 w-4 text-primary" />
@@ -683,7 +683,7 @@ const AppProfile = () => {
             </div>
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-1">
-            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+            <Card className="rounded-2xl shadow-ios border-0 bg-card">
               <CardContent className="space-y-3 pt-4">
                 <div className="flex items-center justify-between p-4 bg-primary/5 rounded-xl">
                   <div>
@@ -715,7 +715,7 @@ const AppProfile = () => {
 
         {/* Order History */}
         <Collapsible open={openSections.has('orders')} onOpenChange={() => toggleSection('orders')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Receipt className="h-4 w-4 text-primary" />
@@ -725,7 +725,7 @@ const AppProfile = () => {
             <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('orders') ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-1">
-            <Card className="rounded-2xl shadow-sm border-0 bg-card">
+            <Card className="rounded-2xl shadow-ios border-0 bg-card">
               <CardContent className="pt-4">
                 {orders && orders.length > 0 ? (
                   <div className="space-y-2">
@@ -759,7 +759,7 @@ const AppProfile = () => {
         <SyncStatusCard />
         <button
           onClick={() => navigate('/app/settings')}
-          className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-sm active:bg-muted/50 transition-colors"
+          className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors"
         >
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-xl bg-muted flex items-center justify-center">

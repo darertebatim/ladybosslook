@@ -616,8 +616,8 @@ export default function AppAudioPlayer() {
                             !isAvailable
                               ? 'opacity-60 bg-muted/30 cursor-not-allowed'
                               : module.audio_id === audioId 
-                                ? 'bg-primary/10 border-primary shadow-sm' 
-                                : 'hover:bg-accent hover:shadow-sm'
+                                ? 'bg-primary/10 border-primary shadow-ios' 
+                                : 'hover:bg-accent hover:shadow-ios'
                           }`}
                         >
                           <div className="flex items-center gap-3">
@@ -659,8 +659,8 @@ export default function AppAudioPlayer() {
                             !isAvailable
                               ? 'opacity-60 bg-muted/30 cursor-not-allowed'
                               : track.audio_id === audioId 
-                                ? 'bg-primary/10 border-primary shadow-sm' 
-                                : 'hover:bg-accent hover:shadow-sm'
+                                ? 'bg-primary/10 border-primary shadow-ios' 
+                                : 'hover:bg-accent hover:shadow-ios'
                           }`}
                         >
                           <div className="flex items-center gap-3">
