@@ -97,9 +97,9 @@ export const MonthCalendar = ({
                     'w-11 h-11 rounded-2xl flex flex-col items-center justify-center transition-all relative',
                     !isCurrentMonth && 'opacity-30',
                     isCurrentMonth && !isSelected && !isTodayDate && !hasBadge && 'text-fg-warm active:bg-bg-warm',
-                    isSelected && !hasBadge && 'bg-lavender text-fg-warm scale-105',
+                    isSelected && !hasBadge && 'bg-brand text-white scale-105',
                     !isSelected && isTodayDate && isCurrentMonth && !hasBadge && 'text-brand',
-                    hasBadge && isSelected && 'ring-2 ring-lavender ring-offset-0'
+                    hasBadge && isSelected && 'ring-2 ring-brand ring-offset-0'
                   )}
                 >
                   {hasProgramEvents && isCurrentMonth && (
@@ -117,7 +117,7 @@ export const MonthCalendar = ({
                   ) : (
                     <span className={cn(
                       'text-[15px] font-bold leading-none',
-                      isSelected && 'text-fg-warm',
+                      isSelected && 'text-white',
                       !isCurrentMonth && 'text-fg-warm-muted/50'
                     )}>
                       {format(dateItem, 'd')}
