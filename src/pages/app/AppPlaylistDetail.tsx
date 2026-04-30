@@ -25,7 +25,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { PaywallSheet } from "@/components/app/PaywallSheet";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import heroStormVideo from "@/assets/watch-hero-storm.mp4";
+
 import { Share2 } from "lucide-react";
 import { useShareContent } from "@/hooks/useShareContent";
 function ExpandableDescription({ text }: { text: string }) {
@@ -661,17 +661,10 @@ export default function AppPlaylistDetail() {
 
   return (
     <>
-    <div className="flex flex-col h-full overflow-hidden" >
-      {/* Hero Video Background */}
-      <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 h-[350px] overflow-hidden" style={{ transform: `translateY(${-scrollY * 0.4}px)` }}>
-        <video autoPlay muted loop playsInline className="w-full h-full object-cover opacity-40" src={heroStormVideo} />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 0%, transparent 30%, rgba(19,34,64,0.5) 60%, hsl(var(--background)) 100%)' }} />
-        <div className="absolute inset-0 bg-foreground/5 animate-[lightning-flash_8s_ease-in-out_infinite]" />
-      </div>
-
+    <div ref={heroRef} className="flex flex-col h-full overflow-hidden bg-background">
       {/* Fixed Header */}
       <div
-        className="fixed top-0 left-0 right-0 z-50"
+        className="fixed top-0 left-0 right-0 z-50 bg-background"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="pt-1 pb-2 px-4 flex items-center justify-between">
