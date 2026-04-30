@@ -1,58 +1,102 @@
-# Add "What is Rilo?" Teach Flow
-
-A new 3-screen explainer flow that tells users exactly what Rilo is **before** any quiz or question. Lives in `/admin/onboarding` so you can preview, iterate, and decide whether to make it the new default first-run experience.
-
 ## Goal
 
-Solve the "people don't get the app" problem by leading with a clear promise:
-**Rilo = a planner + a self-care core that helps you build a routine you actually follow.**
+Implement Step 1 (tokens) + Step 2 (primitives) + restyle the bottom **nav menu** with an iOS 18-inspired look, using the Orange Palette already documented in `/admin/brand`.
 
-No questions. No commitment. Just three quick "aha" screens, then a single CTA into the existing flow (Quick Start → Auth → Self-Care Quiz).
+Note: There is no separate admin/web theme to worry about — the orange tokens will be scoped to `.app-theme` so admin pages stay untouched.
 
-## The 3 screens
+---
 
-**Screen 1 — What Rilo is**
-- Title: "Meet Rilo"
-- Subtitle: "Your self-care planner — built to help you actually show up for yourself."
-- Visual: existing `mascot-planner` asset
-- Single CTA: "Show me how"
+## Step 1 — Wire orange tokens into `.app-theme`
 
-**Screen 2 — The core idea (Planner + Self-Care)**
-- Title: "Plan it. Do it. Feel it."
-- Subtitle: "Rilo turns self-care into a simple daily routine — one you'll actually keep."
-- Visual: 3-row mini illustration (emoji + one-liner each):
-  - 📋 Plan your day in seconds
-  - ✅ Tick off tiny self-care tasks
-  - 🔥 Build a streak that sticks
-- CTA: "What's in it for me?"
+File: `src/index.css` (extend existing `.app-theme` and `.app-theme.dark` blocks).
 
-**Screen 3 — The promise**
-- Title: "In 7 days you'll have a routine"
-- Subtitle: "No overwhelm. No 50-step morning rituals. Just the few things that move your day."
-- Small social proof line: "Join 3,000+ women already using Rilo."
-- CTA: "Let's set yours up" → completes the flow
+Add new tokens **alongside** the current black/white ones (do not flip `--primary` yet; we migrate components first):
 
-## Where it lives
+Light (`.app-theme`):
+- Brand: `--brand-primary: 14 82% 56%` (#EB5E33), `--brand-primary-light: 36 91% 55%` (#F5A623), `--brand-primary-dark: 13 70% 39%` (#A63520), `--brand-accent-rose: 336 71% 45%` (#C2255C)
+- Warm surfaces: `--bg-warm: 28 100% 97%`, `--surface-warm: 28 100% 96%`, `--card-warm: 30 60% 99%`
+- Warm text: `--fg-warm: 22 53% 12%`, `--fg-warm-muted: 23 22% 45%`, `--border-warm: 27 67% 87%`
+- Tints (light + mid pairs): `--peach`, `--peach-mid`, `--mint`, `--mint-mid`, `--lavender`, `--lavender-mid`, `--yellow`, `--yellow-mid`, `--pink`, `--pink-mid`, `--lime-mid`, `--sky-mid`
+- Gradient + shadow: `--gradient-orange`, `--shadow-card-warm`
 
-- New file: `src/data/onboarding-flows/what-is-rilo.ts` — exports `whatIsRiloFlow` with `id: 'what-is-rilo'`
-- Registered in two places (same pattern as every other flow):
-  - `src/pages/admin/Onboarding.tsx` — add to `flows` array so it appears as a card
-  - `src/pages/app/AppOnboarding.tsx` — add to `allFlows` so `/app/onboarding/what-is-rilo` renders
-- Uses existing step types only (`welcome` for screen 1, `motivational` for screens 2 & 3) — **no new step renderers needed**
-- On completion: navigate to `/auth?mode=signup` (same as Quick Start), so the flow is wired correctly for when you decide to make it the entry point
+Dark (`.app-theme.dark`):
+- `--bg-warm: 22 53% 6%` (#1A0F08), `--surface-warm: 22 50% 12%` (#2A1A10), `--card-warm: 22 50% 9%` (#1F140B)
+- `--fg-warm: 28 100% 96%`, `--fg-warm-muted: 27 28% 65%`, `--border-warm: 22 38% 17%`
+- Jewel-tone tints: `--peach-dark` (#3D2A1A), `--mint-dark` (#1A2E26), `--lavender-dark` (#2A1F3A), `--yellow-dark` (#3A3010), `--pink-dark` (#3A1A2A), `--sky-dark` (#1A2638), `--lime-dark` (#1E3020)
+- `--shadow-card-warm` with stronger opacity
 
-## What this is NOT (yet)
+File: `tailwind.config.ts` (extend `theme.extend.colors`):
+- `peach`, `peach-mid`, `peach-dark` (and same for mint/lavender/yellow/pink/lime/sky)
+- `bg-warm`, `surface-warm`, `card-warm`, `fg-warm`, `fg-warm-muted`, `border-warm`
+- `brand`, `brand-light`, `brand-dark`, `brand-rose`
+- `backgroundImage`: `gradient-orange`, `gradient-streak`
+- `boxShadow`: `card-warm`
 
-- Not made the default flow — you'll see it as just another card in the admin list with a "Set Default" button
-- No starter-routine generator yet (that was step 2 of the bigger plan; we'll add it after you approve the teach screens)
-- No changes to Quick Start, Self-Care Quiz, or the auth flow
+All values use `hsl(var(--token))` per the design system rule.
 
-## After you preview
+---
 
-Once you like the screens, the next step is to chain them: **What is Rilo? → Auth → Quick Start (3 questions max) → Starter Routine → Home**. That requires touching the first-run routing in `Index.tsx` / `Auth.tsx`, which we'll do as a separate change.
+## Step 2 — Build reusable primitives
+
+New folder: `src/components/brand/`
+
+1. `TaskCard.tsx` — colored emoji circle + subtitle row (time · repeat · goal) + title + SealCheck/empty circle. Auto dark/light via tokens. Props: `task`, `done`, `onToggle`.
+2. `ToolShortcutTile.tsx` — for when shortcuts return. Emoji circle, label, completion dot.
+3. `GlassHeader.tsx` — translucent backdrop-blur header shell with `left | center | right` slots.
+4. `WeekStrip.tsx` — 7-day strip; today filled with `--brand-primary`, past days have green completion dots.
+5. `GradientBanner.tsx` — orange→yellow gradient banner with decorative blob (Quiz/Promo/Mood/Weekly).
+6. `StreakPill.tsx` — gradient flame chip.
+
+(SealCheck already exists — reuse as-is.)
+
+Each primitive uses ONLY semantic tokens (no inline hex). Light/dark handled by CSS vars automatically.
+
+---
+
+## Step 3 — Restyle the nav menu (iOS 18 inspired)
+
+File: `src/layouts/NativeAppLayout.tsx` (the bottom tab bar at lines 214-288).
+
+iOS 18 design cues to apply:
+- **Floating tab bar**: detached from the screen edge — 16px horizontal + 12px bottom margin (above safe area), `rounded-[28px]` pill shape, not full-width.
+- **Heavy glass material**: `bg-card-warm/70 backdrop-blur-2xl backdrop-saturate-150`, hairline border `border border-border-warm/40`, soft shadow `shadow-card-warm`.
+- **Active tab**: pill-shaped soft fill behind the active item using `bg-peach` (light) / `bg-peach-dark` (dark), the icon switches to `text-brand-primary`, label below in solid `text-fg-warm`.
+- **Inactive**: icons + labels in `text-fg-warm-muted`, no fill.
+- **Spring animation**: active pill slides between tabs using `framer-motion` `layoutId="nav-active-pill"` with a spring transition (mass 0.6, stiffness 380, damping 30) — that smooth iOS underline-glide feel.
+- **Filled icons on active**: switch icon set so active uses the solid/filled variant where lucide offers it (`Home` filled via `fill-current`, otherwise stroke 2.5; inactive stroke 1.75).
+- **Badges**: keep functional behavior; restyle to `bg-brand-primary text-white` with a subtle outer ring matching the bar background for the cut-out look.
+- **Player/watch override**: keep the existing dark-glass variant but restyle to the same floating pill (just darker glass) so the language is consistent.
+- **Touch targets**: minimum 48px per tab (currently 44 — bump up).
+- **Haptics**: keep existing light/medium pattern.
+
+Visually: think iOS 18 Apple Music / Photos — a floating capsule that hovers over the content, with a soft pill that morphs between active items.
+
+---
+
+## QA pass (mandatory before declaring done)
+
+1. Light + dark mode at 390x844 — header doesn't clash with glass nav.
+2. Active pill animates smoothly between all 4 tabs.
+3. Badge (chats unread) renders correctly on top of the glass.
+4. Player page (`/app/player`) and Watch pages still get the dark variant.
+5. Mini-player + routine mini-player sit cleanly above the floating bar (may need to bump their `bottom` offset).
+6. Safe-area inset respected on iOS notched devices.
+7. Keyboard-open state still hides the nav (already wired).
+
+---
+
+## Out of scope (next phases)
+
+- Migrating Home, Tools, banners, task cards (Step 3+ in the master plan).
+- Flipping global `--primary` to orange (we do that after all surfaces migrate).
+- Bringing back hidden shortcuts (still hidden behind `{false && ...}`).
+
+---
 
 ## Technical notes
 
-- Reuses `cheerful-bird.png` and `mascot-planner.png` already imported elsewhere — zero new assets
-- `motivational` step type already supports title + subtitle + image + button, so screens 2 & 3 fit cleanly
-- The flow card will show in `/admin/onboarding` with a "Preview" button and step-by-step expansion, matching every other flow
+- All new tokens use HSL space-separated triplets, accessed via `hsl(var(--token))`.
+- Tokens scoped to `.app-theme` only — admin pages unaffected.
+- `framer-motion` already installed; use `LayoutGroup` + `layoutId` for the active pill morph.
+- Mini-player offset: check `MiniPlayer.tsx` and `RoutineMiniPlayer.tsx` for hardcoded `bottom` values that may need a small bump (e.g., 76px → 92px) to clear the floating pill.
+- Update memory after shipping: add `mem://design/orange-theme-tokens` and update `mem://navigation/app-navigation-specs` with the iOS 18 floating capsule note.

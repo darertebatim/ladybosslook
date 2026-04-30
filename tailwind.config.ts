@@ -35,6 +35,52 @@ export default {
 				chip: {
 					lavender: 'hsl(var(--chip-lavender) / <alpha-value>)',
 				},
+				/* ===== Orange Brand Palette ===== */
+				brand: {
+					DEFAULT: 'hsl(var(--brand-primary) / <alpha-value>)',
+					light: 'hsl(var(--brand-primary-light) / <alpha-value>)',
+					dark: 'hsl(var(--brand-primary-dark) / <alpha-value>)',
+					rose: 'hsl(var(--brand-accent-rose) / <alpha-value>)',
+				},
+				'bg-warm': 'hsl(var(--bg-warm) / <alpha-value>)',
+				'surface-warm': 'hsl(var(--surface-warm) / <alpha-value>)',
+				'card-warm': 'hsl(var(--card-warm) / <alpha-value>)',
+				'fg-warm': 'hsl(var(--fg-warm) / <alpha-value>)',
+				'fg-warm-muted': 'hsl(var(--fg-warm-muted) / <alpha-value>)',
+				'border-warm': 'hsl(var(--border-warm) / <alpha-value>)',
+				peach: {
+					DEFAULT: 'hsl(var(--tint-peach) / <alpha-value>)',
+					mid: 'hsl(var(--tint-peach-mid) / <alpha-value>)',
+					dark: 'hsl(var(--tint-peach-dark) / <alpha-value>)',
+				},
+				mint: {
+					DEFAULT: 'hsl(var(--tint-mint) / <alpha-value>)',
+					mid: 'hsl(var(--tint-mint-mid) / <alpha-value>)',
+					dark: 'hsl(var(--tint-mint-dark) / <alpha-value>)',
+				},
+				lavender: {
+					DEFAULT: 'hsl(var(--tint-lavender) / <alpha-value>)',
+					mid: 'hsl(var(--tint-lavender-mid) / <alpha-value>)',
+					dark: 'hsl(var(--tint-lavender-dark) / <alpha-value>)',
+				},
+				yellow: {
+					DEFAULT: 'hsl(var(--tint-yellow) / <alpha-value>)',
+					mid: 'hsl(var(--tint-yellow-mid) / <alpha-value>)',
+					dark: 'hsl(var(--tint-yellow-dark) / <alpha-value>)',
+				},
+				pink: {
+					DEFAULT: 'hsl(var(--tint-pink) / <alpha-value>)',
+					mid: 'hsl(var(--tint-pink-mid) / <alpha-value>)',
+					dark: 'hsl(var(--tint-pink-dark) / <alpha-value>)',
+				},
+				lime: {
+					mid: 'hsl(var(--tint-lime-mid) / <alpha-value>)',
+					dark: 'hsl(var(--tint-lime-dark) / <alpha-value>)',
+				},
+				sky: {
+					mid: 'hsl(var(--tint-sky-mid) / <alpha-value>)',
+					dark: 'hsl(var(--tint-sky-dark) / <alpha-value>)',
+				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					light: 'hsl(var(--primary-light))',
@@ -246,7 +292,9 @@ export default {
 				'gradient-luxury-text': 'var(--gradient-luxury-text)',
 				'gradient-urgency': 'var(--gradient-urgency)',
 				'gradient-cta': 'var(--gradient-cta)',
-				'gradient-success': 'var(--gradient-success)'
+				'gradient-success': 'var(--gradient-success)',
+				'gradient-orange': 'var(--gradient-orange)',
+				'gradient-streak': 'var(--gradient-streak)'
 			},
 			boxShadow: {
 				'soft': 'var(--shadow-soft)',
@@ -256,7 +304,8 @@ export default {
 				'luxury': 'var(--shadow-luxury)',
 				'luxury-glow': 'var(--shadow-luxury-glow)',
 				'urgency': 'var(--shadow-urgency)',
-				'cta': 'var(--shadow-cta)'
+				'cta': 'var(--shadow-cta)',
+				'card-warm': 'var(--shadow-card-warm)'
 			}
 		}
 	},

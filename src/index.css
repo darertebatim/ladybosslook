@@ -333,6 +333,47 @@ html.native-app [data-scroll-container="true"] {
     --shadow-soft: 0 2px 8px -2px hsl(0 0% 0% / 0.08);
     --shadow-medium: 0 4px 16px -4px hsl(0 0% 0% / 0.12);
     --shadow-bold: 0 8px 32px -8px hsl(0 0% 0% / 0.16);
+
+    /* ===== Orange Brand Palette (Rilo) — additive, used by migrated surfaces ===== */
+    --brand-primary: 14 82% 56%;          /* #EB5E33 */
+    --brand-primary-light: 36 91% 55%;    /* #F5A623 */
+    --brand-primary-dark: 13 70% 39%;     /* #A63520 */
+    --brand-accent-rose: 336 71% 45%;     /* #C2255C */
+
+    /* Warm surfaces */
+    --bg-warm: 28 100% 97%;               /* #FFF8F3 */
+    --surface-warm: 28 100% 96%;          /* #FFF4ED */
+    --card-warm: 30 60% 99%;              /* #FFFDFB */
+    --fg-warm: 22 53% 12%;                /* #2D1A0E */
+    --fg-warm-muted: 23 22% 45%;          /* #8B6E5A */
+    --border-warm: 27 67% 87%;            /* #F5DCC8 */
+
+    /* Soft tints (light mode) */
+    --tint-peach: 31 100% 89%;            /* #FFE6C9 */
+    --tint-peach-mid: 30 100% 81%;        /* #FFD2A1 */
+    --tint-mint: 152 71% 93%;             /* #E2F9F0 */
+    --tint-mint-mid: 152 71% 85%;         /* #C3F1E1 */
+    --tint-lavender: 270 100% 95%;        /* #F0E3FF */
+    --tint-lavender-mid: 270 100% 88%;    /* #DEC1FF */
+    --tint-yellow: 56 100% 79%;           /* #FFF492 */
+    --tint-yellow-mid: 54 100% 65%;       /* #FFEA4E */
+    --tint-pink: 320 100% 94%;            /* #FFE0F5 */
+    --tint-pink-mid: 320 100% 88%;        /* #FFC2EA */
+    --tint-lime-mid: 85 84% 75%;          /* #C9F588 */
+    --tint-sky-mid: 217 100% 86%;         /* #B9D6FF */
+
+    /* Jewel-tone dark variants (used by dark mode tints) */
+    --tint-peach-dark: 25 39% 17%;        /* #3D2A1A */
+    --tint-mint-dark: 158 28% 14%;        /* #1A2E26 */
+    --tint-lavender-dark: 263 30% 17%;    /* #2A1F3A */
+    --tint-yellow-dark: 44 58% 14%;       /* #3A3010 */
+    --tint-pink-dark: 327 38% 16%;        /* #3A1A2A */
+    --tint-sky-dark: 218 38% 16%;         /* #1A2638 */
+    --tint-lime-dark: 124 22% 15%;        /* #1E3020 */
+
+    --gradient-orange: linear-gradient(135deg, hsl(var(--brand-primary-light)) 0%, hsl(var(--brand-primary)) 100%);
+    --gradient-streak: linear-gradient(135deg, hsl(var(--brand-primary-light)), hsl(var(--brand-primary)));
+    --shadow-card-warm: 0 1px 2px hsl(22 53% 12% / 0.06), 0 6px 18px hsl(22 53% 12% / 0.08);
   }
 
   .app-theme.dark,
@@ -379,6 +420,37 @@ html.native-app [data-scroll-container="true"] {
     --shadow-soft: 0 2px 8px -2px hsl(0 0% 0% / 0.4);
     --shadow-medium: 0 4px 16px -4px hsl(0 0% 0% / 0.5);
     --shadow-bold: 0 8px 32px -8px hsl(0 0% 0% / 0.6);
+
+    /* ===== Orange Brand Palette — Dark Mode ===== */
+    --brand-primary: 14 82% 56%;
+    --brand-primary-light: 36 91% 55%;
+    --brand-primary-dark: 13 70% 39%;
+    --brand-accent-rose: 336 71% 45%;
+
+    --bg-warm: 22 53% 6%;                 /* #1A0F08 */
+    --surface-warm: 22 50% 12%;           /* #2A1A10 */
+    --card-warm: 22 50% 9%;               /* #1F140B */
+    --fg-warm: 28 100% 96%;               /* #FFF4ED */
+    --fg-warm-muted: 27 28% 65%;          /* #BFA08A */
+    --border-warm: 22 38% 17%;            /* #3D2A1A */
+
+    /* In dark mode, the "soft" tints become the jewel-tone deeps */
+    --tint-peach: 25 39% 17%;
+    --tint-peach-mid: 25 39% 22%;
+    --tint-mint: 158 28% 14%;
+    --tint-mint-mid: 158 28% 19%;
+    --tint-lavender: 263 30% 17%;
+    --tint-lavender-mid: 263 30% 23%;
+    --tint-yellow: 44 58% 14%;
+    --tint-yellow-mid: 44 58% 20%;
+    --tint-pink: 327 38% 16%;
+    --tint-pink-mid: 327 38% 22%;
+    --tint-lime-mid: 124 22% 15%;
+    --tint-sky-mid: 218 38% 16%;
+
+    --gradient-orange: linear-gradient(135deg, hsl(var(--brand-primary-light)) 0%, hsl(var(--brand-primary)) 100%);
+    --gradient-streak: linear-gradient(135deg, hsl(var(--brand-primary-light)), hsl(var(--brand-primary)));
+    --shadow-card-warm: 0 1px 2px hsl(0 0% 0% / 0.5), 0 6px 18px hsl(0 0% 0% / 0.45);
   }
 }
 

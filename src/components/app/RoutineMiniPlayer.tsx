@@ -57,7 +57,7 @@ export function RoutineMiniPlayer() {
   return (
     <div
       className={cn(
-        "fixed bottom-[calc(64px+env(safe-area-inset-bottom))] left-2 right-2 z-40",
+        "fixed bottom-[calc(88px+env(safe-area-inset-bottom))] left-2 right-2 z-40",
         "rounded-2xl overflow-hidden cursor-pointer",
         "animate-in slide-in-from-bottom-4 duration-300",
         "shadow-lg"
