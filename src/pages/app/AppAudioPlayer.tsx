@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
 
 import { CachedImage } from "@/components/ui/CachedImage";
-import heroStormVideo from "@/assets/watch-hero-storm.mp4";
+
 import { useShareContent } from "@/hooks/useShareContent";
 
 export default function AppAudioPlayer() {
