@@ -2104,51 +2104,43 @@ function WelcomeAboardScreen({ step, onNext }: Props) {
   };
 
   return (
-    <ScreenWrapper>
-      <div className="flex-1 flex flex-col px-1 pt-2">
-        {/* Headline + sub */}
-        <FadeUp delay={0.05}>
-          <h1 className="text-[30px] leading-[1.1] font-extrabold text-[#1a1f3d] tracking-tight">
-            Never miss a task.
-          </h1>
-        </FadeUp>
-        <FadeUp delay={0.12}>
-          <p className="mt-3 text-[15px] text-[#1a1f3d]/70 leading-relaxed max-w-[320px]">
-            We&apos;ll send gentle, tailored nudges so you stay on top of even the most hectic days.
-          </p>
-        </FadeUp>
-
-        {/* Phone mockup with notification */}
-        <FadeUp delay={0.22} className="flex-1 flex items-center justify-center mt-4">
-          <div className="relative w-[240px] aspect-[9/18.5]">
-            {/* Phone frame */}
-            <div className="absolute inset-0 rounded-[36px] bg-[#1a1f3d] shadow-[0_30px_60px_-20px_rgba(26,31,61,0.45)]" />
-            <div className="absolute inset-[6px] rounded-[30px] bg-gradient-to-b from-[#EEF1FA] via-[#F5F0FB] to-[#FBE9EE] overflow-hidden">
+    <div className="h-full w-full flex flex-col relative overflow-hidden bg-gradient-to-b from-[#FFF7F0] via-white to-[#F4F1FF]">
+      {/* ───── Visual: top-half of iPhone (clipped) ───── */}
+      <div className="flex-1 flex items-end justify-center px-6 pt-6 relative z-10 min-h-0 overflow-hidden">
+        <FadeUp delay={0.18} className="w-full flex justify-center">
+          {/* Container clips bottom half of phone */}
+          <div
+            className="relative w-[260px]"
+            style={{ height: 'min(360px, 55vh)' }}
+          >
+            {/* Phone frame — taller than container so bottom is clipped */}
+            <div className="absolute left-0 right-0 top-0 h-[520px] rounded-[40px] bg-[#1a1f3d] shadow-[0_30px_60px_-20px_rgba(26,31,61,0.45)]" />
+            <div className="absolute left-[6px] right-[6px] top-[6px] h-[508px] rounded-[34px] bg-gradient-to-b from-[#EEF1FA] via-[#F5F0FB] to-[#FBE9EE] overflow-hidden">
               {/* Notch */}
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[80px] h-[20px] rounded-full bg-[#1a1f3d]" />
+              <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[88px] h-[22px] rounded-full bg-[#1a1f3d]" />
 
               {/* Lock-screen time */}
-              <div className="pt-12 text-center">
-                <p className="text-[11px] font-medium text-[#1a1f3d]/60">Monday, June 6</p>
-                <p className="text-[44px] font-light text-[#1a1f3d] leading-none mt-1">9:41</p>
+              <div className="pt-14 text-center">
+                <p className="text-[12px] font-medium text-[#1a1f3d]/60">Monday, June 6</p>
+                <p className="text-[56px] font-light text-[#1a1f3d] leading-none mt-1">9:41</p>
               </div>
 
-              {/* Notification card */}
+              {/* Notification card — positioned in upper portion so it's visible after clip */}
               <motion.div
                 initial={{ y: 24, opacity: 0, scale: 0.96 }}
                 animate={{ y: 0, opacity: 1, scale: 1 }}
                 transition={{ delay: 0.55, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="absolute left-3 right-3 bottom-6 bg-white/90 backdrop-blur-md rounded-[18px] px-3 py-2.5 shadow-[0_8px_20px_-8px_rgba(0,0,0,0.15)] flex items-start gap-2.5"
+                className="absolute left-3 right-3 top-[200px] bg-white/95 backdrop-blur-md rounded-[18px] px-3 py-2.5 shadow-[0_8px_20px_-8px_rgba(0,0,0,0.15)] flex items-start gap-2.5"
               >
-                <div className="w-7 h-7 rounded-[8px] bg-[#1a1f3d] flex items-center justify-center shrink-0">
-                  <FluentEmoji emoji="🔔" size={16} />
+                <div className="w-8 h-8 rounded-[8px] bg-[#1a1f3d] flex items-center justify-center shrink-0">
+                  <FluentEmoji emoji="🔔" size={18} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-[11px] font-semibold text-[#1a1f3d] truncate">Rilo</p>
                     <p className="text-[9px] text-[#1a1f3d]/50">now</p>
                   </div>
-                  <p className="text-[11px] font-semibold text-[#1a1f3d] mt-0.5 leading-tight">
+                  <p className="text-[12px] font-semibold text-[#1a1f3d] mt-0.5 leading-tight">
                     Time for your morning reset ☀️
                   </p>
                   <p className="text-[10px] text-[#1a1f3d]/70 leading-snug mt-0.5">
@@ -2157,19 +2149,43 @@ function WelcomeAboardScreen({ step, onNext }: Props) {
                 </div>
               </motion.div>
             </div>
+
+            {/* Soft fade at the clip line so the phone "dissolves" rather than gets cut */}
+            <div
+              aria-hidden
+              className="absolute left-0 right-0 bottom-0 h-20 pointer-events-none"
+              style={{
+                background:
+                  'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.85) 70%, rgba(255,255,255,1) 100%)',
+              }}
+            />
           </div>
         </FadeUp>
       </div>
-      <FadeUp delay={0.3} className="mt-auto sticky bottom-0 bg-white pb-1">
-        <NavyButton onClick={handleEnable}>Turn on notifications</NavyButton>
-        <button
-          onClick={onNext}
-          className="w-full py-3 text-sm text-[#1a1f3d]/50 font-medium active:opacity-60 mt-2"
-        >
-          Maybe later
-        </button>
-      </FadeUp>
-    </ScreenWrapper>
+
+      {/* ───── Text + CTAs (matches RiloTeach pattern) ───── */}
+      <div className="shrink-0 px-6 pb-8 relative z-10">
+        <FadeUp>
+          <h1 className="text-[26px] leading-[1.2] font-extrabold text-[#1a1f3d] text-center">
+            Never miss a task.
+          </h1>
+        </FadeUp>
+        <FadeUp delay={0.08}>
+          <p className="mt-2 text-[14px] text-[#1a1f3d]/65 text-center leading-snug">
+            We&apos;ll send gentle, tailored nudges so you stay on top of even the most hectic days.
+          </p>
+        </FadeUp>
+        <FadeUp delay={0.16} className="mt-5">
+          <NavyButton onClick={handleEnable}>Turn on notifications</NavyButton>
+          <button
+            onClick={onNext}
+            className="w-full py-3 text-sm text-[#1a1f3d]/50 font-medium active:opacity-60 mt-2"
+          >
+            Maybe later
+          </button>
+        </FadeUp>
+      </div>
+    </div>
   );
 }
 
