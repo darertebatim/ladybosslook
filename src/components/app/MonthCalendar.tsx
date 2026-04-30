@@ -4,14 +4,11 @@ import { cn } from '@/lib/utils';
 import { Star } from 'lucide-react';
 import type { BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 
-import coinBronze from '@/assets/coin-bronze.png';
-import coinSilver from '@/assets/coin-silver.png';
-import coinGold from '@/assets/coin-gold.png';
-
-const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
-  bronze: coinBronze,
-  silver: coinSilver,
-  gold: coinGold,
+// Compact dot colors per badge tier (Option B: dot under day number)
+const BADGE_DOT_COLORS: Record<Exclude<BadgeLevel, 'none'>, string> = {
+  bronze: '#CD7F32',
+  silver: '#C0C0C0',
+  gold: '#F5B400',
 };
 
 interface DayStats {
@@ -96,10 +93,9 @@ export const MonthCalendar = ({
                   className={cn(
                     'w-11 h-11 rounded-2xl flex flex-col items-center justify-center transition-all relative',
                     !isCurrentMonth && 'opacity-30',
-                    isCurrentMonth && !isSelected && !isTodayDate && !hasBadge && 'text-fg-warm active:bg-bg-warm',
-                    isSelected && !hasBadge && 'bg-brand text-white scale-105',
-                    !isSelected && isTodayDate && isCurrentMonth && !hasBadge && 'text-brand',
-                    hasBadge && isSelected && 'ring-2 ring-brand ring-offset-0'
+                    isCurrentMonth && !isSelected && !isTodayDate && 'text-fg-warm active:bg-bg-warm',
+                    isSelected && 'bg-brand text-white scale-105',
+                    !isSelected && isTodayDate && isCurrentMonth && 'text-brand'
                   )}
                 >
                   {hasProgramEvents && isCurrentMonth && (
@@ -108,20 +104,19 @@ export const MonthCalendar = ({
                       isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500"
                     )} />
                   )}
-                  {hasBadge && isCurrentMonth ? (
-                    <img 
-                      src={BADGE_IMAGES[badgeLevel]} 
-                      alt={`${badgeLevel} badge`}
-                      className="absolute inset-0 w-full h-full object-cover"
+                  <span className={cn(
+                    'text-[15px] font-bold leading-none',
+                    isSelected && 'text-white',
+                    !isCurrentMonth && 'text-fg-warm-muted/50'
+                  )}>
+                    {format(dateItem, 'd')}
+                  </span>
+                  {hasBadge && isCurrentMonth && (
+                    <span
+                      className="absolute bottom-1.5 w-1.5 h-1.5 rounded-full"
+                      style={{ backgroundColor: isSelected ? '#ffffff' : BADGE_DOT_COLORS[badgeLevel] }}
+                      aria-label={`${badgeLevel} badge`}
                     />
-                  ) : (
-                    <span className={cn(
-                      'text-[15px] font-bold leading-none',
-                      isSelected && 'text-white',
-                      !isCurrentMonth && 'text-fg-warm-muted/50'
-                    )}>
-                      {format(dateItem, 'd')}
-                    </span>
                   )}
                 </div>
               </button>
