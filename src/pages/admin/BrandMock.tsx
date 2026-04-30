@@ -830,8 +830,15 @@ export default function BrandMock() {
         </p>
       </div>
 
-      <div className="flex justify-center">
-        <ListenPhoneFrame darkMode={darkMode} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-items-center">
+        <div className="space-y-2">
+          <p className="text-xs text-muted-foreground text-center">Without clouds</p>
+          <ListenPhoneFrame darkMode={darkMode} clouds={false} />
+        </div>
+        <div className="space-y-2">
+          <p className="text-xs text-muted-foreground text-center">With clouds (hero strip)</p>
+          <ListenPhoneFrame darkMode={darkMode} clouds={true} />
+        </div>
       </div>
 
       {/* Color reference */}
@@ -853,7 +860,7 @@ const LISTEN_PLAYLISTS = [
   { id: 4, type: 'Podcast',  dur: '1m',     title: 'Goals from Our Podcast',             emoji: '🎙️',   free: true,  locked: false, color: O.mint,     darkColor: O.mintDark },
 ];
 
-function ListenPhoneFrame({ darkMode }: { darkMode: boolean }) {
+function ListenPhoneFrame({ darkMode, clouds = false }: { darkMode: boolean; clouds?: boolean }) {
   // Pure white (light) / near-black (dark) — matches `--background` on Home.
   const bg       = darkMode ? '#0A0A0A' : '#FFFFFF';
   const cardBg   = darkMode ? '#1A1410' : '#FFFFFF';
@@ -876,6 +883,28 @@ function ListenPhoneFrame({ darkMode }: { darkMode: boolean }) {
         minHeight: 780,
       }}
     >
+      {/* Optional cloud hero strip — top 320px, fades into white surface */}
+      {clouds && (
+        <div className="absolute top-0 left-0 right-0 h-[320px] overflow-hidden pointer-events-none z-0">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            src={heroStormVideo}
+            className="w-full h-full object-cover"
+            style={{ opacity: darkMode ? 0.55 : 0.7 }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(180deg, transparent 0%, transparent 55%, ${bg} 100%)`,
+            }}
+          />
+        </div>
+      )}
+
+      <div className="relative z-10">
       {/* Status bar */}
       <div className="flex items-center justify-between px-8 pt-4 pb-2">
         <span className="text-xs font-semibold" style={{ color: fgMuted }}>9:41</span>
