@@ -607,10 +607,10 @@ export const TaskCard = memo(function TaskCard({
                 {completedCount}/{totalSubtasks}
               </span>
             )}
-            <span className="text-[11px] text-black/60">{formatTime(task)}</span>
-            <span className="text-[11px] text-black/60">• {repeatLabel}</span>
+            <span className="text-[11px] text-fg-warm-muted">{formatTime(task)}</span>
+            <span className="text-[11px] text-fg-warm-muted">• {repeatLabel}</span>
             {hasGoal && (
-              <span className="text-[11px] text-black/60 font-medium">• {(() => {
+              <span className="text-[11px] text-fg-warm-muted font-medium">• {(() => {
                 const label = formatGoalLabel();
                 if (typeof label === 'string') return label;
                 if (label) return <>{label.prefix}<AnimatedProgress value={label.progress} />{label.suffix}</>;
