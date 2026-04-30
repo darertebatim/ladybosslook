@@ -17,7 +17,6 @@ import { PaywallSheet } from "@/components/app/PaywallSheet";
 import { haptic } from "@/lib/haptics";
 import { PersianFlag } from "@/components/ui/PersianFlag";
 import { useScrollRestore } from "@/hooks/useScrollRestore";
-import heroStormVideo from "@/assets/watch-hero-storm.mp4";
 import { useUserPreferredLanguage, preferredLanguageSorter } from "@/hooks/useUserPreferredLanguage";
 import { LanguagePreferencePopup, shouldShowLanguagePopup } from "@/components/app/LanguagePreferencePopup";
 import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
