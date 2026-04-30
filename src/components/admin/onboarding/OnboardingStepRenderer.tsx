@@ -4078,7 +4078,7 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
         </FadeUp>
         <FadeUp delay={0.08}>
           <p className="mt-3 text-[15.5px] text-[#1a1f3d]/75 text-center leading-[1.45] font-medium">
-            We picked the 3 most popular self-care tools to anchor your day.
+            We picked the 3 most popular self-care tools.
           </p>
         </FadeUp>
 
