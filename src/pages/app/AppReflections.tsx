@@ -14,6 +14,7 @@ import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { useShareContent } from '@/hooks/useShareContent';
+import { SlideUpPage, useSlideClose } from '@/components/app/SlideUpPage';
 
 const SYNTHETIC_REFLECTION_TASK: RoutinePlanTask = {
   id: 'synthetic-reflection-task',
@@ -31,8 +32,18 @@ const SYNTHETIC_REFLECTION_TASK: RoutinePlanTask = {
 };
 
 export default function AppReflections() {
+  return (
+    <SlideUpPage defaultBack="/app/home">
+      <AppReflectionsInner />
+    </SlideUpPage>
+  );
+}
+
+function AppReflectionsInner() {
   const navigate = useNavigate();
   const goBack = useGoBack('/app/home');
+  const slideCtx = useSlideClose();
+  const handleBack = () => (slideCtx ? slideCtx.slideClose() : goBack());
   const { data: reflections, isLoading } = useReflections();
   const { isSubscribed } = useSubscription();
 
@@ -75,7 +86,7 @@ export default function AppReflections() {
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center justify-between pt-1 pb-2 px-4">
-          <button onClick={() => goBack()} className="active:scale-95 transition-transform">
+          <button onClick={handleBack} className="active:scale-95 transition-transform">
             <ArrowLeft className="h-6 w-6" />
           </button>
           <h1 className="text-lg font-semibold">Reflections Journal</h1>
