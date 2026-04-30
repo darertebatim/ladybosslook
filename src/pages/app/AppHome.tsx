@@ -1023,23 +1023,27 @@ const AppHome = () => {
                             ? 'bg-[hsl(var(--brand-primary))] text-white scale-105 shadow-[0_4px_12px_hsl(var(--brand-primary)/0.35)]'
                             : isTodayDate
                               ? 'border border-foreground/15 text-foreground'
-                              : 'text-fg-warm-muted'
+                              : 'text-fg-warm-muted',
+                          hasBadge && isSelected && 'ring-2 ring-[hsl(var(--brand-primary)/0.3)] ring-offset-0'
                         )}>
                           {hasProgramEvents && (
                             <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5 z-20", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />
                           )}
-                          <span className={cn('text-[10px] font-medium leading-none', isSelected ? 'text-white/85' : 'text-fg-warm-muted')}>
-                            {format(day, 'EEE')}
-                          </span>
-                          <span className={cn('text-sm font-bold leading-none', isSelected && 'text-white')}>
-                            {format(day, 'd')}
-                          </span>
-                          {hasBadge && (
+                          {hasBadge && !isSelected ? (
                             <img
                               src={BADGE_IMAGES[badgeLevel]}
                               alt={`${badgeLevel} badge`}
-                              className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full z-10 drop-shadow-sm"
+                              className="absolute inset-0 w-full h-full object-cover rounded-full"
                             />
+                          ) : (
+                            <>
+                              <span className={cn('text-[10px] font-medium leading-none', isSelected ? 'text-white/85' : 'text-fg-warm-muted')}>
+                                {format(day, 'EEE')}
+                              </span>
+                              <span className={cn('text-sm font-bold leading-none', isSelected && 'text-white')}>
+                                {format(day, 'd')}
+                              </span>
+                            </>
                           )}
                         </div>
                       </button>;
