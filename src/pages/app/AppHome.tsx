@@ -1214,14 +1214,14 @@ const AppHome = () => {
                           <div className="flex gap-2 mt-3">
                             <button
                               onClick={() => navigate('/app/routineplayer')}
-                              className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm border-[0.5px] border-border-warm/40 text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+                              className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
                             >
                               <Settings2 className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
                               Manage Routines
                             </button>
                             <button
                               onClick={() => navigate('/app/routines')}
-                              className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm border-[0.5px] border-border-warm/40 text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+                              className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
                             >
                               <Search className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
                               Browse Library
@@ -1332,14 +1332,14 @@ const AppHome = () => {
                               <div className="flex gap-2 mt-3">
                                 <button
                                   onClick={() => navigate('/app/routineplayer')}
-                                  className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm border-[0.5px] border-border-warm/40 text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+                                  className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
                                 >
                                   <Settings2 className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
                                   Manage Routines
                                 </button>
                                 <button
                                   onClick={() => navigate('/app/routines')}
-                                  className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm border-[0.5px] border-border-warm/40 text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+                                  className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
                                 >
                                   <Search className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
                                   Browse Library
