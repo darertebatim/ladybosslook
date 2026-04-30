@@ -284,7 +284,7 @@ export default function AppPlayer() {
   return (
     <div className="relative flex flex-col h-full overflow-hidden bg-background">
       {/* Cloud hero strip — sticks to the top of the page, scrolls away with content */}
-      <div ref={heroRef} className="absolute top-0 left-0 right-0 z-0 h-[340px] overflow-hidden pointer-events-none" style={{ transform: `translateY(${-scrollY * 0.25}px)` }}>
+      <div ref={heroRef} className="absolute top-0 left-0 right-0 z-0 h-[300px] overflow-hidden pointer-events-none" style={{ transform: `translateY(${-scrollY * 0.25}px)` }}>
         <video autoPlay muted loop playsInline className="w-full h-full object-cover" src={heroStormVideo} style={{ opacity: 0.9 }} />
         {/* Seamless fade: transparent → background. No dark band. */}
         <div
@@ -318,7 +318,7 @@ export default function AppPlayer() {
               </div>
             ) : (
               <>
-                <h1 className="text-2xl font-bold text-foreground tracking-tight">Listen</h1>
+                <h1 className="text-2xl font-bold text-fg-warm tracking-tight">Listen</h1>
                 <div className="flex items-center gap-2">
                   {startTour && <TourHelpButton onClick={startTour} />}
                   <IOSIconButton size="sm" onClick={() => setShowSearch(true)} className="tour-player-search" aria-label="Search">
@@ -357,7 +357,7 @@ export default function AppPlayer() {
                         'shrink-0 px-3.5 py-1.5 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all active:scale-95',
                         active
                           ? 'bg-brand text-white shadow-ios'
-                          : 'bg-peach text-muted-foreground'
+                          : 'bg-peach text-fg-warm-muted'
                       )}
                     >
                       {config.name}
@@ -383,8 +383,8 @@ export default function AppPlayer() {
                   className={cn(
                     'px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all active:scale-95',
                     progressFilter === filter
-                      ? 'bg-card text-foreground shadow-ios'
-                      : 'bg-transparent text-muted-foreground'
+                      ? 'bg-card text-fg-warm shadow-ios'
+                      : 'bg-transparent text-fg-warm-muted'
                   )}
                 >
                   {filter === 'all' ? 'All' : filter === 'in_progress' ? 'In Progress' : 'Completed'}
@@ -471,7 +471,7 @@ export default function AppPlayer() {
 
           {/* All Playlists Section */}
           <div className="space-y-3 tour-playlists">
-            <h2 className="tour-playlists-header text-[11px] font-bold text-muted-foreground uppercase tracking-[0.12em]">
+            <h2 className="tour-playlists-header text-[11px] font-bold text-fg-warm-muted uppercase tracking-[0.12em]">
               {selectedCategory === 'all' ? 'All Playlists' : categoryConfig[selectedCategory]?.name || selectedCategory}
             </h2>
             

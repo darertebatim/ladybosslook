@@ -129,7 +129,7 @@ export const PlaylistCard = memo(function PlaylistCard({
         {/* Content */}
         <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
           {/* Meta line: category + duration */}
-          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+          <div className="flex items-center gap-1.5 text-[11px] text-fg-warm-muted">
             {category && (
               <span className="capitalize">{category}</span>
             )}
@@ -140,7 +140,7 @@ export const PlaylistCard = memo(function PlaylistCard({
           </div>
 
           {/* Title */}
-          <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
+          <h3 className="font-bold text-sm text-fg-warm line-clamp-2 leading-snug">
             {name}
           </h3>
 
@@ -163,7 +163,7 @@ export const PlaylistCard = memo(function PlaylistCard({
                 : LANG_FLAGS[language] && <span className="text-[10px] flex-shrink-0 leading-none">{LANG_FLAGS[language]}</span>
             )}
             {(!isLocked || isFree) && progressPercentage > 0 && (
-              <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground font-medium">
+              <span className="flex items-center gap-0.5 text-[10px] text-fg-warm-muted font-medium">
                 <CheckCircle2 className="h-3 w-3" />
                 {Math.round(progressPercentage)}%
               </span>
@@ -177,7 +177,7 @@ export const PlaylistCard = memo(function PlaylistCard({
 
       {/* Enroll CTA for locked playlists */}
       {isLocked && !isFree && programSlug && (
-        <div className="flex items-center justify-center gap-1.5 py-2.5 px-3 bg-bg-warm text-primary text-xs font-semibold border-t border-border">
+        <div className="flex items-center justify-center gap-1.5 py-2.5 px-3 bg-peach text-brand text-xs font-semibold border-t border-border">
           <span>Tap to enroll</span>
           <ChevronRight className="h-3.5 w-3.5" />
         </div>
