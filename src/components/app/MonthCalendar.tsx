@@ -96,10 +96,9 @@ export const MonthCalendar = ({
                   className={cn(
                     'w-11 h-11 rounded-2xl flex flex-col items-center justify-center transition-all relative',
                     !isCurrentMonth && 'opacity-30',
-                    isCurrentMonth && !isSelected && !isTodayDate && !hasBadge && 'text-fg-warm active:bg-bg-warm',
-                    isSelected && !hasBadge && 'bg-brand text-white scale-105',
-                    !isSelected && isTodayDate && isCurrentMonth && !hasBadge && 'text-brand',
-                    hasBadge && isSelected && 'ring-2 ring-brand ring-offset-0'
+                    isCurrentMonth && !isSelected && !isTodayDate && 'text-fg-warm active:bg-bg-warm',
+                    isSelected && 'bg-brand text-white scale-105',
+                    !isSelected && isTodayDate && isCurrentMonth && !hasBadge && 'text-brand'
                   )}
                 >
                   {hasProgramEvents && isCurrentMonth && (
@@ -108,21 +107,21 @@ export const MonthCalendar = ({
                       isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500"
                     )} />
                   )}
-                  {hasBadge && isCurrentMonth ? (
-                    <img 
-                      src={BADGE_IMAGES[badgeLevel]} 
+                  {hasBadge && isCurrentMonth && !isSelected && (
+                    <img
+                      src={BADGE_IMAGES[badgeLevel]}
                       alt={`${badgeLevel} badge`}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      className="absolute inset-0 w-full h-full object-contain opacity-60 pointer-events-none"
                     />
-                  ) : (
-                    <span className={cn(
-                      'text-[15px] font-bold leading-none',
-                      isSelected && 'text-white',
-                      !isCurrentMonth && 'text-fg-warm-muted/50'
-                    )}>
-                      {format(dateItem, 'd')}
-                    </span>
                   )}
+                  <span className={cn(
+                    'relative z-10 text-[15px] font-bold leading-none',
+                    isSelected && 'text-white',
+                    !isCurrentMonth && 'text-fg-warm-muted/50',
+                    hasBadge && !isSelected && isCurrentMonth && 'text-fg-warm drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
+                  )}>
+                    {format(dateItem, 'd')}
+                  </span>
                 </div>
               </button>
             );
