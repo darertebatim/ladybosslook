@@ -4073,12 +4073,12 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
       <div className="shrink-0 px-6 pb-8 relative z-10">
         <FadeUp>
           <h1 className="text-[26px] leading-[1.2] font-extrabold text-[#1a1f3d] text-center">
-            Your first Daily Reset
+            3 tools. One daily routine.
           </h1>
         </FadeUp>
         <FadeUp delay={0.08}>
           <p className="mt-2 text-[14px] text-[#1a1f3d]/65 text-center leading-snug">
-            A simple daily routine to help you take control of your life.
+            We picked the 3 most popular self-care tools — Mood, Breathe & Journal — for your daily reset.
           </p>
         </FadeUp>
 
