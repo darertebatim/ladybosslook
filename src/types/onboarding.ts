@@ -54,7 +54,8 @@ export type OnboardingStepType =
   | 'rilo-pick-tasks'
   | 'rilo-week-plans'
   | 'rilo-building-plan'
-  | 'rilo-commit';
+  | 'rilo-commit'
+  | 'rilo-language-bubbles';
 
 export interface OnboardingOptionVariant {
   cluster: string;
