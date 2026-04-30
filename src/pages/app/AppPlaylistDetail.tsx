@@ -754,7 +754,7 @@ export default function AppPlaylistDetail() {
         {/* Continue Button */}
         {hasAccess && totalItems > 0 && (
           <div className="flex items-center gap-2 w-full">
-            <Button onClick={handleContinue} size="lg" className="flex-1 tour-continue-btn bg-card text-[hsl(var(--background))] active:bg-foreground/80">
+            <Button onClick={handleContinue} size="lg" className="flex-1 tour-continue-btn bg-brand text-white active:bg-brand/90">
               <Play className="h-5 w-5 mr-1" />
               {getNextPlayableItem() ? 'Continue' : 'Play'}
             </Button>
@@ -779,7 +779,7 @@ export default function AppPlaylistDetail() {
               </p>
             </div>
             <Button 
-              className="w-full bg-card text-[hsl(var(--background))] active:bg-foreground/80" 
+              className="w-full bg-brand text-white active:bg-brand/90" 
               size="lg"
               onClick={() => activatePlaylistMutation.mutate()}
               disabled={activatePlaylistMutation.isPending}
@@ -798,7 +798,7 @@ export default function AppPlaylistDetail() {
               </p>
             </div>
             <Button 
-              className="w-full gap-2 bg-card text-[hsl(var(--background))] active:bg-foreground/80" 
+              className="w-full gap-2 bg-brand text-white active:bg-brand/90" 
               size="lg"
               onClick={() => setShowPaywall(true)}
             >
@@ -818,7 +818,7 @@ export default function AppPlaylistDetail() {
             </div>
             {playlist.program_slug && (
               <Button 
-                className="w-full bg-card text-[hsl(var(--background))] active:bg-foreground/80" 
+                className="w-full bg-brand text-white active:bg-brand/90" 
                 size="lg"
                 onClick={() => navigate(`/app/programs/${playlist.program_slug}`)}
               >
