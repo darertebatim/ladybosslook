@@ -74,10 +74,12 @@ export default {
 					dark: 'hsl(var(--tint-pink-dark) / <alpha-value>)',
 				},
 				lime: {
+					DEFAULT: 'hsl(var(--tint-lime) / <alpha-value>)',
 					mid: 'hsl(var(--tint-lime-mid) / <alpha-value>)',
 					dark: 'hsl(var(--tint-lime-dark) / <alpha-value>)',
 				},
 				sky: {
+					DEFAULT: 'hsl(var(--tint-sky) / <alpha-value>)',
 					mid: 'hsl(var(--tint-sky-mid) / <alpha-value>)',
 					dark: 'hsl(var(--tint-sky-dark) / <alpha-value>)',
 				},
