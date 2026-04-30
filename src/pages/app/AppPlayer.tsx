@@ -383,12 +383,12 @@ export default function AppPlayer() {
             {/* Language Selector */}
             <Popover>
               <PopoverTrigger asChild>
-                <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-medium bg-white/15 text-white backdrop-blur-md shadow-ios active:scale-95">
+                <IOSIconButton variant="dark" size="sm" aria-label="Language">
                   {selectedLang.value === 'persian'
                     ? <PersianFlag size={14} />
-                    : <span className="text-sm">{selectedLang.flag}</span>
+                    : <span className="text-base leading-none">{selectedLang.flag}</span>
                   }
-                </button>
+                </IOSIconButton>
               </PopoverTrigger>
               <PopoverContent align="end" className="w-40 p-1 bg-[#1a2d4a]/95 backdrop-blur-xl border-white/10">
                 {LANGUAGE_OPTIONS.map((lang) => (
