@@ -895,10 +895,13 @@ function ListenPhoneFrame({ darkMode, clouds = false }: { darkMode: boolean; clo
             className="w-full h-full object-cover"
             style={{ opacity: darkMode ? 0.55 : 0.7 }}
           />
+          {/* Seamless fade into page background — uses bg with alpha steps to avoid a dark band */}
           <div
             className="absolute inset-0"
             style={{
-              background: `linear-gradient(180deg, transparent 0%, transparent 55%, ${bg} 100%)`,
+              background: darkMode
+                ? `linear-gradient(180deg, rgba(10,10,10,0) 0%, rgba(10,10,10,0) 60%, rgba(10,10,10,0.6) 85%, #0A0A0A 100%)`
+                : `linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.6) 85%, #FFFFFF 100%)`,
             }}
           />
         </div>
