@@ -24,56 +24,56 @@ interface ProgramEventCardProps {
 
 const EVENT_STYLES = {
   session: {
-    bgColor: 'bg-[#E8D5FF]',
-    borderColor: 'border-transparent',
+    tintBg: 'bg-[#F0E3FF]',           // light lavender circle
+    doneBg: 'bg-[#DEC1FF]',           // planner secondary lavender
     settingsBg: 'bg-[#DEC1FF]',
     emoji: '📡',
     badge: 'Live Session',
     badgeClass: 'bg-[#DEC1FF] text-purple-900',
   },
   module: {
-    bgColor: 'bg-[#F0E3FF]',
-    borderColor: 'border-[#D4B8F0]',
+    tintBg: 'bg-[#F0E3FF]',
+    doneBg: 'bg-[#DEC1FF]',
     settingsBg: 'bg-[#DCC8F0]',
     emoji: '📖',
     badge: 'Module',
     badgeClass: 'bg-secondary text-secondary-foreground',
   },
   track: {
-    bgColor: 'bg-[#E2F9F0]',
-    borderColor: 'border-[#B0DFC8]',
+    tintBg: 'bg-[#E2F9F0]',
+    doneBg: 'bg-[#C3F1E1]',
     settingsBg: 'bg-[#C5EDDa]',
     emoji: '🎵',
     badge: 'Audio',
     badgeClass: 'bg-secondary text-secondary-foreground',
   },
   enrollment: {
-    bgColor: 'bg-[#FFF492]',
-    borderColor: 'border-[#E8D86A]',
+    tintBg: 'bg-[#FFF492]',
+    doneBg: 'bg-[#FFEA4E]',
     settingsBg: 'bg-[#F0E46E]',
     emoji: '🎓',
     badge: 'New Program',
     badgeClass: 'bg-secondary text-secondary-foreground',
   },
   round_update: {
-    bgColor: 'bg-[#D7E9FF]',
-    borderColor: 'border-[#A8C8EE]',
+    tintBg: 'bg-[#D7E9FF]',
+    doneBg: 'bg-[#B9D6FF]',
     settingsBg: 'bg-[#B8D4F5]',
     emoji: '🔄',
     badge: 'Changes in Program',
     badgeClass: 'bg-secondary text-secondary-foreground',
   },
   playlist_save: {
-    bgColor: 'bg-[#DEF5EC]',
-    borderColor: 'border-[#B8E4D4]',
+    tintBg: 'bg-[#DEF5EC]',
+    doneBg: 'bg-[#C3F1E1]',
     settingsBg: 'bg-[#C8EBDD]',
     emoji: '🎧',
     badge: 'New Playlist',
     badgeClass: 'bg-secondary text-secondary-foreground',
   },
   playlist_update: {
-    bgColor: 'bg-[#DEF5EC]',
-    borderColor: 'border-[#B8E4D4]',
+    tintBg: 'bg-[#DEF5EC]',
+    doneBg: 'bg-[#C3F1E1]',
     settingsBg: 'bg-[#C8EBDD]',
     emoji: '🆕',
     badge: 'New Audio',
@@ -223,24 +223,26 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
       <div
         onClick={handleCardClick}
         className={cn(
-          'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98] border',
-          style.bgColor,
-          style.borderColor,
+          'rounded-3xl pl-3 pr-4 py-5 transition-all duration-200 cursor-pointer active:scale-[0.98] shadow-card-warm',
+          event.isCompleted ? style.doneBg : 'bg-card-warm',
           event.isCompleted && 'opacity-60'
         )}
       >
         {/* Main row */}
         <div className="flex items-center gap-2">
-          {/* 3D Emoji icon */}
-          <div className="w-10 h-10 flex items-center justify-center shrink-0">
-            <FluentEmoji emoji={style.emoji} size={32} />
+          {/* 3D Emoji icon in colored circle (matches TaskCard mock) */}
+          <div className={cn(
+            'w-10 h-10 rounded-full flex items-center justify-center shrink-0',
+            style.tintBg
+          )}>
+            <FluentEmoji emoji={style.emoji} size={26} />
           </div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
             {/* Top line: time + badge + settings */}
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[11px] text-black">
+              <span className="text-[11px] text-black/60">
                 {event.time || 'Anytime'}
               </span>
               
@@ -276,7 +278,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
             </p>
             
             {/* Subtitle */}
-            <p className="text-[11px] text-black truncate">
+            <p className="text-[11px] text-black/60 truncate">
               {isEnrollment ? 'Tap to explore your program →' :
                isRoundUpdate ? 'Tap to see changes →' :
                isPlaylistSave ? 'Tap to start listening →' :
