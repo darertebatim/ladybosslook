@@ -7,6 +7,7 @@ import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
+import { triggerSoftReview } from '@/lib/appReview';
 
 import journalImg from '@/assets/mood-card-journal.png';
 import reflectImg from '@/assets/mood-card-reflect.png';
@@ -64,6 +65,8 @@ export function BreathingCompleteSheet({
         origin: { y: 0.6 },
         colors: ['#8B5CF6', '#A78BFA', '#C4B5FD', '#60A5FA', '#34D399'],
       });
+      // High-satisfaction moment → ask for a 5-star review (cooldown-protected)
+      setTimeout(() => triggerSoftReview('breathe_complete'), 1500);
     }
   }, [open]);
 

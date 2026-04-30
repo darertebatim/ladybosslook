@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -10,6 +11,7 @@ import {
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { Share2 } from 'lucide-react';
 import { useShareContent } from '@/hooks/useShareContent';
+import { triggerSoftReview } from '@/lib/appReview';
 
 import journalImg from '@/assets/mood-card-journal.png';
 import breathingImg from '@/assets/mood-card-breathing.png';
@@ -102,6 +104,15 @@ export function MoodCelebrationSheet({
 }: MoodCelebrationSheetProps) {
   const navigate = useNavigate();
   const moodData = mood ? MOOD_CONFIG[mood] : null;
+
+  // Fire only for positive moods (great/good) — avoid prompting after negative check-ins
+  useEffect(() => {
+    if (!open || !mood) return;
+    const positive = ['great', 'good', 'amazing', 'happy'];
+    if (positive.includes(mood.toLowerCase())) {
+      setTimeout(() => triggerSoftReview('mood_positive'), 1500);
+    }
+  }, [open, mood]);
 
   const { handleShare } = useShareContent({
     title: 'Mood check-in on Rilo',

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -7,6 +8,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { Share2 } from 'lucide-react';
 import { useShareContent } from '@/hooks/useShareContent';
+import { triggerSoftReview } from '@/lib/appReview';
 
 import academyImg from '@/assets/reflection-card-academy.png';
 import listenImg from '@/assets/reflection-card-listen.png';
@@ -32,6 +34,12 @@ export function ReflectionCelebrationSheet({
   onDone,
 }: ReflectionCelebrationSheetProps) {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => triggerSoftReview('reflection_complete'), 1500);
+    }
+  }, [open]);
 
   const { handleShare } = useShareContent({
     title: 'I just reflected on Rilo 💭',
