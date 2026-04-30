@@ -21,6 +21,7 @@ import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreview
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
 import { useShareContent } from '@/hooks/useShareContent';
+import { SlideUpPage } from '@/components/app/SlideUpPage';
 
 export default function AppBreathe() {
   const navigate = useNavigate();
@@ -132,7 +133,7 @@ export default function AppBreathe() {
   }
 
   return (
-    <>
+    <SlideUpPage defaultBack="/app/home">
       <SEOHead 
         title="Breathe - LadyBoss" 
         description="Breathing exercises for relaxation and focus" 

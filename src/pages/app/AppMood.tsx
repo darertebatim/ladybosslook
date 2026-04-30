@@ -1,10 +1,11 @@
 import { BackButton } from '@/components/app/BackButton';
 import { MoodDashboard } from '@/components/mood/MoodDashboard';
 import { SEOHead } from '@/components/SEOHead';
+import { SlideUpPage } from '@/components/app/SlideUpPage';
 
 export default function AppMood() {
   return (
-    <>
+    <SlideUpPage defaultBack="/app/home">
       <SEOHead 
         title="Mood Check-in | Rilo"
         description="Track your daily mood and emotional well-being"
@@ -25,6 +26,6 @@ export default function AppMood() {
         {/* Main Content */}
         <MoodDashboard />
       </div>
-    </>
+    </SlideUpPage>
   );
 }
