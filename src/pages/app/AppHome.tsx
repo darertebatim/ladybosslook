@@ -1192,7 +1192,7 @@ const AppHome = () => {
                      <div className="flex items-center gap-2 mr-2">
                        {/* Task completion counter chip — mirrors mock */}
                        {homeView === 'tasks' && filteredTasks.length > 0 && (
-                         <div className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[hsl(var(--brand-tint-peach))] text-[hsl(var(--brand-primary))]">
+                         <div className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[hsl(var(--tint-peach))] text-[hsl(var(--brand-primary))]">
                            {filteredTasks.filter(t => completedTaskIds.has(t.id)).length}/{filteredTasks.length}
                          </div>
                        )}
