@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { SealCheck } from '@/components/app/SealCheck';
+import SealCheck from '@/components/app/SealCheck';
 import { cn } from '@/lib/utils';
 import { TINT_BG, TINT_BG_MID, type TintKey } from './tints';
 
