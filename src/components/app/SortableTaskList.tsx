@@ -632,7 +632,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
                     if (e.key === 'Escape') handleClose();
                   }}
                   placeholder="Type task name..."
-                  className="flex-1 bg-transparent text-[15px] font-semibold text-black placeholder:text-black/40 outline-none"
+                  className="flex-1 bg-transparent text-[15px] font-semibold text-black placeholder:text-fg-warm-muted outline-none"
                   enterKeyHint="done"
                   autoComplete="off"
                   autoCorrect="on"
