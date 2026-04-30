@@ -308,6 +308,10 @@ export function useRoutinePlayer() {
       import('@/lib/firebaseAnalytics').then(({ Analytics }) => {
         Analytics.routineCompleted(config.routineId, totalSeconds);
       }).catch(() => {});
+      // High-satisfaction moment → ask for a 5-star review (cooldown-protected)
+      import('@/lib/appReview').then(({ triggerSoftReview }) =>
+        setTimeout(() => triggerSoftReview('routine_complete'), 2500)
+      );
     }
     if (!fullyCompleted || !config || !user) return;
 
