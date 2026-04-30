@@ -6,7 +6,7 @@ import { ChevronLeft } from 'lucide-react';
 import { dearMeFlow } from '@/data/onboarding-flows/dear-me';
 import { mePlusFlow } from '@/data/onboarding-flows/me-plus';
 import { quickStartFlow } from '@/data/onboarding-flows/quick-start';
-import { quickStartV2Flow } from '@/data/onboarding-flows/quick-start-v2';
+import { preAuthWelcomeFlow } from '@/data/onboarding-flows/pre-auth-welcome';
 import { weeklyReviewFlow } from '@/data/onboarding-flows/weekly-review';
 import { selfcareQuizFlow } from '@/data/onboarding-flows/selfcare-quiz';
 import { selfcareWeeklyReviewFlow } from '@/data/onboarding-flows/selfcare-weekly-review';
@@ -22,7 +22,7 @@ import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
 import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
 import { Analytics } from '@/lib/firebaseAnalytics';
 import { provisionRiloPicks } from '@/lib/onboarding/provisionRiloPicks';
-const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow, quickStartV2Flow, weeklyReviewFlow, selfcareQuizFlow, selfcareWeeklyReviewFlow, whatIsRiloFlow];
+const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow, preAuthWelcomeFlow, weeklyReviewFlow, selfcareQuizFlow, selfcareWeeklyReviewFlow, whatIsRiloFlow];
 
 function preloadImages(srcs: string[]) {
   srcs.forEach(src => {
@@ -157,7 +157,7 @@ export default function AppOnboarding() {
       localStorage.setItem('simora_onboarding_gender', typeof answer === 'string' ? answer : answer[0] || '');
     } else if (stepId === 'qs-age-group') {
       localStorage.setItem('simora_onboarding_age_group', typeof answer === 'string' ? answer : answer[0] || '');
-    } else if (stepId === 'qs-second-language') {
+    } else if (stepId === 'qs-second-language' || stepId === 'wir-second-language') {
       localStorage.setItem('simora_onboarding_language', typeof answer === 'string' ? answer : answer[0] || '');
     }
 
