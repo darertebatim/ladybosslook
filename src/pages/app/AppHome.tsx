@@ -1157,7 +1157,7 @@ const AppHome = () => {
               <div>
                   {/* Shared animated 2-pill switcher */}
                   <div className="flex items-center justify-between mb-3">
-                     <div className="relative inline-flex bg-foreground/[0.06] dark:bg-white/[0.08] rounded-full p-0.5">
+                     <div className="relative inline-flex bg-black/[0.05] dark:bg-white/[0.08] rounded-full p-0.5">
                        <motion.div
                          className="absolute top-0.5 bottom-0.5 rounded-full bg-card shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
                         animate={{ 
@@ -1172,7 +1172,7 @@ const AppHome = () => {
                         ref={btnRoutinesRef}
                         onClick={() => { haptic.selection(); setHomeView('routines'); setTaskFilter('all'); }}
                         className={cn(
-                          "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors whitespace-nowrap",
+                          "relative z-10 px-3 py-1 rounded-full text-[11px] font-semibold transition-colors whitespace-nowrap",
                           homeView === 'routines' ? 'text-foreground' : 'text-muted-foreground'
                         )}
                       >
@@ -1182,11 +1182,11 @@ const AppHome = () => {
                          ref={btnTasksRef}
                          onClick={() => { haptic.selection(); setHomeView('tasks'); setTaskFilter('all'); }}
                          className={cn(
-                           "relative z-10 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors flex items-center gap-1 whitespace-nowrap",
+                          "relative z-10 px-3 py-1 rounded-full text-[11px] font-semibold transition-colors flex items-center gap-1 whitespace-nowrap",
                            homeView === 'tasks' ? 'text-foreground' : 'text-muted-foreground'
                          )}
                        >
-                         <Zap className="h-3 w-3 fill-amber-400 text-amber-400 shrink-0" /> My Tasks
+                        <Zap className="h-2.5 w-2.5 fill-amber-400 text-amber-400 shrink-0" /> My Tasks
                        </button>
                      </div>
                      <div className="flex items-center gap-2 mr-2">

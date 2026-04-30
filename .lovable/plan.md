@@ -1,102 +1,61 @@
-## Goal
+## Full Home Page Mock Alignment
 
-Implement Step 1 (tokens) + Step 2 (primitives) + restyle the bottom **nav menu** with an iOS 18-inspired look, using the Orange Palette already documented in `/admin/brand`.
+The current Home has the right layout but the wrong visual style. The mock uses a **white/cream card with a colored emoji circle**, while current renders the entire card in the bright color. This plan migrates every remaining mismatch.
 
-Note: There is no separate admin/web theme to worry about — the orange tokens will be scoped to `.app-theme` so admin pages stay untouched.
+### 1. Task Card visual language (`src/components/app/TaskCard.tsx`)
 
----
+Switch from "fully tinted card" → "white card with colored emoji circle":
 
-## Step 1 — Wire orange tokens into `.app-theme`
+| Element | Current | Mock target |
+|---|---|---|
+| Card background (incomplete) | Full color (`bg-[#FFF492]` etc.) | `bg-card-warm` / `#FFFDFB` (off-white) with warm shadow |
+| Card background (completed) | Same color, strikethrough only | Mid-tone color (`#FFEA4E`, `#FFD2A1` etc.) — softer fill |
+| Emoji wrapper | Bare 32px emoji | 40px rounded-full **colored** circle (light tint) holding 26px emoji |
+| Padding | `pl-3 pr-4 py-3` | `pl-3 pr-4 py-5` (taller, more breathing room) |
+| Title size | `text-[15px] font-semibold` | unchanged ✓ |
+| Subtitle | `text-[11px] text-black/80` | `text-[11px] text-black/60` (softer) |
+| Shadow | none | `shadow-card-warm` (soft warm drop shadow) |
 
-File: `src/index.css` (extend existing `.app-theme` and `.app-theme.dark` blocks).
+Add two color maps to `TASK_COLOR_CLASSES`:
+- `TASK_TINT_CLASSES` — light tint for the emoji circle (current bg colors)
+- `TASK_MID_CLASSES` — mid-tone color for completed card fill (`#FFEA4E`, `#FFD2A1`, `#FFC2EA`, etc., matching `O.peachMid`/`O.yellowMid` from the mock)
 
-Add new tokens **alongside** the current black/white ones (do not flip `--primary` yet; we migrate components first):
+Apply both code paths (regular + Pro Task branches at lines ~404 and ~510).
 
-Light (`.app-theme`):
-- Brand: `--brand-primary: 14 82% 56%` (#EB5E33), `--brand-primary-light: 36 91% 55%` (#F5A623), `--brand-primary-dark: 13 70% 39%` (#A63520), `--brand-accent-rose: 336 71% 45%` (#C2255C)
-- Warm surfaces: `--bg-warm: 28 100% 97%`, `--surface-warm: 28 100% 96%`, `--card-warm: 30 60% 99%`
-- Warm text: `--fg-warm: 22 53% 12%`, `--fg-warm-muted: 23 22% 45%`, `--border-warm: 27 67% 87%`
-- Tints (light + mid pairs): `--peach`, `--peach-mid`, `--mint`, `--mint-mid`, `--lavender`, `--lavender-mid`, `--yellow`, `--yellow-mid`, `--pink`, `--pink-mid`, `--lime-mid`, `--sky-mid`
-- Gradient + shadow: `--gradient-orange`, `--shadow-card-warm`
+### 2. Switcher track shade (`src/pages/app/AppHome.tsx` ~1152)
 
-Dark (`.app-theme.dark`):
-- `--bg-warm: 22 53% 6%` (#1A0F08), `--surface-warm: 22 50% 12%` (#2A1A10), `--card-warm: 22 50% 9%` (#1F140B)
-- `--fg-warm: 28 100% 96%`, `--fg-warm-muted: 27 28% 65%`, `--border-warm: 22 38% 17%`
-- Jewel-tone tints: `--peach-dark` (#3D2A1A), `--mint-dark` (#1A2E26), `--lavender-dark` (#2A1F3A), `--yellow-dark` (#3A3010), `--pink-dark` (#3A1A2A), `--sky-dark` (#1A2638), `--lime-dark` (#1E3020)
-- `--shadow-card-warm` with stronger opacity
+Already changed to `bg-foreground/[0.06]`, but mock uses **`rgba(0,0,0,0.05)`** which is a hair lighter. Tighten to `bg-black/[0.05] dark:bg-white/[0.08]` for exact match. Also reduce active pill to `text-[11px]` (mock) from `text-xs`.
 
-File: `tailwind.config.ts` (extend `theme.extend.colors`):
-- `peach`, `peach-mid`, `peach-dark` (and same for mint/lavender/yellow/pink/lime/sky)
-- `bg-warm`, `surface-warm`, `card-warm`, `fg-warm`, `fg-warm-muted`, `border-warm`
-- `brand`, `brand-light`, `brand-dark`, `brand-rose`
-- `backgroundImage`: `gradient-orange`, `gradient-streak`
-- `boxShadow`: `card-warm`
+### 3. Week strip — already updated. Verify selected day is brand-orange filled circle ✓
 
-All values use `hsl(var(--token))` per the design system rule.
+### 4. Quick-add task input + footer buttons (currently bordered)
 
----
+The "Quick add task..." pill at the bottom of the task list and any other bordered cards: replace with mock-style **soft warm card** (white bg, no border, warm shadow):
 
-## Step 2 — Build reusable primitives
+- Remove `border-2 border-urgency/30` style
+- Use: `bg-card-warm shadow-card-warm border-[0.5px] border-border-warm/40` (same recipe as Manage/Browse buttons we already migrated)
 
-New folder: `src/components/brand/`
+### 5. Counter chip color polish
 
-1. `TaskCard.tsx` — colored emoji circle + subtitle row (time · repeat · goal) + title + SealCheck/empty circle. Auto dark/light via tokens. Props: `task`, `done`, `onToggle`.
-2. `ToolShortcutTile.tsx` — for when shortcuts return. Emoji circle, label, completion dot.
-3. `GlassHeader.tsx` — translucent backdrop-blur header shell with `left | center | right` slots.
-4. `WeekStrip.tsx` — 7-day strip; today filled with `--brand-primary`, past days have green completion dots.
-5. `GradientBanner.tsx` — orange→yellow gradient banner with decorative blob (Quiz/Promo/Mood/Weekly).
-6. `StreakPill.tsx` — gradient flame chip.
+Currently `bg-[hsl(var(--tint-peach))]` — keep, but ensure it reads correctly on warm background (mock uses solid `#FFE6C9` peach with `#EB5E33` text). ✓
 
-(SealCheck already exists — reuse as-is.)
+### Technical notes
 
-Each primitive uses ONLY semantic tokens (no inline hex). Light/dark handled by CSS vars automatically.
+- Add new color maps in `src/hooks/useTaskPlanner.tsx` next to `TASK_COLOR_CLASSES`:
+  - `TASK_TINT_CLASSES[color]` → light tint (existing values)
+  - `TASK_MID_CLASSES[color]` → mid-tone for completed state
+- In `TaskCard.tsx`, change card class from `colorClass` to:
+  - `isCompleted ? TASK_MID_CLASSES[color] : 'bg-card-warm shadow-card-warm'`
+- Wrap the emoji in a `w-10 h-10 rounded-full ${TASK_TINT_CLASSES[color]} flex items-center justify-center` div
+- Reduce `FluentEmoji size={32}` → `size={26}`
+- Apply changes to BOTH the regular branch (~line 540) AND the Pro Task branch (~line 410) for consistency
+- Find the "Quick add task" input in `SortableTaskList.tsx` and apply the same warm-card recipe
 
----
+### Files to edit
 
-## Step 3 — Restyle the nav menu (iOS 18 inspired)
+- `src/hooks/useTaskPlanner.tsx` — add `TASK_TINT_CLASSES`, `TASK_MID_CLASSES`
+- `src/components/app/TaskCard.tsx` — restructure card layout (both branches)
+- `src/components/app/SortableTaskList.tsx` — restyle Quick-add pill
+- `src/pages/app/AppHome.tsx` — switcher shade tighten, font size
 
-File: `src/layouts/NativeAppLayout.tsx` (the bottom tab bar at lines 214-288).
-
-iOS 18 design cues to apply:
-- **Floating tab bar**: detached from the screen edge — 16px horizontal + 12px bottom margin (above safe area), `rounded-[28px]` pill shape, not full-width.
-- **Heavy glass material**: `bg-card-warm/70 backdrop-blur-2xl backdrop-saturate-150`, hairline border `border border-border-warm/40`, soft shadow `shadow-card-warm`.
-- **Active tab**: pill-shaped soft fill behind the active item using `bg-peach` (light) / `bg-peach-dark` (dark), the icon switches to `text-brand-primary`, label below in solid `text-fg-warm`.
-- **Inactive**: icons + labels in `text-fg-warm-muted`, no fill.
-- **Spring animation**: active pill slides between tabs using `framer-motion` `layoutId="nav-active-pill"` with a spring transition (mass 0.6, stiffness 380, damping 30) — that smooth iOS underline-glide feel.
-- **Filled icons on active**: switch icon set so active uses the solid/filled variant where lucide offers it (`Home` filled via `fill-current`, otherwise stroke 2.5; inactive stroke 1.75).
-- **Badges**: keep functional behavior; restyle to `bg-brand-primary text-white` with a subtle outer ring matching the bar background for the cut-out look.
-- **Player/watch override**: keep the existing dark-glass variant but restyle to the same floating pill (just darker glass) so the language is consistent.
-- **Touch targets**: minimum 48px per tab (currently 44 — bump up).
-- **Haptics**: keep existing light/medium pattern.
-
-Visually: think iOS 18 Apple Music / Photos — a floating capsule that hovers over the content, with a soft pill that morphs between active items.
-
----
-
-## QA pass (mandatory before declaring done)
-
-1. Light + dark mode at 390x844 — header doesn't clash with glass nav.
-2. Active pill animates smoothly between all 4 tabs.
-3. Badge (chats unread) renders correctly on top of the glass.
-4. Player page (`/app/player`) and Watch pages still get the dark variant.
-5. Mini-player + routine mini-player sit cleanly above the floating bar (may need to bump their `bottom` offset).
-6. Safe-area inset respected on iOS notched devices.
-7. Keyboard-open state still hides the nav (already wired).
-
----
-
-## Out of scope (next phases)
-
-- Migrating Home, Tools, banners, task cards (Step 3+ in the master plan).
-- Flipping global `--primary` to orange (we do that after all surfaces migrate).
-- Bringing back hidden shortcuts (still hidden behind `{false && ...}`).
-
----
-
-## Technical notes
-
-- All new tokens use HSL space-separated triplets, accessed via `hsl(var(--token))`.
-- Tokens scoped to `.app-theme` only — admin pages unaffected.
-- `framer-motion` already installed; use `LayoutGroup` + `layoutId` for the active pill morph.
-- Mini-player offset: check `MiniPlayer.tsx` and `RoutineMiniPlayer.tsx` for hardcoded `bottom` values that may need a small bump (e.g., 76px → 92px) to clear the floating pill.
-- Update memory after shipping: add `mem://design/orange-theme-tokens` and update `mem://navigation/app-navigation-specs` with the iOS 18 floating capsule note.
+Approve to ship the full migration.

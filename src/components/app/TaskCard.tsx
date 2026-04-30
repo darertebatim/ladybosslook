@@ -8,6 +8,8 @@ import { CircleProgressButton } from './CircleProgressButton';
 import { 
   UserTask, 
   TASK_COLOR_CLASSES,
+  TASK_TINT_CLASSES,
+  TASK_MID_CLASSES,
   useSubtasks,
   useCompleteTask,
   useUncompleteTask,
@@ -260,7 +262,14 @@ export const TaskCard = memo(function TaskCard({
   };
 
   const colorClass = TASK_COLOR_CLASSES[task.color] || TASK_COLOR_CLASSES.yellow;
+  const tintClass = TASK_TINT_CLASSES[task.color] || TASK_TINT_CLASSES.yellow;
+  const midClass = TASK_MID_CLASSES[task.color] || TASK_MID_CLASSES.yellow;
   const isRoutineLauncher = proLinkType === 'routine' && !!(proLinkValue || task.source_routine_id);
+  // Mock visual rule: completed = mid-tone full fill; incomplete = white card + warm shadow + colored emoji circle
+  const isVisuallyDone = hasGoal ? goalReached : (isCompleted || (isRoutineLauncher && isRoutineComplete));
+  const cardSurfaceClass = isVisuallyDone
+    ? cn(midClass, 'shadow-card-warm')
+    : 'bg-card-warm shadow-card-warm';
 
   const routineBorderClass = '';
   
@@ -406,19 +415,23 @@ export const TaskCard = memo(function TaskCard({
         <div
           onClick={handleCardClick}
           className={cn(
-            'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
-            colorClass,
+            'rounded-3xl pl-3 pr-4 py-5 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+            cardSurfaceClass,
             routineBorderClass
           )}
         >
           {/* Main row */}
           <div className="flex items-center gap-2">
-            {/* Icon - use 3D emoji if available, else Lucide icon */}
-            <div className={cn("w-10 h-10 flex items-center justify-center shrink-0", isAnimating && "animate-emoji-bounce [animation-delay:0.8s]")}>
+            {/* Icon — colored circle holding the emoji or pro icon (mock spec) */}
+            <div className={cn(
+              "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
+              tintClass,
+              isAnimating && "animate-emoji-bounce [animation-delay:0.8s]"
+            )}>
               {hasTaskEmoji ? (
-                <FluentEmoji emoji={task.emoji} size={32} />
+                <FluentEmoji emoji={task.emoji} size={26} />
               ) : (
-                <ProIcon className={cn('h-6 w-6', proConfig.iconColorClass)} />
+                <ProIcon className={cn('h-5 w-5', proConfig.iconColorClass)} />
               )}
             </div>
 
@@ -426,10 +439,10 @@ export const TaskCard = memo(function TaskCard({
             <div className={cn("flex-1 min-w-0", isAnimating && "animate-ripple-wave [animation-delay:0.6s]")}>
               {/* Top line: Time + Goal (if applicable) */}
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[11px] text-black/80">{formatTime(task)}</span>
-                <span className="text-[11px] text-black/80">• {repeatLabel}</span>
+                <span className="text-[11px] text-black/60">{formatTime(task)}</span>
+                <span className="text-[11px] text-black/60">• {repeatLabel}</span>
                 {hasGoal && (
-                  <span className="text-[11px] text-black/80 font-medium">• {(() => {
+                  <span className="text-[11px] text-black/60 font-medium">• {(() => {
                     const label = formatProGoalLabel();
                     if (typeof label === 'string') return label;
                     if (label) return <>{label.prefix}<AnimatedProgress value={label.progress} />{label.suffix}</>;
@@ -569,16 +582,20 @@ export const TaskCard = memo(function TaskCard({
     <div
       onClick={handleCardClick}
       className={cn(
-        'rounded-3xl pl-3 pr-4 py-3 transition-all duration-200 cursor-pointer active:scale-[0.98]',
-        colorClass,
+        'rounded-3xl pl-3 pr-4 py-5 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+        cardSurfaceClass,
         routineBorderClass
       )}
     >
       {/* Main row */}
       <div className="flex items-center gap-2">
-        {/* Icon - emoji display like Me+ */}
-        <div className={cn("w-10 h-10 flex items-center justify-center shrink-0", isAnimating && "animate-emoji-bounce [animation-delay:0.8s]")}>
-          <TaskIcon iconName={task.emoji} size={32} className="text-black/80" />
+        {/* Icon — colored circle holding the emoji (mock spec) */}
+        <div className={cn(
+          "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
+          tintClass,
+          isAnimating && "animate-emoji-bounce [animation-delay:0.8s]"
+        )}>
+          <TaskIcon iconName={task.emoji} size={26} className="text-black/80" />
         </div>
 
         {/* Content */}
@@ -586,14 +603,14 @@ export const TaskCard = memo(function TaskCard({
           {/* Top line: subtask count + time/goal */}
           <div className="flex items-center gap-2">
             {hasSubtasks && (
-              <span className="font-semibold bg-white/50 px-1.5 py-0.5 rounded text-xs text-black">
+              <span className="font-semibold bg-black/[0.06] px-1.5 py-0.5 rounded text-xs text-black">
                 {completedCount}/{totalSubtasks}
               </span>
             )}
-            <span className="text-[11px] text-black/80">{formatTime(task)}</span>
-            <span className="text-[11px] text-black/80">• {repeatLabel}</span>
+            <span className="text-[11px] text-black/60">{formatTime(task)}</span>
+            <span className="text-[11px] text-black/60">• {repeatLabel}</span>
             {hasGoal && (
-              <span className="text-[11px] text-black/80 font-medium">• {(() => {
+              <span className="text-[11px] text-black/60 font-medium">• {(() => {
                 const label = formatGoalLabel();
                 if (typeof label === 'string') return label;
                 if (label) return <>{label.prefix}<AnimatedProgress value={label.progress} />{label.suffix}</>;
