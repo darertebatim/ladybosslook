@@ -122,7 +122,7 @@ export const MonthCalendar = ({
                   )}>
                     {format(dateItem, 'd')}
                   </span>
-                  {hasBadge && isCurrentMonth && !isSelected && isTodayDate && (
+                  {hasBadge && isCurrentMonth && isTodayDate && (
                     <img
                       src={BADGE_IMAGES[badgeLevel]}
                       alt={`${badgeLevel} badge`}
