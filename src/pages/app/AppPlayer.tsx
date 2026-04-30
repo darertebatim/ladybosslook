@@ -291,7 +291,9 @@ export default function AppPlayer() {
                       }}
                       className={cn(
                         'shrink-0 px-3.5 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95',
-                        active ? 'bg-brand text-white shadow-ios' : 'bg-peach text-fg-warm-muted'
+                        active
+                          ? 'bg-brand text-white shadow-ios'
+                          : 'bg-white/35 backdrop-blur-md text-fg-warm-muted'
                       )}
                     >
                       {config.name}
@@ -317,7 +319,9 @@ export default function AppPlayer() {
                       onClick={() => setProgressFilter(filter)}
                       className={cn(
                         'px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all active:scale-95',
-                        active ? 'bg-card text-fg-warm shadow-ios' : 'bg-transparent text-fg-warm-muted'
+                        active
+                          ? 'bg-white/70 backdrop-blur-md text-fg-warm shadow-ios'
+                          : 'bg-transparent text-fg-warm-muted'
                       )}
                     >
                       {filter === 'all' ? 'All' : filter === 'in_progress' ? 'In Progress' : 'Completed'}
