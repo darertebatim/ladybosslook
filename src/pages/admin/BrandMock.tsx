@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Flame, Calendar, Headphones, BookOpen, Heart, Sparkles, ChevronRight, Check, Sun, Moon, Droplets, Wind, Home, Compass, CalendarPlus, Music, Users, Menu, Headset, Star, Zap, Settings2, Search } from 'lucide-react';
+import { Globe, Lock } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import appIcon from '@/assets/app-icon.png';
 
@@ -817,9 +818,202 @@ export default function BrandMock() {
         </div>
       </div>
 
+      {/* ──────────────────────────────────────────────────────────── */}
+      {/* ── Listen page (proposed redesign)                       ── */}
+      {/* ──────────────────────────────────────────────────────────── */}
+      <div className="pt-8">
+        <h2 className="text-lg font-bold text-foreground mb-1">🎧 Listen — proposed redesign</h2>
+        <p className="text-muted-foreground text-xs mb-4">
+          Drops storm/cloud video & dark <code>#132240</code> bg. Pure white surface (matches Home <code>--background</code>),
+          glassy rounded header, light filter pills, white playlist cards. Toggles with the dark-mode button above.
+        </p>
+      </div>
+
+      <div className="flex justify-center">
+        <ListenPhoneFrame darkMode={darkMode} />
+      </div>
+
       {/* Color reference */}
       <div className="text-center text-xs text-muted-foreground pt-4">
         All colors sourced from the <span className="font-mono font-medium">App Orange Palette</span> defined above
+      </div>
+    </div>
+  );
+}
+
+/* ───────────────────────── Listen phone frame ───────────────────────── */
+
+const LISTEN_CATEGORIES = ['All', 'Meditate', 'Workout', 'Soundscape', 'Affirmations', 'Audiobooks', 'Course', 'Podcast'];
+const LISTEN_STATUS = ['All', 'In Progress', 'Completed'];
+const LISTEN_PLAYLISTS = [
+  { id: 1, type: 'Meditate', dur: '28m',    title: 'Meditation Level 1 with Razie (FA)', emoji: '🧘‍♀️', free: true,  locked: false, color: O.lavender, darkColor: O.lavenderDark },
+  { id: 2, type: 'Course',   dur: '4h 19m', title: '5 Languages of Strength (Farsi)',    emoji: '💪',   free: false, locked: true,  color: O.pink,     darkColor: O.pinkDark },
+  { id: 3, type: 'Course',   dur: '7h 27m', title: 'Empowered Woman (Farsi)',            emoji: '🌟',   free: false, locked: true,  color: O.peach,    darkColor: O.peachDark },
+  { id: 4, type: 'Podcast',  dur: '1m',     title: 'Goals from Our Podcast',             emoji: '🎙️',   free: true,  locked: false, color: O.mint,     darkColor: O.mintDark },
+];
+
+function ListenPhoneFrame({ darkMode }: { darkMode: boolean }) {
+  // Pure white (light) / near-black (dark) — matches `--background` on Home.
+  const bg       = darkMode ? '#0A0A0A' : '#FFFFFF';
+  const cardBg   = darkMode ? '#1A1410' : '#FFFFFF';
+  const fg       = darkMode ? '#FFF4ED' : O.fg;
+  const fgMuted  = darkMode ? '#BFA08A' : O.fgMuted;
+  const border   = darkMode ? '#3D2A1A' : O.border;
+  const peachBg  = darkMode ? O.peachDark : O.peach;
+  const ctaBg    = darkMode ? '#2A1A10'   : '#FFF1E8';
+  const shadow   = darkMode
+    ? '0 1px 2px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.35)'
+    : '0 1px 2px rgba(60,30,10,0.06), 0 6px 18px rgba(60,30,10,0.08)';
+  const glassBg  = darkMode ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.55)';
+
+  return (
+    <div
+      className="relative w-[375px] rounded-[40px] shadow-2xl overflow-hidden transition-colors duration-500"
+      style={{
+        background: bg,
+        border: `3px solid ${darkMode ? '#3D2A1A' : '#E8D6C8'}`,
+        minHeight: 780,
+      }}
+    >
+      {/* Status bar */}
+      <div className="flex items-center justify-between px-8 pt-4 pb-2">
+        <span className="text-xs font-semibold" style={{ color: fgMuted }}>9:41</span>
+        <div className="flex gap-1.5">
+          <div className="w-4 h-2 rounded-sm" style={{ background: fgMuted }} />
+          <div className="w-4 h-2 rounded-sm" style={{ background: fgMuted }} />
+        </div>
+      </div>
+
+      {/* Glassy rounded header — matches AppHome */}
+      <div
+        className="px-4 pt-2 pb-3 rounded-b-2xl"
+        style={{
+          background: glassBg,
+          backdropFilter: 'blur(20px)',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
+        }}
+      >
+        <div className="flex items-center justify-between min-h-[44px]">
+          <h1 className="text-2xl font-bold tracking-tight" style={{ color: fg }}>Listen</h1>
+          <button
+            className="h-9 w-9 rounded-full flex items-center justify-center"
+            style={{ background: cardBg, color: O.primary, boxShadow: shadow }}
+          >
+            <Search className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Category pills */}
+        <div className="flex gap-2 overflow-x-auto pb-1 mt-2" style={{ scrollbarWidth: 'none' }}>
+          {LISTEN_CATEGORIES.map((c, i) => {
+            const active = i === 0;
+            return (
+              <button
+                key={c}
+                className="shrink-0 px-3.5 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap"
+                style={{
+                  background: active ? O.primary : peachBg,
+                  color: active ? '#fff' : fgMuted,
+                  boxShadow: active ? shadow : 'none',
+                }}
+              >
+                {c}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Status row + globe */}
+        <div className="flex items-center justify-between mt-2 gap-2">
+          <div className="flex gap-1.5">
+            {LISTEN_STATUS.map((s, i) => {
+              const active = i === 0;
+              return (
+                <button
+                  key={s}
+                  className="px-3 py-1.5 rounded-full text-[11px] font-semibold"
+                  style={{
+                    background: active ? cardBg : 'transparent',
+                    color: active ? fg : fgMuted,
+                    boxShadow: active ? shadow : 'none',
+                  }}
+                >
+                  {s}
+                </button>
+              );
+            })}
+          </div>
+          <button
+            className="h-9 w-9 rounded-full flex items-center justify-center"
+            style={{ background: cardBg, color: O.primary, boxShadow: shadow }}
+          >
+            <Globe className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Section heading */}
+      <div className="px-4 pt-4 pb-2">
+        <p className="text-[11px] font-bold tracking-[0.12em]" style={{ color: fgMuted }}>
+          ALL PLAYLISTS
+        </p>
+      </div>
+
+      {/* Playlist cards */}
+      <div className="px-4 space-y-3 pb-6">
+        {LISTEN_PLAYLISTS.map((p) => (
+          <div
+            key={p.id}
+            className="rounded-2xl overflow-hidden"
+            style={{ background: cardBg, boxShadow: shadow }}
+          >
+            <div className="flex items-center gap-3 p-3">
+              <div
+                className="relative h-16 w-16 rounded-xl shrink-0 flex items-center justify-center"
+                style={{ background: darkMode ? p.darkColor : p.color }}
+              >
+                <FluentEmoji emoji={p.emoji} size={36} />
+                {p.locked && (
+                  <div
+                    className="absolute bottom-1 left-1 h-5 w-5 rounded-full flex items-center justify-center"
+                    style={{ background: 'rgba(0,0,0,0.55)' }}
+                  >
+                    <Lock className="h-2.5 w-2.5 text-white" />
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 text-[11px]" style={{ color: fgMuted }}>
+                  <span className="font-medium">{p.type}</span>
+                  <span>·</span>
+                  <span>{p.dur}</span>
+                </div>
+                <h3 className="text-[14px] font-bold leading-tight mt-0.5 line-clamp-2" style={{ color: fg }}>
+                  {p.title}
+                </h3>
+                <div className="mt-1 flex items-center gap-1.5">
+                  {p.free && (
+                    <span
+                      className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                      style={{ background: darkMode ? O.mintDark : '#E2F9F0', color: darkMode ? '#A7F3D0' : '#065F46' }}
+                    >
+                      🔥 FREE
+                    </span>
+                  )}
+                  <span className="text-[13px]">🇮🇷</span>
+                </div>
+              </div>
+            </div>
+            {p.locked && (
+              <button
+                className="w-full py-2.5 text-[12px] font-bold flex items-center justify-center gap-1"
+                style={{ background: ctaBg, color: O.primary, borderTop: `1px solid ${border}` }}
+              >
+                Tap to enroll <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -18,10 +18,11 @@ All in-app pages (`/app/*`) follow the iOS 18 / Liquid Glass language establishe
 ## Rollout rules (apply to every new/edited app page)
 
 - Floating UI: replace `shadow-sm`, `border border-X`, `ring-1 ring-X` with **`shadow-ios`**. No rings/borders for elevation.
-- Cards/list rows: `bg-card-warm shadow-card-warm` (light) or `bg-white/10 backdrop-blur-md shadow-ios` (dark/cinematic).
+- Cards/list rows: white `bg-card` (or `bg-card-warm` if a faint warm tint is needed) with `shadow-card-warm`. No hairline borders/rings.
 - Active tab/chip: `bg-[hsl(var(--brand-primary))] text-white shadow-ios`.
 - Inactive chip: `bg-[hsl(var(--tint-peach))] text-[hsl(var(--fg-warm-muted))]` (light) or `bg-white/10 text-white/70` (dark).
-- Page bg: **`bg-background`** for all light pages (matches Home). Do NOT use `bg-bg-warm` as the page surface. Listen keeps cloud/storm video and uses **dark variant** of all primitives.
+- Page bg: **`bg-background` (pure white `#FFFFFF` light / near-black dark)** for ALL app pages — matches Home. NEVER use `bg-bg-warm` / peach tints / `#FFF8F3` as a page surface. Peach is reserved for inactive chips / small accent surfaces only.
+- Listen page: white `bg-background` like everywhere else. Storm/cloud video and dark `#132240` background are deprecated; if a hero strip is wanted later, place it as a small image at the top — never as the whole page background.
 - White-circle FABs: `bg-white text-[hsl(var(--brand-primary))] shadow-ios` (use `IOSIconButton`).
 - Search inputs: pill-shaped, `shadow-ios`, `border-0`, no focus ring (`focus-visible:ring-0`).
 - Primary CTAs over images: `bg-white/95 text-[hsl(var(--brand-primary))]` pill (e.g. "Tap to enroll").
