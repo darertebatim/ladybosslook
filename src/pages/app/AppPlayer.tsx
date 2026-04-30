@@ -20,7 +20,7 @@ import { haptic } from "@/lib/haptics";
 import { PersianFlag } from "@/components/ui/PersianFlag";
 import { useScrollRestore } from "@/hooks/useScrollRestore";
 import heroStormVideo from "@/assets/watch-hero-storm.mp4";
-import { WatchCategoryPill } from "@/components/video/WatchCategoryPill";
+// WatchCategoryPill removed — Listen now uses light-mode pills inline (matches Home/mock).
 import { useUserPreferredLanguage, preferredLanguageSorter } from "@/hooks/useUserPreferredLanguage";
 import { LanguagePreferencePopup, shouldShowLanguagePopup } from "@/components/app/LanguagePreferencePopup";
 import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
@@ -224,7 +224,7 @@ export default function AppPlayer() {
 
     if (items.length === 0) {
       return (
-        <div className="text-center py-12 text-white/60">
+        <div className="text-center py-12 text-muted-foreground">
           <p className="text-base">No playlists found</p>
         </div>
       );
