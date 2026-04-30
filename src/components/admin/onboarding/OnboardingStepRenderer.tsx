@@ -3836,61 +3836,133 @@ const DAILY_RESET_WHEEL = [
   { emoji: '📝', title: 'Journal', color: '#F3E8FF' },
 ];
 
-function LoopWheel() {
+function LoopWheel({ size = 240 }: { size?: number } = {}) {
+  // Traveling dot: tracks which node is currently "active"
+  const [activeIdx, setActiveIdx] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => {
+      setActiveIdx((i) => (i + 1) % DAILY_RESET_WHEEL.length);
+      haptic.light?.();
+    }, 1400);
+    return () => clearInterval(id);
+  }, []);
+
+  const cx = size / 2;
+  const cy = size / 2;
+  const radius = (size / 2) - 28;
+  const nodeSize = 54;
+
   return (
-    <div className="relative w-[220px] h-[220px] mx-auto">
+    <div
+      className="relative mx-auto"
+      style={{ width: size, height: size }}
+    >
       {/* Center icon */}
       <div className="absolute inset-0 flex items-center justify-center z-10">
-        <div className="w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center">
-          <FluentEmoji emoji="🔄" size={24} />
-        </div>
+        <motion.div
+          key={`pulse-${activeIdx}`}
+          initial={{ scale: 1 }}
+          animate={{ scale: [1, 1.12, 1] }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="relative w-14 h-14 rounded-full bg-white shadow-[0_8px_24px_-8px_rgba(26,31,61,0.35)] flex items-center justify-center"
+        >
+          {/* Soft pulsing halo */}
+          <motion.div
+            aria-hidden
+            className="absolute inset-0 rounded-full bg-emerald-300/40"
+            initial={{ scale: 1, opacity: 0.6 }}
+            animate={{ scale: 1.6, opacity: 0 }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: 'easeOut' }}
+          />
+          <FluentEmoji emoji="🔄" size={26} />
+        </motion.div>
       </div>
 
       {/* Connecting ring */}
-      <div className="absolute inset-[32px] rounded-full border-2 border-dashed border-[#1a1f3d]/10" />
+      <div
+        className="absolute rounded-full border-2 border-dashed border-[#1a1f3d]/15"
+        style={{ inset: 28 }}
+      />
 
       {/* Animated connecting ring glow */}
-      <svg className="absolute inset-[30px] w-[calc(100%-60px)] h-[calc(100%-60px)]" viewBox="0 0 100 100">
+      <svg
+        className="absolute"
+        style={{ inset: 26, width: size - 52, height: size - 52 }}
+        viewBox="0 0 100 100"
+      >
         <circle
           cx="50" cy="50" r="48"
           fill="none"
           stroke="url(#wheelGrad)"
-          strokeWidth="1.5"
+          strokeWidth="2"
           strokeDasharray="12 8"
           style={{ animation: 'spinWheel 20s linear infinite' }}
         />
         <defs>
           <linearGradient id="wheelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.4" />
-            <stop offset="50%" stopColor="#2dd4bf" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="#fbbf24" stopOpacity="0.4" />
+            <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.55" />
+            <stop offset="50%" stopColor="#2dd4bf" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#fbbf24" stopOpacity="0.55" />
           </linearGradient>
         </defs>
       </svg>
 
+      {/* Traveling glow dot — orbits the dashed ring, lands on the active node */}
+      {(() => {
+        const angle = (activeIdx * 90 - 90) * (Math.PI / 180);
+        const dx = cx + radius * Math.cos(angle);
+        const dy = cy + radius * Math.sin(angle);
+        return (
+          <motion.div
+            aria-hidden
+            className="absolute rounded-full bg-emerald-400 shadow-[0_0_24px_8px_rgba(45,212,191,0.55)]"
+            style={{ width: 14, height: 14 }}
+            animate={{ left: dx - 7, top: dy - 7 }}
+            transition={{ type: 'spring', stiffness: 90, damping: 16 }}
+          />
+        );
+      })()}
+
       {/* 4 task nodes positioned around the circle (clockwise: top, right, bottom, left) */}
       {DAILY_RESET_WHEEL.map((task, i) => {
         const angle = (i * 90 - 90) * (Math.PI / 180);
-        const radius = 82;
-        const x = 110 + radius * Math.cos(angle) - 27;
-        const y = 110 + radius * Math.sin(angle) - 27;
+        const x = cx + radius * Math.cos(angle) - nodeSize / 2;
+        const y = cy + radius * Math.sin(angle) - nodeSize / 2;
+        const isActive = i === activeIdx;
 
         return (
           <motion.div
             key={task.title}
             initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 + i * 0.15, type: 'spring', stiffness: 200, damping: 15 }}
+            animate={{
+              opacity: 1,
+              scale: isActive ? 1.14 : 1,
+              y: isActive ? -3 : 0,
+            }}
+            transition={{
+              delay: 0.3 + i * 0.12,
+              type: 'spring',
+              stiffness: 240,
+              damping: 18,
+            }}
             className="absolute flex flex-col items-center"
-            style={{ left: x, top: y, width: 54 }}
+            style={{ left: x, top: y, width: nodeSize }}
           >
             <div
-              className="w-[50px] h-[50px] rounded-2xl flex items-center justify-center shadow-md"
+              className={`w-[50px] h-[50px] rounded-2xl flex items-center justify-center transition-shadow ${
+                isActive
+                  ? 'shadow-[0_10px_24px_-8px_rgba(26,31,61,0.45)]'
+                  : 'shadow-[0_4px_12px_-6px_rgba(26,31,61,0.25)]'
+              }`}
               style={{ backgroundColor: task.color }}
             >
               <FluentEmoji emoji={task.emoji} size={26} />
             </div>
-            <span className="text-[10px] font-semibold text-[#1a1f3d]/70 mt-1 text-center leading-tight">
+            <span
+              className={`text-[11px] font-bold mt-1 text-center leading-tight transition-colors ${
+                isActive ? 'text-[#1a1f3d]' : 'text-[#1a1f3d]/60'
+              }`}
+            >
               {task.title}
             </span>
           </motion.div>
@@ -3898,13 +3970,14 @@ function LoopWheel() {
       })}
 
       {/* Directional arrow SVGs between nodes (clockwise) */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 220 220">
+      <svg
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        viewBox={`0 0 ${size} ${size}`}
+      >
         {DAILY_RESET_WHEEL.map((_, i) => {
           const startDeg = i * 90 - 90 + 28;
           const endDeg = i * 90 - 90 + 62;
-          const midDeg = (startDeg + endDeg) / 2;
-          const r = 82;
-          const cx = 110, cy = 110;
+          const r = radius;
 
           const toRad = (d: number) => d * (Math.PI / 180);
           const sx = cx + r * Math.cos(toRad(startDeg));
@@ -3924,14 +3997,14 @@ function LoopWheel() {
             <motion.g
               key={`arrow-${i}`}
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.3 }}
+              animate={{ opacity: 0.35 }}
               transition={{ delay: 0.9 + i * 0.12 }}
             >
               <path
                 d={`M ${sx} ${sy} A ${r} ${r} 0 0 1 ${ex} ${ey}`}
                 fill="none"
                 stroke="#1a1f3d"
-                strokeWidth="1.2"
+                strokeWidth="1.4"
                 strokeLinecap="round"
               />
               <polygon
@@ -3988,58 +4061,57 @@ function DailyResetPromptScreen({ step, onNext }: Props) {
   }, []);
 
   return (
-    <BottomSheetWrapper bgImage={meplusMascotBg} headerHeight={140}>
-      {/* Celebration badge */}
-      <FadeUp>
-        <div className="flex flex-col items-center mb-3">
-          <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-2">
-            <FluentEmoji emoji="🎉" size={32} />
-          </div>
-          <h1 className="text-[22px] font-extrabold text-[#1a1f3d] text-center leading-tight">
-            Your first<br />Daily Reset!
+    <div className="h-full w-full flex flex-col relative overflow-hidden bg-gradient-to-b from-[#F4FBF6] via-white to-[#F5F0FF]">
+      {/* ───── Visual: Living Cycle ───── */}
+      <div className="flex-1 flex items-center justify-center px-6 pt-6 pb-2 relative z-10 min-h-0">
+        <FadeUp delay={0.15}>
+          <LoopWheel size={260} />
+        </FadeUp>
+      </div>
+
+      {/* ───── Text + CTA (RiloTeach pattern) ───── */}
+      <div className="shrink-0 px-6 pb-8 relative z-10">
+        <FadeUp>
+          <h1 className="text-[26px] leading-[1.2] font-extrabold text-[#1a1f3d] text-center">
+            Your first Daily Reset
           </h1>
-        </div>
-      </FadeUp>
-
-      {/* Description */}
-      <FadeUp delay={0.1}>
-        <p className="text-[16px] text-[#1a1f3d] leading-relaxed text-center mb-3">
-          A simple daily routine to help you<br />take control of your life.
-        </p>
-      </FadeUp>
-
-      {/* Loop Wheel */}
-      <FadeUp delay={0.15}>
-        <LoopWheel />
-      </FadeUp>
-
-      {/* Testimony */}
-      <FadeUp delay={0.25}>
-        <div className="bg-[#f5f3ff] rounded-2xl px-4 py-3 mt-2 mb-1">
-          <p className="text-[13px] text-[#1a1f3d]/70 text-center italic">
-            "It feels like having a little daily reset button in my pocket." — Yalda-M ⭐⭐⭐⭐⭐
+        </FadeUp>
+        <FadeUp delay={0.08}>
+          <p className="mt-2 text-[14px] text-[#1a1f3d]/65 text-center leading-snug">
+            A simple daily routine to help you take control of your life.
           </p>
-        </div>
-      </FadeUp>
+        </FadeUp>
 
-      {/* Bottom button */}
-      <FadeUp delay={0.5} className="mt-auto pt-2 sticky bottom-0 bg-white pb-1">
-        {!added ? (
-          <NavyButton onClick={handleAdd}>
-            Add to my daily routine
-          </NavyButton>
-        ) : (
-          <motion.div
-            initial={{ scale: 0.95 }}
-            animate={{ scale: 1 }}
-            className="w-full py-4 rounded-2xl bg-emerald-500 text-white font-bold text-base flex items-center justify-center gap-2"
+        <FadeUp delay={0.16}>
+          <div className="mt-4 bg-[#f5f3ff] rounded-2xl px-4 py-2.5">
+            <p className="text-[12px] text-[#1a1f3d]/70 text-center italic leading-snug">
+              &ldquo;Like a little reset button in my pocket.&rdquo; — Yalda-M ⭐⭐⭐⭐⭐
+            </p>
+          </div>
+        </FadeUp>
+
+        <FadeUp delay={0.24} className="mt-5">
+          {!added ? (
+            <NavyButton onClick={handleAdd}>Add to my daily routine</NavyButton>
+          ) : (
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              className="w-full py-4 rounded-2xl bg-emerald-500 text-white font-bold text-base flex items-center justify-center gap-2"
+            >
+              <SealCheck className="w-5 h-5" />
+              Added to your routine!
+            </motion.div>
+          )}
+          <button
+            onClick={onNext}
+            className="w-full py-3 text-sm text-[#1a1f3d]/50 font-medium active:opacity-60 mt-2"
           >
-            <SealCheck className="w-5 h-5" />
-            Added to your routine!
-          </motion.div>
-        )}
-      </FadeUp>
-    </BottomSheetWrapper>
+            Skip
+          </button>
+        </FadeUp>
+      </div>
+    </div>
   );
 }
 
