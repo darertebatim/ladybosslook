@@ -268,7 +268,7 @@ export const TaskCard = memo(function TaskCard({
   // Mock visual rule: completed = mid-tone full fill; incomplete = white card + warm shadow + colored emoji circle
   const isVisuallyDone = hasGoal ? goalReached : (isCompleted || (isRoutineLauncher && isRoutineComplete));
   const cardSurfaceClass = isVisuallyDone
-    ? cn(midClass, 'shadow-card-warm opacity-60')
+    ? cn(midClass, 'shadow-card-warm')
     : 'bg-card-warm shadow-card-warm';
 
   const routineBorderClass = '';
