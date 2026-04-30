@@ -1041,7 +1041,7 @@ const AppHome = () => {
                               <img
                                 src={BADGE_IMAGES[badgeLevel]}
                                 alt={`${badgeLevel} badge`}
-                                className="absolute inset-[-2px] w-[calc(100%+4px)] h-[calc(100%+4px)] object-contain opacity-60 pointer-events-none"
+                                className="absolute inset-0 w-full h-full object-contain opacity-60 pointer-events-none"
                               />
                             )}
                             <span className={cn(
@@ -1055,7 +1055,7 @@ const AppHome = () => {
                               <img
                                 src={BADGE_IMAGES[badgeLevel]}
                                 alt={`${badgeLevel} badge`}
-                                className="absolute inset-[-2px] w-[calc(100%+4px)] h-[calc(100%+4px)] object-contain z-20 pointer-events-none drop-shadow-sm"
+                                className="absolute inset-0 w-full h-full object-contain z-20 pointer-events-none drop-shadow-sm"
                               />
                             )}
                           </div>
