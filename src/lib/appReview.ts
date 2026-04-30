@@ -5,6 +5,31 @@ import { App } from '@capacitor/app';
 const LAST_REVIEW_KEY = 'app_last_review_prompt';
 const REVIEW_COOLDOWN_DAYS = 30;
 
+// Cooldown for the in-app "Enjoying Rilo?" pre-prompt (SoftReviewPrompt).
+// Global key shared by every caller so users never see it more than once
+// per cooldown window, no matter which feature triggered it.
+const SOFT_PROMPT_KEY = 'simora_soft_review_prompt_last';
+const SOFT_PROMPT_COOLDOWN_DAYS = 30;
+
+/**
+ * Whether we're allowed to show the in-app "Enjoying Rilo?" pre-prompt.
+ * Shared across every caller (streak, gold badge, audio finish, etc.)
+ * so the user only sees it once per cooldown window.
+ */
+export function canShowSoftReviewPrompt(): boolean {
+  const last = localStorage.getItem(SOFT_PROMPT_KEY);
+  if (!last) return true;
+  const ts = parseInt(last, 10);
+  if (Number.isNaN(ts)) return true;
+  const days = (Date.now() - ts) / (1000 * 60 * 60 * 24);
+  return days >= SOFT_PROMPT_COOLDOWN_DAYS;
+}
+
+/** Record that the in-app pre-prompt was just shown (resets the cooldown). */
+export function markSoftReviewPromptShown(): void {
+  localStorage.setItem(SOFT_PROMPT_KEY, String(Date.now()));
+}
+
 function currentPlatform(): 'ios' | 'android' | 'web' {
   const p = Capacitor.getPlatform();
   if (p === 'ios') return 'ios';
