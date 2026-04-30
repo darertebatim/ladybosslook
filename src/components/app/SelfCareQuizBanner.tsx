@@ -82,7 +82,12 @@ export function SelfCareQuizBanner({ className, onVisibilityChange }: SelfCareQu
             <img
               src={selfcareQuizHero}
               alt=""
-              className="w-full h-full object-cover"
+              className="w-full h-full object-none"
+              style={{
+                objectPosition: '52% 38%',
+                transform: 'scale(2.6)',
+                transformOrigin: '52% 38%',
+              }}
               draggable={false}
             />
           </div>
