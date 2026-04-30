@@ -666,6 +666,10 @@ const AppHome = () => {
         totalTasks: result.totalTasks,
         badgeImageUrl: result.badgeImageUrl,
       });
+      // High-satisfaction moment → ask for a 5-star review (cooldown-protected)
+      import('@/lib/appReview').then(({ triggerSoftReview }) =>
+        setTimeout(() => triggerSoftReview('project_completed'), 2500)
+      );
     }
   }, []);
 
