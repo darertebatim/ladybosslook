@@ -911,7 +911,7 @@ const AppHome = () => {
       
       <div className="flex flex-col h-full overflow-hidden bg-background">
         {/* Fixed header with integrated week strip - Me+ style */}
-        <header className="tour-header fixed top-0 left-0 right-0 z-50 bg-white/20 dark:bg-black/15 backdrop-blur-xl rounded-b-xl shadow-card-warm" style={{
+        <header className="tour-header fixed top-0 left-0 right-0 z-50 bg-white/35 dark:bg-black/20 backdrop-blur-xl rounded-b-2xl shadow-[0_2px_10px_rgba(0,0,0,0.06)]" style={{
         paddingTop: 'max(12px, env(safe-area-inset-top))'
       }}>
           {/* Title bar - three column layout for balanced centering */}
@@ -944,7 +944,7 @@ const AppHome = () => {
               ) : (
                 <h1 className="text-lg font-bold text-foreground flex items-center gap-1">
                   {isToday(selectedDate) ? 'Today' : format(selectedDate, 'MMM d')}
-                  <Star className="h-3 w-3 text-[hsl(var(--brand-accent-rose))] fill-[hsl(var(--brand-accent-rose))]" />
+                  <Star className="h-2.5 w-2.5 text-[#EF4444] fill-[#EF4444]" />
                 </h1>
               )}
             </div>
@@ -956,12 +956,7 @@ const AppHome = () => {
               {/* Streak badge - navigates to presence page */}
               <button
                 onClick={() => navigate('/app/presence')}
-                className={cn(
-                  "tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full shadow-sm active:scale-95 transition-all",
-                  hasAnyCompletionToday
-                    ? "bg-gradient-to-br from-[hsl(var(--brand-primary-light))] to-[hsl(var(--brand-primary))] text-white"
-                    : "bg-muted text-muted-foreground"
-                )}
+                className="tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full shadow-sm active:scale-95 transition-all bg-gradient-to-br from-[hsl(var(--brand-primary-light))] to-[hsl(var(--brand-primary))] text-white"
               >
                 <Flame className="h-3.5 w-3.5 fill-current" />
                 <span className="text-[13px] font-bold">{streak?.current_streak || 0}</span>
