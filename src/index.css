@@ -351,8 +351,8 @@ html.native-app [data-scroll-container="true"] {
     /* Soft tints (light mode) */
     --tint-peach: 31 100% 89%;            /* #FFE6C9 */
     --tint-peach-mid: 30 100% 81%;        /* #FFD2A1 */
-    --tint-mint: 152 71% 93%;             /* #E2F9F0 */
-    --tint-mint-mid: 152 71% 85%;         /* #C3F1E1 */
+    --tint-mint: 85 84% 86%;              /* #E0FBB8 */
+    --tint-mint-mid: 85 84% 75%;          /* #C9F588 */
     --tint-lavender: 270 100% 95%;        /* #F0E3FF */
     --tint-lavender-mid: 270 100% 88%;    /* #DEC1FF */
     --tint-yellow: 56 100% 79%;           /* #FFF492 */
@@ -360,7 +360,7 @@ html.native-app [data-scroll-container="true"] {
     --tint-pink: 320 100% 94%;            /* #FFE0F5 */
     --tint-pink-mid: 320 100% 88%;        /* #FFC2EA */
     --tint-lime: 152 71% 93%;             /* #E2F9F0 */
-    --tint-lime-mid: 85 84% 75%;          /* #C9F588 */
+    --tint-lime-mid: 152 71% 85%;         /* #C3F1E1 */
     --tint-sky: 213 100% 92%;             /* #D7E9FF */
     --tint-sky-mid: 217 100% 86%;         /* #B9D6FF */
 
