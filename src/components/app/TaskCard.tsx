@@ -419,7 +419,7 @@ export const TaskCard = memo(function TaskCard({
         <div
           onClick={handleCardClick}
           className={cn(
-            'rounded-3xl pl-3 pr-4 py-7 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+            'rounded-3xl pl-3 pr-4 py-5 transition-all duration-200 cursor-pointer active:scale-[0.98]',
             cardSurfaceClass,
             routineBorderClass
           )}
@@ -428,12 +428,12 @@ export const TaskCard = memo(function TaskCard({
           <div className="flex items-center gap-2">
             {/* Icon — colored circle holding the emoji or pro icon (mock spec) */}
             <div className={cn(
-              "w-12 h-12 rounded-full flex items-center justify-center shrink-0",
+              "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
               tintClass,
               isAnimating && "animate-emoji-bounce [animation-delay:0.8s]"
             )}>
               {hasTaskEmoji ? (
-                <FluentEmoji emoji={task.emoji} size={30} />
+                <FluentEmoji emoji={task.emoji} size={26} />
               ) : (
                 <ProIcon className={cn('h-5 w-5', proConfig.iconColorClass)} />
               )}
@@ -586,7 +586,7 @@ export const TaskCard = memo(function TaskCard({
     <div
       onClick={handleCardClick}
       className={cn(
-        'rounded-3xl pl-3 pr-4 py-7 transition-all duration-200 cursor-pointer active:scale-[0.98]',
+        'rounded-3xl pl-3 pr-4 py-5 transition-all duration-200 cursor-pointer active:scale-[0.98]',
         cardSurfaceClass,
         routineBorderClass
       )}
@@ -595,11 +595,11 @@ export const TaskCard = memo(function TaskCard({
       <div className="flex items-center gap-2">
         {/* Icon — colored circle holding the emoji (mock spec) */}
         <div className={cn(
-          "w-12 h-12 rounded-full flex items-center justify-center shrink-0",
+          "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
           tintClass,
           isAnimating && "animate-emoji-bounce [animation-delay:0.8s]"
         )}>
-          <TaskIcon iconName={task.emoji} size={30} className="text-black/80" />
+          <TaskIcon iconName={task.emoji} size={26} className="text-black/80" />
         </div>
 
         {/* Content */}
