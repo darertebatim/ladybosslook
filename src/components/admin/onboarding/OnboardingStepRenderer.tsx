@@ -1960,13 +1960,13 @@ function RiloLanguageBubblesScreen({ step, onNext, onAnswer }: Props) {
         </FadeUp>
       )}
 
-      {/* Globe spotlight stage */}
+      {/* Globe spotlight stage — extra padding so orbit pills don't clip */}
       <FadeUp delay={0.12}>
-        <div className="relative mt-6 mx-auto w-full aspect-square max-w-[320px]">
+        <div className="relative mt-6 mx-auto w-full aspect-square max-w-[320px] px-10 py-6">
           {/* Soft spotlight glow that takes accent color when picked */}
           <motion.div
             aria-hidden
-            className="absolute inset-0 rounded-full blur-3xl"
+            className="absolute inset-10 rounded-full blur-3xl"
             animate={{
               backgroundColor: pickedCfg?.ring || 'rgba(26,31,61,0.18)',
               scale: picked !== null ? 1.05 : 1,
@@ -1977,25 +1977,25 @@ function RiloLanguageBubblesScreen({ step, onNext, onAnswer }: Props) {
           {/* Rotating dashed orbit */}
           <motion.div
             aria-hidden
-            className="absolute inset-[8%] rounded-full border-2 border-dashed border-[#1a1f3d]/15"
+            className="absolute inset-10 rounded-full border-2 border-dashed border-[#1a1f3d]/15"
             animate={{ rotate: 360 }}
             transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
           />
           <motion.div
             aria-hidden
-            className="absolute inset-[18%] rounded-full border border-dashed border-[#1a1f3d]/10"
+            className="absolute inset-[72px] rounded-full border border-dashed border-[#1a1f3d]/10"
             animate={{ rotate: -360 }}
             transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
           />
 
           {/* Globe core */}
           <motion.div
-            className="absolute inset-[28%] rounded-full bg-gradient-to-br from-[#1a1f3d] to-[#2d3566] flex items-center justify-center shadow-[0_20px_50px_-15px_rgba(26,31,61,0.6)] overflow-hidden"
+            className="absolute inset-[34%] rounded-full bg-gradient-to-br from-[#1a1f3d] to-[#2d3566] flex items-center justify-center shadow-[0_20px_50px_-15px_rgba(26,31,61,0.6)] overflow-hidden"
             animate={{ scale: picked !== null ? 0.92 : 1 }}
             transition={{ duration: 0.4 }}
           >
             <motion.span
-              className="text-[64px] leading-none"
+              className="text-[52px] leading-none"
               animate={{ rotate: [0, 8, -8, 0] }}
               transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
             >
@@ -2017,15 +2017,17 @@ function RiloLanguageBubblesScreen({ step, onNext, onAnswer }: Props) {
             )}
           </motion.div>
 
-          {/* Orbiting flag pills (positioned at N, E, S, W) */}
+          {/* Orbiting flag pills — anchored to the inner orbit (inset-10) */}
           {step.options?.map((opt, i) => {
             const cfg = LANG_CARDS[opt.label];
             if (!cfg) return null;
+            // Inner stage is inset-10 (40px) on every side, so orbit anchors
+            // are calc-based to land on that inner box edge.
             const positions = [
-              { top: '0%', left: '50%', x: '-50%', y: '0%' },           // N
-              { top: '50%', left: '100%', x: '-100%', y: '-50%' },      // E
-              { top: '100%', left: '50%', x: '-50%', y: '-100%' },      // S
-              { top: '50%', left: '0%', x: '0%', y: '-50%' },           // W
+              { top: '40px', left: '50%', x: '-50%', y: '-50%' },                  // N
+              { top: '50%', left: 'calc(100% - 40px)', x: '-50%', y: '-50%' },     // E
+              { top: 'calc(100% - 40px)', left: '50%', x: '-50%', y: '-50%' },     // S
+              { top: '50%', left: '40px', x: '-50%', y: '-50%' },                  // W
             ];
             const pos = positions[i] || positions[0];
             const isPicked = picked === i;
@@ -2062,11 +2064,11 @@ function RiloLanguageBubblesScreen({ step, onNext, onAnswer }: Props) {
                   className={`flex flex-col items-center gap-1`}
                 >
                   <div
-                    className={`relative w-[58px] h-[58px] rounded-full ${cfg.bg} flex items-center justify-center shadow-[0_8px_20px_-8px_rgba(26,31,61,0.4)] border-[3px] ${
+                    className={`relative w-[54px] h-[54px] rounded-full ${cfg.bg} flex items-center justify-center shadow-[0_8px_20px_-8px_rgba(26,31,61,0.4)] border-[3px] ${
                       isPicked ? 'border-[#1a1f3d]' : 'border-white'
                     }`}
                   >
-                    {opt.emoji && <OptionEmoji emoji={opt.emoji} size={28} />}
+                    {opt.emoji && <OptionEmoji emoji={opt.emoji} size={26} />}
                     {isPicked && (
                       <motion.div
                         initial={{ scale: 0 }}
