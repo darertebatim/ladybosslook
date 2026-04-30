@@ -1,61 +1,83 @@
-## Full Home Page Mock Alignment
+## Goal
 
-The current Home has the right layout but the wrong visual style. The mock uses a **white/cream card with a colored emoji circle**, while current renders the entire card in the bright color. This plan migrates every remaining mismatch.
+Apply the new Home design language (warm tints, soft `shadow-ios`, white-circle FABs, no rings/borders, peach/orange chips, `bg-card-warm` cards) consistently across the rest of the app. Listen page keeps its cloud background and is restyled as the **dark-mode** variant of the same system.
 
-### 1. Task Card visual language (`src/components/app/TaskCard.tsx`)
+## What "the new design" means (from Home rollout)
 
-Switch from "fully tinted card" → "white card with colored emoji circle":
+- Floating buttons / chips / pills / switcher knobs → `shadow-ios`, no rings, no borders.
+- White-circle action buttons → `bg-white text-[hsl(var(--brand-primary))] shadow-ios`.
+- Cards (tasks, list items) → `bg-card-warm shadow-card-warm`, completed state uses tint color (no `opacity-60`).
+- Active tab/chip → `bg-[hsl(var(--brand-primary))] text-white` with `shadow-ios`.
+- Inactive chip → `bg-[hsl(var(--tint-peach))] text-[hsl(var(--fg-warm-muted))]`.
+- Page background → `bg-bg-warm` (light) — except Listen which keeps cloud bg as dark variant.
+- Headers → semi-transparent warm background w/ `backdrop-blur-xl`, `shadow-ios`.
 
-| Element | Current | Mock target |
+## Step 1 — Reusable primitives (do first; everything else uses them)
+
+Create three small components so future pages don't drift:
+
+```text
+src/components/app/ui/
+  PageHeader.tsx       — standard top bar (title + back/close + optional right slot)
+  TabPills.tsx         — animated 2-3 pill switcher (extracted from AppHome)
+  IOSIconButton.tsx    — white circle button, shadow-ios, brand-orange icon
+```
+
+Also add a `--bg-warm-glass` utility / shared header className so blur/shadow stays consistent.
+
+## Step 2 — Apply per page
+
+For every page below: replace existing header with `PageHeader`, swap chip rows for `TabPills`, replace any `bg-white shadow-sm border …` floating buttons with `IOSIconButton`, recolor cards to `bg-card-warm shadow-card-warm`, remove hairline rings/borders used for elevation.
+
+| Page | File | Notes |
 |---|---|---|
-| Card background (incomplete) | Full color (`bg-[#FFF492]` etc.) | `bg-card-warm` / `#FFFDFB` (off-white) with warm shadow |
-| Card background (completed) | Same color, strikethrough only | Mid-tone color (`#FFEA4E`, `#FFD2A1` etc.) — softer fill |
-| Emoji wrapper | Bare 32px emoji | 40px rounded-full **colored** circle (light tint) holding 26px emoji |
-| Padding | `pl-3 pr-4 py-3` | `pl-3 pr-4 py-5` (taller, more breathing room) |
-| Title size | `text-[15px] font-semibold` | unchanged ✓ |
-| Subtitle | `text-[11px] text-black/80` | `text-[11px] text-black/60` (softer) |
-| Shadow | none | `shadow-card-warm` (soft warm drop shadow) |
+| Tools | `AppStore.tsx` | Warm bg, `bg-card-warm` tool tiles w/ tinted emoji circle (mirrors task card). Search bar = pill w/ `shadow-ios`. Goal section keeps current layout. |
+| Chats | `AppChat.tsx` | Warm bg, channel rows = `bg-card-warm shadow-card-warm`, unread badge = brand orange chip. Compose FAB = orange circle (this one stays orange — primary action). |
+| Presence | `AppPresence.tsx` | Warm bg + warm calendar. Streak/badge cards already match — just sweep shadows/borders. |
+| Profile | `AppProfile.tsx` | Warm bg, settings rows in `bg-card-warm` grouped cards (iOS-style). Avatar header chip uses `shadow-ios`. |
+| Settings | `AppSettings.tsx` | Same pattern as Profile — grouped warm cards, no hairline dividers. |
+| Browse Programs / Read / Inspire | `AppBrowsePrograms.tsx`, `AppRead.tsx`, `AppInspire.tsx` | Card grids → `bg-card-warm shadow-card-warm`, category chips → TabPills. |
+| Reflections / Journal / Mood / Emotion / Fasting / Period / Water / Breathe | tool detail pages | Sweep headers + buttons + cards only. Inner tool UI (timers, gradients) stays. |
 
-Add two color maps to `TASK_COLOR_CLASSES`:
-- `TASK_TINT_CLASSES` — light tint for the emoji circle (current bg colors)
-- `TASK_MID_CLASSES` — mid-tone color for completed card fill (`#FFEA4E`, `#FFD2A1`, `#FFC2EA`, etc., matching `O.peachMid`/`O.yellowMid` from the mock)
+## Step 3 — Listen page (dark variant)
 
-Apply both code paths (regular + Pro Task branches at lines ~404 and ~510).
+`AppPlayer.tsx` keeps the cloud background image but is reskinned as the **dark theme** of the new design:
 
-### 2. Switcher track shade (`src/pages/app/AppHome.tsx` ~1152)
+- Header: same `PageHeader` shape, but with `bg-black/30 backdrop-blur-xl` and `text-white`.
+- TabPills: use dark-mode tokens — track `bg-white/10`, knob `bg-white/90 text-fg-warm shadow-ios`.
+- Playlist cards: `bg-white/8 backdrop-blur-md` (glass over clouds) + `shadow-ios`, white text, `text-white/70` meta. Lock badge becomes a subtle white circle.
+- "Tap to enroll" CTA: pill `bg-white text-[hsl(var(--brand-primary))] shadow-ios`.
+- Search icon (top-right) → `IOSIconButton` dark variant (white-on-glass, no ring).
+- "ALL PLAYLISTS" label → `text-white/60 uppercase tracking-wider` (kept).
+- The `AppAudioPlayer` and `AppPlaylistDetail` inherit the same dark/glass treatment.
 
-Already changed to `bg-foreground/[0.06]`, but mock uses **`rgba(0,0,0,0.05)`** which is a hair lighter. Tighten to `bg-black/[0.05] dark:bg-white/[0.08]` for exact match. Also reduce active pill to `text-[11px]` (mock) from `text-xs`.
+This way Listen stays cinematic but feels like the same system as Home — just inverted.
 
-### 3. Week strip — already updated. Verify selected day is brand-orange filled circle ✓
+## Step 4 — Shared sheets / dialogs
 
-### 4. Quick-add task input + footer buttons (currently bordered)
+Quick sweep of bottom sheets used across pages so the language is consistent:
+- `RoutineBuilderSheet`, `GoalSettingsSheet`, `MoodCelebrationSheet`, `FastingStatsSheet`, `FastingProtocolSheet`, `ReflectionCelebrationSheet`, `EmotionDashboard`.
+- Replace `ring-1 ring-black/X` and `border border-black/X` used for elevation with `shadow-ios`.
+- Sheet handle = `bg-fg-warm/15` pill, no border.
 
-The "Quick add task..." pill at the bottom of the task list and any other bordered cards: replace with mock-style **soft warm card** (white bg, no border, warm shadow):
+## Step 5 — Memory updates
 
-- Remove `border-2 border-urgency/30` style
-- Use: `bg-card-warm shadow-card-warm border-[0.5px] border-border-warm/40` (same recipe as Manage/Browse buttons we already migrated)
+Append a "New Design Rollout" memory describing the patterns + the 3 primitives so all future page work picks them up automatically. Update Core line if needed (already covers `shadow-ios`).
 
-### 5. Counter chip color polish
+## Out of scope (won't touch this round)
 
-Currently `bg-[hsl(var(--tint-peach))]` — keep, but ensure it reads correctly on warm background (mock uses solid `#FFE6C9` peach with `#EB5E33` text). ✓
+- Admin panel pages.
+- Onboarding flows (already use their own hero/sheet system).
+- Marketing pages (`/`, `/programs`, `/auth`, etc.).
+- Inner tool UIs (timer rings, breath circles, mesh gradients) — only their headers/buttons.
 
-### Technical notes
+## Order of execution
 
-- Add new color maps in `src/hooks/useTaskPlanner.tsx` next to `TASK_COLOR_CLASSES`:
-  - `TASK_TINT_CLASSES[color]` → light tint (existing values)
-  - `TASK_MID_CLASSES[color]` → mid-tone for completed state
-- In `TaskCard.tsx`, change card class from `colorClass` to:
-  - `isCompleted ? TASK_MID_CLASSES[color] : 'bg-card-warm shadow-card-warm'`
-- Wrap the emoji in a `w-10 h-10 rounded-full ${TASK_TINT_CLASSES[color]} flex items-center justify-center` div
-- Reduce `FluentEmoji size={32}` → `size={26}`
-- Apply changes to BOTH the regular branch (~line 540) AND the Pro Task branch (~line 410) for consistency
-- Find the "Quick add task" input in `SortableTaskList.tsx` and apply the same warm-card recipe
+1. Build the 3 primitives + dark variants.
+2. Tools, Chats, Presence, Profile, Settings (light pages, biggest impact).
+3. Listen (dark variant) + audio player + playlist detail.
+4. Tool detail pages headers/buttons sweep.
+5. Sheets/dialogs sweep.
+6. Save "New Design Rollout" memory.
 
-### Files to edit
-
-- `src/hooks/useTaskPlanner.tsx` — add `TASK_TINT_CLASSES`, `TASK_MID_CLASSES`
-- `src/components/app/TaskCard.tsx` — restructure card layout (both branches)
-- `src/components/app/SortableTaskList.tsx` — restyle Quick-add pill
-- `src/pages/app/AppHome.tsx` — switcher shade tighten, font size
-
-Approve to ship the full migration.
+I'll show you each major page after I finish it so you can course-correct before I move on.
