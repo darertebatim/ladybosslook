@@ -1228,7 +1228,7 @@ const AppHome = () => {
 
                   {/* Program Events Section - rendered inside My Tasks view */}
                   {programEvents.length > 0 && (
-                    <div className="mb-4">
+                    <>
                       <div className="flex items-center gap-2 mb-3">
                         <CalendarDays className="h-4 w-4 text-foreground" />
                         <h2 className="text-sm font-semibold text-foreground">
@@ -1240,7 +1240,10 @@ const AppHome = () => {
                           <ProgramEventCard key={`${event.type}-${event.id}`} event={event} date={selectedDate} />
                         ))}
                       </div>
-                    </div>
+                      <div className="my-3 flex items-center gap-3 px-2">
+                        <div className="flex-1 h-[1px] bg-border/60" />
+                      </div>
+                    </>
                   )}
 
                   {filteredTasks.length === 0 ? (
