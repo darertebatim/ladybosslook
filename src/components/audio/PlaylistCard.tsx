@@ -84,7 +84,7 @@ export const PlaylistCard = memo(function PlaylistCard({
     <button
       className={cn(
         "relative w-full text-left rounded-2xl overflow-hidden cursor-pointer transition-all active:scale-[0.98]",
-        "bg-white/10 backdrop-blur-sm",
+        "bg-white/10 backdrop-blur-md shadow-ios",
         tourClass
       )}
       onClick={handleClick}
@@ -177,7 +177,7 @@ export const PlaylistCard = memo(function PlaylistCard({
 
       {/* Enroll CTA for locked playlists */}
       {isLocked && !isFree && programSlug && (
-        <div className="flex items-center justify-center gap-1.5 py-2 px-3 bg-white/10 text-white text-xs font-medium">
+        <div className="flex items-center justify-center gap-1.5 py-2.5 px-3 bg-white/95 text-[hsl(var(--brand-primary))] text-xs font-semibold">
           <span>Tap to enroll</span>
           <ChevronRight className="h-3.5 w-3.5" />
         </div>
