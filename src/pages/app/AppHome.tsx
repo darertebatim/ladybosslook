@@ -911,7 +911,7 @@ const AppHome = () => {
       
       <div className="flex flex-col h-full overflow-hidden bg-background">
         {/* Fixed header with integrated week strip - Me+ style */}
-        <header className="tour-header fixed top-0 left-0 right-0 z-50 bg-white/20 dark:bg-black/15 backdrop-blur-xl rounded-b-xl shadow-[0_2px_10px_rgba(0,0,0,0.08)]" style={{
+        <header className="tour-header fixed top-0 left-0 right-0 z-50 bg-white/20 dark:bg-black/15 backdrop-blur-xl rounded-b-xl shadow-card-warm" style={{
         paddingTop: 'max(12px, env(safe-area-inset-top))'
       }}>
           {/* Title bar - three column layout for balanced centering */}
