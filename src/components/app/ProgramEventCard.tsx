@@ -258,7 +258,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
                   onClick={handleSettingsClick}
                   className={cn("p-1 rounded-full transition-colors", style.settingsBg)}
                 >
-                  <Settings2 className="h-3 w-3 text-black" />
+                  <Settings2 className="h-3 w-3 text-fg-warm" />
                 </button>
               )}
               
@@ -270,7 +270,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
             
             {/* Title */}
             <p className={cn(
-              'text-black text-[15px] font-semibold leading-tight transition-all truncate',
+              'text-fg-warm text-[15px] font-semibold leading-tight transition-all truncate',
               event.isCompleted && 'line-through'
             )}>
               {isPlaylistUpdate && event.audioTitle ? event.audioTitle : event.title}
