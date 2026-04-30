@@ -956,7 +956,12 @@ const AppHome = () => {
               {/* Streak badge - navigates to presence page */}
               <button
                 onClick={() => navigate('/app/presence')}
-                className="tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full shadow-sm active:scale-95 transition-all bg-gradient-to-br from-[hsl(var(--brand-primary-light))] to-[hsl(var(--brand-primary))] text-white"
+                className={cn(
+                  "tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full shadow-sm active:scale-95 transition-all",
+                  (streak?.current_streak || 0) > 0
+                    ? "bg-gradient-to-br from-[hsl(var(--brand-primary-light))] to-[hsl(var(--brand-primary))] text-white"
+                    : "bg-[hsl(var(--tint-peach))] text-[hsl(var(--fg-warm-muted))]"
+                )}
               >
                 <Flame className="h-3.5 w-3.5 fill-current" />
                 <span className="text-[13px] font-bold">{streak?.current_streak || 0}</span>
