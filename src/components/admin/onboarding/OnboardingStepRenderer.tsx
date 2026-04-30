@@ -1939,177 +1939,144 @@ function RiloLanguageBubblesScreen({ step, onNext, onAnswer }: Props) {
     haptic.success();
     const label = step.options?.[i]?.label || '';
     onAnswer?.(step.id, label);
-    setTimeout(onNext, 750);
+    setTimeout(onNext, 800);
   };
 
   return (
-    <ScreenWrapper>
-      {/* Header */}
-      <FadeUp>
-        <h1 className="text-[26px] font-extrabold text-black leading-[1.15] tracking-tight">
-          {step.title?.split('\n').map((line, i) => (
-            <span key={i} className="block">{line}</span>
-          ))}
-        </h1>
-      </FadeUp>
-      {step.subtitle && (
-        <FadeUp delay={0.08}>
-          <p className="mt-3 text-[15px] text-[#1a1f3d]/65 leading-relaxed">
-            {step.subtitle}
-          </p>
-        </FadeUp>
-      )}
-
-      {/* Globe spotlight stage — extra padding so orbit pills don't clip */}
-      <FadeUp delay={0.12}>
-        <div className="relative mt-6 mx-auto w-full aspect-square max-w-[320px] px-10 py-6">
-          {/* Soft spotlight glow that takes accent color when picked */}
+    <div className="h-full w-full flex flex-col relative overflow-hidden bg-gradient-to-b from-[#FFF7F0] via-white to-[#F4F1FF]">
+      {/* ───── Visual: globe ───── */}
+      <div className="flex-1 flex items-center justify-center px-6 pt-6 pb-2 relative z-10 min-h-0">
+        <div className="relative w-full aspect-square max-w-[260px]">
+          {/* Spotlight glow */}
           <motion.div
             aria-hidden
-            className="absolute inset-10 rounded-full blur-3xl"
+            className="absolute inset-4 rounded-full blur-3xl"
             animate={{
               backgroundColor: pickedCfg?.ring || 'rgba(26,31,61,0.18)',
               scale: picked !== null ? 1.05 : 1,
             }}
             transition={{ duration: 0.5 }}
           />
-
-          {/* Rotating dashed orbit */}
+          {/* Dashed orbits */}
           <motion.div
             aria-hidden
-            className="absolute inset-10 rounded-full border-2 border-dashed border-[#1a1f3d]/15"
+            className="absolute inset-2 rounded-full border-2 border-dashed border-[#1a1f3d]/15"
             animate={{ rotate: 360 }}
             transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
           />
           <motion.div
             aria-hidden
-            className="absolute inset-[72px] rounded-full border border-dashed border-[#1a1f3d]/10"
+            className="absolute inset-8 rounded-full border border-dashed border-[#1a1f3d]/10"
             animate={{ rotate: -360 }}
             transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
           />
-
           {/* Globe core */}
           <motion.div
-            className="absolute inset-[34%] rounded-full bg-gradient-to-br from-[#1a1f3d] to-[#2d3566] flex items-center justify-center shadow-[0_20px_50px_-15px_rgba(26,31,61,0.6)] overflow-hidden"
-            animate={{ scale: picked !== null ? 0.92 : 1 }}
+            className="absolute inset-[22%] rounded-full bg-gradient-to-br from-[#1a1f3d] to-[#2d3566] flex items-center justify-center shadow-[0_20px_50px_-15px_rgba(26,31,61,0.6)] overflow-hidden"
+            animate={{ scale: picked !== null ? 0.94 : 1 }}
             transition={{ duration: 0.4 }}
           >
             <motion.span
-              className="text-[52px] leading-none"
+              className="text-[64px] leading-none"
               animate={{ rotate: [0, 8, -8, 0] }}
               transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
             >
               🌍
             </motion.span>
-
-            {/* Picked greeting bubble inside spotlight */}
-            {pickedCfg && (
-              <motion.div
-                key={pickedCfg.name}
-                initial={{ opacity: 0, y: 8, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ type: 'spring', stiffness: 320, damping: 20 }}
-                className={`absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-white shadow-lg whitespace-nowrap ${pickedCfg.fontClass || ''}`}
-                dir={pickedCfg.rtl ? 'rtl' : 'ltr'}
-              >
-                <span className="text-[13px] font-bold text-black">{pickedCfg.greeting}</span>
-              </motion.div>
-            )}
           </motion.div>
+          {/* Picked greeting bubble pops out below globe */}
+          {pickedCfg && (
+            <motion.div
+              key={pickedCfg.name}
+              initial={{ opacity: 0, y: -6, scale: 0.7 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 20 }}
+              className={`absolute left-1/2 -translate-x-1/2 bottom-2 px-4 py-2 rounded-full bg-white shadow-lg whitespace-nowrap ${pickedCfg.fontClass || ''}`}
+              dir={pickedCfg.rtl ? 'rtl' : 'ltr'}
+            >
+              <span className="text-[14px] font-extrabold text-black">{pickedCfg.greeting}</span>
+            </motion.div>
+          )}
+        </div>
+      </div>
 
-          {/* Orbiting flag pills — anchored to the inner orbit (inset-10) */}
+      {/* ───── Text + tappable list (matches RiloTeach pattern) ───── */}
+      <div className="shrink-0 px-6 pb-8 relative z-10">
+        <FadeUp>
+          <h1 className="text-[24px] leading-[1.2] font-extrabold text-[#1a1f3d] text-center whitespace-pre-line">
+            {step.title}
+          </h1>
+        </FadeUp>
+        {step.subtitle && (
+          <FadeUp delay={0.08}>
+            <p className="mt-2 text-[14px] text-[#1a1f3d]/65 text-center leading-snug">
+              {step.subtitle}
+            </p>
+          </FadeUp>
+        )}
+
+        {/* Visible, obviously-tappable language buttons */}
+        <StaggerContainer className="mt-5 space-y-2.5" staggerDelay={0.06}>
           {step.options?.map((opt, i) => {
             const cfg = LANG_CARDS[opt.label];
             if (!cfg) return null;
-            // Inner stage is inset-10 (40px) on every side, so orbit anchors
-            // are calc-based to land on that inner box edge.
-            const positions = [
-              { top: '40px', left: '50%', x: '-50%', y: '-50%' },                  // N
-              { top: '50%', left: 'calc(100% - 40px)', x: '-50%', y: '-50%' },     // E
-              { top: 'calc(100% - 40px)', left: '50%', x: '-50%', y: '-50%' },     // S
-              { top: '50%', left: '40px', x: '-50%', y: '-50%' },                  // W
-            ];
-            const pos = positions[i] || positions[0];
             const isPicked = picked === i;
             const isDimmed = picked !== null && !isPicked;
             return (
-              <motion.button
-                key={i}
-                onClick={() => select(i)}
-                style={{
-                  top: pos.top,
-                  left: pos.left,
-                  transform: `translate(${pos.x}, ${pos.y})`,
-                }}
-                className="absolute active:scale-95"
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{
-                  opacity: isDimmed ? 0.3 : 1,
-                  scale: isPicked ? 1.18 : 1,
-                }}
-                transition={{
-                  delay: 0.18 + i * 0.08,
-                  duration: 0.4,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-              >
-                <motion.div
-                  animate={isPicked ? {} : { y: [0, -4, 0] }}
-                  transition={{
-                    duration: 3 + i * 0.3,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                    delay: i * 0.4,
+              <StaggerItem key={i}>
+                <motion.button
+                  onClick={() => select(i)}
+                  animate={{
+                    scale: isPicked ? 1.02 : 1,
+                    opacity: isDimmed ? 0.4 : 1,
                   }}
-                  className={`flex flex-col items-center gap-1`}
+                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                  className={`relative w-full flex items-center gap-3 rounded-2xl px-4 py-3 text-left active:scale-[0.98] transition-transform border-2 ${
+                    isPicked
+                      ? 'border-[#1a1f3d] bg-white shadow-[0_10px_24px_-12px_rgba(26,31,61,0.4)]'
+                      : 'border-black/5 bg-white shadow-[0_4px_12px_-8px_rgba(26,31,61,0.2)]'
+                  }`}
                 >
+                  {/* Flag chip */}
+                  <div className={`shrink-0 w-11 h-11 rounded-full ${cfg.bg} flex items-center justify-center`}>
+                    {opt.emoji && <OptionEmoji emoji={opt.emoji} size={22} />}
+                  </div>
+                  {/* Name + greeting */}
+                  <div className="flex-1 min-w-0" dir={cfg.rtl ? 'rtl' : 'ltr'}>
+                    <div
+                      className={`text-[16px] font-extrabold text-black leading-tight ${cfg.fontClass || ''}`}
+                    >
+                      {cfg.name}
+                    </div>
+                    <div
+                      className={`text-[12px] text-[#1a1f3d]/60 leading-tight mt-0.5 ${cfg.fontClass || ''}`}
+                    >
+                      {cfg.greeting}
+                    </div>
+                  </div>
+                  {/* Selection indicator */}
                   <div
-                    className={`relative w-[54px] h-[54px] rounded-full ${cfg.bg} flex items-center justify-center shadow-[0_8px_20px_-8px_rgba(26,31,61,0.4)] border-[3px] ${
-                      isPicked ? 'border-[#1a1f3d]' : 'border-white'
+                    className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
+                      isPicked ? 'bg-[#1a1f3d]' : 'border-2 border-black/15'
                     }`}
                   >
-                    {opt.emoji && <OptionEmoji emoji={opt.emoji} size={26} />}
-                    {isPicked && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: 'spring', stiffness: 380, damping: 18 }}
-                        className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#1a1f3d] flex items-center justify-center shadow-md"
-                      >
-                        <SealCheck className="w-3 h-3 text-white" />
-                      </motion.div>
-                    )}
+                    {isPicked && <SealCheck className="w-4 h-4 text-white" />}
                   </div>
-                  <span
-                    className={`text-[13px] font-extrabold text-black px-2 py-0.5 rounded-md bg-white/90 backdrop-blur ${cfg.fontClass || ''}`}
-                    dir={cfg.rtl ? 'rtl' : 'ltr'}
-                  >
-                    {cfg.name}
-                  </span>
-                </motion.div>
-              </motion.button>
+                </motion.button>
+              </StaggerItem>
             );
           })}
-        </div>
-      </FadeUp>
+        </StaggerContainer>
 
-      {/* Helper note */}
-      <FadeUp delay={0.35}>
-        <p className="mt-4 text-center text-[12px] text-[#1a1f3d]/50">
-          You can change this anytime in Settings.
-        </p>
-      </FadeUp>
-
-      {/* Skip */}
-      <FadeUp delay={0.4} className="mt-auto">
+        {/* Skip */}
         <button
           onClick={onNext}
-          className="w-full text-center text-sm text-[#1a1f3d]/45 py-3 active:opacity-60"
+          className="mt-4 w-full text-center text-[13px] text-[#1a1f3d]/45 py-2 active:opacity-60"
         >
           Skip this question
         </button>
-      </FadeUp>
-    </ScreenWrapper>
+      </div>
+    </div>
   );
 }
 
