@@ -63,6 +63,7 @@ import { GoalSettingsSheet, GoalSettings, formatGoalTarget } from '@/components/
 import { NumberKeypad } from '@/components/app/NumberKeypad';
 import { TimePeriod, TIME_PERIODS, TimeMode, getTimeMode, formatTimeLabel, formatTimeRange, getTimePeriodConfig, normalizeTimePeriod } from '@/lib/taskScheduling';
 import SubtaskEditorSheet from '@/components/app/SubtaskEditorSheet';
+import { useTranslation } from 'react-i18next';
 
 // Me+ style pastel color options with hex values
 const COLOR_OPTIONS: { name: TaskColor; hex: string }[] = [
@@ -156,6 +157,7 @@ const TimePickerSheet = ({
   timePeriod: TimePeriod | null;
   onSave: (time: string | null, period: TimePeriod | null) => void;
 }) => {
+  const { t } = useTranslation();
   const [localTime, setLocalTime] = useState<string | null>(scheduledTime);
   const [localPeriod, setLocalPeriod] = useState<TimePeriod | null>(timePeriod);
 
@@ -186,19 +188,19 @@ const TimePickerSheet = ({
             <button onClick={handleCancel} className="p-2 -ml-2">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <span className="text-lg font-medium">Time</span>
+            <span className="text-lg font-medium">{t('taskEdit.time')}</span>
             <Button
               variant="ghost"
               onClick={handleSave}
               className="text-primary font-medium"
             >
-              Save
+              {t('taskEdit.save')}
             </Button>
           </div>
 
           <div className="px-6 pb-4">
             <div className="flex items-center justify-between py-3 mb-4 border-b border-muted/30">
-              <span className="font-medium text-foreground">Specific time</span>
+              <span className="font-medium text-foreground">{t('taskEdit.specificTime')}</span>
               <Switch
                 checked={localTimeMode === 'specific'}
                 onCheckedChange={(checked) => {
@@ -356,6 +358,7 @@ const AppTaskCreate = ({
   editTaskId: editTaskIdProp,
   createParams,
 }: AppTaskCreateProps) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { taskId: routeTaskId } = useParams<{ taskId?: string }>();
   const taskId = editTaskIdProp || routeTaskId;
@@ -1235,7 +1238,7 @@ const AppTaskCreate = ({
             value={title}
             onChange={(e) => setTitle(e.target.value.slice(0, 50))}
             onFocus={handleTitleFocus}
-            placeholder="Task name"
+            placeholder={t('taskEdit.taskNamePlaceholder')}
             className="w-full text-lg font-semibold border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/50 h-auto py-1 px-0 pr-6"
             maxLength={50}
           />
@@ -1274,7 +1277,7 @@ const AppTaskCreate = ({
           value={description || ''}
           onChange={(e) => setDescription(e.target.value || null)}
           onFocus={handleDescriptionFocus}
-          placeholder="Add a description or notes..."
+          placeholder={t('taskEdit.addDescription')}
           className="w-full bg-white/60 dark:bg-slate-700/60 border-0 rounded-xl resize-none text-sm placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-foreground/20 min-h-0"
           rows={1}
         />
@@ -1289,10 +1292,10 @@ const AppTaskCreate = ({
         >
           <div className="flex items-center gap-3">
             <Calendar className="h-5 w-5 text-black" />
-            <span className="font-medium text-black">{repeatEnabled ? 'Starting from' : 'Date'}</span>
+            <span className="font-medium text-black">{repeatEnabled ? t('taskEdit.startingFrom') : t('taskEdit.date')}</span>
           </div>
           <div className="flex items-center gap-2 text-black">
-            <span>{format(scheduledDate, 'MMM d') === format(new Date(), 'MMM d') ? 'Today' : format(scheduledDate, 'MMM d, yyyy')}</span>
+            <span>{format(scheduledDate, 'MMM d') === format(new Date(), 'MMM d') ? t('taskEdit.today') : format(scheduledDate, 'MMM d, yyyy')}</span>
             <ChevronRight className="h-4 w-4 text-black" />
           </div>
         </button>
@@ -1304,7 +1307,7 @@ const AppTaskCreate = ({
         >
           <div className="flex items-center gap-3">
             <Repeat className="h-5 w-5 text-black" />
-            <span className="font-medium text-black">Repeat</span>
+            <span className="font-medium text-black">{t('taskEdit.repeat')}</span>
           </div>
           <div className="flex items-center gap-2 text-black">
             <span>{getRepeatSummary()}</span>
@@ -1319,7 +1322,7 @@ const AppTaskCreate = ({
         >
           <div className="flex items-center gap-3">
             <Clock className="h-5 w-5 text-black" />
-            <span className="font-medium text-black">Time</span>
+            <span className="font-medium text-black">{t('taskEdit.time')}</span>
           </div>
           <div className="flex items-center gap-2 text-black">
             <span>{formatTimeDisplay(scheduledTime)}</span>
@@ -1334,13 +1337,13 @@ const AppTaskCreate = ({
         >
           <div className="flex items-center gap-3">
             <Timer className="h-5 w-5 text-black" />
-            <span className="font-medium text-black">Duration</span>
+            <span className="font-medium text-black">{t('taskEdit.duration')}</span>
           </div>
           <div className="flex items-center gap-2 text-black">
             <span>
               {durationMinutes 
-                ? `${durationMinutes} min${useHistoryDuration ? ' (avg)' : ''}` 
-                : 'Not set'}
+                ? (useHistoryDuration ? t('taskEdit.minAvg', { min: durationMinutes }) : t('taskEdit.minutesShort', { min: durationMinutes }))
+                : t('taskEdit.notSet')}
             </span>
             <ChevronRight className="h-4 w-4 text-black" />
           </div>
@@ -1353,7 +1356,7 @@ const AppTaskCreate = ({
         >
           <div className="flex items-center gap-3">
             <Bell className="h-5 w-5 text-black" />
-            <span className="font-medium text-black">Reminder</span>
+            <span className="font-medium text-black">{t('taskEdit.reminder')}</span>
           </div>
           <div className="flex items-center gap-2 text-black">
             <span>{getReminderSummary()}</span>
@@ -1367,8 +1370,8 @@ const AppTaskCreate = ({
             <div className="flex items-center gap-3">
               <AlarmClock className={cn("h-5 w-5", isUrgent ? "text-red-500" : "text-black")} />
               <div className="flex flex-col">
-                <span className={cn("font-medium text-black", isUrgent && "text-red-600")}>Urgent</span>
-                <span className="text-xs text-black/60">Alarm rings even on silent</span>
+                <span className={cn("font-medium text-black", isUrgent && "text-red-600")}>{t('taskEdit.urgent')}</span>
+                <span className="text-xs text-black/60">{t('taskEdit.urgentHint')}</span>
               </div>
             </div>
             <Switch 
@@ -1392,10 +1395,10 @@ const AppTaskCreate = ({
         >
           <div className="flex items-center gap-3">
             <Tag className="h-5 w-5 text-black" />
-            <span className="font-medium text-black">Category</span>
+            <span className="font-medium text-black">{t('taskEdit.category')}</span>
           </div>
           <div className="flex items-center gap-2 text-black">
-            <span>{tag || 'No category'}</span>
+            <span>{tag || t('taskEdit.noCategory')}</span>
             <ChevronRight className="h-4 w-4 text-black" />
           </div>
         </button>
@@ -1412,10 +1415,10 @@ const AppTaskCreate = ({
         >
           <div className="flex items-center gap-3">
             <Target className={cn("h-5 w-5", goalSettings.enabled ? "text-emerald-600" : "text-black")} />
-            <span className="font-medium text-black">Goal</span>
+            <span className="font-medium text-black">{t('taskEdit.goal')}</span>
           </div>
           <div className="flex items-center gap-2 text-black">
-            <span>{goalSettings.enabled ? formatGoalTarget(goalSettings) : 'Off'}</span>
+            <span>{goalSettings.enabled ? formatGoalTarget(goalSettings) : t('taskEdit.off')}</span>
             <ChevronRight className="h-4 w-4 text-black" />
           </div>
         </button>
@@ -1432,7 +1435,7 @@ const AppTaskCreate = ({
         >
           <div className="flex items-center gap-3">
             <Sparkles className={cn("h-5 w-5", proLinkType ? "text-violet-600" : "text-black")} />
-            <span className="font-medium text-black">Pro Action Link</span>
+            <span className="font-medium text-black">{t('taskEdit.proActionLink')}</span>
           </div>
           <div className="flex items-center gap-2 text-black">
             {proConfig ? (
@@ -1441,7 +1444,7 @@ const AppTaskCreate = ({
                 <span className="truncate max-w-[100px]">{proConfig.label}</span>
               </span>
             ) : (
-              <span>Off</span>
+              <span>{t('taskEdit.off')}</span>
             )}
             <ChevronRight className="h-4 w-4 text-black" />
           </div>
@@ -1458,14 +1461,14 @@ const AppTaskCreate = ({
           "flex-1 text-left text-base",
           subtasks.length > 0 ? "text-foreground font-medium" : "text-muted-foreground/50"
         )}>
-          {subtasks.length > 0 ? `${subtasks.length} subtask${subtasks.length > 1 ? 's' : ''}` : 'Subtasks'}
+          {subtasks.length > 0 ? t('taskEdit.subtaskCount', { count: subtasks.length }) : t('taskEdit.subtasks')}
         </span>
         <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
       </button>
 
       {/* Subtasks hint text */}
       <p className="text-center text-sm text-black mt-3 px-6">
-        Subtasks can be set as your daily routine or checklist
+        {t('taskEdit.subtasksHint')}
       </p>
 
       {/* Bottom safe area */}
@@ -2924,14 +2927,14 @@ const AppTaskCreate = ({
                     </button>
                   )}
                 </div>
-                <h1 className="text-lg font-semibold">Edit Task</h1>
+                <h1 className="text-lg font-semibold">{taskId ? t('taskEdit.editTask') : t('taskEdit.newTask')}</h1>
                 <Button
                   onClick={handleSubmit}
                   disabled={!title.trim()}
                   variant="ghost"
                   className="text-primary font-semibold"
                 >
-                  Save
+                  {t('taskEdit.save')}
                 </Button>
               </div>
 
@@ -2980,7 +2983,7 @@ const AppTaskCreate = ({
             size="sm"
             className="bg-primary text-primary-foreground font-semibold rounded-full px-5 active:scale-95"
           >
-            {taskId ? 'Save' : 'Create'}
+            {taskId ? t('taskEdit.save') : t('taskEdit.create')}
           </Button>
         </div>
       </header>
@@ -3001,14 +3004,14 @@ const AppTaskCreate = ({
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlarmClock className="h-5 w-5 text-red-500" />
-              Enable Urgent Alarm?
+              {t('taskEdit.enableUrgentAlarm')}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-left">
-              This will create an alarm that rings even when your phone is on silent mode. The alarm will be added to your device's calendar.
+              {t('taskEdit.enableUrgentMessage')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row gap-3">
-            <AlertDialogCancel className="flex-1 mt-0">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="flex-1 mt-0">{t('taskEdit.cancel')}</AlertDialogCancel>
             <AlertDialogAction 
               className="flex-1 bg-red-500"
               onClick={() => {
@@ -3016,7 +3019,7 @@ const AppTaskCreate = ({
                 setShowUrgentConfirm(false);
               }}
             >
-              Enable Urgent
+              {t('taskEdit.enableUrgent')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

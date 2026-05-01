@@ -34,6 +34,7 @@ import { useNavigate } from 'react-router-dom';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
+import { useTranslation } from 'react-i18next';
 
 interface SortableTaskItemProps {
   task: UserTask;
@@ -338,6 +339,7 @@ const TIME_PERIOD_LABELS: Record<string, string> = {
 };
 
 function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride }: { date: Date; taskCount: number; onOpenTaskSheet?: (params: { editTaskId?: string; createParams?: Record<string, string> }) => void; defaultRepeatOverride?: 'Daily' | 'No' | 'Weekly' }) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [showIdeas, setShowIdeas] = useState(false);
@@ -352,6 +354,18 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
   // Quick shortcut states
   const TIME_OPTIONS = ['Anytime', 'Morning', 'Afternoon', 'Evening', 'Bedtime'] as const;
   const REPEAT_OPTIONS = ['Daily', 'No', 'Weekly'] as const;
+  const TIME_LABELS: Record<typeof TIME_OPTIONS[number], string> = {
+    Anytime: t('quickAdd.anytime'),
+    Morning: t('quickAdd.morning'),
+    Afternoon: t('quickAdd.afternoon'),
+    Evening: t('quickAdd.evening'),
+    Bedtime: t('quickAdd.bedtime'),
+  };
+  const REPEAT_LABELS: Record<typeof REPEAT_OPTIONS[number], string> = {
+    Daily: t('quickAdd.daily'),
+    No: t('quickAdd.once'),
+    Weekly: t('quickAdd.weekly'),
+  };
   const [quickTime, setQuickTime] = useState<typeof TIME_OPTIONS[number]>('Anytime');
   const [quickRepeat, setQuickRepeat] = useState<typeof REPEAT_OPTIONS[number]>('Daily');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -542,7 +556,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
         <div className="w-8 h-8 flex items-center justify-center shrink-0">
           <Plus className="h-5 w-5 text-[hsl(var(--brand-primary))]" strokeWidth={3} />
         </div>
-        <span className="text-[15px] font-semibold text-foreground">Quick add task...</span>
+        <span className="text-[15px] font-semibold text-foreground">{t('quickAdd.quickAdd')}</span>
       </button>
 
       {/* Dialog */}
@@ -574,7 +588,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
               )}
             >
               <Repeat className="h-3 w-3" />
-              {quickRepeat.toUpperCase()}
+              {REPEAT_LABELS[quickRepeat].toUpperCase()}
             </button>
             <button
               onMouseDown={(e) => e.preventDefault()}
@@ -591,7 +605,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
               )}
             >
               <Clock className="h-3 w-3" />
-              {quickTime.toUpperCase()}
+              {TIME_LABELS[quickTime].toUpperCase()}
             </button>
             <button
               onMouseDown={(e) => e.preventDefault()}
@@ -631,7 +645,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
                     if (e.key === 'Enter') handleSubmit();
                     if (e.key === 'Escape') handleClose();
                   }}
-                  placeholder="Type task name..."
+                  placeholder={t('quickAdd.typeTaskName')}
                   className="flex-1 bg-transparent text-[15px] font-semibold text-black placeholder:text-fg-warm-muted outline-none"
                   enterKeyHint="done"
                   autoComplete="off"
@@ -642,7 +656,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
             </div>
             <div className="px-4 py-3.5 bg-[#FFE6C0]">
               <p className="text-[13px] font-medium text-black text-center">
-                Press enter to add. Tap outside to cancel.
+                {t('quickAdd.pressEnterAdd')}
               </p>
             </div>
           </div>
@@ -657,7 +671,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
                   className="gap-1.5 h-11 px-5 rounded-2xl text-sm font-medium flex items-center justify-center shadow-sm active:scale-95 transition-transform bg-white text-black"
                 >
                   <MoreHorizontal className="h-4 w-4" />
-                  Details
+                  {t('quickAdd.details')}
                 </button>
                 <button
                   onMouseDown={(e) => e.preventDefault()}
@@ -665,7 +679,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
                   className="flex-1 gap-2 h-11 rounded-2xl text-sm font-medium flex items-center justify-center shadow-sm active:scale-95 transition-transform bg-urgency text-urgency-foreground"
                 >
                   <Plus className="h-4 w-4" />
-                  Add Task
+                  {t('quickAdd.addTask')}
                 </button>
               </div>
             ) : (
@@ -676,7 +690,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
           {/* Search-based suggestions while typing */}
           {searchSuggestions.length > 0 && (
             <div className="mt-3 flex flex-col gap-1.5 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
-              <p className="text-sm text-white/70 font-medium text-center">Need some ideas?</p>
+              <p className="text-sm text-white/70 font-medium text-center">{t('quickAdd.needIdeas')}</p>
               {searchSuggestions.map((template) => {
                 const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
                 return (
@@ -706,7 +720,7 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
                 showIdeas && "opacity-0 pointer-events-none"
               )}
             >
-              Need some ideas?
+              {t('quickAdd.needIdeas')}
             </button>
           </div>
           )}
