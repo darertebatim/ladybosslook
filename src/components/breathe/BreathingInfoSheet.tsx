@@ -1,5 +1,6 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { BreathingExercise } from '@/hooks/useBreathingExercises';
 
 interface BreathingInfoSheetProps {
@@ -15,36 +16,36 @@ export function BreathingInfoSheet({
   onOpenChange,
   onDismiss 
 }: BreathingInfoSheetProps) {
+  const { t } = useTranslation();
   if (!exercise) return null;
 
   const hasInhaleHold = exercise.inhale_hold_seconds > 0;
   const hasExhaleHold = exercise.exhale_hold_seconds > 0;
 
-  // Build phases array for display
   const phases = [
-    { 
-      label: 'Inhale', 
-      seconds: exercise.inhale_seconds, 
-      method: exercise.inhale_method === 'nose' ? 'Nose' : 'Mouth',
-      icon: '○→' // Expanding
+    {
+      label: t('breathePage.inhale'),
+      seconds: exercise.inhale_seconds,
+      method: exercise.inhale_method === 'nose' ? t('breathePage.nose') : t('breathePage.mouth'),
+      icon: '○→',
     },
-    ...(hasInhaleHold ? [{ 
-      label: 'Hold', 
-      seconds: exercise.inhale_hold_seconds, 
-      method: null,
-      icon: '●' // Filled/static
+    ...(hasInhaleHold ? [{
+      label: t('breathePage.hold'),
+      seconds: exercise.inhale_hold_seconds,
+      method: null as string | null,
+      icon: '●',
     }] : []),
-    { 
-      label: 'Exhale', 
-      seconds: exercise.exhale_seconds, 
-      method: exercise.exhale_method === 'nose' ? 'Nose' : 'Mouth',
-      icon: '←○' // Contracting
+    {
+      label: t('breathePage.exhale'),
+      seconds: exercise.exhale_seconds,
+      method: exercise.exhale_method === 'nose' ? t('breathePage.nose') : t('breathePage.mouth'),
+      icon: '←○',
     },
-    ...(hasExhaleHold ? [{ 
-      label: 'Hold', 
-      seconds: exercise.exhale_hold_seconds, 
-      method: null,
-      icon: '●' // Filled/static
+    ...(hasExhaleHold ? [{
+      label: t('breathePage.hold'),
+      seconds: exercise.exhale_hold_seconds,
+      method: null as string | null,
+      icon: '●',
     }] : []),
   ];
 
@@ -102,7 +103,7 @@ export function BreathingInfoSheet({
           onClick={handleOkay}
           className="w-full h-12 font-semibold rounded-2xl"
         >
-          Okay
+          {t('breathePage.okay')}
         </Button>
       </SheetContent>
     </Sheet>
