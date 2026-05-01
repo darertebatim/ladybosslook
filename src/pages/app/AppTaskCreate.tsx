@@ -357,6 +357,7 @@ const AppTaskCreate = ({
   editTaskId: editTaskIdProp,
   createParams,
 }: AppTaskCreateProps) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { taskId: routeTaskId } = useParams<{ taskId?: string }>();
   const taskId = editTaskIdProp || routeTaskId;
