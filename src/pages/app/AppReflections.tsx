@@ -89,7 +89,7 @@ function AppReflectionsInner() {
           <button onClick={handleBack} className="active:scale-95 transition-transform">
             <ArrowLeft className="h-6 w-6" />
           </button>
-          <h1 className="text-lg font-semibold">Reflections Journal</h1>
+          <h1 className="text-lg font-semibold">{t('reflections.title')}</h1>
           <div className="flex items-center gap-1">
             <button
               onClick={() => { haptic.light(); handleShare(); }}
@@ -112,7 +112,7 @@ function AppReflectionsInner() {
       <div style={{ height: 'calc(56px + env(safe-area-inset-top, 0px))' }} />
 
       <div className="px-4 pt-2 pb-2">
-        <p className="text-foreground text-sm">Find ways to be happier & healthier</p>
+        <p className="text-foreground text-sm">{t('reflections.tagline')}</p>
       </div>
 
       {/* Free Form */}
@@ -123,8 +123,8 @@ function AppReflectionsInner() {
         >
           <span className="text-xl">✍️</span>
           <div>
-            <p className="font-semibold text-sm">Free Form</p>
-            <p className="text-xs text-foreground line-clamp-1">Write freely</p>
+            <p className="font-semibold text-sm">{t('reflections.freeForm')}</p>
+            <p className="text-xs text-foreground line-clamp-1">{t('reflections.freeFormHint')}</p>
           </div>
         </button>
         <button
@@ -133,8 +133,8 @@ function AppReflectionsInner() {
         >
           <FluentEmoji emoji="📓" size={24} />
           <div>
-            <p className="font-semibold text-sm">My Notes</p>
-            <p className="text-xs text-foreground line-clamp-1">Past reflections</p>
+            <p className="font-semibold text-sm">{t('reflections.myNotes')}</p>
+            <p className="text-xs text-foreground line-clamp-1">{t('reflections.myNotesHint')}</p>
           </div>
         </button>
       </div>
@@ -142,7 +142,7 @@ function AppReflectionsInner() {
       {/* Featured */}
       {featured.length > 0 && (
         <div className="px-4 mt-4">
-          <h2 className="text-sm font-semibold text-foreground mb-2">For you</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-2">{t('reflections.forYou')}</h2>
           <div className="flex flex-col gap-2">
             {featured.map((r) => (
               <button

@@ -275,7 +275,7 @@ const AppSettings = () => {
           <button onClick={() => navigate(-1)} className="p-1 -ml-1">
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <h1 className="font-semibold text-lg">Settings</h1>
+          <h1 className="font-semibold text-lg">{t('settings.title')}</h1>
         </div>
       </header>
 
