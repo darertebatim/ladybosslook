@@ -9,9 +9,8 @@ import { SEOHead } from '@/components/SEOHead';
 import { supabase } from '@/integrations/supabase/client';
 import { BrandedSplash } from '@/components/app/BrandedSplash';
 import { getDisplayBuildInfo } from '@/lib/buildInfo';
-import { ArrowLeft, Mail, Users } from 'lucide-react';
-import appIcon from '@/assets/app-icon.png';
-import cheerfulBird from '@/assets/onboarding/cheerful-bird.png';
+import { ArrowLeft, Mail } from 'lucide-react';
+import riloAppIcon from '@/assets/rilo-app-icon.png';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { Capacitor } from '@capacitor/core';
 import { Analytics } from '@/lib/firebaseAnalytics';
@@ -180,46 +179,69 @@ export default function Auth() {
   return (
     <>
       <SEOHead />
-      <div className="h-[100dvh] flex flex-col bg-background overflow-hidden relative">
-        {/* HERO — full-bleed cheerful bird mascot with warm glow */}
-        {!showEmailForm && (
-          <div className="relative flex-shrink-0 h-[52vh] min-h-[360px] max-h-[520px] overflow-hidden">
-            <img
-              src={cheerfulBird}
-              alt="Rilo mascot welcoming you"
-              className="absolute inset-0 w-full h-full object-cover"
-              loading="eager"
-              decoding="async"
-            />
-            {/* Soft warm overlay so text stays readable + blends into white card */}
-            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-background pointer-events-none" />
+      <div
+        className="h-[100dvh] flex flex-col overflow-hidden relative"
+        style={{
+          background:
+            'linear-gradient(180deg, #FFF4DC 0%, #FFE0E6 45%, #FBD4E2 100%)',
+        }}
+      >
+        {/* Ambient glow blobs — same palette as "What is Rilo" planner screen */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div
+            className="absolute -top-32 left-1/2 -translate-x-1/2 w-[480px] h-[480px] rounded-full blur-3xl opacity-60"
+            style={{ background: 'radial-gradient(circle, #FFD36E 0%, transparent 70%)' }}
+          />
+          <div
+            className="absolute top-1/3 -right-24 w-[280px] h-[280px] rounded-full blur-3xl opacity-50"
+            style={{ background: 'radial-gradient(circle, #F8B4C6 0%, transparent 70%)' }}
+          />
+          <div
+            className="absolute -bottom-16 -left-20 w-[340px] h-[340px] rounded-full blur-3xl opacity-50"
+            style={{ background: 'radial-gradient(circle, #E84A6F 0%, transparent 70%)' }}
+          />
+          {/* Sparkles scattered like the teach screens */}
+          {Array.from({ length: 12 }).map((_, i) => {
+            const left = (i * 37) % 100;
+            const top = (i * 53) % 100;
+            return (
+              <span
+                key={i}
+                className="absolute text-[10px] opacity-50"
+                style={{ left: `${left}%`, top: `${top}%`, color: '#A0123F' }}
+              >
+                ✨
+              </span>
+            );
+          })}
+        </div>
 
-            {/* Floating social-proof chip riding the seam between hero and card */}
-            <div className="absolute left-1/2 -translate-x-1/2 bottom-4 z-20">
-              <div className="flex items-center gap-2 rounded-full bg-background/85 backdrop-blur-xl px-4 py-2 shadow-ios border border-white/40 whitespace-nowrap">
-                <div className="flex -space-x-1.5">
-                  <span className="h-5 w-5 rounded-full bg-primary border-2 border-background" />
-                  <span className="h-5 w-5 rounded-full bg-amber-400 border-2 border-background" />
-                  <span className="h-5 w-5 rounded-full bg-orange-300 border-2 border-background" />
-                </div>
-                <Users className="h-3.5 w-3.5 text-primary" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-foreground">
-                  Joined by 3,000+ users
-                </span>
-              </div>
+        {/* Top brand bar — Rilo app icon (no mascot) */}
+        {!showEmailForm && (
+          <div className="flex-shrink-0 pt-12 pb-2 px-6 flex flex-col items-center relative z-10">
+            <div className="w-20 h-20 rounded-[22px] overflow-hidden shadow-[0_20px_50px_-10px_rgba(232,74,111,0.45)]">
+              <img
+                src={riloAppIcon}
+                alt="Rilo"
+                className="w-full h-full object-cover select-none"
+                draggable={false}
+              />
             </div>
+            <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-[#B8590E]">
+              ✨ {isLogin ? 'Welcome back' : 'Welcome to Rilo'}
+            </p>
           </div>
         )}
         {showEmailForm && (
-          <div className="flex-shrink-0 pt-10 pb-4 px-6 flex justify-center">
-            <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-ios">
-              <img src={appIcon} alt="Rilo" className="w-full h-full object-cover" />
+          <div className="flex-shrink-0 pt-10 pb-2 px-6 flex justify-center relative z-10">
+            <div className="w-16 h-16 rounded-[18px] overflow-hidden shadow-[0_16px_40px_-12px_rgba(232,74,111,0.4)]">
+              <img src={riloAppIcon} alt="Rilo" className="w-full h-full object-cover" />
             </div>
           </div>
         )}
 
-        {/* Main Content Card */}
-        <div className={`flex-1 bg-background px-6 py-8 overflow-y-auto ${!showEmailForm ? '-mt-8 rounded-t-[2.5rem] relative z-10' : ''}`}>
+        {/* Main Content */}
+        <div className="flex-1 px-6 py-6 overflow-y-auto relative z-10">
           <div className="max-w-md mx-auto space-y-6">
             {/* Back button - inside card for better reach */}
             {showEmailForm && (
@@ -235,63 +257,37 @@ export default function Auth() {
               </div>
             )}
             
-            {/* Title */}
+            {/* Title — bold dark navy like the teach screens */}
             <div className="text-center space-y-2">
+              <h1 className="text-[28px] leading-[1.15] font-bold tracking-tight text-[#1a1f3d] whitespace-pre-line">
+                {isForgotPassword
+                  ? 'Reset your\npassword'
+                  : showEmailForm
+                    ? (isLogin ? 'Sign in with email' : 'Create your account')
+                    : (isLogin ? 'Pick up where\nyou left off' : 'Your day,\nback in your hands.')}
+              </h1>
               {!showEmailForm && !isForgotPassword && (
-                <p className="text-[11px] font-bold tracking-[0.18em] uppercase text-primary">
-                  Your FREE Self-Care App
+                <p className="mt-2 text-[13px] font-semibold text-[#1a1f3d]/60">
+                  <span className="text-[#1a1f3d]">3,000+</span> women already plan their day here.
                 </p>
               )}
-              <h1 className="text-3xl font-bold tracking-tight text-foreground">
-                {isForgotPassword
-                  ? 'Reset Password'
-                  : showEmailForm
-                    ? (isLogin ? 'Sign in with Email' : 'Sign up with Email')
-                    : (isLogin ? 'Welcome back' : 'Welcome to Rilo')}
-              </h1>
-              <p className="text-muted-foreground text-sm max-w-[28ch] mx-auto leading-relaxed">
-                {isForgotPassword
-                  ? 'Enter your email to receive a password reset link'
-                  : showEmailForm
-                    ? (isLogin ? 'Enter your credentials to continue' : 'Create your account to get started')
-                    : (isLogin ? 'Ready to pick up where you left off?' : 'Your day, back in your hands.')}
-              </p>
+              {(showEmailForm || isForgotPassword) && (
+                <p className="text-[14px] text-[#1a1f3d]/65 max-w-[30ch] mx-auto leading-relaxed">
+                  {isForgotPassword
+                    ? 'Enter your email to receive a password reset link.'
+                    : (isLogin ? 'Enter your credentials to continue.' : 'Pick a password — your routines stay synced.')}
+                </p>
+              )}
             </div>
 
             {/* Show either social buttons or email form */}
             {!showEmailForm ? (
-              /* Social Login Buttons */
+              /* Social Login Buttons — Tiimo-style stacked pills */
               <div className="space-y-3">
-                {/* Google Button */}
+                {/* Apple first — primary on iOS */}
                 <Button
                   type="button"
-                  variant="outline"
-                  className="w-full h-14 font-medium text-base rounded-full border-2"
-                  onClick={handleGoogleSignIn}
-                  disabled={oauthLoading !== null || loading}
-                >
-                  {oauthLoading === 'google' ? (
-                    <span className="flex items-center gap-3">
-                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                      Connecting...
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-3">
-                      <svg className="h-5 w-5" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                      </svg>
-                      Continue with Google
-                    </span>
-                  )}
-                </Button>
-
-                {/* Apple Button */}
-                <Button
-                  type="button"
-                  className="w-full h-14 font-medium text-base rounded-full bg-black hover:bg-black/90 text-white"
+                  className="w-full h-14 font-semibold text-[16px] rounded-full bg-[#1a1f3d] active:bg-[#1a1f3d]/90 text-white shadow-[0_12px_30px_-12px_rgba(26,31,61,0.6)]"
                   onClick={handleAppleSignIn}
                   disabled={oauthLoading !== null || loading}
                 >
@@ -310,25 +306,52 @@ export default function Auth() {
                   )}
                 </Button>
 
-                {/* Email Button */}
+                {/* Google */}
                 <Button
                   type="button"
-                  variant="secondary"
-                  className="w-full h-14 font-medium text-base rounded-full text-white"
+                  className="w-full h-14 font-semibold text-[16px] rounded-full bg-white active:bg-white/85 text-[#1a1f3d] shadow-[0_12px_30px_-14px_rgba(26,31,61,0.35)]"
+                  onClick={handleGoogleSignIn}
+                  disabled={oauthLoading !== null || loading}
+                >
+                  {oauthLoading === 'google' ? (
+                    <span className="flex items-center gap-3">
+                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#1a1f3d] border-t-transparent" />
+                      Connecting...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-3">
+                      <svg className="h-5 w-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                      </svg>
+                      Continue with Google
+                    </span>
+                  )}
+                </Button>
+
+                {/* Email Button — softer tertiary */}
+                <Button
+                  type="button"
+                  className="w-full h-14 font-semibold text-[16px] rounded-full bg-white/55 active:bg-white/40 text-[#1a1f3d] backdrop-blur-md border border-white/60"
                   onClick={() => setShowEmailForm(true)}
                   disabled={oauthLoading !== null || loading}
                 >
                   <span className="flex items-center gap-3">
                     <Mail className="h-5 w-5" />
-                    Continue with Email
+                    Continue with email
                   </span>
                 </Button>
               </div>
             ) : (
-              /* Email Form */
-              <form onSubmit={handleSubmit} className="space-y-4">
+              /* Email Form — frosted card like the teach planner card */
+              <form
+                onSubmit={handleSubmit}
+                className="space-y-4 bg-white/80 backdrop-blur-xl rounded-3xl p-5 shadow-[0_24px_70px_-20px_rgba(26,31,61,0.25)] border border-white/70"
+              >
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email" className="text-[11px] font-bold uppercase tracking-wider text-[#1a1f3d]/60">Email</Label>
                   <Input
                     id="email"
                     type="email"
@@ -341,12 +364,12 @@ export default function Auth() {
                       }
                     }}
                     required
-                    className="h-12 rounded-xl"
+                    className="h-12 rounded-2xl bg-white border-transparent text-[#1a1f3d] placeholder:text-[#1a1f3d]/35"
                   />
                 </div>
                 {!isForgotPassword && (
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password" className="text-[11px] font-bold uppercase tracking-wider text-[#1a1f3d]/60">Password</Label>
                     <Input
                       id="password"
                       type="password"
@@ -359,16 +382,16 @@ export default function Auth() {
                         }
                       }}
                       required
-                      className="h-12 rounded-xl"
+                      className="h-12 rounded-2xl bg-white border-transparent text-[#1a1f3d] placeholder:text-[#1a1f3d]/35"
                     />
                   </div>
                 )}
                 <Button 
                   type="submit" 
-                  className="w-full h-12 rounded-full font-medium text-base" 
+                  className="w-full h-[52px] rounded-full font-semibold text-[16px] bg-[#1a1f3d] active:bg-[#1a1f3d]/90 text-white shadow-[0_12px_30px_-12px_rgba(26,31,61,0.6)]"
                   disabled={loading || oauthLoading !== null}
                 >
-                  {loading ? 'Loading...' : (isForgotPassword ? 'Send Reset Link' : (isLogin ? 'Sign In' : 'Sign Up'))}
+                  {loading ? 'Loading...' : (isForgotPassword ? 'Send reset link' : (isLogin ? 'Sign in' : 'Create account'))}
                 </Button>
 
                 {/* Forgot password link */}
@@ -378,7 +401,7 @@ export default function Auth() {
                       type="button"
                       variant="link"
                       onClick={() => setIsForgotPassword(true)}
-                      className="text-sm text-muted-foreground"
+                      className="text-sm text-[#1a1f3d]/60"
                     >
                       Forgot password?
                     </Button>
@@ -392,7 +415,7 @@ export default function Auth() {
                       type="button"
                       variant="link"
                       onClick={() => setIsForgotPassword(false)}
-                      className="text-sm"
+                      className="text-sm text-[#1a1f3d]"
                     >
                       Back to sign in
                     </Button>
@@ -406,13 +429,13 @@ export default function Auth() {
                 what "Continue with Email" opens to. */}
             {!showEmailForm && !isForgotPassword && (
               <div className="text-center pt-2">
-                <p className="text-foreground text-sm font-semibold">
+                <p className="text-[#1a1f3d] text-sm font-semibold">
                   {isLogin ? "New to Rilo? " : "Already have an account? "}
                   <Button
                     type="button"
                     variant="link"
                     onClick={() => setIsLogin(!isLogin)}
-                    className="text-primary font-bold p-0 h-auto underline underline-offset-4"
+                    className="text-[#B8590E] font-bold p-0 h-auto underline underline-offset-4"
                   >
                     {isLogin ? 'Create one' : 'Log in here'}
                   </Button>
