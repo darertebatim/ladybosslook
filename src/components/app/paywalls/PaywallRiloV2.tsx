@@ -31,7 +31,8 @@ const FEATURES = [
 // Rilo brand DNA
 const NAVY = '#1a1f3d';
 const SUNRISE_AMBER = '#B8590E';
-const SUNRISE_BG = 'linear-gradient(to bottom, #FFF4DC 0%, #FFE0E6 50%, #FBD4E2 100%)';
+// Logo-derived warm sunrise — phoenix yellow → orange → soft amber.
+const SUNRISE_BG = 'linear-gradient(to bottom, #FFE9A8 0%, #FFC976 35%, #FFA64D 70%, #F58220 100%)';
 const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
 
 // Pricing — derived from program data (live from RC / catalog) with safe fallbacks.
