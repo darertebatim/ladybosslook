@@ -13,8 +13,10 @@ import { format } from 'date-fns';
 import { ReflectionCelebrationSheet } from '@/components/reflection/ReflectionCelebrationSheet';
 import { BulletAnswerInput } from '@/components/reflection/BulletAnswerInput';
 import { ReflectionReviewSheet, type ReviewItem } from '@/components/reflection/ReflectionReviewSheet';
+import { useTranslation } from 'react-i18next';
 
 export default function AppReflectionFlow() {
+  const { t } = useTranslation();
   const { reflectionId } = useParams<{ reflectionId: string }>();
   const navigate = useNavigate();
   const goBack = useGoBack('/app/reflections');
@@ -111,7 +113,7 @@ export default function AppReflectionFlow() {
       setShowCelebration(true);
     } catch (error) {
       console.error('Failed to save reflection response:', error);
-      toast.error('Failed to save. Please try again.');
+      toast.error(t('reflectionsPage.saveFailed'));
     }
   };
 
@@ -146,7 +148,7 @@ export default function AppReflectionFlow() {
       }
     } catch (error) {
       console.error('Failed to save reflection response:', error);
-      toast.error('Failed to save. Please try again.');
+      toast.error(t('reflectionsPage.saveFailed'));
     }
   };
 
@@ -169,8 +171,8 @@ export default function AppReflectionFlow() {
   if (!pages || pages.length === 0) {
     return (
       <div className="h-full bg-background flex flex-col items-center justify-center p-6">
-        <p className="text-muted-foreground">This reflection has no pages yet.</p>
-        <button onClick={() => goBack()} className="mt-4 text-primary underline">Go back</button>
+        <p className="text-muted-foreground">{t('reflectionsPage.noPagesYet')}</p>
+        <button onClick={() => goBack()} className="mt-4 text-primary underline">{t('reflectionsPage.goBack')}</button>
       </div>
     );
   }
@@ -186,14 +188,14 @@ export default function AppReflectionFlow() {
           style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
         >
           <button onClick={() => goBack()} className="text-sm text-muted-foreground active:scale-95 transition-transform">
-            Cancel
+            {t('reflectionsPage.cancel')}
           </button>
           <button
             onClick={handleSaveSinglePage}
             disabled={saveResponse.isPending || singleLines.every((l) => !l.trim())}
             className="px-5 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold active:scale-95 transition-transform disabled:opacity-40"
           >
-            Done
+            {t('common.done')}
           </button>
         </div>
 
@@ -202,13 +204,13 @@ export default function AppReflectionFlow() {
           {/* Date */}
           <div className="flex items-center justify-between">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              TODAY, {today.toUpperCase()}
+              {t('reflectionsPage.todayPrefix')}, {today.toUpperCase()}
             </p>
             {isShuffleMode && totalPages > 1 && (
               <button
                 onClick={handleShuffle}
                 className="p-2.5 rounded-full active:scale-90 transition-transform text-orange-500 hover:text-orange-600"
-                aria-label="Shuffle question"
+                aria-label={t('reflectionsPage.shuffleAria')}
               >
                 <RefreshCw className="h-6 w-6" />
               </button>
@@ -225,7 +227,7 @@ export default function AppReflectionFlow() {
             <BulletAnswerInput
               lines={singleLines}
               onLinesChange={setSingleLines}
-              placeholder={displayedPage?.description || 'Write your thoughts…'}
+              placeholder={displayedPage?.description || t('reflectionsPage.writeThoughts')}
               autoFocus
             />
           </div>
@@ -274,7 +276,7 @@ export default function AppReflectionFlow() {
               key={page.id}
               lines={currentLines}
               onLinesChange={setCurrentLines}
-              placeholder="Write your thoughts…"
+              placeholder={t('reflectionsPage.writeThoughts')}
               autoFocus
             />
           </div>
@@ -304,7 +306,7 @@ export default function AppReflectionFlow() {
       <ReflectionReviewSheet
         open={showReview}
         onOpenChange={setShowReview}
-        title={reflection?.title || 'Your reflection'}
+        title={reflection?.title || t('reflectionsPage.yourReflection')}
         items={reviewItems}
         onContinue={() => {
           setShowReview(false);

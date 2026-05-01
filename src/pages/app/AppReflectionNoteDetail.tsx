@@ -13,8 +13,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useShareContent } from '@/hooks/useShareContent';
+import { useTranslation } from 'react-i18next';
 
 export default function AppReflectionNoteDetail() {
+  const { t } = useTranslation();
   const { reflectionId } = useParams<{ reflectionId: string }>();
   const navigate = useNavigate();
   const goBack = useGoBack('/app/reflections/notes');
@@ -25,8 +27,8 @@ export default function AppReflectionNoteDetail() {
   const [editText, setEditText] = useState('');
 
   const { handleShare } = useShareContent({
-    title: 'Reflection',
-    text: `🪞 I just reflected on Routine Ladyboss 💫`,
+    title: t('reflectionsPage.shareTitle'),
+    text: t('reflectionsPage.shareText'),
     source: 'reflection_note',
     contentId: reflectionId,
   });
@@ -84,10 +86,10 @@ export default function AppReflectionNoteDetail() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reflection-note-detail', reflectionId] });
-      toast.success('Answer updated');
+      toast.success(t('reflectionsPage.answerUpdated'));
       setEditingIdx(null);
     },
-    onError: () => toast.error('Failed to update'),
+    onError: () => toast.error(t('reflectionsPage.updateFailed')),
   });
 
   const deleteMutation = useMutation({
@@ -101,10 +103,10 @@ export default function AppReflectionNoteDetail() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reflection-notes'] });
-      toast.success('Reflection deleted');
+      toast.success(t('reflectionsPage.deleted'));
       goBack();
     },
-    onError: () => toast.error('Failed to delete'),
+    onError: () => toast.error(t('reflectionsPage.deleteFailed')),
   });
 
   const handleEdit = (idx: number) => {
@@ -114,7 +116,7 @@ export default function AppReflectionNoteDetail() {
   };
 
   const handleDelete = () => {
-    if (!confirm('Delete all your answers for this reflection?')) return;
+    if (!confirm(t('reflectionsPage.deleteAllConfirm'))) return;
     deleteMutation.mutate();
   };
 
@@ -132,7 +134,7 @@ export default function AppReflectionNoteDetail() {
           <button
             onClick={handleShare}
             className="active:scale-95 transition-transform p-1"
-            aria-label="Share"
+            aria-label={t('reflectionsPage.share')}
           >
             <Share2 className="h-5 w-5 text-muted-foreground" />
           </button>
@@ -144,10 +146,10 @@ export default function AppReflectionNoteDetail() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => handleEdit(0)} disabled={!data?.qaPairs.length}>
-                <Pencil className="h-4 w-4 mr-2" /> Edit
+                <Pencil className="h-4 w-4 mr-2" /> {t('reflectionsPage.edit')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleDelete} className="text-destructive focus:text-destructive">
-                <Trash2 className="h-4 w-4 mr-2" /> Delete
+                <Trash2 className="h-4 w-4 mr-2" /> {t('reflectionsPage.delete')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -197,7 +199,7 @@ export default function AppReflectionNoteDetail() {
           </div>
         </div>
       ) : (
-        <p className="text-center text-muted-foreground py-12">Reflection not found.</p>
+        <p className="text-center text-muted-foreground py-12">{t('reflectionsPage.notFound')}</p>
       )}
 
       {/* Edit Dialog */}
@@ -212,10 +214,10 @@ export default function AppReflectionNoteDetail() {
             value={editText}
             onChange={(e) => setEditText(e.target.value)}
             className="min-h-[120px]"
-            placeholder="Type your answer…"
+            placeholder={t('reflectionsPage.typeAnswer')}
           />
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingIdx(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setEditingIdx(null)}>{t('reflectionsPage.cancel')}</Button>
             <Button
               onClick={() => {
                 if (editingIdx === null || !data) return;
@@ -226,7 +228,7 @@ export default function AppReflectionNoteDetail() {
               }}
               disabled={updateMutation.isPending}
             >
-              Save
+              {t('reflectionsPage.save')}
             </Button>
           </DialogFooter>
         </DialogContent>

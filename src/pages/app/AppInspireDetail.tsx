@@ -21,6 +21,7 @@ import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider'
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { useRoutineFavorites, useToggleRoutineFavorite } from '@/hooks/useRoutineFavorites';
+import { useTranslation } from 'react-i18next';
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400 to-amber-600',
@@ -86,6 +87,7 @@ function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask & { sc
 }
 
 export default function AppInspireDetail() {
+  const { t } = useTranslation();
   const { planId } = useParams<{ planId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -120,8 +122,16 @@ export default function AppInspireDetail() {
 
   // Compute effective start date label + details
   const startInfo = useMemo(() => {
-    if (!routine) return { label: 'Starts today', emoji: '🚀', isFuture: false };
-    const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    if (!routine) return { label: t('inspirePage.startsToday'), emoji: '🚀', isFuture: false };
+    const WEEKDAY_NAMES = [
+      t('common.sunday', { defaultValue: 'Sunday' }),
+      t('common.monday', { defaultValue: 'Monday' }),
+      t('common.tuesday', { defaultValue: 'Tuesday' }),
+      t('common.wednesday', { defaultValue: 'Wednesday' }),
+      t('common.thursday', { defaultValue: 'Thursday' }),
+      t('common.friday', { defaultValue: 'Friday' }),
+      t('common.saturday', { defaultValue: 'Saturday' }),
+    ];
     const startDate = (routine as any).challenge_start_date;
     const startDow = (routine as any).start_day_of_week as number | null;
     
@@ -129,19 +139,19 @@ export default function AppInspireDetail() {
       const d = new Date(startDate + 'T00:00:00');
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      if (d <= today) return { label: 'Ready to start today!', emoji: '🚀', isFuture: false };
+      if (d <= today) return { label: t('inspirePage.readyToStart'), emoji: '🚀', isFuture: false };
       const diffDays = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
       return { 
-        label: `Starts ${format(d, 'MMM d')} · in ${diffDays} day${diffDays !== 1 ? 's' : ''}`, 
+        label: t(diffDays === 1 ? 'inspirePage.startsOn' : 'inspirePage.startsOnPlural', { date: format(d, 'MMM d'), days: diffDays }),
         emoji: '📅', 
         isFuture: true 
       };
     }
     if (startDow != null) {
-      return { label: `Starts next ${WEEKDAY_NAMES[startDow]}`, emoji: '📅', isFuture: true };
+      return { label: t('inspirePage.startsNext', { day: WEEKDAY_NAMES[startDow] }), emoji: '📅', isFuture: true };
     }
-    return { label: 'Ready to start today!', emoji: '🚀', isFuture: false };
-  }, [routine]);
+    return { label: t('inspirePage.readyToStart'), emoji: '🚀', isFuture: false };
+  }, [routine, t]);
 
   // Compute end date info
   const endInfo = useMemo(() => {
@@ -152,17 +162,17 @@ export default function AppInspireDetail() {
 
     if (endMode === 'date' && endDate) {
       const d = new Date(endDate + 'T00:00:00');
-      return { label: `Ends ${format(d, 'MMM d')}`, emoji: '🏁' };
+      return { label: t('inspirePage.endsOn', { date: format(d, 'MMM d') }), emoji: '🏁' };
     }
     if (endMode === 'after_days' && endAfterDays) {
-      return { label: `Ends after ${endAfterDays} day${endAfterDays !== 1 ? 's' : ''}`, emoji: '🏁' };
+      return { label: t(endAfterDays === 1 ? 'inspirePage.endsAfter' : 'inspirePage.endsAfterPlural', { count: endAfterDays }), emoji: '🏁' };
     }
     return null;
-  }, [routine]);
+  }, [routine, t]);
 
   const { handleShare, handleShareInstagram } = useShareContent({
-    title: routine?.title || 'Routine',
-    text: `Hey! Join me in the '${routine?.title || 'Routine'}' routine on Routine Ladyboss 💫`,
+    title: routine?.title || t('inspirePage.shareTitleFallback'),
+    text: t('inspirePage.shareText', { title: routine?.title || t('inspirePage.shareTitleFallback') }),
     imageUrl: routine?.cover_image_url,
     source: 'inspire_routine',
     contentId: routine?.id,
@@ -170,7 +180,7 @@ export default function AppInspireDetail() {
 
   const handleAddClick = () => {
     if (!routine?.tasks?.length) {
-      toast.error('No tasks in this routine');
+      toast.error(t('inspirePage.noTasks'));
       return;
     }
     setShowPreviewSheet(true);
@@ -192,12 +202,12 @@ export default function AppInspireDetail() {
       setShowPreviewSheet(false);
       setJustAdded(true);
       if (isProject) {
-        toast.success(`Step 1 tasks added! Complete them to unlock the next step.`, { duration: 5000 });
+        toast.success(t('inspirePage.stepUnlock'), { duration: 5000 });
       } else {
-        toast.success(`${selectedTaskIds.length} tasks added!`);
+        toast.success(t('inspirePage.tasksAdded', { count: selectedTaskIds.length }));
       }
     } catch (error) {
-      toast.error('Failed to add routine');
+      toast.error(t('inspirePage.addFailed'));
     }
   };
 
@@ -212,9 +222,9 @@ export default function AppInspireDetail() {
   if (!routine) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
-        <p className="text-muted-foreground">Routine not found</p>
+        <p className="text-muted-foreground">{t('inspirePage.notFound')}</p>
         <Button variant="outline" onClick={() => navigate('/app/routines')}>
-          Back to Routines
+          {t('inspirePage.backToRoutines')}
         </Button>
       </div>
     );
@@ -253,21 +263,21 @@ export default function AppInspireDetail() {
               toggleFavorite.mutate({ routineId: planId, isFavorited });
             }}
             className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
-            aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+            aria-label={isFavorited ? t('inspirePage.removeFromFavorites') : t('inspirePage.addToFavorites')}
           >
             <Heart className={cn("h-5 w-5 transition-colors", isFavorited && "fill-red-500 text-red-500")} />
           </button>
           <button
             onClick={handleShareInstagram}
             className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
-            aria-label="Share to Instagram"
+            aria-label={t('inspirePage.shareToInstagram')}
           >
             <Instagram className="h-5 w-5" />
           </button>
           <button
             onClick={handleShare}
             className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
-            aria-label="Share"
+            aria-label={t('inspirePage.share')}
           >
             <Share2 className="h-5 w-5" />
           </button>
@@ -334,7 +344,7 @@ export default function AppInspireDetail() {
                     className="absolute inset-0 w-full h-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
-                    title="Routine video"
+                    title={t('inspirePage.videoTitle')}
                   />
                 </div>
               )}
@@ -355,27 +365,27 @@ export default function AppInspireDetail() {
             <div className="flex items-center gap-2 mt-3 flex-wrap">
               {isFocus && (
                  <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300">
-                   🎯 Focus
+                   {t('inspirePage.focusBadge')}
                 </span>
               )}
               {isProject && (
                 <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                  🎯 Project
+                  {t('inspirePage.projectBadge')}
                 </span>
               )}
               {isChallenge && (
                 <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300">
-                  🔥 Challenge
+                  {t('inspirePage.challengeBadge')}
                 </span>
               )}
               {isProgram && (
                 <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
-                  🎓 Program
+                  {t('inspirePage.programBadge')}
                 </span>
               )}
               {isMoment && (
                  <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300">
-                   🫧 Reset
+                   {t('inspirePage.resetBadge')}
                 </span>
               )}
               {routine.category && (
@@ -385,7 +395,7 @@ export default function AppInspireDetail() {
               )}
               {routine.tasks && routine.tasks.length > 0 && (
                <span className="text-sm text-foreground">
-                   {routine.tasks.length} {isProject ? 'step' : 'task'}{routine.tasks.length !== 1 ? 's' : ''}
+                   {routine.tasks.length} {isProject ? t(routine.tasks.length === 1 ? 'inspirePage.step' : 'inspirePage.steps') : t(routine.tasks.length === 1 ? 'inspirePage.task' : 'inspirePage.tasks')}
                 </span>
               )}
             </div>
@@ -395,7 +405,7 @@ export default function AppInspireDetail() {
               <div className="mt-4 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border bg-[#FFF492]/40 border-[#E8D86A] dark:bg-yellow-950/30 dark:border-yellow-800">
                 <span className="text-lg">🎓</span>
                 <span className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
-                  Enrolls you in: {(routine as any).linkedProgram.title}
+                  {t('inspirePage.enrollsIn', { title: (routine as any).linkedProgram.title })}
                 </span>
               </div>
             )}
@@ -437,11 +447,11 @@ export default function AppInspireDetail() {
                   <div className="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-amber-300 bg-amber-50 shadow-md">
                     <img 
                       src={(routine as any).badge_image_url} 
-                      alt="Challenge badge" 
+                      alt={t('inspirePage.challengeBadgeAlt')} 
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <span className="text-[10px] text-amber-600 font-semibold mt-1">🏆 Badge</span>
+                  <span className="text-[10px] text-amber-600 font-semibold mt-1">{t('inspirePage.badge', { defaultValue: 'Badge' })}</span>
                 </div>
               )}
             </div>
@@ -470,7 +480,7 @@ export default function AppInspireDetail() {
           {isProject ? (
             /* Project: show tasks as sequential steps */
             <div className="mt-6 space-y-4">
-              <h3 className="text-lg font-semibold text-foreground">Steps</h3>
+              <h3 className="text-lg font-semibold text-foreground">{t('inspirePage.steps')}</h3>
               {(() => {
                 const allTasks = routine.tasks || [];
                 // Group by drip_day (step number)
@@ -484,7 +494,7 @@ export default function AppInspireDetail() {
                 return sortedSteps.map(step => (
                   <div key={step}>
                     <p className="text-sm font-semibold text-muted-foreground mb-2">
-                      🎯 Step {step}
+                      {t('inspirePage.stepLabel', { n: step })}
                     </p>
                     <div className="space-y-3">
                       {stepGroups.get(step)!.map((task) => {
@@ -502,7 +512,7 @@ export default function AppInspireDetail() {
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium text-black truncate">{task.title}</p>
                                 <p className="text-xs text-black/70 truncate">
-                                  {task.category || 'General'} • One-time step
+                                  {task.category || t('inspirePage.general')} • {t('inspirePage.oneTimeStep')}
                                 </p>
                               </div>
                             </div>
@@ -545,14 +555,14 @@ export default function AppInspireDetail() {
                         {sectionTasks.map((task) => {
                           const bgColor = TASK_COLORS[(task.color as TaskColor) || 'mint'] || TASK_COLORS.mint;
                           const repeatLabel = (() => {
-                            if (!task.repeat_pattern || task.repeat_pattern === 'none') return 'Once';
-                            if (task.repeat_pattern === 'weekly') return 'Weekly';
-                            if (task.repeat_pattern === 'monthly') return 'Monthly';
-                            if (task.repeat_pattern === 'weekend') return 'Weekends';
+                            if (!task.repeat_pattern || task.repeat_pattern === 'none') return t('inspirePage.repeat_once');
+                            if (task.repeat_pattern === 'weekly') return t('inspirePage.repeat_weekly');
+                            if (task.repeat_pattern === 'monthly') return t('inspirePage.repeat_monthly');
+                            if (task.repeat_pattern === 'weekend') return t('inspirePage.repeat_weekend');
                             // schedule_days present → weekly
-                            if (task.schedule_days && task.schedule_days.length > 0) return 'Weekly';
-                            if (task.repeat_pattern === 'daily') return 'Daily';
-                            return 'Once';
+                            if (task.schedule_days && task.schedule_days.length > 0) return t('inspirePage.repeat_weekly');
+                            if (task.repeat_pattern === 'daily') return t('inspirePage.repeat_daily');
+                            return t('inspirePage.repeat_once');
                           })();
                           return (
                             <div
@@ -567,7 +577,7 @@ export default function AppInspireDetail() {
                                 <div className="flex-1 min-w-0">
                                   <p className="font-medium text-black truncate">{task.title}</p>
                                   <p className="text-xs text-black/70 truncate">
-                                    {task.category || 'General'}
+                                    {task.category || t('inspirePage.general')}
                                     <span className="ml-1">• {repeatLabel}</span>
                                   </p>
                                 </div>
@@ -590,18 +600,18 @@ export default function AppInspireDetail() {
               {/* Unsectioned tasks */}
               {(tasksBySection['unsorted']?.length ?? 0) > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">Tasks</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">{t('inspirePage.tasksHeader')}</h3>
                   <div className="space-y-3">
                     {tasksBySection['unsorted'].map((task) => {
                       const bgColor = TASK_COLORS[(task.color as TaskColor) || 'mint'] || TASK_COLORS.mint;
                       const repeatLabel = (() => {
-                        if (!task.repeat_pattern || task.repeat_pattern === 'none') return 'Once';
-                        if (task.repeat_pattern === 'weekly') return 'Weekly';
-                        if (task.repeat_pattern === 'monthly') return 'Monthly';
-                        if (task.repeat_pattern === 'weekend') return 'Weekends';
-                        if (task.schedule_days && task.schedule_days.length > 0) return 'Weekly';
-                        if (task.repeat_pattern === 'daily') return 'Daily';
-                        return 'Once';
+                        if (!task.repeat_pattern || task.repeat_pattern === 'none') return t('inspirePage.repeat_once');
+                        if (task.repeat_pattern === 'weekly') return t('inspirePage.repeat_weekly');
+                        if (task.repeat_pattern === 'monthly') return t('inspirePage.repeat_monthly');
+                        if (task.repeat_pattern === 'weekend') return t('inspirePage.repeat_weekend');
+                        if (task.schedule_days && task.schedule_days.length > 0) return t('inspirePage.repeat_weekly');
+                        if (task.repeat_pattern === 'daily') return t('inspirePage.repeat_daily');
+                        return t('inspirePage.repeat_once');
                       })();
                       return (
                         <div
@@ -616,7 +626,7 @@ export default function AppInspireDetail() {
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-black truncate">{task.title}</p>
                               <p className="text-xs text-black/70 truncate">
-                                {task.category || 'General'}
+                                {task.category || t('inspirePage.general')}
                                 <span className="ml-1">• {repeatLabel}</span>
                               </p>
                             </div>
@@ -673,7 +683,7 @@ export default function AppInspireDetail() {
               className="flex-1 h-12 rounded-xl text-base font-semibold gap-2"
             >
               <Play className="w-5 h-5" />
-              Reset
+              {t('inspirePage.reset')}
             </Button>
             <Button
               variant="outline"
@@ -702,7 +712,7 @@ export default function AppInspireDetail() {
                   .order('order_index', { ascending: true });
 
                 if (!userTasks || userTasks.length === 0) {
-                  toast.error('No tasks found. Try removing and re-adding this routine.');
+                  toast.error(t('inspirePage.noTasksFound'));
                   return;
                 }
 
@@ -739,7 +749,7 @@ export default function AppInspireDetail() {
               className="flex-1 h-12 rounded-xl text-base font-semibold gap-2"
             >
               <Play className="w-5 h-5" />
-              Start Routine
+              {t('inspirePage.startRoutine')}
             </Button>
           </div>
         ) : (
@@ -751,7 +761,7 @@ export default function AppInspireDetail() {
             }}
             isLoading={addRoutineFromBank.isPending}
             size="lg"
-            addText="Add to my routines"
+            addText={t('inspirePage.addToMyRoutines')}
             className="bg-urgency text-urgency-foreground"
           />
         )}
