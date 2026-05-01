@@ -24,7 +24,6 @@ import { PromoBanner } from '@/components/app/PromoBanner';
 import { HomeBanner } from '@/components/app/HomeBanner';
 import { NotificationBanner } from '@/components/app/NotificationBanner';
 import { HomeCelebrations } from '@/components/app/HomeCelebrations';
-import { HomeTour } from '@/components/app/tour';
 import { useAuth } from '@/hooks/useAuth';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -52,8 +51,6 @@ import { WeeklyReviewBanner } from '@/components/app/WeeklyReviewBanner';
 import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
 import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 import { useKeyboard } from '@/hooks/useKeyboard';
-import { HomeSpotlightIntro } from '@/components/app/home/HomeSpotlightIntro';
-import { TaskCoachOverlay } from '@/components/app/home/TaskCoachOverlay';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
@@ -135,38 +132,8 @@ const AppHome = () => {
   // Skip task state
   const [skipTask, setSkipTask] = useState<UserTask | null>(null);
   
-  // Home tour trigger for menu
-  const [startHomeTour, setStartHomeTour] = useState<(() => void) | null>(null);
-  const handleHomeTourReady = useCallback((tourStart: () => void) => {
-    setStartHomeTour(() => tourStart);
-  }, []);
-  
   // First action celebration - tracks if this is user's first ever completion (uses unified StreakCelebration)
   const [isFirstActionCelebration, setIsFirstActionCelebration] = useState(false);
-  
-  // First coach mark: "Mark off your first task" - delayed 3s for new users
-  const [showFirstCoachMark, setShowFirstCoachMark] = useState(false);
-  
-  // Second coach mark: "Tap to manage" - shown 5s after first coach mark OR after first-action celebration
-  const [showTapCoachMark, setShowTapCoachMark] = useState(false);
-  // Track that tap coach mark was triggered (to chain the + button spotlight)
-  const tapCoachMarkTriggeredRef = useRef(false);
-  
-  // Third coach mark: "Tap + to add" - shown after user closes task detail from tap coach mark
-  const [showAddCoachMark, setShowAddCoachMark] = useState(false);
-
-  // Bundled spotlight tour: intro popup + sequenced 3 spotlights
-  const SPOTLIGHT_TOUR_KEY = 'simora_spotlight_tour_done';
-  const [showSpotlightIntro, setShowSpotlightIntro] = useState(false);
-  const spotlightTourActiveRef = useRef(false);
-
-  const scrollHomeToTop = useCallback(() => {
-    try {
-      homeScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch {
-      if (homeScrollRef.current) homeScrollRef.current.scrollTop = 0;
-    }
-  }, [homeScrollRef]);
   
   // Streak goal selection state
   const [showGoalSelection, setShowGoalSelection] = useState(false);
@@ -279,9 +246,6 @@ const AppHome = () => {
   // Track if this is truly a first-time user for tour (no prior completions ever)
   // If server shows 0 completions, treat as first open regardless of localStorage
   // (handles remote admin reset where localStorage wasn't cleared on this device)
-  const serverIndicatesNewUser = totalCompletions === 0;
-  const isFirstOpen = !homeDataLoading && serverIndicatesNewUser;
-  
   
   // Track first action celebration
   const hasAnyCompletionToday = (completions?.tasks?.length ?? 0) > 0;
