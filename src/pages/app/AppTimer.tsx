@@ -50,6 +50,7 @@ export default function AppTimer() {
 }
 
 function AppTimerInner() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const slideCtx = useSlideClose();
   const [screen, setScreen] = useState<Screen>('setup');
