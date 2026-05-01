@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import { BUILD_INFO, getDisplayBuildInfo } from "@/lib/buildInfo";
 import { format } from "date-fns";
 
@@ -263,6 +264,18 @@ function AppUpdateLogsCard() {
 export default function System() {
   const resetPlanner = useResetPlannerData();
   const [enrollingAll, setEnrollingAll] = useState(false);
+  const navigate = useNavigate();
+
+  const handleReplayWelcomeSpotlight = () => {
+    const flowId = "quick-start-v1";
+    // Clear completion / progress flags so the flow plays again
+    localStorage.removeItem(`simora_onboarding_completed_${flowId}`);
+    localStorage.removeItem(`simora_onboarding_progress_${flowId}`);
+    // Reset first-action celebration so the spotlight cascade can re-trigger
+    localStorage.removeItem("simora_first_action_celebrated");
+    toast.success("Welcome Spotlight reset — replaying now");
+    navigate(`/app/onboarding/${flowId}`);
+  };
 
   const handleEnrollAllPrograms = async () => {
     setEnrollingAll(true);
@@ -359,6 +372,28 @@ export default function System() {
                 ) : (
                   "Enroll in All Programs"
                 )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Replay Welcome Spotlight */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5" />
+                Replay Welcome Spotlight
+              </CardTitle>
+              <CardDescription>
+                Re-runs the Quick-Start onboarding flow that includes the
+                3-step starter routine spotlight (select task → add task →
+                complete task). Clears the completion + progress flags for
+                the current device only.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={handleReplayWelcomeSpotlight}>
+                <Sparkles className="h-4 w-4 mr-2" />
+                Replay Welcome Spotlight
               </Button>
             </CardContent>
           </Card>
