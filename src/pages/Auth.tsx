@@ -477,3 +477,36 @@ export default function Auth() {
     </>
   );
 }
+
+/* Cycles through "Welcome" in different languages with a soft fade.
+   Lives in its own layer so it never affects the auth stack. */
+const WELCOMES: { word: string; lang: string }[] = [
+  { word: 'Welcome', lang: 'English' },
+  { word: 'خوش آمدید', lang: 'Persian' },
+  { word: 'Hoş geldin', lang: 'Turkish' },
+  { word: 'Bienvenida', lang: 'Spanish' },
+  { word: 'Bienvenue', lang: 'French' },
+  { word: 'Willkommen', lang: 'German' },
+  { word: 'مرحبًا', lang: 'Arabic' },
+  { word: 'やあ', lang: 'Japanese' },
+  { word: '欢迎', lang: 'Chinese' },
+  { word: 'Olá', lang: 'Portuguese' },
+];
+
+function RotatingWelcome() {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setI((n) => (n + 1) % WELCOMES.length), 2200);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div className="h-5 flex items-center justify-center overflow-hidden">
+      <span
+        key={i}
+        className="text-[12.5px] font-semibold text-[#1a1f3d]/55 tracking-wide animate-welcome-fade"
+      >
+        {WELCOMES[i].word}
+      </span>
+    </div>
+  );
+}
