@@ -191,7 +191,7 @@ export default function AppChannelsList() {
               <div className="flex flex-col items-end gap-1 shrink-0">
                 {coachSummary?.lastMessage?.created_at && (
                   <span className="text-xs text-fg-warm-muted">
-                    {formatLastMessageTime(new Date(coachSummary.lastMessage.created_at))}
+                    {formatLastMessageTime(new Date(coachSummary.lastMessage.created_at), t)}
                   </span>
                 )}
                 {coachUnreadCount > 0 && (
@@ -220,7 +220,7 @@ export default function AppChannelsList() {
               const unreadCount = summary?.unreadCount || 0;
               const lastMessage = summary?.lastMessage;
               const lastMessageTime = lastMessage?.created_at 
-                ? formatLastMessageTime(new Date(lastMessage.created_at))
+                ? formatLastMessageTime(new Date(lastMessage.created_at), t)
                 : null;
 
               return (
