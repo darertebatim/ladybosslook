@@ -339,6 +339,7 @@ const TIME_PERIOD_LABELS: Record<string, string> = {
 };
 
 function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride }: { date: Date; taskCount: number; onOpenTaskSheet?: (params: { editTaskId?: string; createParams?: Record<string, string> }) => void; defaultRepeatOverride?: 'Daily' | 'No' | 'Weekly' }) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [showIdeas, setShowIdeas] = useState(false);
@@ -353,6 +354,18 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
   // Quick shortcut states
   const TIME_OPTIONS = ['Anytime', 'Morning', 'Afternoon', 'Evening', 'Bedtime'] as const;
   const REPEAT_OPTIONS = ['Daily', 'No', 'Weekly'] as const;
+  const TIME_LABELS: Record<typeof TIME_OPTIONS[number], string> = {
+    Anytime: t('quickAdd.anytime'),
+    Morning: t('quickAdd.morning'),
+    Afternoon: t('quickAdd.afternoon'),
+    Evening: t('quickAdd.evening'),
+    Bedtime: t('quickAdd.bedtime'),
+  };
+  const REPEAT_LABELS: Record<typeof REPEAT_OPTIONS[number], string> = {
+    Daily: t('quickAdd.daily'),
+    No: t('quickAdd.once'),
+    Weekly: t('quickAdd.weekly'),
+  };
   const [quickTime, setQuickTime] = useState<typeof TIME_OPTIONS[number]>('Anytime');
   const [quickRepeat, setQuickRepeat] = useState<typeof REPEAT_OPTIONS[number]>('Daily');
   const inputRef = useRef<HTMLInputElement>(null);
