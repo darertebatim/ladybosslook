@@ -883,7 +883,7 @@ export default function AppRoutinePlayer() {
         });
       }
 
-      toast.success('Routine created! 🎉');
+      toast.success(t('routinePlayer.routineCreated'));
       setShowBuilderPreview(false);
       setBuilderResult(null);
       queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
@@ -893,7 +893,7 @@ export default function AppRoutinePlayer() {
       queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
     } catch (err) {
       console.error('Failed to create routine:', err);
-      toast.error('Failed to create routine');
+      toast.error(t('routinePlayer.createFailed'));
     }
   };
 
