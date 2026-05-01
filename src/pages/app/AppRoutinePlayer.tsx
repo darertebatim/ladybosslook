@@ -1332,14 +1332,14 @@ export default function AppRoutinePlayer() {
                   <div className="flex items-center gap-2">
                     <CalendarPlus className="h-4 w-4 text-violet-500" />
                     <h2 className="text-sm font-semibold text-foreground/70 tracking-wide">
-                      Try a routine
+                      {t('routinePlayer.tryRoutine')}
                     </h2>
                   </div>
                   <button
                     onClick={() => navigate('/app/routines')}
                     className="text-xs text-primary font-medium flex items-center gap-0.5"
                   >
-                    All <ChevronRight className="h-3.5 w-3.5" />
+                    {t('routinePlayer.all')} <ChevronRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
                 <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4" style={{ WebkitOverflowScrolling: 'touch' }}>
@@ -1365,7 +1365,7 @@ export default function AppRoutinePlayer() {
                 onClick={() => navigate('/app/routines')}
                 className="w-full flex items-center justify-center gap-1 text-sm text-primary font-medium py-3"
               >
-                Browse Routines Library <ChevronRight className="w-4 h-4" />
+                {t('routinePlayer.browseLibrary')} <ChevronRight className="w-4 h-4" />
               </button>
             )}
           </div>
