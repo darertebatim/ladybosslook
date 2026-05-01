@@ -4,6 +4,16 @@
  * Finch-style approximate time categories for flexible task scheduling.
  * Users can choose approximate time periods instead of specific clock times.
  */
+import i18n from '@/i18n';
+
+const tr = (key: string, fallback: string): string => {
+  try {
+    const out = i18n.t(key);
+    return out && out !== key ? (out as string) : fallback;
+  } catch {
+    return fallback;
+  }
+};
 
 export type TimePeriod = 
   | 'start_of_day' 
@@ -98,7 +108,7 @@ export function getTimePeriodConfig(id: TimePeriod | string | null): TimePeriodC
 export function formatTimeLabel(task: { scheduled_time?: string | null; time_period?: string | null }): string {
   if (task.time_period) {
     const period = TIME_PERIODS.find(p => p.id === task.time_period);
-    return period ? period.label : 'Anytime';
+    return period ? tr(period.labelKey, period.label) : tr('timePeriods.anytime', 'Anytime');
   }
   if (task.scheduled_time) {
     // Format as 12-hour time
@@ -108,7 +118,7 @@ export function formatTimeLabel(task: { scheduled_time?: string | null; time_per
     const displayHour = hour % 12 || 12;
     return `${displayHour}:${minutes} ${ampm}`;
   }
-  return 'Anytime';
+  return tr('timePeriods.anytime', 'Anytime');
 }
 
 /**
@@ -117,7 +127,7 @@ export function formatTimeLabel(task: { scheduled_time?: string | null; time_per
 export function formatTimeLabelWithEmoji(task: { scheduled_time?: string | null; time_period?: string | null }): string {
   if (task.time_period) {
     const period = TIME_PERIODS.find(p => p.id === task.time_period);
-    return period ? period.label : 'Anytime';
+    return period ? tr(period.labelKey, period.label) : tr('timePeriods.anytime', 'Anytime');
   }
   if (task.scheduled_time) {
     const [hours, minutes] = task.scheduled_time.split(':');
@@ -126,7 +136,7 @@ export function formatTimeLabelWithEmoji(task: { scheduled_time?: string | null;
     const displayHour = hour % 12 || 12;
     return `${displayHour}:${minutes} ${ampm}`;
   }
-  return 'Anytime';
+  return tr('timePeriods.anytime', 'Anytime');
 }
 
 /**
