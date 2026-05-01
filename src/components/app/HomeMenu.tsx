@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Menu,
-  Compass,
+  LayoutGrid,
   Music,
   Users,
   Headset,
@@ -45,10 +45,10 @@ interface NavItem {
 
 const navPages: NavItem[] = [
   {
-    id: "explore",
-    nameKey: "explore",
-    icon: <Compass className="h-4 w-4" />,
-    route: "/app/player",
+    id: "tools",
+    nameKey: "tools",
+    icon: <LayoutGrid className="h-4 w-4" />,
+    route: "/app/tools",
     color: "text-violet-600 bg-violet-100",
   },
   {
