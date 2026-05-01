@@ -11,6 +11,7 @@ import { BrandedSplash } from '@/components/app/BrandedSplash';
 import { getDisplayBuildInfo } from '@/lib/buildInfo';
 import { ArrowLeft, Mail, Users } from 'lucide-react';
 import appIcon from '@/assets/app-icon.png';
+import cheerfulBird from '@/assets/onboarding/cheerful-bird.png';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { Capacitor } from '@capacitor/core';
 import { Analytics } from '@/lib/firebaseAnalytics';
@@ -177,44 +178,46 @@ export default function Auth() {
   return (
     <>
       <SEOHead />
-      <div className="h-[100dvh] flex flex-col bg-gradient-to-b from-primary/20 via-primary/10 to-background overflow-hidden">
-        {/* Hero Section: Welcome + FREE badge + tagline + social proof */}
+      <div className="h-[100dvh] flex flex-col bg-background overflow-hidden relative">
+        {/* HERO — full-bleed cheerful bird mascot with warm glow */}
         {!showEmailForm && (
-          <div className="flex-shrink-0 pt-10 pb-6 px-6 flex flex-col items-center text-center">
-            <h1 className="text-3xl font-bold text-foreground tracking-tight">
-              Welcome to Rilo!
-            </h1>
+          <div className="relative flex-shrink-0 h-[52vh] min-h-[360px] max-h-[520px] overflow-hidden">
+            <img
+              src={cheerfulBird}
+              alt="Rilo mascot welcoming you"
+              className="absolute inset-0 w-full h-full object-cover"
+              loading="eager"
+              decoding="async"
+            />
+            {/* Soft warm overlay so text stays readable + blends into white card */}
+            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-background pointer-events-none" />
 
-            <div className="mt-4 flex items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-lg flex-shrink-0">
-                <img src={appIcon} alt="Rilo" className="w-full h-full object-cover" />
+            {/* Floating social-proof chip riding the seam between hero and card */}
+            <div className="absolute left-1/2 -translate-x-1/2 bottom-4 z-20">
+              <div className="flex items-center gap-2 rounded-full bg-background/85 backdrop-blur-xl px-4 py-2 shadow-ios border border-white/40 whitespace-nowrap">
+                <div className="flex -space-x-1.5">
+                  <span className="h-5 w-5 rounded-full bg-primary border-2 border-background" />
+                  <span className="h-5 w-5 rounded-full bg-amber-400 border-2 border-background" />
+                  <span className="h-5 w-5 rounded-full bg-orange-300 border-2 border-background" />
+                </div>
+                <Users className="h-3.5 w-3.5 text-primary" />
+                <span className="text-[11px] font-bold uppercase tracking-wider text-foreground">
+                  Joined by 3,000+ users
+                </span>
               </div>
-              <p className="text-left text-base font-semibold text-foreground leading-tight">
-                Your <span className="text-primary">FREE</span><br />
-                Self-Care App
-              </p>
-            </div>
-
-            <p className="mt-4 text-base font-semibold text-foreground">
-              Your day, back in your hands.
-            </p>
-
-            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
-              <Users className="h-3.5 w-3.5" />
-              Joined by 3,000+ users
             </div>
           </div>
         )}
         {showEmailForm && (
           <div className="flex-shrink-0 pt-10 pb-4 px-6 flex justify-center">
-            <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg">
+            <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-ios">
               <img src={appIcon} alt="Rilo" className="w-full h-full object-cover" />
             </div>
           </div>
         )}
 
         {/* Main Content Card */}
-        <div className="flex-1 bg-background rounded-t-[2.5rem] px-6 py-8 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] overflow-y-auto">
+        <div className={`flex-1 bg-background px-6 py-8 overflow-y-auto ${!showEmailForm ? '-mt-8 rounded-t-[2.5rem] relative z-10' : ''}`}>
           <div className="max-w-md mx-auto space-y-6">
             {/* Back button - inside card for better reach */}
             {showEmailForm && (
@@ -232,21 +235,24 @@ export default function Auth() {
             
             {/* Title */}
             <div className="text-center space-y-2">
-              <h1 className="text-2xl font-bold">
-                {isForgotPassword 
-                  ? 'Reset Password' 
-                  : showEmailForm 
+              {!showEmailForm && !isForgotPassword && (
+                <p className="text-[11px] font-bold tracking-[0.18em] uppercase text-primary">
+                  Your FREE Self-Care App
+                </p>
+              )}
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                {isForgotPassword
+                  ? 'Reset Password'
+                  : showEmailForm
                     ? (isLogin ? 'Sign in with Email' : 'Sign up with Email')
-                    : (isLogin ? 'Welcome back!' : 'Sign up for Rilo')
-                }
+                    : 'Welcome to Rilo'}
               </h1>
-              <p className="text-muted-foreground text-sm">
-                {isForgotPassword 
+              <p className="text-muted-foreground text-sm max-w-[28ch] mx-auto leading-relaxed">
+                {isForgotPassword
                   ? 'Enter your email to receive a password reset link'
                   : showEmailForm
                     ? (isLogin ? 'Enter your credentials to continue' : 'Create your account to get started')
-                    : 'Create an account to save your progress and access it on different devices!'
-                }
+                    : 'Your day, back in your hands.'}
               </p>
             </div>
 
