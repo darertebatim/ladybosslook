@@ -51,7 +51,6 @@ interface TaskDetailModalProps {
   goalProgress?: number;
   onEdit: (task: UserTask) => void;
   onDelete?: (task: UserTask) => void;
-  onTaskComplete?: () => void;
   onStreakIncrease?: () => void;
   onStepUnlocked?: (result: import('@/hooks/useProjectStepUnlock').StepUnlockResult) => void;
   onOpenGoalInput?: (task: UserTask) => void;
@@ -70,7 +69,6 @@ export const TaskDetailModal = ({
   goalProgress = 0,
   onEdit,
   onDelete,
-  onTaskComplete,
   onStreakIncrease,
   onStepUnlocked,
   onOpenGoalInput,
@@ -160,7 +158,6 @@ export const TaskDetailModal = ({
       haptic.successBurst();
       playCompletionSound();
       const result = await completeTask.mutateAsync({ taskId: task.id, date });
-      onTaskComplete?.();
       if (result.streakIncreased && onStreakIncrease) {
         haptic.celebrate();
         onStreakIncrease();

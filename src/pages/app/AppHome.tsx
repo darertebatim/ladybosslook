@@ -122,14 +122,6 @@ const AppHome = () => {
     null | 'tap' | 'add' | 'complete'
   >(null);
   const [, setHasWelcomeBanner] = useState(false);
-  // Once the tour finishes (or is skipped), don't auto-pick another task to spotlight
-  const spotlightFinishedRef = useRef(false);
-  const spotlightCompletionHandledRef = useRef(false);
-  const finishSpotlight = useCallback(() => {
-    spotlightFinishedRef.current = true;
-    spotlightCompletionHandledRef.current = true;
-    setSpotlightStep(null);
-  }, []);
   const { isKeyboardOpen } = useKeyboard();
   const { currentTrack } = useAudioPlayer();
   const hasMiniPlayer = !!currentTrack;
@@ -236,7 +228,6 @@ const AppHome = () => {
     window.dispatchEvent(new CustomEvent('quick-add-open', { detail: { defaultRepeat: taskFilter === 'one-time' ? 'No' : 'Daily' } }));
     // Spotlight: advance from 'add' → 'complete' once user taps the + button
     setSpotlightStep((prev) => (prev === 'add' ? 'complete' : prev));
-    spotlightCompletionHandledRef.current = false;
   }, [taskFilter]);
 
   // Streak data now comes from useNewHomeData (consolidated RPC)
@@ -561,7 +552,6 @@ const AppHome = () => {
   // Welcome spotlight: which task to highlight per step
   const spotlightHighlightTaskId = useMemo<string | null>(() => {
     if (!spotlightStep) return null;
-    if (spotlightFinishedRef.current) return null;
     if (spotlightStep === 'tap') {
       return filteredTasks[0]?.id ?? null;
     }
@@ -615,19 +605,14 @@ const AppHome = () => {
   );
 
   const handleStreakIncrease = useCallback(() => {
-    // Spotlight: finish the tour as soon as user completes a task during step 3
-    if (spotlightStep === 'complete' && !spotlightCompletionHandledRef.current) {
-      spotlightCompletionHandledRef.current = true;
-      spotlightFinishedRef.current = true;
-      setSpotlightStep(null);
-      setSelectedTask(null);
-    }
+    // Spotlight: finish the tour as soon as user completes a task
+    setSpotlightStep((prev) => (prev === 'complete' ? null : prev));
     // If user has never celebrated first action, don't open streak modal immediately —
     // let triggerFirstCelebration handle it with proper delay after seal animation
     const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated') === 'true';
     if (!alreadyCelebrated) return;
     setShowStreakModal(true);
-  }, [spotlightStep]);
+  }, []);
 
   const handleOpenGoalInput = useCallback((task: UserTask) => {
     // Small count goals (< 10): directly increment by 1 without opening keyboard
@@ -1012,10 +997,7 @@ const AppHome = () => {
 
             {/* Welcome Spotlight Banner — invites the user to take the 3-step tour */}
             <WelcomeSpotlightBanner
-              onStart={() => {
-                spotlightFinishedRef.current = false;
-                setSpotlightStep('tap');
-              }}
+              onStart={() => setSpotlightStep('tap')}
               onVisibilityChange={setHasWelcomeBanner}
             />
 
@@ -1115,10 +1097,9 @@ const AppHome = () => {
                         <button
                           onClick={handleFabClick}
                           aria-label={t('home.addTask')}
-                          data-spotlight-add
                           className={cn(
                             "coach-add-btn w-6 h-6 rounded-full bg-brand text-white shadow-[0_4px_12px_hsl(var(--brand-primary)/0.4)] flex items-center justify-center active:scale-90 transition-transform",
-                            spotlightStep === 'add' && 'animate-pulse'
+                            spotlightStep === 'add' && 'ring-4 ring-amber-300 animate-pulse'
                           )}
                         >
                           <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
@@ -1130,7 +1111,7 @@ const AppHome = () => {
                     <>
                       {routineProTasks.length > 0 ? (
                         <>
-                          <SortableTaskList tasks={routineProTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onTaskComplete={handleStreakIncrease} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
+                          <SortableTaskList tasks={routineProTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                           <div className="flex gap-2 mt-3">
                             <button
                               onClick={() => navigate('/app/routineplayer')}
@@ -1195,7 +1176,7 @@ const AppHome = () => {
                       </div>
                       {homeView === 'one-time' ? (
                         <>
-                          <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onTaskComplete={handleStreakIncrease} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} defaultRepeatOverride="No" />
+                          <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} defaultRepeatOverride="No" />
                           <button
                             onClick={() => { setHomeView('tasks'); setTaskFilter('all'); }}
                             className="text-xs font-medium text-primary mt-1"
@@ -1204,13 +1185,13 @@ const AppHome = () => {
                           </button>
                         </>
                       ) : (
-                        <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onTaskComplete={handleStreakIncrease} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
+                        <SortableTaskList tasks={[]} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={() => {}} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} />
                       )}
                     </div>
                   ) : (
                     <>
                        <>
-                         <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onTaskComplete={handleStreakIncrease} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenTaskSheet={handleOpenTaskSheet} hideQuickAdd={taskFilter === 'all-routines' || taskFilter.startsWith('routine:')} defaultRepeatOverride={homeView === 'one-time' ? 'No' : undefined} coachHighlightTaskId={spotlightHighlightTaskId} />
+                         <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenTaskSheet={handleOpenTaskSheet} hideQuickAdd={taskFilter === 'all-routines' || taskFilter.startsWith('routine:')} defaultRepeatOverride={homeView === 'one-time' ? 'No' : undefined} coachHighlightTaskId={spotlightHighlightTaskId} />
                          {(taskFilter === 'all-routines' || taskFilter.startsWith('routine:')) && (
                            <div className="flex gap-2 mt-3">
                              <button
@@ -1308,7 +1289,6 @@ const AppHome = () => {
           onSkipTask={handleSkipTask}
           onOpenGoalInput={handleOpenGoalInput}
           onOpenTimer={handleOpenTimer}
-          onTaskComplete={handleStreakIncrease}
           onStepUnlocked={handleStepUnlocked}
           showStreakModal={showStreakModal}
           setShowStreakModal={setShowStreakModal}
@@ -1385,28 +1365,31 @@ const AppHome = () => {
 
         {/* Welcome Spotlight overlay — anchored to highlighted task during the tour */}
         {spotlightStep === 'tap' && spotlightHighlightTaskId && (
-          <TaskCoachOverlay
-            taskId={spotlightHighlightTaskId}
-            variant="tap"
-            message="👆 Tap a task to see details"
-            onSkip={finishSpotlight}
-          />
-        )}
-        {spotlightStep === 'add' && (
-          <TaskCoachOverlay
-            selector="[data-spotlight-add]"
-            variant="add"
-            message="➕ Tap the + to add your own task"
-            onSkip={finishSpotlight}
-          />
+          <TaskCoachOverlay taskId={spotlightHighlightTaskId} variant="tap" />
         )}
         {spotlightStep === 'complete' && spotlightHighlightTaskId && (
-          <TaskCoachOverlay
-            taskId={spotlightHighlightTaskId}
-            variant="check"
-            message="✅ Tap the circle to complete it"
-            onSkip={finishSpotlight}
-          />
+          <TaskCoachOverlay taskId={spotlightHighlightTaskId} variant="check" />
+        )}
+        {/* Instructional pill — bottom of screen during tour */}
+        {spotlightStep && (
+          <div
+            className="fixed left-0 right-0 z-[104] flex justify-center pointer-events-none"
+            style={{ bottom: 'calc(env(safe-area-inset-bottom) + 96px)' }}
+          >
+            <div className="pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#1a1a2e] text-white text-[13px] font-semibold shadow-[0_8px_24px_rgba(0,0,0,0.3)] max-w-[88vw]">
+              <span>
+                {spotlightStep === 'tap' && '👆 Tap a task to see details'}
+                {spotlightStep === 'add' && '➕ Tap the + to add your own task'}
+                {spotlightStep === 'complete' && '✅ Tap the circle to complete it'}
+              </span>
+              <button
+                onClick={() => setSpotlightStep(null)}
+                className="ml-1 text-white/60 active:text-white text-[11px] font-medium"
+              >
+                Skip
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </>

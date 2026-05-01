@@ -60,7 +60,6 @@ interface HomeCelebrationsProps {
   onSkipTask: (t: UserTask) => void;
   onOpenGoalInput: (t: UserTask) => void;
   onOpenTimer: (t: UserTask) => void;
-  onTaskComplete?: () => void;
   onStepUnlocked: (
     result: import("@/hooks/useProjectStepUnlock").StepUnlockResult,
   ) => void;
@@ -181,7 +180,6 @@ export const HomeCelebrations = memo(function HomeCelebrations(
     onSkipTask,
     onOpenGoalInput,
     onOpenTimer,
-    onTaskComplete,
     onStepUnlocked,
     showStreakModal,
     setShowStreakModal,
@@ -352,10 +350,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(
         }
         onEdit={onEditTask}
         onDelete={onDeleteTask}
-        onStreakIncrease={() => {
-          onTaskComplete?.();
-          setShowStreakModal(true);
-        }}
+        onStreakIncrease={() => setShowStreakModal(true)}
         onOpenGoalInput={onOpenGoalInput}
         onOpenTimer={onOpenTimer}
         onSkip={onSkipTask}

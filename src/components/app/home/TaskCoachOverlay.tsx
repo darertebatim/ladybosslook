@@ -1,43 +1,27 @@
 import { useEffect, useState } from 'react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
-type Variant = 'check' | 'tap' | 'add';
+type Variant = 'check' | 'tap';
 
 interface TaskCoachOverlayProps {
-  /** Task to anchor to (for 'tap' / 'check'). Ignored when `selector` is provided. */
-  taskId?: string | null;
-  /** CSS selector to anchor to (used for 'add' which targets the + button). */
-  selector?: string;
-  variant: Variant;
-  /** Instruction text shown right next to the spotlighted element. */
-  message?: string;
-  /** Called when the user taps the inline Skip button. */
-  onSkip?: () => void;
+  taskId: string | null | undefined;
+  variant: Variant; // 'check' = ring on right checkbox, 'tap' = ring on left body
 }
 
 /**
- * Renders a glowing ring + bouncing hand + inline instruction bubble anchored
- * to a specific element (task card via [data-task-id="..."] or any selector).
+ * Renders a glowing ring + bouncing hand anchored to a specific task card,
+ * found via [data-task-id="..."]. Recomputes on scroll/resize.
+ * The full task list stays visible; this overlay just adds a focal point.
  */
-export function TaskCoachOverlay({
-  taskId,
-  selector,
-  variant,
-  message,
-  onSkip,
-}: TaskCoachOverlayProps) {
+export function TaskCoachOverlay({ taskId, variant }: TaskCoachOverlayProps) {
   const [rect, setRect] = useState<DOMRect | null>(null);
 
-  const clamp = (value: number, min: number, max: number) =>
-    Math.min(Math.max(value, min), max);
-
   useEffect(() => {
-    if (!taskId && !selector) return;
+    if (!taskId) return;
     let raf = 0;
 
     const update = () => {
-      const sel = selector ?? `[data-task-id="${taskId}"]`;
-      const el = document.querySelector(sel);
+      const el = document.querySelector(`[data-task-id="${taskId}"]`);
       if (!el) {
         setRect(null);
         return;
@@ -53,7 +37,7 @@ export function TaskCoachOverlay({
     update();
     window.addEventListener('scroll', tick, true);
     window.addEventListener('resize', tick);
-    const interval = setInterval(update, 250);
+    const interval = setInterval(update, 250); // catch reflows from list animations
 
     return () => {
       cancelAnimationFrame(raf);
@@ -61,87 +45,46 @@ export function TaskCoachOverlay({
       window.removeEventListener('resize', tick);
       clearInterval(interval);
     };
-  }, [taskId, selector]);
+  }, [taskId]);
 
   if (!rect) return null;
 
-  const viewportW = typeof window !== 'undefined' ? window.innerWidth : 390;
-  const viewportH = typeof window !== 'undefined' ? window.innerHeight : 844;
+  const ringSize = 48;
   const cy = rect.top + rect.height / 2;
 
-  let ringLeft = 0;
-  let ringTop = 0;
-  let ringWidth = 0;
-  let ringHeight = 0;
-  let ringRadius = '12px';
-
-  if (variant === 'check') {
-    const ringSize = 54;
-    ringLeft = rect.right - ringSize - 8;
-    ringWidth = ringSize;
-    ringHeight = ringSize;
-    ringRadius = '50%';
-    ringTop = cy - ringHeight / 2;
-  } else if (variant === 'tap') {
-    ringLeft = rect.left - 6;
-    ringTop = rect.top - 6;
-    ringWidth = rect.width + 12;
-    ringHeight = rect.height + 12;
-    ringRadius = '26px';
-  } else {
-    ringLeft = rect.left - 12;
-    ringTop = rect.top - 12;
-    ringWidth = rect.width + 24;
-    ringHeight = rect.height + 24;
-    ringRadius = '50%';
-  }
-
-  const handLeft =
+  // Position depending on variant
+  const ringLeft =
     variant === 'check'
-      ? ringLeft - 30
-      : variant === 'add'
-        ? ringLeft + ringWidth - 18
-        : ringLeft + 20;
-  const handTop =
-    variant === 'check'
-      ? ringTop - 20
-      : variant === 'add'
-        ? ringTop + ringHeight - 6
-        : ringTop + ringHeight - 8;
-
-  const bubbleMaxWidth = Math.min(250, viewportW - 24);
-  const placeBubbleBelow = variant === 'add' || ringTop < 92;
-  const bubbleTop = placeBubbleBelow
-    ? Math.min(ringTop + ringHeight + 18, viewportH - 80)
-    : Math.max(ringTop - 58, 12);
-  const bubbleLeft = clamp(
-    (variant === 'add' ? rect.right - bubbleMaxWidth + 24 : rect.left + rect.width / 2 - bubbleMaxWidth / 2),
-    12,
-    viewportW - bubbleMaxWidth - 12,
-  );
+      ? rect.right - ringSize - 10
+      : rect.left + 12;
+  const ringWidth = variant === 'check' ? ringSize : Math.min(rect.width - ringSize - 30, 200);
+  const ringHeight = variant === 'check' ? ringSize : 36;
+  const handLeft = variant === 'check' ? ringLeft - 36 : ringLeft + 12;
+  const handTop = cy - 60;
 
   return (
     <>
+      {/* Glow ring */}
       <div
-        className="fixed pointer-events-none z-[10020]"
+        className="fixed pointer-events-none z-[102]"
         style={{
           left: ringLeft,
-          top: ringTop,
+          top: cy - ringHeight / 2,
           width: ringWidth,
           height: ringHeight,
-          borderRadius: ringRadius,
-          border: '2px solid hsl(0 0% 100% / 0.98)',
+          borderRadius: variant === 'check' ? '50%' : '12px',
           boxShadow:
-            '0 0 0 9999px hsl(0 0% 0% / 0.82), 0 0 0 8px hsl(0 0% 0% / 0.24), 0 10px 28px hsl(0 0% 0% / 0.45)',
+            '0 0 14px 6px rgba(0,0,0,0.7), 0 0 28px 12px rgba(0,0,0,0.35)',
           animation: 'taskCoachGlow 1.6s ease-in-out infinite',
         }}
       />
+      {/* Bouncing hand */}
       <div
-        className="fixed pointer-events-none z-[10021]"
+        className="fixed pointer-events-none z-[103]"
         style={{
           left: handLeft,
           top: handTop,
-          filter: 'drop-shadow(0 8px 20px hsl(0 0% 0% / 0.42))',
+          filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
           animation: 'taskCoachBounce 1.4s ease-in-out infinite',
           transform: 'rotate(-25deg)',
           transformOrigin: 'center',
@@ -149,28 +92,6 @@ export function TaskCoachOverlay({
       >
         <FluentEmoji emoji="👇" size={56} />
       </div>
-      {message && (
-        <div
-          className="fixed z-[10022] pointer-events-none"
-          style={{ top: bubbleTop, left: bubbleLeft, width: bubbleMaxWidth }}
-        >
-          <div
-            className="pointer-events-auto inline-flex max-w-full items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-semibold shadow-[0_8px_24px_hsl(0_0%_0%_/_0.45)]"
-            style={{ background: 'hsl(0 0% 0%)', color: 'hsl(0 0% 100%)' }}
-          >
-            <span>{message}</span>
-            {onSkip && (
-              <button
-                onClick={onSkip}
-                className="ml-1 rounded-full px-2 py-0.5 text-[11px] font-medium active:opacity-85"
-                style={{ background: 'hsl(0 0% 100% / 0.16)', color: 'hsl(0 0% 100%)' }}
-              >
-                Skip
-              </button>
-            )}
-          </div>
-        </div>
-      )}
       <style>{`
         @keyframes taskCoachBounce {
           0%   { transform: rotate(-25deg) translateY(0px); }
@@ -180,8 +101,8 @@ export function TaskCoachOverlay({
           100% { transform: rotate(-25deg) translateY(0px); }
         }
         @keyframes taskCoachGlow {
-          0%, 100% { box-shadow: 0 0 0 9999px hsl(0 0% 0% / 0.82), 0 0 0 8px hsl(0 0% 0% / 0.24), 0 10px 28px hsl(0 0% 0% / 0.45); }
-          50%      { box-shadow: 0 0 0 9999px hsl(0 0% 0% / 0.82), 0 0 0 12px hsl(0 0% 0% / 0.3), 0 14px 34px hsl(0 0% 0% / 0.55); }
+          0%, 100% { box-shadow: 0 0 14px 6px rgba(0,0,0,0.7), 0 0 28px 12px rgba(0,0,0,0.35); }
+          50%      { box-shadow: 0 0 22px 10px rgba(0,0,0,0.9), 0 0 40px 18px rgba(0,0,0,0.45); }
         }
       `}</style>
     </>
