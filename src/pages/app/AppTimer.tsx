@@ -455,7 +455,7 @@ function AppTimerInner() {
                 activeTab === 'timer' ? 'bg-foreground text-background' : 'text-muted-foreground'
               )}
             >
-              Timer
+              {t('timer.timer')}
             </button>
             <button
               onClick={() => { setActiveTab('pomodoro'); haptic.light(); }}
@@ -464,7 +464,7 @@ function AppTimerInner() {
                 activeTab === 'pomodoro' ? 'bg-foreground text-background' : 'text-muted-foreground'
               )}
             >
-              Pomodoro
+              {t('timer.pomodoro')}
             </button>
           </div>
           <button onClick={() => { setScreen('stats'); haptic.light(); }} className="p-2 -mr-2">
