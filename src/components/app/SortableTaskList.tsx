@@ -49,7 +49,7 @@ interface SortableTaskItemProps {
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
   isDragging?: boolean;
-  coachHighlight?: 'on' | 'off' | null;
+  coachHighlight?: 'on' | 'off' | 'gold' | null;
 }
 
 const SortableTaskItem = ({
@@ -92,7 +92,8 @@ const SortableTaskItem = ({
         'touch-manipulation',
         isSortableDragging && 'opacity-50 scale-[1.02]',
         coachHighlight === 'off' && 'pointer-events-none transition-opacity duration-300',
-        coachHighlight === 'on' && 'relative z-[101] transition-transform duration-300 rounded-2xl [--shadow-card-warm:none] [&_*]:[--shadow-card-warm:none] [filter:drop-shadow(0_0_18px_rgba(255,255,255,0.95))_drop-shadow(0_0_42px_rgba(255,255,255,0.7))]'
+        coachHighlight === 'on' && 'relative z-[101] transition-transform duration-300 rounded-2xl [--shadow-card-warm:none] [&_*]:[--shadow-card-warm:none] [filter:drop-shadow(0_0_18px_rgba(255,255,255,0.95))_drop-shadow(0_0_42px_rgba(255,255,255,0.7))]',
+        coachHighlight === 'gold' && 'relative z-[101] transition-transform duration-300 rounded-2xl [--shadow-card-warm:none] [&_*]:[--shadow-card-warm:none] [filter:drop-shadow(0_0_18px_rgba(250,204,21,0.95))_drop-shadow(0_0_42px_rgba(245,158,11,0.75))]'
       )}
     >
       <TaskCard
@@ -129,6 +130,8 @@ interface SortableTaskListProps {
   onOpenTaskSheet?: (params: { editTaskId?: string; createParams?: Record<string, string> }) => void;
   /** When set, only this task is highlighted; others are dimmed and non-interactive. */
   coachHighlightTaskId?: string | null;
+  /** Visual style of the highlight halo. Defaults to white. */
+  coachHighlightVariant?: 'white' | 'gold';
 }
 
 export const SortableTaskList = ({
@@ -147,6 +150,7 @@ export const SortableTaskList = ({
   defaultRepeatOverride,
   onOpenTaskSheet,
   coachHighlightTaskId,
+  coachHighlightVariant = 'white',
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
@@ -259,7 +263,7 @@ export const SortableTaskList = ({
       coachHighlight={
         coachHighlightTaskId
           ? coachHighlightTaskId === task.id
-            ? 'on'
+            ? (coachHighlightVariant === 'gold' ? 'gold' : 'on')
             : 'off'
           : null
       }
