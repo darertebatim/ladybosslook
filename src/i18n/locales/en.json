@@ -1467,5 +1467,23 @@
     "watchPrefix": "Watch {{name}}",
     "fallbackName": "Video Playlist",
     "shareText": "🎬 Check out '{{name}}' on Routine Ladyboss 💫"
+  },
+  "tour": {
+    "skipAria": "Skip tour",
+    "tryTapping": "Try tapping",
+    "trySwiping": "Try swiping",
+    "takeALook": "Take a look",
+    "gotIt": "Got it!",
+    "next": "Next",
+    "breathe": {
+      "welcomeTitle": "Take a Breath 🌬️",
+      "welcomeDesc": "These exercises help calm your mind. Pick one that matches how you feel.",
+      "exercisesTitle": "Start an Exercise",
+      "exercisesDesc": "Tap any card to begin. Follow the circle animation to breathe in and out.",
+      "addRoutineTitle": "Add to Routines",
+      "addRoutineDesc": "Tap the + button to add this breathing exercise to your Routines (Planner) so you can repeat it daily.",
+      "doneTitle": "Just One Minute 🧘",
+      "doneDesc": "Even one minute makes a difference. Your sessions are tracked automatically."
+    }
   }
 }
