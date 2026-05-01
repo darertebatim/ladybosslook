@@ -6,8 +6,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Wind, Clock, Flame, TrendingUp, Calendar } from 'lucide-react';
 import { format, subDays, startOfDay, isAfter } from 'date-fns';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { useTranslation } from 'react-i18next';
 
 export default function AppBreatheStats() {
+  const { t } = useTranslation();
   const { data: sessions, isLoading: sessionsLoading } = useBreathingSessions();
   const { data: exercises } = useBreathingExercises();
 
@@ -76,9 +78,9 @@ export default function AppBreatheStats() {
 
   return (
     <>
-      <SEOHead title="Breathe Stats - LadyBoss" description="Your breathing exercise statistics" />
+      <SEOHead title={t('breatheStatsPage.seoTitle')} description={t('breatheStatsPage.seoDesc')} />
       <div className="min-h-screen bg-background">
-        <AppHeader title="Breathe Stats" showBack backTo="/app/breathe" />
+        <AppHeader title={t('breatheStatsPage.title')} showBack backTo="/app/breathe" />
         <AppHeaderSpacer />
 
         <div className="px-4 pb-safe space-y-5">
@@ -91,8 +93,8 @@ export default function AppBreatheStats() {
               <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
                 <Wind className="h-8 w-8 text-muted-foreground" />
               </div>
-              <p className="text-foreground font-medium">No sessions yet</p>
-              <p className="text-sm text-muted-foreground mt-1">Complete a breathing exercise to see your stats</p>
+              <p className="text-foreground font-medium">{t('breatheStatsPage.noSessions')}</p>
+              <p className="text-sm text-muted-foreground mt-1">{t('breatheStatsPage.noSessionsHint')}</p>
             </div>
           ) : (
             <>
@@ -101,28 +103,28 @@ export default function AppBreatheStats() {
                 <div className="bg-muted rounded-2xl p-4">
                   <div className="flex items-center gap-2 mb-1">
                     <Wind className="h-4 w-4 text-primary" />
-                    <span className="text-xs text-muted-foreground">Sessions</span>
+                    <span className="text-xs text-muted-foreground">{t('breatheStatsPage.sessions')}</span>
                   </div>
                   <p className="text-2xl font-bold text-foreground">{stats.totalSessions}</p>
                 </div>
                 <div className="bg-muted rounded-2xl p-4">
                   <div className="flex items-center gap-2 mb-1">
                     <Clock className="h-4 w-4 text-primary" />
-                    <span className="text-xs text-muted-foreground">Total Minutes</span>
+                    <span className="text-xs text-muted-foreground">{t('breatheStatsPage.totalMinutes')}</span>
                   </div>
                   <p className="text-2xl font-bold text-foreground">{stats.totalMinutes}</p>
                 </div>
                 <div className="bg-muted rounded-2xl p-4">
                   <div className="flex items-center gap-2 mb-1">
                     <Flame className="h-4 w-4 text-primary" />
-                    <span className="text-xs text-muted-foreground">Day Streak</span>
+                    <span className="text-xs text-muted-foreground">{t('breatheStatsPage.dayStreak')}</span>
                   </div>
                   <p className="text-2xl font-bold text-foreground">{stats.streak}</p>
                 </div>
                 <div className="bg-muted rounded-2xl p-4">
                   <div className="flex items-center gap-2 mb-1">
                     <TrendingUp className="h-4 w-4 text-primary" />
-                    <span className="text-xs text-muted-foreground">Favorite</span>
+                    <span className="text-xs text-muted-foreground">{t('breatheStatsPage.favorite')}</span>
                   </div>
                   <p className="text-sm font-semibold text-foreground truncate">
                     {stats.favoriteExercise?.name || '—'}
@@ -134,7 +136,7 @@ export default function AppBreatheStats() {
               <div className="bg-muted rounded-2xl p-4">
                 <div className="flex items-center gap-2 mb-4">
                   <Calendar className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-semibold text-foreground">Last 7 Days</span>
+                  <span className="text-sm font-semibold text-foreground">{t('breatheStatsPage.last7Days')}</span>
                 </div>
                 <div className="flex items-end justify-between gap-2 h-24">
                   {stats.last7Days.map((day, i) => (
@@ -157,7 +159,7 @@ export default function AppBreatheStats() {
               {/* By exercise breakdown */}
               {stats.byExercise.length > 0 && (
                 <div className="bg-muted rounded-2xl p-4">
-                  <span className="text-sm font-semibold text-foreground mb-3 block">Exercise Breakdown</span>
+                  <span className="text-sm font-semibold text-foreground mb-3 block">{t('breatheStatsPage.exerciseBreakdown')}</span>
                   <div className="space-y-3">
                     {stats.byExercise.map(({ exerciseId, count, totalSeconds }) => {
                       const exercise = exerciseMap.get(exerciseId);
@@ -170,7 +172,7 @@ export default function AppBreatheStats() {
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-foreground truncate">{exercise.name}</p>
                             <p className="text-xs text-muted-foreground">
-                              {count} session{count !== 1 ? 's' : ''} · {Math.round(totalSeconds / 60)} min
+                              {count} {count === 1 ? t('breatheStatsPage.sessionUnit') : t('breatheStatsPage.sessionUnitPlural')} · {Math.round(totalSeconds / 60)} {t('breatheStatsPage.minShort')}
                             </p>
                           </div>
                         </div>

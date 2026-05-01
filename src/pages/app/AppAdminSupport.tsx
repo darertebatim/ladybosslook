@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 
 interface Conversation {
   id: string;
@@ -22,6 +23,7 @@ interface Conversation {
 }
 
 export default function AppAdminSupport() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -176,8 +178,8 @@ export default function AppAdminSupport() {
           ) : (
             <Tabs value={inboxType} onValueChange={(v) => setInboxType(v as 'support' | 'coach')} className="w-full flex justify-center">
               <TabsList className="h-8">
-                <TabsTrigger value="support" className="text-xs px-3 py-1">Support</TabsTrigger>
-                <TabsTrigger value="coach" className="text-xs px-3 py-1">Coach</TabsTrigger>
+                <TabsTrigger value="support" className="text-xs px-3 py-1">{t('adminSupportPage.support')}</TabsTrigger>
+                <TabsTrigger value="coach" className="text-xs px-3 py-1">{t('adminSupportPage.coach')}</TabsTrigger>
               </TabsList>
             </Tabs>
           )}

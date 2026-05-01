@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { useDateRangeTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 import { BackButton } from '@/components/app/BackButton';
 import { SEOHead } from '@/components/SEOHead';
+import { useTranslation } from 'react-i18next';
 
 import coinBronze from '@/assets/coin-bronze.png';
 import coinSilver from '@/assets/coin-silver.png';
@@ -45,6 +46,7 @@ function BadgeIcon({ level }: { level: Exclude<BadgeLevel, 'none'> }) {
 }
 
 const AppActionStats = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentYear, setCurrentYear] = useState(new Date());
@@ -124,7 +126,7 @@ const AppActionStats = () => {
 
   return (
     <>
-      <SEOHead title="Task Stats - LadyBoss" description="Your task completion statistics" />
+      <SEOHead title={t('actionStatsPage.seoTitle')} description={t('actionStatsPage.seoDesc')} />
       
       <div className="flex flex-col h-dvh overflow-hidden bg-amber-50">
         {/* Header */}
@@ -135,7 +137,7 @@ const AppActionStats = () => {
           <div className="px-4 py-2 flex items-center">
             <BackButton to="/app/presence" className="text-orange-700" />
             <h1 className="flex-1 text-center text-lg font-semibold text-foreground">
-               Task Stats
+               {t('actionStatsPage.title')}
             </h1>
             <div className="w-9" /> {/* Spacer */}
           </div>
@@ -153,14 +155,14 @@ const AppActionStats = () => {
               <img src={coinSilver} alt="Silver" className="w-10 h-10 object-contain" />
               <img src={coinBronze} alt="Bronze" className="w-10 h-10 object-contain" />
             </div>
-            <h3 className="text-lg font-bold text-foreground mb-2">Progress Badge</h3>
+            <h3 className="text-lg font-bold text-foreground mb-2">{t('actionStatsPage.progressBadge')}</h3>
             <p className="text-sm text-foreground leading-snug">
-              Complete at least one task for Bronze. Reach 2 tasks for Silver. Finish 3 tasks to claim Gold.
+              {t('actionStatsPage.progressBadgeDesc')}
             </p>
           </div>
 
           {/* Task Stats Calendar */}
-          <h3 className="text-base font-bold text-foreground mb-3">Task Stats</h3>
+          <h3 className="text-base font-bold text-foreground mb-3">{t('actionStatsPage.taskStats')}</h3>
           <div className="bg-white rounded-2xl p-4 shadow-ios mb-6">
             {/* Month navigation */}
             <div className="flex items-center justify-between mb-4">
@@ -229,38 +231,38 @@ const AppActionStats = () => {
               <div className="flex items-center justify-between border-b border-border/50 pb-3">
                 <div className="flex items-center gap-3">
                   <img src={coinGold} alt="Gold" className="w-8 h-8 object-contain" />
-                  <span className="text-base font-semibold text-foreground">Gold Badge</span>
+                  <span className="text-base font-semibold text-foreground">{t('actionStatsPage.goldBadge')}</span>
                 </div>
                 <div className="flex items-baseline gap-1">
                   <span className="text-2xl font-bold text-foreground">{badgeSummary.gold}</span>
-                  <span className="text-sm text-muted-foreground">days</span>
+                  <span className="text-sm text-muted-foreground">{t('actionStatsPage.days')}</span>
                 </div>
               </div>
               <div className="flex items-center justify-between border-b border-border/50 pb-3">
                 <div className="flex items-center gap-3">
                   <img src={coinSilver} alt="Silver" className="w-8 h-8 object-contain" />
-                  <span className="text-base font-semibold text-foreground">Silver Badge</span>
+                  <span className="text-base font-semibold text-foreground">{t('actionStatsPage.silverBadge')}</span>
                 </div>
                 <div className="flex items-baseline gap-1">
                   <span className="text-2xl font-bold text-foreground">{badgeSummary.silver}</span>
-                  <span className="text-sm text-muted-foreground">{badgeSummary.silver === 1 ? 'day' : 'days'}</span>
+                  <span className="text-sm text-muted-foreground">{badgeSummary.silver === 1 ? t('actionStatsPage.day') : t('actionStatsPage.days')}</span>
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <img src={coinBronze} alt="Bronze" className="w-8 h-8 object-contain" />
-                  <span className="text-base font-semibold text-foreground">Bronze Badge</span>
+                  <span className="text-base font-semibold text-foreground">{t('actionStatsPage.bronzeBadge')}</span>
                 </div>
                 <div className="flex items-baseline gap-1">
                   <span className="text-2xl font-bold text-foreground">{badgeSummary.bronze}</span>
-                  <span className="text-sm text-muted-foreground">{badgeSummary.bronze === 1 ? 'day' : 'days'}</span>
+                  <span className="text-sm text-muted-foreground">{badgeSummary.bronze === 1 ? t('actionStatsPage.day') : t('actionStatsPage.days')}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Data this year - Heatmap */}
-          <h3 className="text-base font-bold text-foreground mb-3">Data this year</h3>
+          <h3 className="text-base font-bold text-foreground mb-3">{t('actionStatsPage.dataThisYear')}</h3>
           <div className="bg-white rounded-2xl p-4 shadow-ios mb-6">
             <div className="flex items-center justify-between mb-4">
               <button onClick={() => setCurrentYear(y => subYears(y, 1))} className="p-1 active:scale-90 transition-transform">
@@ -298,15 +300,15 @@ const AppActionStats = () => {
           </div>
 
           {/* Record */}
-          <h3 className="text-base font-bold text-foreground mb-3">Record</h3>
+          <h3 className="text-base font-bold text-foreground mb-3">{t('actionStatsPage.record')}</h3>
           <div className="bg-white rounded-2xl p-5 shadow-ios mb-6">
             <div className="space-y-4">
-              <RecordRow label="Perfect Days" value={yearRecords.perfectDays} unit="days" />
-              <RecordRow label="Best Streaks" value={yearRecords.bestStreak} unit="days" />
-               <RecordRow label="Tasks Done Total" value={yearRecords.totalCompleted} />
-               <RecordRow label="Tasks Done This Month" value={yearRecords.monthCompleted} />
-              <RecordRow label="Overall Rate" value={yearRecords.overallRate} unit="%" />
-              <RecordRow label="Monthly Rate" value={yearRecords.monthlyRate} unit="%" />
+              <RecordRow label={t('actionStatsPage.perfectDays')} value={yearRecords.perfectDays} unit={t('actionStatsPage.days')} />
+              <RecordRow label={t('actionStatsPage.bestStreaks')} value={yearRecords.bestStreak} unit={t('actionStatsPage.days')} />
+               <RecordRow label={t('actionStatsPage.tasksDoneTotal')} value={yearRecords.totalCompleted} />
+               <RecordRow label={t('actionStatsPage.tasksDoneMonth')} value={yearRecords.monthCompleted} />
+              <RecordRow label={t('actionStatsPage.overallRate')} value={yearRecords.overallRate} unit="%" />
+              <RecordRow label={t('actionStatsPage.monthlyRate')} value={yearRecords.monthlyRate} unit="%" />
             </div>
           </div>
 
