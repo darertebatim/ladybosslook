@@ -1184,27 +1184,36 @@ const AppTaskCreate = ({
   };
 
   const getRepeatTitle = () => {
-    if (!repeatEnabled) return 'No repeat';
-    
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    if (!repeatEnabled) return t('taskEdit.noRepeat');
+
+    const dayNames = [
+      t('streakLost.sun', { defaultValue: 'Sun' }),
+      t('streakLost.mon', { defaultValue: 'Mon' }),
+      t('streakLost.tue', { defaultValue: 'Tue' }),
+      t('streakLost.wed', { defaultValue: 'Wed' }),
+      t('streakLost.thu', { defaultValue: 'Thu' }),
+      t('streakLost.fri', { defaultValue: 'Fri' }),
+      t('streakLost.sat', { defaultValue: 'Sat' }),
+    ];
     
     if (repeatPattern === 'weekly' && repeatDays.length > 0) {
       const days = repeatDays.map(d => dayNames[d]).join(', ');
-      return `Repeats every week on ${days}`;
+      return t('taskPickers.repeatsEveryWeekOn', { days });
     }
     
     if (repeatPattern === 'monthly') {
       const dayOfMonth = scheduledDate.getDate();
       const suffix = dayOfMonth === 1 ? 'st' : dayOfMonth === 2 ? 'nd' : dayOfMonth === 3 ? 'rd' : 'th';
-      return `Repeats every month on the ${dayOfMonth}${suffix}`;
+      return t('taskPickers.repeatsEveryMonthOn', { day: `${dayOfMonth}${suffix}` });
     }
     
     if (repeatInterval === 1) {
-      return `Repeats every ${repeatPattern === 'daily' ? 'day' : repeatPattern}`;
+      const unit = repeatPattern === 'daily' ? t('taskPickers.day') : repeatPattern === 'weekly' ? t('taskPickers.week') : t('taskPickers.month');
+      return t('taskPickers.repeatsEvery', { unit });
     }
     
-    const unit = repeatPattern === 'daily' ? 'days' : repeatPattern === 'weekly' ? 'weeks' : 'months';
-    return `Repeats every ${repeatInterval} ${unit}`;
+    const unit = repeatPattern === 'daily' ? t('taskPickers.days') : repeatPattern === 'weekly' ? t('taskPickers.weeks') : t('taskPickers.months');
+    return t('taskPickers.repeatsEveryN', { n: repeatInterval, unit });
   };
 
   const toggleRepeatDay = (day: number) => {
