@@ -273,8 +273,10 @@ export default function System() {
     localStorage.removeItem(`simora_onboarding_progress_${flowId}`);
     // Reset first-action celebration so the spotlight cascade can re-trigger
     localStorage.removeItem("simora_first_action_celebrated");
-    toast.success("Welcome Spotlight reset — replaying now");
-    navigate(`/app/onboarding/${flowId}`);
+    // Reset Welcome Spotlight banner so the "Show me around" offer re-appears
+    localStorage.removeItem("simora_spotlight_banner_dismissed");
+    toast.success("Welcome Spotlight reset — banner will re-appear on Home");
+    navigate("/app/home");
   };
 
   const handleEnrollAllPrograms = async () => {
