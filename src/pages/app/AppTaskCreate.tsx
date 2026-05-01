@@ -1982,7 +1982,7 @@ const AppTaskCreate = ({
             <button onClick={() => setShowReminderPicker(false)} className="p-2 -ml-2">
               <X className="h-5 w-5" />
             </button>
-            <span className="text-base font-medium">Set reminder</span>
+            <span className="text-base font-medium">{t('taskEdit.setReminder')}</span>
             <div className="w-9" />
           </div>
           <div className="py-2">
@@ -1997,7 +1997,7 @@ const AppTaskCreate = ({
                 !reminderEnabled && "bg-[#FFF59D]"
               )}
             >
-              <span className="font-medium">No reminder</span>
+              <span className="font-medium">{t('taskEdit.noReminder')}</span>
               {!reminderEnabled && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
             </button>
 
@@ -2017,7 +2017,7 @@ const AppTaskCreate = ({
                   )}
                 >
                   <span className="font-medium">
-                    At time of event <span className="text-muted-foreground">({formatReminderTimeDisplay(scheduledTime)})</span>
+                    {t('taskPickers.atTimeOfEvent')} <span className="text-muted-foreground">({formatReminderTimeDisplay(scheduledTime)})</span>
                   </span>
                   {reminderEnabled && reminderTime === scheduledTime && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
                 </button>
@@ -2035,7 +2035,7 @@ const AppTaskCreate = ({
                   )}
                 >
                   <span className="font-medium">
-                    10 minutes early <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 10))})</span>
+                    {t('taskPickers.minutesEarly', { n: 10 })} <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 10))})</span>
                   </span>
                   {reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 10) && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
                 </button>
@@ -2053,7 +2053,7 @@ const AppTaskCreate = ({
                   )}
                 >
                   <span className="font-medium">
-                    30 minutes early <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 30))})</span>
+                    {t('taskPickers.minutesEarly', { n: 30 })} <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 30))})</span>
                   </span>
                   {reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 30) && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
                 </button>
@@ -2071,7 +2071,7 @@ const AppTaskCreate = ({
                   )}
                 >
                   <span className="font-medium">
-                    1 hour early <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 60))})</span>
+                    {t('taskPickers.hourEarly')} <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 60))})</span>
                   </span>
                   {reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 60) && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
                 </button>
@@ -2092,7 +2092,7 @@ const AppTaskCreate = ({
                   )}
                 >
                   <span className="font-medium">
-                    {preset.label} <span className="text-muted-foreground">({formatReminderTimeDisplay(preset.time)})</span>
+                    {t(preset.labelKey)} <span className="text-muted-foreground">({formatReminderTimeDisplay(preset.time)})</span>
                   </span>
                   {reminderEnabled && reminderTime === preset.time && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
                 </button>
@@ -2113,7 +2113,7 @@ const AppTaskCreate = ({
               )}
             >
               <span className="font-medium">
-                Custom {reminderEnabled && <span className="text-muted-foreground">(Remind me at {formatReminderTimeDisplay(reminderTime)})</span>}
+                {t('taskEdit.custom')} {reminderEnabled && <span className="text-muted-foreground">({t('taskPickers.remindMeAt', { time: formatReminderTimeDisplay(reminderTime) })})</span>}
               </span>
               {reminderEnabled && !REMINDER_PRESETS.some(p => p.time === reminderTime) && 
                 (scheduledTime ? reminderTime !== scheduledTime && reminderTime !== getTimeOffset(scheduledTime, 10) && reminderTime !== getTimeOffset(scheduledTime, 30) && reminderTime !== getTimeOffset(scheduledTime, 60) : true) && (
