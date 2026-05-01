@@ -92,7 +92,7 @@ const SortableTaskItem = ({
         'touch-manipulation',
         isSortableDragging && 'opacity-50 scale-[1.02]',
         coachHighlight === 'off' && 'pointer-events-none transition-opacity duration-300',
-        coachHighlight === 'on' && 'relative z-[101] transition-transform duration-300 rounded-2xl [&_*]:!shadow-none [filter:drop-shadow(0_0_24px_rgba(255,255,255,0.9))_drop-shadow(0_0_48px_rgba(255,255,255,0.6))]'
+        coachHighlight === 'on' && 'relative z-[101] transition-transform duration-300 rounded-2xl [--shadow-card-warm:none] [&_*]:[--shadow-card-warm:none] [filter:drop-shadow(0_0_18px_rgba(255,255,255,0.95))_drop-shadow(0_0_42px_rgba(255,255,255,0.7))]'
       )}
     >
       <TaskCard
