@@ -879,7 +879,7 @@ function AppTimerInner() {
 
         <div className="flex-1 flex flex-col items-center justify-center px-6">
           <h2 className="text-xl font-semibold text-foreground mb-16">
-            {isPomodoro ? 'Adjust the Pomodoro time' : 'Adjust the time'}
+            {isPomodoro ? t('timer.adjustPomodoroTime') : t('timer.adjustTime')}
           </h2>
 
           {/* Triangle pointer */}
@@ -901,7 +901,7 @@ function AppTimerInner() {
               className="text-2xl font-semibold"
               style={{ color: isPomodoro ? 'hsl(0, 70%, 68%)' : 'hsl(var(--muted-foreground))' }}
             >
-              min
+              {t('timer.min')}
             </span>
           </div>
 
@@ -990,7 +990,7 @@ function AppTimerInner() {
             onClick={() => { setScreen('setup'); haptic.medium(); }}
             className="relative w-full h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
           >
-            Done
+            {t('timer.done')}
           </button>
         </div>
       </div>
