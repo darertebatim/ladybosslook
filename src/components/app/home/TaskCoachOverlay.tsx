@@ -73,9 +73,10 @@ export function TaskCoachOverlay({ taskId, variant }: TaskCoachOverlayProps) {
           width: ringWidth,
           height: ringHeight,
           borderRadius: variant === 'check' ? '50%' : '12px',
-          boxShadow:
-            '0 0 14px 6px rgba(0,0,0,0.7), 0 0 28px 12px rgba(0,0,0,0.35)',
-          animation: 'taskCoachGlow 1.6s ease-in-out infinite',
+          animation:
+            variant === 'check'
+              ? 'taskCoachGlowGold 1.6s ease-in-out infinite'
+              : 'taskCoachGlow 1.6s ease-in-out infinite',
         }}
       />
       {/* Bouncing hand */}
@@ -103,6 +104,10 @@ export function TaskCoachOverlay({ taskId, variant }: TaskCoachOverlayProps) {
         @keyframes taskCoachGlow {
           0%, 100% { box-shadow: 0 0 14px 6px rgba(0,0,0,0.7), 0 0 28px 12px rgba(0,0,0,0.35); }
           50%      { box-shadow: 0 0 22px 10px rgba(0,0,0,0.9), 0 0 40px 18px rgba(0,0,0,0.45); }
+        }
+        @keyframes taskCoachGlowGold {
+          0%, 100% { box-shadow: 0 0 14px 6px rgba(250,204,21,0.85), 0 0 28px 14px rgba(245,158,11,0.55); }
+          50%      { box-shadow: 0 0 22px 10px rgba(250,204,21,1), 0 0 42px 20px rgba(245,158,11,0.7); }
         }
       `}</style>
     </>
