@@ -595,12 +595,12 @@ function AppTimerInner() {
             onClick={() => { setScreen('setup'); haptic.light(); }}
             className="text-base font-semibold text-foreground pr-2"
           >
-            Save
+            {t('timer.save')}
           </button>
         </div>
 
         <div className="px-5 pt-2 pb-4">
-          <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('timer.settings')}</h1>
         </div>
 
         {/* Timer / Pomodoro tabs */}
@@ -613,7 +613,7 @@ function AppTimerInner() {
                 settingsTab === 'timer' ? 'bg-foreground text-background' : 'text-muted-foreground'
               )}
             >
-              Timer
+              {t('timer.timer')}
             </button>
             <button
               onClick={() => { setSettingsTab('pomodoro'); haptic.light(); }}
@@ -622,7 +622,7 @@ function AppTimerInner() {
                 settingsTab === 'pomodoro' ? 'bg-foreground text-background' : 'text-muted-foreground'
               )}
             >
-              Pomodoro
+              {t('timer.pomodoro')}
             </button>
           </div>
         </div>
@@ -632,7 +632,7 @@ function AppTimerInner() {
           <div className="bg-muted/50 rounded-2xl p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Bell className="h-5 w-5 text-foreground" />
-              <span className="text-base font-medium text-foreground">Reminders</span>
+              <span className="text-base font-medium text-foreground">{t('timer.reminders')}</span>
             </div>
             <Switch
               checked={remindersEnabled}
