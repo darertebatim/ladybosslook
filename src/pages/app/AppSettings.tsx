@@ -81,12 +81,15 @@ const useShowNativeSettings = () => {
 
 const AppSettings = () => {
   const { user, signOut, canAccessAdminPage } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { unreadCount } = useUnreadChat();
   const showNativeSettings = useShowNativeSettings();
+  const [searchParams] = useSearchParams();
+  const currentLang = (i18n.language?.startsWith("fa") ? "fa" : "en") as SupportedLanguage;
+  const languageSectionRef = useRef<HTMLDivElement>(null);
 
   // Password
   const [newPassword, setNewPassword] = useState("");
@@ -131,6 +134,28 @@ const AppSettings = () => {
       return next;
     });
   }, []);
+
+  // Deep-link: open and scroll to a section via ?section=
+  useEffect(() => {
+    const target = searchParams.get("section");
+    if (!target) return;
+    setOpenSections((prev) => {
+      const next = new Set(prev);
+      next.add(target);
+      return next;
+    });
+    if (target === "language") {
+      setTimeout(() => {
+        languageSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 120);
+    }
+  }, [searchParams]);
+
+  const handleLangChange = (lang: SupportedLanguage) => {
+    if (lang === currentLang) return;
+    haptic.light();
+    setAppLanguage(lang);
+  };
 
   // Check notification / calendar status
   useEffect(() => {
