@@ -7,6 +7,7 @@ import { OverlayPortal } from '@/components/app/OverlayPortal';
 import { StreakLostPushPrompt } from '@/components/app/StreakLostPushPrompt';
 import { useAuth } from '@/hooks/useAuth';
 import { usePushPermission } from '@/hooks/usePushPermission';
+import { useTranslation } from 'react-i18next';
 
 interface StreakLostBannerProps {
   open: boolean;
@@ -35,6 +36,7 @@ export const StreakLostBanner = ({
   onSubscribe,
   isLoading,
 }: StreakLostBannerProps) => {
+  const { t } = useTranslation();
   const [isAnimating] = useState(true);
   const [showPushPrompt, setShowPushPrompt] = useState(false);
   const { user } = useAuth();
@@ -89,15 +91,15 @@ export const StreakLostBanner = ({
 
         {/* Title */}
         <div className="text-3xl font-bold text-white mb-1">
-          Day {previousStreak}
+          {t('streakLost.day', { n: previousStreak })}
         </div>
-        <p className="text-white/70 text-sm mb-4">streak was lost</p>
+        <p className="text-white/70 text-sm mb-4">{t('streak.wasLost')}</p>
 
         {/* Message */}
         <p className="text-white/90 text-sm mb-6 leading-relaxed">
           {hasShieldsRemaining
-            ? <>You missed a day. Use a <span className="font-semibold text-white">Recovery Shield</span> to restore your {previousStreak}-day streak.</>
-            : "Your streak has reset. But showing up today starts a new one."
+            ? <>{t('streakLost.missedDay')} <span className="font-semibold text-white">{t('streak.recoveryShield')}</span> {t('streakLost.toRestoreStreak', { n: previousStreak })}</>
+            : t('streakLost.streakReset')
           }
         </p>
 
@@ -118,49 +120,49 @@ export const StreakLostBanner = ({
               disabled={isLoading}
               className="w-full bg-white text-red-600 font-semibold py-3 rounded-xl mb-2"
             >
-              🛡️ Use Recovery Shield
+              {t('streakLost.useShield')}
             </Button>
             <p className="text-white/50 text-[10px] mb-2">
-              {shieldsLeft} shield{shieldsLeft !== 1 ? 's' : ''} remaining
+              {t('streakLost.shieldsRemaining', { n: shieldsLeft, count: shieldsLeft })}
             </p>
             <Button
               onClick={() => { haptic.light(); handleDismissChain(); }}
               variant="ghost"
               className="w-full text-white bg-white/15 text-xs font-medium rounded-xl"
             >
-              Let the streak reset
+              {t('streakLost.letReset')}
             </Button>
           </>
         ) : !isSubscribed ? (
           <>
             <p className="text-white/80 text-xs mb-3">
-              No shields left. Unlock more with <span className="font-semibold text-white">Simora Plus</span>.
+              {t('streakLost.noShieldsLeft')} <span className="font-semibold text-white">Simora Plus</span>.
             </p>
             <Button
               onClick={() => { haptic.light(); handleDismissChain(); onSubscribe?.(); }}
               className="w-full bg-white text-red-600 font-semibold py-3 rounded-xl mb-2"
             >
               <Sparkles className="h-4 w-4 mr-1" />
-              Get Simora Plus
+              {t('streakLost.getPlus')}
             </Button>
             <Button
               onClick={() => { haptic.light(); handleDismissChain(); }}
               variant="ghost"
               className="w-full text-white bg-white/15 text-xs font-medium rounded-xl"
             >
-              Start Fresh
+              {t('streakLost.startFresh')}
             </Button>
           </>
         ) : (
           <>
             <p className="text-white/80 text-xs mb-3">
-              All recovery shields have been used. Time for a fresh start.
+              {t('streakLost.allShieldsUsed')}
             </p>
             <Button
               onClick={() => { haptic.light(); handleDismissChain(); }}
               className="w-full bg-white text-red-600 font-semibold py-3 rounded-xl"
             >
-              Start Fresh
+              {t('streakLost.startFresh')}
             </Button>
           </>
         )}

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Check, ChevronDown, Filter } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 
 interface FilterOption {
@@ -25,6 +26,7 @@ interface TaskFilterDropdownProps {
 }
 
 export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTags, categoryNameMap, externalOpen, onExternalOpenChange }: TaskFilterDropdownProps) {
+  const { t } = useTranslation();
   const [internalOpen, setInternalOpen] = useState(false);
   const [hasBeenTapped, setHasBeenTapped] = useState(() => localStorage.getItem('filter-nudge-tapped') === '1');
   const open = externalOpen ?? internalOpen;
@@ -38,20 +40,20 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
   };
 
   const baseOptions: FilterOption[] = [
-    { value: 'all', label: 'All Tasks' },
-    ...(routineNames.size > 0 ? [{ value: 'all-routines', label: 'Routine Players' }] : []),
-    { value: 'one-time', label: 'To-Dos' },
+    { value: 'all', label: t('filter.allTasks') },
+    ...(routineNames.size > 0 ? [{ value: 'all-routines', label: t('filter.routinePlayers') }] : []),
+    { value: 'one-time', label: t('filter.todos') },
   ];
 
   const endOptions: FilterOption[] = [
-    { value: 'unlinked', label: 'Unlinked Tasks' },
+    { value: 'unlinked', label: t('filter.unlinkedTasks') },
   ];
 
   const groups: FilterGroup[] = [];
 
   if (routineNames.size > 0) {
     groups.push({
-      label: 'Routines',
+      label: t('filter.routines'),
       options: Array.from(routineNames.entries()).map(([rid, name]) => ({
         value: `routine:${rid}`,
         label: name,
@@ -61,7 +63,7 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
 
   if (taskTags.length > 0) {
     groups.push({
-      label: 'Categories',
+      label: t('filter.categories'),
       options: taskTags.map(tag => ({
         value: `cat:${tag}`,
         label: categoryNameMap.get(tag) || tag,
@@ -78,7 +80,7 @@ export function TaskFilterDropdown({ value, onValueChange, routineNames, taskTag
       const found = group.options.find(o => o.value === value);
       if (found) return found.label.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]\s*/gu, '').trim();
     }
-    return 'All Tasks';
+    return t('filter.allTasks');
   })();
 
   const handleSelect = (val: string) => {
