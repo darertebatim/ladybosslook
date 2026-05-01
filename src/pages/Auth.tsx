@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -220,74 +219,28 @@ export default function Auth() {
         {/* Vertically-centered stack: hero + main content sit in the middle of the screen */}
         <div className="flex-1 px-6 py-6 overflow-y-auto relative z-10 flex flex-col justify-center">
           <div className="max-w-md w-full mx-auto space-y-7">
-            {/* Hero brand block — big welcome headline + animated icon/tagline reveal */}
+            {/* Hero brand block — big welcome headline + icon + tagline row */}
             {!showEmailForm && (
               <div className="flex flex-col items-center text-center">
-                <motion.h1
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                  className="text-[40px] leading-[1.05] font-bold tracking-tight text-[#1a1f3d]"
-                >
+                <h1 className="text-[40px] leading-[1.05] font-bold tracking-tight text-[#1a1f3d]">
                   {isLogin ? 'Welcome back!' : 'Welcome to Rilo!'}
-                </motion.h1>
-
-                {/* Logo + tagline reveal:
-                    1) Logo blooms in center (scale + fade)
-                    2) Logo slides left while tagline slides out from behind it */}
-                <div className="mt-5 relative h-[96px] w-full max-w-[320px] mx-auto">
-                  {/* Tagline — masked behind logo until logo slides away */}
-                  <motion.div
-                    initial={{ opacity: 0, x: -40, clipPath: 'inset(0 0 0 100%)' }}
-                    animate={{ opacity: 1, x: 0, clipPath: 'inset(0 0 0 0%)' }}
-                    transition={{ duration: 0.7, delay: 1.0, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute top-1/2 -translate-y-1/2 left-[112px] right-0 text-left"
-                  >
-                    <p className="text-[17px] leading-[1.25] font-semibold text-[#1a1f3d]">
-                      Your <span className="text-[#F08A3E] font-bold">FREE</span>
-                      <br />
-                      Self Care Tracker
-                      <br />
-                      and Routine Planner
-                    </p>
-                  </motion.div>
-
-                  {/* Logo — bloom in center, then settle to left position */}
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.4, x: 'calc(50% - 44px)' }}
-                    animate={{
-                      opacity: [0, 1, 1, 1],
-                      scale: [0.4, 1.1, 1, 1],
-                      x: ['calc(50% - 44px)', 'calc(50% - 44px)', 'calc(50% - 44px)', '0px'],
-                    }}
-                    transition={{
-                      duration: 1.3,
-                      times: [0, 0.35, 0.7, 1],
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
-                    className="absolute top-0 left-0 w-[88px] h-[88px] rounded-[22px] overflow-hidden shadow-[0_20px_50px_-10px_rgba(232,74,111,0.45)] z-10"
-                  >
+                </h1>
+                <div className="mt-5 flex items-center gap-4">
+                  <div className="w-[88px] h-[88px] rounded-[22px] overflow-hidden shadow-[0_20px_50px_-10px_rgba(232,74,111,0.45)] shrink-0">
                     <img
                       src={riloAppIcon}
                       alt="Rilo"
                       className="w-full h-full object-cover select-none"
                       draggable={false}
                     />
-                    {/* Bloom rings — radiate from logo on entrance */}
-                    {[0, 1].map((i) => (
-                      <motion.span
-                        key={i}
-                        initial={{ scale: 0.6, opacity: 0.7 }}
-                        animate={{ scale: 2.2, opacity: 0 }}
-                        transition={{
-                          duration: 1.0,
-                          delay: 0.15 + i * 0.25,
-                          ease: 'easeOut',
-                        }}
-                        className="absolute inset-0 rounded-[22px] border-2 border-[#EC4899] pointer-events-none"
-                      />
-                    ))}
-                  </motion.div>
+                  </div>
+                  <p className="text-left text-[17px] leading-[1.25] font-semibold text-[#1a1f3d]">
+                    Your <span className="text-[#F08A3E] font-bold">FREE</span>
+                    <br />
+                    Self Care Tracker
+                    <br />
+                    and Routine Planner
+                  </p>
                 </div>
               </div>
             )}
