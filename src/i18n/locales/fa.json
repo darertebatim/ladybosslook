@@ -1552,6 +1552,9 @@
     "resetBadge": "🫧 ریست",
     "enrollsIn": "ثبت‌نام شما در: {{title}}",
     "shareText": "سلام! در روتین «{{title}}» در Routine Ladyboss به من بپیوند 💫",
-    "videoTitle": "ویدیوی روتین"
+    "videoTitle": "ویدیوی روتین",
+    "tellUsWantText": "روتین مورد نظرتون رو بالا پیدا نکردید؟",
+    "tellUsWantCta": "بگید چی می‌خواید",
+    "chatDraftPrefix": "سلام! خیلی دوست دارم یک روتین داشته باشم برای: "
   }
 }

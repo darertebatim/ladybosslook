@@ -1552,6 +1552,9 @@
     "resetBadge": "🫧 Reset",
     "enrollsIn": "Enrolls you in: {{title}}",
     "shareText": "Hey! Join me in the '{{title}}' routine on Routine Ladyboss 💫",
-    "videoTitle": "Routine video"
+    "videoTitle": "Routine video",
+    "tellUsWantText": "Not any routines you want above?",
+    "tellUsWantCta": "Tell us what you want",
+    "chatDraftPrefix": "Hi! I'd love to have a routine for: "
   }
 }
