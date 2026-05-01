@@ -549,6 +549,19 @@ const AppHome = () => {
     return new Set(completions?.tasks?.map(c => c.task_id) ?? []);
   }, [completions]);
 
+  // Welcome spotlight: which task to highlight per step
+  const spotlightHighlightTaskId = useMemo<string | null>(() => {
+    if (!spotlightStep) return null;
+    if (spotlightStep === 'tap') {
+      return filteredTasks[0]?.id ?? null;
+    }
+    if (spotlightStep === 'complete') {
+      const firstIncomplete = filteredTasks.find(t => !completedTaskIds.has(t.id));
+      return firstIncomplete?.id ?? null;
+    }
+    return null;
+  }, [spotlightStep, filteredTasks, completedTaskIds]);
+
   // Completed subtask IDs for this date
   const completedSubtaskIds = useMemo(() => {
     return completions?.subtasks?.map(c => c.subtask_id) ?? [];
