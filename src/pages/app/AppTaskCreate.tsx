@@ -1535,20 +1535,20 @@ const AppTaskCreate = ({
               <button onClick={() => setShowDatePicker(false)} className="p-2 -ml-2">
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <span className="text-lg font-medium">Date</span>
+              <span className="text-lg font-medium">{t('taskEdit.date')}</span>
               <Button
                 variant="ghost"
                 onClick={() => setShowDatePicker(false)}
                 className="text-primary font-medium"
               >
-                Save
+                {t('taskPickers.save')}
               </Button>
             </div>
 
             {/* Title */}
             <div className="text-center pb-4">
               <h2 className="text-2xl font-bold">
-                {format(scheduledDate, 'MMM d') === format(new Date(), 'MMM d') ? 'Today' : format(scheduledDate, 'EEEE, MMM d')}
+                {format(scheduledDate, 'MMM d') === format(new Date(), 'MMM d') ? t('taskEdit.today') : format(scheduledDate, 'EEEE, MMM d')}
               </h2>
             </div>
 
@@ -1576,7 +1576,7 @@ const AppTaskCreate = ({
                       : "bg-muted/50 text-muted-foreground"
                   )}
                 >
-                  Today
+                  {t('taskEdit.today')}
                 </button>
                 <button
                   onClick={() => {
@@ -1590,7 +1590,7 @@ const AppTaskCreate = ({
                       : "bg-muted/50 text-muted-foreground"
                   )}
                 >
-                  Tomorrow
+                  {t('taskPickers.tomorrow')}
                 </button>
                 <button
                   onClick={() => {
@@ -1604,7 +1604,7 @@ const AppTaskCreate = ({
                       : "bg-muted/50 text-muted-foreground"
                   )}
                 >
-                  Next Monday
+                  {t('taskPickers.nextMonday')}
                 </button>
               </div>
             </div>
