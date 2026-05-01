@@ -122,6 +122,12 @@ const AppHome = () => {
     null | 'tap' | 'add' | 'complete'
   >(null);
   const [, setHasWelcomeBanner] = useState(false);
+  // Once the tour finishes (or is skipped), don't auto-pick another task to spotlight
+  const spotlightFinishedRef = useRef(false);
+  const finishSpotlight = useCallback(() => {
+    spotlightFinishedRef.current = true;
+    setSpotlightStep(null);
+  }, []);
   const { isKeyboardOpen } = useKeyboard();
   const { currentTrack } = useAudioPlayer();
   const hasMiniPlayer = !!currentTrack;
@@ -1097,9 +1103,10 @@ const AppHome = () => {
                         <button
                           onClick={handleFabClick}
                           aria-label={t('home.addTask')}
+                          data-spotlight-add
                           className={cn(
                             "coach-add-btn w-6 h-6 rounded-full bg-brand text-white shadow-[0_4px_12px_hsl(var(--brand-primary)/0.4)] flex items-center justify-center active:scale-90 transition-transform",
-                            spotlightStep === 'add' && 'ring-4 ring-amber-300 animate-pulse'
+                            spotlightStep === 'add' && 'animate-pulse'
                           )}
                         >
                           <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
