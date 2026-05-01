@@ -3,6 +3,7 @@ import { Check, Plus, Play, Droplets, FastForward, Pencil, Trash2 } from 'lucide
 import SealCheck from './SealCheck';
 import { parseISO, isBefore, startOfDay, format as fnsFormat } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { 
   UserTask, 
