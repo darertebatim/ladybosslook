@@ -10,6 +10,7 @@ import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
+import { useTranslation } from 'react-i18next';
 
 // Icon mapping
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -46,6 +47,7 @@ export const EmotionContext = ({
   onBack,
   isSaving 
 }: EmotionContextProps) => {
+  const { t } = useTranslation();
   const [selectedContexts, setSelectedContexts] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
   const notesRef = useRef<HTMLTextAreaElement>(null);
@@ -107,7 +109,7 @@ export const EmotionContext = ({
       >
         {/* Title with emotions highlighted using valence color */}
         <h2 className="text-xl font-semibold text-foreground text-center mb-6">
-          What's making you feel{' '}
+          {t('emotion.whatsMakingYouFeel')}
           <span className={valenceColors.text}>{emotionDisplayText}</span>?
         </h2>
 
@@ -146,7 +148,7 @@ export const EmotionContext = ({
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           onFocus={handleNotesFocus}
-          placeholder="Add Note"
+          placeholder={t('emotion.addNote')}
           className="min-h-[80px] resize-none rounded-2xl bg-white border-0 text-base shadow-sm"
         />
       </div>
@@ -161,10 +163,10 @@ export const EmotionContext = ({
           {isSaving ? (
             <>
               <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-              Saving...
+              {t('emotion.saving')}
             </>
           ) : (
-            'Because of this.'
+            t('emotion.becauseOfThis')
           )}
         </Button>
       </div>

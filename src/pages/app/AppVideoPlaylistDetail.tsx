@@ -18,6 +18,7 @@ import { useExistingVideoPlaylistTask } from "@/hooks/useVideoRoutine";
 import { useAddRoutinePlan, RoutinePlanTask } from "@/hooks/useRoutinePlans";
 import { haptic } from "@/lib/haptics";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 import { useShareContent } from "@/hooks/useShareContent";
 import { PromoBanner } from "@/components/app/PromoBanner";
@@ -26,6 +27,7 @@ import { HomeBanner } from "@/components/app/HomeBanner";
 export default function AppVideoPlaylistDetail() {
   const { playlistId } = useParams();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [playerOpen, setPlayerOpen] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
@@ -79,8 +81,8 @@ export default function AppVideoPlaylistDetail() {
   const addRoutinePlan = useAddRoutinePlan();
 
   const { handleShare } = useShareContent({
-    title: playlist?.name || 'Video Playlist',
-    text: `🎬 Check out '${playlist?.name || 'this playlist'}' on Routine Ladyboss 💫`,
+    title: playlist?.name || t('videoPlaylist.fallbackName'),
+    text: t('videoPlaylist.shareText', { name: playlist?.name || t('videoPlaylist.fallbackName') }),
     imageUrl: playlist?.cover_image_url,
     source: 'video_playlist',
     contentId: playlist?.id,
@@ -89,7 +91,7 @@ export default function AppVideoPlaylistDetail() {
   const syntheticPlaylistTask: RoutinePlanTask | null = playlist ? {
     id: `video-playlist-${playlist.id}`,
     plan_id: `synthetic-video-playlist-${playlist.id}`,
-    title: `Watch ${playlist.name}`,
+    title: t('videoPlaylist.watchPrefix', { name: playlist.name }),
     description: null,
     icon: '📺',
     color: 'sky',
@@ -117,10 +119,10 @@ export default function AppVideoPlaylistDetail() {
         editedTasks,
       });
       setShowRoutineSheet(false);
-      toast.success('Added to your routines! 📺');
+      toast.success(t('videoPlaylist.addedToRoutines'));
     } catch (error) {
       console.error('Failed to add routine:', error);
-      toast.error('Failed to add to routines');
+      toast.error(t('videoPlaylist.addToRoutinesFailed'));
     }
   };
 
@@ -188,7 +190,7 @@ export default function AppVideoPlaylistDetail() {
           <button
             onClick={handleShare}
             className="h-10 w-10 flex items-center justify-center rounded-full text-fg-warm active:scale-95 transition-transform"
-            aria-label="Share"
+            aria-label={t('videoPlaylist.share')}
           >
             <Share2 className="h-5 w-5" />
           </button>
@@ -225,7 +227,7 @@ export default function AppVideoPlaylistDetail() {
           {/* Progress */}
           <div className="space-y-2">
             <div className="flex justify-between text-xs text-fg-warm-muted">
-              <span>{completedCount} of {totalTracks} completed</span>
+              <span>{t('videoPlaylist.completedOf', { completed: completedCount, total: totalTracks })}</span>
               <span>{Math.round(overallProgress)}%</span>
             </div>
             <Progress value={overallProgress} className="h-2 bg-foreground/10" />
@@ -308,7 +310,7 @@ export default function AppVideoPlaylistDetail() {
           open={showRoutineSheet}
           onOpenChange={setShowRoutineSheet}
           tasks={[syntheticPlaylistTask]}
-          routineTitle={playlist?.name || 'Video Playlist'}
+          routineTitle={playlist?.name || t('videoPlaylist.fallbackName')}
           onSave={handleSaveRoutine}
           isSaving={addRoutinePlan.isPending}
         />

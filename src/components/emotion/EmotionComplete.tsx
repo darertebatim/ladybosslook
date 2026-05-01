@@ -3,12 +3,14 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle2, Sparkles } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
+import { useTranslation } from 'react-i18next';
 
 interface EmotionCompleteProps {
   onDone: () => void;
 }
 
 export const EmotionComplete = ({ onDone }: EmotionCompleteProps) => {
+  const { t } = useTranslation();
   useEffect(() => {
     // Celebration effects
     haptic.success();
@@ -37,16 +39,16 @@ export const EmotionComplete = ({ onDone }: EmotionCompleteProps) => {
 
         {/* Title */}
         <h1 className="text-2xl font-semibold text-foreground mb-4">
-          Well done!
+          {t('emotion.wellDone')}
         </h1>
 
         {/* Message */}
         <p className="text-muted-foreground leading-relaxed mb-4">
-          You are getting closer to understanding yourself even more!
+          {t('emotion.closerToUnderstanding')}
         </p>
 
         <p className="text-sm text-muted-foreground">
-          Your emotion has been saved in your history.
+          {t('emotion.savedToHistory')}
         </p>
       </div>
 
@@ -56,7 +58,7 @@ export const EmotionComplete = ({ onDone }: EmotionCompleteProps) => {
           onClick={onDone}
           className="w-full h-14 text-lg rounded-2xl bg-violet-500 hover:bg-violet-600"
         >
-          Done
+          {t('emotion.done')}
         </Button>
       </div>
     </div>

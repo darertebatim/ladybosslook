@@ -6,11 +6,12 @@ import type { CoachMode } from './AICoachHeader';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
+import { useTranslation } from 'react-i18next';
 
-const PLACEHOLDERS: Record<CoachMode, string> = {
-  coach: 'Ask your coach...',
-  assistant: 'What do you need help with?',
-  companion: 'How are you feeling?',
+const PLACEHOLDER_KEYS: Record<CoachMode, string> = {
+  coach: 'aiCoach.placeholderCoach',
+  assistant: 'aiCoach.placeholderAssistant',
+  companion: 'aiCoach.placeholderCompanion',
 };
 
 interface Props {
@@ -23,6 +24,7 @@ interface Props {
 const MAX_IMAGE_SIZE = 4 * 1024 * 1024; // 4MB
 
 export function AICoachInput({ mode, isLoading, onSend, onStop }: Props) {
+  const { t } = useTranslation();
   const [input, setInput] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -36,13 +38,13 @@ export function AICoachInput({ mode, isLoading, onSend, onStop }: Props) {
     const text = input.trim();
     if ((!text && !imageBase64) || isLoading) return;
     setInput('');
-    onSend(text || 'What do you see in this image?', imageBase64 || undefined);
+    onSend(text || t('aiCoach.imageQuestion'), imageBase64 || undefined);
     setImagePreview(null);
     setImageBase64(null);
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
-  }, [input, isLoading, onSend, imageBase64]);
+  }, [input, isLoading, onSend, imageBase64, t]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -63,12 +65,12 @@ export function AICoachInput({ mode, isLoading, onSend, onStop }: Props) {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+      toast.error(t('aiCoach.selectImage'));
       return;
     }
 
     if (file.size > MAX_IMAGE_SIZE) {
-      toast.error('Image is too large (max 4MB)');
+      toast.error(t('aiCoach.imageTooLarge'));
       return;
     }
 
@@ -126,7 +128,7 @@ export function AICoachInput({ mode, isLoading, onSend, onStop }: Props) {
       {isLoading && (
         <div className="flex justify-center mb-2">
           <Button variant="outline" size="sm" className="text-xs rounded-full h-7 gap-1" onClick={onStop}>
-            <Square className="h-3 w-3" /> Stop generating
+            <Square className="h-3 w-3" /> {t('aiCoach.stopGenerating')}
           </Button>
         </div>
       )}
@@ -177,7 +179,7 @@ export function AICoachInput({ mode, isLoading, onSend, onStop }: Props) {
             onChange={handleInput}
             onKeyDown={handleKeyDown}
             onFocus={handleFocus}
-            placeholder={imagePreview ? 'Describe what to do with this image...' : PLACEHOLDERS[mode]}
+            placeholder={imagePreview ? t('aiCoach.placeholderImage') : t(PLACEHOLDER_KEYS[mode])}
             disabled={isLoading}
             rows={1}
             className="min-h-[40px] max-h-[120px] resize-none rounded-2xl pr-12 py-2.5 text-sm bg-muted/50 border-border/50 focus:border-primary/30"

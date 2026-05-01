@@ -13,6 +13,7 @@ import {
 } from '@/lib/emotionData';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface EmotionSelectorProps {
   onComplete: (valence: Valence, category: string, emotions: string[]) => void;
@@ -26,6 +27,7 @@ type SelectionState = {
 };
 
 export const EmotionSelector = ({ onComplete, onBack }: EmotionSelectorProps) => {
+  const { t } = useTranslation();
   const [selection, setSelection] = useState<SelectionState>({
     valence: null,
     category: null,
@@ -114,7 +116,7 @@ export const EmotionSelector = ({ onComplete, onBack }: EmotionSelectorProps) =>
       <header className="shrink-0 flex items-center px-4 py-3">
         <BackButton onClick={handleBack} showLabel={false} />
         <h1 className="text-base font-medium text-foreground ml-2">
-          Try to dig a little deeper
+          {t('emotion.tryDeeper')}
         </h1>
       </header>
 
@@ -189,13 +191,13 @@ export const EmotionSelector = ({ onComplete, onBack }: EmotionSelectorProps) =>
             onClick={handleNext}
             className="w-full h-12 text-base rounded-xl bg-[#4CAF50] hover:bg-[#43A047] text-white font-medium"
           >
-            Next
+            {t('emotion.next')}
           </Button>
         ) : (
           <p className="text-xs text-center text-muted-foreground">
-            {!selection.valence && "Start by selecting how you're feeling overall"}
-            {selection.valence && !showEmotions && "What type of feeling is it?"}
-            {showEmotions && selection.emotions.length === 0 && "Select one or more emotions"}
+            {!selection.valence && t('emotion.startSelectOverall')}
+            {selection.valence && !showEmotions && t('emotion.whatTypeOfFeeling')}
+            {showEmotions && selection.emotions.length === 0 && t('emotion.selectOneOrMore')}
           </p>
         )}
       </div>
