@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { haptic } from '@/lib/haptics';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnreadChat } from '@/hooks/useUnreadChat';
@@ -39,6 +40,7 @@ const useShowNativeSettings = () => {
 
 const AppSettings = () => {
   const { user, signOut, canAccessAdminPage } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();

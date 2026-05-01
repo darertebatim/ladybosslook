@@ -1,6 +1,7 @@
 // AppHome - Main home page component
 import { useState, useMemo, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -69,6 +70,7 @@ const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
 
 const AppHome = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { scrollRef: homeScrollRef } = useScrollRestore('home_scroll', { autoSave: true });
   const {

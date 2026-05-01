@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGoBack } from '@/hooks/useGoBack';
+import { useTranslation } from 'react-i18next';
 import { useReflections, Reflection, REFLECTION_CATEGORIES } from '@/hooks/useReflections';
 import { ArrowLeft, BookOpen, Crown, Share2 } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -41,6 +42,7 @@ export default function AppReflections() {
 
 function AppReflectionsInner() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const goBack = useGoBack('/app/home');
   const slideCtx = useSlideClose();
   const handleBack = () => (slideCtx ? slideCtx.slideClose() : goBack());
