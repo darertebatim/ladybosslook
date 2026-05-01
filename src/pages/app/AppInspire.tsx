@@ -29,8 +29,10 @@ import { FeaturedRoutineCard } from "@/components/app/FeaturedRoutineCard";
 import { useScrollRestore } from "@/hooks/useScrollRestore";
 import { useRoutineFavorites } from "@/hooks/useRoutineFavorites";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export default function AppInspire() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
@@ -130,7 +132,7 @@ export default function AppInspire() {
             <BackButton to="/app/home" showLabel={false} className="-ml-2" />
             <CalendarPlus className="w-6 h-6 text-primary shrink-0" />
             <h1 className="text-xl font-bold text-foreground truncate">
-              Routines Templates
+              {t('inspirePage.title')}
             </h1>
           </div>
           <div className="flex items-center gap-1">
@@ -166,7 +168,7 @@ export default function AppInspire() {
           <div className="px-4 pb-2 animate-in slide-in-from-top duration-200">
             <Input
               type="search"
-              placeholder="Search routines..."
+              placeholder={t('inspirePage.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-muted/50"
@@ -187,17 +189,16 @@ export default function AppInspire() {
           {showFavorites ? (
             <div className="px-4 pt-4 space-y-4">
               <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-                <Heart className="w-5 h-5 fill-red-500 text-red-500" /> My
-                Favorites
+                <Heart className="w-5 h-5 fill-red-500 text-red-500" /> {t('inspirePage.myFavorites')}
               </h2>
               {favoriteIds.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
                   <Heart className="w-12 h-12 text-muted-foreground/30 mb-4" />
                   <p className="text-muted-foreground font-medium">
-                    No favorites yet
+                    {t('inspirePage.noFavorites')}
                   </p>
                   <p className="text-sm text-muted-foreground/70 mt-1">
-                    Tap the heart icon on any routine to save it here
+                    {t('inspirePage.noFavoritesHint')}
                   </p>
                 </div>
               ) : (
@@ -235,7 +236,7 @@ export default function AppInspire() {
                     <div className="flex gap-2 px-4 pb-2">
                       {resetRoutines.length > 0 && (
                         <CategoryCircle
-                          name="Focus"
+                          name={t('inspirePage.focus')}
                           icon="RotateCcw"
                           emoji="🫧"
                           color="violet"
@@ -291,7 +292,7 @@ export default function AppInspire() {
                       )}
                       {challengeRoutines.length > 0 && (
                         <CategoryCircle
-                          name="Challenges"
+                          name={t('inspirePage.challenges')}
                           icon="Flame"
                           emoji="🔥"
                           color="orange"
@@ -308,7 +309,7 @@ export default function AppInspire() {
                       )}
                       {projectRoutines.length > 0 && (
                         <CategoryCircle
-                          name="Projects"
+                          name={t('inspirePage.projects')}
                           icon="Target"
                           emoji="🎯"
                           color="blue"
@@ -325,7 +326,7 @@ export default function AppInspire() {
                       )}
                       {filteredPopular && filteredPopular.length > 0 && (
                         <CategoryCircle
-                          name="Popular"
+                          name={t('inspirePage.popular')}
                           icon="Star"
                           color="yellow"
                           onClick={() => {
@@ -350,7 +351,7 @@ export default function AppInspire() {
                 <div className="mt-4 px-4">
                   <div className="flex items-center gap-2 mb-3">
                     <h2 className="text-xl font-bold text-foreground">
-                      Featured
+                      {t('inspirePage.featured')}
                     </h2>
                   </div>
                   <div
@@ -394,7 +395,7 @@ export default function AppInspire() {
                     <section id="routine-category-popular">
                       <div className="flex items-center justify-between mb-2 px-4">
                         <h2 className="text-xl font-bold text-foreground">
-                          Popular
+                          {t('inspirePage.popular')}
                         </h2>
                         <button
                           onClick={() =>
@@ -402,7 +403,7 @@ export default function AppInspire() {
                           }
                           className="text-sm text-primary font-medium flex items-center gap-0.5"
                         >
-                          All <ChevronRight className="h-4 w-4" />
+                          {t('inspirePage.all')} <ChevronRight className="h-4 w-4" />
                         </button>
                       </div>
                       <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
