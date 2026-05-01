@@ -484,21 +484,16 @@ export default function Auth() {
 /* Horizontal "train" of welcomes from around the world.
    Each carriage is a soft frosted pill with a flag + the word in its
    own script. Persian / Arabic use the Vazirmatn font (font-farsi). */
+// Farsi appears between every other language so Persian users always
+// catch their welcome no matter when they look at the screen.
+const FARSI = { flag: '🇮🇷', word: 'خوش آمدید', farsi: true };
 const WELCOMES: { flag: string; word: string; farsi?: boolean }[] = [
   { flag: '🇺🇸', word: 'Welcome' },
-  { flag: '🇮🇷', word: 'خوش آمدید', farsi: true },
+  FARSI,
   { flag: '🇹🇷', word: 'Hoş geldin' },
+  FARSI,
   { flag: '🇪🇸', word: 'Bienvenida' },
-  { flag: '🇫🇷', word: 'Bienvenue' },
-  { flag: '🇩🇪', word: 'Willkommen' },
-  { flag: '🇸🇦', word: 'مرحبًا', farsi: true },
-  { flag: '🇯🇵', word: 'ようこそ' },
-  { flag: '🇨🇳', word: '欢迎' },
-  { flag: '🇧🇷', word: 'Bem-vinda' },
-  { flag: '🇮🇹', word: 'Benvenuta' },
-  { flag: '🇮🇳', word: 'स्वागत है' },
-  { flag: '🇰🇷', word: '환영합니다' },
-  { flag: '🇳🇱', word: 'Welkom' },
+  FARSI,
 ];
 
 function WelcomeTrain() {
