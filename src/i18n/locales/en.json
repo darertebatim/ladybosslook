@@ -418,5 +418,11 @@
     "searchVideos": "Search videos...",
     "searchVideoPlaylists": "Search video playlists...",
     "programSlugPlaceholder": "Program slug (e.g., mindset-reset)"
+    ,"subtaskCount": "{{count}} subtask",
+    "subtaskCount_other": "{{count}} subtasks",
+    "noCategory": "No category",
+    "minAvg": "{{min}} min (avg)",
+    "minutesShort": "{{min}} min",
+    "today": "Today"
   }
 }

@@ -418,5 +418,11 @@
     "searchVideos": "جستجوی ویدیوها...",
     "searchVideoPlaylists": "جستجوی پلی‌لیست‌های ویدیو...",
     "programSlugPlaceholder": "اسلاگ برنامه (مثلاً mindset-reset)"
+    ,"subtaskCount": "{{count}} زیرکار",
+    "subtaskCount_other": "{{count}} زیرکار",
+    "noCategory": "بدون دسته‌بندی",
+    "minAvg": "{{min}} دقیقه (میانگین)",
+    "minutesShort": "{{min}} دقیقه",
+    "today": "امروز"
   }
 }
