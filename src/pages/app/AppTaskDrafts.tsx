@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Plus, Trash2, Send, Check, ChevronDown, GripVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useBilingualText } from '@/components/ui/BilingualText';
@@ -199,6 +200,7 @@ function DraftSectionBlock({
   onSendItem: (item: DraftItem) => void;
   dragHandleProps?: Record<string, any>;
 }) {
+  const { t } = useTranslation();
   const [sectionTitle, setSectionTitle] = useState(section.title);
   const [desc, setDesc] = useState(section.description || '');
   const [newItemText, setNewItemText] = useState('');
@@ -252,7 +254,7 @@ function DraftSectionBlock({
         <button
           {...dragHandleProps}
           className="w-8 h-10 flex items-center justify-center text-muted-foreground/40 shrink-0 touch-none"
-          aria-label="Drag to reorder"
+          aria-label={t('tier1.taskDrafts.dragReorder')}
         >
           <GripVertical className="w-4 h-4" />
         </button>
@@ -273,7 +275,7 @@ function DraftSectionBlock({
           onChange={handleTitleChange}
           onFocus={handleTitleFocus}
           inputRef={titleRef}
-          placeholder="Project name..."
+          placeholder={t('tier1.taskDrafts.projectName')}
           className="text-xl font-bold flex-1 placeholder:text-muted-foreground/40"
         />
 
@@ -301,7 +303,7 @@ function DraftSectionBlock({
               onChange={handleDescChange}
               onFocus={handleDescFocus}
               textareaRef={descRef as any}
-              placeholder="Add a description..."
+              placeholder={t('tier1.taskDrafts.addDescription')}
               className="text-sm text-muted-foreground mb-3 placeholder:text-muted-foreground/30"
             />
           </div>
@@ -327,7 +329,7 @@ function DraftSectionBlock({
                   handleAddItem();
                 }
               }}
-              placeholder="Add a task..."
+              placeholder={t('tier1.taskDrafts.addTask')}
               className="text-base flex-1 placeholder:text-muted-foreground/30"
             />
             {newItemText.trim() && (
@@ -340,7 +342,7 @@ function DraftSectionBlock({
           {/* Sent items */}
           {sentItems.length > 0 && (
             <div className="mt-3 pt-3 border-t border-border/50 space-y-1.5">
-              <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Sent</p>
+              <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">{t('tier1.taskDrafts.sent')}</p>
               {sentItems.map((item) => (
                 <div key={item.id} className="flex items-center gap-3 py-1">
                   <Check className="w-5 h-5 text-primary shrink-0" />
@@ -424,10 +426,11 @@ function SendToPlannerSheet({
   onSend: (date: Date) => void;
   isPending: boolean;
 }) {
+  const { t } = useTranslation();
   const today = new Date();
   const dateOptions = [
-    { label: 'Today', date: today },
-    { label: 'Tomorrow', date: addDays(today, 1) },
+    { label: t('tier1.common.today'), date: today },
+    { label: t('tier1.common.tomorrow'), date: addDays(today, 1) },
     { label: format(addDays(today, 2), 'EEE'), date: addDays(today, 2) },
     { label: format(addDays(today, 3), 'EEE'), date: addDays(today, 3) },
   ];
@@ -436,8 +439,8 @@ function SendToPlannerSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-2xl pb-safe">
         <SheetHeader>
-          <SheetTitle className="text-base font-semibold">Send to Planner</SheetTitle>
-          <SheetDescription className="sr-only">Choose a date to send this task to planner.</SheetDescription>
+          <SheetTitle className="text-base font-semibold">{t('tier1.taskDrafts.sendToPlanner')}</SheetTitle>
+          <SheetDescription className="sr-only">{t('tier1.taskDrafts.sendToPlannerDesc')}</SheetDescription>
         </SheetHeader>
         {item && (
           <div className="mt-3">
@@ -468,6 +471,7 @@ function SendToPlannerSheet({
 
 // ─── Main page ───
 export default function AppTaskDrafts() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: sections, isLoading: sectionsLoading } = useTaskDraftSections();
   const sectionIds = useMemo(() => sections?.map((s) => s.id) || [], [sections]);
@@ -567,7 +571,7 @@ export default function AppTaskDrafts() {
           <button onClick={() => navigate(-1)} className="p-2 -ml-2 active:scale-95 transition-transform">
             <ArrowLeft className="w-6 h-6 text-foreground" />
           </button>
-          <h1 className="text-xl font-bold">Projects</h1>
+          <h1 className="text-xl font-bold">{t('tier1.taskDrafts.title')}</h1>
         </div>
         <button
           onClick={handleAddSection}
@@ -600,7 +604,8 @@ export default function AppTaskDrafts() {
           <div className="flex flex-col items-center justify-center h-full text-center gap-4 opacity-60">
             <p className="text-5xl">📋</p>
             <p className="text-base text-muted-foreground leading-relaxed">
-              No projects yet.<br />Tap <b>+</b> to create one and dump your tasks.
+              {t('tier1.taskDrafts.noProjects')}<br />
+              <span dangerouslySetInnerHTML={{ __html: t('tier1.taskDrafts.tapPlusHint') }} />
             </p>
           </div>
         ) : (

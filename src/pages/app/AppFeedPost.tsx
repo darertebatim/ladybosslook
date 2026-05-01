@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Loader2, Pin, Megaphone, Music, Calendar, FileText, MessageSquare, Share2 } from 'lucide-react';
 import { BackButton } from '@/components/app/BackButton';
 import { useFeedPost, usePostComments, useAddComment, useDeleteComment, useMarkPostRead } from '@/hooks/useFeed';
@@ -25,12 +26,12 @@ const POST_TYPE_ICONS = {
   discussion: MessageSquare,
 };
 
-const POST_TYPE_LABELS = {
-  announcement: 'Announcement',
-  drip_unlock: 'New Content',
-  session_reminder: 'Session',
-  media: 'Media',
-  discussion: 'Discussion',
+const POST_TYPE_KEYS: Record<string, string> = {
+  announcement: 'tier1.feedPost.postTypes.announcement',
+  drip_unlock: 'tier1.feedPost.postTypes.drip_unlock',
+  session_reminder: 'tier1.feedPost.postTypes.session_reminder',
+  media: 'tier1.feedPost.postTypes.media',
+  discussion: 'tier1.feedPost.postTypes.discussion',
 };
 
 function getYouTubeEmbedUrl(url: string): string {
@@ -40,9 +41,9 @@ function getYouTubeEmbedUrl(url: string): string {
   return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
 }
 
-function getDateLabel(date: Date): string {
-  if (isToday(date)) return 'Today';
-  if (isYesterday(date)) return 'Yesterday';
+function getDateLabel(date: Date, t: (k: string) => string): string {
+  if (isToday(date)) return t('tier1.common.today');
+  if (isYesterday(date)) return t('tier1.common.yesterday');
   return format(date, 'MMM d, yyyy');
 }
 
@@ -60,6 +61,7 @@ function CommentBubble({
   onDelete: () => void;
   deleteDisabled: boolean;
 }) {
+  const { t } = useTranslation();
   const { isPersian, direction, className: bilingualClassName } = useBilingualText(comment.content);
 
   return (
@@ -91,7 +93,7 @@ function CommentBubble({
           {!isFollowUp && (
             <div className="flex items-center gap-2 mb-0.5">
               <span className="font-semibold text-sm">
-                {comment.user?.full_name || 'User'}
+                {comment.user?.full_name || t('tier1.feedPost.user')}
               </span>
             </div>
           )}
@@ -112,7 +114,7 @@ function CommentBubble({
                 disabled={deleteDisabled}
                 className="text-[10px] text-muted-foreground hover:text-destructive transition-colors"
               >
-                Delete
+                {t('tier1.feedPost.delete')}
               </button>
             )}
           </div>
@@ -123,6 +125,7 @@ function CommentBubble({
 }
 
 export default function AppFeedPost() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { postId } = useParams<{ postId: string }>();
   const { user } = useAuth();
@@ -146,8 +149,8 @@ export default function AppFeedPost() {
   const { direction: titleDirection, className: titleBilingualClassName } = useBilingualText(post?.title || '');
 
   const { handleShare } = useShareContent({
-    title: post?.title || 'Post',
-    text: `💬 Check out this post on Routine Ladyboss 💫`,
+    title: post?.title || t('tier1.feedPost.post'),
+    text: t('tier1.feedPost.shareText'),
     imageUrl: post?.image_url,
     source: 'feed_post',
     contentId: post?.id,
@@ -200,7 +203,7 @@ export default function AppFeedPost() {
         >
           <div className="flex items-center gap-1 pt-1 pb-2 px-4">
             <BackButton to="/app/channels" showLabel={false} />
-            <h1 className="text-lg font-semibold">Post</h1>
+            <h1 className="text-lg font-semibold">{t('tier1.feedPost.post')}</h1>
           </div>
         </header>
         <div className="flex-1 flex items-center justify-center">
@@ -222,12 +225,12 @@ export default function AppFeedPost() {
         >
           <div className="flex items-center gap-1 pt-1 pb-2 px-4">
             <BackButton to="/app/channels" showLabel={false} />
-            <h1 className="text-lg font-semibold">Post not found</h1>
+            <h1 className="text-lg font-semibold">{t('tier1.feedPost.notFound')}</h1>
           </div>
         </header>
         <main className="flex-1 flex items-center justify-center p-4">
           <p className="text-muted-foreground text-center">
-            This post doesn't exist or you don't have access to it.
+            {t('tier1.feedPost.noAccess')}
           </p>
         </main>
       </div>
@@ -235,15 +238,15 @@ export default function AppFeedPost() {
   }
 
   const Icon = POST_TYPE_ICONS[post.post_type as keyof typeof POST_TYPE_ICONS] || Megaphone;
-  const senderName = post.display_name || post.author?.full_name || 'Admin';
+  const senderName = post.display_name || post.author?.full_name || t('tier1.feedPost.admin');
 
   // Group comments by date for chat-style display
   const groupedComments = comments?.reduce((acc, comment, index, arr) => {
     const commentDate = new Date(comment.created_at);
-    const dateLabel = getDateLabel(commentDate);
+    const dateLabel = getDateLabel(commentDate, t);
     
     // Check if we need a new date group
-    if (index === 0 || dateLabel !== getDateLabel(new Date(arr[index - 1].created_at))) {
+    if (index === 0 || dateLabel !== getDateLabel(new Date(arr[index - 1].created_at), t)) {
       acc.push({ type: 'date' as const, label: dateLabel, id: `date-${comment.id}` });
     }
     
@@ -267,7 +270,7 @@ export default function AppFeedPost() {
       style={{ height: '100dvh' }}
     >
       <SEOHead 
-        title={post.title || 'Post'} 
+        title={post.title || t('tier1.feedPost.post')} 
         description={post.content.slice(0, 160)}
       />
 
@@ -280,13 +283,13 @@ export default function AppFeedPost() {
           <BackButton to="/app/channels" showLabel={false} />
           <div className="flex-1 min-w-0">
             <h1 className="text-lg font-semibold truncate">
-              {post.channel?.name || 'Post'}
+              {post.channel?.name || t('tier1.feedPost.post')}
             </h1>
           </div>
           <button
             onClick={handleShare}
             className="h-9 w-9 flex items-center justify-center rounded-full active:scale-95 transition-transform"
-            aria-label="Share"
+            aria-label={t('tier1.common.share')}
           >
             <Share2 className="h-5 w-5 text-muted-foreground" />
           </button>
@@ -326,7 +329,7 @@ export default function AppFeedPost() {
           <div className="flex items-center gap-2 mb-2">
             <Badge variant="outline" className="gap-1 text-xs">
               <Icon className="h-3 w-3" />
-              {POST_TYPE_LABELS[post.post_type as keyof typeof POST_TYPE_LABELS]}
+              {POST_TYPE_KEYS[post.post_type] ? t(POST_TYPE_KEYS[post.post_type]) : ''}
             </Badge>
           </div>
 
@@ -403,7 +406,7 @@ export default function AppFeedPost() {
         {/* Comments Section */}
         <div className="px-4 pt-4">
           <h3 className="text-sm font-semibold text-muted-foreground mb-4">
-            {comments?.length || 0} {(comments?.length || 0) === 1 ? 'Reply' : 'Replies'}
+            {comments?.length || 0} {t('tier1.feedPost.reply', { count: comments?.length || 0 })}
           </h3>
 
           {commentsLoading ? (
@@ -444,8 +447,8 @@ export default function AppFeedPost() {
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-sm text-muted-foreground">No replies yet</p>
-              <p className="text-xs text-muted-foreground mt-1">Be the first to reply!</p>
+              <p className="text-sm text-muted-foreground">{t('tier1.feedPost.noReplies')}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t('tier1.feedPost.beFirstReply')}</p>
             </div>
           )}
         </div>
@@ -459,7 +462,7 @@ export default function AppFeedPost() {
         <div className="px-4">
           <FeedReplyInput
             onSend={handleSend}
-            placeholder="Write a reply..."
+            placeholder={t('tier1.feedPost.writeReply')}
             disabled={sending}
           />
         </div>
