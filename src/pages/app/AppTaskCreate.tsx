@@ -2133,20 +2133,20 @@ const AppTaskCreate = ({
               <button onClick={() => setShowReminderCustom(false)} className="p-2 -ml-2">
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <span className="text-lg font-medium">Reminder</span>
+              <span className="text-lg font-medium">{t('taskEdit.reminder')}</span>
               <Button
                 variant="ghost"
                 onClick={() => setShowReminderCustom(false)}
                 className="text-primary font-medium"
               >
-                Save
+                {t('taskPickers.save')}
               </Button>
             </div>
 
             {/* Dynamic title */}
             <div className="text-center pb-4 px-6">
               <h2 className="text-2xl font-bold">
-                Remind me at {formatTimeDisplay(reminderTime)}
+                {t('taskPickers.remindMeAt', { time: formatTimeDisplay(reminderTime) })}
               </h2>
             </div>
 
@@ -2155,8 +2155,8 @@ const AppTaskCreate = ({
               <div className="flex items-center gap-3">
                 <Bell className="h-6 w-6" />
                 <div>
-                  <p className="font-medium">Reminder</p>
-                  <p className="text-sm text-muted-foreground">Set a specific time to remind me</p>
+                  <p className="font-medium">{t('taskEdit.reminder')}</p>
+                  <p className="text-sm text-muted-foreground">{t('taskEdit.setSpecificTimeHint')}</p>
                 </div>
               </div>
               <Switch
@@ -2185,7 +2185,7 @@ const AppTaskCreate = ({
                           : "bg-white border-muted-foreground/30 text-foreground"
                       )}
                     >
-                      At time of event
+                      {t('taskPickers.atTimeOfEvent')}
                     </button>
                     <button
                       onClick={() => setReminderTime(getTimeOffset(scheduledTime, 10))}
@@ -2196,7 +2196,7 @@ const AppTaskCreate = ({
                           : "bg-white border-muted-foreground/30 text-foreground"
                       )}
                     >
-                      10 mins before
+                      {t('taskPickers.minsBefore', { n: 10 })}
                     </button>
                   </div>
                 )}
