@@ -1882,13 +1882,13 @@ const AppTaskCreate = ({
               <button onClick={() => setShowRepeatCustom(false)} className="p-2 -ml-2">
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <span className="text-lg font-medium">Repeat</span>
+              <span className="text-lg font-medium">{t('taskEdit.repeat')}</span>
               <Button
                 variant="ghost"
                 onClick={() => setShowRepeatCustom(false)}
                 className="text-primary font-medium"
               >
-                Save
+                {t('taskPickers.save')}
               </Button>
             </div>
 
@@ -1903,8 +1903,8 @@ const AppTaskCreate = ({
                 <div className="flex items-center gap-3">
                   <Repeat className="h-6 w-6" />
                   <div>
-                    <p className="font-medium">Repeat</p>
-                    <p className="text-sm text-muted-foreground">Set a cycle for your plan</p>
+                    <p className="font-medium">{t('taskEdit.repeat')}</p>
+                    <p className="text-sm text-muted-foreground">{t('taskEdit.setCycleHint')}</p>
                   </div>
                 </div>
                 <Switch
@@ -1955,7 +1955,7 @@ const AppTaskCreate = ({
 
                   {/* Interval selector */}
                   <div className="flex items-center justify-between py-4 border-t border-b mt-6">
-                    <span className="font-medium">Interval</span>
+                    <span className="font-medium">{t('taskEdit.interval')}</span>
                     <select
                       value={repeatInterval}
                       onChange={(e) => setRepeatInterval(parseInt(e.target.value))}
@@ -1963,7 +1963,7 @@ const AppTaskCreate = ({
                     >
                       {[1, 2, 3, 4, 5, 6].map((n) => (
                         <option key={n} value={n}>
-                          Every {n} {repeatPattern === 'daily' ? (n === 1 ? 'day' : 'days') : repeatPattern === 'weekly' ? (n === 1 ? 'week' : 'weeks') : (n === 1 ? 'month' : 'months')}
+                          {t('taskPickers.every', { n })} {repeatPattern === 'daily' ? (n === 1 ? t('taskPickers.day') : t('taskPickers.days')) : repeatPattern === 'weekly' ? (n === 1 ? t('taskPickers.week') : t('taskPickers.weeks')) : (n === 1 ? t('taskPickers.month') : t('taskPickers.months'))}
                         </option>
                       ))}
                     </select>
