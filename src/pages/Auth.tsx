@@ -247,12 +247,11 @@ export default function Auth() {
             {showEmailForm && (
               <div className="-mt-2 -ml-2 mb-2">
                 <Button
-                  variant="ghost"
-                  size="lg"
+                  type="button"
                   onClick={handleBack}
-                  className="rounded-full h-12 w-12 p-0"
+                  className="rounded-full h-11 w-11 p-0 bg-white/80 active:bg-white text-[#1a1f3d] shadow-[0_8px_20px_-10px_rgba(26,31,61,0.4)] border border-white/70"
                 >
-                  <ArrowLeft className="h-6 w-6" />
+                  <ArrowLeft className="h-5 w-5" />
                 </Button>
               </div>
             )}
