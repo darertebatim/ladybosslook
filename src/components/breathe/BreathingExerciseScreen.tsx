@@ -522,7 +522,7 @@ export function BreathingExerciseScreen({
             <button
               onClick={toggleLayout}
               className="p-2 rounded-full bg-muted text-muted-foreground hover:bg-muted/80 transition-colors"
-              title="Switch layout"
+              title={t('breathePage.switchLayout')}
             >
               <Layers className="h-5 w-5" />
             </button>
@@ -565,7 +565,7 @@ export function BreathingExerciseScreen({
                       : 'text-muted-foreground'
                   )}
                 >
-                  {mode === 'minutes' ? 'Minutes' : 'Cycles'}
+                    {mode === 'minutes' ? t('breathePage.minutes') : t('breathePage.cycles')}
                 </button>
               ))}
             </div>
@@ -614,8 +614,8 @@ export function BreathingExerciseScreen({
             <div className="flex justify-between mt-2 text-sm text-muted-foreground">
               {durationMode === 'cycles' ? (
                 <>
-                  <span>{cycleCount} done</span>
-                  <span>{selectedCycles} total</span>
+                  <span>{cycleCount} {t('breathePage.doneSuffix')}</span>
+                  <span>{selectedCycles} {t('breathePage.totalSuffix')}</span>
                 </>
               ) : (
                 <>
@@ -637,18 +637,18 @@ export function BreathingExerciseScreen({
               isPaused ? (
                 <>
                   <Play className="h-5 w-5 mr-2" />
-                  Resume
+                  {t('breathePage.resume')}
                 </>
               ) : (
                 <>
                   <Pause className="h-5 w-5 mr-2" />
-                  Pause
+                  {t('breathePage.pause')}
                 </>
               )
             ) : (
               <>
                 <Play className="h-5 w-5 mr-2" />
-                Start
+                {t('breathePage.start')}
               </>
             )}
           </Button>
