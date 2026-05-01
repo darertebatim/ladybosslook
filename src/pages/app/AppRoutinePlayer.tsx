@@ -774,7 +774,7 @@ export default function AppRoutinePlayer() {
         await supabase.from('user_tasks').insert(userTasks);
       }
 
-      toast.success('Routine updated! ✨');
+      toast.success(t('routinePlayer.routineUpdated'));
       setShowBuilder(false);
       setBuilderEditRoutine(null);
 
@@ -791,7 +791,7 @@ export default function AppRoutinePlayer() {
       ]);
     } catch (err) {
       console.error('Failed to update routine:', err);
-      toast.error('Failed to update routine');
+      toast.error(t('routinePlayer.updateFailed'));
     }
   };
 
