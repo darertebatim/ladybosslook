@@ -1,30 +1,56 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DeviceManagementPanel } from '@/components/admin/DeviceManagementPanel';
-import SecurityAuditLog from '@/components/SecurityAuditLog';
-import { StaffPermissionsManager } from '@/components/admin/StaffPermissionsManager';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Badge } from '@/components/ui/badge';
-import { useResetPlannerData } from '@/hooks/useTaskPlanner';
-import { RotateCcw, UserCheck, Loader2, Smartphone, Copy, Check, RefreshCw, Download, Sparkles, AlarmClock } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { BUILD_INFO, getDisplayBuildInfo } from '@/lib/buildInfo';
-import { format } from 'date-fns';
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DeviceManagementPanel } from "@/components/admin/DeviceManagementPanel";
+import SecurityAuditLog from "@/components/SecurityAuditLog";
+import { StaffPermissionsManager } from "@/components/admin/StaffPermissionsManager";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { useResetPlannerData } from "@/hooks/useTaskPlanner";
+import {
+  RotateCcw,
+  UserCheck,
+  Loader2,
+  Smartphone,
+  Copy,
+  Check,
+  RefreshCw,
+  Download,
+  Sparkles,
+} from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { BUILD_INFO, getDisplayBuildInfo } from "@/lib/buildInfo";
+import { format } from "date-fns";
 
 // Build Info Card Component
 function BuildInfoCard() {
   const [copied, setCopied] = useState(false);
   const displayInfo = getDisplayBuildInfo();
-  
+
   const handleCopy = () => {
     const fullInfo = `Version: ${BUILD_INFO.version}\nBuild ID: ${BUILD_INFO.buildId}\nBuild Time: ${BUILD_INFO.buildTime}\nMode: ${BUILD_INFO.mode}`;
     navigator.clipboard.writeText(fullInfo);
     setCopied(true);
-    toast.success('Build info copied!');
+    toast.success("Build info copied!");
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -42,10 +68,14 @@ function BuildInfoCard() {
       <CardContent className="space-y-4">
         {/* Main display info - what user sees on auth screen */}
         <div className="bg-background rounded-lg p-4 border">
-          <p className="text-xs text-muted-foreground mb-1">Expected on Auth Screen:</p>
-          <code className="text-lg font-mono font-semibold text-primary">{displayInfo}</code>
+          <p className="text-xs text-muted-foreground mb-1">
+            Expected on Auth Screen:
+          </p>
+          <code className="text-lg font-mono font-semibold text-primary">
+            {displayInfo}
+          </code>
         </div>
-        
+
         {/* Detailed breakdown */}
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="bg-background rounded-lg p-3 border">
@@ -54,11 +84,15 @@ function BuildInfoCard() {
           </div>
           <div className="bg-background rounded-lg p-3 border">
             <p className="text-xs text-muted-foreground">Build ID</p>
-            <p className="font-mono font-medium text-primary">{BUILD_INFO.buildId}</p>
+            <p className="font-mono font-medium text-primary">
+              {BUILD_INFO.buildId}
+            </p>
           </div>
           <div className="bg-background rounded-lg p-3 border">
             <p className="text-xs text-muted-foreground">Build Time</p>
-            <p className="font-mono font-medium text-xs">{BUILD_INFO.buildTime}</p>
+            <p className="font-mono font-medium text-xs">
+              {BUILD_INFO.buildTime}
+            </p>
           </div>
           <div className="bg-background rounded-lg p-3 border">
             <p className="text-xs text-muted-foreground">Mode</p>
@@ -66,7 +100,12 @@ function BuildInfoCard() {
           </div>
         </div>
 
-        <Button variant="outline" size="sm" onClick={handleCopy} className="w-full">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleCopy}
+          className="w-full"
+        >
           {copied ? (
             <>
               <Check className="h-4 w-4 mr-2" />
@@ -79,9 +118,12 @@ function BuildInfoCard() {
             </>
           )}
         </Button>
-        
+
         <p className="text-xs text-muted-foreground text-center">
-          💡 If iOS app shows a different Build ID, run: <code className="bg-muted px-1 rounded">npm run build && npx cap sync ios</code>
+          💡 If iOS app shows a different Build ID, run:{" "}
+          <code className="bg-muted px-1 rounded">
+            npm run build && npx cap sync ios
+          </code>
         </p>
       </CardContent>
     </Card>
@@ -90,39 +132,48 @@ function BuildInfoCard() {
 
 // App Update Logs Card
 function AppUpdateLogsCard() {
-  const { data: logs, isLoading, refetch } = useQuery({
-    queryKey: ['app-update-logs'],
+  const {
+    data: logs,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["app-update-logs"],
     queryFn: async () => {
       // First, get the update logs
       const { data: logsData, error: logsError } = await supabase
-        .from('app_update_logs')
-        .select('id, device_version, latest_version, update_available, platform, checked_at, user_id')
-        .order('checked_at', { ascending: false })
+        .from("app_update_logs")
+        .select(
+          "id, device_version, latest_version, update_available, platform, checked_at, user_id",
+        )
+        .order("checked_at", { ascending: false })
         .limit(50);
-      
+
       if (logsError) throw logsError;
       if (!logsData || logsData.length === 0) return [];
 
       // Then, fetch profiles for the user_ids
-      const userIds = [...new Set(logsData.map(l => l.user_id).filter(Boolean))];
-      if (userIds.length === 0) return logsData.map(l => ({ ...l, profile: null }));
+      const userIds = [
+        ...new Set(logsData.map((l) => l.user_id).filter(Boolean)),
+      ];
+      if (userIds.length === 0)
+        return logsData.map((l) => ({ ...l, profile: null }));
 
       const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, full_name, email')
-        .in('id', userIds);
+        .from("profiles")
+        .select("id, full_name, email")
+        .in("id", userIds);
 
-      const profileMap = new Map((profiles || []).map(p => [p.id, p]));
-      
-      return logsData.map(l => ({
+      const profileMap = new Map((profiles || []).map((p) => [p.id, p]));
+
+      return logsData.map((l) => ({
         ...l,
         profile: l.user_id ? profileMap.get(l.user_id) || null : null,
       }));
     },
   });
 
-  const updateNeededCount = logs?.filter(l => l.update_available).length || 0;
-  const uniqueUsers = new Set(logs?.map(l => l.user_id)).size;
+  const updateNeededCount = logs?.filter((l) => l.update_available).length || 0;
+  const uniqueUsers = new Set(logs?.map((l) => l.user_id)).size;
 
   return (
     <Card>
@@ -150,7 +201,9 @@ function AppUpdateLogsCard() {
             <p className="text-xs text-muted-foreground">Total Checks</p>
           </div>
           <div className="bg-muted rounded-lg p-3 text-center">
-            <p className="text-2xl font-bold text-orange-500">{updateNeededCount}</p>
+            <p className="text-2xl font-bold text-orange-500">
+              {updateNeededCount}
+            </p>
             <p className="text-xs text-muted-foreground">Need Update</p>
           </div>
           <div className="bg-muted rounded-lg p-3 text-center">
@@ -161,30 +214,38 @@ function AppUpdateLogsCard() {
 
         {/* Recent logs */}
         {isLoading ? (
-          <div className="text-center py-4 text-muted-foreground">Loading...</div>
+          <div className="text-center py-4 text-muted-foreground">
+            Loading...
+          </div>
         ) : logs && logs.length > 0 ? (
           <div className="max-h-64 overflow-y-auto space-y-2">
             {logs.map((log) => (
-              <div 
-                key={log.id} 
+              <div
+                key={log.id}
                 className="flex items-center justify-between p-2 rounded-lg bg-muted/50 text-sm"
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <Badge 
+                  <Badge
                     variant={log.update_available ? "destructive" : "secondary"}
                     className="shrink-0"
                   >
                     v{log.device_version}
                   </Badge>
                   <span className="text-muted-foreground truncate">
-                    {log.profile?.full_name || log.profile?.email?.split('@')[0] || 'Unknown'}
+                    {log.profile?.full_name ||
+                      log.profile?.email?.split("@")[0] ||
+                      "Unknown"}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
                   {log.update_available && (
-                    <span className="text-orange-500">→ v{log.latest_version}</span>
+                    <span className="text-orange-500">
+                      → v{log.latest_version}
+                    </span>
                   )}
-                  <span>{format(new Date(log.checked_at), 'MMM d, HH:mm')}</span>
+                  <span>
+                    {format(new Date(log.checked_at), "MMM d, HH:mm")}
+                  </span>
                 </div>
               </div>
             ))}
@@ -206,17 +267,22 @@ export default function System() {
   const handleEnrollAllPrograms = async () => {
     setEnrollingAll(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
-        toast.error('Please sign in first');
+        toast.error("Please sign in first");
         return;
       }
 
-      const response = await supabase.functions.invoke('admin-enroll-all-programs', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
+      const response = await supabase.functions.invoke(
+        "admin-enroll-all-programs",
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
         },
-      });
+      );
 
       if (response.error) {
         throw new Error(response.error.message);
@@ -225,8 +291,8 @@ export default function System() {
       const result = response.data;
       toast.success(result.message);
     } catch (error: any) {
-      console.error('Error enrolling in all programs:', error);
-      toast.error(error.message || 'Failed to enroll in programs');
+      console.error("Error enrolling in all programs:", error);
+      toast.error(error.message || "Failed to enroll in programs");
     } finally {
       setEnrollingAll(false);
     }
@@ -236,7 +302,9 @@ export default function System() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">System Management</h2>
-        <p className="text-muted-foreground">Manage devices, permissions, and view security logs</p>
+        <p className="text-muted-foreground">
+          Manage devices, permissions, and view security logs
+        </p>
       </div>
 
       <Tabs defaultValue="devices">
@@ -262,7 +330,7 @@ export default function System() {
         <TabsContent value="tools" className="space-y-4">
           {/* App Update Logs */}
           <AppUpdateLogsCard />
-          
+
           {/* Build Info Card */}
           <BuildInfoCard />
           {/* Enroll in All Programs */}
@@ -273,12 +341,13 @@ export default function System() {
                 Enroll in All Programs
               </CardTitle>
               <CardDescription>
-                Enroll yourself in all active programs with all available rounds. Useful for testing and reviewing all content.
+                Enroll yourself in all active programs with all available
+                rounds. Useful for testing and reviewing all content.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button 
-                onClick={handleEnrollAllPrograms} 
+              <Button
+                onClick={handleEnrollAllPrograms}
                 disabled={enrollingAll}
                 variant="default"
               >
@@ -288,7 +357,7 @@ export default function System() {
                     Enrolling...
                   </>
                 ) : (
-                  'Enroll in All Programs'
+                  "Enroll in All Programs"
                 )}
               </Button>
             </CardContent>
@@ -302,21 +371,30 @@ export default function System() {
                 Complete Reset (Admin Testing)
               </CardTitle>
               <CardDescription>
-                Reset all user data to simulate a fresh "day one" experience. This clears tasks, journal entries, chat history, wallet credits, and all other user-associated data.
+                Reset all user data to simulate a fresh "day one" experience.
+                This clears tasks, journal entries, chat history, wallet
+                credits, and all other user-associated data.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" disabled={resetPlanner.isPending}>
-                    {resetPlanner.isPending ? 'Resetting...' : 'Complete Reset'}
+                  <Button
+                    variant="destructive"
+                    disabled={resetPlanner.isPending}
+                  >
+                    {resetPlanner.isPending ? "Resetting..." : "Complete Reset"}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete all your user data including tasks, journal entries, chat messages, wallet credits, and all progress.
+                      This action cannot be undone. This will permanently delete
+                      all your user data including tasks, journal entries, chat
+                      messages, wallet credits, and all progress.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -330,37 +408,6 @@ export default function System() {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-            </CardContent>
-          </Card>
-
-          {/* Reset Home Spotlight Tour */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlarmClock className="h-5 w-5" />
-                Reset Home Spotlight Tour
-              </CardTitle>
-              <CardDescription>
-                Clears the new-user spotlight flags so the intro popup and the
-                3-step spotlight sequence (complete a task → tap a task → add a
-                task) play again on the next visit to /app/home.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  localStorage.removeItem('simora_spotlight_tour_done');
-                  localStorage.removeItem('simora_first_action_celebrated');
-                  localStorage.removeItem('simora_tap_coach_shown');
-                  localStorage.removeItem('simora_add_coach_shown');
-                  localStorage.setItem('simora_force_new_user', 'true');
-                  toast.success('Spotlight tour reset — open /app/home to test');
-                }}
-              >
-                <AlarmClock className="h-4 w-4 mr-2" />
-                Reset Spotlight Tour
-              </Button>
             </CardContent>
           </Card>
         </TabsContent>
