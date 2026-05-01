@@ -454,7 +454,7 @@ export default function AppInspire() {
                               }
                               className="text-sm text-primary font-medium flex items-center gap-0.5"
                             >
-                              All <ChevronRight className="h-4 w-4" />
+                              {t('inspirePage.all')} <ChevronRight className="h-4 w-4" />
                             </button>
                           </div>
                           <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
@@ -498,7 +498,7 @@ export default function AppInspire() {
                               }
                               className="text-sm text-primary font-medium flex items-center gap-0.5"
                             >
-                              All <ChevronRight className="h-4 w-4" />
+                              {t('inspirePage.all')} <ChevronRight className="h-4 w-4" />
                             </button>
                           </div>
                           <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
@@ -526,7 +526,7 @@ export default function AppInspire() {
                       <div className="flex items-center justify-between mb-2 px-4">
                         <h2 className="text-xl font-bold text-foreground flex items-center gap-1.5">
                           <RotateCcw className="h-5 w-5 text-violet-500" />
-                          Focus
+                          {t('inspirePage.focus')}
                         </h2>
                         <button
                           onClick={() =>
@@ -534,7 +534,7 @@ export default function AppInspire() {
                           }
                           className="text-sm text-primary font-medium flex items-center gap-0.5"
                         >
-                          All <ChevronRight className="h-4 w-4" />
+                          {t('inspirePage.all')} <ChevronRight className="h-4 w-4" />
                         </button>
                       </div>
                       <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
@@ -561,7 +561,7 @@ export default function AppInspire() {
                       <div className="flex items-center justify-between mb-2 px-4">
                         <h2 className="text-xl font-bold text-foreground flex items-center gap-1.5">
                           <Flame className="h-5 w-5 text-orange-500" />
-                          Challenges
+                          {t('inspirePage.challenges')}
                         </h2>
                         <button
                           onClick={() =>
@@ -571,7 +571,7 @@ export default function AppInspire() {
                           }
                           className="text-sm text-primary font-medium flex items-center gap-0.5"
                         >
-                          All <ChevronRight className="h-4 w-4" />
+                          {t('inspirePage.all')} <ChevronRight className="h-4 w-4" />
                         </button>
                       </div>
                       <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
@@ -598,7 +598,7 @@ export default function AppInspire() {
                       <div className="flex items-center justify-between mb-2 px-4">
                         <h2 className="text-xl font-bold text-foreground flex items-center gap-1.5">
                           <Target className="h-5 w-5 text-blue-500" />
-                          Projects
+                          {t('inspirePage.projects')}
                         </h2>
                         <button
                           onClick={() =>
@@ -608,7 +608,7 @@ export default function AppInspire() {
                           }
                           className="text-sm text-primary font-medium flex items-center gap-0.5"
                         >
-                          All <ChevronRight className="h-4 w-4" />
+                          {t('inspirePage.all')} <ChevronRight className="h-4 w-4" />
                         </button>
                       </div>
                       <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
@@ -633,20 +633,20 @@ export default function AppInspire() {
                   {/* CTA to support chat */}
                   <div className="px-4 pt-4 pb-2">
                     <p className="text-sm text-muted-foreground">
-                      Not any routines you want above?
+                      {t('inspirePage.tellUsWantText')}
                     </p>
                     <button
                       onClick={() =>
                         navigate(
                           "/app/chat?draft=" +
                             encodeURIComponent(
-                              "Hi! I'd love to have a routine for: ",
+                              t('inspirePage.chatDraftPrefix'),
                             ),
                         )
                       }
                       className="text-sm text-blue-500 font-medium flex items-center gap-1 mt-1"
                     >
-                      Tell us what you want <ChevronRight className="h-4 w-4" />
+                      {t('inspirePage.tellUsWantCta')} <ChevronRight className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
