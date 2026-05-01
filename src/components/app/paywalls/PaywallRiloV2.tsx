@@ -30,12 +30,8 @@ const FEATURES = [
 
 // Rilo brand DNA
 const NAVY = '#1a1f3d';
-const LOGO_GOLD = '#F5A623';
-// Amber accent used on white sections (pages 2 + 3) — keep readable on white.
 const SUNRISE_AMBER = '#B8590E';
-// Logo-derived hero — same coral/magenta wash as the app icon background.
-// Top-right coral → bottom-left magenta, with deep red shadow grounding the bottom.
-const SUNRISE_BG = 'linear-gradient(155deg, #D94B2B 0%, #C2255C 55%, #8E1B4A 100%)';
+const SUNRISE_BG = 'linear-gradient(to bottom, #FFF4DC 0%, #FFE0E6 50%, #FBD4E2 100%)';
 const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
 
 // Pricing — derived from program data (live from RC / catalog) with safe fallbacks.
@@ -72,15 +68,15 @@ function AmbientGlow() {
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
       <div
         className="absolute -top-24 left-1/2 -translate-x-1/2 w-[420px] h-[420px] rounded-full blur-3xl opacity-60"
-        style={{ background: 'radial-gradient(circle, #FFEABF 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(circle, #FFD36E 0%, transparent 70%)' }}
       />
       <div
         className="absolute top-1/3 -right-20 w-[260px] h-[260px] rounded-full blur-3xl opacity-50"
-        style={{ background: 'radial-gradient(circle, #FFB766 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(circle, #F8B4C6 0%, transparent 70%)' }}
       />
       <div
         className="absolute bottom-10 -left-16 w-[300px] h-[300px] rounded-full blur-3xl opacity-50"
-        style={{ background: 'radial-gradient(circle, #FFD89A 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(circle, #E5D6FF 0%, transparent 70%)' }}
       />
       {sparkles.map((_, i) => {
         const left = (i * 41) % 100;
@@ -93,7 +89,7 @@ function AmbientGlow() {
             animate={{ opacity: [0, 0.85, 0], scale: [0.4, 1, 0.4] }}
             transition={{ duration: 2.2, delay, repeat: Infinity, repeatDelay: 1.5 }}
             className="absolute text-[10px]"
-            style={{ left: `${left}%`, top: `${top}%`, color: '#FFFFFF', opacity: 0.7 }}
+            style={{ left: `${left}%`, top: `${top}%`, color: '#A0123F', opacity: 0.6 }}
           >
             ✨
           </motion.span>
@@ -144,20 +140,20 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', padding: '12px 0 14px' }}>
       <button
         onClick={onClose}
-        style={{ position: 'absolute', left: 14, background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'rgba(255,255,255,0.85)', display: 'flex' }}
+        style={{ position: 'absolute', left: 14, background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'rgba(26,31,61,0.55)', display: 'flex' }}
         aria-label="Close"
       >
         <X size={20} />
       </button>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <img src={riloAppIcon} alt="" style={{ width: 22, height: 22, borderRadius: 6 }} />
-        <span style={{ color: '#fff', fontSize: 17, fontWeight: 700, letterSpacing: -0.3, fontFamily: SF }}>
-          Rilo<span style={{ color: LOGO_GOLD }}>+</span>
+        <span style={{ color: NAVY, fontSize: 17, fontWeight: 700, letterSpacing: -0.3, fontFamily: SF }}>
+          Rilo<span style={{ color: SUNRISE_AMBER }}>+</span>
         </span>
       </div>
       <button
         onClick={onRestore}
-        style={{ position: 'absolute', right: 14, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.85)', fontSize: 13, fontFamily: SF }}
+        style={{ position: 'absolute', right: 14, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(26,31,61,0.55)', fontSize: 13, fontFamily: SF }}
       >
         Restore
       </button>
@@ -186,7 +182,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
               style={{
                 width: 96, height: 96,
                 objectFit: 'contain',
-                filter: 'drop-shadow(0 18px 36px rgba(0,0,0,0.35))',
+                filter: 'drop-shadow(0 18px 36px rgba(232,74,111,0.35))',
               }}
             />
           </motion.div>
@@ -195,7 +191,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15 }}
-            style={{ color: LOGO_GOLD, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2.4, margin: '0 0 12px' }}
+            style={{ color: SUNRISE_AMBER, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2.4, margin: '0 0 12px' }}
           >
             ✨ Rilo Plus
           </motion.p>
@@ -204,11 +200,11 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.22 }}
-            style={{ color: '#fff', fontSize: 30, fontWeight: 800, lineHeight: 1.18, margin: 0, letterSpacing: -0.6 }}
+            style={{ color: NAVY, fontSize: 30, fontWeight: 800, lineHeight: 1.18, margin: 0, letterSpacing: -0.6 }}
           >
             Rilo Plus users are{' '}
             <span style={{
-              background: 'linear-gradient(135deg, #FFD36E 0%, #F5A623 100%)',
+              background: 'linear-gradient(135deg, #FFB347 0%, #E84A6F 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -221,7 +217,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.35 }}
-            style={{ color: 'rgba(255,255,255,0.9)', fontSize: 15, fontWeight: 500, margin: '14px 0 0', lineHeight: 1.45 }}
+            style={{ color: 'rgba(26,31,61,0.7)', fontSize: 15, fontWeight: 500, margin: '14px 0 0', lineHeight: 1.45 }}
           >
             Make self-care actually stick.
           </motion.p>
@@ -259,17 +255,17 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
                   }}>
                     <Emoji3D char={feature.emoji} size={28} />
                   </div>
-                  {/* Plus pill — matches in-app "Plus" tool label */}
+                  {/* Plus badge */}
                   <div style={{
-                    position: 'absolute', top: -6, right: -10,
-                    padding: '3px 8px', borderRadius: 999,
-                    background: 'linear-gradient(135deg, #F5A623 0%, #EB5E33 100%)',
+                    position: 'absolute', top: -2, right: -2,
+                    width: 20, height: 20, borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #FFD36E 0%, #E84A6F 100%)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: '0 3px 8px -1px rgba(235,94,51,0.45), 0 0 0 2px #fff',
-                    color: '#fff', fontSize: 9, fontWeight: 800, lineHeight: 1,
-                    fontFamily: SF, letterSpacing: 0.6, textTransform: 'uppercase',
+                    boxShadow: '0 3px 8px -1px rgba(232,74,111,0.5), 0 0 0 2px #fff',
+                    color: '#fff', fontSize: 13, fontWeight: 900, lineHeight: 1,
+                    fontFamily: SF, paddingBottom: 1,
                   }}>
-                    Plus
+                    +
                   </div>
                 </div>
                 <div style={{ flex: 1, paddingTop: 6 }}>
