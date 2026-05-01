@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useReadingContentById, useContentSections, useReadingUserProgress } from '@/hooks/useReading';
 import { ArrowLeft, Clock, BookOpen, Layers, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import { haptic } from '@/lib/haptics';
 
 
 export default function AppReadDetail() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: content, isLoading } = useReadingContentById(id || null);
@@ -16,8 +18,8 @@ export default function AppReadDetail() {
   const { data: progress = [] } = useReadingUserProgress();
 
   const { handleShare } = useShareContent({
-    title: content?.title || 'Read on Rilo',
-    text: `📖 Reading "${content?.title || 'this story'}" on Rilo — loved this.`,
+    title: content?.title || t('read.shareDefaultTitle'),
+    text: t('read.shareDefaultText', { title: content?.title || t('read.shareFallbackStory') }),
     imageUrl: content?.cover_url,
     source: 'read_story',
     contentId: id,
@@ -60,7 +62,7 @@ export default function AppReadDetail() {
           onClick={() => { haptic.light(); handleShare(); }}
           className="absolute right-4 z-10 bg-white/70 backdrop-blur-sm rounded-full p-2 active:scale-95 transition-transform"
           style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
-          aria-label="Share story"
+          aria-label={t('read.shareStory')}
         >
           <Share2 className="h-5 w-5 text-black" />
         </button>
@@ -71,7 +73,7 @@ export default function AppReadDetail() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4 right-4 text-white">
               <h1 className="text-2xl font-bold leading-tight">{content.title}</h1>
-              {content.author && <p className="text-sm opacity-80 mt-1">by {content.author}</p>}
+              {content.author && <p className="text-sm opacity-80 mt-1">{t('read.byAuthor', { author: content.author })}</p>}
             </div>
           </div>
         ) : (
@@ -80,7 +82,7 @@ export default function AppReadDetail() {
               <FluentEmoji emoji={content.emoji || '📖'} size={56} />
             </div>
             <h1 className="text-2xl font-bold leading-tight text-center text-black">{content.title}</h1>
-            {content.author && <p className="text-sm text-black mt-1.5">by {content.author}</p>}
+            {content.author && <p className="text-sm text-black mt-1.5">{t('read.byAuthor', { author: content.author })}</p>}
           </div>
         )}
       </div>
@@ -94,11 +96,11 @@ export default function AppReadDetail() {
 
           <div className="flex items-center gap-3 mb-5">
             <span className="flex items-center gap-1.5 text-sm text-black">
-              <Clock className="h-4 w-4" /> {calculatedMinutes} min
+              <Clock className="h-4 w-4" /> {t('read.minutesShort', { count: calculatedMinutes })}
             </span>
             <Badge variant="secondary" className="capitalize text-xs">{content.category}</Badge>
             <span className="flex items-center gap-1.5 text-sm text-black">
-              <Layers className="h-4 w-4" /> {sections.length} sections
+              <Layers className="h-4 w-4" /> {t('read.sectionsShort', { count: sections.length })}
             </span>
           </div>
 
@@ -113,7 +115,7 @@ export default function AppReadDetail() {
             }}
           >
             <BookOpen className="h-5 w-5 mr-2" />
-            {isCompleted ? 'Read Again' : hasProgress ? 'Continue Reading' : 'Start Reading'}
+            {isCompleted ? t('read.readAgain') : hasProgress ? t('read.continueReading') : t('read.startReading')}
           </Button>
         </div>
       </div>
