@@ -63,13 +63,6 @@ export default function Auth() {
       } else {
         navigate(redirectPath);
       }
-    } else if (!authLoading) {
-      // First-time users should see onboarding before auth
-      const hasSeenOnboarding = localStorage.getItem('simora_onboarding_completed_pre-auth-welcome') === 'true';
-      const skipOnboarding = searchParams.get('skip_onboarding') === 'true';
-      if (!hasSeenOnboarding && !hasCustomRedirect && !skipOnboarding) {
-        navigate('/app/onboarding/pre-auth-welcome', { replace: true });
-      }
     }
   }, [user, authLoading, navigate, redirectPath, hasCustomRedirect]);
 
