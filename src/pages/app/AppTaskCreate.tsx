@@ -1119,34 +1119,46 @@ const AppTaskCreate = ({
   };
 
   const getRepeatSummary = () => {
-    if (!repeatEnabled) return 'No repeat';
-    
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    if (!repeatEnabled) return t('taskPickers.noRepeatSummary');
+
+    const dayNames = [
+      t('streakLost.sun', { defaultValue: 'Sun' }),
+      t('streakLost.mon', { defaultValue: 'Mon' }),
+      t('streakLost.tue', { defaultValue: 'Tue' }),
+      t('streakLost.wed', { defaultValue: 'Wed' }),
+      t('streakLost.thu', { defaultValue: 'Thu' }),
+      t('streakLost.fri', { defaultValue: 'Fri' }),
+      t('streakLost.sat', { defaultValue: 'Sat' }),
+    ];
     
     if (repeatPattern === 'weekly' && repeatDays.length > 0) {
       const days = repeatDays.map(d => dayNames[d]).join(', ');
-      return `Weekly (${days})`;
+      return t('taskPickers.weeklySummary', { days });
     }
     
     if (repeatPattern === 'monthly') {
       const dayOfMonth = scheduledDate.getDate();
       const suffix = dayOfMonth === 1 ? 'st' : dayOfMonth === 2 ? 'nd' : dayOfMonth === 3 ? 'rd' : 'th';
-      return `Monthly (On ${dayOfMonth}${suffix})`;
+      return t('taskPickers.monthlySummary', { day: `${dayOfMonth}${suffix}` });
     }
     
+    if (repeatPattern === 'daily') return t('taskEdit.daily');
+    if (repeatPattern === 'weekly') return t('taskEdit.weekly');
+    if (repeatPattern === 'monthly') return t('taskEdit.monthly');
     return repeatPattern.charAt(0).toUpperCase() + repeatPattern.slice(1);
   };
 
   const getReminderSummary = () => {
-    if (!reminderEnabled) return 'No Reminder';
+    if (!reminderEnabled) return t('taskPickers.noReminderSummary');
     // If time is set and reminder matches certain offsets, show friendly names
     if (scheduledTime) {
-      if (reminderTime === scheduledTime) return `At time of event (${formatReminderTimeDisplay(reminderTime)})`;
-      if (reminderTime === getTimeOffset(scheduledTime, 10)) return `10 minutes early (${formatReminderTimeDisplay(reminderTime)})`;
-      if (reminderTime === getTimeOffset(scheduledTime, 30)) return `30 minutes early (${formatReminderTimeDisplay(reminderTime)})`;
-      if (reminderTime === getTimeOffset(scheduledTime, 60)) return `1 hour early (${formatReminderTimeDisplay(reminderTime)})`;
+      const time = formatReminderTimeDisplay(reminderTime);
+      if (reminderTime === scheduledTime) return t('taskPickers.atTimeOfEventSummary', { time });
+      if (reminderTime === getTimeOffset(scheduledTime, 10)) return t('taskPickers.minutesEarlySummary', { n: 10, time });
+      if (reminderTime === getTimeOffset(scheduledTime, 30)) return t('taskPickers.minutesEarlySummary', { n: 30, time });
+      if (reminderTime === getTimeOffset(scheduledTime, 60)) return t('taskPickers.hourEarlySummary', { time });
     }
-    return `Custom (${formatReminderTimeDisplay(reminderTime)})`;
+    return t('taskPickers.customSummary', { time: formatReminderTimeDisplay(reminderTime) });
   };
 
   // Get color hex for background
