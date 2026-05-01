@@ -1,12 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, ArrowRight } from 'lucide-react';
+import { X } from 'lucide-react';
+import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { haptic } from '@/lib/haptics';
-import { useTodayMood } from '@/hooks/useMoodLogs';
+import { useTodayMood, useCreateMoodLog } from '@/hooks/useMoodLogs';
 import { cn } from '@/lib/utils';
 import { getLocalDateStr } from '@/lib/localDate';
 import { useSpecialBannerSettings } from '@/hooks/useSpecialBannerSettings';
 import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
+
+const MOODS = [
+  { value: 'great',     emoji: '😄', label: 'Great' },
+  { value: 'good',      emoji: '🙂', label: 'Good' },
+  { value: 'okay',      emoji: '😐', label: 'Okay' },
+  { value: 'not_great', emoji: '😔', label: 'Meh' },
+  { value: 'bad',       emoji: '😢', label: 'Bad' },
+];
 
 const DISMISS_KEY = 'mood-banner-dismissed';
 
@@ -22,9 +32,12 @@ function dismissToday() {
 
 export function MoodCheckInBanner({ onVisibilityChange }: { onVisibilityChange?: (visible: boolean) => void }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { data: todayMood } = useTodayMood();
+  const createMoodLog = useCreateMoodLog();
   const [visible, setVisible] = useState(() => !isDismissedToday());
   const [fading, setFading] = useState(false);
+  const [submittingMood, setSubmittingMood] = useState<string | null>(null);
   const { data: disabledMap = {} } = useSpecialBannerSettings();
 
   const isShowing = visible && !todayMood && !disabledMap['MoodCheckInBanner'];
@@ -47,17 +60,35 @@ export function MoodCheckInBanner({ onVisibilityChange }: { onVisibilityChange?:
     fadeOut(() => setVisible(false));
   };
 
-  const handleTap = () => {
-    haptic.medium();
-    dismissToday();
-    navigate('/app/mood');
+  const handleMoodSelect = async (e: React.MouseEvent, moodValue: string) => {
+    e.stopPropagation();
+    if (submittingMood) return;
+    haptic.selection();
+    setSubmittingMood(moodValue);
+    try {
+      const moodLabel = MOODS.find((m) => m.value === moodValue)?.label || moodValue;
+      await createMoodLog.mutateAsync({
+        mood: moodValue,
+        content: `Feeling ${moodLabel.toLowerCase()} today.`,
+      });
+      haptic.success();
+      toast.success(t('homePlanner.moodLogged', 'Mood logged'), {
+        action: {
+          label: t('reflections.freeForm', 'Reflect'),
+          onClick: () => navigate(`/app/reflections/free-form?mood=${moodValue}`),
+        },
+      });
+      // Banner will auto-hide once todayMood updates via query invalidation.
+    } catch (err) {
+      console.error('Failed to log mood:', err);
+      setSubmittingMood(null);
+    }
   };
 
   return (
-    <button
-      onClick={handleTap}
+    <div
       className={cn(
-        "relative w-full rounded-3xl overflow-hidden active:scale-[0.98] transition-all text-left",
+        "relative w-full rounded-3xl overflow-hidden transition-all text-left",
         fading ? "animate-fade-out opacity-0" : "animate-fade-in"
       )}
       style={{
@@ -76,52 +107,46 @@ export function MoodCheckInBanner({ onVisibilityChange }: { onVisibilityChange?:
         style={{ background: 'radial-gradient(circle, rgba(168,85,247,0.35) 0%, rgba(168,85,247,0) 70%)' }}
       />
 
-      <div className="relative z-[1] flex items-center gap-3 px-4 py-4 pr-12">
-        {/* Floating 3D emoji cluster */}
-        <div className="relative w-[68px] h-[68px] shrink-0">
-          <img
-            src={getFluentEmojiUrl('💧')}
-            alt=""
-            className="absolute left-0 bottom-0 w-9 h-9 select-none"
-            style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.12))' }}
-          />
-          <img
-            src={getFluentEmojiUrl('⭐')}
-            alt=""
-            className="absolute right-0 top-0 w-8 h-8 select-none"
-            style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.12))' }}
-          />
-          <img
-            src={getFluentEmojiUrl('💗')}
-            alt=""
-            className="absolute right-1 bottom-0 w-9 h-9 select-none"
-            style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.12))' }}
-          />
-        </div>
-
-        {/* Copy */}
-        <div className="flex-1 min-w-0">
+      <div className="relative z-[1] px-4 pt-4 pb-4 pr-12">
+        {/* Headline row */}
+        <div className="flex items-center gap-2.5">
           <p className="text-[15px] font-extrabold text-black leading-tight tracking-tight">
             Hi! Dear you~
           </p>
-          <p className="text-[12px] font-semibold text-black/70 leading-tight mt-0.5">
+          <span className="text-[12px] font-semibold text-black/70 leading-tight">
             How is your day?
-          </p>
-          <div
-            className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-full"
-            style={{
-              background: '#FFFFFF',
-              boxShadow: '0 4px 10px -2px rgba(232,74,111,0.25)',
-            }}
-          >
-            <span className="text-[12px] font-bold text-black">Track Mood</span>
-            <span
-              className="w-4 h-4 rounded-full flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #F5A623 0%, #E84A6F 100%)' }}
-            >
-              <ArrowRight className="w-2.5 h-2.5 text-white" strokeWidth={3} />
-            </span>
-          </div>
+          </span>
+        </div>
+
+        {/* 5 mood chips */}
+        <div className="mt-3 grid grid-cols-5 gap-1.5">
+          {MOODS.map((mood) => {
+            const isLoading = submittingMood === mood.value;
+            return (
+              <button
+                key={mood.value}
+                onClick={(e) => handleMoodSelect(e, mood.value)}
+                disabled={!!submittingMood}
+                className={cn(
+                  'flex flex-col items-center justify-center gap-1 py-2 rounded-2xl',
+                  'bg-white/80 backdrop-blur-sm active:scale-90 transition-transform',
+                  'disabled:opacity-60'
+                )}
+                style={{ boxShadow: '0 4px 10px -4px rgba(26,31,61,0.15)' }}
+                aria-label={`Log mood: ${mood.label}`}
+              >
+                <img
+                  src={getFluentEmojiUrl(mood.emoji)}
+                  alt=""
+                  className={cn('w-7 h-7 select-none', isLoading && 'animate-pulse')}
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                />
+                <span className="text-[10px] font-bold text-black leading-none">
+                  {mood.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -132,6 +157,6 @@ export function MoodCheckInBanner({ onVisibilityChange }: { onVisibilityChange?:
       >
         <X className="h-3.5 w-3.5 text-black" strokeWidth={2.5} />
       </button>
-    </button>
+    </div>
   );
 }
