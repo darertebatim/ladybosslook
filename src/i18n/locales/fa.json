@@ -168,7 +168,16 @@
   },
   "recovery": {
     "goldStreakRestored": "رکورد طلایی بازگشت!",
-    "streakRestored": "رکورد بازگشت!"
+    "streakRestored": "رکورد بازگشت!",
+    "backToDays": "برگشتیم به {{n}} روز",
+    "backToGoldDays": "برگشتیم به {{n}} روز طلایی",
+    "letsGo": "بزن بریم! 🚀",
+    "completeAllToday": "<1>همه‌ی</1> کارهای امروزت را انجام بده",
+    "completeThreeForGold": "۳ کار را تمام کن تا نشان طلایی بگیری",
+    "dontMissGold": "حتی یک روز را از دست نده — رکورد طلایی نیاز به بی‌نقصی دارد",
+    "completeAtLeastOne": "<1>حداقل یک</1> کار را امروز تمام کن",
+    "keepShowingUp": "هر روز حاضر شو",
+    "shieldsLimited": "سپرهای بازیابی محدودند — هوشمندانه استفاده کن"
   },
   "quickStart": {
     "typeNew": "یک کار جدید بنویس...",

@@ -168,7 +168,16 @@
   },
   "recovery": {
     "goldStreakRestored": "Gold Streak Restored!",
-    "streakRestored": "Streak Restored!"
+    "streakRestored": "Streak Restored!",
+    "backToDays": "Back to {{n}} days",
+    "backToGoldDays": "Back to {{n}} gold days",
+    "letsGo": "Let's Go! 🚀",
+    "completeAllToday": "Complete <1>all</1> your tasks today",
+    "completeThreeForGold": "Complete 3 tasks to earn a gold badge",
+    "dontMissGold": "Don't miss a day — gold streaks need perfection",
+    "completeAtLeastOne": "Complete <1>at least one</1> action today",
+    "keepShowingUp": "Keep showing up every day",
+    "shieldsLimited": "Recovery shields are limited — use them wisely"
   },
   "quickStart": {
     "typeNew": "Type a new task...",
