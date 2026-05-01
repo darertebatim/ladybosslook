@@ -982,6 +982,12 @@ const AppHome = () => {
             {/* Notification Banner - prompts users to enable notifications */}
             <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
 
+            {/* Welcome Spotlight Banner — invites the user to take the 3-step tour */}
+            <WelcomeSpotlightBanner
+              onStart={() => setSpotlightStep('tap')}
+              onVisibilityChange={setHasWelcomeBanner}
+            />
+
             {/* Self-Care Quiz Banner — highest priority, shown before everything */}
             <SelfCareQuizBanner className="mb-2" onVisibilityChange={setHasSelfCareQuizBanner} />
 
