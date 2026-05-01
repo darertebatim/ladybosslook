@@ -10,6 +10,7 @@ import { CloseButton } from '@/components/app/CloseButton';
 import { EmotionLogCard } from './EmotionLogCard';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 interface EmotionDashboardProps {
   onStartCheckIn: () => void;
@@ -34,6 +35,7 @@ const SYNTHETIC_EMOTION_TASK: RoutinePlanTask = {
 
 export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   
@@ -65,12 +67,12 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
         editedTasks,
         syntheticTasks: [SYNTHETIC_EMOTION_TASK],
       });
-      toast.success('Emotion check-in added to your routines!');
+      toast.success(t('emotion.addedToRoutines'));
       setShowRoutineSheet(false);
       setJustAdded(true);
     } catch (error) {
       console.error('Failed to add routine:', error);
-      toast.error('Failed to add routine');
+      toast.error(t('emotion.addRoutineFailed'));
     }
   };
 
@@ -118,7 +120,7 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
         >
           <CloseButton variant="dark" />
           
-          <h1 className="text-lg font-semibold text-white">Emotions</h1>
+          <h1 className="text-lg font-semibold text-white">{t('emotion.title')}</h1>
           
           <button
             onClick={handleViewHistory}
@@ -150,25 +152,25 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
 
           {/* Title */}
           <h2 className="text-2xl font-semibold text-white text-center mb-3">
-            Name your emotion
+            {t('emotion.nameYourEmotion')}
           </h2>
 
           {/* Description */}
           <p className="text-white/80 text-center text-base leading-relaxed max-w-xs mx-auto mb-6">
-            Sometimes, what we feel is not so obvious. Naming the emotion can help us gain better control and understanding of ourselves.
+            {t('emotion.description')}
           </p>
 
           {/* Today's check-ins */}
           {todayLogs.length > 0 && (
             <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 mb-4 max-h-36 overflow-y-auto border border-white/10">
-              <p className="text-white/80 text-sm font-medium mb-2">Today's Check-ins</p>
+              <p className="text-white/80 text-sm font-medium mb-2">{t('emotion.todayCheckins')}</p>
               <div className="space-y-2">
                 {todayLogs.slice(0, 3).map((log) => (
                   <EmotionLogCard key={log.id} log={log} compact />
                 ))}
                 {todayLogs.length > 3 && (
                   <p className="text-white/60 text-xs text-center pt-1">
-                    +{todayLogs.length - 3} more
+                    {t('emotion.moreCount', { count: todayLogs.length - 3 })}
                   </p>
                 )}
               </div>
@@ -182,7 +184,7 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
                 <Calendar className="h-4 w-4 text-pink-200" />
                 <span className="text-xl font-bold text-white">{thisMonthCount}</span>
               </div>
-              <span className="text-white/70 text-xs">This Month</span>
+              <span className="text-white/70 text-xs">{t('emotion.thisMonth')}</span>
             </div>
             
             <div className="flex flex-col items-center px-4 py-3 bg-white/15 backdrop-blur-md rounded-2xl min-w-[72px] border border-white/10">
@@ -190,7 +192,7 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
                 <BarChart2 className="h-4 w-4 text-violet-200" />
                 <span className="text-xl font-bold text-white">{thisWeekCount}</span>
               </div>
-              <span className="text-white/70 text-xs">This Week</span>
+              <span className="text-white/70 text-xs">{t('emotion.thisWeek')}</span>
             </div>
             
             <div className="flex flex-col items-center px-4 py-3 bg-white/15 backdrop-blur-md rounded-2xl min-w-[72px] border border-white/10">
@@ -198,7 +200,7 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
                 <Heart className="h-4 w-4 text-fuchsia-200" />
                 <span className="text-xl font-bold text-white">{todayLogs.length}</span>
               </div>
-              <span className="text-white/70 text-xs">Today</span>
+              <span className="text-white/70 text-xs">{t('emotion.today')}</span>
             </div>
           </div>
 
@@ -214,7 +216,7 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
             onClick={handleStartCheckIn}
             className="w-full h-14 rounded-full bg-white shadow-lg flex items-center justify-center gap-2 text-violet-600 font-semibold text-lg active:scale-[0.98] transition-transform"
           >
-            Check In Now
+            {t('emotion.checkInNow')}
           </button>
 
           <div className="tour-emotion-add-routine flex items-center gap-2">
@@ -225,12 +227,12 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
               {isAdded ? (
                 <>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Added — Go to Planner
+                  {t('emotion.addedGoToPlanner')}
                 </>
               ) : (
                 <>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-                  Add to My Routines
+                  {t('emotion.addToMyRoutines')}
                 </>
               )}
             </button>
@@ -243,7 +245,7 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
                 }}
                 disabled={addRoutinePlan.isPending}
                 className="h-10 w-10 rounded-full bg-white text-violet-600 flex items-center justify-center shrink-0 active:scale-[0.95] transition-transform"
-                title="Add again to my routines"
+                title={t('emotion.addAgain')}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M12 14v4"/><path d="M10 16h4"/></svg>
               </button>
@@ -274,8 +276,8 @@ export const EmotionDashboard = ({ onStartCheckIn }: EmotionDashboardProps) => {
         open={showRoutineSheet}
         onOpenChange={setShowRoutineSheet}
         tasks={[SYNTHETIC_EMOTION_TASK]}
-        routineTitle="Emotion Check-in"
-        defaultTag="Wellness"
+        routineTitle={t('emotion.checkInName')}
+        defaultTag={t('emotion.tagWellness')}
         onSave={handleSaveRoutine}
         isSaving={addRoutinePlan.isPending}
       />
