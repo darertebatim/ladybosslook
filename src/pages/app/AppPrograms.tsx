@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCoursesData } from '@/hooks/useAppData';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,7 @@ import {
 } from '@/components/ui/carousel';
 
 const AppCourses = () => {
+  const { t } = useTranslation();
   // Use centralized data hook
   const { enrollments, nextSessionMap, nextContentMap, isLoading } = useCoursesData();
   const { programs, isLoading: programsLoading } = usePrograms();
@@ -45,7 +47,7 @@ const AppCourses = () => {
   if (isLoading) {
     return (
       <>
-        <AppHeader title="My Programs" subtitle="Loading..." showBack />
+        <AppHeader title={t('programs.myPrograms')} subtitle={t('programs.loading')} showBack />
         <AppHeaderSpacer />
         <CoursesSkeleton />
       </>
@@ -139,13 +141,13 @@ const AppCourses = () => {
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
       <SEOHead 
-        title="My Programs - LadyBoss Academy"
-        description="Your enrolled programs and courses"
+        title={t('programs.seoTitle')}
+        description={t('programs.seoDesc')}
       />
 
       <AppHeader 
-        title="My Programs" 
-        subtitle={totalPrograms > 0 ? `${totalPrograms} enrolled` : undefined}
+        title={t('programs.myPrograms')} 
+        subtitle={totalPrograms > 0 ? t('programs.enrolledCount', { count: totalPrograms }) : undefined}
         showBack
         rightAction={startTour ? <TourHelpButton onClick={startTour} /> : undefined}
       />
@@ -160,7 +162,7 @@ const AppCourses = () => {
             <div className="flex items-center justify-between">
               <h2 className="text-base font-semibold flex items-center gap-2">
                 <GraduationCap className="h-4 w-4 text-primary" />
-                Your Active Programs
+                {t('programs.active')}
               </h2>
               <Badge variant="secondary" className="text-xs">{sortedActiveRounds.length + selfPacedEnrollments.length}</Badge>
             </div>
@@ -202,7 +204,7 @@ const AppCourses = () => {
             <div className="flex items-center justify-between">
               <h2 className="text-base font-semibold flex items-center gap-2 text-muted-foreground">
                 <CheckCircle2 className="h-4 w-4" />
-                Completed Programs
+                {t('programs.completed')}
               </h2>
               <Badge variant="outline" className="text-muted-foreground text-xs">{completedRounds.length}</Badge>
             </div>
@@ -231,7 +233,7 @@ const AppCourses = () => {
           <div className="text-center py-12">
             <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
             <p className="text-muted-foreground mb-4">
-              No programs available
+              {t('programs.noProgramsAvailable')}
             </p>
           </div>
         )}
@@ -240,8 +242,8 @@ const AppCourses = () => {
         {totalPrograms === 0 && browsePrograms.length > 0 && (
           <div className="text-center py-8 mb-4">
             <GraduationCap className="h-10 w-10 mx-auto mb-2 text-muted-foreground opacity-50" />
-            <p className="text-sm text-muted-foreground">No programs enrolled yet</p>
-            <p className="text-xs text-muted-foreground mt-1">Browse and enroll in programs below</p>
+            <p className="text-sm text-muted-foreground">{t('programs.noProgramsEnrolled')}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('programs.browseEnrollHint')}</p>
           </div>
         )}
 
@@ -260,7 +262,7 @@ const AppCourses = () => {
             {/* Header */}
             <div className="flex items-center justify-between px-4">
               <div className="flex items-center gap-1.5">
-                <h2 className="text-xs font-semibold text-foreground">Browse Programs</h2>
+                <h2 className="text-xs font-semibold text-foreground">{t('programs.browsePrograms')}</h2>
                 <Badge variant="secondary" className="h-3.5 px-1 text-[9px] bg-white/60">
                   {browsePrograms.length}
                 </Badge>
@@ -269,7 +271,7 @@ const AppCourses = () => {
                 to="/app/academy"
                 className="text-[10px] text-primary font-medium flex items-center gap-0.5"
               >
-                View All
+                {t('programs.viewAll')}
                 <ChevronRight className="h-3 w-3" />
               </Link>
             </div>
