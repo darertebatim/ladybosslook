@@ -803,5 +803,28 @@
     "syntheticTaskTitle": "Check Community Channels",
     "addedToRoutines": "Added to your routines!",
     "addToRoutinesFailed": "Failed to add to routines"
+  },
+  "toolsPage": {
+    "title": "Self-Care Tools",
+    "searchPlaceholder": "Search tools & programs...",
+    "searchAria": "Search",
+    "closeSearchAria": "Close search",
+    "allTools": "All Tools",
+    "selfCareGoals": "Self-Care Goals",
+    "all": "All",
+    "routinesTemplates": "Routines Templates",
+    "academyPrograms": "Academy Programs",
+    "noPrograms": "No programs found",
+    "enrolled": "Enrolled",
+    "free": "FREE",
+    "guidedReflections": "Guided Reflections",
+    "breathePractice": "Breathe Practice",
+    "guidedMeditation": "Guided Meditation",
+    "soundScapes": "Sound Scapes",
+    "noResults": "No Results Found",
+    "noResultsHint": "No tools or programs match \"{{query}}\"",
+    "notFinding": "Not finding what you need?",
+    "tellUs": "Tell us what you want",
+    "chatDraft": "Hi! I'd love to have a tool for: "
   }
 }

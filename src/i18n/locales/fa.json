@@ -803,5 +803,28 @@
     "syntheticTaskTitle": "بررسی کانال‌های جامعه",
     "addedToRoutines": "به روتین‌های شما اضافه شد!",
     "addToRoutinesFailed": "افزودن به روتین‌ها ناموفق بود"
+  },
+  "toolsPage": {
+    "title": "ابزارهای خودمراقبتی",
+    "searchPlaceholder": "جستجوی ابزارها و برنامه‌ها…",
+    "searchAria": "جستجو",
+    "closeSearchAria": "بستن جستجو",
+    "allTools": "همه ابزارها",
+    "selfCareGoals": "اهداف خودمراقبتی",
+    "all": "همه",
+    "routinesTemplates": "قالب‌های روتین",
+    "academyPrograms": "برنامه‌های آکادمی",
+    "noPrograms": "برنامه‌ای یافت نشد",
+    "enrolled": "ثبت‌نام شده",
+    "free": "رایگان",
+    "guidedReflections": "تأمل‌های هدایت‌شده",
+    "breathePractice": "تمرین تنفس",
+    "guidedMeditation": "مدیتیشن هدایت‌شده",
+    "soundScapes": "صداهای محیطی",
+    "noResults": "نتیجه‌ای یافت نشد",
+    "noResultsHint": "هیچ ابزار یا برنامه‌ای با «{{query}}» مطابقت ندارد",
+    "notFinding": "آنچه را می‌خواهید پیدا نمی‌کنید؟",
+    "tellUs": "به ما بگویید چه می‌خواهید",
+    "chatDraft": "سلام! دوست دارم ابزاری برای این موضوع داشته باشم: "
   }
 }
