@@ -33,7 +33,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { PushPermissionDot } from "@/components/app/PushPermissionDot";
 import { useTranslation } from "react-i18next";
-import { setAppLanguage, type SupportedLanguage } from "@/i18n";
+// language change moved to Settings page
 interface NavItem {
   id: string;
   /** i18n key under `menu.items.*` */
@@ -161,10 +161,7 @@ export function HomeMenu() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { signOut } = useAuth();
-  const { t, i18n } = useTranslation();
-  const currentLang = (
-    i18n.language?.startsWith("fa") ? "fa" : "en"
-  ) as SupportedLanguage;
+  const { t } = useTranslation();
   const [isDark, setIsDark] = useState(
     () =>
       typeof document !== "undefined" &&
@@ -200,10 +197,10 @@ export function HomeMenu() {
     navigate("/auth");
   };
 
-  const handleLangChange = (lang: SupportedLanguage) => {
-    if (lang === currentLang) return;
+  const goToLanguageSettings = () => {
     haptic.light();
-    setAppLanguage(lang);
+    setOpen(false);
+    navigate("/app/settings?section=language");
   };
 
   const renderPills = (items: NavItem[]) => (
@@ -272,40 +269,19 @@ export function HomeMenu() {
             {renderPills(accountItems)}
           </section>
 
-          {/* Language toggle — EN / فا */}
+          {/* Language — links to Settings */}
           <section className="pt-2 border-t border-border/40">
-            <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Languages className="h-3.5 w-3.5" />
-              {t("menu.language")}
-            </h3>
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleLangChange("en")}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full",
-                  "text-[13px] font-medium transition-all active:scale-95",
-                  currentLang === "en"
-                    ? "text-white bg-[#1a1f3d]"
-                    : "text-slate-700 bg-slate-100",
-                )}
-              >
-                <span className="text-[13px] leading-none">🇺🇸</span>
-                <span>English</span>
-              </button>
-              <button
-                onClick={() => handleLangChange("fa")}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full",
-                  "text-[13px] font-medium transition-all active:scale-95",
-                  currentLang === "fa"
-                    ? "text-white bg-[#1a1f3d]"
-                    : "text-slate-700 bg-slate-100",
-                )}
-              >
-                <span className="text-[13px] leading-none">🇮🇷</span>
-                <span className="font-farsi">فارسی</span>
-              </button>
-            </div>
+            <button
+              onClick={goToLanguageSettings}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-full",
+                "text-[13px] font-medium transition-all active:scale-95",
+                "text-slate-700 bg-slate-100",
+              )}
+            >
+              <Languages className="h-4 w-4" />
+              <span>{t("menu.language")}</span>
+            </button>
           </section>
           {/* Dark Mode Toggle */}
           <section className="pt-2 border-t border-border/40">

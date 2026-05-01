@@ -207,6 +207,7 @@
       "push": "اعلان‌های پوش",
       "preferences": "ترجیحات اعلان",
       "calendar": "همگام‌سازی تقویم",
+      "language": "زبان",
       "support": "پشتیبانی",
       "admin": "ابزار مدیریت",
       "redeem": "استفاده از کد",
@@ -297,6 +298,9 @@
     "admin_section": {
       "supportInbox": "صندوق پشتیبانی",
       "postChannel": "ارسال در کانال"
+    },
+    "language_section": {
+      "active": "فعال"
     },
     "actions_section": {
       "restartTours": "شروع مجدد همه راهنماها",

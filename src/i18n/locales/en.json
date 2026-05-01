@@ -207,6 +207,7 @@
       "push": "Push Notifications",
       "preferences": "Notification Preferences",
       "calendar": "Calendar Sync",
+      "language": "Language",
       "support": "Support",
       "admin": "Admin Tools",
       "redeem": "Redeem Code",
@@ -297,6 +298,9 @@
     "admin_section": {
       "supportInbox": "Support Inbox",
       "postChannel": "Post to Channel"
+    },
+    "language_section": {
+      "active": "Active"
     },
     "actions_section": {
       "restartTours": "Restart All Tours",
