@@ -77,26 +77,30 @@ export function MoodCheckInBanner({ onVisibilityChange }: { onVisibilityChange?:
       />
 
       <div className="relative z-[1] flex items-center gap-3 px-4 py-4 pr-12">
-        {/* Floating 3D emoji cluster */}
-        <div className="relative w-[68px] h-[68px] shrink-0">
-          <img
-            src={getFluentEmojiUrl('💧')}
-            alt=""
-            className="absolute left-0 bottom-0 w-9 h-9 select-none"
-            style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.12))' }}
-          />
-          <img
-            src={getFluentEmojiUrl('⭐')}
-            alt=""
-            className="absolute right-0 top-0 w-8 h-8 select-none"
-            style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.12))' }}
-          />
-          <img
-            src={getFluentEmojiUrl('💗')}
-            alt=""
-            className="absolute right-1 bottom-0 w-9 h-9 select-none"
-            style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.12))' }}
-          />
+        {/* 5 mood faces — fanned overlap */}
+        <div className="relative h-[52px] shrink-0" style={{ width: 96 }}>
+          {(['😢', '😔', '😐', '🙂', '😄'] as const).map((char, i) => {
+            const total = 5;
+            const step = 18;
+            const left = i * step;
+            // Subtle arc — middle face slightly raised
+            const mid = (total - 1) / 2;
+            const lift = Math.round(Math.abs(i - mid) * 2);
+            return (
+              <img
+                key={char}
+                src={getFluentEmojiUrl(char)}
+                alt=""
+                className="absolute w-9 h-9 select-none"
+                style={{
+                  left,
+                  top: lift,
+                  zIndex: i + 1,
+                  filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.18))',
+                }}
+              />
+            );
+          })}
         </div>
 
         {/* Copy */}
