@@ -6,6 +6,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { useState, useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEnrollments, useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 import { ProgramCard } from '@/components/app/ProgramCard';
 import { ToolCard } from '@/components/app/ToolCard';
@@ -31,6 +32,7 @@ import { useNewHomeData } from '@/hooks/useNewHomeData';
 
 const AppStore = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const location = useLocation();
   const { user } = useAuth();
   const { programs, isLoading: programsLoading } = usePrograms();
@@ -281,7 +283,7 @@ const AppStore = () => {
             <div className="flex-1 flex items-center gap-2">
               <Input
                 type="text"
-                placeholder="Search tools & programs..."
+                placeholder={t('toolsPage.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 h-10 bg-white/90 dark:bg-black/30 border-0 rounded-full shadow-ios focus-visible:ring-0"
@@ -293,14 +295,14 @@ const AppStore = () => {
                   setShowSearch(false);
                   setSearchQuery('');
                 }}
-                aria-label="Close search"
+                aria-label={t('toolsPage.closeSearchAria')}
               >
                 <X className="h-5 w-5" />
               </IOSIconButton>
             </div>
           ) : (
             <>
-              <h1 className="text-2xl font-bold text-fg-warm">Self-Care Tools</h1>
+              <h1 className="text-2xl font-bold text-fg-warm">{t('toolsPage.title')}</h1>
               <div className="flex items-center gap-2">
                 {startTour && (
                   <TourHelpButton onClick={startTour} />
@@ -309,7 +311,7 @@ const AppStore = () => {
                   size="sm"
                   onClick={() => setShowSearch(true)}
                   className="tour-search-button"
-                  aria-label="Search"
+                  aria-label={t('toolsPage.searchAria')}
                 >
                   <Search className="h-5 w-5" />
                 </IOSIconButton>
@@ -341,7 +343,7 @@ const AppStore = () => {
             {(!searchQuery || filteredWellnessTools.length > 0 || filteredAudioTools.length > 0) && (
               <section className="tour-tools-section">
                 <h2 className="text-base font-bold text-fg-warm mb-2 px-1">
-                  All Tools
+                  {t('toolsPage.allTools')}
                 </h2>
                 {/* All tools in single scrollable row */}
                 <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
@@ -370,9 +372,9 @@ const AppStore = () => {
             {!searchQuery && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-base font-bold text-fg-warm">Self-Care Goals</h2>
+                  <h2 className="text-base font-bold text-fg-warm">{t('toolsPage.selfCareGoals')}</h2>
                   <Link to="/app/tasksbank" className="text-xs text-primary font-medium flex items-center gap-0.5">
-                    All <ChevronRight className="h-3.5 w-3.5" />
+                    {t('toolsPage.all')} <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
               </section>
@@ -382,9 +384,9 @@ const AppStore = () => {
             {!searchQuery && displayRoutines.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-base font-bold text-fg-warm">Routines Templates</h2>
+                  <h2 className="text-base font-bold text-fg-warm">{t('toolsPage.routinesTemplates')}</h2>
                   <Link to="/app/routines" className="text-xs text-primary font-medium flex items-center gap-0.5">
-                    All <ChevronRight className="h-3.5 w-3.5" />
+                    {t('toolsPage.all')} <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
                 <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4" style={{ WebkitOverflowScrolling: 'touch' }}>
@@ -419,10 +421,10 @@ const AppStore = () => {
               <section className="tour-programs-section">
                 <div className="flex items-center justify-between mb-2 px-1">
                   <h2 className="tour-programs-section-header text-base font-bold text-fg-warm">
-                    Academy Programs
+                    {t('toolsPage.academyPrograms')}
                   </h2>
                   <Link to="/app/academy" className="text-xs text-primary font-medium flex items-center gap-0.5">
-                    All <ChevronRight className="h-3.5 w-3.5" />
+                    {t('toolsPage.all')} <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
 
@@ -430,7 +432,7 @@ const AppStore = () => {
                 {filteredPrograms.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground text-sm">
-                      No programs found
+                      {t('toolsPage.noPrograms')}
                     </p>
                   </div>
                 ) : (
@@ -458,11 +460,11 @@ const AppStore = () => {
                             </div>
                             {enrolled ? (
                               <div className="absolute -top-2.5 left-1 z-10 bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
-                                <CheckCircle2 className="h-2.5 w-2.5" /> Enrolled
+                                <CheckCircle2 className="h-2.5 w-2.5" /> {t('toolsPage.enrolled')}
                               </div>
                             ) : isFree ? (
                               <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
-                                <FluentEmoji emoji="🔥" size={10} /> FREE
+                                <FluentEmoji emoji="🔥" size={10} /> {t('toolsPage.free')}
                               </div>
                             ) : null}
                           </div>
@@ -486,9 +488,9 @@ const AppStore = () => {
             {!searchQuery && reflections && reflections.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-base font-bold text-fg-warm">Guided Reflections</h2>
+                  <h2 className="text-base font-bold text-fg-warm">{t('toolsPage.guidedReflections')}</h2>
                   <Link to="/app/reflections" className="text-xs text-primary font-medium flex items-center gap-0.5">
-                    All <ChevronRight className="h-3.5 w-3.5" />
+                    {t('toolsPage.all')} <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
                 <div className="flex flex-col gap-3 -my-2">
@@ -527,9 +529,9 @@ const AppStore = () => {
             {!searchQuery && breathingExercises && breathingExercises.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-base font-bold text-fg-warm">Breathe Practice</h2>
+                  <h2 className="text-base font-bold text-fg-warm">{t('toolsPage.breathePractice')}</h2>
                   <Link to="/app/breathe" className="text-xs text-primary font-medium flex items-center gap-0.5">
-                    All <ChevronRight className="h-3.5 w-3.5" />
+                    {t('toolsPage.all')} <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
                 <div className="flex gap-3 overflow-x-auto -mx-4 px-4 py-3 -my-1 scrollbar-hide">
@@ -555,9 +557,9 @@ const AppStore = () => {
             {!searchQuery && meditatePlaylists.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-base font-bold text-fg-warm">Guided Meditation</h2>
+                  <h2 className="text-base font-bold text-fg-warm">{t('toolsPage.guidedMeditation')}</h2>
                   <Link to="/app/player?category=meditate" className="text-xs text-primary font-medium flex items-center gap-0.5">
-                    All <ChevronRight className="h-3.5 w-3.5" />
+                    {t('toolsPage.all')} <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
                 <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
@@ -583,7 +585,7 @@ const AppStore = () => {
                           </div>
                         ) : (
                           <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
-                            <FluentEmoji emoji="🔥" size={10} /> FREE
+                            <FluentEmoji emoji="🔥" size={10} /> {t('toolsPage.free')}
                           </div>
                         )}
                       </div>
@@ -598,9 +600,9 @@ const AppStore = () => {
             {!searchQuery && soundscapePlaylists.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-base font-bold text-fg-warm">Sound Scapes</h2>
+                  <h2 className="text-base font-bold text-fg-warm">{t('toolsPage.soundScapes')}</h2>
                   <Link to="/app/player?category=soundscape" className="text-xs text-primary font-medium flex items-center gap-0.5">
-                    All <ChevronRight className="h-3.5 w-3.5" />
+                    {t('toolsPage.all')} <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
                 <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
@@ -626,7 +628,7 @@ const AppStore = () => {
                           </div>
                         ) : (
                           <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
-                            <FluentEmoji emoji="🔥" size={10} /> FREE
+                            <FluentEmoji emoji="🔥" size={10} /> {t('toolsPage.free')}
                           </div>
                         )}
                       </div>
@@ -643,9 +645,9 @@ const AppStore = () => {
                 <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-muted flex items-center justify-center">
                   <Search className="w-7 h-7 text-muted-foreground" />
                 </div>
-                <h2 className="text-lg font-semibold mb-1">No Results Found</h2>
+                <h2 className="text-lg font-semibold mb-1">{t('toolsPage.noResults')}</h2>
                 <p className="text-muted-foreground text-sm">
-                  No tools or programs match "{searchQuery}"
+                  {t('toolsPage.noResultsHint', { query: searchQuery })}
                 </p>
               </div>
             )}
@@ -654,12 +656,12 @@ const AppStore = () => {
 
         {/* CTA to support chat */}
         <div className="px-4 pt-4 pb-2">
-          <p className="text-sm text-muted-foreground">Not finding what you need?</p>
+          <p className="text-sm text-muted-foreground">{t('toolsPage.notFinding')}</p>
           <button
-            onClick={() => navigate('/app/chat?draft=' + encodeURIComponent("Hi! I'd love to have a tool for: "))}
+            onClick={() => navigate('/app/chat?draft=' + encodeURIComponent(t('toolsPage.chatDraft')))}
             className="text-sm text-blue-500 font-medium flex items-center gap-1 mt-1"
           >
-            Tell us what you want <ChevronRight className="h-4 w-4" />
+            {t('toolsPage.tellUs')} <ChevronRight className="h-4 w-4" />
           </button>
         </div>
       </div>
