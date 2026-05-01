@@ -16,6 +16,7 @@ export type TimeMode = 'anytime' | 'part_of_day' | 'specific';
 export interface TimePeriodConfig {
   id: TimePeriod;
   label: string;
+  labelKey: string;
   emoji: string;
   icon: 'sun' | 'mountains' | 'sunset' | 'moon';
   timeRange: { start: string; end: string }; // HH:mm format
@@ -26,6 +27,7 @@ export const TIME_PERIODS: TimePeriodConfig[] = [
   { 
     id: 'start_of_day', 
     label: 'Start the day', 
+    labelKey: 'timePeriods.start_of_day',
     emoji: '☀️', 
     icon: 'sun',
     timeRange: { start: '06:00', end: '12:00' },
@@ -34,6 +36,7 @@ export const TIME_PERIODS: TimePeriodConfig[] = [
   { 
     id: 'afternoon', 
     label: 'Afternoon', 
+    labelKey: 'timePeriods.afternoon',
     emoji: '🏔️', 
     icon: 'mountains',
     timeRange: { start: '12:00', end: '17:00' },
@@ -42,6 +45,7 @@ export const TIME_PERIODS: TimePeriodConfig[] = [
   { 
     id: 'evening', 
     label: 'Evening', 
+    labelKey: 'timePeriods.evening',
     emoji: '🌅', 
     icon: 'sunset',
     timeRange: { start: '17:00', end: '21:00' },
@@ -50,6 +54,7 @@ export const TIME_PERIODS: TimePeriodConfig[] = [
   { 
     id: 'bedtime', 
     label: 'Bedtime', 
+    labelKey: 'timePeriods.bedtime',
     emoji: '🌙', 
     icon: 'moon',
     timeRange: { start: '21:00', end: '24:00' },
