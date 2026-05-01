@@ -164,7 +164,7 @@ export default function AppBreathe() {
               <button
                 onClick={() => { haptic.light(); handleShare(); }}
                 className="h-8 w-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
-                aria-label="Share breathe"
+                aria-label={t('breathePage.shareAria')}
               >
                 <Share2 className="h-4 w-4 text-foreground" />
               </button>
@@ -238,7 +238,7 @@ export default function AppBreathe() {
         open={showRoutineSheet}
         onOpenChange={setShowRoutineSheet}
         tasks={FALLBACK_BREATHING_TASKS}
-        routineTitle="Breathing Routine"
+        routineTitle={t('breathePage.routineTitle')}
         onSave={handleSaveRoutine}
         isSaving={addRoutinePlan.isPending}
       />
