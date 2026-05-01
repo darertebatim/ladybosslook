@@ -386,10 +386,9 @@ export default function System() {
                 Replay Welcome Spotlight
               </CardTitle>
               <CardDescription>
-                Re-runs the Quick-Start onboarding flow that includes the
-                3-step starter routine spotlight (select task → add task →
-                complete task). Clears the completion + progress flags for
-                the current device only.
+                Re-shows the "Want a quick tour?" banner on Home. Tapping it
+                runs the 3-step spotlight: tap a task → tap + to add a task →
+                complete a task. Clears device-local flags only.
               </CardDescription>
             </CardHeader>
             <CardContent>
