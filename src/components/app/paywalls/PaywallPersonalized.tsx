@@ -88,9 +88,10 @@ const DEMO_PICKS = [
 ];
 
 const PLUS_ADDITIONS = [
-  { label: 'AI tweaks your day',  emoji: '🧠', sub: 'Reschedules around real life' },
-  { label: 'Sleep stories',       emoji: '🎧', sub: 'Drift off with calm audio' },
-  { label: 'Streak shields',      emoji: '🔥', sub: 'One bad day won\u2019t break you' },
+  { label: 'AI Planner',         emoji: '🧠', sub: 'Builds your day around you' },
+  { label: 'Smart Reminders',    emoji: '🔔', sub: 'Nudges that actually land' },
+  { label: 'All Routines',       emoji: '🌿', sub: 'Every template, unlocked' },
+  { label: 'All Self-Care Tools', emoji: '🧘', sub: 'Breathwork, mood, fasting & more' },
 ];
 
 /**
