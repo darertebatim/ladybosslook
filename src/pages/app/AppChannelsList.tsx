@@ -50,7 +50,7 @@ const CHANNEL_ICONS: Record<string, React.ElementType> = {
   round: Users,
 };
 
-function formatLastMessageTime(date: Date): string {
+function formatLastMessageTime(date: Date, t: (k: string) => string): string {
   if (isToday(date)) {
     return format(date, 'HH:mm');
   } else if (isYesterday(date)) {
