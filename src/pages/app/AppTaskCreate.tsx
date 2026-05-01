@@ -80,10 +80,10 @@ const COLOR_OPTIONS: { name: TaskColor; hex: string }[] = [
 
 // Reminder presets (Me+ style)
 const REMINDER_PRESETS = [
-  { label: 'Morning reminder', time: '09:00' },
-  { label: 'Midday reminder', time: '12:00' },
-  { label: 'Afternoon reminder', time: '16:00' },
-  { label: 'Evening reminder', time: '19:00' },
+  { labelKey: 'taskPickers.morningReminder', time: '09:00' },
+  { labelKey: 'taskPickers.middayReminder', time: '12:00' },
+  { labelKey: 'taskPickers.afternoonReminder', time: '16:00' },
+  { labelKey: 'taskPickers.eveningReminder', time: '19:00' },
 ];
 
 // Repeat intervals
