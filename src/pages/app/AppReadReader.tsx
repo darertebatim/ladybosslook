@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useReadingContentById, useContentSections, useReadingUserProgress, useUpsertReadingProgress } from '@/hooks/useReading';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, ChevronLeft, ChevronRight, Volume2, VolumeX, PartyPopper } from 'lucide-react';
@@ -8,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 export default function AppReadReader() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -100,7 +102,7 @@ export default function AppReadReader() {
       await audio.play();
       setIsPlaying(true);
     } catch {
-      toast({ title: 'TTS not available', description: 'Text-to-speech requires an API key.', variant: 'destructive' });
+      toast({ title: t('read.ttsUnavailable'), description: t('read.ttsRequiresKey'), variant: 'destructive' });
     } finally {
       setTtsLoading(false);
     }
@@ -122,10 +124,10 @@ export default function AppReadReader() {
         <div className="w-20 h-20 rounded-full flex items-center justify-center mb-5" style={{ backgroundColor: themeColor }}>
           <FluentEmoji emoji="🎉" size={48} />
         </div>
-        <h1 className="text-2xl font-bold mb-2">Well Done!</h1>
-        <p className="text-black mb-8">You've finished "{content.title}"</p>
+        <h1 className="text-2xl font-bold mb-2">{t('read.wellDone')}</h1>
+        <p className="text-black mb-8">{t('read.youveFinished', { title: content.title })}</p>
         <Button size="lg" className="rounded-xl h-12 px-8" onClick={() => navigate('/app/read')}>
-          Back to Library
+          {t('read.backToLibrary')}
         </Button>
       </div>
     );
@@ -175,13 +177,13 @@ export default function AppReadReader() {
       {/* Bottom Nav */}
       <div className="flex items-center justify-between px-4 py-4 border-t bg-background">
         <Button variant="outline" size="sm" onClick={goPrev} disabled={currentIndex === 0} className="rounded-xl">
-          <ChevronLeft className="h-4 w-4 mr-1" /> Prev
+          <ChevronLeft className="h-4 w-4 mr-1" /> {t('read.prev')}
         </Button>
         <Button variant="ghost" size="icon" onClick={toggleTTS} disabled={ttsLoading} className="rounded-full">
           {isPlaying ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
         </Button>
         <Button size="sm" onClick={goNext} className="rounded-xl">
-          {currentIndex === sections.length - 1 ? 'Finish' : 'Next'} <ChevronRight className="h-4 w-4 ml-1" />
+          {currentIndex === sections.length - 1 ? t('read.finish') : t('read.next')} <ChevronRight className="h-4 w-4 ml-1" />
         </Button>
       </div>
     </div>
