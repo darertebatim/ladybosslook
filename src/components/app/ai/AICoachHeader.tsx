@@ -3,13 +3,14 @@ import { ArrowLeft, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export type CoachMode = 'coach' | 'assistant' | 'companion';
 
-const MODES: { id: CoachMode; label: string; emoji: string; color: string }[] = [
-  { id: 'coach', label: 'Coach', emoji: '💪', color: 'from-purple-500 to-violet-600' },
-  { id: 'assistant', label: 'Assistant', emoji: '📋', color: 'from-blue-500 to-cyan-600' },
-  { id: 'companion', label: 'Companion', emoji: '💜', color: 'from-pink-500 to-rose-600' },
+const MODES: { id: CoachMode; emoji: string; color: string }[] = [
+  { id: 'coach', emoji: '💪', color: 'from-purple-500 to-violet-600' },
+  { id: 'assistant', emoji: '📋', color: 'from-blue-500 to-cyan-600' },
+  { id: 'companion', emoji: '💜', color: 'from-pink-500 to-rose-600' },
 ];
 
 const MODE_BG: Record<CoachMode, string> = {
@@ -26,6 +27,9 @@ interface Props {
 
 export function AICoachHeader({ mode, setMode, onClear }: Props) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const labelFor = (id: CoachMode) =>
+    id === 'coach' ? t('aiCoach.modeCoach') : id === 'assistant' ? t('aiCoach.modeAssistant') : t('aiCoach.modeCompanion');
 
   return (
     <div className={cn("safe-area-inset-top relative overflow-hidden bg-gradient-to-br", MODE_BG[mode])}>
@@ -51,8 +55,8 @@ export function AICoachHeader({ mode, setMode, onClear }: Props) {
             <div className="absolute inset-0 rounded-full bg-white/20 animate-ping" style={{ animationDuration: '3s' }} />
             </div>
             <div>
-              <h1 className="text-base font-bold text-white tracking-tight">Rilo AI</h1>
-              <p className="text-[10px] text-white/70 font-medium">{MODES.find(m => m.id === mode)?.label} Mode</p>
+              <h1 className="text-base font-bold text-white tracking-tight">{t('aiCoach.appName')}</h1>
+              <p className="text-[10px] text-white/70 font-medium">{t('aiCoach.modeLabel', { mode: labelFor(mode) })}</p>
             </div>
           </div>
 
@@ -75,7 +79,7 @@ export function AICoachHeader({ mode, setMode, onClear }: Props) {
               )}
             >
               <FluentEmoji emoji={m.emoji} size={18} />
-              {m.label}
+              {labelFor(m.id)}
             </button>
           ))}
         </div>
