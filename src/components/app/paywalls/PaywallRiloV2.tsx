@@ -418,25 +418,25 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
         <Header />
 
         {/* Headline */}
-        <div style={{ paddingLeft: 24, paddingRight: 24, paddingTop: 6, paddingBottom: 18, textAlign: 'center' }}>
-          <p style={{ color: SUNRISE_AMBER, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2.4, margin: '0 0 8px' }}>
+        <div style={{ paddingLeft: 24, paddingRight: 24, paddingTop: 4, paddingBottom: 12, textAlign: 'center' }}>
+          <p style={{ color: SUNRISE_AMBER, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2.4, margin: '0 0 6px' }}>
             Pick your plan
           </p>
-          <p style={{ fontSize: 24, fontWeight: 800, color: NAVY, lineHeight: 1.25, margin: 0, letterSpacing: -0.5 }}>
+          <p style={{ fontSize: 22, fontWeight: 800, color: NAVY, lineHeight: 1.2, margin: 0, letterSpacing: -0.5 }}>
             Start free. Stay if<br />you love it.
           </p>
         </div>
 
         {/* A day with Rilo+ — timeline */}
-        <div style={{ paddingLeft: 20, paddingRight: 20, paddingBottom: 20 }}>
+        <div style={{ paddingLeft: 20, paddingRight: 20, paddingBottom: 14 }}>
           <p style={{
-            textAlign: 'center', fontSize: 12, fontWeight: 800, letterSpacing: 1.6,
-            textTransform: 'uppercase', color: SUNRISE_AMBER, margin: '0 0 14px',
+            textAlign: 'center', fontSize: 11, fontWeight: 800, letterSpacing: 1.6,
+            textTransform: 'uppercase', color: SUNRISE_AMBER, margin: '0 0 10px',
           }}>
             A day with Rilo<span style={{ fontSize: 14 }}>+</span>
           </p>
           <div style={{
-            position: 'relative', borderRadius: 22, padding: '18px 16px 16px',
+            position: 'relative', borderRadius: 20, padding: '10px 14px',
             background: 'rgba(255,255,255,0.7)',
             backdropFilter: 'blur(8px)',
             border: '1px solid rgba(255,255,255,0.95)',
@@ -444,44 +444,40 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
           }}>
             {/* Vertical line */}
             <div style={{
-              position: 'absolute', left: 32, top: 28, bottom: 28,
+              position: 'absolute', left: 30, top: 22, bottom: 22,
               width: 2, background: 'linear-gradient(to bottom, #FFD36E 0%, #E84A6F 50%, #A855F7 100%)',
               borderRadius: 2, opacity: 0.35,
             }} />
             {[
-              { time: 'Morning', emoji: '🌅', title: 'AI plans your day', desc: 'Tailored to your energy & goals.' },
-              { time: 'Midday',  emoji: '🌬️', title: 'Reset with breathwork', desc: 'A 2-min break that actually helps.' },
-              { time: 'Evening', emoji: '📓', title: 'Reflect & log mood',     desc: 'See your week shift in real time.' },
-              { time: 'Night',   emoji: '🌙', title: 'Wind-down soundscape',   desc: 'Drift off without doom-scrolling.' },
+              { time: 'Morning', emoji: '🌅', title: 'AI plans your day' },
+              { time: 'Midday',  emoji: '🌬️', title: 'Reset with breathwork' },
+              { time: 'Evening', emoji: '📓', title: 'Reflect & log mood' },
+              { time: 'Night',   emoji: '🌙', title: 'Wind-down soundscape' },
             ].map((row, i, arr) => (
               <div key={row.time} style={{
-                display: 'flex', alignItems: 'flex-start', gap: 14,
-                padding: '10px 4px',
-                borderBottom: i === arr.length - 1 ? 'none' : '1px solid rgba(26,31,61,0.05)',
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '6px 2px',
                 position: 'relative',
               }}>
                 <div style={{
-                  width: 36, height: 36, borderRadius: '50%',
+                  width: 32, height: 32, borderRadius: '50%',
                   background: '#fff',
                   boxShadow: '0 4px 10px -2px rgba(26,31,61,0.12)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0, zIndex: 1,
                 }}>
-                  <Emoji3D char={row.emoji} size={22} />
+                  <Emoji3D char={row.emoji} size={20} />
                 </div>
-                <div style={{ flex: 1, minWidth: 0, paddingTop: 2 }}>
-                  <p style={{
-                    margin: 0, fontSize: 10, fontWeight: 800, letterSpacing: 1.2,
-                    textTransform: 'uppercase', color: SUNRISE_AMBER,
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <span style={{
+                    fontSize: 9, fontWeight: 800, letterSpacing: 1.1,
+                    textTransform: 'uppercase', color: SUNRISE_AMBER, flexShrink: 0, width: 54,
                   }}>
                     {row.time}
-                  </p>
-                  <p style={{ margin: '2px 0 2px', fontSize: 14, fontWeight: 700, color: NAVY, letterSpacing: -0.2 }}>
+                  </span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: NAVY, letterSpacing: -0.2 }}>
                     {row.title}
-                  </p>
-                  <p style={{ margin: 0, fontSize: 12, color: 'rgba(26,31,61,0.6)', lineHeight: 1.35 }}>
-                    {row.desc}
-                  </p>
+                  </span>
                 </div>
               </div>
             ))}
@@ -580,7 +576,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
         </div>
 
         {/* Fine print */}
-        <p style={{ fontSize: 11, color: 'rgba(26,31,61,0.5)', textAlign: 'center', margin: '16px 24px 8px', lineHeight: 1.5 }}>
+        <p style={{ fontSize: 11, color: 'rgba(26,31,61,0.5)', textAlign: 'center', margin: '10px 24px 4px', lineHeight: 1.45 }}>
           {trialDays > 0 && selectedPlan === 'annual'
             ? `Your ${trialDays}-day free trial then $${annual.toFixed(2)}/year. Cancel anytime.`
             : selectedPlan === 'annual'
@@ -590,12 +586,12 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
       </div>
 
       {/* Sticky CTA */}
-      <div style={{ position: 'sticky', bottom: 0, background: 'linear-gradient(to top, rgba(251,212,226,1) 60%, transparent)', paddingTop: 14, paddingBottom: 28, paddingLeft: 20, paddingRight: 20, zIndex: 10 }}>
+      <div style={{ position: 'sticky', bottom: 0, background: 'linear-gradient(to top, rgba(251,212,226,1) 60%, transparent)', paddingTop: 10, paddingBottom: 20, paddingLeft: 20, paddingRight: 20, zIndex: 10 }}>
         <button
           onClick={handlePurchase}
           disabled={isPurchasing}
           style={{
-            width: '100%', height: 56, borderRadius: 28,
+            width: '100%', height: 54, borderRadius: 27,
             background: isPurchasing ? '#555' : NAVY, border: 'none',
             cursor: preview ? 'default' : 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
@@ -608,7 +604,18 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
           </span>
           {!isPurchasing && <ArrowRight size={20} color="#fff" strokeWidth={2.5} />}
         </button>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 10 }}>
+        <button
+          onClick={onClose}
+          style={{
+            width: '100%', marginTop: 8, padding: '8px 0',
+            background: 'none', border: 'none', cursor: preview ? 'default' : 'pointer',
+            color: 'rgba(26,31,61,0.6)', fontSize: 14, fontWeight: 600, fontFamily: SF,
+          }}
+          className="active:opacity-60 transition-opacity"
+        >
+          Maybe later
+        </button>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 6 }}>
           <Link to="/sms-terms" style={{ fontSize: 11, color: 'rgba(26,31,61,0.5)', textDecoration: 'none' }}>Terms</Link>
           <Link to="/privacy" style={{ fontSize: 11, color: 'rgba(26,31,61,0.5)', textDecoration: 'none' }}>Privacy</Link>
         </div>
