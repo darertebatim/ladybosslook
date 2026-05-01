@@ -43,6 +43,7 @@ interface SortableTaskItemProps {
   completedSubtaskIds: string[];
   goalProgress: number;
   onTap: (task: UserTask) => void;
+  onTaskComplete?: () => void;
   onStreakIncrease: () => void;
   onStepUnlocked?: (result: import('@/hooks/useProjectStepUnlock').StepUnlockResult) => void;
   onOpenGoalInput: (task: UserTask) => void;
@@ -59,6 +60,7 @@ const SortableTaskItem = ({
   completedSubtaskIds,
   goalProgress,
   onTap,
+  onTaskComplete,
   onStreakIncrease,
   onStepUnlocked,
   onOpenGoalInput,
@@ -102,6 +104,7 @@ const SortableTaskItem = ({
         completedSubtaskIds={completedSubtaskIds}
         goalProgress={goalProgress}
         onTap={onTap}
+        onTaskComplete={onTaskComplete}
         onStreakIncrease={onStreakIncrease}
         onStepUnlocked={onStepUnlocked}
         onOpenGoalInput={onOpenGoalInput}
@@ -119,6 +122,7 @@ interface SortableTaskListProps {
   completedSubtaskIds: string[];
   goalProgressMap: Map<string, number>;
   onTaskTap: (task: UserTask) => void;
+  onTaskComplete?: () => void;
   onStreakIncrease: () => void;
   onStepUnlocked?: (result: import('@/hooks/useProjectStepUnlock').StepUnlockResult) => void;
   onOpenGoalInput: (task: UserTask) => void;
@@ -138,6 +142,7 @@ export const SortableTaskList = ({
   completedSubtaskIds,
   goalProgressMap,
   onTaskTap,
+  onTaskComplete,
   onStreakIncrease,
   onStepUnlocked,
   onOpenGoalInput,
@@ -250,6 +255,7 @@ export const SortableTaskList = ({
       completedSubtaskIds={completedSubtaskIds}
       goalProgress={goalProgressMap.get(task.id) || 0}
       onTap={onTaskTap}
+      onTaskComplete={onTaskComplete}
       onStreakIncrease={onStreakIncrease}
       onStepUnlocked={onStepUnlocked}
       onOpenGoalInput={onOpenGoalInput}
