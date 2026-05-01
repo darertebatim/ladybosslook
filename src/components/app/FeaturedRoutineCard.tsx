@@ -8,6 +8,7 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { isEmoji } from '@/lib/fluentEmoji';
 import { cn } from '@/lib/utils';
 import { RoutineBankItem } from '@/hooks/useRoutinesBank';
+import { useTranslation } from 'react-i18next';
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400/80 to-amber-600/90',
@@ -61,6 +62,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
   categoryName,
 }: FeaturedRoutineCardProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const location = useLocation();
   const color = routine.color || 'purple';
   const gradient = colorGradients[color] || colorGradients.purple;
@@ -148,7 +150,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
               onDismiss();
             }}
             className="absolute top-2 right-2 p-1 rounded-full bg-black/80 active:scale-95 transition-transform"
-            aria-label="Dismiss suggestion"
+            aria-label={t('homePlanner.dismissSuggestion')}
           >
             <X className="h-3.5 w-3.5 text-white" />
           </button>
