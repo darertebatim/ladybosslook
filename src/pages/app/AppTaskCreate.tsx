@@ -1766,7 +1766,7 @@ const AppTaskCreate = ({
             <button onClick={() => setShowRepeatPicker(false)} className="p-2 -ml-2">
               <X className="h-5 w-5" />
             </button>
-            <span className="text-base font-medium">Set task repeat</span>
+            <span className="text-base font-medium">{t('taskEdit.setTaskRepeat')}</span>
             <div className="w-9" />
           </div>
           <div className="py-2">
@@ -1781,7 +1781,7 @@ const AppTaskCreate = ({
                 !repeatEnabled && "bg-[#E8F4FD]"
               )}
             >
-              <span className="font-medium">No repeat</span>
+              <span className="font-medium">{t('taskEdit.noRepeat')}</span>
               {!repeatEnabled && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
             </button>
 
@@ -1798,7 +1798,7 @@ const AppTaskCreate = ({
                 repeatEnabled && repeatPattern === 'daily' && repeatInterval === 1 && "bg-[#E8F4FD]"
               )}
             >
-              <span className="font-medium">Daily</span>
+              <span className="font-medium">{t('taskEdit.daily')}</span>
               {repeatEnabled && repeatPattern === 'daily' && repeatInterval === 1 && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
             </button>
 
@@ -1816,7 +1816,7 @@ const AppTaskCreate = ({
               )}
             >
               <span className="font-medium">
-                Weekly <span className="text-muted-foreground">({format(scheduledDate, 'EEEE')})</span>
+                {t('taskEdit.weekly')} <span className="text-muted-foreground">({format(scheduledDate, 'EEEE')})</span>
               </span>
               {repeatEnabled && repeatPattern === 'weekly' && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
             </button>
@@ -1834,7 +1834,7 @@ const AppTaskCreate = ({
               )}
             >
               <span className="font-medium">
-                Monthly <span className="text-muted-foreground">(On {scheduledDate.getDate()}{scheduledDate.getDate() === 1 ? 'st' : scheduledDate.getDate() === 2 ? 'nd' : scheduledDate.getDate() === 3 ? 'rd' : 'th'})</span>
+                {t('taskEdit.monthly')} <span className="text-muted-foreground">(On {scheduledDate.getDate()}{scheduledDate.getDate() === 1 ? 'st' : scheduledDate.getDate() === 2 ? 'nd' : scheduledDate.getDate() === 3 ? 'rd' : 'th'})</span>
               </span>
               {repeatEnabled && repeatPattern === 'monthly' && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
             </button>
@@ -1853,7 +1853,7 @@ const AppTaskCreate = ({
               )}
             >
               <span className="font-medium">
-                Weekend <span className="text-muted-foreground">(Sat, Sun)</span>
+                {t('taskPickers.weekendDays')}
               </span>
             </button>
 
@@ -1866,7 +1866,7 @@ const AppTaskCreate = ({
               }}
               className="w-full text-left px-6 py-4 flex items-center justify-between"
             >
-              <span className="font-medium">Custom</span>
+              <span className="font-medium">{t('taskEdit.custom')}</span>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </button>
           </div>
