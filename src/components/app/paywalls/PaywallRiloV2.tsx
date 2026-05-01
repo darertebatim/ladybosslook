@@ -31,7 +31,8 @@ const FEATURES = [
 // Rilo brand DNA
 const NAVY = '#1a1f3d';
 const SUNRISE_AMBER = '#B8590E';
-const SUNRISE_BG = 'linear-gradient(to bottom, #FFF4DC 0%, #FFE0E6 50%, #FBD4E2 100%)';
+// Logo-derived warm sunrise — phoenix yellow → orange → soft amber.
+const SUNRISE_BG = 'linear-gradient(to bottom, #FFE9A8 0%, #FFC976 35%, #FFA64D 70%, #F58220 100%)';
 const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
 
 // Pricing — derived from program data (live from RC / catalog) with safe fallbacks.
@@ -68,15 +69,15 @@ function AmbientGlow() {
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
       <div
         className="absolute -top-24 left-1/2 -translate-x-1/2 w-[420px] h-[420px] rounded-full blur-3xl opacity-60"
-        style={{ background: 'radial-gradient(circle, #FFD36E 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(circle, #FFEABF 0%, transparent 70%)' }}
       />
       <div
         className="absolute top-1/3 -right-20 w-[260px] h-[260px] rounded-full blur-3xl opacity-50"
-        style={{ background: 'radial-gradient(circle, #F8B4C6 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(circle, #FFB766 0%, transparent 70%)' }}
       />
       <div
         className="absolute bottom-10 -left-16 w-[300px] h-[300px] rounded-full blur-3xl opacity-50"
-        style={{ background: 'radial-gradient(circle, #E5D6FF 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(circle, #FFD89A 0%, transparent 70%)' }}
       />
       {sparkles.map((_, i) => {
         const left = (i * 41) % 100;
@@ -89,7 +90,7 @@ function AmbientGlow() {
             animate={{ opacity: [0, 0.85, 0], scale: [0.4, 1, 0.4] }}
             transition={{ duration: 2.2, delay, repeat: Infinity, repeatDelay: 1.5 }}
             className="absolute text-[10px]"
-            style={{ left: `${left}%`, top: `${top}%`, color: '#A0123F', opacity: 0.6 }}
+            style={{ left: `${left}%`, top: `${top}%`, color: '#FFFFFF', opacity: 0.7 }}
           >
             ✨
           </motion.span>
@@ -255,17 +256,17 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
                   }}>
                     <Emoji3D char={feature.emoji} size={28} />
                   </div>
-                  {/* Plus badge */}
+                  {/* Plus pill — matches in-app "Plus" tool label */}
                   <div style={{
-                    position: 'absolute', top: -2, right: -2,
-                    width: 20, height: 20, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #FFD36E 0%, #E84A6F 100%)',
+                    position: 'absolute', top: -6, right: -10,
+                    padding: '3px 8px', borderRadius: 999,
+                    background: 'linear-gradient(135deg, #F5A623 0%, #EB5E33 100%)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: '0 3px 8px -1px rgba(232,74,111,0.5), 0 0 0 2px #fff',
-                    color: '#fff', fontSize: 13, fontWeight: 900, lineHeight: 1,
-                    fontFamily: SF, paddingBottom: 1,
+                    boxShadow: '0 3px 8px -1px rgba(235,94,51,0.45), 0 0 0 2px #fff',
+                    color: '#fff', fontSize: 9, fontWeight: 800, lineHeight: 1,
+                    fontFamily: SF, letterSpacing: 0.6, textTransform: 'uppercase',
                   }}>
-                    +
+                    Plus
                   </div>
                 </div>
                 <div style={{ flex: 1, paddingTop: 6 }}>
