@@ -38,6 +38,7 @@ interface TaskCardProps {
   completedSubtaskIds: string[];
   goalProgress?: number;
   onTap?: (task: UserTask) => void;
+  onTaskComplete?: () => void;
   onStreakIncrease?: () => void;
   onStepUnlocked?: (result: import('@/hooks/useProjectStepUnlock').StepUnlockResult) => void;
   onOpenGoalInput?: (task: UserTask) => void;
@@ -52,6 +53,7 @@ export const TaskCard = memo(function TaskCard({
   completedSubtaskIds,
   goalProgress = 0,
   onTap,
+  onTaskComplete,
   onStreakIncrease,
   onStepUnlocked,
   onOpenGoalInput,
@@ -181,6 +183,7 @@ export const TaskCard = memo(function TaskCard({
       haptic.successBurst();
       playCompletionSound();
       const result = await completeTask.mutateAsync({ taskId: task.id, date });
+      onTaskComplete?.();
       if (result.streakIncreased && onStreakIncrease) {
         haptic.celebrate();
         onStreakIncrease();
@@ -401,6 +404,7 @@ export const TaskCard = memo(function TaskCard({
         playCompletionSound();
         completeTask.mutate({ taskId: task.id, date }, {
           onSuccess: (result) => {
+            onTaskComplete?.();
             if (result.streakIncreased && onStreakIncrease) {
               haptic.medium();
               onStreakIncrease();
