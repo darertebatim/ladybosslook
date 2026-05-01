@@ -488,35 +488,50 @@ export default function Auth() {
   );
 }
 
-/* Cycles through "Welcome" in different languages with a soft fade.
-   Lives in its own layer so it never affects the auth stack. */
-const WELCOMES: { word: string; lang: string }[] = [
-  { word: 'Welcome', lang: 'English' },
-  { word: 'خوش آمدید', lang: 'Persian' },
-  { word: 'Hoş geldin', lang: 'Turkish' },
-  { word: 'Bienvenida', lang: 'Spanish' },
-  { word: 'Bienvenue', lang: 'French' },
-  { word: 'Willkommen', lang: 'German' },
-  { word: 'مرحبًا', lang: 'Arabic' },
-  { word: 'やあ', lang: 'Japanese' },
-  { word: '欢迎', lang: 'Chinese' },
-  { word: 'Olá', lang: 'Portuguese' },
+/* Horizontal "train" of welcomes from around the world.
+   Each carriage is a soft frosted pill with a flag + the word in its
+   own script. Persian / Arabic use the Vazirmatn font (font-farsi). */
+const WELCOMES: { flag: string; word: string; farsi?: boolean }[] = [
+  { flag: '🇺🇸', word: 'Welcome' },
+  { flag: '🇮🇷', word: 'خوش آمدید', farsi: true },
+  { flag: '🇹🇷', word: 'Hoş geldin' },
+  { flag: '🇪🇸', word: 'Bienvenida' },
+  { flag: '🇫🇷', word: 'Bienvenue' },
+  { flag: '🇩🇪', word: 'Willkommen' },
+  { flag: '🇸🇦', word: 'مرحبًا', farsi: true },
+  { flag: '🇯🇵', word: 'ようこそ' },
+  { flag: '🇨🇳', word: '欢迎' },
+  { flag: '🇧🇷', word: 'Bem-vinda' },
+  { flag: '🇮🇹', word: 'Benvenuta' },
+  { flag: '🇮🇳', word: 'स्वागत है' },
+  { flag: '🇰🇷', word: '환영합니다' },
+  { flag: '🇳🇱', word: 'Welkom' },
 ];
 
-function RotatingWelcome() {
-  const [i, setI] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setI((n) => (n + 1) % WELCOMES.length), 2200);
-    return () => clearInterval(id);
-  }, []);
+function WelcomeTrain() {
+  // Duplicate the list so the loop is seamless (translateX 0 → -50%)
+  const carriages = [...WELCOMES, ...WELCOMES];
   return (
-    <div className="h-5 flex items-center justify-center overflow-hidden">
-      <span
-        key={i}
-        className="text-[12.5px] font-semibold text-[#1a1f3d]/55 tracking-wide animate-welcome-fade"
-      >
-        {WELCOMES[i].word}
-      </span>
+    <div className="overflow-hidden mask-fade-x">
+      <div className="flex w-max items-center gap-2.5 animate-marquee-slow whitespace-nowrap py-1">
+        {carriages.map((w, idx) => (
+          <span
+            key={idx}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/55 backdrop-blur-md border border-white/60 shadow-[0_4px_14px_-6px_rgba(26,31,61,0.18)] shrink-0"
+          >
+            <span className="text-[13px] leading-none">{w.flag}</span>
+            <span
+              dir={w.farsi ? 'rtl' : 'ltr'}
+              className={[
+                'text-[12px] font-semibold text-[#1a1f3d] leading-none',
+                w.farsi ? 'font-farsi text-[13px]' : '',
+              ].join(' ')}
+            >
+              {w.word}
+            </span>
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
