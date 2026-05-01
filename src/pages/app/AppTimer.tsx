@@ -1272,11 +1272,11 @@ function AppTimerInner() {
       >
         <FluentEmoji emoji="🍅" size={56} className="mb-8" />
         <h1 className="text-3xl font-extrabold text-white text-center leading-tight mb-2">
-          You've been focusing for{' '}
-          <span className="text-[hsl(var(--primary))]">{minutes} min</span>.
+          {t('timer.youveBeenFocusing')}{' '}
+          <span className="text-[hsl(var(--primary))]">{t('timer.minutesShort', { count: minutes })}</span>.
         </h1>
         <h1 className="text-3xl font-extrabold text-white text-center leading-tight">
-          Time for a short break.
+          {t('timer.timeForBreak')}
         </h1>
 
         <div className="absolute left-0 right-0 px-8" style={{ bottom: 'max(48px, calc(env(safe-area-inset-bottom) + 24px))' }}>
@@ -1284,7 +1284,7 @@ function AppTimerInner() {
             onClick={() => { haptic.medium(); startPomodoroBreak(); }}
             className="w-full h-14 rounded-full bg-white text-black font-semibold text-base transition-transform active:scale-[0.97]"
           >
-            Take a break
+            {t('timer.takeABreak')}
           </button>
         </div>
       </motion.div>
