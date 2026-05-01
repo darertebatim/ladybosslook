@@ -341,17 +341,71 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
               padding: '20px 18px',
               boxShadow: '0 18px 50px -16px rgba(26,31,61,0.22)',
               border: '1px solid rgba(255,255,255,0.9)',
+              position: 'relative',
             }}
           >
+            {/* Highlight column behind PLUS */}
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                top: -10,
+                bottom: 10,
+                right: 18,
+                width: 'calc((100% - 36px) * (1 / 3.4))',
+                borderRadius: 20,
+                background: 'linear-gradient(180deg, #FFD36E 0%, #E84A6F 55%, #A855F7 100%)',
+                boxShadow: '0 18px 36px -12px rgba(168,85,247,0.55)',
+                zIndex: 0,
+              }}
+            />
+            {/* "76% users' choice" badge */}
+            <div
+              style={{
+                position: 'absolute',
+                top: -22,
+                right: 18,
+                width: 'calc((100% - 36px) * (1 / 3.4))',
+                display: 'flex',
+                justifyContent: 'center',
+                zIndex: 3,
+                pointerEvents: 'none',
+              }}
+            >
+              <div style={{
+                background: NAVY,
+                color: '#fff',
+                fontSize: 11,
+                fontWeight: 800,
+                padding: '5px 10px',
+                borderRadius: 10,
+                letterSpacing: 0.2,
+                boxShadow: '0 6px 14px -4px rgba(26,31,61,0.4)',
+                position: 'relative',
+                whiteSpace: 'nowrap',
+              }}>
+                76% users' choice
+                <span style={{
+                  position: 'absolute',
+                  bottom: -5,
+                  left: '50%',
+                  transform: 'translateX(-50%) rotate(45deg)',
+                  width: 10, height: 10,
+                  background: NAVY,
+                  borderRadius: 2,
+                }} />
+              </div>
+            </div>
+
             {/* Header row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', alignItems: 'center', paddingBottom: 14, borderBottom: '1px solid #f0f0f3' }}>
+            <div style={{ position: 'relative', zIndex: 2, display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', alignItems: 'center', paddingBottom: 14, borderBottom: '1px solid #f0f0f3' }}>
               <span />
               <span style={{ textAlign: 'center', fontSize: 12, fontWeight: 700, color: 'rgba(26,31,61,0.55)', textTransform: 'uppercase', letterSpacing: 1.2 }}>Free</span>
               <div style={{ textAlign: 'center' }}>
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: 4,
-                  background: NAVY, color: '#fff',
-                  fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 999, letterSpacing: 0.4,
+                  background: 'rgba(255,255,255,0.95)', color: NAVY,
+                  fontSize: 11, fontWeight: 900, padding: '4px 10px', borderRadius: 999, letterSpacing: 0.4,
                 }}>
                   <Sparkles size={11} /> PLUS
                 </span>
@@ -367,6 +421,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
               { label: 'Ad-free',              free: true, plus: true },
             ].map((row, i) => (
               <div key={row.label} style={{
+                position: 'relative', zIndex: 2,
                 display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', alignItems: 'center',
                 padding: '12px 0',
                 borderBottom: i === 5 ? 'none' : '1px solid #f6f6f8',
@@ -384,11 +439,11 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                   <div style={{
                     width: 26, height: 26, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #FFD36E 0%, #E84A6F 100%)',
+                    background: 'rgba(255,255,255,0.95)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: '0 4px 10px -2px rgba(232,74,111,0.4)',
+                    boxShadow: '0 4px 10px -2px rgba(0,0,0,0.15)',
                   }}>
-                    <Check size={14} color="#fff" strokeWidth={3} />
+                    <Check size={14} color={NAVY} strokeWidth={3} />
                   </div>
                 </div>
               </div>
