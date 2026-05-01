@@ -192,7 +192,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
             transition={{ duration: 0.4, delay: 0.35 }}
             style={{ color: 'rgba(26,31,61,0.7)', fontSize: 15, fontWeight: 500, margin: '14px 0 0', lineHeight: 1.45 }}
           >
-            Self-care that sticks — backed by a community and content tailored to you.
+            Self-care that sticks.
           </motion.p>
         </div>
 
