@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { getLocalDateStr } from '@/lib/localDate';
 import { useSpecialBannerSettings } from '@/hooks/useSpecialBannerSettings';
 import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
+import { MoodCelebrationSheet } from '@/components/mood/MoodCelebrationSheet';
 
 const MOODS = [
   { value: 'great',     emoji: '😄', label: 'Great' },
@@ -38,13 +39,19 @@ export function MoodCheckInBanner({ onVisibilityChange }: { onVisibilityChange?:
   const [visible, setVisible] = useState(() => !isDismissedToday());
   const [fading, setFading] = useState(false);
   const [submittingMood, setSubmittingMood] = useState<string | null>(null);
+  const [celebrationOpen, setCelebrationOpen] = useState(false);
+  const [loggedMood, setLoggedMood] = useState<string | null>(null);
   const { data: disabledMap = {} } = useSpecialBannerSettings();
 
-  const isShowing = visible && !todayMood && !disabledMap['MoodCheckInBanner'];
+  // Keep banner mounted while celebration sheet is open even after todayMood arrives,
+  // so the sheet doesn't disappear with its parent.
+  const isShowing =
+    (visible && !todayMood && !disabledMap['MoodCheckInBanner']) || celebrationOpen;
 
   useEffect(() => {
-    onVisibilityChange?.(isShowing);
-  }, [isShowing, onVisibilityChange]);
+    // Only report banner card visibility, not the sheet overlay.
+    onVisibilityChange?.(isShowing && !celebrationOpen);
+  }, [isShowing, celebrationOpen, onVisibilityChange]);
 
   if (!isShowing) return null;
 
@@ -72,20 +79,24 @@ export function MoodCheckInBanner({ onVisibilityChange }: { onVisibilityChange?:
         content: `Feeling ${moodLabel.toLowerCase()} today.`,
       });
       haptic.success();
-      toast.success(t('homePlanner.moodLogged', 'Mood logged'), {
-        action: {
-          label: t('reflections.freeForm', 'Reflect'),
-          onClick: () => navigate(`/app/reflections/free-form?mood=${moodValue}`),
-        },
-      });
-      // Banner will auto-hide once todayMood updates via query invalidation.
+      // Open celebration sheet with 4 follow-up action cards
+      setLoggedMood(moodValue);
+      setCelebrationOpen(true);
     } catch (err) {
       console.error('Failed to log mood:', err);
+      toast.error('Could not save your mood. Try again.');
+    } finally {
       setSubmittingMood(null);
     }
   };
 
+  const handleCelebrationDone = () => {
+    setCelebrationOpen(false);
+    setLoggedMood(null);
+  };
+
   return (
+    <>
     <div
       className={cn(
         "relative w-full rounded-3xl overflow-hidden transition-all text-left",
@@ -158,5 +169,12 @@ export function MoodCheckInBanner({ onVisibilityChange }: { onVisibilityChange?:
         <X className="h-3.5 w-3.5 text-black" strokeWidth={2.5} />
       </button>
     </div>
+    <MoodCelebrationSheet
+      open={celebrationOpen}
+      onOpenChange={setCelebrationOpen}
+      mood={loggedMood}
+      onDone={handleCelebrationDone}
+    />
+    </>
   );
 }
