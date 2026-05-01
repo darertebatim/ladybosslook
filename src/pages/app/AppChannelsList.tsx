@@ -317,7 +317,7 @@ export default function AppChannelsList() {
               <div className="flex flex-col items-end gap-1 shrink-0">
                 {supportSummary?.lastMessage?.created_at && (
                   <span className="text-xs text-fg-warm-muted">
-                    {formatLastMessageTime(new Date(supportSummary.lastMessage.created_at))}
+                    {formatLastMessageTime(new Date(supportSummary.lastMessage.created_at), t)}
                   </span>
                 )}
                 {supportUnreadCount > 0 && (
