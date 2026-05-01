@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Zap, BarChart3, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FastingRing } from '@/components/fasting/FastingRing';
@@ -20,6 +21,7 @@ import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 
 export default function AppFasting() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const {
@@ -87,13 +89,13 @@ export default function AppFasting() {
 
   const handleEditStart = async (newStartedAt: string) => {
     await updateActiveSession({ started_at: newStartedAt });
-    toast.success('Start time updated');
+    toast.success(t('tier1.fasting.startTimeUpdated'));
     setEditStartOpen(false);
   };
 
   const handleEditGoal = async (newHours: number) => {
     await updateActiveSession({ fasting_hours: newHours });
-    toast.success('Goal updated');
+    toast.success(t('tier1.fasting.goalUpdated'));
     setEditGoalOpen(false);
   };
 
@@ -113,7 +115,7 @@ export default function AppFasting() {
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
       >
         <BackButton to="/app/home" />
-        <h1 className="font-semibold text-lg">Fasting</h1>
+        <h1 className="font-semibold text-lg">{t('tier1.fasting.title')}</h1>
         <button
           onClick={() => setStatsOpen(true)}
           className="w-10 h-10 flex items-center justify-center active:scale-95 transition-transform"
@@ -152,17 +154,17 @@ export default function AppFasting() {
         {isFasting && activeSession && (
           <div className="flex gap-12 text-center">
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Started</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t('tier1.fasting.started')}</p>
               <p className="text-sm font-bold">{format(new Date(activeSession.started_at), 'EEE d, h:mm a')}</p>
               <button
                 onClick={() => setEditStartOpen(true)}
                 className="text-xs text-amber-500 font-medium mt-0.5 active:opacity-70"
               >
-                Edit start
+                {t('tier1.fasting.editStart')}
               </button>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Goal</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t('tier1.fasting.goal')}</p>
               <p className="text-sm font-bold">
                 {format(
                   new Date(new Date(activeSession.started_at).getTime() + activeSession.fasting_hours * 3600000),
@@ -173,7 +175,7 @@ export default function AppFasting() {
                 onClick={() => setEditGoalOpen(true)}
                 className="text-xs text-amber-500 font-medium mt-0.5 active:opacity-70"
               >
-                Edit {activeSession.fasting_hours}h goal
+                {t('tier1.fasting.editGoal', { hours: activeSession.fasting_hours })}
               </button>
             </div>
           </div>
@@ -201,14 +203,14 @@ export default function AppFasting() {
             onClick={handleEndFast}
             className="rounded-full px-8 py-3 h-auto text-base font-semibold border-2 border-red-400 text-red-600 dark:text-red-400 active:scale-95"
           >
-            End Fast
+            {t('tier1.fasting.endFast')}
           </Button>
         ) : (
           <Button
             onClick={startFast}
             className="rounded-full px-8 py-3 h-auto text-base font-semibold bg-emerald-500 active:bg-emerald-700 text-white active:scale-95"
           >
-            {isEating ? `Start ${selectedFastingHours}h Fast` : 'Start Fast'}
+            {isEating ? t('tier1.fasting.startNHourFast', { hours: selectedFastingHours }) : t('tier1.fasting.startFast')}
           </Button>
         )}
 
