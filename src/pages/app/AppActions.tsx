@@ -13,8 +13,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { AppHeader, AppHeaderSpacer } from '@/components/app/AppHeader';
+import { useTranslation } from 'react-i18next';
 
 export default function AppActions() {
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<string | null>('popular');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
@@ -134,12 +136,12 @@ export default function AppActions() {
       queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
       
-      toast.success('Task added to your routines! ✨');
+      toast.success(t('tools.taskAdded'));
       setPreviewSheetOpen(false);
       setSelectedTemplate(null);
     } catch (error) {
        console.error('Error adding task:', error);
-       toast.error('Failed to add task');
+       toast.error(t('tools.addTaskFailed'));
     } finally {
       setIsSavingTemplate(false);
     }
@@ -148,7 +150,7 @@ export default function AppActions() {
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
       <AppHeader
-        title="Tasks"
+        title={t('tools.tasks')}
         showBack
         backTo="/app/routines"
         rightAction={
@@ -166,7 +168,7 @@ export default function AppActions() {
         <div className="px-4 pb-2 animate-in slide-in-from-top duration-200">
           <Input
             type="search"
-            placeholder="Search tasks..."
+            placeholder={t('tools.searchTasks')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="bg-muted/50"
@@ -180,19 +182,19 @@ export default function AppActions() {
           {categories && categories.length > 0 && (
             <div className="mt-5">
               <h2 className="text-sm font-semibold text-muted-foreground px-4 mb-3">
-                BROWSE CATEGORIES
+                {t('tools.browseCategories')}
               </h2>
               <ScrollArea className="w-full">
                 <div className="flex gap-2 px-4 pb-2">
                   <CategoryCircle
-                    name="Popular"
+                    name={t('tools.popular')}
                     icon="Star"
                     color="yellow"
                     isSelected={selectedCategory === 'popular'}
                     onClick={() => setSelectedCategory('popular')}
                   />
                   <CategoryCircle
-                    name="All"
+                    name={t('tools.all')}
                     icon="ListTodo"
                     color="blue"
                     isSelected={selectedCategory === 'all'}
@@ -221,10 +223,10 @@ export default function AppActions() {
               <ListTodo className="w-4 h-4 text-primary" />
               <h2 className="text-sm font-semibold text-muted-foreground">
                  {selectedCategory === 'popular'
-                   ? 'POPULAR TASKS'
+                   ? t('tools.popularTasks')
                    : selectedCategory === 'all'
-                   ? 'ALL TASKS'
-                   : `${categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || 'CATEGORY'} TASKS`
+                   ? t('tools.allTasks')
+                   : t('tools.categoryTasks', { name: categories?.find(c => c.slug === selectedCategory)?.name?.toUpperCase() || '' })
                 }
               </h2>
             </div>
@@ -245,7 +247,7 @@ export default function AppActions() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No tasks in this category</p>
+                <p className="text-muted-foreground">{t('tools.noTasksInCategory')}</p>
               </div>
             )}
           </div>

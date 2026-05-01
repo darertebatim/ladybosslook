@@ -72,6 +72,17 @@
   },
   "tools": {
     "title": "ابزارها",
+    "tasks": "کارها",
+    "searchTasks": "جستجوی کارها...",
+    "browseCategories": "دسته‌بندی‌ها",
+    "popular": "محبوب",
+    "all": "همه",
+    "popularTasks": "کارهای محبوب",
+    "allTasks": "همه‌ی کارها",
+    "categoryTasks": "کارهای {{name}}",
+    "noTasksInCategory": "کاری در این دسته نیست",
+    "taskAdded": "کار به روتین‌هایت اضافه شد! ✨",
+    "addTaskFailed": "افزودن کار با خطا مواجه شد",
     "breathe": {
       "title": "تنفس",
       "subtitle": "با یک تمرین ساده‌ی تنفس آرام شو"
@@ -86,6 +97,25 @@
       "subtitle": "یک نکته‌ی کوتاه برای خودت بنویس",
       "newEntry": "یادداشت جدید"
     }
+  },
+  "task": {
+    "today": "امروز",
+    "daily": "هر روز",
+    "weekly": "هفتگی",
+    "monthly": "ماهانه",
+    "weekends": "آخر هفته‌ها",
+    "weekdays": "روزهای هفته",
+    "perWeek": "{{count}} بار در هفته",
+    "noReminder": "بدون یادآور",
+    "remindAt": "ساعت {{time}} یادآوری کن",
+    "repeatsOnce": "یک بار تکرار می‌شود",
+    "repeats": "تکرار: {{label}}",
+    "startTimer": "شروع تایمر",
+    "editTask": "ویرایش کار",
+    "skip": "رد کردن",
+    "delete": "حذف",
+    "times": "بار",
+    "min": "دقیقه"
   },
   "settings": {
     "title": "تنظیمات",

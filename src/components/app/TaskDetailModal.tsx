@@ -3,6 +3,7 @@ import { Check, Plus, Play, Droplets, FastForward, Pencil, Trash2 } from 'lucide
 import SealCheck from './SealCheck';
 import { parseISO, isBefore, startOfDay, format as fnsFormat } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { 
   UserTask, 
@@ -76,6 +77,7 @@ export const TaskDetailModal = ({
   onSkip,
 }: TaskDetailModalProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { data: subtasks = [] } = useSubtasks(task?.id);
   const completeSubtask = useCompleteSubtask();
   const uncompleteSubtask = useUncompleteSubtask();
@@ -109,30 +111,30 @@ export const TaskDetailModal = ({
           return fnsFormat(scheduledDate, 'MMM d');
         }
       }
-      return 'Today';
+      return t('task.today');
     }
-    if (p === 'daily') return 'Daily';
-    if (p === 'weekly') return 'Weekly';
-    if (p === 'monthly') return 'Monthly';
-    if (p === 'weekend') return 'Weekends';
+    if (p === 'daily') return t('task.daily');
+    if (p === 'weekly') return t('task.weekly');
+    if (p === 'monthly') return t('task.monthly');
+    if (p === 'weekend') return t('task.weekends');
     if (p === 'custom' && task.repeat_days?.length) {
       const days = task.repeat_days.length;
-      if (days === 7) return 'Daily';
-      if (days === 5) return 'Weekdays';
-      return `${days}x/week`;
+      if (days === 7) return t('task.daily');
+      if (days === 5) return t('task.weekdays');
+      return t('task.perWeek', { count: days });
     }
-    return 'Today';
+    return t('task.today');
   };
 
   const getReminderText = () => {
-    if (!task.reminder_enabled) return 'No Reminder';
+    if (!task.reminder_enabled) return t('task.noReminder');
     const time = task.scheduled_time;
     if (!time) return '';
     const [hours, minutes] = time.split(':');
     const hour = parseInt(hours);
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const displayHour = hour % 12 || 12;
-    return `Remind me at ${displayHour}:${minutes} ${ampm}`;
+    return t('task.remindAt', { time: `${displayHour}:${minutes} ${ampm}` });
   };
 
   const handleToggleSubtask = async (subtaskId: string) => {
@@ -171,7 +173,11 @@ export const TaskDetailModal = ({
   const repeatLabel = getRepeatLabel();
   const reminderText = getReminderText();
   const footerText = [
-    repeatLabel ? `Repeats ${repeatLabel.toLowerCase() === 'today' ? 'once' : repeatLabel.toLowerCase()}` : '',
+    repeatLabel
+      ? (repeatLabel === t('task.today')
+          ? t('task.repeatsOnce')
+          : t('task.repeats', { label: repeatLabel.toLowerCase() }))
+      : '',
     reminderText
   ].filter(Boolean).join('. ');
 
@@ -197,9 +203,9 @@ export const TaskDetailModal = ({
                   <span className="text-[11px] text-black/80">• {repeatLabel}</span>
                   {hasGoal && (
                     <span className="text-[11px] text-black/80 font-medium">
-                      • {isTimerGoal
-                          ? `${Math.floor(goalProgress / 60)}/${Math.floor((task.goal_target || 0) / 60)} min`
-                          : `${goalProgress}/${task.goal_target} ${task.goal_unit || 'times'}`
+                       • {isTimerGoal
+                          ? `${Math.floor(goalProgress / 60)}/${Math.floor((task.goal_target || 0) / 60)} ${t('task.min')}`
+                          : `${goalProgress}/${task.goal_target} ${task.goal_unit || t('task.times')}`
                         }
                     </span>
                   )}
@@ -313,7 +319,7 @@ export const TaskDetailModal = ({
                 className="w-full gap-2 h-10 rounded-xl text-sm bg-black text-white hover:bg-black/90"
               >
                 <Play className="h-4 w-4" />
-                Start Timer
+                {t('task.startTimer')}
               </Button>
             </div>
           )}
@@ -357,7 +363,7 @@ export const TaskDetailModal = ({
             className="flex-1 gap-2 h-11 rounded-2xl border-0 bg-white text-black text-sm shadow-sm active:scale-95 transition-transform"
           >
             <Pencil className="h-4 w-4" />
-            Edit Task
+            {t('task.editTask')}
           </Button>
           
           {!isCompletedState && !goalReached && onSkip && (
@@ -369,7 +375,7 @@ export const TaskDetailModal = ({
               className="gap-1.5 h-11 px-5 rounded-2xl border-0 bg-white text-black text-sm shadow-sm active:scale-95 transition-transform"
             >
               <FastForward className="h-4 w-4" />
-              Skip
+              {t('task.skip')}
             </Button>
           )}
           
@@ -382,7 +388,7 @@ export const TaskDetailModal = ({
               className="gap-1.5 h-11 px-5 rounded-2xl border-0 bg-[#E07060] active:scale-95 transition-transform text-white text-sm shadow-sm"
             >
               <Trash2 className="h-4 w-4" strokeWidth={2} />
-              Delete
+              {t('task.delete')}
             </Button>
           )}
         </div>
