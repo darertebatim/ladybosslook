@@ -1524,7 +1524,7 @@
     "all": "All",
     "reset": "Reset",
     "step": "step",
-    "steps": "steps",
+    "steps": "Steps",
     "task": "task",
     "tasks": "tasks",
     "notFound": "Routine not found",
@@ -1555,6 +1555,21 @@
     "videoTitle": "Routine video",
     "tellUsWantText": "Not any routines you want above?",
     "tellUsWantCta": "Tell us what you want",
-    "chatDraftPrefix": "Hi! I'd love to have a routine for: "
+    "chatDraftPrefix": "Hi! I'd love to have a routine for: ",
+    "badge": "Badge",
+    "challengeBadgeAlt": "Challenge badge",
+    "stepLabel": "🎯 Step {{n}}",
+    "general": "General",
+    "oneTimeStep": "One-time step",
+    "tasksHeader": "Tasks",
+    "noTasksFound": "No tasks found. Try removing and re-adding this routine.",
+    "startRoutine": "Start Routine",
+    "addToMyRoutines": "Add to my routines",
+    "repeat_once": "Once",
+    "repeat_weekly": "Weekly",
+    "repeat_monthly": "Monthly",
+    "repeat_weekend": "Weekends",
+    "repeat_daily": "Daily",
+    "shareTitleFallback": "Routine"
   }
 }
