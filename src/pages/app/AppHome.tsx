@@ -1117,7 +1117,7 @@ const AppHome = () => {
                           aria-label={t('home.addTask')}
                           className={cn(
                             "coach-add-btn w-6 h-6 rounded-full bg-brand text-white shadow-[0_4px_12px_hsl(var(--brand-primary)/0.4)] flex items-center justify-center active:scale-90 transition-transform",
-                            spotlightStep === 'add' && 'relative z-[101] ring-4 ring-amber-300 animate-pulse'
+                            spotlightStep === 'add' && 'relative z-[101] [animation:taskCoachGlowGold_1.6s_ease-in-out_infinite]'
                           )}
                         >
                           <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
