@@ -454,6 +454,9 @@ export default function Auth() {
             className="pointer-events-none absolute left-0 right-0 z-10 px-6 flex flex-col items-center gap-2.5"
             style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 18px)' }}
           >
+            {/* Rotating multilingual welcome — its own layer, fades in/out */}
+            <RotatingWelcome />
+
             {/* Social-proof pill */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/70 backdrop-blur-md border border-white/70 shadow-[0_8px_24px_-12px_rgba(26,31,61,0.25)]">
               <span className="text-[13px]">⭐</span>
