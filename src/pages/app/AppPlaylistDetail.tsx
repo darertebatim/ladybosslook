@@ -960,8 +960,7 @@ export default function AppPlaylistDetail() {
                   <div className="flex items-center gap-2 p-4 bg-amber-900/30 rounded-lg">
                     <Crown className="h-5 w-5 text-amber-400" />
                     <p className="text-sm text-fg-warm">
-                      This content is part of <strong>Simora Plus</strong>.
-                      Subscribe to unlock.
+                      {t('playlistDetailPage.partOfPlusFull_pre')}<strong>{t('playlistDetailPage.partOfPlusBrand')}</strong>{t('playlistDetailPage.partOfPlusFull_post')}
                     </p>
                   </div>
                   <Button
