@@ -1307,8 +1307,8 @@ export default function AppRoutinePlayer() {
                     <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
                   </div>
                   <div className="text-left">
-                    <p className="text-[15px] font-bold text-foreground">Build Your Routine</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Design your perfect daily flow</p>
+                    <p className="text-[15px] font-bold text-foreground">{t('routinePlayer.buildYourRoutine')}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{t('routinePlayer.buildSubtitle')}</p>
                   </div>
                 </div>
               </div>
@@ -1318,9 +1318,9 @@ export default function AppRoutinePlayer() {
             {(myRoutines || []).length === 0 && (
               <div className="text-center py-8">
                 <FluentEmoji emoji="🎯" size={48} className="mx-auto mb-3" />
-                <h3 className="font-semibold text-foreground mb-1">No routines yet</h3>
+                <h3 className="font-semibold text-foreground mb-1">{t('routinePlayer.noRoutinesYet')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Create your own or browse the library
+                  {t('routinePlayer.noRoutinesHint')}
                 </p>
               </div>
             )}
