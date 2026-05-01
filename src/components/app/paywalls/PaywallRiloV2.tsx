@@ -6,7 +6,6 @@ import type { PaywallProgramData } from './PaywallClassic';
 import { usePaywallTracking } from '@/hooks/usePaywallTracking';
 import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
 import riloAppIcon from '@/assets/rilo-app-icon.png';
-import riloPhoenixLogo from '@/assets/rilo-phoenix-logo.png';
 
 interface PaywallRiloV2Props {
   program: PaywallProgramData;
@@ -177,12 +176,11 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
             style={{ display: 'inline-block', marginBottom: 14 }}
           >
             <img
-              src={riloPhoenixLogo}
+              src={riloAppIcon}
               alt="Rilo"
               style={{
-                width: 96, height: 96,
-                objectFit: 'contain',
-                filter: 'drop-shadow(0 18px 36px rgba(232,74,111,0.35))',
+                width: 64, height: 64, borderRadius: 18,
+                boxShadow: '0 18px 48px -12px rgba(232,74,111,0.45)',
               }}
             />
           </motion.div>
@@ -202,7 +200,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
             transition={{ duration: 0.45, delay: 0.22 }}
             style={{ color: NAVY, fontSize: 30, fontWeight: 800, lineHeight: 1.18, margin: 0, letterSpacing: -0.6 }}
           >
-            Rilo Plus users are{' '}
+            Plus users are{' '}
             <span style={{
               background: 'linear-gradient(135deg, #FFB347 0%, #E84A6F 100%)',
               WebkitBackgroundClip: 'text',
@@ -219,7 +217,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
             transition={{ duration: 0.4, delay: 0.35 }}
             style={{ color: 'rgba(26,31,61,0.7)', fontSize: 15, fontWeight: 500, margin: '14px 0 0', lineHeight: 1.45 }}
           >
-            Make self-care actually stick.
+            Join a quality growth community with content tailored to your journey.
           </motion.p>
         </div>
 
@@ -247,26 +245,12 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
                 transition={{ delay: 0.15 + i * 0.09, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
                 style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 20 }}
               >
-                <div style={{ position: 'relative', flexShrink: 0 }}>
-                  <div style={{
-                    width: 54, height: 54, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #FFEFC2 0%, #FFD9E5 100%)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    <Emoji3D char={feature.emoji} size={28} />
-                  </div>
-                  {/* Plus badge */}
-                  <div style={{
-                    position: 'absolute', top: -2, right: -2,
-                    width: 20, height: 20, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #FFD36E 0%, #E84A6F 100%)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: '0 3px 8px -1px rgba(232,74,111,0.5), 0 0 0 2px #fff',
-                    color: '#fff', fontSize: 13, fontWeight: 900, lineHeight: 1,
-                    fontFamily: SF, paddingBottom: 1,
-                  }}>
-                    +
-                  </div>
+                <div style={{
+                  width: 54, height: 54, borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #FFEFC2 0%, #FFD9E5 100%)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}>
+                  <Emoji3D char={feature.emoji} size={28} />
                 </div>
                 <div style={{ flex: 1, paddingTop: 6 }}>
                   <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: NAVY, lineHeight: 1.2, letterSpacing: -0.2 }}>
