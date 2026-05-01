@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ interface Quiz {
 }
 
 export default function QuizDetail() {
+  const { t } = useTranslation();
   const { slug } = useParams();
   const navigate = useNavigate();
   const [quiz, setQuiz] = useState<Quiz | null>(null);
@@ -36,7 +38,7 @@ export default function QuizDetail() {
   }, [slug]);
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Skeleton className="h-8 w-8 rounded-full" /></div>;
-  if (!quiz) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Quiz not found</div>;
+  if (!quiz) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">{t('quiz.notFound')}</div>;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -60,27 +62,27 @@ export default function QuizDetail() {
         
         {quiz.overview && (
           <div className="bg-card rounded-xl p-4 border">
-            <h3 className="text-sm font-semibold mb-1">Overview</h3>
+            <h3 className="text-sm font-semibold mb-1">{t('quiz.overview')}</h3>
             <p className="text-sm text-muted-foreground">{quiz.overview}</p>
           </div>
         )}
 
         {quiz.description && (
           <div className="bg-card rounded-xl p-4 border">
-            <h3 className="text-sm font-semibold mb-1">What you'll get</h3>
+            <h3 className="text-sm font-semibold mb-1">{t('quiz.whatYoullGet')}</h3>
             <p className="text-sm text-muted-foreground">{quiz.description}</p>
           </div>
         )}
 
         <div className="text-center text-xs text-muted-foreground">
-          {questionCount} questions • ~{Math.ceil(questionCount * 0.5)} min
+          {t('quiz.questionsMeta', { count: questionCount, minutes: Math.ceil(questionCount * 0.5) })}
         </div>
       </div>
 
       {/* Fixed bottom CTA */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t safe-bottom">
         <Button className="w-full h-12 text-base font-semibold rounded-xl" onClick={() => navigate(`/app/quiz/${slug}/play`)}>
-          Start Test
+          {t('quiz.startTest')}
         </Button>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useGoBack } from '@/hooks/useGoBack';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -23,6 +24,7 @@ import {
 } from '@/lib/offline/executors/wellnessExecutors';
 
 export default function AppFreeFormNoteDetail() {
+  const { t } = useTranslation();
   const { noteId } = useParams<{ noteId: string }>();
   const navigate = useNavigate();
   const goBack = useGoBack('/app/reflections/notes');
@@ -34,8 +36,8 @@ export default function AppFreeFormNoteDetail() {
   const [editContent, setEditContent] = useState('');
 
   const { handleShare } = useShareContent({
-    title: 'Reflection',
-    text: `🪞 I just reflected on Routine Ladyboss 💫`,
+    title: t('reflection.shareTitle'),
+    text: t('reflection.shareText'),
     source: 'free_note',
     contentId: noteId,
   });
@@ -81,10 +83,10 @@ export default function AppFreeFormNoteDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['free-form-note', noteId] });
       queryClient.invalidateQueries({ queryKey: ['reflection-notes'] });
-      toast.success('Updated');
+      toast.success(t('reflection.updated'));
       setEditing(false);
     },
-    onError: () => toast.error('Failed to update'),
+    onError: () => toast.error(t('reflection.updateFailed')),
   });
 
   const deleteMutation = useMutation({
@@ -107,10 +109,10 @@ export default function AppFreeFormNoteDetail() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reflection-notes'] });
-      toast.success('Deleted');
+      toast.success(t('reflection.deleted'));
       goBack();
     },
-    onError: () => toast.error('Failed to delete'),
+    onError: () => toast.error(t('reflection.deleteFailed')),
   });
 
   const handleEdit = () => {
@@ -121,7 +123,7 @@ export default function AppFreeFormNoteDetail() {
   };
 
   const handleDelete = () => {
-    if (!confirm('Delete this reflection?')) return;
+    if (!confirm(t('reflection.deleteConfirm'))) return;
     deleteMutation.mutate();
   };
 
@@ -136,7 +138,7 @@ export default function AppFreeFormNoteDetail() {
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="flex items-center gap-1">
-          <button onClick={handleShare} className="active:scale-95 transition-transform p-1" aria-label="Share">
+          <button onClick={handleShare} className="active:scale-95 transition-transform p-1" aria-label={t('reflection.share')}>
             <Share2 className="h-5 w-5 text-muted-foreground" />
           </button>
           <DropdownMenu>
@@ -147,10 +149,10 @@ export default function AppFreeFormNoteDetail() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={handleEdit}>
-                <Pencil className="h-4 w-4 mr-2" /> Edit
+                <Pencil className="h-4 w-4 mr-2" /> {t('reflection.edit')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleDelete} className="text-destructive focus:text-destructive">
-                <Trash2 className="h-4 w-4 mr-2" /> Delete
+                <Trash2 className="h-4 w-4 mr-2" /> {t('reflection.delete')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -181,30 +183,30 @@ export default function AppFreeFormNoteDetail() {
           </div>
         </div>
       ) : (
-        <p className="text-center text-muted-foreground py-12">Reflection not found.</p>
+        <p className="text-center text-muted-foreground py-12">{t('reflection.notFound')}</p>
       )}
 
       {/* Edit Dialog */}
       <Dialog open={editing} onOpenChange={(o) => !o && setEditing(false)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Reflection</DialogTitle>
+            <DialogTitle>{t('reflection.editReflection')}</DialogTitle>
           </DialogHeader>
           <Input
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}
-            placeholder="Title"
+            placeholder={t('reflection.titlePlaceholder')}
             className="mb-2"
           />
           <Textarea
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
             className="min-h-[160px]"
-            placeholder="Your reflection…"
+            placeholder={t('reflection.yourReflection')}
           />
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(false)}>Cancel</Button>
-            <Button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending}>Save</Button>
+            <Button variant="outline" onClick={() => setEditing(false)}>{t('reflection.cancel')}</Button>
+            <Button onClick={() => updateMutation.mutate()} disabled={updateMutation.isPending}>{t('reflection.save')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

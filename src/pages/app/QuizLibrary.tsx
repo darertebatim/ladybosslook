@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { ChevronLeft } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,6 +15,7 @@ interface Quiz {
 }
 
 export default function QuizLibrary() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +31,7 @@ export default function QuizLibrary() {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b px-4 py-3 flex items-center gap-3">
         <button onClick={() => navigate(-1)} className="p-1"><ChevronLeft className="h-5 w-5" /></button>
-        <h1 className="text-lg font-bold">Quizzes</h1>
+        <h1 className="text-lg font-bold">{t('quiz.title')}</h1>
       </div>
 
       <div className="p-4 grid grid-cols-2 gap-3">
@@ -51,7 +53,7 @@ export default function QuizLibrary() {
             <div className="p-3 space-y-1">
               <h3 className="text-sm font-semibold leading-tight line-clamp-2">{q.title}</h3>
               <p className="text-xs text-muted-foreground line-clamp-2">{q.overview}</p>
-              <span className="text-xs font-medium text-primary">Take the test →</span>
+              <span className="text-xs font-medium text-primary">{t('quiz.takeTest')}</span>
             </div>
           </button>
         ))}
