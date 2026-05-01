@@ -8,6 +8,7 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { isEmoji } from '@/lib/fluentEmoji';
 import { cn } from '@/lib/utils';
 import { RoutineBankItem } from '@/hooks/useRoutinesBank';
+import { useTranslation } from 'react-i18next';
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400/80 to-amber-600/90',

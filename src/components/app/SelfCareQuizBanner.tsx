@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { X, ChevronRight, Sparkles } from 'lucide-react';
 import { useSpecialBannerSettings } from '@/hooks/useSpecialBannerSettings';
+import { useTranslation } from 'react-i18next';
 
 const SELFCARE_QUIZ_COMPLETED_KEY = 'simora_onboarding_completed_selfcare-quiz';
 const SELFCARE_QUIZ_DISMISSED_KEY = 'simora_selfcare_quiz_banner_dismissed';
@@ -15,6 +16,7 @@ interface SelfCareQuizBannerProps {
 
 export function SelfCareQuizBanner({ className, onVisibilityChange }: SelfCareQuizBannerProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const isCompleted = localStorage.getItem(SELFCARE_QUIZ_COMPLETED_KEY) === 'true';
   const { data: disabledMap, isLoading } = useSpecialBannerSettings();
   const isAdminDisabled = disabledMap?.['SelfCareQuizBanner'] === true;
@@ -68,7 +70,7 @@ export function SelfCareQuizBanner({ className, onVisibilityChange }: SelfCareQu
         <button
           onClick={handleDismiss}
           className="absolute top-1.5 right-1.5 z-10 p-1 rounded-full bg-white active:bg-white/80 transition-colors"
-          aria-label="Dismiss"
+          aria-label={t('homePlanner.dismiss')}
         >
           <X className="h-3.5 w-3.5 text-black" strokeWidth={2.5} />
         </button>

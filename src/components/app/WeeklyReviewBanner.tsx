@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import weeklyReviewBanner from '@/assets/weekly-review-banner.png';
 import { useSpecialBannerSettings } from '@/hooks/useSpecialBannerSettings';
+import { useTranslation } from 'react-i18next';
 
 function getWeekNumber(d: Date): number {
   const oneJan = new Date(d.getFullYear(), 0, 1);
@@ -14,6 +15,7 @@ function getWeekNumber(d: Date): number {
 
 export function WeeklyReviewBanner({ onVisibilityChange }: { onVisibilityChange?: (visible: boolean) => void }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const now = new Date();
   const day = now.getDay();
@@ -63,14 +65,14 @@ export function WeeklyReviewBanner({ onVisibilityChange }: { onVisibilityChange?
     >
       <img
         src={weeklyReviewBanner}
-        alt="Plan your next week in 1 min"
+        alt={t('homePlanner.planNextWeek')}
         className="w-full object-cover rounded-2xl"
         style={{ aspectRatio: '3/1' }}
       />
       <button
         onClick={handleDismiss}
         className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center"
-        aria-label="Dismiss"
+        aria-label={t('homePlanner.dismiss')}
       >
         <X className="h-4 w-4 text-white" />
       </button>
