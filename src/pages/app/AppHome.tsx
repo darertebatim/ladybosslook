@@ -226,6 +226,8 @@ const AppHome = () => {
 
   const handleFabClick = useCallback(() => {
     window.dispatchEvent(new CustomEvent('quick-add-open', { detail: { defaultRepeat: taskFilter === 'one-time' ? 'No' : 'Daily' } }));
+    // Spotlight: advance from 'add' → 'complete' once user taps the + button
+    setSpotlightStep((prev) => (prev === 'add' ? 'complete' : prev));
   }, [taskFilter]);
 
   // Streak data now comes from useNewHomeData (consolidated RPC)
@@ -747,6 +749,8 @@ const AppHome = () => {
   
   const handleTaskTap = useCallback((task: UserTask) => {
     setSelectedTask(task);
+    // Spotlight: advance from 'tap' → 'add' once user taps a task
+    setSpotlightStep((prev) => (prev === 'tap' ? 'add' : prev));
   }, []);
 
   const handleDateSelect = useCallback((date: Date) => {
