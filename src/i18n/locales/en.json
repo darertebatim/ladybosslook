@@ -743,5 +743,40 @@
       "onlineSessions": "Online Sessions",
       "min": "min"
     }
+  },
+  "player": {
+    "title": "Listen",
+    "searchPlaceholder": "Search audio...",
+    "searchAria": "Search",
+    "closeSearchAria": "Close search",
+    "languageAria": "Language",
+    "categories": {
+      "all": "All",
+      "meditate": "Meditate",
+      "workout": "Workout",
+      "soundscape": "Soundscape",
+      "affirmation": "Affirmations",
+      "audiobook": "Audiobooks",
+      "course": "Course",
+      "podcast": "Podcast"
+    },
+    "languages": {
+      "all": "All",
+      "english": "English",
+      "persian": "Persian",
+      "turkish": "Türkçe",
+      "spanish": "Español"
+    },
+    "filters": {
+      "all": "All",
+      "inProgress": "In Progress",
+      "completed": "Completed"
+    },
+    "continueLearning": "Continue Learning",
+    "allPlaylists": "All Playlists",
+    "noPlaylists": "No playlists found",
+    "notFinding": "Not finding the playlist you want?",
+    "tellUs": "Tell us what you want",
+    "chatDraft": "Hi! I'd love to have a playlist for: "
   }
 }

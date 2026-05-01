@@ -743,5 +743,40 @@
       "onlineSessions": "جلسات آنلاین",
       "min": "دقیقه"
     }
+  },
+  "player": {
+    "title": "شنیدن",
+    "searchPlaceholder": "جستجوی صوت…",
+    "searchAria": "جستجو",
+    "closeSearchAria": "بستن جستجو",
+    "languageAria": "زبان",
+    "categories": {
+      "all": "همه",
+      "meditate": "مدیتیشن",
+      "workout": "تمرین",
+      "soundscape": "موسیقی محیطی",
+      "affirmation": "تأییدات",
+      "audiobook": "کتاب صوتی",
+      "course": "دوره",
+      "podcast": "پادکست"
+    },
+    "languages": {
+      "all": "همه",
+      "english": "انگلیسی",
+      "persian": "فارسی",
+      "turkish": "ترکی",
+      "spanish": "اسپانیایی"
+    },
+    "filters": {
+      "all": "همه",
+      "inProgress": "در حال انجام",
+      "completed": "تکمیل‌شده"
+    },
+    "continueLearning": "ادامه گوش دادن",
+    "allPlaylists": "همه پلی‌لیست‌ها",
+    "noPlaylists": "پلی‌لیستی یافت نشد",
+    "notFinding": "پلی‌لیست مورد نظرتان را پیدا نمی‌کنید؟",
+    "tellUs": "به ما بگویید چه می‌خواهید",
+    "chatDraft": "سلام! دوست دارم پلی‌لیستی برای این موضوع داشته باشم: "
   }
 }
