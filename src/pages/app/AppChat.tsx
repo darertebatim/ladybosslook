@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useKeyboard } from "@/hooks/useKeyboard";
@@ -85,6 +86,13 @@ const getGreeting = (t: (k: string) => string) => {
  */
 export default function AppChat() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const conversationStarters = [
+    { icon: MessageCircle, text: t("chatPage.support.starters.question") },
+    { icon: Mic, text: t("chatPage.support.starters.voice") },
+    { icon: Heart, text: t("chatPage.support.starters.talk") },
+    { icon: HelpCircle, text: t("chatPage.support.starters.broken") },
+  ];
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const draftMessage = searchParams.get('draft') || '';
