@@ -1432,7 +1432,7 @@ export default function AppRoutinePlayer() {
             ) : (
               <div className="text-center py-12">
                 <FluentEmoji emoji="📝" size={48} className="mx-auto mb-3" />
-                <p className="text-sm text-muted-foreground">No tasks found for this routine</p>
+                <p className="text-sm text-muted-foreground">{t('routinePlayer.noTasksFound')}</p>
               </div>
             )}
           </div>
@@ -1448,8 +1448,8 @@ export default function AppRoutinePlayer() {
             >
               <Play className="w-5 h-5 fill-current" />
               {plannerCompletedTaskIds.size > 0 && remainingTasks.length < routineFilteredTasks.length
-                ? `Resume (${remainingTasks.length} remaining)`
-                : 'Start'}
+                ? t('routinePlayer.resumeRemaining', { count: remainingTasks.length })
+                : t('routinePlayer.start')}
             </button>
           </div>
 
