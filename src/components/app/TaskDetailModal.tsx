@@ -203,9 +203,9 @@ export const TaskDetailModal = ({
                   <span className="text-[11px] text-black/80">• {repeatLabel}</span>
                   {hasGoal && (
                     <span className="text-[11px] text-black/80 font-medium">
-                      • {isTimerGoal
-                          ? `${Math.floor(goalProgress / 60)}/${Math.floor((task.goal_target || 0) / 60)} min`
-                          : `${goalProgress}/${task.goal_target} ${task.goal_unit || 'times'}`
+                       • {isTimerGoal
+                          ? `${Math.floor(goalProgress / 60)}/${Math.floor((task.goal_target || 0) / 60)} ${t('task.min')}`
+                          : `${goalProgress}/${task.goal_target} ${task.goal_unit || t('task.times')}`
                         }
                     </span>
                   )}
