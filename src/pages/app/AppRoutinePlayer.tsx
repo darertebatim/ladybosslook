@@ -1509,21 +1509,21 @@ export default function AppRoutinePlayer() {
         <AlertDialogContent className="rounded-3xl max-w-[320px]">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-bold text-center leading-snug">
-              Delete "{deleteRoutine?.title}"?
+              {t('routinePlayer.deleteTitle', { title: deleteRoutine?.title || '' })}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center text-muted-foreground">
-              This will remove the routine and all its tasks from your planner. This cannot be undone.
+              {t('routinePlayer.deleteDesc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row gap-3 sm:justify-center">
             <AlertDialogCancel className="flex-1 rounded-full font-semibold">
-              Cancel
+              {t('routinePlayer.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deleteRoutine && handleDeleteRoutine(deleteRoutine)}
               className="flex-1 rounded-full font-bold bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              {t('routinePlayer.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
