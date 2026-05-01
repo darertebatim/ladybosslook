@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Plus, Settings, Droplets, CalendarPlus, Check } from 'lucide-react';
 import { BackButtonCircle } from '@/components/app/BackButton';
 import { cn } from '@/lib/utils';
@@ -22,6 +23,7 @@ const DEFAULT_WATER_GOAL = 64;
 const DEFAULT_WATER_UNIT = 'oz';
 
 const AppWater = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedDate] = useState(new Date());
   const [showInputSheet, setShowInputSheet] = useState(false);
@@ -84,10 +86,10 @@ const AppWater = () => {
       setLocalProgress(prev => prev + amount);
       haptic.success();
       toast(`+${amount} ${goalUnit}`, {
-        description: 'Add water tracking to your routine to save progress!',
+        description: t('tier1.water.addToRoutineDesc'),
         duration: 3000,
         action: {
-          label: 'Add Routine',
+          label: t('tier1.water.addRoutine'),
           onClick: () => setShowRoutineSheet(true),
         },
       });
@@ -100,7 +102,7 @@ const AppWater = () => {
         onSuccess: (result) => {
           haptic.success();
           toast(`+${amount} ${goalUnit}`, {
-            description: `Progress: ${result.newProgress}/${goalTarget}`,
+            description: t('tier1.water.progressFormat', { current: result.newProgress, target: goalTarget }),
             duration: 2000,
           });
           if (result.streakIncreased) {
@@ -156,7 +158,7 @@ const AppWater = () => {
       {
         onSuccess: () => {
           haptic.success();
-          toast.success('Water tracking added to your routines!');
+          toast.success(t('tier1.water.addedToRoutines'));
           setShowRoutineSheet(false);
           setLocalProgress(0);
           setIsSavingRoutine(false);
@@ -165,7 +167,7 @@ const AppWater = () => {
         },
         onError: (error) => {
           console.error('Error adding water task:', error);
-          toast.error('Failed to add water tracking');
+          toast.error(t('tier1.water.addFailed'));
           setIsSavingRoutine(false);
         },
       }
@@ -180,7 +182,7 @@ const AppWater = () => {
     const today = new Date();
     const isToday = selectedDate.toDateString() === today.toDateString();
     
-    if (isToday) return 'Today';
+    if (isToday) return t('tier1.common.today');
     
     return format(selectedDate, 'EEE, MMM d');
   };
@@ -193,13 +195,13 @@ const AppWater = () => {
         <div className="fixed inset-0 z-10 flex flex-col items-center justify-center bg-gradient-to-b from-sky-200 to-sky-50 px-6 text-center">
           <BackButtonCircle />
           <Droplets className="h-16 w-16 text-sky-400 mb-4" />
-          <h2 className="text-xl font-bold mb-2">Water Tracker is a Plus feature</h2>
-          <p className="text-muted-foreground mb-6">Upgrade to Simora Plus to track your hydration with daily goals and reminders.</p>
+          <h2 className="text-xl font-bold mb-2">{t('tier1.water.plusFeatureTitle')}</h2>
+          <p className="text-muted-foreground mb-6">{t('tier1.water.plusFeatureDesc')}</p>
           <button
             onClick={() => { haptic.light(); setShowPaywall(true); }}
             className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-semibold"
           >
-            Unlock with Plus
+            {t('tier1.common.unlockWithPlus')}
           </button>
         </div>
         <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
@@ -268,7 +270,7 @@ const AppWater = () => {
               </span>
             </div>
             <p className="text-sky-600 mt-2">
-              Water intake & your goal
+              {t('tier1.water.intakeGoal')}
             </p>
           </div>
 
@@ -276,14 +278,14 @@ const AppWater = () => {
           {goalReached && (
             <div className="mt-4 px-4 py-2 bg-success text-white rounded-full text-sm font-semibold flex items-center gap-2">
               <span>🎉</span>
-              Goal Reached!
+              {t('tier1.water.goalReached')}
             </div>
           )}
           
           {/* No routine notice */}
           {!waterTask && (
             <p className="mt-4 text-sm text-sky-600/80 text-center">
-              Add to routine to track daily
+              {t('tier1.water.addToTrack')}
             </p>
           )}
         </div>
@@ -356,7 +358,7 @@ const AppWater = () => {
             className="flex-1 max-w-[220px] h-14 rounded-full bg-foreground shadow-lg flex items-center justify-center gap-2 text-background font-semibold"
           >
             <Plus className="h-5 w-5" />
-            Add Water
+            {t('tier1.water.addWater')}
           </button>
 
           {/* Add to Routine button */}
@@ -369,7 +371,7 @@ const AppWater = () => {
                   navigate('/app/home');
                 }}
                 className="w-14 h-14 rounded-full bg-success shadow-lg flex items-center justify-center"
-                title="Added — Go to Planner"
+                title={t('tier1.water.addedGoToPlanner')}
               >
                 <Check className="h-6 w-6 text-white" />
               </button>
@@ -380,7 +382,7 @@ const AppWater = () => {
                   setShowRoutineSheet(true);
                 }}
                 className="w-10 h-10 rounded-full bg-foreground shadow-lg flex items-center justify-center"
-                title="Add again"
+                title={t('tier1.water.addAgain')}
               >
                 <CalendarPlus className="h-5 w-5 text-background" />
               </button>
@@ -444,7 +446,7 @@ const AppWater = () => {
         open={showRoutineSheet}
         onOpenChange={setShowRoutineSheet}
         tasks={[syntheticWaterTask]}
-        routineTitle="Water Tracking"
+        routineTitle={t('tier1.water.routineTitle')}
         onSave={handleSaveRoutine}
         isSaving={isSavingRoutine}
       />
