@@ -34,6 +34,7 @@ import { useNavigate } from 'react-router-dom';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
+import { useTranslation } from 'react-i18next';
 
 interface SortableTaskItemProps {
   task: UserTask;
