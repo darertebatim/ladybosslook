@@ -896,7 +896,7 @@ const AppHome = () => {
                           <div className={cn(
                             'w-9 h-9 rounded-full flex items-center justify-center transition-all relative',
                             isSelected
-                              ? 'border-2 border-[hsl(var(--brand-primary))] text-fg-warm'
+                              ? 'bg-[hsl(var(--brand-primary))] text-white'
                               : isTodayDate
                                 ? 'border border-foreground/20'
                                 : 'border border-foreground/10'
@@ -916,7 +916,7 @@ const AppHome = () => {
                             )}
                             <span className={cn(
                               'relative z-10 text-sm font-bold leading-none translate-y-[0.5px]',
-                              'text-fg-warm',
+                              isSelected ? 'text-white' : 'text-fg-warm',
                               hasBadge && !isTodayDate && 'drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
                             )}>
                               {format(day, 'd')}
