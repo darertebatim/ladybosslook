@@ -48,6 +48,7 @@ const NativeAppLayout = () => {
   // All hooks must be called unconditionally at the top
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation();
   
   // Push notification flow - handles full-screen onboarding
   const { 
@@ -176,11 +177,10 @@ const NativeAppLayout = () => {
   const isOwnScrollPage = location.pathname === '/app/projects';
 
   const navItems = [
-    { path: '/app/home', icon: Home, label: 'Home', tourClass: 'tour-nav-home' },
-    { path: '/app/tools', icon: Compass, label: 'Tools', tourClass: 'tour-nav-explore' },
-    
-    { path: '/app/player', icon: Music, label: 'Listen', tourClass: 'tour-nav-listen' },
-    { path: '/app/channels', icon: Users, label: 'Chats', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
+    { path: '/app/home', icon: Home, label: t('nav.home'), tourClass: 'tour-nav-home' },
+    { path: '/app/tools', icon: Compass, label: t('nav.tools'), tourClass: 'tour-nav-explore' },
+    { path: '/app/player', icon: Music, label: t('nav.listen'), tourClass: 'tour-nav-listen' },
+    { path: '/app/channels', icon: Users, label: t('nav.chats'), showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
   ];
 
   // Tab bar actual height: grid content (~48px for compact) + safe area inset
