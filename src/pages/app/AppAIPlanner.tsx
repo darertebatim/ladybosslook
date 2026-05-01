@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, Sparkles, ArrowUp, RotateCcw, Pencil, Check, ChevronLeft } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
@@ -17,24 +18,24 @@ const BRAND_TASK_COLORS = [
   '#D7E9FF', '#E0FBB8', '#F0E3FF',
 ];
 
-const HINTS: { emoji: string; label: string }[] = [
-  { emoji: '📚', label: 'Work or school' },
-  { emoji: '✅', label: 'To-dos and errands' },
-  { emoji: '💜', label: 'Social plans' },
-  { emoji: '🏡', label: 'Home & family' },
+const HINTS: { emoji: string; key: string }[] = [
+  { emoji: '📚', key: 'aiPlannerPage.hintWork' },
+  { emoji: '✅', key: 'aiPlannerPage.hintTodos' },
+  { emoji: '💜', key: 'aiPlannerPage.hintSocial' },
+  { emoji: '🏡', key: 'aiPlannerPage.hintHome' },
 ];
 
 type Stage = 'input' | 'building' | 'matching' | 'picker' | 'success';
 
-const LOADING_DIALOGUES = [
-  'Reading your plans…',
-  'Picking the right times…',
-  'Building your tasks…',
-  'Matching the right titles…',
-  'Fine-tuning the colors…',
+const LOADING_DIALOGUE_KEYS = [
+  'aiPlannerPage.loading1',
+  'aiPlannerPage.loading2',
+  'aiPlannerPage.loading3',
+  'aiPlannerPage.loading4',
+  'aiPlannerPage.loading5',
 ];
 const DIALOGUE_INTERVAL_MS = 750;
-const MIN_LOADING_MS = LOADING_DIALOGUES.length * DIALOGUE_INTERVAL_MS;
+const MIN_LOADING_MS = LOADING_DIALOGUE_KEYS.length * DIALOGUE_INTERVAL_MS;
 
 type TaskKind = 'event' | 'recurring' | 'todo';
 
@@ -56,6 +57,7 @@ interface ExtractedTask {
  * after each successful add so the user can plan again.
  */
 export default function AppAIPlanner() {
+  const { t } = useTranslation();
   const goBack = useGoBack('/app/home');
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -83,7 +85,7 @@ export default function AppAIPlanner() {
 
   const startListening = () => {
     if (!speechSupported) {
-      toast.error("Voice input isn't supported on this device");
+      toast.error(t('aiPlannerPage.voiceUnsupported'));
       return;
     }
     if (isListening) { stopListening(); return; }
@@ -107,9 +109,9 @@ export default function AppAIPlanner() {
     rec.onerror = (e: any) => {
       setIsListening(false);
       if (e?.error === 'not-allowed' || e?.error === 'service-not-allowed') {
-        toast.error('Microphone permission denied');
+        toast.error(t('aiPlannerPage.micDenied'));
       } else if (e?.error !== 'aborted' && e?.error !== 'no-speech') {
-        toast.error('Voice input failed');
+        toast.error(t('aiPlannerPage.voiceFailed'));
       }
     };
     rec.onend = () => setIsListening(false);
@@ -129,7 +131,7 @@ export default function AppAIPlanner() {
     const startedAt = Date.now();
 
     const dialogueTimer = setInterval(() => {
-      setDialogueIdx((i) => Math.min(i + 1, LOADING_DIALOGUES.length - 1));
+      setDialogueIdx((i) => Math.min(i + 1, LOADING_DIALOGUE_KEYS.length - 1));
       haptic.light();
     }, DIALOGUE_INTERVAL_MS);
 
@@ -191,7 +193,7 @@ export default function AppAIPlanner() {
       clearTimeout(matchingTimer);
       clearInterval(dialogueTimer);
       console.error('[AppAIPlanner] extract failed', e);
-      toast.error(e?.message || 'Could not build your tasks. Try again.');
+      toast.error(e?.message || t('aiPlannerPage.extractFailed'));
       setStage('input');
     }
   };
@@ -283,12 +285,12 @@ export default function AppAIPlanner() {
         const { error: insErr } = await supabase.from('user_tasks').insert(rows);
         if (insErr) {
           console.warn('[AppAIPlanner] insert error', insErr.message);
-          toast.error('Could not save tasks. Try again.');
+          toast.error(t('aiPlannerPage.saveFailed'));
           return;
         }
       } catch (e) {
         console.warn('[AppAIPlanner] persist failed', e);
-        toast.error('Could not save tasks. Try again.');
+        toast.error(t('aiPlannerPage.saveFailed'));
         return;
       }
     }
@@ -324,7 +326,7 @@ export default function AppAIPlanner() {
         <button
           onClick={handleBack}
           className="h-9 w-9 rounded-full bg-white/70 backdrop-blur-sm flex items-center justify-center active:opacity-60"
-          aria-label="Back"
+          aria-label={t('aiPlannerPage.back')}
         >
           <ChevronLeft className="h-5 w-5 text-[#1a1f3d]" />
         </button>
@@ -342,7 +344,7 @@ export default function AppAIPlanner() {
             style={{ background: '#A98AF0', paddingTop: 'calc(env(safe-area-inset-top, 44px) + 12px)' }}
           >
             <p className="text-center text-white font-semibold text-[15px]">
-              ✨ {selectedCount} task{selectedCount === 1 ? '' : 's'} added to your plan ✨
+              {t(selectedCount === 1 ? 'aiPlannerPage.successOne' : 'aiPlannerPage.successMany', { count: selectedCount })}
             </p>
           </motion.div>
         )}
@@ -361,7 +363,7 @@ export default function AppAIPlanner() {
               className="text-[28px] leading-[1.15] font-bold text-[#1a1f3d]"
               style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
             >
-              Tell me your plans. I'll turn them into tasks.
+              {t('aiPlannerPage.title')}
             </motion.h1>
 
             <motion.ul
@@ -371,14 +373,14 @@ export default function AppAIPlanner() {
               className="mt-4 space-y-1.5"
             >
               {HINTS.map((h) => (
-                <li key={h.label} className="flex items-center gap-2 text-[15px] text-[#1a1f3d]">
+                <li key={h.key} className="flex items-center gap-2 text-[15px] text-[#1a1f3d]">
                   <img
                     src={getFluentEmojiUrl(h.emoji)}
                     alt=""
                     className="h-[18px] w-[18px] shrink-0"
                     loading="lazy"
                   />
-                  <span className="font-medium">{h.label}</span>
+                  <span className="font-medium">{t(h.key)}</span>
                 </li>
               ))}
             </motion.ul>
@@ -393,7 +395,7 @@ export default function AppAIPlanner() {
                 ref={textareaRef}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="Write or speak your plans"
+                placeholder={t('aiPlannerPage.placeholder')}
                 rows={4}
                 className="w-full rounded-2xl bg-white/70 backdrop-blur-sm border border-white/60 px-4 py-3.5 pr-14 text-[15px] text-[#1a1f3d] placeholder:text-[#1a1f3d]/40 outline-none focus:bg-white/90 transition-colors resize-none"
               />
@@ -402,7 +404,7 @@ export default function AppAIPlanner() {
                   type="button"
                   onClick={() => startSequence(text)}
                   className="absolute right-3 bottom-3 h-10 w-10 rounded-full bg-black flex items-center justify-center active:scale-95 transition-transform"
-                  aria-label="Submit"
+                  aria-label={t('aiPlannerPage.submit')}
                 >
                   <ArrowUp className="h-4 w-4 text-white" strokeWidth={2.5} />
                 </button>
@@ -415,7 +417,7 @@ export default function AppAIPlanner() {
                     isListening ? 'bg-red-500 animate-pulse' : 'bg-black',
                     !speechSupported && 'opacity-50',
                   )}
-                  aria-label={isListening ? 'Stop voice input' : 'Start voice input'}
+                  aria-label={isListening ? t('aiPlannerPage.stopVoice') : t('aiPlannerPage.startVoice')}
                 >
                   <Mic className="h-4 w-4 text-white" />
                 </button>
@@ -461,14 +463,14 @@ export default function AppAIPlanner() {
                 <button
                   onClick={handleReset}
                   className="h-8 w-8 flex items-center justify-center text-[#1a1f3d]/70 active:opacity-60"
-                  aria-label="Reset"
+                  aria-label={t('aiPlannerPage.reset')}
                 >
                   <RotateCcw className="h-[18px] w-[18px]" strokeWidth={2} />
                 </button>
                 <button
                   onClick={handleEditPrompt}
                   className="h-8 w-8 flex items-center justify-center text-[#1a1f3d]/70 active:opacity-60"
-                  aria-label="Edit"
+                  aria-label={t('aiPlannerPage.edit')}
                 >
                   <Pencil className="h-[18px] w-[18px]" strokeWidth={2} />
                 </button>
@@ -496,7 +498,7 @@ export default function AppAIPlanner() {
                   className="mt-10 text-[24px] font-bold text-[#1a1f3d] text-center px-6"
                   style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
                 >
-                  {LOADING_DIALOGUES[dialogueIdx]}
+                  {t(LOADING_DIALOGUE_KEYS[dialogueIdx])}
                 </motion.h2>
               </motion.div>
             )}
@@ -513,7 +515,7 @@ export default function AppAIPlanner() {
                   className="text-[26px] font-bold text-[#1a1f3d] mb-3 px-1"
                   style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
                 >
-                  Pick tasks for your plan
+                  {t('aiPlannerPage.pickTitle')}
                 </h2>
                 <div className="flex-1 overflow-y-auto space-y-2.5 pb-32 -mx-1 px-1">
                   {tasks.map((task, idx) => {
@@ -562,7 +564,7 @@ export default function AppAIPlanner() {
                           </p>
                           <p className="text-[12px] text-[#1a1f3d]/50 mt-0.5 flex items-center gap-1">
                             <span>{task.kind === 'recurring' ? '🔁' : '📅'}</span>
-                            <span>{describeSchedule(task)}</span>
+                            <span>{describeSchedule(task, t)}</span>
                           </p>
                         </div>
                         <div
@@ -604,7 +606,7 @@ export default function AppAIPlanner() {
                   )}
                 >
                   <span className="text-[16px] font-bold">
-                    Add task{selectedCount === 1 ? '' : 's'} ({selectedCount})
+                    {t(selectedCount === 1 ? 'aiPlannerPage.addTask' : 'aiPlannerPage.addTasks', { count: selectedCount })}
                   </span>
                   <ArrowUp className="h-5 w-5" strokeWidth={2.5} />
                 </button>
@@ -648,7 +650,7 @@ function PulsingOrb() {
   );
 }
 
-function describeSchedule(t: ExtractedTask): string {
+function describeSchedule(task: ExtractedTask, t: (k: string) => string): string {
   const fmtTime = (hhmm?: string) => {
     if (!hhmm) return '';
     const [h, m] = hhmm.split(':').map(Number);
@@ -662,24 +664,24 @@ function describeSchedule(t: ExtractedTask): string {
     if (mins % 60 === 0) return ` · ${mins / 60}h`;
     return ` · ${mins}m`;
   };
-  if (t.kind === 'event') {
+  if (task.kind === 'event') {
     let when = '';
-    if (t.date) {
+    if (task.date) {
       try {
-        const d = new Date(t.date + 'T00:00:00');
+        const d = new Date(task.date + 'T00:00:00');
         when = d.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
-      } catch { when = t.date; }
+      } catch { when = task.date; }
     }
-    const time = t.time ? ` at ${fmtTime(t.time)}` : '';
-    return `${when}${time}${fmtDur(t.duration_minutes)}`.trim() || 'Event';
+    const time = task.time ? ` ${t('aiPlannerPage.scheduleAt')} ${fmtTime(task.time)}` : '';
+    return `${when}${time}${fmtDur(task.duration_minutes)}`.trim() || t('aiPlannerPage.scheduleEvent');
   }
-  if (t.kind === 'recurring') {
+  if (task.kind === 'recurring') {
     const label =
-      t.recurrence === 'weekdays' ? 'M · T · W · T · F'
-        : t.recurrence === 'weekly' ? 'Weekly'
-          : 'Every day';
-    const time = t.time ? ` at ${fmtTime(t.time)}` : '';
-    return `${label}${time}${fmtDur(t.duration_minutes)}`;
+      task.recurrence === 'weekdays' ? t('aiPlannerPage.scheduleWeekdays')
+        : task.recurrence === 'weekly' ? t('aiPlannerPage.scheduleWeekly')
+          : t('aiPlannerPage.scheduleDaily');
+    const time = task.time ? ` ${t('aiPlannerPage.scheduleAt')} ${fmtTime(task.time)}` : '';
+    return `${label}${time}${fmtDur(task.duration_minutes)}`;
   }
-  return 'To-do';
+  return t('aiPlannerPage.scheduleTodo');
 }
