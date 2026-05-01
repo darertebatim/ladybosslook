@@ -1145,7 +1145,7 @@ const AppTaskCreate = ({
     if (repeatPattern === 'daily') return t('taskEdit.daily');
     if (repeatPattern === 'weekly') return t('taskEdit.weekly');
     if (repeatPattern === 'monthly') return t('taskEdit.monthly');
-    return repeatPattern.charAt(0).toUpperCase() + repeatPattern.slice(1);
+    return t('taskEdit.daily');
   };
 
   const getReminderSummary = () => {
