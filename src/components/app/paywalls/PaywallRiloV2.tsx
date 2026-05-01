@@ -200,7 +200,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
             transition={{ duration: 0.45, delay: 0.22 }}
             style={{ color: NAVY, fontSize: 30, fontWeight: 800, lineHeight: 1.18, margin: 0, letterSpacing: -0.6 }}
           >
-            Plus users are{' '}
+            Rilo Plus users are{' '}
             <span style={{
               background: 'linear-gradient(135deg, #FFB347 0%, #E84A6F 100%)',
               WebkitBackgroundClip: 'text',
@@ -217,7 +217,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
             transition={{ duration: 0.4, delay: 0.35 }}
             style={{ color: 'rgba(26,31,61,0.7)', fontSize: 15, fontWeight: 500, margin: '14px 0 0', lineHeight: 1.45 }}
           >
-            Join a quality growth community with content tailored to your journey.
+            Self-care that sticks — backed by a community and content tailored to you.
           </motion.p>
         </div>
 
@@ -246,11 +246,25 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
                 style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 20 }}
               >
                 <div style={{
+                  position: 'relative',
                   width: 54, height: 54, borderRadius: '50%',
                   background: 'linear-gradient(135deg, #FFEFC2 0%, #FFD9E5 100%)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                 }}>
                   <Emoji3D char={feature.emoji} size={28} />
+                  <span style={{
+                    position: 'absolute', top: -4, right: -8,
+                    background: 'linear-gradient(135deg, #FFB347 0%, #E84A6F 100%)',
+                    color: '#fff',
+                    fontSize: 9, fontWeight: 800,
+                    padding: '2px 6px', borderRadius: 999,
+                    letterSpacing: 0.4,
+                    textTransform: 'uppercase',
+                    boxShadow: '0 2px 6px rgba(232,74,111,0.35)',
+                    lineHeight: 1,
+                  }}>
+                    Plus
+                  </span>
                 </div>
                 <div style={{ flex: 1, paddingTop: 6 }}>
                   <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: NAVY, lineHeight: 1.2, letterSpacing: -0.2 }}>
