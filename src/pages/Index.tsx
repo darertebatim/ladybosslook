@@ -21,13 +21,7 @@ const Index = () => {
       if (user) {
         navigate('/app/home', { replace: true });
       } else {
-        // First-time users see onboarding; returning users go to auth
-        const hasSeenOnboarding = localStorage.getItem('simora_onboarding_completed_pre-auth-welcome') === 'true';
-        if (hasSeenOnboarding) {
-          navigate('/auth', { replace: true });
-        } else {
-          navigate('/app/onboarding/pre-auth-welcome', { replace: true });
-        }
+        navigate('/auth', { replace: true });
       }
     }
   }, [user, navigate]);
