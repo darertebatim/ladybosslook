@@ -653,14 +653,14 @@ export default function AppRoutinePlayer() {
         .delete()
         .eq('id', routine.id);
 
-      toast.success(`"${routine.title}" deleted`);
+      toast.success(t('routinePlayer.routineDeleted', { title: routine.title }));
       queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
       queryClient.invalidateQueries({ queryKey: ['linkable-user-routines'] });
       queryClient.invalidateQueries({ queryKey: ['routine-user-tasks-emojis'] });
       queryClient.invalidateQueries({ queryKey: ['routine-user-task-ids'] });
       queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
     } catch (err) {
-      toast.error('Failed to delete routine');
+      toast.error(t('routinePlayer.deleteFailed'));
     }
     setDeleteRoutine(null);
   };
