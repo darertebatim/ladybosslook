@@ -716,6 +716,16 @@ html.native-app [data-scroll-container="true"] {
     animation: marquee-left 18s linear infinite;
   }
 
+  @keyframes welcome-fade {
+    0%   { opacity: 0; transform: translateY(4px); }
+    20%  { opacity: 1; transform: translateY(0); }
+    80%  { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-4px); }
+  }
+  .animate-welcome-fade {
+    animation: welcome-fade 2.2s ease-in-out;
+  }
+
   /* Soft fade on left/right edges so the marquee bleeds out under the bg */
   .mask-fade-x {
     -webkit-mask-image: linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%);
