@@ -103,6 +103,7 @@ function RoutineCardContent({
   onDeleteRoutine,
   onEditRoutine,
 }: RoutineCardProps) {
+  const { t } = useTranslation();
   const completion = getCompletionInfo(routine.routine_id);
   const allTasks = routineTasksMap?.[routine.routine_id] || [];
   const MAX_EMOJIS = 3;
