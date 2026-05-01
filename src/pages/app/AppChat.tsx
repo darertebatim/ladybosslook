@@ -33,9 +33,9 @@ interface Conversation {
 }
 
 // Helper to get date separator label
-const getDateLabel = (date: Date): string => {
-  if (isToday(date)) return "Today";
-  if (isYesterday(date)) return "Yesterday";
+const getDateLabel = (date: Date, t: (k: string) => string): string => {
+  if (isToday(date)) return t("chatPage.today");
+  if (isYesterday(date)) return t("chatPage.yesterday");
   return format(date, "MMMM d, yyyy");
 };
 
@@ -70,20 +70,12 @@ const isLastInGroup = (msg: Message, nextMsg: Message | null): boolean => {
 };
 
 // Time-based greeting
-const getGreeting = () => {
+const getGreeting = (t: (k: string) => string) => {
   const hour = new Date().getHours();
-  if (hour < 12) return { text: "Good morning", emoji: "🌅" };
-  if (hour < 17) return { text: "Good afternoon", emoji: "☀️" };
-  return { text: "Good evening", emoji: "🌙" };
+  if (hour < 12) return { text: t("chatPage.goodMorning"), emoji: "🌅" };
+  if (hour < 17) return { text: t("chatPage.goodAfternoon"), emoji: "☀️" };
+  return { text: t("chatPage.goodEvening"), emoji: "🌙" };
 };
-
-// Conversation starters
-const conversationStarters = [
-  { icon: MessageCircle, text: "I have a question" },
-  { icon: Mic, text: "I'd rather send a voice note" },
-  { icon: Heart, text: "I just need someone to talk to" },
-  { icon: HelpCircle, text: "Something isn't working" },
-];
 
 /**
  * Full-screen Telegram-style chat page
