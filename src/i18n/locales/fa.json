@@ -335,8 +335,101 @@
     "forYou": "برای تو"
   },
   "profile": {
-    "title": "پروفایل",
-    "user": "کاربر"
+    "title": "نمایه",
+    "user": "کاربر",
+    "editProfile": "ویرایش نمایه",
+    "cancel": "انصراف",
+    "save": "ذخیره",
+    "saving": "در حال ذخیره…",
+    "settings": "تنظیمات",
+    "tapEditHint": "برای افزودن جزئیات روی «ویرایش نمایه» بزنید",
+    "noCourses": "هنوز دوره‌ای ندارید",
+    "browsePrograms": "مرور برنامه‌ها",
+    "noOrders": "هنوز سفارشی ندارید",
+    "currentBalance": "موجودی فعلی",
+    "credits": "اعتبار",
+    "recentTransactions": "تراکنش‌های اخیر",
+    "enrolled": "ثبت‌نام در {{date}}",
+    "refunded": "بازپرداخت‌شده",
+    "completed": "تکمیل‌شده",
+    "sections": {
+      "journal": "آمار دفترچه",
+      "programs": "برنامه‌های من",
+      "wallet": "کیف پول و اعتبار",
+      "orders": "تاریخچه سفارش‌ها"
+    },
+    "fields": {
+      "fullName": "نام کامل",
+      "phone": "شماره تماس",
+      "dob": "تاریخ تولد",
+      "month": "ماه",
+      "day": "روز",
+      "year": "سال",
+      "gender": "جنسیت / ضمایر",
+      "city": "شهر",
+      "country": "کشور",
+      "occupation": "شغل",
+      "relationship": "وضعیت تأهل",
+      "secondLanguage": "زبان دوم",
+      "goals": "اهداف",
+      "bio": "بیوگرافی",
+      "instagram": "اینستاگرام",
+      "telegram": "تلگرام",
+      "email": "ایمیل",
+      "name": "نام",
+      "location": "موقعیت",
+      "timezone": "منطقه زمانی"
+    },
+    "placeholders": {
+      "fullName": "نام کامل شما",
+      "phone": "شماره تماس شما",
+      "city": "شهر شما",
+      "country": "کشور شما",
+      "occupation": "شغل شما",
+      "bio": "درباره خودتان بنویسید…",
+      "username": "@نام‌کاربری"
+    },
+    "gender": {
+      "preferNot": "ترجیح می‌دهم نگویم",
+      "female": "زن (او)",
+      "male": "مرد (او)",
+      "nonBinary": "غیر دودویی (آن‌ها)",
+      "other": "سایر"
+    },
+    "relationship": {
+      "preferNot": "ترجیح می‌دهم نگویم",
+      "single": "مجرد",
+      "inRelationship": "در رابطه",
+      "married": "متأهل",
+      "divorced": "جدا شده"
+    },
+    "language": {
+      "notSet": "تنظیم نشده"
+    },
+    "goalsList": {
+      "Personal Growth": "رشد فردی",
+      "Career": "شغل",
+      "Relationships": "روابط",
+      "Health": "سلامتی",
+      "Finance": "مالی",
+      "Creativity": "خلاقیت",
+      "Mindfulness": "ذهن‌آگاهی",
+      "Leadership": "رهبری",
+      "Confidence": "اعتمادبه‌نفس",
+      "Communication": "ارتباطات"
+    },
+    "toasts": {
+      "saved": "نمایه به‌روزرسانی شد",
+      "savedDesc": "نمایه شما با موفقیت ذخیره شد",
+      "saveFailed": "ذخیره نمایه ناموفق بود",
+      "photoUpdated": "عکس به‌روزرسانی شد",
+      "photoUpdatedDesc": "عکس نمایه شما به‌روزرسانی شد",
+      "uploadFailed": "بارگذاری عکس ناموفق بود",
+      "fileTooLarge": "فایل خیلی بزرگ است",
+      "fileTooLargeDesc": "لطفاً تصویری کمتر از ۵ مگابایت انتخاب کنید",
+      "cameraFailed": "دسترسی به دوربین ناموفق بود",
+      "error": "خطا"
+    }
   },
   "moodPage": {
     "title": "ثبت حال و هوا"

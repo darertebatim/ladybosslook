@@ -336,7 +336,100 @@
   },
   "profile": {
     "title": "Profile",
-    "user": "User"
+    "user": "User",
+    "editProfile": "Edit Profile",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "settings": "Settings",
+    "tapEditHint": "Tap \"Edit Profile\" to add your details",
+    "noCourses": "No courses yet",
+    "browsePrograms": "Browse Programs",
+    "noOrders": "No orders yet",
+    "currentBalance": "Current Balance",
+    "credits": "Credits",
+    "recentTransactions": "Recent Transactions",
+    "enrolled": "Enrolled {{date}}",
+    "refunded": "Refunded",
+    "completed": "Completed",
+    "sections": {
+      "journal": "Journal Stats",
+      "programs": "My Programs",
+      "wallet": "Wallet & Credits",
+      "orders": "Order History"
+    },
+    "fields": {
+      "fullName": "Full Name",
+      "phone": "Phone",
+      "dob": "Date of Birth",
+      "month": "Month",
+      "day": "Day",
+      "year": "Year",
+      "gender": "Gender / Pronouns",
+      "city": "City",
+      "country": "Country",
+      "occupation": "Occupation",
+      "relationship": "Relationship Status",
+      "secondLanguage": "Second Language",
+      "goals": "Goals",
+      "bio": "Bio",
+      "instagram": "Instagram",
+      "telegram": "Telegram",
+      "email": "Email",
+      "name": "Name",
+      "location": "Location",
+      "timezone": "Timezone"
+    },
+    "placeholders": {
+      "fullName": "Your full name",
+      "phone": "Your phone number",
+      "city": "Your city",
+      "country": "Your country",
+      "occupation": "Your occupation",
+      "bio": "Tell us about yourself...",
+      "username": "@username"
+    },
+    "gender": {
+      "preferNot": "Prefer not to say",
+      "female": "Female (She/Her)",
+      "male": "Male (He/Him)",
+      "nonBinary": "Non-Binary (They/Them)",
+      "other": "Other"
+    },
+    "relationship": {
+      "preferNot": "Prefer not to say",
+      "single": "Single",
+      "inRelationship": "In a Relationship",
+      "married": "Married",
+      "divorced": "Divorced"
+    },
+    "language": {
+      "notSet": "Not set"
+    },
+    "goalsList": {
+      "Personal Growth": "Personal Growth",
+      "Career": "Career",
+      "Relationships": "Relationships",
+      "Health": "Health",
+      "Finance": "Finance",
+      "Creativity": "Creativity",
+      "Mindfulness": "Mindfulness",
+      "Leadership": "Leadership",
+      "Confidence": "Confidence",
+      "Communication": "Communication"
+    },
+    "toasts": {
+      "saved": "Profile Updated",
+      "savedDesc": "Your profile has been saved successfully",
+      "saveFailed": "Failed to save profile",
+      "photoUpdated": "Photo Updated",
+      "photoUpdatedDesc": "Your profile photo has been updated",
+      "uploadFailed": "Failed to upload photo",
+      "fileTooLarge": "File Too Large",
+      "fileTooLargeDesc": "Please select an image under 5MB",
+      "cameraFailed": "Failed to access camera",
+      "error": "Error"
+    }
   },
   "moodPage": {
     "title": "Mood Check-in"
