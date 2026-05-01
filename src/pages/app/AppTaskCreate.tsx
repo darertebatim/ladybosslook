@@ -2927,14 +2927,14 @@ const AppTaskCreate = ({
                     </button>
                   )}
                 </div>
-                <h1 className="text-lg font-semibold">Edit Task</h1>
+                <h1 className="text-lg font-semibold">{taskId ? t('taskEdit.editTask') : t('taskEdit.newTask')}</h1>
                 <Button
                   onClick={handleSubmit}
                   disabled={!title.trim()}
                   variant="ghost"
                   className="text-primary font-semibold"
                 >
-                  Save
+                  {t('taskEdit.save')}
                 </Button>
               </div>
 
@@ -2983,7 +2983,7 @@ const AppTaskCreate = ({
             size="sm"
             className="bg-primary text-primary-foreground font-semibold rounded-full px-5 active:scale-95"
           >
-            {taskId ? 'Save' : 'Create'}
+            {taskId ? t('taskEdit.save') : t('taskEdit.create')}
           </Button>
         </div>
       </header>
@@ -3004,14 +3004,14 @@ const AppTaskCreate = ({
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlarmClock className="h-5 w-5 text-red-500" />
-              Enable Urgent Alarm?
+              {t('taskEdit.enableUrgentAlarm')}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-left">
-              This will create an alarm that rings even when your phone is on silent mode. The alarm will be added to your device's calendar.
+              {t('taskEdit.enableUrgentMessage')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row gap-3">
-            <AlertDialogCancel className="flex-1 mt-0">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="flex-1 mt-0">{t('taskEdit.cancel')}</AlertDialogCancel>
             <AlertDialogAction 
               className="flex-1 bg-red-500"
               onClick={() => {
@@ -3019,7 +3019,7 @@ const AppTaskCreate = ({
                 setShowUrgentConfirm(false);
               }}
             >
-              Enable Urgent
+              {t('taskEdit.enableUrgent')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
