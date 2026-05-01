@@ -51,6 +51,8 @@ import { WeeklyReviewBanner } from '@/components/app/WeeklyReviewBanner';
 import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
 import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 import { useKeyboard } from '@/hooks/useKeyboard';
+import { WelcomeSpotlightBanner } from '@/components/app/home/WelcomeSpotlightBanner';
+import { TaskCoachOverlay } from '@/components/app/home/TaskCoachOverlay';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
