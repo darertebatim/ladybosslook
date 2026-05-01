@@ -21,6 +21,7 @@ import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider'
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { useRoutineFavorites, useToggleRoutineFavorite } from '@/hooks/useRoutineFavorites';
+import { useTranslation } from 'react-i18next';
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400 to-amber-600',
@@ -86,6 +87,7 @@ function convertToRoutinePlanTask(task: RoutineBankTask): RoutinePlanTask & { sc
 }
 
 export default function AppInspireDetail() {
+  const { t } = useTranslation();
   const { planId } = useParams<{ planId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -120,8 +122,16 @@ export default function AppInspireDetail() {
 
   // Compute effective start date label + details
   const startInfo = useMemo(() => {
-    if (!routine) return { label: 'Starts today', emoji: '🚀', isFuture: false };
-    const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    if (!routine) return { label: t('inspirePage.startsToday'), emoji: '🚀', isFuture: false };
+    const WEEKDAY_NAMES = [
+      t('common.sunday', { defaultValue: 'Sunday' }),
+      t('common.monday', { defaultValue: 'Monday' }),
+      t('common.tuesday', { defaultValue: 'Tuesday' }),
+      t('common.wednesday', { defaultValue: 'Wednesday' }),
+      t('common.thursday', { defaultValue: 'Thursday' }),
+      t('common.friday', { defaultValue: 'Friday' }),
+      t('common.saturday', { defaultValue: 'Saturday' }),
+    ];
     const startDate = (routine as any).challenge_start_date;
     const startDow = (routine as any).start_day_of_week as number | null;
     
@@ -129,19 +139,19 @@ export default function AppInspireDetail() {
       const d = new Date(startDate + 'T00:00:00');
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      if (d <= today) return { label: 'Ready to start today!', emoji: '🚀', isFuture: false };
+      if (d <= today) return { label: t('inspirePage.readyToStart'), emoji: '🚀', isFuture: false };
       const diffDays = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
       return { 
-        label: `Starts ${format(d, 'MMM d')} · in ${diffDays} day${diffDays !== 1 ? 's' : ''}`, 
+        label: t(diffDays === 1 ? 'inspirePage.startsOn' : 'inspirePage.startsOnPlural', { date: format(d, 'MMM d'), days: diffDays }),
         emoji: '📅', 
         isFuture: true 
       };
     }
     if (startDow != null) {
-      return { label: `Starts next ${WEEKDAY_NAMES[startDow]}`, emoji: '📅', isFuture: true };
+      return { label: t('inspirePage.startsNext', { day: WEEKDAY_NAMES[startDow] }), emoji: '📅', isFuture: true };
     }
-    return { label: 'Ready to start today!', emoji: '🚀', isFuture: false };
-  }, [routine]);
+    return { label: t('inspirePage.readyToStart'), emoji: '🚀', isFuture: false };
+  }, [routine, t]);
 
   // Compute end date info
   const endInfo = useMemo(() => {
@@ -152,17 +162,17 @@ export default function AppInspireDetail() {
 
     if (endMode === 'date' && endDate) {
       const d = new Date(endDate + 'T00:00:00');
-      return { label: `Ends ${format(d, 'MMM d')}`, emoji: '🏁' };
+      return { label: t('inspirePage.endsOn', { date: format(d, 'MMM d') }), emoji: '🏁' };
     }
     if (endMode === 'after_days' && endAfterDays) {
-      return { label: `Ends after ${endAfterDays} day${endAfterDays !== 1 ? 's' : ''}`, emoji: '🏁' };
+      return { label: t(endAfterDays === 1 ? 'inspirePage.endsAfter' : 'inspirePage.endsAfterPlural', { count: endAfterDays }), emoji: '🏁' };
     }
     return null;
-  }, [routine]);
+  }, [routine, t]);
 
   const { handleShare, handleShareInstagram } = useShareContent({
-    title: routine?.title || 'Routine',
-    text: `Hey! Join me in the '${routine?.title || 'Routine'}' routine on Routine Ladyboss 💫`,
+    title: routine?.title || t('inspirePage.shareTitleFallback'),
+    text: t('inspirePage.shareText', { title: routine?.title || t('inspirePage.shareTitleFallback') }),
     imageUrl: routine?.cover_image_url,
     source: 'inspire_routine',
     contentId: routine?.id,
@@ -170,7 +180,7 @@ export default function AppInspireDetail() {
 
   const handleAddClick = () => {
     if (!routine?.tasks?.length) {
-      toast.error('No tasks in this routine');
+      toast.error(t('inspirePage.noTasks'));
       return;
     }
     setShowPreviewSheet(true);
@@ -192,12 +202,12 @@ export default function AppInspireDetail() {
       setShowPreviewSheet(false);
       setJustAdded(true);
       if (isProject) {
-        toast.success(`Step 1 tasks added! Complete them to unlock the next step.`, { duration: 5000 });
+        toast.success(t('inspirePage.stepUnlock'), { duration: 5000 });
       } else {
-        toast.success(`${selectedTaskIds.length} tasks added!`);
+        toast.success(t('inspirePage.tasksAdded', { count: selectedTaskIds.length }));
       }
     } catch (error) {
-      toast.error('Failed to add routine');
+      toast.error(t('inspirePage.addFailed'));
     }
   };
 
@@ -212,9 +222,9 @@ export default function AppInspireDetail() {
   if (!routine) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
-        <p className="text-muted-foreground">Routine not found</p>
+        <p className="text-muted-foreground">{t('inspirePage.notFound')}</p>
         <Button variant="outline" onClick={() => navigate('/app/routines')}>
-          Back to Routines
+          {t('inspirePage.backToRoutines')}
         </Button>
       </div>
     );
