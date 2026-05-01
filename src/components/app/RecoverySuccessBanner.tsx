@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 import { useEffect } from 'react';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
+import { useTranslation } from 'react-i18next';
+import { Trans } from 'react-i18next';
 
 interface RecoverySuccessBannerProps {
   open: boolean;
@@ -26,6 +28,7 @@ export const RecoverySuccessBanner = ({
   type,
   onClose,
 }: RecoverySuccessBannerProps) => {
+  const { t } = useTranslation();
   const [isAnimating] = useState(true);
 
   useEffect(() => {
@@ -85,44 +88,44 @@ export const RecoverySuccessBanner = ({
 
         {/* Title */}
         <div className="text-2xl font-bold text-white mb-1">
-          {isGold ? 'Gold Streak Restored!' : 'Streak Restored!'}
+          {isGold ? t('recovery.goldStreakRestored') : t('recovery.streakRestored')}
         </div>
         <p className="text-white/70 text-sm mb-4">
-          Back to {restoredStreak} {isGold ? 'gold ' : ''}days
+          {isGold ? t('recovery.backToGoldDays', { n: restoredStreak }) : t('recovery.backToDays', { n: restoredStreak })}
         </p>
 
         {/* What to do next */}
         <div className="bg-white/15 rounded-xl p-4 mb-6 text-left">
-          <p className="text-white font-semibold text-xs mb-2">To keep your streak alive:</p>
+          <p className="text-white font-semibold text-xs mb-2">{t('streak.keepStreakAlive')}</p>
           <ul className="text-white/90 text-xs space-y-1.5">
             {isGold ? (
               <>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">✅</span>
-                  <span>Complete <strong>all</strong> your tasks today</span>
+                  <span><Trans i18nKey="recovery.completeAllToday" components={{ 1: <strong /> }} /></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">🏅</span>
-                  <span>Complete 3 tasks to earn a gold badge</span>
+                  <span>{t('recovery.completeThreeForGold')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">⚡</span>
-                  <span>Don't miss a day — gold streaks need perfection</span>
+                  <span>{t('recovery.dontMissGold')}</span>
                 </li>
               </>
             ) : (
               <>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">✅</span>
-                  <span>Complete <strong>at least one</strong> action today</span>
+                  <span><Trans i18nKey="recovery.completeAtLeastOne" components={{ 1: <strong /> }} /></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">🔥</span>
-                  <span>Keep showing up every day</span>
+                  <span>{t('recovery.keepShowingUp')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5">🛡️</span>
-                  <span>Recovery shields are limited — use them wisely</span>
+                  <span>{t('recovery.shieldsLimited')}</span>
                 </li>
               </>
             )}
@@ -133,7 +136,7 @@ export const RecoverySuccessBanner = ({
           onClick={onClose}
           className="w-full bg-white hover:bg-white/90 text-emerald-600 font-semibold py-3 rounded-xl"
         >
-          Let's Go! 🚀
+          {t('recovery.letsGo')}
         </Button>
       </div>
     </div>

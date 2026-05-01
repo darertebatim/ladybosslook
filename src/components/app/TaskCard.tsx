@@ -21,6 +21,7 @@ import { TaskIcon } from './IconPicker';
 import { PRO_LINK_CONFIGS, getProTaskNavigationPath, ProLinkType } from '@/lib/proTaskTypes';
 import { isToday, isBefore, isSameDay, startOfDay, parseISO, format as fnsFormat } from 'date-fns';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { isWaterTask } from '@/lib/waterTracking';
 import { formatTimeLabelWithEmoji } from '@/lib/taskScheduling';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -58,6 +59,7 @@ export const TaskCard = memo(function TaskCard({
   onOpenWaterTracking,
 }: TaskCardProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [isAnimating, setIsAnimating] = useState(false);
   const [floatingPlusKey, setFloatingPlusKey] = useState(0);
@@ -134,24 +136,24 @@ export const TaskCard = memo(function TaskCard({
         const scheduledDate = parseISO(task.scheduled_date);
         const today = startOfDay(new Date());
         if (isSameDay(scheduledDate, today)) {
-          return 'Today';
+          return t('task.today');
         }
         return fnsFormat(scheduledDate, 'MMM d');
       }
-      return 'Today';
+      return t('task.today');
     }
-    if (p === 'daily') return 'Daily';
-    if (p === 'weekly') return 'Weekly';
-    if (p === 'monthly') return 'Monthly';
-    if (p === 'weekend') return 'Weekends';
-    if (p === 'custom' && task.repeat_days?.length === 5) return 'Weekdays';
+    if (p === 'daily') return t('task.daily');
+    if (p === 'weekly') return t('task.weekly');
+    if (p === 'monthly') return t('task.monthly');
+    if (p === 'weekend') return t('task.weekends');
+    if (p === 'custom' && task.repeat_days?.length === 5) return t('task.weekdays');
     if (p === 'custom' && task.repeat_days?.length) {
       const days = task.repeat_days.length;
-      if (days === 7) return 'Daily';
-      if (days === 5) return 'Weekdays';
-      return `${days}x/week`;
+      if (days === 7) return t('task.daily');
+      if (days === 5) return t('task.weekdays');
+      return t('task.perWeek', { count: days });
     }
-    return 'Today';
+    return t('task.today');
   };
   const repeatLabel = getRepeatLabel(task);
 
@@ -161,8 +163,8 @@ export const TaskCard = memo(function TaskCard({
     // Prevent completing tasks for future dates - show toast message
     if (isFutureDate) {
       haptic.light();
-      toast("Let's focus on today's routines.", {
-        description: "You can honor this task when the day comes.",
+      toast(t('taskCard.focusOnToday'), {
+        description: t('taskCard.honorWhenComes'),
         duration: 3000,
       });
       return;
