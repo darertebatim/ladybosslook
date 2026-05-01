@@ -503,6 +503,15 @@ html.native-app [data-scroll-container="true"] {
     font-family: var(--font-farsi);
   }
 
+  /* Ensure /app pages also use the Persian font when language is fa.
+     The .app-theme rule above sets font-family explicitly, which would
+     otherwise win over the body rule. */
+  html[data-lang="fa"] .app-theme,
+  html[data-lang="fa"] .app-theme.dark,
+  html[data-lang="fa"] .dark .app-theme {
+    font-family: var(--font-farsi);
+  }
+
   /* RTL Support */
   .rtl {
     direction: rtl;

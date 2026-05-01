@@ -4,6 +4,16 @@
  * Finch-style approximate time categories for flexible task scheduling.
  * Users can choose approximate time periods instead of specific clock times.
  */
+import i18n from '@/i18n';
+
+const tr = (key: string, fallback: string): string => {
+  try {
+    const out = i18n.t(key);
+    return out && out !== key ? (out as string) : fallback;
+  } catch {
+    return fallback;
+  }
+};
 
 export type TimePeriod = 
   | 'start_of_day' 
@@ -16,6 +26,7 @@ export type TimeMode = 'anytime' | 'part_of_day' | 'specific';
 export interface TimePeriodConfig {
   id: TimePeriod;
   label: string;
+  labelKey: string;
   emoji: string;
   icon: 'sun' | 'mountains' | 'sunset' | 'moon';
   timeRange: { start: string; end: string }; // HH:mm format
@@ -26,6 +37,7 @@ export const TIME_PERIODS: TimePeriodConfig[] = [
   { 
     id: 'start_of_day', 
     label: 'Start the day', 
+    labelKey: 'timePeriods.start_of_day',
     emoji: '☀️', 
     icon: 'sun',
     timeRange: { start: '06:00', end: '12:00' },
@@ -34,6 +46,7 @@ export const TIME_PERIODS: TimePeriodConfig[] = [
   { 
     id: 'afternoon', 
     label: 'Afternoon', 
+    labelKey: 'timePeriods.afternoon',
     emoji: '🏔️', 
     icon: 'mountains',
     timeRange: { start: '12:00', end: '17:00' },
@@ -42,6 +55,7 @@ export const TIME_PERIODS: TimePeriodConfig[] = [
   { 
     id: 'evening', 
     label: 'Evening', 
+    labelKey: 'timePeriods.evening',
     emoji: '🌅', 
     icon: 'sunset',
     timeRange: { start: '17:00', end: '21:00' },
@@ -50,6 +64,7 @@ export const TIME_PERIODS: TimePeriodConfig[] = [
   { 
     id: 'bedtime', 
     label: 'Bedtime', 
+    labelKey: 'timePeriods.bedtime',
     emoji: '🌙', 
     icon: 'moon',
     timeRange: { start: '21:00', end: '24:00' },
@@ -93,7 +108,7 @@ export function getTimePeriodConfig(id: TimePeriod | string | null): TimePeriodC
 export function formatTimeLabel(task: { scheduled_time?: string | null; time_period?: string | null }): string {
   if (task.time_period) {
     const period = TIME_PERIODS.find(p => p.id === task.time_period);
-    return period ? period.label : 'Anytime';
+    return period ? tr(period.labelKey, period.label) : tr('timePeriods.anytime', 'Anytime');
   }
   if (task.scheduled_time) {
     // Format as 12-hour time
@@ -103,7 +118,7 @@ export function formatTimeLabel(task: { scheduled_time?: string | null; time_per
     const displayHour = hour % 12 || 12;
     return `${displayHour}:${minutes} ${ampm}`;
   }
-  return 'Anytime';
+  return tr('timePeriods.anytime', 'Anytime');
 }
 
 /**
@@ -112,7 +127,7 @@ export function formatTimeLabel(task: { scheduled_time?: string | null; time_per
 export function formatTimeLabelWithEmoji(task: { scheduled_time?: string | null; time_period?: string | null }): string {
   if (task.time_period) {
     const period = TIME_PERIODS.find(p => p.id === task.time_period);
-    return period ? period.label : 'Anytime';
+    return period ? tr(period.labelKey, period.label) : tr('timePeriods.anytime', 'Anytime');
   }
   if (task.scheduled_time) {
     const [hours, minutes] = task.scheduled_time.split(':');
@@ -121,7 +136,7 @@ export function formatTimeLabelWithEmoji(task: { scheduled_time?: string | null;
     const displayHour = hour % 12 || 12;
     return `${displayHour}:${minutes} ${ampm}`;
   }
-  return 'Anytime';
+  return tr('timePeriods.anytime', 'Anytime');
 }
 
 /**

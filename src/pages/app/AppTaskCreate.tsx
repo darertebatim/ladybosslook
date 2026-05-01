@@ -285,7 +285,7 @@ const TimePickerSheet = ({
                         "text-sm font-medium",
                         localPeriod === period.id ? "text-foreground" : "text-muted-foreground"
                       )}>
-                        {period.label}
+                        {t(period.labelKey)}
                       </span>
                     </button>
                   ))}
@@ -305,7 +305,7 @@ const TimePickerSheet = ({
                   )}
                   aria-pressed={localTimeMode === 'anytime'}
                 >
-                  Any time
+                  {t('timePeriods.anytime')}
                 </button>
               </>
             )}
