@@ -891,5 +891,155 @@
   "reflectionsPage": {
     "shareAria": "اشتراک‌گذاری تأملات",
     "routineTitle": "تأمل روزانه"
+  },
+  "tier1": {
+    "common": {
+      "today": "امروز",
+      "yesterday": "دیروز",
+      "tomorrow": "فردا",
+      "cancel": "لغو",
+      "delete": "حذف",
+      "save": "ذخیره",
+      "settings": "تنظیمات",
+      "back": "بازگشت",
+      "share": "اشتراک‌گذاری",
+      "unlockWithPlus": "باز کردن با Plus",
+      "thisWeek": "این هفته",
+      "previousWeek": "هفته قبل",
+      "nextWeek": "هفته بعد",
+      "loading": "در حال بارگذاری..."
+    },
+    "emotionHistory": {
+      "title": "تاریخچه احساسات",
+      "filterAll": "همه",
+      "filterWeek": "این هفته",
+      "filterMonth": "این ماه",
+      "empty": "هنوز ثبتی وجود ندارد",
+      "emptySub": "احساسات خود را پیگیری کنید",
+      "deleteTitle": "این مورد حذف شود؟",
+      "deleteDesc": "این عمل قابل بازگشت نیست."
+    },
+    "fasting": {
+      "title": "روزه",
+      "started": "شروع",
+      "goal": "هدف",
+      "editStart": "ویرایش شروع",
+      "editGoal": "ویرایش هدف {{hours}} ساعته",
+      "endFast": "پایان روزه",
+      "startFast": "شروع روزه",
+      "startNHourFast": "شروع روزه {{hours}} ساعته",
+      "startTimeUpdated": "زمان شروع به‌روزرسانی شد",
+      "goalUpdated": "هدف به‌روزرسانی شد"
+    },
+    "water": {
+      "title": "آب",
+      "intakeGoal": "مصرف آب و هدف شما",
+      "goalReached": "به هدف رسیدی!",
+      "addToTrack": "برای پیگیری روزانه به روتین اضافه کنید",
+      "addWater": "افزودن آب",
+      "addedGoToPlanner": "اضافه شد — رفتن به برنامه‌ریز",
+      "addAgain": "افزودن دوباره",
+      "plusFeatureTitle": "ردیاب آب یک ویژگی Plus است",
+      "plusFeatureDesc": "برای پیگیری آب‌رسانی با اهداف روزانه و یادآورها به Simora Plus ارتقا دهید.",
+      "addedToRoutines": "ردیابی آب به روتین‌های شما اضافه شد!",
+      "addFailed": "افزودن ردیابی آب ناموفق بود",
+      "addToRoutineDesc": "ردیابی آب را به روتین خود اضافه کنید تا پیشرفت ذخیره شود!",
+      "addRoutine": "افزودن روتین",
+      "progressFormat": "پیشرفت: {{current}}/{{target}}",
+      "routineTitle": "ردیابی آب"
+    },
+    "period": {
+      "title": "ردیاب پریود",
+      "plusFeatureTitle": "ردیاب پریود یک ویژگی Plus است",
+      "plusFeatureDesc": "برای پیگیری چرخه، دریافت پیش‌بینی و ثبت علائم به Simora Plus ارتقا دهید.",
+      "logToday": "ثبت امروز",
+      "startPageTour": "شروع تور صفحه",
+      "legendPeriod": "پریود",
+      "legendPredicted": "پیش‌بینی شده",
+      "legendOvulation": "تخمک‌گذاری",
+      "logged": "پریود ثبت شد!",
+      "logRemoved": "ثبت حذف شد",
+      "saveFailed": "ذخیره‌سازی ناموفق بود"
+    },
+    "balance": {
+      "title": "تعادل خودمراقبتی",
+      "seoDesc": "تعادل هفتگی شما در بدن، ذهن، محیط و افراد",
+      "yourBalance": "تعادل شما",
+      "completionsLabel": "{{n}} انجام شده",
+      "noCompletions": "هیچ کاری در این بازه انجام نشده. هفته قبل را امتحان کنید یا چند کار امروز انجام دهید.",
+      "doneCount": "{{n}} انجام",
+      "suggestionTitle": "پیشنهاد برای هفته بعد",
+      "whatYouDid": "چه کارهایی کردی",
+      "noTagged": "هنوز هیچ کار برچسب‌داری انجام نشده.",
+      "fourWeekTrend": "روند ۴ هفته‌ای",
+      "noTrend": "هنوز داده روندی موجود نیست.",
+      "nowSuffix": "{{pct}}% اکنون",
+      "oldestNewest": "قدیمی‌ترین → جدیدترین هفته (راست = فعلی)",
+      "scoreLegend": "امتیاز سطح فعالیت شماست (۰ تا ۱۰۰). ۱۰+ کار برچسب‌دار در یک خوشه = نوار کامل."
+    },
+    "tasksBank": {
+      "title": "اهداف خودمراقبتی",
+      "search": "جستجوی کارها...",
+      "noTasks": "کاری پیدا نشد",
+      "tryDifferent": "عبارت دیگری را امتحان کنید",
+      "all": "همه",
+      "moreCount": "+{{n}} مورد دیگر",
+      "buildMyRoutine": "ساخت روتین من ({{n}})",
+      "myRoutine": "روتین خودمراقبتی من",
+      "tasksFallback": "کارها",
+      "routineCreated": "روتین ساخته شد! 🎉",
+      "createFailed": "ساخت روتین ناموفق بود"
+    },
+    "taskDrafts": {
+      "title": "پروژه‌ها",
+      "dragReorder": "بکشید برای مرتب‌سازی",
+      "projectName": "نام پروژه...",
+      "addDescription": "افزودن توضیحات...",
+      "addTask": "افزودن یک کار...",
+      "sent": "ارسال شده",
+      "sendToPlanner": "ارسال به برنامه‌ریز",
+      "sendToPlannerDesc": "تاریخی برای ارسال این کار به برنامه‌ریز انتخاب کنید.",
+      "noProjects": "هنوز پروژه‌ای ندارید.",
+      "tapPlusHint": "برای ساخت یکی و ذخیره کارهای خود روی <b>+</b> بزنید."
+    },
+    "channelDetail": {
+      "notFound": "کانال پیدا نشد",
+      "backToChannels": "بازگشت به کانال‌ها",
+      "groupChat": "گفتگوی گروهی",
+      "broadcastChannel": "کانال اعلانات",
+      "noMessages": "هنوز پیامی نیست",
+      "beFirst": "اولین نفری باشید که چیزی می‌گوید!",
+      "checkBack": "بعداً برای به‌روزرسانی‌ها بررسی کنید",
+      "unread": "پیام‌های خوانده‌نشده",
+      "pinned": "پیام سنجاق‌شده"
+    },
+    "feedPost": {
+      "post": "پست",
+      "notFound": "پست پیدا نشد",
+      "noAccess": "این پست وجود ندارد یا دسترسی به آن ندارید.",
+      "reply_one": "پاسخ",
+      "reply_other": "پاسخ",
+      "noReplies": "هنوز پاسخی نیست",
+      "beFirstReply": "اولین نفری باشید که پاسخ می‌دهد!",
+      "writeReply": "پاسخی بنویسید...",
+      "delete": "حذف",
+      "shareText": "💬 این پست را در Routine Ladyboss ببینید 💫",
+      "user": "کاربر",
+      "admin": "ادمین",
+      "postTypes": {
+        "announcement": "اعلامیه",
+        "drip_unlock": "محتوای جدید",
+        "session_reminder": "جلسه",
+        "media": "رسانه",
+        "discussion": "گفتگو"
+      }
+    },
+    "routineCategory": {
+      "challenges": "چالش‌ها",
+      "projects": "پروژه‌ها",
+      "focus": "تمرکز",
+      "popular": "محبوب",
+      "routines": "روتین‌ها"
+    }
   }
 }
