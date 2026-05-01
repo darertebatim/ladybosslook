@@ -130,6 +130,8 @@ interface SortableTaskListProps {
   onOpenTaskSheet?: (params: { editTaskId?: string; createParams?: Record<string, string> }) => void;
   /** When set, only this task is highlighted; others are dimmed and non-interactive. */
   coachHighlightTaskId?: string | null;
+  /** Visual style of the highlight halo. Defaults to white. */
+  coachHighlightVariant?: 'white' | 'gold';
 }
 
 export const SortableTaskList = ({
@@ -148,6 +150,7 @@ export const SortableTaskList = ({
   defaultRepeatOverride,
   onOpenTaskSheet,
   coachHighlightTaskId,
+  coachHighlightVariant = 'white',
 }: SortableTaskListProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<UserTask[]>(tasks);
@@ -260,7 +263,7 @@ export const SortableTaskList = ({
       coachHighlight={
         coachHighlightTaskId
           ? coachHighlightTaskId === task.id
-            ? 'on'
+            ? (coachHighlightVariant === 'gold' ? 'gold' : 'on')
             : 'off'
           : null
       }
