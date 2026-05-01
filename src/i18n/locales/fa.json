@@ -718,5 +718,30 @@
     "listen": "شنیدن",
     "chats": "گفتگوها",
     "aiPlanner": "برنامه‌ریز هوشمند"
+  },
+  "presence": {
+    "title": "حضور من",
+    "daysStreak": "روزهای پیوسته",
+    "tasksDone": "کارهای انجام‌شده",
+    "returnsThisWeek": "بازگشت این هفته",
+    "activityStats": "آمار فعالیت",
+    "taskStats": "آمار کارها",
+    "viewAll": "مشاهده همه",
+    "streakCalendar": "تقویم استریک",
+    "moodInsights": "بینش‌های حال",
+    "awards": "نشان‌ها",
+    "unlocked": "{{count}} باز شده",
+    "stats": {
+      "listening": "شنیدن",
+      "completedTracks": "تراک‌های تکمیل‌شده",
+      "journalEntries": "یادداشت‌های دفترچه",
+      "breathingSessions": "جلسات تنفس",
+      "reflections": "تأمل‌ها",
+      "emotionNamings": "نام‌گذاری احساسات",
+      "moodCheckins": "چک‌این حال",
+      "focusTime": "زمان تمرکز",
+      "onlineSessions": "جلسات آنلاین",
+      "min": "دقیقه"
+    }
   }
 }

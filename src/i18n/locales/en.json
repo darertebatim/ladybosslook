@@ -718,5 +718,30 @@
     "listen": "Listen",
     "chats": "Chats",
     "aiPlanner": "Open AI Planner"
+  },
+  "presence": {
+    "title": "My Presence",
+    "daysStreak": "Days Streak",
+    "tasksDone": "Tasks Done",
+    "returnsThisWeek": "returns this week",
+    "activityStats": "Activity Stats",
+    "taskStats": "Task Stats",
+    "viewAll": "View All",
+    "streakCalendar": "Streak Calendar",
+    "moodInsights": "Mood Insights",
+    "awards": "Awards",
+    "unlocked": "{{count}} unlocked",
+    "stats": {
+      "listening": "Listening",
+      "completedTracks": "Completed Tracks",
+      "journalEntries": "Journal Entries",
+      "breathingSessions": "Breathing Sessions",
+      "reflections": "Reflections",
+      "emotionNamings": "Emotion Namings",
+      "moodCheckins": "Mood Check-ins",
+      "focusTime": "Focus Time",
+      "onlineSessions": "Online Sessions",
+      "min": "min"
+    }
   }
 }
