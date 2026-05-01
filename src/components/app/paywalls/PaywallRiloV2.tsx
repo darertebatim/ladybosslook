@@ -30,9 +30,12 @@ const FEATURES = [
 
 // Rilo brand DNA
 const NAVY = '#1a1f3d';
+const LOGO_GOLD = '#F5A623';
+// Amber accent used on white sections (pages 2 + 3) — keep readable on white.
 const SUNRISE_AMBER = '#B8590E';
-// Logo-derived warm sunrise — phoenix yellow → orange → soft amber.
-const SUNRISE_BG = 'linear-gradient(to bottom, #FFE9A8 0%, #FFC976 35%, #FFA64D 70%, #F58220 100%)';
+// Logo-derived hero — same coral/magenta wash as the app icon background.
+// Top-right coral → bottom-left magenta, with deep red shadow grounding the bottom.
+const SUNRISE_BG = 'linear-gradient(155deg, #D94B2B 0%, #C2255C 55%, #8E1B4A 100%)';
 const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
 
 // Pricing — derived from program data (live from RC / catalog) with safe fallbacks.
@@ -141,20 +144,20 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', padding: '12px 0 14px' }}>
       <button
         onClick={onClose}
-        style={{ position: 'absolute', left: 14, background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'rgba(26,31,61,0.55)', display: 'flex' }}
+        style={{ position: 'absolute', left: 14, background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'rgba(255,255,255,0.85)', display: 'flex' }}
         aria-label="Close"
       >
         <X size={20} />
       </button>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <img src={riloAppIcon} alt="" style={{ width: 22, height: 22, borderRadius: 6 }} />
-        <span style={{ color: NAVY, fontSize: 17, fontWeight: 700, letterSpacing: -0.3, fontFamily: SF }}>
-          Rilo<span style={{ color: SUNRISE_AMBER }}>+</span>
+        <span style={{ color: '#fff', fontSize: 17, fontWeight: 700, letterSpacing: -0.3, fontFamily: SF }}>
+          Rilo<span style={{ color: LOGO_GOLD }}>+</span>
         </span>
       </div>
       <button
         onClick={onRestore}
-        style={{ position: 'absolute', right: 14, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(26,31,61,0.55)', fontSize: 13, fontFamily: SF }}
+        style={{ position: 'absolute', right: 14, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.85)', fontSize: 13, fontFamily: SF }}
       >
         Restore
       </button>
@@ -183,7 +186,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
               style={{
                 width: 96, height: 96,
                 objectFit: 'contain',
-                filter: 'drop-shadow(0 18px 36px rgba(232,74,111,0.35))',
+                filter: 'drop-shadow(0 18px 36px rgba(0,0,0,0.35))',
               }}
             />
           </motion.div>
@@ -192,7 +195,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15 }}
-            style={{ color: SUNRISE_AMBER, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2.4, margin: '0 0 12px' }}
+            style={{ color: LOGO_GOLD, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2.4, margin: '0 0 12px' }}
           >
             ✨ Rilo Plus
           </motion.p>
@@ -201,11 +204,11 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.22 }}
-            style={{ color: NAVY, fontSize: 30, fontWeight: 800, lineHeight: 1.18, margin: 0, letterSpacing: -0.6 }}
+            style={{ color: '#fff', fontSize: 30, fontWeight: 800, lineHeight: 1.18, margin: 0, letterSpacing: -0.6 }}
           >
             Rilo Plus users are{' '}
             <span style={{
-              background: 'linear-gradient(135deg, #FFB347 0%, #E84A6F 100%)',
+              background: 'linear-gradient(135deg, #FFD36E 0%, #F5A623 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -218,7 +221,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.35 }}
-            style={{ color: 'rgba(26,31,61,0.7)', fontSize: 15, fontWeight: 500, margin: '14px 0 0', lineHeight: 1.45 }}
+            style={{ color: 'rgba(255,255,255,0.9)', fontSize: 15, fontWeight: 500, margin: '14px 0 0', lineHeight: 1.45 }}
           >
             Make self-care actually stick.
           </motion.p>
