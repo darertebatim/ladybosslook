@@ -153,7 +153,7 @@ export const AddedToRoutineButton = ({
       )}
     >
       <CalendarPlus className="h-4 w-4" />
-      <span className="text-sm">{addText}</span>
+      <span className="text-sm">{resolvedAddText}</span>
     </Button>
   );
 };
