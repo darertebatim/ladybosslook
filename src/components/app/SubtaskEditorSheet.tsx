@@ -9,6 +9,7 @@ import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } 
 import { CSS } from '@dnd-kit/utilities';
 import { useSensors, useSensor, TouchSensor, MouseSensor } from '@dnd-kit/core';
 import { haptic } from '@/lib/haptics';
+import { useTranslation } from 'react-i18next';
 
 interface SubtaskEditorSheetProps {
   open: boolean;
@@ -80,6 +81,7 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
   subtasks: initialSubtasks,
   onSave,
 }) => {
+  const { t } = useTranslation();
   const [items, setItems] = useState<SubtaskItem[]>([]);
   const [newSubtask, setNewSubtask] = useState('');
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -154,13 +156,13 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
             <button onClick={() => onOpenChange(false)} className="p-2 -ml-2">
               <X className="h-5 w-5" />
             </button>
-            <h2 className="text-lg font-semibold">Subtasks</h2>
+            <h2 className="text-lg font-semibold">{t('task.subtasks')}</h2>
             <Button
               onClick={handleSave}
               variant="ghost"
               className="text-primary font-semibold"
             >
-              Done
+              {t('routineBuilder.done')}
             </Button>
           </div>
 
@@ -175,7 +177,7 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
               value={newSubtask}
               onChange={(e) => setNewSubtask(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addSubtask()}
-              placeholder="Add subtask..."
+              placeholder={t('task.addSubtask')}
               className="flex-1 border-0 bg-transparent focus-visible:ring-0 p-0 h-auto text-base placeholder:text-muted-foreground/50"
               autoFocus
             />

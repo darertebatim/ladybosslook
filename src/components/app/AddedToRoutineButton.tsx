@@ -3,6 +3,7 @@ import { Check, CalendarPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
+import { useTranslation } from 'react-i18next';
 
 interface AddedToRoutineButtonProps {
   isAdded: boolean;
@@ -29,9 +30,11 @@ export const AddedToRoutineButton = ({
   className,
   size = 'default',
   variant = 'default',
-  addText = 'Add to My Routines',
+  addText,
   iconOnly = false,
 }: AddedToRoutineButtonProps) => {
+  const { t } = useTranslation();
+  const resolvedAddText = addText ?? t('homePlanner.addToMyRoutines');
   const navigate = useNavigate();
 
   const handleGoToPlanner = () => {
@@ -79,7 +82,7 @@ export const AddedToRoutineButton = ({
           "rounded-full bg-success/20 text-success hover:bg-success/30 shrink-0",
           className
         )}
-        title="Added — Go to Planner"
+        title={t('homePlanner.addedGoToPlanner')}
       >
         <Check className="h-5 w-5" />
       </Button>
@@ -98,7 +101,7 @@ export const AddedToRoutineButton = ({
           "rounded-xl bg-urgency text-urgency-foreground hover:bg-urgency/90 shrink-0",
           className
         )}
-        title="Add to My Routines"
+        title={t('homePlanner.addToMyRoutines')}
       >
         <CalendarPlus className="h-5 w-5" />
       </Button>
@@ -119,7 +122,7 @@ export const AddedToRoutineButton = ({
           )}
         >
           <Check className="h-4 w-4" />
-          <span className="text-sm">Added — Go to Planner</span>
+          <span className="text-sm">{t('homePlanner.addedGoToPlanner')}</span>
         </Button>
 
         {/* Small re-add button */}
@@ -129,7 +132,7 @@ export const AddedToRoutineButton = ({
           onClick={handleAddAgain}
           disabled={isLoading}
           className="h-10 w-10 rounded-full bg-urgency text-urgency-foreground hover:bg-urgency/90 shrink-0"
-          title="Add again to my routines"
+          title={t('homePlanner.addAgain')}
         >
           <CalendarPlus className="h-4 w-4" />
         </Button>

@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { UserTask, useSkipTask, useSnoozeTask } from '@/hooks/useTaskPlanner';
 import { haptic } from '@/lib/haptics';
 import { TaskIcon } from './IconPicker';
+import { useTranslation } from 'react-i18next';
 
 interface TaskSkipSheetProps {
   task: UserTask | null;
@@ -18,6 +19,7 @@ interface TaskSkipSheetProps {
 }
 
 export const TaskSkipSheet = ({ task, open, onClose, date }: TaskSkipSheetProps) => {
+  const { t } = useTranslation();
   const [snoozeDate, setSnoozeDate] = useState<Date | undefined>(addDays(date, 1));
   const [showCalendar, setShowCalendar] = useState(false);
   const skipTask = useSkipTask();
@@ -51,7 +53,7 @@ export const TaskSkipSheet = ({ task, open, onClose, date }: TaskSkipSheetProps)
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
       <SheetContent side="bottom" className="rounded-t-3xl px-6 pb-8">
         <SheetHeader className="pb-4">
-          <SheetTitle className="text-center">Skip Task</SheetTitle>
+          <SheetTitle className="text-center">{t('task.skipTitle')}</SheetTitle>
         </SheetHeader>
 
         {/* Task preview */}
@@ -62,9 +64,9 @@ export const TaskSkipSheet = ({ task, open, onClose, date }: TaskSkipSheetProps)
           <div className="flex-1">
             <p className="font-medium">{task.title}</p>
             <p className="text-sm text-muted-foreground">
-              {task.repeat_pattern === 'daily' ? 'Daily' : 
-               task.repeat_pattern === 'weekly' ? 'Weekly' :
-               task.repeat_pattern === 'none' ? 'One-time' : task.repeat_pattern}
+              {task.repeat_pattern === 'daily' ? t('task.daily') : 
+               task.repeat_pattern === 'weekly' ? t('task.weekly') :
+               task.repeat_pattern === 'none' ? t('routinePreview.oneTimeAction') : task.repeat_pattern}
             </p>
           </div>
         </div>
@@ -79,7 +81,7 @@ export const TaskSkipSheet = ({ task, open, onClose, date }: TaskSkipSheetProps)
           <FastForward className="h-5 w-5 text-muted-foreground" />
           {isNonRepeating ? 'Move to Tomorrow' : 'Skip for Today'}
           {!isNonRepeating && task.repeat_pattern !== 'none' && (
-            <span className="text-sm text-muted-foreground ml-auto">Returns tomorrow</span>
+            <span className="text-sm text-muted-foreground ml-auto">{t('task.returnsTomorrow')}</span>
           )}
         </Button>
 
@@ -88,7 +90,7 @@ export const TaskSkipSheet = ({ task, open, onClose, date }: TaskSkipSheetProps)
           <>
             <div className="flex items-center gap-2 my-4">
               <div className="flex-1 h-px bg-border" />
-              <span className="text-sm text-muted-foreground">or reschedule to</span>
+              <span className="text-sm text-muted-foreground">{t('task.orRescheduleTo')}</span>
               <div className="flex-1 h-px bg-border" />
             </div>
 
@@ -100,7 +102,7 @@ export const TaskSkipSheet = ({ task, open, onClose, date }: TaskSkipSheetProps)
                 className="h-12 rounded-xl flex-col gap-0.5"
                 disabled={snoozeTask.isPending}
               >
-                <span className="text-sm font-medium">Tomorrow</span>
+                <span className="text-sm font-medium">{t('task.tomorrow')}</span>
                 <span className="text-xs text-muted-foreground">{format(tomorrow, 'MMM d')}</span>
               </Button>
               <Button
@@ -109,7 +111,7 @@ export const TaskSkipSheet = ({ task, open, onClose, date }: TaskSkipSheetProps)
                 className="h-12 rounded-xl flex-col gap-0.5"
                 disabled={snoozeTask.isPending}
               >
-                <span className="text-sm font-medium">In 2 days</span>
+                <span className="text-sm font-medium">{t('task.inTwoDays')}</span>
                 <span className="text-xs text-muted-foreground">{format(addDays(date, 2), 'MMM d')}</span>
               </Button>
               <Button
@@ -118,7 +120,7 @@ export const TaskSkipSheet = ({ task, open, onClose, date }: TaskSkipSheetProps)
                 className="h-12 rounded-xl flex-col gap-0.5"
                 disabled={snoozeTask.isPending}
               >
-                <span className="text-sm font-medium">Next week</span>
+                <span className="text-sm font-medium">{t('task.nextWeek')}</span>
                 <span className="text-xs text-muted-foreground">{format(addDays(date, 7), 'MMM d')}</span>
               </Button>
             </div>
