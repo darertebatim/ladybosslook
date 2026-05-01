@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
@@ -21,70 +22,22 @@ import talkImg from '@/assets/mood-card-talk.png';
 interface MoodData {
   value: string;
   emoji: string;
-  label: string;
   bgColor: string;
-  celebrationText: string;
 }
 
 const MOOD_CONFIG: Record<string, MoodData> = {
-  great: {
-    value: 'great',
-    emoji: '😄',
-    label: 'Great',
-    bgColor: 'bg-yellow-100',
-    celebrationText: 'Amazing! You feel great!',
-  },
-  good: {
-    value: 'good',
-    emoji: '🙂',
-    label: 'Good',
-    bgColor: 'bg-green-100',
-    celebrationText: "Nice! You're feeling good!",
-  },
-  okay: {
-    value: 'okay',
-    emoji: '😐',
-    label: 'Okay',
-    bgColor: 'bg-blue-100',
-    celebrationText: "You're feeling okay.",
-  },
-  not_great: {
-    value: 'not_great',
-    emoji: '😔',
-    label: 'Not Great',
-    bgColor: 'bg-purple-100',
-    celebrationText: "It's okay to feel not great.",
-  },
-  bad: {
-    value: 'bad',
-    emoji: '😢',
-    label: 'Bad',
-    bgColor: 'bg-red-100',
-    celebrationText: "It's okay to have tough days.",
-  },
+  great: { value: 'great', emoji: '😄', bgColor: 'bg-yellow-100' },
+  good: { value: 'good', emoji: '🙂', bgColor: 'bg-green-100' },
+  okay: { value: 'okay', emoji: '😐', bgColor: 'bg-blue-100' },
+  not_great: { value: 'not_great', emoji: '😔', bgColor: 'bg-purple-100' },
+  bad: { value: 'bad', emoji: '😢', bgColor: 'bg-red-100' },
 };
 
 const ACTIONS = [
-  {
-    label: 'Write in Journal',
-    image: journalImg,
-    routeKey: 'journal',
-  },
-  {
-    label: 'Breathe',
-    image: breathingImg,
-    route: '/app/breathe',
-  },
-  {
-    label: 'Choose a Reflection',
-    image: reflectImg,
-    route: '/app/reflections',
-  },
-  {
-    label: 'Talk it Out',
-    image: talkImg,
-    route: '/app/channels',
-  },
+  { labelKey: 'moodPage.celebration.actions.journal', image: journalImg, routeKey: 'journal' as const, route: undefined as string | undefined },
+  { labelKey: 'moodPage.celebration.actions.breathe', image: breathingImg, route: '/app/breathe', routeKey: undefined as 'journal' | undefined },
+  { labelKey: 'moodPage.celebration.actions.reflect', image: reflectImg, route: '/app/reflections', routeKey: undefined as 'journal' | undefined },
+  { labelKey: 'moodPage.celebration.actions.talk', image: talkImg, route: '/app/channels', routeKey: undefined as 'journal' | undefined },
 ];
 
 interface MoodCelebrationSheetProps {
@@ -102,8 +55,11 @@ export function MoodCelebrationSheet({
   onDone,
   onActionClick,
 }: MoodCelebrationSheetProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const moodData = mood ? MOOD_CONFIG[mood] : null;
+  const moodLabel = mood ? t(`moodPage.moods.${mood}`, { defaultValue: mood }) : '';
+  const celebrationText = mood ? t(`moodPage.celebration.${mood}`, { defaultValue: '' }) : '';
 
   // Fire only for positive moods (great/good) — avoid prompting after negative check-ins
   useEffect(() => {
@@ -115,8 +71,10 @@ export function MoodCelebrationSheet({
   }, [open, mood]);
 
   const { handleShare } = useShareContent({
-    title: 'Mood check-in on Rilo',
-    text: moodData ? `Just checked in: feeling ${moodData.label.toLowerCase()} today. Track your mood with me on Rilo 💛` : 'I just checked in my mood on Rilo 💛',
+    title: t('moodPage.celebration.shareTitle'),
+    text: mood
+      ? t('moodPage.celebration.shareText', { mood: moodLabel.toLowerCase() })
+      : t('moodPage.celebration.shareTextFallback'),
     source: 'mood_checkin',
     contentId: mood ?? undefined,
   });
@@ -181,18 +139,20 @@ export function MoodCelebrationSheet({
             <FluentEmoji emoji={moodData.emoji} size={40} />
           </div>
           <p className="text-sm font-medium text-foreground/50 mb-1">
-            {moodData.celebrationText}
+            {celebrationText}
           </p>
           <h2 className="text-xl font-bold text-foreground leading-snug">
-            Something may Help you<br />feel Stronger
+            {t('moodPage.celebration.heading')}
           </h2>
         </div>
 
         {/* 2×2 Cards with illustrations */}
         <div className="grid grid-cols-2 gap-3 mb-5">
-          {ACTIONS.map((action) => (
+          {ACTIONS.map((action) => {
+            const label = t(action.labelKey);
+            return (
             <button
-              key={action.label}
+              key={action.labelKey}
               onClick={() => handleAction(action)}
               className={cn(
                 "flex flex-col items-center rounded-2xl p-3 pt-4",
@@ -202,14 +162,15 @@ export function MoodCelebrationSheet({
             >
               <img 
                 src={action.image} 
-                alt={action.label}
+                alt={label}
                 className="w-24 h-24 object-contain mb-2"
               />
               <span className="text-sm font-semibold text-foreground text-center leading-tight">
-                {action.label}
+                {label}
               </span>
             </button>
-          ))}
+            );
+          })}
         </div>
 
         {/* Maybe later + Share */}
@@ -218,7 +179,7 @@ export function MoodCelebrationSheet({
             variant="ghost"
             onClick={() => { haptic.light(); handleShare(); }}
             className="h-11 px-4 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm"
-            aria-label="Share mood check-in"
+            aria-label={t('moodPage.celebration.shareAria')}
           >
             <Share2 className="w-4 h-4" />
           </Button>
@@ -227,7 +188,7 @@ export function MoodCelebrationSheet({
             onClick={handleDone}
             className="flex-1 h-11 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm"
           >
-            {hasActivePlayer ? 'Continue Routine ▶' : 'Back to Home Planner'}
+            {hasActivePlayer ? t('moodPage.celebration.continueRoutine') : t('moodPage.celebration.backToHomePlanner')}
           </Button>
         </div>
       </SheetContent>

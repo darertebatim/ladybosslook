@@ -9,8 +9,8 @@ export default function AppMood() {
   return (
     <SlideUpPage defaultBack="/app/home">
       <SEOHead 
-        title="Mood Check-in | Rilo"
-        description="Track your daily mood and emotional well-being"
+        title={t('moodPage.seoTitle')}
+        description={t('moodPage.seoDescription')}
       />
       <div 
         className="bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 flex flex-col"

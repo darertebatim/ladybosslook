@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { CalendarPlus, TrendingUp } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
@@ -8,9 +9,9 @@ import {
 } from '@/components/ui/sheet';
 
 const BENEFITS = [
-  { emoji: '📊', text: 'See patterns in your emotions' },
-  { emoji: '🎯', text: 'Understand what affects your mood' },
-  { emoji: '💪', text: 'Build stronger emotional resilience' },
+  { emoji: '📊', key: 'moodPage.routinePrompt.benefit1' },
+  { emoji: '🎯', key: 'moodPage.routinePrompt.benefit2' },
+  { emoji: '💪', key: 'moodPage.routinePrompt.benefit3' },
 ];
 
 interface MoodRoutinePromptSheetProps {
@@ -31,6 +32,7 @@ export function MoodRoutinePromptSheet({
   onNever,
   isLoading,
 }: MoodRoutinePromptSheetProps) {
+  const { t } = useTranslation();
 
   const handleAdd = () => {
     haptic.medium();
@@ -65,24 +67,24 @@ export function MoodRoutinePromptSheet({
         {/* Heading */}
         <div className="text-center mb-2">
           <h2 className="text-[22px] font-bold text-foreground leading-tight">
-            Check In With Your<br />Mood Daily
+            {t('moodPage.routinePrompt.heading')}
           </h2>
         </div>
 
         {/* Description */}
         <p className="text-[15px] font-medium text-foreground text-center leading-snug max-w-[300px] mx-auto mb-5">
-          A 10-second check-in that helps you understand yourself better over time.
+          {t('moodPage.routinePrompt.description')}
         </p>
 
         {/* Benefits */}
         <div className="flex flex-col gap-2.5 mb-4">
           {BENEFITS.map((b) => (
             <div
-              key={b.text}
+              key={b.key}
               className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-background/80 border border-border/40"
             >
               <FluentEmoji emoji={b.emoji} size={26} />
-              <span className="text-[14px] font-medium text-foreground">{b.text}</span>
+              <span className="text-[14px] font-medium text-foreground">{t(b.key)}</span>
             </div>
           ))}
         </div>
@@ -92,7 +94,7 @@ export function MoodRoutinePromptSheet({
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-background/70">
             <TrendingUp className="h-3.5 w-3.5 text-primary" />
             <span className="text-xs font-semibold text-primary">
-              Most users feel more self-aware after a week
+              {t('moodPage.routinePrompt.socialProof')}
             </span>
           </div>
         </div>
@@ -105,7 +107,7 @@ export function MoodRoutinePromptSheet({
           style={{ boxShadow: 'var(--shadow-cta)' }}
         >
           <CalendarPlus className="h-5 w-5" />
-          Add Daily Mood Check-in to My Routines
+          {t('moodPage.routinePrompt.addCta')}
         </Button>
 
         {/* Skip row — visible on hover/active */}
@@ -115,14 +117,14 @@ export function MoodRoutinePromptSheet({
             onClick={handleNever}
             className="flex-1 h-10 rounded-full text-muted-foreground bg-foreground/5 hover:bg-foreground/10 hover:text-foreground active:scale-95 transition-all text-sm"
           >
-            Never
+            {t('moodPage.routinePrompt.never')}
           </Button>
           <Button
             variant="ghost"
             onClick={handleSkip}
             className="flex-1 h-10 rounded-full text-muted-foreground bg-foreground/5 hover:bg-foreground/10 hover:text-foreground active:scale-95 transition-all text-sm"
           >
-            Not now
+            {t('moodPage.routinePrompt.notNow')}
           </Button>
         </div>
       </SheetContent>

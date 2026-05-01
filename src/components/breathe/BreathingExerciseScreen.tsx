@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pause, Play, HelpCircle, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -26,19 +27,8 @@ interface PhaseConfig {
   method?: string;
 }
 
-const CYCLE_OPTIONS = [
-  { value: 3, label: '3×' },
-  { value: 5, label: '5×' },
-  { value: 10, label: '10×' },
-  { value: 30, label: '30×' },
-];
-
-const MINUTE_OPTIONS = [
-  { value: 1, label: '1 min' },
-  { value: 3, label: '3 min' },
-  { value: 5, label: '5 min' },
-  { value: 10, label: '10 min' },
-];
+const CYCLE_VALUES = [3, 5, 10, 30] as const;
+const MINUTE_VALUES = [1, 3, 5, 10] as const;
 
 type DurationMode = 'cycles' | 'minutes';
 
@@ -48,6 +38,9 @@ export function BreathingExerciseScreen({
   exercise,
   onClose,
 }: BreathingExerciseScreenProps) {
+  const { t } = useTranslation();
+  const CYCLE_OPTIONS = CYCLE_VALUES.map(v => ({ value: v, label: t('breathePage.cyclesShort', { count: v }) }));
+  const MINUTE_OPTIONS = MINUTE_VALUES.map(v => ({ value: v, label: t('breathePage.minShort', { count: v }) }));
   // Layout toggle
   const [layout, setLayout] = useState<LayoutMode>(() => {
     try {
@@ -107,19 +100,19 @@ export function BreathingExerciseScreen({
   const phases = useMemo(() => {
     const p: PhaseConfig[] = [];
     if (exercise.inhale_seconds > 0) {
-      p.push({ type: 'inhale', duration: exercise.inhale_seconds, text: 'Inhale', method: exercise.inhale_method === 'nose' ? 'Nose' : 'Mouth' });
+      p.push({ type: 'inhale', duration: exercise.inhale_seconds, text: t('breathePage.inhale'), method: exercise.inhale_method === 'nose' ? t('breathePage.nose') : t('breathePage.mouth') });
     }
     if (exercise.inhale_hold_seconds > 0) {
-      p.push({ type: 'inhale_hold', duration: exercise.inhale_hold_seconds, text: 'Hold' });
+      p.push({ type: 'inhale_hold', duration: exercise.inhale_hold_seconds, text: t('breathePage.hold') });
     }
     if (exercise.exhale_seconds > 0) {
-      p.push({ type: 'exhale', duration: exercise.exhale_seconds, text: 'Exhale', method: exercise.exhale_method === 'nose' ? 'Nose' : 'Mouth' });
+      p.push({ type: 'exhale', duration: exercise.exhale_seconds, text: t('breathePage.exhale'), method: exercise.exhale_method === 'nose' ? t('breathePage.nose') : t('breathePage.mouth') });
     }
     if (exercise.exhale_hold_seconds > 0) {
-      p.push({ type: 'exhale_hold', duration: exercise.exhale_hold_seconds, text: 'Hold' });
+      p.push({ type: 'exhale_hold', duration: exercise.exhale_hold_seconds, text: t('breathePage.hold') });
     }
     return p;
-  }, [exercise]);
+  }, [exercise, t]);
 
 
   const currentPhase = phases[currentPhaseIndex];
@@ -296,14 +289,14 @@ export function BreathingExerciseScreen({
       return { phase: 'ready' as const, text: countdown.toString(), method: undefined };
     }
     if (!isActive) {
-      return { phase: 'ready' as const, text: 'Ready', method: undefined };
+      return { phase: 'ready' as const, text: t('breathePage.ready'), method: undefined };
     }
     if (isPaused) {
-      return { phase: 'ready' as const, text: 'Paused', method: undefined };
+      return { phase: 'ready' as const, text: t('breathePage.paused'), method: undefined };
     }
     return {
       phase: currentPhase?.type || 'inhale',
-      text: currentPhase?.text || 'Inhale',
+      text: currentPhase?.text || t('breathePage.inhale'),
       method: currentPhase?.method,
     };
   };
@@ -339,7 +332,7 @@ export function BreathingExerciseScreen({
               <button
                 onClick={toggleLayout}
                 className="p-2 rounded-full bg-white/10 text-white/70 active:bg-white/20"
-                title="Switch layout"
+                title={t('breathePage.switchLayout')}
               >
                 <Layers className="h-5 w-5" />
               </button>
@@ -416,7 +409,7 @@ export function BreathingExerciseScreen({
                         : 'text-white/40'
                     )}
                   >
-                    {mode === 'minutes' ? 'Minutes' : 'Cycles'}
+                    {mode === 'minutes' ? t('breathePage.minutes') : t('breathePage.cycles')}
                   </button>
                 ))}
               </div>
@@ -464,8 +457,8 @@ export function BreathingExerciseScreen({
               <div className="flex justify-between mt-2 text-sm text-white/40">
                 {durationMode === 'cycles' ? (
                   <>
-                    <span>{cycleCount} done</span>
-                    <span>{selectedCycles} total</span>
+                    <span>{cycleCount} {t('breathePage.doneSuffix')}</span>
+                    <span>{selectedCycles} {t('breathePage.totalSuffix')}</span>
                   </>
                 ) : (
                   <>
@@ -483,9 +476,9 @@ export function BreathingExerciseScreen({
               className="w-full h-14 text-lg font-semibold rounded-2xl bg-purple-500/80 text-white active:bg-purple-600/80 transition-all flex items-center justify-center gap-2"
             >
               {isActive ? (
-                isPaused ? (<><Play className="h-5 w-5" /> Resume</>) : (<><Pause className="h-5 w-5" /> Pause</>)
+                isPaused ? (<><Play className="h-5 w-5" /> {t('breathePage.resume')}</>) : (<><Pause className="h-5 w-5" /> {t('breathePage.pause')}</>)
               ) : (
-                <><Play className="h-5 w-5" /> Start</>
+                <><Play className="h-5 w-5" /> {t('breathePage.start')}</>
               )}
             </button>
           )}
@@ -529,7 +522,7 @@ export function BreathingExerciseScreen({
             <button
               onClick={toggleLayout}
               className="p-2 rounded-full bg-muted text-muted-foreground hover:bg-muted/80 transition-colors"
-              title="Switch layout"
+              title={t('breathePage.switchLayout')}
             >
               <Layers className="h-5 w-5" />
             </button>
@@ -572,7 +565,7 @@ export function BreathingExerciseScreen({
                       : 'text-muted-foreground'
                   )}
                 >
-                  {mode === 'minutes' ? 'Minutes' : 'Cycles'}
+                    {mode === 'minutes' ? t('breathePage.minutes') : t('breathePage.cycles')}
                 </button>
               ))}
             </div>
@@ -621,8 +614,8 @@ export function BreathingExerciseScreen({
             <div className="flex justify-between mt-2 text-sm text-muted-foreground">
               {durationMode === 'cycles' ? (
                 <>
-                  <span>{cycleCount} done</span>
-                  <span>{selectedCycles} total</span>
+                  <span>{cycleCount} {t('breathePage.doneSuffix')}</span>
+                  <span>{selectedCycles} {t('breathePage.totalSuffix')}</span>
                 </>
               ) : (
                 <>
@@ -644,18 +637,18 @@ export function BreathingExerciseScreen({
               isPaused ? (
                 <>
                   <Play className="h-5 w-5 mr-2" />
-                  Resume
+                  {t('breathePage.resume')}
                 </>
               ) : (
                 <>
                   <Pause className="h-5 w-5 mr-2" />
-                  Pause
+                  {t('breathePage.pause')}
                 </>
               )
             ) : (
               <>
                 <Play className="h-5 w-5 mr-2" />
-                Start
+                {t('breathePage.start')}
               </>
             )}
           </Button>

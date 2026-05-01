@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Crown } from 'lucide-react';
 import { BreathingExercise } from '@/hooks/useBreathingExercises';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
@@ -19,6 +20,7 @@ interface BreathingExerciseCardProps {
 }
 
 export function BreathingExerciseCard({ exercise, onClick, className }: BreathingExerciseCardProps) {
+  const { t } = useTranslation();
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
@@ -64,12 +66,12 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
         editedTasks,
         syntheticTasks: [syntheticTask],
       });
-      toast.success(`${exercise.name} added to your routines!`);
+      toast.success(t('breathePage.addedToRoutines', { name: exercise.name }));
       setShowRoutineSheet(false);
       setJustAdded(true);
     } catch (error) {
       console.error('Failed to add routine:', error);
-      toast.error('Failed to add routine');
+      toast.error(t('breathePage.addRoutineFailed'));
     }
   };
 

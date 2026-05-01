@@ -432,7 +432,68 @@
     }
   },
   "moodPage": {
-    "title": "Mood Check-in"
+    "title": "Mood Check-in",
+    "history": "Mood History",
+    "seoTitle": "Mood Check-in | Rilo",
+    "seoDescription": "Track your daily mood and emotional well-being",
+    "historySeoTitle": "Mood History | Rilo",
+    "historySeoDescription": "View your mood tracking history",
+    "moodLegend": "Mood Legend",
+    "feeling": "Feeling {{mood}}",
+    "checkInsCount": "{{count}} check-ins",
+    "howAreYouFeeling": "How are you Feeling?",
+    "saving": "Saving…",
+    "iFeel": "I feel...",
+    "logFailed": "Failed to log mood",
+    "addedToRoutines": "Mood check-in added to your routines!",
+    "addRoutineFailed": "Failed to add routine",
+    "syntheticTaskTitle": "Daily Mood Check-in",
+    "feelingDailyText": "Feeling {{mood}} today.",
+    "moods": {
+      "great": "Great",
+      "good": "Good",
+      "okay": "Okay",
+      "not_great": "Not Great",
+      "bad": "Bad"
+    },
+    "buttonText": {
+      "great": "I feel great!!!",
+      "good": "I feel good!",
+      "okay": "I feel just Okay.",
+      "not_great": "I feel not great...",
+      "bad": "I feel bad..."
+    },
+    "celebration": {
+      "great": "Amazing! You feel great!",
+      "good": "Nice! You're feeling good!",
+      "okay": "You're feeling okay.",
+      "not_great": "It's okay to feel not great.",
+      "bad": "It's okay to have tough days.",
+      "heading": "Something may Help you feel Stronger",
+      "shareTitle": "Mood check-in on Rilo",
+      "shareText": "Just checked in: feeling {{mood}} today. Track your mood with me on Rilo 💛",
+      "shareTextFallback": "I just checked in my mood on Rilo 💛",
+      "shareAria": "Share mood check-in",
+      "continueRoutine": "Continue Routine ▶",
+      "backToHomePlanner": "Back to Home Planner",
+      "actions": {
+        "journal": "Write in Journal",
+        "breathe": "Breathe",
+        "reflect": "Choose a Reflection",
+        "talk": "Talk it Out"
+      }
+    },
+    "routinePrompt": {
+      "heading": "Check In With Your Mood Daily",
+      "description": "A 10-second check-in that helps you understand yourself better over time.",
+      "benefit1": "See patterns in your emotions",
+      "benefit2": "Understand what affects your mood",
+      "benefit3": "Build stronger emotional resilience",
+      "socialProof": "Most users feel more self-aware after a week",
+      "addCta": "Add Daily Mood Check-in to My Routines",
+      "never": "Never",
+      "notNow": "Not now"
+    }
   },
   "homePlanner": {
     "moodLogged": "Mood logged!",
@@ -886,7 +947,40 @@
   },
   "breathePage": {
     "shareAria": "Share breathe",
-    "routineTitle": "Breathing Routine"
+    "routineTitle": "Breathing Routine",
+    "addedToRoutines": "{{name}} added to your routines!",
+    "addRoutineFailed": "Failed to add routine",
+    "switchLayout": "Switch layout",
+    "minutes": "Minutes",
+    "cycles": "Cycles",
+    "minShort": "{{count}} min",
+    "cyclesShort": "{{count}}×",
+    "ready": "Ready",
+    "paused": "Paused",
+    "inhale": "Inhale",
+    "exhale": "Exhale",
+    "hold": "Hold",
+    "nose": "Nose",
+    "mouth": "Mouth",
+    "doneSuffix": "done",
+    "totalSuffix": "total",
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "okay": "Okay",
+    "complete": {
+      "headerEmoji": "🧘",
+      "summary": "{{name}} · {{duration}}",
+      "title": "Great Job! What's Next on Your Journey?",
+      "continueRoutine": "Continue Routine ▶",
+      "backToHome": "Back to Home",
+      "actions": {
+        "writeReflection": "Write Reflection",
+        "selfReflection": "Self Reflection",
+        "startMyPlan": "Start My Plan",
+        "talk": "Talk it Out"
+      }
+    }
   },
   "reflectionsPage": {
     "shareAria": "Share Reflections",
@@ -1373,5 +1467,23 @@
     "watchPrefix": "Watch {{name}}",
     "fallbackName": "Video Playlist",
     "shareText": "🎬 Check out '{{name}}' on Routine Ladyboss 💫"
+  },
+  "tour": {
+    "skipAria": "Skip tour",
+    "tryTapping": "Try tapping",
+    "trySwiping": "Try swiping",
+    "takeALook": "Take a look",
+    "gotIt": "Got it!",
+    "next": "Next",
+    "breathe": {
+      "welcomeTitle": "Take a Breath 🌬️",
+      "welcomeDesc": "These exercises help calm your mind. Pick one that matches how you feel.",
+      "exercisesTitle": "Start an Exercise",
+      "exercisesDesc": "Tap any card to begin. Follow the circle animation to breathe in and out.",
+      "addRoutineTitle": "Add to Routines",
+      "addRoutineDesc": "Tap the + button to add this breathing exercise to your Routines (Planner) so you can repeat it daily.",
+      "doneTitle": "Just One Minute 🧘",
+      "doneDesc": "Even one minute makes a difference. Your sessions are tracked automatically."
+    }
   }
 }

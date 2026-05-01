@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ChartColumn, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -15,63 +16,17 @@ import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
-// 5-level mood system
+// 5-level mood system (labels/buttonText resolved via i18n at render time)
 const MOODS = [
-  { 
-    value: 'great', 
-    emoji: '😄', 
-    label: 'Great',
-    bgColor: 'bg-yellow-200',
-    buttonText: 'I feel great!!!',
-  },
-  { 
-    value: 'good', 
-    emoji: '🙂', 
-    label: 'Good',
-    bgColor: 'bg-green-200',
-    buttonText: 'I feel good!',
-  },
-  { 
-    value: 'okay', 
-    emoji: '😐', 
-    label: 'Okay',
-    bgColor: 'bg-blue-200',
-    buttonText: 'I feel just Okay.',
-  },
-  { 
-    value: 'not_great', 
-    emoji: '😔', 
-    label: 'Not Great',
-    bgColor: 'bg-purple-200',
-    buttonText: 'I feel not great...',
-  },
-  { 
-    value: 'bad', 
-    emoji: '😢', 
-    label: 'Bad',
-    bgColor: 'bg-red-200',
-    buttonText: 'I feel bad...',
-  },
-];
-
-// Synthetic task for mood routine
-const SYNTHETIC_MOOD_TASK: RoutinePlanTask = {
-  id: 'synthetic-mood-task',
-  plan_id: 'synthetic-mood',
-  title: 'Daily Mood Check-in',
-  icon: '🫧',
-  color: 'blue',
-  task_order: 0,
-  is_active: true,
-  created_at: new Date().toISOString(),
-  linked_playlist_id: null,
-  pro_link_type: 'mood',
-  pro_link_value: null,
-  linked_playlist: null,
-  tag: 'pro',
-};
+  { value: 'great', emoji: '😄', bgColor: 'bg-yellow-200' },
+  { value: 'good', emoji: '🙂', bgColor: 'bg-green-200' },
+  { value: 'okay', emoji: '😐', bgColor: 'bg-blue-200' },
+  { value: 'not_great', emoji: '😔', bgColor: 'bg-purple-200' },
+  { value: 'bad', emoji: '😢', bgColor: 'bg-red-200' },
+] as const;
 
 export function MoodDashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { autoCompleteMood } = useAutoCompleteProTask();
   const { data: todayMood } = useTodayMood();
@@ -79,6 +34,23 @@ export function MoodDashboard() {
   const { data: existingTask } = useExistingProTask('mood');
   const addRoutinePlan = useAddRoutinePlan();
   
+  // Synthetic task for mood routine — title localized via t()
+  const SYNTHETIC_MOOD_TASK: RoutinePlanTask = {
+    id: 'synthetic-mood-task',
+    plan_id: 'synthetic-mood',
+    title: t('moodPage.syntheticTaskTitle'),
+    icon: '🫧',
+    color: 'blue',
+    task_order: 0,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    linked_playlist_id: null,
+    pro_link_type: 'mood',
+    pro_link_value: null,
+    linked_playlist: null,
+    tag: 'pro',
+  };
+
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
@@ -103,10 +75,10 @@ export function MoodDashboard() {
     
     try {
       // Save mood check-in in emotion logs (separate from journal entries)
-      const moodLabel = MOODS.find(m => m.value === selectedMood)?.label || selectedMood;
+      const moodLabel = t(`moodPage.moods.${selectedMood}`, { defaultValue: selectedMood });
       await createMoodLog.mutateAsync({
         mood: selectedMood,
-        content: `Feeling ${moodLabel.toLowerCase()} today.`,
+        content: t('moodPage.feelingDailyText', { mood: moodLabel.toLowerCase() }),
       });
 
       // Auto-complete any mood pro tasks for today
@@ -119,10 +91,10 @@ export function MoodDashboard() {
       setIsSubmitting(false);
     } catch (error) {
       console.error('Failed to log mood:', error);
-      toast.error('Failed to log mood');
+      toast.error(t('moodPage.logFailed'));
       setIsSubmitting(false);
     }
-  }, [selectedMood, autoCompleteMood, createMoodLog]);
+  }, [selectedMood, autoCompleteMood, createMoodLog, t]);
 
   const handleCelebrationDone = useCallback(() => {
     navigate('/app/home');
@@ -177,7 +149,7 @@ export function MoodDashboard() {
         editedTasks,
         syntheticTasks: [SYNTHETIC_MOOD_TASK],
       });
-      toast.success('Mood check-in added to your routines!');
+      toast.success(t('moodPage.addedToRoutines'));
       setShowRoutineSheet(false);
       setJustAdded(true);
       // Navigate to pending route after adding
@@ -187,7 +159,7 @@ export function MoodDashboard() {
       }
     } catch (error) {
       console.error('Failed to add routine:', error);
-      toast.error('Failed to add routine');
+      toast.error(t('moodPage.addRoutineFailed'));
     }
   };
 
@@ -201,7 +173,7 @@ export function MoodDashboard() {
           {/* Title - always visible */}
           <div className="text-center mb-6">
             <span className="text-2xl font-bold text-foreground">
-              How are you Feeling?
+              {t('moodPage.howAreYouFeeling')}
             </span>
           </div>
 
@@ -230,7 +202,7 @@ export function MoodDashboard() {
                   )}
                 </div>
                 <span className="text-sm font-medium text-foreground">
-                  {mood.label}
+                  {t(`moodPage.moods.${mood.value}`)}
                 </span>
               </button>
             ))}
@@ -261,7 +233,7 @@ export function MoodDashboard() {
                   )}
                 </div>
                 <span className="text-sm font-medium text-foreground">
-                  {mood.label}
+                  {t(`moodPage.moods.${mood.value}`)}
                 </span>
               </button>
             ))}
@@ -296,7 +268,11 @@ export function MoodDashboard() {
                   : 'bg-muted text-muted-foreground cursor-not-allowed'
               )}
             >
-              {isSubmitting ? 'Saving...' : (selectedMoodData?.buttonText || 'I feel...')}
+              {isSubmitting
+                ? t('moodPage.saving')
+                : selectedMoodData
+                  ? t(`moodPage.buttonText.${selectedMoodData.value}`)
+                  : t('moodPage.iFeel')}
             </Button>
 
             {/* Add to Routines Button - icon only */}
@@ -317,7 +293,7 @@ export function MoodDashboard() {
         open={showRoutineSheet}
         onOpenChange={setShowRoutineSheet}
         tasks={[SYNTHETIC_MOOD_TASK]}
-        routineTitle="Daily Mood Check-in"
+        routineTitle={t('moodPage.syntheticTaskTitle')}
         onSave={handleSaveRoutine}
         isSaving={addRoutinePlan.isPending}
       />
