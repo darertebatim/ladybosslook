@@ -826,5 +826,12 @@
     "notFinding": "Not finding what you need?",
     "tellUs": "Tell us what you want",
     "chatDraft": "Hi! I'd love to have a tool for: "
+  },
+  "timePeriods": {
+    "start_of_day": "Start the day",
+    "afternoon": "Afternoon",
+    "evening": "Evening",
+    "bedtime": "Bedtime",
+    "anytime": "Any time"
   }
 }
