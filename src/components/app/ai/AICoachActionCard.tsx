@@ -5,56 +5,57 @@ import { Button } from '@/components/ui/button';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import type { ActionResult } from '@/hooks/useAICoachStream';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
-const ACTION_CONFIG: Record<string, { icon: string; cta: string; route: string; gradient: string; proposeCta: string }> = {
+const ACTION_CONFIG: Record<string, { icon: string; ctaKey: string; route: string; gradient: string; proposeCtaKey: string }> = {
   add_task_to_planner: {
     icon: '📋',
-    cta: 'Open Task',
+    ctaKey: 'aiCoach.ctaOpenTask',
     route: '/app/home',
     gradient: 'from-blue-500/10 to-cyan-500/10 border-blue-200',
-    proposeCta: 'Add to Planner',
+    proposeCtaKey: 'aiCoach.ctaAddPlanner',
   },
   adopt_routine: {
     icon: '🔄',
-    cta: 'Open Routine',
+    ctaKey: 'aiCoach.ctaOpenRoutine',
     route: '/app/routines',
     gradient: 'from-purple-500/10 to-violet-500/10 border-purple-200',
-    proposeCta: 'Adopt Routine',
+    proposeCtaKey: 'aiCoach.ctaAdoptRoutine',
   },
   suggest_breathing: {
     icon: '🫁',
-    cta: 'Start Breathing',
+    ctaKey: 'aiCoach.ctaStartBreathing',
     route: '/app/breathe',
     gradient: 'from-teal-500/10 to-emerald-500/10 border-teal-200',
-    proposeCta: 'Start Breathing',
+    proposeCtaKey: 'aiCoach.ctaStartBreathing',
   },
   log_mood: {
     icon: '🎭',
-    cta: 'Open Mood History',
+    ctaKey: 'aiCoach.ctaOpenMoodHistory',
     route: '/app/emotion/history',
     gradient: 'from-pink-500/10 to-rose-500/10 border-pink-200',
-    proposeCta: 'Log Mood',
+    proposeCtaKey: 'aiCoach.ctaLogMood',
   },
   create_journal_prompt: {
     icon: '📝',
-    cta: 'Open Reflection',
+    ctaKey: 'aiCoach.ctaOpenReflection',
     route: '/app/reflections/free-form',
     gradient: 'from-amber-500/10 to-yellow-500/10 border-amber-200',
-    proposeCta: 'Start Writing',
+    proposeCtaKey: 'aiCoach.ctaStartWriting',
   },
   get_routine_suggestions: {
     icon: '✨',
-    cta: 'Browse Routines',
+    ctaKey: 'aiCoach.ctaBrowseRoutines',
     route: '/app/routines',
     gradient: 'from-indigo-500/10 to-purple-500/10 border-indigo-200',
-    proposeCta: 'Browse Routines',
+    proposeCtaKey: 'aiCoach.ctaBrowseRoutines',
   },
   get_task_suggestions: {
     icon: '🎯',
-    cta: 'Browse Tasks',
+    ctaKey: 'aiCoach.ctaBrowseTasks',
     route: '/app/tasksbank',
     gradient: 'from-orange-500/10 to-amber-500/10 border-orange-200',
-    proposeCta: 'Browse Tasks',
+    proposeCtaKey: 'aiCoach.ctaBrowseTasks',
   },
 };
 
@@ -67,19 +68,20 @@ interface Props {
 
 export function AICoachActionCard({ result, messageId, resultIndex, onExecute }: Props) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [executing, setExecuting] = useState(false);
   const config = ACTION_CONFIG[result.action] || {
     icon: result.success ? '✅' : '❌',
-    cta: '',
+    ctaKey: '',
     route: '',
     gradient: 'from-muted to-muted border-border',
-    proposeCta: 'Confirm',
+    proposeCtaKey: 'aiCoach.ctaConfirm',
   };
 
   const isProposal = result.proposed === true;
   const deepLink = result.created?.deepLink;
   const route = deepLink || config.route;
-  const cta = result.created?.cta || config.cta;
+  const cta = result.created?.cta || (config.ctaKey ? t(config.ctaKey) : '');
 
   const handleExecute = async () => {
     if (!onExecute || !result.toolArgs) return;
@@ -140,9 +142,9 @@ export function AICoachActionCard({ result, messageId, resultIndex, onExecute }:
           disabled={executing}
         >
           {executing ? (
-            <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Adding...</>
+            <><Loader2 className="h-3.5 w-3.5 animate-spin" /> {t('aiCoach.ctaAdding')}</>
           ) : (
-            <><Plus className="h-3.5 w-3.5" /> {config.proposeCta}</>
+            <><Plus className="h-3.5 w-3.5" /> {t(config.proposeCtaKey)}</>
           )}
         </Button>
       )}
