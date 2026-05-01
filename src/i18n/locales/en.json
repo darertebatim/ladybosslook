@@ -79,5 +79,33 @@
     "title": "Settings",
     "language": "Language",
     "languageHint": "Choose your in-app language. This does not affect content you create."
+  },
+  "home": {
+    "greetingMorning": "Good morning",
+    "greetingAfternoon": "Good afternoon",
+    "greetingEvening": "Good evening",
+    "today": "Today",
+    "browseLibrary": "Browse Library",
+    "noRoutineLaunchers": "No routine launchers yet",
+    "setUpFirstRoutine": "Set up your first routine →",
+    "tryRoutine": "Try a routine",
+    "all": "All"
+  },
+  "reflections": {
+    "title": "Reflections Journal",
+    "tagline": "Find ways to be happier & healthier",
+    "freeForm": "Free Form",
+    "freeFormHint": "Write freely",
+    "myNotes": "My Notes",
+    "myNotesHint": "Past reflections",
+    "forYou": "For you"
+  },
+  "profile": {
+    "title": "Profile",
+    "user": "User"
+  },
+  "moodPage": {
+    "title": "Mood Check-in"
   }
+}
 }
