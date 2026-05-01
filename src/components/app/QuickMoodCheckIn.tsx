@@ -5,6 +5,7 @@ import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useCreateMoodLog } from '@/hooks/useMoodLogs';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import {
   Drawer,
   DrawerContent,

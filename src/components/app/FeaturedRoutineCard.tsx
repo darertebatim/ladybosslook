@@ -62,6 +62,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
   categoryName,
 }: FeaturedRoutineCardProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const location = useLocation();
   const color = routine.color || 'purple';
   const gradient = colorGradients[color] || colorGradients.purple;
@@ -149,7 +150,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
               onDismiss();
             }}
             className="absolute top-2 right-2 p-1 rounded-full bg-black/80 active:scale-95 transition-transform"
-            aria-label="Dismiss suggestion"
+            aria-label={t('homePlanner.dismissSuggestion')}
           >
             <X className="h-3.5 w-3.5 text-white" />
           </button>
