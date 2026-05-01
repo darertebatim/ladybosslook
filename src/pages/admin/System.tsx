@@ -264,6 +264,18 @@ function AppUpdateLogsCard() {
 export default function System() {
   const resetPlanner = useResetPlannerData();
   const [enrollingAll, setEnrollingAll] = useState(false);
+  const navigate = useNavigate();
+
+  const handleReplayWelcomeSpotlight = () => {
+    const flowId = "quick-start-v1";
+    // Clear completion / progress flags so the flow plays again
+    localStorage.removeItem(`simora_onboarding_completed_${flowId}`);
+    localStorage.removeItem(`simora_onboarding_progress_${flowId}`);
+    // Reset first-action celebration so the spotlight cascade can re-trigger
+    localStorage.removeItem("simora_first_action_celebrated");
+    toast.success("Welcome Spotlight reset — replaying now");
+    navigate(`/app/onboarding/${flowId}`);
+  };
 
   const handleEnrollAllPrograms = async () => {
     setEnrollingAll(true);
