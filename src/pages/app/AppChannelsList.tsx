@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, Megaphone, Users, GraduationCap, MessageSquare, ChevronRight, Headset } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -27,7 +28,7 @@ import feedbackIllustration from '@/assets/feedback-illustration.png';
 const SYNTHETIC_CHANNEL_TASK: RoutinePlanTask = {
   id: 'synthetic-channel-task',
   plan_id: 'synthetic-channel',
-  title: 'Check Community Channels',
+  title: 'Check Community Channels', // localized via routineTitle
   icon: '📣',
   color: '#6366f1',
   task_order: 0,
@@ -53,7 +54,7 @@ function formatLastMessageTime(date: Date): string {
   if (isToday(date)) {
     return format(date, 'HH:mm');
   } else if (isYesterday(date)) {
-    return 'Yesterday';
+    return t('chats.yesterday');
   } else {
     return format(date, 'MMM d');
   }
@@ -61,6 +62,7 @@ function formatLastMessageTime(date: Date): string {
 
 export default function AppChannelsList() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { canAccessAdminPage, user } = useAuth();
   const { data: channels, isLoading: channelsLoading } = useChannels();
   const { data: summaries, isLoading: summariesLoading } = useChannelSummaries();
@@ -112,7 +114,7 @@ export default function AppChannelsList() {
   return (
     <div className="flex flex-col h-full bg-background">
       <SEOHead 
-        title="Channels" 
+        title={t('chats.title')} 
         description="Stay connected with announcements, content updates, and community discussions"
       />
 
@@ -122,7 +124,7 @@ export default function AppChannelsList() {
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="px-4 pt-3 pb-3 flex items-center justify-between min-h-[52px]">
-          <h1 className="text-2xl font-bold text-fg-warm">Channels</h1>
+          <h1 className="text-2xl font-bold text-fg-warm">{t('chats.title')}</h1>
           {/* Actions: Add to routines + Admin */}
           <div className="flex items-center gap-2">
             <AddedToRoutineButton
@@ -137,7 +139,7 @@ export default function AppChannelsList() {
               <IOSIconButton
                 size="sm"
                 onClick={() => navigate('/app/support', { state: { from: '/app/channels' } })}
-                aria-label="Support inbox"
+                aria-label={t('chats.supportInbox')}
               >
                 <Headset className="h-4 w-4" />
               </IOSIconButton>
@@ -146,7 +148,7 @@ export default function AppChannelsList() {
               <IOSIconButton
                 size="sm"
                 onClick={() => navigate('/app/channels/new', { state: { from: '/app/channels' } })}
-                aria-label="New channel"
+                aria-label={t('chats.newChannel')}
               >
                 <Megaphone className="h-4 w-4" />
               </IOSIconButton>
@@ -174,15 +176,15 @@ export default function AppChannelsList() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-fg-warm truncate">Coach</span>
+                  <span className="font-semibold text-fg-warm truncate">{t('chats.coach')}</span>
                 </div>
                 {coachSummary?.lastMessage ? (
                   <p className="text-sm text-fg-warm-muted truncate mt-0.5">
-                    {coachSummary.lastMessage.sender_type === 'user' ? 'You' : 'Coach'}: {coachSummary.lastMessage.content}
+                    {coachSummary.lastMessage.sender_type === 'user' ? t('chats.you') : t('chats.coachLabel')}: {coachSummary.lastMessage.content}
                   </p>
                 ) : (
                   <p className="text-sm text-fg-warm-muted/70 mt-0.5">
-                    Chat with your coach
+                    {t('chats.chatWithCoach')}
                   </p>
                 )}
               </div>
@@ -259,12 +261,12 @@ export default function AppChannelsList() {
                     </div>
                     {lastMessage && (
                       <p className="text-sm text-fg-warm-muted truncate mt-0.5">
-                        {lastMessage.display_name || lastMessage.author?.full_name || 'Admin'}: {lastMessage.content}
+                        {lastMessage.display_name || lastMessage.author?.full_name || t('chats.admin')}: {lastMessage.content}
                       </p>
                     )}
                     {!lastMessage && (
                       <p className="text-sm text-fg-warm-muted/70 mt-0.5">
-                        No messages yet
+                        {t('chats.noMessages')}
                       </p>
                     )}
                   </div>
@@ -299,16 +301,16 @@ export default function AppChannelsList() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-fg-warm truncate">Support</span>
-                  <span className="text-[10px] font-bold uppercase tracking-wide bg-[hsl(var(--brand-primary))] text-white px-2 py-0.5 rounded-full shadow-ios">Private</span>
+                  <span className="font-semibold text-fg-warm truncate">{t('chats.support')}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wide bg-[hsl(var(--brand-primary))] text-white px-2 py-0.5 rounded-full shadow-ios">{t('chats.private')}</span>
                 </div>
                 {supportSummary?.lastMessage ? (
                   <p className="text-sm text-fg-warm-muted truncate mt-0.5">
-                    {supportSummary.lastMessage.sender_type === 'user' ? 'You' : 'Support'}: {supportSummary.lastMessage.content}
+                    {supportSummary.lastMessage.sender_type === 'user' ? t('chats.you') : t('chats.supportSender')}: {supportSummary.lastMessage.content}
                   </p>
                 ) : (
                   <p className="text-sm text-fg-warm mt-0.5">
-                    Chat with our team (Private)
+                    {t('chats.chatWithTeam')}
                   </p>
                 )}
               </div>
@@ -334,17 +336,17 @@ export default function AppChannelsList() {
           >
             <img
               src={feedbackIllustration}
-              alt="Share your feedback"
+              alt={t('chats.feedbackAlt')}
               width={100}
               height={100}
               loading="lazy"
               className="mb-3"
             />
             <p className="text-sm font-medium text-foreground text-center">
-              We'd love to hear from you! 💛
+              {t('chats.feedbackHeader')}
             </p>
             <p className="text-xs text-muted-foreground text-center mt-1 max-w-[260px]">
-              Share your ideas, feedback, or suggestions with us in the Support chat
+              {t('chats.feedbackHint')}
             </p>
           </button>
         </>) : (
@@ -352,9 +354,9 @@ export default function AppChannelsList() {
             <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
               <Users className="h-8 w-8 text-muted-foreground" />
             </div>
-            <p className="text-muted-foreground font-medium">No channels available</p>
+            <p className="text-muted-foreground font-medium">{t('chats.noChannels')}</p>
             <p className="text-sm text-muted-foreground/60 mt-1">
-              Check back later for community updates
+              {t('chats.checkBack')}
             </p>
           </div>
         )}
@@ -365,7 +367,7 @@ export default function AppChannelsList() {
         open={showRoutineSheet}
         onOpenChange={setShowRoutineSheet}
         tasks={[SYNTHETIC_CHANNEL_TASK]}
-        routineTitle="Community Channels"
+        routineTitle={t('chats.communityChannels')}
         onSave={async (selectedTaskIds, editedTasks) => {
           try {
             await addRoutinePlan.mutateAsync({
@@ -376,10 +378,10 @@ export default function AppChannelsList() {
             });
             setJustAdded(true);
             haptic.success();
-            toast.success('Added to your routines!');
+            toast.success(t('chats.addedToRoutines'));
             setShowRoutineSheet(false);
           } catch {
-            toast.error('Failed to add to routines');
+            toast.error(t('chats.addToRoutinesFailed'));
           }
         }}
         isSaving={addRoutinePlan.isPending}

@@ -112,26 +112,26 @@ const AppSettings = () => {
 
   const handlePasswordChange = async () => {
     if (!newPassword || !confirmPassword) {
-      toast({ title: 'Error', description: 'Please fill in all password fields', variant: 'destructive' });
+      toast({ title: t('settings.common.error'), description: t('settings.password_section.fillFields'), variant: 'destructive' });
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast({ title: 'Error', description: 'Passwords do not match', variant: 'destructive' });
+      toast({ title: t('settings.common.error'), description: t('settings.password_section.noMatch'), variant: 'destructive' });
       return;
     }
     if (newPassword.length < 6) {
-      toast({ title: 'Error', description: 'Password must be at least 6 characters', variant: 'destructive' });
+      toast({ title: t('settings.common.error'), description: t('settings.password_section.tooShort'), variant: 'destructive' });
       return;
     }
     setIsChangingPassword(true);
     try {
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
-      toast({ title: 'Success', description: 'Password updated successfully' });
+      toast({ title: t('settings.common.success'), description: t('settings.password_section.updateSuccess') });
       setNewPassword('');
       setConfirmPassword('');
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message || 'Failed to update password', variant: 'destructive' });
+      toast({ title: t('settings.common.error'), description: error.message || t('settings.password_section.updateFailed'), variant: 'destructive' });
     } finally {
       setIsChangingPassword(false);
     }
@@ -145,10 +145,10 @@ const AppSettings = () => {
         body: { userIds: [user.id], title: '🔔 Test Notification', body: 'Your push notifications are working correctly!', url: '/app/settings' },
       });
       if (error) throw error;
-      if (data?.sent > 0) toast({ title: 'Test Sent!', description: 'Check your notifications in a moment' });
-      else toast({ title: 'No Device Found', description: 'No registered device found.', variant: 'destructive' });
+      if (data?.sent > 0) toast({ title: t('settings.push_section.testSent'), description: t('settings.push_section.testSentDesc') });
+      else toast({ title: t('settings.push_section.noDevice'), description: t('settings.push_section.noDeviceDesc'), variant: 'destructive' });
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message || 'Failed to send test notification', variant: 'destructive' });
+      toast({ title: t('settings.common.error'), description: error.message || t('settings.push_section.testing'), variant: 'destructive' });
     } finally {
       setIsTestingNotification(false);
     }
@@ -163,16 +163,16 @@ const AppSettings = () => {
         if (result.success) {
           setNotificationPermission('granted');
           setSubscriptionStatus('active');
-          toast({ title: 'Notifications Enabled', description: 'You will now receive push notifications' });
+          toast({ title: t('settings.push_section.enabledTitle'), description: t('settings.push_section.enabledDesc') });
           queryClient.invalidateQueries({ queryKey: ['push-subscription', user?.id] });
         } else {
-          toast({ title: 'Error', description: result.error || 'Failed to enable notifications', variant: 'destructive' });
+          toast({ title: t('settings.common.error'), description: result.error || t('settings.push_section.enableFailed'), variant: 'destructive' });
         }
       } else {
-        toast({ title: 'Permission Denied', description: 'Please enable notifications in Settings', variant: 'destructive' });
+        toast({ title: t('settings.push_section.permissionDenied'), description: t('settings.push_section.permissionDeniedDesc'), variant: 'destructive' });
       }
     } catch (error: any) {
-      toast({ title: 'Error', description: 'Failed to enable notifications', variant: 'destructive' });
+      toast({ title: t('settings.common.error'), description: t('settings.push_section.enableFailed'), variant: 'destructive' });
     } finally {
       setIsEnablingNotifications(false);
     }
@@ -184,12 +184,12 @@ const AppSettings = () => {
       if (result.success) {
         setNotificationPermission('default');
         setSubscriptionStatus('none');
-        toast({ title: 'Notifications Disabled', description: 'You will no longer receive push notifications' });
+        toast({ title: t('settings.push_section.disabledTitle'), description: t('settings.push_section.disabledDesc') });
       } else {
-        toast({ title: 'Error', description: result.error || 'Failed to disable notifications', variant: 'destructive' });
+        toast({ title: t('settings.common.error'), description: result.error || t('settings.push_section.disableFailed'), variant: 'destructive' });
       }
     } catch (error: any) {
-      toast({ title: 'Error', description: 'Failed to disable notifications', variant: 'destructive' });
+      toast({ title: t('settings.common.error'), description: t('settings.push_section.disableFailed'), variant: 'destructive' });
     }
   };
 
@@ -197,7 +197,7 @@ const AppSettings = () => {
     try {
       await NativeSettings.open({ optionAndroid: AndroidSettings.ApplicationDetails, optionIOS: IOSSettings.App });
     } catch (error) {
-      toast({ title: 'Error', description: 'Could not open settings', variant: 'destructive' });
+      toast({ title: t('settings.common.error'), description: t('settings.push_section.openFailed'), variant: 'destructive' });
     }
   };
 
@@ -207,12 +207,12 @@ const AppSettings = () => {
       const result = await requestCalendarPermission();
       setCalendarPermission(result);
       if (result === 'granted') {
-        toast({ title: 'Calendar Access Enabled', description: 'Course sessions can now be added directly to your calendar' });
+        toast({ title: t('settings.calendar_section.enabledTitle'), description: t('settings.calendar_section.enabledDesc') });
       } else {
-        toast({ title: 'Permission Denied', description: 'Please enable calendar access in Settings', variant: 'destructive' });
+        toast({ title: t('settings.push_section.permissionDenied'), description: t('settings.calendar_section.permissionDeniedDesc'), variant: 'destructive' });
       }
     } catch (error) {
-      toast({ title: 'Error', description: 'Failed to request calendar permission', variant: 'destructive' });
+      toast({ title: t('settings.common.error'), description: t('settings.calendar_section.requestFailed'), variant: 'destructive' });
     } finally {
       setIsRequestingCalendar(false);
     }
@@ -223,43 +223,43 @@ const AppSettings = () => {
       const result = await requestCalendarPermission();
       setCalendarPermission(result);
       if (result !== 'granted') {
-        toast({ title: 'Permission Required', description: 'Calendar access is needed to auto-sync sessions', variant: 'destructive' });
+        toast({ title: t('settings.calendar_section.permissionRequired'), description: t('settings.calendar_section.permissionRequiredDesc'), variant: 'destructive' });
         return;
       }
     }
     setAutoSyncCalendar(enabled);
     localStorage.setItem('autoSyncCalendar', enabled.toString());
-    toast({ title: enabled ? 'Auto-Sync Enabled' : 'Auto-Sync Disabled', description: enabled ? 'Course sessions will be added to calendar on enrollment' : "Sessions won't be auto-added on enrollment" });
+    toast({ title: enabled ? t('settings.calendar_section.autoSyncOn') : t('settings.calendar_section.autoSyncOff'), description: enabled ? t('settings.calendar_section.autoSyncOnDesc') : t('settings.calendar_section.autoSyncOffDesc') });
   };
 
   const handleSignOut = async () => {
     await signOut();
-    toast({ title: 'Signed out', description: 'You have been signed out successfully' });
+    toast({ title: t('settings.actions_section.signedOut'), description: t('settings.actions_section.signedOutDesc') });
     navigate('/auth');
   };
 
   const handleDeleteAccount = async () => {
     if (deleteConfirmText !== 'DELETE') {
-      toast({ title: 'Confirmation Required', description: 'Please type DELETE to confirm account deletion', variant: 'destructive' });
+      toast({ title: t('settings.actions_section.confirmRequired'), description: t('settings.actions_section.confirmRequiredDesc'), variant: 'destructive' });
       return;
     }
     setIsDeletingAccount(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { toast({ title: 'Error', description: 'You must be logged in', variant: 'destructive' }); return; }
+      if (!session) { toast({ title: t('settings.common.error'), description: t('settings.actions_section.loginRequired'), variant: 'destructive' }); return; }
       const { data, error } = await supabase.functions.invoke('delete-own-account', {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
-      if (error) { toast({ title: 'Error', description: 'Failed to delete account. Please contact support.', variant: 'destructive' }); return; }
+      if (error) { toast({ title: t('settings.common.error'), description: t('settings.actions_section.deleteFailed'), variant: 'destructive' }); return; }
       if (data?.success) {
-        toast({ title: 'Account Deleted', description: 'Your account has been permanently deleted' });
+        toast({ title: t('settings.actions_section.deletedTitle'), description: t('settings.actions_section.deletedDesc') });
         await signOut();
         navigate('/auth');
       } else {
-        toast({ title: 'Error', description: data?.error || 'Failed to delete account', variant: 'destructive' });
+        toast({ title: t('settings.common.error'), description: data?.error || t('settings.actions_section.deleteFailed'), variant: 'destructive' });
       }
     } catch (error: any) {
-      toast({ title: 'Error', description: 'An unexpected error occurred. Please try again.', variant: 'destructive' });
+      toast({ title: t('settings.common.error'), description: t('settings.actions_section.unexpected'), variant: 'destructive' });
     } finally {
       setIsDeletingAccount(false);
       setShowDeleteDialog(false);
@@ -290,7 +290,7 @@ const AppSettings = () => {
               <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Lock className="h-4 w-4 text-primary" />
               </div>
-              <span className="font-medium text-sm">Password</span>
+              <span className="font-medium text-sm">{t('settings.sections.password')}</span>
             </div>
             <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('password') ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
@@ -298,16 +298,16 @@ const AppSettings = () => {
             <Card className="rounded-2xl shadow-ios border-0 bg-card">
               <CardContent className="space-y-3 pt-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="newPassword" className="text-xs text-muted-foreground">New Password</Label>
-                  <Input id="newPassword" type="password" placeholder="Enter new password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} disabled={isChangingPassword} />
+                  <Label htmlFor="newPassword" className="text-xs text-muted-foreground">{t('settings.password_section.newPassword')}</Label>
+                  <Input id="newPassword" type="password" placeholder={t('settings.password_section.newPlaceholder')} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} disabled={isChangingPassword} />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="confirmPassword" className="text-xs text-muted-foreground">Confirm Password</Label>
-                  <Input id="confirmPassword" type="password" placeholder="Confirm new password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={isChangingPassword} />
+                  <Label htmlFor="confirmPassword" className="text-xs text-muted-foreground">{t('settings.password_section.confirmPassword')}</Label>
+                  <Input id="confirmPassword" type="password" placeholder={t('settings.password_section.confirmPlaceholder')} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={isChangingPassword} />
                 </div>
                 <Button onClick={handlePasswordChange} disabled={isChangingPassword || !newPassword || !confirmPassword} className="w-full">
                   <Lock className="mr-2 h-4 w-4" />
-                  {isChangingPassword ? 'Updating...' : 'Update Password'}
+                  {isChangingPassword ? t('settings.password_section.updating') : t('settings.password_section.update')}
                 </Button>
               </CardContent>
             </Card>
@@ -322,7 +322,7 @@ const AppSettings = () => {
                 <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Bell className="h-4 w-4 text-primary" />
                 </div>
-                <span className="font-medium text-sm">Push Notifications</span>
+                <span className="font-medium text-sm">{t('settings.sections.push')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className={`h-2 w-2 rounded-full ${notificationPermission === 'granted' && subscriptionStatus === 'active' ? 'bg-emerald-500' : notificationPermission === 'denied' ? 'bg-destructive' : 'bg-yellow-500'}`} />
@@ -336,44 +336,44 @@ const AppSettings = () => {
                     <div className="flex items-center gap-2">
                       <div className={`h-2 w-2 rounded-full ${notificationPermission === 'granted' && subscriptionStatus === 'active' ? 'bg-emerald-500' : notificationPermission === 'denied' ? 'bg-destructive' : 'bg-yellow-500'}`} />
                       <span className="text-sm font-medium">
-                        {subscriptionStatus === 'checking' ? 'Checking status...' : notificationPermission === 'granted' && subscriptionStatus === 'active' ? 'Active' : notificationPermission === 'denied' ? 'Denied' : 'Not Enabled'}
+                        {subscriptionStatus === 'checking' ? t('settings.status.checking') : notificationPermission === 'granted' && subscriptionStatus === 'active' ? t('settings.status.active') : notificationPermission === 'denied' ? t('settings.status.denied') : t('settings.status.notEnabled')}
                       </span>
                     </div>
                   </div>
                   {notificationPermission === 'granted' && subscriptionStatus === 'active' && (
                     <div className="space-y-2">
                       <div className="flex gap-2">
-                        <Button variant="outline" onClick={handleDisableNotifications} className="flex-1" size="sm">Disable</Button>
+                        <Button variant="outline" onClick={handleDisableNotifications} className="flex-1" size="sm">{t('settings.push_section.disable')}</Button>
                         <Button variant="outline" onClick={handleEnableNotifications} disabled={isEnablingNotifications} className="flex-1" size="sm">
-                          {isEnablingNotifications ? 'Re-registering...' : 'Re-register'}
+                          {isEnablingNotifications ? t('settings.push_section.reregistering') : t('settings.push_section.reregister')}
                         </Button>
                       </div>
                       <Button onClick={handleTestNotification} disabled={isTestingNotification} className="w-full" size="sm">
                         <Bell className="mr-2 h-4 w-4" />
-                        {isTestingNotification ? 'Sending...' : 'Send Test Notification'}
+                        {isTestingNotification ? t('settings.push_section.testing') : t('settings.push_section.test')}
                       </Button>
                       <Button variant="ghost" onClick={handleOpenAppSettings} className="w-full text-muted-foreground" size="sm">
                         <Settings className="mr-2 h-4 w-4" />
-                        Open Settings
+                        {t('settings.push_section.openSettings')}
                       </Button>
                     </div>
                   )}
                   {notificationPermission === 'granted' && subscriptionStatus === 'none' && (
                     <Button onClick={handleEnableNotifications} className="w-full" disabled={isEnablingNotifications}>
                       <Bell className="mr-2 h-4 w-4" />
-                      {isEnablingNotifications ? 'Enabling...' : 'Enable Notifications'}
+                      {isEnablingNotifications ? t('settings.push_section.enabling') : t('settings.push_section.enable')}
                     </Button>
                   )}
                   {notificationPermission !== 'granted' && (
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">
-                        {notificationPermission === 'denied' ? 'Notifications are disabled. Enable them in Settings.' : 'Get notified about new content and updates'}
+                        {notificationPermission === 'denied' ? t('settings.push_section.deniedHint') : t('settings.push_section.promptHint')}
                       </p>
                       {notificationPermission === 'denied' ? (
-                        <Button onClick={handleOpenAppSettings} className="w-full"><Settings className="mr-2 h-4 w-4" />Open Settings</Button>
+                        <Button onClick={handleOpenAppSettings} className="w-full"><Settings className="mr-2 h-4 w-4" />{t('settings.push_section.openSettings')}</Button>
                       ) : (
                         <Button onClick={handleEnableNotifications} className="w-full" disabled={isEnablingNotifications}>
-                          <Bell className="mr-2 h-4 w-4" />{isEnablingNotifications ? 'Enabling...' : 'Enable Notifications'}
+                          <Bell className="mr-2 h-4 w-4" />{isEnablingNotifications ? t('settings.push_section.enabling') : t('settings.push_section.enable')}
                         </Button>
                       )}
                     </div>
@@ -391,7 +391,7 @@ const AppSettings = () => {
               <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Settings className="h-4 w-4 text-primary" />
               </div>
-              <span className="font-medium text-sm">Notification Preferences</span>
+              <span className="font-medium text-sm">{t('settings.sections.preferences')}</span>
             </div>
             <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('prefs') ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
@@ -411,7 +411,7 @@ const AppSettings = () => {
                 <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Calendar className="h-4 w-4 text-primary" />
                 </div>
-                <span className="font-medium text-sm">Calendar Sync</span>
+                <span className="font-medium text-sm">{t('settings.sections.calendar')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className={`h-2 w-2 rounded-full ${calendarPermission === 'granted' ? 'bg-emerald-500' : calendarPermission === 'denied' ? 'bg-destructive' : 'bg-yellow-500'}`} />
@@ -425,15 +425,15 @@ const AppSettings = () => {
                     <div className="flex items-center gap-2">
                       <div className={`h-2 w-2 rounded-full ${calendarPermission === 'granted' ? 'bg-emerald-500' : calendarPermission === 'denied' ? 'bg-destructive' : 'bg-yellow-500'}`} />
                       <span className="text-sm font-medium">
-                        {calendarPermission === 'granted' ? 'Enabled' : calendarPermission === 'denied' ? 'Denied' : 'Not Enabled'}
+                        {calendarPermission === 'granted' ? t('settings.status.enabled') : calendarPermission === 'denied' ? t('settings.status.denied') : t('settings.status.notEnabled')}
                       </span>
                     </div>
                   </div>
                   {calendarPermission === 'granted' && (
                     <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
                       <div className="space-y-0.5">
-                        <p className="text-sm font-medium">Auto-Sync on Enrollment</p>
-                        <p className="text-xs text-muted-foreground">Automatically add sessions when you enroll</p>
+                        <p className="text-sm font-medium">{t('settings.calendar_section.autoSync')}</p>
+                        <p className="text-xs text-muted-foreground">{t('settings.calendar_section.autoSyncHint')}</p>
                       </div>
                       <Switch checked={autoSyncCalendar} onCheckedChange={handleAutoSyncToggle} />
                     </div>
@@ -441,13 +441,13 @@ const AppSettings = () => {
                   {calendarPermission !== 'granted' && (
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">
-                        {calendarPermission === 'denied' ? 'Calendar access is disabled. Enable it in Settings.' : 'Add course sessions directly to your calendar'}
+                        {calendarPermission === 'denied' ? t('settings.calendar_section.deniedHint') : t('settings.calendar_section.promptHint')}
                       </p>
                       {calendarPermission === 'denied' ? (
-                        <Button onClick={handleOpenAppSettings} className="w-full"><Settings className="mr-2 h-4 w-4" />Open Settings</Button>
+                        <Button onClick={handleOpenAppSettings} className="w-full"><Settings className="mr-2 h-4 w-4" />{t('settings.push_section.openSettings')}</Button>
                       ) : (
                         <Button onClick={handleEnableCalendar} className="w-full" disabled={isRequestingCalendar}>
-                          <Calendar className="mr-2 h-4 w-4" />{isRequestingCalendar ? 'Requesting...' : 'Enable Calendar Access'}
+                          <Calendar className="mr-2 h-4 w-4" />{isRequestingCalendar ? t('settings.calendar_section.requesting') : t('settings.calendar_section.enable')}
                         </Button>
                       )}
                     </div>
@@ -466,7 +466,7 @@ const AppSettings = () => {
               <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <MessageCircle className="h-4 w-4 text-primary" />
               </div>
-              <span className="font-medium text-sm">Support</span>
+              <span className="font-medium text-sm">{t('settings.sections.support')}</span>
             </div>
             <div className="flex items-center gap-2">
               {unreadCount > 0 && (
@@ -479,7 +479,7 @@ const AppSettings = () => {
             <Card className="rounded-2xl shadow-ios border-0 bg-card">
               <CardContent className="space-y-3 pt-4">
                 <Button className="w-full relative" onClick={() => navigate('/app/chat')}>
-                  <MessageCircle className="mr-2 h-4 w-4" />Chat with Support
+                  <MessageCircle className="mr-2 h-4 w-4" />{t('settings.support_section.chatWithSupport')}
                   {unreadCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">{unreadCount}</span>
                   )}
@@ -487,35 +487,35 @@ const AppSettings = () => {
                 <div className="relative py-2">
                   <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">or via Telegram</span>
+                    <span className="bg-card px-2 text-muted-foreground">{t('settings.support_section.orVia')}</span>
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="subject" className="text-xs text-muted-foreground">Subject</Label>
+                  <Label htmlFor="subject" className="text-xs text-muted-foreground">{t('settings.support_section.subject')}</Label>
                   <select id="subject" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" value={contactSubject} onChange={(e) => setContactSubject(e.target.value)}>
-                    <option value="">Select a topic...</option>
-                    <option value="General Inquiry">General Inquiry</option>
-                    <option value="Technical Support">Technical Support</option>
-                    <option value="Refund Request">Refund Request</option>
-                    <option value="Cancel Subscription">Cancel Subscription</option>
-                    <option value="Course Question">Course Question</option>
-                    <option value="Billing Issue">Billing Issue</option>
-                    <option value="Other">Other</option>
+                    <option value="">{t('settings.support_section.selectTopic')}</option>
+                    <option value="General Inquiry">{t('settings.support_section.topics.general')}</option>
+                    <option value="Technical Support">{t('settings.support_section.topics.tech')}</option>
+                    <option value="Refund Request">{t('settings.support_section.topics.refund')}</option>
+                    <option value="Cancel Subscription">{t('settings.support_section.topics.cancel')}</option>
+                    <option value="Course Question">{t('settings.support_section.topics.course')}</option>
+                    <option value="Billing Issue">{t('settings.support_section.topics.billing')}</option>
+                    <option value="Other">{t('settings.support_section.topics.other')}</option>
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="message" className="text-xs text-muted-foreground">Message</Label>
-                  <Textarea id="message" placeholder="Type your message here..." value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} rows={3} />
+                  <Label htmlFor="message" className="text-xs text-muted-foreground">{t('settings.support_section.message')}</Label>
+                  <Textarea id="message" placeholder={t('settings.support_section.messagePlaceholder')} value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} rows={3} />
                 </div>
                 <Button variant="outline" className="w-full" onClick={() => {
                   if (!contactSubject || !contactMessage.trim()) {
-                    toast({ title: 'Error', description: 'Please select a subject and enter a message', variant: 'destructive' });
+                    toast({ title: t('settings.common.error'), description: t('settings.support_section.fillRequired'), variant: 'destructive' });
                     return;
                   }
                   const telegramMessage = `Subject: ${contactSubject}\n\nMessage:\n${contactMessage}`;
                   window.open(`https://t.me/ladybosslook?text=${encodeURIComponent(telegramMessage)}`, '_blank');
                 }}>
-                  <Send className="mr-2 h-4 w-4" />Send via Telegram
+                  <Send className="mr-2 h-4 w-4" />{t('settings.support_section.sendTelegram')}
                 </Button>
               </CardContent>
             </Card>
@@ -530,7 +530,7 @@ const AppSettings = () => {
                 <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Settings className="h-4 w-4 text-primary" />
                 </div>
-                <span className="font-medium text-sm">Admin Tools</span>
+                <span className="font-medium text-sm">{t('settings.sections.admin')}</span>
               </div>
               <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('admin') ? 'rotate-180' : ''}`} />
             </CollapsibleTrigger>
@@ -539,12 +539,12 @@ const AppSettings = () => {
                 <CardContent className="space-y-2 pt-4">
                   {canAccessAdminPage('support') && (
                     <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/app/support', { state: { from: '/app/settings' } })}>
-                      <Headset className="mr-2 h-4 w-4" />Support Inbox
+                      <Headset className="mr-2 h-4 w-4" />{t('settings.admin_section.supportInbox')}
                     </Button>
                   )}
                   {canAccessAdminPage('community') && (
                     <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/app/channels/new', { state: { from: '/app/settings' } })}>
-                      <Megaphone className="mr-2 h-4 w-4" />Post to Channel
+                      <Megaphone className="mr-2 h-4 w-4" />{t('settings.admin_section.postChannel')}
                     </Button>
                   )}
                 </CardContent>
@@ -565,7 +565,7 @@ const AppSettings = () => {
             <div className="h-9 w-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
               <Download className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <span className="font-medium text-sm">Redeem Code</span>
+            <span className="font-medium text-sm">{t('settings.sections.redeem')}</span>
           </div>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </button>
@@ -577,7 +577,7 @@ const AppSettings = () => {
               <div className="h-9 w-9 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                 <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
               </div>
-              <span className="font-medium text-sm">Rate Rilo</span>
+              <span className="font-medium text-sm">{t('settings.sections.rate')}</span>
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </button>
@@ -590,7 +590,7 @@ const AppSettings = () => {
               <div className="h-9 w-9 rounded-xl bg-muted flex items-center justify-center">
                 <LogOut className="h-4 w-4 text-muted-foreground" />
               </div>
-              <span className="font-medium text-sm">Account Actions</span>
+              <span className="font-medium text-sm">{t('settings.sections.actions')}</span>
             </div>
             <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('actions') ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
@@ -600,38 +600,38 @@ const AppSettings = () => {
                 <Button variant="ghost" className="w-full justify-start h-12 rounded-xl bg-muted/30" onClick={() => {
                   resetAllTours();
                   navigate('/app/home');
-                  toast({ title: 'Tours Reset', description: 'All feature tours will restart when you visit each section.' });
+                  toast({ title: t('settings.actions_section.toursReset'), description: t('settings.actions_section.toursResetDesc') });
                 }}>
-                  <PlayCircle className="mr-3 h-4 w-4" />Restart All Tours
+                  <PlayCircle className="mr-3 h-4 w-4" />{t('settings.actions_section.restartTours')}
                 </Button>
                 <Button variant="ghost" className="w-full justify-start h-12 rounded-xl bg-muted/30" onClick={handleSignOut}>
-                  <LogOut className="mr-3 h-4 w-4" />Sign Out
+                  <LogOut className="mr-3 h-4 w-4" />{t('settings.actions_section.signOut')}
                 </Button>
                 <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
                   <AlertDialogTrigger asChild>
                     <Button variant="ghost" className="w-full justify-start h-12 rounded-xl text-destructive bg-destructive/10">
-                      <Trash2 className="mr-3 h-4 w-4" />Delete Account
+                      <Trash2 className="mr-3 h-4 w-4" />{t('settings.actions_section.deleteAccount')}
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle className="flex items-center gap-2 text-destructive">
-                        <AlertTriangle className="h-5 w-5" />Delete Your Account?
+                        <AlertTriangle className="h-5 w-5" />{t('settings.actions_section.deleteTitle')}
                       </AlertDialogTitle>
                       <AlertDialogDescription className="space-y-3">
-                        <p>This action is <strong>permanent and cannot be undone</strong>. All your data will be immediately deleted.</p>
+                        <p>{t('settings.actions_section.deleteDesc')}</p>
                         <div className="pt-2">
                           <Label htmlFor="deleteConfirm" className="text-sm font-medium text-foreground">
-                            Type <span className="font-bold text-destructive">DELETE</span> to confirm:
+                            {t('settings.actions_section.typeToConfirm')}
                           </Label>
-                          <Input id="deleteConfirm" value={deleteConfirmText} onChange={(e) => setDeleteConfirmText(e.target.value)} placeholder="Type DELETE" className="mt-2" />
+                          <Input id="deleteConfirm" value={deleteConfirmText} onChange={(e) => setDeleteConfirmText(e.target.value)} placeholder={t('settings.actions_section.typeDelete')} className="mt-2" />
                         </div>
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                       <AlertDialogAction onClick={() => { haptic.warning(); handleDeleteAccount(); }} disabled={deleteConfirmText !== 'DELETE' || isDeletingAccount} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                        {isDeletingAccount ? 'Deleting...' : 'Delete Forever'}
+                        {isDeletingAccount ? t('settings.actions_section.deleting') : t('settings.actions_section.deleteForever')}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

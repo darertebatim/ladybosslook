@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Search, X, Clock, Globe, Crown, ChevronRight } from "lucide-react";
@@ -22,26 +23,27 @@ import { LanguagePreferencePopup, shouldShowLanguagePopup } from "@/components/a
 import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
 
 const LANGUAGE_OPTIONS = [
-  { value: 'all', label: 'All', flag: '🌐' },
-  { value: 'american', label: 'English', flag: '🇺🇸' },
-  { value: 'persian', label: 'Persian', flag: null },
-  { value: 'turkish', label: 'Türkçe', flag: '🇹🇷' },
-  { value: 'spanish', label: 'Español', flag: '🇪🇸' },
+  { value: 'all', labelKey: 'player.languages.all', flag: '🌐' },
+  { value: 'american', labelKey: 'player.languages.english', flag: '🇺🇸' },
+  { value: 'persian', labelKey: 'player.languages.persian', flag: null },
+  { value: 'turkish', labelKey: 'player.languages.turkish', flag: '🇹🇷' },
+  { value: 'spanish', labelKey: 'player.languages.spanish', flag: '🇪🇸' },
 ];
 
-const categoryConfig: Record<string, { name: string }> = {
-  all: { name: 'All' },
-  meditate: { name: 'Meditate' },
-  workout: { name: 'Workout' },
-  soundscape: { name: 'Soundscape' },
-  affirmation: { name: 'Affirmations' },
-  audiobook: { name: 'Audiobooks' },
-  course: { name: 'Course' },
-  podcast: { name: 'Podcast' },
+const categoryConfig: Record<string, { nameKey: string }> = {
+  all: { nameKey: 'player.categories.all' },
+  meditate: { nameKey: 'player.categories.meditate' },
+  workout: { nameKey: 'player.categories.workout' },
+  soundscape: { nameKey: 'player.categories.soundscape' },
+  affirmation: { nameKey: 'player.categories.affirmation' },
+  audiobook: { nameKey: 'player.categories.audiobook' },
+  course: { nameKey: 'player.categories.course' },
+  podcast: { nameKey: 'player.categories.podcast' },
 };
 
 export default function AppPlayer() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -224,23 +226,23 @@ export default function AppPlayer() {
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-fg-warm-muted" />
                     <Input
-                      placeholder="Search audio..."
+                      placeholder={t('player.searchPlaceholder')}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-9 h-9 bg-card border-0 text-fg-warm placeholder:text-fg-warm-muted focus-visible:ring-0 shadow-ios rounded-full"
                       autoFocus
                     />
                   </div>
-                  <IOSIconButton size="sm" onClick={() => { setShowSearch(false); setSearchQuery(""); }} aria-label="Close search">
+                  <IOSIconButton size="sm" onClick={() => { setShowSearch(false); setSearchQuery(""); }} aria-label={t('player.closeSearchAria')}>
                     <X className="h-5 w-5 text-fg-warm" />
                   </IOSIconButton>
                 </div>
               ) : (
                 <>
-                  <h1 className="text-2xl font-bold text-fg-warm tracking-tight">Listen</h1>
+                  <h1 className="text-2xl font-bold text-fg-warm tracking-tight">{t('player.title')}</h1>
                   <div className="flex items-center gap-2">
                     {startTour && <TourHelpButton onClick={startTour} />}
-                    <IOSIconButton size="sm" onClick={() => setShowSearch(true)} className="tour-player-search" aria-label="Search">
+                    <IOSIconButton size="sm" onClick={() => setShowSearch(true)} className="tour-player-search" aria-label={t('player.searchAria')}>
                       <Search className="h-4 w-4 text-brand" />
                     </IOSIconButton>
                   </div>
@@ -254,7 +256,8 @@ export default function AppPlayer() {
             {/* Category pills */}
             <div className="tour-player-categories flex gap-2 overflow-x-auto pb-1 mt-2 scrollbar-hide">
               {availableCategories.map((cat) => {
-                const config = categoryConfig[cat] || { name: cat };
+                const config = categoryConfig[cat];
+                const name = config ? t(config.nameKey) : cat;
                 const isSoundscapeLocked = cat === 'soundscape' && !hasSoundscapeAccess;
                 const active = selectedCategory === cat;
                 return (
@@ -281,7 +284,7 @@ export default function AppPlayer() {
                           : 'bg-peach text-fg-warm-muted'
                       )}
                     >
-                      {config.name}
+                      {name}
                     </button>
                     {isSoundscapeLocked && (
                       <div className="absolute -bottom-0.5 -right-0.5 z-10 w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center">
@@ -309,14 +312,14 @@ export default function AppPlayer() {
                           : 'text-fg-warm-muted'
                       )}
                     >
-                      {filter === 'all' ? 'All' : filter === 'in_progress' ? 'In Progress' : 'Completed'}
+                      {filter === 'all' ? t('player.filters.all') : filter === 'in_progress' ? t('player.filters.inProgress') : t('player.filters.completed')}
                     </button>
                   );
                 })}
               </div>
               <Popover>
                 <PopoverTrigger asChild>
-                  <IOSIconButton size="sm" aria-label="Language">
+                  <IOSIconButton size="sm" aria-label={t('player.languageAria')}>
                     {selectedLang.value === 'persian'
                       ? <PersianFlag size={14} />
                       : selectedLang.value === 'all'
@@ -339,7 +342,7 @@ export default function AppPlayer() {
                       {lang.value === 'persian'
                         ? <PersianFlag size={14} />
                         : <span>{lang.flag}</span>}
-                      <span>{lang.label}</span>
+                      <span>{t(lang.labelKey)}</span>
                     </button>
                   ))}
                 </PopoverContent>
@@ -352,7 +355,7 @@ export default function AppPlayer() {
             <div className="px-4 pt-4 space-y-2 tour-continue-listening">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-brand" />
-                <h2 className="text-[11px] font-bold text-fg-warm-muted uppercase tracking-[0.12em]">Continue Learning</h2>
+                <h2 className="text-[11px] font-bold text-fg-warm-muted uppercase tracking-[0.12em]">{t('player.continueLearning')}</h2>
               </div>
               <div className="flex flex-col gap-3">
                 {continueListening.slice(0, 4).map(renderCard)}
@@ -363,7 +366,7 @@ export default function AppPlayer() {
           {/* All Playlists */}
           <div className="px-4 pt-4 pb-6 space-y-2 tour-playlists">
             <h2 className="tour-playlists-header text-[11px] font-bold text-fg-warm-muted uppercase tracking-[0.12em]">
-              {selectedCategory === 'all' ? 'All Playlists' : categoryConfig[selectedCategory]?.name || selectedCategory}
+              {selectedCategory === 'all' ? t('player.allPlaylists') : (categoryConfig[selectedCategory] ? t(categoryConfig[selectedCategory].nameKey) : selectedCategory)}
             </h2>
 
             <PromoBanner location="listen" className="mb-2" />
@@ -371,7 +374,7 @@ export default function AppPlayer() {
 
             {filteredPlaylists.length === 0 ? (
               <div className="text-center py-12 text-fg-warm-muted">
-                <p className="text-base">No playlists found</p>
+                <p className="text-base">{t('player.noPlaylists')}</p>
               </div>
             ) : (
               <div className="flex flex-col gap-3">
@@ -381,12 +384,12 @@ export default function AppPlayer() {
 
             {/* CTA */}
             <div className="pt-4 pb-safe">
-              <p className="text-sm text-fg-warm-muted">Not finding the playlist you want?</p>
+              <p className="text-sm text-fg-warm-muted">{t('player.notFinding')}</p>
               <button
-                onClick={() => navigate('/app/chat?draft=' + encodeURIComponent("Hi! I'd love to have a playlist for: "))}
+                onClick={() => navigate('/app/chat?draft=' + encodeURIComponent(t('player.chatDraft')))}
                 className="text-sm text-brand font-medium flex items-center gap-1 mt-1 active:scale-95 transition-transform"
               >
-                Tell us what you want <ChevronRight className="h-4 w-4" />
+                {t('player.tellUs')} <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           </div>

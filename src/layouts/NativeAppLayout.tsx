@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { motion, LayoutGroup } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/UnseenContentContext';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { useTrackAppReturn } from '@/hooks/useUserPresence';
@@ -47,6 +48,7 @@ const NativeAppLayout = () => {
   // All hooks must be called unconditionally at the top
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation();
   
   // Push notification flow - handles full-screen onboarding
   const { 
@@ -175,11 +177,10 @@ const NativeAppLayout = () => {
   const isOwnScrollPage = location.pathname === '/app/projects';
 
   const navItems = [
-    { path: '/app/home', icon: Home, label: 'Home', tourClass: 'tour-nav-home' },
-    { path: '/app/tools', icon: Compass, label: 'Tools', tourClass: 'tour-nav-explore' },
-    
-    { path: '/app/player', icon: Music, label: 'Listen', tourClass: 'tour-nav-listen' },
-    { path: '/app/channels', icon: Users, label: 'Chats', showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
+    { path: '/app/home', icon: Home, label: t('nav.home'), tourClass: 'tour-nav-home' },
+    { path: '/app/tools', icon: Compass, label: t('nav.tools'), tourClass: 'tour-nav-explore' },
+    { path: '/app/player', icon: Music, label: t('nav.listen'), tourClass: 'tour-nav-listen' },
+    { path: '/app/channels', icon: Users, label: t('nav.chats'), showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
   ];
 
   // Tab bar actual height: grid content (~48px for compact) + safe area inset
@@ -326,7 +327,7 @@ const NativeAppLayout = () => {
           <Link
             to="/app/aiplanner"
             onClick={() => haptic.medium()}
-            aria-label="Open AI Planner"
+            aria-label={t('nav.aiPlanner')}
             className={cn(
               'block w-[60px] h-[60px] rounded-full relative',
               'bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-primary-dark))]',

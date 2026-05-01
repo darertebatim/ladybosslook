@@ -50,23 +50,23 @@ const calculateMonthlyPresence = (entries: JournalEntry[]): number => {
 };
 
 const GENDER_OPTIONS = [
-  { value: '', label: 'Prefer not to say' },
-  { value: 'female', label: 'Female (She/Her)' },
-  { value: 'male', label: 'Male (He/Him)' },
-  { value: 'non-binary', label: 'Non-Binary (They/Them)' },
-  { value: 'other', label: 'Other' },
+  { value: '', labelKey: 'profile.gender.preferNot' },
+  { value: 'female', labelKey: 'profile.gender.female' },
+  { value: 'male', labelKey: 'profile.gender.male' },
+  { value: 'non-binary', labelKey: 'profile.gender.nonBinary' },
+  { value: 'other', labelKey: 'profile.gender.other' },
 ];
 
 const RELATIONSHIP_OPTIONS = [
-  { value: '', label: 'Prefer not to say' },
-  { value: 'single', label: 'Single' },
-  { value: 'in-a-relationship', label: 'In a Relationship' },
-  { value: 'married', label: 'Married' },
-  { value: 'divorced', label: 'Divorced' },
+  { value: '', labelKey: 'profile.relationship.preferNot' },
+  { value: 'single', labelKey: 'profile.relationship.single' },
+  { value: 'in-a-relationship', labelKey: 'profile.relationship.inRelationship' },
+  { value: 'married', labelKey: 'profile.relationship.married' },
+  { value: 'divorced', labelKey: 'profile.relationship.divorced' },
 ];
 
 const LANGUAGE_OPTIONS = [
-  { value: '', label: 'Not set' },
+  { value: '', labelKey: 'profile.language.notSet' },
   { value: 'en', label: 'English' },
   { value: 'fa', label: 'فارسی (Persian)' },
   { value: 'ar', label: 'العربية (Arabic)' },
@@ -220,11 +220,11 @@ const AppProfile = () => {
         } as any)
         .eq('id', user.id);
       if (error) throw error;
-      toast({ title: 'Profile Updated', description: 'Your profile has been saved successfully' });
+      toast({ title: t('profile.toasts.saved'), description: t('profile.toasts.savedDesc') });
       setIsEditing(false);
       refetchProfile();
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message || 'Failed to save profile', variant: 'destructive' });
+      toast({ title: t('profile.toasts.error'), description: error.message || t('profile.toasts.saveFailed'), variant: 'destructive' });
     } finally {
       setIsSaving(false);
     }
@@ -275,10 +275,10 @@ const AppProfile = () => {
         .eq('id', user.id);
       if (updateError) throw updateError;
 
-      toast({ title: 'Photo Updated', description: 'Your profile photo has been updated' });
+      toast({ title: t('profile.toasts.photoUpdated'), description: t('profile.toasts.photoUpdatedDesc') });
       refetchProfile();
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message || 'Failed to upload photo', variant: 'destructive' });
+      toast({ title: t('profile.toasts.error'), description: error.message || t('profile.toasts.uploadFailed'), variant: 'destructive' });
     } finally {
       setIsUploadingAvatar(false);
     }
@@ -304,7 +304,7 @@ const AppProfile = () => {
         }
       } catch (error: any) {
         if (error.message !== 'User cancelled photos app') {
-          toast({ title: 'Error', description: 'Failed to access camera', variant: 'destructive' });
+          toast({ title: t('profile.toasts.error'), description: t('profile.toasts.cameraFailed'), variant: 'destructive' });
         }
       }
     } else {
@@ -316,7 +316,7 @@ const AppProfile = () => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        toast({ title: 'File Too Large', description: 'Please select an image under 5MB', variant: 'destructive' });
+        toast({ title: t('profile.toasts.fileTooLarge'), description: t('profile.toasts.fileTooLargeDesc'), variant: 'destructive' });
         return;
       }
       handleAvatarUpload(file);
@@ -348,9 +348,9 @@ const AppProfile = () => {
   const creditBalance = wallet?.credits_balance || 0;
   const avatarUrl = p?.avatar_url;
 
-  const genderLabel = GENDER_OPTIONS.find(o => o.value === (p?.gender || ''))?.label;
-  const relationshipLabel = RELATIONSHIP_OPTIONS.find(o => o.value === (p?.relationship_status || ''))?.label;
-  const languageLabel = LANGUAGE_OPTIONS.find(o => o.value === (p?.preferred_language || ''))?.label;
+  const genderLabel = (() => { const o = GENDER_OPTIONS.find(o => o.value === (p?.gender || '')); return o ? t(o.labelKey) : undefined; })();
+  const relationshipLabel = (() => { const o = RELATIONSHIP_OPTIONS.find(o => o.value === (p?.relationship_status || '')); return o ? t(o.labelKey) : undefined; })();
+  const languageLabel = (() => { const o = LANGUAGE_OPTIONS.find(o => o.value === (p?.preferred_language || '')); return o ? (o.labelKey ? t(o.labelKey) : o.label) : undefined; })();
 
   // Helper for info rows in view mode
   const InfoRow = ({ icon: Icon, value, label }: { icon: React.ComponentType<{ className?: string }>; value?: string | null; label?: string }) => {
@@ -419,20 +419,20 @@ const AppProfile = () => {
         <div className="flex gap-2">
           {!isEditing ? (
             <Button variant="outline" className="flex-1 rounded-2xl h-12" onClick={() => setIsEditing(true)}>
-              <Pencil className="mr-2 h-4 w-4" />Edit Profile
+              <Pencil className="mr-2 h-4 w-4" />{t('profile.editProfile')}
             </Button>
           ) : (
             <>
               <Button variant="ghost" className="flex-1 rounded-2xl h-12" onClick={handleCancelEdit} disabled={isSaving}>
-                <X className="mr-2 h-4 w-4" />Cancel
+                <X className="mr-2 h-4 w-4" />{t('profile.cancel')}
               </Button>
               <Button className="flex-1 rounded-2xl h-12" onClick={handleSaveProfile} disabled={isSaving}>
-                <Check className="mr-2 h-4 w-4" />{isSaving ? 'Saving...' : 'Save'}
+                <Check className="mr-2 h-4 w-4" />{isSaving ? t('profile.saving') : t('profile.save')}
               </Button>
             </>
           )}
           <Button variant="outline" className="flex-1 rounded-2xl h-12" onClick={() => navigate('/app/settings')}>
-            <Settings className="mr-2 h-4 w-4" />Settings
+            <Settings className="mr-2 h-4 w-4" />{t('profile.settings')}
           </Button>
         </div>
 
@@ -446,17 +446,17 @@ const AppProfile = () => {
               <>
                 {/* Full Name */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Full Name</Label>
-                  <Input value={editedFields.full_name} onChange={e => setEditedFields(prev => ({ ...prev, full_name: e.target.value }))} placeholder="Your full name" />
+                  <Label className="text-xs text-muted-foreground">{t('profile.fields.fullName')}</Label>
+                  <Input value={editedFields.full_name} onChange={e => setEditedFields(prev => ({ ...prev, full_name: e.target.value }))} placeholder={t('profile.placeholders.fullName')} />
                 </div>
                 {/* Phone */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Phone</Label>
-                  <Input value={editedFields.phone} onChange={e => setEditedFields(prev => ({ ...prev, phone: e.target.value }))} placeholder="Your phone number" />
+                  <Label className="text-xs text-muted-foreground">{t('profile.fields.phone')}</Label>
+                  <Input value={editedFields.phone} onChange={e => setEditedFields(prev => ({ ...prev, phone: e.target.value }))} placeholder={t('profile.placeholders.phone')} />
                 </div>
                 {/* Date of Birth */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Date of Birth</Label>
+                  <Label className="text-xs text-muted-foreground">{t('profile.fields.dob')}</Label>
                   <div className="flex gap-2">
                     <select
                       className="flex h-10 flex-1 rounded-md border border-input bg-background px-2 py-2 text-sm"
@@ -468,7 +468,7 @@ const AppProfile = () => {
                         setEditedFields(prev => ({ ...prev, date_of_birth: new Date(current.getFullYear(), month - 1, current.getDate()) }));
                       }}
                     >
-                      <option value="">Month</option>
+                      <option value="">{t('profile.fields.month')}</option>
                       {Array.from({ length: 12 }, (_, i) => (
                         <option key={i + 1} value={i + 1}>{format(new Date(2000, i, 1), 'MMM')}</option>
                       ))}
@@ -483,7 +483,7 @@ const AppProfile = () => {
                         setEditedFields(prev => ({ ...prev, date_of_birth: new Date(current.getFullYear(), current.getMonth(), day) }));
                       }}
                     >
-                      <option value="">Day</option>
+                      <option value="">{t('profile.fields.day')}</option>
                       {Array.from({ length: 31 }, (_, i) => (
                         <option key={i + 1} value={i + 1}>{i + 1}</option>
                       ))}
@@ -498,7 +498,7 @@ const AppProfile = () => {
                         setEditedFields(prev => ({ ...prev, date_of_birth: new Date(year, current.getMonth(), current.getDate()) }));
                       }}
                     >
-                      <option value="">Year</option>
+                      <option value="">{t('profile.fields.year')}</option>
                       {Array.from({ length: 100 }, (_, i) => {
                         const year = new Date().getFullYear() - i;
                         return <option key={year} value={year}>{year}</option>;
@@ -508,43 +508,43 @@ const AppProfile = () => {
                 </div>
                 {/* Gender */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Gender / Pronouns</Label>
+                  <Label className="text-xs text-muted-foreground">{t('profile.fields.gender')}</Label>
                   <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={editedFields.gender} onChange={e => setEditedFields(prev => ({ ...prev, gender: e.target.value }))}>
-                    {GENDER_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    {GENDER_OPTIONS.map(o => <option key={o.value} value={o.value}>{t(o.labelKey)}</option>)}
                   </select>
                 </div>
                 {/* City */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">City</Label>
-                  <Input value={editedFields.city} onChange={e => setEditedFields(prev => ({ ...prev, city: e.target.value }))} placeholder="Your city" />
+                  <Label className="text-xs text-muted-foreground">{t('profile.fields.city')}</Label>
+                  <Input value={editedFields.city} onChange={e => setEditedFields(prev => ({ ...prev, city: e.target.value }))} placeholder={t('profile.placeholders.city')} />
                 </div>
                 {/* Country */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Country</Label>
-                  <Input value={editedFields.country} onChange={e => setEditedFields(prev => ({ ...prev, country: e.target.value }))} placeholder="Your country" />
+                  <Label className="text-xs text-muted-foreground">{t('profile.fields.country')}</Label>
+                  <Input value={editedFields.country} onChange={e => setEditedFields(prev => ({ ...prev, country: e.target.value }))} placeholder={t('profile.placeholders.country')} />
                 </div>
                 {/* Occupation */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Occupation</Label>
-                  <Input value={editedFields.occupation} onChange={e => setEditedFields(prev => ({ ...prev, occupation: e.target.value }))} placeholder="Your occupation" />
+                  <Label className="text-xs text-muted-foreground">{t('profile.fields.occupation')}</Label>
+                  <Input value={editedFields.occupation} onChange={e => setEditedFields(prev => ({ ...prev, occupation: e.target.value }))} placeholder={t('profile.placeholders.occupation')} />
                 </div>
                 {/* Relationship Status */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Relationship Status</Label>
+                  <Label className="text-xs text-muted-foreground">{t('profile.fields.relationship')}</Label>
                   <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={editedFields.relationship_status} onChange={e => setEditedFields(prev => ({ ...prev, relationship_status: e.target.value }))}>
-                    {RELATIONSHIP_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    {RELATIONSHIP_OPTIONS.map(o => <option key={o.value} value={o.value}>{t(o.labelKey)}</option>)}
                   </select>
                 </div>
                 {/* Language */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Second Language</Label>
+                  <Label className="text-xs text-muted-foreground">{t('profile.fields.secondLanguage')}</Label>
                   <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={editedFields.preferred_language} onChange={e => setEditedFields(prev => ({ ...prev, preferred_language: e.target.value }))}>
-                    {LANGUAGE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    {LANGUAGE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.labelKey ? t(o.labelKey) : o.label}</option>)}
                   </select>
                 </div>
                 {/* Goals */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Goals</Label>
+                  <Label className="text-xs text-muted-foreground">{t('profile.fields.goals')}</Label>
                   <div className="flex flex-wrap gap-2">
                     {GOAL_OPTIONS.map(goal => (
                       <button
@@ -556,54 +556,54 @@ const AppProfile = () => {
                           editedFields.goals.includes(goal) ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
                         )}
                       >
-                        {goal}
+                        {t(`profile.goalsList.${goal}`, goal)}
                       </button>
                     ))}
                   </div>
                 </div>
                 {/* Bio */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Bio</Label>
-                  <Textarea value={editedFields.bio} onChange={e => setEditedFields(prev => ({ ...prev, bio: e.target.value }))} placeholder="Tell us about yourself..." rows={3} />
+                  <Label className="text-xs text-muted-foreground">{t('profile.fields.bio')}</Label>
+                  <Textarea value={editedFields.bio} onChange={e => setEditedFields(prev => ({ ...prev, bio: e.target.value }))} placeholder={t('profile.placeholders.bio')} rows={3} />
                 </div>
                 {/* Instagram */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Instagram</Label>
-                  <Input value={editedFields.social_instagram} onChange={e => setEditedFields(prev => ({ ...prev, social_instagram: e.target.value }))} placeholder="@username" />
+                  <Label className="text-xs text-muted-foreground">{t('profile.fields.instagram')}</Label>
+                  <Input value={editedFields.social_instagram} onChange={e => setEditedFields(prev => ({ ...prev, social_instagram: e.target.value }))} placeholder={t('profile.placeholders.username')} />
                 </div>
                 {/* Telegram */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Telegram</Label>
-                  <Input value={editedFields.social_telegram} onChange={e => setEditedFields(prev => ({ ...prev, social_telegram: e.target.value }))} placeholder="@username" />
+                  <Label className="text-xs text-muted-foreground">{t('profile.fields.telegram')}</Label>
+                  <Input value={editedFields.social_telegram} onChange={e => setEditedFields(prev => ({ ...prev, social_telegram: e.target.value }))} placeholder={t('profile.placeholders.username')} />
                 </div>
               </>
             ) : (
               <>
-                <InfoRow icon={Mail} value={p?.email || user?.email} label="Email" />
-                <InfoRow icon={User} value={p?.full_name} label="Name" />
-                <InfoRow icon={Phone} value={p?.phone} label="Phone" />
-                <InfoRow icon={CalendarIcon} value={p?.date_of_birth ? format(new Date(p.date_of_birth), 'PPP') : undefined} label="Date of Birth" />
-                <InfoRow icon={User} value={genderLabel && genderLabel !== 'Prefer not to say' ? genderLabel : undefined} label="Gender" />
-                <InfoRow icon={MapPin} value={[p?.city, p?.country].filter(Boolean).join(', ') || undefined} label="Location" />
-                <InfoRow icon={Briefcase} value={p?.occupation} label="Occupation" />
-                <InfoRow icon={Heart} value={relationshipLabel && relationshipLabel !== 'Prefer not to say' ? relationshipLabel : undefined} label="Relationship" />
-                <InfoRow icon={Globe} value={languageLabel && languageLabel !== 'Not set' ? languageLabel : undefined} label="Second Language" />
-                <InfoRow icon={Globe} value={p?.timezone || undefined} label="Timezone" />
+                <InfoRow icon={Mail} value={p?.email || user?.email} label={t('profile.fields.email')} />
+                <InfoRow icon={User} value={p?.full_name} label={t('profile.fields.name')} />
+                <InfoRow icon={Phone} value={p?.phone} label={t('profile.fields.phone')} />
+                <InfoRow icon={CalendarIcon} value={p?.date_of_birth ? format(new Date(p.date_of_birth), 'PPP') : undefined} label={t('profile.fields.dob')} />
+                <InfoRow icon={User} value={genderLabel && genderLabel !== t('profile.gender.preferNot') ? genderLabel : undefined} label={t('profile.fields.gender')} />
+                <InfoRow icon={MapPin} value={[p?.city, p?.country].filter(Boolean).join(', ') || undefined} label={t('profile.fields.location')} />
+                <InfoRow icon={Briefcase} value={p?.occupation} label={t('profile.fields.occupation')} />
+                <InfoRow icon={Heart} value={relationshipLabel && relationshipLabel !== t('profile.relationship.preferNot') ? relationshipLabel : undefined} label={t('profile.fields.relationship')} />
+                <InfoRow icon={Globe} value={languageLabel && languageLabel !== t('profile.language.notSet') ? languageLabel : undefined} label={t('profile.fields.secondLanguage')} />
+                <InfoRow icon={Globe} value={p?.timezone || undefined} label={t('profile.fields.timezone')} />
                 {p?.goals && p.goals.length > 0 && (
                   <div className="p-2.5 bg-muted/30 rounded-lg">
-                    <p className="text-[10px] text-muted-foreground mb-1.5">Goals</p>
+                    <p className="text-[10px] text-muted-foreground mb-1.5">{t('profile.fields.goals')}</p>
                     <div className="flex flex-wrap gap-1.5">
                       {p.goals.map((g: string) => (
-                        <Badge key={g} variant="secondary" className="text-xs">{g}</Badge>
+                        <Badge key={g} variant="secondary" className="text-xs">{t(`profile.goalsList.${g}`, g)}</Badge>
                       ))}
                     </div>
                   </div>
                 )}
-                <InfoRow icon={Instagram} value={p?.social_instagram ? `@${p.social_instagram.replace('@', '')}` : undefined} label="Instagram" />
-                <InfoRow icon={Send} value={p?.social_telegram ? `@${p.social_telegram.replace('@', '')}` : undefined} label="Telegram" />
+                <InfoRow icon={Instagram} value={p?.social_instagram ? `@${p.social_instagram.replace('@', '')}` : undefined} label={t('profile.fields.instagram')} />
+                <InfoRow icon={Send} value={p?.social_telegram ? `@${p.social_telegram.replace('@', '')}` : undefined} label={t('profile.fields.telegram')} />
 
                 {!p?.full_name && !p?.phone && !p?.bio && (
-                  <p className="text-sm text-muted-foreground p-2 text-center">Tap "Edit Profile" to add your details</p>
+                  <p className="text-sm text-muted-foreground p-2 text-center">{t('profile.tapEditHint')}</p>
                 )}
               </>
             )}
@@ -617,7 +617,7 @@ const AppProfile = () => {
               <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <BookOpen className="h-4 w-4 text-primary" />
               </div>
-              <span className="font-medium text-sm">Journal Stats</span>
+              <span className="font-medium text-sm">{t('profile.sections.journal')}</span>
             </div>
             <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('journal') ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
@@ -633,7 +633,7 @@ const AppProfile = () => {
               <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <BookOpen className="h-4 w-4 text-primary" />
               </div>
-              <span className="font-medium text-sm">My Programs</span>
+              <span className="font-medium text-sm">{t('profile.sections.programs')}</span>
             </div>
             <div className="flex items-center gap-2">
               {programCount > 0 && <Badge variant="secondary" className="text-xs">{programCount}</Badge>}
@@ -649,7 +649,7 @@ const AppProfile = () => {
                       <Link key={enrollment.id} to={`/app/myprograms/${enrollment.program_slug || enrollment.course_name}`} className="flex items-center justify-between p-3 bg-muted/30 rounded-xl active:bg-muted/50 transition-colors">
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium truncate">{enrollment.course_name}</p>
-                          <p className="text-xs text-muted-foreground">Enrolled {format(new Date(enrollment.enrolled_at), 'MMM d, yyyy')}</p>
+                          <p className="text-xs text-muted-foreground">{t('profile.enrolled', { date: format(new Date(enrollment.enrolled_at), 'MMM d, yyyy') })}</p>
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge variant="secondary" className="text-xs">{(enrollment.program_rounds as any)?.status || 'active'}</Badge>
@@ -661,8 +661,8 @@ const AppProfile = () => {
                 ) : (
                   <div className="text-center py-6">
                     <BookOpen className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground">No courses yet</p>
-                    <Button variant="link" size="sm" asChild><Link to="/app/store">Browse Programs</Link></Button>
+                    <p className="text-sm text-muted-foreground">{t('profile.noCourses')}</p>
+                    <Button variant="link" size="sm" asChild><Link to="/app/store">{t('profile.browsePrograms')}</Link></Button>
                   </div>
                 )}
               </CardContent>
@@ -677,7 +677,7 @@ const AppProfile = () => {
               <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Wallet className="h-4 w-4 text-primary" />
               </div>
-              <span className="font-medium text-sm">Wallet & Credits</span>
+              <span className="font-medium text-sm">{t('profile.sections.wallet')}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground font-medium">${creditBalance}</span>
@@ -689,14 +689,14 @@ const AppProfile = () => {
               <CardContent className="space-y-3 pt-4">
                 <div className="flex items-center justify-between p-4 bg-primary/5 rounded-xl">
                   <div>
-                    <p className="text-xs text-muted-foreground">Current Balance</p>
-                    <p className="text-2xl font-bold">{wallet?.credits_balance || 0} Credits</p>
+                    <p className="text-xs text-muted-foreground">{t('profile.currentBalance')}</p>
+                    <p className="text-2xl font-bold">{wallet?.credits_balance || 0} {t('profile.credits')}</p>
                   </div>
                   <Wallet className="h-8 w-8 text-primary/30" />
                 </div>
                 {transactions && transactions.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-xs font-medium text-muted-foreground">Recent Transactions</p>
+                    <p className="text-xs font-medium text-muted-foreground">{t('profile.recentTransactions')}</p>
                     {transactions.map((tx) => (
                       <div key={tx.id} className="flex items-center justify-between py-2 px-3 bg-muted/30 rounded-lg">
                         <div className="flex items-center gap-2">
@@ -722,7 +722,7 @@ const AppProfile = () => {
               <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Receipt className="h-4 w-4 text-primary" />
               </div>
-              <span className="font-medium text-sm">Order History</span>
+              <span className="font-medium text-sm">{t('profile.sections.orders')}</span>
             </div>
             <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('orders') ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
@@ -740,7 +740,7 @@ const AppProfile = () => {
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <span className="text-sm font-medium">{formatCurrency(order.amount, order.currency || 'usd')}</span>
                           <Badge variant={getStatusBadgeVariant(order.status || 'completed')}>
-                            {order.refunded ? 'Refunded' : (order.status || 'Completed')}
+                            {order.refunded ? t('profile.refunded') : (order.status || t('profile.completed'))}
                           </Badge>
                         </div>
                       </div>
@@ -749,7 +749,7 @@ const AppProfile = () => {
                 ) : (
                   <div className="text-center py-6">
                     <Receipt className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground">No orders yet</p>
+                    <p className="text-sm text-muted-foreground">{t('profile.noOrders')}</p>
                   </div>
                 )}
               </CardContent>
@@ -767,7 +767,7 @@ const AppProfile = () => {
             <div className="h-9 w-9 rounded-xl bg-muted flex items-center justify-center">
               <Settings className="h-4 w-4 text-muted-foreground" />
             </div>
-            <span className="font-medium text-sm">Settings</span>
+            <span className="font-medium text-sm">{t('profile.settings')}</span>
           </div>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </button>
