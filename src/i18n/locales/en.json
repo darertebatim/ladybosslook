@@ -48,7 +48,13 @@
     "greetingAfternoon": "Good afternoon",
     "greetingEvening": "Good evening",
     "streak": "{{count}} day streak",
-    "streak_other": "{{count}} day streak"
+    "streak_other": "{{count}} day streak",
+    "today": "Today",
+    "browseLibrary": "Browse Library",
+    "noRoutineLaunchers": "No routine launchers yet",
+    "setUpFirstRoutine": "Set up your first routine →",
+    "tryRoutine": "Try a routine",
+    "all": "All"
   },
   "planner": {
     "today": "Today",
@@ -80,17 +86,6 @@
     "language": "Language",
     "languageHint": "Choose your in-app language. This does not affect content you create."
   },
-  "home": {
-    "greetingMorning": "Good morning",
-    "greetingAfternoon": "Good afternoon",
-    "greetingEvening": "Good evening",
-    "today": "Today",
-    "browseLibrary": "Browse Library",
-    "noRoutineLaunchers": "No routine launchers yet",
-    "setUpFirstRoutine": "Set up your first routine →",
-    "tryRoutine": "Try a routine",
-    "all": "All"
-  },
   "reflections": {
     "title": "Reflections Journal",
     "tagline": "Find ways to be happier & healthier",
@@ -107,5 +102,4 @@
   "moodPage": {
     "title": "Mood Check-in"
   }
-}
 }

@@ -48,7 +48,13 @@
     "greetingAfternoon": "ظهر بخیر",
     "greetingEvening": "عصر بخیر",
     "streak": "{{count}} روز پیاپی",
-    "streak_other": "{{count}} روز پیاپی"
+    "streak_other": "{{count}} روز پیاپی",
+    "today": "امروز",
+    "browseLibrary": "کتابخانه",
+    "noRoutineLaunchers": "هنوز روتینی اضافه نکرده‌ای",
+    "setUpFirstRoutine": "اولین روتینت را بساز ←",
+    "tryRoutine": "یک روتین را امتحان کن",
+    "all": "همه"
   },
   "planner": {
     "today": "امروز",
@@ -79,5 +85,21 @@
     "title": "تنظیمات",
     "language": "زبان",
     "languageHint": "زبان داخل برنامه را انتخاب کن. این کار روی محتوایی که خودت می‌سازی اثری ندارد."
+  },
+  "reflections": {
+    "title": "دفتر یادداشت‌ها",
+    "tagline": "راه‌هایی برای شادتر و سالم‌تر بودن پیدا کن",
+    "freeForm": "نوشتن آزاد",
+    "freeFormHint": "هرچه می‌خواهی بنویس",
+    "myNotes": "یادداشت‌های من",
+    "myNotesHint": "یادداشت‌های گذشته",
+    "forYou": "برای تو"
+  },
+  "profile": {
+    "title": "پروفایل",
+    "user": "کاربر"
+  },
+  "moodPage": {
+    "title": "ثبت حال و هوا"
   }
 }
