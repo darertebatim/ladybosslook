@@ -1379,31 +1379,28 @@ const AppHome = () => {
 
         {/* Welcome Spotlight overlay — anchored to highlighted task during the tour */}
         {spotlightStep === 'tap' && spotlightHighlightTaskId && (
-          <TaskCoachOverlay taskId={spotlightHighlightTaskId} variant="tap" />
+          <TaskCoachOverlay
+            taskId={spotlightHighlightTaskId}
+            variant="tap"
+            message="👆 Tap a task to see details"
+            onSkip={finishSpotlight}
+          />
+        )}
+        {spotlightStep === 'add' && (
+          <TaskCoachOverlay
+            selector="[data-spotlight-add]"
+            variant="add"
+            message="➕ Tap the + to add your own task"
+            onSkip={finishSpotlight}
+          />
         )}
         {spotlightStep === 'complete' && spotlightHighlightTaskId && (
-          <TaskCoachOverlay taskId={spotlightHighlightTaskId} variant="check" />
-        )}
-        {/* Instructional pill — bottom of screen during tour */}
-        {spotlightStep && (
-          <div
-            className="fixed left-0 right-0 z-[104] flex justify-center pointer-events-none"
-            style={{ bottom: 'calc(env(safe-area-inset-bottom) + 96px)' }}
-          >
-            <div className="pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#1a1a2e] text-white text-[13px] font-semibold shadow-[0_8px_24px_rgba(0,0,0,0.3)] max-w-[88vw]">
-              <span>
-                {spotlightStep === 'tap' && '👆 Tap a task to see details'}
-                {spotlightStep === 'add' && '➕ Tap the + to add your own task'}
-                {spotlightStep === 'complete' && '✅ Tap the circle to complete it'}
-              </span>
-              <button
-                onClick={() => setSpotlightStep(null)}
-                className="ml-1 text-white/60 active:text-white text-[11px] font-medium"
-              >
-                Skip
-              </button>
-            </div>
-          </div>
+          <TaskCoachOverlay
+            taskId={spotlightHighlightTaskId}
+            variant="check"
+            message="✅ Tap the circle to complete it"
+            onSkip={finishSpotlight}
+          />
         )}
       </div>
     </>
