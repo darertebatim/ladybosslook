@@ -7,6 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import { getMoodEmoji } from '@/components/app/MoodSelector';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface NoteItem {
   id: string;
@@ -19,6 +20,7 @@ interface NoteItem {
 }
 
 export default function AppReflectionNotes() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const goBack = useGoBack('/app/reflections');
   const { user } = useAuth();
@@ -167,7 +169,7 @@ export default function AppReflectionNotes() {
         <button onClick={() => goBack()} className="active:scale-95 transition-transform p-1">
           <ArrowLeft className="h-5 w-5" />
         </button>
-        <h1 className="text-lg font-semibold flex-1 text-center pr-6">Reflection Notes</h1>
+        <h1 className="text-lg font-semibold flex-1 text-center pr-6">{t('reflectionsPage.notesTitle')}</h1>
       </div>
 
       <div className="px-4 py-4 space-y-6" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
@@ -178,7 +180,7 @@ export default function AppReflectionNotes() {
         )}
 
         {!isLoading && (notes?.length || 0) === 0 && (
-          <p className="text-center text-muted-foreground py-12">No completed reflections yet.</p>
+          <p className="text-center text-muted-foreground py-12">{t('reflectionsPage.noCompleted')}</p>
         )}
 
         {Array.from(grouped.entries()).map(([dateLabel, items]) => (
