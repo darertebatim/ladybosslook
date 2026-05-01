@@ -741,105 +741,6 @@ const AppHome = () => {
     setSelectedTask(task);
   }, []);
 
-  useEffect(() => {
-    if (tasksLoading || tasks.length > 0) return;
-    if (showFirstCoachMark) setShowFirstCoachMark(false);
-    if (showTapCoachMark) setShowTapCoachMark(false);
-    if (showAddCoachMark) setShowAddCoachMark(false);
-    tapCoachMarkTriggeredRef.current = false;
-  }, [tasksLoading, tasks.length, showFirstCoachMark, showTapCoachMark, showAddCoachMark]);
-  
-  // Show the bundled spotlight intro popup once for brand-new users.
-  // The 3 spotlights now only fire after the user taps "Show me" in the intro,
-  // so they never start while the user is mid-scroll.
-  useEffect(() => {
-    const forced = localStorage.getItem('simora_force_new_user') === 'true';
-    if (
-      localStorage.getItem(SPOTLIGHT_TOUR_KEY) === 'true' ||
-      homeDataLoading ||
-      tasksLoading ||
-      tasks.length === 0 ||
-      showStreakModal ||
-      showSpotlightIntro ||
-      spotlightTourActiveRef.current
-    ) {
-      return;
-    }
-    // For real new users, only show when there are no completions yet.
-    // For admin testing, `simora_force_new_user` bypasses these checks.
-    if (!forced) {
-      if (
-        localStorage.getItem('simora_first_action_celebrated') === 'true' ||
-        completedTaskIds.size > 0 ||
-        totalCompletions > 0
-      ) {
-        return;
-      }
-    }
-    const t = setTimeout(() => setShowSpotlightIntro(true), 1000);
-    return () => clearTimeout(t);
-  }, [homeDataLoading, tasksLoading, tasks.length, completedTaskIds.size, totalCompletions, showStreakModal, showSpotlightIntro]);
-
-  // Step 2 of the bundled tour: when the user opens & closes a task detail,
-  // wait a beat then show the "+ add a new task" spotlight.
-  useEffect(() => {
-    if (
-      !selectedTask &&
-      tapCoachMarkTriggeredRef.current &&
-      localStorage.getItem('simora_add_coach_shown') !== 'true'
-    ) {
-      tapCoachMarkTriggeredRef.current = false;
-      const t = setTimeout(() => {
-        scrollHomeToTop();
-        setTimeout(() => {
-          setShowAddCoachMark(true);
-          localStorage.setItem('simora_add_coach_shown', 'true');
-        }, 450);
-      }, 900);
-      return () => clearTimeout(t);
-    }
-  }, [selectedTask, scrollHomeToTop]);
-
-  // Step 3 of the bundled tour: once the + add coach mark has been seen and
-  // dismissed, surface the "complete a task" spotlight as the natural finale.
-  useEffect(() => {
-    if (
-      !spotlightTourActiveRef.current ||
-      localStorage.getItem('simora_add_coach_shown') !== 'true' ||
-      showAddCoachMark ||
-      showFirstCoachMark ||
-      tasksLoading ||
-      tasks.length === 0 ||
-      completedTaskIds.size > 0 ||
-      showStreakModal
-    ) {
-      return;
-    }
-    const t = setTimeout(() => {
-      scrollHomeToTop();
-      setTimeout(() => setShowFirstCoachMark(true), 400);
-    }, 600);
-    return () => clearTimeout(t);
-  }, [showAddCoachMark, showFirstCoachMark, tasksLoading, tasks.length, completedTaskIds.size, showStreakModal, scrollHomeToTop]);
-
-  // Finale: dismiss "complete a task" spotlight when the user actually does it,
-  // and mark the whole bundled tour complete.
-  useEffect(() => {
-    if (showFirstCoachMark && completedTaskIds.size > 0) {
-      setShowFirstCoachMark(false);
-      localStorage.setItem(SPOTLIGHT_TOUR_KEY, 'true');
-      spotlightTourActiveRef.current = false;
-      localStorage.removeItem('simora_force_new_user');
-      // Bonus: briefly pulse the streak pill so the user sees the connection
-      // between completing a task and starting their streak.
-      setTimeout(() => {
-        const el = document.querySelector('.tour-streak') as HTMLElement | null;
-        if (!el) return;
-        el.classList.add('streak-tour-pulse');
-        setTimeout(() => el.classList.remove('streak-tour-pulse'), 2400);
-      }, 600);
-    }
-  }, [showFirstCoachMark, completedTaskIds.size]);
   const handleDateSelect = useCallback((date: Date) => {
     setSelectedDate(date);
     setShowCalendar(false);
@@ -1253,80 +1154,27 @@ const AppHome = () => {
                     </div>
                   ) : (
                     <>
-                      {/* Coach mark spotlight for first-ever action — delayed via state */}
-                       {(() => {
-                         const hintTask =
-                           filteredTasks.find(t => !completedTaskIds.has(t.id) && !t.pro_link_type) ||
-                           filteredTasks.find(t => !completedTaskIds.has(t.id)) ||
-                           filteredTasks[0];
-                         const tapHintTask =
-                           filteredTasks.find(t => !completedTaskIds.has(t.id)) || filteredTasks[0];
-                         const coachActive =
-                           (showFirstCoachMark || showTapCoachMark) && filteredTasks.length > 0;
-                         const highlightedId = coachActive
-                           ? (showTapCoachMark ? tapHintTask?.id : hintTask?.id) || null
-                           : null;
-                         return coachActive ? (
-                           <>
-                             {/* Tasks stay in place — only the highlighted one is fully visible */}
-                             <SortableTaskList
-                               tasks={filteredTasks}
-                               date={selectedDate}
-                               completedTaskIds={completedTaskIds}
-                               completedSubtaskIds={completedSubtaskIds}
-                               goalProgressMap={goalProgressMap}
-                               onTaskTap={(task) => {
-                                 if (showTapCoachMark) {
-                                   setShowTapCoachMark(false);
-                                   tapCoachMarkTriggeredRef.current = true;
-                                 }
-                                 handleTaskTap(task);
-                               }}
-                               onStreakIncrease={handleStreakIncrease}
-                               onStepUnlocked={handleStepUnlocked}
-                               onOpenGoalInput={handleOpenGoalInput}
-                               onOpenTimer={handleOpenTimer}
-                               hideQuickAdd
-                               coachHighlightTaskId={highlightedId}
-                             />
-                             {/* Inline pill label — no full-screen dim */}
-                             <div className="flex justify-center mt-4 mb-1 animate-fade-in pointer-events-none">
-                               <span className="px-4 py-2 rounded-full bg-[#1a1a2e] text-white text-[13.5px] font-semibold tracking-tight shadow-[0_8px_24px_rgba(26,26,46,0.28)]">
-                                 {showTapCoachMark
-                                   ? '👆 Tap this task to open its details'
-                                   : '✅ Tap the circle to check it off'}
-                               </span>
-                             </div>
-                             {/* Spotlight ring + hand anchored to the highlighted task */}
-                             <TaskCoachOverlay
-                               taskId={highlightedId}
-                               variant={showTapCoachMark ? 'tap' : 'check'}
-                             />
-                           </>
-                         ) : (
-                          <>
-                            <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenTaskSheet={handleOpenTaskSheet} hideQuickAdd={taskFilter === 'all-routines' || taskFilter.startsWith('routine:')} defaultRepeatOverride={homeView === 'one-time' ? 'No' : undefined} />
-                            {(taskFilter === 'all-routines' || taskFilter.startsWith('routine:')) && (
-                              <div className="flex gap-2 mt-3">
-                                <button
-                                  onClick={() => navigate('/app/routineplayer')}
-                                  className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
-                                >
-                                  <Settings2 className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
-                                  Manage Routines
-                                </button>
-                                <button
-                                  onClick={() => navigate('/app/routines')}
-                                  className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
-                                >
-                                  <Search className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
-                                  Browse Library
-                                </button>
-                              </div>
-                            )}
-                          </>
-                        );
-                      })()}
+                       <>
+                         <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenTaskSheet={handleOpenTaskSheet} hideQuickAdd={taskFilter === 'all-routines' || taskFilter.startsWith('routine:')} defaultRepeatOverride={homeView === 'one-time' ? 'No' : undefined} />
+                         {(taskFilter === 'all-routines' || taskFilter.startsWith('routine:')) && (
+                           <div className="flex gap-2 mt-3">
+                             <button
+                               onClick={() => navigate('/app/routineplayer')}
+                               className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+                             >
+                               <Settings2 className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
+                               Manage Routines
+                             </button>
+                             <button
+                               onClick={() => navigate('/app/routines')}
+                               className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+                             >
+                               <Search className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
+                               Browse Library
+                             </button>
+                           </div>
+                         )}
+                       </>
                     </>
                   )}
                   </>
@@ -1383,104 +1231,6 @@ const AppHome = () => {
           <div style={{ height: isKeyboardOpen ? '24px' : '120px' }} />
         </div>
 
-        {/* Bundled spotlight intro popup (Rilo-style) */}
-        <HomeSpotlightIntro
-          isOpen={showSpotlightIntro}
-          onStart={() => {
-            setShowSpotlightIntro(false);
-            spotlightTourActiveRef.current = true;
-            scrollHomeToTop();
-            // New order: 1) tap a task → 2) tap + to add → 3) complete a task
-            setTimeout(() => {
-              setShowTapCoachMark(true);
-            }, 500);
-          }}
-          onSkip={() => {
-            setShowSpotlightIntro(false);
-            spotlightTourActiveRef.current = false;
-            // Mark all sub-flags so nothing else fires
-            localStorage.setItem(SPOTLIGHT_TOUR_KEY, 'true');
-            localStorage.setItem('simora_first_action_celebrated', 'true');
-            localStorage.setItem('simora_tap_coach_shown', 'true');
-            localStorage.setItem('simora_add_coach_shown', 'true');
-            localStorage.removeItem('simora_force_new_user');
-          }}
-        />
-
-        {/* + Button Coach Mark Spotlight */}
-        {showAddCoachMark && (() => {
-          const el = document.querySelector('.coach-add-btn');
-          const rect = el?.getBoundingClientRect();
-          if (!rect) return null;
-          const cx = rect.left + rect.width / 2;
-          const cy = rect.top + rect.height / 2;
-          const r = Math.max(rect.width, rect.height) / 2 + 8;
-          return (
-            <>
-              <svg className="fixed inset-0 w-full h-full z-[100] animate-fade-in" onClick={() => setShowAddCoachMark(false)}>
-                <defs>
-                  <mask id="add-coach-mask">
-                    <rect width="100%" height="100%" fill="white" />
-                    <circle cx={cx} cy={cy} r={r} fill="black" />
-                  </mask>
-                </defs>
-                <rect width="100%" height="100%" fill="rgba(0,0,0,0.6)" mask="url(#add-coach-mask)" />
-              </svg>
-              {/* Make the real button clickable above overlay */}
-              <div
-                className="fixed z-[101]"
-                style={{
-                  left: rect.left - 4,
-                  top: rect.top - 4,
-                  width: rect.width + 8,
-                  height: rect.height + 8,
-                  borderRadius: '50%',
-                  animation: 'addBtnGlow 1.6s ease-in-out infinite',
-                }}
-                onClick={() => { setShowAddCoachMark(false); handleFabClick(); }}
-              />
-              {/* Bouncing hand */}
-              <div
-                className="fixed z-[102] pointer-events-none"
-                style={{
-                  left: cx - 42,
-                  top: cy - 70,
-                  filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.28))',
-                  animation: 'addCoachBounce 1.4s ease-in-out infinite',
-                }}
-              >
-                <FluentEmoji emoji="👇" size={56} />
-              </div>
-              {/* Label — pill, anchored under the FAB but constrained to viewport */}
-              <div
-                className="fixed z-[102] flex justify-end pointer-events-none px-4"
-                style={{
-                  right: 0,
-                  left: 0,
-                  top: rect.bottom + 14,
-                }}
-              >
-                <span className="px-4 py-2 rounded-full bg-[#1a1a2e] text-white text-[13.5px] font-semibold tracking-tight shadow-[0_8px_24px_rgba(26,26,46,0.28)] max-w-[80vw] text-center">
-                  👆 Tap + to add your own task
-                </span>
-              </div>
-              <style>{`
-                @keyframes addCoachBounce {
-                  0%   { transform: translateY(0px); }
-                  40%  { transform: translateY(10px); }
-                  55%  { transform: translateY(5px); }
-                  70%  { transform: translateY(10px); }
-                  100% { transform: translateY(0px); }
-                }
-                @keyframes addBtnGlow {
-                  0%, 100% { box-shadow: 0 0 14px 6px rgba(255,255,255,0.7), 0 0 28px 12px rgba(255,255,255,0.35); }
-                  50%      { box-shadow: 0 0 22px 10px rgba(255,255,255,0.9), 0 0 40px 18px rgba(255,255,255,0.45); }
-                }
-              `}</style>
-            </>
-          );
-        })()}
-
         {/* FAB removed — AI Planner is now in the bottom nav */}
 
         {/* All celebrations, modals, and sheets */}
@@ -1508,7 +1258,6 @@ const AppHome = () => {
           setShowStreakModal={setShowStreakModal}
           isFirstActionCelebration={isFirstActionCelebration}
           setIsFirstActionCelebration={setIsFirstActionCelebration}
-          setShowTapCoachMark={setShowTapCoachMark}
           streak={streak}
           shouldShowGoalSelection={
             !!streak &&
@@ -1561,15 +1310,6 @@ const AppHome = () => {
           onCloseStepCelebration={handleCloseStepCelebration}
           projectCompletion={projectCompletion}
           onCloseProjectCompletion={handleCloseProjectCompletion}
-        />
-
-        {/* New Interactive Home Tour */}
-        <HomeTour 
-          isFirstOpen={isFirstOpen}
-          forceShow={serverIndicatesNewUser}
-          hasEnrolledPrograms={false}
-          hasSuggestedRoutines={suggestedRoutines.length > 0}
-          onTourReady={handleHomeTourReady}
         />
 
         {/* Task Create/Edit Sheet */}
