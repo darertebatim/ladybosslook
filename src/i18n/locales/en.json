@@ -947,7 +947,40 @@
   },
   "breathePage": {
     "shareAria": "Share breathe",
-    "routineTitle": "Breathing Routine"
+    "routineTitle": "Breathing Routine",
+    "addedToRoutines": "{{name}} added to your routines!",
+    "addRoutineFailed": "Failed to add routine",
+    "switchLayout": "Switch layout",
+    "minutes": "Minutes",
+    "cycles": "Cycles",
+    "minShort": "{{count}} min",
+    "cyclesShort": "{{count}}×",
+    "ready": "Ready",
+    "paused": "Paused",
+    "inhale": "Inhale",
+    "exhale": "Exhale",
+    "hold": "Hold",
+    "nose": "Nose",
+    "mouth": "Mouth",
+    "doneSuffix": "done",
+    "totalSuffix": "total",
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "okay": "Okay",
+    "complete": {
+      "headerEmoji": "🧘",
+      "summary": "{{name}} · {{duration}}",
+      "title": "Great Job! What's Next on Your Journey?",
+      "continueRoutine": "Continue Routine ▶",
+      "backToHome": "Back to Home",
+      "actions": {
+        "writeReflection": "Write Reflection",
+        "selfReflection": "Self Reflection",
+        "startMyPlan": "Start My Plan",
+        "talk": "Talk it Out"
+      }
+    }
   },
   "reflectionsPage": {
     "shareAria": "Share Reflections",
