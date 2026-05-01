@@ -265,14 +265,25 @@ export function PaywallSunriseCard({ program, onPurchase, onRestore, onClose, pr
         >
           Your day, unlocked.
         </motion.h1>
-        <motion.p
+
+        <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 2.35 }}
-          className="mt-3 text-[17px] leading-snug font-bold text-black text-center"
+          className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 max-w-[320px] mx-auto"
         >
-          Everything you just saw — plus the tools that make it stick.
-        </motion.p>
+          {[
+            { emoji: '🧠', label: 'AI Planner' },
+            { emoji: '🔔', label: 'Smart Reminders' },
+            { emoji: '🌿', label: 'All Routines' },
+            { emoji: '🧘', label: 'All Self-Care Tools' },
+          ].map((f) => (
+            <div key={f.label} className="flex items-center gap-2">
+              <Emoji3D char={f.emoji} size={18} />
+              <span className="text-[13px] font-bold text-[#1a1f3d] leading-tight">{f.label}</span>
+            </div>
+          ))}
+        </motion.div>
 
         <motion.button
           initial={{ opacity: 0, y: 8 }}
