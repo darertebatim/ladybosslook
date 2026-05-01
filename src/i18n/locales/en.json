@@ -72,6 +72,17 @@
   },
   "tools": {
     "title": "Tools",
+    "tasks": "Tasks",
+    "searchTasks": "Search tasks...",
+    "browseCategories": "BROWSE CATEGORIES",
+    "popular": "Popular",
+    "all": "All",
+    "popularTasks": "POPULAR TASKS",
+    "allTasks": "ALL TASKS",
+    "categoryTasks": "{{name}} TASKS",
+    "noTasksInCategory": "No tasks in this category",
+    "taskAdded": "Task added to your routines! ✨",
+    "addTaskFailed": "Failed to add task",
     "breathe": {
       "title": "Breathe",
       "subtitle": "Slow down with a simple breathing exercise"
@@ -86,6 +97,25 @@
       "subtitle": "Write a quick note to yourself",
       "newEntry": "New entry"
     }
+  },
+  "task": {
+    "today": "Today",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "weekends": "Weekends",
+    "weekdays": "Weekdays",
+    "perWeek": "{{count}}x/week",
+    "noReminder": "No Reminder",
+    "remindAt": "Remind me at {{time}}",
+    "repeatsOnce": "Repeats once",
+    "repeats": "Repeats {{label}}",
+    "startTimer": "Start Timer",
+    "editTask": "Edit Task",
+    "skip": "Skip",
+    "delete": "Delete",
+    "times": "times",
+    "min": "min"
   },
   "settings": {
     "title": "Settings",
