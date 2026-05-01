@@ -91,8 +91,8 @@ const SortableTaskItem = ({
       className={cn(
         'touch-manipulation',
         isSortableDragging && 'opacity-50 scale-[1.02]',
-        coachHighlight === 'off' && 'opacity-30 pointer-events-none transition-opacity duration-300',
-        coachHighlight === 'on' && 'transition-transform duration-300'
+        coachHighlight === 'off' && 'pointer-events-none transition-opacity duration-300',
+        coachHighlight === 'on' && 'relative z-[101] transition-transform duration-300'
       )}
     >
       <TaskCard

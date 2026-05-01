@@ -1364,6 +1364,12 @@ const AppHome = () => {
         />
 
         {/* Welcome Spotlight overlay — anchored to highlighted task during the tour */}
+        {spotlightStep && (
+          <div
+            className="fixed inset-0 z-[100] bg-black/60 pointer-events-none animate-in fade-in duration-200"
+            aria-hidden
+          />
+        )}
         {spotlightStep === 'tap' && spotlightHighlightTaskId && (
           <TaskCoachOverlay taskId={spotlightHighlightTaskId} variant="tap" />
         )}
