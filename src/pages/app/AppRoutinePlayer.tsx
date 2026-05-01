@@ -1538,7 +1538,7 @@ export default function AppRoutinePlayer() {
             if (!open) setAddRoutineTarget(null);
           }}
           tasks={[addSheetSyntheticTask]}
-          routineTitle={addRoutineTarget?.title || 'Routine'}
+          routineTitle={addRoutineTarget?.title || t('routinePlayer.fallbackRoutine')}
           onSave={handleSaveAddSheet}
           isSaving={addRoutinePlan.isPending}
         />
@@ -1551,7 +1551,7 @@ export default function AppRoutinePlayer() {
         tasks={[{
           id: 'synthetic-routineplayer-page',
           plan_id: 'synthetic-routineplayer-page',
-          title: 'My Routines',
+          title: t('routinePlayer.myRoutines'),
           icon: '🎯',
           color: 'amber',
           task_order: 0,
@@ -1562,7 +1562,7 @@ export default function AppRoutinePlayer() {
           pro_link_value: '/app/routineplayer',
           linked_playlist: null,
         }]}
-        routineTitle="My Routines"
+        routineTitle={t('routinePlayer.myRoutines')}
         onSave={async (selectedTaskIds, editedTasks) => {
           try {
             await addRoutinePlan.mutateAsync({
@@ -1570,7 +1570,7 @@ export default function AppRoutinePlayer() {
               syntheticTasks: [{
                 id: 'synthetic-routineplayer-page',
                 plan_id: 'synthetic-routineplayer-page',
-                title: 'My Routines',
+                title: t('routinePlayer.myRoutines'),
                 icon: '🎯',
                 color: 'amber',
                 task_order: 0,
@@ -1584,9 +1584,9 @@ export default function AppRoutinePlayer() {
               editedTasks,
             });
             setShowPageRoutineSheet(false);
-            toast.success('Added to your planner! 🎯');
+            toast.success(t('routinePlayer.addedToPlannerTarget'));
           } catch (error) {
-            toast.error('Failed to add to planner');
+            toast.error(t('routinePlayer.addFailed'));
           }
         }}
         isSaving={addRoutinePlan.isPending}
