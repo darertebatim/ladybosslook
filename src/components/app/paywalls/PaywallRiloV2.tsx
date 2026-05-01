@@ -21,6 +21,8 @@ const FEATURES = [
   { emoji: '🔔', title: 'Smart Reminders',     desc: 'Nudges that actually land.' },
   { emoji: '🌿', title: 'All Routines',        desc: 'Every template, unlocked.' },
   { emoji: '🧘', title: 'All Self-Care Tools', desc: 'Breathwork, mood, fasting & more.' },
+  { emoji: '🤗', title: 'Quality growth community', desc: 'Support you every step of the way.' },
+  { emoji: '💡', title: 'Customized contents',  desc: 'On routines, wellness, and life hacks.' },
   { emoji: '✨', title: 'Early access',        desc: 'New features before everyone else.' },
   { emoji: '🚫', title: 'No Ads',              desc: '' },
 ];
@@ -171,13 +173,13 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
             initial={{ opacity: 0, scale: 0.6, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            style={{ display: 'inline-block', marginBottom: 18 }}
+            style={{ display: 'inline-block', marginBottom: 14 }}
           >
             <img
               src={riloAppIcon}
               alt="Rilo"
               style={{
-                width: 78, height: 78, borderRadius: 22,
+                width: 64, height: 64, borderRadius: 18,
                 boxShadow: '0 18px 48px -12px rgba(232,74,111,0.45)',
               }}
             />
@@ -187,7 +189,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15 }}
-            style={{ color: SUNRISE_AMBER, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2.4, margin: '0 0 10px' }}
+            style={{ color: SUNRISE_AMBER, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2.4, margin: '0 0 12px' }}
           >
             ✨ Rilo Plus
           </motion.p>
@@ -196,18 +198,26 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.22 }}
-            style={{ color: NAVY, fontSize: 28, fontWeight: 800, lineHeight: 1.2, margin: 0, letterSpacing: -0.5 }}
+            style={{ color: NAVY, fontSize: 30, fontWeight: 800, lineHeight: 1.18, margin: 0, letterSpacing: -0.6 }}
           >
-            Make self-care<br />actually stick.
+            Plus users are{' '}
+            <span style={{
+              background: 'linear-gradient(135deg, #FFB347 0%, #E84A6F 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              fontWeight: 900,
+            }}>4.2×</span>{' '}
+            more likely to stay consistent and see real change.
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.35 }}
-            style={{ color: 'rgba(26,31,61,0.7)', fontSize: 15, fontWeight: 500, margin: '12px 0 0', lineHeight: 1.45 }}
+            style={{ color: 'rgba(26,31,61,0.7)', fontSize: 15, fontWeight: 500, margin: '14px 0 0', lineHeight: 1.45 }}
           >
-            Plus members are <strong style={{ color: NAVY }}>4.2x</strong> more likely to keep their streak alive.
+            Join a quality growth community with content tailored to your journey.
           </motion.p>
         </div>
 
