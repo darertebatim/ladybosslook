@@ -496,6 +496,13 @@ html.native-app [data-scroll-container="true"] {
     font-family: var(--font-farsi);
   }
 
+  /* When the app is in Persian mode (set by src/i18n/index.ts on <html>),
+     swap the body font to Vazirmatn so all UI text renders cleanly in
+     Farsi script — without forcing RTL layout on the whole app. */
+  html[data-lang="fa"] body {
+    font-family: var(--font-farsi);
+  }
+
   /* RTL Support */
   .rtl {
     direction: rtl;

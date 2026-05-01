@@ -1,0 +1,83 @@
+{
+  "common": {
+    "back": "بازگشت",
+    "close": "بستن",
+    "cancel": "انصراف",
+    "save": "ذخیره",
+    "done": "انجام شد",
+    "next": "بعدی",
+    "continue": "ادامه",
+    "skip": "رد کردن",
+    "delete": "حذف",
+    "edit": "ویرایش",
+    "loading": "در حال بارگذاری…",
+    "today": "امروز",
+    "yesterday": "دیروز",
+    "tomorrow": "فردا"
+  },
+  "menu": {
+    "title": "منو",
+    "navigate": "مسیرها",
+    "tools": "ابزارها",
+    "account": "حساب کاربری",
+    "language": "زبان",
+    "takeTour": "تور آشنایی",
+    "darkMode": "حالت تاریک",
+    "lightMode": "حالت روشن",
+    "signOut": "خروج",
+    "items": {
+      "explore": "کاوش",
+      "listen": "گوش دادن",
+      "chats": "گفتگوها",
+      "support": "پشتیبانی",
+      "reflections": "یادداشت‌ها",
+      "mood": "حال و هوا",
+      "breathe": "تنفس",
+      "water": "آب",
+      "emotions": "احساسات",
+      "period": "پریود",
+      "fasting": "روزه",
+      "routines": "روتین‌ها",
+      "myPrograms": "برنامه‌های من",
+      "myProfile": "پروفایل من",
+      "settings": "تنظیمات"
+    }
+  },
+  "home": {
+    "greetingMorning": "صبح بخیر",
+    "greetingAfternoon": "ظهر بخیر",
+    "greetingEvening": "عصر بخیر",
+    "streak": "{{count}} روز پیاپی",
+    "streak_other": "{{count}} روز پیاپی"
+  },
+  "planner": {
+    "today": "امروز",
+    "week": "هفته",
+    "tasks": "کارها",
+    "todos": "فهرست کارها",
+    "empty": "هنوز چیزی برنامه‌ریزی نشده",
+    "addTask": "افزودن کار"
+  },
+  "tools": {
+    "title": "ابزارها",
+    "breathe": {
+      "title": "تنفس",
+      "subtitle": "با یک تمرین ساده‌ی تنفس آرام شو"
+    },
+    "mood": {
+      "title": "حال و هوا",
+      "subtitle": "الان چه حسی داری؟",
+      "logMood": "ثبت حال"
+    },
+    "reflections": {
+      "title": "یادداشت‌ها",
+      "subtitle": "یک نکته‌ی کوتاه برای خودت بنویس",
+      "newEntry": "یادداشت جدید"
+    }
+  },
+  "settings": {
+    "title": "تنظیمات",
+    "language": "زبان",
+    "languageHint": "زبان داخل برنامه را انتخاب کن. این کار روی محتوایی که خودت می‌سازی اثری ندارد."
+  }
+}
