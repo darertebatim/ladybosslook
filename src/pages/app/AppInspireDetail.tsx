@@ -562,7 +562,7 @@ export default function AppInspireDetail() {
                             // schedule_days present → weekly
                             if (task.schedule_days && task.schedule_days.length > 0) return t('inspirePage.repeat_weekly');
                             if (task.repeat_pattern === 'daily') return t('inspirePage.repeat_daily');
-                            return 'Once';
+                            return t('inspirePage.repeat_once');
                           })();
                           return (
                             <div
@@ -611,7 +611,7 @@ export default function AppInspireDetail() {
                         if (task.repeat_pattern === 'weekend') return t('inspirePage.repeat_weekend');
                         if (task.schedule_days && task.schedule_days.length > 0) return t('inspirePage.repeat_weekly');
                         if (task.repeat_pattern === 'daily') return t('inspirePage.repeat_daily');
-                        return 'Once';
+                        return t('inspirePage.repeat_once');
                       })();
                       return (
                         <div
