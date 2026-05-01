@@ -785,7 +785,7 @@ const AppHome = () => {
           <div className="grid grid-cols-[auto_1fr_auto] items-center px-4 h-10">
             {/* Left: Menu + Support */}
             <div className="justify-self-start flex items-center gap-1 tour-menu-button">
-              <HomeMenu onStartTour={startHomeTour || undefined} />
+              <HomeMenu />
               <button
                 onClick={() => navigate('/app/chat')}
                 className="p-2 -ml-1 text-foreground transition-colors"
