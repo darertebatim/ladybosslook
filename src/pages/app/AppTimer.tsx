@@ -1310,12 +1310,12 @@ function AppTimerInner() {
           ))}
         </div>
 
-        <p className="text-white/50 text-sm mb-2">Break time</p>
+        <p className="text-white/50 text-sm mb-2">{t('timer.breakTime')}</p>
         <span className="text-6xl font-bold text-white mb-4" style={{ fontVariantNumeric: 'tabular-nums' }}>
           {breakTimeStr}
         </span>
         <p className="text-white/40 text-sm">
-          Round {nextRoundRef.current + 1} starts soon
+          {t('timer.roundStartsSoon', { round: nextRoundRef.current + 1 })}
         </p>
 
         {/* Skip break */}
@@ -1328,7 +1328,7 @@ function AppTimerInner() {
           }}
           className="mt-10 px-6 py-3 rounded-full bg-white/10 text-white font-semibold text-sm transition-transform active:scale-[0.97]"
         >
-          Skip break
+          {t('timer.skipBreak')}
         </button>
       </motion.div>
     );
