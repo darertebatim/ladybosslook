@@ -169,31 +169,6 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
 
         {/* Hero */}
         <div style={{ paddingLeft: 24, paddingRight: 24, paddingTop: 16, paddingBottom: 28, textAlign: 'center' }}>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.6, y: -10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            style={{ display: 'inline-block', marginBottom: 14 }}
-          >
-            <img
-              src={riloAppIcon}
-              alt="Rilo"
-              style={{
-                width: 64, height: 64, borderRadius: 18,
-                boxShadow: '0 18px 48px -12px rgba(232,74,111,0.45)',
-              }}
-            />
-          </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.15 }}
-            style={{ color: SUNRISE_AMBER, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2.4, margin: '0 0 12px' }}
-          >
-            ✨ Rilo Plus
-          </motion.p>
-
           <motion.h1
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -233,7 +208,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
           <div style={{ width: 40, height: 4, borderRadius: 2, background: '#e8e8ec', margin: '0 auto 22px' }} />
 
           <p style={{ textAlign: 'center', fontSize: 22, fontWeight: 800, color: NAVY, margin: '0 0 22px', letterSpacing: -0.3 }}>
-            What you get
+            What you get with Rilo<span style={{ color: SUNRISE_AMBER }}>+</span>
           </p>
 
           <div style={{ paddingLeft: 22, paddingRight: 22 }}>
