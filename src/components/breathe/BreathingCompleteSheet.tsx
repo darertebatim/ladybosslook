@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -15,26 +16,10 @@ import planImg from '@/assets/mood-card-plan.png';
 import talkImg from '@/assets/mood-card-talk.png';
 
 const ACTIONS = [
-  {
-    label: 'Write Reflection',
-    image: journalImg,
-    route: '/app/reflections/free-form',
-  },
-  {
-    label: 'Self Reflection',
-    image: reflectImg,
-    route: '/app/reflections',
-  },
-  {
-    label: 'Start My Plan',
-    image: planImg,
-    route: '/app/home',
-  },
-  {
-    label: 'Talk it Out',
-    image: talkImg,
-    route: '/app/channels',
-  },
+  { labelKey: 'breathePage.complete.actions.writeReflection', image: journalImg, route: '/app/reflections/free-form' },
+  { labelKey: 'breathePage.complete.actions.selfReflection', image: reflectImg, route: '/app/reflections' },
+  { labelKey: 'breathePage.complete.actions.startMyPlan', image: planImg, route: '/app/home' },
+  { labelKey: 'breathePage.complete.actions.talk', image: talkImg, route: '/app/channels' },
 ];
 
 interface BreathingCompleteSheetProps {
@@ -50,6 +35,7 @@ export function BreathingCompleteSheet({
   exerciseName,
   durationSeconds,
 }: BreathingCompleteSheetProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void; completeTask: () => void } | null = null;
@@ -74,7 +60,7 @@ export function BreathingCompleteSheet({
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     if (mins === 0) return `${secs}s`;
-    return secs > 0 ? `${mins}m ${secs}s` : `${mins} min`;
+    return secs > 0 ? `${mins}m ${secs}s` : t('breathePage.minShort', { count: mins });
   };
 
   const handleAction = (route: string) => {
@@ -116,18 +102,20 @@ export function BreathingCompleteSheet({
             <FluentEmoji emoji="🧘" size={40} />
           </div>
           <p className="text-sm font-medium text-foreground/50 mb-1">
-            {exerciseName} · {formatDuration(durationSeconds)}
+            {t('breathePage.complete.summary', { name: exerciseName, duration: formatDuration(durationSeconds) })}
           </p>
           <h2 className="text-xl font-bold text-foreground leading-snug">
-            Great Job! What's Next<br />on Your Journey?
+            {t('breathePage.complete.title')}
           </h2>
         </div>
 
         {/* 2×2 Cards with illustrations */}
         <div className="grid grid-cols-2 gap-3 mb-5">
-          {ACTIONS.map((action) => (
+          {ACTIONS.map((action) => {
+            const label = t(action.labelKey);
+            return (
             <button
-              key={action.label}
+              key={action.labelKey}
               onClick={() => handleAction(action.route)}
               className={cn(
                 "flex flex-col items-center rounded-2xl p-3 pt-4",
@@ -137,14 +125,15 @@ export function BreathingCompleteSheet({
             >
               <img
                 src={action.image}
-                alt={action.label}
+                alt={label}
                 className="w-24 h-24 object-contain mb-2"
               />
               <span className="text-sm font-semibold text-foreground text-center leading-tight">
-                {action.label}
+                {label}
               </span>
             </button>
-          ))}
+            );
+          })}
         </div>
 
         {/* Back to Home / Back to Player */}
@@ -153,7 +142,7 @@ export function BreathingCompleteSheet({
           variant="ghost"
           className="w-full h-10 rounded-full text-sm bg-orange-200/60 text-orange-900 hover:bg-orange-200/80"
         >
-          {hasActivePlayer ? 'Continue Routine ▶' : 'Back to Home'}
+          {hasActivePlayer ? t('breathePage.complete.continueRoutine') : t('breathePage.complete.backToHome')}
         </Button>
       </SheetContent>
     </Sheet>
