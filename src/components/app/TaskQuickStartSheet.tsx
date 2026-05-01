@@ -13,13 +13,14 @@ import { Keyboard } from '@capacitor/keyboard';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { ActionSheetTour } from '@/components/app/tour/ActionSheetTour';
+import { useTranslation } from 'react-i18next';
 
-// Map time_period values to display labels
-const TIME_PERIOD_LABELS: Record<string, string> = {
-  morning: 'Morning',
-  afternoon: 'Afternoon',
-  evening: 'Evening',
-  night: 'Bedtime',
+// Map time_period values to translation keys
+const TIME_PERIOD_KEYS: Record<string, string> = {
+  morning: 'quickStart.morning',
+  afternoon: 'quickStart.afternoon',
+  evening: 'quickStart.evening',
+  night: 'quickStart.bedtime',
 };
 
 interface TaskQuickStartSheetProps {
@@ -33,6 +34,7 @@ export const TaskQuickStartSheet = ({
   onOpenChange,
   onContinue,
 }: TaskQuickStartSheetProps) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [taskName, setTaskName] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('popular');
@@ -154,7 +156,7 @@ export const TaskQuickStartSheet = ({
                 <button 
                   onClick={startTour}
                   className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
-                  aria-label="Start tour"
+                  aria-label={t('quickStart.startTour')}
                 >
                   <HelpCircle className="w-4 h-4 text-muted-foreground" />
                 </button>
@@ -176,7 +178,7 @@ export const TaskQuickStartSheet = ({
                 <Input
                   value={taskName}
                   onChange={(e) => setTaskName(e.target.value.slice(0, 50))}
-                  placeholder="Type a new task..."
+                  placeholder={t('quickStart.typeNew')}
                   className="text-xl font-semibold text-center border-0 bg-transparent focus-visible:ring-0 placeholder:text-muted-foreground/40 h-auto py-2"
                   maxLength={50}
                   autoFocus
@@ -207,7 +209,7 @@ export const TaskQuickStartSheet = ({
                   onClick={handleContinue}
                   className="w-full h-11 rounded-full bg-foreground text-background font-semibold text-sm hover:bg-foreground/90"
                 >
-                  Continue
+                  {t('common.continue')}
                 </Button>
               </div>
             )}
@@ -223,7 +225,7 @@ export const TaskQuickStartSheet = ({
                   className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-muted/40 hover:bg-muted/60 border border-border/20 transition-all active:scale-[0.98]"
                 >
                   <Lightbulb className="w-4 h-4 text-amber-500" />
-                  <span className="text-sm font-medium text-muted-foreground">Need inspiration?</span>
+                  <span className="text-sm font-medium text-muted-foreground">{t('quickStart.needInspiration')}</span>
                 </button>
               </div>
             )}
@@ -246,7 +248,7 @@ export const TaskQuickStartSheet = ({
                           : "bg-muted text-foreground hover:bg-muted/80 border-transparent"
                       )}
                     >
-                      ⭐ Popular
+                      ⭐ {t('quickStart.popular')}
                     </button>
                     {categories.map((cat) => (
                       <button
@@ -287,21 +289,21 @@ export const TaskQuickStartSheet = ({
                     <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
                       <BookOpen className="w-4 h-4 text-muted-foreground" />
                     </div>
-                    <span className="text-sm font-medium text-foreground">Browse All Routines</span>
+                    <span className="text-sm font-medium text-foreground">{t('quickStart.browseAll')}</span>
                   </button>
                 </div>
 
                 {filteredSuggestions.length > 0 && (
                   <>
                     <p className="text-xs text-muted-foreground mb-2">
-                      {taskName.trim() ? 'Matching tasks' : 'Suggestions'}
+                      {taskName.trim() ? t('quickStart.matching') : t('quickStart.suggestions')}
                     </p>
                     <div className="space-y-2 tour-action-list">
                       {filteredSuggestions.map((template) => {
                         const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
                         const timePeriodLabel = template.time_period 
-                          ? TIME_PERIOD_LABELS[template.time_period] || template.time_period
-                          : 'Anytime';
+                          ? (TIME_PERIOD_KEYS[template.time_period] ? t(TIME_PERIOD_KEYS[template.time_period]) : template.time_period)
+                          : t('quickStart.anytime');
 
                         return (
                           <button 
@@ -320,14 +322,14 @@ export const TaskQuickStartSheet = ({
                                   {template.repeat_pattern && template.repeat_pattern !== 'none' && (
                                     <span>
                                       {' • '}
-                                      {template.repeat_pattern === 'daily' ? 'Daily' : 
-                                       template.repeat_pattern === 'weekly' ? 'Weekly' : 
-                                       template.repeat_pattern === 'monthly' ? 'Monthly' :
-                                       template.repeat_pattern === 'weekend' ? 'Weekends' : ''}
+                                      {template.repeat_pattern === 'daily' ? t('quickStart.daily') : 
+                                       template.repeat_pattern === 'weekly' ? t('quickStart.weekly') : 
+                                       template.repeat_pattern === 'monthly' ? t('quickStart.monthly') :
+                                       template.repeat_pattern === 'weekend' ? t('quickStart.weekends') : ''}
                                     </span>
                                   )}
                                   {(!template.repeat_pattern || template.repeat_pattern === 'none') && (
-                                    <span>{' • '}Once</span>
+                                    <span>{' • '}{t('quickStart.once')}</span>
                                   )}
                                   <span>{' • '}{timePeriodLabel}</span>
                                 </p>
