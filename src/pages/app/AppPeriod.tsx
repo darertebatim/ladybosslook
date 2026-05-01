@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Settings, Heart, ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react';
 import { BackButtonCircle } from '@/components/app/BackButton';
 import { format, addMonths, subMonths } from 'date-fns';
@@ -24,6 +25,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 
 const AppPeriod = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -105,17 +107,17 @@ const AppPeriod = () => {
           });
         }
         
-        toast.success('Period logged!');
+        toast.success(t('tier1.period.logged'));
       } else {
         await deletePeriodLog.mutateAsync(selectedDate);
         haptic.light();
-        toast.success('Log removed');
+        toast.success(t('tier1.period.logRemoved'));
       }
       
       setShowDaySheet(false);
     } catch (error) {
       console.error('Error saving period log:', error);
-      toast.error('Failed to save');
+      toast.error(t('tier1.period.saveFailed'));
     }
   }, [selectedDate, logPeriodDay, deletePeriodLog, loggedPeriodDays]);
 
@@ -134,13 +136,13 @@ const AppPeriod = () => {
         <div className="fixed inset-0 z-10 flex flex-col items-center justify-center bg-gradient-to-b from-pink-200 to-rose-50 px-6 text-center">
           <BackButtonCircle />
           <Heart className="h-16 w-16 text-pink-400 mb-4" />
-          <h2 className="text-xl font-bold mb-2">Period Tracker is a Plus feature</h2>
-          <p className="text-muted-foreground mb-6">Upgrade to Simora Plus to track your cycle, get predictions, and log symptoms.</p>
+          <h2 className="text-xl font-bold mb-2">{t('tier1.period.plusFeatureTitle')}</h2>
+          <p className="text-muted-foreground mb-6">{t('tier1.period.plusFeatureDesc')}</p>
           <button
             onClick={() => { haptic.light(); setShowPaywall(true); }}
             className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-semibold"
           >
-            Unlock with Plus
+            {t('tier1.common.unlockWithPlus')}
           </button>
         </div>
         <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
@@ -185,14 +187,14 @@ const AppPeriod = () => {
         >
           <BackButtonCircle to="/app/home" className="bg-white/60 text-pink-700" />
           
-          <h1 className="text-lg font-semibold text-pink-800">Period Tracker</h1>
+          <h1 className="text-lg font-semibold text-pink-800">{t('tier1.period.title')}</h1>
           
           {/* Help button for tour */}
           {startTour ? (
             <button
               onClick={startTour}
               className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
-              aria-label="Start page tour"
+              aria-label={t('tier1.period.startPageTour')}
             >
               <HelpCircle className="h-5 w-5 text-pink-700" />
             </button>
@@ -243,15 +245,15 @@ const AppPeriod = () => {
             <div className="flex items-center justify-center gap-4 py-3">
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-full bg-pink-500" />
-                <span className="text-[10px] text-pink-700">Period</span>
+                <span className="text-[10px] text-pink-700">{t('tier1.period.legendPeriod')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-full border-2 border-dashed border-pink-400" />
-                <span className="text-[10px] text-pink-600">Predicted</span>
+                <span className="text-[10px] text-pink-600">{t('tier1.period.legendPredicted')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-full bg-amber-400" />
-                <span className="text-[10px] text-amber-700">Ovulation</span>
+                <span className="text-[10px] text-amber-700">{t('tier1.period.legendOvulation')}</span>
               </div>
             </div>
           </div>
@@ -271,7 +273,7 @@ const AppPeriod = () => {
             className="flex-1 max-w-[220px] h-14 rounded-full bg-pink-500 shadow-lg flex items-center justify-center gap-2 text-white font-semibold active:scale-[0.98] transition-transform"
           >
             <Heart className="h-5 w-5" />
-            Log Today
+            {t('tier1.period.logToday')}
           </button>
 
           {/* Settings button */}
@@ -281,7 +283,7 @@ const AppPeriod = () => {
               setShowSettingsSheet(true);
             }}
             className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-sm shadow-lg flex items-center justify-center active:scale-95 transition-transform"
-            title="Settings"
+            title={t('tier1.common.settings')}
           >
             <Settings className="h-5 w-5 text-pink-700" />
           </button>

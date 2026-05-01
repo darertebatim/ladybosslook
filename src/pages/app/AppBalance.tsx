@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Sparkles, TrendingUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { BackButton } from '@/components/app/BackButton';
 import { SEOHead } from '@/components/SEOHead';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -34,6 +35,7 @@ function formatRange(start: string, end: string): string {
 }
 
 const AppBalance = () => {
+  const { t } = useTranslation();
   // Week scrubber: rangeEnd is the latest day in the visible window
   const today = getLocalDateStr();
   const [rangeEnd, setRangeEnd] = useState(today);
@@ -53,7 +55,7 @@ const AppBalance = () => {
 
   return (
     <>
-      <SEOHead title="Self-Care Balance" description="Your weekly balance across Body, Mind, Environment & People" />
+      <SEOHead title={t('tier1.balance.title')} description={t('tier1.balance.seoDesc')} />
 
       <div className="flex flex-col h-dvh overflow-hidden bg-amber-50">
         <header
@@ -63,7 +65,7 @@ const AppBalance = () => {
           <div className="px-4 py-2 flex items-center justify-between">
             <BackButton to="/app/presence" className="text-orange-700" />
             <h1 className="text-base font-semibold text-orange-900">
-              Self-Care Balance
+              {t('tier1.balance.title')}
             </h1>
             <div className="w-9" />
           </div>
@@ -78,13 +80,13 @@ const AppBalance = () => {
             <button
               onClick={goPrev}
               className="w-10 h-10 rounded-full flex items-center justify-center active:scale-95 transition-transform"
-              aria-label="Previous week"
+              aria-label={t('tier1.common.previousWeek')}
             >
               <ChevronLeft className="h-5 w-5 text-orange-700" />
             </button>
             <div className="text-center">
               <p className="text-sm font-semibold text-foreground">
-                {isCurrentWeek ? 'This week' : formatRange(rangeStart, rangeEnd)}
+                {isCurrentWeek ? t('tier1.common.thisWeek') : formatRange(rangeStart, rangeEnd)}
               </p>
               {!isCurrentWeek && (
                 <p className="text-[11px] text-muted-foreground">
@@ -99,7 +101,7 @@ const AppBalance = () => {
                 'w-10 h-10 rounded-full flex items-center justify-center transition-transform',
                 isCurrentWeek ? 'opacity-30' : 'active:scale-95',
               )}
-              aria-label="Next week"
+              aria-label={t('tier1.common.nextWeek')}
             >
               <ChevronRight className="h-5 w-5 text-orange-700" />
             </button>
@@ -109,11 +111,11 @@ const AppBalance = () => {
           <section className="bg-white rounded-2xl p-4 shadow-ios">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-semibold text-orange-900/60 uppercase tracking-wide">
-                Your balance
+                {t('tier1.balance.yourBalance')}
               </h2>
               {hasData && (
                 <span className="text-xs text-muted-foreground">
-                  {data!.totalCompletions} completions
+                  {t('tier1.balance.completionsLabel', { n: data!.totalCompletions })}
                 </span>
               )}
             </div>
@@ -126,8 +128,7 @@ const AppBalance = () => {
               </div>
             ) : !hasData ? (
               <p className="py-6 text-center text-sm text-muted-foreground">
-                No completed tasks in this window. Try a previous week or
-                complete a few tasks today.
+                {t('tier1.balance.noCompletions')}
               </p>
             ) : (
               <div className="space-y-4">
@@ -141,7 +142,7 @@ const AppBalance = () => {
                           {CLUSTER_LABELS[c]}
                         </span>
                         <span className="text-xs font-semibold text-muted-foreground tabular-nums">
-                          {b.score}% · {b.completions} done
+                          {b.score}% · {t('tier1.balance.doneCount', { n: b.completions })}
                         </span>
                       </div>
                       <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
@@ -166,7 +167,7 @@ const AppBalance = () => {
               <Sparkles className="h-5 w-5 text-amber-700 shrink-0 mt-0.5" />
               <div>
                 <p className="text-sm font-semibold text-amber-950 mb-1">
-                  Suggestion for next week
+                  {t('tier1.balance.suggestionTitle')}
                 </p>
                 <p className="text-sm text-amber-950/80 leading-snug">
                   {getSuggestionFor(data.weakestCluster)}
@@ -179,7 +180,7 @@ const AppBalance = () => {
           {hasData && (
             <section className="bg-white rounded-2xl p-4 shadow-ios">
               <h2 className="text-sm font-semibold text-orange-900/60 uppercase tracking-wide mb-3">
-                What you did
+                {t('tier1.balance.whatYouDid')}
               </h2>
               <div className="space-y-4">
                 {CLUSTER_ORDER.map((c) => {
@@ -224,7 +225,7 @@ const AppBalance = () => {
                   (c) => Object.keys(data!.clusters[c].byTask).length === 0,
                 ) && (
                   <p className="text-sm text-muted-foreground">
-                    No tagged tasks completed yet.
+                    {t('tier1.balance.noTagged')}
                   </p>
                 )}
               </div>
@@ -236,7 +237,7 @@ const AppBalance = () => {
             <div className="flex items-center gap-2 mb-3">
               <TrendingUp className="h-4 w-4 text-orange-700" />
               <h2 className="text-sm font-semibold text-orange-900/60 uppercase tracking-wide">
-                4-Week Trend
+                {t('tier1.balance.fourWeekTrend')}
               </h2>
             </div>
 
@@ -247,7 +248,7 @@ const AppBalance = () => {
                 ))}
               </div>
             ) : !trend || trend.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No trend data yet.</p>
+              <p className="text-sm text-muted-foreground">{t('tier1.balance.noTrend')}</p>
             ) : (
               <div className="space-y-3">
                 {CLUSTER_ORDER.map((c) => (
@@ -257,7 +258,7 @@ const AppBalance = () => {
                         {CLUSTER_LABELS[c]}
                       </span>
                       <span className="text-[11px] text-muted-foreground tabular-nums">
-                        {trend[trend.length - 1].scores[c]}% now
+                        {t('tier1.balance.nowSuffix', { pct: trend[trend.length - 1].scores[c] })}
                       </span>
                     </div>
                     <div className="flex items-end gap-1 h-10">
@@ -286,7 +287,7 @@ const AppBalance = () => {
                   </div>
                 ))}
                 <p className="text-[11px] text-muted-foreground text-center pt-1">
-                  Oldest → newest week (rightmost = current)
+                  {t('tier1.balance.oldestNewest')}
                 </p>
               </div>
             )}
@@ -294,8 +295,7 @@ const AppBalance = () => {
 
           {/* Scoring legend */}
           <p className="text-[11px] text-muted-foreground text-center px-4 pt-2">
-            Score is your activity level (0–100). 10+ tagged completions in a
-            cluster = full bar.
+            {t('tier1.balance.scoreLegend')}
           </p>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Search, X, StickyNote } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
@@ -19,6 +20,7 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useTaskBankSelection } from '@/hooks/useTaskBankSelection';
 
 export default function AppTasksBankCategory() {
+  const { t } = useTranslation();
   const { categorySlug } = useParams<{ categorySlug: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -35,7 +37,7 @@ export default function AppTasksBankCategory() {
   const { data: allTasks, isLoading: tasksLoading } = useTaskTemplates();
 
   const category = categories?.find(c => c.slug === categorySlug);
-  const title = category?.name || 'Tasks';
+  const title = category?.name || t('tier1.tasksBank.tasksFallback');
 
   const tasks = useMemo(() => {
     if (!allTasks) return [];
@@ -167,7 +169,7 @@ export default function AppTasksBankCategory() {
         });
       }
 
-      toast({ title: 'Routine created! 🎉' });
+      toast({ title: t('tier1.tasksBank.routineCreated') });
       setShowBuilderPreview(false);
       setBuilderResult(null);
       setSelectedTasks(new Set());
@@ -178,7 +180,7 @@ export default function AppTasksBankCategory() {
       queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
     } catch (err) {
       console.error('Failed to create routine:', err);
-      toast({ title: 'Failed to create routine', variant: 'destructive' });
+      toast({ title: t('tier1.tasksBank.createFailed'), variant: 'destructive' });
     }
   };
 
@@ -216,7 +218,7 @@ export default function AppTasksBankCategory() {
           <div className="px-4 pb-2 animate-in slide-in-from-top duration-200">
             <Input
               type="search"
-              placeholder="Search tasks..."
+              placeholder={t('tier1.tasksBank.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-muted/50"
@@ -258,7 +260,7 @@ export default function AppTasksBankCategory() {
           {!tasksLoading && filteredTasks.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20 text-center px-4">
               <Search className="w-12 h-12 text-muted-foreground/30 mb-4" />
-              <p className="text-muted-foreground font-medium">No tasks found</p>
+              <p className="text-muted-foreground font-medium">{t('tier1.tasksBank.noTasks')}</p>
             </div>
           )}
 
@@ -273,7 +275,7 @@ export default function AppTasksBankCategory() {
         >
           <Button onClick={handleOpenBuilder} className="w-full h-14 rounded-2xl text-base font-bold gap-2 shadow-lg" size="lg">
             <FluentEmoji emoji="✨" size={20} />
-            Build My Routine ({selectionCount})
+            {t('tier1.tasksBank.buildMyRoutine', { n: selectionCount })}
           </Button>
         </div>
       )}
@@ -282,7 +284,7 @@ export default function AppTasksBankCategory() {
         open={showBuilder}
         onOpenChange={setShowBuilder}
         onComplete={handleBuilderComplete}
-        initialTitle="My Self-Care Routine"
+        initialTitle={t('tier1.tasksBank.myRoutine')}
         initialEmoji="✨"
         initialColor="mint"
         initialTasks={getBuilderTasks()}

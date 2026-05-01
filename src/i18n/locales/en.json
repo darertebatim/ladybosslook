@@ -891,5 +891,155 @@
   "reflectionsPage": {
     "shareAria": "Share Reflections",
     "routineTitle": "Daily Reflection"
+  },
+  "tier1": {
+    "common": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "tomorrow": "Tomorrow",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "save": "Save",
+      "settings": "Settings",
+      "back": "Back",
+      "share": "Share",
+      "unlockWithPlus": "Unlock with Plus",
+      "thisWeek": "This week",
+      "previousWeek": "Previous week",
+      "nextWeek": "Next week",
+      "loading": "Loading..."
+    },
+    "emotionHistory": {
+      "title": "Emotion History",
+      "filterAll": "All",
+      "filterWeek": "This Week",
+      "filterMonth": "This Month",
+      "empty": "No emotion logs yet",
+      "emptySub": "Start tracking how you feel",
+      "deleteTitle": "Delete this entry?",
+      "deleteDesc": "This action cannot be undone."
+    },
+    "fasting": {
+      "title": "Fasting",
+      "started": "Started",
+      "goal": "Goal",
+      "editStart": "Edit start",
+      "editGoal": "Edit {{hours}}h goal",
+      "endFast": "End Fast",
+      "startFast": "Start Fast",
+      "startNHourFast": "Start {{hours}}h Fast",
+      "startTimeUpdated": "Start time updated",
+      "goalUpdated": "Goal updated"
+    },
+    "water": {
+      "title": "Water",
+      "intakeGoal": "Water intake & your goal",
+      "goalReached": "Goal Reached!",
+      "addToTrack": "Add to routine to track daily",
+      "addWater": "Add Water",
+      "addedGoToPlanner": "Added — Go to Planner",
+      "addAgain": "Add again",
+      "plusFeatureTitle": "Water Tracker is a Plus feature",
+      "plusFeatureDesc": "Upgrade to Simora Plus to track your hydration with daily goals and reminders.",
+      "addedToRoutines": "Water tracking added to your routines!",
+      "addFailed": "Failed to add water tracking",
+      "addToRoutineDesc": "Add water tracking to your routine to save progress!",
+      "addRoutine": "Add Routine",
+      "progressFormat": "Progress: {{current}}/{{target}}",
+      "routineTitle": "Water Tracking"
+    },
+    "period": {
+      "title": "Period Tracker",
+      "plusFeatureTitle": "Period Tracker is a Plus feature",
+      "plusFeatureDesc": "Upgrade to Simora Plus to track your cycle, get predictions, and log symptoms.",
+      "logToday": "Log Today",
+      "startPageTour": "Start page tour",
+      "legendPeriod": "Period",
+      "legendPredicted": "Predicted",
+      "legendOvulation": "Ovulation",
+      "logged": "Period logged!",
+      "logRemoved": "Log removed",
+      "saveFailed": "Failed to save"
+    },
+    "balance": {
+      "title": "Self-Care Balance",
+      "seoDesc": "Your weekly balance across Body, Mind, Environment & People",
+      "yourBalance": "Your balance",
+      "completionsLabel": "{{n}} completions",
+      "noCompletions": "No completed tasks in this window. Try a previous week or complete a few tasks today.",
+      "doneCount": "{{n}} done",
+      "suggestionTitle": "Suggestion for next week",
+      "whatYouDid": "What you did",
+      "noTagged": "No tagged tasks completed yet.",
+      "fourWeekTrend": "4-Week Trend",
+      "noTrend": "No trend data yet.",
+      "nowSuffix": "{{pct}}% now",
+      "oldestNewest": "Oldest → newest week (rightmost = current)",
+      "scoreLegend": "Score is your activity level (0–100). 10+ tagged completions in a cluster = full bar."
+    },
+    "tasksBank": {
+      "title": "Self-Care Goals",
+      "search": "Search tasks...",
+      "noTasks": "No tasks found",
+      "tryDifferent": "Try a different search term",
+      "all": "All",
+      "moreCount": "+{{n}} more",
+      "buildMyRoutine": "Build My Routine ({{n}})",
+      "myRoutine": "My Self-Care Routine",
+      "tasksFallback": "Tasks",
+      "routineCreated": "Routine created! 🎉",
+      "createFailed": "Failed to create routine"
+    },
+    "taskDrafts": {
+      "title": "Projects",
+      "dragReorder": "Drag to reorder",
+      "projectName": "Project name...",
+      "addDescription": "Add a description...",
+      "addTask": "Add a task...",
+      "sent": "Sent",
+      "sendToPlanner": "Send to Planner",
+      "sendToPlannerDesc": "Choose a date to send this task to planner.",
+      "noProjects": "No projects yet.",
+      "tapPlusHint": "Tap <b>+</b> to create one and dump your tasks."
+    },
+    "channelDetail": {
+      "notFound": "Channel not found",
+      "backToChannels": "Back to channels",
+      "groupChat": "Group chat",
+      "broadcastChannel": "Broadcast channel",
+      "noMessages": "No messages yet",
+      "beFirst": "Be the first to say something!",
+      "checkBack": "Check back later for updates",
+      "unread": "Unread Messages",
+      "pinned": "Pinned Message"
+    },
+    "feedPost": {
+      "post": "Post",
+      "notFound": "Post not found",
+      "noAccess": "This post doesn't exist or you don't have access to it.",
+      "reply_one": "Reply",
+      "reply_other": "Replies",
+      "noReplies": "No replies yet",
+      "beFirstReply": "Be the first to reply!",
+      "writeReply": "Write a reply...",
+      "delete": "Delete",
+      "shareText": "💬 Check out this post on Routine Ladyboss 💫",
+      "user": "User",
+      "admin": "Admin",
+      "postTypes": {
+        "announcement": "Announcement",
+        "drip_unlock": "New Content",
+        "session_reminder": "Session",
+        "media": "Media",
+        "discussion": "Discussion"
+      }
+    },
+    "routineCategory": {
+      "challenges": "Challenges",
+      "projects": "Projects",
+      "focus": "Focus",
+      "popular": "Popular",
+      "routines": "Routines"
+    }
   }
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Loader2, ChevronLeft, Megaphone, Users, GraduationCap, MessageSquare, ChevronDown, Pin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useChannels, useFeedPosts, useMarkPostRead, FeedPost } from '@/hooks/useFeed';
@@ -24,6 +25,7 @@ const CHANNEL_ICONS: Record<string, React.ElementType> = {
 };
 
 export default function AppChannelDetail() {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -167,9 +169,9 @@ export default function AppChannelDetail() {
       let dateLabel: string;
 
       if (isToday(postDate)) {
-        dateLabel = 'Today';
+        dateLabel = t('tier1.common.today');
       } else if (isYesterday(postDate)) {
-        dateLabel = 'Yesterday';
+        dateLabel = t('tier1.common.yesterday');
       } else {
         dateLabel = format(postDate, 'MMM d, yyyy');
       }
@@ -218,12 +220,12 @@ export default function AppChannelDetail() {
   if (!selectedChannel) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-4">
-        <p className="text-muted-foreground">Channel not found</p>
+        <p className="text-muted-foreground">{t('tier1.channelDetail.notFound')}</p>
         <button
           onClick={() => navigate('/app/channels')}
           className="mt-4 text-primary underline"
         >
-          Back to channels
+          {t('tier1.channelDetail.backToChannels')}
         </button>
       </div>
     );
@@ -264,10 +266,10 @@ export default function AppChannelDetail() {
               {isGroupChat ? (
                 <>
                   <MessageSquare className="h-3 w-3" />
-                  <span>Group chat</span>
+                  <span>{t('tier1.channelDetail.groupChat')}</span>
                 </>
               ) : (
-                <span>Broadcast channel</span>
+                <span>{t('tier1.channelDetail.broadcastChannel')}</span>
               )}
             </div>
           </div>
@@ -314,7 +316,7 @@ export default function AppChannelDetail() {
                           <div className="flex items-center gap-3 px-4 py-2 my-2">
                             <div className="flex-1 h-px bg-primary/40" />
                             <span className="text-xs font-medium text-primary px-2">
-                              Unread Messages
+                              {t('tier1.channelDetail.unread')}
                             </span>
                             <div className="flex-1 h-px bg-primary/40" />
                           </div>
@@ -337,9 +339,9 @@ export default function AppChannelDetail() {
               ))
             ) : (
               <div className="text-center py-12 px-4">
-                <p className="text-muted-foreground">No messages yet</p>
+                <p className="text-muted-foreground">{t('tier1.channelDetail.noMessages')}</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {isGroupChat ? 'Be the first to say something!' : 'Check back later for updates'}
+                  {isGroupChat ? t('tier1.channelDetail.beFirst') : t('tier1.channelDetail.checkBack')}
                 </p>
               </div>
             )}
@@ -370,7 +372,7 @@ export default function AppChannelDetail() {
             <Pin className="h-3.5 w-3.5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-primary">Pinned Message</p>
+            <p className="text-xs font-medium text-primary">{t('tier1.channelDetail.pinned')}</p>
             <p className="text-xs text-muted-foreground truncate">
               {pinnedMessage.title || pinnedMessage.content?.slice(0, 60)}
               {pinnedMessage.content && pinnedMessage.content.length > 60 && !pinnedMessage.title ? '...' : ''}

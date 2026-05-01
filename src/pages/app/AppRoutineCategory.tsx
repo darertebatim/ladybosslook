@@ -1,10 +1,12 @@
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { RoutineBankCard } from '@/components/app/RoutineBankCard';
 import { useRoutinesBank, useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { useMemo } from 'react';
 
 export default function AppRoutineCategory() {
+  const { t } = useTranslation();
   const { categorySlug } = useParams<{ categorySlug: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -16,7 +18,15 @@ export default function AppRoutineCategory() {
   const { data: routines, isLoading } = useRoutinesBank(isChallenges || isProjects || isReset || isPopular ? undefined : categorySlug);
 
   const category = categories?.find(c => c.slug === categorySlug);
-  const title = isChallenges ? 'Challenges' : isProjects ? 'Projects' : isReset ? 'Focus' : isPopular ? 'Popular' : (category?.name || 'Routines');
+  const title = isChallenges
+    ? t('tier1.routineCategory.challenges')
+    : isProjects
+    ? t('tier1.routineCategory.projects')
+    : isReset
+    ? t('tier1.routineCategory.focus')
+    : isPopular
+    ? t('tier1.routineCategory.popular')
+    : (category?.name || t('tier1.routineCategory.routines'));
 
   const displayedRoutines = useMemo(() => {
     if (!routines) return [];

@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Search, ChevronRight, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -26,6 +27,7 @@ import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
 const PREVIEW_COUNT = 8;
 
 export default function AppTasksBank() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -197,7 +199,7 @@ export default function AppTasksBank() {
         });
       }
 
-      toast({ title: 'Routine created! 🎉' });
+      toast({ title: t('tier1.tasksBank.routineCreated') });
       setShowBuilderPreview(false);
       setBuilderResult(null);
       setSelectedTasks(new Set());
@@ -208,7 +210,7 @@ export default function AppTasksBank() {
       queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
     } catch (err) {
       console.error('Failed to create routine:', err);
-      toast({ title: 'Failed to create routine', variant: 'destructive' });
+      toast({ title: t('tier1.tasksBank.createFailed'), variant: 'destructive' });
     }
   };
 
@@ -223,7 +225,7 @@ export default function AppTasksBank() {
             <button onClick={() => navigate(-1)} className="p-1 -ml-1 active:scale-95 transition-transform">
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
-            <h1 className="text-xl font-bold text-foreground">Self-Care Goals</h1>
+            <h1 className="text-xl font-bold text-foreground">{t('tier1.tasksBank.title')}</h1>
           </div>
           <div className="flex items-center gap-1">
             {selectionCount > 0 && (
@@ -244,7 +246,7 @@ export default function AppTasksBank() {
           <div className="px-4 pb-2 animate-in slide-in-from-top duration-200">
             <Input
               type="search"
-              placeholder="Search tasks..."
+              placeholder={t('tier1.tasksBank.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-muted/50"
@@ -310,8 +312,8 @@ export default function AppTasksBank() {
               {searchResults.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
                   <Search className="w-12 h-12 text-muted-foreground/30 mb-4" />
-                  <p className="text-muted-foreground font-medium">No tasks found</p>
-                  <p className="text-sm text-muted-foreground/70 mt-1">Try a different search term</p>
+                  <p className="text-muted-foreground font-medium">{t('tier1.tasksBank.noTasks')}</p>
+                  <p className="text-sm text-muted-foreground/70 mt-1">{t('tier1.tasksBank.tryDifferent')}</p>
                 </div>
               ) : (
                 searchResults.map(task => (
@@ -349,7 +351,7 @@ export default function AppTasksBank() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 text-sm font-medium text-primary">
-                    All
+                    {t('tier1.tasksBank.all')}
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </button>
@@ -386,7 +388,7 @@ export default function AppTasksBank() {
                           <ChevronRight className="w-5 h-5 text-primary" />
                         </div>
                         <span className="text-xs font-semibold text-primary">
-                          +{tasks.length - PREVIEW_COUNT} more
+                          {t('tier1.tasksBank.moreCount', { n: tasks.length - PREVIEW_COUNT })}
                         </span>
                       </button>
                     )}
@@ -408,7 +410,7 @@ export default function AppTasksBank() {
         >
           <Button onClick={handleOpenBuilder} className="w-full h-14 rounded-2xl text-base font-bold gap-2 shadow-lg" size="lg">
             <FluentEmoji emoji="✨" size={20} />
-            Build My Routine ({selectionCount})
+            {t('tier1.tasksBank.buildMyRoutine', { n: selectionCount })}
           </Button>
         </div>
       )}
@@ -417,7 +419,7 @@ export default function AppTasksBank() {
         open={showBuilder}
         onOpenChange={setShowBuilder}
         onComplete={handleBuilderComplete}
-        initialTitle="My Self-Care Routine"
+        initialTitle={t('tier1.tasksBank.myRoutine')}
         initialEmoji="✨"
         initialColor="mint"
         initialTasks={getBuilderTasks()}
