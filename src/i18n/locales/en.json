@@ -140,6 +140,55 @@
     "startTour": "Start tour",
     "newTask": "Type a new task..."
   },
+  "taskCard": {
+    "focusOnToday": "Let's focus on today's routines.",
+    "honorWhenComes": "You can honor this task when the day comes."
+  },
+  "filter": {
+    "allTasks": "All Tasks",
+    "routinePlayers": "Routine Players",
+    "todos": "To-Dos",
+    "unlinkedTasks": "Unlinked Tasks",
+    "routines": "Routines",
+    "categories": "Categories"
+  },
+  "streakLost": {
+    "day": "Day {{n}}",
+    "missedDay": "You missed a day. Use a",
+    "toRestoreStreak": "to restore your {{n}}-day streak.",
+    "streakReset": "Your streak has reset. But showing up today starts a new one.",
+    "useShield": "🛡️ Use Recovery Shield",
+    "shieldsRemaining": "{{n}} shield remaining",
+    "shieldsRemaining_other": "{{n}} shields remaining",
+    "letReset": "Let the streak reset",
+    "noShieldsLeft": "No shields left. Unlock more with",
+    "getPlus": "Get Simora Plus",
+    "startFresh": "Start Fresh",
+    "allShieldsUsed": "All recovery shields have been used. Time for a fresh start."
+  },
+  "recovery": {
+    "goldStreakRestored": "Gold Streak Restored!",
+    "streakRestored": "Streak Restored!"
+  },
+  "quickStart": {
+    "typeNew": "Type a new task...",
+    "needInspiration": "Need inspiration?",
+    "browseAll": "Browse All Routines",
+    "matching": "Matching tasks",
+    "suggestions": "Suggestions",
+    "popular": "Popular",
+    "anytime": "Anytime",
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "evening": "Evening",
+    "bedtime": "Bedtime",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "weekends": "Weekends",
+    "once": "Once",
+    "startTour": "Start tour"
+  },
   "settings": {
     "title": "Settings",
     "language": "Language",
