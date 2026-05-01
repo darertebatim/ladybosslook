@@ -558,6 +558,7 @@ const AppHome = () => {
   // Welcome spotlight: which task to highlight per step
   const spotlightHighlightTaskId = useMemo<string | null>(() => {
     if (!spotlightStep) return null;
+    if (spotlightFinishedRef.current) return null;
     if (spotlightStep === 'tap') {
       return filteredTasks[0]?.id ?? null;
     }
@@ -611,14 +612,17 @@ const AppHome = () => {
   );
 
   const handleStreakIncrease = useCallback(() => {
-    // Spotlight: finish the tour as soon as user completes a task
-    setSpotlightStep((prev) => (prev === 'complete' ? null : prev));
+    // Spotlight: finish the tour as soon as user completes a task during step 3
+    if (spotlightStep === 'complete') {
+      spotlightFinishedRef.current = true;
+      setSpotlightStep(null);
+    }
     // If user has never celebrated first action, don't open streak modal immediately —
     // let triggerFirstCelebration handle it with proper delay after seal animation
     const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated') === 'true';
     if (!alreadyCelebrated) return;
     setShowStreakModal(true);
-  }, []);
+  }, [spotlightStep]);
 
   const handleOpenGoalInput = useCallback((task: UserTask) => {
     // Small count goals (< 10): directly increment by 1 without opening keyboard
