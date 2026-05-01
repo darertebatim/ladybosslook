@@ -211,23 +211,16 @@ export default function Auth() {
 
         {/* Vertically-centered stack: hero + main content sit in the middle of the screen */}
         <div className="flex-1 px-6 py-6 overflow-y-auto relative z-10 flex flex-col justify-center">
-
-        {/* Top marquee layer — multilingual welcome train, sits above
-            the centered hero. Absolutely positioned so it never affects
-            the auth stack below. */}
-        {!showEmailForm && !isForgotPassword && !isKeyboardOpen && (
-          <div
-            className="pointer-events-none absolute left-0 right-0 z-20"
-            style={{ top: 'calc(env(safe-area-inset-top, 0px) + 14px)' }}
-          >
-            <WelcomeTrain />
-          </div>
-        )}
-
           <div className="max-w-md w-full mx-auto space-y-7">
             {/* Hero brand block — big welcome headline + icon + tagline row */}
             {!showEmailForm && (
               <div className="flex flex-col items-center text-center">
+                {/* Multilingual welcome train — sits right above the headline.
+                    Negative full-bleed margin so it can scroll edge-to-edge
+                    while the rest of the stack stays padded. */}
+                <div className="-mx-6 mb-4 w-screen max-w-[100vw]">
+                  <WelcomeTrain />
+                </div>
                 <h1 className="text-[40px] leading-[1.05] font-bold tracking-tight text-[#1a1f3d]">
                   {isLogin ? 'Welcome back!' : 'Welcome to Rilo!'}
                 </h1>
