@@ -1241,7 +1241,7 @@ function AppTimerInner() {
                 <div className="w-6 h-0.5 rounded-full bg-white/20" />
               </div>
               <p className="text-white/30 text-sm mt-3">
-                {activeTab === 'pomodoro' ? `Round ${pomodoroRound + 1} of ${pomodoroCycles}` : (customTheme || selectedTheme)}
+                {activeTab === 'pomodoro' ? t('timer.roundOf', { round: pomodoroRound + 1, total: pomodoroCycles }) : (customTheme || selectedTheme)}
               </p>
             </>
           )}
@@ -1249,7 +1249,7 @@ function AppTimerInner() {
 
         {/* Hold to stop */}
         <div className="absolute left-0 right-0 px-10 flex flex-col items-center gap-3" style={{ bottom: 'max(64px, calc(env(safe-area-inset-bottom) + 32px))' }}>
-          <p className="text-white/40 text-sm">Hold to stop timer</p>
+          <p className="text-white/40 text-sm">{t('timer.holdToStop')}</p>
           <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
             <motion.div
               className="h-full rounded-full bg-white/60"
