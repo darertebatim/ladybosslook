@@ -140,6 +140,55 @@
     "startTour": "شروع تور",
     "newTask": "یک کار جدید بنویس..."
   },
+  "taskCard": {
+    "focusOnToday": "بیا روی روتین‌های امروز تمرکز کنیم.",
+    "honorWhenComes": "وقتی روزش رسید این کار را انجام بده."
+  },
+  "filter": {
+    "allTasks": "همه‌ی کارها",
+    "routinePlayers": "پخش‌کننده‌های روتین",
+    "todos": "کارهای روزانه",
+    "unlinkedTasks": "کارهای مستقل",
+    "routines": "روتین‌ها",
+    "categories": "دسته‌بندی‌ها"
+  },
+  "streakLost": {
+    "day": "روز {{n}}",
+    "missedDay": "یک روز را از دست دادی. از",
+    "toRestoreStreak": "برای بازگرداندن رکورد {{n}} روزه‌ات استفاده کن.",
+    "streakReset": "رکوردت ریست شد. اما همین امروز که حاضر شدی، یک رکورد تازه شروع می‌شود.",
+    "useShield": "🛡️ استفاده از سپر بازیابی",
+    "shieldsRemaining": "{{n}} سپر باقی مانده",
+    "shieldsRemaining_other": "{{n}} سپر باقی مانده",
+    "letReset": "بگذار رکورد ریست شود",
+    "noShieldsLeft": "سپری باقی نمانده. بیشترش را با",
+    "getPlus": "تهیه‌ی Simora Plus",
+    "startFresh": "شروع تازه",
+    "allShieldsUsed": "همه‌ی سپرهای بازیابی استفاده شده‌اند. وقت یک شروع تازه است."
+  },
+  "recovery": {
+    "goldStreakRestored": "رکورد طلایی بازگشت!",
+    "streakRestored": "رکورد بازگشت!"
+  },
+  "quickStart": {
+    "typeNew": "یک کار جدید بنویس...",
+    "needInspiration": "ایده می‌خواهی؟",
+    "browseAll": "همه‌ی روتین‌ها",
+    "matching": "کارهای مرتبط",
+    "suggestions": "پیشنهادها",
+    "popular": "محبوب",
+    "anytime": "هر زمان",
+    "morning": "صبح",
+    "afternoon": "بعدازظهر",
+    "evening": "عصر",
+    "bedtime": "شب",
+    "daily": "هر روز",
+    "weekly": "هفتگی",
+    "monthly": "ماهانه",
+    "weekends": "آخر هفته‌ها",
+    "once": "یک بار",
+    "startTour": "شروع تور"
+  },
   "settings": {
     "title": "تنظیمات",
     "language": "زبان",
