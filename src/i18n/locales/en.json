@@ -417,14 +417,14 @@
     "searchChannels": "Search channels...",
     "searchVideos": "Search videos...",
     "searchVideoPlaylists": "Search video playlists...",
-    "programSlugPlaceholder": "Program slug (e.g., mindset-reset)"
-    ,"subtaskCount": "{{count}} subtask",
+    "programSlugPlaceholder": "Program slug (e.g., mindset-reset)",
+    "subtaskCount": "{{count}} subtask",
     "subtaskCount_other": "{{count}} subtasks",
     "noCategory": "No category",
     "minAvg": "{{min}} min (avg)",
     "minutesShort": "{{min}} min",
-    "today": "Today"
-    ,"create": "Create",
+    "today": "Today",
+    "create": "Create",
     "enableUrgentAlarm": "Enable Urgent Alarm?",
     "enableUrgentMessage": "This will create an alarm that rings even when your phone is on silent mode. The alarm will be added to your device's calendar.",
     "enableUrgent": "Enable Urgent"
@@ -496,5 +496,12 @@
     "orSelectSpecificReflection": "Or select a specific reflection:",
     "enterProgramSlug": "Enter the program slug to link to this task.",
     "minutesAbbr": "min"
+  },
+  "nav": {
+    "home": "Home",
+    "tools": "Tools",
+    "listen": "Listen",
+    "chats": "Chats",
+    "aiPlanner": "Open AI Planner"
   }
 }

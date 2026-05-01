@@ -417,14 +417,14 @@
     "searchChannels": "جستجوی کانال‌ها...",
     "searchVideos": "جستجوی ویدیوها...",
     "searchVideoPlaylists": "جستجوی پلی‌لیست‌های ویدیو...",
-    "programSlugPlaceholder": "اسلاگ برنامه (مثلاً mindset-reset)"
-    ,"subtaskCount": "{{count}} زیرکار",
+    "programSlugPlaceholder": "اسلاگ برنامه (مثلاً mindset-reset)",
+    "subtaskCount": "{{count}} زیرکار",
     "subtaskCount_other": "{{count}} زیرکار",
     "noCategory": "بدون دسته‌بندی",
     "minAvg": "{{min}} دقیقه (میانگین)",
     "minutesShort": "{{min}} دقیقه",
-    "today": "امروز"
-    ,"create": "ایجاد",
+    "today": "امروز",
+    "create": "ایجاد",
     "enableUrgentAlarm": "هشدار فوری فعال شود؟",
     "enableUrgentMessage": "این یک هشدار ایجاد می‌کند که حتی در حالت بی‌صدا هم زنگ می‌زند. هشدار به تقویم دستگاه‌ات افزوده می‌شود.",
     "enableUrgent": "فعال کردن هشدار فوری"
@@ -496,5 +496,12 @@
     "orSelectSpecificReflection": "یا یک تأمل خاص انتخاب کن:",
     "enterProgramSlug": "اسلاگ برنامه را برای اتصال به این کار وارد کن.",
     "minutesAbbr": "دقیقه"
+  },
+  "nav": {
+    "home": "خانه",
+    "tools": "ابزارها",
+    "listen": "شنیدن",
+    "chats": "گفتگوها",
+    "aiPlanner": "برنامه‌ریز هوشمند"
   }
 }
