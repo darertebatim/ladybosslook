@@ -124,8 +124,10 @@ const AppHome = () => {
   const [, setHasWelcomeBanner] = useState(false);
   // Once the tour finishes (or is skipped), don't auto-pick another task to spotlight
   const spotlightFinishedRef = useRef(false);
+  const spotlightCompletionHandledRef = useRef(false);
   const finishSpotlight = useCallback(() => {
     spotlightFinishedRef.current = true;
+    spotlightCompletionHandledRef.current = true;
     setSpotlightStep(null);
   }, []);
   const { isKeyboardOpen } = useKeyboard();
@@ -234,6 +236,7 @@ const AppHome = () => {
     window.dispatchEvent(new CustomEvent('quick-add-open', { detail: { defaultRepeat: taskFilter === 'one-time' ? 'No' : 'Daily' } }));
     // Spotlight: advance from 'add' → 'complete' once user taps the + button
     setSpotlightStep((prev) => (prev === 'add' ? 'complete' : prev));
+    spotlightCompletionHandledRef.current = false;
   }, [taskFilter]);
 
   // Streak data now comes from useNewHomeData (consolidated RPC)
@@ -613,9 +616,11 @@ const AppHome = () => {
 
   const handleStreakIncrease = useCallback(() => {
     // Spotlight: finish the tour as soon as user completes a task during step 3
-    if (spotlightStep === 'complete') {
+    if (spotlightStep === 'complete' && !spotlightCompletionHandledRef.current) {
+      spotlightCompletionHandledRef.current = true;
       spotlightFinishedRef.current = true;
       setSpotlightStep(null);
+      setSelectedTask(null);
     }
     // If user has never celebrated first action, don't open streak modal immediately —
     // let triggerFirstCelebration handle it with proper delay after seal animation
@@ -1303,6 +1308,7 @@ const AppHome = () => {
           onSkipTask={handleSkipTask}
           onOpenGoalInput={handleOpenGoalInput}
           onOpenTimer={handleOpenTimer}
+          onTaskComplete={handleStreakIncrease}
           onStepUnlocked={handleStepUnlocked}
           showStreakModal={showStreakModal}
           setShowStreakModal={setShowStreakModal}
