@@ -263,21 +263,21 @@ export default function AppInspireDetail() {
               toggleFavorite.mutate({ routineId: planId, isFavorited });
             }}
             className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
-            aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+            aria-label={isFavorited ? t('inspirePage.removeFromFavorites') : t('inspirePage.addToFavorites')}
           >
             <Heart className={cn("h-5 w-5 transition-colors", isFavorited && "fill-red-500 text-red-500")} />
           </button>
           <button
             onClick={handleShareInstagram}
             className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
-            aria-label="Share to Instagram"
+            aria-label={t('inspirePage.shareToInstagram')}
           >
             <Instagram className="h-5 w-5" />
           </button>
           <button
             onClick={handleShare}
             className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
-            aria-label="Share"
+            aria-label={t('inspirePage.share')}
           >
             <Share2 className="h-5 w-5" />
           </button>
