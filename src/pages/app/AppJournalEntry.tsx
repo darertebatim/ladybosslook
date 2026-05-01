@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Loader2, Trash2, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,6 +30,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 const AppJournalEntry = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { entryId } = useParams<{ entryId: string }>();
@@ -67,8 +69,8 @@ const AppJournalEntry = () => {
   const { className: titleBilingualClassName, direction: titleDirection } = useBilingualText(title);
 
   const { handleShare } = useShareContent({
-    title: 'Journal Entry',
-    text: `📝 I just journaled on Routine Ladyboss — try it! 💫`,
+    title: t('journal.shareTitle'),
+    text: t('journal.shareText'),
     source: 'journal_entry',
   });
 
@@ -174,7 +176,7 @@ const AppJournalEntry = () => {
     // Save immediately if there's content
     if (content.trim()) {
       await saveEntry();
-      toast.success('Entry saved');
+      toast.success(t('journal.entrySaved'));
     }
     
     // If routine player is active, ensure task_completions is written before maximizing
@@ -222,7 +224,7 @@ const AppJournalEntry = () => {
         >
           <div className="flex items-center gap-3 px-4 pt-3 pb-2">
             <BackButton to="/app/journal" />
-            <h1 className="text-lg font-medium">Journal Entry</h1>
+            <h1 className="text-lg font-medium">{t('journal.entryHeader')}</h1>
           </div>
         </header>
         <div className="flex-1 p-4">
@@ -239,7 +241,7 @@ const AppJournalEntry = () => {
       className="flex flex-col bg-background"
       style={{ height: '100dvh' }}
     >
-      <SEOHead title={title || 'New Entry'} description="Write your journal entry" />
+      <SEOHead title={title || t('journal.newEntrySEO')} description={t('journal.writeYourEntry')} />
       
       {/* Header */}
       <header 
@@ -250,7 +252,7 @@ const AppJournalEntry = () => {
           <div className="flex items-center gap-3">
             <BackButton to="/app/journal" onClick={handleBackCleanup} />
             <h1 className="text-lg font-medium">
-              {isNewEntry ? 'New Entry' : 'Edit Entry'}
+              {isNewEntry ? t('journal.newEntry') : t('journal.editEntry')}
             </h1>
           </div>
           
@@ -262,7 +264,7 @@ const AppJournalEntry = () => {
             <button
               onClick={handleShare}
               className="h-9 w-9 flex items-center justify-center rounded-full active:scale-95 transition-transform"
-              aria-label="Share"
+              aria-label={t('journal.share')}
             >
               <Share2 className="h-4 w-4 text-muted-foreground" />
             </button>
@@ -271,7 +273,7 @@ const AppJournalEntry = () => {
               onClick={handleDone}
               disabled={!content.trim() || saveStatus === 'saving'}
             >
-              Done
+              {t('journal.done')}
             </Button>
           </div>
         </div>
@@ -287,7 +289,7 @@ const AppJournalEntry = () => {
 
           {/* Title Input */}
           <Input
-            placeholder="Title (optional)"
+            placeholder={t('journal.titleOptional')}
             value={title}
             onChange={(e) => handleTitleChange(e.target.value)}
             className={cn(
@@ -308,7 +310,7 @@ const AppJournalEntry = () => {
           {/* Content Textarea */}
           <Textarea
             ref={textareaRef}
-            placeholder="Start writing your thoughts..."
+            placeholder={t('journal.startWriting')}
             value={content}
             onChange={(e) => handleContentChange(e.target.value)}
             className={cn(
@@ -336,7 +338,7 @@ const AppJournalEntry = () => {
                 onClick={() => setShowDeleteDialog(true)}
               >
                 <Trash2 className="h-4 w-4 mr-1" />
-                Delete
+                {t('journal.delete')}
               </Button>
             )}
           </div>
@@ -347,18 +349,18 @@ const AppJournalEntry = () => {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Entry?</AlertDialogTitle>
+            <AlertDialogTitle>{t('journal.deleteEntryQ')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. Your journal entry will be permanently deleted.
+              {t('journal.deleteEntryDesc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('journal.cancel')}</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground"
             >
-              Delete
+              {t('journal.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
