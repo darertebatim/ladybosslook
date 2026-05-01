@@ -25,6 +25,8 @@
     "darkMode": "Dark Mode",
     "lightMode": "Light Mode",
     "signOut": "Sign Out",
+    "viewProfile": "View profile",
+    "viewAll": "View all",
     "items": {
       "explore": "Explore",
       "tools": "Tools",
