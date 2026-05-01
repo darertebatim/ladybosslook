@@ -250,12 +250,12 @@ const AppBrowsePrograms = () => {
 
   const availableTypes = useMemo(() => {
     const types = new Set(allPrograms.map((p: any) => p.type).filter(Boolean));
-    const dynamicFilters = Array.from(types).map(t => {
-      const labelKey = TYPE_LABEL_KEYS[t];
-      return { value: t, label: labelKey ? (this as any) /* placeholder */ : t };
+    const dynamicFilters = Array.from(types).map((typeKey) => {
+      const labelKey = TYPE_LABEL_KEYS[typeKey as string];
+      return { value: typeKey as string, label: labelKey ? t(labelKey) : (typeKey as string) };
     });
     return [{ value: 'all', label: t('browseProgramsPage.all') }, ...dynamicFilters];
-  }, [allPrograms]);
+  }, [allPrograms, t]);
 
   const userLang = useUserPreferredLanguage();
 
