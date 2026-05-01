@@ -33,7 +33,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { PushPermissionDot } from "@/components/app/PushPermissionDot";
 import { useTranslation } from "react-i18next";
-import { setAppLanguage, type SupportedLanguage } from "@/i18n";
+// language change moved to Settings page
 interface NavItem {
   id: string;
   /** i18n key under `menu.items.*` */
