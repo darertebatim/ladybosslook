@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { Keyboard } from '@capacitor/keyboard';
+import { useTranslation } from 'react-i18next';
 
 // Secondary (darker) palette for bottom sections
 const TASK_COLORS_DARK: Record<string, string> = {
@@ -116,6 +117,7 @@ export function RoutineBuilderSheet({
   onEditSave,
   onNavigateToRoutine,
 }: RoutineBuilderSheetProps) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [step, setStep] = useState<1 | 2>(1);
   const [routineTitle, setRoutineTitle] = useState(initialTitle);
@@ -583,7 +585,7 @@ export function RoutineBuilderSheet({
                         if (step === 1) handleNext();
                       }
                     }}
-                    placeholder="Type routine name..."
+                    placeholder={t('routineBuilder.typeRoutineName')}
                     className="w-full bg-transparent text-[15px] font-semibold text-black dark:text-foreground placeholder:text-black/40 dark:placeholder:text-muted-foreground/50 outline-none"
                     enterKeyHint={step === 1 ? 'next' : 'done'}
                     autoComplete="off"
@@ -616,7 +618,7 @@ export function RoutineBuilderSheet({
             {step === 1 ? (
               <div className="px-4 py-3 transition-colors duration-200" style={{ backgroundColor: TASK_COLORS_DARK[routineColor] || TASK_COLORS_DARK.peach }}>
                 <p className="text-[13px] font-medium text-black/70 dark:text-muted-foreground text-center">
-                  Press enter to continue. Tap outside to cancel.
+                  {t('routineBuilder.pressEnterContinue')}
                 </p>
               </div>
             ) : (
@@ -627,21 +629,21 @@ export function RoutineBuilderSheet({
                   {tasks.length === 0 ? (
                     <div className="text-center py-6">
                       <FluentEmoji emoji="🧩" size={32} className="mx-auto mb-2" />
-                      <p className="text-xs text-black/50 dark:text-muted-foreground">Add tasks to build your routine</p>
+                      <p className="text-xs text-black/50 dark:text-muted-foreground">{t('routineBuilder.addTasksToBuild')}</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
                       {tasks.map((task, i) => {
                         const colorClass = TASK_COLOR_CLASSES[(task.color as TaskColor) || 'peach'] || TASK_COLOR_CLASSES.peach;
-                        const repeatLabel = task.repeat_pattern === 'daily' ? 'Daily'
-                          : task.repeat_pattern === 'weekly' ? 'Weekly'
-                          : task.repeat_pattern === 'monthly' ? 'Monthly'
-                          : task.repeat_pattern === 'weekend' ? 'Weekends'
-                          : task.repeat_pattern === 'none' ? 'Once' : '';
-                        const timeLabel = task.time_period === 'morning' ? 'Morning'
-                          : task.time_period === 'afternoon' ? 'Afternoon'
-                          : task.time_period === 'evening' ? 'Evening'
-                          : task.time_period === 'night' ? 'Bedtime' : 'Anytime';
+                        const repeatLabel = task.repeat_pattern === 'daily' ? t('routineBuilder.daily')
+                          : task.repeat_pattern === 'weekly' ? t('routineBuilder.weekly')
+                          : task.repeat_pattern === 'monthly' ? t('routineBuilder.monthly')
+                          : task.repeat_pattern === 'weekend' ? t('routineBuilder.weekends')
+                          : task.repeat_pattern === 'none' ? t('routineBuilder.once') : '';
+                        const timeLabel = task.time_period === 'morning' ? t('routineBuilder.morning')
+                          : task.time_period === 'afternoon' ? t('routineBuilder.afternoon')
+                          : task.time_period === 'evening' ? t('routineBuilder.evening')
+                          : task.time_period === 'night' ? t('routineBuilder.bedtime') : t('routineBuilder.anytime');
                         return (
                           <div
                             key={task.id}
@@ -696,7 +698,7 @@ export function RoutineBuilderSheet({
                     <div className="w-8 h-8 rounded-xl bg-amber-400/20 flex items-center justify-center">
                       <Plus className="w-4 h-4 text-amber-600 dark:text-amber-400" strokeWidth={2.5} />
                     </div>
-                    <span className="text-[13px] font-semibold text-black/80 dark:text-foreground">Add Quick Task</span>
+                    <span className="text-[13px] font-semibold text-black/80 dark:text-foreground">{t('routineBuilder.addQuickTask')}</span>
                   </button>
 
                   {/* Add from My Tasks */}
@@ -710,7 +712,7 @@ export function RoutineBuilderSheet({
                     <div className="w-8 h-8 rounded-xl bg-violet-400/20 flex items-center justify-center">
                       <ListChecks className="w-4 h-4 text-violet-600 dark:text-violet-400" strokeWidth={2.5} />
                     </div>
-                    <span className="text-[13px] font-semibold text-black/80 dark:text-foreground">Add from My Tasks</span>
+                    <span className="text-[13px] font-semibold text-black/80 dark:text-foreground">{t('routineBuilder.addFromMyTasks')}</span>
                   </button>
 
                   {/* Add a Self-Care Habit */}
@@ -725,7 +727,7 @@ export function RoutineBuilderSheet({
                     <div className="w-8 h-8 rounded-xl bg-emerald-400/20 flex items-center justify-center">
                       <Leaf className="w-4 h-4 text-emerald-600 dark:text-emerald-400" strokeWidth={2.5} />
                     </div>
-                    <span className="text-[13px] font-semibold text-black/80 dark:text-foreground">Add a Self-Care Habit</span>
+                    <span className="text-[13px] font-semibold text-black/80 dark:text-foreground">{t('routineBuilder.addSelfCareHabit')}</span>
                   </button>
                 </div>
 
@@ -741,7 +743,7 @@ export function RoutineBuilderSheet({
                         : 'bg-black/10 dark:bg-white/10 text-black/30 dark:text-white/30 shadow-none'
                     )}
                   >
-                    {editMode ? 'Save Changes' : `Create Routine${tasks.length > 0 ? ` (${tasks.length})` : ''}`}
+                    {editMode ? t('routineBuilder.saveChanges') : (tasks.length > 0 ? t('routineBuilder.createRoutineCount', { n: tasks.length }) : t('routineBuilder.createRoutine'))}
                   </button>
                 </div>
               </div>
@@ -758,7 +760,7 @@ export function RoutineBuilderSheet({
                     onClick={handleNext}
                     className="w-full gap-2 h-11 rounded-2xl text-sm font-bold flex items-center justify-center shadow-sm active:scale-95 transition-transform bg-amber-400 dark:bg-amber-500 text-black"
                   >
-                    Next — Add Tasks
+                    {t('routineBuilder.nextAddTasks')}
                   </button>
                 </div>
               ) : (
@@ -770,7 +772,7 @@ export function RoutineBuilderSheet({
           {/* Step 1: Inspirations */}
           {step === 1 && showSuggestions && filteredSuggestions.length > 0 && (
             <div className="mt-3 flex flex-col gap-2 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
-              <p className="text-sm text-white/70 font-medium text-center">Need inspiration?</p>
+              <p className="text-sm text-white/70 font-medium text-center">{t('routineBuilder.needInspiration')}</p>
               <div className="space-y-1.5 overflow-hidden">
                 {filteredSuggestions.slice(0, 4).map((s: any) => (
                   <button
@@ -802,10 +804,10 @@ export function RoutineBuilderSheet({
               <button onClick={() => setShowMyTasks(false)} className="p-1 active:opacity-70">
                 <ChevronLeft className="w-5 h-5 text-foreground" />
               </button>
-              <h3 className="text-base font-bold text-foreground flex-1">My Tasks</h3>
+              <h3 className="text-base font-bold text-foreground flex-1">{t('routineBuilder.myTasks')}</h3>
               {tasks.length > 0 && (
                 <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-100/60 dark:bg-amber-900/30 px-2 py-0.5 rounded-full">
-                  {tasks.length} in routine
+                  {t('routineBuilder.inRoutine', { n: tasks.length })}
                 </span>
               )}
             </div>
@@ -814,8 +816,8 @@ export function RoutineBuilderSheet({
               {unlinkedTasks.length === 0 ? (
                 <div className="text-center py-10">
                   <FluentEmoji emoji="📋" size={36} className="mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">No unlinked tasks</p>
-                  <p className="text-xs text-muted-foreground mt-1">Tasks already in a routine won't appear here</p>
+                  <p className="text-sm text-muted-foreground">{t('routineBuilder.noUnlinked')}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('routineBuilder.noUnlinkedHint')}</p>
                 </div>
               ) : (
                 <div className="space-y-1.5">
@@ -834,7 +836,7 @@ export function RoutineBuilderSheet({
                         <FluentEmoji emoji={task.emoji || '📝'} size={24} />
                         <span className="flex-1 text-sm font-medium text-foreground truncate">{task.title}</span>
                         {isAdded ? (
-                          <span className="text-[10px] text-muted-foreground font-semibold bg-background/80 px-2 py-0.5 rounded-full">Added</span>
+                          <span className="text-[10px] text-muted-foreground font-semibold bg-background/80 px-2 py-0.5 rounded-full">{t('routineBuilder.added')}</span>
                         ) : (
                           <div className="w-7 h-7 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                             <Plus className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
@@ -855,7 +857,7 @@ export function RoutineBuilderSheet({
                 onClick={() => setShowMyTasks(false)}
                 className="w-full h-12 rounded-2xl text-base font-bold bg-foreground text-background"
               >
-                Done
+                {t('routineBuilder.done')}
               </Button>
             </div>
           </div>
@@ -874,10 +876,10 @@ export function RoutineBuilderSheet({
               <button onClick={() => { setShowTaskBank(false); setTaskBankSearch(''); setTaskBankCategory(null); }} className="p-1 active:opacity-70">
                 <ChevronLeft className="w-5 h-5 text-foreground" />
               </button>
-              <h3 className="text-base font-bold text-foreground flex-1">Self-Care Goals</h3>
+              <h3 className="text-base font-bold text-foreground flex-1">{t('routineBuilder.selfCareGoals')}</h3>
               {taskBankSelected.size > 0 && (
                 <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-100/60 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
-                  {taskBankSelected.size} selected
+                  {t('routineBuilder.selected', { n: taskBankSelected.size })}
                 </span>
               )}
             </div>
@@ -888,7 +890,7 @@ export function RoutineBuilderSheet({
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   type="search"
-                  placeholder="Search habits..."
+                  placeholder={t('routineBuilder.searchHabits')}
                   value={taskBankSearch}
                   onChange={(e) => setTaskBankSearch(e.target.value)}
                   className="pl-9 bg-muted/50 h-9 text-sm"
@@ -963,12 +965,12 @@ export function RoutineBuilderSheet({
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold text-black truncate">{task.title}</p>
                               <p className="text-[11px] text-black/60 truncate">
-                                {task.repeat_pattern === 'daily' ? 'Daily' : task.repeat_pattern === 'weekly' ? 'Weekly' : 'Once'}
+                                {task.repeat_pattern === 'daily' ? t('routineBuilder.daily') : task.repeat_pattern === 'weekly' ? t('routineBuilder.weekly') : t('routineBuilder.once')}
                                 {task.time_period && ` • ${task.time_period}`}
                               </p>
                             </div>
                             {isAlreadyAdded ? (
-                              <span className="text-[10px] text-black/40 font-semibold bg-white/60 px-2 py-0.5 rounded-full shrink-0">Added</span>
+                              <span className="text-[10px] text-black/40 font-semibold bg-white/60 px-2 py-0.5 rounded-full shrink-0">{t('routineBuilder.added')}</span>
                             ) : (
                               <div className={cn(
                                 'w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-colors',
@@ -992,7 +994,7 @@ export function RoutineBuilderSheet({
               {filteredTaskBankCategories.length === 0 && taskBankSearch && (
                 <div className="text-center py-10">
                   <Search className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">No habits found</p>
+                  <p className="text-sm text-muted-foreground">{t('routineBuilder.noHabitsFound')}</p>
                 </div>
               )}
             </div>
@@ -1006,7 +1008,7 @@ export function RoutineBuilderSheet({
                 onClick={taskBankSelected.size > 0 ? handleTaskBankAddSelected : () => setShowTaskBank(false)}
                 className="w-full h-12 rounded-2xl text-base font-bold bg-foreground text-background"
               >
-                {taskBankSelected.size > 0 ? `Add ${taskBankSelected.size} Habit${taskBankSelected.size > 1 ? 's' : ''}` : 'Done'}
+                {taskBankSelected.size > 0 ? t('routineBuilder.addHabits', { n: taskBankSelected.size, count: taskBankSelected.size }) : t('routineBuilder.done')}
               </Button>
             </div>
           </div>
@@ -1080,7 +1082,7 @@ export function RoutineBuilderSheet({
                     if (e.key === 'Enter') handleQuickAddSubmit();
                     if (e.key === 'Escape') handleQuickAddClose();
                   }}
-                  placeholder="Type task name..."
+                  placeholder={t('routineBuilder.typeTaskName')}
                   className="flex-1 bg-transparent text-[15px] font-semibold text-black placeholder:text-black/40 outline-none"
                   enterKeyHint="done"
                   autoComplete="off"
@@ -1089,7 +1091,7 @@ export function RoutineBuilderSheet({
             </div>
             <div className="px-4 py-3.5 bg-[#FFE6C0]">
               <p className="text-[13px] font-medium text-black text-center">
-                Press enter to add. Tap outside to cancel.
+                {t('routineBuilder.pressEnterAdd')}
               </p>
             </div>
           </div>
@@ -1104,7 +1106,7 @@ export function RoutineBuilderSheet({
                   className="gap-1.5 h-11 px-5 rounded-2xl text-sm font-medium flex items-center justify-center shadow-sm active:scale-95 transition-transform bg-white text-black"
                 >
                   <MoreHorizontal className="h-4 w-4" />
-                  Details
+                  {t('routineBuilder.details')}
                 </button>
                 <button
                   onMouseDown={(e) => e.preventDefault()}
@@ -1112,7 +1114,7 @@ export function RoutineBuilderSheet({
                   className="flex-1 gap-2 h-11 rounded-2xl text-sm font-medium flex items-center justify-center shadow-sm active:scale-95 transition-transform bg-urgency text-urgency-foreground"
                 >
                   <Plus className="h-4 w-4" />
-                  Add Task
+                  {t('routineBuilder.addTask')}
                 </button>
               </div>
             ) : (
@@ -1123,7 +1125,7 @@ export function RoutineBuilderSheet({
           {/* Search-based suggestions while typing */}
           {quickAddSearchSuggestions.length > 0 && (
             <div className="mt-3 flex flex-col gap-1.5 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
-              <p className="text-sm text-white/70 font-medium text-center">Need some ideas?</p>
+              <p className="text-sm text-white/70 font-medium text-center">{t('routineBuilder.needIdeas')}</p>
               {quickAddSearchSuggestions.map((template: any) => {
                 const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
                 return (

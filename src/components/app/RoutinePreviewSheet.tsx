@@ -18,6 +18,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { ActionLimitSheet, hasSeenActionLimitSoft, markActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 import { formatTimeLabel } from '@/lib/taskScheduling';
+import { useTranslation } from 'react-i18next';
 
 // Secondary (darker) palette for card footer strips
 const TASK_COLOR_DARK_CLASSES: Record<string, string> = {
@@ -118,6 +119,7 @@ export function RoutinePreviewSheet({
   linkedProgramTitle,
   linkedProgramSlug,
 }: RoutinePreviewSheetProps) {
+  const { t } = useTranslation();
   // Generate synthetic pro-task for multi-task routines
   const displayTasks = useMemo(() => {
     if (tasks.length > 1 && routineBankId) {
@@ -295,29 +297,29 @@ export function RoutinePreviewSheet({
     // Build base repeat text
     let repeatText = '';
     switch (pattern) {
-      case 'daily': repeatText = 'Repeats every day'; break;
+      case 'daily': repeatText = t('routinePreview.repeatsEveryDay'); break;
       case 'weekly': {
         const days = (task as any).repeat_days as number[] | null;
         if (days && days.length > 0) {
           const dayNames = days.map(d => WEEKDAY_NAMES[d] || `Day ${d}`).join(', ');
-          repeatText = `Repeats every week on ${dayNames}`;
+          repeatText = t('routinePreview.weeklyOnDays', { days: dayNames });
         } else {
-          repeatText = 'Repeats every week';
+          repeatText = t('routinePreview.repeatsEveryWeek');
         }
         break;
       }
-      case 'monthly': repeatText = 'Repeats every month'; break;
+      case 'monthly': repeatText = t('routinePreview.repeatsEveryMonth'); break;
       case 'none':
-      case 'once': repeatText = 'One-time action'; break;
-      default: repeatText = 'Repeats every day';
+      case 'once': repeatText = t('routinePreview.oneTimeAction'); break;
+      default: repeatText = t('routinePreview.repeatsEveryDay');
     }
     
     // Append end date if available
     if (endMode === 'date' && endDate) {
       const d = new Date(endDate + 'T00:00:00');
-      repeatText += ` until ${format(d, 'MMM dd, yyyy')}`;
+      repeatText += t('routinePreview.untilDate', { date: format(d, 'MMM dd, yyyy') });
     } else if (endMode === 'after_days' && endAfterDays) {
-      repeatText += ` for ${endAfterDays} day${endAfterDays !== 1 ? 's' : ''}`;
+      repeatText += t('routinePreview.forDays', { n: endAfterDays, count: endAfterDays });
     }
     
     return repeatText;
@@ -363,7 +365,7 @@ export function RoutinePreviewSheet({
             <FluentEmoji emoji={display.icon || '📝'} size={40} className="shrink-0" />
             <div className="flex-1 min-w-0">
               {isPro ? (
-                <p className="text-[11px] font-semibold text-teal-700 dark:text-teal-300 uppercase tracking-wide mb-0.5">⚡ Routine Player</p>
+                <p className="text-[11px] font-semibold text-teal-700 dark:text-teal-300 uppercase tracking-wide mb-0.5">{t('routinePreview.routinePlayer')}</p>
               ) : (
                 <p className="text-xs font-medium text-black mb-0.5">{timeLabel}</p>
               )}
@@ -381,7 +383,7 @@ export function RoutinePreviewSheet({
           {/* Footer strip with repeat info */}
           <div className={cn('px-4 py-3.5', darkColorClass)}>
             <p className="text-[13px] font-medium text-black text-center">
-              {isPro ? 'One-tap player for this routine' : getRepeatLabel(task, display.repeatPattern)}
+              {isPro ? t('routinePreview.onTapPlayer') : getRepeatLabel(task, display.repeatPattern)}
             </p>
           </div>
         </div>
@@ -399,9 +401,9 @@ export function RoutinePreviewSheet({
         >
           <div className="flex flex-col h-full">
             <SheetHeader className="text-left pb-2 flex-shrink-0">
-              <SheetTitle className="text-xl font-bold">Preview Routine</SheetTitle>
+              <SheetTitle className="text-xl font-bold">{t('routinePreview.previewRoutine')}</SheetTitle>
               <p className="text-sm text-foreground">
-                Edit it to create your personalized routine.
+                {t('routinePreview.editToPersonalize')}
               </p>
               {/* Start/End banners + Badge */}
               <div className="mt-2 flex gap-2">
@@ -410,7 +412,7 @@ export function RoutinePreviewSheet({
                   {/* Start date banner */}
                   {(() => {
                     const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                    let label = 'Starts today!';
+                    let label = t('routinePreview.startsToday');
                     let emoji = '🚀';
                     let isFuture = false;
                     if (challengeStartDate) {
@@ -418,15 +420,15 @@ export function RoutinePreviewSheet({
                       const today = new Date();
                       today.setHours(0, 0, 0, 0);
                       if (d <= today) {
-                        label = 'Starts today!';
+                        label = t('routinePreview.startsToday');
                       } else {
                         const diffDays = Math.ceil((d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                        label = `Starts ${format(d, 'MMM d')}`;
+                        label = t('routinePreview.startsOn', { date: format(d, 'MMM d') });
                         emoji = '📅';
                         isFuture = true;
                       }
                     } else if (startDayOfWeek != null) {
-                      label = `Starts next ${WEEKDAY_NAMES[startDayOfWeek]}`;
+                      label = t('routinePreview.startsNext', { day: WEEKDAY_NAMES[startDayOfWeek] });
                       emoji = '📅';
                       isFuture = true;
                     }
@@ -455,7 +457,7 @@ export function RoutinePreviewSheet({
                         <div className="flex items-center gap-2 rounded-xl px-3 py-2 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
                           <span className="text-base">🏁</span>
                           <span className="text-xs font-medium text-rose-800 dark:text-rose-300">
-                            Ends {format(d, 'MMM d')}
+                            {t('routinePreview.endsOn', { date: format(d, 'MMM d') })}
                           </span>
                         </div>
                       );
@@ -465,7 +467,7 @@ export function RoutinePreviewSheet({
                         <div className="flex items-center gap-2 rounded-xl px-3 py-2 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
                           <span className="text-base">🏁</span>
                           <span className="text-xs font-medium text-rose-800 dark:text-rose-300">
-                            Ends after {endAfterDays} day{endAfterDays !== 1 ? 's' : ''}
+                            {t('routinePreview.endsAfterDays', { n: endAfterDays, count: endAfterDays })}
                           </span>
                         </div>
                       );
@@ -479,11 +481,11 @@ export function RoutinePreviewSheet({
                     <div className="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-amber-300 bg-amber-50 shadow-md">
                       <img 
                         src={badgeImageUrl} 
-                        alt="Challenge badge" 
+                        alt={t('routinePreview.challengeBadge')} 
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <span className="text-[10px] text-amber-600 font-semibold mt-1">🏆 Badge</span>
+                    <span className="text-[10px] text-amber-600 font-semibold mt-1">{t('routinePreview.badge')}</span>
                   </div>
                 )}
               </div>
@@ -493,7 +495,7 @@ export function RoutinePreviewSheet({
             {/* Program Event Card Preview */}
             {linkedProgramTitle && linkedProgramSlug && (
               <div className="mb-4">
-                <p className="text-xs font-medium text-muted-foreground mb-2">Added to your planner:</p>
+                <p className="text-xs font-medium text-muted-foreground mb-2">{t('routinePreview.addedToPlanner')}</p>
                 <div className="pointer-events-none opacity-90">
                   <ProgramEventCard
                     event={{
@@ -529,7 +531,7 @@ export function RoutinePreviewSheet({
                     return sortedDays.map(day => (
                       <div key={day} className="mb-4">
                         <p className="text-base font-semibold text-foreground mb-3">
-                          Day {day}
+                          {t('routinePreview.day', { n: day })}
                         </p>
                         <div className="space-y-3">
                           {dayGroups.get(day)!.map(({ task, index }) => renderTaskCard(task, index))}
@@ -558,7 +560,7 @@ export function RoutinePreviewSheet({
                     return sortedSteps.map(step => (
                       <div key={step} className="mb-4">
                         <p className="text-base font-semibold text-foreground mb-3">
-                          🎯 Step {step}
+                          {t('routinePreview.step', { n: step })}
                         </p>
                         <div className="space-y-3">
                           {stepGroups.get(step)!.map(({ task, index }) => renderTaskCard(task, index))}
@@ -572,19 +574,19 @@ export function RoutinePreviewSheet({
                   {/* Group tasks by repeat_pattern */}
                   {(() => {
                     const groups = [
-                      { key: 'daily', label: 'Daily actions', filter: (t: RoutinePlanTask) => {
+                      { key: 'daily', label: t('routinePreview.dailyActions'), filter: (t: RoutinePlanTask) => {
                         const p = editedTasks[t.id]?.repeatPattern || (t as any).repeat_pattern || 'daily';
                         return p === 'daily';
                       }},
-                      { key: 'weekly', label: 'Weekly actions', filter: (t: RoutinePlanTask) => {
+                      { key: 'weekly', label: t('routinePreview.weeklyActions'), filter: (t: RoutinePlanTask) => {
                         const p = editedTasks[t.id]?.repeatPattern || (t as any).repeat_pattern;
                         return p === 'weekly';
                       }},
-                      { key: 'monthly', label: 'Monthly actions', filter: (t: RoutinePlanTask) => {
+                      { key: 'monthly', label: t('routinePreview.monthlyActions'), filter: (t: RoutinePlanTask) => {
                         const p = editedTasks[t.id]?.repeatPattern || (t as any).repeat_pattern;
                         return p === 'monthly';
                       }},
-                      { key: 'none', label: 'Special events', filter: (t: RoutinePlanTask) => {
+                      { key: 'none', label: t('routinePreview.specialEvents'), filter: (t: RoutinePlanTask) => {
                         const p = editedTasks[t.id]?.repeatPattern || (t as any).repeat_pattern;
                         return p === 'none' || p === 'once';
                       }},
@@ -621,7 +623,7 @@ export function RoutinePreviewSheet({
                   checked={allSelected} 
                   onCheckedChange={toggleAll}
                 />
-                <span className="text-sm font-medium">Add all</span>
+                <span className="text-sm font-medium">{t('routinePreview.addAll')}</span>
               </div>
               
               <Button
@@ -629,7 +631,7 @@ export function RoutinePreviewSheet({
                 disabled={selectedTaskIds.size === 0 || isSaving}
                 className="px-8"
               >
-                {isSaving ? 'Saving...' : 'Save'}
+                {isSaving ? t('routinePreview.saving') : t('routinePreview.save')}
               </Button>
             </div>
           </div>
