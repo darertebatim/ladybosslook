@@ -1,28 +1,27 @@
-import { useState, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { Settings, Heart, ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react';
-import { BackButtonCircle } from '@/components/app/BackButton';
-import { format, addMonths, subMonths } from 'date-fns';
-import { 
-  usePeriodSettings, 
-  usePeriodLogsForMonth, 
+import { useState, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { Settings, Heart, ChevronLeft, ChevronRight } from "lucide-react";
+import { BackButtonCircle } from "@/components/app/BackButton";
+import { format, addMonths, subMonths } from "date-fns";
+import {
+  usePeriodSettings,
+  usePeriodLogsForMonth,
   usePredictedDays,
   useCycleStatusWithLoading,
   useLogPeriodDay,
-  useDeletePeriodLog
-} from '@/hooks/usePeriodTracker';
-import { PeriodOnboarding } from '@/components/app/PeriodOnboarding';
-import { PeriodDaySheet } from '@/components/app/PeriodDaySheet';
-import { PeriodSettingsSheet } from '@/components/app/PeriodSettingsSheet';
-import { PeriodCalendar } from '@/components/app/PeriodCalendar';
-import { PeriodCycleInsights } from '@/components/app/PeriodCycleInsights';
-import { PeriodTour } from '@/components/app/tour';
-import { haptic } from '@/lib/haptics';
-import { toast } from 'sonner';
-import confetti from 'canvas-confetti';
-import { useSubscription } from '@/hooks/useSubscription';
-import { PaywallSheet } from '@/components/app/PaywallSheet';
+  useDeletePeriodLog,
+} from "@/hooks/usePeriodTracker";
+import { PeriodOnboarding } from "@/components/app/PeriodOnboarding";
+import { PeriodDaySheet } from "@/components/app/PeriodDaySheet";
+import { PeriodSettingsSheet } from "@/components/app/PeriodSettingsSheet";
+import { PeriodCalendar } from "@/components/app/PeriodCalendar";
+import { PeriodCycleInsights } from "@/components/app/PeriodCycleInsights";
+import { haptic } from "@/lib/haptics";
+import { toast } from "sonner";
+import confetti from "canvas-confetti";
+import { useSubscription } from "@/hooks/useSubscription";
+import { PaywallSheet } from "@/components/app/PaywallSheet";
 
 const AppPeriod = () => {
   const { t } = useTranslation();
@@ -31,25 +30,21 @@ const AppPeriod = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showDaySheet, setShowDaySheet] = useState(false);
   const [showSettingsSheet, setShowSettingsSheet] = useState(false);
-  const [startTour, setStartTour] = useState<(() => void) | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const { isSubscribed, isLoading: subLoading } = useSubscription();
-  
-  const handleTourReady = useCallback((tourStart: () => void) => {
-    setStartTour(() => tourStart);
-  }, []);
-  
-  const { status, settings, isLoading, hasCompletedOnboarding } = useCycleStatusWithLoading();
+
+  const { status, settings, isLoading, hasCompletedOnboarding } =
+    useCycleStatusWithLoading();
   const { data: monthLogs = [] } = usePeriodLogsForMonth(currentMonth);
   const { predictedPeriodDays, ovulationDays } = usePredictedDays(currentMonth);
-  
+
   const logPeriodDay = useLogPeriodDay();
   const deletePeriodLog = useDeletePeriodLog();
 
   // Get logged period days for current month
   const loggedPeriodDays = useMemo(() => {
     const days = new Set<string>();
-    monthLogs.forEach(log => {
+    monthLogs.forEach((log) => {
       if (log.is_period_day) {
         days.add(log.date);
       }
@@ -60,12 +55,12 @@ const AppPeriod = () => {
   // Handle month navigation
   const handlePrevMonth = useCallback(() => {
     haptic.light();
-    setCurrentMonth(prev => subMonths(prev, 1));
+    setCurrentMonth((prev) => subMonths(prev, 1));
   }, []);
 
   const handleNextMonth = useCallback(() => {
     haptic.light();
-    setCurrentMonth(prev => addMonths(prev, 1));
+    setCurrentMonth((prev) => addMonths(prev, 1));
   }, []);
 
   // Handle date selection
@@ -76,58 +71,63 @@ const AppPeriod = () => {
   }, []);
 
   // Handle log save
-  const handleSaveLog = useCallback(async (data: {
-    is_period_day: boolean;
-    flow_intensity?: 'light' | 'medium' | 'heavy' | null;
-    symptoms?: string[];
-    notes?: string | null;
-  }) => {
-    if (!selectedDate) return;
-    
-    try {
-      if (data.is_period_day) {
-        await logPeriodDay.mutateAsync({
-          date: selectedDate,
-          ...data,
-        });
-        
-        haptic.success();
-        
-        // Confetti for first day of a new period
-        const dateStr = format(selectedDate, 'yyyy-MM-dd');
-        const prevDay = format(new Date(selectedDate.getTime() - 86400000), 'yyyy-MM-dd');
-        const wasYesterdayPeriod = loggedPeriodDays.has(prevDay);
-        
-        if (!wasYesterdayPeriod && !loggedPeriodDays.has(dateStr)) {
-          confetti({
-            particleCount: 80,
-            spread: 60,
-            origin: { y: 0.6 },
-            colors: ['#EC4899', '#F43F5E', '#FB7185', '#FDA4AF', '#FECDD3'],
+  const handleSaveLog = useCallback(
+    async (data: {
+      is_period_day: boolean;
+      flow_intensity?: "light" | "medium" | "heavy" | null;
+      symptoms?: string[];
+      notes?: string | null;
+    }) => {
+      if (!selectedDate) return;
+
+      try {
+        if (data.is_period_day) {
+          await logPeriodDay.mutateAsync({
+            date: selectedDate,
+            ...data,
           });
+
+          haptic.success();
+
+          // Confetti for first day of a new period
+          const dateStr = format(selectedDate, "yyyy-MM-dd");
+          const prevDay = format(
+            new Date(selectedDate.getTime() - 86400000),
+            "yyyy-MM-dd",
+          );
+          const wasYesterdayPeriod = loggedPeriodDays.has(prevDay);
+
+          if (!wasYesterdayPeriod && !loggedPeriodDays.has(dateStr)) {
+            confetti({
+              particleCount: 80,
+              spread: 60,
+              origin: { y: 0.6 },
+              colors: ["#EC4899", "#F43F5E", "#FB7185", "#FDA4AF", "#FECDD3"],
+            });
+          }
+
+          toast.success(t("tier1.period.logged"));
+        } else {
+          await deletePeriodLog.mutateAsync(selectedDate);
+          haptic.light();
+          toast.success(t("tier1.period.logRemoved"));
         }
-        
-        toast.success(t('tier1.period.logged'));
-      } else {
-        await deletePeriodLog.mutateAsync(selectedDate);
-        haptic.light();
-        toast.success(t('tier1.period.logRemoved'));
+
+        setShowDaySheet(false);
+      } catch (error) {
+        console.error("Error saving period log:", error);
+        toast.error(t("tier1.period.saveFailed"));
       }
-      
-      setShowDaySheet(false);
-    } catch (error) {
-      console.error('Error saving period log:', error);
-      toast.error(t('tier1.period.saveFailed'));
-    }
-  }, [selectedDate, logPeriodDay, deletePeriodLog, loggedPeriodDays]);
+    },
+    [selectedDate, logPeriodDay, deletePeriodLog, loggedPeriodDays],
+  );
 
   // Get existing log for selected date
   const selectedDateLog = useMemo(() => {
     if (!selectedDate) return null;
-    const dateStr = format(selectedDate, 'yyyy-MM-dd');
-    return monthLogs.find(log => log.date === dateStr) || null;
+    const dateStr = format(selectedDate, "yyyy-MM-dd");
+    return monthLogs.find((log) => log.date === dateStr) || null;
   }, [selectedDate, monthLogs]);
-
 
   // Subscription gate
   if (!subLoading && !isSubscribed) {
@@ -136,13 +136,20 @@ const AppPeriod = () => {
         <div className="fixed inset-0 z-10 flex flex-col items-center justify-center bg-gradient-to-b from-pink-200 to-rose-50 px-6 text-center">
           <BackButtonCircle />
           <Heart className="h-16 w-16 text-pink-400 mb-4" />
-          <h2 className="text-xl font-bold mb-2">{t('tier1.period.plusFeatureTitle')}</h2>
-          <p className="text-muted-foreground mb-6">{t('tier1.period.plusFeatureDesc')}</p>
+          <h2 className="text-xl font-bold mb-2">
+            {t("tier1.period.plusFeatureTitle")}
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            {t("tier1.period.plusFeatureDesc")}
+          </p>
           <button
-            onClick={() => { haptic.light(); setShowPaywall(true); }}
+            onClick={() => {
+              haptic.light();
+              setShowPaywall(true);
+            }}
             className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-semibold"
           >
-            {t('tier1.common.unlockWithPlus')}
+            {t("tier1.common.unlockWithPlus")}
           </button>
         </div>
         <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
@@ -168,10 +175,11 @@ const AppPeriod = () => {
     <>
       <div className="fixed inset-0 z-10 flex flex-col overflow-hidden">
         {/* Rose gradient background */}
-        <div 
+        <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'linear-gradient(180deg, #FDF2F8 0%, #FCE7F3 30%, #FFF1F2 60%, #FFFFFF 100%)',
+            background:
+              "linear-gradient(180deg, #FDF2F8 0%, #FCE7F3 30%, #FFF1F2 60%, #FFFFFF 100%)",
           }}
         />
 
@@ -181,26 +189,22 @@ const AppPeriod = () => {
         <div className="absolute top-24 right-24 w-4 h-4 bg-pink-300/30 rounded-full blur-sm pointer-events-none animate-float" />
 
         {/* Fixed Header */}
-        <header 
+        <header
           className="relative z-10 shrink-0 flex items-center justify-between px-4"
-          style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)', paddingBottom: '12px' }}
+          style={{
+            paddingTop: "calc(env(safe-area-inset-top) + 12px)",
+            paddingBottom: "12px",
+          }}
         >
-          <BackButtonCircle to="/app/home" className="bg-white/60 text-pink-700" />
-          
-          <h1 className="text-lg font-semibold text-pink-800">{t('tier1.period.title')}</h1>
-          
-          {/* Help button for tour */}
-          {startTour ? (
-            <button
-              onClick={startTour}
-              className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
-              aria-label={t('tier1.period.startPageTour')}
-            >
-              <HelpCircle className="h-5 w-5 text-pink-700" />
-            </button>
-          ) : (
-            <div className="w-10 h-10" />
-          )}
+          <BackButtonCircle
+            to="/app/home"
+            className="bg-white/60 text-pink-700"
+          />
+
+          <h1 className="text-lg font-semibold text-pink-800">
+            {t("tier1.period.title")}
+          </h1>
+          <div className="w-10 h-10" />
         </header>
 
         {/* Content - no scroll needed */}
@@ -216,11 +220,11 @@ const AppPeriod = () => {
             >
               <ChevronLeft className="h-5 w-5 text-pink-700" />
             </button>
-            
+
             <h2 className="text-base font-semibold text-pink-800">
-              {format(currentMonth, 'MMMM yyyy')}
+              {format(currentMonth, "MMMM yyyy")}
             </h2>
-            
+
             <button
               onClick={handleNextMonth}
               className="w-9 h-9 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
@@ -240,29 +244,35 @@ const AppPeriod = () => {
                 onDateSelect={handleDateSelect}
               />
             </div>
-            
+
             {/* Legend */}
             <div className="flex items-center justify-center gap-4 py-3">
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-full bg-pink-500" />
-                <span className="text-[10px] text-pink-700">{t('tier1.period.legendPeriod')}</span>
+                <span className="text-[10px] text-pink-700">
+                  {t("tier1.period.legendPeriod")}
+                </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-full border-2 border-dashed border-pink-400" />
-                <span className="text-[10px] text-pink-600">{t('tier1.period.legendPredicted')}</span>
+                <span className="text-[10px] text-pink-600">
+                  {t("tier1.period.legendPredicted")}
+                </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-full bg-amber-400" />
-                <span className="text-[10px] text-amber-700">{t('tier1.period.legendOvulation')}</span>
+                <span className="text-[10px] text-amber-700">
+                  {t("tier1.period.legendOvulation")}
+                </span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Fixed Bottom action */}
-        <div 
+        <div
           className="absolute bottom-0 left-0 right-0 z-20 flex items-center justify-center gap-3 px-6 bg-gradient-to-t from-white/90 to-transparent pt-6"
-          style={{ paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}
+          style={{ paddingBottom: "max(24px, env(safe-area-inset-bottom))" }}
         >
           <button
             onClick={() => {
@@ -273,7 +283,7 @@ const AppPeriod = () => {
             className="flex-1 max-w-[220px] h-14 rounded-full bg-pink-500 shadow-lg flex items-center justify-center gap-2 text-white font-semibold active:scale-[0.98] transition-transform"
           >
             <Heart className="h-5 w-5" />
-            {t('tier1.period.logToday')}
+            {t("tier1.period.logToday")}
           </button>
 
           {/* Settings button */}
@@ -283,7 +293,7 @@ const AppPeriod = () => {
               setShowSettingsSheet(true);
             }}
             className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-sm shadow-lg flex items-center justify-center active:scale-95 transition-transform"
-            title={t('tier1.common.settings')}
+            title={t("tier1.common.settings")}
           >
             <Settings className="h-5 w-5 text-pink-700" />
           </button>
@@ -323,9 +333,6 @@ const AppPeriod = () => {
         open={showSettingsSheet}
         onOpenChange={setShowSettingsSheet}
       />
-
-      {/* Feature Tour */}
-      <PeriodTour isFirstVisit={true} onTourReady={handleTourReady} />
     </>
   );
 };

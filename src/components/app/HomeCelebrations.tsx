@@ -1,36 +1,40 @@
-import { memo, useEffect, useState } from 'react';
-import { format } from 'date-fns';
-import { OverlayPortal } from '@/components/app/OverlayPortal';
-import { StreakCelebration } from '@/components/app/StreakCelebration';
-import { StreakGoalSelection } from '@/components/app/StreakGoalSelection';
-import { StreakGoalSelectionAdvanced } from '@/components/app/StreakGoalSelectionAdvanced';
-import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
-import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation';
-import { StreakRecoveryPrompt } from '@/components/app/StreakRecoveryPrompt';
-import { BadgeCelebration } from '@/components/app/BadgeCelebration';
-import { GoldStreakCelebration } from '@/components/app/GoldStreakCelebration';
-import { ChallengeDayCelebration } from '@/components/app/ChallengeDayCelebration';
-import { TaskSkipSheet } from '@/components/app/TaskSkipSheet';
-import { StepCompletionCelebration } from '@/components/app/StepCompletionCelebration';
-import { ProjectCompletionCelebration } from '@/components/app/ProjectCompletionCelebration';
-import { GoalInputSheet } from '@/components/app/GoalInputSheet';
-import { TaskTimerScreen } from '@/components/app/TaskTimerScreen';
-import { PaywallSheet } from '@/components/app/PaywallSheet';
-import { ActionLimitSheet } from '@/components/app/ActionLimitSheet';
-import { TaskQuickStartSheet } from '@/components/app/TaskQuickStartSheet';
-import { TaskDetailModal } from '@/components/app/TaskDetailModal';
-import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
-import { RecoverySuccessBanner } from '@/components/app/RecoverySuccessBanner';
-import { ReturningUserPushSheet } from '@/components/app/ReturningUserPushSheet';
-import { TaskCompletionPushNudge } from '@/components/app/TaskCompletionPushNudge';
-import { usePushPermission } from '@/hooks/usePushPermission';
-import { useSubscription } from '@/hooks/useSubscription';
-import { useAppReview } from '@/hooks/useAppReview';
-import { SoftReviewPrompt } from '@/components/app/SoftReviewPrompt';
-import { canShowSoftReviewPrompt, markSoftReviewPromptShown, SOFT_REVIEW_EVENT } from '@/lib/appReview';
-import { Capacitor } from '@capacitor/core';
-import type { UserTask, TaskTemplate } from '@/hooks/useTaskPlanner';
-import type { BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
+import { memo, useEffect, useState } from "react";
+import { format } from "date-fns";
+import { OverlayPortal } from "@/components/app/OverlayPortal";
+import { StreakCelebration } from "@/components/app/StreakCelebration";
+import { StreakGoalSelection } from "@/components/app/StreakGoalSelection";
+import { StreakGoalSelectionAdvanced } from "@/components/app/StreakGoalSelectionAdvanced";
+import { StreakGoalCompletionCelebration } from "@/components/app/StreakGoalCompletionCelebration";
+import { StreakGoalConfirmation } from "@/components/app/StreakGoalConfirmation";
+import { StreakRecoveryPrompt } from "@/components/app/StreakRecoveryPrompt";
+import { BadgeCelebration } from "@/components/app/BadgeCelebration";
+import { GoldStreakCelebration } from "@/components/app/GoldStreakCelebration";
+import { ChallengeDayCelebration } from "@/components/app/ChallengeDayCelebration";
+import { TaskSkipSheet } from "@/components/app/TaskSkipSheet";
+import { StepCompletionCelebration } from "@/components/app/StepCompletionCelebration";
+import { ProjectCompletionCelebration } from "@/components/app/ProjectCompletionCelebration";
+import { GoalInputSheet } from "@/components/app/GoalInputSheet";
+import { TaskTimerScreen } from "@/components/app/TaskTimerScreen";
+import { PaywallSheet } from "@/components/app/PaywallSheet";
+import { ActionLimitSheet } from "@/components/app/ActionLimitSheet";
+import { TaskQuickStartSheet } from "@/components/app/TaskQuickStartSheet";
+import { TaskDetailModal } from "@/components/app/TaskDetailModal";
+import { PushNotificationOnboarding } from "@/components/app/PushNotificationOnboarding";
+import { RecoverySuccessBanner } from "@/components/app/RecoverySuccessBanner";
+import { ReturningUserPushSheet } from "@/components/app/ReturningUserPushSheet";
+import { TaskCompletionPushNudge } from "@/components/app/TaskCompletionPushNudge";
+import { usePushPermission } from "@/hooks/usePushPermission";
+import { useSubscription } from "@/hooks/useSubscription";
+import { useAppReview } from "@/hooks/useAppReview";
+import { SoftReviewPrompt } from "@/components/app/SoftReviewPrompt";
+import {
+  canShowSoftReviewPrompt,
+  markSoftReviewPromptShown,
+  SOFT_REVIEW_EVENT,
+} from "@/lib/appReview";
+import { Capacitor } from "@capacitor/core";
+import type { UserTask, TaskTemplate } from "@/hooks/useTaskPlanner";
+import type { BadgeLevel } from "@/hooks/useWeeklyTaskCompletion";
 
 interface HomeCelebrationsProps {
   // Paywall
@@ -56,14 +60,15 @@ interface HomeCelebrationsProps {
   onSkipTask: (t: UserTask) => void;
   onOpenGoalInput: (t: UserTask) => void;
   onOpenTimer: (t: UserTask) => void;
-  onStepUnlocked: (result: import('@/hooks/useProjectStepUnlock').StepUnlockResult) => void;
+  onStepUnlocked: (
+    result: import("@/hooks/useProjectStepUnlock").StepUnlockResult,
+  ) => void;
 
   // Streak
   showStreakModal: boolean;
   setShowStreakModal: (v: boolean) => void;
   isFirstActionCelebration: boolean;
   setIsFirstActionCelebration: (v: boolean) => void;
-  setShowTapCoachMark: (v: boolean) => void;
   streak: any;
   shouldShowGoalSelection: boolean;
 
@@ -117,8 +122,8 @@ interface HomeCelebrationsProps {
   recoverStreak: any;
 
   // Recovery success
-  showRecoverySuccess: 'streak' | null;
-  setShowRecoverySuccess: (v: 'streak' | null) => void;
+  showRecoverySuccess: "streak" | null;
+  setShowRecoverySuccess: (v: "streak" | null) => void;
 
   // Notification
   userId?: string;
@@ -143,37 +148,99 @@ interface HomeCelebrationsProps {
 
   // Project completion
   projectCompletion: {
-    routineId: string; routineTitle: string; routineEmoji: string;
-    totalSteps: number; totalTasks: number; badgeImageUrl: string | null;
+    routineId: string;
+    routineTitle: string;
+    routineEmoji: string;
+    totalSteps: number;
+    totalTasks: number;
+    badgeImageUrl: string | null;
   } | null;
   onCloseProjectCompletion: () => void;
 }
 
-export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebrationsProps) {
+export const HomeCelebrations = memo(function HomeCelebrations(
+  props: HomeCelebrationsProps,
+) {
   const {
-    showPaywall, setShowPaywall, showActionLimit, setShowActionLimit,
-    showQuickStart, setShowQuickStart, onQuickStartContinue,
-    selectedTask, setSelectedTask, selectedDate, completedTaskIds, completedSubtaskIds,
-    goalProgressMap, onEditTask, onDeleteTask, onSkipTask, onOpenGoalInput, onOpenTimer, onStepUnlocked,
-    showStreakModal, setShowStreakModal, isFirstActionCelebration, setIsFirstActionCelebration,
-    setShowTapCoachMark, streak, shouldShowGoalSelection,
-    showGoalSelection, setShowGoalSelection, isStreakUpgrade, setIsStreakUpgrade,
-    showGoalConfirmation, setShowGoalConfirmation, confirmedGoal, setConfirmedGoal, setStreakGoal,
-    badgeCelebrationType, closeBadgeCelebration, badgeCompletedCount, badgeTotalCount, maybeRequestReview,
-    showGoldStreakCelebration, setShowGoldStreakCelebration, goldStreakData, goldDatesThisWeek, updateGoldStreak,
-    showStreakGoalCompletion, setShowStreakGoalCompletion,
-    skipTask, setSkipTask, goalInputTask, setGoalInputTask, onGoalInputConfirm,
-    timerTask, setTimerTask, onTimerSaveProgress, onTimerMarkComplete,
-    showRecoveryPrompt, setShowRecoveryPrompt, recoverStreak,
-    showRecoverySuccess, setShowRecoverySuccess,
-    userId, showNotificationFlow, setShowNotificationFlow,
-    challengeDayCelebration, closeChallengeDayCelebration, showChallengeDayCelebration,
-    stepCelebration, onCloseStepCelebration,
-    projectCompletion, onCloseProjectCompletion,
+    showPaywall,
+    setShowPaywall,
+    showActionLimit,
+    setShowActionLimit,
+    showQuickStart,
+    setShowQuickStart,
+    onQuickStartContinue,
+    selectedTask,
+    setSelectedTask,
+    selectedDate,
+    completedTaskIds,
+    completedSubtaskIds,
+    goalProgressMap,
+    onEditTask,
+    onDeleteTask,
+    onSkipTask,
+    onOpenGoalInput,
+    onOpenTimer,
+    onStepUnlocked,
+    showStreakModal,
+    setShowStreakModal,
+    isFirstActionCelebration,
+    setIsFirstActionCelebration,
+    streak,
+    shouldShowGoalSelection,
+    showGoalSelection,
+    setShowGoalSelection,
+    isStreakUpgrade,
+    setIsStreakUpgrade,
+    showGoalConfirmation,
+    setShowGoalConfirmation,
+    confirmedGoal,
+    setConfirmedGoal,
+    setStreakGoal,
+    badgeCelebrationType,
+    closeBadgeCelebration,
+    badgeCompletedCount,
+    badgeTotalCount,
+    maybeRequestReview,
+    showGoldStreakCelebration,
+    setShowGoldStreakCelebration,
+    goldStreakData,
+    goldDatesThisWeek,
+    updateGoldStreak,
+    showStreakGoalCompletion,
+    setShowStreakGoalCompletion,
+    skipTask,
+    setSkipTask,
+    goalInputTask,
+    setGoalInputTask,
+    onGoalInputConfirm,
+    timerTask,
+    setTimerTask,
+    onTimerSaveProgress,
+    onTimerMarkComplete,
+    showRecoveryPrompt,
+    setShowRecoveryPrompt,
+    recoverStreak,
+    showRecoverySuccess,
+    setShowRecoverySuccess,
+    userId,
+    showNotificationFlow,
+    setShowNotificationFlow,
+    challengeDayCelebration,
+    closeChallengeDayCelebration,
+    showChallengeDayCelebration,
+    stepCelebration,
+    onCloseStepCelebration,
+    projectCompletion,
+    onCloseProjectCompletion,
   } = props;
-  const { maybeRequestReviewAndroidOnly, openIOSReviewSoftLink, openAndroidReviewSoftLink } = useAppReview();
+  const {
+    maybeRequestReviewAndroidOnly,
+    openIOSReviewSoftLink,
+    openAndroidReviewSoftLink,
+  } = useAppReview();
   const [showIOSSoftReview, setShowIOSSoftReview] = useState(false);
-  const [softReviewTrigger, setSoftReviewTrigger] = useState<string>('soft_review');
+  const [softReviewTrigger, setSoftReviewTrigger] =
+    useState<string>("soft_review");
 
   // Global listener: any feature can dispatch SOFT_REVIEW_EVENT to ask for a
   // 5-star review at a high-satisfaction moment. iOS shows the in-app sheet
@@ -181,12 +248,12 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
   useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail || {};
-      const trigger = detail.trigger || 'soft_review';
+      const trigger = detail.trigger || "soft_review";
       const platform = Capacitor.getPlatform();
-      if (platform === 'ios') {
+      if (platform === "ios") {
         setSoftReviewTrigger(trigger);
         setTimeout(() => setShowIOSSoftReview(true), 800);
-      } else if (platform === 'android') {
+      } else if (platform === "android") {
         // Android: try native first, fallback to Play Store soft-link
         maybeRequestReviewAndroidOnly(trigger).then((shown) => {
           if (!shown) openAndroidReviewSoftLink(trigger);
@@ -198,7 +265,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
   }, [maybeRequestReviewAndroidOnly, openAndroidReviewSoftLink]);
 
   const maybeShowIOSSoftReviewOnGold = () => {
-    if (Capacitor.getPlatform() !== 'ios') return;
+    if (Capacitor.getPlatform() !== "ios") return;
     if (!canShowSoftReviewPrompt()) return;
     markSoftReviewPromptShown();
     // Slight delay so it doesn't collide with gold streak celebration
@@ -206,22 +273,26 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
   };
 
   const { hasAccessToProgram } = useSubscription();
-  const isSubscribed = hasAccessToProgram('any');
+  const isSubscribed = hasAccessToProgram("any");
 
-  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const todayStr = format(new Date(), "yyyy-MM-dd");
   const goldCelebrationShownKey = `simora_gold_celebration_shown_${todayStr}`;
 
   // ---- Push-notification re-engagement triggers ----
   const { needsAttention } = usePushPermission();
   const [showReturningSheet, setShowReturningSheet] = useState(false);
-  const [taskNudge, setTaskNudge] = useState<{ open: boolean; streakDay?: number; streakGoal?: number }>({ open: false });
+  const [taskNudge, setTaskNudge] = useState<{
+    open: boolean;
+    streakDay?: number;
+    streakGoal?: number;
+  }>({ open: false });
 
   // Returning-user sheet: streak >= 3 and not asked in last 5 days
   useEffect(() => {
     if (!userId || !needsAttention) return;
     const currentStreak = streak?.current_streak ?? streak?.currentStreak ?? 0;
     if (currentStreak < 3) return;
-    const last = localStorage.getItem('returningUserPushDismissed');
+    const last = localStorage.getItem("returningUserPushDismissed");
     if (last) {
       const days = (Date.now() - parseInt(last)) / (1000 * 60 * 60 * 24);
       if (days < 5) return;
@@ -234,16 +305,20 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
   useEffect(() => {
     const handler = (e: Event) => {
       if (!userId || !needsAttention) return;
-      const last = localStorage.getItem('taskCompletionNudgeDismissed');
+      const last = localStorage.getItem("taskCompletionNudgeDismissed");
       if (last) {
         const hours = (Date.now() - parseInt(last)) / (1000 * 60 * 60);
         if (hours < 48) return;
       }
       const detail = (e as CustomEvent).detail || {};
-      setTaskNudge({ open: true, streakDay: detail.streakDay, streakGoal: detail.streakGoal });
+      setTaskNudge({
+        open: true,
+        streakDay: detail.streakDay,
+        streakGoal: detail.streakGoal,
+      });
     };
-    window.addEventListener('requestPushNudge', handler);
-    return () => window.removeEventListener('requestPushNudge', handler);
+    window.addEventListener("requestPushNudge", handler);
+    return () => window.removeEventListener("requestPushNudge", handler);
   }, [userId, needsAttention]);
 
   return (
@@ -255,16 +330,24 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         onTakeChallenge={() => setShowPaywall(true)}
       />
 
-      <TaskQuickStartSheet open={showQuickStart} onOpenChange={setShowQuickStart} onContinue={onQuickStartContinue} />
+      <TaskQuickStartSheet
+        open={showQuickStart}
+        onOpenChange={setShowQuickStart}
+        onContinue={onQuickStartContinue}
+      />
 
       <TaskDetailModal
         task={selectedTask}
         open={!!selectedTask}
         onClose={() => setSelectedTask(null)}
         date={selectedDate}
-        isCompleted={selectedTask ? completedTaskIds.has(selectedTask.id) : false}
+        isCompleted={
+          selectedTask ? completedTaskIds.has(selectedTask.id) : false
+        }
         completedSubtaskIds={completedSubtaskIds}
-        goalProgress={selectedTask ? (goalProgressMap.get(selectedTask.id) || 0) : 0}
+        goalProgress={
+          selectedTask ? goalProgressMap.get(selectedTask.id) || 0 : 0
+        }
         onEdit={onEditTask}
         onDelete={onDeleteTask}
         onStreakIncrease={() => setShowStreakModal(true)}
@@ -278,10 +361,6 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         open={showStreakModal}
         onClose={() => {
           setShowStreakModal(false);
-          if (isFirstActionCelebration && localStorage.getItem('simora_tap_coach_shown') !== 'true') {
-            setTimeout(() => setShowTapCoachMark(true), 600);
-            localStorage.setItem('simora_tap_coach_shown', 'true');
-          }
           setIsFirstActionCelebration(false);
         }}
         isFirstAction={isFirstActionCelebration}
@@ -325,7 +404,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
             });
           }}
           isLoading={setStreakGoal.isPending}
-          minGoal={isStreakUpgrade ? (streak?.streak_goal || 0) : 0}
+          minGoal={isStreakUpgrade ? streak?.streak_goal || 0 : 0}
           isUpgrade={isStreakUpgrade}
         />
       )}
@@ -339,19 +418,19 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
       <BadgeCelebration
         type={badgeCelebrationType}
         onClose={() => {
-          const wassilver = badgeCelebrationType === 'silver';
+          const wassilver = badgeCelebrationType === "silver";
           closeBadgeCelebration();
-          if (wassilver) maybeRequestReview('silver_badge');
+          if (wassilver) maybeRequestReview("silver_badge");
         }}
         onCollectGold={closeBadgeCelebration}
         onGoldCollected={() => {
-          if (localStorage.getItem(goldCelebrationShownKey) === 'true') return;
-          localStorage.setItem(goldCelebrationShownKey, 'true');
+          if (localStorage.getItem(goldCelebrationShownKey) === "true") return;
+          localStorage.setItem(goldCelebrationShownKey, "true");
           updateGoldStreak.mutate(undefined, {
             onSuccess: () => setShowGoldStreakCelebration(true),
           });
           // Android-only secondary review trigger (silent no-op on iOS/web).
-          maybeRequestReviewAndroidOnly('gold_badge_android');
+          maybeRequestReviewAndroidOnly("gold_badge_android");
           // iOS-only soft popup with direct App Store link (bypasses 3/year quota).
           maybeShowIOSSoftReviewOnGold();
         }}
@@ -376,7 +455,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
       <GoalInputSheet
         open={!!goalInputTask}
         onOpenChange={(open) => !open && setGoalInputTask(null)}
-        unit={goalInputTask?.goal_unit || 'times'}
+        unit={goalInputTask?.goal_unit || "times"}
         onConfirm={onGoalInputConfirm}
       />
 
@@ -415,12 +494,15 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
         previousStreak={streak?.longest_streak || 0}
         onRecover={() => {
           const prev = streak?.longest_streak || 0;
-          recoverStreak.mutate({ previousStreak: prev, type: 'streak' }, {
-            onSuccess: () => {
-              setShowRecoveryPrompt(false);
-              setShowRecoverySuccess('streak');
+          recoverStreak.mutate(
+            { previousStreak: prev, type: "streak" },
+            {
+              onSuccess: () => {
+                setShowRecoveryPrompt(false);
+                setShowRecoverySuccess("streak");
+              },
             },
-          });
+          );
         }}
         onDismiss={() => setShowRecoveryPrompt(false)}
         isLoading={recoverStreak.isPending}
@@ -436,8 +518,8 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
       <ChallengeDayCelebration
         open={showChallengeDayCelebration}
         onClose={closeChallengeDayCelebration}
-        challengeTitle={challengeDayCelebration?.challengeTitle || ''}
-        challengeEmoji={challengeDayCelebration?.challengeEmoji || '✨'}
+        challengeTitle={challengeDayCelebration?.challengeTitle || ""}
+        challengeEmoji={challengeDayCelebration?.challengeEmoji || "✨"}
         currentDay={challengeDayCelebration?.currentDay || 0}
         totalDays={challengeDayCelebration?.totalDays || 0}
         badgeImageUrl={challengeDayCelebration?.badgeImageUrl}
@@ -453,8 +535,8 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
       <ProjectCompletionCelebration
         open={!!projectCompletion}
         onClose={onCloseProjectCompletion}
-        projectTitle={projectCompletion?.routineTitle || ''}
-        projectEmoji={projectCompletion?.routineEmoji || '🎯'}
+        projectTitle={projectCompletion?.routineTitle || ""}
+        projectEmoji={projectCompletion?.routineEmoji || "🎯"}
         totalSteps={projectCompletion?.totalSteps || 0}
         totalTasks={projectCompletion?.totalTasks || 0}
         badgeImageUrl={projectCompletion?.badgeImageUrl}
@@ -466,7 +548,9 @@ export const HomeCelebrations = memo(function HomeCelebrations(props: HomeCelebr
             userId={userId}
             open={showReturningSheet}
             onClose={() => setShowReturningSheet(false)}
-            consecutiveDays={streak?.current_streak ?? streak?.currentStreak ?? 3}
+            consecutiveDays={
+              streak?.current_streak ?? streak?.currentStreak ?? 3
+            }
           />
           <TaskCompletionPushNudge
             userId={userId}
