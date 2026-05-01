@@ -348,15 +348,13 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
               { label: 'Smart Reminders',     free: 'limit' as const, plus: true },
               { label: 'All Routine templates', free: 'limit' as const, plus: true },
               { label: 'All Self-Care Tools',  free: 'limit' as const, plus: true },
-              { label: 'Unlimited daily actions', free: false, plus: true },
               { label: 'Streak shields',       free: false, plus: true },
-              { label: 'Early access to new features', free: false, plus: true },
               { label: 'Ad-free',              free: true, plus: true },
             ].map((row, i) => (
               <div key={row.label} style={{
                 display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', alignItems: 'center',
                 padding: '12px 0',
-                borderBottom: i === 7 ? 'none' : '1px solid #f6f6f8',
+                borderBottom: i === 5 ? 'none' : '1px solid #f6f6f8',
               }}>
                 <span style={{ fontSize: 14, fontWeight: 600, color: NAVY }}>{row.label}</span>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
