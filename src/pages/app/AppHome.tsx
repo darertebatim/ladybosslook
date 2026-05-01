@@ -273,6 +273,7 @@ const AppHome = () => {
   const btnRoutinesRef = useRef<HTMLButtonElement>(null);
   const btnTasksRef = useRef<HTMLButtonElement>(null);
   const btnOneTimeRef = useRef<HTMLButtonElement>(null);
+  const spotlightCompleteBaselineRef = useRef<number | null>(null);
 
   const prevTotalCompletions = useRef(totalCompletions);
   const prevHasCompletionToday = useRef(hasAnyCompletionToday);
@@ -548,6 +549,23 @@ const AppHome = () => {
   const completedTaskIds = useMemo(() => {
     return new Set(completions?.tasks?.map(c => c.task_id) ?? []);
   }, [completions]);
+
+  useEffect(() => {
+    if (spotlightStep !== 'complete') {
+      spotlightCompleteBaselineRef.current = null;
+      return;
+    }
+
+    if (spotlightCompleteBaselineRef.current === null) {
+      spotlightCompleteBaselineRef.current = completedTaskIds.size;
+      return;
+    }
+
+    if (completedTaskIds.size > spotlightCompleteBaselineRef.current) {
+      spotlightCompleteBaselineRef.current = null;
+      setSpotlightStep(null);
+    }
+  }, [spotlightStep, completedTaskIds]);
 
   // Welcome spotlight: which task to highlight per step
   const spotlightHighlightTaskId = useMemo<string | null>(() => {
