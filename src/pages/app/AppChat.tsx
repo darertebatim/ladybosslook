@@ -148,8 +148,8 @@ export default function AppChat() {
       } catch (error: any) {
         console.error('Error fetching conversation:', error);
         toast({
-          title: "Error",
-          description: "Failed to load chat",
+          title: t("chatPage.errorTitle"),
+          description: t("chatPage.loadFailed"),
           variant: "destructive"
         });
       } finally {
@@ -344,8 +344,8 @@ export default function AppChat() {
     } catch (error: any) {
       console.error('Error sending message:', error);
       toast({
-        title: "Error",
-        description: "Failed to send message",
+        title: t("chatPage.errorTitle"),
+        description: t("chatPage.sendFailed"),
         variant: "destructive"
       });
     } finally {
@@ -469,15 +469,15 @@ export default function AppChat() {
               className="-ml-2 h-10 px-2 gap-0.5 text-foreground bg-transparent active:opacity-70"
             >
                 <ChevronLeft className="h-7 w-7" />
-                <span className="text-[17px]">Back</span>
+                <span className="text-[17px]">{t("chatPage.back")}</span>
               </Button>
               <div className="flex items-center gap-3">
               <div className="h-11 w-11 rounded-full bg-muted border border-border flex items-center justify-center">
                   <MessageCircle className="h-5 w-5 text-foreground" />
                 </div>
                 <div>
-                  <h1 className="font-semibold text-[17px]">Support</h1>
-                  <p className="text-[13px] text-muted-foreground">Loading...</p>
+                  <h1 className="font-semibold text-[17px]">{t("chatPage.support.title")}</h1>
+                  <p className="text-[13px] text-muted-foreground">{t("chatPage.loading")}</p>
                 </div>
               </div>
             </div>
@@ -517,7 +517,7 @@ export default function AppChat() {
               className="-ml-2 h-10 px-2 gap-0.5 text-foreground bg-transparent active:opacity-70"
             >
               <ChevronLeft className="h-7 w-7" />
-              <span className="text-[17px]">Back</span>
+              <span className="text-[17px]">{t("chatPage.back")}</span>
             </Button>
             <div className="flex items-center gap-3">
               <div className="relative">
@@ -528,9 +528,9 @@ export default function AppChat() {
                 <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-background" />
               </div>
               <div>
-                <h1 className="font-semibold text-[17px]">Support</h1>
+                <h1 className="font-semibold text-[17px]">{t("chatPage.support.title")}</h1>
                 <p className="text-[13px] text-orange-500">
-                  {conversation?.status === 'resolved' ? 'Resolved' : 'This conversation is private'}
+                  {conversation?.status === 'resolved' ? t("chatPage.support.resolved") : t("chatPage.support.headerStatus")}
                 </p>
               </div>
             </div>
@@ -584,7 +584,7 @@ export default function AppChat() {
                 
                 {/* Conversation starters */}
                 <div className="w-full max-w-sm mb-6">
-                  <p className="text-[13px] text-muted-foreground/70 mb-3">Tap to start a conversation</p>
+                  <p className="text-[13px] text-muted-foreground/70 mb-3">{t("chatPage.tapToStart")}</p>
                   <div className="grid grid-cols-2 gap-2">
                     {conversationStarters.map((starter, index) => (
                       <button
@@ -602,7 +602,7 @@ export default function AppChat() {
                 
                 {/* Warm footer */}
                 <p className="text-[13px] text-foreground max-w-[260px] leading-relaxed">
-                  Type, or tap the mic if that feels easier — we're listening. We check in throughout the day. 🧡
+                  {t("chatPage.support.footer")}
                 </p>
               </div>
             ) : (
@@ -624,7 +624,7 @@ export default function AppChat() {
                         <div className="flex items-center justify-center my-4">
                           <div className="px-3 py-1 rounded-full bg-muted/60 backdrop-blur-sm">
                             <span className="text-xs font-medium text-muted-foreground">
-                              {getDateLabel(new Date(msg.created_at))}
+                              {getDateLabel(new Date(msg.created_at), t)}
                             </span>
                           </div>
                         </div>
@@ -639,7 +639,7 @@ export default function AppChat() {
                         attachmentName={msg.attachment_name}
                         attachmentType={msg.attachment_type}
                         isBroadcast={msg.is_broadcast}
-                        senderName="Ladyboss Support"
+                        senderName={t("chatPage.support.senderName")}
                         showAvatar={showAvatar}
                         isFirstInGroup={firstInGroup}
                         isLastInGroup={lastInGroup}
@@ -676,7 +676,7 @@ export default function AppChat() {
               onSend={handleSendMessage} 
               disabled={sending}
               uploading={uploading}
-              placeholder="Type a message..."
+              placeholder={t("chatPage.support.placeholder")}
               initialMessage={draftMessage}
             />
           </div>
