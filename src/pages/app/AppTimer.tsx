@@ -1118,7 +1118,7 @@ function AppTimerInner() {
                   <button onClick={(e) => { e.stopPropagation(); setShowSoundPicker(false); }}>
                     <X className="h-5 w-5 text-foreground" />
                   </button>
-                  <span className="text-base font-semibold text-foreground">White Noise</span>
+                  <span className="text-base font-semibold text-foreground">{t('timer.whiteNoise')}</span>
                   <div className="w-5" />
                 </div>
 
@@ -1143,7 +1143,7 @@ function AppTimerInner() {
                         </div>
                       </div>
                     </div>
-                    <span className="text-base font-medium text-foreground flex-1 text-left">Music off</span>
+                    <span className="text-base font-medium text-foreground flex-1 text-left">{t('timer.musicOff')}</span>
                     {!selectedSoundId && (
                       <div className="w-6 h-6 rounded-full border-[5px] border-foreground" />
                     )}
