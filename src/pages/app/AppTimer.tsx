@@ -111,12 +111,12 @@ function AppTimerInner() {
         editedTasks,
         syntheticTasks: [SYNTHETIC_TIMER_TASK],
       });
-      toast.success('Focus Timer added to your routine!');
+      toast.success(t('timer.addedToRoutineToast'));
       setShowRoutineSheet(false);
       setJustAdded(true);
     } catch (error) {
       console.error('Failed to add routine:', error);
-      toast.error('Failed to add routine');
+      toast.error(t('timer.addRoutineFailed'));
     }
   };
 
