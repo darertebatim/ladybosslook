@@ -1190,7 +1190,7 @@ export default function AppRoutinePlayer() {
   const handleDeleteTask = useCallback((task: UserTask) => {
     setSelectedTask(null);
     deleteTask.mutate(task.id, {
-      onSuccess: () => toast.success('Task deleted'),
+      onSuccess: () => toast.success(t('routinePlayer.taskDeleted')),
     });
   }, [deleteTask]);
 
