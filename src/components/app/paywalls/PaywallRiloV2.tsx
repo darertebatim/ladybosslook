@@ -286,6 +286,21 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
           </span>
           <ArrowRight size={20} color="#fff" strokeWidth={2.5} />
         </button>
+        <button
+          onClick={onClose}
+          style={{
+            width: '100%', marginTop: 10, padding: '12px 0',
+            background: 'rgba(255,255,255,0.6)',
+            border: `1.5px solid ${NAVY}`,
+            borderRadius: 24,
+            cursor: preview ? 'default' : 'pointer',
+            color: NAVY, fontSize: 15, fontWeight: 700, fontFamily: SF,
+            letterSpacing: -0.2,
+          }}
+          className="active:opacity-60 transition-opacity"
+        >
+          Maybe later
+        </button>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 10 }}>
           <Link to="/sms-terms" style={{ fontSize: 11, color: 'rgba(26,31,61,0.5)', textDecoration: 'none' }}>Terms</Link>
           <Link to="/privacy" style={{ fontSize: 11, color: 'rgba(26,31,61,0.5)', textDecoration: 'none' }}>Privacy</Link>
