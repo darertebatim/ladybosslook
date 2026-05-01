@@ -35,6 +35,7 @@ import {
   Download,
   ArrowLeft,
   ChevronRight,
+  Languages,
 } from "lucide-react";
 import {
   NativeSettings,
