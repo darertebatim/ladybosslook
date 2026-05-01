@@ -307,7 +307,7 @@ const AppBrowsePrograms = () => {
 
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
-      <SEOHead title="Academy Programs - Rilo" description="Browse all academy programs" />
+      <SEOHead title={t('browseProgramsPage.seoTitle')} description={t('browseProgramsPage.seoDesc')} />
 
       {/* Hero Video Background */}
       <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 h-[420px] overflow-hidden" style={{ transform: `translateY(${-scrollY * 0.4}px)` }}>
@@ -326,7 +326,7 @@ const AppBrowsePrograms = () => {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
                   <Input
-                    placeholder="Search programs..."
+                    placeholder={t('browseProgramsPage.searchPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9 h-9 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus-visible:ring-white/20"
@@ -346,7 +346,7 @@ const AppBrowsePrograms = () => {
                   >
                     <ChevronLeft className="h-4 w-4 text-white" />
                   </button>
-                  <h1 className="text-xl font-bold text-white tracking-tight">Academy</h1>
+                  <h1 className="text-xl font-bold text-white tracking-tight">{t('browseProgramsPage.academy')}</h1>
                 </div>
                 <button onClick={() => setShowSearch(true)} className="p-2 -mr-2">
                   <Search className="h-5 w-5 text-white/70" />
@@ -414,7 +414,7 @@ const AppBrowsePrograms = () => {
           {enrolledPrograms.length > 0 && selectedType === 'all' && !searchQuery && (
             <div className="space-y-3">
               <h2 className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                Your Programs
+                {t('browseProgramsPage.yourPrograms')}
               </h2>
               <div className="space-y-3">
                 {enrolledPrograms.map((program: any) => (
@@ -437,7 +437,7 @@ const AppBrowsePrograms = () => {
           {/* All / Not Enrolled Programs */}
           <div className="space-y-3">
             <h2 className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-              {searchQuery ? 'Results' : selectedType === 'all' ? 'All Programs' : availableTypes.find(f => f.value === selectedType)?.label || 'Programs'}
+              {searchQuery ? t('browseProgramsPage.results') : selectedType === 'all' ? t('browseProgramsPage.allPrograms') : availableTypes.find(f => f.value === selectedType)?.label || t('browseProgramsPage.programs')}
             </h2>
 
             {notEnrolledPrograms.length === 0 && enrolledPrograms.length === 0 ? (
@@ -446,7 +446,7 @@ const AppBrowsePrograms = () => {
                   <GraduationCap className="w-7 h-7 text-white/30" />
                 </div>
                 <p className="text-white/50 text-sm">
-                  {searchQuery ? `No programs match "${searchQuery}"` : 'No programs available'}
+                  {searchQuery ? t('browseProgramsPage.noMatch', { query: searchQuery }) : t('browseProgramsPage.noPrograms')}
                 </p>
               </div>
             ) : (
@@ -469,12 +469,12 @@ const AppBrowsePrograms = () => {
 
             {/* CTA to support chat */}
             <div className="pt-4 pb-2">
-              <p className="text-sm text-white/50">Not any programs you want above?</p>
+              <p className="text-sm text-white/50">{t('browseProgramsPage.tellUsWant')}</p>
               <button
-                onClick={() => navigate('/app/chat?draft=' + encodeURIComponent("Hi! I'd love to have a program for: "))}
+                onClick={() => navigate('/app/chat?draft=' + encodeURIComponent(t('browseProgramsPage.chatDraft')))}
                 className="text-sm text-blue-400 font-medium flex items-center gap-1 mt-1"
               >
-                Tell us what you want <ChevronRight className="h-4 w-4" />
+                {t('browseProgramsPage.tellUsCta')} <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           </div>
