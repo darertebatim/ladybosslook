@@ -1375,18 +1375,18 @@ function AppTimerInner() {
         <div className="w-16 h-16 rounded-full bg-foreground flex items-center justify-center mb-6">
           <Check className="h-8 w-8 text-background" />
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 text-center">Wow! You did it!</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-2 text-center">{t('timer.wow')}</h1>
         <p className="text-muted-foreground text-center mb-10">
           {activeTab === 'pomodoro'
-            ? `Celebrate your progress—${totalFocusMin} minutes of focus completed`
-            : 'Celebrate your progress!'}
+            ? t('timer.celebratePomodoro', { count: totalFocusMin })
+            : t('timer.celebrateProgress')}
         </p>
         <div className="w-full max-w-xs flex flex-col gap-3">
           <button
             onClick={() => { haptic.success(); setScreen('setup'); }}
             className="w-full h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
           >
-            I'm doing great!
+            {t('timer.doingGreat')}
           </button>
           <FocusShareButton minutes={totalFocusMin} mode={activeTab} />
         </div>
@@ -1405,13 +1405,13 @@ function AppTimerInner() {
         <div className="w-16 h-16 rounded-full bg-foreground flex items-center justify-center mb-6">
           <AlertCircle className="h-8 w-8 text-background" />
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 text-center">Relax! Every effort counts!</h1>
-        <p className="text-muted-foreground text-center mb-10">Let's continue when you're ready.</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2 text-center">{t('timer.relax')}</h1>
+        <p className="text-muted-foreground text-center mb-10">{t('timer.continueWhenReady')}</p>
         <button
           onClick={() => { haptic.light(); setScreen('setup'); }}
           className="w-full max-w-xs h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
         >
-          Got it!
+          {t('timer.gotItBang')}
         </button>
       </motion.div>
     );
