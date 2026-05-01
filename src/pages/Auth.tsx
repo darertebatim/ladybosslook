@@ -211,6 +211,19 @@ export default function Auth() {
 
         {/* Vertically-centered stack: hero + main content sit in the middle of the screen */}
         <div className="flex-1 px-6 py-6 overflow-y-auto relative z-10 flex flex-col justify-center">
+
+        {/* Top marquee layer — multilingual welcome train, sits above
+            the centered hero. Absolutely positioned so it never affects
+            the auth stack below. */}
+        {!showEmailForm && !isForgotPassword && !isKeyboardOpen && (
+          <div
+            className="pointer-events-none absolute left-0 right-0 z-20"
+            style={{ top: 'calc(env(safe-area-inset-top, 0px) + 14px)' }}
+          >
+            <WelcomeTrain />
+          </div>
+        )}
+
           <div className="max-w-md w-full mx-auto space-y-7">
             {/* Hero brand block — big welcome headline + icon + tagline row */}
             {!showEmailForm && (
@@ -454,9 +467,6 @@ export default function Auth() {
             className="pointer-events-none absolute left-0 right-0 z-10 px-6 flex flex-col items-center gap-2.5"
             style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 18px)' }}
           >
-            {/* Rotating multilingual welcome — its own layer, fades in/out */}
-            <RotatingWelcome />
-
             {/* Social-proof pill */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/70 backdrop-blur-md border border-white/70 shadow-[0_8px_24px_-12px_rgba(26,31,61,0.25)]">
               <span className="text-[13px]">⭐</span>
