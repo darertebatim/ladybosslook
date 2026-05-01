@@ -31,6 +31,8 @@ const FEATURES = [
 // Rilo brand DNA
 const NAVY = '#1a1f3d';
 const LOGO_GOLD = '#F5A623';
+// Amber accent used on white sections (pages 2 + 3) — keep readable on white.
+const SUNRISE_AMBER = '#B8590E';
 // Logo-derived hero — same coral/magenta wash as the app icon background.
 // Top-right coral → bottom-left magenta, with deep red shadow grounding the bottom.
 const SUNRISE_BG = 'linear-gradient(155deg, #D94B2B 0%, #C2255C 55%, #8E1B4A 100%)';
