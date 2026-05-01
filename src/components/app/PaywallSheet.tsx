@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useDefaultPaywall, PaywallVariantId } from '@/hooks/useDefaultPaywall';
-import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallMascot, PaywallComparison, PaywallLimitedOffer, PaywallVIP, PaywallOnboarding, PaywallMascotV2, type PaywallProgramData } from '@/components/app/paywalls';
+import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallMascot, PaywallComparison, PaywallLimitedOffer, PaywallVIP, PaywallOnboarding, PaywallMascotV2, PaywallSunriseCard, PaywallPersonalized, type PaywallProgramData } from '@/components/app/paywalls';
 import { useRevenueCat } from '@/hooks/useRevenueCat';
 import { PurchaseCelebration } from '@/components/app/PurchaseCelebration';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
@@ -21,6 +21,8 @@ const VARIANT_MAP: Record<PaywallVariantId, React.ComponentType<any>> = {
   vip: PaywallVIP,
   onboarding: PaywallOnboarding,
   'mascot-v2': PaywallMascotV2,
+  'sunrise-card': PaywallSunriseCard,
+  personalized: PaywallPersonalized,
 };
 
 const SIMORA_PLUS_SLUG = 'simora-plus';

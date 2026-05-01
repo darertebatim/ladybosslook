@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallMascot, PaywallComparison, PaywallLimitedOffer, PaywallVIP, PaywallOnboarding, PaywallMascotV2, type PaywallProgramData } from '@/components/app/paywalls';
+import { PaywallClassic, PaywallGradient, PaywallMinimal, PaywallBold, PaywallMascot, PaywallComparison, PaywallLimitedOffer, PaywallVIP, PaywallOnboarding, PaywallMascotV2, PaywallSunriseCard, PaywallPersonalized, type PaywallProgramData } from '@/components/app/paywalls';
 import { Crown, Lock, Unlock, BookOpen, Wind, Droplets, Heart, Brain, Moon, Music, Timer, Sparkles, CalendarPlus, Check, Smartphone } from 'lucide-react';
 import { useDefaultPaywall, useSetDefaultPaywall, PaywallVariantId } from '@/hooks/useDefaultPaywall';
 import { toast } from 'sonner';
@@ -22,6 +22,8 @@ const PAYWALL_VARIANTS = [
   { id: 'limited-offer', label: 'Limited Offer (50% OFF)', component: PaywallLimitedOffer },
   { id: 'vip', label: 'simora+ Plus', component: PaywallVIP },
   { id: 'onboarding', label: 'Onboarding', component: PaywallOnboarding },
+  { id: 'sunrise-card', label: 'Sunrise Card (Rilo DNA)', component: PaywallSunriseCard },
+  { id: 'personalized', label: 'Personalized (Rilo DNA)', component: PaywallPersonalized },
 ] as const;
 
 
