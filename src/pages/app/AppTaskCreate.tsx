@@ -2355,13 +2355,13 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowPlaylistPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Playlist</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectPlaylist')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <Input
               value={playlistSearchQuery}
               onChange={(e) => setPlaylistSearchQuery(e.target.value)}
-              placeholder="Search playlists..."
+              placeholder={t('taskEdit.searchPlaylists')}
               className="mb-2"
             />
             <ScrollArea className="h-[45vh]">
@@ -2408,11 +2408,11 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowBreathingPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Breathing Exercise</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectBreathingExercise')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <p className="text-sm text-muted-foreground">
-              Choose a breathing exercise to link to this task.
+              {t('taskPickers.chooseExerciseHint')}
             </p>
             
             <button
@@ -2430,13 +2430,13 @@ const AppTaskCreate = ({
                 <Wind className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-medium">Any Exercise</p>
-                <p className="text-xs text-muted-foreground">Open the Breathe page to choose</p>
+                <p className="font-medium">{t('taskEdit.anyExercise')}</p>
+                <p className="text-xs text-muted-foreground">{t('taskEdit.anyExerciseHint')}</p>
               </div>
             </button>
             
             <div className="border-t pt-3">
-              <p className="text-xs text-muted-foreground mb-2">Or select a specific exercise:</p>
+              <p className="text-xs text-muted-foreground mb-2">{t('taskPickers.orSelectSpecificExercise')}</p>
             </div>
             
             <ScrollArea className="h-[35vh]">
@@ -2476,7 +2476,7 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowReflectionPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Reflection</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectReflection')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <button
@@ -2494,13 +2494,13 @@ const AppTaskCreate = ({
                 <Brain className="h-5 w-5 text-teal-600 dark:text-teal-400" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-medium">Any Reflection</p>
-                <p className="text-xs text-muted-foreground">Open the Reflections page to choose</p>
+                <p className="font-medium">{t('taskEdit.anyReflection')}</p>
+                <p className="text-xs text-muted-foreground">{t('taskEdit.anyReflectionHint')}</p>
               </div>
             </button>
             
             <div className="border-t pt-3">
-              <p className="text-xs text-muted-foreground mb-2">Or select a specific reflection:</p>
+              <p className="text-xs text-muted-foreground mb-2">{t('taskPickers.orSelectSpecificReflection')}</p>
             </div>
             
             <ScrollArea className="h-[40vh]">
@@ -2546,11 +2546,11 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowRoutinePicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Routine</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectRoutine')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <p className="text-sm text-muted-foreground">
-              Choose a routine to link to this task.
+              {t('taskPickers.chooseRoutineHint')}
             </p>
             
             <ScrollArea className="h-[45vh]">
@@ -2591,10 +2591,10 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowRoutineTemplatePicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Routine Template</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectRoutineTemplate')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
-            <Input value={routineTemplateSearchQuery} onChange={(e) => setRoutineTemplateSearchQuery(e.target.value)} placeholder="Search templates..." className="mb-2" />
+            <Input value={routineTemplateSearchQuery} onChange={(e) => setRoutineTemplateSearchQuery(e.target.value)} placeholder={t('taskEdit.searchTemplates')} className="mb-2" />
             <ScrollArea className="h-[45vh]">
               <div className="space-y-2 pr-4">
                 {routineTemplates.filter(r => !routineTemplateSearchQuery || r.title.toLowerCase().includes(routineTemplateSearchQuery.toLowerCase())).map((routine) => (
@@ -2632,13 +2632,13 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowAudioPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Audio Track</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectAudioTrack')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <Input
               value={audioSearchQuery}
               onChange={(e) => setAudioSearchQuery(e.target.value)}
-              placeholder="Search audio tracks..."
+              placeholder={t('taskEdit.searchAudioTracks')}
               className="mb-2"
             />
             <ScrollArea className="h-[45vh]">
@@ -2686,13 +2686,13 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowChannelPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Channel</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectChannel')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <Input
               value={channelSearchQuery}
               onChange={(e) => setChannelSearchQuery(e.target.value)}
-              placeholder="Search channels..."
+              placeholder={t('taskEdit.searchChannels')}
               className="mb-2"
             />
             <ScrollArea className="h-[45vh]">
@@ -2742,13 +2742,13 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowVideoPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Video</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectVideo')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <Input
               value={videoSearchQuery}
               onChange={(e) => setVideoSearchQuery(e.target.value)}
-              placeholder="Search videos..."
+              placeholder={t('taskEdit.searchVideos')}
               className="mb-2"
             />
             <ScrollArea className="h-[45vh]">
@@ -2796,13 +2796,13 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowVideoPlaylistPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Video Playlist</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectVideoPlaylist')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <Input
               value={videoPlaylistSearchQuery}
               onChange={(e) => setVideoPlaylistSearchQuery(e.target.value)}
-              placeholder="Search video playlists..."
+              placeholder={t('taskEdit.searchVideoPlaylists')}
               className="mb-2"
             />
             <ScrollArea className="h-[45vh]">
@@ -2850,14 +2850,14 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowProgramPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Link Program</SheetTitle>
+            <SheetTitle>{t('taskEdit.linkProgram')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-4">
-            <p className="text-sm text-muted-foreground">Enter the program slug to link to this task.</p>
+            <p className="text-sm text-muted-foreground">{t('taskPickers.enterProgramSlug')}</p>
             <Input
               value={proLinkValue || ''}
               onChange={(e) => setProLinkValue(e.target.value || null)}
-              placeholder="Program slug (e.g., mindset-reset)"
+              placeholder={t('taskEdit.programSlugPlaceholder')}
               autoFocus
             />
             <Button
@@ -2865,7 +2865,7 @@ const AppTaskCreate = ({
               className="w-full rounded-xl"
               disabled={!proLinkValue}
             >
-              Done
+              {t('taskPickers.done')}
             </Button>
           </div>
         </SheetContent>
@@ -2878,7 +2878,7 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowReadingPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Reading</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectReading')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <ScrollArea className="h-[50vh]">
