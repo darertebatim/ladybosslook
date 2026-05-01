@@ -144,8 +144,8 @@ export default function AppCoachChat() {
       } catch (error: any) {
         console.error('Error fetching conversation:', error);
         toast({
-          title: "Error",
-          description: "Failed to load chat",
+          title: t("chatPage.errorTitle"),
+          description: t("chatPage.loadFailed"),
           variant: "destructive"
         });
       } finally {
@@ -315,8 +315,8 @@ export default function AppCoachChat() {
     } catch (error: any) {
       console.error('Error sending message:', error);
       toast({
-        title: "Error",
-        description: "Failed to send message",
+        title: t("chatPage.errorTitle"),
+        description: t("chatPage.sendFailed"),
         variant: "destructive"
       });
     } finally {
