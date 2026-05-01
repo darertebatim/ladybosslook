@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { useGoBack } from '@/hooks/useGoBack';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -57,6 +58,7 @@ function BulletLineInput({ inputRef, value, onChange, onKeyDown, placeholder }: 
 }
 
 export default function AppFreeFormReflection() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const goBack = useGoBack('/app/reflections');
   const { user } = useAuth();
@@ -117,8 +119,8 @@ export default function AppFreeFormReflection() {
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error('Not authenticated');
-      if (!title.trim() && !contentForSave) throw new Error('Please write something');
-      const finalTitle = title.trim() || `Reflection`;
+      if (!title.trim() && !contentForSave) throw new Error(t('reflection.writeSomething'));
+      const finalTitle = title.trim() || t('reflection.defaultTitle');
       const clientId = crypto.randomUUID();
       const payload: CreateReflectionPayload = {
         clientId,
@@ -202,7 +204,7 @@ export default function AppFreeFormReflection() {
         }
       })();
     },
-    onError: (e: any) => toast.error(e.message || 'Failed to save'),
+    onError: (e: any) => toast.error(e.message || t('reflection.saveFailed')),
   });
 
   const handleLineChange = useCallback((index: number, value: string) => {
@@ -250,14 +252,14 @@ export default function AppFreeFormReflection() {
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
       >
         <button onClick={() => goBack()} className="text-sm text-muted-foreground active:scale-95 transition-transform">
-          Cancel
+          {t('reflection.cancel')}
         </button>
         <button
           onClick={() => saveMutation.mutate()}
           disabled={saveMutation.isPending || (!title.trim() && !contentForSave)}
           className="px-5 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold active:scale-95 transition-transform disabled:opacity-40"
         >
-          Done
+          {t('reflection.done')}
         </button>
       </div>
 
@@ -265,7 +267,7 @@ export default function AppFreeFormReflection() {
       <div className="flex-1 px-5 pt-4 overflow-y-auto overscroll-contain" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}>
         {/* Date */}
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-          TODAY, {today.toUpperCase()}
+          {t('reflection.today')}, {today.toUpperCase()}
         </p>
 
         {/* Title row with lamp button */}
@@ -274,7 +276,7 @@ export default function AppFreeFormReflection() {
             ref={titleRef}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Reflections"
+            placeholder={t('reflection.placeholderTitle')}
             rows={1}
             className={cn(
               "flex-1 bg-transparent border-0 outline-none resize-none text-2xl font-bold mt-1 placeholder:text-foreground/30",
@@ -327,14 +329,14 @@ export default function AppFreeFormReflection() {
               value={line}
               onChange={(e) => handleLineChange(idx, e.target.value)}
               onKeyDown={(e) => handleLineKeyDown(idx, e)}
-              placeholder={idx === 0 ? 'Write your thoughts…' : ''}
+              placeholder={idx === 0 ? t('reflection.writeThoughts') : ''}
             />
           ))}
         </div>
 
         {/* Mood selector */}
         <div className="mt-6">
-          <p className="text-xs font-medium text-muted-foreground mb-2">How are you feeling?</p>
+          <p className="text-xs font-medium text-muted-foreground mb-2">{t('reflection.howFeeling')}</p>
           <MoodSelector value={mood} onChange={(m) => setMood(m)} showHeader={false} />
         </div>
       </div>
