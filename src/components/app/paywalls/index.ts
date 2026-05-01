@@ -10,4 +10,5 @@ export { PaywallOnboarding } from './PaywallOnboarding';
 export { PaywallMascotV2 } from './PaywallMascotV2';
 export { PaywallSunriseCard } from './PaywallSunriseCard';
 export { PaywallPersonalized } from './PaywallPersonalized';
+export { PaywallRiloV2 } from './PaywallRiloV2';
 
