@@ -388,9 +388,6 @@ export const TaskQuickStartSheet = ({
             <div className="h-2" />
           </div>
         </div>
-
-        {/* Action Sheet Tour */}
-        <ActionSheetTour isOpen={open} onTourReady={handleTourReady} />
       </SheetContent>
     </Sheet>
   );
