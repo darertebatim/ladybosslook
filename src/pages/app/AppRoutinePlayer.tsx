@@ -1212,7 +1212,7 @@ export default function AppRoutinePlayer() {
           </button>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500" />
-            <h1 className="text-base font-bold text-foreground">Routine Player</h1>
+            <h1 className="text-base font-bold text-foreground">{t('routinePlayer.title')}</h1>
           </div>
           <AddedToRoutineButton
             isAdded={!!isPageAdded}
@@ -1239,7 +1239,7 @@ export default function AppRoutinePlayer() {
 
               return activeRoutines.length > 0 ? (
               <section>
-                <p className="text-base font-bold text-foreground mb-3">My Routines</p>
+                <p className="text-base font-bold text-foreground mb-3">{t('routinePlayer.myRoutines')}</p>
                 <DndContext
                   sensors={routineSensors}
                   collisionDetection={closestCenter}
