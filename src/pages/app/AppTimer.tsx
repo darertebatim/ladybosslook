@@ -773,7 +773,7 @@ function AppTimerInner() {
                   <button onClick={() => setShowBreakPicker(false)}>
                     <X className="h-5 w-5 text-foreground" />
                   </button>
-                  <span className="text-base font-semibold text-foreground">Short Break</span>
+                  <span className="text-base font-semibold text-foreground">{t('timer.shortBreak')}</span>
                   <div className="w-5" />
                 </div>
 
@@ -792,14 +792,14 @@ function AppTimerInner() {
                         n === breakMinutes ? "text-foreground" : "text-muted-foreground/50"
                       )}>{n}</span>
                       {n === breakMinutes && (
-                        <span className="text-base text-muted-foreground">min</span>
+                        <span className="text-base text-muted-foreground">{t('timer.min')}</span>
                       )}
                     </button>
                   ))}
                 </div>
 
                 <p className="text-center text-sm text-muted-foreground px-8 pb-4">
-                  A short break after each Pomodoro helps refresh your mind and boost creativity.
+                  {t('timer.breakHint')}
                 </p>
 
                 <div className="px-5 pb-8">
@@ -807,7 +807,7 @@ function AppTimerInner() {
                     onClick={() => { setShowBreakPicker(false); haptic.medium(); }}
                     className="w-full h-12 rounded-full bg-foreground text-background font-semibold text-base"
                   >
-                    OK
+                    {t('timer.ok')}
                   </button>
                 </div>
               </motion.div>
