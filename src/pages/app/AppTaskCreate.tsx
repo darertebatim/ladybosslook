@@ -2217,19 +2217,19 @@ const AppTaskCreate = ({
               <button onClick={() => setShowTagPicker(false)} className="p-2 -ml-2">
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <span className="text-lg font-medium">Category</span>
+              <span className="text-lg font-medium">{t('taskEdit.category')}</span>
               <Button
                 variant="ghost"
                 onClick={() => setShowTagPicker(false)}
                 className="text-primary font-medium"
               >
-                Save
+                {t('taskPickers.save')}
               </Button>
             </div>
 
             {/* Title */}
             <div className="px-6 pb-2">
-              <h2 className="text-3xl font-bold">Category</h2>
+              <h2 className="text-3xl font-bold">{t('taskEdit.category')}</h2>
             </div>
 
             {/* Tag list */}
@@ -2246,7 +2246,7 @@ const AppTaskCreate = ({
                     tag === null && "bg-[#E8F4FD]"
                   )}
                 >
-                  <span className="font-medium">No tag</span>
+                  <span className="font-medium">{t('taskEdit.noTag')}</span>
                   {tag === null && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
                 </button>
 
