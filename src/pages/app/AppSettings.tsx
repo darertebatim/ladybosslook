@@ -714,6 +714,73 @@ const AppSettings = () => {
           </Collapsible>
         )}
 
+        {/* Language */}
+        <div ref={languageSectionRef}>
+        <Collapsible
+          open={openSections.has("language")}
+          onOpenChange={() => toggleSection("language")}
+        >
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Languages className="h-4 w-4 text-primary" />
+              </div>
+              <span className="font-medium text-sm">
+                {t("settings.sections.language")}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">
+                {currentLang === "fa" ? "فارسی" : "English"}
+              </span>
+              <ChevronDown
+                className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has("language") ? "rotate-180" : ""}`}
+              />
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-1">
+            <Card className="rounded-2xl shadow-ios border-0 bg-card">
+              <CardContent className="space-y-2 pt-4">
+                <button
+                  onClick={() => handleLangChange("en")}
+                  className={cn(
+                    "w-full flex items-center justify-between p-3 rounded-xl transition-colors active:bg-muted/50",
+                    currentLang === "en" ? "bg-primary/10" : "bg-muted/30",
+                  )}
+                >
+                  <span className="flex items-center gap-3">
+                    <span className="text-base leading-none">🇺🇸</span>
+                    <span className="text-sm font-medium">English</span>
+                  </span>
+                  {currentLang === "en" && (
+                    <span className="text-xs font-semibold text-primary">
+                      {t("settings.language_section.active")}
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => handleLangChange("fa")}
+                  className={cn(
+                    "w-full flex items-center justify-between p-3 rounded-xl transition-colors active:bg-muted/50",
+                    currentLang === "fa" ? "bg-primary/10" : "bg-muted/30",
+                  )}
+                >
+                  <span className="flex items-center gap-3">
+                    <span className="text-base leading-none">🇮🇷</span>
+                    <span className="text-sm font-medium font-farsi">فارسی</span>
+                  </span>
+                  {currentLang === "fa" && (
+                    <span className="text-xs font-semibold text-primary">
+                      {t("settings.language_section.active")}
+                    </span>
+                  )}
+                </button>
+              </CardContent>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
+        </div>
+
         {/* Notification Preferences */}
         <Collapsible
           open={openSections.has("prefs")}
