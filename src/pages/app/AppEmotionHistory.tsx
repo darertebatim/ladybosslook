@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Trash2, Heart } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { format, isToday, isYesterday, startOfDay, isSameDay } from 'date-fns';
 import { useEmotionLogs } from '@/hooks/useEmotionLogs';
 import { EmotionLogCard } from '@/components/emotion/EmotionLogCard';
@@ -20,6 +21,7 @@ import { cn } from '@/lib/utils';
 type FilterTab = 'all' | 'week' | 'month';
 
 const AppEmotionHistory = () => {
+  const { t } = useTranslation();
   const [filter, setFilter] = useState<FilterTab>('all');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   
@@ -86,8 +88,8 @@ const AppEmotionHistory = () => {
 
   // Format date header
   const formatDateHeader = (date: Date): string => {
-    if (isToday(date)) return 'Today';
-    if (isYesterday(date)) return 'Yesterday';
+    if (isToday(date)) return t('tier1.common.today');
+    if (isYesterday(date)) return t('tier1.common.yesterday');
     return format(date, 'EEEE, MMMM d');
   };
 
@@ -108,7 +110,7 @@ const AppEmotionHistory = () => {
       {/* Header */}
       <header className="shrink-0 flex items-center gap-1 px-4 py-3 border-b">
         <BackButton to="/app/emotion" showLabel={false} />
-        <h1 className="text-lg font-semibold">Emotion History</h1>
+        <h1 className="text-lg font-semibold">{t('tier1.emotionHistory.title')}</h1>
       </header>
 
       {/* Filter tabs */}
@@ -127,7 +129,11 @@ const AppEmotionHistory = () => {
                 : "bg-muted text-muted-foreground"
             )}
           >
-            {tab === 'all' ? 'All' : tab === 'week' ? 'This Week' : 'This Month'}
+            {tab === 'all'
+              ? t('tier1.emotionHistory.filterAll')
+              : tab === 'week'
+              ? t('tier1.emotionHistory.filterWeek')
+              : t('tier1.emotionHistory.filterMonth')}
           </button>
         ))}
       </div>
@@ -137,9 +143,9 @@ const AppEmotionHistory = () => {
         {groupedLogs.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="text-4xl mb-4">💭</div>
-            <p className="text-muted-foreground">No emotion logs yet</p>
+            <p className="text-muted-foreground">{t('tier1.emotionHistory.empty')}</p>
             <p className="text-sm text-muted-foreground/70 mt-1">
-              Start tracking how you feel
+              {t('tier1.emotionHistory.emptySub')}
             </p>
           </div>
         ) : (
@@ -173,18 +179,18 @@ const AppEmotionHistory = () => {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete this entry?</AlertDialogTitle>
+            <AlertDialogTitle>{t('tier1.emotionHistory.deleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone.
+              {t('tier1.emotionHistory.deleteDesc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('tier1.common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDelete}
               className="bg-red-500 hover:bg-red-600"
             >
-              Delete
+              {t('tier1.common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
