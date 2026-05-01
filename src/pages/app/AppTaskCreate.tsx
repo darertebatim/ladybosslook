@@ -1631,7 +1631,7 @@ const AppTaskCreate = ({
             <button onClick={() => setShowDurationPicker(false)} className="p-2 -ml-2">
               <X className="h-5 w-5" />
             </button>
-            <span className="text-base font-medium">Estimated Duration</span>
+            <span className="text-base font-medium">{t('taskEdit.estimatedDuration')}</span>
             <button
               onClick={() => {
                 setDurationMinutes(null);
@@ -1639,7 +1639,7 @@ const AppTaskCreate = ({
               }}
               className="text-sm text-muted-foreground active:opacity-70 px-2"
             >
-              Clear
+              {t('taskPickers.clear')}
             </button>
           </div>
           <div className="px-5 pt-4 pb-6 overflow-y-auto">
@@ -1664,10 +1664,10 @@ const AppTaskCreate = ({
                   <span className="text-lg">⏱️</span>
                   <div>
                     <p className="text-sm font-medium text-foreground">
-                      Avg from history: <span className="tabular-nums font-bold">{durationHistory.avgMinutes} min</span>
+                      {t('taskPickers.avgFromHistory')} <span className="tabular-nums font-bold">{durationHistory.avgMinutes} {t('taskPickers.minLabel')}</span>
                     </p>
                     <p className="text-[11px] text-muted-foreground">
-                      Based on {durationHistory.count} routine sessions
+                      {t('taskPickers.basedOnSessions', { count: durationHistory.count })}
                     </p>
                   </div>
                 </div>
@@ -1685,7 +1685,7 @@ const AppTaskCreate = ({
             )}
 
             <p className="text-xs text-muted-foreground text-center mb-4">
-              Countdown estimate for the Routine Player
+              {t('taskPickers.countdownEstimate')}
             </p>
             <div className="grid grid-cols-3 gap-2">
               {[1, 2, 3, 5, 10, 15, 20, 30].map(mins => (
@@ -1704,7 +1704,7 @@ const AppTaskCreate = ({
                   )}
                 >
                   <span className="text-lg tabular-nums">{mins}</span>
-                  <span className="text-[11px] text-muted-foreground block -mt-0.5">min</span>
+                  <span className="text-[11px] text-muted-foreground block -mt-0.5">{t('taskPickers.minLabel')}</span>
                 </button>
               ))}
               {/* Custom duration button */}
@@ -1720,7 +1720,7 @@ const AppTaskCreate = ({
                 <span className="text-lg tabular-nums">
                   {durationMinutes && ![1,2,3,5,10,15,20,30].includes(durationMinutes) ? durationMinutes : '···'}
                 </span>
-                <span className="text-[11px] text-muted-foreground block -mt-0.5">custom</span>
+                <span className="text-[11px] text-muted-foreground block -mt-0.5">{t('taskPickers.custom')}</span>
               </button>
             </div>
           </div>
@@ -1756,7 +1756,7 @@ const AppTaskCreate = ({
           }
           setShowCustomDurationKeypad(false);
         }}
-        title="Duration (minutes)"
+        title={t('taskEdit.durationMinutes')}
         maxLength={3}
       />
 
