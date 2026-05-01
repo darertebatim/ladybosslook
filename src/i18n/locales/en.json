@@ -833,5 +833,63 @@
     "evening": "Evening",
     "bedtime": "Bedtime",
     "anytime": "Any time"
+  },
+  "chatPage": {
+    "back": "Back",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "goodMorning": "Good morning",
+    "goodAfternoon": "Good afternoon",
+    "goodEvening": "Good evening",
+    "loading": "Loading...",
+    "errorTitle": "Error",
+    "loadFailed": "Failed to load chat",
+    "sendFailed": "Failed to send message",
+    "tapToStart": "Tap to start a conversation",
+    "support": {
+      "title": "Support",
+      "headerStatus": "This conversation is private",
+      "resolved": "Resolved",
+      "senderName": "Ladyboss Support",
+      "placeholder": "Type a message...",
+      "footer": "Type, or tap the mic if that feels easier — we're listening. We check in throughout the day. 🧡",
+      "starters": {
+        "question": "I have a question",
+        "voice": "I'd rather send a voice note",
+        "talk": "I just need someone to talk to",
+        "broken": "Something isn't working"
+      }
+    },
+    "coach": {
+      "title": "Coach",
+      "headerStatus": "This conversation is private",
+      "resolved": "Resolved",
+      "senderName": "Your Coach",
+      "placeholder": "Message your coach...",
+      "lockedTitle": "Chat with Coach is Locked",
+      "lockedDescription": "This feature hasn't been unlocked for your account yet. Contact support if you believe this is a mistake.",
+      "emptyTitle": "Your personal coach is here",
+      "emptyDescription": "Get personalized guidance, track your progress, and reach your goals faster.",
+      "footer": "Your coach checks in throughout the day. Feel free to share anything! 🎓",
+      "starters": {
+        "progress": "Ask about my progress",
+        "advice": "Get personalized advice",
+        "question": "I have a question",
+        "goals": "Help me with my goals"
+      }
+    }
+  },
+  "audioPlayerPage": {
+    "share": "Share",
+    "goToPlanner": "Go to planner",
+    "addToRoutines": "Add to my routines"
+  },
+  "breathePage": {
+    "shareAria": "Share breathe",
+    "routineTitle": "Breathing Routine"
+  },
+  "reflectionsPage": {
+    "shareAria": "Share Reflections",
+    "routineTitle": "Daily Reflection"
   }
 }
