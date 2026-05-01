@@ -116,6 +116,12 @@ const AppHome = () => {
   const [hasHomeBanner, setHasHomeBanner] = useState(false);
   const [hasMoodBanner, setHasMoodBanner] = useState(false);
   const [hasWeeklyBanner, setHasWeeklyBanner] = useState(false);
+
+  // Welcome spotlight tour: 'tap' → 'add' → 'complete' → null (done)
+  const [spotlightStep, setSpotlightStep] = useState<
+    null | 'tap' | 'add' | 'complete'
+  >(null);
+  const [hasWelcomeBanner, setHasWelcomeBanner] = useState(false);
   const { isKeyboardOpen } = useKeyboard();
   const { currentTrack } = useAudioPlayer();
   const hasMiniPlayer = !!currentTrack;
