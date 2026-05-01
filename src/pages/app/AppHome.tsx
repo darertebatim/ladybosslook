@@ -592,6 +592,8 @@ const AppHome = () => {
   );
 
   const handleStreakIncrease = useCallback(() => {
+    // Spotlight: finish the tour as soon as user completes a task
+    setSpotlightStep((prev) => (prev === 'complete' ? null : prev));
     // If user has never celebrated first action, don't open streak modal immediately —
     // let triggerFirstCelebration handle it with proper delay after seal animation
     const alreadyCelebrated = localStorage.getItem('simora_first_action_celebrated') === 'true';
