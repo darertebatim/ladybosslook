@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { buildShareOneLink, logAppsFlyerEvent } from '@/lib/appsflyer';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 interface QuizOption { label: string; emoji?: string; score?: number; }
 interface Question { id: string; question_text: string; type: string; options: QuizOption[]; sort_order: number; }
@@ -20,6 +21,7 @@ type Phase = 'playing' | 'analyzing' | 'result';
 export default function QuizPlay() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [quizResults, setQuizResults] = useState<QuizResult[]>([]);
@@ -120,20 +122,20 @@ export default function QuizPlay() {
     if (!matchedResult || !quiz) return;
     haptic.light();
     const shareUrl = buildShareOneLink('quiz_result', quiz.slug, matchedResult.title);
-    const fullText = `I got "${matchedResult.title}" on the ${quiz.title} quiz! Try it yourself on Rilo ✨\nGet the app: ${shareUrl}`;
+    const fullText = t('quizPlay.shareText', { result: matchedResult.title, quiz: quiz.title, url: shareUrl });
     try { logAppsFlyerEvent('af_share', { source: 'quiz_result', content_id: quiz.slug }); } catch { /* ignore */ }
     try {
       if (navigator.share) {
         await navigator.share({ title: quiz.title, text: fullText, url: shareUrl });
       } else {
         await navigator.clipboard.writeText(fullText);
-        toast.success('Link copied to clipboard!');
+        toast.success(t('quizPlay.linkCopied'));
       }
     } catch (err: any) {
       if (err?.name === 'AbortError') return;
       try {
         await navigator.clipboard.writeText(fullText);
-        toast.success('Link copied to clipboard!');
+        toast.success(t('quizPlay.linkCopied'));
       } catch { /* ignore */ }
     }
   }
@@ -148,7 +150,7 @@ export default function QuizPlay() {
   }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin" /></div>;
-  if (!quiz) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Quiz not found</div>;
+  if (!quiz) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">{t('quizPlay.notFound')}</div>;
 
   // ─── ANALYZING PHASE ───
   if (phase === 'analyzing') {
@@ -164,8 +166,8 @@ export default function QuizPlay() {
             {Math.round(analyzeProgress)}%
           </span>
         </div>
-        <p className="text-lg font-semibold">Analyzing your answers...</p>
-        <p className="text-sm text-muted-foreground mt-1">Just a moment ✨</p>
+        <p className="text-lg font-semibold">{t('quizPlay.analyzing')}</p>
+        <p className="text-sm text-muted-foreground mt-1">{t('quizPlay.justAMoment')}</p>
       </div>
     );
   }
@@ -184,7 +186,7 @@ export default function QuizPlay() {
           {/* Result Card */}
           <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
             className="rounded-2xl p-6 text-center" style={{ backgroundColor: quiz.theme_color }}>
-            <p className="text-xs text-white/70 uppercase tracking-wider mb-2">My Result</p>
+            <p className="text-xs text-white/70 uppercase tracking-wider mb-2">{t('quizPlay.myResult')}</p>
             <h2 className="text-2xl font-bold text-white mb-1">{matchedResult.title}</h2>
             {matchedResult.subtitle && <p className="text-sm text-white/80">{matchedResult.subtitle}</p>}
             {matchedResult.image_url && (
@@ -195,7 +197,7 @@ export default function QuizPlay() {
           {/* Description */}
           {matchedResult.description && (
             <div className="bg-card rounded-xl p-4 border">
-              <h3 className="text-sm font-semibold mb-2">About Your Result</h3>
+              <h3 className="text-sm font-semibold mb-2">{t('quizPlay.aboutResult')}</h3>
               <p className="text-sm text-muted-foreground">{matchedResult.description}</p>
             </div>
           )}
@@ -203,7 +205,7 @@ export default function QuizPlay() {
           {/* Characteristics */}
           {(matchedResult.characteristics as string[])?.length > 0 && (
             <div className="bg-card rounded-xl p-4 border">
-              <h3 className="text-sm font-semibold mb-2">Characteristics</h3>
+              <h3 className="text-sm font-semibold mb-2">{t('quizPlay.characteristics')}</h3>
               <div className="flex flex-wrap gap-2">
                 {(matchedResult.characteristics as string[]).map((c, i) => (
                   <span key={i} className="text-xs px-3 py-1.5 rounded-full bg-muted">{c}</span>
@@ -215,7 +217,7 @@ export default function QuizPlay() {
           {/* Strengths */}
           {(matchedResult.strengths as string[])?.length > 0 && (
             <div className="bg-card rounded-xl p-4 border">
-              <h3 className="text-sm font-semibold mb-2">💪 Strengths</h3>
+              <h3 className="text-sm font-semibold mb-2">{t('quizPlay.strengths')}</h3>
               <ul className="space-y-1">
                 {(matchedResult.strengths as string[]).map((s, i) => (
                   <li key={i} className="text-sm text-muted-foreground flex gap-2"><span>•</span>{s}</li>
@@ -227,7 +229,7 @@ export default function QuizPlay() {
           {/* Weaknesses */}
           {(matchedResult.weaknesses as string[])?.length > 0 && (
             <div className="bg-card rounded-xl p-4 border">
-              <h3 className="text-sm font-semibold mb-2">🔍 Areas to Improve</h3>
+              <h3 className="text-sm font-semibold mb-2">{t('quizPlay.weaknesses')}</h3>
               <ul className="space-y-1">
                 {(matchedResult.weaknesses as string[]).map((w, i) => (
                   <li key={i} className="text-sm text-muted-foreground flex gap-2"><span>•</span>{w}</li>
@@ -239,7 +241,7 @@ export default function QuizPlay() {
           {/* Suggestions */}
           {(matchedResult.suggestions as string[])?.length > 0 && (
             <div className="bg-card rounded-xl p-4 border">
-              <h3 className="text-sm font-semibold mb-2">✨ Suggestions</h3>
+              <h3 className="text-sm font-semibold mb-2">{t('quizPlay.suggestions')}</h3>
               <ul className="space-y-1">
                 {(matchedResult.suggestions as string[]).map((s, i) => (
                   <li key={i} className="text-sm text-muted-foreground flex gap-2"><span>•</span>{s}</li>
@@ -252,10 +254,10 @@ export default function QuizPlay() {
         {/* Fixed bottom bar */}
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t safe-bottom flex gap-3">
           <Button variant="outline" className="flex-1 h-12 rounded-xl" onClick={retake}>
-            <RotateCcw className="h-4 w-4 mr-2" />Retake
+            <RotateCcw className="h-4 w-4 mr-2" />{t('quizPlay.retake')}
           </Button>
           <Button className="flex-1 h-12 rounded-xl" onClick={shareResult}>
-            <Share2 className="h-4 w-4 mr-2" />Share
+            <Share2 className="h-4 w-4 mr-2" />{t('quizPlay.share')}
           </Button>
         </div>
       </div>
@@ -275,7 +277,7 @@ export default function QuizPlay() {
         </button>
         <div className="flex-1">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-muted-foreground font-medium">QUESTION {currentIdx + 1}/{questions.length}</span>
+            <span className="text-xs text-muted-foreground font-medium">{t('quizPlay.questionOf', { current: currentIdx + 1, total: questions.length })}</span>
           </div>
           <Progress value={progress} className="h-1.5" />
         </div>
@@ -323,7 +325,7 @@ export default function QuizPlay() {
         <div className="px-5 pb-6 safe-bottom">
           <Button className="w-full h-12 rounded-xl" onClick={advanceQuestion}
             disabled={!(selectedAnswer as string[])?.length}>
-            {currentIdx < questions.length - 1 ? 'Next' : 'See Results'}
+            {currentIdx < questions.length - 1 ? t('quizPlay.next') : t('quizPlay.seeResults')}
           </Button>
         </div>
       )}
