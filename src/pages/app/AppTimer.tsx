@@ -830,21 +830,21 @@ function AppTimerInner() {
                 className="fixed bottom-0 left-0 right-0 z-40 bg-background rounded-t-3xl px-6 pt-8 pb-8"
               >
                 <h2 className="text-2xl font-bold text-foreground text-center mb-6">
-                  How Pomodoro Technique Works?
+                  {t('timer.howItWorksTitle')}
                 </h2>
 
                 <div className="space-y-5 mb-8">
                   <p className="text-base text-foreground flex items-start gap-2">
-                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> Pomodoro Technique is a simple tool to boost focus and productivity.
+                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> {t('timer.howItWorksP1')}
                   </p>
                   <p className="text-base text-foreground flex items-start gap-2">
-                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> Work for 25 minutes, take a 5-minute break, and repeat.
+                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> {t('timer.howItWorksP2')}
                   </p>
                   <p className="text-base text-foreground flex items-start gap-2">
-                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> It's perfect for staying on track and avoiding burnout.
+                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> {t('timer.howItWorksP3')}
                   </p>
                   <p className="text-base text-foreground flex items-start gap-2">
-                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> Balancing work and rest is essential for long-term productivity.
+                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> {t('timer.howItWorksP4')}
                   </p>
                 </div>
 
@@ -852,7 +852,7 @@ function AppTimerInner() {
                   onClick={() => { setShowHowItWorks(false); haptic.light(); }}
                   className="w-full h-12 rounded-full bg-foreground text-background font-semibold text-base"
                 >
-                  Got it
+                  {t('timer.gotIt')}
                 </button>
               </motion.div>
             </>
