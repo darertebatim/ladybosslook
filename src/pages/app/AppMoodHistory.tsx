@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import { BackButton } from '@/components/app/BackButton';
 import { MoodCalendar } from '@/components/mood/MoodCalendar';
 import { SEOHead } from '@/components/SEOHead';
@@ -16,13 +17,7 @@ const MOOD_EMOJI: Record<string, string> = {
   bad: '😢',
 };
 
-const MOOD_LABELS: Record<string, string> = {
-  great: 'Great',
-  good: 'Good',
-  okay: 'Okay',
-  not_great: 'Not Great',
-  bad: 'Bad',
-};
+const MOOD_KEYS = ['great', 'good', 'okay', 'not_great', 'bad'] as const;
 
 const MOOD_BG: Record<string, string> = {
   great: 'bg-yellow-100',
@@ -33,6 +28,7 @@ const MOOD_BG: Record<string, string> = {
 };
 
 export default function AppMoodHistory() {
+  const { t } = useTranslation();
   const [selectedDay, setSelectedDay] = useState<{ date: Date; mood: MoodDay } | null>(null);
 
   const handleDaySelect = (date: Date, mood: MoodDay | undefined) => {
@@ -44,8 +40,8 @@ export default function AppMoodHistory() {
   return (
     <>
       <SEOHead 
-        title="Mood History | Rilo"
-        description="View your mood tracking history"
+        title={t('moodPage.historySeoTitle')}
+        description={t('moodPage.historySeoDescription')}
       />
       <div className="min-h-screen bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20">
         {/* Header */}
@@ -55,7 +51,7 @@ export default function AppMoodHistory() {
         >
           <div className="px-4 py-3 flex items-center gap-3">
             <BackButton to="/app/mood" />
-            <h1 className="text-xl font-semibold flex-1">Mood History</h1>
+            <h1 className="text-xl font-semibold flex-1">{t('moodPage.history')}</h1>
           </div>
         </header>
 
@@ -82,8 +78,8 @@ export default function AppMoodHistory() {
                     {format(selectedDay.date, 'EEEE, MMMM d')}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    Feeling {MOOD_LABELS[selectedDay.mood.mood] || selectedDay.mood.mood}
-                    {selectedDay.mood.count > 1 && ` • ${selectedDay.mood.count} check-ins`}
+                    {t('moodPage.feeling', { mood: t(`moodPage.moods.${selectedDay.mood.mood}`, { defaultValue: selectedDay.mood.mood }) })}
+                    {selectedDay.mood.count > 1 && ` • ${t('moodPage.checkInsCount', { count: selectedDay.mood.count })}`}
                   </p>
                 </div>
               </div>
@@ -92,12 +88,12 @@ export default function AppMoodHistory() {
 
           {/* Legend */}
           <div className="bg-card rounded-2xl p-4 shadow-ios border border-border/50">
-            <h3 className="text-sm font-medium text-muted-foreground mb-3">Mood Legend</h3>
+            <h3 className="text-sm font-medium text-muted-foreground mb-3">{t('moodPage.moodLegend')}</h3>
             <div className="flex flex-wrap gap-2">
-              {Object.entries(MOOD_LABELS).map(([value, label]) => (
+              {MOOD_KEYS.map((value) => (
                 <div key={value} className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-muted/50">
                   <FluentEmoji emoji={MOOD_EMOJI[value]} size={16} />
-                  <span className="text-xs font-medium">{label}</span>
+                  <span className="text-xs font-medium">{t(`moodPage.moods.${value}`)}</span>
                 </div>
               ))}
             </div>
