@@ -1012,7 +1012,7 @@ function AppTimerInner() {
           <input
             type="text"
             maxLength={50}
-            placeholder="Custom Themes"
+            placeholder={t('timer.customThemes')}
             value={customTheme}
             onChange={(e) => setCustomTheme(e.target.value)}
             className="text-center text-2xl font-semibold bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground/50 w-full mb-10"
