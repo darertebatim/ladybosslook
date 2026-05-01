@@ -607,9 +607,13 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
         <button
           onClick={onClose}
           style={{
-            width: '100%', marginTop: 8, padding: '8px 0',
-            background: 'none', border: 'none', cursor: preview ? 'default' : 'pointer',
-            color: 'rgba(26,31,61,0.6)', fontSize: 14, fontWeight: 600, fontFamily: SF,
+            width: '100%', marginTop: 10, padding: '12px 0',
+            background: 'rgba(255,255,255,0.6)',
+            border: `1.5px solid ${NAVY}`,
+            borderRadius: 24,
+            cursor: preview ? 'default' : 'pointer',
+            color: NAVY, fontSize: 15, fontWeight: 700, fontFamily: SF,
+            letterSpacing: -0.2,
           }}
           className="active:opacity-60 transition-opacity"
         >
