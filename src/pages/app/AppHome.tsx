@@ -121,7 +121,7 @@ const AppHome = () => {
   const [spotlightStep, setSpotlightStep] = useState<
     null | 'tap' | 'add' | 'complete'
   >(null);
-  const [hasWelcomeBanner, setHasWelcomeBanner] = useState(false);
+  const [, setHasWelcomeBanner] = useState(false);
   const { isKeyboardOpen } = useKeyboard();
   const { currentTrack } = useAudioPlayer();
   const hasMiniPlayer = !!currentTrack;
