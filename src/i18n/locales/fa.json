@@ -1649,5 +1649,46 @@
     "partOfPlusFull_pre": "این محتوا بخشی از ",
     "partOfPlusBrand": "سیمورا پلاس",
     "partOfPlusFull_post": " است. برای باز کردن مشترک شوید."
+  },
+  "breatheStatsPage": {
+    "seoTitle": "آمار تنفس - LadyBoss",
+    "seoDesc": "آمار تمرین‌های تنفسی شما",
+    "title": "آمار تنفس",
+    "noSessions": "هنوز جلسه‌ای نیست",
+    "noSessionsHint": "یک تمرین تنفسی کامل کنید تا آمارتان را ببینید",
+    "sessions": "جلسات",
+    "totalMinutes": "کل دقایق",
+    "dayStreak": "روزهای پیاپی",
+    "favorite": "محبوب",
+    "last7Days": "۷ روز اخیر",
+    "exerciseBreakdown": "تفکیک تمرین",
+    "sessionUnit": "جلسه",
+    "sessionUnitPlural": "جلسه",
+    "minShort": "دقیقه"
+  },
+  "actionStatsPage": {
+    "seoTitle": "آمار کارها - LadyBoss",
+    "seoDesc": "آمار تکمیل کارهای شما",
+    "title": "آمار کارها",
+    "progressBadge": "نشان پیشرفت",
+    "progressBadgeDesc": "حداقل یک کار برای برنز. ۲ کار برای نقره. ۳ کار برای طلا.",
+    "taskStats": "آمار کارها",
+    "goldBadge": "نشان طلا",
+    "silverBadge": "نشان نقره",
+    "bronzeBadge": "نشان برنز",
+    "days": "روز",
+    "day": "روز",
+    "dataThisYear": "داده‌های امسال",
+    "record": "رکورد",
+    "perfectDays": "روزهای کامل",
+    "bestStreaks": "بهترین رکوردها",
+    "tasksDoneTotal": "کل کارهای انجام‌شده",
+    "tasksDoneMonth": "کارهای این ماه",
+    "overallRate": "نرخ کلی",
+    "monthlyRate": "نرخ ماهانه"
+  },
+  "adminSupportPage": {
+    "support": "پشتیبانی",
+    "coach": "کوچ"
   }
 }

@@ -1649,5 +1649,46 @@
     "partOfPlusFull_pre": "This content is part of ",
     "partOfPlusBrand": "Simora Plus",
     "partOfPlusFull_post": ". Subscribe to unlock."
+  },
+  "breatheStatsPage": {
+    "seoTitle": "Breathe Stats - LadyBoss",
+    "seoDesc": "Your breathing exercise statistics",
+    "title": "Breathe Stats",
+    "noSessions": "No sessions yet",
+    "noSessionsHint": "Complete a breathing exercise to see your stats",
+    "sessions": "Sessions",
+    "totalMinutes": "Total Minutes",
+    "dayStreak": "Day Streak",
+    "favorite": "Favorite",
+    "last7Days": "Last 7 Days",
+    "exerciseBreakdown": "Exercise Breakdown",
+    "sessionUnit": "session",
+    "sessionUnitPlural": "sessions",
+    "minShort": "min"
+  },
+  "actionStatsPage": {
+    "seoTitle": "Task Stats - LadyBoss",
+    "seoDesc": "Your task completion statistics",
+    "title": "Task Stats",
+    "progressBadge": "Progress Badge",
+    "progressBadgeDesc": "Complete at least one task for Bronze. Reach 2 tasks for Silver. Finish 3 tasks to claim Gold.",
+    "taskStats": "Task Stats",
+    "goldBadge": "Gold Badge",
+    "silverBadge": "Silver Badge",
+    "bronzeBadge": "Bronze Badge",
+    "days": "days",
+    "day": "day",
+    "dataThisYear": "Data this year",
+    "record": "Record",
+    "perfectDays": "Perfect Days",
+    "bestStreaks": "Best Streaks",
+    "tasksDoneTotal": "Tasks Done Total",
+    "tasksDoneMonth": "Tasks Done This Month",
+    "overallRate": "Overall Rate",
+    "monthlyRate": "Monthly Rate"
+  },
+  "adminSupportPage": {
+    "support": "Support",
+    "coach": "Coach"
   }
 }
