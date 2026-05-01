@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TourStep, setGlobalTourActive } from '@/hooks/useFeatureTour';
 import { X, ChevronLeft, ChevronRight, AlarmClock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -35,6 +36,7 @@ export function TourOverlay({
   onSkip,
   onComplete,
 }: TourOverlayProps) {
+  const { t } = useTranslation();
   const [spotlightRect, setSpotlightRect] = useState<SpotlightRect | null>(null);
   const [tooltipStyle, setTooltipStyle] = useState<React.CSSProperties>({});
   const tooltipRef = useRef<HTMLDivElement>(null);
@@ -371,7 +373,7 @@ export function TourOverlay({
         <button
           onClick={handleSkip}
           className="absolute top-2 right-2 p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors active:scale-95 rounded-full hover:bg-muted/50"
-          aria-label="Skip tour"
+          aria-label={t('tour.skipAria')}
         >
           <X className="h-5 w-5" />
         </button>
@@ -380,9 +382,9 @@ export function TourOverlay({
         {currentStep.action && (
           <div className="flex items-center gap-1.5 text-xs text-indigo-600 font-medium mb-2">
             <AlarmClock className="h-3 w-3" />
-            {currentStep.action === 'tap' && 'Try tapping'}
-            {currentStep.action === 'swipe' && 'Try swiping'}
-            {currentStep.action === 'look' && 'Take a look'}
+            {currentStep.action === 'tap' && t('tour.tryTapping')}
+            {currentStep.action === 'swipe' && t('tour.trySwiping')}
+            {currentStep.action === 'look' && t('tour.takeALook')}
           </div>
         )}
 
@@ -424,7 +426,7 @@ export function TourOverlay({
               onClick={handleNext}
               className="h-9 px-4 active:scale-95"
             >
-              {isLastStep ? "Got it!" : "Next"}
+              {isLastStep ? t('tour.gotIt') : t('tour.next')}
               {!isLastStep && <ChevronRight className="h-4 w-4 ml-1" />}
             </Button>
           </div>
