@@ -19,7 +19,9 @@ import { Analytics } from '@/lib/firebaseAnalytics';
 
 export default function Auth() {
   const initialSearchParams = new URLSearchParams(window.location.search);
-  const [isLogin, setIsLogin] = useState(initialSearchParams.get('mode') !== 'signup');
+  // Default to SIGN UP. Apple/Google buttons handle both flows automatically;
+  // existing users tap "Already have an account? Log in here" to switch.
+  const [isLogin, setIsLogin] = useState(initialSearchParams.get('mode') === 'login');
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [email, setEmail] = useState('');
@@ -245,14 +247,14 @@ export default function Auth() {
                   ? 'Reset Password'
                   : showEmailForm
                     ? (isLogin ? 'Sign in with Email' : 'Sign up with Email')
-                    : 'Welcome to Rilo'}
+                    : (isLogin ? 'Welcome back' : 'Welcome to Rilo')}
               </h1>
               <p className="text-muted-foreground text-sm max-w-[28ch] mx-auto leading-relaxed">
                 {isForgotPassword
                   ? 'Enter your email to receive a password reset link'
                   : showEmailForm
                     ? (isLogin ? 'Enter your credentials to continue' : 'Create your account to get started')
-                    : 'Your day, back in your hands.'}
+                    : (isLogin ? 'Ready to pick up where you left off?' : 'Your day, back in your hands.')}
               </p>
             </div>
 
@@ -399,23 +401,24 @@ export default function Auth() {
               </form>
             )}
 
-            {/* Toggle Login/Signup */}
-            <div className="text-center pt-4">
-              <p className="text-muted-foreground text-sm">
-                {isLogin ? "Don't have an account? " : "Already have an account? "}
-                <Button
-                  type="button"
-                  variant="link"
-                  onClick={() => {
-                    setIsLogin(!isLogin);
-                    setIsForgotPassword(false);
-                  }}
-                  className="text-primary font-semibold p-0 h-auto"
-                >
-                  {isLogin ? 'Sign up!' : 'Log in!'}
-                </Button>
-              </p>
-            </div>
+            {/* Toggle Login/Signup — only on the social-buttons screen.
+                Apple/Google work identically for both flows; this just changes
+                what "Continue with Email" opens to. */}
+            {!showEmailForm && !isForgotPassword && (
+              <div className="text-center pt-2">
+                <p className="text-foreground text-sm font-semibold">
+                  {isLogin ? "New to Rilo? " : "Already have an account? "}
+                  <Button
+                    type="button"
+                    variant="link"
+                    onClick={() => setIsLogin(!isLogin)}
+                    className="text-primary font-bold p-0 h-auto underline underline-offset-4"
+                  >
+                    {isLogin ? 'Create one' : 'Log in here'}
+                  </Button>
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
