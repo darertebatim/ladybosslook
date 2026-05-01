@@ -216,42 +216,42 @@ export default function Auth() {
           })}
         </div>
 
-        {/* Hero brand block — big welcome headline + icon + tagline row */}
-        {!showEmailForm && (
-          <div className="flex-shrink-0 pt-10 pb-2 px-6 flex flex-col items-center text-center relative z-10">
-            <h1 className="text-[40px] leading-[1.05] font-bold tracking-tight text-[#1a1f3d]">
-              {isLogin ? 'Welcome back!' : 'Welcome to Rilo!'}
-            </h1>
-            <div className="mt-5 flex items-center gap-4">
-              <div className="w-[88px] h-[88px] rounded-[22px] overflow-hidden shadow-[0_20px_50px_-10px_rgba(232,74,111,0.45)] shrink-0">
-                <img
-                  src={riloAppIcon}
-                  alt="Rilo"
-                  className="w-full h-full object-cover select-none"
-                  draggable={false}
-                />
+        {/* Vertically-centered stack: hero + main content sit in the middle of the screen */}
+        <div className="flex-1 px-6 py-6 overflow-y-auto relative z-10 flex flex-col justify-center">
+          <div className="max-w-md w-full mx-auto space-y-7">
+            {/* Hero brand block — big welcome headline + icon + tagline row */}
+            {!showEmailForm && (
+              <div className="flex flex-col items-center text-center">
+                <h1 className="text-[40px] leading-[1.05] font-bold tracking-tight text-[#1a1f3d]">
+                  {isLogin ? 'Welcome back!' : 'Welcome to Rilo!'}
+                </h1>
+                <div className="mt-5 flex items-center gap-4">
+                  <div className="w-[88px] h-[88px] rounded-[22px] overflow-hidden shadow-[0_20px_50px_-10px_rgba(232,74,111,0.45)] shrink-0">
+                    <img
+                      src={riloAppIcon}
+                      alt="Rilo"
+                      className="w-full h-full object-cover select-none"
+                      draggable={false}
+                    />
+                  </div>
+                  <p className="text-left text-[17px] leading-[1.25] font-semibold text-[#1a1f3d]">
+                    Your <span className="text-[#F08A3E] font-bold">FREE</span>
+                    <br />
+                    Self Care Tracker
+                    <br />
+                    and Routine Planner
+                  </p>
+                </div>
               </div>
-              <p className="text-left text-[17px] leading-[1.25] font-semibold text-[#1a1f3d]">
-                Your <span className="text-[#F08A3E] font-bold">FREE</span>
-                <br />
-                Self Care Tracker
-                <br />
-                and Routine Planner
-              </p>
-            </div>
-          </div>
-        )}
-        {showEmailForm && (
-          <div className="flex-shrink-0 pt-10 pb-2 px-6 flex justify-center relative z-10">
-            <div className="w-16 h-16 rounded-[18px] overflow-hidden shadow-[0_16px_40px_-12px_rgba(232,74,111,0.4)]">
-              <img src={riloAppIcon} alt="Rilo" className="w-full h-full object-cover" />
-            </div>
-          </div>
-        )}
+            )}
+            {showEmailForm && (
+              <div className="flex justify-center">
+                <div className="w-16 h-16 rounded-[18px] overflow-hidden shadow-[0_16px_40px_-12px_rgba(232,74,111,0.4)]">
+                  <img src={riloAppIcon} alt="Rilo" className="w-full h-full object-cover" />
+                </div>
+              </div>
+            )}
 
-        {/* Main Content */}
-        <div className="flex-1 px-6 py-6 overflow-y-auto relative z-10">
-          <div className="max-w-md mx-auto space-y-6">
             {/* Back button - inside card for better reach */}
             {showEmailForm && (
               <div className="-mt-2 -ml-2 mb-2">
