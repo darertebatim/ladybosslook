@@ -1,5 +1,6 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 const DISMISSED_FEATURED_KEY = 'dismissed-featured-routines';
+import { useTranslation } from 'react-i18next';
 import { fetchSmartEstimates, type SmartEstimateInput } from '@/lib/smartEstimate';
 import { cn } from '@/lib/utils';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
@@ -102,6 +103,7 @@ function RoutineCardContent({
   onDeleteRoutine,
   onEditRoutine,
 }: RoutineCardProps) {
+  const { t } = useTranslation();
   const completion = getCompletionInfo(routine.routine_id);
   const allTasks = routineTasksMap?.[routine.routine_id] || [];
   const MAX_EMOJIS = 3;
@@ -128,7 +130,7 @@ function RoutineCardContent({
             <button
               onClick={(e) => { e.stopPropagation(); onEditRoutine(routine); }}
               className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center active:scale-95 transition-all"
-              title="Edit routine"
+              title={t('routinePlayer.editRoutine')}
             >
               <Pencil className="w-3.5 h-3.5 text-foreground/70" />
             </button>
@@ -137,7 +139,7 @@ function RoutineCardContent({
             <button
               onClick={(e) => { e.stopPropagation(); }}
               className="w-9 h-9 rounded-full bg-success/20 flex items-center justify-center"
-              title="Added to planner"
+              title={t('routinePlayer.addedToPlannerLabel')}
             >
               <Check className="w-4 h-4 text-success" />
             </button>
@@ -145,7 +147,7 @@ function RoutineCardContent({
             <button
               onClick={(e) => { e.stopPropagation(); onOpenAddSheet(routine); }}
               className="w-9 h-9 rounded-full bg-urgency flex items-center justify-center active:scale-95 transition-transform shadow-ios"
-              title="Add to planner"
+              title={t('routinePlayer.addToPlanner')}
             >
               <CalendarPlus className="w-4 h-4 text-urgency-foreground" />
             </button>
@@ -240,6 +242,7 @@ function SortableRoutineCard(props: RoutineCardProps) {
 }
 
 export default function AppRoutinePlayer() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -650,14 +653,14 @@ export default function AppRoutinePlayer() {
         .delete()
         .eq('id', routine.id);
 
-      toast.success(`"${routine.title}" deleted`);
+      toast.success(t('routinePlayer.routineDeleted', { title: routine.title }));
       queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
       queryClient.invalidateQueries({ queryKey: ['linkable-user-routines'] });
       queryClient.invalidateQueries({ queryKey: ['routine-user-tasks-emojis'] });
       queryClient.invalidateQueries({ queryKey: ['routine-user-task-ids'] });
       queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
     } catch (err) {
-      toast.error('Failed to delete routine');
+      toast.error(t('routinePlayer.deleteFailed'));
     }
     setDeleteRoutine(null);
   };
@@ -698,13 +701,13 @@ export default function AppRoutinePlayer() {
         editedTasks,
         syntheticTasks: [addSheetSyntheticTask],
       });
-      toast.success('Added to your planner! 📋');
+      toast.success(t('routinePlayer.addedToPlanner'));
       queryClient.invalidateQueries({ queryKey: ['added-routine-tasks'] });
       setShowAddSheet(false);
       setAddRoutineTarget(null);
     } catch (error) {
       console.error('Failed to add routine task:', error);
-      toast.error('Failed to add to planner');
+      toast.error(t('routinePlayer.addFailed'));
     }
   };
 
@@ -771,7 +774,7 @@ export default function AppRoutinePlayer() {
         await supabase.from('user_tasks').insert(userTasks);
       }
 
-      toast.success('Routine updated! ✨');
+      toast.success(t('routinePlayer.routineUpdated'));
       setShowBuilder(false);
       setBuilderEditRoutine(null);
 
@@ -788,7 +791,7 @@ export default function AppRoutinePlayer() {
       ]);
     } catch (err) {
       console.error('Failed to update routine:', err);
-      toast.error('Failed to update routine');
+      toast.error(t('routinePlayer.updateFailed'));
     }
   };
 
@@ -880,7 +883,7 @@ export default function AppRoutinePlayer() {
         });
       }
 
-      toast.success('Routine created! 🎉');
+      toast.success(t('routinePlayer.routineCreated'));
       setShowBuilderPreview(false);
       setBuilderResult(null);
       queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
@@ -890,7 +893,7 @@ export default function AppRoutinePlayer() {
       queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
     } catch (err) {
       console.error('Failed to create routine:', err);
-      toast.error('Failed to create routine');
+      toast.error(t('routinePlayer.createFailed'));
     }
   };
 
@@ -1187,7 +1190,7 @@ export default function AppRoutinePlayer() {
   const handleDeleteTask = useCallback((task: UserTask) => {
     setSelectedTask(null);
     deleteTask.mutate(task.id, {
-      onSuccess: () => toast.success('Task deleted'),
+      onSuccess: () => toast.success(t('routinePlayer.taskDeleted')),
     });
   }, [deleteTask]);
 
@@ -1209,7 +1212,7 @@ export default function AppRoutinePlayer() {
           </button>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500" />
-            <h1 className="text-base font-bold text-foreground">Routine Player</h1>
+            <h1 className="text-base font-bold text-foreground">{t('routinePlayer.title')}</h1>
           </div>
           <AddedToRoutineButton
             isAdded={!!isPageAdded}
@@ -1236,7 +1239,7 @@ export default function AppRoutinePlayer() {
 
               return activeRoutines.length > 0 ? (
               <section>
-                <p className="text-base font-bold text-foreground mb-3">My Routines</p>
+                <p className="text-base font-bold text-foreground mb-3">{t('routinePlayer.myRoutines')}</p>
                 <DndContext
                   sensors={routineSensors}
                   collisionDetection={closestCenter}
@@ -1304,8 +1307,8 @@ export default function AppRoutinePlayer() {
                     <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
                   </div>
                   <div className="text-left">
-                    <p className="text-[15px] font-bold text-foreground">Build Your Routine</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Design your perfect daily flow</p>
+                    <p className="text-[15px] font-bold text-foreground">{t('routinePlayer.buildYourRoutine')}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{t('routinePlayer.buildSubtitle')}</p>
                   </div>
                 </div>
               </div>
@@ -1315,9 +1318,9 @@ export default function AppRoutinePlayer() {
             {(myRoutines || []).length === 0 && (
               <div className="text-center py-8">
                 <FluentEmoji emoji="🎯" size={48} className="mx-auto mb-3" />
-                <h3 className="font-semibold text-foreground mb-1">No routines yet</h3>
+                <h3 className="font-semibold text-foreground mb-1">{t('routinePlayer.noRoutinesYet')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Create your own or browse the library
+                  {t('routinePlayer.noRoutinesHint')}
                 </p>
               </div>
             )}
@@ -1329,14 +1332,14 @@ export default function AppRoutinePlayer() {
                   <div className="flex items-center gap-2">
                     <CalendarPlus className="h-4 w-4 text-violet-500" />
                     <h2 className="text-sm font-semibold text-foreground/70 tracking-wide">
-                      Try a routine
+                      {t('routinePlayer.tryRoutine')}
                     </h2>
                   </div>
                   <button
                     onClick={() => navigate('/app/routines')}
                     className="text-xs text-primary font-medium flex items-center gap-0.5"
                   >
-                    All <ChevronRight className="h-3.5 w-3.5" />
+                    {t('routinePlayer.all')} <ChevronRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
                 <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4" style={{ WebkitOverflowScrolling: 'touch' }}>
@@ -1362,7 +1365,7 @@ export default function AppRoutinePlayer() {
                 onClick={() => navigate('/app/routines')}
                 className="w-full flex items-center justify-center gap-1 text-sm text-primary font-medium py-3"
               >
-                Browse Routines Library <ChevronRight className="w-4 h-4" />
+                {t('routinePlayer.browseLibrary')} <ChevronRight className="w-4 h-4" />
               </button>
             )}
           </div>
@@ -1389,7 +1392,7 @@ export default function AppRoutinePlayer() {
               <button
                 onClick={() => { haptic.light(); handleEditRoutine(preStartRoutine); }}
                 className="w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center active:scale-95 transition-all"
-                title="Edit routine"
+                title={t('routinePlayer.editRoutine')}
               >
                 <Pencil className="w-3.5 h-3.5 text-foreground/70" />
               </button>
@@ -1397,7 +1400,7 @@ export default function AppRoutinePlayer() {
                 <button
                   onClick={() => { haptic.light(); handleOpenAddSheet(preStartRoutine); }}
                   className="w-8 h-8 rounded-full bg-urgency flex items-center justify-center active:scale-95 transition-transform shadow-ios"
-                  title="Add to planner"
+                  title={t('routinePlayer.addToPlanner')}
                 >
                   <CalendarPlus className="w-3.5 h-3.5 text-urgency-foreground" />
                 </button>
@@ -1405,7 +1408,7 @@ export default function AppRoutinePlayer() {
               <button
                 onClick={() => { haptic.light(); setDeleteRoutine(preStartRoutine); }}
                 className="w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center active:scale-95 transition-all"
-                title="Delete routine"
+                title={t('routinePlayer.deleteRoutine')}
               >
                 <Trash2 className="w-3.5 h-3.5 text-destructive" />
               </button>
@@ -1429,7 +1432,7 @@ export default function AppRoutinePlayer() {
             ) : (
               <div className="text-center py-12">
                 <FluentEmoji emoji="📝" size={48} className="mx-auto mb-3" />
-                <p className="text-sm text-muted-foreground">No tasks found for this routine</p>
+                <p className="text-sm text-muted-foreground">{t('routinePlayer.noTasksFound')}</p>
               </div>
             )}
           </div>
@@ -1445,8 +1448,8 @@ export default function AppRoutinePlayer() {
             >
               <Play className="w-5 h-5 fill-current" />
               {plannerCompletedTaskIds.size > 0 && remainingTasks.length < routineFilteredTasks.length
-                ? `Resume (${remainingTasks.length} remaining)`
-                : 'Start'}
+                ? t('routinePlayer.resumeRemaining', { count: remainingTasks.length })
+                : t('routinePlayer.start')}
             </button>
           </div>
 
@@ -1481,21 +1484,21 @@ export default function AppRoutinePlayer() {
         <AlertDialogContent className="rounded-3xl max-w-[320px]">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-bold text-center leading-snug">
-              You've already completed this routine.
+              {t('routinePlayer.alreadyCompletedTitle')}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center text-muted-foreground">
-              Do you want to reset the existing data and run the routine again?
+              {t('routinePlayer.alreadyCompletedDesc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row gap-3 sm:justify-center">
             <AlertDialogCancel className="flex-1 rounded-full font-semibold">
-              Cancel
+              {t('routinePlayer.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleRestartRoutine}
               className="flex-1 rounded-full font-bold"
             >
-              Restart
+              {t('routinePlayer.restart')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1506,21 +1509,21 @@ export default function AppRoutinePlayer() {
         <AlertDialogContent className="rounded-3xl max-w-[320px]">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-bold text-center leading-snug">
-              Delete "{deleteRoutine?.title}"?
+              {t('routinePlayer.deleteTitle', { title: deleteRoutine?.title || '' })}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center text-muted-foreground">
-              This will remove the routine and all its tasks from your planner. This cannot be undone.
+              {t('routinePlayer.deleteDesc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row gap-3 sm:justify-center">
             <AlertDialogCancel className="flex-1 rounded-full font-semibold">
-              Cancel
+              {t('routinePlayer.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deleteRoutine && handleDeleteRoutine(deleteRoutine)}
               className="flex-1 rounded-full font-bold bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              {t('routinePlayer.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1535,7 +1538,7 @@ export default function AppRoutinePlayer() {
             if (!open) setAddRoutineTarget(null);
           }}
           tasks={[addSheetSyntheticTask]}
-          routineTitle={addRoutineTarget?.title || 'Routine'}
+          routineTitle={addRoutineTarget?.title || t('routinePlayer.fallbackRoutine')}
           onSave={handleSaveAddSheet}
           isSaving={addRoutinePlan.isPending}
         />
@@ -1548,7 +1551,7 @@ export default function AppRoutinePlayer() {
         tasks={[{
           id: 'synthetic-routineplayer-page',
           plan_id: 'synthetic-routineplayer-page',
-          title: 'My Routines',
+          title: t('routinePlayer.myRoutines'),
           icon: '🎯',
           color: 'amber',
           task_order: 0,
@@ -1559,7 +1562,7 @@ export default function AppRoutinePlayer() {
           pro_link_value: '/app/routineplayer',
           linked_playlist: null,
         }]}
-        routineTitle="My Routines"
+        routineTitle={t('routinePlayer.myRoutines')}
         onSave={async (selectedTaskIds, editedTasks) => {
           try {
             await addRoutinePlan.mutateAsync({
@@ -1567,7 +1570,7 @@ export default function AppRoutinePlayer() {
               syntheticTasks: [{
                 id: 'synthetic-routineplayer-page',
                 plan_id: 'synthetic-routineplayer-page',
-                title: 'My Routines',
+                title: t('routinePlayer.myRoutines'),
                 icon: '🎯',
                 color: 'amber',
                 task_order: 0,
@@ -1581,9 +1584,9 @@ export default function AppRoutinePlayer() {
               editedTasks,
             });
             setShowPageRoutineSheet(false);
-            toast.success('Added to your planner! 🎯');
+            toast.success(t('routinePlayer.addedToPlannerTarget'));
           } catch (error) {
-            toast.error('Failed to add to planner');
+            toast.error(t('routinePlayer.addFailed'));
           }
         }}
         isSaving={addRoutinePlan.isPending}

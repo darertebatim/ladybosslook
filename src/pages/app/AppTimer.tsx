@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { X, ArrowLeft, ChevronRight, ChevronLeft, Settings, CalendarPlus, Check, AlertCircle, Music, Maximize, Bell, Coffee, Timer as TimerIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
@@ -49,6 +50,7 @@ export default function AppTimer() {
 }
 
 function AppTimerInner() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const slideCtx = useSlideClose();
   const [screen, setScreen] = useState<Screen>('setup');
@@ -109,12 +111,12 @@ function AppTimerInner() {
         editedTasks,
         syntheticTasks: [SYNTHETIC_TIMER_TASK],
       });
-      toast.success('Focus Timer added to your routine!');
+      toast.success(t('timer.addedToRoutineToast'));
       setShowRoutineSheet(false);
       setJustAdded(true);
     } catch (error) {
       console.error('Failed to add routine:', error);
-      toast.error('Failed to add routine');
+      toast.error(t('timer.addRoutineFailed'));
     }
   };
 
@@ -453,7 +455,7 @@ function AppTimerInner() {
                 activeTab === 'timer' ? 'bg-foreground text-background' : 'text-muted-foreground'
               )}
             >
-              Timer
+              {t('timer.timer')}
             </button>
             <button
               onClick={() => { setActiveTab('pomodoro'); haptic.light(); }}
@@ -462,7 +464,7 @@ function AppTimerInner() {
                 activeTab === 'pomodoro' ? 'bg-foreground text-background' : 'text-muted-foreground'
               )}
             >
-              Pomodoro
+              {t('timer.pomodoro')}
             </button>
           </div>
           <button onClick={() => { setScreen('stats'); haptic.light(); }} className="p-2 -mr-2">
@@ -521,7 +523,7 @@ function AppTimerInner() {
               <span className="text-6xl font-bold text-foreground tracking-tight">
                 {formatTime(minutes * 60)}
               </span>
-              <span className="text-sm text-muted-foreground mt-1">tap to adjust</span>
+              <span className="text-sm text-muted-foreground mt-1">{t('timer.tapToAdjust')}</span>
             </button>
           </div>
 
@@ -547,7 +549,7 @@ function AppTimerInner() {
             onClick={startTimer}
             className="flex-1 h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
           >
-            {activeTab === 'pomodoro' ? 'Start Focus' : 'Start Timer'}
+            {activeTab === 'pomodoro' ? t('timer.startFocus') : t('timer.startTimer')}
           </button>
           <button
             onClick={handleRoutineClick}
@@ -571,7 +573,7 @@ function AppTimerInner() {
           open={showRoutineSheet}
           onOpenChange={setShowRoutineSheet}
           tasks={[SYNTHETIC_TIMER_TASK]}
-          routineTitle="Focus Timer"
+          routineTitle={t('timer.focusTimer')}
           onSave={handleSaveRoutine}
           isSaving={addRoutinePlan.isPending}
         />
@@ -593,12 +595,12 @@ function AppTimerInner() {
             onClick={() => { setScreen('setup'); haptic.light(); }}
             className="text-base font-semibold text-foreground pr-2"
           >
-            Save
+            {t('timer.save')}
           </button>
         </div>
 
         <div className="px-5 pt-2 pb-4">
-          <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('timer.settings')}</h1>
         </div>
 
         {/* Timer / Pomodoro tabs */}
@@ -611,7 +613,7 @@ function AppTimerInner() {
                 settingsTab === 'timer' ? 'bg-foreground text-background' : 'text-muted-foreground'
               )}
             >
-              Timer
+              {t('timer.timer')}
             </button>
             <button
               onClick={() => { setSettingsTab('pomodoro'); haptic.light(); }}
@@ -620,7 +622,7 @@ function AppTimerInner() {
                 settingsTab === 'pomodoro' ? 'bg-foreground text-background' : 'text-muted-foreground'
               )}
             >
-              Pomodoro
+              {t('timer.pomodoro')}
             </button>
           </div>
         </div>
@@ -630,7 +632,7 @@ function AppTimerInner() {
           <div className="bg-muted/50 rounded-2xl p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Bell className="h-5 w-5 text-foreground" />
-              <span className="text-base font-medium text-foreground">Reminders</span>
+              <span className="text-base font-medium text-foreground">{t('timer.reminders')}</span>
             </div>
             <Switch
               checked={remindersEnabled}
@@ -643,7 +645,7 @@ function AppTimerInner() {
         {settingsTab === 'pomodoro' && (
           <>
             <div className="px-5 mb-3">
-              <h2 className="text-lg font-bold text-foreground">Pomodoro Technique</h2>
+              <h2 className="text-lg font-bold text-foreground">{t('timer.pomodoroTechnique')}</h2>
             </div>
 
             <div className="px-5 mb-6">
@@ -655,10 +657,10 @@ function AppTimerInner() {
                 >
                   <div className="flex items-center gap-3">
                     <TimerIcon className="h-5 w-5 text-foreground" />
-                    <span className="text-base font-medium text-foreground">Pomodoro Cycle</span>
+                    <span className="text-base font-medium text-foreground">{t('timer.pomodoroCycle')}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <span className="text-sm text-muted-foreground">{pomodoroCycles} sessions</span>
+                    <span className="text-sm text-muted-foreground">{t('timer.sessions', { count: pomodoroCycles })}</span>
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </button>
@@ -670,10 +672,10 @@ function AppTimerInner() {
                 >
                   <div className="flex items-center gap-3">
                     <Coffee className="h-5 w-5 text-foreground" />
-                    <span className="text-base font-medium text-foreground">Short Break</span>
+                    <span className="text-base font-medium text-foreground">{t('timer.shortBreak')}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <span className="text-sm text-muted-foreground">{breakMinutes} mins</span>
+                    <span className="text-sm text-muted-foreground">{t('timer.mins', { count: breakMinutes })}</span>
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </button>
@@ -687,7 +689,7 @@ function AppTimerInner() {
                 onClick={() => { setShowHowItWorks(true); haptic.light(); }}
                 className="w-full text-center text-sm font-medium text-foreground underline underline-offset-2"
               >
-                How Pomodoro Technique Works?
+                {t('timer.howItWorksLink')}
               </button>
             </div>
           </>
@@ -711,7 +713,7 @@ function AppTimerInner() {
                   <button onClick={() => setShowCyclePicker(false)}>
                     <X className="h-5 w-5 text-foreground" />
                   </button>
-                  <span className="text-base font-semibold text-foreground">Pomodoro Cycle</span>
+                  <span className="text-base font-semibold text-foreground">{t('timer.pomodoroCycle')}</span>
                   <div className="w-5" />
                 </div>
 
@@ -730,14 +732,14 @@ function AppTimerInner() {
                         n === pomodoroCycles ? "text-foreground" : "text-muted-foreground/50"
                       )}>{n}</span>
                       {n === pomodoroCycles && (
-                        <span className="text-base text-muted-foreground">session</span>
+                        <span className="text-base text-muted-foreground">{t('timer.session')}</span>
                       )}
                     </button>
                   ))}
                 </div>
 
                 <p className="text-center text-sm text-muted-foreground px-8 pb-4">
-                  Typically, every 4 pomodoros establish a deep focus rhythm.
+                  {t('timer.cycleHint')}
                 </p>
 
                 <div className="px-5 pb-8">
@@ -745,7 +747,7 @@ function AppTimerInner() {
                     onClick={() => { setShowCyclePicker(false); haptic.medium(); }}
                     className="w-full h-12 rounded-full bg-foreground text-background font-semibold text-base"
                   >
-                    OK
+                    {t('timer.ok')}
                   </button>
                 </div>
               </motion.div>
@@ -771,7 +773,7 @@ function AppTimerInner() {
                   <button onClick={() => setShowBreakPicker(false)}>
                     <X className="h-5 w-5 text-foreground" />
                   </button>
-                  <span className="text-base font-semibold text-foreground">Short Break</span>
+                  <span className="text-base font-semibold text-foreground">{t('timer.shortBreak')}</span>
                   <div className="w-5" />
                 </div>
 
@@ -790,14 +792,14 @@ function AppTimerInner() {
                         n === breakMinutes ? "text-foreground" : "text-muted-foreground/50"
                       )}>{n}</span>
                       {n === breakMinutes && (
-                        <span className="text-base text-muted-foreground">min</span>
+                        <span className="text-base text-muted-foreground">{t('timer.min')}</span>
                       )}
                     </button>
                   ))}
                 </div>
 
                 <p className="text-center text-sm text-muted-foreground px-8 pb-4">
-                  A short break after each Pomodoro helps refresh your mind and boost creativity.
+                  {t('timer.breakHint')}
                 </p>
 
                 <div className="px-5 pb-8">
@@ -805,7 +807,7 @@ function AppTimerInner() {
                     onClick={() => { setShowBreakPicker(false); haptic.medium(); }}
                     className="w-full h-12 rounded-full bg-foreground text-background font-semibold text-base"
                   >
-                    OK
+                    {t('timer.ok')}
                   </button>
                 </div>
               </motion.div>
@@ -828,21 +830,21 @@ function AppTimerInner() {
                 className="fixed bottom-0 left-0 right-0 z-40 bg-background rounded-t-3xl px-6 pt-8 pb-8"
               >
                 <h2 className="text-2xl font-bold text-foreground text-center mb-6">
-                  How Pomodoro Technique Works?
+                  {t('timer.howItWorksTitle')}
                 </h2>
 
                 <div className="space-y-5 mb-8">
                   <p className="text-base text-foreground flex items-start gap-2">
-                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> Pomodoro Technique is a simple tool to boost focus and productivity.
+                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> {t('timer.howItWorksP1')}
                   </p>
                   <p className="text-base text-foreground flex items-start gap-2">
-                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> Work for 25 minutes, take a 5-minute break, and repeat.
+                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> {t('timer.howItWorksP2')}
                   </p>
                   <p className="text-base text-foreground flex items-start gap-2">
-                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> It's perfect for staying on track and avoiding burnout.
+                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> {t('timer.howItWorksP3')}
                   </p>
                   <p className="text-base text-foreground flex items-start gap-2">
-                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> Balancing work and rest is essential for long-term productivity.
+                    <FluentEmoji emoji="🍅" size={20} className="mt-0.5 shrink-0" /> {t('timer.howItWorksP4')}
                   </p>
                 </div>
 
@@ -850,7 +852,7 @@ function AppTimerInner() {
                   onClick={() => { setShowHowItWorks(false); haptic.light(); }}
                   className="w-full h-12 rounded-full bg-foreground text-background font-semibold text-base"
                 >
-                  Got it
+                  {t('timer.gotIt')}
                 </button>
               </motion.div>
             </>
@@ -877,7 +879,7 @@ function AppTimerInner() {
 
         <div className="flex-1 flex flex-col items-center justify-center px-6">
           <h2 className="text-xl font-semibold text-foreground mb-16">
-            {isPomodoro ? 'Adjust the Pomodoro time' : 'Adjust the time'}
+            {isPomodoro ? t('timer.adjustPomodoroTime') : t('timer.adjustTime')}
           </h2>
 
           {/* Triangle pointer */}
@@ -899,7 +901,7 @@ function AppTimerInner() {
               className="text-2xl font-semibold"
               style={{ color: isPomodoro ? 'hsl(0, 70%, 68%)' : 'hsl(var(--muted-foreground))' }}
             >
-              min
+              {t('timer.min')}
             </span>
           </div>
 
@@ -988,7 +990,7 @@ function AppTimerInner() {
             onClick={() => { setScreen('setup'); haptic.medium(); }}
             className="relative w-full h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
           >
-            Done
+            {t('timer.done')}
           </button>
         </div>
       </div>
@@ -1010,7 +1012,7 @@ function AppTimerInner() {
           <input
             type="text"
             maxLength={50}
-            placeholder="Custom Themes"
+            placeholder={t('timer.customThemes')}
             value={customTheme}
             onChange={(e) => setCustomTheme(e.target.value)}
             className="text-center text-2xl font-semibold bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground/50 w-full mb-10"
@@ -1116,7 +1118,7 @@ function AppTimerInner() {
                   <button onClick={(e) => { e.stopPropagation(); setShowSoundPicker(false); }}>
                     <X className="h-5 w-5 text-foreground" />
                   </button>
-                  <span className="text-base font-semibold text-foreground">White Noise</span>
+                  <span className="text-base font-semibold text-foreground">{t('timer.whiteNoise')}</span>
                   <div className="w-5" />
                 </div>
 
@@ -1141,7 +1143,7 @@ function AppTimerInner() {
                         </div>
                       </div>
                     </div>
-                    <span className="text-base font-medium text-foreground flex-1 text-left">Music off</span>
+                    <span className="text-base font-medium text-foreground flex-1 text-left">{t('timer.musicOff')}</span>
                     {!selectedSoundId && (
                       <div className="w-6 h-6 rounded-full border-[5px] border-foreground" />
                     )}
@@ -1239,7 +1241,7 @@ function AppTimerInner() {
                 <div className="w-6 h-0.5 rounded-full bg-white/20" />
               </div>
               <p className="text-white/30 text-sm mt-3">
-                {activeTab === 'pomodoro' ? `Round ${pomodoroRound + 1} of ${pomodoroCycles}` : (customTheme || selectedTheme)}
+                {activeTab === 'pomodoro' ? t('timer.roundOf', { round: pomodoroRound + 1, total: pomodoroCycles }) : (customTheme || selectedTheme)}
               </p>
             </>
           )}
@@ -1247,7 +1249,7 @@ function AppTimerInner() {
 
         {/* Hold to stop */}
         <div className="absolute left-0 right-0 px-10 flex flex-col items-center gap-3" style={{ bottom: 'max(64px, calc(env(safe-area-inset-bottom) + 32px))' }}>
-          <p className="text-white/40 text-sm">Hold to stop timer</p>
+          <p className="text-white/40 text-sm">{t('timer.holdToStop')}</p>
           <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
             <motion.div
               className="h-full rounded-full bg-white/60"
@@ -1270,11 +1272,11 @@ function AppTimerInner() {
       >
         <FluentEmoji emoji="🍅" size={56} className="mb-8" />
         <h1 className="text-3xl font-extrabold text-white text-center leading-tight mb-2">
-          You've been focusing for{' '}
-          <span className="text-[hsl(var(--primary))]">{minutes} min</span>.
+          {t('timer.youveBeenFocusing')}{' '}
+          <span className="text-[hsl(var(--primary))]">{t('timer.minutesShort', { count: minutes })}</span>.
         </h1>
         <h1 className="text-3xl font-extrabold text-white text-center leading-tight">
-          Time for a short break.
+          {t('timer.timeForBreak')}
         </h1>
 
         <div className="absolute left-0 right-0 px-8" style={{ bottom: 'max(48px, calc(env(safe-area-inset-bottom) + 24px))' }}>
@@ -1282,7 +1284,7 @@ function AppTimerInner() {
             onClick={() => { haptic.medium(); startPomodoroBreak(); }}
             className="w-full h-14 rounded-full bg-white text-black font-semibold text-base transition-transform active:scale-[0.97]"
           >
-            Take a break
+            {t('timer.takeABreak')}
           </button>
         </div>
       </motion.div>
@@ -1308,12 +1310,12 @@ function AppTimerInner() {
           ))}
         </div>
 
-        <p className="text-white/50 text-sm mb-2">Break time</p>
+        <p className="text-white/50 text-sm mb-2">{t('timer.breakTime')}</p>
         <span className="text-6xl font-bold text-white mb-4" style={{ fontVariantNumeric: 'tabular-nums' }}>
           {breakTimeStr}
         </span>
         <p className="text-white/40 text-sm">
-          Round {nextRoundRef.current + 1} starts soon
+          {t('timer.roundStartsSoon', { round: nextRoundRef.current + 1 })}
         </p>
 
         {/* Skip break */}
@@ -1326,7 +1328,7 @@ function AppTimerInner() {
           }}
           className="mt-10 px-6 py-3 rounded-full bg-white/10 text-white font-semibold text-sm transition-transform active:scale-[0.97]"
         >
-          Skip break
+          {t('timer.skipBreak')}
         </button>
       </motion.div>
     );
@@ -1342,10 +1344,10 @@ function AppTimerInner() {
       >
         <FluentEmoji emoji="🍅" size={56} className="mb-8" />
         <h1 className="text-3xl font-extrabold text-center leading-tight mb-1">
-          <span className="text-[hsl(var(--primary))]">Break's over!</span>
+          <span className="text-[hsl(var(--primary))]">{t('timer.breaksOver')}</span>
         </h1>
         <h1 className="text-3xl font-extrabold text-white text-center leading-tight">
-          Time to dive into your next Pomodoro session!
+          {t('timer.diveIntoNext')}
         </h1>
 
         <div className="absolute left-0 right-0 px-8" style={{ bottom: 'max(48px, calc(env(safe-area-inset-bottom) + 24px))' }}>
@@ -1353,7 +1355,7 @@ function AppTimerInner() {
             onClick={() => { haptic.medium(); startPomodoroRound(nextRoundRef.current); }}
             className="w-full h-14 rounded-full bg-white text-black font-semibold text-base transition-transform active:scale-[0.97]"
           >
-            Start focus
+            {t('timer.startFocusBtn')}
           </button>
         </div>
       </motion.div>
@@ -1373,18 +1375,18 @@ function AppTimerInner() {
         <div className="w-16 h-16 rounded-full bg-foreground flex items-center justify-center mb-6">
           <Check className="h-8 w-8 text-background" />
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 text-center">Wow! You did it!</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-2 text-center">{t('timer.wow')}</h1>
         <p className="text-muted-foreground text-center mb-10">
           {activeTab === 'pomodoro'
-            ? `Celebrate your progress—${totalFocusMin} minutes of focus completed`
-            : 'Celebrate your progress!'}
+            ? t('timer.celebratePomodoro', { count: totalFocusMin })
+            : t('timer.celebrateProgress')}
         </p>
         <div className="w-full max-w-xs flex flex-col gap-3">
           <button
             onClick={() => { haptic.success(); setScreen('setup'); }}
             className="w-full h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
           >
-            I'm doing great!
+            {t('timer.doingGreat')}
           </button>
           <FocusShareButton minutes={totalFocusMin} mode={activeTab} />
         </div>
@@ -1403,13 +1405,13 @@ function AppTimerInner() {
         <div className="w-16 h-16 rounded-full bg-foreground flex items-center justify-center mb-6">
           <AlertCircle className="h-8 w-8 text-background" />
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2 text-center">Relax! Every effort counts!</h1>
-        <p className="text-muted-foreground text-center mb-10">Let's continue when you're ready.</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2 text-center">{t('timer.relax')}</h1>
+        <p className="text-muted-foreground text-center mb-10">{t('timer.continueWhenReady')}</p>
         <button
           onClick={() => { haptic.light(); setScreen('setup'); }}
           className="w-full max-w-xs h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
         >
-          Got it!
+          {t('timer.gotItBang')}
         </button>
       </motion.div>
     );
