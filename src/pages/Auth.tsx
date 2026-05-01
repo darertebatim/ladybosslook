@@ -446,47 +446,29 @@ export default function Auth() {
           </div>
         </div>
 
-        {/* Marquee social-proof strip — absolutely positioned at the bottom so
-            it never affects the centered auth stack above. Hidden whenever
-            the email form is open or the keyboard is up. */}
+        {/* Bottom social-proof layer — quiet, static, in its own layer so the
+            centered auth stack above is untouched. Hidden when the email form
+            is open or the keyboard is up. */}
         {!showEmailForm && !isForgotPassword && !isKeyboardOpen && (
           <div
-            className="pointer-events-none absolute left-0 right-0 z-10 space-y-2"
-            style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}
+            className="pointer-events-none absolute left-0 right-0 z-10 px-6 flex flex-col items-center gap-2.5"
+            style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 18px)' }}
           >
-            {/* Track 1 — promise */}
-            <div className="overflow-hidden mask-fade-x">
-              <div className="flex w-max animate-marquee-slow whitespace-nowrap">
-                {Array.from({ length: 2 }).map((_, i) => (
-                  <div key={i} className="flex items-center shrink-0">
-                    <span className="px-4 text-[13px] font-semibold text-[#1a1f3d]">
-                      Build a self-care routine that actually sticks.
-                    </span>
-                    <span className="text-[#E84A6F]">•</span>
-                    <span className="px-4 text-[13px] font-semibold text-[#1a1f3d]">
-                      Feel more in control of your day — in 5 minutes.
-                    </span>
-                    <span className="text-[#E84A6F]">•</span>
-                  </div>
-                ))}
-              </div>
+            {/* Social-proof pill */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/70 backdrop-blur-md border border-white/70 shadow-[0_8px_24px_-12px_rgba(26,31,61,0.25)]">
+              <span className="text-[13px]">⭐</span>
+              <span className="text-[12px] font-bold text-[#1a1f3d]">
+                10,000+ women building their routine
+              </span>
             </div>
 
-            {/* Track 2 — social proof, faster, opposite-feeling rhythm */}
-            <div className="overflow-hidden mask-fade-x">
-              <div className="flex w-max animate-marquee-fast whitespace-nowrap">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="flex items-center shrink-0">
-                    <span className="px-4 text-[12px] font-bold text-[#B8590E]">
-                      ⭐ 10,000+ women building their routine
-                    </span>
-                    <span className="text-[#F08A3E]">✦</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Single tagline — outcome promise */}
+            <p className="text-[11.5px] leading-tight font-medium text-[#1a1f3d]/70 text-center max-w-[34ch]">
+              Feel more in control of your day — in 5 minutes.
+            </p>
           </div>
         )}
+
 
       </div>
     </>
