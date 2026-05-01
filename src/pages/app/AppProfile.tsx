@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -84,6 +85,7 @@ const GOAL_OPTIONS = [
 
 const AppProfile = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -378,7 +380,7 @@ const AppProfile = () => {
       >
         <div className="pt-3 pb-1 px-4 flex items-center">
           <BackButton to="/app" className="text-foreground" />
-          <h1 className="font-semibold text-lg flex-1 text-center mr-8">Profile</h1>
+          <h1 className="font-semibold text-lg flex-1 text-center mr-8">{t('profile.title')}</h1>
         </div>
 
         {/* Avatar + Name + Bio */}
@@ -404,7 +406,7 @@ const AppProfile = () => {
               </div>
             )}
           </button>
-          <h2 className="font-bold text-lg mt-3">{p?.full_name || 'User'}</h2>
+          <h2 className="font-bold text-lg mt-3">{p?.full_name || t('profile.user')}</h2>
           <p className="text-sm text-muted-foreground">{user?.email}</p>
           {p?.bio && <p className="text-xs text-muted-foreground mt-1 px-8 text-center line-clamp-2">{p.bio}</p>}
         </div>

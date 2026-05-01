@@ -22,9 +22,11 @@ import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { toast } from 'sonner';
 import { useShareContent } from '@/hooks/useShareContent';
 import { SlideUpPage } from '@/components/app/SlideUpPage';
+import { useTranslation } from 'react-i18next';
 
 export default function AppBreathe() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const { data: exercises, isLoading } = useBreathingExercises();
   
@@ -142,7 +144,7 @@ export default function AppBreathe() {
       <div className="min-h-0 bg-background">
         {/* Header */}
         <AppHeader
-          title="Breathe"
+          title={t('tools.breathe.title')}
           showBack
           backTo="/app/home"
           rightAction={

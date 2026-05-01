@@ -1,6 +1,7 @@
 // AppHome - Main home page component
 import { useState, useMemo, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -69,6 +70,7 @@ const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
 
 const AppHome = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { scrollRef: homeScrollRef } = useScrollRestore('home_scroll', { autoSave: true });
   const {
@@ -943,7 +945,7 @@ const AppHome = () => {
                 </div>
               ) : (
                 <h1 className="text-lg font-bold text-foreground flex items-center gap-1">
-                  {isToday(selectedDate) ? 'Today' : format(selectedDate, 'MMM d')}
+                  {isToday(selectedDate) ? t('home.today') : format(selectedDate, 'MMM d')}
                   <Star className="h-2.5 w-2.5 text-[#EF4444] fill-[#EF4444]" />
                 </h1>
               )}
@@ -1222,19 +1224,19 @@ const AppHome = () => {
                               className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
                             >
                               <Search className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
-                              Browse Library
+                              {t('home.browseLibrary')}
                             </button>
                           </div>
                         </>
                       ) : (
                         <div className="flex flex-col items-center justify-center py-10 gap-3">
                           <FluentEmoji emoji="🎬" size={40} />
-                          <p className="text-sm text-muted-foreground text-center">No routine launchers yet</p>
+                          <p className="text-sm text-muted-foreground text-center">{t('home.noRoutineLaunchers')}</p>
                           <button
                             onClick={() => navigate('/app/routineplayer')}
                             className="text-sm font-medium text-primary"
                           >
-                            Set up your first routine →
+                            {t('home.setUpFirstRoutine')}
                           </button>
                         </div>
                       )}
@@ -1374,14 +1376,14 @@ const AppHome = () => {
                     <div className="flex items-center gap-2">
                       <CalendarPlus className="h-4 w-4 text-violet-500" />
                       <h2 className="text-sm font-semibold text-foreground/70 tracking-wide">
-                        Try a routine
+                        {t('home.tryRoutine')}
                       </h2>
                     </div>
                     <button
                       onClick={() => navigate('/app/routines')}
                       className="text-xs text-primary font-medium flex items-center gap-0.5"
                     >
-                      All <ChevronRight className="h-3.5 w-3.5" />
+                      {t('home.all')} <ChevronRight className="h-3.5 w-3.5" />
                     </button>
                   </div>
                   <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide snap-x snap-mandatory scroll-pl-4" style={{ WebkitOverflowScrolling: 'touch' }}>
