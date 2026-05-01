@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import { BUILD_INFO, getDisplayBuildInfo } from "@/lib/buildInfo";
 import { format } from "date-fns";
 
