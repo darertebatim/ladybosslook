@@ -376,6 +376,28 @@ export default function System() {
             </CardContent>
           </Card>
 
+          {/* Replay Welcome Spotlight */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5" />
+                Replay Welcome Spotlight
+              </CardTitle>
+              <CardDescription>
+                Re-runs the Quick-Start onboarding flow that includes the
+                3-step starter routine spotlight (select task → add task →
+                complete task). Clears the completion + progress flags for
+                the current device only.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={handleReplayWelcomeSpotlight}>
+                <Sparkles className="h-4 w-4 mr-2" />
+                Replay Welcome Spotlight
+              </Button>
+            </CardContent>
+          </Card>
+
           {/* Complete Reset */}
           <Card>
             <CardHeader>
