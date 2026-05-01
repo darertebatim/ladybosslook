@@ -541,7 +541,7 @@ export default function AppCoachChat() {
                   </div>
                   
                   <p className="text-muted-foreground text-[15px] mb-1">
-                    {getGreeting().text} {getGreeting().emoji}
+                    {getGreeting(t).text} {getGreeting(t).emoji}
                   </p>
                   <h2 className="font-semibold text-xl mb-3">Your personal coach is here</h2>
                   
@@ -587,7 +587,7 @@ export default function AppCoachChat() {
                         <div className="flex items-center justify-center my-4">
                           <div className="px-3 py-1 rounded-full bg-muted/60 backdrop-blur-sm">
                             <span className="text-xs font-medium text-muted-foreground">
-                              {getDateLabel(new Date(msg.created_at))}
+                              {getDateLabel(new Date(msg.created_at), t)}
                             </span>
                           </div>
                         </div>
