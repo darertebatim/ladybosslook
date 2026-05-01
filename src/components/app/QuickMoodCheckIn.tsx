@@ -54,6 +54,7 @@ interface QuickMoodCheckInProps {
 
 export function QuickMoodCheckIn({ open, onOpenChange }: QuickMoodCheckInProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const createMoodLog = useCreateMoodLog();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -70,9 +71,9 @@ export function QuickMoodCheckIn({ open, onOpenChange }: QuickMoodCheckInProps) 
       });
       
       haptic.success();
-      toast.success('Mood logged!', {
+      toast.success(t('homePlanner.moodLogged'), {
         action: {
-          label: 'Write more',
+          label: t('reflections.freeForm'),
           onClick: () => navigate(`/app/reflections/free-form?mood=${moodValue}`),
         },
       });
