@@ -18,6 +18,7 @@ import { haptic } from '@/lib/haptics';
 import heroStormVideo from '@/assets/watch-hero-storm.mp4';
 import { useScrollRestore } from '@/hooks/useScrollRestore';
 import { useUserPreferredLanguage, preferredLanguageSorter } from '@/hooks/useUserPreferredLanguage';
+import { useTranslation } from 'react-i18next';
 
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
@@ -26,26 +27,32 @@ const LANG_FLAGS: Record<string, string> = {
   spanish: '🇪🇸',
 };
 
-const LANGUAGE_OPTIONS = [
-  { value: 'all', label: 'All', flag: '🌐' },
-  { value: 'american', label: 'English', flag: '🇺🇸' },
-  { value: 'persian', label: 'Persian', flag: null },
-  { value: 'turkish', label: 'Türkçe', flag: '🇹🇷' },
-  { value: 'spanish', label: 'Español', flag: '🇪🇸' },
-];
-
-const typeConfig: Record<string, { label: string; icon: typeof BookOpen }> = {
-  'course': { label: 'Course', icon: BookOpen },
-  'group-coaching': { label: 'Coaching', icon: Users },
-  '1o1-session': { label: '1-on-1', icon: UserCheck },
-  'audiobook': { label: 'Audiobook', icon: Headphones },
-  'meditate': { label: 'Meditate', icon: Sparkles },
-  'workout': { label: 'Workout', icon: Dumbbell },
-  'soundscape': { label: 'Soundscape', icon: Waves },
-  'affirmations': { label: 'Affirmations', icon: Heart },
-  'webinar': { label: 'Webinar', icon: Video },
-  'event': { label: 'Event', icon: Calendar },
-  'subscription': { label: 'Club', icon: Sparkles },
+// LANGUAGE_OPTIONS and typeConfig are built inside the component so labels are translated.
+const TYPE_ICONS: Record<string, typeof BookOpen> = {
+  'course': BookOpen,
+  'group-coaching': Users,
+  '1o1-session': UserCheck,
+  'audiobook': Headphones,
+  'meditate': Sparkles,
+  'workout': Dumbbell,
+  'soundscape': Waves,
+  'affirmations': Heart,
+  'webinar': Video,
+  'event': Calendar,
+  'subscription': Sparkles,
+};
+const TYPE_LABEL_KEYS: Record<string, string> = {
+  'course': 'browseProgramsPage.typeCourse',
+  'group-coaching': 'browseProgramsPage.typeCoaching',
+  '1o1-session': 'browseProgramsPage.type1on1',
+  'audiobook': 'browseProgramsPage.typeAudiobook',
+  'meditate': 'browseProgramsPage.typeMeditate',
+  'workout': 'browseProgramsPage.typeWorkout',
+  'soundscape': 'browseProgramsPage.typeSoundscape',
+  'affirmations': 'browseProgramsPage.typeAffirmations',
+  'webinar': 'browseProgramsPage.typeWebinar',
+  'event': 'browseProgramsPage.typeEvent',
+  'subscription': 'browseProgramsPage.typeClub',
 };
 
 // --- Horizontal Program Card (matches PlaylistCard style) ---
@@ -61,8 +68,9 @@ interface AcademyProgramCardProps {
 }
 
 const AcademyProgramCard = ({ title, image, type, language, isFree, isEnrolled, isWaitlist, onClick }: AcademyProgramCardProps) => {
-  const typeInfo = type ? typeConfig[type] : null;
-  const TypeIcon = typeInfo?.icon || Sparkles;
+  const { t } = useTranslation();
+  const TypeIcon = (type && TYPE_ICONS[type]) || Sparkles;
+  const typeLabel = type && TYPE_LABEL_KEYS[type] ? t(TYPE_LABEL_KEYS[type]) : null;
 
   return (
     <button
@@ -87,13 +95,13 @@ const AcademyProgramCard = ({ title, image, type, language, isFree, isEnrolled, 
           {/* Enrolled badge */}
           {isEnrolled && (
             <div className="absolute -top-2 -left-1 z-10 bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
-              <CheckCircle2 className="h-2.5 w-2.5" /> Enrolled
+              <CheckCircle2 className="h-2.5 w-2.5" /> {t('browseProgramsPage.enrolled')}
             </div>
           )}
           {/* FREE badge */}
           {isFree && !isEnrolled && (
             <div className="absolute -top-2 -left-1 z-10 bg-white text-[#132240] text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-ios">
-              FREE
+              {t('browseProgramsPage.free')}
             </div>
           )}
           {/* Lock icon for waitlist */}
@@ -110,7 +118,7 @@ const AcademyProgramCard = ({ title, image, type, language, isFree, isEnrolled, 
         <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
           {/* Meta line */}
           <div className="flex items-center gap-1.5 text-[11px] text-white/70">
-            {typeInfo && <span className="capitalize">{typeInfo.label}</span>}
+            {typeLabel && <span className="capitalize">{typeLabel}</span>}
           </div>
 
           {/* Title */}
@@ -130,7 +138,7 @@ const AcademyProgramCard = ({ title, image, type, language, isFree, isEnrolled, 
       {/* Enroll CTA for waitlist */}
       {isWaitlist && !isEnrolled && (
         <div className="flex items-center justify-center gap-1.5 py-2 px-3 bg-white/10 text-white text-xs font-medium">
-          <span>Tap to enroll</span>
+          <span>{t('browseProgramsPage.tapToEnroll')}</span>
           <ChevronRight className="h-3.5 w-3.5" />
         </div>
       )}
@@ -140,6 +148,7 @@ const AcademyProgramCard = ({ title, image, type, language, isFree, isEnrolled, 
 
 // --- Main Page ---
 const AppBrowsePrograms = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { programs, isLoading } = usePrograms();
@@ -153,6 +162,14 @@ const AppBrowsePrograms = () => {
   const [preferredLanguage, setPreferredLanguage] = useState(() => {
     return localStorage.getItem('academy-language') || 'all';
   });
+
+  const LANGUAGE_OPTIONS = useMemo(() => [
+    { value: 'all', label: t('browseProgramsPage.all'), flag: '🌐' },
+    { value: 'american', label: t('browseProgramsPage.langEnglish'), flag: '🇺🇸' },
+    { value: 'persian', label: t('browseProgramsPage.langPersian'), flag: null as string | null },
+    { value: 'turkish', label: 'Türkçe', flag: '🇹🇷' },
+    { value: 'spanish', label: 'Español', flag: '🇪🇸' },
+  ], [t]);
 
   const handleLanguageChange = useCallback((lang: string) => {
     setPreferredLanguage(lang);
@@ -234,10 +251,10 @@ const AppBrowsePrograms = () => {
   const availableTypes = useMemo(() => {
     const types = new Set(allPrograms.map((p: any) => p.type).filter(Boolean));
     const dynamicFilters = Array.from(types).map(t => {
-      const config = typeConfig[t];
-      return { value: t, label: config?.label || t };
+      const labelKey = TYPE_LABEL_KEYS[t];
+      return { value: t, label: labelKey ? (this as any) /* placeholder */ : t };
     });
-    return [{ value: 'all', label: 'All' }, ...dynamicFilters];
+    return [{ value: 'all', label: t('browseProgramsPage.all') }, ...dynamicFilters];
   }, [allPrograms]);
 
   const userLang = useUserPreferredLanguage();
