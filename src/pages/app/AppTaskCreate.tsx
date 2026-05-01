@@ -157,6 +157,7 @@ const TimePickerSheet = ({
   timePeriod: TimePeriod | null;
   onSave: (time: string | null, period: TimePeriod | null) => void;
 }) => {
+  const { t } = useTranslation();
   const [localTime, setLocalTime] = useState<string | null>(scheduledTime);
   const [localPeriod, setLocalPeriod] = useState<TimePeriod | null>(timePeriod);
 
