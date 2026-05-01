@@ -54,7 +54,13 @@
     "noRoutineLaunchers": "No routine launchers yet",
     "setUpFirstRoutine": "Set up your first routine →",
     "tryRoutine": "Try a routine",
-    "all": "All"
+    "all": "All",
+    "myRoutines": "My Routines",
+    "myTasks": "My Tasks",
+    "addTask": "Add task",
+    "dailyChecklist": "Your daily checklist",
+    "emptyTasks": "Nothing here yet — add your first task!",
+    "addTodayHint": "Add things you need to get done today"
   },
   "planner": {
     "today": "Today",

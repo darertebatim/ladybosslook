@@ -54,7 +54,13 @@
     "noRoutineLaunchers": "هنوز روتینی اضافه نکرده‌ای",
     "setUpFirstRoutine": "اولین روتینت را بساز ←",
     "tryRoutine": "یک روتین را امتحان کن",
-    "all": "همه"
+    "all": "همه",
+    "myRoutines": "روتین‌های من",
+    "myTasks": "کارهای من",
+    "addTask": "افزودن کار",
+    "dailyChecklist": "چک‌لیست امروز تو",
+    "emptyTasks": "هنوز چیزی نیست — اولین کارت رو اضافه کن!",
+    "addTodayHint": "کارهایی که باید امروز انجام بدی رو اضافه کن"
   },
   "planner": {
     "today": "امروز",

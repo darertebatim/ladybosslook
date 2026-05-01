@@ -1182,7 +1182,7 @@ const AppHome = () => {
                           homeView === 'routines' ? 'text-foreground' : 'text-fg-warm-muted dark:text-white/40'
                         )}
                       >
-                        My Routines
+                        {t('home.myRoutines')}
                       </button>
                        <button
                          ref={btnTasksRef}
@@ -1192,13 +1192,13 @@ const AppHome = () => {
                            homeView === 'tasks' ? 'text-foreground' : 'text-fg-warm-muted dark:text-white/40'
                          )}
                        >
-                        <Zap className="h-2.5 w-2.5 fill-amber-400 text-amber-400 shrink-0" /> My Tasks
+                        <Zap className="h-2.5 w-2.5 fill-amber-400 text-amber-400 shrink-0" /> {t('home.myTasks')}
                        </button>
                      </div>
                       <div className="flex items-center gap-2 mr-2">
                         <button
                           onClick={handleFabClick}
-                          aria-label="Add task"
+                          aria-label={t('home.addTask')}
                           className="coach-add-btn w-6 h-6 rounded-full bg-brand text-white shadow-[0_4px_12px_hsl(var(--brand-primary)/0.4)] flex items-center justify-center active:scale-90 transition-transform"
                         >
                           <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
@@ -1265,11 +1265,11 @@ const AppHome = () => {
                       )}
                       <div className="text-center px-4">
                         <p className="text-sm font-medium text-foreground">
-                          {homeView === 'one-time' ? "Your daily checklist" : 'Nothing here yet — add your first task!'}
+                          {homeView === 'one-time' ? t('home.dailyChecklist') : t('home.emptyTasks')}
                         </p>
                         {homeView === 'one-time' && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            Add things you need to get done today
+                            {t('home.addTodayHint')}
                           </p>
                         )}
                       </div>
