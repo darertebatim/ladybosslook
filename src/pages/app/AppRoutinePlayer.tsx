@@ -701,13 +701,13 @@ export default function AppRoutinePlayer() {
         editedTasks,
         syntheticTasks: [addSheetSyntheticTask],
       });
-      toast.success('Added to your planner! 📋');
+      toast.success(t('routinePlayer.addedToPlanner'));
       queryClient.invalidateQueries({ queryKey: ['added-routine-tasks'] });
       setShowAddSheet(false);
       setAddRoutineTarget(null);
     } catch (error) {
       console.error('Failed to add routine task:', error);
-      toast.error('Failed to add to planner');
+      toast.error(t('routinePlayer.addFailed'));
     }
   };
 
