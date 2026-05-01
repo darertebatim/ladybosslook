@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Headphones, List, Lock, CheckCircle, Play, CalendarPlus, Check, Download, CheckCircle2, Share2 } from "lucide-react";
 import { BackButton } from "@/components/app/BackButton";
@@ -33,6 +34,7 @@ import { CachedImage } from "@/components/ui/CachedImage";
 import { useShareContent } from "@/hooks/useShareContent";
 
 export default function AppAudioPlayer() {
+  const { t } = useTranslation();
   const { audioId } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -552,7 +554,7 @@ export default function AppAudioPlayer() {
               size="icon"
               className="h-10 w-10 text-fg-warm hover:bg-foreground/10"
               onClick={handleShare}
-              aria-label="Share"
+              aria-label={t('audioPlayerPage.share')}
             >
               <Share2 className="h-5 w-5" />
             </Button>
@@ -574,7 +576,7 @@ export default function AppAudioPlayer() {
                 }
               }}
               disabled={isCheckingTask}
-              title={existingTask ? "Go to planner" : "Add to my routines"}
+              title={existingTask ? t('audioPlayerPage.goToPlanner') : t('audioPlayerPage.addToRoutines')}
             >
               {existingTask ? (
                 <Check className="h-5 w-5 text-emerald-400" />
