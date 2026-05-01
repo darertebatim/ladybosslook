@@ -1344,10 +1344,10 @@ function AppTimerInner() {
       >
         <FluentEmoji emoji="🍅" size={56} className="mb-8" />
         <h1 className="text-3xl font-extrabold text-center leading-tight mb-1">
-          <span className="text-[hsl(var(--primary))]">Break's over!</span>
+          <span className="text-[hsl(var(--primary))]">{t('timer.breaksOver')}</span>
         </h1>
         <h1 className="text-3xl font-extrabold text-white text-center leading-tight">
-          Time to dive into your next Pomodoro session!
+          {t('timer.diveIntoNext')}
         </h1>
 
         <div className="absolute left-0 right-0 px-8" style={{ bottom: 'max(48px, calc(env(safe-area-inset-bottom) + 24px))' }}>
@@ -1355,7 +1355,7 @@ function AppTimerInner() {
             onClick={() => { haptic.medium(); startPomodoroRound(nextRoundRef.current); }}
             className="w-full h-14 rounded-full bg-white text-black font-semibold text-base transition-transform active:scale-[0.97]"
           >
-            Start focus
+            {t('timer.startFocusBtn')}
           </button>
         </div>
       </motion.div>
