@@ -1007,7 +1007,10 @@ const AppHome = () => {
 
             {/* Welcome Spotlight Banner — invites the user to take the 3-step tour */}
             <WelcomeSpotlightBanner
-              onStart={() => setSpotlightStep('tap')}
+              onStart={() => {
+                spotlightFinishedRef.current = false;
+                setSpotlightStep('tap');
+              }}
               onVisibilityChange={setHasWelcomeBanner}
             />
 
