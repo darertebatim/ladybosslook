@@ -216,20 +216,29 @@ export default function Auth() {
           })}
         </div>
 
-        {/* Top brand bar — Rilo app icon (no mascot) */}
+        {/* Hero brand block — big welcome headline + icon + tagline row */}
         {!showEmailForm && (
-          <div className="flex-shrink-0 pt-12 pb-2 px-6 flex flex-col items-center relative z-10">
-            <div className="w-20 h-20 rounded-[22px] overflow-hidden shadow-[0_20px_50px_-10px_rgba(232,74,111,0.45)]">
-              <img
-                src={riloAppIcon}
-                alt="Rilo"
-                className="w-full h-full object-cover select-none"
-                draggable={false}
-              />
+          <div className="flex-shrink-0 pt-10 pb-2 px-6 flex flex-col items-center text-center relative z-10">
+            <h1 className="text-[40px] leading-[1.05] font-bold tracking-tight text-[#1a1f3d]">
+              {isLogin ? 'Welcome back!' : 'Welcome to Rilo!'}
+            </h1>
+            <div className="mt-5 flex items-center gap-4">
+              <div className="w-[88px] h-[88px] rounded-[22px] overflow-hidden shadow-[0_20px_50px_-10px_rgba(232,74,111,0.45)] shrink-0">
+                <img
+                  src={riloAppIcon}
+                  alt="Rilo"
+                  className="w-full h-full object-cover select-none"
+                  draggable={false}
+                />
+              </div>
+              <p className="text-left text-[17px] leading-[1.25] font-semibold text-[#1a1f3d]">
+                Your <span className="text-[#F08A3E] font-bold">FREE</span>
+                <br />
+                Self Care Tracker
+                <br />
+                and Routine Planner
+              </p>
             </div>
-            <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-[#B8590E]">
-              ✨ {isLogin ? 'Welcome back' : 'Welcome to Rilo'}
-            </p>
           </div>
         )}
         {showEmailForm && (
@@ -258,16 +267,16 @@ export default function Auth() {
             
             {/* Title — bold dark navy like the teach screens */}
             <div className="text-center space-y-2">
-              <h1 className="text-[28px] leading-[1.15] font-bold tracking-tight text-[#1a1f3d] whitespace-pre-line">
-                {isForgotPassword
-                  ? 'Reset your\npassword'
-                  : showEmailForm
-                    ? (isLogin ? 'Sign in with email' : 'Create your account')
-                    : (isLogin ? 'Pick up where\nyou left off' : 'Your day,\nback in your hands.')}
-              </h1>
+              {(showEmailForm || isForgotPassword) && (
+                <h1 className="text-[26px] leading-[1.15] font-bold tracking-tight text-[#1a1f3d]">
+                  {isForgotPassword
+                    ? 'Reset your password'
+                    : (isLogin ? 'Sign in with email' : 'Create your account')}
+                </h1>
+              )}
               {!showEmailForm && !isForgotPassword && (
-                <p className="mt-2 text-[13px] font-semibold text-[#1a1f3d]/60">
-                  <span className="text-[#1a1f3d]">3,000+</span> women already plan their day here.
+                <p className="text-[15px] font-semibold text-[#1a1f3d]">
+                  Your day, back in your hands.
                 </p>
               )}
               {(showEmailForm || isForgotPassword) && (
