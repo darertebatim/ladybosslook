@@ -130,7 +130,7 @@ function RoutineCardContent({
             <button
               onClick={(e) => { e.stopPropagation(); onEditRoutine(routine); }}
               className="w-9 h-9 rounded-full bg-background/60 flex items-center justify-center active:scale-95 transition-all"
-              title="Edit routine"
+              title={t('routinePlayer.editRoutine')}
             >
               <Pencil className="w-3.5 h-3.5 text-foreground/70" />
             </button>
@@ -139,7 +139,7 @@ function RoutineCardContent({
             <button
               onClick={(e) => { e.stopPropagation(); }}
               className="w-9 h-9 rounded-full bg-success/20 flex items-center justify-center"
-              title="Added to planner"
+              title={t('routinePlayer.addedToPlannerLabel')}
             >
               <Check className="w-4 h-4 text-success" />
             </button>
@@ -147,7 +147,7 @@ function RoutineCardContent({
             <button
               onClick={(e) => { e.stopPropagation(); onOpenAddSheet(routine); }}
               className="w-9 h-9 rounded-full bg-urgency flex items-center justify-center active:scale-95 transition-transform shadow-ios"
-              title="Add to planner"
+              title={t('routinePlayer.addToPlanner')}
             >
               <CalendarPlus className="w-4 h-4 text-urgency-foreground" />
             </button>
