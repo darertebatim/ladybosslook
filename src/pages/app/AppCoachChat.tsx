@@ -410,15 +410,15 @@ export default function AppCoachChat() {
             <div className="flex items-center gap-1 pt-3 pb-2 px-4">
               <Button variant="ghost" onClick={handleBack} className="-ml-2 h-10 px-2 gap-0.5 text-foreground bg-transparent active:opacity-70">
                 <ChevronLeft className="h-7 w-7" />
-                <span className="text-[17px]">Back</span>
+                <span className="text-[17px]">{t("chatPage.back")}</span>
               </Button>
               <div className="flex items-center gap-3">
                 <div className="h-11 w-11 rounded-full bg-muted border border-border flex items-center justify-center">
                   <GraduationCap className="h-5 w-5 text-foreground" />
                 </div>
                 <div>
-                  <h1 className="font-semibold text-[17px]">Coach</h1>
-                  <p className="text-[13px] text-muted-foreground">Loading...</p>
+                  <h1 className="font-semibold text-[17px]">{t("chatPage.coach.title")}</h1>
+                  <p className="text-[13px] text-muted-foreground">{t("chatPage.loading")}</p>
                 </div>
               </div>
             </div>
@@ -442,15 +442,15 @@ export default function AppCoachChat() {
             <div className="flex items-center gap-1 pt-3 pb-2 px-4">
               <Button variant="ghost" onClick={handleBack} className="-ml-2 h-10 px-2 gap-0.5 text-foreground bg-transparent active:opacity-70">
                 <ChevronLeft className="h-7 w-7" />
-                <span className="text-[17px]">Back</span>
+                <span className="text-[17px]">{t("chatPage.back")}</span>
               </Button>
               <div className="flex items-center gap-3">
                 <div className="h-11 w-11 rounded-full bg-muted border border-border flex items-center justify-center">
                   <GraduationCap className="h-5 w-5 text-foreground" />
                 </div>
                 <div>
-                  <h1 className="font-semibold text-[17px]">Coach</h1>
-                  <p className="text-[13px] text-muted-foreground">Private chat</p>
+                  <h1 className="font-semibold text-[17px]">{t("chatPage.coach.title")}</h1>
+                  <p className="text-[13px] text-muted-foreground">{t("chatPage.coach.headerStatus")}</p>
                 </div>
               </div>
             </div>
@@ -460,9 +460,9 @@ export default function AppCoachChat() {
             <div className="h-20 w-20 rounded-full bg-muted border border-border flex items-center justify-center mb-5">
               <Lock className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h2 className="font-semibold text-xl mb-2">Chat with Coach is Locked</h2>
+            <h2 className="font-semibold text-xl mb-2">{t("chatPage.coach.lockedTitle")}</h2>
             <p className="text-muted-foreground text-[15px] max-w-xs">
-              This feature hasn't been unlocked for your account yet. Contact support if you believe this is a mistake.
+              {t("chatPage.coach.lockedDescription")}
             </p>
           </div>
         </div>
@@ -488,7 +488,7 @@ export default function AppCoachChat() {
           <div className="flex items-center gap-1 pt-3 pb-2 px-4">
             <Button variant="ghost" onClick={handleBack} className="-ml-2 h-10 px-2 gap-0.5 text-foreground bg-transparent active:opacity-70">
               <ChevronLeft className="h-7 w-7" />
-              <span className="text-[17px]">Back</span>
+              <span className="text-[17px]">{t("chatPage.back")}</span>
             </Button>
             <div className="flex items-center gap-3">
               <div className="relative">
@@ -498,9 +498,9 @@ export default function AppCoachChat() {
                 <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-background" />
               </div>
               <div>
-                <h1 className="font-semibold text-[17px]">Coach</h1>
+                <h1 className="font-semibold text-[17px]">{t("chatPage.coach.title")}</h1>
                 <p className="text-[13px] text-muted-foreground">
-                  {conversation?.status === 'resolved' ? 'Resolved' : 'This conversation is private'}
+                  {conversation?.status === 'resolved' ? t("chatPage.coach.resolved") : t("chatPage.coach.headerStatus")}
                 </p>
               </div>
             </div>
@@ -543,15 +543,15 @@ export default function AppCoachChat() {
                   <p className="text-muted-foreground text-[15px] mb-1">
                     {getGreeting(t).text} {getGreeting(t).emoji}
                   </p>
-                  <h2 className="font-semibold text-xl mb-3">Your personal coach is here</h2>
+                  <h2 className="font-semibold text-xl mb-3">{t("chatPage.coach.emptyTitle")}</h2>
                   
                   <p className="text-[15px] text-muted-foreground leading-relaxed max-w-[280px] mx-auto">
-                    Get personalized guidance, track your progress, and reach your goals faster.
+                    {t("chatPage.coach.emptyDescription")}
                   </p>
                 </div>
                 
                 <div className="w-full max-w-sm mb-6">
-                  <p className="text-[13px] text-muted-foreground/70 mb-3">Tap to start a conversation</p>
+                  <p className="text-[13px] text-muted-foreground/70 mb-3">{t("chatPage.tapToStart")}</p>
                   <div className="grid grid-cols-2 gap-2">
                     {conversationStarters.map((starter, index) => (
                       <button
@@ -568,7 +568,7 @@ export default function AppCoachChat() {
                 </div>
                 
                 <p className="text-[13px] text-muted-foreground/60 max-w-[260px] leading-relaxed">
-                  Your coach checks in throughout the day. Feel free to share anything! 🎓
+                  {t("chatPage.coach.footer")}
                 </p>
               </div>
             ) : (
@@ -602,7 +602,7 @@ export default function AppCoachChat() {
                         attachmentName={msg.attachment_name}
                         attachmentType={msg.attachment_type}
                         isBroadcast={msg.is_broadcast}
-                        senderName="Your Coach"
+                        senderName={t("chatPage.coach.senderName")}
                         showAvatar={showAvatar}
                         isFirstInGroup={firstInGrp}
                         isLastInGroup={lastInGrp}
@@ -636,7 +636,7 @@ export default function AppCoachChat() {
               onSend={handleSendMessage} 
               disabled={sending}
               uploading={uploading}
-              placeholder="Message your coach..."
+              placeholder={t("chatPage.coach.placeholder")}
             />
           </div>
         </div>
