@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { Keyboard } from '@capacitor/keyboard';
+import { useTranslation } from 'react-i18next';
 
 // Secondary (darker) palette for bottom sections
 const TASK_COLORS_DARK: Record<string, string> = {
@@ -116,6 +117,7 @@ export function RoutineBuilderSheet({
   onEditSave,
   onNavigateToRoutine,
 }: RoutineBuilderSheetProps) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [step, setStep] = useState<1 | 2>(1);
   const [routineTitle, setRoutineTitle] = useState(initialTitle);
@@ -584,6 +586,7 @@ export function RoutineBuilderSheet({
                       }
                     }}
                     placeholder="Type routine name..."
+                    // i18n
                     className="w-full bg-transparent text-[15px] font-semibold text-black dark:text-foreground placeholder:text-black/40 dark:placeholder:text-muted-foreground/50 outline-none"
                     enterKeyHint={step === 1 ? 'next' : 'done'}
                     autoComplete="off"
