@@ -947,7 +947,40 @@
   },
   "breathePage": {
     "shareAria": "اشتراک‌گذاری تنفس",
-    "routineTitle": "روتین تنفسی"
+    "routineTitle": "روتین تنفسی",
+    "addedToRoutines": "{{name}} به روتین‌هایت اضافه شد!",
+    "addRoutineFailed": "افزودن به روتین ناموفق بود",
+    "switchLayout": "تغییر چیدمان",
+    "minutes": "دقیقه",
+    "cycles": "دوره",
+    "minShort": "{{count}} دقیقه",
+    "cyclesShort": "{{count}}×",
+    "ready": "آماده",
+    "paused": "متوقف",
+    "inhale": "دم",
+    "exhale": "بازدم",
+    "hold": "نگه‌دار",
+    "nose": "بینی",
+    "mouth": "دهان",
+    "doneSuffix": "انجام شد",
+    "totalSuffix": "کل",
+    "start": "شروع",
+    "pause": "توقف",
+    "resume": "ادامه",
+    "okay": "باشه",
+    "complete": {
+      "headerEmoji": "🧘",
+      "summary": "{{name}} · {{duration}}",
+      "title": "آفرین! قدم بعدی در سفرت چیست؟",
+      "continueRoutine": "ادامه روتین ▶",
+      "backToHome": "بازگشت به خانه",
+      "actions": {
+        "writeReflection": "نوشتن تأمل",
+        "selfReflection": "تأمل شخصی",
+        "startMyPlan": "شروع برنامه‌ام",
+        "talk": "گفت‌وگو"
+      }
+    }
   },
   "reflectionsPage": {
     "shareAria": "اشتراک‌گذاری تأملات",
