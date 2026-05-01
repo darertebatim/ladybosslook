@@ -79,8 +79,10 @@ import {
 } from "@/lib/localNotifications";
 import DOMPurify from "dompurify";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 const AppCourseDetail = () => {
+  const { t } = useTranslation();
   const { slug, roundId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -137,7 +139,7 @@ const AppCourseDetail = () => {
           .delete()
           .eq("user_id", user.id)
           .eq("program_slug", slug);
-        toast.success("Removed from waitlist");
+        toast.success(t('courseDetailPage.removedFromWaitlist'));
       } else {
         await supabase
           .from("program_waitlist")
@@ -188,7 +190,7 @@ const AppCourseDetail = () => {
       }
       refetchWaitlist();
     } catch {
-      toast.error("Something went wrong");
+      toast.error(t('courseDetailPage.somethingWrong'));
     } finally {
       setJoiningWaitlist(false);
     }
@@ -550,10 +552,10 @@ const AppCourseDetail = () => {
         }
 
         if (result.success) {
-          toast.success("Session added to your calendar!");
+          toast.success(t('courseDetailPage.sessionAddedToCalendar'));
           markSessionSynced(nextSession.id, result.calendarEventId);
         } else if (result.error === "Calendar permission denied") {
-          toast.error("Please allow calendar access in Settings");
+          toast.error(t('courseDetailPage.allowCalendarAccess'));
         } else {
           // Fallback to share sheet if native calendar fails
           const icsContent = generateICSFile(event);
@@ -572,17 +574,17 @@ const AppCourseDetail = () => {
             dialogTitle: "Add Event to Calendar",
           });
 
-          toast.success("Select Calendar app to add event");
+          toast.success(t('courseDetailPage.selectCalendarApp'));
           markSessionSynced(nextSession.id);
         }
       } catch (error) {
         console.error("Error adding calendar event:", error);
-        toast.error("Failed to add to calendar");
+        toast.error(t('courseDetailPage.failedAddCalendar'));
       }
     } else {
       // Web: Download ICS file
       downloadICSFile(event, `${program.title.replace(/\s+/g, "-")}.ics`);
-      toast.success("Calendar event downloaded!");
+      toast.success(t('courseDetailPage.calendarDownloaded'));
       markSessionSynced(nextSession.id);
     }
   };
@@ -650,7 +652,7 @@ const AppCourseDetail = () => {
 
     const events = generateAllSessionEvents();
     if (events.length === 0) {
-      toast.error("No sessions to sync");
+      toast.error(t('courseDetailPage.noSessions'));
       return;
     }
 
@@ -679,13 +681,13 @@ const AppCourseDetail = () => {
           markAllSessionsSynced(sessionIds, calEventIdMap);
           setHasNewSessions(false);
         } else if (result.error === "Calendar permission denied") {
-          toast.error("Please allow calendar access in Settings");
+          toast.error(t('courseDetailPage.allowCalendarAccess'));
         } else {
           toast.error(result.error || "Failed to sync sessions");
         }
       } catch (error) {
         console.error("Error syncing sessions:", error);
-        toast.error("Failed to sync sessions");
+        toast.error(t('courseDetailPage.failedSyncSessions'));
       } finally {
         setIsSyncingAllSessions(false);
       }
@@ -704,7 +706,7 @@ const AppCourseDetail = () => {
         icsEvents[0],
         `${program.title.replace(/\s+/g, "-")}-sessions.ics`,
       );
-      toast.success("Calendar file downloaded!");
+      toast.success(t('courseDetailPage.calendarFileDownloaded'));
       // Mark all sessions as synced for web too
       const sessionIds = dbSessions?.map((s) => s.id) || [];
       markAllSessionsSynced(sessionIds);
@@ -769,14 +771,14 @@ const AppCourseDetail = () => {
         });
 
         if (result.success) {
-          toast.success("Urgent alarm set!");
+          toast.success(t('courseDetailPage.urgentAlarmSet'));
           markSessionSynced(session.id);
         } else {
           toast.error(result.error || "Failed to set alarm");
         }
       } catch (error) {
         console.error("Error setting urgent alarm:", error);
-        toast.error("Failed to set alarm");
+        toast.error(t('courseDetailPage.failedSetAlarm'));
       }
       setAddingSessionId(null);
       return;
@@ -809,16 +811,16 @@ const AppCourseDetail = () => {
         }
 
         if (result.success) {
-          toast.success("Session added to calendar!");
+          toast.success(t('courseDetailPage.sessionAddedShort'));
           markSessionSynced(session.id, result.calendarEventId);
         } else if (result.error === "Calendar permission denied") {
-          toast.error("Please allow calendar access in Settings");
+          toast.error(t('courseDetailPage.allowCalendarAccess'));
         } else {
           toast.error(result.error || "Failed to add session");
         }
       } catch (error) {
         console.error("Error adding session:", error);
-        toast.error("Failed to add to calendar");
+        toast.error(t('courseDetailPage.failedAddCalendar'));
       }
     } else {
       downloadICSFile(
@@ -831,7 +833,7 @@ const AppCourseDetail = () => {
         },
         `${session.title.replace(/\s+/g, "-")}.ics`,
       );
-      toast.success("Calendar file downloaded!");
+      toast.success(t('courseDetailPage.calendarFileDownloaded'));
       markSessionSynced(session.id);
     }
 
@@ -843,7 +845,7 @@ const AppCourseDetail = () => {
     setSessionSettings(settings);
 
     if (!dbSessions || dbSessions.length === 0) {
-      toast.success("Session reminder settings saved");
+      toast.success(t('courseDetailPage.reminderSettingsSaved'));
       return;
     }
 
@@ -878,15 +880,15 @@ const AppCourseDetail = () => {
           scheduledCount++;
         }
       }
-      toast.success(`Reminders set for ${scheduledCount} sessions`);
+      toast.success(t('courseDetailPage.remindersSetForSessions', { count: scheduledCount }));
     } else if (!settings.enabled) {
       // Cancel all session reminders
       for (const session of dbSessions) {
         await cancelTaskReminder(`program-session-${session.id}`);
       }
-      toast.success("Session reminders disabled");
+      toast.success(t('courseDetailPage.sessionRemindersDisabled'));
     } else {
-      toast.success("Session reminder settings saved");
+      toast.success(t('courseDetailPage.reminderSettingsSaved'));
     }
   };
 
@@ -900,7 +902,7 @@ const AppCourseDetail = () => {
         ? playlistTracks
         : [];
     if (!items || items.length === 0) {
-      toast.success("Content reminder settings saved");
+      toast.success(t('courseDetailPage.contentReminderSettingsSaved'));
       return;
     }
 
@@ -941,23 +943,23 @@ const AppCourseDetail = () => {
           scheduledCount++;
         }
       }
-      toast.success(`Reminders set for ${scheduledCount} content items`);
+      toast.success(t('courseDetailPage.remindersSetForContent', { count: scheduledCount }));
     } else if (!settings.enabled) {
       // Cancel all content reminders
       for (const item of items) {
         await cancelTaskReminder(`program-content-${item.id}`);
         unmarkContentScheduled(item.id);
       }
-      toast.success("Content reminders disabled");
+      toast.success(t('courseDetailPage.contentRemindersDisabled'));
     } else {
-      toast.success("Content reminder settings saved");
+      toast.success(t('courseDetailPage.contentReminderSettingsSaved'));
     }
   };
 
   // Handle content reminder (for locked modules/tracks) - uses GLOBAL content settings
   const handleContentReminder = async (item: any, unlockDate: Date) => {
     if (!isLocalNotificationsAvailable()) {
-      toast.error("Reminders are only available in the app");
+      toast.error(t('courseDetailPage.remindersOnlyInApp'));
       return;
     }
 
@@ -967,7 +969,7 @@ const AppCourseDetail = () => {
       // Cancel existing reminder
       await cancelTaskReminder(`content-${item.id}`);
       unmarkContentScheduled(item.id);
-      toast.success("Reminder cancelled");
+      toast.success(t('courseDetailPage.reminderCancelled'));
     } else {
       // Schedule new reminder using global content settings
       const title =
@@ -985,7 +987,7 @@ const AppCourseDetail = () => {
 
         if (result.success) {
           markContentScheduled(item.id);
-          toast.success("Urgent reminder set for unlock!");
+          toast.success(t('courseDetailPage.urgentReminderUnlock'));
         } else {
           toast.error(result.error || "Failed to set reminder");
         }
@@ -1004,7 +1006,7 @@ const AppCourseDetail = () => {
 
         if (result.success) {
           markContentScheduled(item.id);
-          toast.success("Reminder set for unlock!");
+          toast.success(t('courseDetailPage.reminderSetUnlock'));
         } else {
           toast.error(result.error || "Failed to set reminder");
         }
@@ -1147,7 +1149,7 @@ const AppCourseDetail = () => {
       return { previousEnrollments };
     },
     onSuccess: async () => {
-      toast.success("Enrolled successfully!");
+      toast.success(t('courseDetailPage.enrolledSuccessfully'));
 
       // Invalidate and refetch with correct user-scoped keys for full data refresh
       invalidateAllEnrollmentData();
@@ -1174,7 +1176,7 @@ const AppCourseDetail = () => {
     },
     onError: (error, variables, context) => {
       console.error("Enrollment error:", error);
-      toast.error("Failed to enroll. Please try again.");
+      toast.error(t('courseDetailPage.failedEnroll'));
 
       // Rollback optimistic update on error
       if (context?.previousEnrollments) {
@@ -1502,7 +1504,7 @@ const AppCourseDetail = () => {
                   {program && (
                     <Card>
                       <CardHeader>
-                        <CardTitle>Program Details</CardTitle>
+                        <CardTitle>{t('courseDetailPage.programDetails')}</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
@@ -2193,7 +2195,7 @@ const AppCourseDetail = () => {
                   <Card className="tour-program-info">
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <CardTitle>Program Information</CardTitle>
+                        <CardTitle>{t('courseDetailPage.programInformation')}</CardTitle>
                         <Badge>{enrollment.status}</Badge>
                       </div>
                     </CardHeader>
@@ -2260,9 +2262,9 @@ const AppCourseDetail = () => {
                               queryClient.invalidateQueries({
                                 queryKey: ["courses-data"],
                               });
-                              toast.success("Program marked as completed!");
+                              toast.success(t('courseDetailPage.programCompleted'));
                             } catch (err) {
-                              toast.error("Failed to mark as completed");
+                              toast.error(t('courseDetailPage.failedMarkCompleted'));
                             }
                           }}
                         >
@@ -2305,7 +2307,7 @@ const AppCourseDetail = () => {
                 try {
                   const result = await subscribeToPushNotifications(user.id);
                   if (result.success) {
-                    toast.success("Push notifications enabled!");
+                    toast.success(t('courseDetailPage.pushEnabled'));
                     localStorage.setItem("hasSeenEnrollmentPrompt", "true");
                     setShowEnrollmentReminder(false);
                   } else {
@@ -2315,7 +2317,7 @@ const AppCourseDetail = () => {
                   }
                 } catch (error) {
                   console.error("Error:", error);
-                  toast.error("An error occurred");
+                  toast.error(t('courseDetailPage.errorOccurred'));
                 } finally {
                   setIsEnablingEnrollment(false);
                 }

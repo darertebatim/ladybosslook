@@ -48,6 +48,7 @@ import { cn } from "@/lib/utils";
 
 import { Share2 } from "lucide-react";
 import { useShareContent } from "@/hooks/useShareContent";
+import { useTranslation } from "react-i18next";
 function ExpandableDescription({ text }: { text: string }) {
   const [expanded, setExpanded] = useState(false);
   const MAX_LENGTH = 120;
@@ -86,6 +87,7 @@ function ExpandableDescription({ text }: { text: string }) {
 }
 
 export default function AppPlaylistDetail() {
+  const { t } = useTranslation();
   const { playlistId } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -309,10 +311,10 @@ export default function AppPlaylistDetail() {
       queryClient.invalidateQueries({
         queryKey: ["playlist-save", playlistId, user?.id],
       });
-      toast.success("Access granted! Enjoy listening 🎧");
+      toast.success(t('playlistDetailPage.accessGranted'));
     },
     onError: () => {
-      toast.error("Something went wrong. Please try again.");
+      toast.error(t('playlistDetailPage.somethingWrong'));
     },
   });
 
@@ -578,10 +580,10 @@ export default function AppPlaylistDetail() {
         });
       }
       setShowRoutineSheet(false);
-      toast.success("Added to your routines!");
+      toast.success(t('playlistDetailPage.addedToRoutines'));
     } catch (error) {
       console.error("Failed to add routine:", error);
-      toast.error("Failed to add to routines");
+      toast.error(t('playlistDetailPage.failedAddRoutines'));
     }
   };
 
@@ -748,7 +750,7 @@ export default function AppPlaylistDetail() {
         />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-fg-warm-muted mb-4">Playlist not found</p>
+            <p className="text-fg-warm-muted mb-4">{t('playlistDetailPage.notFound')}</p>
             <Button onClick={() => navigate("/app/player")}>
               Back to Library
             </Button>
@@ -782,7 +784,7 @@ export default function AppPlaylistDetail() {
               <button
                 onClick={handleShare}
                 className="h-9 w-9 flex items-center justify-center rounded-full active:scale-95 transition-transform"
-                aria-label="Share"
+                aria-label={t('playlistDetailPage.shareAria')}
               >
                 <Share2 className="h-5 w-5 text-fg-warm-muted" />
               </button>
@@ -876,7 +878,7 @@ export default function AppPlaylistDetail() {
                   {!hasAccess &&
                     !playlist.is_free &&
                     !playlist.requires_subscription && (
-                      <Badge variant="destructive">Locked</Badge>
+                      <Badge variant="destructive">{t('playlistDetailPage.locked')}</Badge>
                     )}
                 </div>
                 <h1 className="text-2xl font-bold text-fg-warm">
@@ -958,8 +960,7 @@ export default function AppPlaylistDetail() {
                   <div className="flex items-center gap-2 p-4 bg-amber-900/30 rounded-lg">
                     <Crown className="h-5 w-5 text-amber-400" />
                     <p className="text-sm text-fg-warm">
-                      This content is part of <strong>Simora Plus</strong>.
-                      Subscribe to unlock.
+                      {t('playlistDetailPage.partOfPlusFull_pre')}<strong>{t('playlistDetailPage.partOfPlusBrand')}</strong>{t('playlistDetailPage.partOfPlusFull_post')}
                     </p>
                   </div>
                   <Button

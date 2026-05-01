@@ -18,6 +18,7 @@ import { haptic } from '@/lib/haptics';
 import heroStormVideo from '@/assets/watch-hero-storm.mp4';
 import { useScrollRestore } from '@/hooks/useScrollRestore';
 import { useUserPreferredLanguage, preferredLanguageSorter } from '@/hooks/useUserPreferredLanguage';
+import { useTranslation } from 'react-i18next';
 
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
@@ -26,26 +27,32 @@ const LANG_FLAGS: Record<string, string> = {
   spanish: '🇪🇸',
 };
 
-const LANGUAGE_OPTIONS = [
-  { value: 'all', label: 'All', flag: '🌐' },
-  { value: 'american', label: 'English', flag: '🇺🇸' },
-  { value: 'persian', label: 'Persian', flag: null },
-  { value: 'turkish', label: 'Türkçe', flag: '🇹🇷' },
-  { value: 'spanish', label: 'Español', flag: '🇪🇸' },
-];
-
-const typeConfig: Record<string, { label: string; icon: typeof BookOpen }> = {
-  'course': { label: 'Course', icon: BookOpen },
-  'group-coaching': { label: 'Coaching', icon: Users },
-  '1o1-session': { label: '1-on-1', icon: UserCheck },
-  'audiobook': { label: 'Audiobook', icon: Headphones },
-  'meditate': { label: 'Meditate', icon: Sparkles },
-  'workout': { label: 'Workout', icon: Dumbbell },
-  'soundscape': { label: 'Soundscape', icon: Waves },
-  'affirmations': { label: 'Affirmations', icon: Heart },
-  'webinar': { label: 'Webinar', icon: Video },
-  'event': { label: 'Event', icon: Calendar },
-  'subscription': { label: 'Club', icon: Sparkles },
+// LANGUAGE_OPTIONS and typeConfig are built inside the component so labels are translated.
+const TYPE_ICONS: Record<string, typeof BookOpen> = {
+  'course': BookOpen,
+  'group-coaching': Users,
+  '1o1-session': UserCheck,
+  'audiobook': Headphones,
+  'meditate': Sparkles,
+  'workout': Dumbbell,
+  'soundscape': Waves,
+  'affirmations': Heart,
+  'webinar': Video,
+  'event': Calendar,
+  'subscription': Sparkles,
+};
+const TYPE_LABEL_KEYS: Record<string, string> = {
+  'course': 'browseProgramsPage.typeCourse',
+  'group-coaching': 'browseProgramsPage.typeCoaching',
+  '1o1-session': 'browseProgramsPage.type1on1',
+  'audiobook': 'browseProgramsPage.typeAudiobook',
+  'meditate': 'browseProgramsPage.typeMeditate',
+  'workout': 'browseProgramsPage.typeWorkout',
+  'soundscape': 'browseProgramsPage.typeSoundscape',
+  'affirmations': 'browseProgramsPage.typeAffirmations',
+  'webinar': 'browseProgramsPage.typeWebinar',
+  'event': 'browseProgramsPage.typeEvent',
+  'subscription': 'browseProgramsPage.typeClub',
 };
 
 // --- Horizontal Program Card (matches PlaylistCard style) ---
@@ -61,8 +68,9 @@ interface AcademyProgramCardProps {
 }
 
 const AcademyProgramCard = ({ title, image, type, language, isFree, isEnrolled, isWaitlist, onClick }: AcademyProgramCardProps) => {
-  const typeInfo = type ? typeConfig[type] : null;
-  const TypeIcon = typeInfo?.icon || Sparkles;
+  const { t } = useTranslation();
+  const TypeIcon = (type && TYPE_ICONS[type]) || Sparkles;
+  const typeLabel = type && TYPE_LABEL_KEYS[type] ? t(TYPE_LABEL_KEYS[type]) : null;
 
   return (
     <button
@@ -87,13 +95,13 @@ const AcademyProgramCard = ({ title, image, type, language, isFree, isEnrolled, 
           {/* Enrolled badge */}
           {isEnrolled && (
             <div className="absolute -top-2 -left-1 z-10 bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
-              <CheckCircle2 className="h-2.5 w-2.5" /> Enrolled
+              <CheckCircle2 className="h-2.5 w-2.5" /> {t('browseProgramsPage.enrolled')}
             </div>
           )}
           {/* FREE badge */}
           {isFree && !isEnrolled && (
             <div className="absolute -top-2 -left-1 z-10 bg-white text-[#132240] text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-ios">
-              FREE
+              {t('browseProgramsPage.free')}
             </div>
           )}
           {/* Lock icon for waitlist */}
@@ -110,7 +118,7 @@ const AcademyProgramCard = ({ title, image, type, language, isFree, isEnrolled, 
         <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
           {/* Meta line */}
           <div className="flex items-center gap-1.5 text-[11px] text-white/70">
-            {typeInfo && <span className="capitalize">{typeInfo.label}</span>}
+            {typeLabel && <span className="capitalize">{typeLabel}</span>}
           </div>
 
           {/* Title */}
@@ -130,7 +138,7 @@ const AcademyProgramCard = ({ title, image, type, language, isFree, isEnrolled, 
       {/* Enroll CTA for waitlist */}
       {isWaitlist && !isEnrolled && (
         <div className="flex items-center justify-center gap-1.5 py-2 px-3 bg-white/10 text-white text-xs font-medium">
-          <span>Tap to enroll</span>
+          <span>{t('browseProgramsPage.tapToEnroll')}</span>
           <ChevronRight className="h-3.5 w-3.5" />
         </div>
       )}
@@ -140,6 +148,7 @@ const AcademyProgramCard = ({ title, image, type, language, isFree, isEnrolled, 
 
 // --- Main Page ---
 const AppBrowsePrograms = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { programs, isLoading } = usePrograms();
@@ -153,6 +162,14 @@ const AppBrowsePrograms = () => {
   const [preferredLanguage, setPreferredLanguage] = useState(() => {
     return localStorage.getItem('academy-language') || 'all';
   });
+
+  const LANGUAGE_OPTIONS = useMemo(() => [
+    { value: 'all', label: t('browseProgramsPage.all'), flag: '🌐' },
+    { value: 'american', label: t('browseProgramsPage.langEnglish'), flag: '🇺🇸' },
+    { value: 'persian', label: t('browseProgramsPage.langPersian'), flag: null as string | null },
+    { value: 'turkish', label: 'Türkçe', flag: '🇹🇷' },
+    { value: 'spanish', label: 'Español', flag: '🇪🇸' },
+  ], [t]);
 
   const handleLanguageChange = useCallback((lang: string) => {
     setPreferredLanguage(lang);
@@ -233,12 +250,12 @@ const AppBrowsePrograms = () => {
 
   const availableTypes = useMemo(() => {
     const types = new Set(allPrograms.map((p: any) => p.type).filter(Boolean));
-    const dynamicFilters = Array.from(types).map(t => {
-      const config = typeConfig[t];
-      return { value: t, label: config?.label || t };
+    const dynamicFilters = Array.from(types).map((typeKey) => {
+      const labelKey = TYPE_LABEL_KEYS[typeKey as string];
+      return { value: typeKey as string, label: labelKey ? t(labelKey) : (typeKey as string) };
     });
-    return [{ value: 'all', label: 'All' }, ...dynamicFilters];
-  }, [allPrograms]);
+    return [{ value: 'all', label: t('browseProgramsPage.all') }, ...dynamicFilters];
+  }, [allPrograms, t]);
 
   const userLang = useUserPreferredLanguage();
 
@@ -290,7 +307,7 @@ const AppBrowsePrograms = () => {
 
   return (
     <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
-      <SEOHead title="Academy Programs - Rilo" description="Browse all academy programs" />
+      <SEOHead title={t('browseProgramsPage.seoTitle')} description={t('browseProgramsPage.seoDesc')} />
 
       {/* Hero Video Background */}
       <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 h-[420px] overflow-hidden" style={{ transform: `translateY(${-scrollY * 0.4}px)` }}>
@@ -309,7 +326,7 @@ const AppBrowsePrograms = () => {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
                   <Input
-                    placeholder="Search programs..."
+                    placeholder={t('browseProgramsPage.searchPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9 h-9 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus-visible:ring-white/20"
@@ -329,7 +346,7 @@ const AppBrowsePrograms = () => {
                   >
                     <ChevronLeft className="h-4 w-4 text-white" />
                   </button>
-                  <h1 className="text-xl font-bold text-white tracking-tight">Academy</h1>
+                  <h1 className="text-xl font-bold text-white tracking-tight">{t('browseProgramsPage.academy')}</h1>
                 </div>
                 <button onClick={() => setShowSearch(true)} className="p-2 -mr-2">
                   <Search className="h-5 w-5 text-white/70" />
@@ -397,7 +414,7 @@ const AppBrowsePrograms = () => {
           {enrolledPrograms.length > 0 && selectedType === 'all' && !searchQuery && (
             <div className="space-y-3">
               <h2 className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-                Your Programs
+                {t('browseProgramsPage.yourPrograms')}
               </h2>
               <div className="space-y-3">
                 {enrolledPrograms.map((program: any) => (
@@ -420,7 +437,7 @@ const AppBrowsePrograms = () => {
           {/* All / Not Enrolled Programs */}
           <div className="space-y-3">
             <h2 className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-              {searchQuery ? 'Results' : selectedType === 'all' ? 'All Programs' : availableTypes.find(f => f.value === selectedType)?.label || 'Programs'}
+              {searchQuery ? t('browseProgramsPage.results') : selectedType === 'all' ? t('browseProgramsPage.allPrograms') : availableTypes.find(f => f.value === selectedType)?.label || t('browseProgramsPage.programs')}
             </h2>
 
             {notEnrolledPrograms.length === 0 && enrolledPrograms.length === 0 ? (
@@ -429,7 +446,7 @@ const AppBrowsePrograms = () => {
                   <GraduationCap className="w-7 h-7 text-white/30" />
                 </div>
                 <p className="text-white/50 text-sm">
-                  {searchQuery ? `No programs match "${searchQuery}"` : 'No programs available'}
+                  {searchQuery ? t('browseProgramsPage.noMatch', { query: searchQuery }) : t('browseProgramsPage.noPrograms')}
                 </p>
               </div>
             ) : (
@@ -452,12 +469,12 @@ const AppBrowsePrograms = () => {
 
             {/* CTA to support chat */}
             <div className="pt-4 pb-2">
-              <p className="text-sm text-white/50">Not any programs you want above?</p>
+              <p className="text-sm text-white/50">{t('browseProgramsPage.tellUsWant')}</p>
               <button
-                onClick={() => navigate('/app/chat?draft=' + encodeURIComponent("Hi! I'd love to have a program for: "))}
+                onClick={() => navigate('/app/chat?draft=' + encodeURIComponent(t('browseProgramsPage.chatDraft')))}
                 className="text-sm text-blue-400 font-medium flex items-center gap-1 mt-1"
               >
-                Tell us what you want <ChevronRight className="h-4 w-4" />
+                {t('browseProgramsPage.tellUsCta')} <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           </div>
