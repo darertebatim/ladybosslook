@@ -190,9 +190,16 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.35 }}
-            style={{ color: 'rgba(26,31,61,0.7)', fontSize: 15, fontWeight: 500, margin: '14px 0 0', lineHeight: 1.45 }}
+            style={{ fontSize: 20, fontWeight: 800, margin: '16px 0 0', lineHeight: 1.3, letterSpacing: -0.3 }}
           >
-            Self-care that sticks.
+            <span style={{
+              background: 'linear-gradient(135deg, #FFB347 0%, #E84A6F 60%, #A855F7 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>
+              Self-care that sticks.
+            </span>
           </motion.p>
         </div>
 
