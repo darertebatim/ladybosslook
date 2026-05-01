@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useKeyboard } from "@/hooks/useKeyboard";
@@ -32,9 +33,9 @@ interface Conversation {
   unread_count_user: number;
 }
 
-const getDateLabel = (date: Date): string => {
-  if (isToday(date)) return "Today";
-  if (isYesterday(date)) return "Yesterday";
+const getDateLabel = (date: Date, t: (k: string) => string): string => {
+  if (isToday(date)) return t("chatPage.today");
+  if (isYesterday(date)) return t("chatPage.yesterday");
   return format(date, "MMMM d, yyyy");
 };
 
@@ -63,22 +64,22 @@ const isLastInGroup = (msg: Message, nextMsg: Message | null): boolean => {
   return timeDiff > GROUP_TIME_THRESHOLD;
 };
 
-const getGreeting = () => {
+const getGreeting = (t: (k: string) => string) => {
   const hour = new Date().getHours();
-  if (hour < 12) return { text: "Good morning", emoji: "🌅" };
-  if (hour < 17) return { text: "Good afternoon", emoji: "☀️" };
-  return { text: "Good evening", emoji: "🌙" };
+  if (hour < 12) return { text: t("chatPage.goodMorning"), emoji: "🌅" };
+  if (hour < 17) return { text: t("chatPage.goodAfternoon"), emoji: "☀️" };
+  return { text: t("chatPage.goodEvening"), emoji: "🌙" };
 };
-
-const conversationStarters = [
-  { icon: Target, text: "Ask about my progress" },
-  { icon: Sparkles, text: "Get personalized advice" },
-  { icon: MessageCircle, text: "I have a question" },
-  { icon: GraduationCap, text: "Help me with my goals" },
-];
 
 export default function AppCoachChat() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const conversationStarters = [
+    { icon: Target, text: t("chatPage.coach.starters.progress") },
+    { icon: Sparkles, text: t("chatPage.coach.starters.advice") },
+    { icon: MessageCircle, text: t("chatPage.coach.starters.question") },
+    { icon: GraduationCap, text: t("chatPage.coach.starters.goals") },
+  ];
   const { user } = useAuth();
   const { toast } = useToast();
   const { isKeyboardOpen } = useKeyboard();
