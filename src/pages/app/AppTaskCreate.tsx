@@ -188,19 +188,19 @@ const TimePickerSheet = ({
             <button onClick={handleCancel} className="p-2 -ml-2">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <span className="text-lg font-medium">Time</span>
+            <span className="text-lg font-medium">{t('taskEdit.time')}</span>
             <Button
               variant="ghost"
               onClick={handleSave}
               className="text-primary font-medium"
             >
-              Save
+              {t('taskEdit.save')}
             </Button>
           </div>
 
           <div className="px-6 pb-4">
             <div className="flex items-center justify-between py-3 mb-4 border-b border-muted/30">
-              <span className="font-medium text-foreground">Specific time</span>
+              <span className="font-medium text-foreground">{t('taskEdit.specificTime')}</span>
               <Switch
                 checked={localTimeMode === 'specific'}
                 onCheckedChange={(checked) => {
