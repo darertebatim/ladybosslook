@@ -54,6 +54,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { NotificationPreferencesCard } from "@/components/app/NotificationPreferencesCard";
+import { setAppLanguage, type SupportedLanguage } from "@/i18n";
+import { useTranslation as _useTranslationUnused } from "react-i18next";
+import { cn } from "@/lib/utils";
 import {
   checkCalendarPermission,
   requestCalendarPermission,
