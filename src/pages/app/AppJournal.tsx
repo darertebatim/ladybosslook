@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { X, Search, BookOpen, NotebookPen, CalendarPlus, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -33,6 +34,7 @@ const calculateMonthlyPresence = (entries: any[]): number => {
 };
 
 const AppJournal = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
   try { routinePlayer = useRoutinePlayerContext(); } catch { /* not available */ }
@@ -145,7 +147,7 @@ const AppJournal = () => {
           <button onClick={() => setShowStats(false)} className="p-2 -ml-2">
             <X className="h-5 w-5 text-foreground" />
           </button>
-          <h1 className="text-lg font-semibold text-foreground">Journal Stats</h1>
+          <h1 className="text-lg font-semibold text-foreground">{t('journal.stats')}</h1>
           <div className="w-9" />
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6 pb-safe">
@@ -171,7 +173,7 @@ const AppJournal = () => {
           <button onClick={goHome} className="p-2 -ml-2">
             <X className="h-5 w-5 text-foreground" />
           </button>
-          <h1 className="text-lg font-semibold text-foreground">My Journal</h1>
+          <h1 className="text-lg font-semibold text-foreground">{t('journal.myJournal')}</h1>
           <div className="w-9" />
         </div>
         <JournalSkeleton />
@@ -182,7 +184,7 @@ const AppJournal = () => {
   // ─── MAIN SCREEN ───
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <SEOHead title="My Journal" description="Your personal journal entries" />
+      <SEOHead title={t('journal.seoTitle')} description={t('journal.seoDesc')} />
 
       {/* Top bar */}
       <div
@@ -192,7 +194,7 @@ const AppJournal = () => {
         <button onClick={goHome} className="p-2 -ml-2">
           <X className="h-5 w-5 text-foreground" />
         </button>
-        <h1 className="text-lg font-semibold text-foreground">My Journal</h1>
+        <h1 className="text-lg font-semibold text-foreground">{t('journal.myJournal')}</h1>
         <button onClick={() => { setShowStats(true); haptic.light(); }} className="p-2 -mr-2">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground">
             <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -210,7 +212,7 @@ const AppJournal = () => {
       {showSearch && (
         <div className="px-4 pb-3">
           <Input
-            placeholder="Search entries..."
+            placeholder={t('journal.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full"
@@ -232,9 +234,9 @@ const AppJournal = () => {
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <BookOpen className="h-8 w-8 text-primary" />
               </div>
-              <h2 className="text-lg font-medium mb-2">Start Your Journal</h2>
+              <h2 className="text-lg font-medium mb-2">{t('journal.startYourJournal')}</h2>
               <p className="text-muted-foreground text-sm max-w-xs">
-                Capture your thoughts, reflections, and daily moments in your personal journal.
+                {t('journal.captureThoughts')}
               </p>
             </div>
           ) : (
@@ -282,7 +284,7 @@ const AppJournal = () => {
           className="tour-new-entry flex-1 h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97] flex items-center justify-center gap-2"
         >
           <NotebookPen className="h-4 w-4" />
-          Write Today's Entry
+          {t('journal.writeTodaysEntry')}
         </button>
 
         <button
