@@ -73,10 +73,7 @@ export function TaskCoachOverlay({ taskId, variant }: TaskCoachOverlayProps) {
           width: ringWidth,
           height: ringHeight,
           borderRadius: variant === 'check' ? '50%' : '12px',
-          animation:
-            variant === 'check'
-              ? 'taskCoachGlowGold 1.6s ease-in-out infinite'
-              : 'taskCoachGlow 1.6s ease-in-out infinite',
+          animation: 'taskCoachGlowGold 1.6s ease-in-out infinite',
         }}
       />
       {/* Bouncing hand */}
