@@ -645,7 +645,7 @@ function AppTimerInner() {
         {settingsTab === 'pomodoro' && (
           <>
             <div className="px-5 mb-3">
-              <h2 className="text-lg font-bold text-foreground">Pomodoro Technique</h2>
+              <h2 className="text-lg font-bold text-foreground">{t('timer.pomodoroTechnique')}</h2>
             </div>
 
             <div className="px-5 mb-6">
@@ -657,10 +657,10 @@ function AppTimerInner() {
                 >
                   <div className="flex items-center gap-3">
                     <TimerIcon className="h-5 w-5 text-foreground" />
-                    <span className="text-base font-medium text-foreground">Pomodoro Cycle</span>
+                    <span className="text-base font-medium text-foreground">{t('timer.pomodoroCycle')}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <span className="text-sm text-muted-foreground">{pomodoroCycles} sessions</span>
+                    <span className="text-sm text-muted-foreground">{t('timer.sessions', { count: pomodoroCycles })}</span>
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </button>
@@ -672,10 +672,10 @@ function AppTimerInner() {
                 >
                   <div className="flex items-center gap-3">
                     <Coffee className="h-5 w-5 text-foreground" />
-                    <span className="text-base font-medium text-foreground">Short Break</span>
+                    <span className="text-base font-medium text-foreground">{t('timer.shortBreak')}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <span className="text-sm text-muted-foreground">{breakMinutes} mins</span>
+                    <span className="text-sm text-muted-foreground">{t('timer.mins', { count: breakMinutes })}</span>
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </button>
@@ -689,7 +689,7 @@ function AppTimerInner() {
                 onClick={() => { setShowHowItWorks(true); haptic.light(); }}
                 className="w-full text-center text-sm font-medium text-foreground underline underline-offset-2"
               >
-                How Pomodoro Technique Works?
+                {t('timer.howItWorksLink')}
               </button>
             </div>
           </>
