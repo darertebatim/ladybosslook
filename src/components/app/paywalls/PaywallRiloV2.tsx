@@ -437,6 +437,22 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
               onClick={() => setSelectedPlan('annual')}
               style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}
             >
+              <div style={{ position: 'relative' }}>
+              {/* 76% users' choice tag */}
+              <div style={{
+                position: 'absolute', top: -11, left: '50%', transform: 'translateX(-50%)',
+                zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', pointerEvents: 'none',
+              }}>
+                <div style={{
+                  background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)',
+                  color: '#fff', fontSize: 11, fontWeight: 800, padding: '5px 12px', borderRadius: 999,
+                  letterSpacing: 0.3, boxShadow: '0 6px 16px -4px rgba(124,58,237,0.45)',
+                  display: 'flex', alignItems: 'baseline', gap: 4, whiteSpace: 'nowrap',
+                }}>
+                  <span style={{ fontSize: 13, fontWeight: 900 }}>76%</span>
+                  <span style={{ fontSize: 10, opacity: 0.95 }}>users' choice</span>
+                </div>
+              </div>
               <div style={{
                 position: 'relative', borderRadius: 20, padding: '18px 18px',
                 border: selectedPlan === 'annual' ? `2px solid ${NAVY}` : '2px solid rgba(255,255,255,0.95)',
@@ -481,6 +497,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
                     ${annualMonthly}<span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(26,31,61,0.55)' }}>/mo</span>
                   </p>
                 </div>
+              </div>
               </div>
             </button>
           )}
