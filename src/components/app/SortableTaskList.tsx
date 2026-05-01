@@ -49,7 +49,7 @@ interface SortableTaskItemProps {
   onOpenTimer: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
   isDragging?: boolean;
-  coachHighlight?: 'on' | 'off' | null;
+  coachHighlight?: 'on' | 'off' | 'gold' | null;
 }
 
 const SortableTaskItem = ({
@@ -92,7 +92,8 @@ const SortableTaskItem = ({
         'touch-manipulation',
         isSortableDragging && 'opacity-50 scale-[1.02]',
         coachHighlight === 'off' && 'pointer-events-none transition-opacity duration-300',
-        coachHighlight === 'on' && 'relative z-[101] transition-transform duration-300 rounded-2xl [--shadow-card-warm:none] [&_*]:[--shadow-card-warm:none] [filter:drop-shadow(0_0_18px_rgba(255,255,255,0.95))_drop-shadow(0_0_42px_rgba(255,255,255,0.7))]'
+        coachHighlight === 'on' && 'relative z-[101] transition-transform duration-300 rounded-2xl [--shadow-card-warm:none] [&_*]:[--shadow-card-warm:none] [filter:drop-shadow(0_0_18px_rgba(255,255,255,0.95))_drop-shadow(0_0_42px_rgba(255,255,255,0.7))]',
+        coachHighlight === 'gold' && 'relative z-[101] transition-transform duration-300 rounded-2xl [--shadow-card-warm:none] [&_*]:[--shadow-card-warm:none] [filter:drop-shadow(0_0_18px_rgba(250,204,21,0.95))_drop-shadow(0_0_42px_rgba(245,158,11,0.75))]'
       )}
     >
       <TaskCard
