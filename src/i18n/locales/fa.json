@@ -1645,6 +1645,9 @@
     "shareAria": "اشتراک‌گذاری",
     "notFound": "پلی‌لیست پیدا نشد",
     "locked": "قفل شده",
-    "partOfSimoraPlus": "این محتوا بخشی از <1>سیمورا پلاس</1> است."
+    "partOfSimoraPlus": "این محتوا بخشی از <1>سیمورا پلاس</1> است.",
+    "partOfPlusFull_pre": "این محتوا بخشی از ",
+    "partOfPlusBrand": "سیمورا پلاس",
+    "partOfPlusFull_post": " است. برای باز کردن مشترک شوید."
   }
 }

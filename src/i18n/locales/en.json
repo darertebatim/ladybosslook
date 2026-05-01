@@ -1645,6 +1645,9 @@
     "shareAria": "Share",
     "notFound": "Playlist not found",
     "locked": "Locked",
-    "partOfSimoraPlus": "This content is part of <1>Simora Plus</1>."
+    "partOfSimoraPlus": "This content is part of <1>Simora Plus</1>.",
+    "partOfPlusFull_pre": "This content is part of ",
+    "partOfPlusBrand": "Simora Plus",
+    "partOfPlusFull_post": ". Subscribe to unlock."
   }
 }
