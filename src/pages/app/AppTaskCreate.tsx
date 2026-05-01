@@ -80,10 +80,10 @@ const COLOR_OPTIONS: { name: TaskColor; hex: string }[] = [
 
 // Reminder presets (Me+ style)
 const REMINDER_PRESETS = [
-  { label: 'Morning reminder', time: '09:00' },
-  { label: 'Midday reminder', time: '12:00' },
-  { label: 'Afternoon reminder', time: '16:00' },
-  { label: 'Evening reminder', time: '19:00' },
+  { labelKey: 'taskPickers.morningReminder', time: '09:00' },
+  { labelKey: 'taskPickers.middayReminder', time: '12:00' },
+  { labelKey: 'taskPickers.afternoonReminder', time: '16:00' },
+  { labelKey: 'taskPickers.eveningReminder', time: '19:00' },
 ];
 
 // Repeat intervals
@@ -1119,34 +1119,46 @@ const AppTaskCreate = ({
   };
 
   const getRepeatSummary = () => {
-    if (!repeatEnabled) return 'No repeat';
-    
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    if (!repeatEnabled) return t('taskPickers.noRepeatSummary');
+
+    const dayNames = [
+      t('streakLost.sun', { defaultValue: 'Sun' }),
+      t('streakLost.mon', { defaultValue: 'Mon' }),
+      t('streakLost.tue', { defaultValue: 'Tue' }),
+      t('streakLost.wed', { defaultValue: 'Wed' }),
+      t('streakLost.thu', { defaultValue: 'Thu' }),
+      t('streakLost.fri', { defaultValue: 'Fri' }),
+      t('streakLost.sat', { defaultValue: 'Sat' }),
+    ];
     
     if (repeatPattern === 'weekly' && repeatDays.length > 0) {
       const days = repeatDays.map(d => dayNames[d]).join(', ');
-      return `Weekly (${days})`;
+      return t('taskPickers.weeklySummary', { days });
     }
     
     if (repeatPattern === 'monthly') {
       const dayOfMonth = scheduledDate.getDate();
       const suffix = dayOfMonth === 1 ? 'st' : dayOfMonth === 2 ? 'nd' : dayOfMonth === 3 ? 'rd' : 'th';
-      return `Monthly (On ${dayOfMonth}${suffix})`;
+      return t('taskPickers.monthlySummary', { day: `${dayOfMonth}${suffix}` });
     }
     
-    return repeatPattern.charAt(0).toUpperCase() + repeatPattern.slice(1);
+    if (repeatPattern === 'daily') return t('taskEdit.daily');
+    if (repeatPattern === 'weekly') return t('taskEdit.weekly');
+    if (repeatPattern === 'monthly') return t('taskEdit.monthly');
+    return t('taskEdit.daily');
   };
 
   const getReminderSummary = () => {
-    if (!reminderEnabled) return 'No Reminder';
+    if (!reminderEnabled) return t('taskPickers.noReminderSummary');
     // If time is set and reminder matches certain offsets, show friendly names
     if (scheduledTime) {
-      if (reminderTime === scheduledTime) return `At time of event (${formatReminderTimeDisplay(reminderTime)})`;
-      if (reminderTime === getTimeOffset(scheduledTime, 10)) return `10 minutes early (${formatReminderTimeDisplay(reminderTime)})`;
-      if (reminderTime === getTimeOffset(scheduledTime, 30)) return `30 minutes early (${formatReminderTimeDisplay(reminderTime)})`;
-      if (reminderTime === getTimeOffset(scheduledTime, 60)) return `1 hour early (${formatReminderTimeDisplay(reminderTime)})`;
+      const time = formatReminderTimeDisplay(reminderTime);
+      if (reminderTime === scheduledTime) return t('taskPickers.atTimeOfEventSummary', { time });
+      if (reminderTime === getTimeOffset(scheduledTime, 10)) return t('taskPickers.minutesEarlySummary', { n: 10, time });
+      if (reminderTime === getTimeOffset(scheduledTime, 30)) return t('taskPickers.minutesEarlySummary', { n: 30, time });
+      if (reminderTime === getTimeOffset(scheduledTime, 60)) return t('taskPickers.hourEarlySummary', { time });
     }
-    return `Custom (${formatReminderTimeDisplay(reminderTime)})`;
+    return t('taskPickers.customSummary', { time: formatReminderTimeDisplay(reminderTime) });
   };
 
   // Get color hex for background
@@ -1172,27 +1184,36 @@ const AppTaskCreate = ({
   };
 
   const getRepeatTitle = () => {
-    if (!repeatEnabled) return 'No repeat';
-    
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    if (!repeatEnabled) return t('taskEdit.noRepeat');
+
+    const dayNames = [
+      t('streakLost.sun', { defaultValue: 'Sun' }),
+      t('streakLost.mon', { defaultValue: 'Mon' }),
+      t('streakLost.tue', { defaultValue: 'Tue' }),
+      t('streakLost.wed', { defaultValue: 'Wed' }),
+      t('streakLost.thu', { defaultValue: 'Thu' }),
+      t('streakLost.fri', { defaultValue: 'Fri' }),
+      t('streakLost.sat', { defaultValue: 'Sat' }),
+    ];
     
     if (repeatPattern === 'weekly' && repeatDays.length > 0) {
       const days = repeatDays.map(d => dayNames[d]).join(', ');
-      return `Repeats every week on ${days}`;
+      return t('taskPickers.repeatsEveryWeekOn', { days });
     }
     
     if (repeatPattern === 'monthly') {
       const dayOfMonth = scheduledDate.getDate();
       const suffix = dayOfMonth === 1 ? 'st' : dayOfMonth === 2 ? 'nd' : dayOfMonth === 3 ? 'rd' : 'th';
-      return `Repeats every month on the ${dayOfMonth}${suffix}`;
+      return t('taskPickers.repeatsEveryMonthOn', { day: `${dayOfMonth}${suffix}` });
     }
     
     if (repeatInterval === 1) {
-      return `Repeats every ${repeatPattern === 'daily' ? 'day' : repeatPattern}`;
+      const unit = repeatPattern === 'daily' ? t('taskPickers.day') : repeatPattern === 'weekly' ? t('taskPickers.week') : t('taskPickers.month');
+      return t('taskPickers.repeatsEvery', { unit });
     }
     
-    const unit = repeatPattern === 'daily' ? 'days' : repeatPattern === 'weekly' ? 'weeks' : 'months';
-    return `Repeats every ${repeatInterval} ${unit}`;
+    const unit = repeatPattern === 'daily' ? t('taskPickers.days') : repeatPattern === 'weekly' ? t('taskPickers.weeks') : t('taskPickers.months');
+    return t('taskPickers.repeatsEveryN', { n: repeatInterval, unit });
   };
 
   const toggleRepeatDay = (day: number) => {
@@ -1514,20 +1535,20 @@ const AppTaskCreate = ({
               <button onClick={() => setShowDatePicker(false)} className="p-2 -ml-2">
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <span className="text-lg font-medium">Date</span>
+              <span className="text-lg font-medium">{t('taskEdit.date')}</span>
               <Button
                 variant="ghost"
                 onClick={() => setShowDatePicker(false)}
                 className="text-primary font-medium"
               >
-                Save
+                {t('taskPickers.save')}
               </Button>
             </div>
 
             {/* Title */}
             <div className="text-center pb-4">
               <h2 className="text-2xl font-bold">
-                {format(scheduledDate, 'MMM d') === format(new Date(), 'MMM d') ? 'Today' : format(scheduledDate, 'EEEE, MMM d')}
+                {format(scheduledDate, 'MMM d') === format(new Date(), 'MMM d') ? t('taskEdit.today') : format(scheduledDate, 'EEEE, MMM d')}
               </h2>
             </div>
 
@@ -1555,7 +1576,7 @@ const AppTaskCreate = ({
                       : "bg-muted/50 text-muted-foreground"
                   )}
                 >
-                  Today
+                  {t('taskEdit.today')}
                 </button>
                 <button
                   onClick={() => {
@@ -1569,7 +1590,7 @@ const AppTaskCreate = ({
                       : "bg-muted/50 text-muted-foreground"
                   )}
                 >
-                  Tomorrow
+                  {t('taskPickers.tomorrow')}
                 </button>
                 <button
                   onClick={() => {
@@ -1583,7 +1604,7 @@ const AppTaskCreate = ({
                       : "bg-muted/50 text-muted-foreground"
                   )}
                 >
-                  Next Monday
+                  {t('taskPickers.nextMonday')}
                 </button>
               </div>
             </div>
@@ -1610,7 +1631,7 @@ const AppTaskCreate = ({
             <button onClick={() => setShowDurationPicker(false)} className="p-2 -ml-2">
               <X className="h-5 w-5" />
             </button>
-            <span className="text-base font-medium">Estimated Duration</span>
+            <span className="text-base font-medium">{t('taskEdit.estimatedDuration')}</span>
             <button
               onClick={() => {
                 setDurationMinutes(null);
@@ -1618,7 +1639,7 @@ const AppTaskCreate = ({
               }}
               className="text-sm text-muted-foreground active:opacity-70 px-2"
             >
-              Clear
+              {t('taskPickers.clear')}
             </button>
           </div>
           <div className="px-5 pt-4 pb-6 overflow-y-auto">
@@ -1643,10 +1664,10 @@ const AppTaskCreate = ({
                   <span className="text-lg">⏱️</span>
                   <div>
                     <p className="text-sm font-medium text-foreground">
-                      Avg from history: <span className="tabular-nums font-bold">{durationHistory.avgMinutes} min</span>
+                      {t('taskPickers.avgFromHistory')} <span className="tabular-nums font-bold">{durationHistory.avgMinutes} {t('taskPickers.minLabel')}</span>
                     </p>
                     <p className="text-[11px] text-muted-foreground">
-                      Based on {durationHistory.count} routine sessions
+                      {t('taskPickers.basedOnSessions', { count: durationHistory.count })}
                     </p>
                   </div>
                 </div>
@@ -1664,7 +1685,7 @@ const AppTaskCreate = ({
             )}
 
             <p className="text-xs text-muted-foreground text-center mb-4">
-              Countdown estimate for the Routine Player
+              {t('taskPickers.countdownEstimate')}
             </p>
             <div className="grid grid-cols-3 gap-2">
               {[1, 2, 3, 5, 10, 15, 20, 30].map(mins => (
@@ -1683,7 +1704,7 @@ const AppTaskCreate = ({
                   )}
                 >
                   <span className="text-lg tabular-nums">{mins}</span>
-                  <span className="text-[11px] text-muted-foreground block -mt-0.5">min</span>
+                  <span className="text-[11px] text-muted-foreground block -mt-0.5">{t('taskPickers.minLabel')}</span>
                 </button>
               ))}
               {/* Custom duration button */}
@@ -1699,7 +1720,7 @@ const AppTaskCreate = ({
                 <span className="text-lg tabular-nums">
                   {durationMinutes && ![1,2,3,5,10,15,20,30].includes(durationMinutes) ? durationMinutes : '···'}
                 </span>
-                <span className="text-[11px] text-muted-foreground block -mt-0.5">custom</span>
+                <span className="text-[11px] text-muted-foreground block -mt-0.5">{t('taskPickers.custom')}</span>
               </button>
             </div>
           </div>
@@ -1735,7 +1756,7 @@ const AppTaskCreate = ({
           }
           setShowCustomDurationKeypad(false);
         }}
-        title="Duration (minutes)"
+        title={t('taskEdit.durationMinutes')}
         maxLength={3}
       />
 
@@ -1745,7 +1766,7 @@ const AppTaskCreate = ({
             <button onClick={() => setShowRepeatPicker(false)} className="p-2 -ml-2">
               <X className="h-5 w-5" />
             </button>
-            <span className="text-base font-medium">Set task repeat</span>
+            <span className="text-base font-medium">{t('taskEdit.setTaskRepeat')}</span>
             <div className="w-9" />
           </div>
           <div className="py-2">
@@ -1760,7 +1781,7 @@ const AppTaskCreate = ({
                 !repeatEnabled && "bg-[#E8F4FD]"
               )}
             >
-              <span className="font-medium">No repeat</span>
+              <span className="font-medium">{t('taskEdit.noRepeat')}</span>
               {!repeatEnabled && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
             </button>
 
@@ -1777,7 +1798,7 @@ const AppTaskCreate = ({
                 repeatEnabled && repeatPattern === 'daily' && repeatInterval === 1 && "bg-[#E8F4FD]"
               )}
             >
-              <span className="font-medium">Daily</span>
+              <span className="font-medium">{t('taskEdit.daily')}</span>
               {repeatEnabled && repeatPattern === 'daily' && repeatInterval === 1 && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
             </button>
 
@@ -1795,7 +1816,7 @@ const AppTaskCreate = ({
               )}
             >
               <span className="font-medium">
-                Weekly <span className="text-muted-foreground">({format(scheduledDate, 'EEEE')})</span>
+                {t('taskEdit.weekly')} <span className="text-muted-foreground">({format(scheduledDate, 'EEEE')})</span>
               </span>
               {repeatEnabled && repeatPattern === 'weekly' && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
             </button>
@@ -1813,7 +1834,7 @@ const AppTaskCreate = ({
               )}
             >
               <span className="font-medium">
-                Monthly <span className="text-muted-foreground">(On {scheduledDate.getDate()}{scheduledDate.getDate() === 1 ? 'st' : scheduledDate.getDate() === 2 ? 'nd' : scheduledDate.getDate() === 3 ? 'rd' : 'th'})</span>
+                {t('taskEdit.monthly')} <span className="text-muted-foreground">(On {scheduledDate.getDate()}{scheduledDate.getDate() === 1 ? 'st' : scheduledDate.getDate() === 2 ? 'nd' : scheduledDate.getDate() === 3 ? 'rd' : 'th'})</span>
               </span>
               {repeatEnabled && repeatPattern === 'monthly' && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
             </button>
@@ -1832,7 +1853,7 @@ const AppTaskCreate = ({
               )}
             >
               <span className="font-medium">
-                Weekend <span className="text-muted-foreground">(Sat, Sun)</span>
+                {t('taskPickers.weekendDays')}
               </span>
             </button>
 
@@ -1845,7 +1866,7 @@ const AppTaskCreate = ({
               }}
               className="w-full text-left px-6 py-4 flex items-center justify-between"
             >
-              <span className="font-medium">Custom</span>
+              <span className="font-medium">{t('taskEdit.custom')}</span>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </button>
           </div>
@@ -1861,13 +1882,13 @@ const AppTaskCreate = ({
               <button onClick={() => setShowRepeatCustom(false)} className="p-2 -ml-2">
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <span className="text-lg font-medium">Repeat</span>
+              <span className="text-lg font-medium">{t('taskEdit.repeat')}</span>
               <Button
                 variant="ghost"
                 onClick={() => setShowRepeatCustom(false)}
                 className="text-primary font-medium"
               >
-                Save
+                {t('taskPickers.save')}
               </Button>
             </div>
 
@@ -1882,8 +1903,8 @@ const AppTaskCreate = ({
                 <div className="flex items-center gap-3">
                   <Repeat className="h-6 w-6" />
                   <div>
-                    <p className="font-medium">Repeat</p>
-                    <p className="text-sm text-muted-foreground">Set a cycle for your plan</p>
+                    <p className="font-medium">{t('taskEdit.repeat')}</p>
+                    <p className="text-sm text-muted-foreground">{t('taskEdit.setCycleHint')}</p>
                   </div>
                 </div>
                 <Switch
@@ -1934,7 +1955,7 @@ const AppTaskCreate = ({
 
                   {/* Interval selector */}
                   <div className="flex items-center justify-between py-4 border-t border-b mt-6">
-                    <span className="font-medium">Interval</span>
+                    <span className="font-medium">{t('taskEdit.interval')}</span>
                     <select
                       value={repeatInterval}
                       onChange={(e) => setRepeatInterval(parseInt(e.target.value))}
@@ -1942,7 +1963,7 @@ const AppTaskCreate = ({
                     >
                       {[1, 2, 3, 4, 5, 6].map((n) => (
                         <option key={n} value={n}>
-                          Every {n} {repeatPattern === 'daily' ? (n === 1 ? 'day' : 'days') : repeatPattern === 'weekly' ? (n === 1 ? 'week' : 'weeks') : (n === 1 ? 'month' : 'months')}
+                          {t('taskPickers.every', { n })} {repeatPattern === 'daily' ? (n === 1 ? t('taskPickers.day') : t('taskPickers.days')) : repeatPattern === 'weekly' ? (n === 1 ? t('taskPickers.week') : t('taskPickers.weeks')) : (n === 1 ? t('taskPickers.month') : t('taskPickers.months'))}
                         </option>
                       ))}
                     </select>
@@ -1961,7 +1982,7 @@ const AppTaskCreate = ({
             <button onClick={() => setShowReminderPicker(false)} className="p-2 -ml-2">
               <X className="h-5 w-5" />
             </button>
-            <span className="text-base font-medium">Set reminder</span>
+            <span className="text-base font-medium">{t('taskEdit.setReminder')}</span>
             <div className="w-9" />
           </div>
           <div className="py-2">
@@ -1976,7 +1997,7 @@ const AppTaskCreate = ({
                 !reminderEnabled && "bg-[#FFF59D]"
               )}
             >
-              <span className="font-medium">No reminder</span>
+              <span className="font-medium">{t('taskEdit.noReminder')}</span>
               {!reminderEnabled && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
             </button>
 
@@ -1996,7 +2017,7 @@ const AppTaskCreate = ({
                   )}
                 >
                   <span className="font-medium">
-                    At time of event <span className="text-muted-foreground">({formatReminderTimeDisplay(scheduledTime)})</span>
+                    {t('taskPickers.atTimeOfEvent')} <span className="text-muted-foreground">({formatReminderTimeDisplay(scheduledTime)})</span>
                   </span>
                   {reminderEnabled && reminderTime === scheduledTime && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
                 </button>
@@ -2014,7 +2035,7 @@ const AppTaskCreate = ({
                   )}
                 >
                   <span className="font-medium">
-                    10 minutes early <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 10))})</span>
+                    {t('taskPickers.minutesEarly', { n: 10 })} <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 10))})</span>
                   </span>
                   {reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 10) && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
                 </button>
@@ -2032,7 +2053,7 @@ const AppTaskCreate = ({
                   )}
                 >
                   <span className="font-medium">
-                    30 minutes early <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 30))})</span>
+                    {t('taskPickers.minutesEarly', { n: 30 })} <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 30))})</span>
                   </span>
                   {reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 30) && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
                 </button>
@@ -2050,7 +2071,7 @@ const AppTaskCreate = ({
                   )}
                 >
                   <span className="font-medium">
-                    1 hour early <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 60))})</span>
+                    {t('taskPickers.hourEarly')} <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 60))})</span>
                   </span>
                   {reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 60) && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
                 </button>
@@ -2071,7 +2092,7 @@ const AppTaskCreate = ({
                   )}
                 >
                   <span className="font-medium">
-                    {preset.label} <span className="text-muted-foreground">({formatReminderTimeDisplay(preset.time)})</span>
+                    {t(preset.labelKey)} <span className="text-muted-foreground">({formatReminderTimeDisplay(preset.time)})</span>
                   </span>
                   {reminderEnabled && reminderTime === preset.time && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
                 </button>
@@ -2092,7 +2113,7 @@ const AppTaskCreate = ({
               )}
             >
               <span className="font-medium">
-                Custom {reminderEnabled && <span className="text-muted-foreground">(Remind me at {formatReminderTimeDisplay(reminderTime)})</span>}
+                {t('taskEdit.custom')} {reminderEnabled && <span className="text-muted-foreground">({t('taskPickers.remindMeAt', { time: formatReminderTimeDisplay(reminderTime) })})</span>}
               </span>
               {reminderEnabled && !REMINDER_PRESETS.some(p => p.time === reminderTime) && 
                 (scheduledTime ? reminderTime !== scheduledTime && reminderTime !== getTimeOffset(scheduledTime, 10) && reminderTime !== getTimeOffset(scheduledTime, 30) && reminderTime !== getTimeOffset(scheduledTime, 60) : true) && (
@@ -2112,20 +2133,20 @@ const AppTaskCreate = ({
               <button onClick={() => setShowReminderCustom(false)} className="p-2 -ml-2">
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <span className="text-lg font-medium">Reminder</span>
+              <span className="text-lg font-medium">{t('taskEdit.reminder')}</span>
               <Button
                 variant="ghost"
                 onClick={() => setShowReminderCustom(false)}
                 className="text-primary font-medium"
               >
-                Save
+                {t('taskPickers.save')}
               </Button>
             </div>
 
             {/* Dynamic title */}
             <div className="text-center pb-4 px-6">
               <h2 className="text-2xl font-bold">
-                Remind me at {formatTimeDisplay(reminderTime)}
+                {t('taskPickers.remindMeAt', { time: formatTimeDisplay(reminderTime) })}
               </h2>
             </div>
 
@@ -2134,8 +2155,8 @@ const AppTaskCreate = ({
               <div className="flex items-center gap-3">
                 <Bell className="h-6 w-6" />
                 <div>
-                  <p className="font-medium">Reminder</p>
-                  <p className="text-sm text-muted-foreground">Set a specific time to remind me</p>
+                  <p className="font-medium">{t('taskEdit.reminder')}</p>
+                  <p className="text-sm text-muted-foreground">{t('taskEdit.setSpecificTimeHint')}</p>
                 </div>
               </div>
               <Switch
@@ -2164,7 +2185,7 @@ const AppTaskCreate = ({
                           : "bg-white border-muted-foreground/30 text-foreground"
                       )}
                     >
-                      At time of event
+                      {t('taskPickers.atTimeOfEvent')}
                     </button>
                     <button
                       onClick={() => setReminderTime(getTimeOffset(scheduledTime, 10))}
@@ -2175,7 +2196,7 @@ const AppTaskCreate = ({
                           : "bg-white border-muted-foreground/30 text-foreground"
                       )}
                     >
-                      10 mins before
+                      {t('taskPickers.minsBefore', { n: 10 })}
                     </button>
                   </div>
                 )}
@@ -2196,19 +2217,19 @@ const AppTaskCreate = ({
               <button onClick={() => setShowTagPicker(false)} className="p-2 -ml-2">
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <span className="text-lg font-medium">Category</span>
+              <span className="text-lg font-medium">{t('taskEdit.category')}</span>
               <Button
                 variant="ghost"
                 onClick={() => setShowTagPicker(false)}
                 className="text-primary font-medium"
               >
-                Save
+                {t('taskPickers.save')}
               </Button>
             </div>
 
             {/* Title */}
             <div className="px-6 pb-2">
-              <h2 className="text-3xl font-bold">Category</h2>
+              <h2 className="text-3xl font-bold">{t('taskEdit.category')}</h2>
             </div>
 
             {/* Tag list */}
@@ -2225,7 +2246,7 @@ const AppTaskCreate = ({
                     tag === null && "bg-[#E8F4FD]"
                   )}
                 >
-                  <span className="font-medium">No tag</span>
+                  <span className="font-medium">{t('taskEdit.noTag')}</span>
                   {tag === null && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
                 </button>
 
@@ -2334,13 +2355,13 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowPlaylistPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Playlist</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectPlaylist')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <Input
               value={playlistSearchQuery}
               onChange={(e) => setPlaylistSearchQuery(e.target.value)}
-              placeholder="Search playlists..."
+              placeholder={t('taskEdit.searchPlaylists')}
               className="mb-2"
             />
             <ScrollArea className="h-[45vh]">
@@ -2387,11 +2408,11 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowBreathingPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Breathing Exercise</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectBreathingExercise')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <p className="text-sm text-muted-foreground">
-              Choose a breathing exercise to link to this task.
+              {t('taskPickers.chooseExerciseHint')}
             </p>
             
             <button
@@ -2409,13 +2430,13 @@ const AppTaskCreate = ({
                 <Wind className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-medium">Any Exercise</p>
-                <p className="text-xs text-muted-foreground">Open the Breathe page to choose</p>
+                <p className="font-medium">{t('taskEdit.anyExercise')}</p>
+                <p className="text-xs text-muted-foreground">{t('taskEdit.anyExerciseHint')}</p>
               </div>
             </button>
             
             <div className="border-t pt-3">
-              <p className="text-xs text-muted-foreground mb-2">Or select a specific exercise:</p>
+              <p className="text-xs text-muted-foreground mb-2">{t('taskPickers.orSelectSpecificExercise')}</p>
             </div>
             
             <ScrollArea className="h-[35vh]">
@@ -2455,7 +2476,7 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowReflectionPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Reflection</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectReflection')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <button
@@ -2473,13 +2494,13 @@ const AppTaskCreate = ({
                 <Brain className="h-5 w-5 text-teal-600 dark:text-teal-400" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-medium">Any Reflection</p>
-                <p className="text-xs text-muted-foreground">Open the Reflections page to choose</p>
+                <p className="font-medium">{t('taskEdit.anyReflection')}</p>
+                <p className="text-xs text-muted-foreground">{t('taskEdit.anyReflectionHint')}</p>
               </div>
             </button>
             
             <div className="border-t pt-3">
-              <p className="text-xs text-muted-foreground mb-2">Or select a specific reflection:</p>
+              <p className="text-xs text-muted-foreground mb-2">{t('taskPickers.orSelectSpecificReflection')}</p>
             </div>
             
             <ScrollArea className="h-[40vh]">
@@ -2525,11 +2546,11 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowRoutinePicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Routine</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectRoutine')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <p className="text-sm text-muted-foreground">
-              Choose a routine to link to this task.
+              {t('taskPickers.chooseRoutineHint')}
             </p>
             
             <ScrollArea className="h-[45vh]">
@@ -2570,10 +2591,10 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowRoutineTemplatePicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Routine Template</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectRoutineTemplate')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
-            <Input value={routineTemplateSearchQuery} onChange={(e) => setRoutineTemplateSearchQuery(e.target.value)} placeholder="Search templates..." className="mb-2" />
+            <Input value={routineTemplateSearchQuery} onChange={(e) => setRoutineTemplateSearchQuery(e.target.value)} placeholder={t('taskEdit.searchTemplates')} className="mb-2" />
             <ScrollArea className="h-[45vh]">
               <div className="space-y-2 pr-4">
                 {routineTemplates.filter(r => !routineTemplateSearchQuery || r.title.toLowerCase().includes(routineTemplateSearchQuery.toLowerCase())).map((routine) => (
@@ -2611,13 +2632,13 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowAudioPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Audio Track</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectAudioTrack')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <Input
               value={audioSearchQuery}
               onChange={(e) => setAudioSearchQuery(e.target.value)}
-              placeholder="Search audio tracks..."
+              placeholder={t('taskEdit.searchAudioTracks')}
               className="mb-2"
             />
             <ScrollArea className="h-[45vh]">
@@ -2665,13 +2686,13 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowChannelPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Channel</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectChannel')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <Input
               value={channelSearchQuery}
               onChange={(e) => setChannelSearchQuery(e.target.value)}
-              placeholder="Search channels..."
+              placeholder={t('taskEdit.searchChannels')}
               className="mb-2"
             />
             <ScrollArea className="h-[45vh]">
@@ -2721,13 +2742,13 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowVideoPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Video</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectVideo')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <Input
               value={videoSearchQuery}
               onChange={(e) => setVideoSearchQuery(e.target.value)}
-              placeholder="Search videos..."
+              placeholder={t('taskEdit.searchVideos')}
               className="mb-2"
             />
             <ScrollArea className="h-[45vh]">
@@ -2775,13 +2796,13 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowVideoPlaylistPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Video Playlist</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectVideoPlaylist')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <Input
               value={videoPlaylistSearchQuery}
               onChange={(e) => setVideoPlaylistSearchQuery(e.target.value)}
-              placeholder="Search video playlists..."
+              placeholder={t('taskEdit.searchVideoPlaylists')}
               className="mb-2"
             />
             <ScrollArea className="h-[45vh]">
@@ -2829,14 +2850,14 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowProgramPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Link Program</SheetTitle>
+            <SheetTitle>{t('taskEdit.linkProgram')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-4">
-            <p className="text-sm text-muted-foreground">Enter the program slug to link to this task.</p>
+            <p className="text-sm text-muted-foreground">{t('taskPickers.enterProgramSlug')}</p>
             <Input
               value={proLinkValue || ''}
               onChange={(e) => setProLinkValue(e.target.value || null)}
-              placeholder="Program slug (e.g., mindset-reset)"
+              placeholder={t('taskEdit.programSlugPlaceholder')}
               autoFocus
             />
             <Button
@@ -2844,7 +2865,7 @@ const AppTaskCreate = ({
               className="w-full rounded-xl"
               disabled={!proLinkValue}
             >
-              Done
+              {t('taskPickers.done')}
             </Button>
           </div>
         </SheetContent>
@@ -2857,7 +2878,7 @@ const AppTaskCreate = ({
             <button onClick={() => { setShowReadingPicker(false); setShowProLinkPicker(true); }} className="p-1.5 rounded-lg hover:bg-muted active:bg-muted/80">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <SheetTitle>Select Reading</SheetTitle>
+            <SheetTitle>{t('taskEdit.selectReading')}</SheetTitle>
           </SheetHeader>
           <div className="p-4 space-y-3">
             <ScrollArea className="h-[50vh]">
