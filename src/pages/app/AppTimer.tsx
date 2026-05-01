@@ -713,7 +713,7 @@ function AppTimerInner() {
                   <button onClick={() => setShowCyclePicker(false)}>
                     <X className="h-5 w-5 text-foreground" />
                   </button>
-                  <span className="text-base font-semibold text-foreground">Pomodoro Cycle</span>
+                  <span className="text-base font-semibold text-foreground">{t('timer.pomodoroCycle')}</span>
                   <div className="w-5" />
                 </div>
 
@@ -732,14 +732,14 @@ function AppTimerInner() {
                         n === pomodoroCycles ? "text-foreground" : "text-muted-foreground/50"
                       )}>{n}</span>
                       {n === pomodoroCycles && (
-                        <span className="text-base text-muted-foreground">session</span>
+                        <span className="text-base text-muted-foreground">{t('timer.session')}</span>
                       )}
                     </button>
                   ))}
                 </div>
 
                 <p className="text-center text-sm text-muted-foreground px-8 pb-4">
-                  Typically, every 4 pomodoros establish a deep focus rhythm.
+                  {t('timer.cycleHint')}
                 </p>
 
                 <div className="px-5 pb-8">
@@ -747,7 +747,7 @@ function AppTimerInner() {
                     onClick={() => { setShowCyclePicker(false); haptic.medium(); }}
                     className="w-full h-12 rounded-full bg-foreground text-background font-semibold text-base"
                   >
-                    OK
+                    {t('timer.ok')}
                   </button>
                 </div>
               </motion.div>
