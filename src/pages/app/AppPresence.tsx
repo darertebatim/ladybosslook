@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, Heart, User, Settings, Sparkles, SmilePlus, Focus, Wifi, BookOpen } from 'lucide-react';
 import { usePresenceStats } from '@/hooks/usePresenceStats';
@@ -30,6 +31,7 @@ import { SelfCareBalanceCard } from '@/components/app/SelfCareBalanceCard';
 
 const AppPresence = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { data: stats, isLoading } = usePresenceStats();
   const { data: presence } = useUserPresence();
   const { data: streak } = useUserStreak();
@@ -63,7 +65,7 @@ const AppPresence = () => {
 
   return (
     <>
-      <SEOHead title="My Presence - LadyBoss" description="Your presence and achievements" />
+      <SEOHead title={`${t('presence.title')} - LadyBoss`} description="Your presence and achievements" />
       
       <div className="flex flex-col h-dvh overflow-hidden bg-amber-50">
         {/* Fixed Header - iOS standard with safe area */}
@@ -135,7 +137,7 @@ const AppPresence = () => {
                         <span className="text-2xl font-bold text-orange-900">{stats?.currentStreak || 0}</span>
                       </div>
                     )}
-                    <div className="text-xs text-orange-700/60 font-medium">Days Streak</div>
+                    <div className="text-xs text-orange-700/60 font-medium">{t('presence.daysStreak')}</div>
                   </div>
                   <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-ios text-center">
                     {isLoading ? (
@@ -146,7 +148,7 @@ const AppPresence = () => {
                         <span className="text-2xl font-bold text-orange-900">{stats?.totalTaskCompletions || 0}</span>
                       </div>
                     )}
-                    <div className="text-xs text-orange-700/60 font-medium">Tasks Done</div>
+                    <div className="text-xs text-orange-700/60 font-medium">{t('presence.tasksDone')}</div>
                   </div>
                 </div>
                 
@@ -172,7 +174,7 @@ const AppPresence = () => {
                       </span>
                     </div>
                   )}
-                  <p className="text-orange-600/80 text-base font-medium">returns this week</p>
+                  <p className="text-orange-600/80 text-base font-medium">{t('presence.returnsThisWeek')}</p>
                 </div>
               </div>
               
@@ -219,20 +221,20 @@ const AppPresence = () => {
             {/* All-Time Activity Stats */}
             <section className="bg-white rounded-2xl p-4 shadow-ios">
               <h3 className="text-sm font-semibold text-orange-900/60 mb-3">
-                Activity Stats
+                {t('presence.activityStats')}
               </h3>
               <div className="grid grid-cols-2 gap-3">
                 <ActivityStatCard 
                   icon={Headphones}
-                  label="Listening"
-                  value={`${stats?.listeningMinutes || 0} min`}
+                  label={t('presence.stats.listening')}
+                  value={`${stats?.listeningMinutes || 0} ${t('presence.stats.min')}`}
                   iconColor="text-orange-500"
                   iconBg="bg-orange-100"
                   isLoading={isLoading}
                 />
                 <ActivityStatCard 
                   icon={CheckCircle2}
-                  label="Completed Tracks"
+                  label={t('presence.stats.completedTracks')}
                   value={stats?.completedTracks || 0}
                   iconColor="text-amber-600"
                   iconBg="bg-amber-100"
@@ -240,7 +242,7 @@ const AppPresence = () => {
                 />
                 <ActivityStatCard 
                   icon={BookHeart}
-                  label="Journal Entries"
+                  label={t('presence.stats.journalEntries')}
                   value={stats?.journalEntries || 0}
                   iconColor="text-orange-600"
                   iconBg="bg-orange-100"
@@ -248,7 +250,7 @@ const AppPresence = () => {
                 />
                 <ActivityStatCard 
                   icon={Wind}
-                  label="Breathing Sessions"
+                  label={t('presence.stats.breathingSessions')}
                   value={stats?.breathingSessions || 0}
                   iconColor="text-amber-500"
                   iconBg="bg-amber-100"
@@ -256,7 +258,7 @@ const AppPresence = () => {
                 />
                 <ActivityStatCard 
                   icon={BookOpen}
-                  label="Reflections"
+                  label={t('presence.stats.reflections')}
                   value={stats?.reflectionCompletions || 0}
                   iconColor="text-purple-500"
                   iconBg="bg-purple-100"
@@ -264,7 +266,7 @@ const AppPresence = () => {
                 />
                 <ActivityStatCard 
                   icon={Sparkles}
-                  label="Emotion Namings"
+                  label={t('presence.stats.emotionNamings')}
                   value={stats?.emotionLogs || 0}
                   iconColor="text-rose-500"
                   iconBg="bg-rose-100"
@@ -272,7 +274,7 @@ const AppPresence = () => {
                 />
                 <ActivityStatCard 
                   icon={SmilePlus}
-                  label="Mood Check-ins"
+                  label={t('presence.stats.moodCheckins')}
                   value={stats?.moodCheckins || 0}
                   iconColor="text-blue-500"
                   iconBg="bg-blue-100"
@@ -280,15 +282,15 @@ const AppPresence = () => {
                 />
                 <ActivityStatCard 
                   icon={Focus}
-                  label="Focus Time"
-                  value={`${stats?.focusMinutes || 0} min`}
+                  label={t('presence.stats.focusTime')}
+                  value={`${stats?.focusMinutes || 0} ${t('presence.stats.min')}`}
                   iconColor="text-indigo-500"
                   iconBg="bg-indigo-100"
                   isLoading={isLoading}
                 />
                 <ActivityStatCard 
                   icon={Wifi}
-                  label="Online Sessions"
+                  label={t('presence.stats.onlineSessions')}
                   value={stats?.onlineSessions || 0}
                   iconColor="text-teal-500"
                   iconBg="bg-teal-100"
@@ -301,13 +303,13 @@ const AppPresence = () => {
             <section>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-orange-900/60">
-                   Task Stats
+                  {t('presence.taskStats')}
                 </h3>
                 <button
                   onClick={() => navigate('/app/action-stats')}
                   className="flex items-center gap-0.5 text-sm font-medium text-muted-foreground active:scale-95 transition-transform"
                 >
-                  View All <ChevronRightIcon className="h-4 w-4" />
+                  {t('presence.viewAll')} <ChevronRightIcon className="h-4 w-4" />
                 </button>
               </div>
               <ActionCalendar />
@@ -316,7 +318,7 @@ const AppPresence = () => {
             {/* Streak Calendar */}
             <section>
               <h3 className="text-sm font-semibold text-orange-900/60 mb-3">
-                Streak Calendar
+                {t('presence.streakCalendar')}
               </h3>
               <StreakCalendar />
             </section>
@@ -325,13 +327,13 @@ const AppPresence = () => {
             <section>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-orange-900/60">
-                  Mood Insights
+                  {t('presence.moodInsights')}
                 </h3>
                 <button
                   onClick={() => navigate('/app/mood/history')}
                   className="flex items-center gap-0.5 text-sm font-medium text-muted-foreground active:scale-95 transition-transform"
                 >
-                  View All <ChevronRightIcon className="h-4 w-4" />
+                  {t('presence.viewAll')} <ChevronRightIcon className="h-4 w-4" />
                 </button>
               </div>
               <MoodCalendar />
@@ -341,10 +343,10 @@ const AppPresence = () => {
             <section className="bg-white rounded-2xl p-4 shadow-ios">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-orange-900/60">
-                  Awards
+                  {t('presence.awards')}
                 </h3>
                 <span className="text-xs text-orange-500 font-medium">
-                  {unlocked.length} unlocked
+                  {t('presence.unlocked', { count: unlocked.length })}
                 </span>
               </div>
               
