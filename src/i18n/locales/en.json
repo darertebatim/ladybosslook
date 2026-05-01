@@ -1,0 +1,83 @@
+{
+  "common": {
+    "back": "Back",
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save",
+    "done": "Done",
+    "next": "Next",
+    "continue": "Continue",
+    "skip": "Skip",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading…",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow"
+  },
+  "menu": {
+    "title": "Menu",
+    "navigate": "Navigate",
+    "tools": "Tools",
+    "account": "Account",
+    "language": "Language",
+    "takeTour": "Take a Tour",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "signOut": "Sign Out",
+    "items": {
+      "explore": "Explore",
+      "listen": "Listen",
+      "chats": "Chats",
+      "support": "Support",
+      "reflections": "Reflections",
+      "mood": "Mood",
+      "breathe": "Breathe",
+      "water": "Water",
+      "emotions": "Emotions",
+      "period": "Period",
+      "fasting": "Fasting",
+      "routines": "Routines",
+      "myPrograms": "My Programs",
+      "myProfile": "My Profile",
+      "settings": "Settings"
+    }
+  },
+  "home": {
+    "greetingMorning": "Good morning",
+    "greetingAfternoon": "Good afternoon",
+    "greetingEvening": "Good evening",
+    "streak": "{{count}} day streak",
+    "streak_other": "{{count}} day streak"
+  },
+  "planner": {
+    "today": "Today",
+    "week": "Week",
+    "tasks": "Tasks",
+    "todos": "To-dos",
+    "empty": "Nothing planned yet",
+    "addTask": "Add task"
+  },
+  "tools": {
+    "title": "Tools",
+    "breathe": {
+      "title": "Breathe",
+      "subtitle": "Slow down with a simple breathing exercise"
+    },
+    "mood": {
+      "title": "Mood",
+      "subtitle": "How are you feeling right now?",
+      "logMood": "Log mood"
+    },
+    "reflections": {
+      "title": "Reflections",
+      "subtitle": "Write a quick note to yourself",
+      "newEntry": "New entry"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "languageHint": "Choose your in-app language. This does not affect content you create."
+  }
+}
