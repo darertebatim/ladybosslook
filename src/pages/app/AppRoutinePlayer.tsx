@@ -1392,7 +1392,7 @@ export default function AppRoutinePlayer() {
               <button
                 onClick={() => { haptic.light(); handleEditRoutine(preStartRoutine); }}
                 className="w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center active:scale-95 transition-all"
-                title="Edit routine"
+                title={t('routinePlayer.editRoutine')}
               >
                 <Pencil className="w-3.5 h-3.5 text-foreground/70" />
               </button>
@@ -1400,7 +1400,7 @@ export default function AppRoutinePlayer() {
                 <button
                   onClick={() => { haptic.light(); handleOpenAddSheet(preStartRoutine); }}
                   className="w-8 h-8 rounded-full bg-urgency flex items-center justify-center active:scale-95 transition-transform shadow-ios"
-                  title="Add to planner"
+                  title={t('routinePlayer.addToPlanner')}
                 >
                   <CalendarPlus className="w-3.5 h-3.5 text-urgency-foreground" />
                 </button>
@@ -1408,7 +1408,7 @@ export default function AppRoutinePlayer() {
               <button
                 onClick={() => { haptic.light(); setDeleteRoutine(preStartRoutine); }}
                 className="w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center active:scale-95 transition-all"
-                title="Delete routine"
+                title={t('routinePlayer.deleteRoutine')}
               >
                 <Trash2 className="w-3.5 h-3.5 text-destructive" />
               </button>
