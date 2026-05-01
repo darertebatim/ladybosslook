@@ -69,15 +69,15 @@ function AmbientGlow() {
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
       <div
         className="absolute -top-24 left-1/2 -translate-x-1/2 w-[420px] h-[420px] rounded-full blur-3xl opacity-60"
-        style={{ background: 'radial-gradient(circle, #FFD36E 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(circle, #FFEABF 0%, transparent 70%)' }}
       />
       <div
         className="absolute top-1/3 -right-20 w-[260px] h-[260px] rounded-full blur-3xl opacity-50"
-        style={{ background: 'radial-gradient(circle, #F8B4C6 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(circle, #FFB766 0%, transparent 70%)' }}
       />
       <div
         className="absolute bottom-10 -left-16 w-[300px] h-[300px] rounded-full blur-3xl opacity-50"
-        style={{ background: 'radial-gradient(circle, #E5D6FF 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(circle, #FFD89A 0%, transparent 70%)' }}
       />
       {sparkles.map((_, i) => {
         const left = (i * 41) % 100;
@@ -90,7 +90,7 @@ function AmbientGlow() {
             animate={{ opacity: [0, 0.85, 0], scale: [0.4, 1, 0.4] }}
             transition={{ duration: 2.2, delay, repeat: Infinity, repeatDelay: 1.5 }}
             className="absolute text-[10px]"
-            style={{ left: `${left}%`, top: `${top}%`, color: '#A0123F', opacity: 0.6 }}
+            style={{ left: `${left}%`, top: `${top}%`, color: '#FFFFFF', opacity: 0.7 }}
           >
             ✨
           </motion.span>
