@@ -9,7 +9,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { supabase } from '@/integrations/supabase/client';
 import { BrandedSplash } from '@/components/app/BrandedSplash';
 import { getDisplayBuildInfo } from '@/lib/buildInfo';
-import { ArrowLeft, Mail } from 'lucide-react';
+import { ArrowLeft, Mail, Users } from 'lucide-react';
 import appIcon from '@/assets/app-icon.png';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { Capacitor } from '@capacitor/core';
@@ -178,19 +178,40 @@ export default function Auth() {
     <>
       <SEOHead />
       <div className="h-[100dvh] flex flex-col bg-gradient-to-b from-primary/20 via-primary/10 to-background overflow-hidden">
-        {/* Hero Section with Logo */}
-        <div className="flex-shrink-0 pt-16 pb-8 px-6 flex flex-col items-center">
-          {/* Decorative hearts pattern could be added via CSS */}
-          <div className="relative">
-            <div className="w-32 h-32 rounded-3xl overflow-hidden shadow-xl">
-              <img 
-                src={appIcon} 
-                alt="Rilo" 
-                className="w-full h-full object-cover"
-              />
+        {/* Hero Section: Welcome + FREE badge + tagline + social proof */}
+        {!showEmailForm && (
+          <div className="flex-shrink-0 pt-10 pb-6 px-6 flex flex-col items-center text-center">
+            <h1 className="text-3xl font-bold text-foreground tracking-tight">
+              Welcome to Rilo!
+            </h1>
+
+            <div className="mt-4 flex items-center gap-3">
+              <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-lg flex-shrink-0">
+                <img src={appIcon} alt="Rilo" className="w-full h-full object-cover" />
+              </div>
+              <p className="text-left text-base font-semibold text-foreground leading-tight">
+                Your <span className="text-primary">FREE</span><br />
+                Self-Care App
+              </p>
+            </div>
+
+            <p className="mt-4 text-base font-semibold text-foreground">
+              Your day, back in your hands.
+            </p>
+
+            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+              <Users className="h-3.5 w-3.5" />
+              Joined by 3,000+ users
             </div>
           </div>
-        </div>
+        )}
+        {showEmailForm && (
+          <div className="flex-shrink-0 pt-10 pb-4 px-6 flex justify-center">
+            <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg">
+              <img src={appIcon} alt="Rilo" className="w-full h-full object-cover" />
+            </div>
+          </div>
+        )}
 
         {/* Main Content Card */}
         <div className="flex-1 bg-background rounded-t-[2.5rem] px-6 py-8 shadow-[0_-4px_30px_rgba(0,0,0,0.1)] overflow-y-auto">
