@@ -428,5 +428,23 @@
     "enableUrgentAlarm": "Enable Urgent Alarm?",
     "enableUrgentMessage": "This will create an alarm that rings even when your phone is on silent mode. The alarm will be added to your device's calendar.",
     "enableUrgent": "Enable Urgent"
+  },
+  "quickAdd": {
+    "quickAdd": "Quick add task...",
+    "typeTaskName": "Type task name...",
+    "pressEnterAdd": "Press enter to add. Tap outside to cancel.",
+    "details": "Details",
+    "addTask": "Add Task",
+    "needIdeas": "Need some ideas?",
+    "anytime": "Anytime",
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "evening": "Evening",
+    "bedtime": "Bedtime",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "weekends": "Weekends",
+    "once": "Once"
   }
 }
