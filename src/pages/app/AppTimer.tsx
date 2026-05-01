@@ -523,7 +523,7 @@ function AppTimerInner() {
               <span className="text-6xl font-bold text-foreground tracking-tight">
                 {formatTime(minutes * 60)}
               </span>
-              <span className="text-sm text-muted-foreground mt-1">tap to adjust</span>
+              <span className="text-sm text-muted-foreground mt-1">{t('timer.tapToAdjust')}</span>
             </button>
           </div>
 
@@ -549,7 +549,7 @@ function AppTimerInner() {
             onClick={startTimer}
             className="flex-1 h-12 rounded-full bg-foreground text-background font-semibold text-base transition-transform active:scale-[0.97]"
           >
-            {activeTab === 'pomodoro' ? 'Start Focus' : 'Start Timer'}
+            {activeTab === 'pomodoro' ? t('timer.startFocus') : t('timer.startTimer')}
           </button>
           <button
             onClick={handleRoutineClick}
@@ -573,7 +573,7 @@ function AppTimerInner() {
           open={showRoutineSheet}
           onOpenChange={setShowRoutineSheet}
           tasks={[SYNTHETIC_TIMER_TASK]}
-          routineTitle="Focus Timer"
+          routineTitle={t('timer.focusTimer')}
           onSave={handleSaveRoutine}
           isSaving={addRoutinePlan.isPending}
         />
