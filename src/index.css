@@ -709,6 +709,19 @@ html.native-app [data-scroll-container="true"] {
     100% { transform: translateX(0); }
   }
 
+  .animate-marquee-slow {
+    animation: marquee-left 32s linear infinite;
+  }
+  .animate-marquee-fast {
+    animation: marquee-left 18s linear infinite;
+  }
+
+  /* Soft fade on left/right edges so the marquee bleeds out under the bg */
+  .mask-fade-x {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%);
+  }
+
   /* Streak pill celebration after first task in spotlight tour */
   @keyframes streakTourPulse {
     0%   { transform: scale(1);   box-shadow: 0 0 0 0 rgba(251, 146, 60, 0.6); }
