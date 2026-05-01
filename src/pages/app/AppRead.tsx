@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useGoBack } from '@/hooks/useGoBack';
+import { useTranslation } from 'react-i18next';
 import { usePublishedContent, useReadingUserProgress, ReadingContent } from '@/hooks/useReading';
 import { ArrowLeft, BookOpen, CheckCircle2 } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -75,6 +76,7 @@ function ReadingCard({ item, isCompleted, onClick }: { item: ReadingContent; isC
 }
 
 export default function AppRead() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const goBack = useGoBack('/app/tools');
   const { data: content = [], isLoading } = usePublishedContent();
@@ -92,13 +94,13 @@ export default function AppRead() {
         <button onClick={() => goBack()} className="active:scale-95 transition-transform p-1">
           <ArrowLeft className="h-5 w-5" />
         </button>
-        <h1 className="text-lg font-semibold flex-1">Read</h1>
+        <h1 className="text-lg font-semibold flex-1">{t('read.title')}</h1>
       </div>
 
       {/* Spacer for fixed header */}
       <div style={{ height: 'calc(env(safe-area-inset-top, 0px) + 56px)' }} />
 
-      <p className="text-foreground text-sm px-4 pt-3">Stories & lessons for your mind</p>
+      <p className="text-foreground text-sm px-4 pt-3">{t('read.subtitle')}</p>
 
       {/* Content Grid */}
       <div className="px-4 pt-3">
@@ -111,8 +113,8 @@ export default function AppRead() {
         ) : content.length === 0 ? (
           <div className="py-16 text-center text-black">
             <BookOpen className="h-12 w-12 mx-auto mb-3 opacity-30" />
-            <p className="font-medium">Nothing here yet</p>
-            <p className="text-sm">New reading content will appear here</p>
+            <p className="font-medium">{t('read.nothingHere')}</p>
+            <p className="text-sm">{t('read.newWillAppear')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
