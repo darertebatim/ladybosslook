@@ -222,7 +222,7 @@ export default function Auth() {
             <h1 className="text-[40px] leading-[1.05] font-bold tracking-tight text-[#1a1f3d]">
               {isLogin ? 'Welcome back!' : 'Welcome to Rilo!'}
             </h1>
-            <div className="mt-5 flex items-center justify-center gap-4 mx-auto">
+            <div className="mt-5 flex items-center gap-4">
               <div className="w-[88px] h-[88px] rounded-[22px] overflow-hidden shadow-[0_20px_50px_-10px_rgba(232,74,111,0.45)] shrink-0">
                 <img
                   src={riloAppIcon}
@@ -231,7 +231,7 @@ export default function Auth() {
                   draggable={false}
                 />
               </div>
-              <p className="text-center text-[17px] leading-[1.25] font-semibold text-[#1a1f3d]">
+              <p className="text-left text-[17px] leading-[1.25] font-semibold text-[#1a1f3d]">
                 Your <span className="text-[#F08A3E] font-bold">FREE</span>
                 <br />
                 Self Care Tracker
