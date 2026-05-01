@@ -778,5 +778,30 @@
     "notFinding": "Not finding the playlist you want?",
     "tellUs": "Tell us what you want",
     "chatDraft": "Hi! I'd love to have a playlist for: "
+  },
+  "chats": {
+    "title": "Channels",
+    "supportInbox": "Support inbox",
+    "newChannel": "New channel",
+    "coach": "Coach",
+    "chatWithCoach": "Chat with your coach",
+    "coachLabel": "Coach",
+    "you": "You",
+    "support": "Support",
+    "private": "Private",
+    "supportSender": "Support",
+    "chatWithTeam": "Chat with our team (Private)",
+    "noMessages": "No messages yet",
+    "admin": "Admin",
+    "feedbackHeader": "We'd love to hear from you! 💛",
+    "feedbackHint": "Share your ideas, feedback, or suggestions with us in the Support chat",
+    "feedbackAlt": "Share your feedback",
+    "noChannels": "No channels available",
+    "checkBack": "Check back later for community updates",
+    "yesterday": "Yesterday",
+    "communityChannels": "Community Channels",
+    "syntheticTaskTitle": "Check Community Channels",
+    "addedToRoutines": "Added to your routines!",
+    "addToRoutinesFailed": "Failed to add to routines"
   }
 }
