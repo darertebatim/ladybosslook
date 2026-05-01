@@ -299,6 +299,9 @@
       "supportInbox": "Support Inbox",
       "postChannel": "Post to Channel"
     },
+    "language_section": {
+      "active": "Active"
+    },
     "actions_section": {
       "restartTours": "Restart All Tours",
       "toursReset": "Tours Reset",
