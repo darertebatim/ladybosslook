@@ -427,6 +427,67 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
           </p>
         </div>
 
+        {/* A day with Rilo+ — timeline */}
+        <div style={{ paddingLeft: 20, paddingRight: 20, paddingBottom: 20 }}>
+          <p style={{
+            textAlign: 'center', fontSize: 12, fontWeight: 800, letterSpacing: 1.6,
+            textTransform: 'uppercase', color: SUNRISE_AMBER, margin: '0 0 14px',
+          }}>
+            A day with Rilo<span style={{ fontSize: 14 }}>+</span>
+          </p>
+          <div style={{
+            position: 'relative', borderRadius: 22, padding: '18px 16px 16px',
+            background: 'rgba(255,255,255,0.7)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.95)',
+            boxShadow: '0 8px 24px -10px rgba(26,31,61,0.12)',
+          }}>
+            {/* Vertical line */}
+            <div style={{
+              position: 'absolute', left: 32, top: 28, bottom: 28,
+              width: 2, background: 'linear-gradient(to bottom, #FFD36E 0%, #E84A6F 50%, #A855F7 100%)',
+              borderRadius: 2, opacity: 0.35,
+            }} />
+            {[
+              { time: 'Morning', emoji: '🌅', title: 'AI plans your day', desc: 'Tailored to your energy & goals.' },
+              { time: 'Midday',  emoji: '🌬️', title: 'Reset with breathwork', desc: 'A 2-min break that actually helps.' },
+              { time: 'Evening', emoji: '📓', title: 'Reflect & log mood',     desc: 'See your week shift in real time.' },
+              { time: 'Night',   emoji: '🌙', title: 'Wind-down soundscape',   desc: 'Drift off without doom-scrolling.' },
+            ].map((row, i, arr) => (
+              <div key={row.time} style={{
+                display: 'flex', alignItems: 'flex-start', gap: 14,
+                padding: '10px 4px',
+                borderBottom: i === arr.length - 1 ? 'none' : '1px solid rgba(26,31,61,0.05)',
+                position: 'relative',
+              }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: '50%',
+                  background: '#fff',
+                  boxShadow: '0 4px 10px -2px rgba(26,31,61,0.12)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0, zIndex: 1,
+                }}>
+                  <Emoji3D char={row.emoji} size={22} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0, paddingTop: 2 }}>
+                  <p style={{
+                    margin: 0, fontSize: 10, fontWeight: 800, letterSpacing: 1.2,
+                    textTransform: 'uppercase', color: SUNRISE_AMBER,
+                  }}>
+                    {row.time}
+                  </p>
+                  <p style={{ margin: '2px 0 2px', fontSize: 14, fontWeight: 700, color: NAVY, letterSpacing: -0.2 }}>
+                    {row.title}
+                  </p>
+                  <p style={{ margin: 0, fontSize: 12, color: 'rgba(26,31,61,0.6)', lineHeight: 1.35 }}>
+                    {row.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Pricing cards */}
         <div style={{ paddingLeft: 16, paddingRight: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
           {/* Annual */}
