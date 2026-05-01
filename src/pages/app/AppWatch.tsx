@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Search, X, Clock, Video, CalendarPlus, ChevronRight } from "lucide-react";
 import { VideoPlaylistCard } from "@/components/video/VideoPlaylistCard";
@@ -43,6 +44,7 @@ const categoryConfig: Record<string, { name: string; icon: string; color: string
 };
 
 export default function AppWatch() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -93,10 +95,10 @@ export default function AppWatch() {
         editedTasks,
       });
       setShowRoutineSheet(false);
-      toast.success('Added to your routines! 📺');
+      toast.success(t('watch.addedToRoutines'));
     } catch (error) {
       console.error('Failed to add routine:', error);
-      toast.error('Failed to add to routines');
+      toast.error(t('watch.addToRoutinesFailed'));
     }
   };
 
@@ -238,7 +240,7 @@ export default function AppWatch() {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/50" />
                   <Input
-                    placeholder="Search videos..."
+                    placeholder={t('watch.searchPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9 h-9 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus-visible:ring-white/20"
@@ -251,7 +253,7 @@ export default function AppWatch() {
               </div>
             ) : (
               <>
-                <h1 className="text-xl font-bold text-white tracking-tight">Watch</h1>
+                <h1 className="text-xl font-bold text-white tracking-tight">{t('watch.title')}</h1>
                 <div className="flex items-center gap-1">
                   <AddedToRoutineButton isAdded={!!isWatchAdded} onAddClick={handleAddWatchToRoutines} iconOnly />
                   <button onClick={() => setShowSearch(true)} className="p-2 -mr-2">
@@ -293,7 +295,7 @@ export default function AppWatch() {
                       : 'text-white/50'
                   )}
                 >
-                  {f === 'all' ? 'All' : f === 'in_progress' ? 'In Progress' : 'Completed'}
+                  {f === 'all' ? t('watch.filterAll') : f === 'in_progress' ? t('watch.filterInProgress') : t('watch.filterCompleted')}
                 </button>
               ))}
             </div>
@@ -337,7 +339,7 @@ export default function AppWatch() {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-sky-400" />
-                <h2 className="text-lg font-semibold text-white">Continue Watching</h2>
+                <h2 className="text-lg font-semibold text-white">{t('watch.continueWatching')}</h2>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {continueWatching.slice(0, 4).map((p) => {
@@ -351,10 +353,10 @@ export default function AppWatch() {
           {/* All Playlists */}
           <div className="space-y-3">
             <h2 className="text-sm font-semibold text-white/70 uppercase tracking-wider">
-              {selectedCategory === 'all' ? 'All Playlists' : categoryConfig[selectedCategory]?.name || selectedCategory}
+              {selectedCategory === 'all' ? t('watch.allPlaylists') : categoryConfig[selectedCategory]?.name || selectedCategory}
             </h2>
             {filtered.length === 0 ? (
-              <div className="text-center py-12 text-white/60"><p className="text-base">No playlists found</p></div>
+              <div className="text-center py-12 text-white/60"><p className="text-base">{t('watch.noPlaylists')}</p></div>
             ) : (
               <div className="grid grid-cols-2 gap-4">
                 {filtered.map((p) => {
@@ -366,12 +368,12 @@ export default function AppWatch() {
 
             {/* CTA to support chat */}
             <div className="pt-4 pb-2">
-              <p className="text-sm text-white/50">Not any videos you want above?</p>
+              <p className="text-sm text-white/50">{t('watch.notSeeingVideos')}</p>
               <button
-                onClick={() => navigate('/app/chat?draft=' + encodeURIComponent("Hi! I'd love to have a video for: "))}
+                onClick={() => navigate('/app/chat?draft=' + encodeURIComponent(t('watch.draftPrefix')))}
                 className="text-sm text-blue-400 font-medium flex items-center gap-1 mt-1"
               >
-                Tell us what you want <ChevronRight className="h-4 w-4" />
+                {t('watch.tellUsWhat')} <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           </div>
@@ -382,7 +384,7 @@ export default function AppWatch() {
         open={showRoutineSheet}
         onOpenChange={setShowRoutineSheet}
         tasks={[syntheticWatchTask]}
-        routineTitle="Watch Videos"
+        routineTitle={t('watch.watchVideos')}
         onSave={handleSaveRoutine}
         isSaving={addPlanMutation.isPending}
       />
