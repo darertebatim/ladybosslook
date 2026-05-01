@@ -327,7 +327,7 @@ const NativeAppLayout = () => {
           <Link
             to="/app/aiplanner"
             onClick={() => haptic.medium()}
-            aria-label="Open AI Planner"
+            aria-label={t('nav.aiPlanner')}
             className={cn(
               'block w-[60px] h-[60px] rounded-full relative',
               'bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-primary-dark))]',
