@@ -256,17 +256,17 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
                   }}>
                     <Emoji3D char={feature.emoji} size={28} />
                   </div>
-                  {/* Plus badge */}
+                  {/* Plus pill — matches in-app "Plus" tool label */}
                   <div style={{
-                    position: 'absolute', top: -2, right: -2,
-                    width: 20, height: 20, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #FFD36E 0%, #E84A6F 100%)',
+                    position: 'absolute', top: -6, right: -10,
+                    padding: '3px 8px', borderRadius: 999,
+                    background: 'linear-gradient(135deg, #F5A623 0%, #EB5E33 100%)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: '0 3px 8px -1px rgba(232,74,111,0.5), 0 0 0 2px #fff',
-                    color: '#fff', fontSize: 13, fontWeight: 900, lineHeight: 1,
-                    fontFamily: SF, paddingBottom: 1,
+                    boxShadow: '0 3px 8px -1px rgba(235,94,51,0.45), 0 0 0 2px #fff',
+                    color: '#fff', fontSize: 9, fontWeight: 800, lineHeight: 1,
+                    fontFamily: SF, letterSpacing: 0.6, textTransform: 'uppercase',
                   }}>
-                    +
+                    Plus
                   </div>
                 </div>
                 <div style={{ flex: 1, paddingTop: 6 }}>
