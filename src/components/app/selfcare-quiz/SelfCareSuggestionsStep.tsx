@@ -26,6 +26,7 @@ interface Props {
   step: OnboardingStep;
   onNext: () => void;
   answers?: OnboardingAnswers;
+  onAnswer?: (stepId: string, answer: string | string[]) => void;
 }
 
 const CATEGORY_EMOJI: Record<string, string> = {
@@ -42,7 +43,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   TidyUp: 'Tidy Up', Evening: 'Evening', LovedOnes: 'Loved Ones', 'easy-win': 'Easy Win',
 };
 
-export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
+export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Props) {
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [showPreview, setShowPreview] = useState(false);
   const { user } = useAuth();
@@ -197,6 +198,23 @@ export function SelfCareSuggestionsStep({ step, onNext, answers }: Props) {
         syntheticPlanCategoryName: 'Self-Care Gap Plan',
       });
       toast.success('Routine created! 🎉');
+      // Persist the chosen tasks so the routine-reveal step can show them.
+      try {
+        const editedById = new Map(editedTasks.map(t => [t.id, t]));
+        const finalTasks = selectedTaskIds.map(id => {
+          const edited = editedById.get(id);
+          const base = taskTemplates.find(t => t.id === id);
+          return {
+            id,
+            title: edited?.title || base?.title || '',
+            emoji: edited?.icon || base?.emoji || '✨',
+            color: edited?.color || base?.color || 'mint',
+          };
+        });
+        const payload = JSON.stringify({ tasks: finalTasks });
+        onAnswer?.(step.id, payload);
+        localStorage.setItem('simora_selfcare_revealed_tasks', payload);
+      } catch {}
       setShowPreview(false);
       onNext();
     } catch (err) {
