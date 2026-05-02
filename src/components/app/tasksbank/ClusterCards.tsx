@@ -22,11 +22,11 @@ const CLUSTERS: Cluster[] = [
     ring: 'ring-purple-200/60',
   },
   {
-    slug: 'calm',
-    emoji: '🧘',
-    question: 'Need to unwind?',
-    bg: 'bg-gradient-to-br from-purple-100 to-pink-100',
-    ring: 'ring-purple-200/60',
+    slug: 'connection',
+    emoji: '💕',
+    question: 'Feel more connected?',
+    bg: 'bg-gradient-to-br from-pink-100 to-rose-100',
+    ring: 'ring-pink-200/60',
   },
   {
     slug: 'movement',
@@ -36,11 +36,11 @@ const CLUSTERS: Cluster[] = [
     ring: 'ring-teal-200/60',
   },
   {
-    slug: 'easy-win',
-    emoji: '💪',
-    question: 'Just need a tiny win?',
-    bg: 'bg-gradient-to-br from-amber-100 to-orange-100',
-    ring: 'ring-amber-200/60',
+    slug: 'nutrition',
+    emoji: '🥗',
+    question: 'Eat or drink something good?',
+    bg: 'bg-gradient-to-br from-sky-100 to-blue-100',
+    ring: 'ring-sky-200/60',
   },
 ];
 
