@@ -139,7 +139,7 @@ export function InstructorWelcomeContent({
             <span className="text-xl">✨</span>
             <div>
               <p className="text-sm font-semibold text-foreground">
-                {plusTrialDays}-day Simora Plus trial
+                {plusTrialDays}-day Rilo Plus trial
               </p>
               <p className="text-xs text-foreground/65">
                 Unlock all premium features on us.

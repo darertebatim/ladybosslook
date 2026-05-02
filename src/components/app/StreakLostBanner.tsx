@@ -136,7 +136,7 @@ export const StreakLostBanner = ({
         ) : !isSubscribed ? (
           <>
             <p className="text-white/80 text-xs mb-3">
-              {t('streakLost.noShieldsLeft')} <span className="font-semibold text-white">Simora Plus</span>.
+              {t('streakLost.noShieldsLeft')} <span className="font-semibold text-white">Rilo Plus</span>.
             </p>
             <Button
               onClick={() => { haptic.light(); handleDismissChain(); onSubscribe?.(); }}
