@@ -414,16 +414,16 @@ export default function AppInspireDetail() {
             {/* Start/End + Badge row */}
             <div className={cn("mt-4 flex gap-3", (routine as any).badge_image_url ? "" : "")}>
               {/* Left: Start & End banners */}
-              <div className={cn("flex flex-col gap-2", (routine as any).badge_image_url ? "flex-1" : "w-full")}>
+              <div className={cn("flex flex-row gap-2", (routine as any).badge_image_url ? "flex-1" : "w-full")}>
                 <div className={cn(
-                  'flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border',
+                  'flex-1 min-w-0 flex items-center gap-2 rounded-xl px-3 py-2.5 border',
                   startInfo.isFuture 
                     ? 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800'
                     : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800'
                 )}>
-                  <span className="text-lg">{startInfo.emoji}</span>
+                  <span className="text-base shrink-0">{startInfo.emoji}</span>
                   <span className={cn(
-                    'text-sm font-medium',
+                    'text-sm font-medium truncate',
                     startInfo.isFuture 
                       ? 'text-amber-800 dark:text-amber-300'
                       : 'text-emerald-800 dark:text-emerald-300'
@@ -433,9 +433,9 @@ export default function AppInspireDetail() {
                 </div>
 
                 {endInfo && (
-                  <div className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
-                    <span className="text-lg">{endInfo.emoji}</span>
-                    <span className="text-sm font-medium text-rose-800 dark:text-rose-300">
+                  <div className="flex-1 min-w-0 flex items-center gap-2 rounded-xl px-3 py-2.5 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
+                    <span className="text-base shrink-0">{endInfo.emoji}</span>
+                    <span className="text-sm font-medium text-rose-800 dark:text-rose-300 truncate">
                       {endInfo.label}
                     </span>
                   </div>
