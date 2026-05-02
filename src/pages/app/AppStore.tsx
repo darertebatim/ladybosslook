@@ -58,6 +58,9 @@ const AppStore = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { user } = useAuth();
+  // Subscribe to dark-mode changes so `pickPeach()` calls below the loop
+  // re-evaluate with the dark palette when the theme toggles.
+  useIsDarkMode();
   const { programs, isLoading: programsLoading } = usePrograms();
   const [enrollingSlug, setEnrollingSlug] = useState<string | null>(null);
   const [showSearch, setShowSearch] = useState(false);
