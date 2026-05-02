@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
+import { CleanTaskRow } from '@/components/app/tasksbank/CleanTaskRow';
+import { CategorySection } from '@/components/app/tasksbank/CategorySection';
 import { useTaskTemplates, TaskTemplate } from '@/hooks/useTaskPlanner';
 import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { haptic } from '@/lib/haptics';
@@ -316,86 +318,49 @@ export default function AppTasksBank() {
                   <p className="text-sm text-muted-foreground/70 mt-1">{t('tier1.tasksBank.tryDifferent')}</p>
                 </div>
               ) : (
-                searchResults.map(task => (
-                  <TaskTemplateCard
-                    key={task.id}
-                    template={task}
-                    onAdd={() => handleToggleTask(task.id)}
-                    isSelected={selectedTasks.has(task.id)}
-                    selectable
-                  />
-                ))
+                searchResults.map(task => {
+                  const cat = sortedCategories.find(c => c.slug === task.category);
+                  return (
+                    <CleanTaskRow
+                      key={task.id}
+                      template={task}
+                      onToggle={() => handleToggleTask(task.id)}
+                      isSelected={selectedTasks.has(task.id)}
+                      accentColor={cat?.color || task.color}
+                    />
+                  );
+                })
               )}
             </div>
           )}
 
-          {!isLoading && !isSearching && sortedCategories.map(cat => {
+          {!isLoading && !isSearching && sortedCategories.map((cat, idx) => {
             const tasks = tasksByCategory[cat.slug] || [];
             if (tasks.length === 0) return null;
+            const preview = tasks.slice(0, PREVIEW_COUNT);
 
              return (
-              <div key={cat.slug} className="mt-6 first:mt-4">
-                {cat.description && (
-                  <p className="text-[11px] text-muted-foreground/70 px-4 mb-1.5 italic line-clamp-1">{cat.description}</p>
-                )}
-                <button
-                  onClick={() => handleCategoryTap(cat.slug)}
-                  className="w-full flex items-center justify-between px-4 mb-3 active:opacity-70 transition-opacity"
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-lg font-bold text-foreground">{cat.name}</h2>
-                      <span className="text-xs text-muted-foreground font-medium bg-muted/60 px-2 py-0.5 rounded-full">
-                        {tasks.length}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 text-sm font-medium text-primary">
-                    {t('tier1.tasksBank.all')}
-                    <ChevronRight className="w-4 h-4" />
-                  </div>
-                </button>
-
-                <ScrollArea className="w-full">
-                  <div className="flex gap-2.5 px-4 pb-2">
-                    {(() => {
-                      const preview = tasks.slice(0, PREVIEW_COUNT);
-                      const columns: TaskTemplate[][] = [];
-                      for (let i = 0; i < preview.length; i += 2) {
-                        columns.push(preview.slice(i, i + 2));
-                      }
-                      return columns.map((col, ci) => (
-                        <div key={ci} className="flex flex-col gap-2 min-w-[260px] max-w-[260px]">
-                          {col.map(task => (
-                            <TaskTemplateCard
-                              key={task.id}
-                              template={task}
-                              onAdd={() => handleToggleTask(task.id)}
-                              isSelected={selectedTasks.has(task.id)}
-                              selectable
-                              compact
-                            />
-                          ))}
-                        </div>
-                      ));
-                    })()}
-                    {tasks.length > PREVIEW_COUNT && (
-                      <button
-                        onClick={() => handleCategoryTap(cat.slug)}
-                        className="min-w-[100px] max-w-[100px] rounded-xl border border-border/50 bg-muted/30 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform self-stretch"
-                      >
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <ChevronRight className="w-5 h-5 text-primary" />
-                        </div>
-                        <span className="text-xs font-semibold text-primary">
-                          {t('tier1.tasksBank.moreCount', { n: tasks.length - PREVIEW_COUNT })}
-                        </span>
-                      </button>
-                    )}
-                  </div>
-                  <ScrollBar orientation="horizontal" className="invisible" />
-                </ScrollArea>
-              </div>
+              <CategorySection
+                key={cat.slug}
+                name={cat.name}
+                emoji={cat.emoji}
+                description={cat.description}
+                color={cat.color}
+                count={tasks.length}
+                defaultOpen={idx < 2}
+                onSeeAll={tasks.length > PREVIEW_COUNT ? () => handleCategoryTap(cat.slug) : undefined}
+                seeAllLabel={t('tier1.tasksBank.moreCount', { n: tasks.length - PREVIEW_COUNT })}
+              >
+                {preview.map(task => (
+                  <CleanTaskRow
+                    key={task.id}
+                    template={task}
+                    onToggle={() => handleToggleTask(task.id)}
+                    isSelected={selectedTasks.has(task.id)}
+                    accentColor={cat.color}
+                  />
+                ))}
+              </CategorySection>
             );
           })}
 
