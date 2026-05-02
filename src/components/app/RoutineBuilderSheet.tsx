@@ -83,6 +83,8 @@ interface RoutineBuilderSheetProps {
   initialColor?: string;
   initialTasks?: BuilderTask[];
   onEditSave?: (routineTitle: string, routineEmoji: string, routineColor: string, tasks: BuilderTask[]) => void;
+  /** Called when user taps the trash icon while in edit mode */
+  onDelete?: () => void;
   /** Called when user taps a routine suggestion to preview it */
   onNavigateToRoutine?: (routineId: string) => void;
 }
@@ -115,6 +117,7 @@ export function RoutineBuilderSheet({
   initialColor = 'mint',
   initialTasks = [],
   onEditSave,
+  onDelete,
   onNavigateToRoutine,
 }: RoutineBuilderSheetProps) {
   const { t } = useTranslation();
@@ -596,6 +599,30 @@ export function RoutineBuilderSheet({
                     </div>
                   )}
                 </div>
+                {editMode && step === 2 && (
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {onDelete && (
+                      <button
+                        onClick={() => { haptic.light(); onDelete(); }}
+                        aria-label="Delete routine"
+                        className="w-9 h-9 rounded-full bg-white/70 dark:bg-white/10 flex items-center justify-center active:scale-90 transition-transform"
+                      >
+                        <Trash2 className="w-4 h-4 text-black/60 dark:text-white/70" />
+                      </button>
+                    )}
+                    <button
+                      onClick={handleCreate}
+                      disabled={tasks.length === 0}
+                      aria-label="Save changes"
+                      className={cn(
+                        "w-9 h-9 rounded-full flex items-center justify-center active:scale-90 transition-transform",
+                        tasks.length > 0 ? "bg-urgency text-urgency-foreground" : "bg-white/40 text-black/30"
+                      )}
+                    >
+                      <Check className="w-4 h-4" strokeWidth={3} />
+                    </button>
+                  </div>
+                )}
               </div>
               {step === 2 && (
               <div className="flex items-center gap-2 mt-2 pl-12">

@@ -1606,6 +1606,10 @@ export default function AppRoutinePlayer() {
         initialColor={builderEditRoutine?.color || 'mint'}
         initialTasks={builderEditRoutine ? builderEditTasks : []}
         onEditSave={handleBuilderEditSave}
+        onDelete={builderEditRoutine ? () => {
+          setShowBuilder(false);
+          setDeleteRoutine(builderEditRoutine);
+        } : undefined}
         onNavigateToRoutine={handleBuilderNavigateToRoutine}
       />
 
