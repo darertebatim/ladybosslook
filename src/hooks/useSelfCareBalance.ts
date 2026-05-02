@@ -252,3 +252,28 @@ export function getSuggestionFor(cluster: ClusterType): string {
       return 'Reach out to someone — a text, a call, or a small kindness.';
   }
 }
+
+/** Tappable category chips per cluster — used in suggestion blocks. */
+export const SUGGESTION_CHIPS: Record<
+  ClusterType,
+  Array<{ slug: string; label: string; emoji: string }>
+> = {
+  body: [
+    { slug: 'sleep', label: 'Sleep', emoji: '💤' },
+    { slug: 'nutrition', label: 'Hydrate', emoji: '💧' },
+    { slug: 'movement', label: 'Walk', emoji: '🚶' },
+  ],
+  mind: [
+    { slug: 'calm', label: 'Breathe', emoji: '🌬️' },
+    { slug: 'gratitude', label: 'Gratitude', emoji: '🙏' },
+    { slug: 'Presence', label: 'Pause', emoji: '🧘' },
+  ],
+  environment: [
+    { slug: 'TidyUp', label: 'Tidy up', emoji: '🧹' },
+    { slug: 'Evening', label: 'Evening ritual', emoji: '🌙' },
+  ],
+  people: [
+    { slug: 'connection', label: 'Reach out', emoji: '💕' },
+    { slug: 'LovedOnes', label: 'Loved ones', emoji: '👨‍👩‍👧' },
+  ],
+};
