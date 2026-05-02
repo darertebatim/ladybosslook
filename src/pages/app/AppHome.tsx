@@ -135,6 +135,9 @@ const AppHome = () => {
   const [spotlightStep, setSpotlightStep] = useState<
     null | 'tap' | 'add' | 'complete'
   >(null);
+  // When user taps a task during the 'tap' step, defer advancement until
+  // the TaskDetailModal closes so step 2 doesn't appear behind the modal.
+  const [spotlightAdvancePending, setSpotlightAdvancePending] = useState(false);
   const [, setHasWelcomeBanner] = useState(false);
   const { isKeyboardOpen } = useKeyboard();
   const { currentTrack } = useAudioPlayer();
@@ -582,6 +585,14 @@ const AppHome = () => {
     }
   }, [spotlightStep, completedTaskIds]);
 
+  // Advance spotlight from 'tap' → 'add' only after the TaskDetailModal closes.
+  useEffect(() => {
+    if (!spotlightAdvancePending) return;
+    if (selectedTask) return; // wait for modal close
+    setSpotlightAdvancePending(false);
+    setSpotlightStep((prev) => (prev === 'tap' ? 'add' : prev));
+  }, [spotlightAdvancePending, selectedTask]);
+
   // Welcome spotlight: which task to highlight per step
   const spotlightHighlightTaskId = useMemo<string | null>(() => {
     if (!spotlightStep) return null;
@@ -800,8 +811,9 @@ const AppHome = () => {
   
   const handleTaskTap = useCallback((task: UserTask) => {
     setSelectedTask(task);
-    // Spotlight: advance from 'tap' → 'add' once user taps a task
-    setSpotlightStep((prev) => (prev === 'tap' ? 'add' : prev));
+    // Spotlight: defer 'tap' → 'add' advancement until the detail modal
+    // closes, so step 2 isn't hidden behind the open sheet.
+    setSpotlightAdvancePending((pending) => pending || true);
   }, []);
 
   const handleDateSelect = useCallback((date: Date) => {
