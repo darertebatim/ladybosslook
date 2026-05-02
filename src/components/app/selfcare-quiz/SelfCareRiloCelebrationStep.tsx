@@ -35,10 +35,12 @@ export function SelfCareRiloCelebrationStep({ step, onNext, answers }: Props) {
       } catch {}
       return null;
     };
+    const clean = (list: RevealedTask[]) =>
+      list.filter((t) => t && typeof t.title === 'string' && t.title.trim().length > 0);
     const fromAnswers = parse(answers?.['sc-suggestions']);
-    if (fromAnswers && fromAnswers.length) return fromAnswers;
+    if (fromAnswers && fromAnswers.length) return clean(fromAnswers);
     const fromStorage = parse(localStorage.getItem('simora_selfcare_revealed_tasks'));
-    if (fromStorage && fromStorage.length) return fromStorage;
+    if (fromStorage && fromStorage.length) return clean(fromStorage);
     return [];
   }, [answers]);
 
@@ -113,16 +115,6 @@ export function SelfCareRiloCelebrationStep({ step, onNext, answers }: Props) {
         >
           {step.title || 'You showed up\nfor yourself today.'}
         </motion.h1>
-        {step.subtitle && (
-          <motion.p
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.6 }}
-            className="mt-2 leading-snug text-center text-[14px] text-[#1a1f3d]/70"
-          >
-            {step.subtitle}
-          </motion.p>
-        )}
 
         {/* Notepad with the user's tasks */}
         {hasTasks && (
@@ -145,7 +137,6 @@ export function SelfCareRiloCelebrationStep({ step, onNext, answers }: Props) {
             <div className="rounded-3xl bg-white border border-[#F2D9A6] shadow-[0_24px_60px_-20px_rgba(180,120,40,0.35)] p-4 pt-5">
               <div className="text-center mb-3">
                 <h2 className="text-[15px] font-extrabold text-[#1a1f3d]">Your starter plan</h2>
-                <p className="text-[12px] text-[#1a1f3d]/55 mt-0.5">Waiting for you on Home — one tiny win at a time.</p>
               </div>
               <ul className="divide-y divide-[#F2E6CC]">
                 {tasks.map((t, i) => (
