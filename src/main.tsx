@@ -35,13 +35,12 @@ async function initializeNative() {
   // Add native-app class to html for iOS scroll containment
   document.documentElement.classList.add('native-app');
   
-  // StatusBar - with availability check
+  // StatusBar - reactive sync that mirrors the app's light/dark theme
+  // so the clock/battery/wifi icons stay legible in both modes.
   try {
-    if (Capacitor.isPluginAvailable('StatusBar')) {
-      const { StatusBar, Style } = await import('@capacitor/status-bar');
-      await StatusBar.setStyle({ style: Style.Dark });
-      console.log('[Main] ✓ StatusBar configured');
-    }
+    const { startStatusBarThemeSync } = await import('@/lib/statusBarSync');
+    startStatusBarThemeSync();
+    console.log('[Main] ✓ StatusBar theme sync started');
   } catch (e) {
     console.warn('[Main] StatusBar init failed:', e);
   }
