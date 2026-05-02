@@ -48,6 +48,12 @@ export function SelfCareRiloCelebrationStep({ step, onNext, answers }: Props) {
 
   const handleTap = () => {
     haptic.success();
+    // High-stakes happy moment: user just got their personalized self-care plan
+    // and is about to see the Plus offer. Soft review prompt has its own 30-day
+    // cooldown so it won't double-fire with other triggers.
+    import('@/lib/appReview').then(({ triggerSoftReview }) =>
+      triggerSoftReview('selfcare_quiz_complete')
+    );
     onNext();
   };
 
