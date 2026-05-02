@@ -27,6 +27,7 @@ import { SelfCareCommitmentStep } from '@/components/app/selfcare-quiz/SelfCareC
 import { SelfCareReflectionStep } from '@/components/app/selfcare-quiz/SelfCareReflectionStep';
 import { SelfCareRiloCelebrationStep } from '@/components/app/selfcare-quiz/SelfCareRiloCelebrationStep';
 import { SelfCarePlusIntroStep } from '@/components/app/selfcare-quiz/SelfCarePlusIntroStep';
+import { SelfCarePushPermissionStep } from '@/components/app/selfcare-quiz/SelfCarePushPermissionStep';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 import { computeTopCluster } from '@/utils/selfcare-scoring';
 import { RiloTeachScreen } from '@/components/admin/onboarding/RiloTeachScreen';
@@ -185,6 +186,8 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
           onDecline={() => { onAnswer?.(step.id, 'declined'); onNext(); }}
         />
       );
+    case 'selfcare-push-permission':
+      return <SelfCarePushPermissionStep step={step} onNext={onNext} />;
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }
