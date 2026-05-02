@@ -53,6 +53,7 @@ import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { WelcomeSpotlightBanner } from '@/components/app/home/WelcomeSpotlightBanner';
 import { TaskCoachOverlay } from '@/components/app/home/TaskCoachOverlay';
+import { SpotlightCutout } from '@/components/app/home/SpotlightCutout';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
@@ -1404,9 +1405,16 @@ const AppHome = () => {
 
         {/* Welcome Spotlight overlay — anchored to highlighted task during the tour */}
         {spotlightStep && (
-          <div
-            className="fixed inset-0 z-[100] bg-black/60 pointer-events-none animate-in fade-in duration-200"
-            aria-hidden
+          <SpotlightCutout
+            targetSelector={
+              spotlightStep === 'add'
+                ? '.coach-add-btn'
+                : spotlightHighlightTaskId
+                ? `[data-task-id="${spotlightHighlightTaskId}"]`
+                : null
+            }
+            padding={spotlightStep === 'add' ? 6 : 8}
+            radius={spotlightStep === 'add' ? 999 : 18}
           />
         )}
         {spotlightStep === 'tap' && spotlightHighlightTaskId && (
