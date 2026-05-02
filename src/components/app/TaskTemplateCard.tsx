@@ -85,25 +85,23 @@ export function TaskTemplateCard({ template, onAdd, isSelected, selectable, comp
               "shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-colors",
               isSelected
                 ? "bg-primary"
-                : lightUnselectedCircle
-                  ? "bg-white border border-black/15"
-                  : "bg-foreground"
+                : "bg-white border border-black/15"
             )}
             aria-label={isSelected ? "Deselect task" : "Select task"}
           >
             {isSelected ? (
               <Check className="h-5 w-5 text-primary-foreground" />
             ) : (
-              <CalendarPlus className={cn("h-5 w-5", lightUnselectedCircle ? "text-foreground" : "text-background")} />
+              <CalendarPlus className="h-5 w-5 text-foreground" />
             )}
           </button>
         ) : (
           <button
             onClick={handleAdd}
-            className="tour-action-add-btn shrink-0 p-2.5 rounded-full bg-foreground hover:bg-foreground/90 transition-colors"
+            className="tour-action-add-btn shrink-0 p-2.5 rounded-full bg-white border border-black/15 hover:bg-white/90 transition-colors"
             aria-label="Add to my routines"
           >
-            <CalendarPlus className="h-5 w-5 text-background" />
+            <CalendarPlus className="h-5 w-5 text-foreground" />
           </button>
         )}
       </div>
