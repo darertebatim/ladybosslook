@@ -16,11 +16,18 @@ import { PaywallSheet } from '@/components/app/PaywallSheet';
 
 const FREE_AI_PLANNER_USES = 7;
 const usesKey = (uid?: string | null) => `ai_planner_uses_${uid || 'anon'}`;
+const giftSeenKey = (uid?: string | null) => `ai_planner_gift_seen_${uid || 'anon'}`;
 const readUses = (uid?: string | null): number => {
   try { return parseInt(localStorage.getItem(usesKey(uid)) || '0', 10) || 0; } catch { return 0; }
 };
 const writeUses = (uid: string | null | undefined, n: number) => {
   try { localStorage.setItem(usesKey(uid), String(n)); } catch {}
+};
+const readGiftSeen = (uid?: string | null): boolean => {
+  try { return localStorage.getItem(giftSeenKey(uid)) === '1'; } catch { return false; }
+};
+const writeGiftSeen = (uid?: string | null) => {
+  try { localStorage.setItem(giftSeenKey(uid), '1'); } catch {}
 };
 
 // Brand round-robin pastel palette (matches user task bank)
@@ -76,10 +83,33 @@ export default function AppAIPlanner() {
 
   const [usesCount, setUsesCount] = useState<number>(() => readUses(user?.id));
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showGift, setShowGift] = useState(false);
 
   useEffect(() => {
     setUsesCount(readUses(user?.id));
   }, [user?.id]);
+
+  // First-visit gift reveal — only for non-subscribers who haven't used it yet.
+  useEffect(() => {
+    if (subLoading) return;
+    if (isSubscribed) return;
+    if (readGiftSeen(user?.id)) return;
+    if (readUses(user?.id) > 0) {
+      writeGiftSeen(user?.id);
+      return;
+    }
+    const t = setTimeout(() => {
+      setShowGift(true);
+      haptic.medium();
+    }, 350);
+    return () => clearTimeout(t);
+  }, [user?.id, isSubscribed, subLoading]);
+
+  const dismissGift = () => {
+    writeGiftSeen(user?.id);
+    haptic.light?.();
+    setShowGift(false);
+  };
 
   const remainingFree = Math.max(0, FREE_AI_PLANNER_USES - usesCount);
   const showCounter = !subLoading && !isSubscribed;
