@@ -786,6 +786,7 @@ export default function AppInspireDetail() {
           onSave={handleSaveRoutine}
           isSaving={addRoutineFromBank.isPending}
           isFree={(routine as any).is_free ?? false}
+          isPro={(routine as any).is_pro_routine ?? false}
           routineBankId={planId || null}
           linkedProgramTitle={(routine as any).linkedProgram?.title || null}
           linkedProgramSlug={(routine as any).linked_program_slug || null}
