@@ -472,8 +472,8 @@ export default function AppAIPlanner() {
                     </p>
                     <p className="text-white/70 text-[12px] leading-tight mt-0.5">
                       {remainingFree > 0
-                        ? `${remainingFree} free ${remainingFree === 1 ? 'plan' : 'plans'} left · Get Plus`
-                        : 'You\u2019re out of free plans · Get Plus'}
+                        ? `${remainingFree} of ${FREE_AI_PLANNER_USES} free plans remaining`
+                        : 'You\u2019ve used all your free plans'}
                     </p>
                     <p
                       className="text-[11px] font-semibold leading-tight mt-1"
