@@ -1428,7 +1428,7 @@ const AppHome = () => {
         {/* Instructional pill — vertically centered during tour */}
         {spotlightStep && (
           <div
-            className="fixed left-0 right-0 top-1/2 -translate-y-1/2 z-[10054] flex justify-center pointer-events-none px-4"
+            className="fixed left-0 right-0 top-1/2 -translate-y-1/2 z-[10062] flex justify-center pointer-events-none px-4"
           >
             <div className="pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#1a1a2e] text-white text-[13px] font-semibold shadow-[0_8px_24px_rgba(0,0,0,0.3)] max-w-[88vw]">
               <span>
