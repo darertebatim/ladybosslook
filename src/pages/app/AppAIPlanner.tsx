@@ -7,7 +7,6 @@ import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { useGoBack } from '@/hooks/useGoBack';
 import { getLocalDateStr } from '@/lib/localDate';
 import { toast } from 'sonner';
 import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
@@ -89,7 +88,11 @@ interface ExtractedTask {
  */
 export default function AppAIPlanner() {
   const { t } = useTranslation();
-  const goBack = useGoBack('/app/home');
+  // AI Planner is reachable from many entry points (mood sheet, banners,
+  // tools hub) that use `navigate(..., { replace: true })`, so a generic
+  // history-based back can land back on the originating sheet/banner.
+  // Always return to Home for a consistent, polished feel.
+  const goBack = () => navigate('/app/home');
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isSubscribed, isLoading: subLoading } = useSubscription();
