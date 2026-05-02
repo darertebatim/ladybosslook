@@ -19,12 +19,6 @@ export function SelfCarePlusIntroStep({ step, onAccept, onDecline }: Props) {
   const accept = () => { haptic.light(); onAccept(); };
   const decline = () => { haptic.light(); onDecline(); };
 
-  const perks = [
-    { icon: '🌿', label: 'Unlimited self-care tools' },
-    { icon: '🎧', label: 'Full audio & guided sessions' },
-    { icon: '🪄', label: 'Personalized AI coaching' },
-  ];
-
   return (
     <div className="h-full w-full flex flex-col relative overflow-hidden bg-gradient-to-b from-[#FFF6E8] via-[#FFE9F1] to-[#EFE4FF]">
       {/* Ambient warmth */}
@@ -84,36 +78,114 @@ export function SelfCarePlusIntroStep({ step, onAccept, onDecline }: Props) {
           </motion.p>
         ) : null}
 
-        {/* Perks card */}
+        {/* Creative animated gift box */}
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.45 }}
-          className="mt-6 max-w-[360px] mx-auto rounded-3xl bg-white/70 backdrop-blur-sm border border-white shadow-[0_18px_45px_-18px_rgba(138,92,240,0.35)] p-4"
+          className="mt-8 mx-auto relative w-[260px] h-[260px] flex items-center justify-center"
         >
-          <div className="flex items-center justify-between mb-3 px-1">
-            <span className="text-[12px] font-bold text-[#1a1f3d] uppercase tracking-wider">Plus includes</span>
-            <span className="text-[11px] font-bold text-[#8A5CF0] bg-[#8A5CF0]/10 px-2 py-1 rounded-full">7 days free</span>
-          </div>
-          <ul className="space-y-2.5">
-            {perks.map((p, i) => (
-              <motion.li
-                key={p.label}
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: 0.55 + i * 0.07 }}
-                className="flex items-center gap-3"
-              >
-                <div className="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center text-[18px]">
-                  {p.icon}
-                </div>
-                <span className="text-[14px] font-semibold text-[#1a1f3d]">{p.label}</span>
-              </motion.li>
-            ))}
-          </ul>
-          <p className="mt-3 text-center text-[11px] text-[#1a1f3d]/55">
-            Cancel anytime. No charge during your trial.
-          </p>
+          {/* Sparkles around */}
+          {[
+            { top: '8%', left: '12%', size: 18, delay: 0.9 },
+            { top: '14%', right: '10%', size: 14, delay: 1.05 },
+            { bottom: '18%', left: '6%', size: 12, delay: 1.2 },
+            { bottom: '10%', right: '14%', size: 20, delay: 1.35 },
+            { top: '40%', right: '2%', size: 10, delay: 1.5 },
+            { top: '42%', left: '0%', size: 10, delay: 1.6 },
+          ].map((s, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: [0, 1, 0.6, 1], scale: [0, 1.2, 0.9, 1] }}
+              transition={{ duration: 2.4, delay: s.delay, repeat: Infinity, repeatDelay: 1.2 }}
+              className="absolute"
+              style={{ top: s.top, left: s.left, right: s.right, bottom: s.bottom }}
+            >
+              <Sparkles className="text-[#F59E0B]" style={{ width: s.size, height: s.size }} strokeWidth={2.5} />
+            </motion.div>
+          ))}
+
+          {/* Glow halo */}
+          <div
+            className="absolute inset-0 rounded-full blur-2xl opacity-70"
+            style={{ background: 'radial-gradient(circle, rgba(255,200,120,0.6) 0%, rgba(236,72,153,0.25) 40%, transparent 70%)' }}
+          />
+
+          {/* Gift box */}
+          <motion.div
+            animate={{ y: [0, -8, 0], rotate: [-1.5, 1.5, -1.5] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+            className="relative"
+          >
+            <svg width="200" height="210" viewBox="0 0 200 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Lid bow shadow */}
+              <ellipse cx="100" cy="200" rx="70" ry="6" fill="#000" opacity="0.12" />
+
+              {/* Box base */}
+              <defs>
+                <linearGradient id="boxBase" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#F08A3E" />
+                  <stop offset="55%" stopColor="#EC4899" />
+                  <stop offset="100%" stopColor="#8A5CF0" />
+                </linearGradient>
+                <linearGradient id="boxLid" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#FFB066" />
+                  <stop offset="100%" stopColor="#F472B6" />
+                </linearGradient>
+                <linearGradient id="ribbon" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#FFF4D6" />
+                  <stop offset="100%" stopColor="#FFD27A" />
+                </linearGradient>
+              </defs>
+
+              {/* Body */}
+              <rect x="30" y="90" width="140" height="100" rx="14" fill="url(#boxBase)" />
+              {/* Vertical ribbon body */}
+              <rect x="86" y="90" width="28" height="100" fill="url(#ribbon)" />
+
+              {/* Lid */}
+              <rect x="22" y="68" width="156" height="34" rx="10" fill="url(#boxLid)" />
+              {/* Vertical ribbon on lid */}
+              <rect x="86" y="68" width="28" height="34" fill="url(#ribbon)" />
+
+              {/* Bow left loop */}
+              <path
+                d="M100 68 C 70 30, 30 40, 50 60 C 65 75, 90 70, 100 68 Z"
+                fill="url(#ribbon)"
+                stroke="#E8A53A"
+                strokeWidth="1.2"
+              />
+              {/* Bow right loop */}
+              <path
+                d="M100 68 C 130 30, 170 40, 150 60 C 135 75, 110 70, 100 68 Z"
+                fill="url(#ribbon)"
+                stroke="#E8A53A"
+                strokeWidth="1.2"
+              />
+              {/* Bow knot */}
+              <ellipse cx="100" cy="66" rx="14" ry="11" fill="#FFD27A" stroke="#E8A53A" strokeWidth="1.2" />
+              <ellipse cx="100" cy="64" rx="6" ry="4" fill="#FFF4D6" opacity="0.8" />
+
+              {/* Bow tails */}
+              <path d="M92 76 C 80 92, 78 100, 70 104 L 84 104 C 92 96, 96 90, 100 82 Z" fill="url(#ribbon)" stroke="#E8A53A" strokeWidth="1" />
+              <path d="M108 76 C 120 92, 122 100, 130 104 L 116 104 C 108 96, 104 90, 100 82 Z" fill="url(#ribbon)" stroke="#E8A53A" strokeWidth="1" />
+
+              {/* Highlights */}
+              <rect x="38" y="96" width="6" height="80" rx="3" fill="white" opacity="0.18" />
+              <rect x="30" y="74" width="6" height="22" rx="3" fill="white" opacity="0.25" />
+            </svg>
+
+            {/* "7 days free" floating tag */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.6, rotate: -8 }}
+              animate={{ opacity: 1, scale: 1, rotate: -8 }}
+              transition={{ duration: 0.5, delay: 0.95, type: 'spring', stiffness: 220, damping: 14 }}
+              className="absolute -top-2 -right-6 px-3 py-1.5 rounded-full bg-white shadow-[0_10px_24px_-8px_rgba(138,92,240,0.5)] border border-[#F3E8FF]"
+            >
+              <span className="text-[11px] font-extrabold text-[#8A5CF0] tracking-wide">7 DAYS FREE</span>
+            </motion.div>
+          </motion.div>
         </motion.div>
       </div>
 
