@@ -68,10 +68,25 @@ export function SelfCarePlusIntroStep({ step, onAccept, onDecline }: Props) {
           {(() => {
             const raw = step.title || "Rilo is free to use —\nbut we'd love for you to try Rilo Plus for 7 days free too!";
             const [first, ...rest] = raw.split('\n');
+            const renderHighlight = (line: string) => {
+              const parts = line.split(/(7 days free)/i);
+              return parts.map((part, i) =>
+                /^7 days free$/i.test(part) ? (
+                  <span
+                    key={i}
+                    className="font-extrabold bg-gradient-to-r from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] bg-clip-text text-transparent"
+                  >
+                    {part}
+                  </span>
+                ) : (
+                  <span key={i}>{part}</span>
+                )
+              );
+            };
             return (
               <>
-                <span className="block">{first}</span>
-                {rest.length > 0 && <span className="block mt-3">{rest.join(' ')}</span>}
+                <span className="block">{renderHighlight(first)}</span>
+                {rest.length > 0 && <span className="block mt-3">{renderHighlight(rest.join(' '))}</span>}
               </>
             );
           })()}
