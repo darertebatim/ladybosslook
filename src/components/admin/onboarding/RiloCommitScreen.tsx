@@ -7,7 +7,6 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { provisionRiloPicks } from '@/lib/onboarding/provisionRiloPicks';
 import confetti from 'canvas-confetti';
-import { requestAppReview } from '@/lib/appReview';
 import type { OnboardingStep } from '@/types/onboarding';
 
 interface Props {
