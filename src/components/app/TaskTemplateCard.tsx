@@ -14,6 +14,8 @@ interface TaskTemplateCardProps {
   hideSubtitle?: boolean;
   /** Use a white circle (with border) for the unselected state instead of the dark planner pill. */
   lightUnselectedCircle?: boolean;
+  /** Suppress the orange border/ring shown on the selected state. */
+  hideSelectedBorder?: boolean;
 }
 
 // Map time_period values to display labels
@@ -24,7 +26,7 @@ const TIME_PERIOD_LABELS: Record<string, string> = {
   night: 'Bedtime',
 };
 
-export function TaskTemplateCard({ template, onAdd, isSelected, selectable, compact, hideSubtitle, lightUnselectedCircle }: TaskTemplateCardProps) {
+export function TaskTemplateCard({ template, onAdd, isSelected, selectable, compact, hideSubtitle, lightUnselectedCircle, hideSelectedBorder }: TaskTemplateCardProps) {
   const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
 
   const handleAdd = () => {
@@ -41,8 +43,10 @@ export function TaskTemplateCard({ template, onAdd, isSelected, selectable, comp
     <div 
       className={cn(
         "rounded-xl border overflow-hidden transition-all duration-150",
-        isSelected 
-          ? "border-primary ring-2 ring-primary/30" 
+        isSelected
+          ? hideSelectedBorder
+            ? "border-transparent"
+            : "border-primary ring-2 ring-primary/30"
           : "border-border/50"
       )}
       style={{ backgroundColor: bgColor }}
