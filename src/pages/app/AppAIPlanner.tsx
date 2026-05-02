@@ -11,6 +11,17 @@ import { useGoBack } from '@/hooks/useGoBack';
 import { getLocalDateStr } from '@/lib/localDate';
 import { toast } from 'sonner';
 import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
+import { useSubscription } from '@/hooks/useSubscription';
+import { PaywallSheet } from '@/components/app/PaywallSheet';
+
+const FREE_AI_PLANNER_USES = 7;
+const usesKey = (uid?: string | null) => `ai_planner_uses_${uid || 'anon'}`;
+const readUses = (uid?: string | null): number => {
+  try { return parseInt(localStorage.getItem(usesKey(uid)) || '0', 10) || 0; } catch { return 0; }
+};
+const writeUses = (uid: string | null | undefined, n: number) => {
+  try { localStorage.setItem(usesKey(uid), String(n)); } catch {}
+};
 
 // Brand round-robin pastel palette (matches user task bank)
 const BRAND_TASK_COLORS = [
@@ -61,6 +72,17 @@ export default function AppAIPlanner() {
   const goBack = useGoBack('/app/home');
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isSubscribed, isLoading: subLoading } = useSubscription();
+
+  const [usesCount, setUsesCount] = useState<number>(() => readUses(user?.id));
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  useEffect(() => {
+    setUsesCount(readUses(user?.id));
+  }, [user?.id]);
+
+  const remainingFree = Math.max(0, FREE_AI_PLANNER_USES - usesCount);
+  const showCounter = !subLoading && !isSubscribed;
 
   const [stage, setStage] = useState<Stage>('input');
   const [isClosing, setIsClosing] = useState(false);
@@ -124,6 +146,20 @@ export default function AppAIPlanner() {
   const startSequence = async (raw: string) => {
     const trimmed = raw.trim();
     if (!trimmed) return;
+
+    // Gating: non-subscribers get FREE_AI_PLANNER_USES lifetime submissions
+    if (!subLoading && !isSubscribed) {
+      const current = readUses(user?.id);
+      if (current >= FREE_AI_PLANNER_USES) {
+        haptic.medium();
+        setShowPaywall(true);
+        return;
+      }
+      const next = current + 1;
+      writeUses(user?.id, next);
+      setUsesCount(next);
+    }
+
     haptic.medium();
     setStage('building');
     setDialogueIdx(0);
