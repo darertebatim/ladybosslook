@@ -21,6 +21,7 @@ import {
 } from "@/hooks/useAppData";
 import { ProgramCard } from "@/components/app/ProgramCard";
 import { ToolCard } from "@/components/app/ToolCard";
+import { pickPeach } from "@/lib/peachPalette";
 import { Input } from "@/components/ui/input";
 import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
 import {
@@ -608,7 +609,10 @@ const AppStore = () => {
                                   className="h-12 w-12 rounded-xl object-cover"
                                 />
                               ) : (
-                                <div className="h-12 w-12 rounded-xl flex items-center justify-center bg-[hsl(var(--tint-peach))]">
+                                <div
+                                  className="h-12 w-12 rounded-[16px] flex items-center justify-center"
+                                  style={{ backgroundColor: pickPeach(r.id) }}
+                                >
                                   <FluentEmoji
                                     emoji={r.emoji || "🪞"}
                                     size={26}
@@ -665,7 +669,10 @@ const AppStore = () => {
                           }
                           className="shrink-0 w-[140px] flex items-center gap-2 py-2 text-left transition-transform active:scale-[0.97] bg-card-warm rounded-2xl px-2 border-none"
                         >
-                          <div className="h-10 w-10 rounded-lg bg-[hsl(var(--tint-peach))] flex items-center justify-center shrink-0">
+                          <div
+                            className="h-10 w-10 rounded-[14px] flex items-center justify-center shrink-0"
+                            style={{ backgroundColor: pickPeach(exercise.id) }}
+                          >
                             <FluentEmoji
                               emoji={exercise.emoji || "🌬️"}
                               size={22}

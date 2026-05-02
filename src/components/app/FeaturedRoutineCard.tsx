@@ -9,6 +9,7 @@ import { isEmoji } from '@/lib/fluentEmoji';
 import { cn } from '@/lib/utils';
 import { RoutineBankItem } from '@/hooks/useRoutinesBank';
 import { useTranslation } from 'react-i18next';
+import { pickPeach } from '@/lib/peachPalette';
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400/80 to-amber-600/90',
@@ -67,7 +68,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
   const color = routine.color || 'purple';
   const gradient = colorGradients[color] || colorGradients.purple;
   const routineEmoji = routine.emoji && isEmoji(routine.emoji) ? routine.emoji : '✨';
-  const bgColor = colorBackgrounds[color] || colorBackgrounds.purple;
+  const peachBg = pickPeach(routine.id);
 
   const handleClick = () => {
     haptic.light();
@@ -78,11 +79,10 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
   return (
     <button
       className={cn(
-        "relative w-full text-left rounded-2xl overflow-hidden cursor-pointer transition-all active:scale-[0.98]",
-        "border-0",
-        bgColor,
+        "relative w-full text-left rounded-2xl overflow-hidden cursor-pointer transition-all active:scale-[0.98] border-0",
         className
       )}
+      style={{ backgroundColor: peachBg }}
       onClick={handleClick}
     >
       <div className="flex gap-3 p-2">
