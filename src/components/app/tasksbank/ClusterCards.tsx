@@ -38,7 +38,7 @@ const CLUSTERS: Cluster[] = [
   {
     slug: 'nutrition',
     emoji: '🥗',
-    question: 'Eat or drink something good?',
+    question: 'Eat or drink Better?',
     bg: 'bg-gradient-to-br from-sky-100 to-blue-100',
     ring: 'ring-sky-200/60',
   },
