@@ -10,6 +10,8 @@ import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 
+const PAYWALL_Z_INDEX = 10100;
+
 const VARIANT_MAP: Record<PaywallVariantId, React.ComponentType<any>> = {
   classic: PaywallClassic,
   gradient: PaywallGradient,
@@ -137,7 +139,7 @@ export function PaywallSheet({ open, onOpenChange }: PaywallSheetProps) {
   return (
     <OverlayPortal>
       {open && !showCelebration && (
-        <div className="fixed inset-0 z-[200] bg-white" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <div className="fixed inset-0 bg-background" style={{ zIndex: PAYWALL_Z_INDEX, paddingTop: 'env(safe-area-inset-top)' }}>
           <div className="h-full overflow-y-auto">
             <Component
               program={programData}
