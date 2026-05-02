@@ -54,6 +54,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { NotificationPreferencesCard } from "@/components/app/NotificationPreferencesCard";
+import { PlusUpsellBanner } from "@/components/app/PlusUpsellBanner";
 import { setAppLanguage, type SupportedLanguage } from "@/i18n";
 import { cn } from "@/lib/utils";
 import {
@@ -504,6 +505,11 @@ const AppSettings = () => {
       </header>
 
       <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-safe space-y-2 mt-4">
+        <PlusUpsellBanner
+          title="Go Plus — unlock everything"
+          subtitle="AI Planner, all tools & full audio library"
+          className="mb-2"
+        />
         {/* Password */}
         <Collapsible
           open={openSections.has("password")}
