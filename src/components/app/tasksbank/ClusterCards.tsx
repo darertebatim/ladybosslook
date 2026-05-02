@@ -8,40 +8,13 @@ interface Cluster {
   slug: string;
   emoji: string;
   question: string;
-  bg: string;        // tailwind gradient classes
-  ring: string;      // subtle inner ring tone
 }
 
-// 4 most universally-needed self-care clusters — phrased as gentle questions.
 const CLUSTERS: Cluster[] = [
-  {
-    slug: 'sleep',
-    emoji: '💤',
-    question: 'Sleep better tonight?',
-    bg: 'bg-gradient-to-br from-indigo-100 to-purple-100',
-    ring: 'ring-purple-200/60',
-  },
-  {
-    slug: 'connection',
-    emoji: '💕',
-    question: 'Feel more connected?',
-    bg: 'bg-gradient-to-br from-pink-100 to-rose-100',
-    ring: 'ring-pink-200/60',
-  },
-  {
-    slug: 'movement',
-    emoji: '🚶',
-    question: 'Move your body?',
-    bg: 'bg-gradient-to-br from-teal-100 to-emerald-100',
-    ring: 'ring-teal-200/60',
-  },
-  {
-    slug: 'nutrition',
-    emoji: '🥗',
-    question: 'Eat or drink Better?',
-    bg: 'bg-gradient-to-br from-sky-100 to-blue-100',
-    ring: 'ring-sky-200/60',
-  },
+  { slug: 'sleep', emoji: '💤', question: 'Sleep better tonight?' },
+  { slug: 'connection', emoji: '💕', question: 'Feel more connected?' },
+  { slug: 'movement', emoji: '🚶', question: 'Move your body?' },
+  { slug: 'nutrition', emoji: '🥗', question: 'Eat or drink Better?' },
 ];
 
 export function ClusterCards({ className }: { className?: string }) {
@@ -64,13 +37,12 @@ export function ClusterCards({ className }: { className?: string }) {
             key={c.slug}
             onClick={() => handleTap(c.slug)}
             className={cn(
-              'relative rounded-2xl text-left p-3.5 min-h-[110px] flex flex-col justify-between',
-              'active:scale-[0.97] transition-transform shadow-ios',
-              c.bg
+              'relative rounded-2xl text-left p-3.5 min-h-[110px] flex flex-col justify-between bg-card',
+              'active:scale-[0.97] transition-transform shadow-ios'
             )}
           >
             <FluentEmoji emoji={c.emoji} size={32} />
-            <p className="text-[14px] font-bold text-black leading-tight mt-2">
+            <p className="text-[14px] font-bold text-foreground leading-tight mt-2">
               {c.question}
             </p>
           </button>
