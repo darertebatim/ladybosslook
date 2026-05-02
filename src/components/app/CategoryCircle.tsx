@@ -31,23 +31,23 @@ export function CategoryCircle({ name, icon, emoji, color, isSelected, onClick }
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center gap-1 min-w-[56px]"
+      className="flex flex-col items-center gap-1.5 min-w-[76px]"
     >
       <div
         className={cn(
-          'w-12 h-12 rounded-full flex items-center justify-center transition-all',
+          'w-[68px] h-[68px] rounded-full flex items-center justify-center transition-all',
           colors.bg,
           isSelected && 'ring-2 ring-primary ring-offset-2'
         )}
       >
         {emoji ? (
-          <FluentEmoji emoji={emoji} size={32} />
+          <FluentEmoji emoji={emoji} size={44} />
         ) : (
-          <IconComponent className={cn('w-5 h-5', colors.text)} />
+          <IconComponent className={cn('w-7 h-7', colors.text)} />
         )}
       </div>
       <span className={cn(
-        'text-[11px] text-center font-medium max-w-[56px] line-clamp-2 leading-tight',
+        'text-[12px] text-center font-medium max-w-[76px] line-clamp-2 leading-tight',
         isSelected ? 'text-primary' : 'text-muted-foreground'
       )}>
         {name}
