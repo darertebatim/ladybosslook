@@ -524,15 +524,6 @@ export default function AppAIPlanner() {
               )}
             </motion.div>
           </div>
-          {showCounter && (
-            <div className="shrink-0 px-6 -mt-1 pb-1">
-              <p className="text-[12px] font-medium text-[#1a1f3d]/55 text-center">
-                {remainingFree > 0
-                  ? `${remainingFree} of ${FREE_AI_PLANNER_USES} free plans left`
-                  : 'No free plans left — upgrade to keep planning'}
-              </p>
-            </div>
-          )}
           <div
             className="shrink-0"
             style={{ height: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}
