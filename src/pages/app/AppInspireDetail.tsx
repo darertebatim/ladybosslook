@@ -421,9 +421,9 @@ export default function AppInspireDetail() {
                     ? 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800'
                     : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800'
                 )}>
-                  <span className="text-base shrink-0">{startInfo.emoji}</span>
+                  <span className="text-sm shrink-0">{startInfo.emoji}</span>
                   <span className={cn(
-                    'text-sm font-medium truncate',
+                    'text-xs font-medium truncate',
                     startInfo.isFuture 
                       ? 'text-amber-800 dark:text-amber-300'
                       : 'text-emerald-800 dark:text-emerald-300'
@@ -434,8 +434,8 @@ export default function AppInspireDetail() {
 
                 {endInfo && (
                   <div className="flex-1 min-w-0 flex items-center gap-2 rounded-xl px-3 py-2.5 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
-                    <span className="text-base shrink-0">{endInfo.emoji}</span>
-                    <span className="text-sm font-medium text-rose-800 dark:text-rose-300 truncate">
+                    <span className="text-sm shrink-0">{endInfo.emoji}</span>
+                    <span className="text-xs font-medium text-rose-800 dark:text-rose-300 truncate">
                       {endInfo.label}
                     </span>
                   </div>
