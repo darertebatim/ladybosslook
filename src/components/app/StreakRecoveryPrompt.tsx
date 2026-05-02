@@ -42,23 +42,26 @@ export const StreakRecoveryPrompt = ({
     <OverlayPortal>
     <div
       className="fixed inset-0 z-[10100] flex items-center justify-center p-4"
-      onClick={handleDismiss}
+      style={{ touchAction: 'manipulation' }}
     >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      {/* Overlay — own click handler so taps outside the card dismiss */}
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={handleDismiss}
+      />
 
       {/* Card */}
       <div
         className={cn(
-          'relative bg-gradient-to-b from-orange-400 to-orange-500 rounded-3xl p-8 w-full max-w-[300px] text-center transition-all duration-500',
+          'relative z-10 bg-gradient-to-b from-orange-400 to-orange-500 rounded-3xl p-8 w-full max-w-[300px] text-center transition-all duration-500',
           isAnimating ? 'scale-100 opacity-100' : 'scale-90 opacity-0'
         )}
-        onClick={(e) => e.stopPropagation()}
       >
         {/* Dismiss */}
         <button
           onClick={handleDismiss}
-          className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-white/60 active:text-white transition-colors p-2 -m-2"
+          aria-label="Dismiss"
         >
           <X className="h-5 w-5" />
         </button>
@@ -95,7 +98,7 @@ export const StreakRecoveryPrompt = ({
         <Button
           onClick={handleRecover}
           disabled={isLoading}
-          className="w-full bg-white hover:bg-white/90 text-orange-600 font-semibold py-3 rounded-xl mb-3"
+          className="w-full bg-white active:bg-white/90 text-orange-600 font-semibold py-3 rounded-xl mb-3"
         >
           🛡️ Recover My Streak
         </Button>
@@ -103,7 +106,7 @@ export const StreakRecoveryPrompt = ({
         {/* Skip */}
         <button
           onClick={handleDismiss}
-          className="text-white/60 text-xs hover:text-white/80 transition-colors"
+          className="text-white/80 text-xs active:text-white transition-colors py-2 px-4 -mx-4"
         >
           Let the streak reset
         </button>
