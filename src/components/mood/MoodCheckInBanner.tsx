@@ -104,18 +104,18 @@ export function MoodCheckInBanner({ onVisibilityChange }: { onVisibilityChange?:
       )}
       style={{
         background:
-          'linear-gradient(135deg, #FFE9D6 0%, #FFD1DC 45%, #F3D8FF 100%)',
-        boxShadow: '0 10px 28px -10px rgba(232, 74, 111, 0.35)',
+          'linear-gradient(135deg, #FFE3D1 0%, #FFCFA8 50%, #F5A623 100%)',
+        boxShadow: '0 10px 28px -10px rgba(235, 94, 51, 0.40)',
       }}
     >
       {/* Ambient blobs */}
       <div
         className="absolute -top-10 -right-10 w-32 h-32 rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(255,211,110,0.55) 0%, rgba(255,211,110,0) 70%)' }}
+        style={{ background: 'radial-gradient(circle, rgba(255,200,130,0.65) 0%, rgba(255,200,130,0) 70%)' }}
       />
       <div
         className="absolute -bottom-12 -left-8 w-32 h-32 rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(168,85,247,0.35) 0%, rgba(168,85,247,0) 70%)' }}
+        style={{ background: 'radial-gradient(circle, rgba(235,94,51,0.30) 0%, rgba(235,94,51,0) 70%)' }}
       />
 
       <div className="relative z-[1] px-4 pt-4 pb-4 pr-12">
