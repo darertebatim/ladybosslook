@@ -83,6 +83,8 @@ interface RoutineBuilderSheetProps {
   initialColor?: string;
   initialTasks?: BuilderTask[];
   onEditSave?: (routineTitle: string, routineEmoji: string, routineColor: string, tasks: BuilderTask[]) => void;
+  /** Called when user taps the trash icon while in edit mode */
+  onDelete?: () => void;
   /** Called when user taps a routine suggestion to preview it */
   onNavigateToRoutine?: (routineId: string) => void;
 }
@@ -115,6 +117,7 @@ export function RoutineBuilderSheet({
   initialColor = 'mint',
   initialTasks = [],
   onEditSave,
+  onDelete,
   onNavigateToRoutine,
 }: RoutineBuilderSheetProps) {
   const { t } = useTranslation();
