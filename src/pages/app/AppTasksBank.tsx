@@ -8,6 +8,7 @@ import { CategoryCircle } from '@/components/app/CategoryCircle';
 import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
 import { CleanTaskRow } from '@/components/app/tasksbank/CleanTaskRow';
 import { CategorySection } from '@/components/app/tasksbank/CategorySection';
+import { ClusterCards } from '@/components/app/tasksbank/ClusterCards';
 import { useTaskTemplates, TaskTemplate } from '@/hooks/useTaskPlanner';
 import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { haptic } from '@/lib/haptics';
@@ -290,6 +291,8 @@ export default function AppTasksBank() {
               </ScrollArea>
             </div>
           )}
+
+          {!isSearching && <ClusterCards className="mt-5" />}
 
           {!isSearching && (
             <>
