@@ -756,17 +756,25 @@ export default function AppInspireDetail() {
             </Button>
           </div>
         ) : (
-          <AddedToRoutineButton
-            isAdded={isAdded}
-            onAddClick={() => {
-              dismissHint();
-              handleAddClick();
-            }}
-            isLoading={addRoutineFromBank.isPending}
-            size="lg"
-            addText={t('inspirePage.addToMyRoutines')}
-            className="bg-urgency text-urgency-foreground"
-          />
+          <div className="relative">
+            <AddedToRoutineButton
+              isAdded={isAdded}
+              onAddClick={() => {
+                dismissHint();
+                handleAddClick();
+              }}
+              isLoading={addRoutineFromBank.isPending}
+              size="lg"
+              addText={t('inspirePage.addToMyRoutines')}
+              className="bg-urgency text-urgency-foreground"
+            />
+            {isPlusRoutine && !isSubscribed && !isAdded && (
+              <div className="pointer-events-none absolute -top-2 -right-2 flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-2.5 py-1 shadow-ios">
+                <Sparkles className="w-3 h-3 text-white" strokeWidth={2.5} />
+                <span className="text-[11px] font-bold text-white tracking-wide">PLUS</span>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
