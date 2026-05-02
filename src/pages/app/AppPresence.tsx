@@ -204,7 +204,7 @@ const AppPresence = () => {
                   previousStreak={previousStreakForRecovery}
                   onRecover={() => setShowRecoveryPrompt(true)}
                 />
-                <RecoveryShields recoveryCount={recoveryCount} />
+                <RecoveryShields recoveryCount={recoveryCount} longestStreak={longestStreak} />
               </div>
             )}
             
