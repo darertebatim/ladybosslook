@@ -142,12 +142,12 @@ export function SelfCareRiloCelebrationStep({ step, onNext, answers }: Props) {
                 />
               ))}
             </div>
-            <div className="rounded-3xl bg-[#FFF6E1] border border-[#F2D9A6] shadow-[0_24px_60px_-20px_rgba(180,120,40,0.35)] p-4 pt-5">
+            <div className="rounded-3xl bg-white border border-[#F2D9A6] shadow-[0_24px_60px_-20px_rgba(180,120,40,0.35)] p-4 pt-5">
               <div className="text-center mb-3">
                 <h2 className="text-[15px] font-extrabold text-[#1a1f3d]">Your starter plan</h2>
                 <p className="text-[12px] text-[#1a1f3d]/55 mt-0.5">Waiting for you on Home — one tiny win at a time.</p>
               </div>
-              <ul className="divide-y divide-[#F0DAA8]">
+              <ul className="divide-y divide-[#F2E6CC]">
                 {tasks.map((t, i) => (
                   <motion.li
                     key={t.id}
