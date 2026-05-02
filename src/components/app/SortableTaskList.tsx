@@ -438,7 +438,13 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
   }, [templates, title, showIdeas]);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      // Notify listeners (e.g. spotlight tour) on every close transition.
+      window.dispatchEvent(new CustomEvent('quick-add-close'));
+      return;
+    }
+    // Notify listeners on every open transition (covers inline trigger too).
+    window.dispatchEvent(new CustomEvent('quick-add-opened'));
     const t = window.setTimeout(() => {
       inputRef.current?.focus();
     }, 100);
