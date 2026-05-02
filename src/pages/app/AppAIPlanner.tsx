@@ -11,6 +11,17 @@ import { useGoBack } from '@/hooks/useGoBack';
 import { getLocalDateStr } from '@/lib/localDate';
 import { toast } from 'sonner';
 import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
+import { useSubscription } from '@/hooks/useSubscription';
+import { PaywallSheet } from '@/components/app/PaywallSheet';
+
+const FREE_AI_PLANNER_USES = 7;
+const usesKey = (uid?: string | null) => `ai_planner_uses_${uid || 'anon'}`;
+const readUses = (uid?: string | null): number => {
+  try { return parseInt(localStorage.getItem(usesKey(uid)) || '0', 10) || 0; } catch { return 0; }
+};
+const writeUses = (uid: string | null | undefined, n: number) => {
+  try { localStorage.setItem(usesKey(uid), String(n)); } catch {}
+};
 
 // Brand round-robin pastel palette (matches user task bank)
 const BRAND_TASK_COLORS = [
@@ -61,6 +72,17 @@ export default function AppAIPlanner() {
   const goBack = useGoBack('/app/home');
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isSubscribed, isLoading: subLoading } = useSubscription();
+
+  const [usesCount, setUsesCount] = useState<number>(() => readUses(user?.id));
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  useEffect(() => {
+    setUsesCount(readUses(user?.id));
+  }, [user?.id]);
+
+  const remainingFree = Math.max(0, FREE_AI_PLANNER_USES - usesCount);
+  const showCounter = !subLoading && !isSubscribed;
 
   const [stage, setStage] = useState<Stage>('input');
   const [isClosing, setIsClosing] = useState(false);
@@ -124,6 +146,20 @@ export default function AppAIPlanner() {
   const startSequence = async (raw: string) => {
     const trimmed = raw.trim();
     if (!trimmed) return;
+
+    // Gating: non-subscribers get FREE_AI_PLANNER_USES lifetime submissions
+    if (!subLoading && !isSubscribed) {
+      const current = readUses(user?.id);
+      if (current >= FREE_AI_PLANNER_USES) {
+        haptic.medium();
+        setShowPaywall(true);
+        return;
+      }
+      const next = current + 1;
+      writeUses(user?.id, next);
+      setUsesCount(next);
+    }
+
     haptic.medium();
     setStage('building');
     setDialogueIdx(0);
@@ -304,6 +340,7 @@ export default function AppAIPlanner() {
   const selectedCount = selectedIds.size;
 
   return (
+    <>
     <motion.div
       initial={{ y: '100%' }}
       animate={{ y: isClosing ? '100%' : 0 }}
@@ -424,6 +461,15 @@ export default function AppAIPlanner() {
               )}
             </motion.div>
           </div>
+          {showCounter && (
+            <div className="shrink-0 px-6 -mt-1 pb-1">
+              <p className="text-[12px] font-medium text-[#1a1f3d]/55 text-center">
+                {remainingFree > 0
+                  ? `${remainingFree} of ${FREE_AI_PLANNER_USES} free plans left`
+                  : 'No free plans left — upgrade to keep planning'}
+              </p>
+            </div>
+          )}
           <div
             className="shrink-0"
             style={{ height: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}
@@ -616,6 +662,8 @@ export default function AppAIPlanner() {
         </div>
       )}
     </motion.div>
+    <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
+    </>
   );
 }
 
