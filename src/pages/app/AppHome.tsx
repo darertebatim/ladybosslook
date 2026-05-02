@@ -586,13 +586,27 @@ const AppHome = () => {
     }
   }, [spotlightStep, completedTaskIds]);
 
-  // Advance spotlight from 'tap' → 'add' only after the TaskDetailModal closes.
+  // Advance spotlight from 'tap' → 'add' once the TaskDetailModal closes.
   useEffect(() => {
     if (!spotlightAdvancePending) return;
+    if (spotlightStep !== 'tap') return;
     if (selectedTask) return; // wait for modal close
     setSpotlightAdvancePending(false);
-    setSpotlightStep((prev) => (prev === 'tap' ? 'add' : prev));
-  }, [spotlightAdvancePending, selectedTask]);
+    setSpotlightStep('add');
+  }, [spotlightAdvancePending, spotlightStep, selectedTask]);
+
+  // Advance spotlight from 'add' → 'complete' once the quick-add sheet closes.
+  useEffect(() => {
+    const onQuickAddClose = () => {
+      setSpotlightStep((prev) => {
+        if (prev !== 'add') return prev;
+        setSpotlightAdvancePending(false);
+        return 'complete';
+      });
+    };
+    window.addEventListener('quick-add-close', onQuickAddClose);
+    return () => window.removeEventListener('quick-add-close', onQuickAddClose);
+  }, []);
 
   // Welcome spotlight: which task to highlight per step
   const spotlightHighlightTaskId = useMemo<string | null>(() => {
