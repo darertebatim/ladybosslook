@@ -243,8 +243,9 @@ const AppHome = () => {
 
   const handleFabClick = useCallback(() => {
     window.dispatchEvent(new CustomEvent('quick-add-open', { detail: { defaultRepeat: taskFilter === 'one-time' ? 'No' : 'Daily' } }));
-    // Spotlight: advance from 'add' → 'complete' once user taps the + button
-    setSpotlightStep((prev) => (prev === 'add' ? 'complete' : prev));
+    // Spotlight: defer 'add' → 'complete' advancement until the quick-add
+    // sheet closes, so step 3 isn't hidden behind the open sheet.
+    setSpotlightAdvancePending((pending) => pending || true);
   }, [taskFilter]);
 
   // Streak data now comes from useNewHomeData (consolidated RPC)
