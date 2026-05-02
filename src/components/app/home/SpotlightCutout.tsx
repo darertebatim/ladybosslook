@@ -4,8 +4,6 @@ import { OverlayPortal } from '@/components/app/OverlayPortal';
 interface Props {
   /** CSS selector or null for full dim (no cutout) */
   targetSelector: string | null;
-  /** Optional extra layer to keep visible above the scrim during the tour */
-  contextSelector?: string | null;
   /** Padding around the target rect in px */
   padding?: number;
   /** Border radius of the cutout in px */
@@ -20,12 +18,7 @@ interface Props {
  * This guarantees the target sits on top of EVERY ancestor (action sheets,
  * task detail rows, etc.) without each card needing its own `relative z-10`.
  */
-export function SpotlightCutout({
-  targetSelector,
-  contextSelector = null,
-  padding = 8,
-  radius = 16,
-}: Props) {
+export function SpotlightCutout({ targetSelector, padding = 8, radius = 16 }: Props) {
   const [hasTarget, setHasTarget] = useState(false);
 
   // Promote the live target element above the scrim using inline styles.
@@ -37,8 +30,7 @@ export function SpotlightCutout({
       return;
     }
 
-    let currentTargetEl: HTMLElement | null = null;
-    let currentContextEl: HTMLElement | null = null;
+    let currentEl: HTMLElement | null = null;
     const saved = new WeakMap<HTMLElement, {
       position: string;
       zIndex: string;
@@ -47,7 +39,7 @@ export function SpotlightCutout({
       transition: string;
     }>();
 
-    const promote = (el: HTMLElement, zIndex: string, forcedRadius?: string) => {
+    const promote = (el: HTMLElement) => {
       if (saved.has(el)) return;
       saved.set(el, {
         position: el.style.position,
@@ -57,11 +49,10 @@ export function SpotlightCutout({
         transition: el.style.transition,
       });
       // position:relative is required for z-index to apply on non-positioned elements.
-      // 10055 sits above the scrim (10050), while 10056 is reserved for
-      // context sheets/modals that must stay readable above the dim layer too.
+      // 10055 sits above the scrim (10050) and below tooltip (10054 → bumped below).
       el.style.position = el.style.position || 'relative';
-      el.style.zIndex = zIndex;
-      el.style.borderRadius = el.style.borderRadius || forcedRadius || `${radius}px`;
+      el.style.zIndex = '10055';
+      el.style.borderRadius = el.style.borderRadius || `${radius}px`;
       el.style.boxShadow =
         '0 0 0 3px rgba(250,204,21,0.65), 0 0 28px 10px rgba(250,204,21,0.35)';
       el.style.transition = 'box-shadow 200ms ease-out';
@@ -79,28 +70,12 @@ export function SpotlightCutout({
     };
 
     const tick = () => {
-      const targetEl = document.querySelector(targetSelector) as HTMLElement | null;
-      const contextEl = contextSelector
-        ? (document.querySelector(contextSelector) as HTMLElement | null)
-        : null;
-
-      if (targetEl !== currentTargetEl) {
-        if (currentTargetEl) restore(currentTargetEl);
-        currentTargetEl = targetEl;
-        if (targetEl) {
-          promote(targetEl, '10055');
-        }
-      }
-
-      if (contextEl !== currentContextEl) {
-        if (currentContextEl) restore(currentContextEl);
-        currentContextEl = contextEl;
-        if (contextEl) {
-          promote(contextEl, '10056', '24px');
-        }
-      }
-
-      if (targetEl) {
+      const el = document.querySelector(targetSelector) as HTMLElement | null;
+      if (el === currentEl) return;
+      if (currentEl) restore(currentEl);
+      currentEl = el;
+      if (el) {
+        promote(el);
         setHasTarget(true);
       } else {
         setHasTarget(false);
@@ -111,10 +86,9 @@ export function SpotlightCutout({
     const id = setInterval(tick, 150);
     return () => {
       clearInterval(id);
-      if (currentTargetEl) restore(currentTargetEl);
-      if (currentContextEl) restore(currentContextEl);
+      if (currentEl) restore(currentEl);
     };
-  }, [targetSelector, contextSelector, radius]);
+  }, [targetSelector, radius]);
 
   const dim = 'rgba(0,0,0,0.6)';
 
