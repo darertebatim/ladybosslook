@@ -766,7 +766,7 @@ export default function AppInspireDetail() {
               isLoading={addRoutineFromBank.isPending}
               size="lg"
               addText={t('inspirePage.addToMyRoutines')}
-              className="bg-brand-primary text-white"
+              className="!bg-brand-primary hover:!bg-brand-primary/90 !text-white !border-0"
             />
             {isPlusRoutine && !isSubscribed && !isAdded && (
               <div className="pointer-events-none absolute -top-2 -right-2 flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-2.5 py-1 shadow-ios">
