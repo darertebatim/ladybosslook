@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { OverlayPortal } from '@/components/app/OverlayPortal';
+import { useEffect } from 'react';
 
 interface Props {
   /** CSS selector or null for full dim (no cutout) */
@@ -19,14 +18,11 @@ interface Props {
  * task detail rows, etc.) without each card needing its own `relative z-10`.
  */
 export function SpotlightCutout({ targetSelector, padding = 8, radius = 16 }: Props) {
-  const [hasTarget, setHasTarget] = useState(false);
-
-  // Promote the live target element above the scrim using inline styles.
+  // Highlight the live target element with a glowing outline.
   // We re-query on a short interval so list reorders / sheet open animations
  // don't leave us pointing at a stale node.
   useEffect(() => {
     if (!targetSelector) {
-      setHasTarget(false);
       return;
     }
 
@@ -48,10 +44,6 @@ export function SpotlightCutout({ targetSelector, padding = 8, radius = 16 }: Pr
         borderRadius: el.style.borderRadius,
         transition: el.style.transition,
       });
-      // position:relative is required for z-index to apply on non-positioned elements.
-      // 10055 sits above the scrim (10050) and below tooltip (10054 → bumped below).
-      el.style.position = el.style.position || 'relative';
-      el.style.zIndex = '10055';
       el.style.borderRadius = el.style.borderRadius || `${radius}px`;
       el.style.boxShadow =
         '0 0 0 3px rgba(250,204,21,0.65), 0 0 28px 10px rgba(250,204,21,0.35)';
@@ -74,12 +66,7 @@ export function SpotlightCutout({ targetSelector, padding = 8, radius = 16 }: Pr
       if (el === currentEl) return;
       if (currentEl) restore(currentEl);
       currentEl = el;
-      if (el) {
-        promote(el);
-        setHasTarget(true);
-      } else {
-        setHasTarget(false);
-      }
+      if (el) promote(el);
     };
 
     tick();
@@ -90,17 +77,6 @@ export function SpotlightCutout({ targetSelector, padding = 8, radius = 16 }: Pr
     };
   }, [targetSelector, radius]);
 
-  const dim = 'rgba(0,0,0,0.6)';
-
-  return (
-    <OverlayPortal>
-      <div
-        aria-hidden
-        className="fixed inset-0 z-[10050] pointer-events-none animate-in fade-in duration-200"
-        style={{ background: dim }}
-      />
-      {/* Suppress unused warning for hasTarget; reserved for future cutout fade. */}
-      {hasTarget ? null : null}
-    </OverlayPortal>
-  );
+  // No scrim — the glowing outline + instructional pill guide the user.
+  return null;
 }
