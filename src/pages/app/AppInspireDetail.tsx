@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
 import { useUserChallenges } from '@/hooks/useUserChallenges';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Loader2, Share2, Instagram, Play, Heart, CalendarPlus } from 'lucide-react';
+import { Loader2, Share2, Instagram, Play, Heart, CalendarPlus, Sparkles } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { BackButtonCircle } from '@/components/app/BackButton';
@@ -22,6 +22,7 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { useRoutineFavorites, useToggleRoutineFavorite } from '@/hooks/useRoutineFavorites';
 import { useTranslation } from 'react-i18next';
+import { useSubscription } from '@/hooks/useSubscription';
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400 to-amber-600',
@@ -102,6 +103,7 @@ export default function AppInspireDetail() {
   const { data: categories = [] } = useRoutineBankCategories();
   const { startRoutine } = useRoutinePlayerContext();
   const { user } = useAuth();
+  const { isSubscribed } = useSubscription();
   const { favoriteIds } = useRoutineFavorites();
   const toggleFavorite = useToggleRoutineFavorite();
   const isFavorited = planId ? favoriteIds.includes(planId) : false;
@@ -754,17 +756,25 @@ export default function AppInspireDetail() {
             </Button>
           </div>
         ) : (
-          <AddedToRoutineButton
-            isAdded={isAdded}
-            onAddClick={() => {
-              dismissHint();
-              handleAddClick();
-            }}
-            isLoading={addRoutineFromBank.isPending}
-            size="lg"
-            addText={t('inspirePage.addToMyRoutines')}
-            className="bg-urgency text-urgency-foreground"
-          />
+          <div className="relative">
+            <AddedToRoutineButton
+              isAdded={isAdded}
+              onAddClick={() => {
+                dismissHint();
+                handleAddClick();
+              }}
+              isLoading={addRoutineFromBank.isPending}
+              size="lg"
+              addText={t('inspirePage.addToMyRoutines')}
+              className="bg-urgency text-urgency-foreground"
+            />
+            {isPlusRoutine && !isSubscribed && !isAdded && (
+              <div className="pointer-events-none absolute -top-2 -right-2 flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-2.5 py-1 shadow-ios">
+                <Sparkles className="w-3 h-3 text-white" strokeWidth={2.5} />
+                <span className="text-[11px] font-bold text-white tracking-wide">PLUS</span>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
