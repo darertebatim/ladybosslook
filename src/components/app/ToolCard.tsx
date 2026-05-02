@@ -124,9 +124,24 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
               <FluentEmoji emoji="🔥" size={10} /> FREE
             </div>
           )}
-          <div className={cn(
-            'w-[68px] h-[68px] rounded-[26px] flex items-center justify-center relative bg-peach'
-          )}>
+          <div
+            className="w-[68px] h-[68px] rounded-[26px] flex items-center justify-center relative"
+            style={{
+              backgroundColor: (() => {
+                const peaches = [
+                  'hsl(31 100% 89%)',  // light peach
+                  'hsl(28 100% 84%)',  // mid peach
+                  'hsl(22 100% 87%)',  // warm coral peach
+                  'hsl(35 100% 90%)',  // pale apricot
+                  'hsl(18 100% 88%)',  // pinkish peach
+                  'hsl(30 90% 82%)',   // deeper peach
+                ];
+                let h = 0;
+                for (let i = 0; i < tool.id.length; i++) h = (h * 31 + tool.id.charCodeAt(i)) >>> 0;
+                return peaches[h % peaches.length];
+              })(),
+            }}
+          >
             {tool.emoji ? (
               <FluentEmoji emoji={tool.emoji} size={44} />
             ) : (
