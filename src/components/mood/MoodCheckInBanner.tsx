@@ -12,11 +12,11 @@ import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
 import { MoodCelebrationSheet } from '@/components/mood/MoodCelebrationSheet';
 
 const MOODS = [
-  { value: 'great',     emoji: '😄', label: 'Great' },
-  { value: 'good',      emoji: '🙂', label: 'Good' },
-  { value: 'okay',      emoji: '😐', label: 'Okay' },
-  { value: 'not_great', emoji: '😔', label: 'Meh' },
-  { value: 'bad',       emoji: '😢', label: 'Bad' },
+  { value: 'great',     emoji: '😄', label: 'Great', bg: '#FEF9C3', shadow: 'rgba(202,138,4,0.25)' },   // yellow
+  { value: 'good',      emoji: '🙂', label: 'Good',  bg: '#DCFCE7', shadow: 'rgba(22,163,74,0.25)' },   // green
+  { value: 'okay',      emoji: '😐', label: 'Okay',  bg: '#DBEAFE', shadow: 'rgba(37,99,235,0.25)' },   // blue
+  { value: 'not_great', emoji: '😔', label: 'Meh',   bg: '#F3E8FF', shadow: 'rgba(147,51,234,0.25)' },  // purple
+  { value: 'bad',       emoji: '😢', label: 'Bad',   bg: '#FEE2E2', shadow: 'rgba(220,38,38,0.25)' },   // red
 ];
 
 const DISMISS_KEY = 'mood-banner-dismissed';
@@ -161,10 +161,13 @@ export function MoodCheckInBanner({ onVisibilityChange }: { onVisibilityChange?:
                 disabled={!!submittingMood}
                 className={cn(
                   'flex flex-col items-center justify-center gap-1 py-2 rounded-2xl',
-                  'bg-white/80 backdrop-blur-sm active:scale-90 transition-transform',
+                  'backdrop-blur-sm active:scale-90 transition-transform',
                   'disabled:opacity-60'
                 )}
-                style={{ boxShadow: '0 4px 10px -4px rgba(26,31,61,0.15)' }}
+                style={{
+                  background: mood.bg,
+                  boxShadow: `0 4px 10px -4px ${mood.shadow}`,
+                }}
                 aria-label={`Log mood: ${mood.label}`}
               >
                 <img
