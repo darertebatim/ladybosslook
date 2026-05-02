@@ -190,9 +190,9 @@ export function SelfCarePlusIntroStep({ step, onAccept, onDecline }: Props) {
               initial={{ opacity: 0, scale: 0.6, rotate: -8 }}
               animate={{ opacity: 1, scale: 1, rotate: -8 }}
               transition={{ duration: 0.5, delay: 0.95, type: 'spring', stiffness: 220, damping: 14 }}
-              className="absolute -top-2 -right-6 px-3 py-1.5 rounded-full bg-white shadow-[0_10px_24px_-8px_rgba(138,92,240,0.5)] border border-[#F3E8FF]"
+              className="absolute -top-2 -right-6 px-3 py-1.5 rounded-full shadow-[0_10px_24px_-8px_rgba(236,72,153,0.6)] bg-gradient-to-r from-[#FFB347] via-[#EC4899] to-[#8A5CF0] ring-2 ring-white"
             >
-              <span className="text-[11px] font-extrabold text-[#8A5CF0] tracking-wide">7 DAYS FREE</span>
+              <span className="text-[11px] font-extrabold text-white tracking-wide drop-shadow-sm">7 DAYS FREE</span>
             </motion.div>
           </motion.div>
         </motion.div>
