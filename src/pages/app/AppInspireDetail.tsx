@@ -103,6 +103,7 @@ export default function AppInspireDetail() {
   const { data: categories = [] } = useRoutineBankCategories();
   const { startRoutine } = useRoutinePlayerContext();
   const { user } = useAuth();
+  const { isSubscribed } = useSubscription();
   const { favoriteIds } = useRoutineFavorites();
   const toggleFavorite = useToggleRoutineFavorite();
   const isFavorited = planId ? favoriteIds.includes(planId) : false;
