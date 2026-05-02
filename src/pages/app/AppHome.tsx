@@ -803,8 +803,9 @@ const AppHome = () => {
   
   const handleTaskTap = useCallback((task: UserTask) => {
     setSelectedTask(task);
-    // Spotlight: advance from 'tap' → 'add' once user taps a task
-    setSpotlightStep((prev) => (prev === 'tap' ? 'add' : prev));
+    // Spotlight: defer 'tap' → 'add' advancement until the detail modal
+    // closes, so step 2 isn't hidden behind the open sheet.
+    setSpotlightAdvancePending((pending) => pending || true);
   }, []);
 
   const handleDateSelect = useCallback((date: Date) => {
