@@ -127,6 +127,27 @@ export function MoodCheckInBanner({ onVisibilityChange }: { onVisibilityChange?:
           <span className="text-[12px] font-semibold text-black/70 leading-tight">
             How is your day?
           </span>
+          {/* 3D emoji cluster */}
+          <div className="ml-auto flex items-center -space-x-1.5 pr-1">
+            <img
+              src={getFluentEmojiUrl('💧')}
+              alt=""
+              className="w-6 h-6 select-none"
+              style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.12))', transform: 'rotate(-8deg)' }}
+            />
+            <img
+              src={getFluentEmojiUrl('⭐')}
+              alt=""
+              className="w-6 h-6 select-none"
+              style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.12))', transform: 'translateY(-2px)' }}
+            />
+            <img
+              src={getFluentEmojiUrl('💗')}
+              alt=""
+              className="w-6 h-6 select-none"
+              style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.12))', transform: 'rotate(8deg)' }}
+            />
+          </div>
         </div>
 
         {/* 5 mood chips */}
