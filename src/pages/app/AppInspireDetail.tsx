@@ -655,7 +655,7 @@ export default function AppInspireDetail() {
       {/* Sticky Footer: Play button (for focus routines already added), Moment play-once, OR Add button */}
       <div 
         className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 104px)' }}
       >
         {isMoment && routine?.tasks?.length ? (
           <div className="flex gap-3">
