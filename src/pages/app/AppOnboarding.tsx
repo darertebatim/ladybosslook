@@ -205,7 +205,9 @@ export default function AppOnboarding() {
       if (flowId === 'weekly-review') {
         navigate('/app/home');
       } else if (flowId === 'selfcare-quiz') {
-        navigate('/app/home');
+        const plusChoice = answers?.['sc-plus-intro'];
+        const accepted = Array.isArray(plusChoice) ? plusChoice[0] === 'accepted' : plusChoice === 'accepted';
+        navigate(accepted ? '/app/home?paywall=1' : '/app/home');
       } else if (flowId === 'what-is-rilo') {
         // Persist the user's morning / afternoon / evening picks as real
         // recurring tasks on their planner. Fire-and-forget so navigation
