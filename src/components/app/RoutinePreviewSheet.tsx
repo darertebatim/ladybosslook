@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { ProgramEventCard } from '@/components/app/ProgramEventCard';
 import { type ProgramEvent } from '@/hooks/usePlannerProgramEvents';
 import { SaveRoutineHandHint, useSaveRoutineHint } from '@/components/app/AddToRoutineHandHint';
-import { Check, Pencil } from 'lucide-react';
+import { Check, Pencil, Crown } from 'lucide-react';
 import { format } from 'date-fns';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -93,6 +93,8 @@ interface RoutinePreviewSheetProps {
   onSave: (selectedTaskIds: string[], editedTasks: EditedTask[]) => void;
   isSaving?: boolean;
   isFree?: boolean;
+  /** True when the source routine_plans row has is_pro_routine = true. */
+  isPro?: boolean;
   routineBankId?: string | null;
   linkedProgramTitle?: string | null;
   linkedProgramSlug?: string | null;
@@ -115,6 +117,7 @@ export function RoutinePreviewSheet({
   onSave,
   isSaving,
   isFree,
+  isPro,
   routineBankId,
   linkedProgramTitle,
   linkedProgramSlug,
@@ -287,6 +290,11 @@ export function RoutinePreviewSheet({
   };
 
   const handleSave = () => {
+    // Plus-only routine: block non-subscribers and surface the paywall.
+    if (isPro && !subLoading && !isSubscribed) {
+      setShowPaywall(true);
+      return;
+    }
     const editedTasksList = Object.values(editedTasks);
     onSave(Array.from(selectedTaskIds), editedTasksList);
   };
@@ -401,7 +409,18 @@ export function RoutinePreviewSheet({
         >
           <div className="flex flex-col h-full">
             <SheetHeader className="text-left pb-2 flex-shrink-0">
-              <SheetTitle className="text-xl font-bold">{t('routinePreview.previewRoutine')}</SheetTitle>
+              <div className="flex items-center gap-2">
+                <SheetTitle className="text-xl font-bold">{t('routinePreview.previewRoutine')}</SheetTitle>
+                {isPro && !isSubscribed && !subLoading && (
+                  <span
+                    className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold text-[#1a1f3d]"
+                    style={{ background: 'linear-gradient(135deg, #FFD27A 0%, #FF8A5C 100%)' }}
+                  >
+                    <Crown className="h-3 w-3" strokeWidth={2.6} />
+                    Plus
+                  </span>
+                )}
+              </div>
               <p className="text-sm text-foreground">
                 {t('routinePreview.editToPersonalize')}
               </p>
