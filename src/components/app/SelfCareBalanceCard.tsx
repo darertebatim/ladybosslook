@@ -102,7 +102,7 @@ export function SelfCareBalanceCard() {
                 <p className="text-xs text-amber-900/80 leading-snug">
                   {getSuggestionFor(data.weakestCluster)}
                 </p>
-                <div className="mt-2.5 flex flex-wrap gap-1.5">
+                <div className="mt-2.5 flex gap-1.5 overflow-x-auto -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {SUGGESTION_CHIPS[data.weakestCluster].map((chip) => (
                     <button
                       key={chip.slug}
@@ -110,7 +110,7 @@ export function SelfCareBalanceCard() {
                         haptic.light();
                         navigate(`/app/tasksbank/${chip.slug}`);
                       }}
-                      className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1.5 text-xs font-semibold text-amber-900 shadow-ios active:scale-95 transition-transform min-h-[32px]"
+                      className="shrink-0 inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1.5 text-xs font-semibold text-amber-900 shadow-ios active:scale-95 transition-transform min-h-[32px] whitespace-nowrap"
                     >
                       <span aria-hidden>{chip.emoji}</span>
                       <span>{chip.label}</span>

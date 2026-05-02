@@ -176,7 +176,7 @@ const AppBalance = () => {
                 <p className="text-sm text-amber-950/80 leading-snug">
                   {getSuggestionFor(data.weakestCluster)}
                 </p>
-                <div className="mt-3 flex flex-wrap gap-2">
+                <div className="mt-3 flex gap-2 overflow-x-auto -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {SUGGESTION_CHIPS[data.weakestCluster].map((chip) => (
                     <button
                       key={chip.slug}
@@ -184,7 +184,7 @@ const AppBalance = () => {
                         haptic.light();
                         navigate(`/app/tasksbank/${chip.slug}`);
                       }}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-2 text-sm font-semibold text-amber-950 shadow-ios active:scale-95 transition-transform min-h-[40px]"
+                      className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-2 text-sm font-semibold text-amber-950 shadow-ios active:scale-95 transition-transform min-h-[40px] whitespace-nowrap"
                     >
                       <span aria-hidden>{chip.emoji}</span>
                       <span>{chip.label}</span>
