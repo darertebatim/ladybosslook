@@ -62,6 +62,7 @@ import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation'
 import { ActionLimitSheet, resetActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 import { StreakLostBanner } from '@/components/app/StreakLostBanner';
 import { RecoverySuccessBanner } from '@/components/app/RecoverySuccessBanner';
+import { ShieldEarnedSheet } from '@/components/app/ShieldEarnedSheet';
 import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { ChallengeCompleteSummary } from '@/components/app/ChallengeCompleteSummary';
@@ -114,6 +115,7 @@ export default function AppTest() {
   const [showStreakLostBanner, setShowStreakLostBanner] = useState(false);
   const [showStreakLostNoShields, setShowStreakLostNoShields] = useState(false);
   const [showRecoverySuccess, setShowRecoverySuccess] = useState<'streak' | null>(null);
+  const [shieldEarnedPreview, setShieldEarnedPreview] = useState<7 | 30 | null>(null);
   const [showStreakGoalCompletion, setShowStreakGoalCompletion] = useState(false);
   const [showChallengeSummary, setShowChallengeSummary] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
@@ -680,7 +682,21 @@ export default function AppTest() {
               <Flame className="h-4 w-4 mr-2" />
               No Shields (Free User)
             </Button>
+            <Button onClick={() => setShieldEarnedPreview(7)} variant="outline">
+              <Shield className="h-4 w-4 mr-2" />
+              Shield Earned (Day 7)
+            </Button>
+            <Button onClick={() => setShieldEarnedPreview(30)} variant="outline">
+              <Shield className="h-4 w-4 mr-2" />
+              Shield Earned (Day 30)
+            </Button>
           </div>
+          <ShieldEarnedSheet
+            open={shieldEarnedPreview !== null}
+            milestoneDay={shieldEarnedPreview ?? 7}
+            totalShields={shieldEarnedPreview === 30 ? 3 : 2}
+            onClose={() => setShieldEarnedPreview(null)}
+          />
           <StreakLostBanner
             open={showStreakLostBanner}
             previousStreak={12}
