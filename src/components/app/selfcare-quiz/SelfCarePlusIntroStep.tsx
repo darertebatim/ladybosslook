@@ -63,9 +63,18 @@ export function SelfCarePlusIntroStep({ step, onAccept, onDecline }: Props) {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.28 }}
-          className="mt-2 text-[24px] leading-[1.2] font-extrabold text-[#1a1f3d] text-center whitespace-pre-line"
+          className="mt-2 text-[24px] leading-[1.2] font-extrabold text-[#1a1f3d] text-center"
         >
-          {step.title || "Rilo is free to use —\nbut we'd love for you to try Rilo Plus for 7 days free too!"}
+          {(() => {
+            const raw = step.title || "Rilo is free to use —\nbut we'd love for you to try Rilo Plus for 7 days free too!";
+            const [first, ...rest] = raw.split('\n');
+            return (
+              <>
+                <span className="block">{first}</span>
+                {rest.length > 0 && <span className="block mt-3">{rest.join(' ')}</span>}
+              </>
+            );
+          })()}
         </motion.h1>
         {step.subtitle ? (
           <motion.p
