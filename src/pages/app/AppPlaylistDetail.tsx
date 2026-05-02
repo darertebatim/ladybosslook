@@ -957,22 +957,10 @@ export default function AppPlaylistDetail() {
             {!hasAccess &&
               !playlist.is_free &&
               playlist.requires_subscription && (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 p-4 bg-amber-900/30 rounded-lg">
-                    <Crown className="h-5 w-5 text-amber-400" />
-                    <p className="text-sm text-fg-warm">
-                      {t('playlistDetailPage.partOfPlusFull_pre')}<strong>{t('playlistDetailPage.partOfPlusBrand')}</strong>{t('playlistDetailPage.partOfPlusFull_post')}
-                    </p>
-                  </div>
-                  <Button
-                    className="w-full gap-2 bg-brand text-white active:bg-brand/90"
-                    size="lg"
-                    onClick={() => setShowPaywall(true)}
-                  >
-                    <Sparkles className="h-4 w-4" />
-                    Unlock with Simora Plus
-                  </Button>
-                </div>
+                <PlusUpsellBanner
+                  title="Unlock this with Rilo Plus"
+                  subtitle="Plus full audio library, AI Planner & all tools"
+                />
               )}
 
             {!hasAccess &&
