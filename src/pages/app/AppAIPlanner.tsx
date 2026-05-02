@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, Sparkles, ArrowUp, RotateCcw, Pencil, Check, ChevronLeft } from 'lucide-react';
+import { Mic, Sparkles, ArrowUp, RotateCcw, Pencil, Check, ChevronLeft, Crown } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -391,6 +391,69 @@ export default function AppAIPlanner() {
       {stage === 'input' && (
         <>
           <div className="shrink-0" style={{ paddingTop: 'env(safe-area-inset-top, 44px)' }} />
+          {/* Plus upsell banner — only for non-subscribers, slides up out of screen on submit */}
+          <AnimatePresence>
+            {showCounter && (
+              <motion.button
+                key="plus-banner"
+                type="button"
+                onClick={() => { haptic.medium(); setShowPaywall(true); }}
+                initial={{ y: -120, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -160, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 280, damping: 28 }}
+                className="relative mx-4 mt-14 rounded-2xl overflow-hidden text-left active:scale-[0.98] transition-transform shadow-ios"
+                style={{
+                  background:
+                    'linear-gradient(120deg, #1a1f3d 0%, #3d2a5c 45%, #6b3d7a 100%)',
+                }}
+              >
+                {/* Shimmer overlay */}
+                <motion.div
+                  aria-hidden
+                  initial={{ x: '-120%' }}
+                  animate={{ x: '220%' }}
+                  transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 1.6, ease: 'easeInOut' }}
+                  className="pointer-events-none absolute inset-y-0 w-1/3"
+                  style={{
+                    background:
+                      'linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%)',
+                  }}
+                />
+                {/* Glow blob */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute -top-8 -right-8 h-32 w-32 rounded-full opacity-60 blur-2xl"
+                  style={{ background: 'radial-gradient(circle, #FFB37A 0%, transparent 70%)' }}
+                />
+                <div className="relative flex items-center gap-3 p-3.5">
+                  <div
+                    className="h-11 w-11 rounded-xl flex items-center justify-center shrink-0"
+                    style={{
+                      background: 'linear-gradient(135deg, #FFD27A 0%, #FF8A5C 100%)',
+                      boxShadow: '0 6px 16px -6px rgba(255,138,92,0.7)',
+                    }}
+                  >
+                    <Crown className="h-5 w-5 text-[#1a1f3d]" strokeWidth={2.4} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white font-bold text-[14px] leading-tight">
+                      Unlock unlimited AI planning
+                    </p>
+                    <p className="text-white/70 text-[12px] leading-tight mt-0.5">
+                      {remainingFree > 0
+                        ? `${remainingFree} free ${remainingFree === 1 ? 'plan' : 'plans'} left · Get Plus`
+                        : 'You\u2019re out of free plans · Get Plus'}
+                    </p>
+                  </div>
+                  <div className="shrink-0 h-7 px-2.5 rounded-full bg-white/15 backdrop-blur flex items-center gap-1">
+                    <Sparkles className="h-3 w-3 text-[#FFD27A]" />
+                    <span className="text-white text-[11px] font-bold tracking-wide">PLUS</span>
+                  </div>
+                </div>
+              </motion.button>
+            )}
+          </AnimatePresence>
           <div className="flex-1" />
           <div className="shrink-0 px-6 pb-4">
             <motion.h1
@@ -461,15 +524,6 @@ export default function AppAIPlanner() {
               )}
             </motion.div>
           </div>
-          {showCounter && (
-            <div className="shrink-0 px-6 -mt-1 pb-1">
-              <p className="text-[12px] font-medium text-[#1a1f3d]/55 text-center">
-                {remainingFree > 0
-                  ? `${remainingFree} of ${FREE_AI_PLANNER_USES} free plans left`
-                  : 'No free plans left — upgrade to keep planning'}
-              </p>
-            </div>
-          )}
           <div
             className="shrink-0"
             style={{ height: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}
