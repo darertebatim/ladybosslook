@@ -76,6 +76,7 @@ export const selfcareQuizFlow: OnboardingFlow = {
       type: 'single-select',
       illustrationLabel: 'selfcare-quiz',
       title: 'What would feel like a win this week?',
+      singleColumn: true,
       options: [
         { label: 'A real morning routine', emoji: '🌅' },
         { label: 'A calmer, clearer mind', emoji: '🧠' },
