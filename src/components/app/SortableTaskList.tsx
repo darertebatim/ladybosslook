@@ -452,6 +452,8 @@ function QuickAddCard({ date, taskCount, onOpenTaskSheet, defaultRepeatOverride 
     setSelectedCategory('popular');
     setQuickTime('Anytime');
     setQuickRepeat('Daily');
+    // Notify listeners (e.g. spotlight tour) that the quick-add sheet closed.
+    window.dispatchEvent(new CustomEvent('quick-add-close'));
   };
 
   // Map quick shortcut values to task params
