@@ -682,7 +682,21 @@ export default function AppTest() {
               <Flame className="h-4 w-4 mr-2" />
               No Shields (Free User)
             </Button>
+            <Button onClick={() => setShieldEarnedPreview(7)} variant="outline">
+              <Shield className="h-4 w-4 mr-2" />
+              Shield Earned (Day 7)
+            </Button>
+            <Button onClick={() => setShieldEarnedPreview(30)} variant="outline">
+              <Shield className="h-4 w-4 mr-2" />
+              Shield Earned (Day 30)
+            </Button>
           </div>
+          <ShieldEarnedSheet
+            open={shieldEarnedPreview !== null}
+            milestoneDay={shieldEarnedPreview ?? 7}
+            totalShields={shieldEarnedPreview === 30 ? 3 : 2}
+            onClose={() => setShieldEarnedPreview(null)}
+          />
           <StreakLostBanner
             open={showStreakLostBanner}
             previousStreak={12}
