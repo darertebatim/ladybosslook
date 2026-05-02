@@ -125,8 +125,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
             </div>
           )}
           <div className={cn(
-            'w-[68px] h-[68px] rounded-[26px] flex items-center justify-center relative',
-            tool.bgColor
+            'w-[68px] h-[68px] rounded-[26px] flex items-center justify-center relative bg-peach'
           )}>
             {tool.emoji ? (
               <FluentEmoji emoji={tool.emoji} size={44} />
