@@ -585,6 +585,14 @@ const AppHome = () => {
     }
   }, [spotlightStep, completedTaskIds]);
 
+  // Advance spotlight from 'tap' → 'add' only after the TaskDetailModal closes.
+  useEffect(() => {
+    if (!spotlightAdvancePending) return;
+    if (selectedTask) return; // wait for modal close
+    setSpotlightAdvancePending(false);
+    setSpotlightStep((prev) => (prev === 'tap' ? 'add' : prev));
+  }, [spotlightAdvancePending, selectedTask]);
+
   // Welcome spotlight: which task to highlight per step
   const spotlightHighlightTaskId = useMemo<string | null>(() => {
     if (!spotlightStep) return null;
