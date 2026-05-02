@@ -268,18 +268,17 @@ export default function AppTasksBankCategory() {
             <div className="px-4 pt-4 space-y-3">
               {/* Hero card — pastel background, big emoji, name + description */}
               {category && (
-                <div className={cn('rounded-2xl p-4 flex items-center gap-3', heroBg)}>
-                  <span className="shrink-0 w-14 h-14 rounded-2xl bg-white/80 flex items-center justify-center">
-                    <FluentEmoji emoji={categoryEmoji} size={36} />
+                <div className={cn('rounded-2xl p-4 flex items-center gap-4', heroBg)}>
+                  <span className="shrink-0 w-16 h-16 rounded-2xl bg-white/80 flex items-center justify-center">
+                    <FluentEmoji emoji={categoryEmoji} size={42} />
                   </span>
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-base font-bold text-black leading-tight">{category.name}</h2>
-                    {category.description && (
-                      <p className="text-[12px] text-black leading-snug mt-1 line-clamp-3">
-                        {category.description}
-                      </p>
-                    )}
-                  </div>
+                  {category.description ? (
+                    <p className="flex-1 text-[16px] font-bold text-black leading-snug">
+                      {category.description}
+                    </p>
+                  ) : (
+                    <h2 className="flex-1 text-[16px] font-bold text-black leading-snug">{category.name}</h2>
+                  )}
                 </div>
               )}
 
