@@ -115,6 +115,7 @@ export default function AppTest() {
   const [showStreakLostBanner, setShowStreakLostBanner] = useState(false);
   const [showStreakLostNoShields, setShowStreakLostNoShields] = useState(false);
   const [showRecoverySuccess, setShowRecoverySuccess] = useState<'streak' | null>(null);
+  const [shieldEarnedPreview, setShieldEarnedPreview] = useState<7 | 30 | null>(null);
   const [showStreakGoalCompletion, setShowStreakGoalCompletion] = useState(false);
   const [showChallengeSummary, setShowChallengeSummary] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
