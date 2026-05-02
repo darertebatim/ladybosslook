@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
 import { useUserChallenges } from '@/hooks/useUserChallenges';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Loader2, Share2, Instagram, Play, Heart, CalendarPlus } from 'lucide-react';
+import { Loader2, Share2, Instagram, Play, Heart, CalendarPlus, Sparkles } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { BackButtonCircle } from '@/components/app/BackButton';
@@ -22,6 +22,7 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { useRoutineFavorites, useToggleRoutineFavorite } from '@/hooks/useRoutineFavorites';
 import { useTranslation } from 'react-i18next';
+import { useSubscription } from '@/hooks/useSubscription';
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400 to-amber-600',
