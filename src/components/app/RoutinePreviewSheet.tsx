@@ -446,7 +446,7 @@ export function RoutinePreviewSheet({
               {/* Start/End banners + Badge */}
               <div className="mt-2 flex gap-2">
                 {/* Left: start & end banners */}
-                <div className={cn("flex flex-col gap-2", badgeImageUrl ? "flex-1" : "w-full")}>
+                <div className={cn("flex flex-row gap-2", badgeImageUrl ? "flex-1" : "w-full")}>
                   {/* Start date banner */}
                   {(() => {
                     const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -471,13 +471,13 @@ export function RoutinePreviewSheet({
                       isFuture = true;
                     }
                     return (
-                      <div className={`flex items-center gap-2 rounded-xl px-3 py-2 border ${
+                      <div className={`flex-1 min-w-0 flex items-center gap-2 rounded-xl px-3 py-2 border ${
                         isFuture 
                           ? 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800'
                           : 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800'
                       }`}>
-                        <span className="text-base">{emoji}</span>
-                        <span className={`text-xs font-medium ${
+                        <span className="text-sm shrink-0">{emoji}</span>
+                        <span className={`text-xs font-medium truncate ${
                           isFuture 
                             ? 'text-amber-800 dark:text-amber-300'
                             : 'text-emerald-800 dark:text-emerald-300'
@@ -492,9 +492,9 @@ export function RoutinePreviewSheet({
                     if (endMode === 'date' && endDate) {
                       const d = new Date(endDate + 'T00:00:00');
                       return (
-                        <div className="flex items-center gap-2 rounded-xl px-3 py-2 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
-                          <span className="text-base">🏁</span>
-                          <span className="text-xs font-medium text-rose-800 dark:text-rose-300">
+                        <div className="flex-1 min-w-0 flex items-center gap-2 rounded-xl px-3 py-2 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
+                          <span className="text-sm shrink-0">🏁</span>
+                          <span className="text-xs font-medium text-rose-800 dark:text-rose-300 truncate">
                             {t('routinePreview.endsOn', { date: format(d, 'MMM d') })}
                           </span>
                         </div>
@@ -502,9 +502,9 @@ export function RoutinePreviewSheet({
                     }
                     if (endMode === 'after_days' && endAfterDays) {
                       return (
-                        <div className="flex items-center gap-2 rounded-xl px-3 py-2 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
-                          <span className="text-base">🏁</span>
-                          <span className="text-xs font-medium text-rose-800 dark:text-rose-300">
+                        <div className="flex-1 min-w-0 flex items-center gap-2 rounded-xl px-3 py-2 border bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800">
+                          <span className="text-sm shrink-0">🏁</span>
+                          <span className="text-xs font-medium text-rose-800 dark:text-rose-300 truncate">
                             {t('routinePreview.endsAfterDays', { n: endAfterDays, count: endAfterDays })}
                           </span>
                         </div>
