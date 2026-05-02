@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { getLocalDateStr } from '@/lib/localDate';
 import { toast } from 'sonner';
 import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
+import { requestAppReview } from '@/lib/appReview';
 
 // Brand round-robin pastel palette (matches user task bank)
 const BRAND_TASK_COLORS = [
@@ -315,6 +316,12 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
     }
 
     setStage('success');
+    // Fire native iOS/Android review prompt at peak satisfaction —
+    // user just built their AI-generated week plan, a meaningful
+    // positive moment. No-ops on web; system-throttled on native.
+    setTimeout(() => {
+      requestAppReview('onboarding_week_plans').catch(() => {});
+    }, 900);
     setTimeout(() => onNext(), 1700);
   };
 
