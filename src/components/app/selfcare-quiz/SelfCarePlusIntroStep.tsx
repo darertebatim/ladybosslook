@@ -71,16 +71,18 @@ export function SelfCarePlusIntroStep({ step, onAccept, onDecline }: Props) {
           transition={{ duration: 0.45, delay: 0.28 }}
           className="mt-2 text-[24px] leading-[1.2] font-extrabold text-[#1a1f3d] text-center whitespace-pre-line"
         >
-          {step.title || 'Rilo is free to use —\ntry Plus for 7 days, on us.'}
+          {step.title || "Rilo is free to use —\nbut we'd love for you to try Rilo Plus for 7 days free too!"}
         </motion.h1>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.36 }}
-          className="mt-3 text-center text-[14px] text-[#1a1f3d]/70 leading-snug"
-        >
-          {step.subtitle || "Your routine is yours either way. Plus just unlocks a few extras while you build the habit."}
-        </motion.p>
+        {step.subtitle ? (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.36 }}
+            className="mt-3 text-center text-[14px] text-[#1a1f3d]/70 leading-snug"
+          >
+            {step.subtitle}
+          </motion.p>
+        ) : null}
 
         {/* Perks card */}
         <motion.div
