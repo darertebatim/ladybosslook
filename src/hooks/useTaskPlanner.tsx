@@ -815,7 +815,7 @@ export const useQuickAddPlaylistTask = () => {
           user_id: user.id,
           title: playlistName,
           emoji: icon || '🎧',
-          color: (color || 'sky') as TaskColor,
+          color: (color || 'green') as TaskColor,
           repeat_pattern: (repeatPattern || 'daily') as RepeatPattern,
           repeat_days: [],
           scheduled_time: scheduledTime || null,
