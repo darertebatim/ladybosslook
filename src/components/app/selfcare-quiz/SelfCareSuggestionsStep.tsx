@@ -284,6 +284,7 @@ export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Pro
                           selectable
                           hideSubtitle
                           lightUnselectedCircle
+                          hideSelectedBorder
                         />
                       </motion.div>
                     ))}
