@@ -94,6 +94,7 @@ export function fullClientReset(): void {
       key.startsWith('mood-banner') ||
       key.startsWith('routine_') ||
       key.startsWith('appTour') ||
+      key.startsWith('ai_planner_') ||
       key === 'autoSyncCalendar'
     ) {
       keysToRemove.push(key);

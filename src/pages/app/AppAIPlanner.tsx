@@ -15,10 +15,23 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 
 const FREE_AI_PLANNER_USES = 7;
-const usesKey = (uid?: string | null) => `ai_planner_uses_${uid || 'anon'}`;
-const giftSeenKey = (uid?: string | null) => `ai_planner_gift_seen_${uid || 'anon'}`;
+// NOTE: keys use the `simora_` prefix so they're cleared by `fullClientReset`.
+const usesKey = (uid?: string | null) => `simora_ai_planner_uses_${uid || 'anon'}`;
+const giftSeenKey = (uid?: string | null) => `simora_ai_planner_gift_seen_${uid || 'anon'}`;
+const legacyUsesKey = (uid?: string | null) => `ai_planner_uses_${uid || 'anon'}`;
 const readUses = (uid?: string | null): number => {
-  try { return parseInt(localStorage.getItem(usesKey(uid)) || '0', 10) || 0; } catch { return 0; }
+  try {
+    const cur = localStorage.getItem(usesKey(uid));
+    if (cur != null) return parseInt(cur, 10) || 0;
+    // Migrate legacy key, then remove it.
+    const legacy = localStorage.getItem(legacyUsesKey(uid));
+    if (legacy != null) {
+      localStorage.setItem(usesKey(uid), legacy);
+      localStorage.removeItem(legacyUsesKey(uid));
+      return parseInt(legacy, 10) || 0;
+    }
+    return 0;
+  } catch { return 0; }
 };
 const writeUses = (uid: string | null | undefined, n: number) => {
   try { localStorage.setItem(usesKey(uid), String(n)); } catch {}
