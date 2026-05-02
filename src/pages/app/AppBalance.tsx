@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight, Sparkles, TrendingUp } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles, TrendingUp, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { haptic } from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 import { BackButton } from '@/components/app/BackButton';
 import { SEOHead } from '@/components/SEOHead';
@@ -12,6 +14,7 @@ import {
   CLUSTER_BAR_COLORS,
   CLUSTER_TEXT_COLORS,
   getSuggestionFor,
+  SUGGESTION_CHIPS,
 } from '@/hooks/useSelfCareBalance';
 import {
   CLUSTER_LABELS,
@@ -36,6 +39,7 @@ function formatRange(start: string, end: string): string {
 
 const AppBalance = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   // Week scrubber: rangeEnd is the latest day in the visible window
   const today = getLocalDateStr();
   const [rangeEnd, setRangeEnd] = useState(today);
@@ -165,13 +169,29 @@ const AppBalance = () => {
           {hasData && data?.weakestCluster && (
             <section className="rounded-2xl bg-amber-100/70 p-4 flex gap-3">
               <Sparkles className="h-5 w-5 text-amber-700 shrink-0 mt-0.5" />
-              <div>
+              <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-amber-950 mb-1">
                   {t('tier1.balance.suggestionTitle')}
                 </p>
                 <p className="text-sm text-amber-950/80 leading-snug">
                   {getSuggestionFor(data.weakestCluster)}
                 </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {SUGGESTION_CHIPS[data.weakestCluster].map((chip) => (
+                    <button
+                      key={chip.slug}
+                      onClick={() => {
+                        haptic.light();
+                        navigate(`/app/tasksbank/${chip.slug}`);
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-2 text-sm font-semibold text-amber-950 shadow-ios active:scale-95 transition-transform min-h-[40px]"
+                    >
+                      <span aria-hidden>{chip.emoji}</span>
+                      <span>{chip.label}</span>
+                      <ArrowRight className="h-3.5 w-3.5 text-amber-700/70" />
+                    </button>
+                  ))}
+                </div>
               </div>
             </section>
           )}
