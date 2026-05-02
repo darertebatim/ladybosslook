@@ -507,6 +507,11 @@ export default function AppPlayer() {
 
             <PromoBanner location="listen" className="mb-2" />
             <HomeBanner location="listen" className="mb-2" />
+            <PlusUpsellBanner
+              title="Unlock the full audio library"
+              subtitle="Hundreds of guided sessions with Plus"
+              className="mb-2"
+            />
 
             {filteredPlaylists.length === 0 ? (
               <div className="text-center py-12 text-fg-warm-muted">
