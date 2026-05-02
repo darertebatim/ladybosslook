@@ -72,7 +72,7 @@ export function CategorySection({
             <span className="text-[11px] font-semibold text-foreground/60">{count}</span>
           </div>
           {description && (
-            <p className="text-[11px] text-foreground/60 line-clamp-1 mt-0.5">{description}</p>
+            <p className="text-[11px] text-black line-clamp-2 mt-0.5 leading-snug">{description}</p>
           )}
         </div>
         <ChevronDown
