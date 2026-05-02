@@ -35,7 +35,7 @@ export function CategoryCircle({ name, icon, emoji, color, isSelected, onClick }
     >
       <div
         className={cn(
-          'w-[68px] h-[68px] rounded-full flex items-center justify-center transition-all',
+          'w-[68px] h-[68px] rounded-[26px] flex items-center justify-center transition-all',
           colors.bg,
           isSelected && 'ring-2 ring-primary ring-offset-2'
         )}
