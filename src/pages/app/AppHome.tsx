@@ -33,6 +33,7 @@ import { FeaturedRoutineCard } from '@/components/app/FeaturedRoutineCard';
 import { haptic } from '@/lib/haptics';
 import { useScrollRestore } from '@/hooks/useScrollRestore';
 import { isWaterTask } from '@/lib/waterTracking';
+import { getAvailableShields } from '@/lib/recoveryShields';
 import { PeriodStatusCard } from '@/components/app/PeriodStatusCard';
 import { FastingStatusCard } from '@/components/app/FastingStatusCard';
 
@@ -348,14 +349,9 @@ const AppHome = () => {
   useEffect(() => {
     if (!streak) return;
     const recoveryCount = (streak as any).streak_recovery_count || 0;
-    // Only show if user has actually EARNED a shield they haven't used.
-    // New users with longest_streak 0/1 get no shield yet → silent reset.
-    const longest = streak.longest_streak || 0;
-    if (longest < 1) return;
-    // Lazy import to avoid circular deps in this large file
-    const earned =
-      longest >= 30 ? 3 : longest >= 7 ? 2 : longest >= 1 ? 1 : 0;
-    if (earned - recoveryCount <= 0) return;
+    // Only show if user has actually EARNED a shield they haven't used yet.
+    // New users with longest_streak 0 get no shield → silent reset.
+    if (getAvailableShields(streak.longest_streak || 0, recoveryCount) <= 0) return;
     
     // Check if streak is actually broken by comparing last_completion_date
     const today = format(new Date(), 'yyyy-MM-dd');
