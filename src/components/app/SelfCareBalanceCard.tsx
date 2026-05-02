@@ -20,6 +20,12 @@ export function SelfCareBalanceCard() {
   const { data, isLoading } = useSelfCareBalance(start, today);
 
   const hasData = (data?.totalCompletions ?? 0) > 0;
+  const maxCompletions = data
+    ? Math.max(
+        1,
+        ...CLUSTER_ORDER.map((c) => data.clusters[c].completions),
+      )
+    : 1;
 
   return (
     <section className="bg-white rounded-2xl p-4 shadow-sm">
@@ -59,6 +65,7 @@ export function SelfCareBalanceCard() {
           <div className="space-y-3">
             {CLUSTER_ORDER.map((c) => {
               const bucket = data!.clusters[c];
+              const widthPct = (bucket.completions / maxCompletions) * 100;
               return (
                 <div key={c}>
                   <div className="flex items-center justify-between mb-1">
@@ -66,7 +73,7 @@ export function SelfCareBalanceCard() {
                       {CLUSTER_LABELS[c]}
                     </span>
                     <span className="text-xs font-semibold text-muted-foreground tabular-nums">
-                      {bucket.score}%
+                      {bucket.completions} {bucket.completions === 1 ? 'task' : 'tasks'}
                     </span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
@@ -75,7 +82,7 @@ export function SelfCareBalanceCard() {
                         'h-full rounded-full transition-all',
                         CLUSTER_BAR_COLORS[c],
                       )}
-                      style={{ width: `${Math.max(2, bucket.score)}%` }}
+                      style={{ width: `${bucket.completions > 0 ? Math.max(4, widthPct) : 0}%` }}
                     />
                   </div>
                 </div>
