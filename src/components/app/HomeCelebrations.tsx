@@ -21,6 +21,7 @@ import { TaskQuickStartSheet } from "@/components/app/TaskQuickStartSheet";
 import { TaskDetailModal } from "@/components/app/TaskDetailModal";
 import { PushNotificationOnboarding } from "@/components/app/PushNotificationOnboarding";
 import { RecoverySuccessBanner } from "@/components/app/RecoverySuccessBanner";
+import { ShieldEarnedDetector } from "@/components/app/ShieldEarnedDetector";
 import { ReturningUserPushSheet } from "@/components/app/ReturningUserPushSheet";
 import { TaskCompletionPushNudge } from "@/components/app/TaskCompletionPushNudge";
 import { usePushPermission } from "@/hooks/usePushPermission";
@@ -514,6 +515,9 @@ export const HomeCelebrations = memo(function HomeCelebrations(
         type="streak"
         onClose={() => setShowRecoverySuccess(null)}
       />
+
+      {/* Surfaces a small celebration sheet when the user newly unlocks a shield (Day 7 / Day 30). */}
+      <ShieldEarnedDetector longestStreak={streak?.longest_streak || 0} />
 
       <ChallengeDayCelebration
         open={showChallengeDayCelebration}
