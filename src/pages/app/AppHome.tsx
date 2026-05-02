@@ -594,15 +594,25 @@ const AppHome = () => {
 
   // Advance spotlight from 'add' → 'complete' once the quick-add sheet closes.
   useEffect(() => {
+    const onQuickAddOpened = () => {
+      // Hide spotlight overlays while the quick-add sheet is open.
+      setSpotlightAdvancePending((prev) => prev || true);
+    };
     const onQuickAddClose = () => {
       setSpotlightStep((prev) => {
         if (prev !== 'add') return prev;
         setSpotlightAdvancePending(false);
         return 'complete';
       });
+      // Always clear pending on close (covers tap step / safety).
+      setSpotlightAdvancePending(false);
     };
+    window.addEventListener('quick-add-opened', onQuickAddOpened);
     window.addEventListener('quick-add-close', onQuickAddClose);
-    return () => window.removeEventListener('quick-add-close', onQuickAddClose);
+    return () => {
+      window.removeEventListener('quick-add-opened', onQuickAddOpened);
+      window.removeEventListener('quick-add-close', onQuickAddClose);
+    };
   }, []);
 
   // Welcome spotlight: which task to highlight per step
