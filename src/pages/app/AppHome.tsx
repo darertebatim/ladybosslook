@@ -51,6 +51,7 @@ import { WeeklyReviewBanner } from '@/components/app/WeeklyReviewBanner';
 import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
 import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 import { useKeyboard } from '@/hooks/useKeyboard';
+import { WelcomeSpotlightBanner } from '@/components/app/home/WelcomeSpotlightBanner';
 import { TaskCoachOverlay } from '@/components/app/home/TaskCoachOverlay';
 
 
@@ -120,6 +121,7 @@ const AppHome = () => {
   const [spotlightStep, setSpotlightStep] = useState<
     null | 'tap' | 'add' | 'complete'
   >(null);
+  const [, setHasWelcomeBanner] = useState(false);
   const { isKeyboardOpen } = useKeyboard();
   const { currentTrack } = useAudioPlayer();
   const hasMiniPlayer = !!currentTrack;
@@ -1010,6 +1012,12 @@ const AppHome = () => {
           <div className="px-4 pt-6 pb-4 pb-safe">
             {/* Notification Banner - prompts users to enable notifications */}
             <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
+
+            {/* Welcome Spotlight Banner — invites the user to take the 3-step tour */}
+            <WelcomeSpotlightBanner
+              onStart={() => setSpotlightStep('tap')}
+              onVisibilityChange={setHasWelcomeBanner}
+            />
 
             {/* Self-Care Quiz Banner — highest priority, shown before everything */}
             <SelfCareQuizBanner className="mb-2" onVisibilityChange={setHasSelfCareQuizBanner} />
