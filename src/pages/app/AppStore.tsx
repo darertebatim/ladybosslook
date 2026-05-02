@@ -21,7 +21,7 @@ import {
 } from "@/hooks/useAppData";
 import { ProgramCard } from "@/components/app/ProgramCard";
 import { ToolCard } from "@/components/app/ToolCard";
-import { pickPeach } from "@/lib/peachPalette";
+import { pickPeach, useIsDarkMode } from "@/lib/peachPalette";
 import { Input } from "@/components/ui/input";
 import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
 import {
@@ -58,6 +58,9 @@ const AppStore = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { user } = useAuth();
+  // Subscribe to dark-mode changes so `pickPeach()` calls below the loop
+  // re-evaluate with the dark palette when the theme toggles.
+  useIsDarkMode();
   const { programs, isLoading: programsLoading } = usePrograms();
   const [enrollingSlug, setEnrollingSlug] = useState<string | null>(null);
   const [showSearch, setShowSearch] = useState(false);

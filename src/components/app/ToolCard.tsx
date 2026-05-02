@@ -8,7 +8,7 @@ import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { Crown, Check, X } from 'lucide-react';
 import { useTodayMood } from '@/hooks/useMoodLogs';
-import { pickPeach } from '@/lib/peachPalette';
+import { usePeach } from '@/lib/peachPalette';
 import { 
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, 
@@ -39,6 +39,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
   const isPremiumTool = LOCKED_TOOLS.includes(tool.id);
   const isLocked = isPremiumTool && !isSubscribed;
   const isMoodTool = tool.id === 'mood';
+  const peachBg = usePeach(tool.id);
 
   const handleClick = () => {
     if (tool.comingSoon) {
@@ -127,7 +128,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
           )}
           <div
             className="w-[68px] h-[68px] rounded-[26px] flex items-center justify-center relative"
-            style={{ backgroundColor: pickPeach(tool.id) }}
+            style={{ backgroundColor: peachBg }}
           >
             {tool.emoji ? (
               <FluentEmoji emoji={tool.emoji} size={44} />
