@@ -62,6 +62,7 @@ import { StreakGoalConfirmation } from '@/components/app/StreakGoalConfirmation'
 import { ActionLimitSheet, resetActionLimitSoftSeen } from '@/components/app/ActionLimitSheet';
 import { StreakLostBanner } from '@/components/app/StreakLostBanner';
 import { RecoverySuccessBanner } from '@/components/app/RecoverySuccessBanner';
+import { ShieldEarnedSheet } from '@/components/app/ShieldEarnedSheet';
 import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalCompletionCelebration';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { ChallengeCompleteSummary } from '@/components/app/ChallengeCompleteSummary';
