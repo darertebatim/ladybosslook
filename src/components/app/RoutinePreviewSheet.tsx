@@ -290,10 +290,13 @@ export function RoutinePreviewSheet({
   };
 
   const handleSave = () => {
-    // Plus-only routine: block non-subscribers and surface the paywall.
-    if (isPro && !subLoading && !isSubscribed) {
-      setShowPaywall(true);
-      return;
+    // Plus-only routine: never allow save until subscription state is loaded.
+    if (isPro) {
+      if (subLoading) return;
+      if (!isSubscribed) {
+        setShowPaywall(true);
+        return;
+      }
     }
     const editedTasksList = Object.values(editedTasks);
     onSave(Array.from(selectedTaskIds), editedTasksList);
@@ -647,7 +650,7 @@ export function RoutinePreviewSheet({
               
               <Button
                 onClick={() => { dismissSaveHint(); handleSave(); }}
-                disabled={selectedTaskIds.size === 0 || isSaving}
+                disabled={selectedTaskIds.size === 0 || isSaving || (isPro && subLoading)}
                 className="px-8"
               >
                 {isSaving ? t('routinePreview.saving') : t('routinePreview.save')}

@@ -233,6 +233,7 @@ export default function AppInspireDetail() {
   const color = routine.color || 'purple';
   const gradient = colorGradients[color] || colorGradients.purple;
   const routineIcon = routine.emoji && isEmoji(routine.emoji) ? routine.emoji : '✨';
+  const isPlusRoutine = (routine as any).is_free === false;
 
   // Convert tasks for preview sheet
   const previewTasks = routine.tasks?.map(convertToRoutinePlanTask) || [];
@@ -786,7 +787,7 @@ export default function AppInspireDetail() {
           onSave={handleSaveRoutine}
           isSaving={addRoutineFromBank.isPending}
           isFree={(routine as any).is_free ?? false}
-          isPro={(routine as any).is_pro_routine ?? false}
+          isPro={isPlusRoutine}
           routineBankId={planId || null}
           linkedProgramTitle={(routine as any).linkedProgram?.title || null}
           linkedProgramSlug={(routine as any).linked_program_slug || null}
