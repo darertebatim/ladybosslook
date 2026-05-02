@@ -409,7 +409,18 @@ export function RoutinePreviewSheet({
         >
           <div className="flex flex-col h-full">
             <SheetHeader className="text-left pb-2 flex-shrink-0">
-              <SheetTitle className="text-xl font-bold">{t('routinePreview.previewRoutine')}</SheetTitle>
+              <div className="flex items-center gap-2">
+                <SheetTitle className="text-xl font-bold">{t('routinePreview.previewRoutine')}</SheetTitle>
+                {isPro && !isSubscribed && !subLoading && (
+                  <span
+                    className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold text-[#1a1f3d]"
+                    style={{ background: 'linear-gradient(135deg, #FFD27A 0%, #FF8A5C 100%)' }}
+                  >
+                    <Crown className="h-3 w-3" strokeWidth={2.6} />
+                    Plus
+                  </span>
+                )}
+              </div>
               <p className="text-sm text-foreground">
                 {t('routinePreview.editToPersonalize')}
               </p>
