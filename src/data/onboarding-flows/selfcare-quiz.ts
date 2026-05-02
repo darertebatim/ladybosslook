@@ -176,7 +176,7 @@ export const selfcareQuizFlow: OnboardingFlow = {
       type: 'selfcare-rilo-celebration',
       illustrationLabel: 'selfcare-quiz',
       title: "You showed up\nfor yourself today.",
-      subtitle: 'Your routine is now part of Rilo — small daily wins, designed for you.',
+      subtitle: '',
       buttonLabel: 'Continue →',
     },
     {
