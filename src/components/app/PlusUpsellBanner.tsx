@@ -41,6 +41,7 @@ export function PlusUpsellBanner({
           className,
         )}
         style={{
+          touchAction: 'pan-y',
           background:
             'linear-gradient(120deg, #1a1f3d 0%, #3d2a5c 45%, #6b3d7a 100%)',
         }}
