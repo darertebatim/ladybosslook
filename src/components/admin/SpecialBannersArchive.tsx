@@ -2,14 +2,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Info } from 'lucide-react';
+import selfCareQuizBannerImg from '@/assets/selfcare-quiz-banner.jpg';
+import moodBannerImg from '@/assets/mood-banner.png';
 import onboardingBannerImg from '@/assets/onboarding-banner.png';
 import weeklyReviewBannerImg from '@/assets/weekly-review-banner.png';
-import tourBannerImg from '@/assets/tour-banner.png';
 import { useSpecialBannerSettings, useToggleSpecialBanner } from '@/hooks/useSpecialBannerSettings';
-import { MoodCheckInBanner } from '@/components/mood/MoodCheckInBanner';
-import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
-
-import type { ReactNode } from 'react';
 
 interface SpecialBanner {
   name: string;
@@ -18,8 +15,6 @@ interface SpecialBanner {
   description: string;
   conditions: string[];
   coverImage?: string;
-  // Optional live React preview (used when the banner is built as a custom box)
-  preview?: ReactNode;
 }
 
 const specialBanners: SpecialBanner[] = [
@@ -28,7 +23,7 @@ const specialBanners: SpecialBanner[] = [
     component: 'SelfCareQuizBanner',
     location: 'Home (above Tasks), Tools Page (under Tools), Programs Page, Tasks Bank (under Categories)',
     description: 'Promotes the "What\'s Missing?" self-care diagnostic quiz. Box banner with orange→amber gradient, sparkle icon, and "AI Powered Analyze" sub-pill. Tapping opens the self-care quiz onboarding flow.',
-    preview: <SelfCareQuizBanner />,
+    coverImage: selfCareQuizBannerImg,
     conditions: [
       'Shown only to users who haven\'t completed the self-care quiz',
       'First special banner new users see (before Promo Banners & Mood Check-In)',
@@ -42,26 +37,12 @@ const specialBanners: SpecialBanner[] = [
     component: 'MoodCheckInBanner',
     location: 'Home (after Promo & Home banners)',
     description: 'Daily prompt encouraging users to log their mood. Box banner with sunrise gradient. Shows 5 inline mood chips (Great / Good / Okay / Meh / Bad) — tapping one logs the mood directly and opens the celebration sheet with 4 follow-up cards (Journal, Breathe, Reflect, Talk).',
-    preview: <MoodCheckInBanner />,
+    coverImage: moodBannerImg,
     conditions: [
       'Hidden when Promo or Home banners are active',
       'Auto-hides after today\'s mood is logged',
       'Dismissible via X button (resets daily)',
       'Tapping a mood chip logs it inline + opens celebration sheet',
-    ],
-  },
-  {
-    name: 'Welcome Tour ("What is Rilo?")',
-    component: 'WhatIsRiloTour',
-    location: 'Auto-launches once after sign-up, before the planner is shown',
-    description: '12-step "What is Rilo?" teach + setup flow that introduces the planner, routine builder, task details, tools hub, and asks for the first round of routine picks. No tap required — runs automatically the first time a new user lands in /app.',
-    coverImage: tourBannerImg,
-    conditions: [
-      'Shown only to users who haven\'t completed the what-is-rilo flow',
-      'Auto-redirects from /auth → /app/onboarding/what-is-rilo on first sign-in',
-      'Marks simora_onboarding_completed_what-is-rilo on finish',
-      'Cannot be dismissed mid-flow (designed as required onboarding)',
-      'Toggle off here to skip it for all new users',
     ],
   },
   {
