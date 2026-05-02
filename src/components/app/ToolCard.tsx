@@ -8,7 +8,7 @@ import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { Crown, Check, X } from 'lucide-react';
 import { useTodayMood } from '@/hooks/useMoodLogs';
-import { pickPeach } from '@/lib/peachPalette';
+import { usePeach } from '@/lib/peachPalette';
 import { 
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, 
