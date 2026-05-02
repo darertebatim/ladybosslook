@@ -1,27 +1,29 @@
 import { Shield, Lock, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useSubscription } from '@/hooks/useSubscription';
+import { SHIELD_MILESTONES, getEarnedShields } from '@/lib/recoveryShields';
 
 interface RecoveryShieldsProps {
   /** Number of shields already used (0-3) */
   recoveryCount: number;
+  /** User's longest streak ever — drives which shields are unlocked */
+  longestStreak: number;
   className?: string;
 }
 
 /**
  * 3 small square recovery shield cards.
- * Shield 1: Free for all users
- * Shield 2-3: Unlocked for subscribers only
- * Shows used/available/locked state based on recoveryCount
+ * Shields are EARNED through streak milestones (Day 1 / 7 / 30) — not gated by Plus.
+ * Shows used / available / locked-with-target-day based on recoveryCount + longestStreak.
  */
-export const RecoveryShields = ({ recoveryCount, className }: RecoveryShieldsProps) => {
-  const { isSubscribed } = useSubscription();
+export const RecoveryShields = ({ recoveryCount, longestStreak, className }: RecoveryShieldsProps) => {
+  const earned = getEarnedShields(longestStreak);
 
-  const shields = [
-    { id: 1, locked: false, used: recoveryCount >= 1 },
-    { id: 2, locked: !isSubscribed, used: recoveryCount >= 2 },
-    { id: 3, locked: !isSubscribed, used: recoveryCount >= 3 },
-  ];
+  const shields = SHIELD_MILESTONES.map((m, idx) => {
+    const id = idx + 1;
+    const unlocked = id <= earned;
+    const used = recoveryCount >= id;
+    return { id, locked: !unlocked, used, milestoneDay: m.day };
+  });
 
   return (
     <div className={cn('flex gap-2', className)}>
@@ -51,7 +53,7 @@ export const RecoveryShields = ({ recoveryCount, className }: RecoveryShieldsPro
                 <Lock className="w-3 h-3 text-muted-foreground/60" />
               </div>
               <span className="text-[8px] text-muted-foreground/60 font-medium leading-tight text-center">Recovery<br/>Shield</span>
-              <span className="text-[8px] text-muted-foreground/40 mt-0.5">Pro</span>
+              <span className="text-[8px] text-muted-foreground/40 mt-0.5">Day {shield.milestoneDay}</span>
             </>
           ) : (
             <>
