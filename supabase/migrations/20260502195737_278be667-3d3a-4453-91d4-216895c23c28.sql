@@ -1,0 +1,17 @@
+UPDATE public.routine_categories SET description = 'What can you do today to spend time with someone important to you?' WHERE slug = 'connection';
+UPDATE public.routine_categories SET description = 'What''s something easy that can get you moving?' WHERE slug = 'movement';
+UPDATE public.routine_categories SET description = 'What can you do today to unwind and sleep better?' WHERE slug = 'sleep';
+UPDATE public.routine_categories SET description = 'What''s one small thing that can calm your mind right now?' WHERE slug = 'calm';
+UPDATE public.routine_categories SET description = 'What''s a kind thing you can say or do for yourself today?' WHERE slug = 'selfkind';
+UPDATE public.routine_categories SET description = 'What''s the smallest win you can give yourself today?' WHERE slug = 'easy-win';
+UPDATE public.routine_categories SET description = 'What''s one thing you''re thankful for today?' WHERE slug = 'gratitude';
+UPDATE public.routine_categories SET description = 'What''s one small care ritual you can do for yourself today?' WHERE slug = 'hygiene';
+UPDATE public.routine_categories SET description = 'What''s one thing you can eat or drink today to feel better?' WHERE slug = 'nutrition';
+UPDATE public.routine_categories SET description = 'What''s one thing you''d love to finish today?' WHERE slug = 'productivity';
+UPDATE public.routine_categories SET description = 'How would you like to wind down tonight?' WHERE slug = 'Evening';
+UPDATE public.routine_categories SET description = 'How can you show love to someone close to you today?' WHERE slug = 'LovedOnes';
+UPDATE public.routine_categories SET description = 'What can you fully enjoy in this moment?' WHERE slug = 'Presence';
+UPDATE public.routine_categories SET description = 'What''s one brave choice you can make today?' WHERE slug = 'Empowered';
+UPDATE public.routine_categories SET description = 'What''s one tiny thing you can tidy up right now?' WHERE slug = 'TidyUp';
+UPDATE public.routine_categories SET description = 'How can you take care of yourself while you chase your goals today?' WHERE slug = 'CeoWellness';
+UPDATE public.routine_categories SET description = 'What''s one thought of abundance you can hold onto today?' WHERE slug = 'MoneyMindset';
