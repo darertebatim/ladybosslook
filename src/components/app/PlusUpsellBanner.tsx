@@ -78,6 +78,12 @@ export function PlusUpsellBanner({
           <div className="flex-1 min-w-0">
             <p className="text-white font-bold text-[14px] leading-tight">{title}</p>
             <p className="text-white/70 text-[12px] leading-tight mt-0.5">{subtitle}</p>
+            <p
+              className="text-[11px] font-semibold leading-tight mt-1"
+              style={{ color: '#FFD27A' }}
+            >
+              Start your 7-day free trial →
+            </p>
           </div>
           <div className="shrink-0 h-7 px-2.5 rounded-full bg-white/15 backdrop-blur flex items-center gap-1">
             <Sparkles className="h-3 w-3 text-[#FFD27A]" />
