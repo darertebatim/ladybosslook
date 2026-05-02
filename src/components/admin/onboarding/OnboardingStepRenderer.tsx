@@ -182,8 +182,16 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return (
         <SelfCarePlusIntroStep
           step={step}
-          onAccept={() => { onAnswer?.(step.id, 'accepted'); onNext(); }}
-          onDecline={() => { onAnswer?.(step.id, 'declined'); onNext(); }}
+          onAccept={() => {
+            onAnswer?.(step.id, 'accepted');
+            try { localStorage.setItem('simora_selfcare_plus_choice', 'accepted'); } catch {}
+            onNext();
+          }}
+          onDecline={() => {
+            onAnswer?.(step.id, 'declined');
+            try { localStorage.setItem('simora_selfcare_plus_choice', 'declined'); } catch {}
+            onNext();
+          }}
         />
       );
     case 'selfcare-push-permission':
