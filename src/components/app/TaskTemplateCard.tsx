@@ -10,6 +10,10 @@ interface TaskTemplateCardProps {
   isSelected?: boolean;
   selectable?: boolean;
   compact?: boolean;
+  /** Hide the small "category • daily • anytime" subtitle line. */
+  hideSubtitle?: boolean;
+  /** Use a white circle (with border) for the unselected state instead of the dark planner pill. */
+  lightUnselectedCircle?: boolean;
 }
 
 // Map time_period values to display labels
@@ -20,7 +24,7 @@ const TIME_PERIOD_LABELS: Record<string, string> = {
   night: 'Bedtime',
 };
 
-export function TaskTemplateCard({ template, onAdd, isSelected, selectable, compact }: TaskTemplateCardProps) {
+export function TaskTemplateCard({ template, onAdd, isSelected, selectable, compact, hideSubtitle, lightUnselectedCircle }: TaskTemplateCardProps) {
   const bgColor = TASK_COLORS[template.color as TaskColor] || TASK_COLORS.blue;
 
   const handleAdd = () => {
@@ -50,7 +54,7 @@ export function TaskTemplateCard({ template, onAdd, isSelected, selectable, comp
         
         <div className="flex-1 min-w-0">
           <p className={cn("font-medium text-black", compact ? "text-sm leading-tight" : "text-sm leading-snug")}>{template.title}</p>
-          {!compact && (
+          {!compact && !hideSubtitle && (
             <p className="text-xs text-black truncate">
               {template.category}
               {template.repeat_pattern && template.repeat_pattern !== 'none' && (
@@ -77,14 +81,16 @@ export function TaskTemplateCard({ template, onAdd, isSelected, selectable, comp
               "shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-colors",
               isSelected
                 ? "bg-primary"
-                : "bg-foreground"
+                : lightUnselectedCircle
+                  ? "bg-white border border-black/15"
+                  : "bg-foreground"
             )}
             aria-label={isSelected ? "Deselect task" : "Select task"}
           >
             {isSelected ? (
               <Check className="h-5 w-5 text-primary-foreground" />
             ) : (
-              <CalendarPlus className="h-5 w-5 text-background" />
+              <CalendarPlus className={cn("h-5 w-5", lightUnselectedCircle ? "text-foreground" : "text-background")} />
             )}
           </button>
         ) : (

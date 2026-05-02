@@ -112,16 +112,10 @@ export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Pro
     return groups;
   }, [taskTemplates, gapCategories]);
 
-  // Pre-select first task from each category on mount
+  // Pre-select ALL suggested tasks on mount
   useEffect(() => {
     if (taskTemplates.length === 0) return;
-    const preSelected = new Set<string>();
-    for (const group of groupedTasks) {
-      if (group.tasks[0]) {
-        preSelected.add(group.tasks[0].id);
-      }
-    }
-    setSelectedTasks(preSelected);
+    setSelectedTasks(new Set(taskTemplates.map(t => t.id)));
   }, [taskTemplates.length]);
 
   const handleToggleTask = (taskId: string) => {
@@ -288,6 +282,8 @@ export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Pro
                           onAdd={() => handleToggleTask(template.id)}
                           isSelected={selectedTasks.has(template.id)}
                           selectable
+                          hideSubtitle
+                          lightUnselectedCircle
                         />
                       </motion.div>
                     ))}
