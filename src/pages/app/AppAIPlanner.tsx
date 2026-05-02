@@ -340,6 +340,7 @@ export default function AppAIPlanner() {
   const selectedCount = selectedIds.size;
 
   return (
+    <>
     <motion.div
       initial={{ y: '100%' }}
       animate={{ y: isClosing ? '100%' : 0 }}
@@ -661,6 +662,8 @@ export default function AppAIPlanner() {
         </div>
       )}
     </motion.div>
+    <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
+    </>
   );
 }
 
