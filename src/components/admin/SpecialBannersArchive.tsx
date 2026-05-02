@@ -95,19 +95,7 @@ export function SpecialBannersArchive() {
 
       {specialBanners.map((banner) => (
         <Card key={banner.component} className={disabledMap[banner.component] ? 'opacity-60' : ''}>
-          {banner.preview ? (
-            <div className="px-4 pt-4">
-              <div
-                className="rounded-lg border bg-[#F8F4ED] p-3 pointer-events-none select-none"
-                aria-hidden="true"
-              >
-                {banner.preview}
-              </div>
-              <p className="mt-2 text-[11px] text-muted-foreground italic">
-                Live preview — interactions are disabled in this archive view.
-              </p>
-            </div>
-          ) : banner.coverImage ? (
+          {banner.coverImage ? (
             <div className="px-4 pt-4">
               <img
                 src={banner.coverImage}
