@@ -39,6 +39,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
   const isPremiumTool = LOCKED_TOOLS.includes(tool.id);
   const isLocked = isPremiumTool && !isSubscribed;
   const isMoodTool = tool.id === 'mood';
+  const peachBg = usePeach(tool.id);
 
   const handleClick = () => {
     if (tool.comingSoon) {
@@ -127,7 +128,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
           )}
           <div
             className="w-[68px] h-[68px] rounded-[26px] flex items-center justify-center relative"
-            style={{ backgroundColor: pickPeach(tool.id) }}
+            style={{ backgroundColor: peachBg }}
           >
             {tool.emoji ? (
               <FluentEmoji emoji={tool.emoji} size={44} />
