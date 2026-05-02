@@ -16,11 +16,18 @@ import { PaywallSheet } from '@/components/app/PaywallSheet';
 
 const FREE_AI_PLANNER_USES = 7;
 const usesKey = (uid?: string | null) => `ai_planner_uses_${uid || 'anon'}`;
+const giftSeenKey = (uid?: string | null) => `ai_planner_gift_seen_${uid || 'anon'}`;
 const readUses = (uid?: string | null): number => {
   try { return parseInt(localStorage.getItem(usesKey(uid)) || '0', 10) || 0; } catch { return 0; }
 };
 const writeUses = (uid: string | null | undefined, n: number) => {
   try { localStorage.setItem(usesKey(uid), String(n)); } catch {}
+};
+const readGiftSeen = (uid?: string | null): boolean => {
+  try { return localStorage.getItem(giftSeenKey(uid)) === '1'; } catch { return false; }
+};
+const writeGiftSeen = (uid?: string | null) => {
+  try { localStorage.setItem(giftSeenKey(uid), '1'); } catch {}
 };
 
 // Brand round-robin pastel palette (matches user task bank)
@@ -76,10 +83,33 @@ export default function AppAIPlanner() {
 
   const [usesCount, setUsesCount] = useState<number>(() => readUses(user?.id));
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showGift, setShowGift] = useState(false);
 
   useEffect(() => {
     setUsesCount(readUses(user?.id));
   }, [user?.id]);
+
+  // First-visit gift reveal — only for non-subscribers who haven't used it yet.
+  useEffect(() => {
+    if (subLoading) return;
+    if (isSubscribed) return;
+    if (readGiftSeen(user?.id)) return;
+    if (readUses(user?.id) > 0) {
+      writeGiftSeen(user?.id);
+      return;
+    }
+    const t = setTimeout(() => {
+      setShowGift(true);
+      haptic.medium();
+    }, 350);
+    return () => clearTimeout(t);
+  }, [user?.id, isSubscribed, subLoading]);
+
+  const dismissGift = () => {
+    writeGiftSeen(user?.id);
+    haptic.light?.();
+    setShowGift(false);
+  };
 
   const remainingFree = Math.max(0, FREE_AI_PLANNER_USES - usesCount);
   const showCounter = !subLoading && !isSubscribed;
@@ -442,8 +472,8 @@ export default function AppAIPlanner() {
                     </p>
                     <p className="text-white/70 text-[12px] leading-tight mt-0.5">
                       {remainingFree > 0
-                        ? `${remainingFree} free ${remainingFree === 1 ? 'plan' : 'plans'} left · Get Plus`
-                        : 'You\u2019re out of free plans · Get Plus'}
+                        ? `${remainingFree} of ${FREE_AI_PLANNER_USES} free plans remaining`
+                        : 'You\u2019ve used all your free plans'}
                     </p>
                     <p
                       className="text-[11px] font-semibold leading-tight mt-1"
@@ -723,6 +753,83 @@ export default function AppAIPlanner() {
       )}
     </motion.div>
     <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
+    {/* First-visit gift reveal */}
+    <AnimatePresence>
+      {showGift && (
+        <motion.div
+          key="gift-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-[10050] flex items-center justify-center px-6"
+          style={{ background: 'rgba(20, 14, 30, 0.55)', backdropFilter: 'blur(8px)' }}
+          onClick={dismissGift}
+        >
+          <motion.div
+            initial={{ scale: 0.85, y: 30, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.9, y: 20, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 280, damping: 24 }}
+            className="relative w-full max-w-[340px] rounded-3xl overflow-hidden shadow-ios"
+            style={{
+              background: 'linear-gradient(160deg, #FFE9D6 0%, #FFD3C4 55%, #F4B5D6 100%)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Floating sparkles */}
+            <motion.div
+              aria-hidden
+              animate={{ y: [0, -6, 0], rotate: [0, 8, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute top-4 right-5 text-2xl"
+            >
+              ✨
+            </motion.div>
+            <motion.div
+              aria-hidden
+              animate={{ y: [0, 5, 0], rotate: [0, -10, 0] }}
+              transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+              className="absolute bottom-20 left-5 text-xl opacity-80"
+            >
+              💖
+            </motion.div>
+
+            <div className="px-6 pt-8 pb-6 text-center">
+              <motion.div
+                initial={{ scale: 0.4, rotate: -20, opacity: 0 }}
+                animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 220, damping: 14, delay: 0.1 }}
+                className="mx-auto mb-4 h-20 w-20 rounded-2xl flex items-center justify-center text-5xl"
+                style={{
+                  background: 'linear-gradient(135deg, #FFD27A 0%, #FF8A5C 100%)',
+                  boxShadow: '0 12px 28px -8px rgba(255,138,92,0.55)',
+                }}
+              >
+                🎁
+              </motion.div>
+              <h2 className="text-[#1a1f3d] font-bold text-[22px] leading-tight">
+                A little gift for you
+              </h2>
+              <p className="mt-2 text-[#3d2a5c]/80 text-[15px] leading-snug">
+                Enjoy <span className="font-bold text-[#1a1f3d]">7 free AI plans</span> on us — turn any thought into a plan, instantly. ✨
+              </p>
+
+              <button
+                type="button"
+                onClick={dismissGift}
+                className="mt-6 w-full h-12 rounded-2xl text-white font-bold text-[15px] active:scale-[0.98] transition-transform shadow-ios"
+                style={{
+                  background: 'linear-gradient(120deg, #1a1f3d 0%, #3d2a5c 50%, #6b3d7a 100%)',
+                }}
+              >
+                Let's plan something
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
     </>
   );
 }
