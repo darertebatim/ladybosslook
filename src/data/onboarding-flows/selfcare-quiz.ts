@@ -44,6 +44,7 @@ export const selfcareQuizFlow: OnboardingFlow = {
       type: 'single-select',
       illustrationLabel: 'selfcare-quiz',
       title: "What's weighing on you the most?",
+      singleColumn: true,
       options: [
         { label: 'Stress that won\'t quit', emoji: '😰' },
         { label: 'Running on empty', emoji: '😴' },
