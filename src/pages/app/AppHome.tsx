@@ -1144,10 +1144,12 @@ const AppHome = () => {
                           <SortableTaskList tasks={routineProTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} hideQuickAdd />
                           <button
                             onClick={() => navigate('/app/routineplayer', { state: { openBuilder: true } })}
-                            className="w-full rounded-3xl py-2.5 px-3 mt-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+                            className="mt-3 w-full rounded-3xl pl-3 pr-4 py-2.5 bg-card-warm shadow-card-warm flex items-center gap-2 active:scale-[0.98] transition-all"
                           >
-                            <Wand2 className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
-                            Build Your Routine
+                            <div className="w-8 h-8 flex items-center justify-center shrink-0">
+                              <Wand2 className="h-5 w-5 text-[hsl(var(--brand-primary))]" strokeWidth={2.5} />
+                            </div>
+                            <span className="text-[15px] font-semibold text-foreground">Build Your Routine</span>
                           </button>
                           <div className="flex gap-2 mt-3">
                             <button
