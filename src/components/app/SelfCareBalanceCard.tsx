@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Sparkles } from 'lucide-react';
+import { ChevronRight, Sparkles, ArrowRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   useSelfCareBalance,
@@ -9,8 +9,35 @@ import {
 import { getLocalDateStr } from '@/lib/localDate';
 import { CLUSTER_LABELS, type ClusterType } from '@/utils/selfcare-scoring';
 import { cn } from '@/lib/utils';
+import { haptic } from '@/lib/haptics';
 
 const CLUSTER_ORDER: ClusterType[] = ['body', 'mind', 'environment', 'people'];
+
+// Categories highlighted in the per-cluster suggestion text.
+// slug = task bank route segment, label/emoji shown on the chip.
+const SUGGESTION_CHIPS: Record<
+  ClusterType,
+  Array<{ slug: string; label: string; emoji: string }>
+> = {
+  body: [
+    { slug: 'sleep', label: 'Sleep', emoji: '💤' },
+    { slug: 'nutrition', label: 'Hydrate', emoji: '💧' },
+    { slug: 'movement', label: 'Walk', emoji: '🚶' },
+  ],
+  mind: [
+    { slug: 'calm', label: 'Breathe', emoji: '🌬️' },
+    { slug: 'gratitude', label: 'Gratitude', emoji: '🙏' },
+    { slug: 'Presence', label: 'Pause', emoji: '🧘' },
+  ],
+  environment: [
+    { slug: 'TidyUp', label: 'Tidy up', emoji: '🧹' },
+    { slug: 'Evening', label: 'Evening ritual', emoji: '🌙' },
+  ],
+  people: [
+    { slug: 'connection', label: 'Reach out', emoji: '💕' },
+    { slug: 'LovedOnes', label: 'Loved ones', emoji: '👨‍👩‍👧' },
+  ],
+};
 
 export function SelfCareBalanceCard() {
   const navigate = useNavigate();
@@ -93,13 +120,29 @@ export function SelfCareBalanceCard() {
           {data?.weakestCluster && (
             <div className="mt-4 rounded-xl bg-amber-50 p-3 flex gap-2">
               <Sparkles className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-              <div>
+              <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-amber-900 mb-0.5">
                   Suggestion for next week
                 </p>
                 <p className="text-xs text-amber-900/80 leading-snug">
                   {getSuggestionFor(data.weakestCluster)}
                 </p>
+                <div className="mt-2.5 flex flex-wrap gap-1.5">
+                  {SUGGESTION_CHIPS[data.weakestCluster].map((chip) => (
+                    <button
+                      key={chip.slug}
+                      onClick={() => {
+                        haptic.light();
+                        navigate(`/app/tasksbank/${chip.slug}`);
+                      }}
+                      className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1.5 text-xs font-semibold text-amber-900 shadow-ios active:scale-95 transition-transform min-h-[32px]"
+                    >
+                      <span aria-hidden>{chip.emoji}</span>
+                      <span>{chip.label}</span>
+                      <ArrowRight className="h-3 w-3 text-amber-700/70" />
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}
