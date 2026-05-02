@@ -5,6 +5,7 @@ import {
   useSelfCareBalance,
   CLUSTER_BAR_COLORS,
   getSuggestionFor,
+  SUGGESTION_CHIPS,
 } from '@/hooks/useSelfCareBalance';
 import { getLocalDateStr } from '@/lib/localDate';
 import { CLUSTER_LABELS, type ClusterType } from '@/utils/selfcare-scoring';
@@ -12,32 +13,6 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 
 const CLUSTER_ORDER: ClusterType[] = ['body', 'mind', 'environment', 'people'];
-
-// Categories highlighted in the per-cluster suggestion text.
-// slug = task bank route segment, label/emoji shown on the chip.
-const SUGGESTION_CHIPS: Record<
-  ClusterType,
-  Array<{ slug: string; label: string; emoji: string }>
-> = {
-  body: [
-    { slug: 'sleep', label: 'Sleep', emoji: '💤' },
-    { slug: 'nutrition', label: 'Hydrate', emoji: '💧' },
-    { slug: 'movement', label: 'Walk', emoji: '🚶' },
-  ],
-  mind: [
-    { slug: 'calm', label: 'Breathe', emoji: '🌬️' },
-    { slug: 'gratitude', label: 'Gratitude', emoji: '🙏' },
-    { slug: 'Presence', label: 'Pause', emoji: '🧘' },
-  ],
-  environment: [
-    { slug: 'TidyUp', label: 'Tidy up', emoji: '🧹' },
-    { slug: 'Evening', label: 'Evening ritual', emoji: '🌙' },
-  ],
-  people: [
-    { slug: 'connection', label: 'Reach out', emoji: '💕' },
-    { slug: 'LovedOnes', label: 'Loved ones', emoji: '👨‍👩‍👧' },
-  ],
-};
 
 export function SelfCareBalanceCard() {
   const navigate = useNavigate();
