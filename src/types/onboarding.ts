@@ -49,6 +49,8 @@ export type OnboardingStepType =
   | 'selfcare-your-why'
   | 'selfcare-commitment'
   | 'selfcare-reflection'
+  | 'selfcare-rilo-celebration'
+  | 'selfcare-routine-reveal'
   | 'week-cleanup'
   | 'rilo-teach'
   | 'rilo-pick-tasks'

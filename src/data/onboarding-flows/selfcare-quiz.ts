@@ -160,5 +160,21 @@ export const selfcareQuizFlow: OnboardingFlow = {
       subtitle: 'How often do you want to show up for yourself?',
       buttonLabel: "I'm Ready →",
     },
+    {
+      id: 'sc-rilo-celebration',
+      type: 'selfcare-rilo-celebration',
+      illustrationLabel: 'selfcare-quiz',
+      title: "You showed up\nfor yourself today.",
+      subtitle: 'Your routine is now part of Rilo — small daily wins, designed for you.',
+      buttonLabel: 'See my routine →',
+    },
+    {
+      id: 'sc-routine-reveal',
+      type: 'selfcare-routine-reveal',
+      illustrationLabel: 'selfcare-quiz',
+      title: 'Your starter plan',
+      subtitle: "These will be waiting for you on Home — one tiny win at a time.",
+      buttonLabel: "Let's do it!",
+    },
   ],
 };

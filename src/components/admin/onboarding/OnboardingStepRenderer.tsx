@@ -25,6 +25,8 @@ import { SelfCareSuggestionsStep } from '@/components/app/selfcare-quiz/SelfCare
 import { SelfCareYourWhyStep } from '@/components/app/selfcare-quiz/SelfCareYourWhyStep';
 import { SelfCareCommitmentStep } from '@/components/app/selfcare-quiz/SelfCareCommitmentStep';
 import { SelfCareReflectionStep } from '@/components/app/selfcare-quiz/SelfCareReflectionStep';
+import { SelfCareRiloCelebrationStep } from '@/components/app/selfcare-quiz/SelfCareRiloCelebrationStep';
+import { SelfCareRoutineRevealStep } from '@/components/app/selfcare-quiz/SelfCareRoutineRevealStep';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 import { computeTopCluster } from '@/utils/selfcare-scoring';
 import { RiloTeachScreen } from '@/components/admin/onboarding/RiloTeachScreen';
@@ -173,6 +175,10 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <SelfCareCommitmentStep step={step} onNext={onNext} onAnswer={onAnswer} />;
     case 'selfcare-reflection':
       return <SelfCareReflectionStep step={step} onNext={onNext} onAnswer={onAnswer} answers={answers} />;
+    case 'selfcare-rilo-celebration':
+      return <SelfCareRiloCelebrationStep step={step} onNext={onNext} />;
+    case 'selfcare-routine-reveal':
+      return <SelfCareRoutineRevealStep step={step} onNext={onNext} answers={answers} />;
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }
