@@ -54,6 +54,7 @@ import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { WelcomeSpotlightBanner } from '@/components/app/home/WelcomeSpotlightBanner';
 import { TaskCoachOverlay } from '@/components/app/home/TaskCoachOverlay';
+import { AddButtonCoachOverlay } from '@/components/app/home/AddButtonCoachOverlay';
 import { SpotlightCutout } from '@/components/app/home/SpotlightCutout';
 
 
@@ -1463,6 +1464,9 @@ const AppHome = () => {
         )}
         {spotlightStep === 'complete' && !spotlightAdvancePending && spotlightHighlightTaskId && (
           <TaskCoachOverlay taskId={spotlightHighlightTaskId} variant="check" />
+        )}
+        {spotlightStep === 'add' && !spotlightAdvancePending && (
+          <AddButtonCoachOverlay />
         )}
         {/* Instructional pill — vertically centered during tour */}
         {spotlightStep && !spotlightAdvancePending && (
