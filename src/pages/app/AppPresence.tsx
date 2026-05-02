@@ -7,6 +7,7 @@ import { useUserPresence } from '@/hooks/useUserPresence';
 import { useUserStreak, useSetStreakGoal, useRecoverStreak } from '@/hooks/useTaskPlanner';
 import { useUserChallenges } from '@/hooks/useUserChallenges';
 import { StreakRecoveryPrompt } from '@/components/app/StreakRecoveryPrompt';
+import { getAvailableShields } from '@/lib/recoveryShields';
 import { ACHIEVEMENTS, getAchievementStatus } from '@/lib/achievements';
 import { AchievementCard } from '@/components/app/AchievementCard';
 import { WeeklyPresenceGrid } from '@/components/app/WeeklyPresenceGrid';
@@ -54,10 +55,13 @@ const AppPresence = () => {
   // Check if user has a streak goal challenge active
   const hasStreakChallenge = streak?.streak_goal && streak.streak_goal > 0;
 
-  // Recovery: check shield availability by count (max 3)
+  // Recovery: shields are EARNED via streak milestones (Day 1/7/30).
+  // Availability = earned − used.
   const recoveryCount = (streak as any)?.streak_recovery_count || 0;
-  const hasShieldsRemaining = recoveryCount < 3;
-  const streakRecoveryAvailable = streak && 
+  const longestStreak = streak?.longest_streak || 0;
+  const availableShields = getAvailableShields(longestStreak, recoveryCount);
+  const hasShieldsRemaining = availableShields > 0;
+  const streakRecoveryAvailable = streak &&
     hasShieldsRemaining &&
     streak.current_streak === 0 &&
     streak.longest_streak > 0;
