@@ -185,6 +185,7 @@ export const TaskDetailModal = ({
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent 
         hideCloseButton 
+        data-spotlight-context="task-detail"
         className="app-theme w-[calc(100%-32px)] max-w-[calc(100%-32px)] p-0 gap-0 bg-transparent border-0 shadow-none flex flex-col"
       >
         {/* Task card */}
