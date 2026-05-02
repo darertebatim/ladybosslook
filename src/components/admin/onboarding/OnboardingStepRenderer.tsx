@@ -164,7 +164,7 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
     case 'selfcare-diagnosis':
       return <SelfCareDiagnosisStep step={step} onNext={onNext} onAnswer={onAnswer} answers={answers} />;
     case 'selfcare-suggestions':
-      return <SelfCareSuggestionsStep step={step} onNext={onNext} answers={answers} />;
+      return <SelfCareSuggestionsStep step={step} onNext={onNext} answers={answers} onAnswer={onAnswer} />;
     case 'dynamic-single-select':
       return <DynamicSingleSelectScreen step={step} onNext={onNext} onAnswer={onAnswer} answers={answers} />;
     case 'selfcare-your-why':
