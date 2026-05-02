@@ -182,6 +182,12 @@
     "keepShowingUp": "Keep showing up every day",
     "shieldsLimited": "Recovery shields are limited — use them wisely"
   },
+  "shieldEarned": {
+    "title": "Shield Unlocked!",
+    "subtitle": "You reached a {{day}}-day streak",
+    "body": "You now have {{count}} Recovery Shields. Use one to save your streak if you ever miss a day.",
+    "cta": "Awesome"
+  },
   "quickStart": {
     "typeNew": "Type a new task...",
     "needInspiration": "Need inspiration?",
