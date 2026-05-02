@@ -135,6 +135,9 @@ const AppHome = () => {
   const [spotlightStep, setSpotlightStep] = useState<
     null | 'tap' | 'add' | 'complete'
   >(null);
+  // When user taps a task during the 'tap' step, defer advancement until
+  // the TaskDetailModal closes so step 2 doesn't appear behind the modal.
+  const [spotlightAdvancePending, setSpotlightAdvancePending] = useState(false);
   const [, setHasWelcomeBanner] = useState(false);
   const { isKeyboardOpen } = useKeyboard();
   const { currentTrack } = useAudioPlayer();
