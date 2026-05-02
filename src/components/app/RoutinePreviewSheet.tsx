@@ -369,7 +369,7 @@ export function RoutinePreviewSheet({
         <div className={cn(
           'flex-1 rounded-2xl overflow-hidden',
           isPro ? 'ring-2 ring-teal-300 dark:ring-teal-600' : '',
-          colorClass
+          darkColorClass
         )}>
           {/* Main content area */}
           <div className="flex items-center gap-3 px-3 pt-3 pb-2.5">
