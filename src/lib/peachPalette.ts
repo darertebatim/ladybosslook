@@ -47,6 +47,17 @@ export function pickPeach(seed: string | undefined | null): string {
  * update instantly when the theme is toggled in-app.
  */
 export function usePeach(seed: string | undefined | null): string {
+  const dark = useIsDarkMode();
+  const palette = dark ? PEACHES_DARK : PEACHES_LIGHT;
+  return palette[hashSeed(seed) % palette.length];
+}
+
+/**
+ * Subscribes to dark-mode toggles on <html>. Use this in components that
+ * call `pickPeach()` inside loops (where a hook can't be invoked per item)
+ * so the parent re-renders when the theme changes.
+ */
+export function useIsDarkMode(): boolean {
   const [dark, setDark] = useState<boolean>(isDarkMode);
 
   useEffect(() => {
@@ -59,6 +70,5 @@ export function usePeach(seed: string | undefined | null): string {
     return () => observer.disconnect();
   }, []);
 
-  const palette = dark ? PEACHES_DARK : PEACHES_LIGHT;
-  return palette[hashSeed(seed) % palette.length];
+  return dark;
 }
