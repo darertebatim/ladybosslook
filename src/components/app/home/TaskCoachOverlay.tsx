@@ -66,7 +66,7 @@ export function TaskCoachOverlay({ taskId, variant }: TaskCoachOverlayProps) {
     <>
       {/* Glow ring */}
       <div
-        className="fixed pointer-events-none z-[10052]"
+        className="fixed pointer-events-none z-[10060]"
         style={{
           left: ringLeft,
           top: cy - ringHeight / 2,
@@ -78,7 +78,7 @@ export function TaskCoachOverlay({ taskId, variant }: TaskCoachOverlayProps) {
       />
       {/* Bouncing hand */}
       <div
-        className="fixed pointer-events-none z-[10053]"
+        className="fixed pointer-events-none z-[10061]"
         style={{
           left: handLeft,
           top: handTop,
