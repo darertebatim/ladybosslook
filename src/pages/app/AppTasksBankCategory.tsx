@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Search, X, StickyNote } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
+import { CleanTaskRow } from '@/components/app/tasksbank/CleanTaskRow';
 import { useTaskTemplates, TaskTemplate } from '@/hooks/useTaskPlanner';
 import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { haptic } from '@/lib/haptics';
@@ -38,6 +38,30 @@ export default function AppTasksBankCategory() {
 
   const category = categories?.find(c => c.slug === categorySlug);
   const title = category?.name || t('tier1.tasksBank.tasksFallback');
+  const categoryColor = category?.color || 'purple';
+  const categoryEmoji = category?.emoji || '✨';
+
+  // Soft pastel header bg per category color (matches CategorySection).
+  const headerBgMap: Record<string, string> = {
+    yellow: 'bg-amber-50',
+    pink: 'bg-pink-50',
+    purple: 'bg-purple-50',
+    blue: 'bg-blue-50',
+    green: 'bg-emerald-50',
+    orange: 'bg-orange-50',
+    red: 'bg-red-50',
+    teal: 'bg-teal-50',
+    indigo: 'bg-indigo-50',
+    rose: 'bg-rose-50',
+    amber: 'bg-amber-50',
+    mint: 'bg-teal-50',
+    lavender: 'bg-purple-50',
+    sky: 'bg-sky-50',
+    lime: 'bg-lime-50',
+    peach: 'bg-orange-50',
+    emerald: 'bg-emerald-50',
+  };
+  const heroBg = headerBgMap[categoryColor] || headerBgMap.purple;
 
   const tasks = useMemo(() => {
     if (!allTasks) return [];
@@ -241,19 +265,35 @@ export default function AppTasksBankCategory() {
           )}
 
           {!tasksLoading && (
-            <div className="px-4 pt-4 space-y-2.5">
-              {category?.description && (
-                <p className="text-sm text-muted-foreground pb-1">{category.description}</p>
+            <div className="px-4 pt-4 space-y-3">
+              {/* Hero card — pastel background, big emoji, name + description */}
+              {category && (
+                <div className={cn('rounded-2xl p-4 flex items-center gap-3', heroBg)}>
+                  <span className="shrink-0 w-14 h-14 rounded-2xl bg-white/80 flex items-center justify-center">
+                    <FluentEmoji emoji={categoryEmoji} size={36} />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-base font-bold text-black leading-tight">{category.name}</h2>
+                    {category.description && (
+                      <p className="text-[12px] text-black leading-snug mt-1 line-clamp-3">
+                        {category.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
               )}
-              {filteredTasks.map(task => (
-                <TaskTemplateCard
-                  key={task.id}
-                  template={task}
-                  onAdd={() => handleToggleTask(task.id)}
-                  isSelected={selectedTasks.has(task.id)}
-                  selectable
-                />
-              ))}
+
+              <div className="space-y-2">
+                {filteredTasks.map(task => (
+                  <CleanTaskRow
+                    key={task.id}
+                    template={task}
+                    onToggle={() => handleToggleTask(task.id)}
+                    isSelected={selectedTasks.has(task.id)}
+                    accentColor={categoryColor}
+                  />
+                ))}
+              </div>
             </div>
           )}
 
