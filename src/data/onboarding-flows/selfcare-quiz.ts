@@ -147,6 +147,15 @@ export const selfcareQuizFlow: OnboardingFlow = {
       buttonLabel: 'Build My Routine',
     },
     {
+      id: 'sc-push-permission',
+      type: 'selfcare-push-permission',
+      illustrationLabel: 'selfcare-quiz',
+      title: 'Gentle nudges,\nnot noisy alerts.',
+      subtitle: "We'll send a soft reminder when it's time to show up for one of your routine tasks.",
+      buttonLabel: 'Turn on reminders',
+      secondaryButtonLabel: 'Maybe later',
+    },
+    {
       id: 'sc-your-why',
       type: 'selfcare-your-why',
       illustrationLabel: 'selfcare-quiz',
