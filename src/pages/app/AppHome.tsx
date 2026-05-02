@@ -1418,6 +1418,13 @@ const AppHome = () => {
                 ? `[data-task-id="${spotlightHighlightTaskId}"]`
                 : null
             }
+            contextSelector={
+              spotlightStep === 'add'
+                ? '[data-spotlight-context="task-detail"]'
+                : spotlightStep === 'complete'
+                ? '[data-spotlight-context="task-create"]'
+                : null
+            }
             padding={spotlightStep === 'add' ? 6 : 8}
             radius={spotlightStep === 'add' ? 999 : 18}
           />
