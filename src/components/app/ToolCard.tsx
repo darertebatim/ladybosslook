@@ -125,13 +125,13 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
             </div>
           )}
           <div className={cn(
-            'w-14 h-14 rounded-2xl flex items-center justify-center relative',
+            'w-[68px] h-[68px] rounded-[26px] flex items-center justify-center relative',
             tool.bgColor
           )}>
             {tool.emoji ? (
-              <FluentEmoji emoji={tool.emoji} size={38} />
+              <FluentEmoji emoji={tool.emoji} size={44} />
             ) : (
-              <IconComponent className={cn('h-6 w-6', tool.iconColor)} />
+              <IconComponent className={cn('h-7 w-7', tool.iconColor)} />
             )}
             {isLocked && (
               <div className="absolute -bottom-1 -right-1 p-1 rounded-full bg-amber-100">
@@ -148,7 +148,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
               )
             )}
           </div>
-          <span className="text-[11px] font-medium text-foreground max-w-[64px] text-center leading-tight line-clamp-2">
+          <span className="text-[12px] font-medium text-foreground max-w-[76px] text-center leading-tight line-clamp-2">
             {tool.name}
           </span>
         </button>
