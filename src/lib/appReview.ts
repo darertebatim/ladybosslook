@@ -51,9 +51,23 @@ export function triggerSoftReview(
       localStorage.setItem(options.oneShotKey, 'true');
     }
 
-    window.dispatchEvent(
-      new CustomEvent(SOFT_REVIEW_EVENT, { detail: { trigger } })
-    );
+    // Strategy: try the NATIVE Apple/Google in-app review dialog first.
+    // If it succeeds (or even silently no-ops without throwing), we're done.
+    // Only when the native path is unavailable / throttled / errors do we
+    // fall back to our in-app SoftReviewPrompt banner.
+    requestAppReview(trigger)
+      .then((nativeShown) => {
+        if (!nativeShown) {
+          window.dispatchEvent(
+            new CustomEvent(SOFT_REVIEW_EVENT, { detail: { trigger } })
+          );
+        }
+      })
+      .catch(() => {
+        window.dispatchEvent(
+          new CustomEvent(SOFT_REVIEW_EVENT, { detail: { trigger } })
+        );
+      });
     return true;
   } catch (e) {
     console.warn('[Review] triggerSoftReview failed', e);
