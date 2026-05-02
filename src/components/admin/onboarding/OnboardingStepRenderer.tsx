@@ -176,9 +176,15 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
     case 'selfcare-reflection':
       return <SelfCareReflectionStep step={step} onNext={onNext} onAnswer={onAnswer} answers={answers} />;
     case 'selfcare-rilo-celebration':
-      return <SelfCareRiloCelebrationStep step={step} onNext={onNext} />;
-    case 'selfcare-routine-reveal':
-      return <SelfCareRoutineRevealStep step={step} onNext={onNext} answers={answers} />;
+      return <SelfCareRiloCelebrationStep step={step} onNext={onNext} answers={answers} />;
+    case 'selfcare-plus-intro':
+      return (
+        <SelfCarePlusIntroStep
+          step={step}
+          onAccept={() => { onAnswer?.(step.id, 'accepted'); onNext(); }}
+          onDecline={() => { onAnswer?.(step.id, 'declined'); onNext(); }}
+        />
+      );
     default:
       return <div className="flex items-center justify-center h-full text-sm text-gray-400">Unknown: {step.type}</div>;
   }
