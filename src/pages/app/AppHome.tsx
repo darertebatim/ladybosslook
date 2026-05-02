@@ -589,7 +589,10 @@ const AppHome = () => {
       return filteredTasks[0]?.id ?? null;
     }
     if (spotlightStep === 'complete') {
-      const firstIncomplete = filteredTasks.find(t => !completedTaskIds.has(t.id));
+      // Skip pro-linked tasks: their circle navigates to a tool instead of completing.
+      const firstIncomplete = filteredTasks.find(
+        t => !completedTaskIds.has(t.id) && !t.pro_link_type
+      );
       return firstIncomplete?.id ?? null;
     }
     return null;
