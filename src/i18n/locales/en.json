@@ -487,7 +487,8 @@
         "journal": "Write in Journal",
         "breathe": "Breathe",
         "reflect": "Choose a Reflection",
-        "talk": "Talk it Out"
+        "talk": "Talk it Out",
+        "plan": "AI Planner"
       }
     },
     "routinePrompt": {
