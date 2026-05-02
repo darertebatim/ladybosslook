@@ -3,7 +3,6 @@ import { ChevronRight, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   useSelfCareBalance,
-  getWindowStart,
   CLUSTER_BAR_COLORS,
   getSuggestionFor,
 } from '@/hooks/useSelfCareBalance';
@@ -16,7 +15,8 @@ const CLUSTER_ORDER: ClusterType[] = ['body', 'mind', 'environment', 'people'];
 export function SelfCareBalanceCard() {
   const navigate = useNavigate();
   const today = getLocalDateStr();
-  const start = getWindowStart(7);
+  // All-time window
+  const start = '2000-01-01';
   const { data, isLoading } = useSelfCareBalance(start, today);
 
   const hasData = (data?.totalCompletions ?? 0) > 0;
@@ -29,7 +29,7 @@ export function SelfCareBalanceCard() {
             Self-Care Balance
           </h3>
           <p className="text-[11px] text-muted-foreground mt-0.5">
-            Last 7 days
+            All time
           </p>
         </div>
         <button
@@ -50,7 +50,7 @@ export function SelfCareBalanceCard() {
       ) : !hasData ? (
         <div className="py-6 text-center">
           <p className="text-sm text-muted-foreground">
-            Complete a few tasks this week to see your balance across Body, Mind,
+            Complete a few tasks to see your balance across Body, Mind,
             Environment & People.
           </p>
         </div>
