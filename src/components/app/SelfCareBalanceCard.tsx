@@ -50,7 +50,7 @@ export function SelfCareBalanceCard() {
       ) : !hasData ? (
         <div className="py-6 text-center">
           <p className="text-sm text-muted-foreground">
-            Complete a few tasks this week to see your balance across Body, Mind,
+            Complete a few tasks to see your balance across Body, Mind,
             Environment & People.
           </p>
         </div>
