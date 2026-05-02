@@ -53,6 +53,7 @@ import { ToolShortcuts } from '@/components/app/ToolShortcuts';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { WelcomeSpotlightBanner } from '@/components/app/home/WelcomeSpotlightBanner';
 import { TaskCoachOverlay } from '@/components/app/home/TaskCoachOverlay';
+import { SpotlightCutout } from '@/components/app/home/SpotlightCutout';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
@@ -1404,9 +1405,16 @@ const AppHome = () => {
 
         {/* Welcome Spotlight overlay — anchored to highlighted task during the tour */}
         {spotlightStep && (
-          <div
-            className="fixed inset-0 z-[100] bg-black/60 pointer-events-none animate-in fade-in duration-200"
-            aria-hidden
+          <SpotlightCutout
+            targetSelector={
+              spotlightStep === 'add'
+                ? '.coach-add-btn'
+                : spotlightHighlightTaskId
+                ? `[data-task-id="${spotlightHighlightTaskId}"]`
+                : null
+            }
+            padding={spotlightStep === 'add' ? 6 : 8}
+            radius={spotlightStep === 'add' ? 999 : 18}
           />
         )}
         {spotlightStep === 'tap' && spotlightHighlightTaskId && (
@@ -1418,7 +1426,7 @@ const AppHome = () => {
         {/* Instructional pill — vertically centered during tour */}
         {spotlightStep && (
           <div
-            className="fixed left-0 right-0 top-1/2 -translate-y-1/2 z-[104] flex justify-center pointer-events-none px-4"
+            className="fixed left-0 right-0 top-1/2 -translate-y-1/2 z-[10054] flex justify-center pointer-events-none px-4"
           >
             <div className="pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#1a1a2e] text-white text-[13px] font-semibold shadow-[0_8px_24px_rgba(0,0,0,0.3)] max-w-[88vw]">
               <span>
