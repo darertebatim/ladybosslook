@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { CategoryCircle } from "@/components/app/CategoryCircle";
 import { RoutineBankCard } from "@/components/app/RoutineBankCard";
 import { BackButton } from "@/components/app/BackButton";
+import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
 import {
   useRoutineBankCategories,
   useRoutinesBank,
@@ -122,63 +123,57 @@ export default function AppInspire() {
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
-      {/* Fixed Header */}
+      {/* Glassy Header */}
       <header
-        className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-ios"
+        className="fixed top-0 left-0 right-0 z-50 bg-white/35 dark:bg-black/20 backdrop-blur-xl rounded-b-2xl shadow-[0_2px_10px_rgba(0,0,0,0.06)]"
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
-        <div className="flex items-center justify-between px-4 pt-3 pb-2">
-          <div className="flex items-center gap-1 min-w-0">
+        <div className="px-4 pt-3 pb-3 flex items-center justify-between min-h-[52px] gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <BackButton to="/app/home" showLabel={false} className="-ml-2" />
-            <CalendarPlus className="w-6 h-6 text-primary shrink-0" />
-            <h1 className="text-xl font-bold text-foreground truncate">
+            <CalendarPlus className="w-5 h-5 text-[hsl(var(--brand-primary))] shrink-0" />
+            <h1 className="text-xl font-bold text-fg-warm truncate">
               {t('inspirePage.title')}
             </h1>
           </div>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setShowSearch(!showSearch)}
-              className="p-2 rounded-full active:bg-muted/50 transition-colors"
+          <div className="flex items-center gap-2">
+            <IOSIconButton
+              size="sm"
+              onClick={() => { haptic.light(); setShowSearch(!showSearch); }}
+              aria-label="Search"
             >
-              <Search className="w-5 h-5 text-muted-foreground" />
-            </button>
-            <button
-              onClick={() => {
-                haptic.light();
-                setShowFavorites(!showFavorites);
-              }}
-              className={cn(
-                "p-2 rounded-full active:bg-muted/50 transition-colors",
-                showFavorites && "bg-primary/10",
-              )}
+              <Search className="w-4 h-4" />
+            </IOSIconButton>
+            <IOSIconButton
+              size="sm"
+              onClick={() => { haptic.light(); setShowFavorites(!showFavorites); }}
+              aria-label="Favorites"
             >
               <Heart
                 className={cn(
-                  "w-5 h-5",
-                  showFavorites
-                    ? "fill-red-500 text-red-500"
-                    : "text-muted-foreground",
+                  "w-4 h-4",
+                  showFavorites && "fill-red-500 text-red-500",
                 )}
               />
-            </button>
+            </IOSIconButton>
           </div>
         </div>
 
         {showSearch && (
-          <div className="px-4 pb-2 animate-in slide-in-from-top duration-200">
+          <div className="px-4 pb-3 animate-in slide-in-from-top duration-200">
             <Input
               type="search"
               placeholder={t('inspirePage.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-muted/50"
+              className="bg-white/70 dark:bg-white/10 border-0 shadow-ios rounded-full focus-visible:ring-0"
             />
           </div>
         )}
       </header>
 
       {/* Header Spacer */}
-      <div style={{ height: "calc(48px + env(safe-area-inset-top, 0px))" }} />
+      <div style={{ height: "calc(56px + env(safe-area-inset-top, 0px))" }} />
 
       <div
         ref={scrollRef}
