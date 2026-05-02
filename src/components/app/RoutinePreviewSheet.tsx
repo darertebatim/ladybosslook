@@ -21,6 +21,22 @@ import { formatTimeLabel } from '@/lib/taskScheduling';
 import { useTranslation } from 'react-i18next';
 
 // Secondary (darker) palette for card footer strips
+// Visible mid-tone tints for the card body (top half)
+const TASK_COLOR_LIGHT_CLASSES: Record<string, string> = {
+  pink: 'bg-[#FFE0F5]',
+  peach: 'bg-[#FFE6C9]',
+  yellow: 'bg-[#FFF492]',
+  lime: 'bg-[#E2F9F0]',
+  sky: 'bg-[#D7E9FF]',
+  mint: 'bg-[#E0FBB8]',
+  lavender: 'bg-[#F0E3FF]',
+  purple: 'bg-[#F0E3FF]',
+  blue: 'bg-[#D7E9FF]',
+  red: 'bg-[#FFE0F5]',
+  orange: 'bg-[#FFE6C9]',
+  green: 'bg-[#E2F9F0]',
+};
+
 const TASK_COLOR_DARK_CLASSES: Record<string, string> = {
   pink: 'bg-[#FFC2EA]',
   peach: 'bg-[#FFD2A1]',
@@ -343,7 +359,7 @@ export function RoutinePreviewSheet({
     const isSelected = selectedTaskIds.has(task.id);
     const isPro = isProTask(task.id);
     const display = getTaskDisplay(task, index);
-    const colorClass = TASK_COLOR_CLASSES[display.color];
+    const colorClass = TASK_COLOR_LIGHT_CLASSES[display.color] || TASK_COLOR_CLASSES[display.color];
     const darkColorClass = TASK_COLOR_DARK_CLASSES[display.color] || 'bg-black/10';
     const edited = editedTasks[task.id];
     
@@ -369,7 +385,7 @@ export function RoutinePreviewSheet({
         <div className={cn(
           'flex-1 rounded-2xl overflow-hidden',
           isPro ? 'ring-2 ring-teal-300 dark:ring-teal-600' : '',
-          darkColorClass
+          colorClass
         )}>
           {/* Main content area */}
           <div className="flex items-center gap-3 px-3 pt-3 pb-2.5">
