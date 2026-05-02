@@ -1420,8 +1420,10 @@ const AppHome = () => {
           createParams={taskSheetCreateParams}
         />
 
-        {/* Welcome Spotlight overlay — anchored to highlighted task during the tour */}
-        {spotlightStep && (
+        {/* Welcome Spotlight overlay — anchored to highlighted task during the tour.
+            Hidden while the TaskDetailModal is open (pending advance) so the
+            scrim/pill don't sit on top of the sheet. */}
+        {spotlightStep && !spotlightAdvancePending && (
           <SpotlightCutout
             targetSelector={
               spotlightStep === 'add'
@@ -1434,14 +1436,14 @@ const AppHome = () => {
             radius={spotlightStep === 'add' ? 999 : 18}
           />
         )}
-        {spotlightStep === 'tap' && spotlightHighlightTaskId && (
+        {spotlightStep === 'tap' && !spotlightAdvancePending && spotlightHighlightTaskId && (
           <TaskCoachOverlay taskId={spotlightHighlightTaskId} variant="tap" />
         )}
-        {spotlightStep === 'complete' && spotlightHighlightTaskId && (
+        {spotlightStep === 'complete' && !spotlightAdvancePending && spotlightHighlightTaskId && (
           <TaskCoachOverlay taskId={spotlightHighlightTaskId} variant="check" />
         )}
         {/* Instructional pill — vertically centered during tour */}
-        {spotlightStep && (
+        {spotlightStep && !spotlightAdvancePending && (
           <div
             className="fixed left-0 right-0 top-1/2 -translate-y-1/2 z-[10062] flex justify-center pointer-events-none px-4"
           >
