@@ -165,7 +165,7 @@
     "shieldsRemaining_other": "{{n}} shields remaining",
     "letReset": "Let the streak reset",
     "noShieldsLeft": "No shields left. Unlock more with",
-    "getPlus": "Get Simora Plus",
+    "getPlus": "Get Rilo Plus",
     "startFresh": "Start Fresh",
     "allShieldsUsed": "All recovery shields have been used. Time for a fresh start."
   },
@@ -525,7 +525,7 @@
     "missedDay": "You missed a day. Use a",
     "recoveryShield": "Recovery Shield",
     "oneRecovery": "one recovery",
-    "simoraPlus": "Simora Plus",
+    "simoraPlus": "Rilo Plus",
     "keepStreakAlive": "To keep your streak alive:",
     "complete": "Complete",
     "all": "all",
@@ -1065,7 +1065,7 @@
       "addedGoToPlanner": "Added — Go to Planner",
       "addAgain": "Add again",
       "plusFeatureTitle": "Water Tracker is a Plus feature",
-      "plusFeatureDesc": "Upgrade to Simora Plus to track your hydration with daily goals and reminders.",
+      "plusFeatureDesc": "Upgrade to Rilo Plus to track your hydration with daily goals and reminders.",
       "addedToRoutines": "Water tracking added to your routines!",
       "addFailed": "Failed to add water tracking",
       "addToRoutineDesc": "Add water tracking to your routine to save progress!",
@@ -1076,7 +1076,7 @@
     "period": {
       "title": "Period Tracker",
       "plusFeatureTitle": "Period Tracker is a Plus feature",
-      "plusFeatureDesc": "Upgrade to Simora Plus to track your cycle, get predictions, and log symptoms.",
+      "plusFeatureDesc": "Upgrade to Rilo Plus to track your cycle, get predictions, and log symptoms.",
       "logToday": "Log Today",
       "startPageTour": "Start page tour",
       "legendPeriod": "Period",
@@ -1652,9 +1652,9 @@
     "shareAria": "Share",
     "notFound": "Playlist not found",
     "locked": "Locked",
-    "partOfSimoraPlus": "This content is part of <1>Simora Plus</1>.",
+    "partOfSimoraPlus": "This content is part of <1>Rilo Plus</1>.",
     "partOfPlusFull_pre": "This content is part of ",
-    "partOfPlusBrand": "Simora Plus",
+    "partOfPlusBrand": "Rilo Plus",
     "partOfPlusFull_post": ". Subscribe to unlock."
   },
   "breatheStatsPage": {
