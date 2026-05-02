@@ -30,6 +30,7 @@ import {
 } from "@/lib/toolsConfig";
 import { PromoBanner } from "@/components/app/PromoBanner";
 import { HomeBanner } from "@/components/app/HomeBanner";
+import { PlusUpsellBanner } from "@/components/app/PlusUpsellBanner";
 import { SelfCareQuizBanner } from "@/components/app/SelfCareQuizBanner";
 import { useReflections, type Reflection } from "@/hooks/useReflections";
 import {
@@ -372,6 +373,11 @@ const AppStore = () => {
             {/* Promo Banner - Explore Page */}
             <PromoBanner location="explore" className="mb-2" />
             <HomeBanner location="explore" className="mb-2" />
+            <PlusUpsellBanner
+              title="Unlock all tools with Plus"
+              subtitle="Reflections, Fasting, AI Planner & more"
+              className="mb-2"
+            />
 
             {/* Tools Section */}
             {(!searchQuery ||
