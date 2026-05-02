@@ -213,7 +213,7 @@ export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, previ
         {/* Headline */}
         <div style={{ paddingLeft: 24, paddingRight: 24, paddingTop: 8, paddingBottom: 24, textAlign: 'center' }}>
           <p style={{ fontSize: 26, fontWeight: 800, color: '#0a0a0a', lineHeight: 1.25, margin: 0, letterSpacing: -0.5 }}>
-            Simora Plus is the fastest<br />way to your best routine yet.
+            Rilo Plus is the fastest<br />way to your best routine yet.
           </p>
         </div>
 
@@ -255,7 +255,7 @@ export function PaywallMascotV2({ program, onPurchase, onRestore, onClose, previ
         {/* Headline */}
         <div style={{ paddingLeft: 24, paddingRight: 24, paddingTop: 4, paddingBottom: 20, textAlign: 'center' }}>
           <p style={{ fontSize: 24, fontWeight: 800, color: '#0a0a0a', lineHeight: 1.25, margin: 0, letterSpacing: -0.5 }}>
-            Simora Plus is the best plan<br />for building lasting habits
+            Rilo Plus is the best plan<br />for building lasting habits
           </p>
         </div>
 

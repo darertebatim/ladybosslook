@@ -72,7 +72,7 @@ export function InstructorInviteContent({
   if (plusTrialDays > 0) {
     perks.push({
       icon: '✨',
-      label: `${plusTrialDays}-day Simora Plus trial`,
+      label: `${plusTrialDays}-day Rilo Plus trial`,
     });
   }
 

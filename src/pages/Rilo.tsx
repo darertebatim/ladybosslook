@@ -78,7 +78,7 @@ function PhoneFrame({
 const faqs = [
   {
     q: 'Is Rilo free to use?',
-    a: 'Yes. The Self-Care Quiz, daily planner, routine templates, mood check-in, reflections, reading library, and community chats are all free. Simora Plus unlocks unlimited routines and tasks, AI Agents, Fasting, Period, Projects, and premium audio.',
+    a: 'Yes. The Self-Care Quiz, daily planner, routine templates, mood check-in, reflections, reading library, and community chats are all free. Rilo Plus unlocks unlimited routines and tasks, AI Agents, Fasting, Period, Projects, and premium audio.',
   },
   {
     q: 'What is the Self-Care Quiz?',
@@ -89,8 +89,8 @@ const faqs = [
     a: 'Yes. Your planner, routines, journal, and previously played audio work offline. Streaming content needs a connection, but the app is built native-first with persistent caching.',
   },
   {
-    q: 'How much is Simora Plus?',
-    a: 'Simora Plus is the optional premium tier. Pricing varies by region and is shown clearly in the app before any purchase. You can start with the free tier and upgrade anytime.',
+    q: 'How much is Rilo Plus?',
+    a: 'Rilo Plus is the optional premium tier. Pricing varies by region and is shown clearly in the app before any purchase. You can start with the free tier and upgrade anytime.',
   },
   {
     q: 'What languages does Rilo support?',
@@ -566,13 +566,13 @@ const Rilo = () => {
         <div className="mx-auto max-w-6xl px-5 py-20 md:py-24">
           <div className="max-w-2xl">
             <span className="text-sm font-medium uppercase tracking-widest text-[hsl(15,55%,45%)]">
-              Free & Simora Plus
+              Free & Rilo Plus
             </span>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
               Most of Rilo is free.
             </h2>
             <p className="mt-4 text-lg text-[hsl(20,10%,35%)]">
-              The full self-care loop works on the free plan. Simora Plus exists for people who want more
+              The full self-care loop works on the free plan. Rilo Plus exists for people who want more
               depth, more tools, and unlimited routines.
             </p>
           </div>
@@ -601,7 +601,7 @@ const Rilo = () => {
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-[hsl(45,90%,70%)]" aria-hidden />
                 <p className="text-sm font-semibold uppercase tracking-widest text-[hsl(45,90%,70%)]">
-                  Simora Plus
+                  Rilo Plus
                 </p>
               </div>
               <h3 className="mt-2 text-2xl font-semibold">Go deeper, without limits</h3>

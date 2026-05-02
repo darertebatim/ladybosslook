@@ -22,7 +22,7 @@ const PREMIUM_FEATURES = [
 const HELP_FAQ = [
   { q: 'Why was I automatically charged?', a: 'Your subscription auto-renews at the end of each billing period. You can manage this in your device settings.' },
   { q: 'How do I restore my membership?', a: 'Go to the paywall screen and tap "Restore Purchases" to restore your active subscription.' },
-  { q: 'How does a subscription work?', a: 'Simora Plus is a recurring subscription that gives you access to all premium content. It renews automatically unless cancelled.' },
+  { q: 'How does a subscription work?', a: 'Rilo Plus is a recurring subscription that gives you access to all premium content. It renews automatically unless cancelled.' },
   { q: 'Worries about how personal data is handled or shared?', a: 'We take your privacy seriously. Please review our Privacy Policy for full details on data handling.' },
   { q: 'How can I get help with technical issues?', a: 'Contact us through the in-app chat or email support@simora.app for technical assistance.' },
   { q: 'Money-back policy', a: 'Refunds for in-app purchases are handled by Apple/Google. Contact their support for refund requests.' },
@@ -82,7 +82,7 @@ export function SubscriptionCard() {
   const activeSub = subscriptions[0];
   const isAnnual = activeSub?.product_id?.toLowerCase().includes('annual') || activeSub?.product_id?.toLowerCase().includes('yearly');
   const isMonthly = !isAnnual;
-  const planLabel = isAnnual ? 'Simora Plus Yearly' : 'Simora Plus Monthly';
+  const planLabel = isAnnual ? 'Rilo Plus Yearly' : 'Rilo Plus Monthly';
   const planPrice = isAnnual ? '$59.99/year' : '$7.99/month';
   const expiresAt = activeSub?.expires_at;
   const platform = activeSub?.platform;

@@ -64,7 +64,7 @@ export function PaywallMascot({ program, onPurchase, onRestore, onClose, preview
       <div className="flex-1 px-6 pt-4 pb-4 flex flex-col">
         <div className="flex items-center justify-center gap-2.5">
           <img src={appIcon} alt="App icon" className="h-8 w-8 rounded-lg" />
-          <h2 className="text-3xl font-bold">Simora Plus</h2>
+          <h2 className="text-3xl font-bold">Rilo Plus</h2>
         </div>
         <p className="text-center text-sm opacity-70 mt-1">
           Unlocks premium wellness features including:
