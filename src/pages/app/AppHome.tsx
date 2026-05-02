@@ -110,6 +110,18 @@ const AppHome = () => {
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
   const [showNotificationFlow, setShowNotificationFlow] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  // Open the onboarding paywall when arriving with ?paywall=1 (e.g. from
+  // the Self-Care Quiz "Plus intro" step). Strip the param afterwards.
+  useEffect(() => {
+    if (searchParams.get('paywall') === '1') {
+      setShowPaywall(true);
+      setSearchParams(prev => {
+        const next = new URLSearchParams(prev);
+        next.delete('paywall');
+        return next;
+      }, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
   const [showActionLimit, setShowActionLimit] = useState(false);
   const [hasSelfCareQuizBanner, setHasSelfCareQuizBanner] = useState(false);
   const [hasPromoBanner, setHasPromoBanner] = useState(false);
