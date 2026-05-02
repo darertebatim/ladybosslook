@@ -9,6 +9,7 @@ import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
 import { CleanTaskRow } from '@/components/app/tasksbank/CleanTaskRow';
 import { CategorySection } from '@/components/app/tasksbank/CategorySection';
 import { ClusterCards } from '@/components/app/tasksbank/ClusterCards';
+import { SelfCareBalanceCard } from '@/components/app/SelfCareBalanceCard';
 import { useTaskTemplates, TaskTemplate } from '@/hooks/useTaskPlanner';
 import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
 import { haptic } from '@/lib/haptics';
@@ -293,6 +294,12 @@ export default function AppTasksBank() {
           )}
 
           {!isSearching && <ClusterCards className="mt-5" />}
+
+          {!isSearching && (
+            <div className="px-4 mt-4">
+              <SelfCareBalanceCard />
+            </div>
+          )}
 
           {!isSearching && (
             <>
