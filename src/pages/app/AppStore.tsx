@@ -21,7 +21,7 @@ import {
 } from "@/hooks/useAppData";
 import { ProgramCard } from "@/components/app/ProgramCard";
 import { ToolCard } from "@/components/app/ToolCard";
-import { pickPeach } from "@/lib/peachPalette";
+import { pickPeach, useIsDarkMode } from "@/lib/peachPalette";
 import { Input } from "@/components/ui/input";
 import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
 import {
