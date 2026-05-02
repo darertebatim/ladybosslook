@@ -526,7 +526,9 @@ export function LeadsManager() {
         const { fullClientReset } = await import('@/lib/clientReset');
         fullClientReset();
         queryClient.clear();
-        window.location.href = '/app/home';
+        // Send straight into the "What is Rilo?" teach onboarding so the post-reset
+        // experience matches a fresh signup.
+        window.location.href = '/app/onboarding/what-is-rilo';
         return;
       }
 
