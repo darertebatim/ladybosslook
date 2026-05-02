@@ -11,6 +11,7 @@ import { usePlayerData } from "@/hooks/useAppData";
 import { cn } from "@/lib/utils";
 import { PromoBanner } from "@/components/app/PromoBanner";
 import { HomeBanner } from "@/components/app/HomeBanner";
+import { PlusUpsellBanner } from "@/components/app/PlusUpsellBanner";
 import {
   Popover,
   PopoverContent,
