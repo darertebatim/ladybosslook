@@ -258,6 +258,7 @@ export type Database = {
           repeat_days: number[] | null
           repeat_interval: number | null
           repeat_pattern: string
+          self_care_equivalent_id: string | null
           sort_order: number
           tag: string | null
           time_period: string | null
@@ -285,6 +286,7 @@ export type Database = {
           repeat_days?: number[] | null
           repeat_interval?: number | null
           repeat_pattern?: string
+          self_care_equivalent_id?: string | null
           sort_order?: number
           tag?: string | null
           time_period?: string | null
@@ -312,13 +314,22 @@ export type Database = {
           repeat_days?: number[] | null
           repeat_interval?: number | null
           repeat_pattern?: string
+          self_care_equivalent_id?: string | null
           sort_order?: number
           tag?: string | null
           time_period?: string | null
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "admin_task_bank_self_care_equivalent_id_fkey"
+            columns: ["self_care_equivalent_id"]
+            isOneToOne: false
+            referencedRelation: "admin_task_bank"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       admin_task_bank_subtasks: {
         Row: {
