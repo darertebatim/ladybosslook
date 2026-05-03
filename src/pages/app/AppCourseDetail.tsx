@@ -1193,17 +1193,17 @@ const AppCourseDetail = () => {
       <div className="flex flex-col h-full overflow-hidden bg-background">
         {/* Fixed Header with safe area */}
         <div
-          className="fixed top-0 left-0 right-0 z-50 bg-[#F4ECFE]/80 dark:bg-violet-950/80 backdrop-blur-lg rounded-b-3xl shadow-ios"
+          className="fixed top-0 left-0 right-0 z-50 bg-[hsl(var(--tint-peach))]/85 backdrop-blur-lg rounded-b-3xl shadow-ios"
           style={{ paddingTop: "env(safe-area-inset-top)" }}
         >
           <div className="pt-1 pb-2 px-4 flex items-center gap-1">
             <BackButton to="/app/myprograms" replace showLabel={false} />
             <div className="min-w-0 flex-1">
-              <h1 className="font-semibold text-lg truncate">
+              <h1 className="font-semibold text-lg truncate text-fg-warm">
                 {program?.title || "Program Details"}
               </h1>
               {round && (
-                <p className="text-xs text-muted-foreground truncate">
+                <p className="text-xs text-fg-warm/70 truncate">
                   {round.round_name}
                 </p>
               )}
