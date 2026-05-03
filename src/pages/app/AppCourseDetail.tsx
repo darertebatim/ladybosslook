@@ -1824,12 +1824,12 @@ const AppCourseDetail = () => {
 
                   {/* Upcoming Sessions Card */}
                   {dbSessions && dbSessions.length > 0 && (
-                    <Card className="tour-sessions-list">
+                    <Card className="tour-sessions-list rounded-2xl border-0 shadow-ios bg-[hsl(var(--tint-lavender))]">
                       <CardHeader className="tour-sessions-header">
-                        <CardTitle className="tour-sessions-title flex items-center gap-2">
+                        <CardTitle className="tour-sessions-title flex items-center gap-2 text-fg-warm">
                           <Clock className="h-5 w-5" />
                           Sessions
-                          <Badge variant="secondary" className="ml-auto">
+                          <Badge className="ml-auto bg-white text-fg-warm border-0">
                             {dbSessions.length}
                           </Badge>
                         </CardTitle>
@@ -1837,8 +1837,7 @@ const AppCourseDetail = () => {
                       <CardContent>
                         {/* Reminder Settings Button */}
                         <Button
-                          variant="outline"
-                          className="w-full mb-4 bg-[#F4ECFE] border-[#F4ECFE] tour-session-reminder-btn"
+                          className="w-full mb-4 tour-session-reminder-btn bg-white text-fg-warm shadow-ios rounded-full border-0"
                           onClick={() => setShowSessionReminderSheet(true)}
                         >
                           <Bell className="h-4 w-4 mr-2" />
@@ -1857,12 +1856,12 @@ const AppCourseDetail = () => {
                             return (
                               <div
                                 key={session.id}
-                                className={`flex items-center gap-3 p-3 rounded-lg border ${
+                                className={`flex items-center gap-3 p-3 rounded-2xl shadow-ios ${
                                   isPast
-                                    ? "bg-muted/50 opacity-60"
+                                    ? "bg-white/50 opacity-60"
                                     : isToday
-                                      ? "border-primary bg-primary/5"
-                                      : "bg-card"
+                                      ? "bg-[hsl(var(--tint-peach-mid))] text-fg-warm"
+                                      : "bg-white"
                                 }`}
                               >
                                 {/* Date Column */}
