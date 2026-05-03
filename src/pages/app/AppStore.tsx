@@ -429,7 +429,10 @@ const AppStore = () => {
                     <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-                <div className="grid grid-cols-2 gap-2.5">
+                <div
+                  className="flex gap-2.5 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4"
+                  style={{ WebkitOverflowScrolling: "touch" }}
+                >
                   {[
                     { slug: 'sleep', emoji: '💤', question: 'Sleep better tonight?' },
                     { slug: 'connection', emoji: '💕', question: 'Feel more connected?' },
@@ -439,10 +442,10 @@ const AppStore = () => {
                     <button
                       key={c.slug}
                       onClick={() => navigate(`/app/tasksbank/${c.slug}`)}
-                      className="relative rounded-2xl text-left p-3.5 min-h-[110px] flex flex-col justify-between bg-card active:scale-[0.97] transition-transform shadow-ios"
+                      className="shrink-0 snap-start w-[150px] h-[110px] relative rounded-2xl text-left p-3 flex flex-col justify-between bg-card active:scale-[0.97] transition-transform shadow-ios"
                     >
-                      <FluentEmoji emoji={c.emoji} size={32} />
-                      <p className="text-[14px] font-bold text-foreground leading-tight mt-2">
+                      <FluentEmoji emoji={c.emoji} size={28} />
+                      <p className="text-[13px] font-bold text-foreground leading-tight">
                         {c.question}
                       </p>
                     </button>
