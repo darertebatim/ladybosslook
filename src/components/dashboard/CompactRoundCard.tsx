@@ -4,17 +4,7 @@ import { format, isToday } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { CachedImage } from '@/components/ui/CachedImage';
 import { cn } from '@/lib/utils';
-
-// Various peach tones — matches the Tools shortcut tiles vibe
-const PROGRAM_CARD_BACKGROUNDS: string[] = [
-  'bg-peach',
-  'bg-peach-mid',
-  'bg-yellow',
-  'bg-yellow-mid',
-  'bg-pink',
-  'bg-pink-mid',
-  'bg-peach',
-];
+import { pickPeach } from '@/lib/peachPalette';
 
 interface CompactRoundCardProps {
   enrollment: any;
@@ -41,7 +31,7 @@ export function CompactRoundCard({
   const displayDate = nextSessionDate || round.first_session_date;
   const isSessionToday = displayDate && isToday(new Date(displayDate));
 
-  const paletteClass = PROGRAM_CARD_BACKGROUNDS[colorIndex % PROGRAM_CARD_BACKGROUNDS.length];
+  const peachBg = pickPeach(enrollment.program_slug || enrollment.id || String(colorIndex));
 
   // Get video thumbnail
   let thumbnailUrl = programImage || '';
@@ -64,11 +54,13 @@ export function CompactRoundCard({
       onClick={onView}
       className="block"
     >
-      <div className={cn(
-        "relative w-[280px] rounded-2xl overflow-hidden shadow-ios transition-transform active:scale-[0.98]",
-        paletteClass,
-        isUnseen && "ring-2 ring-brand ring-offset-2"
-      )}>
+      <div
+        className={cn(
+          "relative w-[280px] rounded-2xl overflow-hidden shadow-ios transition-transform active:scale-[0.98]",
+          isUnseen && "ring-2 ring-brand ring-offset-2"
+        )}
+        style={{ backgroundColor: peachBg }}
+      >
         <div className="flex gap-3 p-2">
           {/* Square thumbnail */}
           <div className="relative h-20 w-20 flex-shrink-0 rounded-xl overflow-hidden bg-background/40">
