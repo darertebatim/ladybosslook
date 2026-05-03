@@ -1601,18 +1601,17 @@ const AppCourseDetail = () => {
 
                   {/* New Sessions Available Banner */}
                   {hasNewSessions && round && (
-                    <Alert className="border-amber-500/50 bg-amber-50 dark:bg-amber-950/30 tour-sync-banner">
-                      <CalendarPlus className="h-4 w-4 text-amber-600" />
+                    <Alert className="border-0 bg-[hsl(var(--tint-yellow))] shadow-ios rounded-2xl tour-sync-banner">
+                      <CalendarPlus className="h-4 w-4 text-fg-warm" />
                       <AlertDescription className="flex items-center justify-between gap-4">
-                        <span className="text-sm text-amber-800 dark:text-amber-200">
+                        <span className="text-sm text-fg-warm">
                           {getUnsyncedCount(sessionIds)} new session
                           {getUnsyncedCount(sessionIds) > 1 ? "s" : ""}{" "}
                           available! Sync to your calendar.
                         </span>
                         <Button
                           size="sm"
-                          variant="outline"
-                          className="shrink-0 border-amber-500 text-amber-700 dark:text-amber-200"
+                          className="shrink-0 bg-brand text-white border-0 shadow-ios rounded-full"
                           onClick={handleSyncAllSessions}
                           disabled={isSyncingAllSessions}
                         >
@@ -1631,19 +1630,19 @@ const AppCourseDetail = () => {
 
                   {/* Program Playlist Card */}
                   {(program as any)?.audio_playlist_id && enrollment && (
-                    <Card>
+                    <Card className="rounded-2xl border-0 shadow-ios bg-[hsl(var(--tint-mint))]">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
+                        <CardTitle className="flex items-center gap-2 text-fg-warm">
                           <Music className="h-5 w-5" />
                           Program Playlist
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-sm text-muted-foreground mb-4">
+                        <p className="text-sm text-fg-warm/75 mb-4">
                           Content for this program
                         </p>
                         <Button
-                          className="w-full"
+                          className="w-full bg-brand text-white shadow-ios rounded-full border-0"
                           size="lg"
                           onClick={() =>
                             navigate(
@@ -1660,9 +1659,9 @@ const AppCourseDetail = () => {
 
                   {/* Quick Actions - Only show if enrollment has a round */}
                   {round && (
-                    <Card className="tour-quick-actions">
+                    <Card className="tour-quick-actions rounded-2xl border-0 shadow-ios bg-[hsl(var(--tint-peach))]">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
+                        <CardTitle className="flex items-center gap-2 text-fg-warm">
                           <Calendar className="h-5 w-5" />
                           Quick Actions
                         </CardTitle>
