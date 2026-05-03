@@ -1670,9 +1670,8 @@ const AppCourseDetail = () => {
                         {/* 1. Community Channel - Most used */}
                         {roundChannel && (
                           <Button
-                            variant="default"
                             size="lg"
-                            className="w-full relative tour-community-btn"
+                            className="w-full relative tour-community-btn bg-brand text-white shadow-ios rounded-full border-0"
                             onClick={() =>
                               navigate(
                                 `/app/channels?channel=${roundChannel.id}`,
@@ -1697,9 +1696,8 @@ const AppCourseDetail = () => {
                         {/* 2. Round Audio Playlist - Primary content */}
                         {round.audio_playlist_id && (
                           <Button
-                            variant="default"
                             size="lg"
-                            className="w-full tour-playlist-btn"
+                            className="w-full tour-playlist-btn bg-fg-warm text-white shadow-ios rounded-full border-0"
                             onClick={() =>
                               navigate(
                                 `/app/player/playlist/${round.audio_playlist_id}`,
@@ -1714,9 +1712,8 @@ const AppCourseDetail = () => {
                         {/* 3. Join Google Meet - Time-sensitive */}
                         {round.google_meet_link && (
                           <Button
-                            variant="default"
                             size="lg"
-                            className="w-full tour-meet-btn"
+                            className="w-full tour-meet-btn bg-fg-warm text-white shadow-ios rounded-full border-0"
                             onClick={() =>
                               window.open(round.google_meet_link!, "_blank")
                             }
@@ -1729,16 +1726,13 @@ const AppCourseDetail = () => {
                         {/* 4. Add Next Session to Calendar - only shows if there's an upcoming session */}
                         {nextSession && (
                           <Button
-                            variant={
-                              isSessionSynced(nextSession.id)
-                                ? "outline"
-                                : "secondary"
-                            }
                             size="lg"
                             className={cn(
-                              "w-full tour-calendar-btn",
+                              "w-full tour-calendar-btn shadow-ios rounded-full border-0",
                               isSessionSynced(nextSession.id) &&
-                                "border-green-500 text-green-700 dark:text-green-400",
+                                "bg-[hsl(var(--tint-mint))] text-fg-warm",
+                              !isSessionSynced(nextSession.id) &&
+                                "bg-white text-fg-warm",
                             )}
                             onClick={handleAddToCalendar}
                           >
@@ -1761,16 +1755,13 @@ const AppCourseDetail = () => {
                         {/* 5. Sync All Sessions to Calendar */}
                         {dbSessions && dbSessions.length > 1 && (
                           <Button
-                            variant={
-                              areAllSessionsSynced(sessionIds)
-                                ? "outline"
-                                : "secondary"
-                            }
                             size="lg"
                             className={cn(
-                              "w-full tour-sync-all-btn",
+                              "w-full tour-sync-all-btn shadow-ios rounded-full border-0",
                               areAllSessionsSynced(sessionIds) &&
-                                "border-green-500 text-green-700 dark:text-green-400",
+                                "bg-[hsl(var(--tint-mint))] text-fg-warm",
+                              !areAllSessionsSynced(sessionIds) &&
+                                "bg-white text-fg-warm",
                             )}
                             onClick={handleSyncAllSessions}
                             disabled={isSyncingAllSessions}
@@ -1804,9 +1795,8 @@ const AppCourseDetail = () => {
                         {/* 6. Access Google Drive - Resources */}
                         {round.google_drive_link && (
                           <Button
-                            variant="outline"
                             size="lg"
-                            className="w-full tour-drive-btn"
+                            className="w-full tour-drive-btn bg-white text-fg-warm shadow-ios rounded-full border-0"
                             onClick={() =>
                               window.open(round.google_drive_link!, "_blank")
                             }
@@ -1819,9 +1809,8 @@ const AppCourseDetail = () => {
                         {/* 7. Contact Support - When needed */}
                         {(round as any).support_link_url && (
                           <Button
-                            variant="outline"
                             size="lg"
-                            className="w-full tour-support-btn"
+                            className="w-full tour-support-btn bg-white text-fg-warm shadow-ios rounded-full border-0"
                             onClick={handleContactSupport}
                           >
                             <MessageCircle className="h-5 w-5 mr-2" />
