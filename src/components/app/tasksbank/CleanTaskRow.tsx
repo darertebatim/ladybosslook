@@ -4,23 +4,33 @@ import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { cn } from '@/lib/utils';
 
-const accentBarMap: Record<string, string> = {
-  yellow: 'bg-amber-400',
-  pink: 'bg-pink-400',
-  purple: 'bg-purple-400',
-  blue: 'bg-blue-400',
-  green: 'bg-emerald-400',
-  orange: 'bg-orange-400',
-  red: 'bg-red-400',
-  teal: 'bg-teal-400',
-  indigo: 'bg-indigo-400',
-  rose: 'bg-rose-400',
-  amber: 'bg-amber-400',
-  mint: 'bg-teal-300',
-  lavender: 'bg-purple-300',
-  sky: 'bg-sky-300',
-  lime: 'bg-lime-300',
-  peach: 'bg-orange-300',
+// Map any incoming color to our warm theme tint tokens (peach/mint/lavender/yellow/pink/sky/lime).
+type TintKey = 'peach' | 'mint' | 'lavender' | 'yellow' | 'pink' | 'sky' | 'lime';
+
+const tintMap: Record<string, TintKey> = {
+  yellow: 'yellow', amber: 'yellow', orange: 'peach', peach: 'peach', red: 'peach', rose: 'pink',
+  pink: 'pink', purple: 'lavender', lavender: 'lavender', indigo: 'lavender',
+  blue: 'sky', sky: 'sky', teal: 'mint', mint: 'mint', green: 'lime', lime: 'lime',
+};
+
+const accentBarMap: Record<TintKey, string> = {
+  peach: 'bg-peach-mid',
+  mint: 'bg-mint-mid',
+  lavender: 'bg-lavender-mid',
+  yellow: 'bg-yellow-mid',
+  pink: 'bg-pink-mid',
+  sky: 'bg-sky-mid',
+  lime: 'bg-lime-mid',
+};
+
+const selectedBgMap: Record<TintKey, string> = {
+  peach: 'bg-peach',
+  mint: 'bg-mint',
+  lavender: 'bg-lavender',
+  yellow: 'bg-yellow',
+  pink: 'bg-pink',
+  sky: 'bg-sky-mid',
+  lime: 'bg-lime-mid',
 };
 
 interface Props {
@@ -37,8 +47,10 @@ interface Props {
  * page reads as a unified premium list rather than a rainbow patchwork.
  */
 export function CleanTaskRow({ template, onToggle, isSelected, accentColor }: Props) {
-  const color = accentColor || template.color || 'purple';
-  const accent = accentBarMap[color] || accentBarMap.purple;
+  const raw = (accentColor || template.color || 'lavender').toLowerCase();
+  const tint: TintKey = tintMap[raw] || 'lavender';
+  const accent = accentBarMap[tint];
+  const selectedBg = selectedBgMap[tint];
 
   const handleClick = () => {
     haptic.light();
@@ -49,8 +61,8 @@ export function CleanTaskRow({ template, onToggle, isSelected, accentColor }: Pr
     <button
       onClick={handleClick}
       className={cn(
-        'w-full flex items-stretch gap-3 rounded-2xl bg-white border transition-all overflow-hidden text-left',
-        isSelected ? 'border-primary ring-2 ring-primary/20' : 'border-black/[0.06] active:bg-black/[0.02]'
+        'w-full flex items-stretch gap-3 rounded-2xl transition-all overflow-hidden text-left shadow-ios',
+        isSelected ? selectedBg : 'bg-card-warm active:brightness-[0.97]'
       )}
     >
       {/* Colored accent strip — inherits from the category */}
@@ -72,12 +84,12 @@ export function CleanTaskRow({ template, onToggle, isSelected, accentColor }: Pr
         <span
           className={cn(
             'shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-colors',
-            isSelected ? 'bg-primary' : 'bg-muted/60'
+            isSelected ? 'bg-brand' : 'bg-white/70'
           )}
           aria-label={isSelected ? 'Selected' : 'Add'}
         >
           {isSelected ? (
-            <Check className="h-5 w-5 text-primary-foreground" />
+            <Check className="h-5 w-5 text-white" />
           ) : (
             <CalendarPlus className="h-[18px] w-[18px] text-foreground/70" />
           )}
