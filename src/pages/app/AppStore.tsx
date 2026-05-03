@@ -429,7 +429,25 @@ const AppStore = () => {
                     <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-                <ClusterCards className="!px-0" />
+                <div className="grid grid-cols-2 gap-2.5">
+                  {[
+                    { slug: 'sleep', emoji: '💤', question: 'Sleep better tonight?' },
+                    { slug: 'connection', emoji: '💕', question: 'Feel more connected?' },
+                    { slug: 'movement', emoji: '🚶', question: 'Move your body?' },
+                    { slug: 'nutrition', emoji: '🥗', question: 'Eat or drink Better?' },
+                  ].map((c) => (
+                    <button
+                      key={c.slug}
+                      onClick={() => navigate(`/app/tasksbank/${c.slug}`)}
+                      className="relative rounded-2xl text-left p-3.5 min-h-[110px] flex flex-col justify-between bg-card active:scale-[0.97] transition-transform shadow-ios"
+                    >
+                      <FluentEmoji emoji={c.emoji} size={32} />
+                      <p className="text-[14px] font-bold text-foreground leading-tight mt-2">
+                        {c.question}
+                      </p>
+                    </button>
+                  ))}
+                </div>
               </section>
             )}
 
