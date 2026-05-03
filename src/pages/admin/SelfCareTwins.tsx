@@ -83,7 +83,6 @@ export default function SelfCareTwins() {
   const { selfCare, nonSelfCare } = useMemo(() => {
     const sc: Task[] = [], non: Task[] = [];
     for (const t of tasks) {
-      const tagLower = (t.tag || "").toLowerCase();
       if (SELF_CARE_TAGS.has(normTag(t.tag))) sc.push(t);
       else non.push(t);
     }
