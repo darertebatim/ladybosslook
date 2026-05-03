@@ -281,7 +281,7 @@ const AppCourses = () => {
 
           {/* Inline Browse Programs Section — peach band that scrolls with the page */}
           {browsePrograms.length > 0 && (
-            <section className="-mx-4 mt-2 rounded-3xl bg-[hsl(var(--tint-peach))] px-4 py-4 space-y-3">
+            <section className="mt-2 rounded-3xl bg-[hsl(var(--tint-peach))] px-4 py-4 space-y-3 shadow-ios">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Compass className="h-4 w-4 text-brand" />
