@@ -49,6 +49,7 @@ import {
 } from "@/hooks/useRoutinesBank";
 import { FeaturedRoutineCard } from "@/components/app/FeaturedRoutineCard";
 import { SelfCareGoalsCategoryCard } from "@/components/app/SelfCareGoalsCategoryCard";
+import { ClusterCards } from "@/components/app/tasksbank/ClusterCards";
 import { useTaskTemplates } from "@/hooks/useTaskPlanner";
 import { ActiveRoundsCarousel } from "@/components/dashboard/ActiveRoundsCarousel";
 import { useNewHomeData } from "@/hooks/useNewHomeData";
@@ -429,6 +430,7 @@ const AppStore = () => {
                     <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
+                <ClusterCards className="!px-0" />
               </section>
             )}
 
