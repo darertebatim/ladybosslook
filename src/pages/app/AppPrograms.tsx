@@ -279,69 +279,65 @@ const AppCourses = () => {
             </div>
           )}
 
-          {/* Spacer for fixed bottom section */}
-          {browsePrograms.length > 0 && <div className="h-[100px]" />}
+          {/* Inline Browse Programs Section — peach band that scrolls with the page */}
+          {browsePrograms.length > 0 && (
+            <section className="-mx-4 mt-2 rounded-3xl bg-[hsl(var(--tint-peach))] px-4 py-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Compass className="h-4 w-4 text-brand" />
+                  <h2 className="text-base font-semibold text-fg-warm">
+                    {t("programs.browsePrograms")}
+                  </h2>
+                  <Badge
+                    variant="secondary"
+                    className="h-4 px-1.5 text-[10px] bg-white/80 text-fg-warm border-0"
+                  >
+                    {browsePrograms.length}
+                  </Badge>
+                </div>
+                <Link
+                  to="/app/academy"
+                  className="text-xs text-brand font-medium flex items-center gap-0.5"
+                >
+                  {t("programs.viewAll")}
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+
+              <Carousel opts={{ align: "start", loop: false }} className="w-full">
+                <CarouselContent className="-ml-2">
+                  {browsePrograms.map((program) => (
+                    <CarouselItem
+                      key={program.slug}
+                      className="pl-2 basis-[130px]"
+                    >
+                      <Link to={`/app/programs/${program.slug}`} className="block active:scale-[0.98] transition-transform">
+                        <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-ios">
+                          <img
+                            src={program.image}
+                            alt={program.title}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                          <div className="absolute bottom-0 left-0 right-0 p-2">
+                            <p className="text-[11px] font-semibold text-white line-clamp-2 leading-tight">
+                              {program.title}
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
+            </section>
+          )}
+
+          {/* Tab bar clearance */}
+          <div className="h-24" />
         </div>
       </div>
-
-      {/* Fixed Browse Programs Section - Bottom Dashboard Style */}
-      {browsePrograms.length > 0 && (
-        <div
-          className="fixed bottom-[70px] left-0 right-0 z-30 rounded-t-3xl bg-[hsl(var(--tint-peach))] shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
-        >
-          <div className="py-2 space-y-1">
-            {/* Header */}
-            <div className="flex items-center justify-between px-4">
-              <div className="flex items-center gap-1.5">
-                <h2 className="text-xs font-semibold text-fg-warm">
-                  {t("programs.browsePrograms")}
-                </h2>
-                <Badge
-                  variant="secondary"
-                  className="h-3.5 px-1 text-[9px] bg-white/70 text-fg-warm border-0"
-                >
-                  {browsePrograms.length}
-                </Badge>
-              </div>
-              <Link
-                to="/app/academy"
-                className="text-[10px] text-brand font-medium flex items-center gap-0.5"
-              >
-                {t("programs.viewAll")}
-                <ChevronRight className="h-3 w-3" />
-              </Link>
-            </div>
-
-            {/* Carousel - Compact cards */}
-            <Carousel opts={{ align: "start", loop: false }} className="w-full">
-              <CarouselContent className="-ml-2 px-3">
-                {browsePrograms.map((program) => (
-                  <CarouselItem
-                    key={program.slug}
-                    className="pl-2 basis-[100px]"
-                  >
-                    <Link to={`/app/programs/${program.slug}`}>
-                      <div className="relative aspect-[3/4] rounded-lg overflow-hidden">
-                        <img
-                          src={program.image}
-                          alt={program.title}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                        <div className="absolute bottom-0 left-0 right-0 p-1.5">
-                          <p className="text-[9px] font-medium text-white line-clamp-2 leading-tight">
-                            {program.title}
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
