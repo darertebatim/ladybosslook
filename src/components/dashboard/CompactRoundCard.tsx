@@ -5,15 +5,15 @@ import { Link } from 'react-router-dom';
 import { CachedImage } from '@/components/ui/CachedImage';
 import { cn } from '@/lib/utils';
 
-// Uses the new orange-theme tint tokens (auto light/dark via CSS vars)
+// Various peach tones — matches the Tools shortcut tiles vibe
 const PROGRAM_CARD_BACKGROUNDS: string[] = [
   'bg-peach',
-  'bg-mint',
-  'bg-lavender',
+  'bg-peach-mid',
   'bg-yellow',
+  'bg-yellow-mid',
   'bg-pink',
-  'bg-sky-mid',
-  'bg-lime-mid',
+  'bg-pink-mid',
+  'bg-peach',
 ];
 
 interface CompactRoundCardProps {
