@@ -12,7 +12,7 @@ import {
   Compass,
 } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
-import { AppHeader, AppHeaderSpacer } from "@/components/app/AppHeader";
+import { PageHeader } from "@/components/app/ui/PageHeader";
 import { useUnseenContentContext } from "@/contexts/UnseenContentContext";
 import { CoursesSkeleton } from "@/components/app/skeletons";
 import { usePrograms } from "@/hooks/usePrograms";
@@ -48,12 +48,7 @@ const AppCourses = () => {
   if (isLoading) {
     return (
       <>
-        <AppHeader
-          title={t("programs.myPrograms")}
-          subtitle={t("programs.loading")}
-          showBack
-        />
-        <AppHeaderSpacer />
+        <PageHeader title={t("programs.myPrograms")} back />
         <CoursesSkeleton />
       </>
     );
@@ -166,16 +161,17 @@ const AppCourses = () => {
         description={t("programs.seoDesc")}
       />
 
-      <AppHeader
+      <PageHeader
         title={t("programs.myPrograms")}
-        subtitle={
-          totalPrograms > 0
-            ? t("programs.enrolledCount", { count: totalPrograms })
-            : undefined
+        back
+        subRow={
+          totalPrograms > 0 ? (
+            <p className="text-xs text-fg-warm-muted">
+              {t("programs.enrolledCount", { count: totalPrograms })}
+            </p>
+          ) : undefined
         }
-        showBack
       />
-      <AppHeaderSpacer />
 
       {/* Scroll container */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
@@ -186,7 +182,7 @@ const AppCourses = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h2 className="text-base font-semibold flex items-center gap-2">
-                  <GraduationCap className="h-4 w-4 text-primary" />
+                  <GraduationCap className="h-4 w-4 text-brand" />
                   {t("programs.active")}
                 </h2>
                 <Badge variant="secondary" className="text-xs">
@@ -291,26 +287,25 @@ const AppCourses = () => {
       {/* Fixed Browse Programs Section - Bottom Dashboard Style */}
       {browsePrograms.length > 0 && (
         <div
-          className="fixed bottom-[70px] left-0 right-0 z-30 rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
-          style={{ backgroundColor: "#F4ECFE" }}
+          className="fixed bottom-[70px] left-0 right-0 z-30 rounded-t-3xl bg-[hsl(var(--tint-peach))] shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
         >
           <div className="py-2 space-y-1">
             {/* Header */}
             <div className="flex items-center justify-between px-4">
               <div className="flex items-center gap-1.5">
-                <h2 className="text-xs font-semibold text-foreground">
+                <h2 className="text-xs font-semibold text-fg-warm">
                   {t("programs.browsePrograms")}
                 </h2>
                 <Badge
                   variant="secondary"
-                  className="h-3.5 px-1 text-[9px] bg-white/60"
+                  className="h-3.5 px-1 text-[9px] bg-white/70 text-fg-warm border-0"
                 >
                   {browsePrograms.length}
                 </Badge>
               </div>
               <Link
                 to="/app/academy"
-                className="text-[10px] text-primary font-medium flex items-center gap-0.5"
+                className="text-[10px] text-brand font-medium flex items-center gap-0.5"
               >
                 {t("programs.viewAll")}
                 <ChevronRight className="h-3 w-3" />
