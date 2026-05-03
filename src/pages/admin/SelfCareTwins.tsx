@@ -89,12 +89,23 @@ export default function SelfCareTwins() {
     const result = nonSelfCare
       .filter(t => !search || t.title?.toLowerCase().includes(lowSearch))
       .map(t => {
-        const matches = selfCare
+        const scored = selfCare
           .map(sc => ({ sc, score: similarity(t.title, sc.title) }))
-          .filter(m => m.score >= minScore)
-          .sort((a, b) => b.score - a.score)
-          .slice(0, 5);
-        return { task: t, matches };
+          .sort((a, b) => b.score - a.score);
+        const matches = scored.filter(m => m.score >= minScore).slice(0, 5);
+        // Picker options: include any self-care task sharing a meaningful word,
+        // even if below the row threshold — so you can always pick the right twin.
+        const taskTokens = new Set(
+          norm(t.title).split(/\s+/).filter(w => w.length > 2)
+        );
+        const pickerOptions = scored
+          .filter(m => {
+            if (m.score >= minScore) return true;
+            const scTokens = norm(m.sc.title).split(/\s+/).filter(w => w.length > 2);
+            return scTokens.some(w => taskTokens.has(w));
+          })
+          .slice(0, 20);
+        return { task: t, matches, pickerOptions };
       })
       .filter(r => r.matches.length > 0)
       .filter(r => !onlyUnmarked || !r.task.self_care_equivalent_id);
@@ -157,7 +168,7 @@ export default function SelfCareTwins() {
               </tr>
             </thead>
             <tbody>
-              {rows.map(({ task, matches }) => {
+              {rows.map(({ task, matches, pickerOptions }) => {
                 const current = task.self_care_equivalent_id ? scById.get(task.self_care_equivalent_id) : null;
                 const top = matches[0];
                 return (
@@ -188,7 +199,7 @@ export default function SelfCareTwins() {
                           <SelectValue placeholder={current ? `${current.emoji} ${current.title}` : "Choose…"} />
                         </SelectTrigger>
                         <SelectContent>
-                          {matches.map(m => (
+                          {pickerOptions.map(m => (
                             <SelectItem key={m.sc.id} value={m.sc.id}>
                               {m.sc.emoji} {m.sc.title} · {m.sc.tag} ({m.score.toFixed(2)})
                             </SelectItem>
