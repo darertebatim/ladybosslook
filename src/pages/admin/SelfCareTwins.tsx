@@ -9,10 +9,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Loader2, Check, X } from "lucide-react";
 
-const SELF_CARE_TAGS = [
-  'sleep','nutrition','movement','calm','presence','gratitude','self-kindness',
-  'tidyup','productivity','hygiene','evening','easy-win','connection','lovedones',
-];
+// Normalized (lowercased, no spaces/dashes) self-care tag keys.
+// DB has mixed casing/spacing like "Easy Win", "easy-win", "TidyUp", "LovedOnes".
+const SELF_CARE_TAGS = new Set([
+  'sleep','nutrition','movement','calm','presence','gratitude','selfkindness',
+  'tidyup','productivity','hygiene','evening','easywin','connection','lovedones',
+]);
+
+function normTag(t: string | null) {
+  return (t || '').toLowerCase().replace(/[\s\-_]/g, '');
+}
 
 interface Task {
   id: string;
@@ -78,7 +84,7 @@ export default function SelfCareTwins() {
     const sc: Task[] = [], non: Task[] = [];
     for (const t of tasks) {
       const tagLower = (t.tag || "").toLowerCase();
-      if (SELF_CARE_TAGS.includes(tagLower)) sc.push(t);
+      if (SELF_CARE_TAGS.has(normTag(t.tag))) sc.push(t);
       else non.push(t);
     }
     return { selfCare: sc, nonSelfCare: non };
