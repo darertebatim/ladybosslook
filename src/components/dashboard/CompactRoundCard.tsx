@@ -5,15 +5,15 @@ import { Link } from 'react-router-dom';
 import { CachedImage } from '@/components/ui/CachedImage';
 import { cn } from '@/lib/utils';
 
-// Mirrors FeaturedRoutineCard `colorBackgrounds` palette
+// Uses the new orange-theme tint tokens (auto light/dark via CSS vars)
 const PROGRAM_CARD_BACKGROUNDS: string[] = [
-  'bg-purple-50 border-purple-200/60',
-  'bg-sky-50 border-sky-200/60',
-  'bg-teal-50 border-teal-200/60',
-  'bg-orange-50 border-orange-200/60',
-  'bg-pink-50 border-pink-200/60',
-  'bg-lime-50 border-lime-200/60',
-  'bg-amber-50 border-amber-200/60',
+  'bg-peach',
+  'bg-mint',
+  'bg-lavender',
+  'bg-yellow',
+  'bg-pink',
+  'bg-sky-mid',
+  'bg-lime-mid',
 ];
 
 interface CompactRoundCardProps {
@@ -65,9 +65,9 @@ export function CompactRoundCard({
       className="block"
     >
       <div className={cn(
-        "relative w-[280px] rounded-2xl overflow-hidden shadow-sm transition-transform active:scale-[0.98] border",
+        "relative w-[280px] rounded-2xl overflow-hidden shadow-ios transition-transform active:scale-[0.98]",
         paletteClass,
-        isUnseen && "ring-2 ring-primary ring-offset-2"
+        isUnseen && "ring-2 ring-brand ring-offset-2"
       )}>
         <div className="flex gap-3 p-2">
           {/* Square thumbnail */}
