@@ -1,0 +1,2 @@
+ALTER TABLE public.admin_task_bank ADD COLUMN IF NOT EXISTS self_care_equivalent_id UUID REFERENCES public.admin_task_bank(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS idx_admin_task_bank_sc_equiv ON public.admin_task_bank(self_care_equivalent_id);
