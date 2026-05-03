@@ -430,7 +430,7 @@ const AppStore = () => {
                   </Link>
                 </div>
                 <div
-                  className="flex gap-2.5 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4"
+                  className="flex gap-2.5 overflow-x-auto -mx-4 px-4 pt-1 pb-4 scrollbar-hide snap-x snap-mandatory scroll-pl-4"
                   style={{ WebkitOverflowScrolling: "touch" }}
                 >
                   {[
