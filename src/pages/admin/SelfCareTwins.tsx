@@ -102,7 +102,10 @@ export default function SelfCareTwins() {
           .filter(m => {
             if (m.score >= minScore) return true;
             const scTokens = norm(m.sc.title).split(/\s+/).filter(w => w.length > 2);
-            return scTokens.some(w => taskTokens.has(w));
+            // Require at least 2 shared meaningful words to avoid noise
+            // (e.g. "Skip that drink tonight" sharing only "drink").
+            const shared = scTokens.filter(w => taskTokens.has(w)).length;
+            return shared >= 2;
           })
           .slice(0, 20);
         return { task: t, matches, pickerOptions };
