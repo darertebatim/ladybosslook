@@ -2179,29 +2179,29 @@ const AppCourseDetail = () => {
                     </Card>
                   )}
 
-                  <Card className="tour-program-info">
+                  <Card className="tour-program-info rounded-2xl border-0 shadow-ios bg-[hsl(var(--tint-pink))]">
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <CardTitle>{t('courseDetailPage.programInformation')}</CardTitle>
-                        <Badge>{enrollment.status}</Badge>
+                        <CardTitle className="text-fg-warm">{t('courseDetailPage.programInformation')}</CardTitle>
+                        <Badge className="bg-white text-fg-warm border-0">{enrollment.status}</Badge>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {program?.description && (
                         <div
-                          className="text-muted-foreground whitespace-pre-wrap leading-relaxed"
+                          className="text-fg-warm/80 whitespace-pre-wrap leading-relaxed"
                           dangerouslySetInnerHTML={{
                             __html: DOMPurify.sanitize(program.description),
                           }}
                         />
                       )}
                       {round && (
-                        <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-fg-warm/10">
                           <div>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-fg-warm/70">
                               Start Date
                             </p>
-                            <p className="font-semibold">
+                            <p className="font-semibold text-fg-warm">
                               {format(
                                 new Date(round.start_date),
                                 "MMM d, yyyy",
@@ -2210,10 +2210,10 @@ const AppCourseDetail = () => {
                           </div>
                           {round.end_date && (
                             <div>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-sm text-fg-warm/70">
                                 End Date
                               </p>
-                              <p className="font-semibold">
+                              <p className="font-semibold text-fg-warm">
                                 {format(
                                   new Date(round.end_date),
                                   "MMM d, yyyy",
