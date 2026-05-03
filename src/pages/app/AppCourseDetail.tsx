@@ -1586,12 +1586,12 @@ const AppCourseDetail = () => {
 
                   {round?.important_message && (
                     <Alert
-                      className="border-primary/20 bg-primary/5"
+                      className="border-0 bg-[hsl(var(--tint-sky))] shadow-ios rounded-2xl"
                       dir="auto"
                     >
-                      <Info className="h-4 w-4" />
+                      <Info className="h-4 w-4 text-fg-warm" />
                       <AlertDescription
-                        className="text-sm leading-relaxed whitespace-pre-wrap"
+                        className="text-sm leading-relaxed whitespace-pre-wrap text-fg-warm"
                         dir="auto"
                       >
                         {round.important_message}
