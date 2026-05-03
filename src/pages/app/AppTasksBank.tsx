@@ -375,7 +375,7 @@ export default function AppTasksBank() {
 
       {selectionCount > 0 && (
         <div
-          className="fixed left-0 right-0 bottom-20 z-40 px-4 pb-2 animate-in slide-in-from-bottom duration-300"
+          className="fixed left-0 right-0 bottom-28 z-40 px-4 pb-2 animate-in slide-in-from-bottom duration-300"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 8px)' }}
         >
           <div className="flex items-center gap-2">
