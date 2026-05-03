@@ -49,7 +49,6 @@ import {
 } from "@/hooks/useRoutinesBank";
 import { FeaturedRoutineCard } from "@/components/app/FeaturedRoutineCard";
 import { SelfCareGoalsCategoryCard } from "@/components/app/SelfCareGoalsCategoryCard";
-import { ClusterCards } from "@/components/app/tasksbank/ClusterCards";
 import { useTaskTemplates } from "@/hooks/useTaskPlanner";
 import { ActiveRoundsCarousel } from "@/components/dashboard/ActiveRoundsCarousel";
 import { useNewHomeData } from "@/hooks/useNewHomeData";
