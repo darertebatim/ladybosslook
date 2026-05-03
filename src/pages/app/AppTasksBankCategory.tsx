@@ -308,17 +308,17 @@ export default function AppTasksBankCategory() {
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 8px)' }}
         >
           <div className="flex items-center gap-2">
+            <button
+              onClick={handleClearSelection}
+              aria-label="Cancel selection"
+              className="shrink-0 h-14 w-14 rounded-2xl bg-card-warm text-fg-warm shadow-ios flex items-center justify-center active:scale-95 transition-transform"
+            >
+              <X className="w-5 h-5" />
+            </button>
             <Button onClick={handleOpenBuilder} className="flex-1 h-14 rounded-2xl text-base font-bold gap-2 shadow-lg" size="lg">
               <FluentEmoji emoji="✨" size={20} />
               {t('tier1.tasksBank.buildMyRoutine', { n: selectionCount })}
             </Button>
-            <button
-              onClick={handleClearSelection}
-              aria-label="Cancel selection"
-              className="shrink-0 h-14 w-14 rounded-2xl bg-card text-foreground shadow-ios flex items-center justify-center active:scale-95 transition-transform"
-            >
-              <X className="w-5 h-5" />
-            </button>
           </div>
         </div>
       )}
