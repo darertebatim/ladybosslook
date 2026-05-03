@@ -55,15 +55,10 @@
             </intent-filter>
         </service>
 
-        <!-- Receivers for Local Notifications -->
-        <receiver android:name="com.getcapacitor.plugins.localnotifications.LocalNotificationReceiver" />
-        <receiver android:name="com.getcapacitor.plugins.localnotifications.LocalNotificationRestoreReceiver" android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-            </intent-filter>
-        </receiver>
+        <!-- Local Notification receivers are auto-merged from the @capacitor/local-notifications plugin manifest.
+             Do NOT redeclare them here — the previous entries used the wrong package
+             (com.getcapacitor.* instead of com.capacitorjs.*) and caused ClassNotFoundException
+             crashes on BOOT_COMPLETED, especially on Xiaomi/Redmi devices. -->
 
         <provider
             android:name="androidx.core.content.FileProvider"
