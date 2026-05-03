@@ -227,11 +227,6 @@ export default function AppTasksBankCategory() {
             </span>
           </div>
           <div className="flex items-center gap-1">
-            {selectionCount > 0 && (
-              <button onClick={handleClearSelection} className="p-2 rounded-full active:bg-muted/50 transition-colors">
-                <X className="w-5 h-5 text-muted-foreground" />
-              </button>
-            )}
             <button onClick={() => setShowSearch(!showSearch)} className="p-2 rounded-full active:bg-muted/50 transition-colors">
               <Search className="w-5 h-5 text-muted-foreground" />
             </button>
@@ -312,10 +307,19 @@ export default function AppTasksBankCategory() {
           className="fixed left-0 right-0 bottom-20 z-40 px-4 pb-2 animate-in slide-in-from-bottom duration-300"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 8px)' }}
         >
-          <Button onClick={handleOpenBuilder} className="w-full h-14 rounded-2xl text-base font-bold gap-2 shadow-lg" size="lg">
-            <FluentEmoji emoji="✨" size={20} />
-            {t('tier1.tasksBank.buildMyRoutine', { n: selectionCount })}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button onClick={handleOpenBuilder} className="flex-1 h-14 rounded-2xl text-base font-bold gap-2 shadow-lg" size="lg">
+              <FluentEmoji emoji="✨" size={20} />
+              {t('tier1.tasksBank.buildMyRoutine', { n: selectionCount })}
+            </Button>
+            <button
+              onClick={handleClearSelection}
+              aria-label="Cancel selection"
+              className="shrink-0 h-14 w-14 rounded-2xl bg-card text-foreground shadow-ios flex items-center justify-center active:scale-95 transition-transform"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       )}
 
