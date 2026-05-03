@@ -118,6 +118,7 @@ const Support = lazy(() => import("@/pages/admin/Support"));
 const Community = lazy(() => import("@/pages/admin/Community"));
 const Tools = lazy(() => import("@/pages/admin/Tools"));
 const TasksBank = lazy(() => import("@/pages/admin/TasksBank"));
+const SelfCareTwins = lazy(() => import("@/pages/admin/SelfCareTwins"));
 const AppTest = lazy(() => import("@/pages/admin/AppTest"));
 const NotificationAnalytics = lazy(() => import("@/pages/admin/NotificationAnalytics"));
 const PushNotifications = lazy(() => import("@/pages/admin/PushNotifications"));
@@ -443,6 +444,7 @@ const App = () => (
                       
                       <Route path="tools" element={<ProtectedRoute requiredPage="tools"><Tools /></ProtectedRoute>} />
                       <Route path="tools/tasks" element={<ProtectedRoute requiredPage="tools"><TasksBank /></ProtectedRoute>} />
+                      <Route path="tools/self-care-twins" element={<ProtectedRoute requiredPage="tools"><SelfCareTwins /></ProtectedRoute>} />
                       <Route path="tools/notifications" element={<ProtectedRoute requiredPage="tools"><NotificationAnalytics /></ProtectedRoute>} />
                       <Route path="onboarding" element={<ProtectedRoute requiredPage="tools"><Onboarding /></ProtectedRoute>} />
                       
