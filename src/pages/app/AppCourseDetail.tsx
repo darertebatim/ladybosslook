@@ -1586,7 +1586,7 @@ const AppCourseDetail = () => {
 
                   {round?.important_message && (
                     <Alert
-                      className="border-0 bg-[hsl(var(--tint-sky))] shadow-ios rounded-2xl"
+                      className="border-0 bg-card-warm shadow-ios rounded-2xl"
                       dir="auto"
                     >
                       <Info className="h-4 w-4 text-fg-warm" />
@@ -1601,7 +1601,7 @@ const AppCourseDetail = () => {
 
                   {/* New Sessions Available Banner */}
                   {hasNewSessions && round && (
-                    <Alert className="border-0 bg-[hsl(var(--tint-yellow))] shadow-ios rounded-2xl tour-sync-banner">
+                    <Alert className="border-0 bg-card-warm shadow-ios rounded-2xl tour-sync-banner">
                       <CalendarPlus className="h-4 w-4 text-fg-warm" />
                       <AlertDescription className="flex items-center justify-between gap-4">
                         <span className="text-sm text-fg-warm">
@@ -1630,7 +1630,7 @@ const AppCourseDetail = () => {
 
                   {/* Program Playlist Card */}
                   {(program as any)?.audio_playlist_id && enrollment && (
-                    <Card className="rounded-2xl border-0 shadow-ios bg-[hsl(var(--tint-mint))]">
+                    <Card className="rounded-2xl border-0 shadow-ios bg-card-warm">
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-fg-warm">
                           <Music className="h-5 w-5" />
@@ -1730,7 +1730,7 @@ const AppCourseDetail = () => {
                             className={cn(
                               "w-full tour-calendar-btn shadow-ios rounded-full border-0",
                               isSessionSynced(nextSession.id) &&
-                                "bg-[hsl(var(--tint-mint))] text-fg-warm",
+                                "bg-card-warm text-fg-warm",
                               !isSessionSynced(nextSession.id) &&
                                 "bg-white text-fg-warm",
                             )}
@@ -1759,7 +1759,7 @@ const AppCourseDetail = () => {
                             className={cn(
                               "w-full tour-sync-all-btn shadow-ios rounded-full border-0",
                               areAllSessionsSynced(sessionIds) &&
-                                "bg-[hsl(var(--tint-mint))] text-fg-warm",
+                                "bg-card-warm text-fg-warm",
                               !areAllSessionsSynced(sessionIds) &&
                                 "bg-white text-fg-warm",
                             )}
@@ -1824,7 +1824,7 @@ const AppCourseDetail = () => {
 
                   {/* Upcoming Sessions Card */}
                   {dbSessions && dbSessions.length > 0 && (
-                    <Card className="tour-sessions-list rounded-2xl border-0 shadow-ios bg-[hsl(var(--tint-lavender))]">
+                    <Card className="tour-sessions-list rounded-2xl border-0 shadow-ios bg-card-warm">
                       <CardHeader className="tour-sessions-header">
                         <CardTitle className="tour-sessions-title flex items-center gap-2 text-fg-warm">
                           <Clock className="h-5 w-5" />
@@ -1860,7 +1860,7 @@ const AppCourseDetail = () => {
                                   isPast
                                     ? "bg-white/50 opacity-60"
                                     : isToday
-                                      ? "bg-[hsl(var(--tint-peach-mid))] text-fg-warm"
+                                      ? "bg-[hsl(var(--tint-peach))] text-fg-warm"
                                       : "bg-white"
                                 }`}
                               >
@@ -2179,7 +2179,7 @@ const AppCourseDetail = () => {
                     </Card>
                   )}
 
-                  <Card className="tour-program-info rounded-2xl border-0 shadow-ios bg-[hsl(var(--tint-pink))]">
+                  <Card className="tour-program-info rounded-2xl border-0 shadow-ios bg-card-warm">
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-fg-warm">{t('courseDetailPage.programInformation')}</CardTitle>
