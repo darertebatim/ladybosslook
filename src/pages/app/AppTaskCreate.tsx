@@ -412,6 +412,10 @@ const AppTaskCreate = ({
   const [reminderTime, setReminderTime] = useState(initialData?.reminderTime || '09:00');
   const [isUrgent, setIsUrgent] = useState(initialData?.isUrgent ?? false);
   const [showUrgentConfirm, setShowUrgentConfirm] = useState(false);
+  // Calendar sync (Plus only) — adds task to native iOS/Android calendar
+  const [calendarSyncEnabled, setCalendarSyncEnabled] = useState(false);
+  const [showCalendarPaywall, setShowCalendarPaywall] = useState(false);
+  const { isSubscribed } = useSubscription();
   const [tag, setTag] = useState<string | null>(initialData?.tag ?? urlTag ?? null);
   const [subtasks, setSubtasks] = useState<string[]>(initialData?.subtasks || []);
   const [newSubtask, setNewSubtask] = useState('');
