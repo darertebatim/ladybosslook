@@ -13,6 +13,12 @@ import type { ProLinkType } from '@/lib/proTaskTypes';
 import { getIsOnline } from '@/hooks/useNetworkStatus';
 import { enqueueMutation } from '@/lib/offline/offlineMutationQueue';
 import {
+  addEventToCalendar,
+  replaceCalendarEvent,
+  deleteCalendarEventsById,
+  isCalendarAvailable,
+} from '@/lib/calendarIntegration';
+import {
   TASK_EXECUTOR_TYPES,
   type CompleteTaskPayload,
   type UncompleteTaskPayload,
@@ -57,6 +63,8 @@ export interface UserTask {
   duration_minutes: number | null;
   // Routine link
   source_routine_id: string | null;
+  // Native calendar event ID (when user enabled "Add to Calendar")
+  calendar_event_id?: string | null;
   // Joined data (optional, populated by queries)
   linked_playlist?: {
     id: string;
