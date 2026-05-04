@@ -665,14 +665,19 @@ export default function AppAIPlanner() {
                 <button
                   type="button"
                   onClick={startListening}
+                  disabled={isTranscribing}
                   className={cn(
                     'absolute right-3 bottom-3 h-10 w-10 rounded-full flex items-center justify-center active:scale-95 transition-all',
-                    isListening ? 'bg-red-500 animate-pulse' : 'bg-black',
+                    isListening ? 'bg-red-500 animate-pulse' : isTranscribing ? 'bg-black/60' : 'bg-black',
                     !speechSupported && 'opacity-50',
                   )}
                   aria-label={isListening ? t('aiPlannerPage.stopVoice') : t('aiPlannerPage.startVoice')}
                 >
-                  <Mic className="h-4 w-4 text-white" />
+                  {isTranscribing ? (
+                    <span className="h-3.5 w-3.5 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                  ) : (
+                    <Mic className="h-4 w-4 text-white" />
+                  )}
                 </button>
               )}
             </motion.div>
