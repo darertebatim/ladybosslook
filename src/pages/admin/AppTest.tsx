@@ -70,6 +70,7 @@ import { ChallengeDayCelebration } from '@/components/app/ChallengeDayCelebratio
 import { PlusGateSheet } from '@/components/app/PlusGateSheet';
 import { StepCompletionCelebration } from '@/components/app/StepCompletionCelebration';
 import { ProjectCompletionCelebration } from '@/components/app/ProjectCompletionCelebration';
+import { PurchaseCelebration } from '@/components/app/PurchaseCelebration';
 import { LanguagePreferencePopup } from '@/components/app/LanguagePreferencePopup';
 import { InstructorInviteContent } from '@/components/instructor/InstructorInviteModal';
 import { InstructorWelcomeContent } from '@/components/instructor/InstructorWelcomeSheet';
@@ -122,6 +123,7 @@ export default function AppTest() {
   const [showChallengeDayCelebration, setShowChallengeDayCelebration] = useState(false);
   const [challengeDayTest, setChallengeDayTest] = useState(3);
   const [showStepCelebration, setShowStepCelebration] = useState(false);
+  const [purchaseCelebrationPlan, setPurchaseCelebrationPlan] = useState<'monthly' | 'annual' | null>(null);
   const [testCompletedStep, setTestCompletedStep] = useState(1);
   const [showProjectCompletion, setShowProjectCompletion] = useState(false);
   const [showNewMessagePopup, setShowNewMessagePopup] = useState(false);
