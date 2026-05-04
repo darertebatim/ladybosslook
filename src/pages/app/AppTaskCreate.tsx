@@ -1028,6 +1028,9 @@ const AppTaskCreate = ({
       goal_target: goalSettings.enabled ? goalSettings.target : null,
       goal_unit: goalSettings.enabled ? goalSettings.unit : null,
       duration_minutes: durationMinutes,
+      // Calendar sync (only effective on native + Plus). UI prevents non-Plus
+      // users from enabling it; we still gate again here as defense-in-depth.
+      calendar_sync_enabled: !!(calendarSyncEnabled && isSubscribed && scheduledTime),
     };
 
     if (taskId) {
