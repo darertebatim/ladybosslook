@@ -1439,7 +1439,7 @@ const AppTaskCreate = ({
               checked={calendarSyncEnabled}
               onCheckedChange={(checked) => {
                 if (checked && !isSubscribed) {
-                  haptic('light');
+                  haptic.light();
                   setShowCalendarPaywall(true);
                   return;
                 }
