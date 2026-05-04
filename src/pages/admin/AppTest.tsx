@@ -189,6 +189,14 @@ export default function AppTest() {
                   <Sparkles className="h-4 w-4 mr-2" />
                   Playlist Complete
                 </Button>
+                <Button onClick={() => setPurchaseCelebrationPlan('monthly')} className="w-full justify-start" variant="outline">
+                  <Crown className="h-4 w-4 mr-2" />
+                  Rilo Plus Welcome (Monthly)
+                </Button>
+                <Button onClick={() => setPurchaseCelebrationPlan('annual')} className="w-full justify-start" variant="outline">
+                  <Crown className="h-4 w-4 mr-2" />
+                  Rilo Plus Welcome (Annual)
+                </Button>
               </CardContent>
             </Card>
 
