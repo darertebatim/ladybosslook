@@ -70,6 +70,7 @@ import { ChallengeDayCelebration } from '@/components/app/ChallengeDayCelebratio
 import { PlusGateSheet } from '@/components/app/PlusGateSheet';
 import { StepCompletionCelebration } from '@/components/app/StepCompletionCelebration';
 import { ProjectCompletionCelebration } from '@/components/app/ProjectCompletionCelebration';
+import { PurchaseCelebration } from '@/components/app/PurchaseCelebration';
 import { LanguagePreferencePopup } from '@/components/app/LanguagePreferencePopup';
 import { InstructorInviteContent } from '@/components/instructor/InstructorInviteModal';
 import { InstructorWelcomeContent } from '@/components/instructor/InstructorWelcomeSheet';
@@ -122,6 +123,7 @@ export default function AppTest() {
   const [showChallengeDayCelebration, setShowChallengeDayCelebration] = useState(false);
   const [challengeDayTest, setChallengeDayTest] = useState(3);
   const [showStepCelebration, setShowStepCelebration] = useState(false);
+  const [purchaseCelebrationPlan, setPurchaseCelebrationPlan] = useState<'monthly' | 'annual' | null>(null);
   const [testCompletedStep, setTestCompletedStep] = useState(1);
   const [showProjectCompletion, setShowProjectCompletion] = useState(false);
   const [showNewMessagePopup, setShowNewMessagePopup] = useState(false);
@@ -186,6 +188,14 @@ export default function AppTest() {
                 <Button onClick={() => setShowTrackCelebrationPlaylistComplete(true)} className="w-full justify-start" variant="outline">
                   <Sparkles className="h-4 w-4 mr-2" />
                   Playlist Complete
+                </Button>
+                <Button onClick={() => setPurchaseCelebrationPlan('monthly')} className="w-full justify-start" variant="outline">
+                  <Crown className="h-4 w-4 mr-2" />
+                  Rilo Plus Welcome (Monthly)
+                </Button>
+                <Button onClick={() => setPurchaseCelebrationPlan('annual')} className="w-full justify-start" variant="outline">
+                  <Crown className="h-4 w-4 mr-2" />
+                  Rilo Plus Welcome (Annual)
                 </Button>
               </CardContent>
             </Card>
@@ -766,6 +776,11 @@ export default function AppTest() {
             projectEmoji="🌅"
             totalSteps={4}
             totalTasks={12}
+          />
+          <PurchaseCelebration
+            open={purchaseCelebrationPlan !== null}
+            plan={purchaseCelebrationPlan ?? undefined}
+            onClose={() => setPurchaseCelebrationPlan(null)}
           />
         </CardContent>
       </Card>
