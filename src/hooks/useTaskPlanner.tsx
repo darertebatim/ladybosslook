@@ -889,6 +889,25 @@ export const useCreateTask = () => {
         }
       }
 
+      // Sync to native calendar if requested (Plus-gated in UI)
+      if (taskData.calendar_sync_enabled) {
+        await syncTaskCalendarEvent({
+          taskId: task.id,
+          enabled: true,
+          title: taskData.title,
+          emoji: taskData.emoji || '☀️',
+          description: taskData.description ?? null,
+          scheduledDate: taskData.scheduled_date || null,
+          scheduledTime: taskData.scheduled_time || null,
+          durationMinutes: taskData.duration_minutes ?? null,
+          reminderEnabled: !!taskData.reminder_enabled,
+          reminderOffset: taskData.reminder_offset || 0,
+          repeatPattern: (taskData.repeat_pattern || 'none') as RepeatPattern,
+          repeatDays: taskData.repeat_days,
+          existingCalendarEventId: null,
+        });
+      }
+
       // Create subtasks if provided
       if (subtasks && subtasks.length > 0) {
         const subtaskData = subtasks.map((title, index) => ({
