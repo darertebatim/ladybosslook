@@ -3085,6 +3085,9 @@ const AppTaskCreate = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Plus paywall when non-Plus user toggles Add to Calendar */}
+      <PaywallSheet open={showCalendarPaywall} onOpenChange={setShowCalendarPaywall} />
     </div>
   );
 };
