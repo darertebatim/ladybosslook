@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tansta
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
-import { format, subDays, isEqual, parseISO } from 'date-fns';
+import { format, subDays, isEqual, parseISO, addDays } from 'date-fns';
 import { getLocalDateStr, taskAppliesToDate } from '@/lib/localDate';
 import { scheduleUrgentAlarm, cancelUrgentAlarms, isUrgentAlarmAvailable } from '@/lib/taskAlarm';
 import { scheduleTaskReminder, cancelTaskReminder, isLocalNotificationsAvailable } from '@/lib/localNotifications';
@@ -18,6 +18,127 @@ import {
   deleteCalendarEventsById,
   isCalendarAvailable,
 } from '@/lib/calendarIntegration';
+
+/**
+ * Compute the next occurrence Date (local) for a task. Returns null if it
+ * cannot be determined (no time, no future date, etc.).
+ */
+function computeNextTaskOccurrence(opts: {
+  scheduledDate: string | null;
+  scheduledTime: string | null;
+  repeatPattern: RepeatPattern;
+  repeatDays?: number[];
+}): Date | null {
+  const { scheduledDate, scheduledTime, repeatPattern, repeatDays } = opts;
+  if (!scheduledTime) return null;
+  const [hh, mm] = scheduledTime.split(':').map(Number);
+
+  const now = new Date();
+
+  // Non-repeating: use scheduled_date or today
+  if (!repeatPattern || repeatPattern === 'none') {
+    if (!scheduledDate) return null;
+    const [y, m, d] = scheduledDate.split('-').map(Number);
+    const at = new Date(y, m - 1, d, hh, mm, 0, 0);
+    return at > now ? at : null;
+  }
+
+  // Repeating: scan next 35 days for the first matching occurrence in the future
+  const start = scheduledDate
+    ? (() => {
+        const [y, m, d] = scheduledDate.split('-').map(Number);
+        return new Date(y, m - 1, d);
+      })()
+    : now;
+  for (let i = 0; i < 35; i++) {
+    const candidate = addDays(now, i);
+    candidate.setHours(hh, mm, 0, 0);
+    if (candidate <= now) continue;
+    const dow = candidate.getDay();
+    let match = false;
+    if (repeatPattern === 'daily') match = true;
+    else if (repeatPattern === 'weekly') match = dow === start.getDay();
+    else if (repeatPattern === 'monthly') match = candidate.getDate() === start.getDate();
+    else if (repeatPattern === 'weekend') match = dow === 0 || dow === 6;
+    else if (repeatPattern === 'custom' && repeatDays?.length) match = repeatDays.includes(dow);
+    if (match) return candidate;
+  }
+  return null;
+}
+
+/**
+ * Sync (create/update/delete) the native calendar event for a task.
+ * No-op when not on native or calendar plugin not available.
+ */
+async function syncTaskCalendarEvent(opts: {
+  taskId: string;
+  enabled: boolean;
+  title: string;
+  emoji: string;
+  description: string | null;
+  scheduledDate: string | null;
+  scheduledTime: string | null;
+  durationMinutes: number | null;
+  reminderEnabled: boolean;
+  reminderOffset: number;
+  repeatPattern: RepeatPattern;
+  repeatDays?: number[];
+  existingCalendarEventId?: string | null;
+}): Promise<string | null> {
+  if (!isCalendarAvailable()) {
+    return opts.existingCalendarEventId ?? null;
+  }
+
+  // If disabled, delete any prior event
+  if (!opts.enabled) {
+    if (opts.existingCalendarEventId) {
+      await deleteCalendarEventsById([opts.existingCalendarEventId]);
+    }
+    return null;
+  }
+
+  const start = computeNextTaskOccurrence({
+    scheduledDate: opts.scheduledDate,
+    scheduledTime: opts.scheduledTime,
+    repeatPattern: opts.repeatPattern,
+    repeatDays: opts.repeatDays,
+  });
+  if (!start) {
+    // Nothing future to schedule; clean up any old event
+    if (opts.existingCalendarEventId) {
+      await deleteCalendarEventsById([opts.existingCalendarEventId]);
+    }
+    return null;
+  }
+
+  const durMin = Math.max(5, opts.durationMinutes || 30);
+  const end = new Date(start.getTime() + durMin * 60 * 1000);
+
+  const result = await replaceCalendarEvent(
+    {
+      title: `${opts.emoji} ${opts.title}`.trim(),
+      description: opts.description || 'Synced from Rilo',
+      startDate: start,
+      endDate: end,
+      reminderMinutes: opts.reminderEnabled ? Math.max(0, opts.reminderOffset || 0) : undefined,
+    },
+    opts.existingCalendarEventId || undefined,
+  );
+
+  if (result.success && result.calendarEventId) {
+    // Persist the new event ID on the task row
+    try {
+      await supabase
+        .from('user_tasks')
+        .update({ calendar_event_id: result.calendarEventId } as any)
+        .eq('id', opts.taskId);
+    } catch (e) {
+      console.warn('[CalendarSync] Failed to persist calendar_event_id', e);
+    }
+    return result.calendarEventId;
+  }
+  return null;
+}
 import {
   TASK_EXECUTOR_TYPES,
   type CompleteTaskPayload,
