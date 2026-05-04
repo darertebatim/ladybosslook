@@ -179,7 +179,6 @@ const Video = lazy(() => import("@/pages/Video"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const SendTestEmail = lazy(() => import("@/pages/SendTestEmail"));
 const AppSupport = lazy(() => import("@/pages/AppSupport"));
-const AppMarketing = lazy(() => import("@/pages/AppMarketing"));
 const CartPage = lazy(() => import("@/pages/CartPage"));
 const Rilo = lazy(() => import("@/pages/Rilo"));
 
