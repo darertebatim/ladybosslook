@@ -777,6 +777,11 @@ export default function AppTest() {
             totalSteps={4}
             totalTasks={12}
           />
+          <PurchaseCelebration
+            open={purchaseCelebrationPlan !== null}
+            plan={purchaseCelebrationPlan ?? undefined}
+            onClose={() => setPurchaseCelebrationPlan(null)}
+          />
         </CardContent>
       </Card>
 
