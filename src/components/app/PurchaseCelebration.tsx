@@ -126,7 +126,7 @@ export function PurchaseCelebration({ open, onClose, plan }: PurchaseCelebration
           transition={{ duration: 0.4, delay: 0.1 }}
           className="text-center text-[11px] font-bold uppercase tracking-[0.18em] text-[#B8590E] mb-2"
         >
-          ✨ You're in
+          ✨ You're a Rilo Plus member
         </motion.p>
         <motion.h1
           initial={{ opacity: 0, y: 8 }}
@@ -134,7 +134,7 @@ export function PurchaseCelebration({ open, onClose, plan }: PurchaseCelebration
           transition={{ duration: 0.45, delay: 0.18 }}
           className="text-[26px] leading-[1.2] font-bold text-[#1a1f3d] text-center"
         >
-          Welcome to Rilo Plus
+          Thank you — and welcome in.
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 6 }}
@@ -142,8 +142,9 @@ export function PurchaseCelebration({ open, onClose, plan }: PurchaseCelebration
           transition={{ duration: 0.4, delay: 0.28 }}
           className="mt-3 text-[15px] text-[#1a1f3d]/70 text-center"
         >
-          All premium features are unlocked. Enjoy your{' '}
-          {plan === 'annual' ? 'annual' : 'monthly'} membership.
+          {plan === 'annual'
+            ? 'Your annual membership is active. Every tool, every sound, every guided session — all yours now.'
+            : 'Your monthly membership is active. Every tool, every sound, every guided session — all yours now.'}
         </motion.p>
 
         <motion.div
@@ -153,10 +154,10 @@ export function PurchaseCelebration({ open, onClose, plan }: PurchaseCelebration
           className="grid grid-cols-2 gap-2 mt-5 max-w-[320px] mx-auto"
         >
           {[
-            '🧘 Premium Breathing',
-            '🎵 All Soundscapes',
-            '📋 Unlimited Planner',
-            '💎 Exclusive Content',
+            '🧘 Every breathing session',
+            '🎵 All audio & soundscapes',
+            '🤖 AI planner & coach',
+            '💎 Members-only programs',
           ].map((feature) => (
             <div
               key={feature}
@@ -176,7 +177,7 @@ export function PurchaseCelebration({ open, onClose, plan }: PurchaseCelebration
           style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <Sparkles className="h-4 w-4" />
-          Start exploring
+          Take me to my Rilo
         </motion.button>
       </div>
     </div>
