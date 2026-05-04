@@ -1147,14 +1147,20 @@ export const useDeleteTask = () => {
         await cancelTaskReminder(taskId);
       }
 
-      // Check if this task belongs to a routine before deleting
+      // Check if this task belongs to a routine, and pull calendar_event_id for cleanup
       const { data: taskData } = await supabase
         .from('user_tasks')
-        .select('source_routine_id')
+        .select('source_routine_id, calendar_event_id')
         .eq('id', taskId)
         .single();
 
       const routineId = taskData?.source_routine_id;
+      const calendarEventId = (taskData as any)?.calendar_event_id as string | undefined;
+
+      // Best-effort: delete native calendar event if we previously synced one
+      if (calendarEventId && isCalendarAvailable()) {
+        await deleteCalendarEventsById([calendarEventId]);
+      }
 
       const { error } = await supabase
         .from('user_tasks')
