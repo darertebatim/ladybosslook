@@ -6,6 +6,7 @@ import { RoutineBankItem } from '@/hooks/useRoutinesBank';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { isEmoji } from '@/lib/fluentEmoji';
 import { X, Crown, CheckCircle, Target, RotateCcw } from 'lucide-react';
+import { useSubscription } from '@/hooks/useSubscription';
 import { CachedImage } from '@/components/ui/CachedImage';
 
 interface RoutineBankCardProps {
@@ -62,6 +63,7 @@ export function RoutineBankCard({
   isCompleted = false,
   hideFocusBadge = false,
 }: RoutineBankCardProps) {
+  const { isSubscribed } = useSubscription();
   const color = routine.color || 'purple';
   const gradient = colorGradients[color] || colorGradients.purple;
   const bgColor = colorBackgrounds[color] || colorBackgrounds.purple;
@@ -104,12 +106,12 @@ export function RoutineBankCard({
         <Badge className="absolute -top-2.5 -left-2 z-30 rounded-full text-xs px-2 py-0.5 shadow-sm text-black font-bold flex items-center gap-0.5" style={{ backgroundColor: '#E8F5A3' }}>
           <FluentEmoji emoji="🔥" size={12} /> FREE
         </Badge>
-      ) : (
+      ) : !isSubscribed ? (
         <Badge className="absolute -top-2.5 -left-2 z-30 bg-amber-200 text-amber-700 hover:bg-amber-200 rounded-full text-xs gap-1 shadow-sm">
           <Crown className="h-3 w-3" />
           PLUS
         </Badge>
-      )}
+      ) : null}
       <button 
         className={cn(
           "overflow-hidden cursor-pointer transition-all active:scale-[0.98] w-full text-left rounded-2xl shadow-lg border border-border/50",

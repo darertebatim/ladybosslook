@@ -138,7 +138,7 @@ export const PlaylistCard = memo(function PlaylistCard({
           </h3>
 
           <div className="mt-1 flex items-center gap-1.5">
-            {requiresSubscription && (
+            {requiresSubscription && !isSubscribed && (
               <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-200 text-amber-700">
                 <Crown className="h-2.5 w-2.5" /> PLUS
               </span>

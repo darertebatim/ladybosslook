@@ -870,7 +870,7 @@ export default function AppPlaylistDetail() {
                       FREE
                     </Badge>
                   )}
-                  {playlist.requires_subscription && (
+                  {playlist.requires_subscription && !hasAccess && (
                     <Badge className="bg-amber-200 text-amber-700 gap-1">
                       <Crown className="h-3 w-3" />
                       PLUS

@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { RoutineBankItem } from '@/hooks/useRoutinesBank';
 import { useTranslation } from 'react-i18next';
 import { usePeach } from '@/lib/peachPalette';
+import { useSubscription } from '@/hooks/useSubscription';
 
 const colorGradients: Record<string, string> = {
   yellow: 'from-amber-400/80 to-amber-600/90',
@@ -65,6 +66,7 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
   const navigate = useNavigate();
   const { t } = useTranslation();
   const location = useLocation();
+  const { isSubscribed } = useSubscription();
   const color = routine.color || 'purple';
   const gradient = colorGradients[color] || colorGradients.purple;
   const routineEmoji = routine.emoji && isEmoji(routine.emoji) ? routine.emoji : '✨';
@@ -127,12 +129,12 @@ export const FeaturedRoutineCard = memo(function FeaturedRoutineCard({
               <Badge className="rounded-full text-[10px] px-1.5 py-0 shadow-sm h-4 font-semibold text-black border-0 flex items-center gap-0.5" style={{ backgroundColor: '#E8F5A3' }}>
                 <FluentEmoji emoji="🔥" size={10} /> FREE
               </Badge>
-            ) : (
+            ) : !isSubscribed ? (
               <Badge className="bg-amber-200 text-amber-700 hover:bg-amber-200 rounded-full text-[10px] px-1.5 py-0 gap-0.5 shadow-sm h-4">
                 <Crown className="h-2.5 w-2.5" />
                 PLUS
               </Badge>
-            )}
+            ) : null}
             {routine.category && (
               <span className="text-[10px] text-foreground/70 font-medium truncate capitalize">
                 {categoryName || routine.category}
