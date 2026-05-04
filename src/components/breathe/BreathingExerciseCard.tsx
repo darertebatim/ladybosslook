@@ -87,7 +87,7 @@ export function BreathingExerciseCard({ exercise, onClick, className }: Breathin
             <div className="h-12 w-12 rounded-xl bg-muted flex items-center justify-center">
               <FluentEmoji emoji={exercise.emoji || '🌬️'} size={28} />
             </div>
-            {isPremium && (
+            {isPremium && !isSubscribed && (
               <span className="absolute -top-2 -left-1.5 flex items-center gap-0.5 bg-amber-200 text-amber-900 text-[8px] font-bold px-1 py-0.5 rounded-full shadow-sm">
                 <Crown className="h-2 w-2" />
                 PLUS
