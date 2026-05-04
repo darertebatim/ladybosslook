@@ -546,6 +546,14 @@ export default function AppTest() {
               <Star className="h-4 w-4 mr-2" />
               Challenge Wrap-Up Summary
             </Button>
+            <Button onClick={() => setPurchaseCelebrationPlan('monthly')} variant="outline">
+              <Crown className="h-4 w-4 mr-2" />
+              Rilo Plus Welcome (Monthly)
+            </Button>
+            <Button onClick={() => setPurchaseCelebrationPlan('annual')} variant="outline">
+              <Crown className="h-4 w-4 mr-2" />
+              Rilo Plus Welcome (Annual)
+            </Button>
           </div>
         </CardContent>
       </Card>
