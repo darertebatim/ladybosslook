@@ -162,6 +162,10 @@ export interface CreateTaskInput {
   goal_target?: number | null;
   goal_unit?: string | null;
   order_index?: number;
+  /** When true, also create a native calendar event for the next occurrence (Plus only, native only). */
+  calendar_sync_enabled?: boolean;
+  /** Estimated duration in minutes — used as event length when calendar sync is on. */
+  duration_minutes?: number | null;
 }
 
 export interface UpdateTaskInput extends Partial<CreateTaskInput> {
