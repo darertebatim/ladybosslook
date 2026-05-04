@@ -415,7 +415,8 @@ const App = () => (
                   <Route path="/" element={<Index />} />
                   <Route path="/programs" element={<Programs />} />
                   <Route path="/about" element={<About />} />
-                  <Route path="/rilo" element={<Rilo />} />
+                  <Route path="/appmarketing" element={<Rilo />} />
+                  <Route path="/rilo" element={<Navigate to="/appmarketing" replace />} />
                   <Route path="/landing" element={<Landing />} />
                   <Route path="/asac" element={<AssertLanding />} />
                   <Route path="/auth" element={<Auth />} />
@@ -472,7 +473,6 @@ const App = () => (
                   <Route path="/refund-policy" element={<RefundPolicy />} />
                   <Route path="/sms-terms" element={<SMSTerms />} />
                   <Route path="/appsupport" element={<AppSupport />} />
-                  <Route path="/appmarketing" element={<AppMarketing />} />
                   <Route path="/giveaway" element={<Giveaway />} />
                   {!isNativeApp() && <Route path="/ewc" element={<EmpoweredWomanCoaching />} />}
                   {!isNativeApp() && <Route path="/ewcnow" element={<EmpoweredWomanCoaching />} />}
