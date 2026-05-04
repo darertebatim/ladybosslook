@@ -117,15 +117,15 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
             className
           )}
         >
-          {isPremiumTool ? (
+          {isPremiumTool && !isSubscribed ? (
             <div className="absolute -top-2.5 left-0 z-10 inline-flex items-center gap-0.5 text-[8px] font-bold text-amber-700 bg-amber-200 px-1.5 py-0.5 rounded-full shadow-sm">
               <Crown className="h-2.5 w-2.5" /> PLUS
             </div>
-          ) : (
+          ) : !isPremiumTool ? (
             <div className="absolute -top-2.5 left-0 z-10 inline-flex items-center gap-0.5 text-[8px] font-bold text-emerald-800 bg-[#E2F9F0] px-1.5 py-0.5 rounded-full shadow-sm">
               <FluentEmoji emoji="🔥" size={10} /> FREE
             </div>
-          )}
+          ) : null}
           <div
             className="w-[68px] h-[68px] rounded-[26px] flex items-center justify-center relative"
             style={{ backgroundColor: peachBg }}
@@ -194,7 +194,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
             </span>
           )}
         </div>
-        {isPremiumTool && (
+        {isPremiumTool && !isSubscribed && (
           <div className="absolute -top-2 -left-1 z-10 inline-flex items-center gap-0.5 text-[8px] font-bold text-amber-700 bg-amber-200 px-1.5 py-0.5 rounded-full shadow-sm">
             <Crown className="h-2.5 w-2.5" /> PLUS
           </div>
