@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { getFluentEmojiUrl } from '@/lib/fluentEmoji';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallSheet } from '@/components/app/PaywallSheet';
+import { Capacitor } from '@capacitor/core';
 
 const FREE_AI_PLANNER_USES = 7;
 // NOTE: keys use the `simora_` prefix so they're cleared by `fullClientReset`.
@@ -141,18 +142,117 @@ export default function AppAIPlanner() {
 
   // Voice input
   const [isListening, setIsListening] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const recognitionRef = useRef<any>(null);
-  const speechSupported =
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  // On native (Capacitor WebView) Web Speech API does not work — use MediaRecorder + edge transcription instead.
+  const isNative = Capacitor.isNativePlatform();
+  const webSpeechSupported =
     typeof window !== 'undefined' &&
     !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+  const mediaRecorderSupported =
+    typeof window !== 'undefined' && typeof (window as any).MediaRecorder !== 'undefined';
+  const speechSupported = (!isNative && webSpeechSupported) || mediaRecorderSupported;
 
   const stopListening = () => {
     try { recognitionRef.current?.stop(); } catch {}
+    try {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop();
+      }
+    } catch {}
     setIsListening(false);
   };
 
+  const cleanupStream = () => {
+    try { mediaStreamRef.current?.getTracks().forEach((t) => t.stop()); } catch {}
+    mediaStreamRef.current = null;
+  };
+
+  const startMediaRecording = async () => {
+    if (isListening || isTranscribing) { stopListening(); return; }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
+
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/mp4')
+          ? 'audio/mp4'
+          : MediaRecorder.isTypeSupported('audio/webm')
+            ? 'audio/webm'
+            : '';
+      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+      audioChunksRef.current = [];
+      recorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+      recorder.onstop = async () => {
+        cleanupStream();
+        const chunks = audioChunksRef.current;
+        audioChunksRef.current = [];
+        if (chunks.length === 0) { setIsTranscribing(false); return; }
+        const blob = new Blob(chunks, { type: mimeType || 'audio/webm' });
+        if (blob.size < 1000) { setIsTranscribing(false); return; }
+        setIsTranscribing(true);
+        try {
+          const base64 = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              const r = reader.result as string;
+              resolve(r.split(',')[1] || '');
+            };
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(blob);
+          });
+          const { data, error } = await supabase.functions.invoke('transcribe-audio', {
+            body: { audio: base64, mimeType: mimeType || 'audio/webm', language: navigator.language },
+          });
+          if (error) throw error;
+          const transcript = (data?.text || '').toString().trim();
+          if (transcript) {
+            setText((prev) => (prev ? `${prev} ${transcript}` : transcript));
+            haptic.light();
+          } else {
+            toast.error(t('aiPlannerPage.voiceFailed'));
+          }
+        } catch (e: any) {
+          console.error('[AppAIPlanner] transcribe failed', e);
+          toast.error(e?.message || t('aiPlannerPage.voiceFailed'));
+        } finally {
+          setIsTranscribing(false);
+        }
+      };
+      mediaRecorderRef.current = recorder;
+      recorder.start();
+      setIsListening(true);
+      haptic.light();
+    } catch (err: any) {
+      cleanupStream();
+      setIsListening(false);
+      if (err?.name === 'NotAllowedError') {
+        toast.error(t('aiPlannerPage.micDenied'));
+      } else if (err?.name === 'NotFoundError') {
+        toast.error(t('aiPlannerPage.voiceUnsupported'));
+      } else {
+        toast.error(t('aiPlannerPage.voiceFailed'));
+      }
+    }
+  };
+
   const startListening = () => {
-    if (!speechSupported) {
+    // On native, always use MediaRecorder + edge transcription (Web Speech API is broken in WKWebView).
+    if (isNative || !webSpeechSupported) {
+      if (!mediaRecorderSupported) {
+        toast.error(t('aiPlannerPage.voiceUnsupported'));
+        return;
+      }
+      startMediaRecording();
+      return;
+    }
+    if (!webSpeechSupported) {
       toast.error(t('aiPlannerPage.voiceUnsupported'));
       return;
     }
@@ -188,6 +288,7 @@ export default function AppAIPlanner() {
   };
 
   useEffect(() => () => { try { recognitionRef.current?.stop(); } catch {} }, []);
+  useEffect(() => () => { cleanupStream(); }, []);
 
   const startSequence = async (raw: string) => {
     const trimmed = raw.trim();
