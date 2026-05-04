@@ -354,7 +354,12 @@ const AppHome = () => {
     // Only show if user has actually EARNED a shield they haven't used yet.
     // New users with longest_streak 0 get no shield → silent reset.
     if (getAvailableShields(streak.longest_streak || 0, recoveryCount) <= 0) return;
-    
+
+    // Don't pester brand-new users. Require at least a 2-day streak history
+    // and an actual prior completion before offering recovery.
+    if ((streak.longest_streak || 0) < 2) return;
+    if (!streak.last_completion_date) return;
+
     // Check if streak is actually broken by comparing last_completion_date
     const today = format(new Date(), 'yyyy-MM-dd');
     const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
