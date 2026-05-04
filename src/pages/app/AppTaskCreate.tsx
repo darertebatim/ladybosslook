@@ -941,6 +941,7 @@ const AppTaskCreate = ({
       }
       
       setIsUrgent(existingTask.is_urgent ?? false);
+      setCalendarSyncEnabled(!!(existingTask as any).calendar_event_id);
       setTag(existingTask.tag);
       setLinkedPlaylistId(existingTask.linked_playlist_id ?? null);
       setProLinkType(existingTask.pro_link_type ?? null);
