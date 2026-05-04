@@ -1002,7 +1002,7 @@ export const useUpdateTask = () => {
 
   return useMutation({
     mutationFn: async (input: UpdateTaskInput) => {
-      const { id, subtasks, ...updates } = input;
+      const { id, subtasks, calendar_sync_enabled, ...updates } = input;
 
       // Cancel existing local notification and urgent alarms before updating
       if (isLocalNotificationsAvailable()) {
@@ -1013,6 +1013,17 @@ export const useUpdateTask = () => {
       if (isUrgentAlarmAvailable()) {
         await cancelUrgentAlarms(id);
       }
+
+      // Snapshot prior calendar_event_id before update so we can replace/delete
+      let priorCalendarEventId: string | null = null;
+      try {
+        const { data: prior } = await supabase
+          .from('user_tasks')
+          .select('calendar_event_id')
+          .eq('id', id)
+          .maybeSingle();
+        priorCalendarEventId = (prior as any)?.calendar_event_id ?? null;
+      } catch { /* ignore */ }
 
       // Update the task
       const { data, error } = await supabase
@@ -1061,6 +1072,25 @@ export const useUpdateTask = () => {
         } else if (alarmResult.scheduledCount) {
           console.log(`[UpdateTask] Scheduled ${alarmResult.scheduledCount} urgent alarms`);
         }
+      }
+
+      // Calendar sync — only act when the caller explicitly passes the flag
+      if (calendar_sync_enabled !== undefined) {
+        await syncTaskCalendarEvent({
+          taskId: task.id,
+          enabled: !!calendar_sync_enabled,
+          title: task.title,
+          emoji: task.emoji,
+          description: task.description ?? null,
+          scheduledDate: task.scheduled_date,
+          scheduledTime: task.scheduled_time,
+          durationMinutes: (task as any).duration_minutes ?? null,
+          reminderEnabled: task.reminder_enabled,
+          reminderOffset: task.reminder_offset,
+          repeatPattern: task.repeat_pattern,
+          repeatDays: task.repeat_days,
+          existingCalendarEventId: priorCalendarEventId,
+        });
       }
 
       // If subtasks are provided, replace existing subtasks
