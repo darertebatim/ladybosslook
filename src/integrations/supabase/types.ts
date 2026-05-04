@@ -5285,6 +5285,7 @@ export type Database = {
       }
       user_tasks: {
         Row: {
+          calendar_event_id: string | null
           color: string
           created_at: string
           description: string | null
@@ -5318,6 +5319,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          calendar_event_id?: string | null
           color?: string
           created_at?: string
           description?: string | null
@@ -5351,6 +5353,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          calendar_event_id?: string | null
           color?: string
           created_at?: string
           description?: string | null

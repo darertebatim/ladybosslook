@@ -671,6 +671,8 @@
     "off": "Off",
     "urgent": "Urgent",
     "urgentHint": "Alarm rings even on silent",
+    "addToCalendar": "Add to Calendar",
+    "addToCalendarHint": "Sync this task to your phone calendar (Plus)",
     "date": "Date",
     "estimatedDuration": "Estimated Duration",
     "durationMinutes": "Duration (minutes)",

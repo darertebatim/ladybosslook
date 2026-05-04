@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { format, addDays, nextMonday, startOfDay } from 'date-fns';
-import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag, AlarmClock, Target, Wind, Pencil, Brain, GripVertical, Headphones, MessageCircle, Clapperboard, Video, GraduationCap, Timer } from 'lucide-react';
+import { X, ChevronRight, Plus, Trash2, Music, XCircle, Sparkles, ArrowLeft, Check, Calendar, Repeat, Clock, Bell, Tag, AlarmClock, Target, Wind, Pencil, Brain, GripVertical, Headphones, MessageCircle, Clapperboard, Video, GraduationCap, Timer, CalendarPlus, Crown } from 'lucide-react';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { cn } from '@/lib/utils';
 import {
@@ -64,6 +64,9 @@ import { NumberKeypad } from '@/components/app/NumberKeypad';
 import { TimePeriod, TIME_PERIODS, TimeMode, getTimeMode, formatTimeLabel, formatTimeRange, getTimePeriodConfig, normalizeTimePeriod } from '@/lib/taskScheduling';
 import SubtaskEditorSheet from '@/components/app/SubtaskEditorSheet';
 import { useTranslation } from 'react-i18next';
+import { useSubscription } from '@/hooks/useSubscription';
+import { PaywallSheet } from '@/components/app/PaywallSheet';
+import { isCalendarAvailable } from '@/lib/calendarIntegration';
 
 // Me+ style pastel color options with hex values
 const COLOR_OPTIONS: { name: TaskColor; hex: string }[] = [
@@ -409,6 +412,10 @@ const AppTaskCreate = ({
   const [reminderTime, setReminderTime] = useState(initialData?.reminderTime || '09:00');
   const [isUrgent, setIsUrgent] = useState(initialData?.isUrgent ?? false);
   const [showUrgentConfirm, setShowUrgentConfirm] = useState(false);
+  // Calendar sync (Plus only) — adds task to native iOS/Android calendar
+  const [calendarSyncEnabled, setCalendarSyncEnabled] = useState(false);
+  const [showCalendarPaywall, setShowCalendarPaywall] = useState(false);
+  const { isSubscribed } = useSubscription();
   const [tag, setTag] = useState<string | null>(initialData?.tag ?? urlTag ?? null);
   const [subtasks, setSubtasks] = useState<string[]>(initialData?.subtasks || []);
   const [newSubtask, setNewSubtask] = useState('');
@@ -934,6 +941,7 @@ const AppTaskCreate = ({
       }
       
       setIsUrgent(existingTask.is_urgent ?? false);
+      setCalendarSyncEnabled(!!(existingTask as any).calendar_event_id);
       setTag(existingTask.tag);
       setLinkedPlaylistId(existingTask.linked_playlist_id ?? null);
       setProLinkType(existingTask.pro_link_type ?? null);
@@ -1020,6 +1028,9 @@ const AppTaskCreate = ({
       goal_target: goalSettings.enabled ? goalSettings.target : null,
       goal_unit: goalSettings.enabled ? goalSettings.unit : null,
       duration_minutes: durationMinutes,
+      // Calendar sync (only effective on native + Plus). UI prevents non-Plus
+      // users from enabling it; we still gate again here as defense-in-depth.
+      calendar_sync_enabled: !!(calendarSyncEnabled && isSubscribed && scheduledTime),
     };
 
     if (taskId) {
@@ -1405,6 +1416,35 @@ const AppTaskCreate = ({
                 }
               }}
               className="data-[state=checked]:bg-red-500"
+            />
+          </div>
+        )}
+
+        {/* Add to Calendar — Plus only, native only, requires a specific time */}
+        {scheduledTime && isCalendarAvailable() && (
+          <div className="flex items-center justify-between py-2 px-4 border-b border-muted/30">
+            <div className="flex items-center gap-3">
+              <CalendarPlus className={cn("h-5 w-5", calendarSyncEnabled ? "text-primary" : "text-black")} />
+              <div className="flex flex-col">
+                <span className="font-medium text-black inline-flex items-center gap-1.5">
+                  {t('taskEdit.addToCalendar')}
+                  {!isSubscribed && (
+                    <Crown className="h-3.5 w-3.5 text-amber-500" />
+                  )}
+                </span>
+                <span className="text-xs text-black/60">{t('taskEdit.addToCalendarHint')}</span>
+              </div>
+            </div>
+            <Switch
+              checked={calendarSyncEnabled}
+              onCheckedChange={(checked) => {
+                if (checked && !isSubscribed) {
+                  haptic.light();
+                  setShowCalendarPaywall(true);
+                  return;
+                }
+                setCalendarSyncEnabled(checked);
+              }}
             />
           </div>
         )}
@@ -3045,6 +3085,9 @@ const AppTaskCreate = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Plus paywall when non-Plus user toggles Add to Calendar */}
+      <PaywallSheet open={showCalendarPaywall} onOpenChange={setShowCalendarPaywall} />
     </div>
   );
 };
