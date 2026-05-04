@@ -1431,7 +1431,10 @@ const AppTaskCreate = ({
                 <span className="font-medium text-black inline-flex items-center gap-1.5">
                   {t('taskEdit.addToCalendar')}
                   {!isSubscribed && (
-                    <Crown className="h-3.5 w-3.5 text-amber-500" />
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-1.5 py-0.5">
+                      <Crown className="h-3 w-3 text-amber-600" />
+                      <span className="text-[10px] font-bold uppercase tracking-wide text-amber-700">Plus</span>
+                    </span>
                   )}
                 </span>
                 <span className="text-xs text-black/60">{t('taskEdit.addToCalendarHint')}</span>
