@@ -1420,6 +1420,35 @@ const AppTaskCreate = ({
           </div>
         )}
 
+        {/* Add to Calendar — Plus only, native only, requires a specific time */}
+        {scheduledTime && isCalendarAvailable() && (
+          <div className="flex items-center justify-between py-2 px-4 border-b border-muted/30">
+            <div className="flex items-center gap-3">
+              <CalendarPlus className={cn("h-5 w-5", calendarSyncEnabled ? "text-primary" : "text-black")} />
+              <div className="flex flex-col">
+                <span className="font-medium text-black inline-flex items-center gap-1.5">
+                  {t('taskEdit.addToCalendar')}
+                  {!isSubscribed && (
+                    <Crown className="h-3.5 w-3.5 text-amber-500" />
+                  )}
+                </span>
+                <span className="text-xs text-black/60">{t('taskEdit.addToCalendarHint')}</span>
+              </div>
+            </div>
+            <Switch
+              checked={calendarSyncEnabled}
+              onCheckedChange={(checked) => {
+                if (checked && !isSubscribed) {
+                  haptic('light');
+                  setShowCalendarPaywall(true);
+                  return;
+                }
+                setCalendarSyncEnabled(checked);
+              }}
+            />
+          </div>
+        )}
+
         {/* Tag */}
         <button
           onClick={() => setShowTagPicker(true)}
