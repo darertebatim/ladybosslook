@@ -1420,8 +1420,10 @@ const AppTaskCreate = ({
           </div>
         )}
 
-        {/* Add to Calendar — Plus only, native only, requires a specific time */}
-        {scheduledTime && isCalendarAvailable() && (
+        {/* Add to Calendar — Plus only, requires a specific time.
+            Visible in web preview so the design can be reviewed; actual
+            sync only fires on native (gracefully no-ops on web). */}
+        {scheduledTime && (
           <div className="flex items-center justify-between py-2 px-4 border-b border-muted/30">
             <div className="flex items-center gap-3">
               <CalendarPlus className={cn("h-5 w-5", calendarSyncEnabled ? "text-primary" : "text-black")} />
