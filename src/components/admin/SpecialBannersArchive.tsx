@@ -1,12 +1,15 @@
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Info } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Info, Eye, Crown } from 'lucide-react';
 import moodBannerImg from '@/assets/mood-banner.png';
 import onboardingBannerImg from '@/assets/onboarding-banner.png';
 import weeklyReviewBannerImg from '@/assets/weekly-review-banner.png';
 import selfcareQuizBannerImg from '@/assets/selfcare-quiz-banner.jpg';
 import { useSpecialBannerSettings, useToggleSpecialBanner } from '@/hooks/useSpecialBannerSettings';
+import { PurchaseCelebration } from '@/components/app/PurchaseCelebration';
 
 interface SpecialBanner {
   name: string;
@@ -77,6 +80,7 @@ const specialBanners: SpecialBanner[] = [
 export function SpecialBannersArchive() {
   const { data: disabledMap = {} } = useSpecialBannerSettings();
   const toggleMutation = useToggleSpecialBanner();
+  const [previewPlan, setPreviewPlan] = useState<'monthly' | 'annual' | null>(null);
 
   const toggleBanner = (banner: SpecialBanner) => {
     const newValue = !disabledMap[banner.component];
@@ -92,6 +96,37 @@ export function SpecialBannersArchive() {
           Use the toggle to enable or disable each banner across all devices.
         </span>
       </div>
+
+      {/* Post-purchase welcome — preview only, fires automatically after subscribing */}
+      <Card className="border-primary/30">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Crown className="h-4 w-4 text-primary" />
+              Rilo Plus Welcome
+            </CardTitle>
+            <Badge variant="secondary" className="text-xs">Auto · Post-purchase</Badge>
+          </div>
+          <CardDescription>
+            Full-screen welcome that fires automatically right after a successful Rilo Plus subscription
+            purchase (web Stripe and mobile RevenueCat). Confetti, Rilo icon, and the unlocked feature grid.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="text-sm">
+            <span className="font-medium">Triggers from:</span>{' '}
+            <span className="text-muted-foreground">PaywallSheet, IAPPlanPicker</span>
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => setPreviewPlan('monthly')}>
+              <Eye className="h-4 w-4 mr-1.5" /> Preview (Monthly)
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => setPreviewPlan('annual')}>
+              <Eye className="h-4 w-4 mr-1.5" /> Preview (Annual)
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {specialBanners.map((banner) => (
         <Card key={banner.component} className={disabledMap[banner.component] ? 'opacity-60' : ''}>
@@ -136,6 +171,12 @@ export function SpecialBannersArchive() {
           </CardContent>
         </Card>
       ))}
+
+      <PurchaseCelebration
+        open={previewPlan !== null}
+        plan={previewPlan ?? undefined}
+        onClose={() => setPreviewPlan(null)}
+      />
     </div>
   );
 }
