@@ -403,8 +403,15 @@ function CategoriesManager() {
             <div>
               <Label>Tags (comma-separated)</Label>
               <Input
-                value={formData.tags.join(', ')}
-                onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) }))}
+                value={(formData as any)._tagsRaw ?? formData.tags.join(', ')}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  setFormData(prev => ({
+                    ...prev,
+                    _tagsRaw: raw,
+                    tags: raw.split(',').map(t => t.trim()).filter(Boolean),
+                  } as any));
+                }}
                 placeholder="e.g. self-care, wellness"
               />
             </div>

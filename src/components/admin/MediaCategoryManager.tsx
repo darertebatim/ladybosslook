@@ -145,8 +145,15 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
       <div>
         <Label>Tags (comma-separated)</Label>
         <Input
-          value={form.tags.join(', ')}
-          onChange={(e) => setForm({ ...form, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
+          value={(form as any)._tagsRaw ?? form.tags.join(', ')}
+          onChange={(e) => {
+            const raw = e.target.value;
+            setForm({
+              ...form,
+              _tagsRaw: raw,
+              tags: raw.split(',').map(t => t.trim()).filter(Boolean),
+            } as any);
+          }}
           placeholder="e.g. self-care, wellness"
         />
       </div>
