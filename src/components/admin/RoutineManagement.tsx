@@ -218,6 +218,7 @@ function CategoriesManager() {
       tags: [],
       description: '',
     });
+    setTagsRaw('');
     setIsDialogOpen(true);
   };
 
@@ -234,6 +235,7 @@ function CategoriesManager() {
       tags: cat.tags || [],
       description: cat.description || '',
     });
+    setTagsRaw((cat.tags || []).join(', '));
     setIsDialogOpen(true);
   };
 
