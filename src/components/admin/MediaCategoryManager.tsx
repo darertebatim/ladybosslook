@@ -172,7 +172,7 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{type === 'audio' ? 'Audio' : 'Video'} Categories</CardTitle>
-        <Button size="sm" onClick={() => { setForm({ ...defaultForm, sort_order: (categories?.length || 0) }); setIsCreateOpen(true); }}>
+        <Button size="sm" onClick={() => { setForm({ ...defaultForm, sort_order: (categories?.length || 0) }); setTagsRaw(''); setIsCreateOpen(true); }}>
           <Plus className="h-4 w-4 mr-1" /> Add Category
         </Button>
       </CardHeader>
