@@ -17,14 +17,14 @@ const Privacy = () => {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-foreground mb-4">About Us</h2>
             <p className="text-foreground/80 mb-6">
-              "We", "us" or "our" means Ladybosslook LLC., with its principal place of business located at 2403 Elements Way # 2403 Irvine CA US 92612-1536.
+              "We", "us" or "our" means Ladybosslook LLC. (developer: Ali Lotfi), with its principal place of business located at 2403 Elements Way # 2403 Irvine CA US 92612-1536. This Privacy Policy applies to the <strong>Rilo</strong> mobile application (also referred to as "Rilo Self-Care & Routines") and all related Services provided by Ladybosslook LLC.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-foreground mb-4">About This Privacy Policy</h2>
             <p className="text-foreground/80 mb-4">
-              Your privacy is important to us, so we've developed this Privacy Policy, which explains how we collect, use, and disclose your personal information. We collect personal information when you use our website(s), mobile apps, and other online and offline products, services and experiences (collectively, the "Services"). Please take a moment to read through this Policy in its entirety.
+              Your privacy is important to us, so we've developed this Privacy Policy, which explains how we (Ladybosslook LLC., developer Ali Lotfi) collect, use, and disclose your personal information through the <strong>Rilo</strong> app. We collect personal information when you use our website(s), the Rilo mobile app, and other online and offline products, services and experiences (collectively, the "Services"). Please take a moment to read through this Policy in its entirety.
             </p>
             <p className="text-foreground/80 mb-6">
               If you have any questions, concerns or complaints regarding this Privacy Policy or how we use your personal information please contact us via e-mail at <a href="mailto:hi@ladybosslook.com" className="text-primary hover:underline">hi@ladybosslook.com</a>.
@@ -182,6 +182,8 @@ const Privacy = () => {
             </p>
             <div className="bg-muted p-6 rounded-lg">
               <p className="text-foreground font-medium mb-2">Ladybosslook LLC.</p>
+              <p className="text-foreground/80 mb-1">Developer: Ali Lotfi</p>
+              <p className="text-foreground/80 mb-1">App: Rilo (Rilo Self-Care & Routines)</p>
               <p className="text-foreground/80 mb-1">2403 Elements Way # 2403</p>
               <p className="text-foreground/80 mb-1">Irvine CA US 92612-1536</p>
               <p className="text-foreground/80">
