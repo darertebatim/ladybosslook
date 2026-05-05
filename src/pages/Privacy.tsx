@@ -182,6 +182,8 @@ const Privacy = () => {
             </p>
             <div className="bg-muted p-6 rounded-lg">
               <p className="text-foreground font-medium mb-2">Ladybosslook LLC.</p>
+              <p className="text-foreground/80 mb-1">Developer: Ali Lotfi</p>
+              <p className="text-foreground/80 mb-1">App: Rilo (Rilo Self-Care & Routines)</p>
               <p className="text-foreground/80 mb-1">2403 Elements Way # 2403</p>
               <p className="text-foreground/80 mb-1">Irvine CA US 92612-1536</p>
               <p className="text-foreground/80">
