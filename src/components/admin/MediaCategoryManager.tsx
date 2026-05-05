@@ -39,6 +39,7 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<CategoryForm>({ ...defaultForm });
+  const [tagsRaw, setTagsRaw] = useState('');
 
   const queryKey = [`media-categories-${type}`];
 
@@ -109,6 +110,7 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
       slug: cat.slug, label: cat.label, emoji: cat.emoji,
       sort_order: cat.sort_order, is_active: cat.is_active, tags: cat.tags || [],
     });
+    setTagsRaw(((cat.tags as string[]) || []).join(', '));
     setIsEditOpen(true);
   };
 
@@ -145,14 +147,11 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
       <div>
         <Label>Tags (comma-separated)</Label>
         <Input
-          value={(form as any)._tagsRaw ?? form.tags.join(', ')}
+          value={tagsRaw}
           onChange={(e) => {
             const raw = e.target.value;
-            setForm({
-              ...form,
-              _tagsRaw: raw,
-              tags: raw.split(',').map(t => t.trim()).filter(Boolean),
-            } as any);
+            setTagsRaw(raw);
+            setForm({ ...form, tags: raw.split(',').map(t => t.trim()).filter(Boolean) });
           }}
           placeholder="e.g. self-care, wellness"
         />
@@ -173,7 +172,7 @@ export const MediaCategoryManager = ({ type }: MediaCategoryManagerProps) => {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{type === 'audio' ? 'Audio' : 'Video'} Categories</CardTitle>
-        <Button size="sm" onClick={() => { setForm({ ...defaultForm, sort_order: (categories?.length || 0) }); setIsCreateOpen(true); }}>
+        <Button size="sm" onClick={() => { setForm({ ...defaultForm, sort_order: (categories?.length || 0) }); setTagsRaw(''); setIsCreateOpen(true); }}>
           <Plus className="h-4 w-4 mr-1" /> Add Category
         </Button>
       </CardHeader>

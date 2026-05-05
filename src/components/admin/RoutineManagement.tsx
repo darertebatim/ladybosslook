@@ -140,6 +140,7 @@ function CategoriesManager() {
   const [editingCategory, setEditingCategory] = useState<RoutineCategory | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [tagsRaw, setTagsRaw] = useState('');
   
   const [formData, setFormData] = useState({
     name: '',
@@ -217,6 +218,7 @@ function CategoriesManager() {
       tags: [],
       description: '',
     });
+    setTagsRaw('');
     setIsDialogOpen(true);
   };
 
@@ -233,6 +235,7 @@ function CategoriesManager() {
       tags: cat.tags || [],
       description: cat.description || '',
     });
+    setTagsRaw((cat.tags || []).join(', '));
     setIsDialogOpen(true);
   };
 
@@ -403,14 +406,14 @@ function CategoriesManager() {
             <div>
               <Label>Tags (comma-separated)</Label>
               <Input
-                value={(formData as any)._tagsRaw ?? formData.tags.join(', ')}
+                value={tagsRaw}
                 onChange={(e) => {
                   const raw = e.target.value;
+                  setTagsRaw(raw);
                   setFormData(prev => ({
                     ...prev,
-                    _tagsRaw: raw,
                     tags: raw.split(',').map(t => t.trim()).filter(Boolean),
-                  } as any));
+                  }));
                 }}
                 placeholder="e.g. self-care, wellness"
               />
