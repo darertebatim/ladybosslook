@@ -229,23 +229,6 @@ export default function AppInspire() {
                 <div className="mt-4">
                   <ScrollArea className="w-full tour-routine-categories">
                     <div className="flex gap-2 px-4 pb-2">
-                      {resetRoutines.length > 0 && (
-                        <CategoryCircle
-                          name={t('inspirePage.focus')}
-                          icon="RotateCcw"
-                          emoji="🫧"
-                          color="violet"
-                          onClick={() => {
-                            const el = document.getElementById(
-                              "routine-category-reset",
-                            );
-                            el?.scrollIntoView({
-                              behavior: "smooth",
-                              block: "start",
-                            });
-                          }}
-                        />
-                      )}
                       {nonEmptyCategories
                         .filter((c) => c.slug !== "pro")
                         .map((category) => (
@@ -294,6 +277,23 @@ export default function AppInspire() {
                           onClick={() => {
                             const el = document.getElementById(
                               "routine-category-challenges",
+                            );
+                            el?.scrollIntoView({
+                              behavior: "smooth",
+                              block: "start",
+                            });
+                          }}
+                        />
+                      )}
+                      {resetRoutines.length > 0 && (
+                        <CategoryCircle
+                          name={t('inspirePage.focus')}
+                          icon="RotateCcw"
+                          emoji="🫧"
+                          color="violet"
+                          onClick={() => {
+                            const el = document.getElementById(
+                              "routine-category-reset",
                             );
                             el?.scrollIntoView({
                               behavior: "smooth",
