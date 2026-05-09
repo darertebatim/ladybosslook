@@ -620,6 +620,7 @@ export default function RoutinesBank() {
     });
     setLocalSections([]);
     setLocalTasks([]);
+    setHosts([]);
     setDialogTab('basic');
     setDialogOpen(true);
   };
@@ -652,6 +653,11 @@ export default function RoutinesBank() {
     const { sections, tasks } = await fetchRoutineData(routine.id);
     setLocalSections(sections);
     setLocalTasks(tasks);
+    try {
+      setHosts(await loadContentHosts('routine', routine.id));
+    } catch {
+      setHosts([]);
+    }
     setDialogTab('basic');
     setDialogOpen(true);
   };
@@ -661,6 +667,7 @@ export default function RoutinesBank() {
     setEditingRoutine(null);
     setLocalSections([]);
     setLocalTasks([]);
+    setHosts([]);
     setTaskSearchOpen(false);
     setTaskSearch('');
     setAddingTaskToSection(null);
