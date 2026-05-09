@@ -61,6 +61,7 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-blue-600',
     route: '/app/routineplayer',
     description: 'Routine player',
+    hidden: true,
   },
   {
     id: 'projects',
@@ -112,6 +113,7 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-rose-600',
     route: '/app/watch',
     description: 'Workout videos',
+    hidden: true,
   },
   {
     id: 'water',
@@ -152,6 +154,7 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-amber-600',
     route: '/app/myprograms',
     description: 'Courses & coaching',
+    hidden: true,
   },
   {
     id: 'profile',
@@ -162,6 +165,7 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-slate-600',
     route: '/app/myprofile',
     description: 'Settings & account',
+    hidden: true,
   },
   {
     id: 'academy',
@@ -172,6 +176,7 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-blue-600',
     route: '/app/academy',
     description: 'Browse programs',
+    hidden: true,
   },
   {
     id: 'listen',
@@ -182,6 +187,7 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-purple-600',
     route: '/app/player',
     description: 'Audio player',
+    hidden: true,
   },
   {
     id: 'new-task',
@@ -192,6 +198,7 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-orange-600',
     route: '__action:new-task',
     description: 'Quick add a task',
+    hidden: true,
   },
   {
     id: 'new-routine',
@@ -202,6 +209,7 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-emerald-600',
     route: '__action:new-routine',
     description: 'Build a routine',
+    hidden: true,
   },
   {
     id: 'read',
@@ -212,6 +220,7 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-purple-600',
     route: '/app/read',
     description: 'Micro-learning lessons',
+    hidden: true,
   },
   {
     id: 'presence',
@@ -222,6 +231,7 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-orange-600',
     route: '/app/presence',
     description: 'Daily streak',
+    hidden: true,
   },
   {
     id: 'ai',
@@ -232,6 +242,7 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-cyan-600',
     route: '/app/ai',
     description: 'Personal assistant',
+    hidden: true,
   },
 ];
 
