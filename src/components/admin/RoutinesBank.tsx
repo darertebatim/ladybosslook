@@ -1549,8 +1549,56 @@ export default function RoutinesBank() {
                       onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
                       placeholder="https://youtube.com/watch?v=... or https://example.com/video.mp4"
                     />
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <MediaLibraryPicker
+                        kind="video"
+                        triggerLabel="Pick from video library"
+                        onPick={(item) => setFormData({ ...formData, video_url: item.file_url })}
+                      />
+                      {formData.video_url && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setFormData({ ...formData, video_url: '' })}
+                        >
+                          Clear
+                        </Button>
+                      )}
+                    </div>
                     {formData.video_url && (
                       <p className="text-xs text-muted-foreground">Video will appear below the cover image on the routine page.</p>
+                    )}
+                  </div>
+
+                  {/* Audio URL */}
+                  <div className="space-y-2">
+                    <Label htmlFor="audio_url">Intro Audio URL (MP3)</Label>
+                    <Input
+                      id="audio_url"
+                      value={formData.audio_url}
+                      onChange={(e) => setFormData({ ...formData, audio_url: e.target.value })}
+                      placeholder="https://example.com/intro.mp3"
+                    />
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <MediaLibraryPicker
+                        kind="audio"
+                        triggerLabel="Pick from audio library"
+                        onPick={(item) => setFormData({ ...formData, audio_url: item.file_url })}
+                      />
+                      {formData.audio_url && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setFormData({ ...formData, audio_url: '' })}
+                        >
+                          Clear
+                        </Button>
+                      )}
+                    </div>
+                    {formData.audio_url && (
+                      <p className="text-xs text-muted-foreground">Plays as an intro on the routine page so users can learn about it.</p>
                     )}
                   </div>
 
