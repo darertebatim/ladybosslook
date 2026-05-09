@@ -291,12 +291,6 @@ export default function AppTasksBank() {
           {!isSearching && <ClusterCards className="mt-5" />}
 
           {!isSearching && (
-            <div className="px-4 mt-4">
-              <SelfCareBalanceCard />
-            </div>
-          )}
-
-          {!isSearching && (
             <>
               <div className="px-4 pb-2">
                 <SelfCareQuizBanner />
