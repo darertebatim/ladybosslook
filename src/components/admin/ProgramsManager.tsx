@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { GraduationCap, Plus, RefreshCw, Pencil, Trash2, Copy, Link2, Upload, X, ImageIcon, Sparkles } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { HostPicker, HostAssignment, saveContentHosts, loadContentHosts } from '@/components/admin/HostPicker';
 import { RichTextEditor } from './RichTextEditor';
 import { programImages } from '@/data/programs';
 
@@ -92,6 +93,7 @@ export function ProgramsManager() {
     annual_android_product_id: '',
     show_in_app_waitlist: false,
   });
+  const [hosts, setHosts] = useState<HostAssignment[]>([]);
 
   // Fetch playlists for dropdown
   const { data: playlists } = useQuery({
@@ -170,6 +172,7 @@ export function ProgramsManager() {
     });
     setEditingId(null);
     setShowForm(false);
+    setHosts([]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -183,6 +186,7 @@ export function ProgramsManager() {
           .eq('id', editingId);
 
         if (error) throw error;
+        await saveContentHosts('program', formData.slug, hosts);
 
         toast({
           title: 'Success',
@@ -194,6 +198,7 @@ export function ProgramsManager() {
           .insert([formData] as any);
 
         if (error) throw error;
+        await saveContentHosts('program', formData.slug, hosts);
 
         toast({
           title: 'Success',
@@ -213,7 +218,7 @@ export function ProgramsManager() {
     }
   };
 
-  const handleEdit = (program: ProgramCatalog) => {
+  const handleEdit = async (program: ProgramCatalog) => {
     setFormData({
       slug: program.slug,
       title: program.title,
@@ -254,6 +259,11 @@ export function ProgramsManager() {
       annual_android_product_id: (program as any).annual_android_product_id || '',
       show_in_app_waitlist: (program as any).show_in_app_waitlist || false,
     });
+    try {
+      setHosts(await loadContentHosts('program', program.slug));
+    } catch {
+      setHosts([]);
+    }
     setEditingId(program.id);
     setShowForm(true);
   };
@@ -826,6 +836,12 @@ export function ProgramsManager() {
                   placeholder="Program description... Use the toolbar to format text with bold, lists, headers, etc."
                 />
               </div>
+
+              <HostPicker
+                value={hosts}
+                onChange={setHosts}
+                hint="Who hosts this program? Shown to users on the program page."
+              />
 
               {/* Cover Image Upload */}
               <div className="space-y-3">

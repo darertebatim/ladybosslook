@@ -36,6 +36,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { HostPicker, HostAssignment, saveContentHosts, loadContentHosts } from "@/components/admin/HostPicker";
 
 type DisplayMode = 'tracks' | 'modules' | 'both';
 
@@ -71,6 +72,8 @@ interface PlaylistFormProps {
   onGenerateCover: () => void;
   onImproveDescription: () => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
+  hosts: HostAssignment[];
+  setHosts: (hosts: HostAssignment[]) => void;
 }
 
 const PlaylistForm = ({ 
@@ -89,6 +92,8 @@ const PlaylistForm = ({
   onGenerateCover,
   onImproveDescription,
   fileInputRef,
+  hosts,
+  setHosts,
 }: PlaylistFormProps) => (
   <form onSubmit={onSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
     <div>
@@ -296,6 +301,12 @@ const PlaylistForm = ({
       />
     </div>
 
+    <HostPicker
+      value={hosts}
+      onChange={setHosts}
+      hint="Who presents this playlist? Shown to users on the playlist page."
+    />
+
     <div className="flex justify-end gap-2 pt-2 sticky bottom-0 bg-background">
       <Button type="button" variant="outline" onClick={onCancel}>
         Cancel
@@ -358,6 +369,9 @@ export const PlaylistManager = () => {
     cover_image_url: "",
     language: "american",
   });
+
+  const [createHosts, setCreateHosts] = useState<HostAssignment[]>([]);
+  const [editHosts, setEditHosts] = useState<HostAssignment[]>([]);
 
   // Fetch playlists with item count
   const { data: playlists } = useQuery({
@@ -559,7 +573,7 @@ export const PlaylistManager = () => {
   // Create playlist mutation
   const createMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
+      const { data: created, error } = await supabase
         .from('audio_playlists')
         .insert({
           name: createFormData.name,
@@ -573,9 +587,12 @@ export const PlaylistManager = () => {
           display_mode: createFormData.display_mode,
           cover_image_url: createFormData.cover_image_url || null,
           language: createFormData.language,
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
+      if (created?.id) await saveContentHosts('playlist', created.id, createHosts);
     },
     onSuccess: () => {
       toast.success('Playlist created successfully');
@@ -597,6 +614,7 @@ export const PlaylistManager = () => {
         .eq('id', id);
 
       if (error) throw error;
+      await saveContentHosts('playlist', id, editHosts);
     },
     onSuccess: () => {
       toast.success('Playlist updated successfully');
@@ -836,7 +854,7 @@ export const PlaylistManager = () => {
     }
   };
 
-  const handleEdit = (playlist: any) => {
+  const handleEdit = async (playlist: any) => {
     setEditingPlaylist(playlist);
     setEditFormData({
       name: playlist.name,
@@ -851,18 +869,25 @@ export const PlaylistManager = () => {
       cover_image_url: playlist.cover_image_url || "",
       language: playlist.language || "american",
     });
+    try {
+      setEditHosts(await loadContentHosts('playlist', playlist.id));
+    } catch {
+      setEditHosts([]);
+    }
     setIsEditDialogOpen(true);
   };
 
   const handleCloseCreate = () => {
     setIsCreateDialogOpen(false);
     resetCreateForm();
+    setCreateHosts([]);
   };
 
   const handleCloseEdit = () => {
     setIsEditDialogOpen(false);
     resetEditForm();
     setEditingPlaylist(null);
+    setEditHosts([]);
   };
 
   const handleUpdate = (e: React.FormEvent) => {
@@ -1073,6 +1098,8 @@ export const PlaylistManager = () => {
             onGenerateCover={handleCreateGenerateCover}
             onImproveDescription={handleCreateImproveDescription}
             fileInputRef={createFileInputRef}
+            hosts={createHosts}
+            setHosts={setCreateHosts}
           />
         </DialogContent>
       </Dialog>
@@ -1098,6 +1125,8 @@ export const PlaylistManager = () => {
             onGenerateCover={handleEditGenerateCover}
             onImproveDescription={handleEditImproveDescription}
             fileInputRef={editFileInputRef}
+            hosts={editHosts}
+            setHosts={setEditHosts}
           />
         </DialogContent>
       </Dialog>

@@ -3,6 +3,7 @@ import { AddToRoutineHandHint, useAddToRoutineHint } from '@/components/app/AddT
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { ChallengeRoutineCard } from '@/components/app/ChallengeRoutineCard';
+import { HostBadges } from '@/components/app/HostBadges';
 import { useUserChallenges } from '@/hooks/useUserChallenges';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Loader2, Share2, Instagram, Play, Heart, CalendarPlus, Sparkles } from 'lucide-react';
@@ -376,6 +377,7 @@ export default function AppInspireDetail() {
             {routine.subtitle && (
               <p className="text-foreground">{routine.subtitle}</p>
             )}
+            <HostBadges contentType="routine" contentId={routine.id} size="md" className="mt-3" />
             
             <div className="flex items-center gap-2 mt-3 flex-wrap">
               {isFocus && (

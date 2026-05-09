@@ -30,6 +30,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { format } from 'date-fns';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 import { MediaLibraryPicker } from '@/components/admin/MediaLibraryPicker';
+import { HostPicker, HostAssignment, saveContentHosts, loadContentHosts } from '@/components/admin/HostPicker';
 
 const COLOR_OPTIONS = [
   { name: 'pink', hex: '#FFD6E8' },
@@ -212,6 +213,7 @@ export default function RoutinesBank() {
   });
   const [localSections, setLocalSections] = useState<LocalSection[]>([]);
   const [localTasks, setLocalTasks] = useState<LocalTask[]>([]);
+  const [hosts, setHosts] = useState<HostAssignment[]>([]);
 
   // Fetch categories
   const { data: routineCategories = [] } = useQuery({
@@ -359,6 +361,7 @@ export default function RoutinesBank() {
         }));
         await supabase.from('routines_bank_tasks').insert(taskRecords);
       }
+      await saveContentHosts('routine', newRoutine.id, hosts);
       return newRoutine;
     },
     onSuccess: () => {
@@ -444,6 +447,7 @@ export default function RoutinesBank() {
         }));
         await supabase.from('routines_bank_tasks').insert(taskRecords);
       }
+      await saveContentHosts('routine', data.id, hosts);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
@@ -616,6 +620,7 @@ export default function RoutinesBank() {
     });
     setLocalSections([]);
     setLocalTasks([]);
+    setHosts([]);
     setDialogTab('basic');
     setDialogOpen(true);
   };
@@ -648,6 +653,11 @@ export default function RoutinesBank() {
     const { sections, tasks } = await fetchRoutineData(routine.id);
     setLocalSections(sections);
     setLocalTasks(tasks);
+    try {
+      setHosts(await loadContentHosts('routine', routine.id));
+    } catch {
+      setHosts([]);
+    }
     setDialogTab('basic');
     setDialogOpen(true);
   };
@@ -657,6 +667,7 @@ export default function RoutinesBank() {
     setEditingRoutine(null);
     setLocalSections([]);
     setLocalTasks([]);
+    setHosts([]);
     setTaskSearchOpen(false);
     setTaskSearch('');
     setAddingTaskToSection(null);
@@ -1600,6 +1611,15 @@ export default function RoutinesBank() {
                     {formData.audio_url && (
                       <p className="text-xs text-muted-foreground">Plays as an intro on the routine page so users can learn about it.</p>
                     )}
+                  </div>
+
+                  {/* Hosts */}
+                  <div className="space-y-2">
+                    <HostPicker
+                      value={hosts}
+                      onChange={setHosts}
+                      hint="Who presents this routine? Shown to users on the routine page."
+                    />
                   </div>
 
                   {/* Description */}

@@ -8,6 +8,7 @@ import Navigation from '@/components/ui/navigation';
 import Footer from '@/components/sections/Footer';
 import { SEOHead } from '@/components/SEOHead';
 import { useCart } from '@/hooks/useCart';
+import { HostBadges } from '@/components/app/HostBadges';
 import { useAuth } from '@/hooks/useAuth';
 import DOMPurify from 'dompurify';
 
@@ -155,6 +156,7 @@ const ProgramPage = () => {
                     )}
                   </div>
                   <h1 className="font-display text-3xl md:text-4xl font-bold">{program.title}</h1>
+                  <HostBadges contentType="program" contentId={program.slug} size="md" className="mt-3" />
                 </div>
 
                 {/* Video */}
