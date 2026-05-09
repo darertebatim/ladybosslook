@@ -25,6 +25,7 @@ export default function Auth() {
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<'google' | 'apple' | null>(null);
   const { signIn, signUp, signInWithGoogle, signInWithApple, user, loading: authLoading } = useAuth();
@@ -97,6 +98,24 @@ export default function Auth() {
         }
       } else {
         if (!isLogin) Analytics.signupStarted('email');
+        if (!isLogin && password !== confirmPassword) {
+          toast({
+            variant: "destructive",
+            title: "Passwords don't match",
+            description: "Please make sure both passwords are the same.",
+          });
+          setLoading(false);
+          return;
+        }
+        if (!isLogin && password.length < 6) {
+          toast({
+            variant: "destructive",
+            title: "Password too short",
+            description: "Use at least 6 characters.",
+          });
+          setLoading(false);
+          return;
+        }
         const { error } = isLogin 
           ? await signIn(email, password)
           : await signUp(email, password);
@@ -110,8 +129,8 @@ export default function Auth() {
         } else if (!isLogin) {
           Analytics.signupCompleted('email');
           toast({
-            title: "Check your email",
-            description: "We've sent you a confirmation link.",
+            title: "Welcome to Rilo!",
+            description: "Your account is ready.",
           });
         } else {
           Analytics.loginCompleted('email');
@@ -383,6 +402,25 @@ export default function Auth() {
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      onFocus={(e) => {
+                        if (Capacitor.isNativePlatform()) {
+                          focusedInputRef.current = e.target;
+                        }
+                      }}
+                      required
+                      className="h-12 rounded-2xl bg-white border-transparent text-[#1a1f3d] placeholder:text-[#1a1f3d]/35"
+                    />
+                  </div>
+                )}
+                {!isForgotPassword && !isLogin && (
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" className="text-[11px] font-bold uppercase tracking-wider text-[#1a1f3d]/60">Repeat password</Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      placeholder="Repeat your password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       onFocus={(e) => {
                         if (Capacitor.isNativePlatform()) {
                           focusedInputRef.current = e.target;
