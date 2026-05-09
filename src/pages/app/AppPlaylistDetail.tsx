@@ -875,6 +875,7 @@ export default function AppPlaylistDetail() {
                 <h1 className="text-2xl font-bold text-fg-warm">
                   {playlist.name}
                 </h1>
+                <HostBadges contentType="playlist" contentId={playlist.id} size="md" className="mt-2" />
                 {playlist.description && (
                   <ExpandableDescription text={playlist.description} />
                 )}
