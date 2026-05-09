@@ -217,7 +217,7 @@ export function ProgramsManager() {
     }
   };
 
-  const handleEdit = (program: ProgramCatalog) => {
+  const handleEdit = async (program: ProgramCatalog) => {
     setFormData({
       slug: program.slug,
       title: program.title,
@@ -258,6 +258,11 @@ export function ProgramsManager() {
       annual_android_product_id: (program as any).annual_android_product_id || '',
       show_in_app_waitlist: (program as any).show_in_app_waitlist || false,
     });
+    try {
+      setHosts(await loadContentHosts('program', program.slug));
+    } catch {
+      setHosts([]);
+    }
     setEditingId(program.id);
     setShowForm(true);
   };
