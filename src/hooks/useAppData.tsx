@@ -485,6 +485,7 @@ export function usePlayerData() {
     progressData: query.data?.progressData || [],
     enrollments: query.data?.enrollments || [],
     programs: query.data?.programs || [],
+    savedPlaylistIds: query.data?.savedPlaylistIds || [],
   };
 }
 
