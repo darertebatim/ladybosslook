@@ -867,7 +867,7 @@ export default function AppPlaylistDetail() {
                       </Badge>
                     )
                   )}
-                  {playlist.is_free && (
+                  {playlist.is_free && !hasAccessToProgram("simora-plus") && (
                     <Badge className="bg-foreground/20 text-fg-warm">
                       FREE
                     </Badge>
