@@ -32,6 +32,7 @@ import { BackButton } from "@/components/app/BackButton";
 import { isNativeApp } from "@/lib/platform";
 import { getTrackAvailabilityWithCountdown } from "@/lib/dripContent";
 import { useEnrollments } from "@/hooks/useAppData";
+import { useMediaCategories } from "@/hooks/useMediaCategories";
 import {
   usePlaylistRoutine,
   useExistingPlaylistTask,
@@ -281,6 +282,7 @@ export default function AppPlaylistDetail() {
 
   // Use centralized enrollments hook - single source of truth
   const { data: enrollments } = useEnrollments();
+  const { categories: audioCategories } = useMediaCategories("audio");
 
   // Check if user has activated this free playlist
   const { data: playlistSave, isLoading: saveLoading } = useQuery({
@@ -668,24 +670,10 @@ export default function AppPlaylistDetail() {
   };
 
   const getCategoryLabel = () => {
-    switch (playlist?.category) {
-      case "podcast":
-        return "Podcast";
-      case "course_supplement":
-        return "Course";
-      case "audiobook":
-        return "Audiobook";
-      case "meditate":
-        return "Meditate";
-      case "workout":
-        return "Workout";
-      case "soundscape":
-        return "Soundscape";
-      case "affirmation":
-        return "Affirmation";
-      default:
-        return "Audio";
-    }
+    const slug = playlist?.category;
+    if (!slug) return "Audio";
+    const found = (audioCategories as any[])?.find((c) => c.slug === slug);
+    return found?.label || slug;
   };
 
   const getModuleIcon = (type: string) => {
