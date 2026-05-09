@@ -936,21 +936,22 @@ export default function AppPlaylistDetail() {
             )}
 
             {!hasAccess && playlist.is_free && (
-              <div className="flex items-center gap-2">
-                <div className="flex-1 flex items-center gap-2 px-3 py-2.5 bg-foreground/10 rounded-lg min-w-0">
-                  <Music className="h-5 w-5 text-sky-400 shrink-0" />
-                  <p className="text-xs text-fg-warm leading-tight">
-                    Free playlist — tap to listen.
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 p-4 bg-foreground/10 rounded-lg">
+                  <Music className="h-5 w-5 text-sky-400" />
+                  <p className="text-sm text-fg-warm">
+                    This playlist is free! Tap below to start listening.
                   </p>
                 </div>
                 <Button
-                  className="bg-brand text-white active:bg-brand/90 shrink-0"
+                  className="w-full bg-brand text-white active:bg-brand/90"
+                  size="lg"
                   onClick={() => activatePlaylistMutation.mutate()}
                   disabled={activatePlaylistMutation.isPending}
                 >
                   {activatePlaylistMutation.isPending
                     ? "Following..."
-                    : "Follow"}
+                    : "Follow Playlist"}
                 </Button>
               </div>
             )}
