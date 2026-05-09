@@ -282,6 +282,7 @@ export default function AppPlaylistDetail() {
 
   // Use centralized enrollments hook - single source of truth
   const { data: enrollments } = useEnrollments();
+  const { categories: audioCategories } = useMediaCategories("audio");
 
   // Check if user has activated this free playlist
   const { data: playlistSave, isLoading: saveLoading } = useQuery({
