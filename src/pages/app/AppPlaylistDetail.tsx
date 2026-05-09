@@ -32,6 +32,7 @@ import { BackButton } from "@/components/app/BackButton";
 import { isNativeApp } from "@/lib/platform";
 import { getTrackAvailabilityWithCountdown } from "@/lib/dripContent";
 import { useEnrollments } from "@/hooks/useAppData";
+import { useMediaCategories } from "@/hooks/useMediaCategories";
 import {
   usePlaylistRoutine,
   useExistingPlaylistTask,
