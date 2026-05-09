@@ -1084,9 +1084,11 @@ const AppHome = () => {
             {!hasSelfCareQuizBanner && (
               <>
                 <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
-                <div className="tour-banner">
-                  <HomeBanner location="home_top" onVisibilityChange={setHasHomeBanner} className="py-2" />
-                </div>
+                {!hasPromoBanner && (
+                  <div className="tour-banner">
+                    <HomeBanner location="home_top" onVisibilityChange={setHasHomeBanner} className="py-2" />
+                  </div>
+                )}
               </>
             )}
 
