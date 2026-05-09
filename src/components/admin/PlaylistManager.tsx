@@ -36,6 +36,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { HostPicker, HostAssignment, saveContentHosts, loadContentHosts } from "@/components/admin/HostPicker";
 
 type DisplayMode = 'tracks' | 'modules' | 'both';
 
@@ -71,6 +72,8 @@ interface PlaylistFormProps {
   onGenerateCover: () => void;
   onImproveDescription: () => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
+  hosts: HostAssignment[];
+  setHosts: (hosts: HostAssignment[]) => void;
 }
 
 const PlaylistForm = ({ 
@@ -89,6 +92,8 @@ const PlaylistForm = ({
   onGenerateCover,
   onImproveDescription,
   fileInputRef,
+  hosts,
+  setHosts,
 }: PlaylistFormProps) => (
   <form onSubmit={onSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
     <div>
