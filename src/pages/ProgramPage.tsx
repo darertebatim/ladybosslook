@@ -155,6 +155,7 @@ const ProgramPage = () => {
                     )}
                   </div>
                   <h1 className="font-display text-3xl md:text-4xl font-bold">{program.title}</h1>
+                  <HostBadges contentType="program" contentId={program.slug} size="md" className="mt-3" />
                 </div>
 
                 {/* Video */}
