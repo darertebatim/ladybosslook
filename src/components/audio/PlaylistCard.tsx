@@ -42,6 +42,7 @@ interface PlaylistCardProps {
   completedTracks: number;
   totalDuration: number;
   isFollowing?: boolean;
+  categoryLabel?: string;
 }
 
 export const PlaylistCard = memo(function PlaylistCard({
@@ -59,6 +60,7 @@ export const PlaylistCard = memo(function PlaylistCard({
   completedTracks,
   totalDuration,
   isFollowing,
+  categoryLabel,
 }: PlaylistCardProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -130,7 +132,7 @@ export const PlaylistCard = memo(function PlaylistCard({
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 text-[11px] text-fg-warm-muted">
-            {category && <span className="font-medium capitalize">{category}</span>}
+            {category && <span className="font-medium capitalize">{categoryLabel || category}</span>}
             {category && totalDuration > 0 && <span>·</span>}
             {totalDuration > 0 && <span>{formatDuration(totalDuration)}</span>}
           </div>
