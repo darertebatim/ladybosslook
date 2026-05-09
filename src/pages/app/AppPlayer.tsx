@@ -281,6 +281,7 @@ export default function AppPlayer() {
         trackCount={stats.trackCount}
         completedTracks={stats.completedTracks}
         totalDuration={stats.totalDuration}
+        isFollowing={isFollowingPlaylist(playlist)}
       />
     );
   };
