@@ -31,6 +31,7 @@ import {
   shouldShowLanguagePopup,
 } from "@/components/app/LanguagePreferencePopup";
 import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
+import { useMediaCategories } from "@/hooks/useMediaCategories";
 
 const LANGUAGE_OPTIONS = [
   { value: "all", labelKey: "player.languages.all", flag: "🌐" },
@@ -39,17 +40,6 @@ const LANGUAGE_OPTIONS = [
   { value: "turkish", labelKey: "player.languages.turkish", flag: "🇹🇷" },
   { value: "spanish", labelKey: "player.languages.spanish", flag: "🇪🇸" },
 ];
-
-const categoryConfig: Record<string, { nameKey: string }> = {
-  all: { nameKey: "player.categories.all" },
-  meditate: { nameKey: "player.categories.meditate" },
-  workout: { nameKey: "player.categories.workout" },
-  soundscape: { nameKey: "player.categories.soundscape" },
-  affirmation: { nameKey: "player.categories.affirmation" },
-  audiobook: { nameKey: "player.categories.audiobook" },
-  course: { nameKey: "player.categories.course" },
-  podcast: { nameKey: "player.categories.podcast" },
-};
 
 export default function AppPlayer() {
   const navigate = useNavigate();
@@ -65,6 +55,16 @@ export default function AppPlayer() {
   const { hasAccessToProgram } = useSubscription();
   const hasSoundscapeAccess = hasAccessToProgram("simora-plus");
   const [preferredLanguage, setPreferredLanguage] = useState("all");
+  const { categories: dbCategories } = useMediaCategories("audio");
+  const categoryConfig = useMemo(() => {
+    const map: Record<string, { name: string }> = {
+      all: { name: t("player.categories.all") },
+    };
+    for (const c of dbCategories as any[]) {
+      map[c.slug] = { name: c.label };
+    }
+    return map;
+  }, [dbCategories, t]);
 
   const handleLanguageChange = useCallback((lang: string) => {
     setPreferredLanguage(lang);
