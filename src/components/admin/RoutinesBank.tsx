@@ -361,6 +361,7 @@ export default function RoutinesBank() {
         }));
         await supabase.from('routines_bank_tasks').insert(taskRecords);
       }
+      await saveContentHosts('routine', newRoutine.id, hosts);
       return newRoutine;
     },
     onSuccess: () => {
