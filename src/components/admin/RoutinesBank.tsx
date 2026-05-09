@@ -29,6 +29,7 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
+import { MediaLibraryPicker } from '@/components/admin/MediaLibraryPicker';
 
 const COLOR_OPTIONS = [
   { name: 'pink', hex: '#FFD6E8' },
@@ -54,6 +55,7 @@ interface RoutineBankItem {
   description: string | null;
   cover_image_url: string | null;
   video_url: string | null;
+  audio_url: string | null;
   category: string;
   color: string;
   emoji: string;
@@ -192,6 +194,7 @@ export default function RoutinesBank() {
     cover_image_url: '',
     cover_aspect: 'square' as string,
     video_url: '',
+    audio_url: '',
     category: 'general',
     color: 'yellow',
     emoji: '✨',
@@ -297,6 +300,7 @@ export default function RoutinesBank() {
           description: data.formData.description || null,
           cover_image_url: data.formData.cover_image_url || null,
           video_url: data.formData.video_url || null,
+          audio_url: data.formData.audio_url || null,
           category: data.formData.category,
           color: data.formData.color,
           emoji: data.formData.emoji,
@@ -378,6 +382,7 @@ export default function RoutinesBank() {
           description: data.formData.description || null,
           cover_image_url: data.formData.cover_image_url || null,
           video_url: data.formData.video_url || null,
+          audio_url: data.formData.audio_url || null,
           category: data.formData.category,
           color: data.formData.color,
           emoji: data.formData.emoji,
@@ -593,6 +598,7 @@ export default function RoutinesBank() {
       cover_image_url: '',
       cover_aspect: 'square',
       video_url: '',
+      audio_url: '',
       category: 'general',
       color: 'yellow',
       emoji: '✨',
@@ -623,6 +629,7 @@ export default function RoutinesBank() {
       cover_image_url: routine.cover_image_url || '',
       cover_aspect: (routine as any).cover_aspect || 'square',
       video_url: (routine as any).video_url || '',
+      audio_url: (routine as any).audio_url || '',
       category: routine.category,
       color: routine.color,
       emoji: routine.emoji,
