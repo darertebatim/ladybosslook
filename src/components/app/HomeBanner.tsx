@@ -480,8 +480,8 @@ function HomeBannerCarousel({
             className={cn(
               "h-1.5 rounded-full transition-all",
               index === selectedIndex
-                ? "w-4 bg-foreground/70"
-                : "w-1.5 bg-foreground/20"
+                ? "w-4 bg-[#D94B2B]"
+                : "w-1.5 bg-fg-warm/20"
             )}
           />
         ))}
