@@ -293,6 +293,12 @@ export default function AppTasksBank() {
 
           {!isSearching && <ClusterCards className="mt-5" />}
 
+          {!isSearching && (
+            <div className="px-4 mt-4">
+              <PlusUpsellBanner />
+            </div>
+          )}
+
           {!isSearching && selfcareRoutines && selfcareRoutines.length > 0 && (
             <section className="mt-5">
               <div className="flex items-center justify-between mb-2 px-4">
