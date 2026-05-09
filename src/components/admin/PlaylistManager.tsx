@@ -1098,6 +1098,8 @@ export const PlaylistManager = () => {
             onGenerateCover={handleCreateGenerateCover}
             onImproveDescription={handleCreateImproveDescription}
             fileInputRef={createFileInputRef}
+            hosts={createHosts}
+            setHosts={setCreateHosts}
           />
         </DialogContent>
       </Dialog>
@@ -1123,6 +1125,8 @@ export const PlaylistManager = () => {
             onGenerateCover={handleEditGenerateCover}
             onImproveDescription={handleEditImproveDescription}
             fileInputRef={editFileInputRef}
+            hosts={editHosts}
+            setHosts={setEditHosts}
           />
         </DialogContent>
       </Dialog>
