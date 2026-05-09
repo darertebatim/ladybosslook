@@ -30,6 +30,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { format } from 'date-fns';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
 import { MediaLibraryPicker } from '@/components/admin/MediaLibraryPicker';
+import { HostPicker, HostAssignment, saveContentHosts, loadContentHosts } from '@/components/admin/HostPicker';
 
 const COLOR_OPTIONS = [
   { name: 'pink', hex: '#FFD6E8' },
