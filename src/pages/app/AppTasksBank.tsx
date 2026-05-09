@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Search, ChevronRight, X } from 'lucide-react';
-import { IOSIconButton } from '@/components/ui/IOSIconButton';
+import { IOSIconButton } from '@/components/app/ui/IOSIconButton';
 import { Input } from '@/components/ui/input';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
