@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Lock, ChevronRight, Crown } from "lucide-react";
+import { Lock, ChevronRight, Crown, Check } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -41,6 +41,7 @@ interface PlaylistCardProps {
   trackCount: number;
   completedTracks: number;
   totalDuration: number;
+  isFollowing?: boolean;
 }
 
 export const PlaylistCard = memo(function PlaylistCard({
@@ -57,6 +58,7 @@ export const PlaylistCard = memo(function PlaylistCard({
   trackCount,
   completedTracks,
   totalDuration,
+  isFollowing,
 }: PlaylistCardProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -138,6 +140,11 @@ export const PlaylistCard = memo(function PlaylistCard({
           </h3>
 
           <div className="mt-1 flex items-center gap-1.5">
+            {isFollowing && (
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-brand/10 text-brand">
+                <Check className="h-2.5 w-2.5" /> FOLLOWING
+              </span>
+            )}
             {requiresSubscription && !isSubscribed && (
               <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-200 text-amber-700">
                 <Crown className="h-2.5 w-2.5" /> PLUS

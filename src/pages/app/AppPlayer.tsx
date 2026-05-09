@@ -49,7 +49,7 @@ export default function AppPlayer() {
   const [showSearch, setShowSearch] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [progressFilter, setProgressFilter] = useState<
-    "all" | "in_progress" | "completed"
+    "all" | "following" | "in_progress" | "completed"
   >("all");
   const [showPaywall, setShowPaywall] = useState(false);
   const { hasAccessToProgram } = useSubscription();
@@ -86,7 +86,7 @@ export default function AppPlayer() {
     }
   }, [searchParams]);
 
-  const { playlists, playlistItems, progressData, enrollments, isLoading } =
+  const { playlists, playlistItems, progressData, enrollments, savedPlaylistIds, isLoading } =
     usePlayerData();
   const userLang = useUserPreferredLanguage();
   const [showLangPopup, setShowLangPopup] = useState(false);
@@ -158,12 +158,29 @@ export default function AppPlayer() {
     return true;
   };
 
+  const followedSet = useMemo(
+    () => new Set(savedPlaylistIds || []),
+    [savedPlaylistIds],
+  );
+  const isFollowingPlaylist = (playlist: any) => {
+    if (followedSet.has(playlist.id)) return true;
+    if (
+      playlist.program_slug &&
+      !playlist.is_free &&
+      !playlist.requires_subscription &&
+      enrollments?.includes(playlist.program_slug)
+    )
+      return true;
+    return false;
+  };
+
   const filterPlaylistByProgress = (playlist: any) => {
     const stats = getPlaylistStats(playlist.id);
     const progress =
       stats.trackCount > 0
         ? (stats.completedTracks / stats.trackCount) * 100
         : 0;
+    if (progressFilter === "following") return isFollowingPlaylist(playlist);
     if (progressFilter === "in_progress") return progress > 0 && progress < 100;
     if (progressFilter === "completed") return progress >= 100;
     return true;
@@ -264,6 +281,7 @@ export default function AppPlayer() {
         trackCount={stats.trackCount}
         completedTracks={stats.completedTracks}
         totalDuration={stats.totalDuration}
+        isFollowing={isFollowingPlaylist(playlist)}
       />
     );
   };
@@ -405,7 +423,7 @@ export default function AppPlayer() {
             {/* Status filters + Language globe */}
             <div className="tour-player-progress-filter flex items-center justify-between mt-2 gap-2">
               <div className="flex gap-1.5">
-                {(["all", "in_progress", "completed"] as const).map(
+                {(["all", "following", "in_progress", "completed"] as const).map(
                   (filter) => {
                     const active = progressFilter === filter;
                     return (
@@ -421,6 +439,8 @@ export default function AppPlayer() {
                       >
                         {filter === "all"
                           ? t("player.filters.all")
+                          : filter === "following"
+                            ? t("player.filters.following", "Following")
                           : filter === "in_progress"
                             ? t("player.filters.inProgress")
                             : t("player.filters.completed")}
