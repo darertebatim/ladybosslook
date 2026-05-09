@@ -228,18 +228,21 @@ export default function Auth() {
           })}
         </div>
 
+        {/* Multilingual welcome train pinned to the top as the page header */}
+        {!showEmailForm && (
+          <div
+            className="absolute top-0 left-0 right-0 z-20 pt-[calc(env(safe-area-inset-top)+10px)] pb-2"
+          >
+            <WelcomeTrain />
+          </div>
+        )}
+
         {/* Vertically-centered stack: hero + main content sit in the middle of the screen */}
         <div className="flex-1 px-6 py-6 overflow-y-auto relative z-10 flex flex-col justify-center">
           <div className="max-w-md w-full mx-auto space-y-7">
             {/* Hero brand block — big welcome headline + icon + tagline row */}
             {!showEmailForm && (
               <div className="flex flex-col items-center text-center">
-                {/* Multilingual welcome train — sits right above the headline.
-                    Negative full-bleed margin so it can scroll edge-to-edge
-                    while the rest of the stack stays padded. */}
-                <div className="-mx-6 mb-4 w-screen max-w-[100vw]">
-                  <WelcomeTrain />
-                </div>
                 <h1 className="text-[40px] leading-[1.05] font-bold tracking-tight text-[#1a1f3d]">
                   {isLogin ? 'Welcome back!' : 'Welcome to Rilo!'}
                 </h1>
