@@ -950,8 +950,8 @@ export default function AppPlaylistDetail() {
                   disabled={activatePlaylistMutation.isPending}
                 >
                   {activatePlaylistMutation.isPending
-                    ? "Activating..."
-                    : "Get Free Access"}
+                    ? "Following..."
+                    : "Follow Playlist"}
                 </Button>
               </div>
             )}
@@ -974,8 +974,8 @@ export default function AppPlaylistDetail() {
                       disabled={activatePlaylistMutation.isPending}
                     >
                       {activatePlaylistMutation.isPending
-                        ? "Activating..."
-                        : "Get Access"}
+                        ? "Following..."
+                        : "Follow Playlist"}
                     </Button>
                   </div>
                 ) : (
