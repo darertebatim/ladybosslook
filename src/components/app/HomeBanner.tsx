@@ -238,16 +238,16 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
         return (
           <div
             key={banner.id}
-            className={`relative bg-card-warm rounded-2xl shadow-card-warm overflow-hidden ${hasDestination && !banner.video_url ? 'active:scale-[0.98] transition-transform cursor-pointer' : ''}`}
+            className={`relative bg-white rounded-2xl shadow-card-warm overflow-hidden ${hasDestination && !banner.video_url ? 'active:scale-[0.98] transition-transform cursor-pointer' : ''}`}
             onClick={hasDestination && !banner.video_url ? () => handleBannerClick(banner) : undefined}
           >
             {/* Dismiss button */}
             <button
               onClick={(e) => handleDismiss(e, banner.id)}
-              className="absolute top-3 right-3 p-1.5 rounded-full bg-black/40 hover:bg-black/60 transition-colors z-10"
+              className="absolute top-3 right-3 p-1.5 rounded-full bg-black/10 active:bg-black/20 transition-colors z-10"
               aria-label="Dismiss banner"
             >
-              <X className="h-4 w-4 text-white" />
+              <X className="h-4 w-4 text-fg-warm" />
             </button>
 
             {/* Video Thumbnail */}
@@ -291,21 +291,21 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
                   <Megaphone className="h-5 w-5 text-[#D94B2B]" />
                 </div>
                 <div className="flex-1 min-w-0 pr-6">
-                  <h3 className="font-semibold text-foreground">{banner.title}</h3>
+                  <h3 className="font-semibold text-fg-warm">{banner.title}</h3>
                   {banner.description && (
-                    <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{banner.description}</p>
+                    <p className="text-sm text-fg-warm-muted mt-0.5 line-clamp-2">{banner.description}</p>
                   )}
                 </div>
                 {hasDestination && !banner.video_url && !banner.button_text && (
-                  <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-2" />
+                  <ChevronRight className="h-5 w-5 text-fg-warm-muted flex-shrink-0 mt-2" />
                 )}
               </div>
 
               {/* Button - show when explicit button_text is set, or when destination exists */}
               {hasDestination && (banner.button_text || banner.video_url) && (
-                <Button
-                  size="sm"
-                  className="mt-3 w-full bg-[#D94B2B] hover:bg-[#A63520] text-white"
+                <button
+                  type="button"
+                  className="mt-2 ml-[52px] inline-flex items-center gap-0.5 text-[#D94B2B] font-semibold text-sm active:opacity-70 transition-opacity"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleBannerClick(banner);
@@ -313,11 +313,11 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
                 >
                   {buttonLabel}
                   {destinationUrl?.startsWith('http') ? (
-                    <ExternalLink className="h-3 w-3 ml-1" />
+                    <ExternalLink className="h-3.5 w-3.5" />
                   ) : (
-                    <ChevronRight className="h-3 w-3 ml-1" />
+                    <ChevronRight className="h-4 w-4" />
                   )}
-                </Button>
+                </button>
               )}
             </div>
           </div>
@@ -347,15 +347,15 @@ function HomeBannerCard({
 
   return (
     <div
-      className={`relative bg-card-warm rounded-2xl shadow-card-warm overflow-hidden ${hasDestination && !banner.video_url ? 'active:scale-[0.98] transition-transform cursor-pointer' : ''}`}
+      className={`relative bg-white rounded-2xl shadow-card-warm overflow-hidden ${hasDestination && !banner.video_url ? 'active:scale-[0.98] transition-transform cursor-pointer' : ''}`}
       onClick={hasDestination && !banner.video_url ? () => handleBannerClick(banner) : undefined}
     >
       <button
         onClick={(e) => handleDismiss(e, banner.id)}
-        className="absolute top-3 right-3 p-1.5 rounded-full bg-black/40 active:bg-black/60 transition-colors z-10"
+        className="absolute top-3 right-3 p-1.5 rounded-full bg-black/10 active:bg-black/20 transition-colors z-10"
         aria-label="Dismiss banner"
       >
-        <X className="h-4 w-4 text-white" />
+        <X className="h-4 w-4 text-fg-warm" />
       </button>
 
       {banner.video_url && videoType && (
@@ -397,20 +397,20 @@ function HomeBannerCard({
             <Megaphone className="h-5 w-5 text-[#D94B2B]" />
           </div>
           <div className="flex-1 min-w-0 pr-6">
-            <h3 className="font-semibold text-foreground">{banner.title}</h3>
+            <h3 className="font-semibold text-fg-warm">{banner.title}</h3>
             {banner.description && (
-              <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{banner.description}</p>
+              <p className="text-sm text-fg-warm-muted mt-0.5 line-clamp-2">{banner.description}</p>
             )}
           </div>
           {hasDestination && !banner.video_url && !banner.button_text && (
-            <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-2" />
+            <ChevronRight className="h-5 w-5 text-fg-warm-muted flex-shrink-0 mt-2" />
           )}
         </div>
 
         {hasDestination && (banner.button_text || banner.video_url) && (
-          <Button
-            size="sm"
-            className="mt-3 w-full bg-[#D94B2B] active:bg-[#A63520] text-white"
+          <button
+            type="button"
+            className="mt-2 ml-[52px] inline-flex items-center gap-0.5 text-[#D94B2B] font-semibold text-sm active:opacity-70 transition-opacity"
             onClick={(e) => {
               e.stopPropagation();
               handleBannerClick(banner);
@@ -418,11 +418,11 @@ function HomeBannerCard({
           >
             {buttonLabel}
             {destinationUrl?.startsWith('http') ? (
-              <ExternalLink className="h-3 w-3 ml-1" />
+              <ExternalLink className="h-3.5 w-3.5" />
             ) : (
-              <ChevronRight className="h-3 w-3 ml-1" />
+              <ChevronRight className="h-4 w-4" />
             )}
-          </Button>
+          </button>
         )}
       </div>
     </div>
