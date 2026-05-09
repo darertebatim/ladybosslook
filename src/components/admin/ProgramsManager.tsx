@@ -837,6 +837,12 @@ export function ProgramsManager() {
                 />
               </div>
 
+              <HostPicker
+                value={hosts}
+                onChange={setHosts}
+                hint="Who hosts this program? Shown to users on the program page."
+              />
+
               {/* Cover Image Upload */}
               <div className="space-y-3">
                 <Label>Cover Image</Label>
