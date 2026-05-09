@@ -412,6 +412,25 @@ export default function Auth() {
                     />
                   </div>
                 )}
+                {!isForgotPassword && !isLogin && (
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" className="text-[11px] font-bold uppercase tracking-wider text-[#1a1f3d]/60">Repeat password</Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      placeholder="Repeat your password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      onFocus={(e) => {
+                        if (Capacitor.isNativePlatform()) {
+                          focusedInputRef.current = e.target;
+                        }
+                      }}
+                      required
+                      className="h-12 rounded-2xl bg-white border-transparent text-[#1a1f3d] placeholder:text-[#1a1f3d]/35"
+                    />
+                  </div>
+                )}
                 <Button 
                   type="submit" 
                   className="w-full h-[52px] rounded-full font-semibold text-[16px] bg-[#1a1f3d] active:bg-[#1a1f3d]/90 text-white shadow-[0_12px_30px_-12px_rgba(26,31,61,0.6)]"
