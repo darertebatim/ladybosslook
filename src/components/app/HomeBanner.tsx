@@ -236,91 +236,14 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
         const buttonLabel = banner.button_text || getDestinationLabel(banner.destination_type);
 
         return (
-          <div
+          <HomeBannerCard
             key={banner.id}
-            className={`relative bg-card-warm rounded-2xl shadow-card-warm overflow-hidden ${hasDestination && !banner.video_url ? 'active:scale-[0.98] transition-transform cursor-pointer' : ''}`}
-            onClick={hasDestination && !banner.video_url ? () => handleBannerClick(banner) : undefined}
-          >
-            {/* Dismiss button */}
-            <button
-              onClick={(e) => handleDismiss(e, banner.id)}
-              className="absolute top-3 right-3 p-1.5 rounded-full bg-black/40 hover:bg-black/60 transition-colors z-10"
-              aria-label="Dismiss banner"
-            >
-              <X className="h-4 w-4 text-white" />
-            </button>
-
-            {/* Video Thumbnail */}
-            {banner.video_url && videoType && (
-              <>
-                <button
-                  onClick={() => setVideoPlayerId(banner.id)}
-                  className="relative w-full aspect-video group active:scale-[0.98] transition-transform"
-                >
-                  {videoType === 'youtube' ? (
-                    <img
-                      src={`https://img.youtube.com/vi/${extractYouTubeId(banner.video_url)}/hqdefault.jpg`}
-                      alt={banner.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-muted flex items-center justify-center">
-                      <Play className="h-8 w-8 text-muted-foreground" />
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-active:bg-black/40 transition-colors">
-                    <div className="bg-white/90 text-foreground rounded-full p-3 shadow-lg">
-                      <Play className="h-6 w-6 fill-current" />
-                    </div>
-                  </div>
-                </button>
-                <AppVideoPlayer
-                  isOpen={videoPlayerId === banner.id}
-                  onClose={() => setVideoPlayerId(null)}
-                  url={banner.video_url}
-                  title={banner.title}
-                  description={banner.description || undefined}
-                />
-              </>
-            )}
-
-            {/* Content */}
-            <div className="p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#D94B2B]/10 flex items-center justify-center flex-shrink-0">
-                  <Megaphone className="h-5 w-5 text-[#D94B2B]" />
-                </div>
-                <div className="flex-1 min-w-0 pr-6">
-                  <h3 className="font-semibold text-foreground">{banner.title}</h3>
-                  {banner.description && (
-                    <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{banner.description}</p>
-                  )}
-                </div>
-                {hasDestination && !banner.video_url && !banner.button_text && (
-                  <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-2" />
-                )}
-              </div>
-
-              {/* Button - show when explicit button_text is set, or when destination exists */}
-              {hasDestination && (banner.button_text || banner.video_url) && (
-                <Button
-                  size="sm"
-                  className="mt-3 w-full bg-[#D94B2B] hover:bg-[#A63520] text-white"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleBannerClick(banner);
-                  }}
-                >
-                  {buttonLabel}
-                  {destinationUrl?.startsWith('http') ? (
-                    <ExternalLink className="h-3 w-3 ml-1" />
-                  ) : (
-                    <ChevronRight className="h-3 w-3 ml-1" />
-                  )}
-                </Button>
-              )}
-            </div>
-          </div>
+            banner={banner}
+            videoPlayerId={videoPlayerId}
+            setVideoPlayerId={setVideoPlayerId}
+            handleDismiss={handleDismiss}
+            handleBannerClick={handleBannerClick}
+          />
         );
       })}
     </div>
@@ -347,15 +270,23 @@ function HomeBannerCard({
 
   return (
     <div
-      className={`relative bg-card-warm rounded-2xl shadow-card-warm overflow-hidden ${hasDestination && !banner.video_url ? 'active:scale-[0.98] transition-transform cursor-pointer' : ''}`}
+      className={cn(
+        "relative rounded-2xl overflow-hidden shadow-ios",
+        "bg-gradient-to-br from-[#FFE9DD] via-[#FFD4BE] to-[#FFC2A3]",
+        hasDestination && !banner.video_url && "active:scale-[0.98] transition-transform cursor-pointer"
+      )}
       onClick={hasDestination && !banner.video_url ? () => handleBannerClick(banner) : undefined}
     >
+      {/* Soft decorative glow */}
+      <div className="pointer-events-none absolute -top-8 -right-8 h-32 w-32 rounded-full bg-white/40 blur-2xl" />
+      <div className="pointer-events-none absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-[#D94B2B]/20 blur-2xl" />
+
       <button
         onClick={(e) => handleDismiss(e, banner.id)}
-        className="absolute top-3 right-3 p-1.5 rounded-full bg-black/40 active:bg-black/60 transition-colors z-10"
+        className="absolute top-3 right-3 p-1.5 rounded-full bg-black/10 active:bg-black/20 transition-colors z-10"
         aria-label="Dismiss banner"
       >
-        <X className="h-4 w-4 text-white" />
+        <X className="h-3.5 w-3.5 text-black/60" />
       </button>
 
       {banner.video_url && videoType && (
@@ -375,8 +306,8 @@ function HomeBannerCard({
                 <Play className="h-8 w-8 text-muted-foreground" />
               </div>
             )}
-            <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-active:bg-black/40 transition-colors">
-              <div className="bg-white/90 text-foreground rounded-full p-3 shadow-lg">
+            <div className="absolute inset-0 bg-black/25 flex items-center justify-center group-active:bg-black/35 transition-colors">
+              <div className="bg-white/95 text-black rounded-full p-3 shadow-ios">
                 <Play className="h-6 w-6 fill-current" />
               </div>
             </div>
@@ -391,26 +322,19 @@ function HomeBannerCard({
         </>
       )}
 
-      <div className="p-4">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#D94B2B]/10 flex items-center justify-center flex-shrink-0">
-            <Megaphone className="h-5 w-5 text-[#D94B2B]" />
-          </div>
-          <div className="flex-1 min-w-0 pr-6">
-            <h3 className="font-semibold text-foreground">{banner.title}</h3>
-            {banner.description && (
-              <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{banner.description}</p>
-            )}
-          </div>
-          {hasDestination && !banner.video_url && !banner.button_text && (
-            <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-2" />
-          )}
-        </div>
+      <div className="relative p-4 pr-12">
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black text-white text-[10px] font-bold uppercase tracking-wider mb-2">
+          New
+        </span>
+        <h3 className="text-[17px] font-bold leading-tight text-black">{banner.title}</h3>
+        {banner.description && (
+          <p className="text-[13px] text-black/70 mt-1 leading-snug line-clamp-2">{banner.description}</p>
+        )}
 
-        {hasDestination && (banner.button_text || banner.video_url) && (
+        {hasDestination && (banner.button_text || banner.video_url) ? (
           <Button
             size="sm"
-            className="mt-3 w-full bg-[#D94B2B] active:bg-[#A63520] text-white"
+            className="mt-3 bg-black active:bg-black/80 text-white rounded-full px-4 h-9 font-semibold"
             onClick={(e) => {
               e.stopPropagation();
               handleBannerClick(banner);
@@ -418,12 +342,17 @@ function HomeBannerCard({
           >
             {buttonLabel}
             {destinationUrl?.startsWith('http') ? (
-              <ExternalLink className="h-3 w-3 ml-1" />
+              <ExternalLink className="h-3.5 w-3.5 ml-1" />
             ) : (
-              <ChevronRight className="h-3 w-3 ml-1" />
+              <ChevronRight className="h-3.5 w-3.5 ml-1" />
             )}
           </Button>
-        )}
+        ) : hasDestination && !banner.video_url ? (
+          <div className="mt-2 inline-flex items-center gap-1 text-[13px] font-semibold text-black/80">
+            Open
+            <ChevronRight className="h-3.5 w-3.5" />
+          </div>
+        ) : null}
       </div>
     </div>
   );
