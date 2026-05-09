@@ -421,7 +421,7 @@ export function useCoursesData() {
 // ============ PLAYER PAGE DATA ============
 async function fetchPlayerData(userId: string): Promise<PlayerData> {
   // Parallel fetch all player data
-  const [playlistsRes, playlistItemsRes, progressRes, enrollmentsRes, programsRes] = await Promise.all([
+  const [playlistsRes, playlistItemsRes, progressRes, enrollmentsRes, programsRes, savesRes] = await Promise.all([
     supabase
       .from('audio_playlists')
       .select('*')
@@ -450,6 +450,10 @@ async function fetchPlayerData(userId: string): Promise<PlayerData> {
     supabase
       .from('program_catalog')
       .select('slug, available_on_mobile'),
+    supabase
+      .from('playlist_saves')
+      .select('playlist_id')
+      .eq('user_id', userId),
   ]);
 
   return {
@@ -458,6 +462,7 @@ async function fetchPlayerData(userId: string): Promise<PlayerData> {
     progressData: progressRes.data || [],
     enrollments: (enrollmentsRes.data || []).map(e => e.program_slug),
     programs: programsRes.data || [],
+    savedPlaylistIds: (savesRes.data || []).map((s: any) => s.playlist_id),
   };
 }
 
