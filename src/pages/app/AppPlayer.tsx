@@ -424,7 +424,7 @@ export default function AppPlayer() {
             {/* Status filters + Language globe */}
             <div className="tour-player-progress-filter flex items-center justify-between mt-2 gap-2">
               <div className="flex gap-1.5">
-                {(["all", "following", "in_progress", "completed"] as const).map(
+                {(["all", "in_progress", "completed"] as const).map(
                   (filter) => {
                     const active = progressFilter === filter;
                     return (
@@ -440,8 +440,6 @@ export default function AppPlayer() {
                       >
                         {filter === "all"
                           ? t("player.filters.all")
-                          : filter === "following"
-                            ? t("player.filters.following", "Following")
                           : filter === "in_progress"
                             ? t("player.filters.inProgress")
                             : t("player.filters.completed")}
