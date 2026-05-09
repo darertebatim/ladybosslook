@@ -670,24 +670,10 @@ export default function AppPlaylistDetail() {
   };
 
   const getCategoryLabel = () => {
-    switch (playlist?.category) {
-      case "podcast":
-        return "Podcast";
-      case "course_supplement":
-        return "Course";
-      case "audiobook":
-        return "Audiobook";
-      case "meditate":
-        return "Meditate";
-      case "workout":
-        return "Workout";
-      case "soundscape":
-        return "Soundscape";
-      case "affirmation":
-        return "Affirmation";
-      default:
-        return "Audio";
-    }
+    const slug = playlist?.category;
+    if (!slug) return "Audio";
+    const found = (audioCategories as any[])?.find((c) => c.slug === slug);
+    return found?.label || slug;
   };
 
   const getModuleIcon = (type: string) => {
