@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Search, ChevronRight, X } from 'lucide-react';
+import { IOSIconButton } from '@/components/app/ui/IOSIconButton';
 import { Input } from '@/components/ui/input';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
@@ -225,41 +226,52 @@ export default function AppTasksBank() {
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden">
       <header
-        className="fixed top-0 left-0 right-0 z-50 bg-[#FFF8E1] dark:bg-amber-950/90 rounded-b-3xl shadow-ios"
+        className="shrink-0 z-40 bg-white/35 dark:bg-black/20 backdrop-blur-xl rounded-b-2xl shadow-[0_2px_10px_rgba(0,0,0,0.06)]"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="flex items-center justify-between px-4 pt-3 pb-2">
-          <div className="flex items-center gap-2">
-            <button onClick={() => navigate(-1)} className="p-1 -ml-1 active:scale-95 transition-transform">
-              <ArrowLeft className="w-5 h-5 text-foreground" />
-            </button>
-            <h1 className="text-xl font-bold text-foreground">{t('tier1.tasksBank.title')}</h1>
-          </div>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setShowSearch(!showSearch)}
-              className="p-2 rounded-full active:bg-muted/50 transition-colors"
-            >
-              <Search className="w-5 h-5 text-muted-foreground" />
-            </button>
-          </div>
+        <div className="flex items-center justify-between px-4 pt-3 pb-3 min-h-[52px] gap-2">
+          {showSearch ? (
+            <div className="flex-1 flex items-center gap-2">
+              <Input
+                type="search"
+                placeholder={t('tier1.tasksBank.search')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 h-10 bg-white/90 dark:bg-black/30 border-0 rounded-full shadow-ios focus-visible:ring-0"
+                autoFocus
+              />
+              <IOSIconButton
+                size="sm"
+                onClick={() => {
+                  setShowSearch(false);
+                  setSearchQuery('');
+                }}
+                aria-label="Close search"
+              >
+                <X className="h-5 w-5" />
+              </IOSIconButton>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 min-w-0">
+                <IOSIconButton size="sm" onClick={() => navigate(-1)} aria-label="Back">
+                  <ArrowLeft className="h-5 w-5" />
+                </IOSIconButton>
+                <h1 className="text-2xl font-bold text-fg-warm truncate">
+                  {t('tier1.tasksBank.title')}
+                </h1>
+              </div>
+              <IOSIconButton
+                size="sm"
+                onClick={() => setShowSearch(true)}
+                aria-label="Search"
+              >
+                <Search className="h-5 w-5" />
+              </IOSIconButton>
+            </>
+          )}
         </div>
-
-        {showSearch && (
-          <div className="px-4 pb-2 animate-in slide-in-from-top duration-200">
-            <Input
-              type="search"
-              placeholder={t('tier1.tasksBank.search')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-muted/50"
-              autoFocus
-            />
-          </div>
-        )}
       </header>
-
-      <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} />
 
       <div className="flex-1 overflow-y-auto overflow-x-hidden w-full">
         <div className="pb-safe w-full max-w-full">
