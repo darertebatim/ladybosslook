@@ -177,16 +177,10 @@ export default function AppPlayer() {
     );
   };
 
-  const categoryOrder = [
-    "all",
-    "podcast",
-    "course",
-    "audiobook",
-    "meditate",
-    "workout",
-    "soundscape",
-    "affirmation",
-  ];
+  const categoryOrder = useMemo(
+    () => ["all", ...(dbCategories as any[]).map((c) => c.slug)],
+    [dbCategories],
+  );
   const availableCategoriesSet = new Set(
     playlists
       ?.filter((p) => !p.is_hidden && isPlaylistAvailableOnMobile(p))
