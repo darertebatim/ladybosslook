@@ -301,6 +301,12 @@ const PlaylistForm = ({
       />
     </div>
 
+    <HostPicker
+      value={hosts}
+      onChange={setHosts}
+      hint="Who presents this playlist? Shown to users on the playlist page."
+    />
+
     <div className="flex justify-end gap-2 pt-2 sticky bottom-0 bg-background">
       <Button type="button" variant="outline" onClick={onCancel}>
         Cancel
