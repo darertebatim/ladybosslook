@@ -9,6 +9,8 @@ interface CategoryCircleProps {
   color: string;
   isSelected?: boolean;
   onClick?: () => void;
+  /** Optional inline background color override (e.g. peach palette) */
+  bgColor?: string;
 }
 
 const colorMap: Record<string, { bg: string; text: string }> = {
@@ -24,7 +26,7 @@ const colorMap: Record<string, { bg: string; text: string }> = {
   rose: { bg: 'bg-rose-100', text: 'text-rose-600' },
 };
 
-export function CategoryCircle({ name, icon, emoji, color, isSelected, onClick }: CategoryCircleProps) {
+export function CategoryCircle({ name, icon, emoji, color, isSelected, onClick, bgColor }: CategoryCircleProps) {
   const IconComponent = (LucideIcons as any)[icon] || LucideIcons.Sparkles;
   const colors = colorMap[color] || colorMap.yellow;
 
@@ -36,9 +38,10 @@ export function CategoryCircle({ name, icon, emoji, color, isSelected, onClick }
       <div
         className={cn(
           'w-[68px] h-[68px] rounded-[26px] flex items-center justify-center transition-all',
-          colors.bg,
+          !bgColor && colors.bg,
           isSelected && 'ring-2 ring-primary ring-offset-2'
         )}
+        style={bgColor ? { backgroundColor: bgColor } : undefined}
       >
         {emoji ? (
           <FluentEmoji emoji={emoji} size={44} />
