@@ -370,6 +370,9 @@ export const PlaylistManager = () => {
     language: "american",
   });
 
+  const [createHosts, setCreateHosts] = useState<HostAssignment[]>([]);
+  const [editHosts, setEditHosts] = useState<HostAssignment[]>([]);
+
   // Fetch playlists with item count
   const { data: playlists } = useQuery({
     queryKey: ['audio-playlists-with-count'],
