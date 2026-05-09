@@ -213,6 +213,7 @@ export default function RoutinesBank() {
   });
   const [localSections, setLocalSections] = useState<LocalSection[]>([]);
   const [localTasks, setLocalTasks] = useState<LocalTask[]>([]);
+  const [hosts, setHosts] = useState<HostAssignment[]>([]);
 
   // Fetch categories
   const { data: routineCategories = [] } = useQuery({
