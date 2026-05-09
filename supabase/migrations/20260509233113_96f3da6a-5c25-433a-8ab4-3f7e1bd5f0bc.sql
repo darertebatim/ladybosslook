@@ -1,0 +1,1 @@
+ALTER TABLE public.routines_bank ADD COLUMN IF NOT EXISTS audio_url text;

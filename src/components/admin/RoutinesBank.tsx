@@ -29,6 +29,7 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import AppTaskCreate, { TaskFormData } from '@/pages/app/AppTaskCreate';
+import { MediaLibraryPicker } from '@/components/admin/MediaLibraryPicker';
 
 const COLOR_OPTIONS = [
   { name: 'pink', hex: '#FFD6E8' },
@@ -54,6 +55,7 @@ interface RoutineBankItem {
   description: string | null;
   cover_image_url: string | null;
   video_url: string | null;
+  audio_url: string | null;
   category: string;
   color: string;
   emoji: string;
@@ -192,6 +194,7 @@ export default function RoutinesBank() {
     cover_image_url: '',
     cover_aspect: 'square' as string,
     video_url: '',
+    audio_url: '',
     category: 'general',
     color: 'yellow',
     emoji: '✨',
@@ -297,6 +300,7 @@ export default function RoutinesBank() {
           description: data.formData.description || null,
           cover_image_url: data.formData.cover_image_url || null,
           video_url: data.formData.video_url || null,
+          audio_url: data.formData.audio_url || null,
           category: data.formData.category,
           color: data.formData.color,
           emoji: data.formData.emoji,
@@ -378,6 +382,7 @@ export default function RoutinesBank() {
           description: data.formData.description || null,
           cover_image_url: data.formData.cover_image_url || null,
           video_url: data.formData.video_url || null,
+          audio_url: data.formData.audio_url || null,
           category: data.formData.category,
           color: data.formData.color,
           emoji: data.formData.emoji,
@@ -593,6 +598,7 @@ export default function RoutinesBank() {
       cover_image_url: '',
       cover_aspect: 'square',
       video_url: '',
+      audio_url: '',
       category: 'general',
       color: 'yellow',
       emoji: '✨',
@@ -623,6 +629,7 @@ export default function RoutinesBank() {
       cover_image_url: routine.cover_image_url || '',
       cover_aspect: (routine as any).cover_aspect || 'square',
       video_url: (routine as any).video_url || '',
+      audio_url: (routine as any).audio_url || '',
       category: routine.category,
       color: routine.color,
       emoji: routine.emoji,
@@ -1542,8 +1549,56 @@ export default function RoutinesBank() {
                       onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
                       placeholder="https://youtube.com/watch?v=... or https://example.com/video.mp4"
                     />
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <MediaLibraryPicker
+                        kind="video"
+                        triggerLabel="Pick from video library"
+                        onPick={(item) => setFormData({ ...formData, video_url: item.file_url })}
+                      />
+                      {formData.video_url && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setFormData({ ...formData, video_url: '' })}
+                        >
+                          Clear
+                        </Button>
+                      )}
+                    </div>
                     {formData.video_url && (
                       <p className="text-xs text-muted-foreground">Video will appear below the cover image on the routine page.</p>
+                    )}
+                  </div>
+
+                  {/* Audio URL */}
+                  <div className="space-y-2">
+                    <Label htmlFor="audio_url">Intro Audio URL (MP3)</Label>
+                    <Input
+                      id="audio_url"
+                      value={formData.audio_url}
+                      onChange={(e) => setFormData({ ...formData, audio_url: e.target.value })}
+                      placeholder="https://example.com/intro.mp3"
+                    />
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <MediaLibraryPicker
+                        kind="audio"
+                        triggerLabel="Pick from audio library"
+                        onPick={(item) => setFormData({ ...formData, audio_url: item.file_url })}
+                      />
+                      {formData.audio_url && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setFormData({ ...formData, audio_url: '' })}
+                        >
+                          Clear
+                        </Button>
+                      )}
+                    </div>
+                    {formData.audio_url && (
+                      <p className="text-xs text-muted-foreground">Plays as an intro on the routine page so users can learn about it.</p>
                     )}
                   </div>
 
