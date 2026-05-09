@@ -526,10 +526,6 @@ export default function Auth() {
               </span>
             </div>
 
-            {/* Single tagline — outcome promise */}
-            <p className="text-[11.5px] leading-tight font-medium text-[#1a1f3d]/70 text-center max-w-[34ch]">
-              Feel more in control of your day — in 5 minutes.
-            </p>
           </div>
         )}
 
