@@ -49,7 +49,7 @@ export default function AppPlayer() {
   const [showSearch, setShowSearch] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [progressFilter, setProgressFilter] = useState<
-    "all" | "in_progress" | "completed"
+    "all" | "following" | "in_progress" | "completed"
   >("all");
   const [showPaywall, setShowPaywall] = useState(false);
   const { hasAccessToProgram } = useSubscription();
