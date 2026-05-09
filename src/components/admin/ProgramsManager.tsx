@@ -172,6 +172,7 @@ export function ProgramsManager() {
     });
     setEditingId(null);
     setShowForm(false);
+    setHosts([]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
