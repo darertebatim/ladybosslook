@@ -271,22 +271,17 @@ function HomeBannerCard({
   return (
     <div
       className={cn(
-        "relative rounded-2xl overflow-hidden shadow-ios",
-        "bg-gradient-to-br from-[#FFE9DD] via-[#FFD4BE] to-[#FFC2A3]",
+        "relative rounded-2xl overflow-hidden bg-card-warm shadow-ios",
         hasDestination && !banner.video_url && "active:scale-[0.98] transition-transform cursor-pointer"
       )}
       onClick={hasDestination && !banner.video_url ? () => handleBannerClick(banner) : undefined}
     >
-      {/* Soft decorative glow */}
-      <div className="pointer-events-none absolute -top-8 -right-8 h-32 w-32 rounded-full bg-white/40 blur-2xl" />
-      <div className="pointer-events-none absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-[#D94B2B]/20 blur-2xl" />
-
       <button
         onClick={(e) => handleDismiss(e, banner.id)}
-        className="absolute top-3 right-3 p-1.5 rounded-full bg-black/10 active:bg-black/20 transition-colors z-10"
+        className="absolute top-2.5 right-2.5 h-7 w-7 flex items-center justify-center rounded-full bg-black/5 active:bg-black/10 transition-colors z-10"
         aria-label="Dismiss banner"
       >
-        <X className="h-3.5 w-3.5 text-black/60" />
+        <X className="h-3.5 w-3.5 text-fg-warm-muted" />
       </button>
 
       {banner.video_url && videoType && (
@@ -322,37 +317,34 @@ function HomeBannerCard({
         </>
       )}
 
-      <div className="relative p-4 pr-12">
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black text-white text-[10px] font-bold uppercase tracking-wider mb-2">
-          New
-        </span>
-        <h3 className="text-[17px] font-bold leading-tight text-black">{banner.title}</h3>
-        {banner.description && (
-          <p className="text-[13px] text-black/70 mt-1 leading-snug line-clamp-2">{banner.description}</p>
-        )}
+      <div className="relative p-4 pr-10 flex gap-3 items-start">
+        <div className="flex-shrink-0 h-11 w-11 rounded-2xl bg-peach flex items-center justify-center">
+          <Megaphone className="h-5 w-5 text-[hsl(var(--brand-primary))]" strokeWidth={2.2} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <h3 className="text-[16px] font-semibold leading-tight text-fg-warm">{banner.title}</h3>
+          {banner.description && (
+            <p className="text-[13px] text-fg-warm-muted mt-0.5 leading-snug line-clamp-2">{banner.description}</p>
+          )}
 
-        {hasDestination && (banner.button_text || banner.video_url) ? (
-          <Button
-            size="sm"
-            className="mt-3 bg-black active:bg-black/80 text-white rounded-full px-4 h-9 font-semibold"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleBannerClick(banner);
-            }}
-          >
-            {buttonLabel}
-            {destinationUrl?.startsWith('http') ? (
-              <ExternalLink className="h-3.5 w-3.5 ml-1" />
-            ) : (
-              <ChevronRight className="h-3.5 w-3.5 ml-1" />
-            )}
-          </Button>
-        ) : hasDestination && !banner.video_url ? (
-          <div className="mt-2 inline-flex items-center gap-1 text-[13px] font-semibold text-black/80">
-            Open
-            <ChevronRight className="h-3.5 w-3.5" />
-          </div>
-        ) : null}
+          {hasDestination && (
+            <button
+              type="button"
+              className="mt-2 inline-flex items-center gap-0.5 text-[13px] font-semibold text-[hsl(var(--brand-primary))] active:opacity-70 transition-opacity"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleBannerClick(banner);
+              }}
+            >
+              {buttonLabel}
+              {destinationUrl?.startsWith('http') ? (
+                <ExternalLink className="h-3.5 w-3.5 ml-0.5" />
+              ) : (
+                <ChevronRight className="h-3.5 w-3.5" />
+              )}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
