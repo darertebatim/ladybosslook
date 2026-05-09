@@ -93,6 +93,7 @@ export function ProgramsManager() {
     annual_android_product_id: '',
     show_in_app_waitlist: false,
   });
+  const [hosts, setHosts] = useState<HostAssignment[]>([]);
 
   // Fetch playlists for dropdown
   const { data: playlists } = useQuery({
