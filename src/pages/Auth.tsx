@@ -304,7 +304,7 @@ export default function Auth() {
                 <p className="text-[14px] text-[#1a1f3d]/65 max-w-[30ch] mx-auto leading-relaxed">
                   {isForgotPassword
                     ? 'Enter your email to receive a password reset link.'
-                    : (isLogin ? 'Enter your credentials to continue.' : 'Pick a password — your routines stay synced.')}
+                    : (isLogin ? 'Enter your credentials to continue.' : '')}
                 </p>
               )}
             </div>
@@ -470,6 +470,23 @@ export default function Auth() {
                   </div>
                 )}
               </form>
+            )}
+
+            {/* Switch to login from email signup */}
+            {showEmailForm && !isForgotPassword && !isLogin && (
+              <div className="text-center pt-1">
+                <p className="text-[#1a1f3d] text-sm font-semibold">
+                  Already have an account?{' '}
+                  <Button
+                    type="button"
+                    variant="link"
+                    onClick={() => setIsLogin(true)}
+                    className="text-[#B8590E] font-bold p-0 h-auto underline underline-offset-4"
+                  >
+                    Log in here
+                  </Button>
+                </p>
+              </div>
             )}
 
             {/* Toggle Login/Signup — only on the social-buttons screen.
