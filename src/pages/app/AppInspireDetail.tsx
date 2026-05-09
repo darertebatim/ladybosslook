@@ -355,6 +355,18 @@ export default function AppInspireDetail() {
           );
         })()}
 
+        {/* Intro Audio */}
+        {(routine as any).audio_url && (
+          <div className="px-4 pt-4">
+            <audio
+              src={(routine as any).audio_url}
+              controls
+              preload="metadata"
+              className="w-full"
+            />
+          </div>
+        )}
+
         <div className="px-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 160px)' }}>
 
 
