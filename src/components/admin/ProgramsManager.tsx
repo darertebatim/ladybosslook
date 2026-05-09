@@ -185,6 +185,7 @@ export function ProgramsManager() {
           .eq('id', editingId);
 
         if (error) throw error;
+        await saveContentHosts('program', formData.slug, hosts);
 
         toast({
           title: 'Success',
@@ -196,6 +197,7 @@ export function ProgramsManager() {
           .insert([formData] as any);
 
         if (error) throw error;
+        await saveContentHosts('program', formData.slug, hosts);
 
         toast({
           title: 'Success',
