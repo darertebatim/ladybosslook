@@ -29,6 +29,7 @@ import { useTaskBankSelection } from '@/hooks/useTaskBankSelection';
 import { PromoBanner } from '@/components/app/PromoBanner';
 import { HomeBanner } from '@/components/app/HomeBanner';
 import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
+import { PlusUpsellBanner } from '@/components/app/PlusUpsellBanner';
 
 const PREVIEW_COUNT = 8;
 
@@ -292,6 +293,12 @@ export default function AppTasksBank() {
           )}
 
           {!isSearching && <ClusterCards className="mt-5" />}
+
+          {!isSearching && (
+            <div className="px-4 mt-4">
+              <PlusUpsellBanner />
+            </div>
+          )}
 
           {!isSearching && selfcareRoutines && selfcareRoutines.length > 0 && (
             <section className="mt-5">
