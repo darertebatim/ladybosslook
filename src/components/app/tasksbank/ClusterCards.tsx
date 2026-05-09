@@ -37,12 +37,12 @@ export function ClusterCards({ className }: { className?: string }) {
             key={c.slug}
             onClick={() => handleTap(c.slug)}
             className={cn(
-              'relative rounded-2xl text-left p-3.5 min-h-[110px] flex flex-col justify-between bg-card',
+              'relative rounded-2xl text-left p-3 flex flex-col gap-1.5 bg-card',
               'active:scale-[0.97] transition-transform shadow-ios'
             )}
           >
-            <FluentEmoji emoji={c.emoji} size={32} />
-            <p className="text-[14px] font-bold text-foreground leading-tight mt-2">
+            <FluentEmoji emoji={c.emoji} size={28} />
+            <p className="text-[14px] font-bold text-foreground leading-tight">
               {c.question}
             </p>
           </button>
