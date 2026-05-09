@@ -1202,6 +1202,44 @@ export type Database = {
           },
         ]
       }
+      content_hosts: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          host_id: string
+          id: string
+          role: string
+          sort_order: number
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          host_id: string
+          id?: string
+          role?: string
+          sort_order?: number
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          host_id?: string
+          id?: string
+          role?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_hosts_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "instructors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_enrollments: {
         Row: {
           course_name: string
