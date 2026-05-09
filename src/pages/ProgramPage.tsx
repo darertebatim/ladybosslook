@@ -8,6 +8,7 @@ import Navigation from '@/components/ui/navigation';
 import Footer from '@/components/sections/Footer';
 import { SEOHead } from '@/components/SEOHead';
 import { useCart } from '@/hooks/useCart';
+import { HostBadges } from '@/components/app/HostBadges';
 import { useAuth } from '@/hooks/useAuth';
 import DOMPurify from 'dompurify';
 
