@@ -1613,6 +1613,15 @@ export default function RoutinesBank() {
                     )}
                   </div>
 
+                  {/* Hosts */}
+                  <div className="space-y-2">
+                    <HostPicker
+                      value={hosts}
+                      onChange={setHosts}
+                      hint="Who presents this routine? Shown to users on the routine page."
+                    />
+                  </div>
+
                   {/* Description */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
