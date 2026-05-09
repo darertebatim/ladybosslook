@@ -447,6 +447,7 @@ export default function RoutinesBank() {
         }));
         await supabase.from('routines_bank_tasks').insert(taskRecords);
       }
+      await saveContentHosts('routine', data.id, hosts);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routines-bank'] });
