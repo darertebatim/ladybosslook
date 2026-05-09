@@ -314,7 +314,7 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
                 <FluentEmoji emoji={reflection.emoji || '📝'} size={28} />
               </div>
             )}
-            {isPremium && (
+            {isPremium && !isSubscribed && (
               <span className="absolute -top-2 -left-1.5 flex items-center gap-0.5 bg-amber-200 text-amber-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-ios">
                 <Crown className="h-2.5 w-2.5" />
                 PLUS

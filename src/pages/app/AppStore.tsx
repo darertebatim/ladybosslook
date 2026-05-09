@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
@@ -58,6 +59,7 @@ const AppStore = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { user } = useAuth();
+  const { isSubscribed } = useSubscription();
   // Subscribe to dark-mode changes so `pickPeach()` calls below the loop
   // re-evaluate with the dark palette when the theme toggles.
   useIsDarkMode();
@@ -754,14 +756,18 @@ const AppStore = () => {
                           )}
                         </div>
                         {playlist.requires_subscription ? (
+                          !isSubscribed && (
                           <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
                             <Crown className="h-2.5 w-2.5" /> PLUS
                           </div>
+                          )
                         ) : (
+                          !isSubscribed && (
                           <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
                             <FluentEmoji emoji="🔥" size={10} />{" "}
                             {t("toolsPage.free")}
                           </div>
+                          )
                         )}
                       </div>
                       <p className="text-xs font-medium line-clamp-2 leading-tight">
@@ -814,14 +820,18 @@ const AppStore = () => {
                           )}
                         </div>
                         {playlist.requires_subscription ? (
+                          !isSubscribed && (
                           <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
                             <Crown className="h-2.5 w-2.5" /> PLUS
                           </div>
+                          )
                         ) : (
+                          !isSubscribed && (
                           <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
                             <FluentEmoji emoji="🔥" size={10} />{" "}
                             {t("toolsPage.free")}
                           </div>
+                          )
                         )}
                       </div>
                       <p className="text-xs font-medium line-clamp-2 leading-tight">
