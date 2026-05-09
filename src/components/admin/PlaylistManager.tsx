@@ -854,7 +854,7 @@ export const PlaylistManager = () => {
     }
   };
 
-  const handleEdit = (playlist: any) => {
+  const handleEdit = async (playlist: any) => {
     setEditingPlaylist(playlist);
     setEditFormData({
       name: playlist.name,
@@ -869,18 +869,25 @@ export const PlaylistManager = () => {
       cover_image_url: playlist.cover_image_url || "",
       language: playlist.language || "american",
     });
+    try {
+      setEditHosts(await loadContentHosts('playlist', playlist.id));
+    } catch {
+      setEditHosts([]);
+    }
     setIsEditDialogOpen(true);
   };
 
   const handleCloseCreate = () => {
     setIsCreateDialogOpen(false);
     resetCreateForm();
+    setCreateHosts([]);
   };
 
   const handleCloseEdit = () => {
     setIsEditDialogOpen(false);
     resetEditForm();
     setEditingPlaylist(null);
+    setEditHosts([]);
   };
 
   const handleUpdate = (e: React.FormEvent) => {
