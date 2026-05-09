@@ -202,30 +202,14 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
   };
 
   // Only show the highest-priority eligible banner (banners are already
-  // ordered by priority desc from the query). This matches promo banner
-  // behavior and prevents box banners from stacking under each other.
-  // Mirror promo banner behavior: ordered by priority desc; show only one
-  // at a time, with a swipeable carousel + dots when multiple are eligible.
-  const visibleBanners = banners.filter(b => !dismissedIds.has(b.id));
+  // ordered by priority desc from the query). Prevents stacking.
+  const visibleBanners = banners.filter(b => !dismissedIds.has(b.id)).slice(0, 1);
 
   useEffect(() => {
     onVisibilityChange?.(visibleBanners.length > 0);
   }, [visibleBanners.length, onVisibilityChange]);
 
   if (visibleBanners.length === 0) return null;
-
-  if (visibleBanners.length > 1) {
-    return (
-      <HomeBannerCarousel
-        banners={visibleBanners}
-        className={className}
-        videoPlayerId={videoPlayerId}
-        setVideoPlayerId={setVideoPlayerId}
-        handleDismiss={handleDismiss}
-        handleBannerClick={handleBannerClick}
-      />
-    );
-  }
 
   return (
     <div className={className || "px-4 py-2 space-y-3"}>
