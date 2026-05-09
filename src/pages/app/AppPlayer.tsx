@@ -86,7 +86,7 @@ export default function AppPlayer() {
     }
   }, [searchParams]);
 
-  const { playlists, playlistItems, progressData, enrollments, isLoading } =
+  const { playlists, playlistItems, progressData, enrollments, savedPlaylistIds, isLoading } =
     usePlayerData();
   const userLang = useUserPreferredLanguage();
   const [showLangPopup, setShowLangPopup] = useState(false);
@@ -158,12 +158,29 @@ export default function AppPlayer() {
     return true;
   };
 
+  const followedSet = useMemo(
+    () => new Set(savedPlaylistIds || []),
+    [savedPlaylistIds],
+  );
+  const isFollowingPlaylist = (playlist: any) => {
+    if (followedSet.has(playlist.id)) return true;
+    if (
+      playlist.program_slug &&
+      !playlist.is_free &&
+      !playlist.requires_subscription &&
+      enrollments?.includes(playlist.program_slug)
+    )
+      return true;
+    return false;
+  };
+
   const filterPlaylistByProgress = (playlist: any) => {
     const stats = getPlaylistStats(playlist.id);
     const progress =
       stats.trackCount > 0
         ? (stats.completedTracks / stats.trackCount) * 100
         : 0;
+    if (progressFilter === "following") return isFollowingPlaylist(playlist);
     if (progressFilter === "in_progress") return progress > 0 && progress < 100;
     if (progressFilter === "completed") return progress >= 100;
     return true;
