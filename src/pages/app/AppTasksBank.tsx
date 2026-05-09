@@ -272,6 +272,12 @@ export default function AppTasksBank() {
             </>
           )}
 
+          {!isSearching && (
+            <div className="px-4 pt-4">
+              <PlusUpsellBanner />
+            </div>
+          )}
+
           {!isSearching && sortedCategories.length > 0 && (
             <div className="mt-4">
               <ScrollArea className="w-full">
@@ -293,12 +299,6 @@ export default function AppTasksBank() {
           )}
 
           {!isSearching && <ClusterCards className="mt-5" />}
-
-          {!isSearching && (
-            <div className="px-4 mt-4">
-              <PlusUpsellBanner />
-            </div>
-          )}
 
           {!isSearching && selfcareRoutines && selfcareRoutines.length > 0 && (
             <section className="mt-5">
