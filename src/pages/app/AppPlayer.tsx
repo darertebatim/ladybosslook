@@ -282,6 +282,7 @@ export default function AppPlayer() {
         completedTracks={stats.completedTracks}
         totalDuration={stats.totalDuration}
         isFollowing={isFollowingPlaylist(playlist)}
+        categoryLabel={categoryConfig[playlist.category]?.name}
       />
     );
   };
