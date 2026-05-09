@@ -4218,6 +4218,7 @@ export type Database = {
       }
       routines_bank: {
         Row: {
+          audio_url: string | null
           badge_image_url: string | null
           category: string
           challenge_start_date: string | null
@@ -4249,6 +4250,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          audio_url?: string | null
           badge_image_url?: string | null
           category?: string
           challenge_start_date?: string | null
@@ -4280,6 +4282,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          audio_url?: string | null
           badge_image_url?: string | null
           category?: string
           challenge_start_date?: string | null
