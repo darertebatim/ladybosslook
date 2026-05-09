@@ -376,6 +376,7 @@ export default function AppInspireDetail() {
             {routine.subtitle && (
               <p className="text-foreground">{routine.subtitle}</p>
             )}
+            <HostBadges contentType="routine" contentId={routine.id} size="md" className="mt-3" />
             
             <div className="flex items-center gap-2 mt-3 flex-wrap">
               {isFocus && (
