@@ -11,7 +11,9 @@ import { CategorySection } from '@/components/app/tasksbank/CategorySection';
 import { ClusterCards } from '@/components/app/tasksbank/ClusterCards';
 import { SelfCareBalanceCard } from '@/components/app/SelfCareBalanceCard';
 import { useTaskTemplates, TaskTemplate } from '@/hooks/useTaskPlanner';
-import { useRoutineBankCategories } from '@/hooks/useRoutinesBank';
+import { useRoutineBankCategories, useRoutinesBank } from '@/hooks/useRoutinesBank';
+import { RoutineBankCard } from '@/components/app/RoutineBankCard';
+import { ChevronRight as ChevronRightIcon } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
@@ -45,6 +47,7 @@ export default function AppTasksBank() {
 
   const { data: categories, isLoading: categoriesLoading } = useRoutineBankCategories();
   const { data: allTasks, isLoading: tasksLoading } = useTaskTemplates();
+  const { data: selfcareRoutines } = useRoutinesBank('selfcareroutines');
 
   const isLoading = categoriesLoading || tasksLoading;
 
@@ -289,6 +292,31 @@ export default function AppTasksBank() {
           )}
 
           {!isSearching && <ClusterCards className="mt-5" />}
+
+          {!isSearching && selfcareRoutines && selfcareRoutines.length > 0 && (
+            <section className="mt-5">
+              <div className="flex items-center justify-between mb-2 px-4">
+                <h2 className="text-xl font-bold text-foreground">Self-Care Routines</h2>
+                <button
+                  onClick={() => navigate('/app/routines/category/selfcareroutines')}
+                  className="text-sm text-primary font-medium flex items-center gap-0.5"
+                >
+                  All <ChevronRightIcon className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="flex gap-3 overflow-x-auto px-4 pt-3 pb-2 scrollbar-hide">
+                {selfcareRoutines.slice(0, 8).map((routine) => (
+                  <div key={routine.id} className="shrink-0 w-40">
+                    <RoutineBankCard
+                      hideFocusBadge
+                      routine={routine}
+                      onClick={() => navigate(`/app/routines/${routine.id}`)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {!isSearching && (
             <>
