@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { GraduationCap, Plus, RefreshCw, Pencil, Trash2, Copy, Link2, Upload, X, ImageIcon, Sparkles } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { HostPicker, HostAssignment, saveContentHosts, loadContentHosts } from '@/components/admin/HostPicker';
 import { RichTextEditor } from './RichTextEditor';
 import { programImages } from '@/data/programs';
 
