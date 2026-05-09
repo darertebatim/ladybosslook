@@ -363,12 +363,14 @@ export default function AppPlaylistDetail() {
 
   const displayMode = (playlist as any)?.display_mode || "tracks";
   // Free playlists require activation (playlist_saves)
-  // requires_subscription playlists require Simora Plus subscription
+  // requires_subscription playlists require BOTH Simora Plus AND explicit
+  // activation (playlist_saves) — so users opt-in per playlist and we only
+  // PN those who actually follow it.
   // Regular paid playlists require enrollment
   const hasAccess = playlist?.is_free
     ? !!playlistSave
     : playlist?.requires_subscription
-      ? hasAccessToProgram("simora-plus")
+      ? hasAccessToProgram("simora-plus") && !!playlistSave
       : enrollments?.includes(playlist?.program_slug);
 
   const getTrackProgress = (audioId: string) => {
@@ -957,10 +959,31 @@ export default function AppPlaylistDetail() {
             {!hasAccess &&
               !playlist.is_free &&
               playlist.requires_subscription && (
-                <PlusUpsellBanner
-                  title="Unlock this with Rilo Plus"
-                  subtitle="Plus full audio library, AI Planner & all tools"
-                />
+                hasAccessToProgram("simora-plus") ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 p-4 bg-foreground/10 rounded-lg">
+                      <Crown className="h-5 w-5 text-amber-500" />
+                      <p className="text-sm text-fg-warm">
+                        Tap below to follow this playlist and get notified about new tracks.
+                      </p>
+                    </div>
+                    <Button
+                      className="w-full bg-brand text-white active:bg-brand/90"
+                      size="lg"
+                      onClick={() => activatePlaylistMutation.mutate()}
+                      disabled={activatePlaylistMutation.isPending}
+                    >
+                      {activatePlaylistMutation.isPending
+                        ? "Activating..."
+                        : "Get Access"}
+                    </Button>
+                  </div>
+                ) : (
+                  <PlusUpsellBanner
+                    title="Unlock this with Rilo Plus"
+                    subtitle="Plus full audio library, AI Planner & all tools"
+                  />
+                )
               )}
 
             {!hasAccess &&

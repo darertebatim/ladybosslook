@@ -38,7 +38,7 @@ import { PlaylistManager } from "./PlaylistManager";
 // Notify users who have access to a playlist about a new track
 async function notifyPlaylistSubscribers(playlistId: string, trackTitle: string) {
   try {
-    // Get the playlist info (program_slug, requires_subscription, name)
+    // Get the playlist info (program_slug, name)
     const { data: playlist } = await supabase
       .from('audio_playlists')
       .select('name, program_slug, requires_subscription')
@@ -58,15 +58,15 @@ async function notifyPlaylistSubscribers(playlistId: string, trackTitle: string)
       userIds = (enrollments || []).map(e => e.user_id);
     }
 
-    if (playlist.requires_subscription) {
-      // Also get subscription users (Simora Plus)
-      const { data: subs } = await supabase
-        .from('user_subscriptions' as any)
-        .select('user_id')
-        .eq('status', 'active');
-      const subIds = (subs || []).map((s: any) => s.user_id);
-      userIds = [...new Set([...userIds, ...subIds])];
-    }
+    // Always include users who explicitly saved this playlist (free OR plus).
+    // This replaces the old "blast all Plus subscribers" behavior so PNs only
+    // reach users who opted in by tapping "Get Access".
+    const { data: saves } = await supabase
+      .from('playlist_saves')
+      .select('user_id')
+      .eq('playlist_id', playlistId);
+    const savedIds = (saves || []).map((s: any) => s.user_id);
+    userIds = [...new Set([...userIds, ...savedIds])];
 
     if (userIds.length === 0) return;
 
