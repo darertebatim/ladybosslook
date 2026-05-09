@@ -40,6 +40,7 @@ export default function AppTasksBank() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  useIsDarkMode(); // re-render on theme toggle for peach palette
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [showBuilder, setShowBuilder] = useState(false);
