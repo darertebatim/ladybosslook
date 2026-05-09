@@ -70,6 +70,7 @@ interface PlayerData {
   progressData: any[];
   enrollments: string[];
   programs: any[];
+  savedPlaylistIds: string[];
 }
 
 // ============ HOME PAGE DATA ============
