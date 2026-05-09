@@ -297,7 +297,7 @@ export default function Auth() {
               )}
               {!showEmailForm && !isForgotPassword && (
                 <p className="text-[15px] font-semibold text-[#1a1f3d]">
-                  Your day, back in your hands.
+                  {"\n"}
                 </p>
               )}
               {(showEmailForm || isForgotPassword) && (
