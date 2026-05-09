@@ -363,12 +363,14 @@ export default function AppPlaylistDetail() {
 
   const displayMode = (playlist as any)?.display_mode || "tracks";
   // Free playlists require activation (playlist_saves)
-  // requires_subscription playlists require Simora Plus subscription
+  // requires_subscription playlists require BOTH Simora Plus AND explicit
+  // activation (playlist_saves) — so users opt-in per playlist and we only
+  // PN those who actually follow it.
   // Regular paid playlists require enrollment
   const hasAccess = playlist?.is_free
     ? !!playlistSave
     : playlist?.requires_subscription
-      ? hasAccessToProgram("simora-plus")
+      ? hasAccessToProgram("simora-plus") && !!playlistSave
       : enrollments?.includes(playlist?.program_slug);
 
   const getTrackProgress = (audioId: string) => {
