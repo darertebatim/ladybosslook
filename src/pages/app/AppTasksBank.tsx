@@ -29,6 +29,7 @@ import { useTaskBankSelection } from '@/hooks/useTaskBankSelection';
 import { PromoBanner } from '@/components/app/PromoBanner';
 import { HomeBanner } from '@/components/app/HomeBanner';
 import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
+import { PlusUpsellBanner } from '@/components/app/PlusUpsellBanner';
 
 const PREVIEW_COUNT = 8;
 
