@@ -199,7 +199,10 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
     if (url) smartOpenUrl(url, navigate);
   };
 
-  const visibleBanners = banners.filter(b => !dismissedIds.has(b.id));
+  // Only show the highest-priority eligible banner (banners are already
+  // ordered by priority desc from the query). This matches promo banner
+  // behavior and prevents box banners from stacking under each other.
+  const visibleBanners = banners.filter(b => !dismissedIds.has(b.id)).slice(0, 1);
 
   useEffect(() => {
     onVisibilityChange?.(visibleBanners.length > 0);
