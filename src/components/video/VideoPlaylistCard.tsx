@@ -61,7 +61,7 @@ export const VideoPlaylistCard = memo(function VideoPlaylistCard({
           <Crown className="h-3 w-3" /> PLUS
         </Badge>
       )}
-      {isFree && !isLocked && !requiresSubscription && (
+      {isFree && !isLocked && !requiresSubscription && !isSubscribed && (
         <Badge className="absolute -top-2.5 -left-2 z-30 bg-green-500 hover:bg-green-500 text-white rounded-full text-xs shadow-sm">FREE</Badge>
       )}
 

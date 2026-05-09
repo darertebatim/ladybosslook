@@ -143,7 +143,7 @@ export const PlaylistCard = memo(function PlaylistCard({
                 <Crown className="h-2.5 w-2.5" /> PLUS
               </span>
             )}
-            {isFree && !isLocked && !requiresSubscription && (
+            {isFree && !isLocked && !requiresSubscription && !isSubscribed && (
               <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#E2F9F0] text-[#065F46]">
                 🔥 FREE
               </span>
