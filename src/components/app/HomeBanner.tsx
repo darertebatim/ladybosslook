@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import useEmblaCarousel from 'embla-carousel-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { X, Play, Megaphone, ExternalLink, ChevronRight } from 'lucide-react';
@@ -7,6 +8,7 @@ import { smartOpenUrl } from '@/lib/navigation-utils';
 import { detectVideoType, extractYouTubeId } from '@/lib/videoUtils';
 import { BUILD_INFO } from '@/lib/buildInfo';
 import { AppVideoPlayer } from '@/components/app/AppVideoPlayer';
+import { cn } from '@/lib/utils';
 
 type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch' | 'video_player' | 'routines_top' | 'routines_after_categories' | 'routine_player' | 'tasks_bank_top' | 'tasks_bank_after_categories';
 
@@ -202,13 +204,28 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
   // Only show the highest-priority eligible banner (banners are already
   // ordered by priority desc from the query). This matches promo banner
   // behavior and prevents box banners from stacking under each other.
-  const visibleBanners = banners.filter(b => !dismissedIds.has(b.id)).slice(0, 1);
+  // Mirror promo banner behavior: ordered by priority desc; show only one
+  // at a time, with a swipeable carousel + dots when multiple are eligible.
+  const visibleBanners = banners.filter(b => !dismissedIds.has(b.id));
 
   useEffect(() => {
     onVisibilityChange?.(visibleBanners.length > 0);
   }, [visibleBanners.length, onVisibilityChange]);
 
   if (visibleBanners.length === 0) return null;
+
+  if (visibleBanners.length > 1) {
+    return (
+      <HomeBannerCarousel
+        banners={visibleBanners}
+        className={className}
+        videoPlayerId={videoPlayerId}
+        setVideoPlayerId={setVideoPlayerId}
+        handleDismiss={handleDismiss}
+        handleBannerClick={handleBannerClick}
+      />
+    );
+  }
 
   return (
     <div className={className || "px-4 py-2 space-y-3"}>
@@ -306,6 +323,169 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function HomeBannerCard({
+  banner,
+  videoPlayerId,
+  setVideoPlayerId,
+  handleDismiss,
+  handleBannerClick,
+}: {
+  banner: HomeBannerData;
+  videoPlayerId: string | null;
+  setVideoPlayerId: (id: string | null) => void;
+  handleDismiss: (e: React.MouseEvent, id: string) => void;
+  handleBannerClick: (banner: HomeBannerData) => void;
+}) {
+  const videoType = banner.video_url ? detectVideoType(banner.video_url) : null;
+  const destinationUrl = resolveDestinationUrl(banner);
+  const hasDestination = !!destinationUrl;
+  const buttonLabel = banner.button_text || getDestinationLabel(banner.destination_type);
+
+  return (
+    <div
+      className={`relative bg-card-warm rounded-2xl shadow-card-warm overflow-hidden ${hasDestination && !banner.video_url ? 'active:scale-[0.98] transition-transform cursor-pointer' : ''}`}
+      onClick={hasDestination && !banner.video_url ? () => handleBannerClick(banner) : undefined}
+    >
+      <button
+        onClick={(e) => handleDismiss(e, banner.id)}
+        className="absolute top-3 right-3 p-1.5 rounded-full bg-black/40 active:bg-black/60 transition-colors z-10"
+        aria-label="Dismiss banner"
+      >
+        <X className="h-4 w-4 text-white" />
+      </button>
+
+      {banner.video_url && videoType && (
+        <>
+          <button
+            onClick={() => setVideoPlayerId(banner.id)}
+            className="relative w-full aspect-video group active:scale-[0.98] transition-transform"
+          >
+            {videoType === 'youtube' ? (
+              <img
+                src={`https://img.youtube.com/vi/${extractYouTubeId(banner.video_url)}/hqdefault.jpg`}
+                alt={banner.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-muted flex items-center justify-center">
+                <Play className="h-8 w-8 text-muted-foreground" />
+              </div>
+            )}
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-active:bg-black/40 transition-colors">
+              <div className="bg-white/90 text-foreground rounded-full p-3 shadow-lg">
+                <Play className="h-6 w-6 fill-current" />
+              </div>
+            </div>
+          </button>
+          <AppVideoPlayer
+            isOpen={videoPlayerId === banner.id}
+            onClose={() => setVideoPlayerId(null)}
+            url={banner.video_url}
+            title={banner.title}
+            description={banner.description || undefined}
+          />
+        </>
+      )}
+
+      <div className="p-4">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#D94B2B]/10 flex items-center justify-center flex-shrink-0">
+            <Megaphone className="h-5 w-5 text-[#D94B2B]" />
+          </div>
+          <div className="flex-1 min-w-0 pr-6">
+            <h3 className="font-semibold text-foreground">{banner.title}</h3>
+            {banner.description && (
+              <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{banner.description}</p>
+            )}
+          </div>
+          {hasDestination && !banner.video_url && !banner.button_text && (
+            <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-2" />
+          )}
+        </div>
+
+        {hasDestination && (banner.button_text || banner.video_url) && (
+          <Button
+            size="sm"
+            className="mt-3 w-full bg-[#D94B2B] active:bg-[#A63520] text-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleBannerClick(banner);
+            }}
+          >
+            {buttonLabel}
+            {destinationUrl?.startsWith('http') ? (
+              <ExternalLink className="h-3 w-3 ml-1" />
+            ) : (
+              <ChevronRight className="h-3 w-3 ml-1" />
+            )}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function HomeBannerCarousel({
+  banners,
+  className,
+  videoPlayerId,
+  setVideoPlayerId,
+  handleDismiss,
+  handleBannerClick,
+}: {
+  banners: HomeBannerData[];
+  className?: string;
+  videoPlayerId: string | null;
+  setVideoPlayerId: (id: string | null) => void;
+  handleDismiss: (e: React.MouseEvent, id: string) => void;
+  handleBannerClick: (banner: HomeBannerData) => void;
+}) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'center' });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
+    emblaApi.on('select', onSelect);
+    onSelect();
+    return () => { emblaApi.off('select', onSelect); };
+  }, [emblaApi]);
+
+  return (
+    <div className={className || "px-4 py-2"}>
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex">
+          {banners.map((banner) => (
+            <div key={banner.id} className="min-w-0 flex-[0_0_100%] pr-2 last:pr-0">
+              <HomeBannerCard
+                banner={banner}
+                videoPlayerId={videoPlayerId}
+                setVideoPlayerId={setVideoPlayerId}
+                handleDismiss={handleDismiss}
+                handleBannerClick={handleBannerClick}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="flex justify-center gap-1.5 mt-2">
+        {banners.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => emblaApi?.scrollTo(index)}
+            className={cn(
+              "h-1.5 rounded-full transition-all",
+              index === selectedIndex
+                ? "w-4 bg-foreground/70"
+                : "w-1.5 bg-foreground/20"
+            )}
+          />
+        ))}
+      </div>
     </div>
   );
 }
