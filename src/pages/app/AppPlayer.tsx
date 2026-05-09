@@ -362,7 +362,7 @@ export default function AppPlayer() {
             <div className="tour-player-categories flex gap-2 overflow-x-auto pb-1 mt-2 scrollbar-hide">
               {availableCategories.map((cat) => {
                 const config = categoryConfig[cat];
-                const name = config ? t(config.nameKey) : cat;
+                const name = config ? config.name : cat;
                 const isSoundscapeLocked =
                   cat === "soundscape" && !hasSoundscapeAccess;
                 const active = selectedCategory === cat;
@@ -495,7 +495,7 @@ export default function AppPlayer() {
               {selectedCategory === "all"
                 ? t("player.allPlaylists")
                 : categoryConfig[selectedCategory]
-                  ? t(categoryConfig[selectedCategory].nameKey)
+                  ? categoryConfig[selectedCategory].name
                   : selectedCategory}
             </h2>
 
