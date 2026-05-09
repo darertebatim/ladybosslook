@@ -6,7 +6,6 @@ import { IOSIconButton } from '@/components/app/ui/IOSIconButton';
 import { Input } from '@/components/ui/input';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { CategoryCircle } from '@/components/app/CategoryCircle';
-import { pickPeach, useIsDarkMode } from '@/lib/peachPalette';
 import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
 import { CleanTaskRow } from '@/components/app/tasksbank/CleanTaskRow';
 import { CategorySection } from '@/components/app/tasksbank/CategorySection';
@@ -40,7 +39,6 @@ export default function AppTasksBank() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  useIsDarkMode(); // re-render on theme toggle for peach palette
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [showBuilder, setShowBuilder] = useState(false);
@@ -303,7 +301,6 @@ export default function AppTasksBank() {
                       icon={cat.icon}
                       emoji={cat.emoji}
                       color={cat.color}
-                      bgColor={pickPeach(cat.slug)}
                       onClick={() => handleCategoryTap(cat.slug)}
                     />
                   ))}
