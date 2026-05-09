@@ -573,7 +573,7 @@ export const PlaylistManager = () => {
   // Create playlist mutation
   const createMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
+      const { data: created, error } = await supabase
         .from('audio_playlists')
         .insert({
           name: createFormData.name,
@@ -587,9 +587,12 @@ export const PlaylistManager = () => {
           display_mode: createFormData.display_mode,
           cover_image_url: createFormData.cover_image_url || null,
           language: createFormData.language,
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
+      if (created?.id) await saveContentHosts('playlist', created.id, createHosts);
     },
     onSuccess: () => {
       toast.success('Playlist created successfully');
@@ -611,6 +614,7 @@ export const PlaylistManager = () => {
         .eq('id', id);
 
       if (error) throw error;
+      await saveContentHosts('playlist', id, editHosts);
     },
     onSuccess: () => {
       toast.success('Playlist updated successfully');
