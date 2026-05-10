@@ -443,7 +443,8 @@ function OnboardingTwins({ selfCare }: { selfCare: Task[] }) {
                     .map(sc => ({ sc, score: similarity(b.label, sc.title) }))
                     .sort((a, b) => b.score - a.score);
                   const top = scored[0];
-                  const options = scored.slice(0, 25);
+                  // Show all self-care tasks in the picker so admin can search the full bank.
+                  const options = scored;
                   const dec = decisions[key];
                   const chosen = dec?.twinId ? selfCare.find(s => s.id === dec.twinId) : null;
                   return (
@@ -460,21 +461,54 @@ function OnboardingTwins({ selfCare }: { selfCare: Task[] }) {
                         ) : <span className="text-muted-foreground">No match</span>}
                       </td>
                       <td className="p-3">
-                        <Select
-                          value={dec?.twinId ?? ""}
-                          onValueChange={(v) => update(key, { twinId: v, action: dec?.action || 'replace' })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder={chosen ? `${chosen.emoji} ${chosen.title}` : "Choose twin…"} />
-                          </SelectTrigger>
-                          <SelectContent className="max-h-[320px]">
-                            {options.map(o => (
-                              <SelectItem key={o.sc.id} value={o.sc.id}>
-                                {o.sc.emoji} {o.sc.title} · {o.sc.tag} ({o.score.toFixed(2)})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className="w-full justify-between font-normal"
+                            >
+                              <span className="truncate">
+                                {chosen ? `${chosen.emoji} ${chosen.title}` : "Choose twin…"}
+                              </span>
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="p-0 w-[360px]" align="start">
+                            <Command
+                              filter={(value, search) => {
+                                if (!search) return 1;
+                                return value.toLowerCase().includes(search.toLowerCase()) ? 1 : 0;
+                              }}
+                            >
+                              <CommandInput placeholder="Search self-care tasks…" />
+                              <CommandList className="max-h-[320px]">
+                                <CommandEmpty>No task found.</CommandEmpty>
+                                <CommandGroup>
+                                  {options.map(o => {
+                                    const value = `${o.sc.emoji ?? ''} ${o.sc.title} ${o.sc.tag ?? ''}`;
+                                    const isSelected = dec?.twinId === o.sc.id;
+                                    return (
+                                      <CommandItem
+                                        key={o.sc.id}
+                                        value={value}
+                                        onSelect={() => update(key, { twinId: o.sc.id, action: dec?.action || 'replace' })}
+                                      >
+                                        <Check className={cn("mr-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")} />
+                                        <span className="flex-1 truncate">
+                                          {o.sc.emoji} {o.sc.title}
+                                        </span>
+                                        <span className="ml-2 text-xs text-muted-foreground">
+                                          {o.sc.tag} · {o.score.toFixed(2)}
+                                        </span>
+                                      </CommandItem>
+                                    );
+                                  })}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                       </td>
                       <td className="p-3">
                         <Select
