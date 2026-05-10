@@ -62,7 +62,7 @@ export const whatIsRiloFlow: OnboardingFlow = {
         { label: 'Change clothes', emoji: '👕' },
         { label: 'Breakfast', emoji: '🥗' },
         { label: 'Have coffee', emoji: '☀️' },
-        { label: 'Plan top 3 priorities', emoji: '💼' },
+        { label: 'Plan your Day', emoji: '🗓️' },
         { label: 'Quick tidy', emoji: '🧹' },
         { label: 'Stretch', emoji: '💪' },
         { label: 'Journal reflection', emoji: '☀️' },
@@ -76,7 +76,7 @@ export const whatIsRiloFlow: OnboardingFlow = {
       title: 'Add daytime routines to your day',
       subtitle: 'Stay productive, balanced, and on track.',
       pickerTasks: [
-        { label: 'Plan top 3 priorities', emoji: '💼' },
+        { label: 'Plan your Day', emoji: '🗓️' },
         { label: 'Start work', emoji: '🎯' },
         { label: 'Lunch', emoji: '🥗' },
         { label: 'Have coffee', emoji: '☀️' },
