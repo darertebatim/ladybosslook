@@ -219,7 +219,7 @@ export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Pro
 
   return (
     <div className="h-full flex flex-col relative overflow-hidden bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]">
-      <AmbientGlow palette="rose" />
+      <AmbientGlow palette="rosé" />
 
       {/* Animated header visual */}
       <div className="shrink-0 relative z-10 pt-7 pb-2 flex justify-center">
