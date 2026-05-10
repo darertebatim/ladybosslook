@@ -42,6 +42,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { CachedImage } from "@/components/ui/CachedImage";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
+import { RoutineBankCard } from "@/components/app/RoutineBankCard";
 import { ToolShortcuts } from "@/components/app/ToolShortcuts";
 import {
   useRoutinesBank,
@@ -182,6 +183,8 @@ const AppStore = () => {
   const { data: taskTemplatesData } = useTaskTemplates();
 
   const { data: featuredRoutines = [] } = useFeaturedRoutinesBank();
+
+  const { data: selfcareRoutines } = useRoutinesBank("selfcareroutines");
 
   const displayRoutines = useMemo(() => {
     if (!routinesBankData) return featuredRoutines;
@@ -416,25 +419,13 @@ const AppStore = () => {
                 </div>
               </section>
             )}
-            {/* Self-Care Goals */}
+            {/* What do you need? */}
             {!searchQuery && (
               <section>
-                <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-base font-bold text-fg-warm">
-                    {t("toolsPage.selfCareGoals")}
-                  </h2>
-                  <Link
-                    to="/app/tasksbank"
-                    className="text-xs text-primary font-medium flex items-center gap-0.5"
-                  >
-                    {t("toolsPage.all")}{" "}
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
-                <div
-                  className="flex gap-2.5 overflow-x-auto -mx-4 px-4 pt-1 pb-4 scrollbar-hide snap-x snap-mandatory scroll-pl-4"
-                  style={{ WebkitOverflowScrolling: "touch" }}
-                >
+                <h2 className="text-base font-bold text-fg-warm mb-2 px-1">
+                  {t("tier1.tasksBank.startHere", "What do you need?")}
+                </h2>
+                <div className="grid grid-cols-2 gap-2.5">
                   {[
                     { slug: 'sleep', emoji: '💤', question: 'Sleep better tonight?' },
                     { slug: 'connection', emoji: '💕', question: 'Feel more connected?' },
@@ -444,13 +435,45 @@ const AppStore = () => {
                     <button
                       key={c.slug}
                       onClick={() => navigate(`/app/tasksbank/${c.slug}`)}
-                      className="shrink-0 snap-start w-[150px] h-[110px] relative rounded-2xl text-left p-3 flex flex-col justify-between bg-card active:scale-[0.97] transition-transform shadow-ios"
+                      className="relative rounded-2xl text-left p-3 flex flex-col gap-1.5 bg-card active:scale-[0.97] transition-transform shadow-ios"
                     >
                       <FluentEmoji emoji={c.emoji} size={28} />
-                      <p className="text-[13px] font-bold text-foreground leading-tight">
+                      <p className="text-[14px] font-bold text-foreground leading-tight">
                         {c.question}
                       </p>
                     </button>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Self-Care Routines */}
+            {!searchQuery && selfcareRoutines && selfcareRoutines.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h2 className="text-base font-bold text-fg-warm">
+                    Self-Care Routines
+                  </h2>
+                  <button
+                    onClick={() => navigate('/app/routines/category/selfcareroutines')}
+                    className="text-xs text-primary font-medium flex items-center gap-0.5"
+                  >
+                    {t("toolsPage.all")}{" "}
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <div
+                  className="flex gap-3 overflow-x-auto -mx-4 px-4 pt-1 pb-2 scrollbar-hide"
+                  style={{ WebkitOverflowScrolling: "touch" }}
+                >
+                  {selfcareRoutines.slice(0, 8).map((routine) => (
+                    <div key={routine.id} className="shrink-0 w-40">
+                      <RoutineBankCard
+                        hideFocusBadge
+                        routine={routine}
+                        onClick={() => navigate(`/app/routines/${routine.id}`)}
+                      />
+                    </div>
                   ))}
                 </div>
               </section>
