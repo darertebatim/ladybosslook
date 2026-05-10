@@ -28,6 +28,7 @@ import { SelfCareReflectionStep } from '@/components/app/selfcare-quiz/SelfCareR
 import { SelfCareRiloCelebrationStep } from '@/components/app/selfcare-quiz/SelfCareRiloCelebrationStep';
 import { SelfCarePlusIntroStep } from '@/components/app/selfcare-quiz/SelfCarePlusIntroStep';
 import { SelfCarePushPermissionStep } from '@/components/app/selfcare-quiz/SelfCarePushPermissionStep';
+import { SelfCareQuizScreen } from '@/components/app/selfcare-quiz/SelfCareQuizScreen';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 import { computeTopCluster } from '@/utils/selfcare-scoring';
 import { RiloTeachScreen } from '@/components/admin/onboarding/RiloTeachScreen';
@@ -61,6 +62,11 @@ interface Props {
 }
 
 export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, answers }: Props) {
+  // Self-Care Quiz steps get bespoke "What is Rilo?"-style screens.
+  if (step.id?.startsWith('sc-')) {
+    const el = SelfCareQuizScreen({ step, onNext, onAnswer, answers });
+    if (el) return el;
+  }
   switch (step.type) {
     case 'welcome':
       return <WelcomeScreen step={step} onNext={onNext} />;
