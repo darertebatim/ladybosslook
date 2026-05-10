@@ -653,7 +653,7 @@ const AppStore = () => {
                                 state: { from: location.pathname },
                               })
                             }
-                            className="shrink-0 w-[200px] flex items-center gap-3 p-2.5 text-left transition-transform active:scale-[0.97] bg-card-warm rounded-2xl border-none"
+                            className="shrink-0 w-[330px] flex items-center gap-3 p-2.5 text-left transition-transform active:scale-[0.97] bg-card-warm rounded-2xl border-none"
                           >
                             <div className="relative shrink-0">
                               {r.cover_image_url ? (
