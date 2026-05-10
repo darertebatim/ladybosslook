@@ -31,6 +31,7 @@ interface Task {
   title: string;
   emoji: string | null;
   tag: string | null;
+  category?: string | null;
   self_care_equivalent_id: string | null;
 }
 
@@ -64,7 +65,7 @@ export default function SelfCareTwins() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('admin_task_bank')
-        .select('id, title, emoji, tag, self_care_equivalent_id')
+        .select('id, title, emoji, tag, category, self_care_equivalent_id')
         .order('title');
       if (error) throw error;
       return data as Task[];
@@ -89,7 +90,10 @@ export default function SelfCareTwins() {
   const { selfCare, nonSelfCare } = useMemo(() => {
     const sc: Task[] = [], non: Task[] = [];
     for (const t of tasks) {
-      if (SELF_CARE_TAGS.has(normTag(t.tag))) sc.push(t);
+      if (
+        SELF_CARE_TAGS.has(normTag(t.tag)) ||
+        SELF_CARE_TAGS.has(normTag((t as any).category ?? null))
+      ) sc.push(t);
       else non.push(t);
     }
     return { selfCare: sc, nonSelfCare: non };
