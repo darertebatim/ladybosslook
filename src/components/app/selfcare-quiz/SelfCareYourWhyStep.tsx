@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { OnboardingStep } from '@/types/onboarding';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import selfcareQuizHero from '@/assets/selfcare-quiz-hero.png';
+import { AmbientGlow } from './visuals/AmbientGlow';
 
 const WHY_OPTIONS = [
   { emoji: '💪', label: 'For my health' },
@@ -31,15 +31,9 @@ export function SelfCareYourWhyStep({ step, onNext, onAnswer }: Props) {
   };
 
   return (
-    <div className="h-full bg-white flex flex-col overflow-hidden">
-      {/* Hero */}
-      <div className="relative w-full h-[38%] min-h-[200px] flex-shrink-0">
-        <img src={selfcareQuizHero} alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
-      </div>
-
-      {/* Bottom sheet */}
-      <div className="flex-1 flex flex-col px-5 pb-6 -mt-6 relative z-10" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)' }}>
+    <div className="h-full flex flex-col overflow-hidden relative bg-gradient-to-b from-[#FFE6E2] via-[#FFE1EE] to-[#F1E1FF]">
+      <AmbientGlow palette="rosé" />
+      <div className="flex-1 flex flex-col px-5 pt-10 pb-6 relative z-10" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)' }}>
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
