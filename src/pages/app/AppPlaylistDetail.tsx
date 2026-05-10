@@ -828,6 +828,7 @@ export default function AppPlaylistDetail() {
                       className="text-sm flex items-center gap-1 px-1.5 border-border text-fg-warm-muted"
                     >
                       <PersianFlag size={14} />
+                      <span>Persian</span>
                     </Badge>
                   ) : (
                     playlist.language &&
@@ -841,18 +842,32 @@ export default function AppPlaylistDetail() {
                     )[playlist.language] && (
                       <Badge
                         variant="outline"
-                        className="text-sm border-border text-fg-warm-muted"
+                        className="text-sm border-border text-fg-warm-muted flex items-center gap-1"
                       >
-                        {
-                          (
-                            {
-                              american: "🇺🇸",
-                              turkish: "🇹🇷",
-                              spanish: "🇪🇸",
-                              all: "🌐",
-                            } as Record<string, string>
-                          )[playlist.language]
-                        }
+                        <span>
+                          {
+                            (
+                              {
+                                american: "🇺🇸",
+                                turkish: "🇹🇷",
+                                spanish: "🇪🇸",
+                                all: "🌐",
+                              } as Record<string, string>
+                            )[playlist.language]
+                          }
+                        </span>
+                        <span>
+                          {
+                            (
+                              {
+                                american: "American",
+                                turkish: "Türkçe",
+                                spanish: "Español",
+                                all: "All",
+                              } as Record<string, string>
+                            )[playlist.language]
+                          }
+                        </span>
                       </Badge>
                     )
                   )}
