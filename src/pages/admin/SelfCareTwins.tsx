@@ -63,12 +63,26 @@ export default function SelfCareTwins() {
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ['admin-task-bank-twins'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('admin_task_bank')
-        .select('id, title, emoji, tag, category, self_care_equivalent_id')
-        .order('title');
-      if (error) throw error;
-      return data as Task[];
+      const pageSize = 1000;
+      const allTasks: Task[] = [];
+
+      for (let from = 0; ; from += pageSize) {
+        const to = from + pageSize - 1;
+        const { data, error } = await supabase
+          .from('admin_task_bank')
+          .select('id, title, emoji, tag, category, self_care_equivalent_id')
+          .order('title')
+          .range(from, to);
+
+        if (error) throw error;
+
+        const batch = (data ?? []) as Task[];
+        allTasks.push(...batch);
+
+        if (batch.length < pageSize) break;
+      }
+
+      return allTasks;
     },
   });
 
