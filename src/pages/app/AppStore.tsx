@@ -42,6 +42,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { CachedImage } from "@/components/ui/CachedImage";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
+import { RoutineBankCard } from "@/components/app/RoutineBankCard";
 import { ToolShortcuts } from "@/components/app/ToolShortcuts";
 import {
   useRoutinesBank,
@@ -182,6 +183,8 @@ const AppStore = () => {
   const { data: taskTemplatesData } = useTaskTemplates();
 
   const { data: featuredRoutines = [] } = useFeaturedRoutinesBank();
+
+  const { data: selfcareRoutines } = useRoutinesBank("selfcareroutines");
 
   const displayRoutines = useMemo(() => {
     if (!routinesBankData) return featuredRoutines;
