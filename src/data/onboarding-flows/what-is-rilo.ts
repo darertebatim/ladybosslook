@@ -57,6 +57,7 @@ export const whatIsRiloFlow: OnboardingFlow = {
         { label: 'Make my bed', emoji: '🛏️' },
         { label: 'Brush teeth', emoji: '🪥' },
         { label: 'Drink Water', emoji: '☀️' },
+        { label: 'Take Supplements', emoji: '💊' },
         { label: 'Take a shower', emoji: '🚿' },
         { label: 'Change clothes', emoji: '👕' },
         { label: 'Breakfast', emoji: '🥗' },
