@@ -29,7 +29,7 @@ export function ClusterCards({ className }: { className?: string }) {
   return (
     <section className={cn('px-4', className)}>
       <h2 className="text-foreground/70 mb-2.5 px-1 text-lg font-bold">
-        {t('tier1.tasksBank.startHere', 'Start here')}
+        {t('tier1.tasksBank.startHere', 'What do you need?')}
       </h2>
       <div className="grid grid-cols-2 gap-2.5">
         {CLUSTERS.map((c) => (
