@@ -61,6 +61,11 @@ interface Props {
 }
 
 export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, answers }: Props) {
+  // Self-Care Quiz steps get bespoke "What is Rilo?"-style screens.
+  if (step.id?.startsWith('sc-')) {
+    const el = SelfCareQuizScreen({ step, onNext, onAnswer, answers });
+    if (el) return el;
+  }
   switch (step.type) {
     case 'welcome':
       return <WelcomeScreen step={step} onNext={onNext} />;
