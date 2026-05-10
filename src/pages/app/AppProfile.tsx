@@ -67,7 +67,7 @@ const RELATIONSHIP_OPTIONS = [
 
 const LANGUAGE_OPTIONS = [
   { value: '', labelKey: 'profile.language.notSet' },
-  { value: 'en', label: 'English' },
+  { value: 'en', label: 'American' },
   { value: 'fa', label: 'فارسی (Persian)' },
   { value: 'ar', label: 'العربية (Arabic)' },
   { value: 'es', label: 'Español' },
