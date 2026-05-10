@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2, Check, X } from "lucide-react";
+import { whatIsRiloFlow } from "@/data/onboarding-flows/what-is-rilo";
 
 // Normalized (lowercased, no spaces/dashes) self-care tag keys.
 // DB has mixed casing/spacing like "Easy Win", "easy-win", "TidyUp", "LovedOnes".
@@ -131,11 +133,18 @@ export default function SelfCareTwins() {
       <div>
         <h1 className="text-2xl font-bold">Self-Care Twins (audit)</h1>
         <p className="text-muted-foreground text-sm">
-          Non-self-care tasks that look similar to a self-care reference task.
-          Pick the right twin and save — that link will be used to count completions toward Self-Care Balance.
+          Match tasks to a self-care reference task. Use the DB tab for admin_task_bank
+          twin links, and the Onboarding tab to plan replacements for "What's Rilo" picker tasks.
         </p>
       </div>
 
+      <Tabs defaultValue="db" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="db">DB tasks</TabsTrigger>
+          <TabsTrigger value="onboarding">Onboarding (What's Rilo)</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="db" className="space-y-4">
       <Card className="p-4 flex flex-wrap gap-3 items-center">
         <Input
           placeholder="Search task title…"
@@ -248,6 +257,169 @@ export default function SelfCareTwins() {
           </table>
         </Card>
       )}
+        </TabsContent>
+
+        <TabsContent value="onboarding">
+          <OnboardingTwins selfCare={selfCare} />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+// ---------------- Onboarding twin planner ----------------
+
+type OnbAction = 'replace' | 'delete' | 'keep' | '';
+interface OnbDecision { action: OnbAction; twinId: string; }
+const STORAGE_KEY = 'onboarding_twin_decisions_v1';
+
+function loadDecisions(): Record<string, OnbDecision> {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }
+}
+function saveDecisions(d: Record<string, OnbDecision>) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+}
+
+function OnboardingTwins({ selfCare }: { selfCare: Task[] }) {
+  const [decisions, setDecisions] = useState<Record<string, OnbDecision>>(loadDecisions);
+
+  const buckets = useMemo(() => {
+    const out: { bucket: string; label: string; emoji: string }[] = [];
+    for (const step of whatIsRiloFlow.steps as any[]) {
+      if (step.type === 'rilo-pick-tasks' && Array.isArray(step.pickerTasks)) {
+        for (const t of step.pickerTasks) {
+          out.push({ bucket: step.bucket, label: t.label, emoji: t.emoji });
+        }
+      }
+    }
+    return out;
+  }, []);
+
+  const update = (key: string, patch: Partial<OnbDecision>) => {
+    setDecisions(prev => {
+      const next = { ...prev, [key]: { action: '', twinId: '', ...prev[key], ...patch } };
+      saveDecisions(next);
+      return next;
+    });
+  };
+
+  const exportPlan = () => {
+    const plan = buckets.map(b => {
+      const key = `${b.bucket}::${b.label}`;
+      const d = decisions[key];
+      const twin = d?.twinId ? selfCare.find(s => s.id === d.twinId) : null;
+      return { ...b, action: d?.action || 'keep', twin: twin ? `${twin.emoji} ${twin.title}` : null };
+    });
+    navigator.clipboard.writeText(JSON.stringify(plan, null, 2));
+    toast.success("Plan copied to clipboard");
+  };
+
+  const counts = useMemo(() => {
+    let r = 0, d = 0, k = 0, u = 0;
+    for (const b of buckets) {
+      const dec = decisions[`${b.bucket}::${b.label}`];
+      if (dec?.action === 'replace') r++;
+      else if (dec?.action === 'delete') d++;
+      else if (dec?.action === 'keep') k++;
+      else u++;
+    }
+    return { r, d, k, u };
+  }, [buckets, decisions]);
+
+  return (
+    <div className="space-y-4">
+      <Card className="p-4 flex flex-wrap items-center gap-3">
+        <div className="text-sm">
+          <Badge variant="outline" className="mr-2">Replace: {counts.r}</Badge>
+          <Badge variant="outline" className="mr-2">Delete: {counts.d}</Badge>
+          <Badge variant="outline" className="mr-2">Keep: {counts.k}</Badge>
+          <Badge variant="secondary">Undecided: {counts.u}</Badge>
+        </div>
+        <div className="ml-auto flex gap-2">
+          <Button size="sm" variant="outline" onClick={exportPlan}>Copy plan as JSON</Button>
+          <Button size="sm" variant="ghost" onClick={() => { localStorage.removeItem(STORAGE_KEY); setDecisions({}); }}>
+            Reset
+          </Button>
+        </div>
+      </Card>
+
+      {(['morning','afternoon','evening'] as const).map(bucket => {
+        const items = buckets.filter(b => b.bucket === bucket);
+        return (
+          <Card key={bucket} className="overflow-x-auto">
+            <div className="px-4 py-3 border-b font-semibold capitalize">{bucket}</div>
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50 text-left">
+                <tr>
+                  <th className="p-3 w-[26%]">Onboarding task</th>
+                  <th className="p-3 w-[34%]">Top self-care twin</th>
+                  <th className="p-3 w-[28%]">Pick twin</th>
+                  <th className="p-3 w-[12%]">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map(b => {
+                  const key = `${b.bucket}::${b.label}`;
+                  const scored = selfCare
+                    .map(sc => ({ sc, score: similarity(b.label, sc.title) }))
+                    .sort((a, b) => b.score - a.score);
+                  const top = scored[0];
+                  const options = scored.slice(0, 25);
+                  const dec = decisions[key];
+                  const chosen = dec?.twinId ? selfCare.find(s => s.id === dec.twinId) : null;
+                  return (
+                    <tr key={key} className="border-t align-top">
+                      <td className="p-3 font-medium">{b.emoji} {b.label}</td>
+                      <td className="p-3">
+                        {top && top.score > 0 ? (
+                          <div>
+                            <div>{top.sc.emoji} {top.sc.title}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {top.sc.tag} · score {top.score.toFixed(2)}
+                            </div>
+                          </div>
+                        ) : <span className="text-muted-foreground">No match</span>}
+                      </td>
+                      <td className="p-3">
+                        <Select
+                          value={dec?.twinId ?? ""}
+                          onValueChange={(v) => update(key, { twinId: v, action: dec?.action || 'replace' })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder={chosen ? `${chosen.emoji} ${chosen.title}` : "Choose twin…"} />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-[320px]">
+                            {options.map(o => (
+                              <SelectItem key={o.sc.id} value={o.sc.id}>
+                                {o.sc.emoji} {o.sc.title} · {o.sc.tag} ({o.score.toFixed(2)})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </td>
+                      <td className="p-3">
+                        <Select
+                          value={dec?.action ?? ""}
+                          onValueChange={(v) => update(key, { action: v as OnbAction })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="—" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="replace">Replace</SelectItem>
+                            <SelectItem value="delete">Delete</SelectItem>
+                            <SelectItem value="keep">Keep</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </Card>
+        );
+      })}
     </div>
   );
 }
