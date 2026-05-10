@@ -221,14 +221,14 @@ const NativeAppLayout = () => {
         className={cn(
           'fixed left-3 right-3 z-50',
           'bottom-[calc(12px+env(safe-area-inset-bottom))]',
-          'flex items-end gap-2',
+          'flex items-start gap-2',
         )}
       >
         {/* Main nav pill (4 items) */}
         <LayoutGroup id="nav-active-pill">
           <div
             className={cn(
-              'flex-1 self-end rounded-[28px] px-2 py-2',
+              'flex-1 self-start rounded-[28px] px-2 py-2',
               'border-[0.5px] shadow-card-warm',
               'backdrop-blur-2xl backdrop-saturate-150',
               location.pathname.startsWith('/app/watch')
