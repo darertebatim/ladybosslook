@@ -737,7 +737,7 @@ const AppSettings = () => {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">
-                {currentLang === "fa" ? "فارسی" : "English"}
+                {currentLang === "fa" ? "فارسی" : "American"}
               </span>
               <ChevronDown
                 className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has("language") ? "rotate-180" : ""}`}
@@ -756,7 +756,7 @@ const AppSettings = () => {
                 >
                   <span className="flex items-center gap-3">
                     <span className="text-base leading-none">🇺🇸</span>
-                    <span className="text-sm font-medium">English</span>
+                    <span className="text-sm font-medium">American</span>
                   </span>
                   {currentLang === "en" && (
                     <span className="text-xs font-semibold text-primary">
