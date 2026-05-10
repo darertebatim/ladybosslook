@@ -13,6 +13,7 @@ import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, Command
 import { toast } from "sonner";
 import { Loader2, Check, X, ChevronsUpDown } from "lucide-react";
 import { whatIsRiloFlow } from "@/data/onboarding-flows/what-is-rilo";
+import { cn } from "@/lib/utils";
 
 // Normalized (lowercased, no spaces/dashes) self-care tag keys.
 // DB has mixed casing/spacing like "Easy Win", "easy-win", "TidyUp", "LovedOnes".
