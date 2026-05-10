@@ -9,7 +9,7 @@ import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import type { ProLinkType } from '@/lib/proTaskTypes';
-import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
+import { AmbientGlow } from './visuals/AmbientGlow';
 
 interface SuggestedTask {
   id: string;
@@ -218,14 +218,23 @@ export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Pro
   };
 
   return (
-    <div className="h-full flex flex-col relative overflow-hidden">
-      {/* Hero mascot header */}
-      <div className="shrink-0 relative" style={{ height: 140 }}>
-        <img src={meplusMascotBg} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
+    <div className="h-full flex flex-col relative overflow-hidden bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]">
+      <AmbientGlow palette="rose" />
+
+      {/* Animated header visual */}
+      <div className="shrink-0 relative z-10 pt-7 pb-2 flex justify-center">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 220, damping: 18 }}
+          className="relative w-[88px] h-[88px] rounded-full bg-gradient-to-br from-[#FFD49A] via-[#EC4899] to-[#8A5CF0] shadow-[0_14px_30px_-10px_rgba(236,72,153,0.55)] flex items-center justify-center"
+        >
+          <FluentEmoji emoji="🌿" size={44} />
+        </motion.div>
       </div>
 
-      {/* White bottom sheet */}
-      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-y-auto overscroll-contain">
+      {/* Content */}
+      <div className="flex-1 relative z-10 flex flex-col overflow-y-auto overscroll-contain">
         <div className="px-5 pt-5 flex flex-col flex-1 min-h-0" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -233,14 +242,14 @@ export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Pro
             transition={{ duration: 0.4 }}
             className="flex-1 flex flex-col"
           >
-            <h2 className="text-[22px] font-extrabold text-foreground mb-1">Suggested Goals for You</h2>
+            <h2 className="text-[24px] font-extrabold text-[#1a1f3d] text-center mb-1">Suggested Goals for You</h2>
             
             {/* Subtitle + Select All row */}
-            <div className="flex items-center justify-between mb-5">
-              <p className="text-sm font-semibold text-foreground">Select the Tasks you want to add</p>
+            <div className="flex items-center justify-between mb-5 mt-2">
+              <p className="text-sm font-semibold text-[#1a1f3d]/80">Select the Tasks you want to add</p>
               <button
                 onClick={handleSelectAll}
-                className="text-xs font-bold text-primary px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 active:scale-95 transition-all shrink-0"
+                className="text-xs font-bold text-[#B8590E] px-3 py-1.5 rounded-full border border-[#F08A3E]/30 bg-white/70 backdrop-blur active:scale-95 transition-all shrink-0"
               >
                 {allSelected ? 'Deselect All' : 'Select All'}
               </button>
@@ -301,13 +310,13 @@ export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Pro
 
       {/* Fixed bottom button */}
       <div
-        className="fixed left-0 right-0 bottom-0 z-40 px-5 pb-5 pt-3 bg-gradient-to-t from-white via-white to-white/0"
+        className="fixed left-0 right-0 bottom-0 z-40 px-5 pb-5 pt-3 bg-gradient-to-t from-[#F0E6FF] via-[#F0E6FF]/85 to-transparent"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)' }}
       >
         {selectionCount > 0 ? (
           <button
             onClick={handleBuildRoutine}
-            className="w-full py-4 rounded-2xl bg-[#1a1f3d] text-white font-bold text-base active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            className="w-full h-[56px] rounded-2xl text-white font-bold text-base active:opacity-80 transition-opacity flex items-center justify-center gap-2 bg-gradient-to-r from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] shadow-[0_12px_30px_-8px_rgba(138,92,240,0.55)]"
           >
             <FluentEmoji emoji="✨" size={20} />
             Build My Routine ({selectionCount})
@@ -315,7 +324,7 @@ export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Pro
         ) : (
           <button
             onClick={onNext}
-            className="w-full py-4 rounded-2xl bg-muted text-muted-foreground font-bold text-base active:scale-[0.98] transition-all"
+            className="w-full py-4 rounded-2xl bg-white/70 backdrop-blur text-[#1a1f3d]/60 font-bold text-base active:scale-[0.98] transition-all"
           >
             Skip
           </button>
