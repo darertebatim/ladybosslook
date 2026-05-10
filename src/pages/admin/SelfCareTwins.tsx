@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Loader2, Check, X } from "lucide-react";
 import { whatIsRiloFlow } from "@/data/onboarding-flows/what-is-rilo";
@@ -280,6 +281,63 @@ function saveDecisions(d: Record<string, OnbDecision>) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
 }
 
+function buildOnboardingPlan(
+  buckets: { bucket: string; label: string; emoji: string }[],
+  decisions: Record<string, OnbDecision>,
+  selfCare: Task[]
+) {
+  return buckets.map((b) => {
+    const key = `${b.bucket}::${b.label}`;
+    const d = decisions[key];
+    const twin = d?.twinId ? selfCare.find((s) => s.id === d.twinId) : null;
+
+    return {
+      ...b,
+      action: d?.action || 'keep',
+      twinId: twin?.id ?? null,
+      twinTitle: twin ? `${twin.emoji} ${twin.title}` : null,
+    };
+  });
+}
+
+async function copyTextWithFallback(text: string) {
+  if (typeof navigator !== 'undefined' && window.isSecureContext && navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return true;
+  }
+
+  if (typeof document === 'undefined') return false;
+
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.setAttribute('readonly', 'true');
+  textArea.style.position = 'fixed';
+  textArea.style.opacity = '0';
+  textArea.style.pointerEvents = 'none';
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  textArea.setSelectionRange(0, text.length);
+
+  try {
+    return document.execCommand('copy');
+  } finally {
+    document.body.removeChild(textArea);
+  }
+}
+
+function downloadJsonFile(filename: string, text: string) {
+  const blob = new Blob([text], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 function OnboardingTwins({ selfCare }: { selfCare: Task[] }) {
   const [decisions, setDecisions] = useState<Record<string, OnbDecision>>(loadDecisions);
 
@@ -303,15 +361,22 @@ function OnboardingTwins({ selfCare }: { selfCare: Task[] }) {
     });
   };
 
-  const exportPlan = () => {
-    const plan = buckets.map(b => {
-      const key = `${b.bucket}::${b.label}`;
-      const d = decisions[key];
-      const twin = d?.twinId ? selfCare.find(s => s.id === d.twinId) : null;
-      return { ...b, action: d?.action || 'keep', twin: twin ? `${twin.emoji} ${twin.title}` : null };
-    });
-    navigator.clipboard.writeText(JSON.stringify(plan, null, 2));
-    toast.success("Plan copied to clipboard");
+  const planJson = useMemo(
+    () => JSON.stringify(buildOnboardingPlan(buckets, decisions, selfCare), null, 2),
+    [buckets, decisions, selfCare]
+  );
+
+  const exportPlan = async () => {
+    try {
+      const copied = await copyTextWithFallback(planJson);
+      if (copied) {
+        toast.success("Plan copied to clipboard");
+      } else {
+        toast.error("Copy was blocked. Use the JSON box below or download the file.");
+      }
+    } catch {
+      toast.error("Copy failed. Use the JSON box below or download the file.");
+    }
   };
 
   const counts = useMemo(() => {
@@ -334,13 +399,25 @@ function OnboardingTwins({ selfCare }: { selfCare: Task[] }) {
           <Badge variant="outline" className="mr-2">Delete: {counts.d}</Badge>
           <Badge variant="outline" className="mr-2">Keep: {counts.k}</Badge>
           <Badge variant="secondary">Undecided: {counts.u}</Badge>
+          <p className="mt-2 text-xs text-muted-foreground">Your choices are auto-saved on this device while you work.</p>
         </div>
         <div className="ml-auto flex gap-2">
           <Button size="sm" variant="outline" onClick={exportPlan}>Copy plan as JSON</Button>
+          <Button size="sm" variant="outline" onClick={() => downloadJsonFile('onboarding-twin-plan.json', planJson)}>
+            Download JSON
+          </Button>
           <Button size="sm" variant="ghost" onClick={() => { localStorage.removeItem(STORAGE_KEY); setDecisions({}); }}>
             Reset
           </Button>
         </div>
+      </Card>
+
+      <Card className="p-4 space-y-3">
+        <div>
+          <div className="font-medium">Plan JSON</div>
+          <div className="text-xs text-muted-foreground">If clipboard access is blocked, copy from here or download the file.</div>
+        </div>
+        <Textarea value={planJson} readOnly className="min-h-[220px] font-mono text-xs" />
       </Card>
 
       {(['morning','afternoon','evening'] as const).map(bucket => {
