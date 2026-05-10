@@ -797,23 +797,8 @@ export default function AppPlaylistDetail() {
         >
           {/* Playlist Info */}
           <div className="p-4 space-y-4">
-            <div className="flex gap-4">
-              <div className="relative h-32 w-32 flex-shrink-0 rounded-lg overflow-hidden">
-                {playlist.cover_image_url ? (
-                  <img
-                    src={playlist.cover_image_url}
-                    alt={playlist.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-foreground/5 flex items-center justify-center">
-                    <Music className="h-12 w-12 text-fg-warm-muted" />
-                  </div>
-                )}
-              </div>
-
-              <div className="flex-1 space-y-2">
-                <div className="flex gap-2 flex-nowrap items-center overflow-x-auto">
+            {/* Pills row above cover + title */}
+            <div className="flex gap-2 flex-wrap items-center">
                   {playlist.category && (
                     <Badge
                       variant="secondary"
@@ -887,7 +872,24 @@ export default function AppPlaylistDetail() {
                     !playlist.requires_subscription && (
                       <Badge variant="destructive">{t('playlistDetailPage.locked')}</Badge>
                     )}
-                </div>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="relative h-32 w-32 flex-shrink-0 rounded-lg overflow-hidden">
+                {playlist.cover_image_url ? (
+                  <img
+                    src={playlist.cover_image_url}
+                    alt={playlist.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-foreground/5 flex items-center justify-center">
+                    <Music className="h-12 w-12 text-fg-warm-muted" />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex-1 space-y-2">
                 <h1 className="text-2xl font-bold text-fg-warm">
                   {playlist.name}
                 </h1>
