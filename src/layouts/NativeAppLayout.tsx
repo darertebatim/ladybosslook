@@ -228,7 +228,7 @@ const NativeAppLayout = () => {
         <LayoutGroup id="nav-active-pill">
           <div
             className={cn(
-              'flex-1 rounded-[28px] px-2 py-2',
+              'flex-1 self-end rounded-[28px] px-2 py-2',
               'border-[0.5px] shadow-card-warm',
               'backdrop-blur-2xl backdrop-saturate-150',
               location.pathname.startsWith('/app/watch')
