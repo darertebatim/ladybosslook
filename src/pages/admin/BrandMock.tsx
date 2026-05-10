@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Flame, Calendar, Headphones, BookOpen, Heart, Sparkles, ChevronRight, Check, Sun, Moon, Droplets, Wind, Home, Compass, CalendarPlus, Music, Users, Menu, Headset, Star, Zap, Settings2, Search } from 'lucide-react';
-import { Globe, Lock } from 'lucide-react';
+import { Globe, Lock, Mic, ArrowUp, Play, ChevronDown } from 'lucide-react';
 import heroStormVideo from '@/assets/watch-hero-storm.mp4';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import appIcon from '@/assets/app-icon.png';
@@ -493,6 +493,271 @@ export default function BrandMock() {
           </div>
 
         </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════ */}
+      {/* ── Coach Home (AI-powered focused home) ── */}
+      {/* ═══════════════════════════════════════════════ */}
+      <div className="pt-8">
+        <h2 className="text-xl font-bold text-foreground text-center mb-1">💬 Coach Home — AI-powered focused home</h2>
+        <p className="text-center text-muted-foreground text-sm mb-6">
+          A second home opposite the Planner: one greeting, one focus, one conversation with the instructor's AI clone.
+        </p>
+      </div>
+      <div className="flex justify-center">
+        <div
+          className="relative w-[375px] rounded-[40px] shadow-2xl overflow-hidden transition-colors duration-500 flex flex-col"
+          style={{
+            background: darkMode
+              ? 'linear-gradient(180deg, #1A0F08 0%, #2A1810 100%)'
+              : `linear-gradient(180deg, ${O.bgWarm} 0%, #FFFFFF 60%)`,
+            border: `3px solid ${darkMode ? '#3D2A1A' : '#E8D6C8'}`,
+            minHeight: 780,
+          }}
+        >
+          {/* Status bar */}
+          <div className="flex items-center justify-between px-8 pt-4 pb-2">
+            <span className="text-xs font-semibold" style={{ color: fgMuted }}>9:41</span>
+            <div className="flex gap-1.5">
+              <div className="w-4 h-2 rounded-sm" style={{ background: fgMuted }} />
+              <div className="w-4 h-2 rounded-sm" style={{ background: fgMuted }} />
+            </div>
+          </div>
+
+          {/* Header — Plan ⇆ Coach pill switcher */}
+          <div className="px-4 pt-1 pb-3">
+            <div className="grid grid-cols-[auto_1fr_auto] items-center h-9">
+              <button className="p-1.5 -ml-1" style={{ color: fg }}>
+                <Menu className="w-[18px] h-[18px]" />
+              </button>
+              <div className="flex justify-center">
+                <div
+                  className="flex items-center rounded-full p-0.5"
+                  style={{
+                    background: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
+                  }}
+                >
+                  <button
+                    className="text-[12px] font-semibold px-3 py-1 rounded-full"
+                    style={{ color: fgMuted }}
+                  >
+                    Plan
+                  </button>
+                  <button
+                    className="text-[12px] font-bold px-3 py-1 rounded-full"
+                    style={{
+                      background: O.primary,
+                      color: '#FFFFFF',
+                      boxShadow: '0 2px 8px rgba(235,94,51,0.35)',
+                    }}
+                  >
+                    Coach
+                  </button>
+                </div>
+              </div>
+              <button className="p-1.5" style={{ color: fg }}>
+                <Headset className="w-[18px] h-[18px]" />
+              </button>
+            </div>
+          </div>
+
+          {/* Hero greeting — instructor avatar + warm one-liner */}
+          <div className="px-5 pt-2 pb-4 flex flex-col items-center text-center">
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center mb-3"
+              style={{
+                background: `linear-gradient(135deg, ${O.primaryL}, ${O.primary})`,
+                boxShadow: '0 8px 24px rgba(235,94,51,0.35)',
+              }}
+            >
+              <FluentEmoji emoji="👩🏻‍🏫" size={42} />
+            </div>
+            <div className="text-[11px] font-semibold tracking-wide uppercase mb-1" style={{ color: O.primary }}>
+              Rilo Coach
+            </div>
+            <h2 className="text-[20px] font-bold leading-snug" style={{ color: fg }}>
+              Morning, Sara —<br />let's start with one thing.
+            </h2>
+          </div>
+
+          {/* ONE Focus Card — the AI's chosen next move */}
+          <div className="px-4 pb-3">
+            <div
+              className="rounded-3xl p-4 relative overflow-hidden"
+              style={{
+                background: darkMode
+                  ? `linear-gradient(135deg, ${O.peachDark}, #2A1810)`
+                  : `linear-gradient(135deg, #FFFFFF, ${O.peach})`,
+                boxShadow: darkMode
+                  ? '0 8px 24px rgba(0,0,0,0.4)'
+                  : '0 8px 24px rgba(235,94,51,0.15)',
+                border: `1px solid ${darkMode ? '#3D2A1A' : O.peachMid}`,
+              }}
+            >
+              <div className="flex items-start gap-3 mb-3">
+                <div
+                  className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+                  style={{ background: darkMode ? O.peachDark : '#FFFFFF' }}
+                >
+                  <FluentEmoji emoji="🧘‍♀️" size={30} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] font-bold tracking-wide uppercase mb-1" style={{ color: O.primary }}>
+                    Your one focus now
+                  </div>
+                  <div className="text-[16px] font-bold leading-tight" style={{ color: fg }}>
+                    2-minute morning breath
+                  </div>
+                  <div className="text-[12px] mt-1" style={{ color: fgMuted }}>
+                    You said mornings feel rushed — start small.
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  className="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-2xl text-[14px] font-bold"
+                  style={{
+                    background: O.primary,
+                    color: '#FFFFFF',
+                    boxShadow: '0 4px 14px rgba(235,94,51,0.35)',
+                  }}
+                >
+                  <Play className="w-3.5 h-3.5" fill="#FFFFFF" />
+                  Start now
+                </button>
+                <button
+                  className="px-4 py-3 rounded-2xl text-[13px] font-semibold"
+                  style={{
+                    background: darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                    color: fgMuted,
+                  }}
+                >
+                  Skip
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Conversation surface */}
+          <div className="px-4 pb-3 space-y-3 flex-1">
+            {/* Assistant message — text */}
+            <div className="flex gap-2 items-start">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5"
+                style={{ background: `linear-gradient(135deg, ${O.primaryL}, ${O.primary})` }}
+              >
+                <FluentEmoji emoji="👩🏻‍🏫" size={18} />
+              </div>
+              <div className="text-[13px] leading-relaxed pt-0.5 max-w-[85%]" style={{ color: fg }}>
+                I peeked at your plan — 3 things today. Tell me how you're feeling and I'll pick the easiest entry point.
+              </div>
+            </div>
+
+            {/* Tool-call card (collapsed accordion) */}
+            <div className="ml-9">
+              <div
+                className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium"
+                style={{
+                  background: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+                  color: fgMuted,
+                }}
+              >
+                <Calendar className="w-3 h-3" />
+                Looked at your plan
+                <ChevronDown className="w-3 h-3 opacity-60" />
+              </div>
+            </div>
+
+            {/* User message — bubble */}
+            <div className="flex justify-end">
+              <div
+                className="max-w-[80%] px-3.5 py-2.5 rounded-2xl rounded-br-md text-[13px] leading-relaxed"
+                style={{
+                  background: O.primary,
+                  color: '#FFFFFF',
+                }}
+              >
+                honestly i'm overwhelmed
+              </div>
+            </div>
+
+            {/* Assistant follow-up */}
+            <div className="flex gap-2 items-start">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5"
+                style={{ background: `linear-gradient(135deg, ${O.primaryL}, ${O.primary})` }}
+              >
+                <FluentEmoji emoji="👩🏻‍🏫" size={18} />
+              </div>
+              <div className="text-[13px] leading-relaxed pt-0.5 max-w-[85%]" style={{ color: fg }}>
+                That's okay. Forget the list. Just the breath above — 2 minutes. I'll be here when you're done. 🧡
+              </div>
+            </div>
+          </div>
+
+          {/* Suggestion chips */}
+          <div className="px-4 pb-2">
+            <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+              {['What\'s next?', 'I skipped yesterday', 'Plan my evening', 'I need a reset'].map((chip) => (
+                <button
+                  key={chip}
+                  className="shrink-0 px-3 py-1.5 rounded-full text-[12px] font-medium whitespace-nowrap"
+                  style={{
+                    background: darkMode ? 'rgba(255,255,255,0.06)' : '#FFFFFF',
+                    color: fg,
+                    border: `1px solid ${darkMode ? '#3D2A1A' : O.border}`,
+                  }}
+                >
+                  {chip}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Composer */}
+          <div className="px-4 pb-6 pt-2">
+            <div
+              className="flex items-center gap-2 rounded-full pl-4 pr-1.5 py-1.5"
+              style={{
+                background: darkMode ? 'rgba(255,255,255,0.06)' : '#FFFFFF',
+                border: `1px solid ${darkMode ? '#3D2A1A' : O.border}`,
+                boxShadow: darkMode ? 'none' : '0 4px 14px rgba(60,30,10,0.06)',
+              }}
+            >
+              <input
+                placeholder="Talk to Rilo…"
+                className="flex-1 bg-transparent text-[14px] outline-none py-1.5"
+                style={{ color: fg }}
+                readOnly
+              />
+              <button
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ color: fgMuted }}
+              >
+                <Mic className="w-[18px] h-[18px]" />
+              </button>
+              <button
+                className="w-9 h-9 rounded-full flex items-center justify-center"
+                style={{
+                  background: O.primary,
+                  color: '#FFFFFF',
+                  boxShadow: '0 2px 8px rgba(235,94,51,0.35)',
+                }}
+              >
+                <ArrowUp className="w-[18px] h-[18px]" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Concept notes under the mock */}
+      <div className="max-w-[640px] mx-auto pt-2 pb-4 text-[13px] leading-relaxed text-muted-foreground space-y-2">
+        <p><strong className="text-foreground">Header:</strong> 2-pill switcher between <em>Plan</em> (current home) and <em>Coach</em> (this screen).</p>
+        <p><strong className="text-foreground">Hero:</strong> instructor's AI clone — avatar + warm one-liner that pulls live context (time of day, mood, streak).</p>
+        <p><strong className="text-foreground">One Focus Card:</strong> a single next action chosen by the AI, with the reason. Big "Start" tap target. No lists, no tiles.</p>
+        <p><strong className="text-foreground">Chat:</strong> instructor-voice replies, tool-call chips ("Looked at your plan", "Marked done", "Added to today") so users see real grounding.</p>
+        <p><strong className="text-foreground">Composer:</strong> text + voice. Suggestion chips above for one-tap entry.</p>
       </div>
 
       {/* ═══════════════════════════════════════════════ */}
