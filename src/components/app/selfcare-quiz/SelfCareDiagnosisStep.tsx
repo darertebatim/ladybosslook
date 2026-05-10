@@ -4,7 +4,7 @@ import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { supabase } from '@/integrations/supabase/client';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { computeGapCategories, computeTopCluster, ClusterType } from '@/utils/selfcare-scoring';
-import meplusMascotBg from '@/assets/meplus-mascot-bg.png';
+import { AmbientGlow } from './visuals/AmbientGlow';
 
 interface Props {
   step: OnboardingStep;
@@ -202,12 +202,27 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
   const currentStatus = STATUS_MESSAGES[statusIdx];
 
   return (
-    <div className="h-full flex flex-col relative overflow-hidden">
-      <div className="shrink-0 relative" style={{ height: 200 }}>
-        <img src={meplusMascotBg} alt="" className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />
+    <div className="h-full flex flex-col relative overflow-hidden bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]">
+      <AmbientGlow palette="warm" />
+
+      {/* Animated header visual */}
+      <div className="shrink-0 relative z-10 pt-8 pb-3 flex justify-center">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 18 }}
+          className="relative w-[110px] h-[110px] rounded-full bg-gradient-to-br from-[#FFD49A] via-[#F08A3E] to-[#EC4899] shadow-[0_18px_38px_-12px_rgba(236,72,153,0.55)] flex items-center justify-center"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: phase === 'loading' ? 4 : 18, repeat: Infinity, ease: 'linear' }}
+            className="absolute inset-[-12px] rounded-full border-2 border-dashed border-[#F08A3E]/40"
+          />
+          <FluentEmoji emoji={phase === 'loading' ? '🔍' : '✨'} size={56} />
+        </motion.div>
       </div>
 
-      <div className="flex-1 bg-white rounded-t-[28px] -mt-6 relative z-10 flex flex-col overflow-hidden">
+      <div className="flex-1 relative z-10 flex flex-col overflow-hidden">
         <div className="px-5 pt-5 flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain">
           <AnimatePresence mode="wait">
             {phase === 'loading' && (
@@ -362,10 +377,10 @@ export function SelfCareDiagnosisStep({ step, onNext, onAnswer, answers }: Props
 
         {/* Sticky bottom button — only show in results phase */}
         {phase === 'results' && (
-          <div className="sticky bottom-0 left-0 right-0 px-5 pb-5 pt-3 bg-gradient-to-t from-white via-white to-white/0 z-20" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)' }}>
+          <div className="sticky bottom-0 left-0 right-0 px-5 pb-5 pt-3 bg-gradient-to-t from-[#F0E6FF] via-[#F0E6FF]/85 to-transparent z-20" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)' }}>
             <button
               onClick={onNext}
-              className="w-full rounded-2xl bg-primary py-4 text-base font-bold text-primary-foreground transition-all active:scale-[0.98]"
+              className="w-full h-[56px] rounded-2xl text-white font-bold text-base active:opacity-80 transition-opacity bg-gradient-to-r from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] shadow-[0_12px_30px_-8px_rgba(138,92,240,0.55)]"
             >
               {step.buttonLabel || 'See Suggested Goals →'}
             </button>
