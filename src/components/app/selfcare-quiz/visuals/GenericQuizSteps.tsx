@@ -43,30 +43,95 @@ export function ScIntroScreen({ step, onNext }: BaseProps) {
 }
 
 function IntroOrb() {
+  const orbitChips = [
+    { emoji: '🧘‍♀️', x: -130, y: -40, d: 0.2 },
+    { emoji: '💧', x: 130, y: -60, d: 0.35 },
+    { emoji: '🌿', x: -110, y: 90, d: 0.5 },
+    { emoji: '😴', x: 120, y: 80, d: 0.6 },
+    { emoji: '🍎', x: 0, y: -130, d: 0.7 },
+    { emoji: '💗', x: 0, y: 140, d: 0.8 },
+  ];
   return (
-    <div className="relative w-[240px] h-[240px] flex items-center justify-center">
-      {[0, 1, 2].map((i) => (
+    <div className="relative w-[300px] h-[300px] flex items-center justify-center">
+      {/* Pulsing rings */}
+      {[0, 1, 2, 3].map((i) => (
         <motion.div
           key={i}
-          initial={{ scale: 0.5, opacity: 0.5 }}
-          animate={{ scale: 1.4, opacity: 0 }}
-          transition={{ duration: 2.2, delay: i * 0.55, repeat: Infinity, ease: 'easeOut' }}
+          initial={{ scale: 0.4, opacity: 0.6 }}
+          animate={{ scale: 1.7, opacity: 0 }}
+          transition={{ duration: 2.6, delay: i * 0.5, repeat: Infinity, ease: 'easeOut' }}
           className="absolute w-[180px] h-[180px] rounded-full border-2"
-          style={{ borderColor: ['#F08A3E', '#EC4899', '#8A5CF0'][i] }}
+          style={{ borderColor: ['#F08A3E', '#EC4899', '#8A5CF0', '#FFB6D1'][i] }}
         />
       ))}
+      {/* Orbiting dashed ring */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 14, repeat: Infinity, ease: 'linear' }}
+        className="absolute w-[260px] h-[260px] rounded-full border border-dashed border-[#1a1f3d]/15"
+      />
+      <motion.div
+        animate={{ rotate: -360 }}
+        transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
+        className="absolute w-[200px] h-[200px] rounded-full border border-[#1a1f3d]/10"
+      />
+      {/* Floating self-care chips around the orb */}
+      {orbitChips.map((c, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, scale: 0.4 }}
+          animate={{ opacity: 1, scale: 1, y: [0, -6, 0] }}
+          transition={{
+            opacity: { duration: 0.5, delay: c.d },
+            scale: { duration: 0.5, delay: c.d, type: 'spring', stiffness: 200, damping: 14 },
+            y: { duration: 3 + i * 0.3, delay: c.d, repeat: Infinity, ease: 'easeInOut' },
+          }}
+          className="absolute"
+          style={{ transform: `translate(${c.x}px, ${c.y}px)` }}
+        >
+          <div className="w-[44px] h-[44px] rounded-full bg-white/85 backdrop-blur-sm flex items-center justify-center shadow-[0_8px_20px_-6px_rgba(138,92,240,0.4)] text-[22px]">
+            {c.emoji}
+          </div>
+        </motion.div>
+      ))}
+      {/* Sparkle particles */}
+      {Array.from({ length: 8 }).map((_, i) => {
+        const angle = (i / 8) * Math.PI * 2;
+        const r = 95;
+        return (
+          <motion.span
+            key={`sp-${i}`}
+            initial={{ opacity: 0, scale: 0.4 }}
+            animate={{ opacity: [0, 1, 0], scale: [0.4, 1.1, 0.4] }}
+            transition={{ duration: 1.8, delay: 0.3 + i * 0.18, repeat: Infinity, repeatDelay: 0.6 }}
+            className="absolute text-[14px]"
+            style={{ transform: `translate(${Math.cos(angle) * r}px, ${Math.sin(angle) * r}px)`, color: '#F08A3E' }}
+          >
+            ✦
+          </motion.span>
+        );
+      })}
+      {/* Core orb */}
       <motion.div
         initial={{ scale: 0.6, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
+        animate={{ scale: [1, 1.06, 1], opacity: 1 }}
         transition={{ duration: 0.6, type: 'spring', stiffness: 220, damping: 18 }}
-        className="relative w-[120px] h-[120px] rounded-full bg-gradient-to-br from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] shadow-[0_24px_60px_-12px_rgba(138,92,240,0.55)] flex items-center justify-center"
+        className="relative w-[140px] h-[140px] rounded-full bg-gradient-to-br from-[#FFB347] via-[#EC4899] to-[#8A5CF0] shadow-[0_28px_70px_-12px_rgba(236,72,153,0.6)] flex items-center justify-center"
       >
+        {/* Inner gloss */}
+        <div className="absolute inset-3 rounded-full bg-gradient-to-br from-white/40 to-transparent" />
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
           className="absolute inset-[-12px] rounded-full border-2 border-dashed border-white/60"
         />
-        <span className="text-5xl">✨</span>
+        <motion.span
+          animate={{ scale: [1, 1.15, 1], rotate: [0, 8, -8, 0] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+          className="text-[56px] relative z-10 drop-shadow-[0_4px_10px_rgba(0,0,0,0.25)]"
+        >
+          ✨
+        </motion.span>
       </motion.div>
     </div>
   );
