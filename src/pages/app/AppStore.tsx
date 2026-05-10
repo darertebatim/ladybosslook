@@ -462,10 +462,10 @@ const AppStore = () => {
                     <ChevronRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
-                <div
-                  className="flex gap-3 overflow-x-auto -mx-4 px-4 pt-1 pb-2 scrollbar-hide"
-                  style={{ WebkitOverflowScrolling: "touch" }}
-                >
+                 <div
+                   className="flex gap-3 overflow-x-auto overflow-y-visible -mx-4 px-4 pt-3 pb-2 scrollbar-hide"
+                   style={{ WebkitOverflowScrolling: "touch" }}
+                 >
                   {selfcareRoutines.slice(0, 8).map((routine) => (
                     <div key={routine.id} className="shrink-0 w-40">
                       <RoutineBankCard
