@@ -28,6 +28,7 @@ import { SelfCareReflectionStep } from '@/components/app/selfcare-quiz/SelfCareR
 import { SelfCareRiloCelebrationStep } from '@/components/app/selfcare-quiz/SelfCareRiloCelebrationStep';
 import { SelfCarePlusIntroStep } from '@/components/app/selfcare-quiz/SelfCarePlusIntroStep';
 import { SelfCarePushPermissionStep } from '@/components/app/selfcare-quiz/SelfCarePushPermissionStep';
+import { SelfCareQuizScreen } from '@/components/app/selfcare-quiz/SelfCareQuizScreen';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 import { computeTopCluster } from '@/utils/selfcare-scoring';
 import { RiloTeachScreen } from '@/components/admin/onboarding/RiloTeachScreen';
