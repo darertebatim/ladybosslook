@@ -14,6 +14,14 @@ const LANG_FLAGS: Record<string, string> = {
   spanish: '🇪🇸',
 };
 
+const LANG_LABELS: Record<string, string> = {
+  all: 'All',
+  american: 'American',
+  persian: 'Persian',
+  turkish: 'Türkçe',
+  spanish: 'Español',
+};
+
 // Pastel tile palette (mirrors BrandMock O.* tokens) — keyed by category
 const CATEGORY_TILE: Record<string, { bg: string; emoji: string }> = {
   meditate:    { bg: '#F0E3FF', emoji: '🧘‍♀️' }, // lavender
@@ -158,9 +166,12 @@ export const PlaylistCard = memo(function PlaylistCard({
               </span>
             )}
             {language && language !== 'all' && (
-              language === 'persian'
-                ? <PersianFlag size={12} />
-                : LANG_FLAGS[language] && <span className="text-[13px] leading-none">{LANG_FLAGS[language]}</span>
+              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-fg-warm-muted">
+                {language === 'persian'
+                  ? <PersianFlag size={12} />
+                  : LANG_FLAGS[language] && <span className="text-[13px] leading-none">{LANG_FLAGS[language]}</span>}
+                {LANG_LABELS[language] && <span>{LANG_LABELS[language]}</span>}
+              </span>
             )}
             {(!isLocked || isFree) && progressPercentage > 0 && (
               <span className="text-[10px] text-fg-warm-muted font-medium">
