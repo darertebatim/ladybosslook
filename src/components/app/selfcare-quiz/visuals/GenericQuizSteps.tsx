@@ -164,49 +164,93 @@ export function ScHookScreen({ step, onNext }: BaseProps) {
 }
 
 function OrbitingBadges({ badges }: { badges: { emoji: string; label: string }[] }) {
+  const COLORS = ['#F08A3E', '#EC4899', '#8A5CF0', '#FFB347', '#FF6B9D', '#A78BFA', '#FBBF24'];
   // Place badges around an oval orbit
   const positions = useMemo(() => {
-    const W = 280, H = 240;
-    return badges.slice(0, 13).map((b, i) => {
-      const t = i / Math.max(badges.length, 1);
+    const list = badges.slice(0, 13);
+    const W = 300, H = 280;
+    return list.map((b, i) => {
+      const t = i / Math.max(list.length, 1);
       const angle = t * Math.PI * 2 - Math.PI / 2;
-      const x = Math.cos(angle) * (W / 2 - 30);
-      const y = Math.sin(angle) * (H / 2 - 24);
-      return { ...b, x, y, delay: 0.1 + i * 0.05 };
+      const radius = i % 2 === 0 ? 1 : 0.78;
+      const x = Math.cos(angle) * (W / 2 - 30) * radius;
+      const y = Math.sin(angle) * (H / 2 - 26) * radius;
+      return { ...b, x, y, delay: 0.1 + i * 0.05, color: COLORS[i % COLORS.length] };
     });
   }, [badges]);
   return (
-    <div className="relative w-[280px] h-[260px]">
+    <div className="relative w-[300px] h-[300px]">
       {/* faded life-wheel rings */}
       <div className="absolute inset-0 flex items-center justify-center">
-        {[0, 1, 2].map((i) => (
-          <div
+        {[0, 1, 2, 3].map((i) => (
+          <motion.div
             key={i}
-            className="absolute rounded-full border border-[#1a1f3d]/10"
-            style={{ width: 90 + i * 50, height: 90 + i * 50 }}
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.6, delay: i * 0.08 }}
+            className="absolute rounded-full border border-dashed border-[#1a1f3d]/15"
+            style={{ width: 80 + i * 50, height: 80 + i * 50 }}
           />
         ))}
+        {/* Rotating gradient ring */}
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
+          className="absolute w-[230px] h-[230px] rounded-full"
+          style={{
+            background: 'conic-gradient(from 0deg, #F08A3E33, #EC489933, #8A5CF033, #F08A3E33)',
+            mask: 'radial-gradient(circle, transparent 50%, black 51%, black 60%, transparent 61%)',
+            WebkitMask: 'radial-gradient(circle, transparent 50%, black 51%, black 60%, transparent 61%)',
+          }}
+        />
         <motion.div
           initial={{ scale: 0.4, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
+          animate={{ scale: [1, 1.06, 1], opacity: 1 }}
           transition={{ duration: 0.5, type: 'spring', stiffness: 220, damping: 18 }}
-          className="w-[80px] h-[80px] rounded-full bg-gradient-to-br from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] flex items-center justify-center text-white text-2xl font-extrabold shadow-[0_12px_30px_-8px_rgba(138,92,240,0.5)]"
+          className="relative w-[90px] h-[90px] rounded-full bg-gradient-to-br from-[#FFB347] via-[#EC4899] to-[#8A5CF0] flex items-center justify-center text-white text-[20px] font-extrabold shadow-[0_16px_36px_-8px_rgba(236,72,153,0.55)]"
         >
-          You
+          <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white/30 to-transparent" />
+          <span className="relative z-10">You</span>
         </motion.div>
       </div>
       {positions.map((p, i) => (
         <motion.div
           key={i}
           initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
+          animate={{ opacity: 1, scale: 1, y: [0, -4, 0] }}
           transition={{ duration: 0.4, delay: p.delay, type: 'spring', stiffness: 200, damping: 16 }}
           className="absolute"
           style={{ left: '50%', top: '50%', transform: `translate(calc(-50% + ${p.x}px), calc(-50% + ${p.y}px))` }}
         >
-          <FloatingChip emoji={p.emoji} delay={p.delay} amplitude={4} emojiSize={20} />
+          <div
+            className="w-[42px] h-[42px] rounded-full flex items-center justify-center backdrop-blur-sm"
+            style={{
+              background: `linear-gradient(135deg, ${p.color}33, white)`,
+              boxShadow: `0 8px 20px -6px ${p.color}66`,
+              border: `1.5px solid ${p.color}55`,
+            }}
+          >
+            <FluentEmoji emoji={p.emoji} size={22} />
+          </div>
         </motion.div>
       ))}
+      {/* Floating sparkles */}
+      {Array.from({ length: 10 }).map((_, i) => {
+        const angle = (i / 10) * Math.PI * 2;
+        const r = 70 + (i % 3) * 18;
+        return (
+          <motion.span
+            key={`sp-${i}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 0], scale: [0.5, 1, 0.5] }}
+            transition={{ duration: 2, delay: i * 0.2, repeat: Infinity, repeatDelay: 0.8 }}
+            className="absolute left-1/2 top-1/2 text-[10px]"
+            style={{ transform: `translate(${Math.cos(angle) * r}px, ${Math.sin(angle) * r}px)`, color: COLORS[i % COLORS.length] }}
+          >
+            ✦
+          </motion.span>
+        );
+      })}
     </div>
   );
 }
