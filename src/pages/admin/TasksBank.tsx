@@ -512,8 +512,12 @@ export default function TasksBank() {
   };
 
   const handleSaveSheet = (formData: TaskFormData) => {
-    // Use tag as category - the form's "Category" picker sets the tag field
-    const categoryToSave = formData.tag || editCategory;
+    // The form's "Category" picker stores the category display name in `tag`.
+    // The user-facing tasks bank filters by category SLUG, so map name -> slug.
+    const rawTag = formData.tag || editCategory;
+    const matchedBySlug = routineCategories.find(c => c.slug === rawTag);
+    const matchedByName = routineCategories.find(c => c.name === rawTag);
+    const categoryToSave = matchedBySlug?.slug || matchedByName?.slug || rawTag;
     
     if (editingTask) {
       updateTask.mutate({
