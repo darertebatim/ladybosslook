@@ -690,7 +690,8 @@ const AppStore = () => {
                   ))}
                 </div>
               </section>
-            )}
+              );
+            })()}
 
             {/* Breathe Section */}
             {!searchQuery &&
