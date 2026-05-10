@@ -62,6 +62,7 @@ export const whatIsRiloFlow: OnboardingFlow = {
         { label: 'Change clothes', emoji: '👕' },
         { label: 'Breakfast', emoji: '🥗' },
         { label: 'Have coffee', emoji: '☀️' },
+        { label: 'Plan your Day', emoji: '🗓️' },
         { label: 'Quick tidy', emoji: '🧹' },
         { label: 'Stretch', emoji: '💪' },
         { label: 'Journal reflection', emoji: '☀️' },
