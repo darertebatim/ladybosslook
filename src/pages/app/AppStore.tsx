@@ -618,7 +618,11 @@ const AppStore = () => {
             {/* My Shortcuts moved above programs */}
 
             {/* Reflections Section */}
-            {!searchQuery && reflections && reflections.length > 0 && (
+            {!searchQuery && reflections && reflections.length > 0 && (() => {
+              const sortedReflections = [...reflections].sort(
+                (a, b) => Number(!!b.is_featured) - Number(!!a.is_featured)
+              );
+              return (
               <section>
                 <div className="flex items-center justify-between mb-2 px-1">
                   <h2 className="text-base font-bold text-fg-warm">
@@ -639,7 +643,7 @@ const AppStore = () => {
                       className="flex gap-2 overflow-x-auto -mx-4 px-4 py-3 scrollbar-hide"
                       style={{ scrollbarGutter: "stable" }}
                     >
-                      {reflections
+                       {sortedReflections
                         .slice(rowIdx * 4, rowIdx * 4 + 4)
                         .map((r) => (
                           <button
@@ -686,7 +690,8 @@ const AppStore = () => {
                   ))}
                 </div>
               </section>
-            )}
+              );
+            })()}
 
             {/* Breathe Section */}
             {!searchQuery &&
