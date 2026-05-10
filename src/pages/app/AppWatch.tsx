@@ -27,7 +27,7 @@ import { HomeBanner } from "@/components/app/HomeBanner";
 
 const LANGUAGE_OPTIONS = [
   { value: 'all', label: 'All', flag: '🌐' },
-  { value: 'american', label: 'English', flag: '🇺🇸' },
+  { value: 'american', label: 'American', flag: '🇺🇸' },
   { value: 'persian', label: 'Persian', flag: null },
   { value: 'turkish', label: 'Türkçe', flag: '🇹🇷' },
   { value: 'spanish', label: 'Español', flag: '🇪🇸' },
