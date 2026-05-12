@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Settings2 } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 
 const DISMISSED_KEY = 'simora_language_settings_hint_dismissed';
 
@@ -22,6 +23,7 @@ export function LanguageSettingsHintPopup({ open, onClose }: LanguageSettingsHin
   };
 
   return (
+    <OverlayPortal>
     <AnimatePresence>
       {open && (
         <motion.div
