@@ -4,6 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { haptic } from '@/lib/haptics';
 import { openIOSReviewPage, openAndroidReviewPage } from '@/hooks/useAppReview';
 import { useShareContent } from '@/hooks/useShareContent';
+import { OverlayPortal } from '@/components/app/OverlayPortal';
 
 const DISMISSED_KEY = 'simora_language_change_thanks_dismissed';
 
@@ -77,6 +78,7 @@ export function LanguageChangeThanksPopup({ open, lang, onClose }: LanguageChang
   };
 
   return (
+    <OverlayPortal>
     <AnimatePresence>
       {open && (
         <motion.div
@@ -161,6 +163,7 @@ export function LanguageChangeThanksPopup({ open, lang, onClose }: LanguageChang
         </motion.div>
       )}
     </AnimatePresence>
+    </OverlayPortal>
   );
 }
 
