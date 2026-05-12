@@ -1469,6 +1469,7 @@ export default function AppTest() {
       {/* Soft Review Prompt (preview) */}
       <SoftReviewPrompt
         isOpen={showSoftReviewPrompt}
+        trigger="admin_preview"
         onClose={() => setShowSoftReviewPrompt(false)}
         onAccept={() => {
           setShowSoftReviewPrompt(false);
