@@ -162,7 +162,7 @@ const AppStore = () => {
           "id, name, cover_image_url, category, is_free, is_hidden, requires_subscription",
         )
         .eq("is_hidden", false)
-        .in("category", ["meditate", "soundscape"])
+        .in("category", ["meditate", "soundscape", "audiobook", "podcast"])
         .order("sort_order", { ascending: true });
       if (error) throw error;
       return data;
@@ -175,6 +175,15 @@ const AppStore = () => {
   );
   const soundscapePlaylists = useMemo(
     () => audioPlaylists?.filter((p) => p.category === "soundscape") || [],
+    [audioPlaylists],
+  );
+
+  // Combined list for the "Playlists" hub section under Self-Care Routines.
+  // Surfaces every listenable playlist (meditate + soundscape + audiobook +
+  // podcast) in one rail so users can discover audio content without scrolling
+  // past Programs / Courses first.
+  const allListenPlaylists = useMemo(
+    () => audioPlaylists || [],
     [audioPlaylists],
   );
 
@@ -474,6 +483,79 @@ const AppStore = () => {
                         onClick={() => navigate(`/app/routines/${routine.id}`)}
                       />
                     </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Playlists — combined audio rail (meditate + soundscape + audiobook + podcast) */}
+            {!searchQuery && allListenPlaylists.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h2 className="text-base font-bold text-fg-warm">
+                    Playlists
+                  </h2>
+                  <Link
+                    to="/app/player"
+                    className="text-xs text-primary font-medium flex items-center gap-0.5"
+                  >
+                    {t("toolsPage.all")}{" "}
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
+                  {allListenPlaylists.map((playlist) => (
+                    <button
+                      key={playlist.id}
+                      onClick={() =>
+                        navigate(`/app/player/playlist/${playlist.id}`, {
+                          state: { from: location.pathname },
+                        })
+                      }
+                      className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
+                    >
+                      <div className="relative h-32 w-32 overflow-visible mb-1.5">
+                        <div className="h-full w-full rounded-2xl overflow-hidden bg-muted shadow-lg">
+                          {playlist.cover_image_url ? (
+                            <CachedImage
+                              src={playlist.cover_image_url}
+                              alt={playlist.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-muted">
+                              <FluentEmoji
+                                emoji={
+                                  playlist.category === "meditate"
+                                    ? "🧘"
+                                    : playlist.category === "soundscape"
+                                    ? "🌊"
+                                    : playlist.category === "audiobook"
+                                    ? "📖"
+                                    : "🎙️"
+                                }
+                                size={36}
+                              />
+                            </div>
+                          )}
+                        </div>
+                        {playlist.requires_subscription
+                          ? !isSubscribed && (
+                              <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
+                                <Crown className="h-2.5 w-2.5" /> PLUS
+                              </div>
+                            )
+                          : !isSubscribed && (
+                              <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
+                                <FluentEmoji emoji="🔥" size={10} />{" "}
+                                {t("toolsPage.free")}
+                              </div>
+                            )}
+                      </div>
+                      <p className="text-xs font-medium line-clamp-2 leading-tight">
+                        {playlist.name}
+                      </p>
+                    </button>
                   ))}
                 </div>
               </section>
