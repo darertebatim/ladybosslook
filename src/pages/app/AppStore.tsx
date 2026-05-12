@@ -14,7 +14,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   useEnrollments,
@@ -59,7 +59,6 @@ import {
   LanguageSettingsHintPopup,
   shouldShowLanguageSettingsHint,
 } from "@/components/app/LanguageSettingsHintPopup";
-import { useEffect } from "react";
 
 const AppStore = () => {
   const navigate = useNavigate();
