@@ -71,6 +71,7 @@ export function LanguageSettingsHintPopup({ open, onClose }: LanguageSettingsHin
         </motion.div>
       )}
     </AnimatePresence>
+    </OverlayPortal>
   );
 }
 
