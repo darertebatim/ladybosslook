@@ -90,7 +90,7 @@ export function SoftReviewPrompt({ isOpen, onClose, onAccept, trigger }: SoftRev
   const handleSendFeedback = () => {
     haptic.light();
     logSignal('negative', 'support');
-    close(() => navigate('/app/support'));
+    close(() => navigate('/app/chat'));
   };
 
   const handleDismiss = () => {
