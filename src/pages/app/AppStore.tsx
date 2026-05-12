@@ -14,7 +14,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   useEnrollments,
@@ -54,6 +54,11 @@ import { SelfCareGoalsCategoryCard } from "@/components/app/SelfCareGoalsCategor
 import { useTaskTemplates } from "@/hooks/useTaskPlanner";
 import { ActiveRoundsCarousel } from "@/components/dashboard/ActiveRoundsCarousel";
 import { useNewHomeData } from "@/hooks/useNewHomeData";
+import { useUserPreferredLanguage } from "@/hooks/useUserPreferredLanguage";
+import {
+  LanguageSettingsHintPopup,
+  shouldShowLanguageSettingsHint,
+} from "@/components/app/LanguageSettingsHintPopup";
 
 const AppStore = () => {
   const navigate = useNavigate();
@@ -68,6 +73,15 @@ const AppStore = () => {
   const [enrollingSlug, setEnrollingSlug] = useState<string | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const userLang = useUserPreferredLanguage();
+  const [showLangHint, setShowLangHint] = useState(false);
+
+  useEffect(() => {
+    if (userLang && shouldShowLanguageSettingsHint()) {
+      const timer = setTimeout(() => setShowLangHint(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [userLang]);
 
   const { data: enrollments = [] } = useEnrollments();
   const invalidateAllEnrollmentData = useInvalidateAllEnrollmentData();
@@ -988,6 +1002,10 @@ const AppStore = () => {
           </button>
         </div>
       </div>
+      <LanguageSettingsHintPopup
+        open={showLangHint}
+        onClose={() => setShowLangHint(false)}
+      />
     </div>
   );
 };

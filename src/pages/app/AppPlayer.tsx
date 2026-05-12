@@ -30,6 +30,10 @@ import {
   LanguagePreferencePopup,
   shouldShowLanguagePopup,
 } from "@/components/app/LanguagePreferencePopup";
+import {
+  LanguageSettingsHintPopup,
+  shouldShowLanguageSettingsHint,
+} from "@/components/app/LanguageSettingsHintPopup";
 import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
 import { useMediaCategories } from "@/hooks/useMediaCategories";
 
@@ -90,10 +94,17 @@ export default function AppPlayer() {
     usePlayerData();
   const userLang = useUserPreferredLanguage();
   const [showLangPopup, setShowLangPopup] = useState(false);
+  const [showLangHint, setShowLangHint] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && shouldShowLanguagePopup(userLang)) {
+    if (isLoading) return;
+    if (shouldShowLanguagePopup(userLang)) {
       const timer = setTimeout(() => setShowLangPopup(true), 800);
+      return () => clearTimeout(timer);
+    }
+    // Already chose preferred language → show settings hint once
+    if (userLang && shouldShowLanguageSettingsHint()) {
+      const timer = setTimeout(() => setShowLangHint(true), 800);
       return () => clearTimeout(timer);
     }
   }, [isLoading, userLang]);
@@ -559,7 +570,16 @@ export default function AppPlayer() {
       <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
       <LanguagePreferencePopup
         open={showLangPopup}
-        onClose={() => setShowLangPopup(false)}
+        onClose={() => {
+          setShowLangPopup(false);
+          if (shouldShowLanguageSettingsHint()) {
+            setTimeout(() => setShowLangHint(true), 350);
+          }
+        }}
+      />
+      <LanguageSettingsHintPopup
+        open={showLangHint}
+        onClose={() => setShowLangHint(false)}
       />
     </div>
   );
