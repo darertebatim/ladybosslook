@@ -28,11 +28,7 @@ import { usePushPermission } from "@/hooks/usePushPermission";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAppReview } from "@/hooks/useAppReview";
 import { SoftReviewPrompt } from "@/components/app/SoftReviewPrompt";
-import {
-  canShowSoftReviewPrompt,
-  markSoftReviewPromptShown,
-  SOFT_REVIEW_EVENT,
-} from "@/lib/appReview";
+import { SOFT_REVIEW_EVENT } from "@/lib/appReview";
 import { Capacitor } from "@capacitor/core";
 import type { UserTask, TaskTemplate } from "@/hooks/useTaskPlanner";
 import type { BadgeLevel } from "@/hooks/useWeeklyTaskCompletion";
