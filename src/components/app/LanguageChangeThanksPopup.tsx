@@ -25,20 +25,20 @@ const COPY: Record<string, {
   dir: 'ltr' | 'rtl';
 }> = {
   fa: {
-    title: '❤️ از انتخابت ممنونیم',
-    body: 'ترجمه و آماده‌سازی ریلو به زبان فارسی برای ما کار سختی بود — تا تجربه‌ات راحت‌تر باشه. اگه دوستش داری، با ۵ ستاره و معرفی به دوستات از ما حمایت کن.',
-    rate: '⭐ امتیاز ۵ ستاره',
-    share: 'به دوستات معرفی کن',
+    title: 'یه هدیه کوچیک از ریلو 🎁',
+    body: 'ریلو رو با عشق به فارسی آوردیم — تا حس کنی این اپ مال خودته. این زبان، هدیهٔ ما به توئه. اگه دوستش داری، با ۵ ستاره و معرفی به دوستات، این هدیه رو با ما جشن بگیر.',
+    rate: '۵ ستاره بده',
+    share: 'به دوستات هدیه بده',
     later: 'بعداً',
     shareTitle: 'ریلو',
     shareText: 'ریلو رو امتحان کن — به فارسی هم هست! 💛',
     dir: 'rtl',
   },
   en: {
-    title: '❤️ Thanks for switching',
-    body: 'Translating Rilo into your language took real work — to make your experience feel like home. If you love it, support us with a 5-star rating and tell a friend.',
-    rate: '⭐ Rate 5 stars',
-    share: 'Share with a friend',
+    title: 'A little gift from Rilo 🎁',
+    body: 'We translated Rilo into your language with love — so the app feels like home. Consider it our gift to you. If it touched you, celebrate with us: leave 5 stars and share it with a friend.',
+    rate: 'Rate 5 stars',
+    share: 'Gift it to a friend',
     later: 'Maybe later',
     shareTitle: 'Rilo',
     shareText: 'Try Rilo — it now speaks your language! 💛',
