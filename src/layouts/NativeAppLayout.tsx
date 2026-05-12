@@ -220,7 +220,7 @@ const NativeAppLayout = () => {
       <nav
         className={cn(
           'fixed left-3 right-3 z-50',
-          'bottom-[calc(12px+env(safe-area-inset-bottom))]',
+          'bottom-[calc(2px+env(safe-area-inset-bottom))]',
           'flex items-start gap-2',
         )}
       >
