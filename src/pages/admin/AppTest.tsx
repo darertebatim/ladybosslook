@@ -73,6 +73,7 @@ import { ProjectCompletionCelebration } from '@/components/app/ProjectCompletion
 import { PurchaseCelebration } from '@/components/app/PurchaseCelebration';
 import { LanguagePreferencePopup } from '@/components/app/LanguagePreferencePopup';
 import { LanguageSettingsHintPopup } from '@/components/app/LanguageSettingsHintPopup';
+import { LanguageChangeThanksPopup } from '@/components/app/LanguageChangeThanksPopup';
 import { InstructorInviteContent } from '@/components/instructor/InstructorInviteModal';
 import { InstructorWelcomeContent } from '@/components/instructor/InstructorWelcomeSheet';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -132,6 +133,7 @@ export default function AppTest() {
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
   const [showLanguagePopup, setShowLanguagePopup] = useState(false);
   const [showLanguageHint, setShowLanguageHint] = useState(false);
+  const [showLanguageThanks, setShowLanguageThanks] = useState<null | 'fa' | 'en'>(null);
   // Instructor referral previews
   const [showInstructorInvite, setShowInstructorInvite] = useState(false);
   const [showInstructorWelcome, setShowInstructorWelcome] = useState(false);
@@ -692,6 +694,27 @@ export default function AppTest() {
           <Button onClick={() => setShowLanguageHint(true)} variant="outline">
             <Globe className="h-4 w-4 mr-2" />
             Preview Language Settings Hint
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Language Change Thanks Popup */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Heart className="h-5 w-5" />
+            Language Change Thanks Popup
+          </CardTitle>
+          <CardDescription>
+            Shown after a user switches the app's UI language to a non-English language in Settings. Thanks them for the choice and asks for a 5-star rating + share. Persian copy for Farsi.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <Button onClick={() => setShowLanguageThanks('fa')} variant="outline">
+            🇮🇷 Preview (Persian)
+          </Button>
+          <Button onClick={() => setShowLanguageThanks('en')} variant="outline">
+            🇺🇸 Preview (English fallback)
           </Button>
         </CardContent>
       </Card>
@@ -1487,6 +1510,11 @@ export default function AppTest() {
       {/* Language Preference Popup */}
       <LanguagePreferencePopup open={showLanguagePopup} onClose={() => setShowLanguagePopup(false)} />
       <LanguageSettingsHintPopup open={showLanguageHint} onClose={() => setShowLanguageHint(false)} />
+      <LanguageChangeThanksPopup
+        open={!!showLanguageThanks}
+        lang={showLanguageThanks ?? 'fa'}
+        onClose={() => setShowLanguageThanks(null)}
+      />
 
       {/* Soft Review Prompt (preview) */}
       <SoftReviewPrompt
