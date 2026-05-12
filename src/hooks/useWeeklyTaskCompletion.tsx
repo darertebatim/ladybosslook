@@ -204,9 +204,7 @@ export function useWeeklyTaskCompletion() {
         );
 
         const dayTasks = tasks.filter((task) =>
-          !task.source_routine_id &&
-          !skippedTaskIds.has(task.id) &&
-          taskAppliesToDate(task, dateStr)
+          !skippedTaskIds.has(task.id) && taskAppliesToDate(task, dateStr)
         );
 
         const completedCount = countCompletedTasksForDate(dayTasks, dayCompletions, completedRoutineIds);
@@ -304,9 +302,7 @@ export function useDateRangeTaskCompletion(startDate: Date, endDate: Date) {
         );
 
         const dayTasks = tasks.filter((task) =>
-          !task.source_routine_id &&
-          !skippedTaskIds.has(task.id) &&
-          taskAppliesToDate(task, dateStr)
+          !skippedTaskIds.has(task.id) && taskAppliesToDate(task, dateStr)
         );
 
         const completedCount = countCompletedTasksForDate(dayTasks, dayCompletions, completedRoutineIds);
