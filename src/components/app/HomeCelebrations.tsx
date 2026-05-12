@@ -265,14 +265,6 @@ export const HomeCelebrations = memo(function HomeCelebrations(
     return () => window.removeEventListener(SOFT_REVIEW_EVENT, handler);
   }, [maybeRequestReviewAndroidOnly, openAndroidReviewSoftLink]);
 
-  const maybeShowIOSSoftReviewOnGold = () => {
-    if (Capacitor.getPlatform() !== "ios") return;
-    if (!canShowSoftReviewPrompt()) return;
-    markSoftReviewPromptShown();
-    // Slight delay so it doesn't collide with gold streak celebration
-    setTimeout(() => setShowIOSSoftReview(true), 1200);
-  };
-
   const { hasAccessToProgram } = useSubscription();
   const isSubscribed = hasAccessToProgram("any");
 
