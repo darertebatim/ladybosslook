@@ -247,19 +247,17 @@ export const HomeCelebrations = memo(function HomeCelebrations(
       const detail = (e as CustomEvent).detail || {};
       const trigger = detail.trigger || "soft_review";
       const platform = Capacitor.getPlatform();
-      if (platform === "ios") {
+      // Universal Satisfaction Gate: every native platform sees the gate
+      // FIRST. The native StoreKit / Play In-App Review dialog is only
+      // fired from the gate's onAccept path (positive sentiment users).
+      if (platform === "ios" || platform === "android") {
         setSoftReviewTrigger(trigger);
         setTimeout(() => setShowIOSSoftReview(true), 800);
-      } else if (platform === "android") {
-        // Android: try native first, fallback to Play Store soft-link
-        maybeRequestReviewAndroidOnly(trigger).then((shown) => {
-          if (!shown) openAndroidReviewSoftLink(trigger);
-        });
       }
     };
     window.addEventListener(SOFT_REVIEW_EVENT, handler);
     return () => window.removeEventListener(SOFT_REVIEW_EVENT, handler);
-  }, [maybeRequestReviewAndroidOnly, openAndroidReviewSoftLink]);
+  }, []);
 
   const { hasAccessToProgram } = useSubscription();
   const isSubscribed = hasAccessToProgram("any");
@@ -558,7 +556,14 @@ export const HomeCelebrations = memo(function HomeCelebrations(
         trigger={softReviewTrigger}
         onAccept={async () => {
           setShowIOSSoftReview(false);
-          await openIOSReviewSoftLink(softReviewTrigger);
+          const platform = Capacitor.getPlatform();
+          if (platform === "android") {
+            // Try Google Play In-App Review first, fall back to Play Store link
+            const shown = await maybeRequestReviewAndroidOnly(softReviewTrigger);
+            if (!shown) await openAndroidReviewSoftLink(softReviewTrigger);
+          } else {
+            await openIOSReviewSoftLink(softReviewTrigger);
+          }
         }}
       />
     </OverlayPortal>
