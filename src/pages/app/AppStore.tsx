@@ -162,7 +162,7 @@ const AppStore = () => {
           "id, name, cover_image_url, category, is_free, is_hidden, requires_subscription",
         )
         .eq("is_hidden", false)
-        .in("category", ["meditate", "soundscape"])
+        .in("category", ["meditate", "soundscape", "audiobook", "podcast"])
         .order("sort_order", { ascending: true });
       if (error) throw error;
       return data;
@@ -175,6 +175,15 @@ const AppStore = () => {
   );
   const soundscapePlaylists = useMemo(
     () => audioPlaylists?.filter((p) => p.category === "soundscape") || [],
+    [audioPlaylists],
+  );
+
+  // Combined list for the "Playlists" hub section under Self-Care Routines.
+  // Surfaces every listenable playlist (meditate + soundscape + audiobook +
+  // podcast) in one rail so users can discover audio content without scrolling
+  // past Programs / Courses first.
+  const allListenPlaylists = useMemo(
+    () => audioPlaylists || [],
     [audioPlaylists],
   );
 
