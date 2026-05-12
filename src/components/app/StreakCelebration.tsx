@@ -235,6 +235,7 @@ export const StreakCelebration = ({
 
       <SoftReviewPrompt
         isOpen={showReviewPrompt}
+        trigger={`streak_day_${currentStreak}`}
         onClose={handleDeclineReview}
         onAccept={handleAcceptReview}
       />

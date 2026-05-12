@@ -28,11 +28,7 @@ import { usePushPermission } from "@/hooks/usePushPermission";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAppReview } from "@/hooks/useAppReview";
 import { SoftReviewPrompt } from "@/components/app/SoftReviewPrompt";
-import {
-  canShowSoftReviewPrompt,
-  markSoftReviewPromptShown,
-  SOFT_REVIEW_EVENT,
-} from "@/lib/appReview";
+import { SOFT_REVIEW_EVENT } from "@/lib/appReview";
 import { Capacitor } from "@capacitor/core";
 import type { UserTask, TaskTemplate } from "@/hooks/useTaskPlanner";
 import type { BadgeLevel } from "@/hooks/useWeeklyTaskCompletion";
@@ -265,14 +261,6 @@ export const HomeCelebrations = memo(function HomeCelebrations(
     return () => window.removeEventListener(SOFT_REVIEW_EVENT, handler);
   }, [maybeRequestReviewAndroidOnly, openAndroidReviewSoftLink]);
 
-  const maybeShowIOSSoftReviewOnGold = () => {
-    if (Capacitor.getPlatform() !== "ios") return;
-    if (!canShowSoftReviewPrompt()) return;
-    markSoftReviewPromptShown();
-    // Slight delay so it doesn't collide with gold streak celebration
-    setTimeout(() => setShowIOSSoftReview(true), 1200);
-  };
-
   const { hasAccessToProgram } = useSubscription();
   const isSubscribed = hasAccessToProgram("any");
 
@@ -419,9 +407,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(
       <BadgeCelebration
         type={badgeCelebrationType}
         onClose={() => {
-          const wassilver = badgeCelebrationType === "silver";
           closeBadgeCelebration();
-          if (wassilver) maybeRequestReview("silver_badge");
         }}
         onCollectGold={closeBadgeCelebration}
         onGoldCollected={() => {
@@ -430,10 +416,10 @@ export const HomeCelebrations = memo(function HomeCelebrations(
           updateGoldStreak.mutate(undefined, {
             onSuccess: () => setShowGoldStreakCelebration(true),
           });
-          // Android-only secondary review trigger (silent no-op on iOS/web).
-          maybeRequestReviewAndroidOnly("gold_badge_android");
-          // iOS-only soft popup with direct App Store link (bypasses 3/year quota).
-          maybeShowIOSSoftReviewOnGold();
+          // Daily badges (silver/gold) are NOT review triggers — they're earned
+          // every day for completing 2-3 tasks, far too frequent and low-signal
+          // to anchor an App Store rating. Reviews now only fire on streak
+          // milestones, all gated by the SatisfactionGate.
         }}
         completedCount={badgeCompletedCount}
         totalCount={badgeTotalCount}
@@ -569,6 +555,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(
       <SoftReviewPrompt
         isOpen={showIOSSoftReview}
         onClose={() => setShowIOSSoftReview(false)}
+        trigger={softReviewTrigger}
         onAccept={async () => {
           setShowIOSSoftReview(false);
           await openIOSReviewSoftLink(softReviewTrigger);
