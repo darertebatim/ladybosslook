@@ -300,7 +300,7 @@ export default function AppPlayer() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col h-full overflow-hidden bg-background">
+      <div className="dark flex flex-col h-full overflow-hidden bg-background text-foreground">
         <div
           className="px-4 pt-4 space-y-3"
           style={{ paddingTop: "calc(env(safe-area-inset-top) + 1rem)" }}
@@ -327,7 +327,7 @@ export default function AppPlayer() {
   }
 
   return (
-    <div className="relative flex flex-col h-full overflow-hidden bg-background">
+    <div className="dark relative flex flex-col h-full overflow-hidden bg-background text-foreground">
       {/* Single scroll container */}
       <div
         ref={listenScrollRef}
