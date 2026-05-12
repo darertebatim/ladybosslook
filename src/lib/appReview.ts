@@ -51,23 +51,14 @@ export function triggerSoftReview(
       localStorage.setItem(options.oneShotKey, 'true');
     }
 
-    // Strategy: try the NATIVE Apple/Google in-app review dialog first.
-    // If it succeeds (or even silently no-ops without throwing), we're done.
-    // Only when the native path is unavailable / throttled / errors do we
-    // fall back to our in-app SoftReviewPrompt banner.
-    requestAppReview(trigger)
-      .then((nativeShown) => {
-        if (!nativeShown) {
-          window.dispatchEvent(
-            new CustomEvent(SOFT_REVIEW_EVENT, { detail: { trigger } })
-          );
-        }
-      })
-      .catch(() => {
-        window.dispatchEvent(
-          new CustomEvent(SOFT_REVIEW_EVENT, { detail: { trigger } })
-        );
-      });
+    // Strategy: ALWAYS show the Satisfaction Gate first — never fire the
+    // native Apple/Google review dialog directly. The gate's onAccept path
+    // (in HomeCelebrations) is what calls requestAppReview() so only users
+    // who self-identify as happy ever see the OS-level rating prompt.
+    // This protects the App Store rating from low-signal milestone moments.
+    window.dispatchEvent(
+      new CustomEvent(SOFT_REVIEW_EVENT, { detail: { trigger } })
+    );
     return true;
   } catch (e) {
     console.warn('[Review] triggerSoftReview failed', e);
