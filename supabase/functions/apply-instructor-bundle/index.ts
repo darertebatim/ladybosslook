@@ -183,12 +183,26 @@ Deno.serve(async (req) => {
           .maybeSingle();
         const courseName = catalog?.title || pkg.default_program_slug;
 
-        const { error: enrollErr } = await admin.from('course_enrollments').insert({
+        // Honor program_auto_enrollment so referrals land in the same round
+        // paid customers (stripe-webhook) and routine purchases get.
+        const { data: autoEnrollRule } = await admin
+          .from('program_auto_enrollment')
+          .select('round_id')
+          .eq('program_slug', pkg.default_program_slug)
+          .maybeSingle();
+
+        const enrollmentData: Record<string, unknown> = {
           user_id: userId,
           program_slug: pkg.default_program_slug,
           course_name: courseName,
           status: 'active',
-        });
+        };
+        if (autoEnrollRule?.round_id) {
+          enrollmentData.round_id = autoEnrollRule.round_id;
+          console.log('[apply-instructor-bundle] Using auto-enroll round:', autoEnrollRule.round_id);
+        }
+
+        const { error: enrollErr } = await admin.from('course_enrollments').insert(enrollmentData);
         if (!enrollErr) granted.program = true;
         else console.warn('Enroll failed:', enrollErr.message);
       }
