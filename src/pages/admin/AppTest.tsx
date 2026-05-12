@@ -72,6 +72,7 @@ import { StepCompletionCelebration } from '@/components/app/StepCompletionCelebr
 import { ProjectCompletionCelebration } from '@/components/app/ProjectCompletionCelebration';
 import { PurchaseCelebration } from '@/components/app/PurchaseCelebration';
 import { LanguagePreferencePopup } from '@/components/app/LanguagePreferencePopup';
+import { LanguageSettingsHintPopup } from '@/components/app/LanguageSettingsHintPopup';
 import { InstructorInviteContent } from '@/components/instructor/InstructorInviteModal';
 import { InstructorWelcomeContent } from '@/components/instructor/InstructorWelcomeSheet';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -130,6 +131,7 @@ export default function AppTest() {
   const [testUnreadCount, setTestUnreadCount] = useState(1);
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
   const [showLanguagePopup, setShowLanguagePopup] = useState(false);
+  const [showLanguageHint, setShowLanguageHint] = useState(false);
   // Instructor referral previews
   const [showInstructorInvite, setShowInstructorInvite] = useState(false);
   const [showInstructorWelcome, setShowInstructorWelcome] = useState(false);
@@ -671,6 +673,25 @@ export default function AppTest() {
           <Button onClick={() => setShowLanguagePopup(true)} variant="outline">
             <Globe className="h-4 w-4 mr-2" />
             Preview Language Popup
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Language Settings Hint Popup */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Globe className="h-5 w-5" />
+            Language Settings Hint Popup
+          </CardTitle>
+          <CardDescription>
+            Secondary sheet shown after the language picker (or once for users who already chose a language) telling them they can change the app's UI language in Settings.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={() => setShowLanguageHint(true)} variant="outline">
+            <Globe className="h-4 w-4 mr-2" />
+            Preview Language Settings Hint
           </Button>
         </CardContent>
       </Card>
@@ -1465,6 +1486,7 @@ export default function AppTest() {
 
       {/* Language Preference Popup */}
       <LanguagePreferencePopup open={showLanguagePopup} onClose={() => setShowLanguagePopup(false)} />
+      <LanguageSettingsHintPopup open={showLanguageHint} onClose={() => setShowLanguageHint(false)} />
 
       {/* Soft Review Prompt (preview) */}
       <SoftReviewPrompt
