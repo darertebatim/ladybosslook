@@ -51,6 +51,7 @@ export default function AppRate() {
     <div className="min-h-screen bg-background">
       <SoftReviewPrompt
         isOpen={showPrompt}
+        trigger="app_rate_page"
         onClose={handleClose}
         onAccept={handleAccept}
       />
