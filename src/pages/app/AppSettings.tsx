@@ -56,6 +56,10 @@ import {
 import { NotificationPreferencesCard } from "@/components/app/NotificationPreferencesCard";
 import { PlusUpsellBanner } from "@/components/app/PlusUpsellBanner";
 import { setAppLanguage, type SupportedLanguage } from "@/i18n";
+import {
+  LanguageChangeThanksPopup,
+  shouldShowLanguageChangeThanks,
+} from "@/components/app/LanguageChangeThanksPopup";
 import { cn } from "@/lib/utils";
 import {
   checkCalendarPermission,
@@ -91,6 +95,10 @@ const AppSettings = () => {
   const [searchParams] = useSearchParams();
   const currentLang = (i18n.language?.startsWith("fa") ? "fa" : "en") as SupportedLanguage;
   const languageSectionRef = useRef<HTMLDivElement>(null);
+  const [thanksPopup, setThanksPopup] = useState<{ open: boolean; lang: string }>({
+    open: false,
+    lang: 'fa',
+  });
 
   // Password
   const [newPassword, setNewPassword] = useState("");
@@ -156,6 +164,10 @@ const AppSettings = () => {
     if (lang === currentLang) return;
     haptic.light();
     setAppLanguage(lang);
+    // Thank non-English switchers and ask for a 5-star rating + share.
+    if (lang !== 'en' && shouldShowLanguageChangeThanks()) {
+      setTimeout(() => setThanksPopup({ open: true, lang }), 450);
+    }
   };
 
   // Check notification / calendar status
@@ -1235,6 +1247,12 @@ const AppSettings = () => {
         </Collapsible>
       </div>
     </div>
+      <LanguageChangeThanksPopup
+        open={thanksPopup.open}
+        lang={thanksPopup.lang}
+        onClose={() => setThanksPopup(p => ({ ...p, open: false }))}
+      />
+    </>
   );
 };
 
