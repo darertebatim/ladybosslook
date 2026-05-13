@@ -219,9 +219,6 @@ const AppPresence = () => {
             {/* Earned Challenge Badges */}
             <EarnedBadgesCard />
             
-            {/* Self-Care Balance (last 7 days) */}
-            <SelfCareBalanceCard />
-
             {/* All-Time Activity Stats */}
             <section className="bg-white rounded-2xl p-4 shadow-ios">
               <h3 className="text-sm font-semibold text-orange-900/60 mb-3">
@@ -302,7 +299,10 @@ const AppPresence = () => {
                 />
               </div>
             </section>
-            
+
+            {/* Self-Care Balance (last 7 days) */}
+            <SelfCareBalanceCard />
+
             {/* Action Stats */}
             <section>
               <div className="flex items-center justify-between mb-3">
