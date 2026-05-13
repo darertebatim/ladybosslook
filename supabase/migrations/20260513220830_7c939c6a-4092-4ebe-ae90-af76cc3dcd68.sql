@@ -1,0 +1,1 @@
+ALTER TABLE public.audio_playlists DROP CONSTRAINT IF EXISTS audio_playlists_category_check;
