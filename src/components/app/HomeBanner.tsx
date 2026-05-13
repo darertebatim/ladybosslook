@@ -269,10 +269,10 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
             )}
 
             {/* Content */}
-            <div className="px-3 py-4">
-              <div className="flex items-start gap-3">
-                <div className="w-12 h-12 rounded-full border border-fg-warm-muted/30 flex items-center justify-center flex-shrink-0">
-                  <Megaphone className="h-[22px] w-[22px] text-fg-warm" strokeWidth={1.75} />
+            <div className="pl-3 pr-4 py-4">
+              <div className="flex items-start gap-2">
+                <div className="w-10 h-10 rounded-full border border-fg-warm-muted/30 flex items-center justify-center flex-shrink-0">
+                  <Megaphone className="h-[18px] w-[18px] text-fg-warm" strokeWidth={1.75} />
                 </div>
                 <div className="flex-1 min-w-0 pr-6">
                   <h3 className="font-bold text-[15px] leading-snug text-fg-warm">{banner.title}</h3>
