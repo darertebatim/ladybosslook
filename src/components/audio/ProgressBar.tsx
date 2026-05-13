@@ -59,6 +59,9 @@ export const ProgressBar = ({
     setIsDragging(true);
     const newProgress = calculateProgress(e.touches[0].clientX);
     setDragProgress(newProgress);
+    // Commit seek synchronously inside the user gesture so iOS native
+    // audio bridge accepts it (gesture chain must not be broken by async).
+    onSeek((newProgress / 100) * duration);
   };
 
   const handleTouchMove = useCallback((e: TouchEvent) => {
