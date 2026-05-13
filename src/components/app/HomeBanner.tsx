@@ -349,10 +349,10 @@ function HomeBannerCard({
     >
       <button
         onClick={(e) => handleDismiss(e, banner.id)}
-        className="absolute top-3 right-3 p-1.5 rounded-full bg-black/10 active:bg-black/20 transition-colors z-10"
+        className="absolute top-4 right-4 p-1 rounded-full active:bg-black/10 transition-colors z-10"
         aria-label="Dismiss banner"
       >
-        <X className="h-4 w-4 text-fg-warm" />
+        <X className="h-[18px] w-[18px] text-fg-warm-muted" strokeWidth={2.25} />
       </button>
 
       {banner.video_url && videoType && (
@@ -388,39 +388,53 @@ function HomeBannerCard({
         </>
       )}
 
-      <div className="p-4">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#D94B2B]/10 flex items-center justify-center flex-shrink-0">
-            <Megaphone className="h-5 w-5 text-[#D94B2B]" />
+      <div className="px-5 py-5">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-full border border-fg-warm-muted/30 flex items-center justify-center flex-shrink-0">
+            <Megaphone className="h-[22px] w-[22px] text-fg-warm" strokeWidth={1.75} />
           </div>
           <div className="flex-1 min-w-0 pr-6">
-            <h3 className="font-semibold text-fg-warm">{banner.title}</h3>
+            <h3 className="font-bold text-[15px] leading-snug text-fg-warm">{banner.title}</h3>
             {banner.description && (
-              <p className="text-sm text-fg-warm-muted mt-0.5 line-clamp-2">{banner.description}</p>
+              <p className="text-[14px] leading-snug text-fg-warm-muted mt-1">
+                {banner.description}
+                {hasDestination && (
+                  <>
+                    {' '}
+                    <button
+                      type="button"
+                      className="text-[#D94B2B] font-semibold active:opacity-70 transition-opacity inline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleBannerClick(banner);
+                      }}
+                    >
+                      {buttonLabel}
+                      {destinationUrl?.startsWith('http') && (
+                        <ExternalLink className="inline h-3 w-3 ml-0.5 -mt-0.5" />
+                      )}
+                    </button>
+                  </>
+                )}
+              </p>
+            )}
+            {!banner.description && hasDestination && (
+              <button
+                type="button"
+                className="mt-1 inline-flex items-center gap-0.5 text-[#D94B2B] font-semibold text-[14px] active:opacity-70 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleBannerClick(banner);
+                }}
+              >
+                {buttonLabel}
+                {destinationUrl?.startsWith('http') && (
+                  <ExternalLink className="h-3.5 w-3.5" />
+                )}
+              </button>
             )}
           </div>
-          {hasDestination && !banner.video_url && !banner.button_text && (
-            <ChevronRight className="h-5 w-5 text-fg-warm-muted flex-shrink-0 mt-2" />
-          )}
         </div>
-
-        {hasDestination && (banner.button_text || banner.video_url) && (
-          <button
-            type="button"
-            className="mt-2 ml-[52px] inline-flex items-center gap-0.5 text-[#D94B2B] font-semibold text-sm active:opacity-70 transition-opacity"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleBannerClick(banner);
-            }}
-          >
-            {buttonLabel}
-            {destinationUrl?.startsWith('http') ? (
-              <ExternalLink className="h-3.5 w-3.5" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
-          </button>
-        )}
       </div>
     </div>
   );
