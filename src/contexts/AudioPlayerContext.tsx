@@ -482,33 +482,29 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
 
   const skipForward = useCallback((seconds = 15) => {
     if (useNative.current) {
-      nativeAudioGetCurrentTime().then(t => {
-        const newTime = Math.min(t + seconds, duration || Infinity);
-        nativeAudioSeek(newTime);
-        setCurrentTime(newTime);
-      });
+      const newTime = Math.min((currentTime || 0) + seconds, duration || Infinity);
+      nativeAudioSeek(newTime);
+      setCurrentTime(newTime);
     } else if (audioRef.current) {
       audioRef.current.currentTime = Math.min(
         audioRef.current.currentTime + seconds,
         audioRef.current.duration || 0
       );
     }
-  }, [duration]);
+  }, [duration, currentTime]);
 
   const skipBack = useCallback((seconds = 15) => {
     if (useNative.current) {
-      nativeAudioGetCurrentTime().then(t => {
-        const newTime = Math.max(t - seconds, 0);
-        nativeAudioSeek(newTime);
-        setCurrentTime(newTime);
-      });
+      const newTime = Math.max((currentTime || 0) - seconds, 0);
+      nativeAudioSeek(newTime);
+      setCurrentTime(newTime);
     } else if (audioRef.current) {
       audioRef.current.currentTime = Math.max(
         audioRef.current.currentTime - seconds,
         0
       );
     }
-  }, []);
+  }, [currentTime]);
 
   const stop = useCallback(() => {
     if (useNative.current) {
