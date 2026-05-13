@@ -228,7 +228,7 @@ export function HomeBanner({ location = 'home_top', onVisibilityChange, classNam
             {/* Dismiss button */}
             <button
               onClick={(e) => handleDismiss(e, banner.id)}
-              className="absolute top-4 right-4 p-1 rounded-full active:bg-black/10 transition-colors z-10"
+        className="absolute top-3 right-3 p-1 rounded-full active:bg-black/10 transition-colors z-10"
               aria-label="Dismiss banner"
             >
               <X className="h-[18px] w-[18px] text-fg-warm-muted" strokeWidth={2.25} />
@@ -388,8 +388,8 @@ function HomeBannerCard({
         </>
       )}
 
-      <div className="px-5 py-5">
-        <div className="flex items-start gap-4">
+      <div className="px-3 py-4">
+        <div className="flex items-start gap-3">
           <div className="w-12 h-12 rounded-full border border-fg-warm-muted/30 flex items-center justify-center flex-shrink-0">
             <Megaphone className="h-[22px] w-[22px] text-fg-warm" strokeWidth={1.75} />
           </div>
