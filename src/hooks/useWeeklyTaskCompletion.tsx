@@ -25,10 +25,10 @@ type PlannerTaskRow = {
   pro_link_value: string | null;
 };
 
-function calculateBadgeLevel(completed: number, _total: number): BadgeLevel {
-  if (completed === 0) return 'none';
-  if (completed >= 3) return 'gold';
-  if (completed >= 2) return 'silver';
+function calculateBadgeLevel(completed: number, total: number): BadgeLevel {
+  if (completed === 0 || total === 0) return 'none';
+  if (completed >= total) return 'gold';
+  if (completed / total >= 0.5) return 'silver';
   return 'bronze';
 }
 
