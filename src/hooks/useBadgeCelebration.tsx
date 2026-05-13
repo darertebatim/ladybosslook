@@ -105,9 +105,10 @@ export function useBadgeCelebration({
       return;
     }
 
-    // Priority 2: Almost gold (2 tasks completed, 1 away from gold)
+    // Priority 2: Almost gold (1 task away from gold)
     if (
-      completedCount === 2 &&
+      totalCount > 0 &&
+      completedCount === totalCount - 1 &&
       !celebratedLevels.has('almostGold') &&
       !celebratedLevels.has('gold')
     ) {
