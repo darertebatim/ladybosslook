@@ -204,7 +204,10 @@ export function useWeeklyTaskCompletion() {
         );
 
         const dayTasks = tasks.filter((task) =>
-          !skippedTaskIds.has(task.id) && taskAppliesToDate(task, dateStr)
+          !skippedTaskIds.has(task.id) &&
+          taskAppliesToDate(task, dateStr) &&
+          // Exclude routine launcher tasks — only their sub-tasks count toward total
+          !(task.pro_link_type === 'routine' && !!task.pro_link_value)
         );
 
         const completedCount = countCompletedTasksForDate(dayTasks, dayCompletions, completedRoutineIds);
@@ -302,7 +305,9 @@ export function useDateRangeTaskCompletion(startDate: Date, endDate: Date) {
         );
 
         const dayTasks = tasks.filter((task) =>
-          !skippedTaskIds.has(task.id) && taskAppliesToDate(task, dateStr)
+          !skippedTaskIds.has(task.id) &&
+          taskAppliesToDate(task, dateStr) &&
+          !(task.pro_link_type === 'routine' && !!task.pro_link_value)
         );
 
         const completedCount = countCompletedTasksForDate(dayTasks, dayCompletions, completedRoutineIds);
