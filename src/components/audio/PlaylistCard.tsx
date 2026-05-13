@@ -103,10 +103,10 @@ export const PlaylistCard = memo(function PlaylistCard({
       )}
       onClick={handleClick}
     >
-      <div className="flex items-center gap-3 p-3">
-        {/* 64×64 tile — cover image when present, else solid color + emoji */}
+      <div className="flex items-center gap-3 p-2">
+        {/* 72×72 tile — cover image when present, else solid color + emoji */}
         <div
-          className="relative h-16 w-16 shrink-0 rounded-xl overflow-hidden flex items-center justify-center"
+          className="relative h-[72px] w-[72px] shrink-0 rounded-xl overflow-hidden flex items-center justify-center"
           style={{ background: tile.bg }}
         >
           {coverImageUrl ? (
