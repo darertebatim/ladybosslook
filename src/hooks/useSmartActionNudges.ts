@@ -21,7 +21,26 @@ import { getLocalDateStr } from '@/lib/localDate';
 const PULSE_IDS = {
   MOOD: 200001,
   STREAK: 200002,
+  SELFCARE: 200003,
 };
+const SELFCARE_MESSAGES_GENERIC = [
+  { title: '🌿 A moment for you', body: 'Self-care isn\'t selfish. Take 2 minutes for yourself today.' },
+  { title: '💛 You matter', body: 'A small act of self-care goes a long way. What can you do right now?' },
+  { title: '✨ Gentle reminder', body: 'You\'ve been showing up for everyone. Show up for yourself too.' },
+  { title: '🌸 Pause & breathe', body: 'One deep breath. One kind thought. That\'s self-care.' },
+  { title: '☕ Slow down', body: 'Permission granted to rest. You\'ve earned it.' },
+];
+
+const SELFCARE_MESSAGES_QUIZ = [
+  { title: '🌿 Your self-care plan is waiting', body: 'Pick one tiny thing from your plan today. That\'s enough.' },
+  { title: '💛 Remember your gaps?', body: 'You discovered what you needed. Give yourself a little of it today.' },
+  { title: '✨ Self-care check', body: 'Your quiz showed what you crave. Honor it with one small action.' },
+  { title: '🌸 You know yourself', body: 'You named what nourishes you. Time to take a sip of it today.' },
+];
+
+function pickRandom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 
 const ALL_IDS = Object.values(PULSE_IDS).map((id) => ({ id }));
 
@@ -59,8 +78,15 @@ export function useSmartActionNudges(userId: string | undefined) {
           .maybeSingle(),
       ]);
 
+      const { data: quizRes } = await supabase
+        .from('selfcare_quiz_results')
+        .select('id')
+        .eq('user_id', userId)
+        .limit(1);
+
       const moodLoggedToday = (moodRes.data?.length ?? 0) > 0;
       const currentStreak = streakRes.data?.current_streak ?? 0;
+      const tookQuiz = (quizRes?.length ?? 0) > 0;
 
       const notifications: any[] = [];
 
@@ -90,6 +116,25 @@ export function useSmartActionNudges(userId: string | undefined) {
             schedule: { at },
             sound: 'default',
             extra: { type: 'daily_pulse_streak', url: '/app/home' },
+          });
+        }
+      }
+
+      // Priority 3: Self-care encouragement (late morning, ~10:30)
+      // Quiz-takers get tailored copy; everyone else gets generic gentle nudges.
+      {
+        const at = todayAt(10, 15 + Math.floor(Math.random() * 45));
+        if (at) {
+          const msg = tookQuiz
+            ? pickRandom(SELFCARE_MESSAGES_QUIZ)
+            : pickRandom(SELFCARE_MESSAGES_GENERIC);
+          notifications.push({
+            id: PULSE_IDS.SELFCARE,
+            title: msg.title,
+            body: msg.body,
+            schedule: { at },
+            sound: 'default',
+            extra: { type: 'daily_pulse_selfcare', url: '/app/tools' },
           });
         }
       }
