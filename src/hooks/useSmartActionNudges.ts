@@ -11,7 +11,10 @@ import { getLocalDateStr, taskAppliesToDate } from '@/lib/localDate';
  * Schedules random notifications from user's actual planner data:
  * - Task Reminders: 1-3 random incomplete tasks (IDs: 200001-200010)
  * - ProTask Nudges: 1 random proaction (IDs: 200011-200020)
- * - Water Reminders: 3-4 random times (IDs: 200021-200030)
+ *
+ * Water reminders moved to useWaterNotifications.ts (separate tool).
+ * Fasting reminders moved to useFastingNotifications.ts.
+ * Period reminders live in usePeriodNotifications.ts.
  *
  * All scheduled between 8 AM and 8 PM local time.
  * Reschedules daily on app open.
@@ -20,7 +23,6 @@ import { getLocalDateStr, taskAppliesToDate } from '@/lib/localDate';
 const ID_RANGES = {
   ACTION: { start: 200001, end: 200010 },
   PROACTION: { start: 200011, end: 200020 },
-  WATER: { start: 200021, end: 200030 },
 };
 
 const PROACTION_MESSAGES: Record<string, { emoji: string; title: string; body: string }> = {
@@ -30,13 +32,6 @@ const PROACTION_MESSAGES: Record<string, { emoji: string; title: string; body: s
   playlist: { emoji: '🎧', title: 'Your audio is ready', body: "There's a lesson waiting for you. Tap to listen." },
   water: { emoji: '💧', title: 'Stay hydrated', body: 'Have you had water recently? Your body will thank you.' },
 };
-
-const WATER_MESSAGES = [
-  'Have you had water recently? 💧',
-  'Stay hydrated — your body will thank you 💧',
-  'Time for a glass of water 💧',
-  'Hydration check! Keep going 💧',
-];
 
 const ACTION_BODIES = [
   'Time to do this! Your strength grows with each action.',
