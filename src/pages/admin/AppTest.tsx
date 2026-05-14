@@ -1635,6 +1635,25 @@ export default function AppTest() {
           </>
         );
       })()}
+
+      {/* 4-Card Completion Sheets previews */}
+      <MoodCelebrationSheet
+        open={!!moodSheetMood}
+        onOpenChange={(o) => { if (!o) setMoodSheetMood(null); }}
+        mood={moodSheetMood}
+        onDone={() => setMoodSheetMood(null)}
+      />
+      <ReflectionCelebrationSheet
+        open={showReflectionSheet}
+        onOpenChange={setShowReflectionSheet}
+        onDone={() => setShowReflectionSheet(false)}
+      />
+      <BreathingCompleteSheet
+        open={showBreathingSheet}
+        onOpenChange={setShowBreathingSheet}
+        exerciseName="Energy Breathing"
+        durationSeconds={24}
+      />
     </div>
   );
 }
