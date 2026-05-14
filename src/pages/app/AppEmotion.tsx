@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { EmotionDashboard } from '@/components/emotion/EmotionDashboard';
 import { EmotionSelector } from '@/components/emotion/EmotionSelector';
 import { EmotionContext } from '@/components/emotion/EmotionContext';
-import { EmotionComplete } from '@/components/emotion/EmotionComplete';
+import { MoodCelebrationSheet } from '@/components/mood/MoodCelebrationSheet';
 import { useEmotionLogs } from '@/hooks/useEmotionLogs';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
@@ -110,7 +110,24 @@ const AppEmotion = () => {
           />
         );
       case 'complete':
-        return <EmotionComplete onDone={handleDone} />;
+        return (
+          <>
+            <EmotionContext
+              valence={state.valence!}
+              category={state.category!}
+              emotions={state.emotions}
+              onSave={() => {}}
+              onBack={handleBack}
+              isSaving={false}
+            />
+            <MoodCelebrationSheet
+              open
+              onOpenChange={(o) => { if (!o) handleDone(); }}
+              mood={state.valence === 'pleasant' ? 'great' : state.valence === 'unpleasant' ? 'not_great' : 'okay'}
+              onDone={handleDone}
+            />
+          </>
+        );
       default:
         return null;
     }
