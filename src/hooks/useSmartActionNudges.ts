@@ -111,12 +111,12 @@ export function useSmartActionNudges(userId: string | undefined) {
       const [{ data: tasks }, { data: completions }] = await Promise.all([
         supabase
           .from('user_tasks')
-          .select('id, title, emoji, pro_link_type, goal_type, is_active, repeat_pattern, repeat_days, scheduled_date, created_at, repeat_end_date')
+          .select('id, title, emoji, pro_link_type, goal_type, goal_target, is_active, repeat_pattern, repeat_days, scheduled_date, created_at, repeat_end_date')
           .eq('user_id', userId)
           .eq('is_active', true),
         supabase
           .from('task_completions')
-          .select('task_id')
+          .select('task_id, goal_progress')
           .eq('user_id', userId)
           .eq('completed_date', todayStr),
       ]);
@@ -208,11 +208,24 @@ export function useSmartActionNudges(userId: string | undefined) {
         }
       }
 
-      // 2c. Water Reminders (always show if water task exists, even if completed — hydration is recurring)
-      const hasWater = incompleteTasks.some((t) => t.pro_link_type === 'water' || t.goal_type === 'water')
-        || applicableTasks.some((t) => t.pro_link_type === 'water' || t.goal_type === 'water');
-      if (hasWater) {
-        const waterCount = 3 + Math.floor(Math.random() * 2); // 3-4
+      // 2c. Water Reminders — respect today's progress, cap aggressively
+      const waterTasks = applicableTasks.filter(
+        (t) => t.pro_link_type === 'water' || t.goal_type === 'water'
+      );
+      const completionByTask = new Map(
+        (completions || []).map((c) => [c.task_id, c.goal_progress ?? 0])
+      );
+      // A water task is "done" if no goal_target OR progress >= target OR marked complete
+      const incompleteWaterTasks = waterTasks.filter((t) => {
+        const progress = completionByTask.get(t.id) ?? 0;
+        const target = (t as any).goal_target ?? 0;
+        if (target > 0) return progress < target;
+        // No target set — treat as done if any completion exists today
+        return !completionByTask.has(t.id);
+      });
+      if (incompleteWaterTasks.length > 0) {
+        // Cap at 2 reminders/day (was 3-4 — caused spam)
+        const waterCount = 1 + Math.floor(Math.random() * 2); // 1-2
         for (let i = 0; i < waterCount; i++) {
           const time = randomTimeBetween(8, 20);
           if (!time) continue; // No available time slot
@@ -227,6 +240,8 @@ export function useSmartActionNudges(userId: string | undefined) {
             extra: { type: 'water_nudge', url: '/app/home' },
           });
         }
+      } else {
+        console.log('[SmartNudges] 💧 Water complete or removed — no reminders today');
       }
 
       if (notifications.length > 0) {
