@@ -46,9 +46,10 @@ export function useSmartActionNudges(userId: string | undefined) {
       // Fetch state in parallel: today's mood log + current streak
       const [moodRes, streakRes] = await Promise.all([
         supabase
-          .from('mood_logs')
+          .from('emotion_logs')
           .select('id')
           .eq('user_id', userId)
+          .eq('category', 'mood_checkin')
           .gte('created_at', startOfDayIso)
           .limit(1),
         supabase
