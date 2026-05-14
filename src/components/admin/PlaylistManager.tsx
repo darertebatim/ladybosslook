@@ -396,6 +396,53 @@ export const PlaylistManager = () => {
     },
   });
 
+  // Keep local ordered copy in sync when not actively reordering
+  useEffect(() => {
+    if (!orderDirty && playlists) {
+      setOrderedPlaylists(playlists);
+    }
+  }, [playlists, orderDirty]);
+
+  const movePlaylist = (fromIndex: number, toIndex: number) => {
+    if (toIndex < 0 || toIndex >= orderedPlaylists.length) return;
+    const next = [...orderedPlaylists];
+    const [moved] = next.splice(fromIndex, 1);
+    next.splice(toIndex, 0, moved);
+    setOrderedPlaylists(next);
+    setOrderDirty(true);
+  };
+
+  const handleSaveOrder = async () => {
+    setIsSavingOrder(true);
+    try {
+      for (let i = 0; i < orderedPlaylists.length; i++) {
+        const p = orderedPlaylists[i];
+        const newOrder = i + 1;
+        if (p.sort_order === newOrder) continue;
+        const { error } = await supabase
+          .from('audio_playlists')
+          .update({ sort_order: newOrder })
+          .eq('id', p.id);
+        if (error) throw error;
+      }
+      toast.success('Playlist order updated');
+      setOrderDirty(false);
+      setReorderMode(false);
+      queryClient.invalidateQueries({ queryKey: ['audio-playlists-with-count'] });
+      queryClient.invalidateQueries({ queryKey: ['audio-playlists'] });
+    } catch (e: any) {
+      toast.error(e.message || 'Failed to save order');
+    } finally {
+      setIsSavingOrder(false);
+    }
+  };
+
+  const handleCancelOrder = () => {
+    setOrderedPlaylists(playlists || []);
+    setOrderDirty(false);
+    setReorderMode(false);
+  };
+
   // Upload cover image helper
   const uploadCoverImage = async (file: File, playlistId?: string): Promise<string> => {
     const fileExt = file.name.split('.').pop();
