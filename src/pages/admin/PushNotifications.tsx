@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import NotificationAnalytics from '@/pages/admin/NotificationAnalytics';
-import { PNConfigEditor } from '@/components/admin/pn/PNConfigEditor';
 import { LNHealthMonitor } from '@/components/admin/pn/LNHealthMonitor';
 import { usePNDeliveryStats } from '@/hooks/usePNDeliveryStats';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -883,10 +882,6 @@ export default function PushNotifications() {
             <Bell className="h-4 w-4" />
             PN Map
           </TabsTrigger>
-          <TabsTrigger value="config" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Config
-          </TabsTrigger>
           <TabsTrigger value="local" className="flex items-center gap-2">
             <Smartphone className="h-4 w-4" />
             Local Analytics
@@ -899,27 +894,6 @@ export default function PushNotifications() {
 
         <TabsContent value="map">
           <PNDocumentation />
-        </TabsContent>
-
-        <TabsContent value="config">
-          <div className="space-y-6">
-            <LNHealthMonitor />
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="h-5 w-5" />
-                  Local Notification Config
-                </CardTitle>
-                <CardDescription>
-                  Edit notification messages, timing, and enabled state. Changes sync to all user devices in real-time.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <PNConfigEditor />
-              </CardContent>
-            </Card>
-          </div>
         </TabsContent>
 
         <TabsContent value="local">

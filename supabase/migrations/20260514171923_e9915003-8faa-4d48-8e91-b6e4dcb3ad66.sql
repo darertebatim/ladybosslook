@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS public.pn_config CASCADE;
