@@ -86,6 +86,7 @@ const scheduledPNs: PNType[] = [
     messages: [
       { title: '💛 How are you feeling?', body: 'Take a moment to check in with yourself.', condition: 'No mood logged today (~2:00 PM)' },
       { title: '🔥 Your {N}-day streak is waiting', body: "Don't let it slip — open the app to keep it alive.", condition: 'Active streak ≥ 1 (~7:30 PM)' },
+      { title: '🌿 Self-care nudge (random)', body: 'Random gentle self-care encouragement. Tailored copy for users who took the Self-Care Quiz, generic copy for everyone else.', condition: 'Always (~10:30 AM)' },
     ],
   },
   {
