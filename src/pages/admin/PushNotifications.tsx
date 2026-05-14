@@ -882,10 +882,6 @@ export default function PushNotifications() {
             <Bell className="h-4 w-4" />
             PN Map
           </TabsTrigger>
-          <TabsTrigger value="config" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Config
-          </TabsTrigger>
           <TabsTrigger value="local" className="flex items-center gap-2">
             <Smartphone className="h-4 w-4" />
             Local Analytics
