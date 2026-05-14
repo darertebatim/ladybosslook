@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bell, Sparkles, Target, Clock, Calendar, Megaphone, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
+import { Bell, Sparkles, Target, Clock, Calendar, Megaphone, MessageSquare, ChevronDown, ChevronUp, AlarmClock } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { PreferenceItem } from './notifications/PreferenceItem';
 import { WakeSleepTimeSettings } from './notifications/WakeSleepTimeSettings';
 import { useLocalNotificationScheduler } from '@/hooks/useLocalNotificationScheduler';
+import { Capacitor } from '@capacitor/core';
+import { getAndroidExactAlarmStatus, openAndroidExactAlarmSettings } from '@/lib/localNotifications';
 
 interface NotificationPreferences {
   id: string;
