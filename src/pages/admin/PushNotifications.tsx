@@ -721,6 +721,25 @@ function PNDocumentation() {
   const { stats } = usePNDeliveryStats();
   const [runningFunctions, setRunningFunctions] = useState<Set<string>>(new Set());
   const queryClient = useQueryClient();
+
+  // Last-fired per function (server only) — surfaced in unified table
+  const { data: lastFiredMap } = useQuery({
+    queryKey: ['pn-last-fired'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('pn_schedule_logs')
+        .select('function_name, created_at')
+        .order('created_at', { ascending: false })
+        .limit(500);
+      if (error) throw error;
+      const map: Record<string, string> = {};
+      for (const log of data || []) {
+        if (!map[log.function_name]) map[log.function_name] = log.created_at;
+      }
+      return map;
+    },
+    refetchInterval: 60000,
+  });
   
   const runNow = async (functionName: string) => {
     setRunningFunctions(prev => new Set(prev).add(functionName));
@@ -749,6 +768,62 @@ function PNDocumentation() {
   
   return (
     <div className="space-y-6">
+      {/* Unified Notifications Map — every PN that actually fires */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Bell className="h-5 w-5 text-primary" />
+            <CardTitle>All Notifications</CardTitle>
+          </div>
+          <CardDescription>
+            Single map of every notification that actually fires, with delivery type and last-24h stats.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Delivery</TableHead>
+                <TableHead>Trigger / Schedule</TableHead>
+                <TableHead>Last fired</TableHead>
+                <TableHead className="text-right">Sent (24h)</TableHead>
+                <TableHead className="text-right">Failed (24h)</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...scheduledPNs, ...triggeredPNs, ...localPNs].map((pn) => {
+                const s = stats?.[pn.function];
+                const lastFired = lastFiredMap?.[pn.function];
+                return (
+                  <TableRow key={pn.function}>
+                    <TableCell className="text-sm font-medium flex items-center gap-2">
+                      <span className="text-primary">{pn.icon}</span>
+                      {pn.name}
+                    </TableCell>
+                    <TableCell><DeliveryBadge type={pn.deliveryType} /></TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{pn.schedule || pn.trigger || '—'}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {pn.deliveryType === 'local'
+                        ? <span className="italic">on device</span>
+                        : lastFired
+                          ? formatDistanceToNow(new Date(lastFired), { addSuffix: true })
+                          : '—'}
+                    </TableCell>
+                    <TableCell className="text-right text-xs font-medium" style={{ color: 'hsl(var(--primary))' }}>
+                      {s?.sent ?? (pn.deliveryType === 'local' ? '—' : 0)}
+                    </TableCell>
+                    <TableCell className="text-right text-xs font-medium text-destructive">
+                      {s?.failed ?? (pn.deliveryType === 'local' ? '—' : 0)}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
       {/* Legend */}
       <div className="flex items-center gap-4 flex-wrap text-sm">
         <span className="text-muted-foreground">Delivery types:</span>
