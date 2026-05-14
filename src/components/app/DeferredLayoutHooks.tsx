@@ -68,7 +68,6 @@ export const DeferredLayoutHooks = ({ userId }: { userId: string | undefined }) 
   useLocalNotificationScheduler(userId);
   useSmartActionNudges(userId);
   usePeriodNotifications(userId);
-  useHybridNotificationScheduler(userId);
   useProgramEventNotificationScheduler();
 
   return (
