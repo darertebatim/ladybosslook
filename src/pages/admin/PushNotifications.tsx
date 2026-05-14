@@ -900,27 +900,6 @@ export default function PushNotifications() {
           <PNDocumentation />
         </TabsContent>
 
-        <TabsContent value="config">
-          <div className="space-y-6">
-            <LNHealthMonitor />
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="h-5 w-5" />
-                  Local Notification Config
-                </CardTitle>
-                <CardDescription>
-                  Edit notification messages, timing, and enabled state. Changes sync to all user devices in real-time.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <PNConfigEditor />
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
         <TabsContent value="local">
           <NotificationAnalytics />
         </TabsContent>
