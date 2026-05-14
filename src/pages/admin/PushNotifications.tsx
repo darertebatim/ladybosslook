@@ -751,6 +751,7 @@ function RecentLogsTable() {
 function PNDocumentation() {
   const { stats } = usePNDeliveryStats();
   const [runningFunctions, setRunningFunctions] = useState<Set<string>>(new Set());
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const queryClient = useQueryClient();
 
   // Last-fired per function (server only) — surfaced in unified table
@@ -826,9 +827,22 @@ function PNDocumentation() {
               {[...scheduledPNs, ...triggeredPNs, ...localPNs].map((pn) => {
                 const s = stats?.[pn.function];
                 const lastFired = lastFiredMap?.[pn.function];
+                const isExpanded = expandedRows.has(pn.function);
                 return (
-                  <TableRow key={pn.function}>
+                  <>
+                  <TableRow
+                    key={pn.function}
+                    className="cursor-pointer hover:bg-muted/40"
+                    onClick={() =>
+                      setExpandedRows((prev) => {
+                        const next = new Set(prev);
+                        next.has(pn.function) ? next.delete(pn.function) : next.add(pn.function);
+                        return next;
+                      })
+                    }
+                  >
                     <TableCell className="text-sm font-medium flex items-center gap-2">
+                      {isExpanded ? <ChevronDown className="h-3 w-3 text-muted-foreground" /> : <ChevronRight className="h-3 w-3 text-muted-foreground" />}
                       <span className="text-primary">{pn.icon}</span>
                       {pn.name}
                     </TableCell>
@@ -848,6 +862,28 @@ function PNDocumentation() {
                       {s?.failed ?? (pn.deliveryType === 'local' ? '—' : 0)}
                     </TableCell>
                   </TableRow>
+                  {isExpanded && (
+                    <TableRow key={pn.function + '-templates'} className="bg-muted/20">
+                      <TableCell colSpan={6} className="py-3">
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">{pn.description}</p>
+                          <div className="text-xs font-medium text-muted-foreground">Message templates:</div>
+                          <div className="grid gap-2 md:grid-cols-2">
+                            {pn.messages.map((msg, idx) => (
+                              <div key={idx} className="bg-background rounded p-2 text-xs space-y-1 border border-border/50">
+                                <div className="font-medium">{msg.title}</div>
+                                <div className="text-muted-foreground">{msg.body}</div>
+                                {msg.condition && (
+                                  <div className="text-primary/80 text-[10px]">When: {msg.condition}</div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  </>
                 );
               })}
             </TableBody>
