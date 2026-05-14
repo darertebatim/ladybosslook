@@ -498,7 +498,7 @@ const AppSettings = () => {
 
   return (
     <>
-    <div className="flex flex-col h-full overflow-hidden bg-background">
+    <div className="flex flex-col min-h-full bg-background">
       <SEOHead
         title="Settings - LadyBoss Academy"
         description="App settings and preferences"
@@ -506,7 +506,7 @@ const AppSettings = () => {
 
       {/* Header */}
       <header
-        className="shrink-0 bg-card border-b"
+        className="shrink-0 bg-card border-b sticky top-0 z-20"
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
         <div className="flex items-center gap-3 px-4 py-3">
@@ -517,7 +517,7 @@ const AppSettings = () => {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-safe space-y-2 mt-4">
+      <div className="px-4 pb-safe space-y-2 mt-4">
         <PlusUpsellBanner
           title="Go Plus — unlock everything"
           subtitle="AI Planner, all tools & full audio library"
