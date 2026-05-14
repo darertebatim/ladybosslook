@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, Trash2, Plus, Pencil, List, Layers, Eye, EyeOff, Upload, X, Sparkles, RefreshCw, Wand2, Zap } from "lucide-react";
+import { Loader2, Trash2, Plus, Pencil, List, Layers, Eye, EyeOff, Upload, X, Sparkles, RefreshCw, Wand2, Zap, ArrowUp, ArrowDown, Save } from "lucide-react";
 import { optimizeCoversForTable } from '@/lib/imageUtils';
 import { PlaylistTracksManager } from "./PlaylistTracksManager";
 import { PlaylistModulesManager } from "./PlaylistModulesManager";
@@ -341,6 +341,12 @@ export const PlaylistManager = () => {
   const [isOptimizingCovers, setIsOptimizingCovers] = useState(false);
   const createFileInputRef = useRef<HTMLInputElement>(null);
   const editFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Reorder mode (local list state for drag-free up/down reordering)
+  const [reorderMode, setReorderMode] = useState(false);
+  const [orderedPlaylists, setOrderedPlaylists] = useState<any[]>([]);
+  const [orderDirty, setOrderDirty] = useState(false);
+  const [isSavingOrder, setIsSavingOrder] = useState(false);
 
   const [createFormData, setCreateFormData] = useState<PlaylistFormData>({
     name: "",
