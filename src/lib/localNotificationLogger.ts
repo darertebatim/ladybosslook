@@ -19,7 +19,8 @@ export type NotificationType =
   | 'action_nudge'
   | 'proaction_nudge'
   | 'water_reminder'
-  | 'period_reminder';
+  | 'period_reminder'
+  | 'fasting_reminder';
 
 interface LogEventParams {
   notificationType: NotificationType;
