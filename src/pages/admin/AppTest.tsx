@@ -212,6 +212,35 @@ export default function AppTest() {
 
             <Card>
               <CardHeader className="pb-2">
+                <CardTitle className="text-lg">💭 4-Card Completion Sheets</CardTitle>
+                <CardDescription>The "what's next" sheets shown after Mood, Reflection and Breathing.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Button onClick={() => setMoodSheetMood('great')} className="w-full justify-start" variant="outline">
+                  <Heart className="h-4 w-4 mr-2" />
+                  Mood Sheet — Great
+                </Button>
+                <Button onClick={() => setMoodSheetMood('okay')} className="w-full justify-start" variant="outline">
+                  <Heart className="h-4 w-4 mr-2" />
+                  Mood Sheet — Okay
+                </Button>
+                <Button onClick={() => setMoodSheetMood('not_great')} className="w-full justify-start" variant="outline">
+                  <Heart className="h-4 w-4 mr-2" />
+                  Mood Sheet — Not Great
+                </Button>
+                <Button onClick={() => setShowReflectionSheet(true)} className="w-full justify-start" variant="outline">
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Reflection Complete Sheet
+                </Button>
+                <Button onClick={() => setShowBreathingSheet(true)} className="w-full justify-start" variant="outline">
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Breathing Complete Sheet
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
                 <CardTitle className="text-lg">🏅 Badge Celebrations</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
