@@ -1,5 +1,7 @@
 import { LocalNotifications, ScheduleOn } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
+import { addDays, format } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
 import { logLocalNotificationEvent } from './localNotificationLogger';
 import type { Json } from '@/integrations/supabase/types';
 
@@ -23,6 +25,11 @@ export interface TaskNotificationInput {
   proLinkValue?: string | null;
 }
 
+// Notification ID prefix to identify task reminders (separate from urgent alarms 900000–999999)
+const TASK_REMINDER_ID_PREFIX = 1_000_000;
+// How many upcoming occurrences to schedule for non-daily/weekly recurring patterns
+const RECURRING_HORIZON_DAYS = 60;
+
 // Convert UUID to numeric ID (LocalNotifications requires number IDs)
 function hashTaskId(uuid: string): number {
   let hash = 0;
@@ -31,6 +38,46 @@ function hashTaskId(uuid: string): number {
     hash |= 0;
   }
   return Math.abs(hash);
+}
+
+// Per-(taskId, date) ID for multi-occurrence scheduling
+function generateOccurrenceId(taskId: string, dateStr: string): number {
+  let hash = 0;
+  const str = `${taskId}-${dateStr}`;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return TASK_REMINDER_ID_PREFIX + (Math.abs(hash) % 100_000_000);
+}
+
+// Compute future occurrence dates for a given repeat pattern (next horizon days)
+function getOccurrenceDates(
+  baseDate: string,
+  repeatPattern: TaskNotificationInput['repeatPattern'],
+  repeatDays?: number[],
+  horizonDays: number = RECURRING_HORIZON_DAYS,
+): string[] {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const [by, bm, bd] = baseDate.split('-').map(Number);
+  const startDate = new Date(by, bm - 1, bd);
+
+  if (!repeatPattern || repeatPattern === 'none') {
+    return startDate >= today ? [baseDate] : [];
+  }
+
+  const dates: string[] = [];
+  for (let i = 0; i < horizonDays; i++) {
+    const d = addDays(today, i);
+    const dow = d.getDay();
+    let ok = false;
+    if (repeatPattern === 'weekend') ok = dow === 0 || dow === 6;
+    else if (repeatPattern === 'monthly') ok = d.getDate() === startDate.getDate();
+    else if (repeatPattern === 'custom' && repeatDays?.length) ok = repeatDays.includes(dow);
+    if (ok) dates.push(format(d, 'yyyy-MM-dd'));
+  }
+  return dates;
 }
 
 // Calculate the notification time based on scheduled time minus offset
@@ -104,81 +151,91 @@ export async function scheduleTaskReminder(task: TaskNotificationInput): Promise
       task.scheduledTime,
       task.reminderOffset
     );
-    
-    // Don't schedule if time has already passed
-    if (notificationTime <= new Date()) {
-      console.log('[LocalNotifications] Notification time has passed, skipping');
-      return { success: false, error: 'Notification time has passed' };
-    }
-    
-    const notificationId = hashTaskId(task.taskId);
+
     const url = getNotificationUrl(task.proLinkType, task.proLinkValue);
     
     // Determine schedule based on repeat pattern
     // allowWhileIdle ensures Android delivers the notification even in Doze mode
-    let schedule: any = { at: notificationTime, allowWhileIdle: true };
-    
-    // For repeating tasks, use native repeat functionality
+    const notifications: any[] = [];
+
     if (task.repeatPattern === 'daily') {
-      schedule = {
-        on: {
-          hour: notificationTime.getHours(),
-          minute: notificationTime.getMinutes(),
-        } as ScheduleOn,
-        repeats: true,
-        allowWhileIdle: true,
-      };
-    } else if (task.repeatPattern === 'weekly' && task.scheduledDate) {
-      // Weekly - same day of week
-      const dayOfWeek = new Date(task.scheduledDate).getDay();
-      schedule = {
-        on: {
-          weekday: dayOfWeek + 1, // iOS uses 1-7, JS uses 0-6
-          hour: notificationTime.getHours(),
-          minute: notificationTime.getMinutes(),
-        } as ScheduleOn,
-        repeats: true,
-        allowWhileIdle: true,
-      };
-    }
-    // For other patterns (none, monthly, weekend, custom), use one-time scheduling
-    // The server-side cron can handle the more complex patterns as a fallback
-    
-    await LocalNotifications.schedule({
-      notifications: [{
-        id: notificationId,
+      // Native repeating daily — single notification, lifetime
+      notifications.push({
+        id: hashTaskId(task.taskId),
         title: `${task.emoji} ${task.title}`,
         body: formatOffsetText(task.reminderOffset),
-        schedule,
-        sound: 'default',
-        // Android: assign to high-importance channel so OEMs (Xiaomi/Huawei/Samsung)
-        // don't suppress the notification and the heads-up + sound is guaranteed.
-        channelId: 'task-reminders',
-        extra: {
-          taskId: task.taskId,
-          url,
-          type: 'task_reminder',
+        schedule: {
+          on: { hour: notificationTime.getHours(), minute: notificationTime.getMinutes() } as ScheduleOn,
+          repeats: true,
+          allowWhileIdle: true,
         },
-      }],
-    });
-    
-    console.log(`[LocalNotifications] ✅ Scheduled reminder for "${task.title}" at ${notificationTime.toISOString()}`);
-    
-    // Log the scheduled event
+        sound: 'default',
+        channelId: 'task-reminders',
+        extra: { taskId: task.taskId, url, type: 'task_reminder' },
+      });
+    } else if (task.repeatPattern === 'weekly' && task.scheduledDate) {
+      const dayOfWeek = new Date(`${task.scheduledDate}T00:00:00`).getDay();
+      notifications.push({
+        id: hashTaskId(task.taskId),
+        title: `${task.emoji} ${task.title}`,
+        body: formatOffsetText(task.reminderOffset),
+        schedule: {
+          on: {
+            weekday: dayOfWeek + 1,
+            hour: notificationTime.getHours(),
+            minute: notificationTime.getMinutes(),
+          } as ScheduleOn,
+          repeats: true,
+          allowWhileIdle: true,
+        },
+        sound: 'default',
+        channelId: 'task-reminders',
+        extra: { taskId: task.taskId, url, type: 'task_reminder' },
+      });
+    } else {
+      // none / monthly / weekend / custom — schedule N upcoming occurrences explicitly.
+      // Each (taskId, date) gets a unique ID; refresh on app launch keeps horizon full.
+      const dates = getOccurrenceDates(task.scheduledDate, task.repeatPattern, task.repeatDays);
+      const now = new Date();
+      for (const dateStr of dates) {
+        const at = calculateNotificationTime(dateStr, task.scheduledTime, task.reminderOffset);
+        if (at <= now) continue;
+        notifications.push({
+          id: generateOccurrenceId(task.taskId, dateStr),
+          title: `${task.emoji} ${task.title}`,
+          body: formatOffsetText(task.reminderOffset),
+          schedule: { at, allowWhileIdle: true },
+          sound: 'default',
+          channelId: 'task-reminders',
+          extra: { taskId: task.taskId, url, type: 'task_reminder', occurrenceDate: dateStr },
+        });
+      }
+    }
+
+    if (notifications.length === 0) {
+      console.log('[LocalNotifications] No future occurrences to schedule');
+      return { success: false, error: 'No future occurrences' };
+    }
+
+    await LocalNotifications.schedule({ notifications });
+
+    console.log(`[LocalNotifications] ✅ Scheduled ${notifications.length} reminder(s) for "${task.title}"`);
+
     logLocalNotificationEvent({
       notificationType: 'task_reminder',
       event: 'scheduled',
       taskId: task.taskId,
-      notificationId,
+      notificationId: notifications[0].id,
       metadata: {
         title: task.title,
         scheduledDate: task.scheduledDate,
         scheduledTime: task.scheduledTime,
         reminderOffset: task.reminderOffset,
-        notificationTime: notificationTime.toISOString(),
+        repeatPattern: task.repeatPattern || 'none',
+        scheduledCount: notifications.length,
       } as Record<string, Json>,
     });
-    
+
     return { success: true };
   } catch (error) {
     console.error('[LocalNotifications] Failed to schedule reminder:', error);
@@ -193,9 +250,19 @@ export async function cancelTaskReminder(taskId: string): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
   
   try {
-    const notificationId = hashTaskId(taskId);
+    // Cancel both the legacy single-id reminder and any per-occurrence notifications
+    const ids = new Set<number>([hashTaskId(taskId)]);
+    try {
+      const pending = await LocalNotifications.getPending();
+      for (const n of pending.notifications) {
+        if (n.extra?.taskId === taskId && n.extra?.type === 'task_reminder') {
+          ids.add(n.id);
+        }
+      }
+    } catch { /* ignore */ }
+
     await LocalNotifications.cancel({
-      notifications: [{ id: notificationId }],
+      notifications: Array.from(ids).map((id) => ({ id })),
     });
     console.log(`[LocalNotifications] Cancelled reminder for task ${taskId}`);
     
@@ -204,10 +271,58 @@ export async function cancelTaskReminder(taskId: string): Promise<void> {
       notificationType: 'task_reminder',
       event: 'cancelled',
       taskId,
-      notificationId,
+      notificationId: hashTaskId(taskId),
     });
   } catch (error) {
     console.error('[LocalNotifications] Failed to cancel reminder:', error);
+  }
+}
+
+/**
+ * Refresh all of a user's task reminders.
+ * Call on app launch + on app resume so non-daily/weekly horizons stay full
+ * and reminders survive cleanup or device reschedules.
+ */
+export async function refreshAllTaskReminders(userId: string | undefined): Promise<void> {
+  if (!userId) return;
+  if (!Capacitor.isNativePlatform()) return;
+
+  try {
+    const { data, error } = await supabase
+      .from('user_tasks')
+      .select('id, title, emoji, scheduled_date, scheduled_time, reminder_enabled, reminder_offset, repeat_pattern, repeat_days, is_urgent, is_active, pro_link_type, pro_link_value')
+      .eq('user_id', userId)
+      .eq('reminder_enabled', true)
+      .eq('is_urgent', false)
+      .eq('is_active', true);
+
+    if (error) throw error;
+    if (!data?.length) return;
+
+    let refreshed = 0;
+    for (const t of data as any[]) {
+      if (!t.scheduled_time) continue;
+      // For 'none', scheduled_date is required; skip past one-offs
+      if ((t.repeat_pattern || 'none') === 'none' && !t.scheduled_date) continue;
+
+      await cancelTaskReminder(t.id);
+      const result = await scheduleTaskReminder({
+        taskId: t.id,
+        title: t.title,
+        emoji: t.emoji || '☀️',
+        scheduledDate: t.scheduled_date || format(new Date(), 'yyyy-MM-dd'),
+        scheduledTime: t.scheduled_time,
+        reminderOffset: t.reminder_offset || 0,
+        repeatPattern: t.repeat_pattern || 'none',
+        repeatDays: t.repeat_days || [],
+        proLinkType: t.pro_link_type,
+        proLinkValue: t.pro_link_value,
+      });
+      if (result.success) refreshed++;
+    }
+    console.log(`[LocalNotifications] Refreshed ${refreshed}/${data.length} task reminders`);
+  } catch (e) {
+    console.error('[LocalNotifications] refreshAllTaskReminders failed:', e);
   }
 }
 
