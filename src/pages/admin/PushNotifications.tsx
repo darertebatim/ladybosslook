@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, Fragment } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getLocalDateStr } from '@/lib/localDate';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,7 +36,9 @@ import {
   Server,
   Play,
   RefreshCw,
-  AlertCircle
+  AlertCircle,
+  Droplet,
+  Timer
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -76,7 +78,7 @@ const scheduledPNs: PNType[] = [
     name: 'Smart Task Nudges',
     function: 'local-smart-nudges',
     schedule: 'On app launch (local)',
-    description: 'Random reminders from user\'s actual planner data: incomplete tasks, proactions (journal, breathe, emotion), and water reminders. Scheduled between 8 AM - 8 PM.',
+    description: 'Random reminders from user\'s actual planner data: incomplete tasks and proactions (journal, breathe, emotion). Water, period, and fasting now have their own schedulers. Scheduled between 8 AM - 8 PM.',
     userPreference: 'Auto (based on active tasks)',
     icon: <Sparkles className="h-5 w-5" />,
     codeFile: 'src/hooks/useSmartActionNudges.ts',
@@ -85,7 +87,6 @@ const scheduledPNs: PNType[] = [
       { title: '{emoji} {taskTitle}', body: 'Time to do this! Your strength grows with each task.', condition: 'Random incomplete task' },
       { title: '🫁 Time for breathing', body: 'A few deep breaths can change your whole day.', condition: 'Random proaction' },
       { title: '📝 Your journal is waiting', body: 'Take a moment to write. Even a few words matter.', condition: 'Random proaction' },
-      { title: '💧 Water Reminder', body: 'Have you had water recently? 💧', condition: '3-4x daily if water tracking' },
     ],
   },
   {
@@ -101,6 +102,36 @@ const scheduledPNs: PNType[] = [
       { title: '🌸 Period Reminder', body: 'Your period may start in {X} days. Prepare yourself.', condition: 'reminder_days before' },
       { title: '🌸 Period May Have Started', body: 'Your period may have started today. Tap to log.', condition: 'Predicted start day' },
       { title: '🌸 Log Your Day', body: "Don't forget to log today.", condition: 'During predicted period' },
+    ],
+  },
+  {
+    name: 'Water Reminders',
+    function: 'local-water-reminders',
+    schedule: 'On app launch (local)',
+    description: 'Hydration nudges scheduled only when the user has incomplete water tasks today. Capped at 1-2 reminders/day between 8 AM - 8 PM.',
+    userPreference: 'Auto (based on active water tasks)',
+    icon: <Droplet className="h-5 w-5" />,
+    codeFile: 'src/hooks/useWaterNotifications.ts',
+    deliveryType: 'local',
+    messages: [
+      { title: '💧 Water Reminder', body: 'Have you had water recently? 💧', condition: 'Random morning/afternoon slot' },
+      { title: '💧 Water Reminder', body: 'Stay hydrated — your body will thank you 💧' },
+      { title: '💧 Water Reminder', body: 'Time for a glass of water 💧' },
+      { title: '💧 Water Reminder', body: 'Hydration check! Keep going 💧' },
+    ],
+  },
+  {
+    name: 'Fasting Reminders',
+    function: 'local-fasting-reminders',
+    schedule: 'On app launch + session change (local)',
+    description: 'Anchored to the active fasting session. Fires when the fasting target is reached, or when the eating window is closing.',
+    userPreference: 'Auto (based on active fasting session)',
+    icon: <Timer className="h-5 w-5" />,
+    codeFile: 'src/hooks/useFastingNotifications.ts',
+    deliveryType: 'local',
+    messages: [
+      { title: '⏱️ Fasting Window Complete', body: "You've reached your {N}h fast. You can break it whenever you're ready.", condition: 'started_at + fasting_hours' },
+      { title: '🍽️ Eating Window Closing', body: 'Your eating window is ending. Ready to start the next fast?', condition: 'No active fast, eating window ending soon' },
     ],
   },
   {
@@ -720,6 +751,7 @@ function RecentLogsTable() {
 function PNDocumentation() {
   const { stats } = usePNDeliveryStats();
   const [runningFunctions, setRunningFunctions] = useState<Set<string>>(new Set());
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const queryClient = useQueryClient();
 
   // Last-fired per function (server only) — surfaced in unified table
@@ -795,9 +827,21 @@ function PNDocumentation() {
               {[...scheduledPNs, ...triggeredPNs, ...localPNs].map((pn) => {
                 const s = stats?.[pn.function];
                 const lastFired = lastFiredMap?.[pn.function];
+                const isExpanded = expandedRows.has(pn.function);
                 return (
-                  <TableRow key={pn.function}>
+                  <Fragment key={pn.function}>
+                  <TableRow
+                    className="cursor-pointer hover:bg-muted/40"
+                    onClick={() =>
+                      setExpandedRows((prev) => {
+                        const next = new Set(prev);
+                        next.has(pn.function) ? next.delete(pn.function) : next.add(pn.function);
+                        return next;
+                      })
+                    }
+                  >
                     <TableCell className="text-sm font-medium flex items-center gap-2">
+                      {isExpanded ? <ChevronDown className="h-3 w-3 text-muted-foreground" /> : <ChevronRight className="h-3 w-3 text-muted-foreground" />}
                       <span className="text-primary">{pn.icon}</span>
                       {pn.name}
                     </TableCell>
@@ -817,6 +861,28 @@ function PNDocumentation() {
                       {s?.failed ?? (pn.deliveryType === 'local' ? '—' : 0)}
                     </TableCell>
                   </TableRow>
+                  {isExpanded && (
+                    <TableRow className="bg-muted/20">
+                      <TableCell colSpan={6} className="py-3">
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted-foreground">{pn.description}</p>
+                          <div className="text-xs font-medium text-muted-foreground">Message templates:</div>
+                          <div className="grid gap-2 md:grid-cols-2">
+                            {pn.messages.map((msg, idx) => (
+                              <div key={idx} className="bg-background rounded p-2 text-xs space-y-1 border border-border/50">
+                                <div className="font-medium">{msg.title}</div>
+                                <div className="text-muted-foreground">{msg.body}</div>
+                                {msg.condition && (
+                                  <div className="text-primary/80 text-[10px]">When: {msg.condition}</div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  </Fragment>
                 );
               })}
             </TableBody>
