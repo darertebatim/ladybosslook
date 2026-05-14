@@ -78,6 +78,9 @@ import { InstructorInviteContent } from '@/components/instructor/InstructorInvit
 import { InstructorWelcomeContent } from '@/components/instructor/InstructorWelcomeSheet';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { MoodCelebrationSheet } from '@/components/mood/MoodCelebrationSheet';
+import { ReflectionCelebrationSheet } from '@/components/reflection/ReflectionCelebrationSheet';
+import { BreathingCompleteSheet } from '@/components/breathe/BreathingCompleteSheet';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
@@ -107,6 +110,9 @@ export default function AppTest() {
   const [showActionLimit, setShowActionLimit] = useState(false);
   const [showPlusGate, setShowPlusGate] = useState(false);
   const [showSoftReviewPrompt, setShowSoftReviewPrompt] = useState(false);
+  const [moodSheetMood, setMoodSheetMood] = useState<string | null>(null);
+  const [showReflectionSheet, setShowReflectionSheet] = useState(false);
+  const [showBreathingSheet, setShowBreathingSheet] = useState(false);
   
   // Badge celebration states
   const [badgeCelebrationType, setBadgeCelebrationType] = useState<BadgeCelebrationLevel | null>(null);
