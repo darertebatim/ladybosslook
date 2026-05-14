@@ -31,7 +31,7 @@ export function MoodDashboard() {
   const { autoCompleteMood } = useAutoCompleteProTask();
   const { data: todayMood } = useTodayMood();
   const createMoodLog = useCreateMoodLog();
-  const { data: existingTask } = useExistingProTask('mood');
+  const { data: existingTask, isLoading: existingTaskLoading } = useExistingProTask('mood');
   const addRoutinePlan = useAddRoutinePlan();
   
   // Synthetic task for mood routine — title localized via t()
@@ -102,13 +102,16 @@ export function MoodDashboard() {
 
   // Intercept action clicks from celebration to show routine prompt
   const handleCelebrationAction = useCallback((route: string): boolean => {
-    if (!isAdded && !neverPrompt) {
+    // Only intercept when we know for sure the user has NOT added it yet.
+    // While the query is loading (existingTask === undefined), assume added
+    // to avoid showing the prompt to users who already have the routine.
+    if (existingTask === false && !justAdded && !neverPrompt && !existingTaskLoading) {
       setPendingRoute(route);
       setShowRoutinePrompt(true);
       return true; // intercept
     }
     return false; // let celebration handle navigation
-  }, [isAdded, neverPrompt]);
+  }, [existingTask, justAdded, neverPrompt, existingTaskLoading]);
 
   const handleRoutinePromptAdd = useCallback(() => {
     setShowRoutinePrompt(false);
