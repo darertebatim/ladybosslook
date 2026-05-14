@@ -30,6 +30,34 @@ const TASK_REMINDER_ID_PREFIX = 1_000_000;
 // How many upcoming occurrences to schedule for non-daily/weekly recurring patterns
 const RECURRING_HORIZON_DAYS = 60;
 
+/**
+ * Returns Android exact-alarm permission status.
+ * - 'granted' on iOS / non-native (no separate permission needed)
+ * - 'granted' | 'denied' | 'unknown' on Android
+ */
+export async function getAndroidExactAlarmStatus(): Promise<'granted' | 'denied' | 'unknown'> {
+  if (!Capacitor.isNativePlatform()) return 'granted';
+  if (Capacitor.getPlatform() !== 'android') return 'granted';
+  try {
+    const setting = await LocalNotifications.checkExactNotificationSetting();
+    if (setting.exact_alarm === 'granted') return 'granted';
+    if (setting.exact_alarm === 'denied') return 'denied';
+    return 'unknown';
+  } catch {
+    return 'unknown';
+  }
+}
+
+/** Open the Android system settings page where the user can grant exact alarms. */
+export async function openAndroidExactAlarmSettings(): Promise<void> {
+  if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') return;
+  try {
+    await LocalNotifications.changeExactNotificationSetting();
+  } catch (e) {
+    console.warn('[LocalNotifications] openAndroidExactAlarmSettings failed:', e);
+  }
+}
+
 // Convert UUID to numeric ID (LocalNotifications requires number IDs)
 function hashTaskId(uuid: string): number {
   let hash = 0;

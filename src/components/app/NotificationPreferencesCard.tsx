@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bell, Sparkles, Target, Clock, Calendar, Megaphone, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
+import { Bell, Sparkles, Target, Clock, Calendar, Megaphone, MessageSquare, ChevronDown, ChevronUp, AlarmClock } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { PreferenceItem } from './notifications/PreferenceItem';
 import { WakeSleepTimeSettings } from './notifications/WakeSleepTimeSettings';
 import { useLocalNotificationScheduler } from '@/hooks/useLocalNotificationScheduler';
+import { Capacitor } from '@capacitor/core';
+import { getAndroidExactAlarmStatus, openAndroidExactAlarmSettings } from '@/lib/localNotifications';
 
 interface NotificationPreferences {
   id: string;
@@ -57,6 +59,22 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
   const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
   const { scheduleNotifications } = useLocalNotificationScheduler(userId);
+
+  // Android exact-alarm permission state (so we can warn users that reminders won't fire on time)
+  const [exactAlarmStatus, setExactAlarmStatus] = useState<'granted' | 'denied' | 'unknown'>('granted');
+  const isAndroid = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
+
+  useEffect(() => {
+    if (!isAndroid) return;
+    let cancelled = false;
+    const check = () => {
+      getAndroidExactAlarmStatus().then((s) => { if (!cancelled) setExactAlarmStatus(s); });
+    };
+    check();
+    const onVisible = () => { if (document.visibilityState === 'visible') check(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => { cancelled = true; document.removeEventListener('visibilitychange', onVisible); };
+  }, [isAndroid]);
 
   // Fetch user preferences
   const { data: preferences, isLoading } = useQuery({
@@ -157,6 +175,32 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
 
         <CollapsibleContent>
           <CardContent className="space-y-4 pt-2">
+            {isAndroid && exactAlarmStatus !== 'granted' && (
+              <div className="rounded-xl border border-amber-300/60 bg-amber-50 dark:bg-amber-950/30 p-3 flex items-start gap-3">
+                <div className="h-8 w-8 rounded-lg bg-amber-200/70 dark:bg-amber-900/50 flex items-center justify-center shrink-0">
+                  <AlarmClock className="h-4 w-4 text-amber-700 dark:text-amber-300" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">
+                    Reminders may be late
+                  </p>
+                  <p className="text-xs text-amber-800/90 dark:text-amber-200/80 mt-0.5">
+                    Android needs the “Alarms &amp; reminders” permission so task reminders fire exactly on time.
+                  </p>
+                  <Button
+                    size="sm"
+                    className="mt-2 h-8 bg-amber-600 hover:bg-amber-700 text-white"
+                    onClick={async () => {
+                      await openAndroidExactAlarmSettings();
+                      toast.message('Toggle “Allow setting alarms and reminders”, then return to the app.');
+                    }}
+                  >
+                    Open Android Settings
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {isLoading ? (
               <div className="py-4 text-center text-sm text-muted-foreground">
                 Loading preferences...
