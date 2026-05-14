@@ -3,7 +3,6 @@ import { Capacitor } from '@capacitor/core';
 import { useAppInstallTracking } from '@/hooks/useAppInstallTracking';
 import { useAppsFlyerTracking } from '@/hooks/useAppsFlyerTracking';
 import { useLocalNotificationScheduler } from '@/hooks/useLocalNotificationScheduler';
-import { useHybridNotificationScheduler } from '@/hooks/useHybridNotificationScheduler';
 import { useProgramEventNotificationScheduler } from '@/hooks/useProgramEventNotificationScheduler';
 import { useSmartActionNudges } from '@/hooks/useSmartActionNudges';
 import { usePeriodNotifications } from '@/hooks/usePeriodNotifications';
