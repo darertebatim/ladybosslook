@@ -86,7 +86,15 @@ const scheduledPNs: PNType[] = [
     messages: [
       { title: '💛 How are you feeling?', body: 'Take a moment to check in with yourself.', condition: 'No mood logged today (~2:00 PM)' },
       { title: '🔥 Your {N}-day streak is waiting', body: "Don't let it slip — open the app to keep it alive.", condition: 'Active streak ≥ 1 (~7:30 PM)' },
-      { title: '🌿 Self-care nudge (random)', body: 'Random gentle self-care encouragement. Tailored copy for users who took the Self-Care Quiz, generic copy for everyone else.', condition: 'Always (~10:30 AM)' },
+      { title: '🌿 A moment for you', body: "Self-care isn't selfish. Take 2 minutes for yourself today.", condition: 'Self-care (generic) — ~10:30 AM' },
+      { title: '💛 You matter', body: 'A small act of self-care goes a long way. What can you do right now?', condition: 'Self-care (generic) — ~10:30 AM' },
+      { title: '✨ Gentle reminder', body: "You've been showing up for everyone. Show up for yourself too.", condition: 'Self-care (generic) — ~10:30 AM' },
+      { title: '🌸 Pause & breathe', body: "One deep breath. One kind thought. That's self-care.", condition: 'Self-care (generic) — ~10:30 AM' },
+      { title: '☕ Slow down', body: "Permission granted to rest. You've earned it.", condition: 'Self-care (generic) — ~10:30 AM' },
+      { title: '🌿 Your self-care plan is waiting', body: "Pick one tiny thing from your plan today. That's enough.", condition: 'Self-care (quiz-takers) — ~10:30 AM' },
+      { title: '💛 Remember your gaps?', body: 'You discovered what you needed. Give yourself a little of it today.', condition: 'Self-care (quiz-takers) — ~10:30 AM' },
+      { title: '✨ Self-care check', body: 'Your quiz showed what you crave. Honor it with one small action.', condition: 'Self-care (quiz-takers) — ~10:30 AM' },
+      { title: '🌸 You know yourself', body: 'You named what nourishes you. Time to take a sip of it today.', condition: 'Self-care (quiz-takers) — ~10:30 AM' },
     ],
   },
   {
