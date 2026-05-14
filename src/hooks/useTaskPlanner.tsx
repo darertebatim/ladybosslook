@@ -865,6 +865,12 @@ export const useCreateTask = () => {
         
         if (!reminderResult.success && reminderResult.error) {
           console.warn('[CreateTask] Local notification scheduling failed:', reminderResult.error);
+          if (/exact alarm/i.test(reminderResult.error)) {
+            toast({
+              title: 'Enable exact reminders',
+              description: 'Android needs the “Alarms & reminders” permission so reminders fire on time. Open Settings to allow it.',
+            });
+          }
         }
       }
 
@@ -884,6 +890,12 @@ export const useCreateTask = () => {
         
         if (!alarmResult.success && alarmResult.error) {
           console.warn('[CreateTask] Urgent alarm scheduling failed:', alarmResult.error);
+          if (/exact alarm/i.test(alarmResult.error) || /permission/i.test(alarmResult.error)) {
+            toast({
+              title: 'Enable exact alarms',
+              description: 'Urgent alarms need the “Alarms & reminders” permission on Android. Open Settings to allow it.',
+            });
+          }
         } else if (alarmResult.scheduledCount) {
           console.log(`[CreateTask] Scheduled ${alarmResult.scheduledCount} urgent alarms`);
         }
@@ -1069,6 +1081,12 @@ export const useUpdateTask = () => {
         
         if (!alarmResult.success) {
           console.warn('[UpdateTask] Urgent alarm not scheduled:', alarmResult.error);
+          if (alarmResult.error && (/exact alarm/i.test(alarmResult.error) || /permission/i.test(alarmResult.error))) {
+            toast({
+              title: 'Enable exact alarms',
+              description: 'Urgent alarms need the “Alarms & reminders” permission on Android. Open Settings to allow it.',
+            });
+          }
         } else if (alarmResult.scheduledCount) {
           console.log(`[UpdateTask] Scheduled ${alarmResult.scheduledCount} urgent alarms`);
         }
