@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, Trash2, Plus, Pencil, List, Layers, Eye, EyeOff, Upload, X, Sparkles, RefreshCw, Wand2, Zap } from "lucide-react";
+import { Loader2, Trash2, Plus, Pencil, List, Layers, Eye, EyeOff, Upload, X, Sparkles, RefreshCw, Wand2, Zap, ArrowUp, ArrowDown, Save } from "lucide-react";
 import { optimizeCoversForTable } from '@/lib/imageUtils';
 import { PlaylistTracksManager } from "./PlaylistTracksManager";
 import { PlaylistModulesManager } from "./PlaylistModulesManager";
@@ -342,6 +342,12 @@ export const PlaylistManager = () => {
   const createFileInputRef = useRef<HTMLInputElement>(null);
   const editFileInputRef = useRef<HTMLInputElement>(null);
 
+  // Reorder mode (local list state for drag-free up/down reordering)
+  const [reorderMode, setReorderMode] = useState(false);
+  const [orderedPlaylists, setOrderedPlaylists] = useState<any[]>([]);
+  const [orderDirty, setOrderDirty] = useState(false);
+  const [isSavingOrder, setIsSavingOrder] = useState(false);
+
   const [createFormData, setCreateFormData] = useState<PlaylistFormData>({
     name: "",
     description: "",
@@ -389,6 +395,53 @@ export const PlaylistManager = () => {
       return data;
     },
   });
+
+  // Keep local ordered copy in sync when not actively reordering
+  useEffect(() => {
+    if (!orderDirty && playlists) {
+      setOrderedPlaylists(playlists);
+    }
+  }, [playlists, orderDirty]);
+
+  const movePlaylist = (fromIndex: number, toIndex: number) => {
+    if (toIndex < 0 || toIndex >= orderedPlaylists.length) return;
+    const next = [...orderedPlaylists];
+    const [moved] = next.splice(fromIndex, 1);
+    next.splice(toIndex, 0, moved);
+    setOrderedPlaylists(next);
+    setOrderDirty(true);
+  };
+
+  const handleSaveOrder = async () => {
+    setIsSavingOrder(true);
+    try {
+      for (let i = 0; i < orderedPlaylists.length; i++) {
+        const p = orderedPlaylists[i];
+        const newOrder = i + 1;
+        if (p.sort_order === newOrder) continue;
+        const { error } = await supabase
+          .from('audio_playlists')
+          .update({ sort_order: newOrder })
+          .eq('id', p.id);
+        if (error) throw error;
+      }
+      toast.success('Playlist order updated');
+      setOrderDirty(false);
+      setReorderMode(false);
+      queryClient.invalidateQueries({ queryKey: ['audio-playlists-with-count'] });
+      queryClient.invalidateQueries({ queryKey: ['audio-playlists'] });
+    } catch (e: any) {
+      toast.error(e.message || 'Failed to save order');
+    } finally {
+      setIsSavingOrder(false);
+    }
+  };
+
+  const handleCancelOrder = () => {
+    setOrderedPlaylists(playlists || []);
+    setOrderDirty(false);
+    setReorderMode(false);
+  };
 
   // Upload cover image helper
   const uploadCoverImage = async (file: File, playlistId?: string): Promise<string> => {
@@ -937,6 +990,37 @@ export const PlaylistManager = () => {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Playlists/Albums</CardTitle>
         <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mr-2 px-2 py-1 rounded-md border">
+            <Switch
+              id="playlist_reorder_mode"
+              checked={reorderMode}
+              onCheckedChange={(checked) => {
+                if (!checked && orderDirty) {
+                  handleCancelOrder();
+                } else {
+                  setReorderMode(checked);
+                }
+              }}
+            />
+            <Label htmlFor="playlist_reorder_mode" className="text-xs cursor-pointer">
+              Reorder
+            </Label>
+          </div>
+          {reorderMode && orderDirty && (
+            <>
+              <Button size="sm" variant="outline" onClick={handleCancelOrder} disabled={isSavingOrder}>
+                Cancel
+              </Button>
+              <Button size="sm" onClick={handleSaveOrder} disabled={isSavingOrder}>
+                {isSavingOrder ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                Save Order
+              </Button>
+            </>
+          )}
           <Button 
             onClick={handleGenerateFreePrograms} 
             size="sm" 
@@ -975,6 +1059,7 @@ export const PlaylistManager = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-20">#</TableHead>
               <TableHead className="w-16">Cover</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Description</TableHead>
@@ -984,8 +1069,39 @@ export const PlaylistManager = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {playlists?.map((playlist) => (
+            {orderedPlaylists?.map((playlist, index) => (
               <TableRow key={playlist.id} className={playlist.is_hidden ? "opacity-50" : ""}>
+                <TableCell>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-mono text-muted-foreground w-5 text-right">
+                      {index + 1}
+                    </span>
+                    {reorderMode && (
+                      <div className="flex flex-col">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={() => movePlaylist(index, index - 1)}
+                          disabled={index === 0}
+                          title="Move up"
+                        >
+                          <ArrowUp className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={() => movePlaylist(index, index + 1)}
+                          disabled={index === orderedPlaylists.length - 1}
+                          title="Move down"
+                        >
+                          <ArrowDown className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell>
                   {playlist.cover_image_url ? (
                     <img
