@@ -75,18 +75,17 @@ interface PNLog {
 
 const scheduledPNs: PNType[] = [
   {
-    name: 'Smart Task Nudges',
-    function: 'local-smart-nudges',
+    name: 'Daily Pulse',
+    function: 'local-daily-pulse',
     schedule: 'On app launch (local)',
-    description: 'Random reminders from user\'s actual planner data: incomplete tasks and proactions (journal, breathe, emotion). Water, period, and fasting now have their own schedulers. Scheduled between 8 AM - 8 PM.',
-    userPreference: 'Auto (based on active tasks)',
+    description: 'Up to 2 gentle daily nudges decided at schedule time based on current state. Never references specific tasks.',
+    userPreference: 'Auto (state-based)',
     icon: <Sparkles className="h-5 w-5" />,
     codeFile: 'src/hooks/useSmartActionNudges.ts',
     deliveryType: 'local',
     messages: [
-      { title: '{emoji} {taskTitle}', body: 'Time to do this! Your strength grows with each task.', condition: 'Random incomplete task' },
-      { title: '🫁 Time for breathing', body: 'A few deep breaths can change your whole day.', condition: 'Random proaction' },
-      { title: '📝 Your journal is waiting', body: 'Take a moment to write. Even a few words matter.', condition: 'Random proaction' },
+      { title: '💛 How are you feeling?', body: 'Take a moment to check in with yourself.', condition: 'No mood logged today (~2:00 PM)' },
+      { title: '🔥 Your {N}-day streak is waiting', body: "Don't let it slip — open the app to keep it alive.", condition: 'Active streak ≥ 1 (~7:30 PM)' },
     ],
   },
   {
