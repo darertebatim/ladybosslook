@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import NotificationAnalytics from '@/pages/admin/NotificationAnalytics';
-import { PNConfigEditor } from '@/components/admin/pn/PNConfigEditor';
 import { LNHealthMonitor } from '@/components/admin/pn/LNHealthMonitor';
 import { usePNDeliveryStats } from '@/hooks/usePNDeliveryStats';
 import { format, formatDistanceToNow } from 'date-fns';
