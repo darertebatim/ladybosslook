@@ -60,6 +60,22 @@ export function NotificationPreferencesCard({ userId, notificationsEnabled }: No
   const queryClient = useQueryClient();
   const { scheduleNotifications } = useLocalNotificationScheduler(userId);
 
+  // Android exact-alarm permission state (so we can warn users that reminders won't fire on time)
+  const [exactAlarmStatus, setExactAlarmStatus] = useState<'granted' | 'denied' | 'unknown'>('granted');
+  const isAndroid = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
+
+  useEffect(() => {
+    if (!isAndroid) return;
+    let cancelled = false;
+    const check = () => {
+      getAndroidExactAlarmStatus().then((s) => { if (!cancelled) setExactAlarmStatus(s); });
+    };
+    check();
+    const onVisible = () => { if (document.visibilityState === 'visible') check(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => { cancelled = true; document.removeEventListener('visibilitychange', onVisible); };
+  }, [isAndroid]);
+
   // Fetch user preferences
   const { data: preferences, isLoading } = useQuery({
     queryKey: ['notification-preferences', userId],
