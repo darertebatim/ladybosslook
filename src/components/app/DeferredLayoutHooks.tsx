@@ -6,6 +6,8 @@ import { useLocalNotificationScheduler } from '@/hooks/useLocalNotificationSched
 import { useProgramEventNotificationScheduler } from '@/hooks/useProgramEventNotificationScheduler';
 import { useSmartActionNudges } from '@/hooks/useSmartActionNudges';
 import { usePeriodNotifications } from '@/hooks/usePeriodNotifications';
+import { useWaterNotifications } from '@/hooks/useWaterNotifications';
+import { useFastingNotifications } from '@/hooks/useFastingNotifications';
 import { useFirebaseUserSync } from '@/hooks/useFirebaseUserSync';
 import { useOfflinePrefetch } from '@/hooks/useOfflinePrefetch';
 import { InstructorWelcomeSheet } from '@/components/instructor/InstructorWelcomeSheet';
@@ -68,6 +70,8 @@ export const DeferredLayoutHooks = ({ userId }: { userId: string | undefined }) 
   useLocalNotificationScheduler(userId);
   useSmartActionNudges(userId);
   usePeriodNotifications(userId);
+  useWaterNotifications(userId);
+  useFastingNotifications(userId);
   useProgramEventNotificationScheduler();
 
   return (
