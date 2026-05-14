@@ -78,6 +78,9 @@ import { InstructorInviteContent } from '@/components/instructor/InstructorInvit
 import { InstructorWelcomeContent } from '@/components/instructor/InstructorWelcomeSheet';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { MoodCelebrationSheet } from '@/components/mood/MoodCelebrationSheet';
+import { ReflectionCelebrationSheet } from '@/components/reflection/ReflectionCelebrationSheet';
+import { BreathingCompleteSheet } from '@/components/breathe/BreathingCompleteSheet';
 
 // Mock bottom nav items for testing
 const mockNavItems = [
@@ -107,6 +110,9 @@ export default function AppTest() {
   const [showActionLimit, setShowActionLimit] = useState(false);
   const [showPlusGate, setShowPlusGate] = useState(false);
   const [showSoftReviewPrompt, setShowSoftReviewPrompt] = useState(false);
+  const [moodSheetMood, setMoodSheetMood] = useState<string | null>(null);
+  const [showReflectionSheet, setShowReflectionSheet] = useState(false);
+  const [showBreathingSheet, setShowBreathingSheet] = useState(false);
   
   // Badge celebration states
   const [badgeCelebrationType, setBadgeCelebrationType] = useState<BadgeCelebrationLevel | null>(null);
@@ -200,6 +206,35 @@ export default function AppTest() {
                 <Button onClick={() => setPurchaseCelebrationPlan('annual')} className="w-full justify-start" variant="outline">
                   <Crown className="h-4 w-4 mr-2" />
                   Rilo Plus Welcome (Annual)
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">💭 4-Card Completion Sheets</CardTitle>
+                <CardDescription>The "what's next" sheets shown after Mood, Reflection and Breathing.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Button onClick={() => setMoodSheetMood('great')} className="w-full justify-start" variant="outline">
+                  <Heart className="h-4 w-4 mr-2" />
+                  Mood Sheet — Great
+                </Button>
+                <Button onClick={() => setMoodSheetMood('okay')} className="w-full justify-start" variant="outline">
+                  <Heart className="h-4 w-4 mr-2" />
+                  Mood Sheet — Okay
+                </Button>
+                <Button onClick={() => setMoodSheetMood('not_great')} className="w-full justify-start" variant="outline">
+                  <Heart className="h-4 w-4 mr-2" />
+                  Mood Sheet — Not Great
+                </Button>
+                <Button onClick={() => setShowReflectionSheet(true)} className="w-full justify-start" variant="outline">
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Reflection Complete Sheet
+                </Button>
+                <Button onClick={() => setShowBreathingSheet(true)} className="w-full justify-start" variant="outline">
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Breathing Complete Sheet
                 </Button>
               </CardContent>
             </Card>
@@ -1600,6 +1635,25 @@ export default function AppTest() {
           </>
         );
       })()}
+
+      {/* 4-Card Completion Sheets previews */}
+      <MoodCelebrationSheet
+        open={!!moodSheetMood}
+        onOpenChange={(o) => { if (!o) setMoodSheetMood(null); }}
+        mood={moodSheetMood}
+        onDone={() => setMoodSheetMood(null)}
+      />
+      <ReflectionCelebrationSheet
+        open={showReflectionSheet}
+        onOpenChange={setShowReflectionSheet}
+        onDone={() => setShowReflectionSheet(false)}
+      />
+      <BreathingCompleteSheet
+        open={showBreathingSheet}
+        onOpenChange={setShowBreathingSheet}
+        exerciseName="Energy Breathing"
+        durationSeconds={24}
+      />
     </div>
   );
 }
