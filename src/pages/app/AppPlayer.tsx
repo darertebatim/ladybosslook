@@ -88,7 +88,7 @@ export default function AppPlayer() {
     if (categoryParam && categoryConfig[categoryParam]) {
       setSelectedCategory(categoryParam);
     }
-  }, [searchParams]);
+  }, [searchParams, categoryConfig]);
 
   const { playlists, playlistItems, progressData, enrollments, savedPlaylistIds, isLoading } =
     usePlayerData();
