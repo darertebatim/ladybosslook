@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, Fragment } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getLocalDateStr } from '@/lib/localDate';
 import { supabase } from '@/integrations/supabase/client';
@@ -829,9 +829,8 @@ function PNDocumentation() {
                 const lastFired = lastFiredMap?.[pn.function];
                 const isExpanded = expandedRows.has(pn.function);
                 return (
-                  <>
+                  <Fragment key={pn.function}>
                   <TableRow
-                    key={pn.function}
                     className="cursor-pointer hover:bg-muted/40"
                     onClick={() =>
                       setExpandedRows((prev) => {
@@ -863,7 +862,7 @@ function PNDocumentation() {
                     </TableCell>
                   </TableRow>
                   {isExpanded && (
-                    <TableRow key={pn.function + '-templates'} className="bg-muted/20">
+                    <TableRow className="bg-muted/20">
                       <TableCell colSpan={6} className="py-3">
                         <div className="space-y-2">
                           <p className="text-xs text-muted-foreground">{pn.description}</p>
@@ -883,7 +882,7 @@ function PNDocumentation() {
                       </TableCell>
                     </TableRow>
                   )}
-                  </>
+                  </Fragment>
                 );
               })}
             </TableBody>
