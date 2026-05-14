@@ -18,7 +18,7 @@ import talkImg from '@/assets/mood-card-talk.png';
 const ACTIONS = [
   { labelKey: 'breathePage.complete.actions.writeReflection', image: journalImg, route: '/app/reflections/free-form' },
   { labelKey: 'breathePage.complete.actions.selfReflection', image: reflectImg, route: '/app/reflections' },
-  { labelKey: 'breathePage.complete.actions.startMyPlan', image: planImg, route: '/app/home' },
+  { labelKey: 'breathePage.complete.actions.startMyPlan', image: planImg, route: '/app/aiplanner' },
   { labelKey: 'breathePage.complete.actions.talk', image: talkImg, route: '/app/channels' },
 ];
 
