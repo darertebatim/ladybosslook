@@ -13,25 +13,28 @@ import { LocalNotifications } from '@capacitor/local-notifications';
  * - 200021-200030: Water Reminders
  * - 200031-200040: Period Reminders
  * - 300000-399999: Program Event Notifications (sessions, drip)
- * - 200000-209999: Hybrid daily notifications (server-config based)
- * - 500000-599999: Task alarm reminders
+ * - 900000-999999: Urgent task alarms (taskAlarm.ts)
+ * - All other positive ints: per-task local reminders (localNotifications.ts hashTaskId,
+ *   unbounded — only legacy IDs in 100001-100010 are explicitly cancelled)
  * 
  * Legacy IDs (100001-100010) should ALWAYS be cancelled.
- * Any ID outside known ranges should also be cancelled.
  */
 
 // All valid ID ranges that current schedulers use
 const VALID_RANGES = [
   { start: 200001, end: 200040 },   // Smart nudges + period
-  { start: 200000, end: 209999 },   // Hybrid daily (hashed IDs)
   { start: 300000, end: 399999 },   // Program events
-  { start: 500000, end: 599999 },   // Task alarms
+  { start: 900000, end: 999999 },   // Urgent task alarms
 ];
 
 // Legacy IDs that should ALWAYS be removed
 const LEGACY_RANGE = { start: 100001, end: 100010 };
 
 function isValidId(id: number): boolean {
+  // Hashed per-task reminder IDs from localNotifications.ts are unbounded
+  // positive ints. Treat anything >= 1_000_000 outside the legacy/special
+  // ranges as a valid hashed task-reminder ID (do not cancel).
+  if (id >= 1_000_000) return true;
   return VALID_RANGES.some(r => id >= r.start && id <= r.end);
 }
 
