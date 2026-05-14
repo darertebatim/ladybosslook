@@ -123,7 +123,7 @@ const AppEmotion = () => {
             <MoodCelebrationSheet
               open
               onOpenChange={(o) => { if (!o) handleDone(); }}
-              mood={state.valence === 'positive' ? 'great' : state.valence === 'negative' ? 'not_great' : 'okay'}
+              mood={state.valence === 'pleasant' ? 'great' : state.valence === 'unpleasant' ? 'not_great' : 'okay'}
               onDone={handleDone}
             />
           </>
