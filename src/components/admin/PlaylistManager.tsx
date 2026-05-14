@@ -990,6 +990,37 @@ export const PlaylistManager = () => {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Playlists/Albums</CardTitle>
         <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mr-2 px-2 py-1 rounded-md border">
+            <Switch
+              id="playlist_reorder_mode"
+              checked={reorderMode}
+              onCheckedChange={(checked) => {
+                if (!checked && orderDirty) {
+                  handleCancelOrder();
+                } else {
+                  setReorderMode(checked);
+                }
+              }}
+            />
+            <Label htmlFor="playlist_reorder_mode" className="text-xs cursor-pointer">
+              Reorder
+            </Label>
+          </div>
+          {reorderMode && orderDirty && (
+            <>
+              <Button size="sm" variant="outline" onClick={handleCancelOrder} disabled={isSavingOrder}>
+                Cancel
+              </Button>
+              <Button size="sm" onClick={handleSaveOrder} disabled={isSavingOrder}>
+                {isSavingOrder ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                Save Order
+              </Button>
+            </>
+          )}
           <Button 
             onClick={handleGenerateFreePrograms} 
             size="sm" 
@@ -1028,6 +1059,7 @@ export const PlaylistManager = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-20">#</TableHead>
               <TableHead className="w-16">Cover</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Description</TableHead>
@@ -1037,8 +1069,39 @@ export const PlaylistManager = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {playlists?.map((playlist) => (
+            {orderedPlaylists?.map((playlist, index) => (
               <TableRow key={playlist.id} className={playlist.is_hidden ? "opacity-50" : ""}>
+                <TableCell>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-mono text-muted-foreground w-5 text-right">
+                      {index + 1}
+                    </span>
+                    {reorderMode && (
+                      <div className="flex flex-col">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={() => movePlaylist(index, index - 1)}
+                          disabled={index === 0}
+                          title="Move up"
+                        >
+                          <ArrowUp className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5"
+                          onClick={() => movePlaylist(index, index + 1)}
+                          disabled={index === orderedPlaylists.length - 1}
+                          title="Move down"
+                        >
+                          <ArrowDown className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell>
                   {playlist.cover_image_url ? (
                     <img
