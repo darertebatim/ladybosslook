@@ -96,7 +96,6 @@ export function useSmartActionNudges(userId: string | undefined) {
       const allIds = [];
       for (let i = ID_RANGES.ACTION.start; i <= ID_RANGES.ACTION.end; i++) allIds.push({ id: i });
       for (let i = ID_RANGES.PROACTION.start; i <= ID_RANGES.PROACTION.end; i++) allIds.push({ id: i });
-      for (let i = ID_RANGES.WATER.start; i <= ID_RANGES.WATER.end; i++) allIds.push({ id: i });
 
       await LocalNotifications.cancel({ notifications: allIds });
 
@@ -203,41 +202,7 @@ export function useSmartActionNudges(userId: string | undefined) {
         }
       }
 
-      // 2c. Water Reminders — respect today's progress, cap aggressively
-      const waterTasks = applicableTasks.filter(
-        (t) => t.pro_link_type === 'water' || t.goal_type === 'water'
-      );
-      const completionByTask = new Map(
-        (completions || []).map((c) => [c.task_id, c.goal_progress ?? 0])
-      );
-      // A water task is "done" if no goal_target OR progress >= target OR marked complete
-      const incompleteWaterTasks = waterTasks.filter((t) => {
-        const progress = completionByTask.get(t.id) ?? 0;
-        const target = (t as any).goal_target ?? 0;
-        if (target > 0) return progress < target;
-        // No target set — treat as done if any completion exists today
-        return !completionByTask.has(t.id);
-      });
-      if (incompleteWaterTasks.length > 0) {
-        // Cap at 2 reminders/day (was 3-4 — caused spam)
-        const waterCount = 1 + Math.floor(Math.random() * 2); // 1-2
-        for (let i = 0; i < waterCount; i++) {
-          const time = randomTimeBetween(8, 20);
-          if (!time) continue; // No available time slot
-          const scheduleAt = getScheduleDate(time.hour, time.minute);
-
-          notifications.push({
-            id: ID_RANGES.WATER.start + i,
-            title: '💧 Water Reminder',
-            body: WATER_MESSAGES[i % WATER_MESSAGES.length],
-            schedule: { at: scheduleAt },
-            sound: 'default',
-            extra: { type: 'water_nudge', url: '/app/home' },
-          });
-        }
-      } else {
-        console.log('[SmartNudges] 💧 Water complete or removed — no reminders today');
-      }
+      // Water reminders are scheduled in useWaterNotifications.ts.
 
       if (notifications.length > 0) {
         await LocalNotifications.schedule({ notifications });
@@ -246,7 +211,7 @@ export function useSmartActionNudges(userId: string | undefined) {
         // Log scheduled events
         for (const n of notifications) {
           logLocalNotificationEvent({
-            notificationType: n.extra.type === 'water_nudge' ? 'water_reminder' : 'action_nudge',
+            notificationType: n.extra.type === 'proaction_nudge' ? 'proaction_nudge' : 'action_nudge',
             event: 'scheduled',
             notificationId: n.id,
             taskId: n.extra.taskId,
