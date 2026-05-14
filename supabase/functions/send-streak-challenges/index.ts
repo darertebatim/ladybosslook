@@ -204,6 +204,26 @@ Deno.serve(async (req) => {
       .in('id', userIds);
     const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
 
+    // Get latest app_installations.last_seen_at per user (used to skip users who already opened the app today — Smart Nudges already covers them locally)
+    const { data: installs } = await supabase
+      .from('app_installations')
+      .select('user_id, last_seen_at')
+      .in('user_id', userIds)
+      .order('last_seen_at', { ascending: false });
+    const lastSeenMap = new Map<string, string>();
+    for (const i of (installs || [])) {
+      if (!lastSeenMap.has(i.user_id) && i.last_seen_at) {
+        lastSeenMap.set(i.user_id, i.last_seen_at);
+      }
+    }
+    const localDateInTz = (iso: string, tz: string): string => {
+      try {
+        return new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(iso));
+      } catch {
+        return iso.split('T')[0];
+      }
+    };
+
     // Check preferences
     const { data: prefs } = await supabase
       .from('user_notification_preferences')
@@ -280,6 +300,15 @@ Deno.serve(async (req) => {
 
       const devices = userSubs.get(userId);
       if (!devices || devices.length === 0) continue;
+
+      // Skip if user already opened the app today (their local day) — Smart Nudges handles them on launch
+      const lastSeen = lastSeenMap.get(userId);
+      if (lastSeen) {
+        const tz = profile.timezone || 'America/Los_Angeles';
+        const todayLocal = localDateInTz(now.toISOString(), tz);
+        const lastSeenLocal = localDateInTz(lastSeen, tz);
+        if (lastSeenLocal === todayLocal) { skipCount++; continue; }
+      }
 
       const cameYesterday = streak.last_completion_date === yesterday || streak.last_completion_date === today;
       const hasAnyCompletion = !!streak.last_completion_date;
