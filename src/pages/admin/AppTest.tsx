@@ -597,6 +597,51 @@ export default function AppTest() {
         </CardContent>
       </Card>
 
+      {/* 4-Card Completion Sheets */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Heart className="h-5 w-5 text-pink-500" />
+            4-Card Completion Sheets
+          </CardTitle>
+          <CardDescription>
+            The "what's next" sheets shown after Mood check-in, Reflection, and Breathing exercises.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setMoodSheetMood('great')} variant="outline">
+              <Heart className="h-4 w-4 mr-2" />
+              Mood Sheet — Great
+            </Button>
+            <Button onClick={() => setMoodSheetMood('good')} variant="outline">
+              <Heart className="h-4 w-4 mr-2" />
+              Mood Sheet — Good
+            </Button>
+            <Button onClick={() => setMoodSheetMood('okay')} variant="outline">
+              <Heart className="h-4 w-4 mr-2" />
+              Mood Sheet — Okay
+            </Button>
+            <Button onClick={() => setMoodSheetMood('not_great')} variant="outline">
+              <Heart className="h-4 w-4 mr-2" />
+              Mood Sheet — Not Great
+            </Button>
+            <Button onClick={() => setMoodSheetMood('bad')} variant="outline">
+              <Heart className="h-4 w-4 mr-2" />
+              Mood Sheet — Bad
+            </Button>
+            <Button onClick={() => setShowReflectionSheet(true)} variant="outline">
+              <Sparkles className="h-4 w-4 mr-2" />
+              Reflection Complete Sheet
+            </Button>
+            <Button onClick={() => setShowBreathingSheet(true)} variant="outline">
+              <Sparkles className="h-4 w-4 mr-2" />
+              Breathing Complete Sheet
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Badge Celebrations */}
       <Card>
         <CardHeader>
