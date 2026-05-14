@@ -2682,60 +2682,6 @@ export type Database = {
         }
         Relationships: []
       }
-      pn_config: {
-        Row: {
-          body: string
-          category: string
-          created_at: string
-          emoji: string | null
-          id: string
-          is_enabled: boolean
-          is_urgent: boolean | null
-          notification_key: string
-          repeat_days: number[] | null
-          schedule_hour: number
-          schedule_minute: number
-          sort_order: number | null
-          sound: string | null
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          body: string
-          category?: string
-          created_at?: string
-          emoji?: string | null
-          id?: string
-          is_enabled?: boolean
-          is_urgent?: boolean | null
-          notification_key: string
-          repeat_days?: number[] | null
-          schedule_hour: number
-          schedule_minute?: number
-          sort_order?: number | null
-          sound?: string | null
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          body?: string
-          category?: string
-          created_at?: string
-          emoji?: string | null
-          id?: string
-          is_enabled?: boolean
-          is_urgent?: boolean | null
-          notification_key?: string
-          repeat_days?: number[] | null
-          schedule_hour?: number
-          schedule_minute?: number
-          sort_order?: number | null
-          sound?: string | null
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       pn_schedule_logs: {
         Row: {
           created_at: string | null
