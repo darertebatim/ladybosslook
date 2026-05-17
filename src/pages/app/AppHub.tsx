@@ -10,8 +10,8 @@ import { MyCodeSheet } from "@/components/hub/MyCodeSheet";
 import { RecentMomentsRow } from "@/components/hub/RecentMomentsRow";
 import { DedicationReceivedSheet } from "@/components/friends/DedicationReceivedSheet";
 import { SendMomentToFriendSheet } from "@/components/hub/SendMomentToFriendSheet";
+import { DedicateMomentSheet } from "@/components/friends/DedicateMomentSheet";
 import { useReceivedDedications, type DedicationWithRelations } from "@/hooks/useDedications";
-import { useGiftableMoments } from "@/hooks/useMoments";
 import { ChevronLeft, Bell, Settings, Gift, ChevronRight } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import { Share as CapShare } from "@capacitor/share";
@@ -29,14 +29,10 @@ export default function AppHub() {
   const [sendBackMoment, setSendBackMoment] = useState<null | { recipientId: string; recipientName: string | null }>(null);
 
   const { data: receivedDedications = [] } = useReceivedDedications();
-  const { data: giftableMoments = [] } = useGiftableMoments();
   const unseenDedication = useMemo(
     () => receivedDedications.find((d) => !d.dedication.seen_at) ?? null,
     [receivedDedications],
   );
-
-  // For "Dedicate one back" from received sheet — pick latest giftable moment.
-  const latestGiftable = giftableMoments[0] ?? null;
 
   const accepted = useMemo<FriendProfile[]>(
     () => friendships
@@ -206,10 +202,11 @@ export default function AppHub() {
             setTimeout(() => setSendBackMoment({ recipientId: id, recipientName: name }), 200);
           }}
         />
-        <SendMomentToFriendSheet
-          moment={sendBackMoment ? latestGiftable : null}
+        <DedicateMomentSheet
           open={!!sendBackMoment}
           onOpenChange={(v) => !v && setSendBackMoment(null)}
+          recipientId={sendBackMoment?.recipientId ?? null}
+          recipientName={sendBackMoment?.recipientName ?? null}
         />
       </div>
     </SlideUpPage>
