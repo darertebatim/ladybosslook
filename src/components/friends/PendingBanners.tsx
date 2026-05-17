@@ -74,7 +74,7 @@ export function PendingBanners({ incoming, unseenDedications, onOpenDedication }
             <button
               onClick={() => respond.mutate({ id: f.friendship.id, accept: true })}
               disabled={respond.isPending}
-              className="h-10 min-w-[92px] px-4 rounded-full bg-brand text-white text-sm font-semibold shadow-ios active:scale-95 transition-transform inline-flex items-center justify-center gap-1.5 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:opacity-100"
+              className="h-10 min-w-[92px] px-4 rounded-full bg-[hsl(var(--brand-primary))] text-white text-sm font-semibold shadow-ios active:bg-[hsl(var(--brand-primary-dark))] active:scale-95 transition-transform inline-flex items-center justify-center gap-1.5 whitespace-nowrap disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:opacity-100"
               aria-label="Accept"
             >
               <Check className="w-4 h-4" /> Accept
