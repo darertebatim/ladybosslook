@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,12 +23,15 @@ export function useClaimPendingDedication() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const ran = useRef(false);
+  const [tokenSignal, setTokenSignal] = useState(0);
 
   useEffect(() => {
     const syncDedicationTokenFromAttribution = () => {
       const attribution = getStoredAttribution();
       if (attribution?.deepLinkValue === "dedication" && attribution.dedicationToken) {
         stashDedicationToken(attribution.dedicationToken);
+        ran.current = false;
+        setTokenSignal((v) => v + 1);
       }
     };
 
@@ -79,5 +82,5 @@ export function useClaimPendingDedication() {
         }
       }
     })();
-  }, [user?.id, navigate, qc]);
+  }, [user?.id, navigate, qc, tokenSignal]);
 }
