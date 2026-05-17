@@ -95,20 +95,20 @@ export default function AppFriends() {
         <FriendsHero onAddFriend={() => setAddOpen(true)} onShareInvite={shareInvite} />
 
         {/* Send Care Package to non-user */}
-        <div className="px-3 mt-3">
+        <div className="px-3 mt-4">
           <button
             onClick={() => setTokenSheetOpen(true)}
-            className="w-full p-4 rounded-3xl bg-white/70 dark:bg-white/10 backdrop-blur-2xl shadow-ios active:scale-[0.99] transition-transform flex items-center gap-3 text-left"
+            className="w-full p-4 rounded-3xl bg-[hsl(var(--tint-peach))]/40 dark:bg-white/5 border border-[hsl(var(--tint-peach-mid))]/60 shadow-ios active:scale-[0.99] transition-transform flex items-center gap-3 text-left"
           >
-            <div className="w-11 h-11 rounded-2xl grid place-items-center bg-gradient-to-br from-[hsl(var(--tint-peach))] to-[hsl(var(--tint-lavender))]">
-              <Gift className="w-5 h-5 text-black" />
+            <div className="w-11 h-11 rounded-2xl grid place-items-center bg-white shadow-ios shrink-0">
+              <Gift className="w-5 h-5" style={{ color: "#EB5E33" }} />
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-[15px] font-semibold text-black dark:text-white">
-                Send to anyone — even if they're not on Rilo
+                Send love to anyone
               </div>
               <div className="text-xs text-[hsl(var(--fg-warm-muted))]">
-                Create a share link · expires in 30 days
+                Share a link — even if they're not on Rilo yet
               </div>
             </div>
           </button>
@@ -279,24 +279,24 @@ function FriendRow({
   onRemove: () => void;
 }) {
   return (
-    <div className="rounded-3xl p-3 pl-4 bg-white/60 dark:bg-white/10 backdrop-blur-2xl shadow-ios flex items-center gap-3">
+    <div className="rounded-[28px] p-3 pl-4 bg-white dark:bg-white/10 shadow-ios flex items-center gap-3 border border-white/80 dark:border-white/5">
       {data.other.avatar_url ? (
         <img
           src={data.other.avatar_url}
           alt=""
-          className="w-12 h-12 rounded-full object-cover"
+          className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-ios"
         />
       ) : (
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[hsl(var(--tint-peach))] to-[hsl(var(--tint-lavender))] grid place-items-center text-lg font-semibold text-black">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[hsl(var(--tint-peach-mid))] to-[hsl(var(--tint-lavender-mid))] grid place-items-center text-xl font-bold text-black shadow-ios">
           {(data.other.full_name || "?").charAt(0).toUpperCase()}
         </div>
       )}
       <div className="flex-1 min-w-0">
-        <div className="text-[15px] font-semibold text-black dark:text-white truncate">
+        <div className="text-[16px] font-bold text-black dark:text-white truncate">
           {data.other.full_name || "Friend"}
         </div>
-        <div className="text-xs text-[hsl(var(--fg-warm-muted))] flex items-center gap-1">
-          <Heart className="w-3 h-3" /> Friends
+        <div className="text-xs text-[hsl(var(--fg-warm-muted))] flex items-center gap-1 mt-0.5">
+          <Heart className="w-3 h-3" fill="#EB5E33" style={{ color: "#EB5E33" }} /> In your circle
         </div>
       </div>
       <button
