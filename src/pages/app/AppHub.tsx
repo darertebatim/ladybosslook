@@ -13,7 +13,7 @@ import { Share as CapShare } from "@capacitor/share";
 import { toast } from "sonner";
 
 export default function AppHub() {
-  const goBack = useGoBack({ fallback: "/app/home" });
+  const goBack = useGoBack("/app/home");
   const { user } = useAuth();
   const { data: friendships = [] } = useFriendships();
   const { data: myCode } = useMyFriendCode();
