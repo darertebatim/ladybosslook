@@ -9,6 +9,7 @@ import {
   WELLNESS_EXECUTOR_TYPES,
   type CreateEmotionLogPayload,
 } from '@/lib/offline/executors/wellnessExecutors';
+import { recordMoment } from '@/lib/moments';
 
 export interface MoodLog {
   id: string;
@@ -108,6 +109,15 @@ export function useCreateMoodLog() {
       queryClient.invalidateQueries({ queryKey: ['mood-logs-month'] });
       queryClient.invalidateQueries({ queryKey: ['today-mood'] });
       try { Analytics.moodLogged(data.mood); } catch { /* ignore */ }
+      if (user?.id) {
+        void recordMoment({
+          userId: user.id,
+          kind: 'mood',
+          title: 'A mood check-in',
+          emoji: '💗',
+          payload: { ref_id: data.id, mood: data.mood },
+        });
+      }
     },
     onError: (error) => {
       console.error('Failed to log mood:', error);
