@@ -301,7 +301,7 @@ function FriendRow({
       </div>
       <button
         onClick={onDedicate}
-        className="inline-flex min-h-10 items-center gap-1.5 px-3.5 py-2 rounded-full bg-brand text-white text-sm font-semibold shadow-ios active:scale-95 transition-transform"
+        className="inline-flex min-h-10 items-center gap-1.5 px-3.5 py-2 rounded-full bg-[hsl(var(--brand-primary))] text-white text-sm font-semibold shadow-ios active:bg-[hsl(var(--brand-primary-dark))] active:scale-95 transition-transform"
       >
         <Send className="w-3.5 h-3.5" /> Dedicate
       </button>
