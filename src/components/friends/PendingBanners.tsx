@@ -62,20 +62,24 @@ export function PendingBanners({ incoming, unseenDedications, onOpenDedication }
               {f.other.full_name || "A new friend"}
             </div>
           </div>
-          <button
-            onClick={() => respond.mutate({ id: f.friendship.id, accept: false })}
-            className="w-10 h-10 grid place-items-center rounded-full bg-black/5 text-black/70 active:scale-90 transition-transform"
-            aria-label="Decline"
-          >
-            <X className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => respond.mutate({ id: f.friendship.id, accept: true })}
-            className="w-10 h-10 grid place-items-center rounded-full bg-[hsl(var(--brand-primary))] text-white shadow-ios active:scale-90 transition-transform"
-            aria-label="Accept"
-          >
-            <Check className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => respond.mutate({ id: f.friendship.id, accept: false })}
+              disabled={respond.isPending}
+              className="h-10 px-3 rounded-full bg-black/5 text-black/70 text-sm font-semibold active:scale-95 transition-transform inline-flex items-center gap-1.5 disabled:opacity-50"
+              aria-label="Decline"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => respond.mutate({ id: f.friendship.id, accept: true })}
+              disabled={respond.isPending}
+              className="h-10 px-4 rounded-full bg-[hsl(var(--brand-primary))] text-white text-sm font-semibold shadow-ios active:scale-95 transition-transform inline-flex items-center gap-1.5 disabled:opacity-50"
+              aria-label="Accept"
+            >
+              <Check className="w-4 h-4" /> Accept
+            </button>
+          </div>
         </div>
       ))}
     </div>

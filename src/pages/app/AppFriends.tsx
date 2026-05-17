@@ -158,10 +158,11 @@ export default function AppFriends() {
             ) : (
               <>
                 {incoming.length > 0 && (
-                  <SectionLabel>Incoming</SectionLabel>
+                  <>
+                    <SectionLabel>Incoming</SectionLabel>
+                    <PendingBanners incoming={incoming} unseenDedications={[]} onOpenDedication={() => {}} />
+                  </>
                 )}
-                {/* Incoming already shown as banner; show again in tab for completeness */}
-                <PendingBanners incoming={incoming} unseenDedications={[]} onOpenDedication={() => {}} />
                 {outgoing.length > 0 && (
                   <>
                     <SectionLabel>Sent</SectionLabel>
