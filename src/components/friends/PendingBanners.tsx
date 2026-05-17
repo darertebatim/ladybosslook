@@ -66,7 +66,7 @@ export function PendingBanners({ incoming, unseenDedications, onOpenDedication }
             <button
               onClick={() => respond.mutate({ id: f.friendship.id, accept: false })}
               disabled={respond.isPending}
-              className="h-10 px-3 rounded-full bg-black/5 text-black/70 text-sm font-semibold active:scale-95 transition-transform inline-flex items-center gap-1.5 disabled:opacity-50"
+              className="h-10 min-w-10 px-3 rounded-full bg-black/5 text-black/70 text-sm font-semibold active:scale-95 transition-transform inline-flex items-center justify-center gap-1.5 disabled:opacity-50"
               aria-label="Decline"
             >
               <X className="w-4 h-4" />
@@ -74,7 +74,7 @@ export function PendingBanners({ incoming, unseenDedications, onOpenDedication }
             <button
               onClick={() => respond.mutate({ id: f.friendship.id, accept: true })}
               disabled={respond.isPending}
-              className="h-10 px-4 rounded-full bg-[hsl(var(--brand-primary))] text-white text-sm font-semibold shadow-ios active:scale-95 transition-transform inline-flex items-center gap-1.5 disabled:opacity-50"
+              className="h-10 min-w-[92px] px-4 rounded-full bg-brand text-white text-sm font-semibold shadow-ios active:scale-95 transition-transform inline-flex items-center justify-center gap-1.5 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:opacity-100"
               aria-label="Accept"
             >
               <Check className="w-4 h-4" /> Accept

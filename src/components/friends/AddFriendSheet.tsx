@@ -53,7 +53,7 @@ export function AddFriendSheet({ open, onOpenChange }: Props) {
           <button
             onClick={submit}
             disabled={code.trim().length < 4 || send.isPending}
-            className="mt-5 w-full py-3.5 rounded-2xl bg-black text-white font-semibold shadow-ios active:scale-[0.98] transition-transform disabled:opacity-40"
+            className="mt-5 w-full min-h-12 py-3.5 rounded-2xl bg-black text-white font-semibold shadow-ios active:scale-[0.98] transition-transform disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:opacity-100"
           >
             {send.isPending ? "Sending…" : "Send friend request"}
           </button>
