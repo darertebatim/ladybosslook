@@ -97,9 +97,9 @@ export default function AppFriends() {
         />
 
         <div className="px-3 mt-5">
-          <TabPills<TabValue>
+          <TabPills
             value={tab}
-            onChange={setTab}
+            onChange={(v) => setTab(v as TabValue)}
             options={[
               { value: "friends", label: `Friends${accepted.length ? ` · ${accepted.length}` : ""}` },
               { value: "requests", label: `Requests${(incoming.length + outgoing.length) ? ` · ${incoming.length + outgoing.length}` : ""}` },
