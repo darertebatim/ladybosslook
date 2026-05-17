@@ -27,6 +27,8 @@ import { toast } from "sonner";
 import { defaultEmojiForKind } from "@/lib/moments";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import { useEffect } from "react";
+import { Capacitor } from "@capacitor/core";
+import { Share as CapShare } from "@capacitor/share";
 
 type TabValue = "friends" | "requests" | "received";
 
@@ -75,15 +77,28 @@ export default function AppFriends() {
 
   const shareInvite = async () => {
     if (!myCode) return;
-    const text = `Be my friend on Rilo 💝\n\nMy friend code: ${myCode}\n\nhttps://ladybosslook.com`;
+    const url = "https://ladybosslook.com";
+    const text = `Be my friend on Rilo 💝\n\nMy friend code: ${myCode}\n\n${url}`;
     try {
-      if (navigator.share) {
-        await navigator.share({ title: "Add me on Rilo", text });
-      } else {
-        await navigator.clipboard.writeText(text);
-        toast.success("Invite copied — paste anywhere");
+      if (Capacitor.isNativePlatform()) {
+        await CapShare.share({ title: "Add me on Rilo", text, url, dialogTitle: "Invite a friend" });
+        return;
       }
-    } catch { /* user cancelled */ }
+      if (typeof navigator !== "undefined" && (navigator as any).share) {
+        await (navigator as any).share({ title: "Add me on Rilo", text, url });
+        return;
+      }
+      await navigator.clipboard.writeText(text);
+      toast.success("Invite copied — paste anywhere");
+    } catch (err: any) {
+      // User cancelled native sheet — ignore. Other errors: fallback to clipboard.
+      if (err?.message && !/cancel/i.test(err.message)) {
+        try {
+          await navigator.clipboard.writeText(text);
+          toast.success("Invite copied — paste anywhere");
+        } catch { toast.error("Couldn't open share sheet"); }
+      }
+    }
   };
 
   return (
