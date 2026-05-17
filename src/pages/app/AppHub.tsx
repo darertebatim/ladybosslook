@@ -99,9 +99,9 @@ export default function AppHub() {
         </div>
 
         {/* Title */}
-        <div className="relative z-10 px-6 mt-3 text-center">
-          <h1 className="text-white text-[26px] font-bold tracking-tight">Your circle</h1>
-          <p className="text-white/65 text-[13px] mt-1">
+        <div className="relative z-10 px-6 mt-1 text-center">
+          <h1 className="text-white text-[22px] font-bold tracking-tight">Your circle</h1>
+          <p className="text-white/65 text-[12px] mt-0.5">
             {accepted.length === 0
               ? "Light up the sky with friends."
               : `${accepted.length} ${accepted.length === 1 ? "star" : "stars"} shining with you.`}
@@ -109,35 +109,34 @@ export default function AppHub() {
         </div>
 
         {/* Constellation scene */}
-        <div className="relative z-10 px-2 mt-2">
+        <div className="relative z-10 px-3 mt-1">
           <Constellation friends={accepted} onAdd={() => setAddOpen(true)} />
         </div>
 
         {/* Invite banner (placeholder — you'll spec later) */}
-        <div className="relative z-10 px-4 mt-12">
+        <div className="relative z-10 px-4 mt-8">
           <button
             onClick={shareInvite}
-            className="w-full rounded-3xl p-4 flex items-center gap-3 active:scale-[0.99] transition-transform text-left shadow-ios"
+            className="w-full rounded-2xl p-3 flex items-center gap-3 active:scale-[0.99] transition-transform text-left shadow-ios"
             style={{
               background: "linear-gradient(135deg, rgba(235,94,51,0.95) 0%, rgba(214,67,122,0.92) 100%)",
             }}
           >
-            <div className="w-12 h-12 rounded-2xl grid place-items-center bg-white/20 shrink-0">
-              <Gift className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-xl grid place-items-center bg-white/20 shrink-0">
+              <Gift className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-[11px] uppercase tracking-wider font-bold text-white/85">
+              <div className="text-[10px] uppercase tracking-wider font-bold text-white/85">
                 Invite a friend
               </div>
-              <div className="text-[15px] font-bold text-white leading-tight mt-0.5">
+              <div className="text-[14px] font-bold text-white leading-tight mt-0.5">
                 Share Rilo — grow your circle
               </div>
             </div>
-            <ChevronRight className="w-5 h-5 text-white/90 shrink-0" />
+            <ChevronRight className="w-4 h-4 text-white/90 shrink-0" />
           </button>
         </div>
 
-        <div className="h-24" />
 
         <HubAddFriendSheet
           open={addOpen}

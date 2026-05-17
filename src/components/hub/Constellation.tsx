@@ -26,7 +26,7 @@ export function Constellation({ friends, onAdd }: Props) {
   }, [friends]);
 
   return (
-    <div className="relative w-full" style={{ aspectRatio: "1 / 1.05" }}>
+    <div className="relative w-full" style={{ aspectRatio: "1 / 0.72" }}>
       {/* Soft background nebulas */}
       <div
         aria-hidden
@@ -42,12 +42,12 @@ export function Constellation({ friends, onAdd }: Props) {
       {slots.map((s, i) => {
         const left = `${s.x * 100}%`;
         const top = `${s.y * 100}%`;
-        const size = 64 * s.size;
+        const size = 46 * s.size;
         return (
           <div
             key={i}
             className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
-            style={{ left, top, width: size + 16 }}
+            style={{ left, top, width: size + 12 }}
           >
             {s.friend ? (
               <FilledStar friend={s.friend} size={size} delay={i * 0.18} />
@@ -61,13 +61,13 @@ export function Constellation({ friends, onAdd }: Props) {
       {/* Center add friend pill */}
       <button
         onClick={onAdd}
-        className="absolute left-1/2 -translate-x-1/2 bottom-[-22px] inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white shadow-ios active:scale-95 transition-transform"
+        className="absolute left-1/2 -translate-x-1/2 bottom-[-18px] inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-white shadow-ios active:scale-95 transition-transform"
         style={{ color: "#EB5E33" }}
       >
-        <span className="grid place-items-center w-7 h-7 rounded-full" style={{ backgroundColor: "#EB5E33" }}>
-          <Plus className="w-4 h-4" color="#FFFFFF" strokeWidth={3} />
+        <span className="grid place-items-center w-6 h-6 rounded-full" style={{ backgroundColor: "#EB5E33" }}>
+          <Plus className="w-3.5 h-3.5" color="#FFFFFF" strokeWidth={3} />
         </span>
-        <span className="text-[15px] font-bold">Add friend</span>
+        <span className="text-[14px] font-bold">Add friend</span>
       </button>
     </div>
   );
