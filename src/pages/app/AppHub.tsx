@@ -7,6 +7,11 @@ import { useFriendships, useMyFriendCode, type FriendProfile } from "@/hooks/use
 import { Constellation } from "@/components/hub/Constellation";
 import { HubAddFriendSheet } from "@/components/hub/HubAddFriendSheet";
 import { MyCodeSheet } from "@/components/hub/MyCodeSheet";
+import { RecentMomentsRow } from "@/components/hub/RecentMomentsRow";
+import { DedicationReceivedSheet } from "@/components/friends/DedicationReceivedSheet";
+import { SendMomentToFriendSheet } from "@/components/hub/SendMomentToFriendSheet";
+import { useReceivedDedications, type DedicationWithRelations } from "@/hooks/useDedications";
+import { useGiftableMoments } from "@/hooks/useMoments";
 import { ChevronLeft, Bell, Settings, Gift, ChevronRight } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import { Share as CapShare } from "@capacitor/share";
@@ -20,6 +25,18 @@ export default function AppHub() {
 
   const [addOpen, setAddOpen] = useState(false);
   const [codeOpen, setCodeOpen] = useState(false);
+  const [openedDedication, setOpenedDedication] = useState<DedicationWithRelations | null>(null);
+  const [sendBackMoment, setSendBackMoment] = useState<null | { recipientId: string; recipientName: string | null }>(null);
+
+  const { data: receivedDedications = [] } = useReceivedDedications();
+  const { data: giftableMoments = [] } = useGiftableMoments();
+  const unseenDedication = useMemo(
+    () => receivedDedications.find((d) => !d.dedication.seen_at) ?? null,
+    [receivedDedications],
+  );
+
+  // For "Dedicate one back" from received sheet — pick latest giftable moment.
+  const latestGiftable = giftableMoments[0] ?? null;
 
   const accepted = useMemo<FriendProfile[]>(
     () => friendships
@@ -113,8 +130,39 @@ export default function AppHub() {
           <Constellation friends={accepted} onAdd={() => setAddOpen(true)} />
         </div>
 
-        {/* Invite banner (placeholder — you'll spec later) */}
-        <div className="relative z-10 px-4 mt-8">
+        {/* Bottom half: fresh-from-you moments to dedicate */}
+        <div className="relative z-10 mt-6">
+          <RecentMomentsRow />
+        </div>
+
+        {/* Received dedications strip (only if any exist) */}
+        {receivedDedications.length > 0 && (
+          <div className="relative z-10 px-4 mt-5">
+            <div className="text-white/80 text-[11px] uppercase tracking-wider font-semibold mb-2">
+              For you {unseenDedication && <span className="ml-1 text-[hsl(var(--brand-primary))]">●</span>}
+            </div>
+            <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1">
+              {receivedDedications.slice(0, 6).map((d) => (
+                <button
+                  key={d.dedication.id}
+                  onClick={() => setOpenedDedication(d)}
+                  className="shrink-0 px-3 py-2 rounded-full bg-white/10 backdrop-blur-md text-white text-[12px] font-medium active:scale-95 flex items-center gap-2"
+                >
+                  <span>{d.moment?.emoji ?? "💝"}</span>
+                  <span className="max-w-[140px] truncate">
+                    from {d.other?.full_name?.split(" ")[0] || "a friend"}
+                  </span>
+                  {!d.dedication.seen_at && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--brand-primary))]" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Invite banner */}
+        <div className="relative z-10 px-4 mt-5">
           <button
             onClick={shareInvite}
             className="w-full rounded-2xl p-3 flex items-center gap-3 active:scale-[0.99] transition-transform text-left shadow-ios"
@@ -149,6 +197,19 @@ export default function AppHub() {
           onOpenChange={setCodeOpen}
           code={myCode ?? null}
           displayName={displayName}
+        />
+        <DedicationReceivedSheet
+          dedication={openedDedication}
+          onOpenChange={(v) => !v && setOpenedDedication(null)}
+          onSendBack={(id, name) => {
+            setOpenedDedication(null);
+            setTimeout(() => setSendBackMoment({ recipientId: id, recipientName: name }), 200);
+          }}
+        />
+        <SendMomentToFriendSheet
+          moment={sendBackMoment ? latestGiftable : null}
+          open={!!sendBackMoment}
+          onOpenChange={(v) => !v && setSendBackMoment(null)}
         />
       </div>
     </SlideUpPage>
