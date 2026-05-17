@@ -20,6 +20,7 @@ import {
   WELLNESS_EXECUTOR_TYPES,
   type CreateReflectionPayload,
 } from '@/lib/offline/executors/wellnessExecutors';
+import { recordMoment } from '@/lib/moments';
 
 const BULLET_COLOR = 'hsl(var(--muted-foreground) / 0.4)';
 
@@ -146,6 +147,14 @@ export default function AppFreeFormReflection() {
           if (error) throw error;
           return null;
         },
+      });
+
+      void recordMoment({
+        userId: user.id,
+        kind: 'reflection',
+        title: finalTitle,
+        emoji: '✍️',
+        payload: { ref_id: clientId },
       });
 
       // Optimistically inject this note into all reflection-notes caches so it
