@@ -29,8 +29,7 @@ export function RecentMomentsRow() {
           </h2>
         </div>
         <p className="text-white/60 text-[12px] mt-1 leading-snug">
-          Things you did in the last 24h. Tap one to dedicate it to a friend —
-          they'll be able to try the same one.
+          These are your moments for taking better care of yourself in the last 24h. Inspire a friend into it.
         </p>
       </div>
 
@@ -80,7 +79,7 @@ export function RecentMomentsRow() {
                 ) : (
                   <span className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/15 text-white text-[11px] font-semibold">
                     <Send className="w-3 h-3" />
-                    Dedicate
+                    Inspire
                   </span>
                 )}
               </button>
