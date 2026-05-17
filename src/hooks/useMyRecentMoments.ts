@@ -4,6 +4,14 @@ import { useAuth } from "@/hooks/useAuth";
 import type { UserMoment } from "@/hooks/useMoments";
 
 /**
+ * Kinds that are safe to dedicate to a friend.
+ * MUST stay system-generated only — never include kinds whose title
+ * or payload can carry user-written content (UGC). Free-form
+ * reflections are explicitly excluded.
+ */
+const DEDICATABLE_KINDS = ["breathe", "mood", "audio", "routine"] as const;
+
+/**
  * My moments from the last 24 hours, regardless of whether they've
  * been dedicated already. Used in the Hub's "fresh from you" row so
  * the user feels proud and can dedicate undated ones to friends.
@@ -20,6 +28,7 @@ export function useMyRecentMoments() {
         .from("user_moments" as any)
         .select("*")
         .eq("user_id", user.id)
+        .in("kind", DEDICATABLE_KINDS as unknown as string[])
         .gte("created_at", since)
         .order("created_at", { ascending: false })
         .limit(10);
