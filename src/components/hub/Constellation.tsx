@@ -42,7 +42,7 @@ export function Constellation({ friends, onAdd }: Props) {
       {slots.map((s, i) => {
         const left = `${s.x * 100}%`;
         const top = `${s.y * 100}%`;
-        const size = 64 * s.size;
+        const size = 46 * s.size;
         return (
           <div
             key={i}
