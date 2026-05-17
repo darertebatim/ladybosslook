@@ -1308,6 +1308,44 @@ export type Database = {
         }
         Relationships: []
       }
+      dedications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          moment_id: string
+          recipient_id: string
+          seen_at: string | null
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          moment_id: string
+          recipient_id: string
+          seen_at?: string | null
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          moment_id?: string
+          recipient_id?: string
+          seen_at?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dedications_moment_id_fkey"
+            columns: ["moment_id"]
+            isOneToOne: false
+            referencedRelation: "user_moments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_folders: {
         Row: {
           created_at: string
@@ -1913,6 +1951,57 @@ export type Database = {
           title?: string
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      friend_invite_clicks: {
+        Row: {
+          clicked_at: string
+          code: string
+          id: string
+          installed_user_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          clicked_at?: string
+          code: string
+          id?: string
+          installed_user_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          clicked_at?: string
+          code?: string
+          id?: string
+          installed_user_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      friendships: {
+        Row: {
+          accepted_at: string | null
+          addressee_id: string
+          created_at: string
+          id: string
+          requester_id: string
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          addressee_id: string
+          created_at?: string
+          id?: string
+          requester_id: string
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          addressee_id?: string
+          created_at?: string
+          id?: string
+          requester_id?: string
+          status?: string
         }
         Relationships: []
       }
@@ -2744,6 +2833,7 @@ export type Database = {
           created_at: string
           date_of_birth: string | null
           email: string
+          friend_code: string | null
           full_name: string | null
           gender: string | null
           goals: string[] | null
@@ -2775,6 +2865,7 @@ export type Database = {
           created_at?: string
           date_of_birth?: string | null
           email: string
+          friend_code?: string | null
           full_name?: string | null
           gender?: string | null
           goals?: string[] | null
@@ -2806,6 +2897,7 @@ export type Database = {
           created_at?: string
           date_of_birth?: string | null
           email?: string
+          friend_code?: string | null
           full_name?: string | null
           gender?: string | null
           goals?: string[] | null
@@ -4888,6 +4980,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_moments: {
+        Row: {
+          created_at: string
+          dedicated_at: string | null
+          emoji: string | null
+          expires_at: string
+          id: string
+          kind: string
+          payload: Json
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dedicated_at?: string | null
+          emoji?: string | null
+          expires_at?: string
+          id?: string
+          kind: string
+          payload?: Json
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dedicated_at?: string | null
+          emoji?: string | null
+          expires_at?: string
+          id?: string
+          kind?: string
+          payload?: Json
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_notification_preferences: {
         Row: {
           action_reminders: boolean
@@ -5631,6 +5759,7 @@ export type Database = {
         Args: { _page_slug: string; _user_id: string }
         Returns: boolean
       }
+      generate_friend_code: { Args: never; Returns: string }
       get_current_user_role: { Args: never; Returns: string }
       get_home_data: {
         Args: { p_date_str: string; p_user_id: string }

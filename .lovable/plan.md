@@ -1,95 +1,169 @@
+# Friends + Dedicate-a-Moment — Phase 1 (Final Plan)
 
-## Goal
+A single self-contained page at `/app/friends` that hosts everything: friend list, requests, dedications inbox, banners, and celebration sheets. **No menu entry, no Home banner, no other page touched.** This keeps the experiment fully isolated — easy to remove or graduate later.
 
-Redesign every screen of the **Self-Care Quiz** flow (`selfcareQuizFlow`, 13 steps) in the same visual language as the *What's Rilo* teach flow:
+---
 
-- Soft per-step gradient backgrounds + ambient glow blobs
-- Floating 3D Fluent emoji chips, orbiting badges, drifting elements
-- Mini illustrated "mock UI" cards (planner-style, diagnosis-card, suggestions-stack, commitment-dial, etc.)
-- Sparkle / confetti moments on diagnosis reveal, celebration, and plus-intro
-- **No mascot anywhere**
+## Scope locks (your confirmed answers)
 
-Keep the change isolated — every other onboarding flow (Dear Me, Me Plus, Weekly Review, etc.) renders exactly as today.
+1. Everything lives inside `/app/friends`. No bottom-tab change, no Home banner, no surfacing elsewhere. Users reach it via a direct link or a small entry we put in Profile/Settings later if needed.
+2. Discovery = **friend code + share link only**. No username search.
+3. **Daily send cap = 5 dedications/sender/day** (enforced server-side).
+4. **Window to dedicate a moment = 72 hours** (configurable; can tighten to 24h later via a single constant — no migration).
+5. Visual quality bar: this page must feel like a hero feature — gradient-rich, soft glass cards, fluent 3D emojis, tasteful motion. Same craft level as the redesigned Self-Care Quiz.
 
-## Architecture
+---
 
-Add a single new dispatcher: `SelfCareQuizScreen` (mirroring `RiloTeachScreen`'s pattern), with one bespoke sub-component per quiz step keyed by step `id`.
+## What is a "Moment"?
 
-```text
-src/components/app/selfcare-quiz/
-├── SelfCareQuizScreen.tsx          ← dispatcher (new)
-├── visuals/                         ← new bespoke visuals + shared primitives
-│   ├── QuizShell.tsx                (gradient bg + glow + title/cta layout)
-│   ├── AmbientGlow.tsx              (per-step glow blob palette)
-│   ├── FloatingChip.tsx             (3D emoji chip with drift animation)
-│   ├── ConfettiBurst.tsx            (sparkle moment)
-│   └── steps/
-│       ├── IntroVisual.tsx          (sc-intro)
-│       ├── HookVisual.tsx           (sc-hook — orbiting category chips)
-│       ├── WeighingVisual.tsx       (sc-weighing — single-select + decorative weight scale)
-│       ├── NeglectingVisual.tsx     (sc-neglecting — multi-select w/ tilted card stack)
-│       ├── WinVisual.tsx            (sc-win — trophy/sparkle bg)
-│       ├── DeeperVisual.tsx         (sc-deeper — cluster-tinted bg)
-│       ├── DiagnosisVisual.tsx      (sc-diagnosis — animated diagnosis card reveal)
-│       ├── SuggestionsVisual.tsx    (sc-suggestions — fanned habit cards)
-│       ├── PushPermissionVisual.tsx (sc-push-permission — phone w/ notification)
-│       ├── YourWhyVisual.tsx        (sc-your-why — heart/anchor visual + textarea)
-│       ├── CommitmentVisual.tsx     (sc-commitment — frequency dial)
-│       ├── CelebrationVisual.tsx    (sc-rilo-celebration — confetti + glow)
-│       └── PlusIntroVisual.tsx      (sc-plus-intro — Plus crown + sparkle)
+A meaningful completed action worth giving away — not every tap. Phase 1 list:
+
+| Source | Moment title example | Emoji |
+|---|---|---|
+| Breathe session completed | "3 min of Box Breathing" | 🧘 |
+| Reflection submitted (free-form or guided) | "A reflection" | ✍️ |
+| Audio track completed | "Listened to *Track Name*" | 🎧 |
+| Routine round completed | "Finished Daily Reset" | 🌅 |
+| Mood check-in submitted | "A mood check-in" | 💗 |
+
+Excluded: individual tasks, water/fasting toggles, period logs, emotion logs (too noisy).
+
+A moment is eligible for dedication for **72h** after creation; after that it disappears from the picker (but stays in the user's own history). A moment can be dedicated **only once**.
+
+---
+
+## The `/app/friends` page
+
+One page, three vertically-stacked sections, all gorgeous:
+
+### A. Hero header (always visible)
+- Soft peach→lavender gradient strip, glow blobs, sparkle motes.
+- "Friends" title + my friend code in a glass pill (tap = copy + haptic).
+- Two big floating CTAs: **Add a Friend** · **Share Invite Link**.
+
+### B. Pending banners (conditional, animated in)
+Stacked at the top when present:
+- **Incoming requests** — "Sara wants to be your friend" with Accept / Decline.
+- **Unseen dedications** — "✨ Sara dedicated *3 min of Box Breathing* to you" — tap opens the celebration sheet.
+
+These are the in-page "banners and popups" you asked for — no Home interference.
+
+### C. Tabs (TabPills, animated knob)
+- **Friends** — accepted friends as glass rows: avatar + name + last activity + "Dedicate" button. Empty state = illustrated.
+- **Requests** — incoming + outgoing pending.
+- **Received** — full sentimental archive of dedications you've gotten (no expiry on viewing).
+
+---
+
+## Dedicate flow (Phase 1 — pick from a list)
+
+Triggered from any friend row → opens `DedicateMomentSheet`:
+
+1. Header: "Dedicate a moment to **Sara** 💝"
+2. Horizontal scrolling stack of glass cards = my last-72h moments (newest first). Each card: big fluent emoji, kind label, title, "x hours ago" + a subtle shimmering border to feel like a trophy.
+3. Tap a card → it lifts and dims the others.
+4. Optional 140-char message ("This one's for you…").
+5. **Dedicate** button → haptic success + confetti burst + toast "Sent to Sara 💝", sheet closes.
+
+Empty-list state: friendly illustration — "Finish a breathe, reflection, or routine to earn a moment to give."
+
+---
+
+## Receiver experience
+
+- **Push notification** (existing PN edge function, new template `dedication_received`): "✨ Sara dedicated a moment to you" → deep link `/app/friends?dedication=:id`.
+- **Inside `/app/friends`**: an unseen-dedication banner appears at the top (point B above). Tap → `DedicationReceivedSheet`: full-screen gradient, the moment card centered, sender's name + message, "Send one back" CTA which opens the dedicate flow with sender preselected.
+- A small red dot on the Received tab indicates unseen items.
+- Dedications are stored forever; only the *eligibility window for sending* is 72h.
+
+---
+
+## Database (migration)
+
+### `profiles` — add column
+- `friend_code TEXT UNIQUE` — 8 chars, alphanumeric, no `0/O/1/I/L`. Backfilled for existing users + auto-generated for new users via the existing `handle_new_user` trigger.
+
+### `friendships`
+- `id`, `requester_id`, `addressee_id`, `status` (`pending` | `accepted` | `declined` | `blocked`), `created_at`, `accepted_at`.
+- Unique expression index on `(LEAST(requester, addressee), GREATEST(requester, addressee))` to prevent dup pairs.
+- RLS: each user sees rows where they're requester or addressee; requester inserts; addressee updates status.
+
+### `user_moments`
+- `id`, `user_id`, `kind` (`breathe` | `reflection` | `audio` | `routine` | `mood`), `title`, `emoji`, `payload jsonb`, `created_at`, `expires_at` (= created_at + 72h), `dedicated_at` (nullable).
+- Idempotency: partial unique index on `(user_id, kind, payload->>'ref_id')` for the last 5 min — prevents double-writes from React strict mode / retries.
+- RLS: owner full access; recipient can SELECT only via `dedications` join.
+
+### `dedications`
+- `id`, `moment_id`, `sender_id`, `recipient_id`, `message TEXT (≤140)`, `created_at`, `seen_at`.
+- Validation trigger (NOT a CHECK — per project rule): moment must belong to sender, not be expired, not already dedicated; recipient must be an accepted friend; sender ≤ 5 dedications today.
+- RLS: sender and recipient SELECT; sender INSERT.
+
+### `friend_invite_clicks` (lightweight)
+- For later analytics; just `code`, `clicked_at`, `installed_user_id`. Out-of-scope for v1 UI but the table is cheap to create now.
+
+---
+
+## Backend touches
+
+- **`recordMoment(kind, title, emoji, payload)`** helper in `src/lib/moments.ts`, called from existing completion points (no behavior change):
+  - `BreathingCompleteSheet` (on open)
+  - reflections save mutation
+  - audio progress when `completed` flips true
+  - routine round completion celebration
+  - mood check-in submit
+- **Push notification**: extend existing `send-push` edge function with new template `dedication_received`. Daily cap is enforced in the insert path of `dedications` (a `RAISE EXCEPTION` from a trigger).
+
+---
+
+## Frontend files (new)
+
+```
+src/pages/app/AppFriends.tsx
+src/components/friends/
+  FriendsHero.tsx
+  PendingBanners.tsx
+  FriendsTab.tsx
+  RequestsTab.tsx
+  ReceivedTab.tsx
+  AddFriendSheet.tsx           ← paste code or share link
+  DedicateMomentSheet.tsx
+  DedicationReceivedSheet.tsx
+  MomentCard.tsx               ← reusable, gorgeous
+src/hooks/
+  useFriends.ts
+  useMoments.ts
+  useDedications.ts
+src/lib/moments.ts             ← recordMoment helper
 ```
 
-The **existing** `SelfCare*Step.tsx` files keep their core logic (state, persistence, answer wiring) but each gets restyled to use the new shell + visual primitives. Generic step types reused by the quiz (`motivational`, `single-select`, `multi-select`, `dynamic-single-select`) are NOT modified globally; instead, the dispatcher renders custom screens for them when invoked from this flow.
+Route added in the app router. **No nav entry, no Home banner.**
 
-## Routing change
+---
 
-In `OnboardingStepRenderer`, detect quiz steps by `step.id` prefix `sc-` and route to `SelfCareQuizScreen` first. If it returns null (unknown id), fall through to the current switch. This keeps isolation perfect with one tiny shim.
+## Visual craft commitments
 
-```ts
-// at top of switch:
-if (step.id?.startsWith('sc-')) {
-  const el = SelfCareQuizScreen({ step, onNext, onAnswer, answers, onMilestone });
-  if (el) return el;
-}
-```
+- Soft per-section gradients (peach → lavender → mint) with `AmbientGlow` blobs.
+- Glass cards: `bg-card-warm/60 backdrop-blur-2xl`, `shadow-ios`, no rings.
+- Fluent 3D emoji at 56–72px in moment cards.
+- Confetti burst + haptic on send.
+- Spring entrance for banners (`framer-motion` already in project).
+- Empty states are illustrated, never plain text.
+- Honors all project rules: no `hover:`, `shadow-ios` for floats, solid text on gradients, `getLocalDateStr()` for the 72h window, `useGoBack()` on sheets.
 
-## Per-step visual concept
+---
 
-| Step | Concept |
-|---|---|
-| sc-intro | Centered "AI-analyzing" orb with rotating sparkle ring, soft peach→lavender gradient |
-| sc-hook | "Productivity isn't the problem" — 13 category chips orbit a faded life-wheel |
-| sc-weighing | Tilted card stack (one chosen card lifts on tap), rosé gradient |
-| sc-neglecting | 9 mini "neglected" cards in a soft grid; selected = full color, unselected = desaturated |
-| sc-win | Sunrise gradient + soft sun-ray sweep behind options |
-| sc-deeper | Cluster-tinted bg (body=peach, mind=lavender, env=mint, people=pink) |
-| sc-diagnosis | Animated reveal: blurred shapes resolve into a diagnosis "card" with category chips |
-| sc-suggestions | Fanned habit cards animate into a tidy stack, tap-to-select with check overlay |
-| sc-push-permission | Floating mock notification banner enters from top with subtle glow |
-| sc-your-why | Anchor/heart visual; auto-resizing textarea on a paper-grain card |
-| sc-commitment | Frequency dial (3/5/7 days) with progress ring; tap-to-set |
-| sc-rilo-celebration | Confetti burst + radial sparkle, "you showed up" headline scales in |
-| sc-plus-intro | Crown medallion with rotating gold sparkles, dual CTA |
+## i18n
 
-## Shared primitives
+EN + FA written manually (Rilo standard). Other locales auto-translated per the project's i18n strategy.
 
-- `QuizShell`: full-height column, safe-area, configurable gradient, optional `<AmbientGlow />`, slot for visual + slot for title/sub/CTA. Mirrors `RiloTeachScreen` structure.
-- `FloatingChip`: 3D emoji + label, framer-motion drift loop (configurable delay/amplitude).
-- `ConfettiBurst`: lightweight CSS-only burst used on diagnosis/celebration/plus-intro.
-- All animations via `framer-motion` (already in project).
+---
 
-## Out of scope
+## Out of scope for Phase 1
 
-- No DB / quiz logic / answer-shape changes.
-- No copy changes.
-- No changes to other flows or shared question screens.
-- Selfcare quiz spec memory (`mem://features/tasks/self-care-quiz-specs`) stays valid; only visuals change.
+- Pre-install landing page / deferred deep link onboarding (Phase 2, when we validate the loop works friend-to-friend).
+- "Dedicate right after finishing" inline screen (Phase 2 — gated on Phase 1 engagement).
+- Username search, group friends, vibes/gifts beyond moments.
 
-## Validation
+---
 
-- Walk through the quiz in admin preview (`/admin` → onboarding flow preview) and on `/app` quiz entry, verifying each step renders, animates, and progresses.
-- Confirm Dear Me, Me Plus, and Weekly Review flows look unchanged.
-
-## Estimated footprint
-
-~1 dispatcher + 13 visual files (~80–200 LOC each) + 4 primitives + minor edits to the 7 existing `SelfCare*Step.tsx` files and 1 line in `OnboardingStepRenderer.tsx`.
+Ready to ship when you approve. First step after approval: write the migration (4 tables + trigger + RLS), wait for your confirmation, then build the page + sheets + `recordMoment` wiring.
