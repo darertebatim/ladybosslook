@@ -124,3 +124,18 @@ export function useMarkDedicationSeen() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["dedications-received"] }),
   });
 }
+
+/** Marks a received dedication as "tried" — the recipient tapped Try it. */
+export function useMarkDedicationTried() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("dedications" as any)
+        .update({ tried_at: new Date().toISOString() })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["dedications-received"] }),
+  });
+}
