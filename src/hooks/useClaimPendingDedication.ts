@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { APPSFLYER_ATTRIBUTION_EVENT, getStoredAttribution } from "@/lib/appsflyer";
 
 const STORAGE_KEY = "pendingDedicationToken";
 
@@ -22,6 +23,21 @@ export function useClaimPendingDedication() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const ran = useRef(false);
+
+  useEffect(() => {
+    const syncDedicationTokenFromAttribution = () => {
+      const attribution = getStoredAttribution();
+      if (attribution?.deepLinkValue === "dedication" && attribution.dedicationToken) {
+        stashDedicationToken(attribution.dedicationToken);
+      }
+    };
+
+    syncDedicationTokenFromAttribution();
+    window.addEventListener(APPSFLYER_ATTRIBUTION_EVENT, syncDedicationTokenFromAttribution);
+    return () => {
+      window.removeEventListener(APPSFLYER_ATTRIBUTION_EVENT, syncDedicationTokenFromAttribution);
+    };
+  }, []);
 
   useEffect(() => {
     if (!user?.id || ran.current) return;
