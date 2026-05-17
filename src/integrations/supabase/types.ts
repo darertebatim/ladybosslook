@@ -1308,35 +1308,78 @@ export type Database = {
         }
         Relationships: []
       }
+      dedication_claim_attempts: {
+        Row: {
+          attempted_at: string
+          id: number
+          ip_hash: string
+          token: string | null
+        }
+        Insert: {
+          attempted_at?: string
+          id?: number
+          ip_hash: string
+          token?: string | null
+        }
+        Update: {
+          attempted_at?: string
+          id?: number
+          ip_hash?: string
+          token?: string | null
+        }
+        Relationships: []
+      }
       dedications: {
         Row: {
+          claimed_at: string | null
+          claimed_by_user_id: string | null
           created_at: string
           id: string
           message: string | null
           moment_id: string
-          recipient_id: string
+          recipient_hint: string | null
+          recipient_id: string | null
+          recipient_token: string | null
+          reported_at: string | null
           seen_at: string | null
           sender_id: string
         }
         Insert: {
+          claimed_at?: string | null
+          claimed_by_user_id?: string | null
           created_at?: string
           id?: string
           message?: string | null
           moment_id: string
-          recipient_id: string
+          recipient_hint?: string | null
+          recipient_id?: string | null
+          recipient_token?: string | null
+          reported_at?: string | null
           seen_at?: string | null
           sender_id: string
         }
         Update: {
+          claimed_at?: string | null
+          claimed_by_user_id?: string | null
           created_at?: string
           id?: string
           message?: string | null
           moment_id?: string
-          recipient_id?: string
+          recipient_hint?: string | null
+          recipient_id?: string | null
+          recipient_token?: string | null
+          reported_at?: string | null
           seen_at?: string | null
           sender_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "dedications_claimed_by_user_id_fkey"
+            columns: ["claimed_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "dedications_moment_id_fkey"
             columns: ["moment_id"]
@@ -5759,8 +5802,27 @@ export type Database = {
         Args: { _page_slug: string; _user_id: string }
         Returns: boolean
       }
+      claim_dedication: { Args: { t: string }; Returns: Json }
+      generate_dedication_token: { Args: never; Returns: string }
       generate_friend_code: { Args: never; Returns: string }
       get_current_user_role: { Args: never; Returns: string }
+      get_dedication_by_token: {
+        Args: { t: string }
+        Returns: {
+          created_at: string
+          expires_token_at: string
+          id: string
+          is_claimed: boolean
+          message: string
+          moment_emoji: string
+          moment_kind: string
+          moment_payload: Json
+          moment_title: string
+          recipient_hint: string
+          sender_avatar_url: string
+          sender_first_name: string
+        }[]
+      }
       get_home_data: {
         Args: { p_date_str: string; p_user_id: string }
         Returns: Json
