@@ -72,6 +72,25 @@ export function buildShareOneLink(
   return `${ONELINK_BASE_URL}?${params.toString()}`;
 }
 
+/**
+ * Build a OneLink URL for a Friends dedication token.
+ * - Native app reads `deep_link_value=dedication`
+ * - Token arrives in `deep_link_sub1`
+ * - Web fallback opens the public dedication page
+ */
+export function buildDedicationOneLink(token: string): string {
+  const publicUrl = `https://ladybosslook.com/d/${encodeURIComponent(token)}`;
+  const params = new URLSearchParams({
+    af_xp: 'custom',
+    pid: 'user_share',
+    c: 'friends_dedication',
+    deep_link_value: 'dedication',
+    deep_link_sub1: token,
+    af_web_dp: publicUrl,
+  });
+  return `${ONELINK_BASE_URL}?${params.toString()}`;
+}
+
 const ATTRIBUTION_STORAGE_KEY = 'rilo_appsflyer_attribution';
 const ATTRIBUTION_PROCESSED_KEY = 'rilo_appsflyer_attribution_processed';
 
@@ -91,6 +110,8 @@ function dispatchAttributionEvent(slug: string) {
 export interface AppsFlyerAttribution {
   instructorSlug?: string;
   packageSlug?: string;
+  deepLinkValue?: string;
+  dedicationToken?: string;
   raw: Record<string, unknown>;
   capturedAt: string;
 }
@@ -150,6 +171,12 @@ export async function initAppsFlyer(): Promise<void> {
         console.log('[AppsFlyer] 🔔 Conversion callback fired:', JSON.stringify(event));
         try {
           const data = event?.data || {};
+          const deepLinkValue =
+            (data?.deep_link_value as string | undefined)?.trim().toLowerCase() ||
+            undefined;
+          const dedicationToken =
+            (data?.deep_link_sub1 as string | undefined)?.trim() ||
+            undefined;
           const instructorSlug =
             (data?.af_sub1 as string | undefined) ||
             (data?.deep_link_value as string | undefined) ||
@@ -158,6 +185,8 @@ export async function initAppsFlyer(): Promise<void> {
             (data?.af_sub2 as string | undefined) ||
             (data?.deep_link_sub1 as string | undefined);
           const payload: AppsFlyerAttribution = {
+            deepLinkValue,
+            dedicationToken: deepLinkValue === 'dedication' ? dedicationToken : undefined,
             instructorSlug: instructorSlug ? String(instructorSlug).trim().toLowerCase() : undefined,
             packageSlug: packageSlug ? String(packageSlug).trim().toLowerCase() : undefined,
             raw: data as Record<string, unknown>,
@@ -175,6 +204,12 @@ export async function initAppsFlyer(): Promise<void> {
         console.log('[AppsFlyer] 🔗 UDL callback fired:', JSON.stringify(event));
         try {
           const data = event?.deepLink || event?.data || event || {};
+          const deepLinkValue =
+            (data?.deep_link_value as string | undefined)?.trim().toLowerCase() ||
+            undefined;
+          const dedicationToken =
+            (data?.deep_link_sub1 as string | undefined)?.trim() ||
+            undefined;
           const instructorSlug =
             (data?.deep_link_value as string | undefined) ||
             (data?.af_sub1 as string | undefined) ||
@@ -182,8 +217,10 @@ export async function initAppsFlyer(): Promise<void> {
           const packageSlug =
             (data?.deep_link_sub1 as string | undefined) ||
             (data?.af_sub2 as string | undefined);
-          if (instructorSlug) {
+          if (deepLinkValue === 'dedication' || instructorSlug) {
             const payload: AppsFlyerAttribution = {
+              deepLinkValue,
+              dedicationToken: deepLinkValue === 'dedication' ? dedicationToken : undefined,
               instructorSlug: String(instructorSlug).trim().toLowerCase(),
               packageSlug: packageSlug ? String(packageSlug).trim().toLowerCase() : undefined,
               raw: data as Record<string, unknown>,
