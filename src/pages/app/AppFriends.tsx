@@ -9,6 +9,8 @@ import { PendingBanners } from "@/components/friends/PendingBanners";
 import { AddFriendSheet } from "@/components/friends/AddFriendSheet";
 import { DedicateMomentSheet } from "@/components/friends/DedicateMomentSheet";
 import { DedicationReceivedSheet } from "@/components/friends/DedicationReceivedSheet";
+import { ShareCarePackageSheet } from "@/components/friends/ShareCarePackageSheet";
+import type { SharePayload } from "@/lib/dedicationShare";
 import { useAuth } from "@/hooks/useAuth";
 import {
   useFriendships,
@@ -20,7 +22,7 @@ import {
   useReceivedDedications,
   type DedicationWithRelations,
 } from "@/hooks/useDedications";
-import { Send, X, Heart } from "lucide-react";
+import { Send, X, Heart, Gift } from "lucide-react";
 import { toast } from "sonner";
 import { defaultEmojiForKind } from "@/lib/moments";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
@@ -37,6 +39,8 @@ export default function AppFriends() {
   const [tab, setTab] = useState<TabValue>("friends");
   const [addOpen, setAddOpen] = useState(false);
   const [dedicateTarget, setDedicateTarget] = useState<{ id: string; name: string | null } | null>(null);
+  const [tokenSheetOpen, setTokenSheetOpen] = useState(false);
+  const [sharePayload, setSharePayload] = useState<(SharePayload & { momentEmoji: string | null }) | null>(null);
   const [openedDedication, setOpenedDedication] = useState<DedicationWithRelations | null>(null);
   const [params, setParams] = useSearchParams();
 
@@ -89,6 +93,26 @@ export default function AppFriends() {
         <PageHeader title="Friends" back />
 
         <FriendsHero onAddFriend={() => setAddOpen(true)} onShareInvite={shareInvite} />
+
+        {/* Send Care Package to non-user */}
+        <div className="px-3 mt-3">
+          <button
+            onClick={() => setTokenSheetOpen(true)}
+            className="w-full p-4 rounded-3xl bg-white/70 dark:bg-white/10 backdrop-blur-2xl shadow-ios active:scale-[0.99] transition-transform flex items-center gap-3 text-left"
+          >
+            <div className="w-11 h-11 rounded-2xl grid place-items-center bg-gradient-to-br from-[hsl(var(--tint-peach))] to-[hsl(var(--tint-lavender))]">
+              <Gift className="w-5 h-5 text-black" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-[15px] font-semibold text-black dark:text-white">
+                Send to anyone — even if they're not on Rilo
+              </div>
+              <div className="text-xs text-[hsl(var(--fg-warm-muted))]">
+                Create a share link · expires in 30 days
+              </div>
+            </div>
+          </button>
+        </div>
 
         <PendingBanners
           incoming={incoming}
@@ -210,6 +234,28 @@ export default function AppFriends() {
           onOpenChange={(v) => !v && setDedicateTarget(null)}
           recipientId={dedicateTarget?.id ?? null}
           recipientName={dedicateTarget?.name ?? null}
+        />
+        <DedicateMomentSheet
+          open={tokenSheetOpen}
+          onOpenChange={setTokenSheetOpen}
+          recipientId={null}
+          recipientName={null}
+          tokenMode
+          onTokenCreated={(args) => {
+            setSharePayload({
+              token: args.token,
+              senderName: null,
+              momentTitle: args.momentTitle,
+              recipientHint: args.recipientHint,
+              momentEmoji: args.momentEmoji,
+            });
+          }}
+        />
+        <ShareCarePackageSheet
+          open={!!sharePayload}
+          onOpenChange={(v) => !v && setSharePayload(null)}
+          payload={sharePayload}
+          momentEmoji={sharePayload?.momentEmoji}
         />
         <DedicationReceivedSheet
           dedication={openedDedication}

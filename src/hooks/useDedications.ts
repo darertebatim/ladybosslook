@@ -81,6 +81,36 @@ export function useSendDedication() {
   });
 }
 
+/** Create a non-user (token-based) dedication. Returns the generated token. */
+export function useSendTokenDedication() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (args: { momentId: string; message?: string; recipientHint?: string }) => {
+      if (!user?.id) throw new Error("Sign in required");
+      // Generate token client-side: 16-char base32 (matches DB unique constraint)
+      const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+      const bytes = new Uint8Array(16);
+      crypto.getRandomValues(bytes);
+      let token = "";
+      for (let i = 0; i < 16; i++) token += alphabet[bytes[i] % alphabet.length];
+      const { error } = await supabase.from("dedications" as any).insert({
+        moment_id: args.momentId,
+        sender_id: user.id,
+        recipient_token: token,
+        recipient_hint: args.recipientHint?.trim() || null,
+        message: args.message?.trim() || null,
+      });
+      if (error) throw error;
+      return { token };
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["giftable-moments"] });
+    },
+    onError: (e: any) => toast.error(e.message ?? "Could not create Care Package"),
+  });
+}
+
 export function useMarkDedicationSeen() {
   const qc = useQueryClient();
   return useMutation({

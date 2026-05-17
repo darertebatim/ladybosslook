@@ -147,6 +147,7 @@ const Programs = lazy(() => import("@/pages/Programs"));
 const About = lazy(() => import("@/pages/About"));
 const AssertLanding = lazy(() => import("@/pages/AssertLanding"));
 const Auth = lazy(() => import("@/pages/Auth"));
+const PublicDedication = lazy(() => import("@/pages/PublicDedication"));
 const BusinessIdeas = lazy(() => import("@/pages/BusinessIdeas"));
 const RathusAssessment = lazy(() => import("@/pages/RathusAssessment"));
 const BusinessGrowthAccelerator = lazy(() => import("@/pages/BusinessGrowthAccelerator"));
@@ -421,6 +422,7 @@ const App = () => (
                   <Route path="/asac" element={<AssertLanding />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/cart" element={<CartPage />} />
+                  <Route path="/d/:token" element={<PublicDedication />} />
                   
                   {/* Admin Routes */}
                   {!isNativeApp() && (

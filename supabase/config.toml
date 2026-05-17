@@ -208,3 +208,6 @@ verify_jwt = false
 
 [functions.selfcare-diagnosis]
 verify_jwt = false
+
+[functions.og-dedication]
+verify_jwt = false
