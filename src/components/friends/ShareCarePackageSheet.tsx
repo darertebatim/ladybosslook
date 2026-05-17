@@ -95,7 +95,8 @@ export function ShareCarePackageSheet({ open, onOpenChange, payload, momentEmoji
 
           <button
             onClick={handleCopy}
-            className="mt-3 w-full min-h-12 py-3.5 rounded-2xl bg-[hsl(var(--brand-primary))] text-white font-semibold shadow-ios active:bg-[hsl(var(--brand-primary-dark))] active:scale-[0.98] transition-transform inline-flex items-center justify-center gap-2"
+            style={{ backgroundColor: "#EB5E33", color: "#FFFFFF" }}
+            className="mt-3 w-full min-h-12 py-3.5 rounded-2xl font-semibold shadow-ios active:scale-[0.98] transition-transform inline-flex items-center justify-center gap-2"
           >
             {copied ? <Check className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
             {copied ? "Copied" : "Copy link"}
