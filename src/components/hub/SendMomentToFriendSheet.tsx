@@ -22,17 +22,17 @@ export function SendMomentToFriendSheet({ moment, open, onOpenChange }: Props) {
     .map((f) => f.other);
 
   const [selected, setSelected] = useState<FriendProfile | null>(null);
-  const [message, setMessage] = useState("");
   const send = useSendDedication();
 
   useEffect(() => {
-    if (open) { setSelected(null); setMessage(""); }
+    if (open) { setSelected(null); }
   }, [open]);
 
   const submit = async () => {
     if (!selected || !moment) return;
     try {
-      await send.mutateAsync({ momentId: moment.id, recipientId: selected.id, message });
+      // No message — UGC between users is not allowed.
+      await send.mutateAsync({ momentId: moment.id, recipientId: selected.id });
       haptic.success();
       confetti({
         particleCount: 80, spread: 70, origin: { y: 0.7 },
@@ -114,20 +114,6 @@ export function SendMomentToFriendSheet({ moment, open, onOpenChange }: Props) {
             </div>
           )}
 
-          {selected && (
-            <>
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value.slice(0, 140))}
-                placeholder="Add a note — this helped me…"
-                rows={2}
-                className="mt-4 w-full p-4 rounded-2xl bg-white border border-black/10 text-black placeholder:text-black/40 outline-none shadow-ios resize-none text-[15px]"
-              />
-              <div className="text-right text-[11px] text-[hsl(var(--fg-warm-muted))] mt-1">
-                {message.length}/140
-              </div>
-            </>
-          )}
         </div>
         {friends.length > 0 && (
           <div className="shrink-0 px-6 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] bg-background border-t border-black/5">
