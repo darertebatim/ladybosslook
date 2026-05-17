@@ -151,7 +151,7 @@ export function DedicateMomentSheet({
             <button
               onClick={submit}
               disabled={!selectedId || pending}
-              className="w-full min-h-12 py-3.5 rounded-2xl bg-brand text-white font-semibold shadow-ios active:scale-[0.98] transition-transform disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:opacity-100"
+              className="w-full min-h-12 py-3.5 rounded-2xl bg-[hsl(var(--brand-primary))] text-white font-semibold shadow-ios active:bg-[hsl(var(--brand-primary-dark))] active:scale-[0.98] transition-transform disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:opacity-100"
             >
               {ctaLabel}
             </button>
