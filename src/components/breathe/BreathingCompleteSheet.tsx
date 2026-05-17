@@ -9,6 +9,8 @@ import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { triggerSoftReview } from '@/lib/appReview';
+import { recordMoment } from '@/lib/moments';
+import { useAuth } from '@/hooks/useAuth';
 
 import journalImg from '@/assets/mood-card-journal.png';
 import reflectImg from '@/assets/mood-card-reflect.png';
@@ -37,6 +39,7 @@ export function BreathingCompleteSheet({
 }: BreathingCompleteSheetProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void; completeTask: () => void } | null = null;
   try { routinePlayer = useRoutinePlayerContext(); } catch { /* provider not available */ }
@@ -53,6 +56,16 @@ export function BreathingCompleteSheet({
       });
       // High-satisfaction moment → ask for a 5-star review (cooldown-protected)
       setTimeout(() => triggerSoftReview('breathe_complete'), 1500);
+      if (user?.id) {
+        const mins = Math.max(1, Math.round(durationSeconds / 60));
+        void recordMoment({
+          userId: user.id,
+          kind: 'breathe',
+          title: `${mins} min of ${exerciseName}`,
+          emoji: '🧘',
+          payload: { ref_id: `breathe-${Date.now()}`, durationSeconds, exerciseName },
+        });
+      }
     }
   }, [open]);
 
