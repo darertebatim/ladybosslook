@@ -9,7 +9,6 @@ import { HubAddFriendSheet } from "@/components/hub/HubAddFriendSheet";
 import { MyCodeSheet } from "@/components/hub/MyCodeSheet";
 import { RecentMomentsRow } from "@/components/hub/RecentMomentsRow";
 import { DedicationReceivedSheet } from "@/components/friends/DedicationReceivedSheet";
-import { SendMomentToFriendSheet } from "@/components/hub/SendMomentToFriendSheet";
 import { DedicateMomentSheet } from "@/components/friends/DedicateMomentSheet";
 import { useReceivedDedications, type DedicationWithRelations } from "@/hooks/useDedications";
 import { ChevronLeft, Bell, Settings, Gift, ChevronRight } from "lucide-react";
