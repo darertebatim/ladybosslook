@@ -95,7 +95,7 @@ export function ShareCarePackageSheet({ open, onOpenChange, payload, momentEmoji
 
           <button
             onClick={handleCopy}
-            className="mt-3 w-full py-3.5 rounded-2xl bg-black text-white font-semibold shadow-ios active:scale-[0.98] transition-transform inline-flex items-center justify-center gap-2"
+            className="mt-3 w-full min-h-12 py-3.5 rounded-2xl bg-black text-white font-semibold shadow-ios active:scale-[0.98] transition-transform inline-flex items-center justify-center gap-2"
           >
             {copied ? <Check className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
             {copied ? "Copied" : "Copy link"}
