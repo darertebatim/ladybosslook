@@ -73,8 +73,8 @@ export function DedicateMomentSheet({
     ? "Pick a moment, then we'll create a shareable link."
     : "Pick a moment from the last 72 hours.";
   const ctaLabel = tokenMode
-    ? (sendToken.isPending ? "Creating…" : "Create share link →")
-    : (send.isPending ? "Sending…" : "Dedicate 💝");
+    ? (sendToken.isPending ? "Creating…" : "Create share link")
+    : (send.isPending ? "Sending…" : "Send dedication");
   const pending = tokenMode ? sendToken.isPending : send.isPending;
 
   return (
@@ -151,7 +151,7 @@ export function DedicateMomentSheet({
             <button
               onClick={submit}
               disabled={!selectedId || pending}
-              className="w-full py-3.5 rounded-2xl bg-[hsl(var(--brand-primary))] text-white font-semibold shadow-ios active:scale-[0.98] transition-transform disabled:opacity-40"
+              className="w-full min-h-12 py-3.5 rounded-2xl bg-brand text-white font-semibold shadow-ios active:scale-[0.98] transition-transform disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:opacity-100"
             >
               {ctaLabel}
             </button>
