@@ -1,9 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { APPSFLYER_ATTRIBUTION_EVENT, getStoredAttribution } from "@/lib/appsflyer";
 
 const STORAGE_KEY = "pendingDedicationToken";
 
@@ -22,6 +23,24 @@ export function useClaimPendingDedication() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const ran = useRef(false);
+  const [tokenSignal, setTokenSignal] = useState(0);
+
+  useEffect(() => {
+    const syncDedicationTokenFromAttribution = () => {
+      const attribution = getStoredAttribution();
+      if (attribution?.deepLinkValue === "dedication" && attribution.dedicationToken) {
+        stashDedicationToken(attribution.dedicationToken);
+        ran.current = false;
+        setTokenSignal((v) => v + 1);
+      }
+    };
+
+    syncDedicationTokenFromAttribution();
+    window.addEventListener(APPSFLYER_ATTRIBUTION_EVENT, syncDedicationTokenFromAttribution);
+    return () => {
+      window.removeEventListener(APPSFLYER_ATTRIBUTION_EVENT, syncDedicationTokenFromAttribution);
+    };
+  }, []);
 
   useEffect(() => {
     if (!user?.id || ran.current) return;
@@ -63,5 +82,5 @@ export function useClaimPendingDedication() {
         }
       }
     })();
-  }, [user?.id, navigate, qc]);
+  }, [user?.id, navigate, qc, tokenSignal]);
 }

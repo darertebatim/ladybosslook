@@ -1,5 +1,6 @@
 import { Capacitor } from "@capacitor/core";
 import { Share } from "@capacitor/share";
+import { buildDedicationOneLink } from "@/lib/appsflyer";
 
 export interface SharePayload {
   token: string;
@@ -9,7 +10,7 @@ export interface SharePayload {
 }
 
 export function dedicationUrl(token: string): string {
-  return `https://ladybosslook.com/d/${token}`;
+  return buildDedicationOneLink(token);
 }
 
 function baseMessage(p: SharePayload): string {
