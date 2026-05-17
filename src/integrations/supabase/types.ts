@@ -1343,6 +1343,7 @@ export type Database = {
           reported_at: string | null
           seen_at: string | null
           sender_id: string
+          tried_at: string | null
         }
         Insert: {
           claimed_at?: string | null
@@ -1357,6 +1358,7 @@ export type Database = {
           reported_at?: string | null
           seen_at?: string | null
           sender_id: string
+          tried_at?: string | null
         }
         Update: {
           claimed_at?: string | null
@@ -1371,6 +1373,7 @@ export type Database = {
           reported_at?: string | null
           seen_at?: string | null
           sender_id?: string
+          tried_at?: string | null
         }
         Relationships: [
           {
