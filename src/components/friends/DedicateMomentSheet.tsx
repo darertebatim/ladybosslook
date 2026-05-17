@@ -81,9 +81,9 @@ export function DedicateMomentSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="rounded-t-[28px] border-0 p-0 max-h-[90dvh] overflow-y-auto"
+        className="rounded-t-[28px] border-0 p-0 max-h-[92dvh] flex flex-col"
       >
-        <div className="p-6 pt-5">
+        <div className="flex-1 overflow-y-auto p-6 pt-5 pb-4">
           <div className="mx-auto w-10 h-1.5 rounded-full bg-black/15 mb-4" />
           <div className="flex items-center gap-2 mb-1">
             <Sparkles className="w-4 h-4 text-[hsl(var(--brand-primary))]" />
@@ -128,7 +128,7 @@ export function DedicateMomentSheet({
                   value={hint}
                   onChange={(e) => setHint(e.target.value.slice(0, 40))}
                   placeholder="Their first name (optional)"
-                  className="mt-4 w-full p-4 rounded-2xl bg-[hsl(var(--tint-lavender))] text-black placeholder:text-black/40 outline-none shadow-ios text-[15px]"
+                  className="mt-4 w-full p-4 rounded-2xl bg-white border border-black/10 text-black placeholder:text-black/40 outline-none shadow-ios text-[15px]"
                 />
               )}
               <textarea
@@ -136,22 +136,27 @@ export function DedicateMomentSheet({
                 onChange={(e) => setMessage(e.target.value.slice(0, 140))}
                 placeholder="Add a note (optional) — this one's for you…"
                 rows={2}
-                className="mt-3 w-full p-4 rounded-2xl bg-[hsl(var(--tint-peach))] text-black placeholder:text-black/40 outline-none shadow-ios resize-none text-[15px]"
+                className="mt-3 w-full p-4 rounded-2xl bg-white border border-black/10 text-black placeholder:text-black/40 outline-none shadow-ios resize-none text-[15px]"
               />
               <div className="text-right text-[11px] text-[hsl(var(--fg-warm-muted))] mt-1">
                 {message.length}/140
               </div>
-
-              <button
-                onClick={submit}
-                disabled={!selectedId || pending}
-                className="mt-3 w-full py-3.5 rounded-2xl bg-[hsl(var(--brand-primary))] text-white font-semibold shadow-ios active:scale-[0.98] transition-transform disabled:opacity-40"
-              >
-                {ctaLabel}
-              </button>
             </>
           )}
         </div>
+        {moments.length > 0 && (
+          <div
+            className="shrink-0 px-6 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] bg-background border-t border-black/5"
+          >
+            <button
+              onClick={submit}
+              disabled={!selectedId || pending}
+              className="w-full py-3.5 rounded-2xl bg-[hsl(var(--brand-primary))] text-white font-semibold shadow-ios active:scale-[0.98] transition-transform disabled:opacity-40"
+            >
+              {ctaLabel}
+            </button>
+          </div>
+        )}
       </SheetContent>
     </Sheet>
   );
