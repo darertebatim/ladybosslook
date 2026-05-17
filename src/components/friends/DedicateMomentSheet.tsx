@@ -151,7 +151,11 @@ export function DedicateMomentSheet({
             <button
               onClick={submit}
               disabled={!selectedId || pending}
-              className="w-full min-h-12 py-3.5 rounded-2xl bg-[hsl(var(--brand-primary))] text-white font-semibold shadow-ios active:bg-[hsl(var(--brand-primary-dark))] active:scale-[0.98] transition-transform disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:opacity-100"
+              style={{
+                backgroundColor: !selectedId || pending ? "#E5E5E5" : "#EB5E33",
+                color: !selectedId || pending ? "#8A8A8A" : "#FFFFFF",
+              }}
+              className="w-full min-h-12 py-3.5 rounded-2xl font-semibold shadow-ios active:scale-[0.98] transition-transform"
             >
               {ctaLabel}
             </button>
