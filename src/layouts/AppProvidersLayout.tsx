@@ -1,6 +1,12 @@
 import { Outlet } from 'react-router-dom';
 import { AudioPlayerProvider } from '@/contexts/AudioPlayerContext';
 import { RoutinePlayerProvider } from '@/components/app/RoutinePlayerProvider';
+import { useClaimPendingDedication } from '@/hooks/useClaimPendingDedication';
+
+function DedicationClaimer() {
+  useClaimPendingDedication();
+  return null;
+}
 
 /**
  * Wraps ALL /app/* routes with AudioPlayer and RoutinePlayer providers.
@@ -11,6 +17,7 @@ export function AppProvidersLayout() {
   return (
     <AudioPlayerProvider>
       <RoutinePlayerProvider>
+        <DedicationClaimer />
         <Outlet />
       </RoutinePlayerProvider>
     </AudioPlayerProvider>
