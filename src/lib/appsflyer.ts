@@ -187,8 +187,12 @@ export async function initAppsFlyer(): Promise<void> {
           const payload: AppsFlyerAttribution = {
             deepLinkValue,
             dedicationToken: deepLinkValue === 'dedication' ? dedicationToken : undefined,
-            instructorSlug: instructorSlug ? String(instructorSlug).trim().toLowerCase() : undefined,
-            packageSlug: packageSlug ? String(packageSlug).trim().toLowerCase() : undefined,
+            instructorSlug: deepLinkValue === 'dedication'
+              ? undefined
+              : (instructorSlug ? String(instructorSlug).trim().toLowerCase() : undefined),
+            packageSlug: deepLinkValue === 'dedication'
+              ? undefined
+              : (packageSlug ? String(packageSlug).trim().toLowerCase() : undefined),
             raw: data as Record<string, unknown>,
             capturedAt: new Date().toISOString(),
           };
@@ -221,16 +225,20 @@ export async function initAppsFlyer(): Promise<void> {
             const payload: AppsFlyerAttribution = {
               deepLinkValue,
               dedicationToken: deepLinkValue === 'dedication' ? dedicationToken : undefined,
-              instructorSlug: String(instructorSlug).trim().toLowerCase(),
-              packageSlug: packageSlug ? String(packageSlug).trim().toLowerCase() : undefined,
+              instructorSlug: deepLinkValue === 'dedication'
+                ? undefined
+                : String(instructorSlug).trim().toLowerCase(),
+              packageSlug: deepLinkValue === 'dedication'
+                ? undefined
+                : (packageSlug ? String(packageSlug).trim().toLowerCase() : undefined),
               raw: data as Record<string, unknown>,
               capturedAt: new Date().toISOString(),
             };
             // Also clear the "processed" flag so the modal can re-trigger for a new instructor on re-engagement
             try { localStorage.removeItem(ATTRIBUTION_PROCESSED_KEY); } catch {/* ignore */}
             localStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(payload));
-            console.log('[AppsFlyer] ✅ Deep link captured. Slug:', payload.instructorSlug, 'Package:', payload.packageSlug ?? '(none)');
-            dispatchAttributionEvent(payload.instructorSlug);
+            console.log('[AppsFlyer] ✅ Deep link captured. Type:', payload.deepLinkValue ?? 'instructor', 'Slug:', payload.instructorSlug ?? '(none)', 'Package:', payload.packageSlug ?? '(none)');
+            dispatchAttributionEvent(payload.instructorSlug ?? payload.deepLinkValue ?? 'deep-link');
           } else {
             console.log('[AppsFlyer] UDL fired but no instructor slug found in payload');
           }
