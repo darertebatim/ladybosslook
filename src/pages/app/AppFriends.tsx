@@ -279,7 +279,10 @@ function FriendRow({
   onRemove: () => void;
 }) {
   return (
-    <div className="rounded-[28px] p-3 pl-4 bg-white dark:bg-white/10 shadow-ios flex items-center gap-3 border border-white/80 dark:border-white/5">
+    <div
+      className="rounded-[28px] p-3 pl-3 shadow-ios flex items-center gap-3"
+      style={{ backgroundColor: "#FFFFFF" }}
+    >
       {data.other.avatar_url ? (
         <img
           src={data.other.avatar_url}
@@ -287,7 +290,10 @@ function FriendRow({
           className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-ios"
         />
       ) : (
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[hsl(var(--tint-peach-mid))] to-[hsl(var(--tint-lavender-mid))] grid place-items-center text-xl font-bold text-black shadow-ios">
+        <div
+          className="w-14 h-14 rounded-2xl grid place-items-center text-xl font-bold text-black shadow-ios shrink-0"
+          style={{ background: "linear-gradient(135deg, #FFD2A1 0%, #FFB088 55%, #DEC1FF 100%)" }}
+        >
           {(data.other.full_name || "?").charAt(0).toUpperCase()}
         </div>
       )}
