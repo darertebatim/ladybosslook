@@ -1,10 +1,14 @@
 import { useEffect } from "react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import type { DedicationWithRelations } from "@/hooks/useDedications";
-import { useMarkDedicationSeen } from "@/hooks/useDedications";
+import { useMarkDedicationSeen, useMarkDedicationTried } from "@/hooks/useDedications";
 import { MomentCard } from "./MomentCard";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Play } from "lucide-react";
 import confetti from "canvas-confetti";
+import { useNavigate } from "react-router-dom";
+import { tryDeepLinkForMoment } from "@/lib/momentDeepLink";
+import { haptic } from "@/lib/haptics";
+import { toast } from "sonner";
 
 interface Props {
   dedication: DedicationWithRelations | null;
@@ -15,6 +19,8 @@ interface Props {
 export function DedicationReceivedSheet({ dedication, onOpenChange, onSendBack }: Props) {
   const open = !!dedication;
   const markSeen = useMarkDedicationSeen();
+  const markTried = useMarkDedicationTried();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (dedication && !dedication.dedication.seen_at) {
@@ -24,6 +30,21 @@ export function DedicationReceivedSheet({ dedication, onOpenChange, onSendBack }
       confetti({ particleCount: 60, spread: 70, origin: { y: 0.7 }, colors: ["#FF8FA3", "#C4B5FD", "#34D399"] });
     }
   }, [open]); // eslint-disable-line
+
+  const handleTryIt = async () => {
+    if (!dedication?.moment) return;
+    haptic.success();
+    // Fire-and-forget nudge to sender ("liked")
+    markTried.mutate(dedication.dedication.id);
+    const senderName = dedication.other?.full_name || "your friend";
+    toast.success(`Nudge sent to ${senderName} 💛`);
+    const href = tryDeepLinkForMoment(
+      dedication.moment.kind,
+      dedication.moment.payload,
+    );
+    onOpenChange(false);
+    setTimeout(() => navigate(href), 200);
+  };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -70,18 +91,25 @@ export function DedicationReceivedSheet({ dedication, onOpenChange, onSendBack }
               )}
 
               <button
+                onClick={handleTryIt}
+                className="mt-6 w-full py-3.5 rounded-2xl bg-black text-white font-semibold shadow-ios active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+              >
+                <Play className="w-4 h-4 fill-white" />
+                Try it
+              </button>
+              <button
                 onClick={() => {
                   if (dedication.other) {
                     onSendBack(dedication.other.id, dedication.other.full_name);
                   }
                 }}
-                className="mt-6 w-full py-3.5 rounded-2xl bg-black text-white font-semibold shadow-ios active:scale-[0.98] transition-transform"
+                className="mt-2 w-full py-3 rounded-2xl bg-white/60 text-black font-semibold active:scale-[0.98] transition-transform"
               >
-                Send one back 💝
+                Dedicate one back 💝
               </button>
               <button
                 onClick={() => onOpenChange(false)}
-                className="mt-2 w-full py-3 rounded-2xl text-black/70 font-medium active:scale-[0.98] transition-transform"
+                className="mt-1 w-full py-2.5 rounded-2xl text-black/60 text-sm font-medium active:scale-[0.98] transition-transform"
               >
                 Close
               </button>
