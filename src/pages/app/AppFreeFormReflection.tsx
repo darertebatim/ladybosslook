@@ -149,13 +149,10 @@ export default function AppFreeFormReflection() {
         },
       });
 
-      void recordMoment({
-        userId: user.id,
-        kind: 'reflection',
-        title: finalTitle,
-        emoji: '✍️',
-        payload: { ref_id: clientId },
-      });
+      // NOTE: Free-form reflections are user-written content (UGC) and must
+      // NEVER be surfaced as dedicatable moments to other users. Only
+      // system-generated, template-based moments (breathe, mood, official
+      // routines, official playlists) are allowed in the Hub dedication flow.
 
       // Optimistically inject this note into all reflection-notes caches so it
       // appears in the list instantly — even fully offline. The list query

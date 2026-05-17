@@ -82,13 +82,7 @@ export function DedicationReceivedSheet({ dedication, onOpenChange, onSendBack }
                 </div>
               )}
 
-              {dedication.dedication.message && (
-                <div className="mt-4 p-4 rounded-2xl bg-white/70 backdrop-blur-xl shadow-ios">
-                  <p className="text-[15px] text-black italic">
-                    "{dedication.dedication.message}"
-                  </p>
-                </div>
-              )}
+              {/* No user-written messages displayed — UGC between users is not allowed. */}
 
               <button
                 onClick={handleTryIt}

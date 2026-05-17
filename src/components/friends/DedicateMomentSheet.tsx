@@ -131,16 +131,7 @@ export function DedicateMomentSheet({
                   className="mt-4 w-full p-4 rounded-2xl bg-white border border-black/10 text-black placeholder:text-black/40 outline-none shadow-ios text-[15px]"
                 />
               )}
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value.slice(0, 140))}
-                placeholder="Add a note (optional) — this one's for you…"
-                rows={2}
-                className="mt-3 w-full p-4 rounded-2xl bg-white border border-black/10 text-black placeholder:text-black/40 outline-none shadow-ios resize-none text-[15px]"
-              />
-              <div className="text-right text-[11px] text-[hsl(var(--fg-warm-muted))] mt-1">
-                {message.length}/140
-              </div>
+              {/* No user-written messages — UGC between users is not allowed. */}
             </>
           )}
         </div>
