@@ -1,0 +1,1 @@
+ALTER TABLE public.dedications ADD COLUMN IF NOT EXISTS tried_at timestamptz;
