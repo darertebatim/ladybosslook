@@ -105,6 +105,7 @@ const AppTasksBank = lazy(() => import("@/pages/app/AppTasksBank"));
 const AppTasksBankCategory = lazy(() => import("@/pages/app/AppTasksBankCategory"));
 const AppTaskDrafts = lazy(() => import("@/pages/app/AppTaskDrafts"));
 const AppFriends = lazy(() => import("@/pages/app/AppFriends"));
+const AppHub = lazy(() => import("@/pages/app/AppHub"));
 
 const Users = lazy(() => import("@/pages/admin/Users"));
 const Enrollment = lazy(() => import("@/pages/admin/Enrollment"));
@@ -518,6 +519,7 @@ const App = () => (
                     <Route path="/app/rate" element={<ProtectedRoute><AppRate /></ProtectedRoute>} />
                     <Route path="/app/settings" element={<ProtectedRoute><AppSettings /></ProtectedRoute>} />
                     <Route path="/app/friends" element={<ProtectedRoute><AppFriends /></ProtectedRoute>} />
+                    <Route path="/app/hub" element={<ProtectedRoute><AppHub /></ProtectedRoute>} />
                     <Route path="/app/onboarding/:flowId" element={<AppOnboarding />} />
                     <Route path="/app/reflections/notes/free/:noteId" element={<ProtectedRoute><AppFreeFormNoteDetail /></ProtectedRoute>} />
                     <Route path="/app/reflections/notes/:reflectionId" element={<ProtectedRoute><AppReflectionNoteDetail /></ProtectedRoute>} />
