@@ -89,6 +89,7 @@ export function RecentMomentsRow() {
         <div className="flex flex-col gap-2.5">
           {moments.map((m) => {
             const isPending = pendingId === m.id;
+            const sentToFriend = !!m.dedicated_at;
             return (
               <button
                 key={m.id}
@@ -109,11 +110,17 @@ export function RecentMomentsRow() {
                 <div className="flex-1 min-w-0">
                   <div className="text-[10px] uppercase tracking-wider font-semibold text-white/60">
                     {labelForKind(m.kind)} · {relTime(m.created_at)}
+                    {sentToFriend && " · sent to friend"}
                   </div>
                   <div className="text-[14px] font-semibold text-white leading-tight truncate mt-0.5">
                     {m.title}
                   </div>
                 </div>
+                {sentToFriend ? (
+                  <span className="shrink-0 text-[9px] uppercase tracking-wider font-bold text-white/70 px-2 py-1 rounded-full bg-white/10">
+                    Sent
+                  </span>
+                ) : (
                 <span
                   className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full text-white text-[11px] font-bold"
                   style={{ backgroundColor: isPending ? "rgba(255,255,255,0.15)" : "#EB5E33" }}
@@ -124,6 +131,7 @@ export function RecentMomentsRow() {
                     <><Gift className="w-3 h-3" /> Gift</>
                   )}
                 </span>
+                )}
               </button>
             );
           })}
