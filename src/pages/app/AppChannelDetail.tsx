@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Loader2, ChevronLeft, Megaphone, Users, GraduationCap, MessageSquare, ChevronDown, Pin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { IOSIconButton } from '@/components/app/ui/IOSIconButton';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useChannels, useFeedPosts, useMarkPostRead, FeedPost } from '@/hooks/useFeed';
 import { useFeedRealtime } from '@/hooks/useFeedRealtime';
 import { FeedMessage } from '@/components/feed/FeedMessage';
@@ -23,6 +26,9 @@ const CHANNEL_ICONS: Record<string, React.ElementType> = {
   program: GraduationCap,
   round: Users,
 };
+
+const isEmojiCover = (url: string | null | undefined) => !!url?.startsWith('emoji:');
+const getEmojiFromCover = (url: string | null | undefined) => url?.replace('emoji:', '') || '';
 
 export default function AppChannelDetail() {
   const { t } = useTranslation();
@@ -232,37 +238,46 @@ export default function AppChannelDetail() {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-muted/30">
+    <div className="flex flex-col h-full overflow-hidden bg-background">
       <SEOHead 
         title={selectedChannel.name} 
         description={`Channel: ${selectedChannel.name}`}
       />
 
-      {/* Header */}
-      <header 
-        className="sticky top-0 z-10 bg-[#F4ECFE] dark:bg-violet-950/90 rounded-b-3xl shadow-ios"
+      {/* Glassy rounded header — matches new design system */}
+      <header
+        className="sticky top-0 z-30 bg-white/35 dark:bg-black/20 backdrop-blur-xl rounded-b-2xl shadow-[0_2px_10px_rgba(0,0,0,0.06)]"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="flex items-center gap-2 px-2 pt-2 pb-3">
-          <button
+        <div className="px-3 pt-2 pb-3 flex items-center gap-3 min-h-[52px]">
+          <IOSIconButton
+            size="sm"
             onClick={() => navigate('/app/channels')}
-            className="p-2 -ml-1 active:bg-black/5 rounded-full transition-colors"
+            aria-label="Back"
           >
-            <ChevronLeft className="h-6 w-6" />
-          </button>
-          
+            <ChevronLeft className="h-5 w-5" />
+          </IOSIconButton>
+
           <div className={cn(
-            "h-10 w-10 rounded-full flex items-center justify-center shrink-0",
-            selectedChannel.type === 'general' && "bg-primary/20 text-primary",
-            selectedChannel.type === 'program' && "bg-accent/20 text-accent-foreground",
-            selectedChannel.type === 'round' && "bg-muted text-muted-foreground"
+            "h-10 w-10 rounded-full flex items-center justify-center shrink-0 overflow-hidden",
+            selectedChannel.type === 'general' && "bg-[hsl(var(--brand-primary)/0.12)] text-[hsl(var(--brand-primary))]",
+            selectedChannel.type !== 'general' && "bg-[hsl(var(--tint-peach))] text-fg-warm"
           )}>
-            <Icon className="h-5 w-5" />
+            {isEmojiCover(selectedChannel.cover_image_url) ? (
+              <FluentEmoji emoji={getEmojiFromCover(selectedChannel.cover_image_url)} size={24} />
+            ) : selectedChannel.cover_image_url ? (
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={selectedChannel.cover_image_url} className="object-cover" />
+                <AvatarFallback><Icon className="h-5 w-5" /></AvatarFallback>
+              </Avatar>
+            ) : (
+              <Icon className="h-5 w-5" />
+            )}
           </div>
-          
+
           <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-semibold truncate">{selectedChannel.name}</h1>
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <h1 className="text-lg font-bold text-fg-warm truncate">{selectedChannel.name}</h1>
+            <div className="flex items-center gap-1.5 text-xs text-fg-warm-muted">
               {isGroupChat ? (
                 <>
                   <MessageSquare className="h-3 w-3" />
@@ -296,7 +311,7 @@ export default function AppChannelDetail() {
                   <div className="flex justify-center py-3">
                     <Badge 
                       variant="secondary" 
-                      className="bg-background/80 backdrop-blur-sm shadow-ios border text-xs font-normal"
+                      className="bg-white/70 dark:bg-black/30 backdrop-blur-xl shadow-ios border-0 text-xs font-normal text-fg-warm-muted"
                     >
                       {group.dateLabel}
                     </Badge>
@@ -355,7 +370,7 @@ export default function AppChannelDetail() {
         {showScrollButton && (
           <button
             onClick={scrollToBottomSmooth}
-            className="absolute bottom-4 right-4 h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center z-20 transition-all active:scale-95 animate-in fade-in slide-in-from-bottom-2 duration-200"
+            className="absolute bottom-4 right-4 h-10 w-10 rounded-full bg-white text-[hsl(var(--brand-primary))] shadow-ios flex items-center justify-center z-20 transition-all active:scale-95 animate-in fade-in slide-in-from-bottom-2 duration-200"
           >
             <ChevronDown className="h-5 w-5" />
           </button>
@@ -365,20 +380,20 @@ export default function AppChannelDetail() {
       {/* Pinned message bar - floating above input */}
       {pinnedMessage && (
         <div 
-          className="bg-primary/10 border-t border-primary/20 px-3 py-2 flex items-center gap-2 cursor-pointer active:bg-primary/15 transition-colors"
+          className="bg-[hsl(var(--tint-peach))] px-3 py-2 flex items-center gap-2 cursor-pointer active:opacity-80 transition-opacity shadow-[0_-2px_10px_rgba(0,0,0,0.04)]"
           onClick={scrollToPinnedMessage}
         >
-          <div className="bg-primary/20 rounded-full p-1.5">
-            <Pin className="h-3.5 w-3.5 text-primary" />
+          <div className="bg-white rounded-full p-1.5 shadow-ios">
+            <Pin className="h-3.5 w-3.5 text-[hsl(var(--brand-primary))]" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-primary">{t('tier1.channelDetail.pinned')}</p>
-            <p className="text-xs text-muted-foreground truncate">
+            <p className="text-xs font-semibold text-[hsl(var(--brand-primary))]">{t('tier1.channelDetail.pinned')}</p>
+            <p className="text-xs text-fg-warm-muted truncate">
               {pinnedMessage.title || pinnedMessage.content?.slice(0, 60)}
               {pinnedMessage.content && pinnedMessage.content.length > 60 && !pinnedMessage.title ? '...' : ''}
             </p>
           </div>
-          <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
+          <ChevronDown className="h-4 w-4 text-fg-warm-muted shrink-0" />
         </div>
       )}
 
