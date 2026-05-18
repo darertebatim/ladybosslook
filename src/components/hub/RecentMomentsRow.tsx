@@ -28,8 +28,8 @@ export function RecentMomentsRow() {
             Your moments today
           </h2>
         </div>
-        <p className="text-white/60 text-[12px] mt-1 leading-snug">
-          These are your moments for taking better care of yourself in the last 24h. Inspire a friend into it.
+        <p className="text-white text-[15px] mt-1.5 leading-snug font-medium">
+          These are your moments of taking better care of yourself in the last 24 hours. Inspire a friend to join in.
         </p>
       </div>
 
