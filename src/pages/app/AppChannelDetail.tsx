@@ -299,7 +299,7 @@ export default function AppChannelDetail() {
           style={{ WebkitOverflowScrolling: 'touch' }}
           onScroll={handleScroll}
         >
-          <div className="pb-safe">
+          <div className="pb-[calc(env(safe-area-inset-bottom)+120px)]">
             {postsLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
