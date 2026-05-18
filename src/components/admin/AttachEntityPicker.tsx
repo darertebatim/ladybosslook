@@ -22,6 +22,7 @@ import {
   Loader2,
   Wind,
   PenLine,
+  ChevronRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -250,7 +251,19 @@ export function AttachEntityPicker({ onPick, className }: AttachEntityPickerProp
     );
   }, [q, playlists, tracks, videoPlaylists, routines, breathingExercises, reflections, programs, channels, readings]);
 
-  // Group by type for display
+  // Group by type for display, in a stable predictable order
+  const GROUP_ORDER = [
+    '🎯 Tools',
+    '📌 Channels',
+    '📌 Playlists',
+    '📌 Tracks',
+    '📌 Video Playlists',
+    '📌 Routines',
+    '📌 Breathings',
+    '📌 Reflections',
+    '📌 Readings',
+    '📌 Programs',
+  ];
   const grouped = useMemo(() => {
     const g = new Map<string, EntityRow[]>();
     for (const row of all) {
@@ -258,8 +271,23 @@ export function AttachEntityPicker({ onPick, className }: AttachEntityPickerProp
       if (!g.has(key)) g.set(key, []);
       g.get(key)!.push(row);
     }
-    return g;
+    // Return in stable order, unknown groups appended
+    const ordered = new Map<string, EntityRow[]>();
+    for (const k of GROUP_ORDER) if (g.has(k)) ordered.set(k, g.get(k)!);
+    for (const [k, v] of g) if (!ordered.has(k)) ordered.set(k, v);
+    return ordered;
   }, [all]);
+
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const isSearching = q.trim().length > 0;
+  const toggleGroup = (k: string) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(k)) next.delete(k);
+      else next.add(k);
+      return next;
+    });
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -292,7 +320,7 @@ export function AttachEntityPicker({ onPick, className }: AttachEntityPickerProp
           </p>
         </div>
 
-        <div className="max-h-[360px] overflow-y-auto p-2">
+        <div className="max-h-[420px] overflow-y-auto p-1.5">
           {loading && (
             <div className="flex items-center justify-center py-8 text-muted-foreground text-sm">
               <Loader2 className="h-4 w-4 animate-spin mr-2" /> Loading…
@@ -304,31 +332,59 @@ export function AttachEntityPicker({ onPick, className }: AttachEntityPickerProp
             </p>
           )}
           {!loading &&
-            Array.from(grouped.entries()).map(([group, rows]) => (
-              <div key={group} className="mt-2">
-                <p className="px-3 py-1 text-xs font-medium text-muted-foreground">
-                  {group}
-                </p>
-                {rows.slice(0, 20).map((row) => {
-                  const Icon = row.Icon;
-                  return (
-                    <button
-                      key={row.url}
-                      type="button"
-                      className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-muted/80 transition-colors flex items-center gap-2.5"
-                      onClick={() => {
-                        onPick(row.url);
-                        setOpen(false);
-                        setQ('');
-                      }}
-                    >
-                      <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <span className="flex-1 truncate">{row.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            ))}
+            Array.from(grouped.entries()).map(([group, rows]) => {
+              const isOpen = isSearching || expanded.has(group);
+              return (
+                <div key={group} className="mb-0.5">
+                  <button
+                    type="button"
+                    onClick={() => !isSearching && toggleGroup(group)}
+                    className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg hover:bg-muted/60 transition-colors text-left"
+                  >
+                    <ChevronRight
+                      className={cn(
+                        'h-3.5 w-3.5 text-muted-foreground transition-transform shrink-0',
+                        isOpen && 'rotate-90',
+                      )}
+                    />
+                    <span className="text-xs font-semibold flex-1 truncate">
+                      {group}
+                    </span>
+                    <span className="text-[10px] font-medium text-muted-foreground tabular-nums">
+                      {rows.length}
+                    </span>
+                  </button>
+                  {isOpen && (
+                    <div className="pl-2">
+                      {rows.slice(0, 50).map((row) => {
+                        const Icon = row.Icon;
+                        return (
+                          <button
+                            key={row.url}
+                            type="button"
+                            className="w-full text-left px-2.5 py-2 rounded-lg text-sm hover:bg-muted/80 transition-colors flex items-center gap-2.5"
+                            onClick={() => {
+                              onPick(row.url);
+                              setOpen(false);
+                              setQ('');
+                              setExpanded(new Set());
+                            }}
+                          >
+                            <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <span className="flex-1 truncate">{row.label}</span>
+                          </button>
+                        );
+                      })}
+                      {rows.length > 50 && (
+                        <p className="px-2.5 py-1 text-[10px] text-muted-foreground">
+                          Showing first 50 — search to narrow.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
         </div>
       </PopoverContent>
     </Popover>
