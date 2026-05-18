@@ -5893,6 +5893,22 @@ export type Database = {
         Args: { p_date_str: string; p_user_id: string }
         Returns: Json
       }
+      get_scheduled_feed_posts: {
+        Args: never
+        Returns: {
+          author_full_name: string
+          channel_id: string
+          channel_name: string
+          content: string
+          display_name: string
+          id: string
+          image_url: string
+          is_pinned: boolean
+          scheduled_for: string
+          send_push: boolean
+          title: string
+        }[]
+      }
       has_channel_access: {
         Args: { _channel_id: string; _user_id: string }
         Returns: boolean
