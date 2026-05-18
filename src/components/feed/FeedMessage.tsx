@@ -222,6 +222,7 @@ export const FeedMessage = memo(function FeedMessage({
               content={post.content}
               className={bilingualClassName}
               dir={direction as 'ltr' | 'rtl' | 'auto'}
+              singleLineBreaksAsParagraphs
             />
           )}
 
