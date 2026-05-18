@@ -372,7 +372,8 @@ export function useUnreadFeedCount() {
       // Get all accessible posts
       const { data: posts } = await supabase
         .from('feed_posts')
-        .select('id, created_at');
+        .select('id, created_at')
+        .or('scheduled_for.is.null,scheduled_for.lte.' + new Date().toISOString());
 
       if (!posts || posts.length === 0) return 0;
 
