@@ -531,6 +531,13 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
 
         {/* Main input area */}
         <div className="relative">
+          {/* Markdown formatting toolbar */}
+          <MarkdownToolbar
+            textareaRef={contentTextareaRef}
+            value={content}
+            onChange={setContent}
+            className="mb-1"
+          />
           <div className="flex items-end gap-2 bg-muted/50 rounded-2xl p-2">
             {/* Attachments button */}
             <Popover open={showAttachments} onOpenChange={setShowAttachments}>
