@@ -32,12 +32,12 @@ export function useGiftablePlaylists() {
       const hasPlus =
         !!sub && (!sub.expires_at || new Date(sub.expires_at) > new Date());
 
-      const playlistsRes: any = await
-        supabase
-          .from("audio_playlists")
-          .select("id, name, description, cover_image_url, requires_subscription, is_active")
-          .eq("is_active", true)
-          .order("sort_order", { ascending: true });
+      const sb: any = supabase;
+      const playlistsRes: any = await sb
+        .from("audio_playlists")
+        .select("id, name, description, cover_image_url, requires_subscription, is_active")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true });
       const savesRes: any = await supabase
         .from("playlist_saves")
         .select("playlist_id")
