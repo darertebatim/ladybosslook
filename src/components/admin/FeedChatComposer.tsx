@@ -224,8 +224,9 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
 
     setIsUploadingImage(true);
     try {
+      if (!user?.id) throw new Error('Not signed in');
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const fileName = `${user.id}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
       
       const { data, error } = await supabase.storage
         .from('feed-attachments')
