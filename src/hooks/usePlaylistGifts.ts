@@ -32,20 +32,22 @@ export function useGiftablePlaylists() {
       const hasPlus =
         !!sub && (!sub.expires_at || new Date(sub.expires_at) > new Date());
 
-      const [playlistsRes, savesRes, enrollmentsRes, itemsRes] = await Promise.all([
+      const playlistsRes: any = await
         supabase
           .from("audio_playlists")
           .select("id, name, description, cover_image_url, requires_subscription, is_active")
           .eq("is_active", true)
-          .order("sort_order", { ascending: true }),
-        supabase.from("playlist_saves").select("playlist_id").eq("user_id", user.id),
-        supabase
+          .order("sort_order", { ascending: true });
+      const savesRes: any = await supabase
+        .from("playlist_saves")
+        .select("playlist_id")
+        .eq("user_id", user.id);
+      const enrollmentsRes: any = await supabase
           .from("course_enrollments")
           .select("round_id, status, program_rounds(audio_playlist_id)")
           .eq("user_id", user.id)
-          .eq("status", "active"),
-        supabase.from("audio_playlist_items").select("playlist_id"),
-      ]);
+          .eq("status", "active");
+      const itemsRes: any = await supabase.from("audio_playlist_items").select("playlist_id");
 
       const savedIds = new Set((savesRes.data || []).map((s: any) => s.playlist_id));
       const enrolledPlaylistIds = new Set(
