@@ -308,10 +308,10 @@ export default function AppChannelDetail() {
               groupedPosts.map((group) => (
                 <div key={group.dateLabel}>
                   {/* Date separator */}
-                  <div className="flex justify-center py-3">
+                  <div className="flex justify-center py-2">
                     <Badge 
                       variant="secondary" 
-                      className="bg-white/70 dark:bg-black/30 backdrop-blur-xl shadow-ios border-0 text-xs font-normal text-fg-warm-muted"
+                      className="bg-white/70 dark:bg-black/30 backdrop-blur-xl shadow-ios border-0 text-[11px] font-medium text-fg-warm-muted px-2.5 py-0.5"
                     >
                       {group.dateLabel}
                     </Badge>
