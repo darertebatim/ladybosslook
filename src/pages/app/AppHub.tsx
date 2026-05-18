@@ -125,6 +125,30 @@ export default function AppHub() {
           <Constellation friends={accepted} onAdd={() => setAddOpen(true)} />
         </div>
 
+        {/* Invite banner */}
+        <div className="relative z-10 px-4 mt-5">
+          <button
+            onClick={shareInvite}
+            className="w-full rounded-2xl p-3 flex items-center gap-3 active:scale-[0.99] transition-transform text-left shadow-ios"
+            style={{
+              background: "linear-gradient(135deg, rgba(235,94,51,0.95) 0%, rgba(214,67,122,0.92) 100%)",
+            }}
+          >
+            <div className="w-10 h-10 rounded-xl grid place-items-center bg-white/20 shrink-0">
+              <Gift className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-[10px] uppercase tracking-wider font-bold text-white/85">
+                Invite a friend
+              </div>
+              <div className="text-[14px] font-bold text-white leading-tight mt-0.5">
+                Share Rilo — grow your circle
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-white/90 shrink-0" />
+          </button>
+        </div>
+
         {/* Bottom half: fresh-from-you moments to dedicate */}
         <div className="relative z-10 mt-6">
           <RecentMomentsRow />
@@ -155,31 +179,6 @@ export default function AppHub() {
             </div>
           </div>
         )}
-
-        {/* Invite banner */}
-        <div className="relative z-10 px-4 mt-5">
-          <button
-            onClick={shareInvite}
-            className="w-full rounded-2xl p-3 flex items-center gap-3 active:scale-[0.99] transition-transform text-left shadow-ios"
-            style={{
-              background: "linear-gradient(135deg, rgba(235,94,51,0.95) 0%, rgba(214,67,122,0.92) 100%)",
-            }}
-          >
-            <div className="w-10 h-10 rounded-xl grid place-items-center bg-white/20 shrink-0">
-              <Gift className="w-5 h-5 text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-[10px] uppercase tracking-wider font-bold text-white/85">
-                Invite a friend
-              </div>
-              <div className="text-[14px] font-bold text-white leading-tight mt-0.5">
-                Share Rilo — grow your circle
-              </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-white/90 shrink-0" />
-          </button>
-        </div>
-
 
         <HubAddFriendSheet
           open={addOpen}
