@@ -126,13 +126,13 @@ function useEntityPreview(entity: InternalEntity) {
         case 'program': {
           const { data: p } = await supabase
             .from('program_catalog')
-            .select('slug, title, short_description, cover_image_url')
+            .select('slug, title, description, cover_image_url')
             .eq('slug', entity.id)
             .maybeSingle();
           if (!p) return null;
           return {
             title: p.title,
-            subtitle: p.short_description || 'Program',
+            subtitle: p.description || 'Program',
             coverUrl: p.cover_image_url,
             cta: 'Open',
             Icon: GraduationCap,
@@ -140,15 +140,15 @@ function useEntityPreview(entity: InternalEntity) {
         }
         case 'reading': {
           const { data: r } = await supabase
-            .from('reading_items')
-            .select('id, title, summary, cover_image_url')
+            .from('reading_content')
+            .select('id, title, subtitle, description, cover_url')
             .eq('id', entity.id)
             .maybeSingle();
           if (!r) return null;
           return {
             title: r.title,
-            subtitle: r.summary || 'Reading',
-            coverUrl: r.cover_image_url,
+            subtitle: r.subtitle || r.description || 'Reading',
+            coverUrl: r.cover_url,
             cta: 'Read',
             Icon: BookOpen,
           };
@@ -156,13 +156,13 @@ function useEntityPreview(entity: InternalEntity) {
         case 'channel': {
           const { data: c } = await supabase
             .from('feed_channels')
-            .select('id, name, slug, description, cover_image_url')
+            .select('id, name, slug, cover_image_url')
             .eq('slug', entity.id)
             .maybeSingle();
           if (!c) return null;
           return {
             title: c.name,
-            subtitle: c.description || 'Channel',
+            subtitle: 'Channel',
             coverUrl: c.cover_image_url,
             cta: 'Open',
             Icon: MessageCircle,
@@ -170,15 +170,15 @@ function useEntityPreview(entity: InternalEntity) {
         }
         case 'quiz': {
           const { data: q } = await supabase
-            .from('quizzes')
-            .select('slug, title, description, cover_image_url')
+            .from('admin_quizzes')
+            .select('slug, title, description, cover_url')
             .eq('slug', entity.id)
             .maybeSingle();
           if (!q) return null;
           return {
             title: q.title,
             subtitle: q.description || 'Quiz',
-            coverUrl: q.cover_image_url,
+            coverUrl: q.cover_url,
             cta: 'Take Quiz',
             Icon: Brain,
           };
