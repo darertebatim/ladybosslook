@@ -23,6 +23,7 @@ import {
   Wind,
   PenLine,
   ChevronRight,
+  ListTodo,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -182,6 +183,20 @@ export function AttachEntityPicker({ onPick, className }: AttachEntityPickerProp
     },
   });
 
+  const { data: selfcareTasks } = useQuery({
+    queryKey: ['attach-picker-selfcare-tasks'],
+    enabled: open,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('admin_task_bank')
+        .select('id, title, emoji, category')
+        .eq('is_active', true)
+        .order('title')
+        .limit(500);
+      return data || [];
+    },
+  });
+
   const loading = !playlists && !routines && !programs;
 
   const all: EntityRow[] = useMemo(() => {
@@ -223,6 +238,12 @@ export function AttachEntityPicker({ onPick, className }: AttachEntityPickerProp
         url: `/app/reflections/${r.id}`,
         Icon: PenLine,
       })) ?? []),
+      ...(selfcareTasks?.map((t) => ({
+        type: 'Self-Care Task',
+        label: `${t.emoji || '🌿'} ${t.title}`,
+        url: `/app/tasksbank/${t.category || 'self-care'}?add=${t.id}`,
+        Icon: ListTodo,
+      })) ?? []),
       ...(programs?.map((p) => ({
         type: 'Program',
         label: p.title,
@@ -249,7 +270,7 @@ export function AttachEntityPicker({ onPick, className }: AttachEntityPickerProp
         r.label.toLowerCase().includes(needle) ||
         r.type.toLowerCase().includes(needle),
     );
-  }, [q, playlists, tracks, videoPlaylists, routines, breathingExercises, reflections, programs, channels, readings]);
+  }, [q, playlists, tracks, videoPlaylists, routines, breathingExercises, reflections, selfcareTasks, programs, channels, readings]);
 
   // Group by type for display, in a stable predictable order
   const GROUP_ORDER = [
@@ -261,6 +282,7 @@ export function AttachEntityPicker({ onPick, className }: AttachEntityPickerProp
     '📌 Routines',
     '📌 Breathings',
     '📌 Reflections',
+    '📌 Self-Care Tasks',
     '📌 Readings',
     '📌 Programs',
   ];
