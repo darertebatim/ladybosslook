@@ -35,6 +35,7 @@ export interface FeedPost {
   send_push: boolean;
   display_name: string | null;
   reply_to_post_id: string | null;
+  scheduled_for: string | null;
   created_at: string;
   updated_at: string;
   author?: {
@@ -75,6 +76,15 @@ export const EMOJI_OPTIONS = [
   { key: 'lightbulb', emoji: '💡', label: 'Idea' },
   { key: 'pray', emoji: '🙏', label: 'Thanks' },
 ];
+
+function filterVisibleFeedPosts<T extends { scheduled_for: string | null }>(posts: T[] | null | undefined): T[] {
+  const nowMs = Date.now();
+  return (posts || []).filter((post) => {
+    if (!post.scheduled_for) return true;
+    const scheduledMs = new Date(post.scheduled_for).getTime();
+    return Number.isFinite(scheduledMs) && scheduledMs <= nowMs;
+  });
+}
 
 export function useChannels() {
   const { user } = useAuth();
@@ -152,13 +162,7 @@ export function useFeedPosts(channelId?: string) {
 
       const { data: rawPosts, error } = await query;
       if (error) throw error;
-      // Defensive client-side filter: hide future-scheduled posts even for admins
-      // viewing the user-facing channel. Old app builds can't enforce this, so
-      // RLS is the source of truth for non-admins.
-      const nowMs = Date.now();
-      const posts = (rawPosts || []).filter(
-        (p: any) => !p.scheduled_for || new Date(p.scheduled_for).getTime() <= nowMs
-      );
+      const posts = filterVisibleFeedPosts(rawPosts as FeedPost[] | null | undefined);
       if (posts.length === 0) return [] as FeedPost[];
 
       // Batch fetch reactions and comments in parallel
@@ -209,6 +213,7 @@ export function useFeedPosts(channelId?: string) {
 
       return postsWithEngagement as FeedPost[];
     },
+    select: (posts) => filterVisibleFeedPosts(posts),
     enabled: !!user,
     staleTime: 1000 * 30, // 30 seconds
   });
