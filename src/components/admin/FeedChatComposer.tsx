@@ -12,10 +12,13 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { 
   Loader2, Image, Video, Link, Play, FileText, ExternalLink, 
-  Mic, Square, Send, Pin, Bell, X, Trash2, Upload, Search, Star, ChevronRight
+  Mic, Square, Send, Pin, Bell, X, Trash2, Upload, Search, Star, ChevronRight,
+  CalendarClock, Calendar as CalendarIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FeedMessage } from '@/components/feed/FeedMessage';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
 import { detectVideoType, getVideoPlatformLabel, getVideoEmbedUrl, extractYouTubeId } from '@/lib/videoUtils';
 import { PRO_LINK_CONFIGS, PRO_LINK_TYPES, type ProLinkType } from '@/lib/proTaskTypes';
 import { PRO_LINK_EMOJIS } from '@/lib/proLinkPresentation';
@@ -66,6 +69,19 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
   const [sendPush, setSendPush] = useState(false);
   const [displayName, setDisplayName] = useState('default');
   const [customDisplayName, setCustomDisplayName] = useState('');
+
+  // Scheduled publishing
+  const [scheduledDate, setScheduledDate] = useState<Date | undefined>(undefined);
+  const [scheduledTime, setScheduledTime] = useState<string>('09:00');
+
+  const scheduledFor: Date | null = (() => {
+    if (!scheduledDate) return null;
+    const [h, m] = scheduledTime.split(':').map(Number);
+    const d = new Date(scheduledDate);
+    d.setHours(h || 0, m || 0, 0, 0);
+    return d;
+  })();
+  const isScheduledFuture = !!scheduledFor && scheduledFor.getTime() > Date.now() + 30_000;
 
   const SENDER_OPTIONS = [
     { value: 'default', label: 'Use my name' },
@@ -293,13 +309,17 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
         is_pinned: isPinned,
         send_push: sendPush,
         display_name: displayName === 'custom' ? customDisplayName : (displayName === 'default' ? null : displayName),
+        scheduled_for: isScheduledFuture ? scheduledFor!.toISOString() : null,
       });
 
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['feed-posts'] });
-      toast.success('Message sent!');
+      queryClient.invalidateQueries({ queryKey: ['scheduled-feed-posts'] });
+      toast.success(isScheduledFuture
+        ? `Scheduled for ${format(scheduledFor!, 'MMM d, h:mm a')}`
+        : 'Message sent!');
       resetForm();
       onSuccess?.();
     },
@@ -326,6 +346,8 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
     setActionSearch('');
     clearRecording();
     setShowAttachments(false);
+    setScheduledDate(undefined);
+    setScheduledTime('09:00');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -622,6 +644,8 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
               >
                 {createPost.isPending ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
+                ) : isScheduledFuture ? (
+                  <CalendarClock className="h-5 w-5" />
                 ) : (
                   <Send className="h-5 w-5" />
                 )}
@@ -663,6 +687,64 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
               <Bell className="h-3.5 w-3.5" /> Push
             </Label>
           </div>
+
+          {/* Schedule picker */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant={isScheduledFuture ? 'default' : 'outline'}
+                size="sm"
+                className="h-8"
+              >
+                <CalendarClock className="h-3.5 w-3.5 mr-1.5" />
+                {isScheduledFuture
+                  ? format(scheduledFor!, 'MMM d, h:mm a')
+                  : 'Schedule'}
+                {isScheduledFuture && (
+                  <button
+                    type="button"
+                    className="ml-1.5 h-4 w-4 rounded-full hover:bg-black/10 inline-flex items-center justify-center"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setScheduledDate(undefined);
+                      setScheduledTime('09:00');
+                    }}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-auto p-0" sideOffset={8}>
+              <Calendar
+                mode="single"
+                selected={scheduledDate}
+                onSelect={setScheduledDate}
+                disabled={(d) => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  return d < today;
+                }}
+                initialFocus
+                className={cn('p-3 pointer-events-auto')}
+              />
+              <div className="p-3 border-t flex items-center gap-2">
+                <Label className="text-xs text-muted-foreground">Time</Label>
+                <Input
+                  type="time"
+                  value={scheduledTime}
+                  onChange={(e) => setScheduledTime(e.target.value)}
+                  className="h-8 w-32"
+                />
+              </div>
+              {scheduledFor && !isScheduledFuture && (
+                <p className="px-3 pb-3 text-xs text-destructive">
+                  Pick a time in the future.
+                </p>
+              )}
+            </PopoverContent>
+          </Popover>
 
           {/* Action button picker */}
           <Popover>

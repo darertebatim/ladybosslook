@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FeedChannelManager } from '@/components/admin/FeedChannelManager';
 import { FeedChatComposer } from '@/components/admin/FeedChatComposer';
 import { AdminChannelChat } from '@/components/admin/AdminChannelChat';
+import { ScheduledPostsList } from '@/components/admin/ScheduledPostsList';
 
 export default function Community() {
   const [activeTab, setActiveTab] = useState('create');
@@ -17,9 +18,10 @@ export default function Community() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="create">New Message</TabsTrigger>
           <TabsTrigger value="messages">Messages</TabsTrigger>
+          <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
@@ -29,6 +31,10 @@ export default function Community() {
 
         <TabsContent value="messages" className="mt-6">
           <AdminChannelChat />
+        </TabsContent>
+
+        <TabsContent value="scheduled" className="mt-6">
+          <ScheduledPostsList />
         </TabsContent>
 
         <TabsContent value="settings" className="mt-6">

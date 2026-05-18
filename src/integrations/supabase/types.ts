@@ -1776,6 +1776,7 @@ export type Database = {
           is_system: boolean
           post_type: string
           reply_to_post_id: string | null
+          scheduled_for: string | null
           send_push: boolean
           title: string | null
           updated_at: string
@@ -1797,6 +1798,7 @@ export type Database = {
           is_system?: boolean
           post_type?: string
           reply_to_post_id?: string | null
+          scheduled_for?: string | null
           send_push?: boolean
           title?: string | null
           updated_at?: string
@@ -1818,6 +1820,7 @@ export type Database = {
           is_system?: boolean
           post_type?: string
           reply_to_post_id?: string | null
+          scheduled_for?: string | null
           send_push?: boolean
           title?: string | null
           updated_at?: string
@@ -5917,6 +5920,7 @@ export type Database = {
         Args: { p_routine_id: string; p_user_id: string }
         Returns: Json
       }
+      publish_due_scheduled_posts: { Args: never; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "user"
