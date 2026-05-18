@@ -470,7 +470,15 @@ export function useChannelSummaries() {
           .eq('user_id', user.id)
       ]);
 
-      const posts = postsResult.data || [];
+      const posts = filterVisibleFeedPosts(postsResult.data as Array<{
+        id: string;
+        channel_id: string;
+        content: string;
+        created_at: string;
+        display_name: string | null;
+        scheduled_for: string | null;
+        author?: { full_name: string | null };
+      }> | null | undefined);
       const reads = readsResult.data || [];
       const readPostIds = new Set(reads.map(r => r.post_id));
 
