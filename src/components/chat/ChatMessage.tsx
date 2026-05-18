@@ -379,12 +379,11 @@ export function ChatMessage({
         {/* Text Content - hide for voice messages */}
         {displayText && !isAudio && (
           <div className="px-3.5 py-2">
-            <p 
-              className={cn("text-[15px] leading-relaxed whitespace-pre-wrap break-words", bilingualClassName)}
-              dir={direction}
-            >
-              {linkifyText(displayText, navigate)}
-            </p>
+            <RichText
+              content={displayText}
+              className={bilingualClassName}
+              dir={direction as 'ltr' | 'rtl' | 'auto'}
+            />
           </div>
         )}
 
