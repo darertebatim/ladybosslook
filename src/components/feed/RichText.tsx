@@ -35,8 +35,12 @@ export function RichText({ content, className, dir }: RichTextProps) {
       dir={dir}
       className={cn(
         'text-[15px] leading-relaxed break-words',
-        // paragraph spacing
-        '[&_p]:my-0 [&_p+p]:mt-3',
+        // paragraph spacing — must be visibly larger than line-height
+        // (leading-relaxed ≈ 24px, so paragraph gap needs to clearly exceed that)
+        '[&_p]:my-0 [&_p+p]:mt-5',
+        // soft line breaks (single newline → <br>) get a small extra nudge
+        // so they don't look identical to paragraph breaks
+        '[&_br]:block [&_br]:content-[""]',
         // headings
         '[&_h1]:text-lg [&_h1]:font-semibold [&_h1]:mt-3 [&_h1]:mb-1',
         '[&_h2]:text-base [&_h2]:font-semibold [&_h2]:mt-3 [&_h2]:mb-1',
