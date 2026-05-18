@@ -1,5 +1,5 @@
-import { useState, useMemo, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Search, X, StickyNote } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,7 @@ export default function AppTasksBankCategory() {
   const { t } = useTranslation();
   const { categorySlug } = useParams<{ categorySlug: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
@@ -75,6 +76,25 @@ export default function AppTasksBankCategory() {
   };
 
   const filteredTasks = useMemo(() => tasks.filter(matchesSearch), [tasks, searchQuery]);
+
+  // Auto-select a task when deep-linked via ?add=<taskId> (e.g. from a channel attach).
+  const autoAddHandledRef = useRef(false);
+  useEffect(() => {
+    if (autoAddHandledRef.current) return;
+    const addId = searchParams.get('add');
+    if (!addId || !allTasks) return;
+    const target = allTasks.find(t => t.id === addId);
+    if (!target) return;
+    autoAddHandledRef.current = true;
+    setSelectedTasks(new Set([addId]));
+    haptic.medium();
+    // Open the builder so user can confirm and add to their routine.
+    setTimeout(() => setShowBuilder(true), 250);
+    // Clean the URL so refresh/back doesn't re-trigger.
+    const next = new URLSearchParams(searchParams);
+    next.delete('add');
+    setSearchParams(next, { replace: true });
+  }, [searchParams, allTasks, setSelectedTasks, setSearchParams]);
 
   const getBuilderTasks = useCallback((): BuilderTask[] => {
     if (!allTasks) return [];
