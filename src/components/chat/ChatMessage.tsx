@@ -6,7 +6,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useRef, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBilingualText } from "@/components/ui/BilingualText";
-import { smartOpenUrl, getInternalPath } from "@/lib/navigation-utils";
+import { smartOpenUrl } from "@/lib/navigation-utils";
+import { RichText } from "@/components/feed/RichText";
 
 interface ChatMessageProps {
   content: string;
@@ -33,73 +34,6 @@ function formatTime(seconds: number) {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${mins}:${secs.toString().padStart(2, '0')}`;
-}
-
-// Function to make URLs clickable - internal links navigate in-app
-function linkifyText(text: string, navigate: (path: string) => void) {
-  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:\/[^\s]*)?)/gi;
-  
-  const parts: (string | JSX.Element)[] = [];
-  let lastIndex = 0;
-  let match;
-  
-  // Reset regex state
-  urlRegex.lastIndex = 0;
-  
-  while ((match = urlRegex.exec(text)) !== null) {
-    // Add text before the match
-    if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index));
-    }
-    
-    // Add the link
-    const url = match[0];
-    const href = url.startsWith('http') ? url : `https://${url}`;
-    const internalPath = getInternalPath(href);
-    
-    if (internalPath) {
-      // Internal app link — navigate in-app
-      parts.push(
-        <span
-          key={match.index}
-          role="link"
-          tabIndex={0}
-          className="underline decoration-1 underline-offset-2 cursor-pointer active:opacity-70 transition-opacity"
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(internalPath);
-          }}
-        >
-          {url}
-        </span>
-      );
-    } else {
-      // External link — open in browser
-      parts.push(
-        <span
-          key={match.index}
-          role="link"
-          tabIndex={0}
-          className="underline decoration-1 underline-offset-2 cursor-pointer active:opacity-70 transition-opacity"
-          onClick={(e) => {
-            e.stopPropagation();
-            smartOpenUrl(href, navigate);
-          }}
-        >
-          {url}
-        </span>
-      );
-    }
-    
-    lastIndex = urlRegex.lastIndex;
-  }
-  
-  // Add remaining text
-  if (lastIndex < text.length) {
-    parts.push(text.slice(lastIndex));
-  }
-  
-  return parts.length > 0 ? parts : [text];
 }
 
 // Parse message content for link buttons
@@ -445,12 +379,11 @@ export function ChatMessage({
         {/* Text Content - hide for voice messages */}
         {displayText && !isAudio && (
           <div className="px-3.5 py-2">
-            <p 
-              className={cn("text-[15px] leading-relaxed whitespace-pre-wrap break-words", bilingualClassName)}
-              dir={direction}
-            >
-              {linkifyText(displayText, navigate)}
-            </p>
+            <RichText
+              content={displayText}
+              className={bilingualClassName}
+              dir={direction as 'ltr' | 'rtl' | 'auto'}
+            />
           </div>
         )}
 

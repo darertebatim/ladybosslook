@@ -98,12 +98,11 @@ function CommentBubble({
               </span>
             </div>
           )}
-          <p 
-            className={cn("text-sm text-foreground whitespace-pre-wrap break-words", bilingualClassName)}
-            dir={direction}
-          >
-            {comment.content}
-          </p>
+          <RichText
+            content={comment.content}
+            className={cn("text-sm text-foreground", bilingualClassName)}
+            dir={direction as 'ltr' | 'rtl' | 'auto'}
+          />
           {/* Timestamp in bubble */}
           <div className="flex items-center justify-end gap-2 mt-1">
             <span className="text-[10px] text-muted-foreground">
