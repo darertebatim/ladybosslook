@@ -159,26 +159,31 @@ export const FeedMessage = memo(function FeedMessage({
           className={cn(
             "flex-1 min-w-0 max-w-[80%]",
             getBubbleRadius(),
-            "px-3.5 py-2.5 text-foreground",
-            "bg-background border-2",
+            "px-3.5 py-2.5 text-foreground bg-card-warm shadow-card-warm",
+            // Keep colored accent only for distinguishing other discussion users
+            !isSystemMessage && !isCurrentUser && "border-l-[3px]",
             // Align bubbles
             isCurrentUser && "ml-auto"
           )}
-          style={{ borderColor: accentColor }}
+          style={
+            !isSystemMessage && !isCurrentUser
+              ? { borderLeftColor: accentColor }
+              : undefined
+          }
         >
           {/* Reply preview - if this message is a reply */}
           {replyToPost && (
             <button
               onClick={() => onScrollToPost?.(replyToPost.id)}
-              className="w-full text-left mb-2 pl-2 border-l-2 border-foreground/30 rounded-sm text-xs active:scale-[0.98] active:bg-black/5 transition-transform py-1 -ml-1 pr-1"
+              className="w-full text-left mb-2 pl-2 border-l-2 border-[hsl(var(--brand-primary))] rounded-sm text-xs active:scale-[0.98] active:bg-black/5 transition-transform py-1 -ml-1 pr-1"
             >
-              <div className="font-medium truncate text-foreground/80">
+              <div className="font-medium truncate text-[hsl(var(--brand-primary))]">
                 {/* Show "Rilo" for system messages, otherwise show author name */}
                 {(replyToPost.is_system || replyToPost.post_type !== 'discussion')
                   ? 'Rilo'
                   : (replyToPost.display_name || replyToPost.author?.full_name || 'User')}
               </div>
-              <div className="truncate text-foreground/60">
+              <div className="truncate text-fg-warm-muted">
                 {replyToPost.content?.slice(0, 50)}{replyToPost.content && replyToPost.content.length > 50 ? '...' : ''}
               </div>
             </button>
@@ -214,12 +219,12 @@ export const FeedMessage = memo(function FeedMessage({
           {post.content && !isVoiceMessage && (
             <div
               className={cn(
-                "text-[15px] break-words leading-relaxed space-y-3",
+                "text-[15px] break-words leading-snug space-y-3",
                 bilingualClassName
               )}
               dir={direction}
             >
-              {post.content.split(/\n{2,}/).map((para, i) => (
+              {post.content.split(/\n+/).map((para, i) => (
                 <p key={i} className="whitespace-pre-wrap">{para}</p>
               ))}
             </div>
