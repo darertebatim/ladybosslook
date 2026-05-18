@@ -30,12 +30,47 @@ interface ScheduledRow {
   author: { full_name: string | null } | null;
 }
 
+interface ScheduledFeedPostRpcRow {
+  id: string;
+  channel_id: string;
+  title: string | null;
+  content: string;
+  image_url: string | null;
+  scheduled_for: string;
+  send_push: boolean;
+  is_pinned: boolean;
+  display_name: string | null;
+  channel_name: string | null;
+  author_full_name: string | null;
+}
+
 export function ScheduledPostsList() {
   const queryClient = useQueryClient();
 
   const { data: posts, isLoading } = useQuery({
     queryKey: ['scheduled-feed-posts'],
     queryFn: async () => {
+      const { data: rpcData, error: rpcError } = await (supabase as any).rpc('get_scheduled_feed_posts');
+
+      if (!rpcError && rpcData) {
+        return ((rpcData as unknown as ScheduledFeedPostRpcRow[])).map((row) => ({
+          id: row.id,
+          channel_id: row.channel_id,
+          title: row.title,
+          content: row.content,
+          image_url: row.image_url,
+          scheduled_for: row.scheduled_for,
+          send_push: row.send_push,
+          is_pinned: row.is_pinned,
+          display_name: row.display_name,
+          channel: row.channel_name ? { name: row.channel_name } : null,
+          author: { full_name: row.author_full_name },
+        })) as ScheduledRow[];
+      }
+
+      const isMissingRpc = rpcError && /get_scheduled_feed_posts/i.test(rpcError.message);
+      if (rpcError && !isMissingRpc) throw rpcError;
+
       const { data, error } = await supabase
         .from('feed_posts')
         .select(`
