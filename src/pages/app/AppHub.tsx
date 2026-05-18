@@ -13,8 +13,6 @@ import { DedicationReceivedSheet } from "@/components/friends/DedicationReceived
 import { DedicateMomentSheet } from "@/components/friends/DedicateMomentSheet";
 import { useReceivedDedications, type DedicationWithRelations } from "@/hooks/useDedications";
 import { ChevronLeft, Bell, Settings, Gift, ChevronRight } from "lucide-react";
-import { Capacitor } from "@capacitor/core";
-import { Share as CapShare } from "@capacitor/share";
 import { toast } from "sonner";
 
 export default function AppHub() {
