@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FeedMessage } from '@/components/feed/FeedMessage';
+import { MarkdownToolbar } from '@/components/admin/MarkdownToolbar';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { detectVideoType, getVideoPlatformLabel, getVideoEmbedUrl, extractYouTubeId } from '@/lib/videoUtils';
@@ -112,6 +113,7 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
   const [showAttachments, setShowAttachments] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const contentTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Detect video type when URL changes
   const detectedVideoType = videoUrl ? detectVideoType(videoUrl) : null;
@@ -595,9 +597,10 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
 
             {/* Text input */}
             <textarea
+              ref={contentTextareaRef}
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Type a message..."
+              placeholder="Type a message... (Markdown supported)"
               rows={1}
               className={cn(
                 "flex-1 resize-none bg-transparent border-none px-2 py-2.5",
