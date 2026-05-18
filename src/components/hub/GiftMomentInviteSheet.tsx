@@ -140,7 +140,6 @@ export function GiftMomentInviteSheet({ open, onOpenChange, myCode }: Props) {
           ) : (
             <div className="flex flex-col gap-2.5">
               {moments.map((m) => {
-                const dedicated = !!m.dedicated_at;
                 const isPending = pendingId === m.id;
                 return (
                   <button
@@ -161,7 +160,7 @@ export function GiftMomentInviteSheet({ open, onOpenChange, myCode }: Props) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-[10px] uppercase tracking-wider font-semibold text-white/60">
-                        {labelForKind(m.kind)}{dedicated ? " · already gifted" : ""}
+                        {labelForKind(m.kind)}
                       </div>
                       <div className="text-[14px] font-semibold text-white leading-tight truncate mt-0.5">
                         {m.title}
