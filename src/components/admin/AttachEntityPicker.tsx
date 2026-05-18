@@ -20,6 +20,8 @@ import {
   Brain,
   Play,
   Loader2,
+  Wind,
+  PenLine,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -138,6 +140,47 @@ export function AttachEntityPicker({ onPick, className }: AttachEntityPickerProp
     },
   });
 
+  const { data: tracks } = useQuery({
+    queryKey: ['attach-picker-tracks'],
+    enabled: open,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('audio_content')
+        .select('id, title')
+        .order('title')
+        .limit(200);
+      return data || [];
+    },
+  });
+
+  const { data: breathingExercises } = useQuery({
+    queryKey: ['attach-picker-breathing'],
+    enabled: open,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('breathing_exercises')
+        .select('id, name')
+        .eq('is_active', true)
+        .order('name')
+        .limit(100);
+      return data || [];
+    },
+  });
+
+  const { data: reflections } = useQuery({
+    queryKey: ['attach-picker-reflections'],
+    enabled: open,
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .from('reflections')
+        .select('id, title')
+        .eq('is_active', true)
+        .order('title')
+        .limit(200);
+      return (data as { id: string; title: string }[]) || [];
+    },
+  });
+
   const loading = !playlists && !routines && !programs;
 
   const all: EntityRow[] = useMemo(() => {
@@ -148,6 +191,12 @@ export function AttachEntityPicker({ onPick, className }: AttachEntityPickerProp
         label: p.name,
         url: `/app/player/playlist/${p.id}`,
         Icon: Headphones,
+      })) ?? []),
+      ...(tracks?.map((t) => ({
+        type: 'Track',
+        label: t.title,
+        url: `/app/player/${t.id}`,
+        Icon: Play,
       })) ?? []),
       ...(videoPlaylists?.map((p) => ({
         type: 'Video Playlist',
@@ -160,6 +209,18 @@ export function AttachEntityPicker({ onPick, className }: AttachEntityPickerProp
         label: `${r.emoji || '🚀'} ${r.title}`,
         url: `/app/routines/${r.id}`,
         Icon: Sparkles,
+      })) ?? []),
+      ...(breathingExercises?.map((b) => ({
+        type: 'Breathing',
+        label: b.name,
+        url: `/app/breathe?exercise=${b.id}`,
+        Icon: Wind,
+      })) ?? []),
+      ...(reflections?.map((r) => ({
+        type: 'Reflection',
+        label: r.title,
+        url: `/app/reflections/${r.id}`,
+        Icon: PenLine,
       })) ?? []),
       ...(programs?.map((p) => ({
         type: 'Program',
@@ -187,7 +248,7 @@ export function AttachEntityPicker({ onPick, className }: AttachEntityPickerProp
         r.label.toLowerCase().includes(needle) ||
         r.type.toLowerCase().includes(needle),
     );
-  }, [q, playlists, videoPlaylists, routines, programs, channels, readings]);
+  }, [q, playlists, tracks, videoPlaylists, routines, breathingExercises, reflections, programs, channels, readings]);
 
   // Group by type for display
   const grouped = useMemo(() => {
