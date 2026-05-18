@@ -8,6 +8,7 @@ import { Constellation } from "@/components/hub/Constellation";
 import { HubAddFriendSheet } from "@/components/hub/HubAddFriendSheet";
 import { MyCodeSheet } from "@/components/hub/MyCodeSheet";
 import { RecentMomentsRow } from "@/components/hub/RecentMomentsRow";
+import { GiftMomentInviteSheet } from "@/components/hub/GiftMomentInviteSheet";
 import { DedicationReceivedSheet } from "@/components/friends/DedicationReceivedSheet";
 import { DedicateMomentSheet } from "@/components/friends/DedicateMomentSheet";
 import { useReceivedDedications, type DedicationWithRelations } from "@/hooks/useDedications";
@@ -24,6 +25,7 @@ export default function AppHub() {
 
   const [addOpen, setAddOpen] = useState(false);
   const [codeOpen, setCodeOpen] = useState(false);
+  const [giftInviteOpen, setGiftInviteOpen] = useState(false);
   const [openedDedication, setOpenedDedication] = useState<DedicationWithRelations | null>(null);
   const [sendBackMoment, setSendBackMoment] = useState<null | { recipientId: string; recipientName: string | null }>(null);
 
@@ -42,31 +44,7 @@ export default function AppHub() {
 
   const displayName = (user?.user_metadata as any)?.full_name || (user?.email?.split("@")[0] ?? null);
 
-  const shareInvite = async () => {
-    if (!myCode) {
-      toast.error("Your code isn't ready yet");
-      return;
-    }
-    const url = "https://ladybosslook.com";
-    const text = `Be my friend on Rilo 💝\n\nMy friend code: ${myCode}\n\n${url}`;
-    try {
-      if (Capacitor.isNativePlatform()) {
-        await CapShare.share({ title: "Add me on Rilo", text, url, dialogTitle: "Invite a friend" });
-        return;
-      }
-      if (typeof navigator !== "undefined" && (navigator as any).share) {
-        await (navigator as any).share({ title: "Add me on Rilo", text, url });
-        return;
-      }
-      await navigator.clipboard.writeText(text);
-      toast.success("Invite copied — paste anywhere");
-    } catch (err: any) {
-      if (err?.message && !/cancel/i.test(err.message)) {
-        try { await navigator.clipboard.writeText(text); toast.success("Invite copied"); }
-        catch { toast.error("Couldn't share"); }
-      }
-    }
-  };
+  const openGiftInvite = () => setGiftInviteOpen(true);
 
   return (
     <SlideUpPage defaultBack="/app/home">
@@ -128,7 +106,7 @@ export default function AppHub() {
         {/* Invite banner */}
         <div className="relative z-10 px-4 mt-5">
           <button
-            onClick={shareInvite}
+            onClick={openGiftInvite}
             className="w-full rounded-2xl p-3 flex items-center gap-3 active:scale-[0.99] transition-transform text-left shadow-ios"
             style={{
               background: "linear-gradient(135deg, rgba(235,94,51,0.95) 0%, rgba(214,67,122,0.92) 100%)",
@@ -139,10 +117,10 @@ export default function AppHub() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-[10px] uppercase tracking-wider font-bold text-white/85">
-                Invite a friend
+                Gift a moment
               </div>
               <div className="text-[14px] font-bold text-white leading-tight mt-0.5">
-                Share Rilo — grow your circle
+                Inspire a friend with what worked for you
               </div>
             </div>
             <ChevronRight className="w-4 h-4 text-white/90 shrink-0" />
@@ -183,8 +161,13 @@ export default function AppHub() {
         <HubAddFriendSheet
           open={addOpen}
           onOpenChange={setAddOpen}
-          onInvite={shareInvite}
+          onInvite={openGiftInvite}
           onShowMyCode={() => setCodeOpen(true)}
+        />
+        <GiftMomentInviteSheet
+          open={giftInviteOpen}
+          onOpenChange={setGiftInviteOpen}
+          myCode={myCode ?? null}
         />
         <MyCodeSheet
           open={codeOpen}
