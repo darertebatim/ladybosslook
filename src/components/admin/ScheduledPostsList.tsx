@@ -50,10 +50,10 @@ export function ScheduledPostsList() {
   const { data: posts, isLoading } = useQuery({
     queryKey: ['scheduled-feed-posts'],
     queryFn: async () => {
-      const { data: rpcData, error: rpcError } = await supabase.rpc('get_scheduled_feed_posts');
+      const { data: rpcData, error: rpcError } = await (supabase as any).rpc('get_scheduled_feed_posts');
 
       if (!rpcError && rpcData) {
-        return (rpcData as ScheduledFeedPostRpcRow[]).map((row) => ({
+        return ((rpcData as unknown as ScheduledFeedPostRpcRow[])).map((row) => ({
           id: row.id,
           channel_id: row.channel_id,
           title: row.title,
