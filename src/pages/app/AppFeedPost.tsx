@@ -13,6 +13,7 @@ import { format, formatDistanceToNow, isToday, isYesterday, differenceInMinutes 
 import { FeedReactions } from '@/components/feed/FeedReactions';
 import { FeedActionButton } from '@/components/feed/FeedActionButton';
 import { FeedReplyInput } from '@/components/feed/FeedReplyInput';
+import { RichText } from '@/components/feed/RichText';
 import { SEOHead } from '@/components/SEOHead';
 import { cn } from '@/lib/utils';
 import { useBilingualText } from '@/components/ui/BilingualText';
@@ -344,12 +345,11 @@ export default function AppFeedPost() {
           )}
 
           {/* Content */}
-          <p 
-            className={cn("text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed", contentBilingualClassName)}
-            dir={contentDirection}
-          >
-            {post.content}
-          </p>
+          <RichText
+            content={post.content}
+            className={cn("text-sm text-foreground", contentBilingualClassName)}
+            dir={contentDirection as 'ltr' | 'rtl' | 'auto'}
+          />
 
           {/* Image */}
           {post.image_url && (
