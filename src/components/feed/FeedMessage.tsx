@@ -10,6 +10,7 @@ import { FeedVoiceMessage } from './FeedVoiceMessage';
 import { cn } from '@/lib/utils';
 import { detectVideoType, getVideoEmbedUrl } from '@/lib/videoUtils';
 import { useBilingualText } from '@/components/ui/BilingualText';
+import { RichText } from './RichText';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import appIcon from '@/assets/app-icon.png';
@@ -217,17 +218,11 @@ export const FeedMessage = memo(function FeedMessage({
 
           {/* Text content */}
           {post.content && !isVoiceMessage && (
-            <div
-              className={cn(
-                "text-[15px] break-words leading-snug space-y-3",
-                bilingualClassName
-              )}
-              dir={direction}
-            >
-              {post.content.split(/\n+/).map((para, i) => (
-                <p key={i} className="whitespace-pre-wrap">{para}</p>
-              ))}
-            </div>
+            <RichText
+              content={post.content}
+              className={bilingualClassName}
+              dir={direction as 'ltr' | 'rtl' | 'auto'}
+            />
           )}
 
           {/* Caption for voice message */}
