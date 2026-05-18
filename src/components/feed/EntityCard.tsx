@@ -40,7 +40,7 @@ function useEntityPreview(entity: InternalEntity) {
         case 'playlist': {
           const { data: pl } = await supabase
             .from('audio_playlists')
-            .select('id, name, description, cover_image_url')
+            .select('id, name, description, cover_image_url, category, language')
             .eq('id', entity.id)
             .maybeSingle();
           if (!pl) return null;
@@ -48,9 +48,20 @@ function useEntityPreview(entity: InternalEntity) {
             .from('audio_playlist_items')
             .select('audio_id', { count: 'exact', head: true })
             .eq('playlist_id', entity.id);
+          const LANG_FLAGS: Record<string, string> = {
+            american: '🇺🇸', english: '🇺🇸', persian: '🇮🇷', farsi: '🇮🇷',
+            turkish: '🇹🇷', spanish: '🇪🇸',
+          };
+          const parts: string[] = [];
+          if (pl.category) parts.push(String(pl.category).replace(/\b\w/g, c => c.toUpperCase()));
+          if (count != null) parts.push(`${count} track${count === 1 ? '' : 's'}`);
+          if (pl.language && pl.language !== 'all') {
+            const flag = LANG_FLAGS[String(pl.language).toLowerCase()];
+            if (flag) parts.push(flag);
+          }
           return {
             title: pl.name,
-            subtitle: count != null ? `${count} track${count === 1 ? '' : 's'}` : pl.description || 'Playlist',
+            subtitle: parts.length ? parts.join(' · ') : pl.description || 'Playlist',
             coverUrl: pl.cover_image_url,
             cta: 'Play',
             Icon: Headphones,
