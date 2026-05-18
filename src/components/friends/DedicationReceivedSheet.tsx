@@ -54,8 +54,7 @@ export function DedicationReceivedSheet({ dedication, onOpenChange, onSendBack }
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        hideClose
-        className="rounded-t-[28px] border-0 p-0 max-h-[92dvh] overflow-hidden text-white"
+        className="rounded-t-[28px] border-0 p-0 max-h-[92dvh] overflow-hidden text-white [&>button]:text-white [&>button]:opacity-80"
         style={{
           background:
             "radial-gradient(ellipse 90% 60% at 50% 0%, #3A1E66 0%, #1A0E2E 60%, #0E0820 100%)",
@@ -86,20 +85,11 @@ export function DedicationReceivedSheet({ dedication, onOpenChange, onSendBack }
 
         <div className="relative px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="mx-auto w-10 h-1.5 rounded-full bg-white/20 mb-4" />
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-white/90" />
-              <span className="text-[11px] uppercase tracking-wider font-semibold text-white/80">
-                A dedication for you
-              </span>
-            </div>
-            <button
-              onClick={() => onOpenChange(false)}
-              className="w-8 h-8 grid place-items-center rounded-full bg-white/10 active:scale-90"
-              aria-label="Close"
-            >
-              <X className="w-4 h-4 text-white" />
-            </button>
+          <div className="flex items-center gap-1.5 mb-4">
+            <Sparkles className="w-4 h-4 text-white/90" />
+            <span className="text-[11px] uppercase tracking-wider font-semibold text-white/80">
+              A dedication for you
+            </span>
           </div>
 
           {dedication && (
