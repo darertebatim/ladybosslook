@@ -149,11 +149,6 @@ export default function AppHub() {
           </button>
         </div>
 
-        {/* Bottom half: fresh-from-you moments to dedicate */}
-        <div className="relative z-10 mt-6">
-          <RecentMomentsRow />
-        </div>
-
         {/* Received dedications strip (only if any exist) */}
         {receivedDedications.length > 0 && (
           <div className="relative z-10 px-4 mt-5">
@@ -179,6 +174,11 @@ export default function AppHub() {
             </div>
           </div>
         )}
+
+        {/* Bottom half: fresh-from-you moments to dedicate */}
+        <div className="relative z-10 mt-6">
+          <RecentMomentsRow />
+        </div>
 
         <HubAddFriendSheet
           open={addOpen}
