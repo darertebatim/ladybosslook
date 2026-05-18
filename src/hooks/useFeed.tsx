@@ -135,6 +135,7 @@ export function useFeedPosts(channelId?: string) {
     queryKey: ['feed-posts', channelId],
     queryFn: async () => {
       // Single optimized query with all data - keep chronological order (no pinned first)
+      const nowIso = new Date().toISOString();
       let query = supabase
         .from('feed_posts')
         .select(`
@@ -142,16 +143,23 @@ export function useFeedPosts(channelId?: string) {
           author:profiles!feed_posts_author_id_fkey(full_name, avatar_url),
           channel:feed_channels!feed_posts_channel_id_fkey(*)
         `)
-        .or('scheduled_for.is.null,scheduled_for.lte.' + new Date().toISOString())
+        .or(`scheduled_for.is.null,scheduled_for.lte.${nowIso}`)
         .order('created_at', { ascending: true });
 
       if (channelId) {
         query = query.eq('channel_id', channelId);
       }
 
-      const { data: posts, error } = await query;
+      const { data: rawPosts, error } = await query;
       if (error) throw error;
-      if (!posts || posts.length === 0) return [] as FeedPost[];
+      // Defensive client-side filter: hide future-scheduled posts even for admins
+      // viewing the user-facing channel. Old app builds can't enforce this, so
+      // RLS is the source of truth for non-admins.
+      const nowMs = Date.now();
+      const posts = (rawPosts || []).filter(
+        (p: any) => !p.scheduled_for || new Date(p.scheduled_for).getTime() <= nowMs
+      );
+      if (posts.length === 0) return [] as FeedPost[];
 
       // Batch fetch reactions and comments in parallel
       const postIds = posts.map(p => p.id);
