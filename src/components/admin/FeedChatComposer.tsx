@@ -634,7 +634,7 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
               ref={contentTextareaRef}
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Type a message... (Markdown supported)"
+              placeholder="Type a message... (Markdown · [btn:Label](url) for buttons)"
               rows={1}
               className={cn(
                 "flex-1 resize-none bg-transparent border-none px-2 py-2.5",
