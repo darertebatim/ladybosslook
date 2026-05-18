@@ -9,10 +9,11 @@ import { HubAddFriendSheet } from "@/components/hub/HubAddFriendSheet";
 import { MyCodeSheet } from "@/components/hub/MyCodeSheet";
 import { RecentMomentsRow } from "@/components/hub/RecentMomentsRow";
 import { GiftMomentInviteSheet } from "@/components/hub/GiftMomentInviteSheet";
+import { GiftPlaylistInviteSheet } from "@/components/hub/GiftPlaylistInviteSheet";
 import { DedicationReceivedSheet } from "@/components/friends/DedicationReceivedSheet";
 import { DedicateMomentSheet } from "@/components/friends/DedicateMomentSheet";
 import { useReceivedDedications, type DedicationWithRelations } from "@/hooks/useDedications";
-import { ChevronLeft, Bell, Settings, Gift, ChevronRight } from "lucide-react";
+import { ChevronLeft, Bell, Settings, Gift, ChevronRight, Music } from "lucide-react";
 
 export default function AppHub() {
   const goBack = useGoBack("/app/home");
@@ -23,6 +24,7 @@ export default function AppHub() {
   const [addOpen, setAddOpen] = useState(false);
   const [codeOpen, setCodeOpen] = useState(false);
   const [giftInviteOpen, setGiftInviteOpen] = useState(false);
+  const [giftPlaylistOpen, setGiftPlaylistOpen] = useState(false);
   const [openedDedication, setOpenedDedication] = useState<DedicationWithRelations | null>(null);
   const [sendBackMoment, setSendBackMoment] = useState<null | { recipientId: string; recipientName: string | null }>(null);
 
@@ -124,6 +126,30 @@ export default function AppHub() {
           </button>
         </div>
 
+        {/* Gift a playlist banner */}
+        <div className="relative z-10 px-4 mt-2.5">
+          <button
+            onClick={() => setGiftPlaylistOpen(true)}
+            className="w-full rounded-2xl p-3 flex items-center gap-3 active:scale-[0.99] transition-transform text-left shadow-ios"
+            style={{
+              background: "linear-gradient(135deg, rgba(45,212,168,0.95) 0%, rgba(56,140,222,0.92) 100%)",
+            }}
+          >
+            <div className="w-10 h-10 rounded-xl grid place-items-center bg-white/20 shrink-0">
+              <Music className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-[10px] uppercase tracking-wider font-bold text-white/85">
+                Gift a playlist
+              </div>
+              <div className="text-[14px] font-bold text-white leading-tight mt-0.5">
+                Send one of your playlists — yours forever for them
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-white/90 shrink-0" />
+          </button>
+        </div>
+
         {/* Received dedications strip (only if any exist) */}
         {receivedDedications.length > 0 && (
           <div className="relative z-10 px-4 mt-5">
@@ -164,6 +190,11 @@ export default function AppHub() {
         <GiftMomentInviteSheet
           open={giftInviteOpen}
           onOpenChange={setGiftInviteOpen}
+          myCode={myCode ?? null}
+        />
+        <GiftPlaylistInviteSheet
+          open={giftPlaylistOpen}
+          onOpenChange={setGiftPlaylistOpen}
           myCode={myCode ?? null}
         />
         <MyCodeSheet

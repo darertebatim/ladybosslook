@@ -2707,6 +2707,44 @@ export type Database = {
         }
         Relationships: []
       }
+      playlist_gifts: {
+        Row: {
+          claimed_at: string | null
+          created_at: string
+          id: string
+          playlist_id: string
+          recipient_id: string | null
+          recipient_token: string
+          sender_id: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          created_at?: string
+          id?: string
+          playlist_id: string
+          recipient_id?: string | null
+          recipient_token: string
+          sender_id: string
+        }
+        Update: {
+          claimed_at?: string | null
+          created_at?: string
+          id?: string
+          playlist_id?: string
+          recipient_id?: string | null
+          recipient_token?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_gifts_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "audio_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       playlist_saves: {
         Row: {
           id: string
@@ -5806,8 +5844,11 @@ export type Database = {
         Returns: boolean
       }
       claim_dedication: { Args: { t: string }; Returns: Json }
+      claim_playlist_gift: { Args: { t: string }; Returns: Json }
+      create_playlist_gift: { Args: { p_playlist_id: string }; Returns: Json }
       generate_dedication_token: { Args: never; Returns: string }
       generate_friend_code: { Args: never; Returns: string }
+      generate_playlist_gift_token: { Args: never; Returns: string }
       get_current_user_role: { Args: never; Returns: string }
       get_dedication_by_token: {
         Args: { t: string }
@@ -5829,6 +5870,21 @@ export type Database = {
       get_home_data: {
         Args: { p_date_str: string; p_user_id: string }
         Returns: Json
+      }
+      get_playlist_gift_by_token: {
+        Args: { t: string }
+        Returns: {
+          created_at: string
+          id: string
+          is_claimed: boolean
+          playlist_cover_image_url: string
+          playlist_description: string
+          playlist_id: string
+          playlist_name: string
+          requires_subscription: boolean
+          sender_avatar_url: string
+          sender_first_name: string
+        }[]
       }
       get_program_events_for_date: {
         Args: { p_date_str: string; p_user_id: string }
