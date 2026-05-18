@@ -25,6 +25,7 @@ import { PRO_LINK_EMOJIS } from '@/lib/proLinkPresentation';
 interface PreviewData {
   title: string;
   subtitle?: string;
+  flag?: string;
   coverUrl?: string | null;
   emoji?: string;
   cta: string;
@@ -55,13 +56,13 @@ function useEntityPreview(entity: InternalEntity) {
           const parts: string[] = [];
           if (pl.category) parts.push(String(pl.category).replace(/\b\w/g, c => c.toUpperCase()));
           if (count != null) parts.push(`${count} track${count === 1 ? '' : 's'}`);
-          if (pl.language && pl.language !== 'all') {
-            const flag = LANG_FLAGS[String(pl.language).toLowerCase()];
-            if (flag) parts.push(flag);
-          }
+          const flag = pl.language && pl.language !== 'all'
+            ? LANG_FLAGS[String(pl.language).toLowerCase()]
+            : undefined;
           return {
             title: pl.name,
             subtitle: parts.length ? parts.join(' · ') : pl.description || 'Playlist',
+            flag,
             coverUrl: pl.cover_image_url,
             cta: 'Play',
             Icon: Headphones,
@@ -270,49 +271,54 @@ export function EntityCard({ href, className }: EntityCardProps) {
     );
   }
 
-  const { title, subtitle, coverUrl, emoji, cta, Icon } = data;
+  const { title, subtitle, flag, coverUrl, emoji, cta, Icon } = data;
 
   return (
     <button
       type="button"
       onClick={handleOpen}
       className={cn(
-        'mt-2 w-full flex items-center gap-2.5 rounded-xl bg-card-warm shadow-card-warm p-1.5 pr-2 text-left active:scale-[0.99] transition-transform',
+        'mt-2 w-full flex items-center gap-3.5 rounded-[22px] bg-card-warm shadow-ios p-3 text-left active:scale-[0.99] transition-transform',
         className,
       )}
     >
-      {/* Cover / emoji thumb */}
-      <div className="relative h-11 w-11 rounded-lg overflow-hidden shrink-0 bg-[hsl(var(--tint-peach))] flex items-center justify-center">
-        {coverUrl ? (
-          <img
-            src={coverUrl}
-            alt=""
-            loading="lazy"
-            className="h-full w-full object-cover"
-          />
-        ) : emoji ? (
-          <span className="text-lg" aria-hidden>
-            {emoji}
-          </span>
-        ) : Icon ? (
-          <Icon className="h-5 w-5 text-[hsl(var(--brand-primary))]" />
-        ) : null}
+      {/* Cover with floating language flag */}
+      <div className="relative shrink-0">
+        <div className="h-[72px] w-[72px] rounded-[18px] overflow-hidden bg-[hsl(var(--tint-peach))] flex items-center justify-center">
+          {coverUrl ? (
+            <img
+              src={coverUrl}
+              alt=""
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
+          ) : emoji ? (
+            <span className="text-2xl" aria-hidden>{emoji}</span>
+          ) : Icon ? (
+            <Icon className="h-6 w-6 text-[hsl(var(--brand-primary))]" />
+          ) : null}
+        </div>
+        {flag && (
+          <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-white shadow-ios flex items-center justify-center text-[13px] leading-none">
+            <span aria-hidden>{flag}</span>
+          </div>
+        )}
       </div>
 
-      {/* Body */}
-      <div className="flex-1 min-w-0">
-        <p className="text-[10px] text-fg-warm-muted uppercase tracking-wide font-medium leading-none mb-0.5 truncate">
-          {subtitle}
-        </p>
-        <p className="text-[13px] font-semibold text-fg-warm leading-snug line-clamp-1">
+      {/* Tiered content stack */}
+      <div className="flex-1 min-w-0 flex flex-col">
+        {subtitle && (
+          <p className="text-[10px] font-bold uppercase tracking-[0.06em] text-fg-warm-muted truncate mb-1">
+            {subtitle}
+          </p>
+        )}
+        <h3 className="text-[15px] font-bold text-fg-warm leading-tight line-clamp-2 mb-2">
           {title}
-        </p>
-      </div>
-
-      {/* CTA */}
-      <div className="shrink-0 flex items-center gap-0.5 px-2.5 py-1 rounded-full bg-[hsl(var(--brand-primary))] text-white text-[11px] font-semibold">
-        {cta}
-        <ChevronRight className="h-3 w-3" />
+        </h3>
+        <span className="inline-flex w-fit items-center gap-1 px-3.5 h-8 rounded-full bg-[hsl(var(--brand-primary))] text-white text-[12px] font-bold shadow-ios">
+          {cta}
+          <ChevronRight className="h-3.5 w-3.5" />
+        </span>
       </div>
     </button>
   );
