@@ -644,6 +644,8 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
               >
                 {createPost.isPending ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
+                ) : isScheduledFuture ? (
+                  <CalendarClock className="h-5 w-5" />
                 ) : (
                   <Send className="h-5 w-5" />
                 )}
