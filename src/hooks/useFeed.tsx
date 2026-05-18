@@ -142,6 +142,7 @@ export function useFeedPosts(channelId?: string) {
           author:profiles!feed_posts_author_id_fkey(full_name, avatar_url),
           channel:feed_channels!feed_posts_channel_id_fkey(*)
         `)
+        .or('scheduled_for.is.null,scheduled_for.lte.' + new Date().toISOString())
         .order('created_at', { ascending: true });
 
       if (channelId) {
@@ -447,6 +448,7 @@ export function useChannelSummaries() {
           .from('feed_posts')
           .select('id, channel_id, content, created_at, display_name, author:profiles!feed_posts_author_id_fkey(full_name)')
           .in('channel_id', channelIds)
+          .or('scheduled_for.is.null,scheduled_for.lte.' + new Date().toISOString())
           .order('created_at', { ascending: false }),
         supabase
           .from('feed_post_reads')
