@@ -15,6 +15,7 @@ interface RichTextProps {
   content: string;
   className?: string;
   dir?: 'ltr' | 'rtl' | 'auto';
+  singleLineBreaksAsParagraphs?: boolean;
 }
 
 /**
@@ -26,9 +27,12 @@ interface RichTextProps {
  * - `[btn:Label](url)` renders as a branded action button
  * Backwards compatible with plain text.
  */
-export function RichText({ content, className, dir }: RichTextProps) {
+export function RichText({ content, className, dir, singleLineBreaksAsParagraphs = false }: RichTextProps) {
   const navigate = useNavigate();
-  const { urls, stripped } = extractStandaloneInternalUrls(content);
+  const normalizedContent = singleLineBreaksAsParagraphs
+    ? content.replace(/(?<!\n)\n(?!\n)/g, '\n\n')
+    : content;
+  const { urls, stripped } = extractStandaloneInternalUrls(normalizedContent);
 
   return (
     <div
