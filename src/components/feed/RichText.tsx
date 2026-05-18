@@ -41,7 +41,7 @@ export function RichText({ content, className, dir, singleLineBreaksAsParagraphs
         'text-[15px] leading-relaxed break-words',
         // paragraph spacing — must be visibly larger than line-height
         // (leading-relaxed ≈ 24px, so paragraph gap needs to clearly exceed that)
-        '[&_p]:my-0 [&_p+p]:mt-8',
+        '[&_p]:my-0 [&_p+p]:mt-4',
         // soft line breaks (single newline → <br>) get a small extra nudge
         // so they don't look identical to paragraph breaks
         '[&_br]:block [&_br]:content-[""]',
