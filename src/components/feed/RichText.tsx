@@ -2,6 +2,14 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
+import {
+  extractStandaloneInternalUrls,
+  resolveInternalEntity,
+} from '@/lib/internalEntityResolver';
+import { smartOpenUrl } from '@/lib/navigation-utils';
+import { EntityCard } from './EntityCard';
 
 interface RichTextProps {
   content: string;
@@ -10,13 +18,18 @@ interface RichTextProps {
 }
 
 /**
- * Renders channel post content as Markdown.
+ * Renders channel post content as Markdown with rich extensions:
  * - Bold, italic, links, lists, blockquotes, inline code, headings
  * - Single line breaks render as <br> (chat-friendly)
  * - Blank lines create true paragraphs with spacing
+ * - Internal app URLs on their own line render as rich entity cards
+ * - `[btn:Label](url)` renders as a branded action button
  * Backwards compatible with plain text.
  */
 export function RichText({ content, className, dir }: RichTextProps) {
+  const navigate = useNavigate();
+  const { urls, stripped } = extractStandaloneInternalUrls(content);
+
   return (
     <div
       dir={dir}
@@ -46,16 +59,66 @@ export function RichText({ content, className, dir }: RichTextProps) {
         className
       )}
     >
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkBreaks]}
-        components={{
-          a: ({ node, ...props }) => (
-            <a {...props} target="_blank" rel="noopener noreferrer" />
-          ),
-        }}
-      >
-        {content}
-      </ReactMarkdown>
+      {stripped && (
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm, remarkBreaks]}
+          components={{
+            a: ({ node, children, href, ...props }) => {
+              const text = typeof children?.[0] === 'string' ? (children[0] as string) : '';
+              const btnMatch = text.match(/^btn:(.+)$/i);
+
+              // [btn:Label](url) → branded action button
+              if (btnMatch && href) {
+                const label = btnMatch[1].trim();
+                return (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      smartOpenUrl(href, navigate);
+                    }}
+                    className="not-prose inline-flex items-center gap-1.5 mt-2 mr-2 px-4 py-2 rounded-full bg-[hsl(var(--brand-primary))] text-white text-[13px] font-semibold no-underline active:scale-[0.97] transition-transform"
+                  >
+                    {label}
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                );
+              }
+
+              // Internal app link → navigate in-app
+              const internal = href ? resolveInternalEntity(href) : null;
+              if (internal) {
+                return (
+                  <a
+                    {...props}
+                    href={href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      smartOpenUrl(href!, navigate);
+                    }}
+                  >
+                    {children}
+                  </a>
+                );
+              }
+
+              return (
+                <a {...props} href={href} target="_blank" rel="noopener noreferrer">
+                  {children}
+                </a>
+              );
+            },
+          }}
+        >
+          {stripped}
+        </ReactMarkdown>
+      )}
+
+      {/* Auto-render rich entity cards for standalone internal URLs */}
+      {urls.map((url, i) => (
+        <EntityCard key={`${url}-${i}`} href={url} />
+      ))}
     </div>
   );
 }

@@ -18,6 +18,7 @@ import {
 import { cn } from '@/lib/utils';
 import { FeedMessage } from '@/components/feed/FeedMessage';
 import { MarkdownToolbar } from '@/components/admin/MarkdownToolbar';
+import { AttachEntityPicker } from '@/components/admin/AttachEntityPicker';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { detectVideoType, getVideoPlatformLabel, getVideoEmbedUrl, extractYouTubeId } from '@/lib/videoUtils';
@@ -531,13 +532,39 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
 
         {/* Main input area */}
         <div className="relative">
-          {/* Markdown formatting toolbar */}
-          <MarkdownToolbar
-            textareaRef={contentTextareaRef}
-            value={content}
-            onChange={setContent}
-            className="mb-1"
-          />
+          {/* Markdown formatting toolbar + entity attach picker */}
+          <div className="flex items-center gap-1 mb-1">
+            <MarkdownToolbar
+              textareaRef={contentTextareaRef}
+              value={content}
+              onChange={setContent}
+            />
+            <div className="h-4 w-px bg-border mx-1" />
+            <AttachEntityPicker
+              onPick={(url) => {
+                // Insert as a standalone line so it renders as a rich card
+                const ta = contentTextareaRef.current;
+                const pos = ta?.selectionStart ?? content.length;
+                const before = content.slice(0, pos);
+                const after = content.slice(pos);
+                const needsLeadingNl = before.length > 0 && !before.endsWith('\n');
+                const needsTrailingNl = after.length > 0 && !after.startsWith('\n');
+                const insert =
+                  (needsLeadingNl ? '\n\n' : '') +
+                  url +
+                  (needsTrailingNl ? '\n\n' : '');
+                const next = before + insert + after;
+                setContent(next);
+                // Restore focus + place cursor after inserted URL
+                requestAnimationFrame(() => {
+                  if (!ta) return;
+                  ta.focus();
+                  const caret = before.length + insert.length;
+                  ta.setSelectionRange(caret, caret);
+                });
+              }}
+            />
+          </div>
           <div className="flex items-end gap-2 bg-muted/50 rounded-2xl p-2">
             {/* Attachments button */}
             <Popover open={showAttachments} onOpenChange={setShowAttachments}>
@@ -607,7 +634,7 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
               ref={contentTextareaRef}
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Type a message... (Markdown supported)"
+              placeholder="Type a message... (Markdown · [btn:Label](url) for buttons)"
               rows={1}
               className={cn(
                 "flex-1 resize-none bg-transparent border-none px-2 py-2.5",
