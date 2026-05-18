@@ -237,11 +237,11 @@ export function EntityCard({ href, className }: EntityCardProps) {
     return (
       <div
         className={cn(
-          'mt-2 flex items-center gap-3 rounded-2xl bg-card-warm shadow-card-warm px-3 py-3',
+          'mt-2 flex items-center gap-2.5 rounded-xl bg-card-warm shadow-card-warm px-2 py-2',
           className,
         )}
       >
-        <div className="h-14 w-14 rounded-xl bg-[hsl(var(--tint-peach))] animate-pulse" />
+        <div className="h-11 w-11 rounded-lg bg-[hsl(var(--tint-peach))] animate-pulse" />
         <div className="flex-1 space-y-2">
           <div className="h-3.5 w-2/3 rounded bg-[hsl(var(--tint-peach))] animate-pulse" />
           <div className="h-3 w-1/3 rounded bg-[hsl(var(--tint-peach))] animate-pulse" />
@@ -277,12 +277,12 @@ export function EntityCard({ href, className }: EntityCardProps) {
       type="button"
       onClick={handleOpen}
       className={cn(
-        'mt-2 w-full flex items-center gap-3 rounded-2xl bg-card-warm shadow-card-warm p-2 pr-3 text-left active:scale-[0.99] transition-transform',
+        'mt-2 w-full flex items-center gap-2.5 rounded-xl bg-card-warm shadow-card-warm p-1.5 pr-2 text-left active:scale-[0.99] transition-transform',
         className,
       )}
     >
       {/* Cover / emoji thumb */}
-      <div className="relative h-14 w-14 rounded-xl overflow-hidden shrink-0 bg-[hsl(var(--tint-peach))] flex items-center justify-center">
+      <div className="relative h-11 w-11 rounded-lg overflow-hidden shrink-0 bg-[hsl(var(--tint-peach))] flex items-center justify-center">
         {coverUrl ? (
           <img
             src={coverUrl}
@@ -291,28 +291,28 @@ export function EntityCard({ href, className }: EntityCardProps) {
             className="h-full w-full object-cover"
           />
         ) : emoji ? (
-          <span className="text-2xl" aria-hidden>
+          <span className="text-lg" aria-hidden>
             {emoji}
           </span>
         ) : Icon ? (
-          <Icon className="h-6 w-6 text-[hsl(var(--brand-primary))]" />
+          <Icon className="h-5 w-5 text-[hsl(var(--brand-primary))]" />
         ) : null}
       </div>
 
       {/* Body */}
       <div className="flex-1 min-w-0">
-        <p className="text-[13px] text-fg-warm-muted uppercase tracking-wide font-medium leading-none mb-1">
+        <p className="text-[10px] text-fg-warm-muted uppercase tracking-wide font-medium leading-none mb-0.5 truncate">
           {subtitle}
         </p>
-        <p className="text-[15px] font-semibold text-fg-warm leading-snug line-clamp-2">
+        <p className="text-[13px] font-semibold text-fg-warm leading-snug line-clamp-1">
           {title}
         </p>
       </div>
 
       {/* CTA */}
-      <div className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full bg-[hsl(var(--brand-primary))] text-white text-[13px] font-semibold">
+      <div className="shrink-0 flex items-center gap-0.5 px-2.5 py-1 rounded-full bg-[hsl(var(--brand-primary))] text-white text-[11px] font-semibold">
         {cta}
-        <ChevronRight className="h-3.5 w-3.5" />
+        <ChevronRight className="h-3 w-3" />
       </div>
     </button>
   );
