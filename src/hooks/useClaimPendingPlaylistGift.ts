@@ -36,9 +36,9 @@ export function useClaimPendingPlaylistGift() {
         qc.invalidateQueries({ queryKey: ["player-data"] });
         toast.success("Playlist unlocked — it's yours forever 💫");
         if (payload?.playlist_id) {
-          navigate(`/app/listen/playlist/${payload.playlist_id}`, { replace: true });
+          navigate(`/app/player/playlist/${payload.playlist_id}`, { replace: true });
         } else {
-          navigate(`/app/listen`, { replace: true });
+          navigate(`/app/player`, { replace: true });
         }
       } catch (e: any) {
         const msg = e?.message || "";
