@@ -2,9 +2,11 @@ import { Outlet } from 'react-router-dom';
 import { AudioPlayerProvider } from '@/contexts/AudioPlayerContext';
 import { RoutinePlayerProvider } from '@/components/app/RoutinePlayerProvider';
 import { useClaimPendingDedication } from '@/hooks/useClaimPendingDedication';
+import { useClaimPendingPlaylistGift } from '@/hooks/useClaimPendingPlaylistGift';
 
 function DedicationClaimer() {
   useClaimPendingDedication();
+  useClaimPendingPlaylistGift();
   return null;
 }
 
