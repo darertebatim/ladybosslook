@@ -3,6 +3,7 @@ import { EMOJI_OPTIONS, useToggleReaction } from '@/hooks/useFeed';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { SmilePlus } from 'lucide-react';
 import { useState } from 'react';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface FeedReactionsProps {
   postId: string;
@@ -39,7 +40,7 @@ export function FeedReactions({
       <div className="flex items-center gap-1.5">
         {/* Existing reactions - compact inline */}
         {hasReactions && (
-          <div className="flex items-center">
+          <div className="flex items-center gap-0.5">
             {EMOJI_OPTIONS.filter(opt => (reactionsCount[opt.key] || 0) > 0)
               .slice(0, 3)
               .map((option, idx) => (
@@ -48,15 +49,15 @@ export function FeedReactions({
                   onClick={(e) => handleReaction(option.key, e)}
                   disabled={toggleReaction.isPending}
                   className={cn(
-                    "text-base -ml-1 first:ml-0 hover:scale-110 transition-transform",
+                    "active:scale-110 transition-transform leading-none",
                     userReactions.includes(option.key) && "drop-shadow-sm"
                   )}
                 >
-                  {option.emoji}
+                  <FluentEmoji emoji={option.emoji} size={22} />
                 </button>
               ))}
             {totalReactions > 0 && (
-              <span className="text-xs text-muted-foreground ml-1.5">{totalReactions}</span>
+              <span className="text-xs text-muted-foreground ml-1">{totalReactions}</span>
             )}
           </div>
         )}
@@ -67,11 +68,11 @@ export function FeedReactions({
             <button
               onClick={(e) => e.stopPropagation()}
               className={cn(
-                "p-1 rounded-full hover:bg-muted transition-colors",
+                "p-1.5 rounded-full active:bg-muted transition-colors",
                 "text-muted-foreground hover:text-foreground"
               )}
             >
-              <SmilePlus className="h-4 w-4" />
+              <SmilePlus className="h-[18px] w-[18px]" />
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-1.5" align="start" onClick={(e) => e.stopPropagation()}>
@@ -82,12 +83,12 @@ export function FeedReactions({
                   onClick={(e) => handleReaction(option.key, e)}
                   disabled={toggleReaction.isPending}
                   className={cn(
-                    "p-1.5 rounded-lg hover:bg-muted transition-colors text-lg",
+                    "p-1.5 rounded-lg active:bg-muted transition-colors",
                     userReactions.includes(option.key) && "bg-primary/20"
                   )}
                   title={option.label}
                 >
-                  {option.emoji}
+                  <FluentEmoji emoji={option.emoji} size={28} />
                 </button>
               ))}
             </div>
@@ -118,7 +119,7 @@ export function FeedReactions({
                 : "bg-muted hover:bg-muted/80 text-muted-foreground"
             )}
           >
-            <span>{option.emoji}</span>
+            <FluentEmoji emoji={option.emoji} size={18} />
             <span className="font-medium">{count}</span>
           </button>
         );
@@ -144,12 +145,12 @@ export function FeedReactions({
                 onClick={(e) => handleReaction(option.key, e)}
                 disabled={toggleReaction.isPending}
                 className={cn(
-                  "p-2 rounded-lg hover:bg-muted transition-colors text-xl",
+                  "p-2 rounded-lg active:bg-muted transition-colors",
                   userReactions.includes(option.key) && "bg-primary/20"
                 )}
                 title={option.label}
               >
-                {option.emoji}
+                <FluentEmoji emoji={option.emoji} size={28} />
               </button>
             ))}
           </div>
