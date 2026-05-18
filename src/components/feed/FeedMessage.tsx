@@ -212,15 +212,17 @@ export const FeedMessage = memo(function FeedMessage({
 
           {/* Text content */}
           {post.content && !isVoiceMessage && (
-            <p 
+            <div
               className={cn(
-                "text-[15px] whitespace-pre-wrap break-words leading-relaxed", 
+                "text-[15px] break-words leading-relaxed space-y-3",
                 bilingualClassName
               )}
               dir={direction}
             >
-              {post.content}
-            </p>
+              {post.content.split(/\n{2,}/).map((para, i) => (
+                <p key={i} className="whitespace-pre-wrap">{para}</p>
+              ))}
+            </div>
           )}
 
           {/* Caption for voice message */}
