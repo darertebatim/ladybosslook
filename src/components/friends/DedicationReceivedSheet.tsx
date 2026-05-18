@@ -4,7 +4,7 @@ import type { DedicationWithRelations } from "@/hooks/useDedications";
 import { useMarkDedicationSeen, useMarkDedicationTried } from "@/hooks/useDedications";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import { defaultEmojiForKind, labelForKind } from "@/lib/moments";
-import { Sparkles, Play, Send, X } from "lucide-react";
+import { Sparkles, Play, Send } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useNavigate } from "react-router-dom";
 import { tryDeepLinkForMoment } from "@/lib/momentDeepLink";
