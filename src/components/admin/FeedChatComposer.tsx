@@ -12,10 +12,13 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { 
   Loader2, Image, Video, Link, Play, FileText, ExternalLink, 
-  Mic, Square, Send, Pin, Bell, X, Trash2, Upload, Search, Star, ChevronRight
+  Mic, Square, Send, Pin, Bell, X, Trash2, Upload, Search, Star, ChevronRight,
+  CalendarClock, Calendar as CalendarIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FeedMessage } from '@/components/feed/FeedMessage';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
 import { detectVideoType, getVideoPlatformLabel, getVideoEmbedUrl, extractYouTubeId } from '@/lib/videoUtils';
 import { PRO_LINK_CONFIGS, PRO_LINK_TYPES, type ProLinkType } from '@/lib/proTaskTypes';
 import { PRO_LINK_EMOJIS } from '@/lib/proLinkPresentation';
@@ -66,6 +69,19 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
   const [sendPush, setSendPush] = useState(false);
   const [displayName, setDisplayName] = useState('default');
   const [customDisplayName, setCustomDisplayName] = useState('');
+
+  // Scheduled publishing
+  const [scheduledDate, setScheduledDate] = useState<Date | undefined>(undefined);
+  const [scheduledTime, setScheduledTime] = useState<string>('09:00');
+
+  const scheduledFor: Date | null = (() => {
+    if (!scheduledDate) return null;
+    const [h, m] = scheduledTime.split(':').map(Number);
+    const d = new Date(scheduledDate);
+    d.setHours(h || 0, m || 0, 0, 0);
+    return d;
+  })();
+  const isScheduledFuture = !!scheduledFor && scheduledFor.getTime() > Date.now() + 30_000;
 
   const SENDER_OPTIONS = [
     { value: 'default', label: 'Use my name' },
