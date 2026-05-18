@@ -282,6 +282,7 @@ export function AttachEntityPicker({ onPick, className }: AttachEntityPickerProp
     '📌 Routines',
     '📌 Breathings',
     '📌 Reflections',
+    '📌 Self-Care Tasks',
     '📌 Readings',
     '📌 Programs',
   ];
