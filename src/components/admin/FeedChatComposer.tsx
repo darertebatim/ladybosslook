@@ -309,13 +309,17 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
         is_pinned: isPinned,
         send_push: sendPush,
         display_name: displayName === 'custom' ? customDisplayName : (displayName === 'default' ? null : displayName),
+        scheduled_for: isScheduledFuture ? scheduledFor!.toISOString() : null,
       });
 
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['feed-posts'] });
-      toast.success('Message sent!');
+      queryClient.invalidateQueries({ queryKey: ['scheduled-feed-posts'] });
+      toast.success(isScheduledFuture
+        ? `Scheduled for ${format(scheduledFor!, 'MMM d, h:mm a')}`
+        : 'Message sent!');
       resetForm();
       onSuccess?.();
     },
@@ -342,6 +346,8 @@ export function FeedChatComposer({ onSuccess }: FeedChatComposerProps) {
     setActionSearch('');
     clearRecording();
     setShowAttachments(false);
+    setScheduledDate(undefined);
+    setScheduledTime('09:00');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
