@@ -204,7 +204,7 @@ export const FeedMessage = memo(function FeedMessage({
 
           {/* Title */}
           {post.title && (
-            <h3 className="font-semibold text-base leading-snug mb-1">{post.title}</h3>
+            <h3 className="font-semibold text-base leading-snug mb-3">{post.title}</h3>
           )}
 
           {/* Voice message */}
