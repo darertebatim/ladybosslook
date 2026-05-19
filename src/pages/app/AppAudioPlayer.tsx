@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -328,7 +328,10 @@ export default function AppAudioPlayer() {
   // Setup completion callback
   useEffect(() => {
     setOnTrackComplete(() => {
-      setShowCelebration(true);
+      // Only celebrate the FIRST time a track is completed.
+      if (!wasAlreadyCompletedRef.current) {
+        setShowCelebration(true);
+      }
       refetchProgress();
     });
     
