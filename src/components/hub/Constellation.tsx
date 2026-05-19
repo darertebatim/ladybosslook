@@ -7,21 +7,28 @@ import type { FriendProfile } from "@/hooks/useFriends";
  * Top arc: 5 slots curving across the top.
  * Bottom arc: 4 slots curving below, offset between top ones.
  */
-// 3 rows: 4 / 3 / 2 stars, larger and more relaxed
+// 3 rows revealed progressively. Filled order = middle (3) → bottom (2) → top (4).
+// SPOTS are listed in fill order so friends[i] maps naturally.
 const SPOTS: Array<{ x: number; y: number; size: number }> = [
-  // Row 1 — 4 stars
+  // Tier 1 — middle row, 3 stars (always visible)
+  { x: 0.22, y: 0.50, size: 1.1 },
+  { x: 0.50, y: 0.46, size: 1.25 },
+  { x: 0.78, y: 0.50, size: 1.1 },
+  // Tier 2 — bottom row, 2 stars (revealed at 3 friends)
+  { x: 0.34, y: 0.82, size: 1.1 },
+  { x: 0.66, y: 0.82, size: 1.1 },
+  // Tier 3 — top row, 4 stars (revealed at 5 friends)
   { x: 0.14, y: 0.18, size: 1.0 },
   { x: 0.38, y: 0.14, size: 1.15 },
   { x: 0.62, y: 0.14, size: 1.15 },
   { x: 0.86, y: 0.18, size: 1.0 },
-  // Row 2 — 3 stars
-  { x: 0.22, y: 0.50, size: 1.1 },
-  { x: 0.50, y: 0.46, size: 1.25 },
-  { x: 0.78, y: 0.50, size: 1.1 },
-  // Row 3 — 2 stars
-  { x: 0.34, y: 0.82, size: 1.1 },
-  { x: 0.66, y: 0.82, size: 1.1 },
 ];
+
+function visibleCount(accepted: number): number {
+  if (accepted >= 5) return 9;
+  if (accepted >= 3) return 5;
+  return 3;
+}
 
 interface Props {
   friends: FriendProfile[];
@@ -30,8 +37,12 @@ interface Props {
 
 export function Constellation({ friends, onAdd }: Props) {
   const slots = useMemo(() => {
-    return SPOTS.map((spot, i) => ({ ...spot, friend: friends[i] ?? null }));
+    const count = visibleCount(friends.length);
+    return SPOTS.slice(0, count).map((spot, i) => ({ ...spot, friend: friends[i] ?? null }));
   }, [friends]);
+
+  const showTier2 = friends.length >= 3;
+  const showTier3 = friends.length >= 5;
 
   return (
     <div className="relative w-full" style={{ aspectRatio: "1 / 0.95" }}>
@@ -46,9 +57,13 @@ export function Constellation({ friends, onAdd }: Props) {
       />
       {/* Connecting arc line behind the stars */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden viewBox="0 0 100 100" preserveAspectRatio="none">
-        <path d="M 14 18 Q 50 6 86 18" stroke="rgba(255,255,255,0.16)" strokeWidth="0.3" strokeDasharray="0.8 1.2" fill="none" />
         <path d="M 22 50 Q 50 38 78 50" stroke="rgba(255,255,255,0.14)" strokeWidth="0.3" strokeDasharray="0.8 1.2" fill="none" />
-        <path d="M 34 82 Q 50 74 66 82" stroke="rgba(255,255,255,0.12)" strokeWidth="0.3" strokeDasharray="0.8 1.2" fill="none" />
+        {showTier2 && (
+          <path d="M 34 82 Q 50 74 66 82" stroke="rgba(255,255,255,0.12)" strokeWidth="0.3" strokeDasharray="0.8 1.2" fill="none" />
+        )}
+        {showTier3 && (
+          <path d="M 14 18 Q 50 6 86 18" stroke="rgba(255,255,255,0.16)" strokeWidth="0.3" strokeDasharray="0.8 1.2" fill="none" />
+        )}
       </svg>
       {/* Tiny twinkle stars */}
       <TwinkleField />
