@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, Heart, User, Settings, Sparkles, SmilePlus, Focus, Wifi, BookOpen } from 'lucide-react';
+import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, Heart, User, Settings, Sparkles, SmilePlus, Focus, Wifi, BookOpen, Trophy, Users, Sprout, Timer, Utensils } from 'lucide-react';
 import { usePresenceStats } from '@/hooks/usePresenceStats';
 import { useUserPresence } from '@/hooks/useUserPresence';
 import { useUserStreak, useSetStreakGoal, useRecoverStreak } from '@/hooks/useTaskPlanner';
 import { useUserChallenges } from '@/hooks/useUserChallenges';
+import { useFriendships } from '@/hooks/useFriends';
+import { useEarnedChallengeBadges } from '@/hooks/useEarnedChallengeBadges';
 import { StreakRecoveryPrompt } from '@/components/app/StreakRecoveryPrompt';
 import { getAvailableShields } from '@/lib/recoveryShields';
 import { ACHIEVEMENTS, getAchievementStatus } from '@/lib/achievements';
