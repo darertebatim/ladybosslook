@@ -107,6 +107,7 @@ export const RoutineEndedCelebration = ({
           onClick={(e) => e.stopPropagation()}
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
+          <div className="flex-1 min-h-4" />
           {/* Badge / Emoji */}
           <div className="relative mb-6">
             <div
@@ -165,8 +166,6 @@ export const RoutineEndedCelebration = ({
               Loved this rhythm? Add it to your planner again and keep the momentum going.
             </p>
           </div>
-
-          <div className="flex-1 min-h-2" />
 
           {/* CTAs */}
           <div
