@@ -14,9 +14,12 @@ import { ReflectionCelebrationSheet } from '@/components/reflection/ReflectionCe
 import { BulletAnswerInput } from '@/components/reflection/BulletAnswerInput';
 import { ReflectionReviewSheet, type ReviewItem } from '@/components/reflection/ReflectionReviewSheet';
 import { useTranslation } from 'react-i18next';
+import { recordMoment } from '@/lib/moments';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function AppReflectionFlow() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { reflectionId } = useParams<{ reflectionId: string }>();
   const navigate = useNavigate();
   const goBack = useGoBack('/app/reflections');
@@ -109,6 +112,14 @@ export default function AppReflectionFlow() {
       if (reflectionId) {
         await autoCompleteReflection(reflectionId);
       }
+      if (user?.id && reflection?.title) {
+        void recordMoment({
+          userId: user.id,
+          kind: 'reflection',
+          title: reflection.title,
+          payload: { ref_id: `reflection:${reflectionId}:${new Date().toISOString().slice(0, 10)}` },
+        });
+      }
       // Single-page: skip review sheet, go straight to celebration
       setShowCelebration(true);
     } catch (error) {
@@ -140,6 +151,14 @@ export default function AppReflectionFlow() {
       if (isLast) {
         if (reflectionId) {
           await autoCompleteReflection(reflectionId);
+        }
+        if (user?.id && reflection?.title) {
+          void recordMoment({
+            userId: user.id,
+            kind: 'reflection',
+            title: reflection.title,
+            payload: { ref_id: `reflection:${reflectionId}:${new Date().toISOString().slice(0, 10)}` },
+          });
         }
         // Multi-page: show review sheet first; user taps Continue → celebration
         setShowReview(true);
