@@ -33,9 +33,10 @@ function visibleCount(accepted: number): number {
 interface Props {
   friends: FriendProfile[];
   onAdd: () => void;
+  onFriendTap?: (friend: FriendProfile) => void;
 }
 
-export function Constellation({ friends, onAdd }: Props) {
+export function Constellation({ friends, onAdd, onFriendTap }: Props) {
   const slots = useMemo(() => {
     const count = visibleCount(friends.length);
     return SPOTS.slice(0, count).map((spot, i) => ({ ...spot, friend: friends[i] ?? null }));
@@ -79,7 +80,12 @@ export function Constellation({ friends, onAdd }: Props) {
             style={{ left, top, width: size + 12 }}
           >
             {s.friend ? (
-              <FilledStar friend={s.friend} size={size} delay={i * 0.18} />
+              <FilledStar
+                friend={s.friend}
+                size={size}
+                delay={i * 0.18}
+                onTap={onFriendTap}
+              />
             ) : (
               <EmptyStar size={size} delay={i * 0.18} onAdd={onAdd} />
             )}
@@ -90,11 +96,28 @@ export function Constellation({ friends, onAdd }: Props) {
   );
 }
 
-function FilledStar({ friend, size, delay }: { friend: FriendProfile; size: number; delay: number }) {
+function FilledStar({
+  friend,
+  size,
+  delay,
+  onTap,
+}: {
+  friend: FriendProfile;
+  size: number;
+  delay: number;
+  onTap?: (friend: FriendProfile) => void;
+}) {
   const initial = (friend.full_name || "?").charAt(0).toUpperCase();
   return (
     <>
-      <div className="relative" style={{ width: size, height: size, animation: `hub-float 6s ease-in-out ${delay}s infinite` }}>
+      <button
+        type="button"
+        onClick={() => onTap?.(friend)}
+        disabled={!onTap}
+        aria-label={`Open ${friend.full_name || "friend"}`}
+        className="relative block active:scale-95 transition-transform disabled:cursor-default"
+        style={{ width: size, height: size, animation: `hub-float 6s ease-in-out ${delay}s infinite` }}
+      >
         {/* 4-point sparkle burst behind avatar */}
         <svg
           aria-hidden
@@ -134,7 +157,7 @@ function FilledStar({ friend, size, delay }: { friend: FriendProfile; size: numb
             {initial}
           </div>
         )}
-      </div>
+      </button>
       <span className="mt-1.5 text-[12px] font-semibold text-white/95 truncate max-w-[88px] text-center" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
         {friend.full_name || "Friend"}
       </span>
