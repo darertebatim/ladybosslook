@@ -10,6 +10,8 @@ import { StreakRecoveryPrompt } from "@/components/app/StreakRecoveryPrompt";
 import { BadgeCelebration } from "@/components/app/BadgeCelebration";
 import { GoldStreakCelebration } from "@/components/app/GoldStreakCelebration";
 import { ChallengeDayCelebration } from "@/components/app/ChallengeDayCelebration";
+import { RoutineEndedCelebration } from "@/components/app/RoutineEndedCelebration";
+import type { RoutineEndedData } from "@/hooks/useRoutineEndedCelebration";
 import { TaskSkipSheet } from "@/components/app/TaskSkipSheet";
 import { StepCompletionCelebration } from "@/components/app/StepCompletionCelebration";
 import { ProjectCompletionCelebration } from "@/components/app/ProjectCompletionCelebration";
@@ -139,6 +141,13 @@ interface HomeCelebrationsProps {
   closeChallengeDayCelebration: () => void;
   showChallengeDayCelebration: boolean;
 
+  // Routine ended (re-add prompt)
+  routineEndedData?: RoutineEndedData | null;
+  showRoutineEnded?: boolean;
+  closeRoutineEnded?: () => void;
+  onAddRoutineAgain?: () => void | Promise<void>;
+  isAddingRoutineAgain?: boolean;
+
   // Step completion
   stepCelebration: { completedStep: number; newTaskCount: number } | null;
   onCloseStepCelebration: () => void;
@@ -225,6 +234,11 @@ export const HomeCelebrations = memo(function HomeCelebrations(
     challengeDayCelebration,
     closeChallengeDayCelebration,
     showChallengeDayCelebration,
+    routineEndedData,
+    showRoutineEnded,
+    closeRoutineEnded,
+    onAddRoutineAgain,
+    isAddingRoutineAgain,
     stepCelebration,
     onCloseStepCelebration,
     projectCompletion,
@@ -511,6 +525,17 @@ export const HomeCelebrations = memo(function HomeCelebrations(
         currentDay={challengeDayCelebration?.currentDay || 0}
         totalDays={challengeDayCelebration?.totalDays || 0}
         badgeImageUrl={challengeDayCelebration?.badgeImageUrl}
+      />
+
+      <RoutineEndedCelebration
+        open={!!showRoutineEnded}
+        onClose={() => closeRoutineEnded?.()}
+        routineTitle={routineEndedData?.routineTitle || ""}
+        routineEmoji={routineEndedData?.routineEmoji || "✨"}
+        totalDays={routineEndedData?.totalDays ?? null}
+        badgeImageUrl={routineEndedData?.badgeImageUrl}
+        onAddAgain={async () => { await onAddRoutineAgain?.(); }}
+        isAddingAgain={!!isAddingRoutineAgain}
       />
 
       <StepCompletionCelebration

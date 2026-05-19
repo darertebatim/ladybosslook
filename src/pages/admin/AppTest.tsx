@@ -67,6 +67,7 @@ import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalComp
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { ChallengeCompleteSummary } from '@/components/app/ChallengeCompleteSummary';
 import { ChallengeDayCelebration } from '@/components/app/ChallengeDayCelebration';
+import { RoutineEndedCelebration } from '@/components/app/RoutineEndedCelebration';
 import { PlusGateSheet } from '@/components/app/PlusGateSheet';
 import { StepCompletionCelebration } from '@/components/app/StepCompletionCelebration';
 import { ProjectCompletionCelebration } from '@/components/app/ProjectCompletionCelebration';
@@ -129,6 +130,8 @@ export default function AppTest() {
   const [showChallengeSummary, setShowChallengeSummary] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showChallengeDayCelebration, setShowChallengeDayCelebration] = useState(false);
+  const [showRoutineEnded, setShowRoutineEnded] = useState(false);
+  const [routineEndedTest, setRoutineEndedTest] = useState<{ totalDays: number | null; withBadge: boolean }>({ totalDays: 30, withBadge: false });
   const [challengeDayTest, setChallengeDayTest] = useState(3);
   const [showStepCelebration, setShowStepCelebration] = useState(false);
   const [purchaseCelebrationPlan, setPurchaseCelebrationPlan] = useState<'monthly' | 'annual' | null>(null);
@@ -895,6 +898,16 @@ export default function AppTest() {
             currentDay={challengeDayTest}
             totalDays={28}
           />
+          <RoutineEndedCelebration
+            open={showRoutineEnded}
+            onClose={() => setShowRoutineEnded(false)}
+            routineTitle="Morning Glow Up Routine"
+            routineEmoji="🌅"
+            totalDays={routineEndedTest.totalDays}
+            badgeImageUrl={routineEndedTest.withBadge ? 'https://api.dicebear.com/7.x/shapes/svg?seed=routine' : null}
+            isAddingAgain={false}
+            onAddAgain={() => setShowRoutineEnded(false)}
+          />
           <StepCompletionCelebration
             open={showStepCelebration}
             onClose={() => setShowStepCelebration(false)}
@@ -998,6 +1011,38 @@ export default function AppTest() {
           </div>
           <p className="text-xs text-muted-foreground">
             Shows at different milestones with unique messages: Day 1, Week 1, Halfway, Almost Done, Complete.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Routine Ended (Re-add prompt) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-violet-500" />
+            Routine Ended (Re-add prompt)
+          </CardTitle>
+          <CardDescription>
+            Shown when a routine with an ending finishes — asks the user if they want to add it again
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => { setRoutineEndedTest({ totalDays: 7, withBadge: false }); setShowRoutineEnded(true); }} variant="outline">
+              🌅 7-day routine
+            </Button>
+            <Button onClick={() => { setRoutineEndedTest({ totalDays: 30, withBadge: false }); setShowRoutineEnded(true); }} variant="outline">
+              📅 30-day routine
+            </Button>
+            <Button onClick={() => { setRoutineEndedTest({ totalDays: 30, withBadge: true }); setShowRoutineEnded(true); }} variant="outline">
+              🏅 With badge
+            </Button>
+            <Button onClick={() => { setRoutineEndedTest({ totalDays: null, withBadge: false }); setShowRoutineEnded(true); }} variant="outline">
+              📆 End date
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Triggers in-app when end_after_days or end_date is reached. "Add it again" re-enrolls the user.
           </p>
         </CardContent>
       </Card>
