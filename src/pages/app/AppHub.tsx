@@ -14,6 +14,7 @@ import { DedicationReceivedSheet } from "@/components/friends/DedicationReceived
 import { DedicateMomentSheet } from "@/components/friends/DedicateMomentSheet";
 import { useReceivedDedications, type DedicationWithRelations } from "@/hooks/useDedications";
 import { ChevronLeft, Bell, Settings, Gift, ChevronRight, Music } from "lucide-react";
+import { HubNotificationsSheet } from "@/components/hub/HubNotificationsSheet";
 
 export default function AppHub() {
   const goBack = useGoBack("/app/home");
@@ -25,6 +26,7 @@ export default function AppHub() {
   const [codeOpen, setCodeOpen] = useState(false);
   const [giftInviteOpen, setGiftInviteOpen] = useState(false);
   const [giftPlaylistOpen, setGiftPlaylistOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const [openedDedication, setOpenedDedication] = useState<DedicationWithRelations | null>(null);
   const [sendBackMoment, setSendBackMoment] = useState<null | { recipientId: string; recipientName: string | null }>(null);
 
@@ -33,6 +35,19 @@ export default function AppHub() {
     () => receivedDedications.find((d) => !d.dedication.seen_at) ?? null,
     [receivedDedications],
   );
+
+  const incomingRequestCount = useMemo(
+    () =>
+      friendships.filter(
+        (f) => f.friendship.status === "pending" && f.friendship.addressee_id === user?.id,
+      ).length,
+    [friendships, user?.id],
+  );
+  const unseenDedCount = useMemo(
+    () => receivedDedications.filter((d) => !d.dedication.seen_at).length,
+    [receivedDedications],
+  );
+  const notifCount = incomingRequestCount + unseenDedCount;
 
   const accepted = useMemo<FriendProfile[]>(
     () => friendships
@@ -73,10 +88,24 @@ export default function AppHub() {
           </button>
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setNotifOpen(true)}
               className="w-10 h-10 grid place-items-center rounded-full bg-white/10 backdrop-blur-md active:scale-90"
               aria-label="Notifications"
             >
-              <Bell className="w-5 h-5 text-white" />
+              <div className="relative">
+                <Bell className="w-5 h-5 text-white" />
+                {notifCount > 0 && (
+                  <span
+                    className="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] px-1 grid place-items-center rounded-full text-[10px] font-bold text-black"
+                    style={{
+                      background: "linear-gradient(135deg, #FFE0B8 0%, #EB5E33 100%)",
+                      boxShadow: "0 0 8px 1px rgba(235,94,51,0.7)",
+                    }}
+                  >
+                    {notifCount > 9 ? "9+" : notifCount}
+                  </span>
+                )}
+              </div>
             </button>
             <button
               className="w-10 h-10 grid place-items-center rounded-full bg-white/10 backdrop-blur-md active:scale-90"
