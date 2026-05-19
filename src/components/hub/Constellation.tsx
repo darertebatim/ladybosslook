@@ -2,17 +2,23 @@ import { useMemo } from "react";
 import { Plus } from "lucide-react";
 import type { FriendProfile } from "@/hooks/useFriends";
 
-/** 9 fixed star positions, normalized 0-1 inside the scene box. */
+/**
+ * 9 positions arranged as two gentle arcs (a half-moon constellation).
+ * Top arc: 5 slots curving across the top.
+ * Bottom arc: 4 slots curving below, offset between top ones.
+ */
 const SPOTS: Array<{ x: number; y: number; size: number }> = [
-  { x: 0.20, y: 0.18, size: 1.0 },
-  { x: 0.52, y: 0.08, size: 1.15 },
-  { x: 0.82, y: 0.20, size: 0.95 },
-  { x: 0.30, y: 0.40, size: 1.05 },
-  { x: 0.72, y: 0.42, size: 1.0 },
-  { x: 0.14, y: 0.62, size: 0.9 },
-  { x: 0.52, y: 0.58, size: 1.2 },
-  { x: 0.86, y: 0.66, size: 0.95 },
-  { x: 0.40, y: 0.82, size: 1.0 },
+  // Top arc (left -> right), gentle dip in the middle
+  { x: 0.10, y: 0.30, size: 0.95 },
+  { x: 0.30, y: 0.18, size: 1.05 },
+  { x: 0.50, y: 0.12, size: 1.2 },
+  { x: 0.70, y: 0.18, size: 1.05 },
+  { x: 0.90, y: 0.30, size: 0.95 },
+  // Bottom arc, offset between
+  { x: 0.20, y: 0.62, size: 1.0 },
+  { x: 0.40, y: 0.55, size: 1.1 },
+  { x: 0.60, y: 0.55, size: 1.1 },
+  { x: 0.80, y: 0.62, size: 1.0 },
 ];
 
 interface Props {
@@ -26,16 +32,21 @@ export function Constellation({ friends, onAdd }: Props) {
   }, [friends]);
 
   return (
-    <div className="relative w-full" style={{ aspectRatio: "1 / 0.72" }}>
-      {/* Soft background nebulas */}
+    <div className="relative w-full" style={{ aspectRatio: "1 / 0.78" }}>
+      {/* Subtle background nebula — dimmed so stars stay foreground */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 60% 40% at 30% 25%, rgba(235,94,51,0.18), transparent 60%), radial-gradient(ellipse 55% 40% at 75% 70%, rgba(178,140,255,0.22), transparent 60%), radial-gradient(ellipse 70% 50% at 50% 95%, rgba(255,170,120,0.14), transparent 60%)",
+            "radial-gradient(ellipse 60% 40% at 50% 40%, rgba(235,94,51,0.08), transparent 70%), radial-gradient(ellipse 70% 45% at 50% 90%, rgba(178,140,255,0.10), transparent 70%)",
         }}
       />
+      {/* Connecting arc line behind the stars */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden viewBox="0 0 100 78" preserveAspectRatio="none">
+        <path d="M 10 30 Q 50 4 90 30" stroke="rgba(255,255,255,0.18)" strokeWidth="0.3" strokeDasharray="0.8 1.2" fill="none" />
+        <path d="M 20 62 Q 50 46 80 62" stroke="rgba(255,255,255,0.14)" strokeWidth="0.3" strokeDasharray="0.8 1.2" fill="none" />
+      </svg>
       {/* Tiny twinkle stars */}
       <TwinkleField />
 
@@ -78,16 +89,26 @@ function FilledStar({ friend, size, delay }: { friend: FriendProfile; size: numb
   return (
     <>
       <div className="relative" style={{ width: size, height: size, animation: `hub-float 6s ease-in-out ${delay}s infinite` }}>
-        {/* Glow halo */}
-        <div
+        {/* 4-point sparkle burst behind avatar */}
+        <svg
           aria-hidden
-          className="absolute inset-[-30%] rounded-full"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(255,210,161,0.55) 0%, rgba(235,94,51,0.25) 35%, transparent 70%)",
-            filter: "blur(2px)",
-          }}
-        />
+          className="absolute inset-[-35%] w-[170%] h-[170%] pointer-events-none"
+          viewBox="0 0 100 100"
+        >
+          <defs>
+            <radialGradient id={`sparkGrad-${delay}`} cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="rgba(255,220,170,0.85)" />
+              <stop offset="40%" stopColor="rgba(235,94,51,0.35)" />
+              <stop offset="100%" stopColor="rgba(235,94,51,0)" />
+            </radialGradient>
+          </defs>
+          <circle cx="50" cy="50" r="38" fill={`url(#sparkGrad-${delay})`} />
+          {/* 4-point star burst */}
+          <path
+            d="M50 6 L54 46 L94 50 L54 54 L50 94 L46 54 L6 50 L46 46 Z"
+            fill="rgba(255,230,190,0.55)"
+          />
+        </svg>
         {/* Avatar disc */}
         {friend.avatar_url ? (
           <img
@@ -107,12 +128,6 @@ function FilledStar({ friend, size, delay }: { friend: FriendProfile; size: numb
             {initial}
           </div>
         )}
-        {/* Tiny sparkle */}
-        <span
-          aria-hidden
-          className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
-          style={{ background: "#FFD2A1", boxShadow: "0 0 10px 2px rgba(255,210,161,0.9)" }}
-        />
       </div>
       <span className="mt-1.5 text-[12px] font-semibold text-white/95 truncate max-w-[88px] text-center" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>
         {friend.full_name || "Friend"}
@@ -122,23 +137,23 @@ function FilledStar({ friend, size, delay }: { friend: FriendProfile; size: numb
 }
 
 function EmptyStar({ size, delay }: { size: number; delay: number }) {
+  // Real 5-point star outline at full slot size, no surrounding circle
   return (
     <div
-      className="rounded-full grid place-items-center"
+      className="grid place-items-center"
       style={{
         width: size,
         height: size,
-        background: "rgba(255,255,255,0.04)",
-        border: "1.5px dashed rgba(255,255,255,0.28)",
         animation: `hub-pulse 4.5s ease-in-out ${delay}s infinite`,
       }}
     >
-      <svg width={size * 0.35} height={size * 0.35} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
         <path
-          d="M12 3l2.2 5.4 5.8.5-4.4 3.9 1.4 5.7L12 15.8 6.9 18.5l1.4-5.7L4 8.9l5.8-.5L12 3z"
-          stroke="rgba(255,255,255,0.4)"
-          strokeWidth="1.6"
+          d="M12 2.5l2.7 6.6 7.1.6-5.4 4.7 1.7 7L12 17.7 5.9 21.4l1.7-7L2.2 9.7l7.1-.6L12 2.5z"
+          stroke="rgba(255,255,255,0.55)"
+          strokeWidth="1.2"
           strokeLinejoin="round"
+          fill="rgba(255,255,255,0.04)"
         />
       </svg>
     </div>
