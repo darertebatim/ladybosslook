@@ -33,9 +33,10 @@ function visibleCount(accepted: number): number {
 interface Props {
   friends: FriendProfile[];
   onAdd: () => void;
+  onFriendTap?: (friend: FriendProfile) => void;
 }
 
-export function Constellation({ friends, onAdd }: Props) {
+export function Constellation({ friends, onAdd, onFriendTap }: Props) {
   const slots = useMemo(() => {
     const count = visibleCount(friends.length);
     return SPOTS.slice(0, count).map((spot, i) => ({ ...spot, friend: friends[i] ?? null }));
@@ -79,7 +80,12 @@ export function Constellation({ friends, onAdd }: Props) {
             style={{ left, top, width: size + 12 }}
           >
             {s.friend ? (
-              <FilledStar friend={s.friend} size={size} delay={i * 0.18} />
+              <FilledStar
+                friend={s.friend}
+                size={size}
+                delay={i * 0.18}
+                onTap={onFriendTap}
+              />
             ) : (
               <EmptyStar size={size} delay={i * 0.18} onAdd={onAdd} />
             )}
