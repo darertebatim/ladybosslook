@@ -5,11 +5,11 @@ import type { UserMoment } from "@/hooks/useMoments";
 
 /**
  * Kinds that are safe to dedicate to a friend.
- * MUST stay system-generated only — never include kinds whose title
- * or payload can carry user-written content (UGC). Free-form
- * reflections are explicitly excluded.
+ * Titles come from system/admin-defined content (reflection.title,
+ * routine name, audio track, breathing exercise, mood label) — not
+ * from the user's own writing — so they're safe to surface to friends.
  */
-const DEDICATABLE_KINDS = ["breathe", "mood", "audio", "routine"] as const;
+const DEDICATABLE_KINDS = ["breathe", "mood", "audio", "routine", "reflection"] as const;
 
 /**
  * My moments from the last 24 hours, regardless of whether they've
