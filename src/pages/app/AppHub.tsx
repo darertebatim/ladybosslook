@@ -344,6 +344,13 @@ export default function AppHub() {
           onOpenChange={setNotifOpen}
           onOpenDedication={(d) => setOpenedDedication(d)}
         />
+        <HubSettingsSheet
+          open={settingsOpen}
+          onOpenChange={setSettingsOpen}
+          code={myCode ?? null}
+          hideEmptyStars={hideEmptyStars}
+          onHideEmptyStarsChange={setHideEmptyStars}
+        />
         <FriendDetailSheet
           open={!!openFriendship}
           onOpenChange={(v) => !v && setOpenFriendId(null)}
