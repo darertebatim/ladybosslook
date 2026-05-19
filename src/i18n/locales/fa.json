@@ -813,14 +813,20 @@
     "unlocked": "{{count}} باز شده",
     "stats": {
       "listening": "شنیدن",
-      "completedTracks": "تراک‌های تکمیل‌شده",
+      "completedTracks": "تراک‌های صوتی",
       "journalEntries": "یادداشت‌های دفترچه",
       "breathingSessions": "جلسات تنفس",
-      "reflections": "تأمل‌ها",
+      "reflections": "تأمل‌های راهنمایی‌شده",
       "emotionNamings": "نام‌گذاری احساسات",
       "moodCheckins": "چک‌این حال",
       "focusTime": "زمان تمرکز",
-      "onlineSessions": "جلسات آنلاین",
+      "onlineSessions": "بازدید از اپ",
+      "focusSessions": "جلسات تمرکز",
+      "meditationMinutes": "مدیتیشن",
+      "fastingSessions": "روزه‌های تکمیل‌شده",
+      "habitsFormed": "عادت‌های ساخته‌شده",
+      "friends": "دوستان",
+      "trophies": "جام‌ها",
       "min": "دقیقه"
     }
   },
