@@ -60,7 +60,7 @@ export function useUserChallenges() {
         .from('routines_bank')
         .select('id, title, emoji, schedule_type, challenge_start_date, start_day_of_week, end_after_days, end_mode, badge_image_url')
         .in('id', routineIds)
-        .eq('schedule_type', 'challenge');
+        .eq('is_challenge', true);
 
       if (rError) throw rError;
       if (!routines?.length) return [];

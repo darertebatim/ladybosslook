@@ -4396,6 +4396,7 @@ export type Database = {
           end_mode: string
           id: string
           is_active: boolean | null
+          is_challenge: boolean
           is_featured: boolean
           is_focus: boolean
           is_free: boolean
@@ -4428,6 +4429,7 @@ export type Database = {
           end_mode?: string
           id?: string
           is_active?: boolean | null
+          is_challenge?: boolean
           is_featured?: boolean
           is_focus?: boolean
           is_free?: boolean
@@ -4460,6 +4462,7 @@ export type Database = {
           end_mode?: string
           id?: string
           is_active?: boolean | null
+          is_challenge?: boolean
           is_featured?: boolean
           is_focus?: boolean
           is_free?: boolean

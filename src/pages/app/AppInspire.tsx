@@ -95,7 +95,7 @@ export default function AppInspire() {
   const challengeRoutines = useMemo(() => {
     if (!allRoutines) return [];
     return allRoutines
-      .filter((r) => r.schedule_type === "challenge")
+      .filter((r) => r.schedule_type === "drip")
       .filter(matchesSearch);
   }, [allRoutines, searchQuery]);
 

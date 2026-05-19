@@ -113,7 +113,7 @@ export default function AppInspireDetail() {
   const isAlreadyAdded = planId ? addedRoutineIds.includes(planId) : false;
   const isAdded = isAlreadyAdded || justAdded;
   
-  const isChallenge = (routine as any)?.schedule_type === 'challenge';
+  const isChallenge = (routine as any)?.schedule_type === 'drip';
   const isProject = (routine as any)?.schedule_type === 'project';
   const isProgram = (routine as any)?.schedule_type === 'program';
   const isFocus = (routine as any)?.is_focus === true;

@@ -22,7 +22,7 @@ export interface RoutineBankItem {
   sort_order: number | null;
   created_at: string | null;
   updated_at: string | null;
-  schedule_type?: string; // 'daily' | 'challenge' | 'project'
+  schedule_type?: string; // 'daily' | 'drip' | 'project' | 'program'
   challenge_start_date?: string | null;
   start_day_of_week?: number | null;
 }
@@ -565,7 +565,7 @@ export async function addRoutineToUserPlanner(
           let scheduledDate: string | null = null;
           let projectStep: number | null = null;
 
-          if (scheduleType === 'challenge') {
+          if (scheduleType === 'drip') {
             const dripDay = (task as any).drip_day as number;
             const taskScheduleDays = (task as any).schedule_days as number[] | null;
             

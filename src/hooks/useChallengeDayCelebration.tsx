@@ -59,7 +59,7 @@ export function useChallengeDayCelebration(
         .from('routines_bank')
         .select('id, title, emoji, end_after_days, challenge_start_date, start_day_of_week, badge_image_url')
         .in('id', routineIds)
-        .eq('schedule_type', 'challenge');
+        .eq('is_challenge', true);
 
       if (!routines?.length) return [];
 
