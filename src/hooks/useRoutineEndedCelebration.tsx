@@ -90,9 +90,13 @@ export function useRoutineEndedCelebration(dateKey: string) {
 
   useEffect(() => {
     if (endedData) return;
-    const next = candidates?.[0];
+    const next = candidates?.find((c) => {
+      if (!user) return false;
+      const endDate = (c as any).endDate || getLocalDateStr();
+      return localStorage.getItem(LS_KEY(user.id, c.routineId, endDate)) !== 'true';
+    });
     if (next) setEndedData(next);
-  }, [candidates, endedData]);
+  }, [candidates, endedData, user]);
 
   const closeCelebration = useCallback(() => {
     if (endedData && user) {
@@ -103,7 +107,8 @@ export function useRoutineEndedCelebration(dateKey: string) {
       localStorage.setItem(LS_KEY(user.id, endedData.routineId, endDate), 'true');
     }
     setEndedData(null);
-  }, [endedData, candidates, user]);
+    queryClient.invalidateQueries({ queryKey: ['routine-ended-candidates'] });
+  }, [endedData, candidates, user, queryClient]);
 
   const addAgain = useCallback(async () => {
     if (!endedData || !user) return;
