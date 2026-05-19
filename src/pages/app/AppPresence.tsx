@@ -238,11 +238,11 @@ const AppPresence = () => {
                   isLoading={isLoading}
                 />
                 <ActivityStatCard 
-                  icon={CheckCircle2}
-                  label={t('presence.stats.completedTracks')}
-                  value={stats?.completedTracks || 0}
-                  iconColor="text-amber-600"
-                  iconBg="bg-amber-100"
+                  icon={Sprout}
+                  label={t('presence.stats.meditationMinutes')}
+                  value={`${stats?.meditationMinutes || 0} ${t('presence.stats.min')}`}
+                  iconColor="text-emerald-600"
+                  iconBg="bg-emerald-100"
                   isLoading={isLoading}
                 />
                 <ActivityStatCard 
@@ -254,19 +254,19 @@ const AppPresence = () => {
                   isLoading={isLoading}
                 />
                 <ActivityStatCard 
-                  icon={Wind}
-                  label={t('presence.stats.breathingSessions')}
-                  value={stats?.breathingSessions || 0}
-                  iconColor="text-amber-500"
-                  iconBg="bg-amber-100"
-                  isLoading={isLoading}
-                />
-                <ActivityStatCard 
                   icon={BookOpen}
                   label={t('presence.stats.reflections')}
                   value={stats?.reflectionCompletions || 0}
                   iconColor="text-purple-500"
                   iconBg="bg-purple-100"
+                  isLoading={isLoading}
+                />
+                <ActivityStatCard 
+                  icon={Wind}
+                  label={t('presence.stats.breathingSessions')}
+                  value={stats?.breathingSessions || 0}
+                  iconColor="text-sky-500"
+                  iconBg="bg-sky-100"
                   isLoading={isLoading}
                 />
                 <ActivityStatCard 
@@ -286,11 +286,51 @@ const AppPresence = () => {
                   isLoading={isLoading}
                 />
                 <ActivityStatCard 
-                  icon={Focus}
+                  icon={Timer}
                   label={t('presence.stats.focusTime')}
                   value={`${stats?.focusMinutes || 0} ${t('presence.stats.min')}`}
                   iconColor="text-indigo-500"
                   iconBg="bg-indigo-100"
+                  isLoading={isLoading}
+                />
+                <ActivityStatCard 
+                  icon={CheckCircle2}
+                  label={t('presence.stats.completedTracks')}
+                  value={stats?.completedTracks || 0}
+                  iconColor="text-amber-600"
+                  iconBg="bg-amber-100"
+                  isLoading={isLoading}
+                />
+                <ActivityStatCard 
+                  icon={Utensils}
+                  label={t('presence.stats.fastingSessions')}
+                  value={stats?.fastingSessions || 0}
+                  iconColor="text-fuchsia-600"
+                  iconBg="bg-fuchsia-100"
+                  isLoading={isLoading}
+                />
+                <ActivityStatCard 
+                  icon={Sprout}
+                  label={t('presence.stats.habitsFormed')}
+                  value={stats?.habitsFormed || 0}
+                  iconColor="text-green-600"
+                  iconBg="bg-green-100"
+                  isLoading={isLoading}
+                />
+                <ActivityStatCard 
+                  icon={Trophy}
+                  label={t('presence.stats.trophies')}
+                  value={trophies?.length || 0}
+                  iconColor="text-yellow-600"
+                  iconBg="bg-yellow-100"
+                  isLoading={isLoading}
+                />
+                <ActivityStatCard 
+                  icon={Users}
+                  label={t('presence.stats.friends')}
+                  value={friendships?.length || 0}
+                  iconColor="text-pink-500"
+                  iconBg="bg-pink-100"
                   isLoading={isLoading}
                 />
                 <ActivityStatCard 
