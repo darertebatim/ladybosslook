@@ -114,7 +114,7 @@ export function BreathingCompleteSheet({
           <div className="w-16 h-16 rounded-full bg-emerald-200 flex items-center justify-center mb-3">
             <FluentEmoji emoji="🧘" size={40} />
           </div>
-          <p className="text-sm font-medium text-foreground/50 mb-1">
+          <p className="text-base font-semibold text-black mb-1">
             {t('breathePage.complete.summary', { name: exerciseName, duration: formatDuration(durationSeconds) })}
           </p>
           <h2 className="text-xl font-bold text-foreground leading-snug">

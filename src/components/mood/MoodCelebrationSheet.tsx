@@ -138,7 +138,7 @@ export function MoodCelebrationSheet({
           )}>
             <FluentEmoji emoji={moodData.emoji} size={40} />
           </div>
-          <p className="text-sm font-medium text-foreground/50 mb-1">
+          <p className="text-base font-semibold text-black mb-1">
             {celebrationText}
           </p>
           <h2 className="text-xl font-bold text-foreground leading-snug">
