@@ -16,7 +16,7 @@ import presenceImg from '@/assets/reflection-card-presence.png';
 import breatheImg from '@/assets/mood-card-breathing.png';
 
 const ACTIONS = [
-  { label: 'Education', image: academyImg, route: '/app/player?category=education' },
+  { label: 'Education', image: academyImg, route: '/app/player?category=course' },
   { label: 'Listen', image: listenImg, route: '/app/player' },
   { label: 'Breathe', image: breatheImg, route: '/app/breathe' },
   { label: 'Self-Care Goals', image: presenceImg, route: '/app/balance' },
