@@ -2036,142 +2036,88 @@ const AppTaskCreate = ({
             <span className="text-base font-medium">{t('taskEdit.setReminder')}</span>
             <div className="w-9" />
           </div>
-          <div className="py-2">
-            {/* No reminder */}
-            <button
-              onClick={() => {
-                setReminderEnabled(false);
-                setShowReminderPicker(false);
-              }}
-              className={cn(
-                "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
-                !reminderEnabled && "bg-[#FFF59D]"
-              )}
-            >
-              <span className="font-medium">{t('taskEdit.noReminder')}</span>
-              {!reminderEnabled && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
-            </button>
+          {(() => {
+            const presetCards = scheduledTime
+              ? [
+                  { key: 'at', label: t('taskPickers.atTimeOfEventShort', { defaultValue: 'At time' }), time: scheduledTime },
+                  { key: '10', label: t('taskPickers.minutesEarlyShort', { n: 10, defaultValue: '10 min early' }), time: getTimeOffset(scheduledTime, 10) },
+                  { key: '30', label: t('taskPickers.minutesEarlyShort', { n: 30, defaultValue: '30 min early' }), time: getTimeOffset(scheduledTime, 30) },
+                  { key: '60', label: t('taskPickers.hourEarlyShort', { defaultValue: '1 hour early' }), time: getTimeOffset(scheduledTime, 60) },
+                ]
+              : REMINDER_PRESETS.map((p) => ({ key: p.time, label: t(p.labelKey).replace(/ reminder$/i, ''), time: p.time }));
+            const isCustomSelected =
+              reminderEnabled &&
+              !presetCards.some((c) => c.time === reminderTime);
+            return (
+              <div className="px-4 py-4 space-y-3">
+                {/* No reminder switcher row */}
+                <div className="flex items-center justify-between rounded-2xl bg-muted/40 px-4 py-3">
+                  <span className="font-medium text-black">{t('taskEdit.noReminder')}</span>
+                  <Switch
+                    checked={!reminderEnabled}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setReminderEnabled(false);
+                        setShowReminderPicker(false);
+                      } else {
+                        setReminderEnabled(true);
+                      }
+                    }}
+                  />
+                </div>
 
-            {/* Dynamic reminder options when time is set */}
-            {scheduledTime ? (
-              <>
-                {/* At time of event */}
+                {/* 2x2 grid of preset cards */}
+                <div className="grid grid-cols-2 gap-2">
+                  {presetCards.map((preset) => {
+                    const selected = reminderEnabled && reminderTime === preset.time;
+                    return (
+                      <button
+                        key={preset.key}
+                        onClick={() => {
+                          setReminderEnabled(true);
+                          setReminderTime(preset.time);
+                          setShowReminderPicker(false);
+                        }}
+                        className={cn(
+                          "rounded-2xl px-3 py-3 text-left transition-colors border",
+                          selected
+                            ? "bg-[#FFF59D] border-foreground/30"
+                            : "bg-white border-muted/40 active:bg-muted/30"
+                        )}
+                      >
+                        <div className="text-sm font-semibold text-black leading-tight">{preset.label}</div>
+                        <div className="text-xs text-black/60 mt-0.5">{formatReminderTimeDisplay(preset.time)}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Custom — always visible with current time preview */}
                 <button
                   onClick={() => {
                     setReminderEnabled(true);
-                    setReminderTime(scheduledTime);
                     setShowReminderPicker(false);
+                    setShowReminderCustom(true);
                   }}
                   className={cn(
-                    "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
-                    reminderEnabled && reminderTime === scheduledTime && "bg-[#FFF59D]"
+                    "w-full rounded-2xl px-4 py-3 flex items-center justify-between border transition-colors",
+                    isCustomSelected
+                      ? "bg-[#FFF59D] border-foreground/30"
+                      : "bg-white border-muted/40 active:bg-muted/30"
                   )}
                 >
-                  <span className="font-medium">
-                    {t('taskPickers.atTimeOfEvent')} <span className="text-muted-foreground">({formatReminderTimeDisplay(scheduledTime)})</span>
-                  </span>
-                  {reminderEnabled && reminderTime === scheduledTime && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-black/70" />
+                    <span className="font-semibold text-black">{t('taskEdit.custom')}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-sm text-black/70">
+                    <span>{isCustomSelected ? formatReminderTimeDisplay(reminderTime) : t('taskPickers.setTime', { defaultValue: 'Set time' })}</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </div>
                 </button>
-
-                {/* 10 minutes early */}
-                <button
-                  onClick={() => {
-                    setReminderEnabled(true);
-                    setReminderTime(getTimeOffset(scheduledTime, 10));
-                    setShowReminderPicker(false);
-                  }}
-                  className={cn(
-                    "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
-                    reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 10) && "bg-[#FFF59D]"
-                  )}
-                >
-                  <span className="font-medium">
-                    {t('taskPickers.minutesEarly', { n: 10 })} <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 10))})</span>
-                  </span>
-                  {reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 10) && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
-                </button>
-
-                {/* 30 minutes early */}
-                <button
-                  onClick={() => {
-                    setReminderEnabled(true);
-                    setReminderTime(getTimeOffset(scheduledTime, 30));
-                    setShowReminderPicker(false);
-                  }}
-                  className={cn(
-                    "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
-                    reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 30) && "bg-[#FFF59D]"
-                  )}
-                >
-                  <span className="font-medium">
-                    {t('taskPickers.minutesEarly', { n: 30 })} <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 30))})</span>
-                  </span>
-                  {reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 30) && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
-                </button>
-
-                {/* 1 hour early */}
-                <button
-                  onClick={() => {
-                    setReminderEnabled(true);
-                    setReminderTime(getTimeOffset(scheduledTime, 60));
-                    setShowReminderPicker(false);
-                  }}
-                  className={cn(
-                    "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
-                    reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 60) && "bg-[#FFF59D]"
-                  )}
-                >
-                  <span className="font-medium">
-                    {t('taskPickers.hourEarly')} <span className="text-muted-foreground">({formatReminderTimeDisplay(getTimeOffset(scheduledTime, 60))})</span>
-                  </span>
-                  {reminderEnabled && reminderTime === getTimeOffset(scheduledTime, 60) && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
-                </button>
-              </>
-            ) : (
-              /* Preset reminders when no time is set */
-              REMINDER_PRESETS.map((preset) => (
-                <button
-                  key={preset.time}
-                  onClick={() => {
-                    setReminderEnabled(true);
-                    setReminderTime(preset.time);
-                    setShowReminderPicker(false);
-                  }}
-                  className={cn(
-                    "w-full text-left px-6 py-4 flex items-center justify-between border-b border-muted/30",
-                    reminderEnabled && reminderTime === preset.time && "bg-[#FFF59D]"
-                  )}
-                >
-                  <span className="font-medium">
-                    {t(preset.labelKey)} <span className="text-muted-foreground">({formatReminderTimeDisplay(preset.time)})</span>
-                  </span>
-                  {reminderEnabled && reminderTime === preset.time && <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>}
-                </button>
-              ))
-            )}
-
-            {/* Custom */}
-            <button
-              onClick={() => {
-                setReminderEnabled(true);
-                setShowReminderPicker(false);
-                setShowReminderCustom(true);
-              }}
-              className={cn(
-                "w-full text-left px-6 py-4 flex items-center justify-between",
-                reminderEnabled && !REMINDER_PRESETS.some(p => p.time === reminderTime) && 
-                  (scheduledTime ? reminderTime !== scheduledTime && reminderTime !== getTimeOffset(scheduledTime, 10) && reminderTime !== getTimeOffset(scheduledTime, 30) && reminderTime !== getTimeOffset(scheduledTime, 60) : true) && "bg-[#FFF59D]"
-              )}
-            >
-              <span className="font-medium">
-                {t('taskEdit.custom')} {reminderEnabled && <span className="text-muted-foreground">({t('taskPickers.remindMeAt', { time: formatReminderTimeDisplay(reminderTime) })})</span>}
-              </span>
-              {reminderEnabled && !REMINDER_PRESETS.some(p => p.time === reminderTime) && 
-                (scheduledTime ? reminderTime !== scheduledTime && reminderTime !== getTimeOffset(scheduledTime, 10) && reminderTime !== getTimeOffset(scheduledTime, 30) && reminderTime !== getTimeOffset(scheduledTime, 60) : true) && (
-                <div className="w-5 h-5 rounded-full border-2 border-foreground flex items-center justify-center"><div className="w-2.5 h-2.5 rounded-full bg-foreground" /></div>
-              )}
-            </button>
-          </div>
+              </div>
+            );
+          })()}
         </SheetContent>
       </Sheet>
 
