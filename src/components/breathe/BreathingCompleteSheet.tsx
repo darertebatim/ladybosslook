@@ -20,7 +20,7 @@ import talkImg from '@/assets/mood-card-talk.png';
 const ACTIONS = [
   { labelKey: 'moodPage.celebration.actions.journal', image: journalImg, route: '/app/reflections/free-form' },
   { labelKey: 'moodPage.celebration.actions.reflect', image: reflectImg, route: '/app/reflections' },
-  { labelKey: 'breathePage.complete.actions.startMyPlan', image: planImg, route: '/app/aiplanner' },
+  { labelKey: 'moodPage.celebration.actions.plan', image: planImg, route: '/app/aiplanner' },
   { labelKey: 'breathePage.complete.actions.talk', image: talkImg, route: '/app/channels' },
 ];
 
