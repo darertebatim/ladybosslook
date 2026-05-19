@@ -30,7 +30,7 @@ export const ChallengeRoutineCard = ({
             <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
               <Trophy className="w-3.5 h-3.5 text-amber-600" />
             </div>
-            <h3 className="text-sm font-semibold text-gray-900">Challenge Routine</h3>
+            <h3 className="text-sm font-semibold text-gray-900">Drip Routine</h3>
           </div>
           
           <div className="flex items-baseline gap-2">
@@ -46,7 +46,7 @@ export const ChallengeRoutineCard = ({
                 Starts {formatStartDate(challenge.computedStartDate)}
               </span>
             ) : isCompleted 
-              ? `🎉 Challenge complete! All ${challenge.totalDays} days done!`
+              ? `🎉 Drip complete! All ${challenge.totalDays} days done!`
               : `Day ${challenge.completedDays} of ${challenge.totalDays}`
             }
           </p>
@@ -58,7 +58,7 @@ export const ChallengeRoutineCard = ({
             <div className="w-14 h-14 rounded-xl overflow-hidden border-2 border-amber-200 bg-amber-50 shadow-sm">
               <img 
                 src={challenge.badgeImageUrl} 
-                alt="Challenge badge" 
+                alt="Drip badge" 
                 className={cn(
                   "w-full h-full object-cover",
                   !isCompleted && "opacity-40 grayscale"
