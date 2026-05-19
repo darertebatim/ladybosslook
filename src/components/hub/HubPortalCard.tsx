@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Sparkles, ArrowUpRight } from "lucide-react";
 import { useFriendships, type FriendProfile } from "@/hooks/useFriends";
 import { useMyRecentMoments } from "@/hooks/useMyRecentMoments";
+import { useReceivedDedications } from "@/hooks/useDedications";
+import { useAuth } from "@/hooks/useAuth";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import { defaultEmojiForKind, labelForKind } from "@/lib/moments";
 
@@ -12,18 +14,28 @@ import { defaultEmojiForKind, labelForKind } from "@/lib/moments";
  */
 export function HubPortalCard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { data: friendships = [] } = useFriendships();
   const { data: moments = [] } = useMyRecentMoments();
+  const { data: receivedDedications = [] } = useReceivedDedications();
 
   const friends: FriendProfile[] = useMemo(
     () =>
       friendships
         .filter((f) => f.friendship.status === "accepted")
         .map((f) => f.other)
-        .slice(0, 5),
+        .slice(0, 3),
     [friendships],
   );
   const latest = moments[0] ?? null;
+
+  const notifCount = useMemo(() => {
+    const incoming = friendships.filter(
+      (f) => f.friendship.status === "pending" && f.friendship.addressee_id === user?.id,
+    ).length;
+    const unseen = receivedDedications.filter((d) => !d.dedication.seen_at).length;
+    return incoming + unseen;
+  }, [friendships, receivedDedications, user?.id]);
 
   // Deterministic background twinkle stars
   const twinkles = useMemo(() => {
@@ -39,13 +51,11 @@ export function HubPortalCard() {
     return arr;
   }, []);
 
-  // Arc positions for up to 5 friend stars (left → right)
+  // Arc positions for up to 3 friend stars (left → center → right)
   const arc = [
-    { x: 0.12, y: 0.45 },
-    { x: 0.30, y: 0.28 },
-    { x: 0.50, y: 0.22 },
-    { x: 0.70, y: 0.28 },
-    { x: 0.88, y: 0.45 },
+    { x: 0.22, y: 0.42 },
+    { x: 0.50, y: 0.32 },
+    { x: 0.78, y: 0.42 },
   ];
 
   return (
@@ -53,9 +63,9 @@ export function HubPortalCard() {
       type="button"
       onClick={() => navigate("/app/hub")}
       aria-label="Open your friends hub"
-      className="relative w-full rounded-3xl overflow-hidden text-left active:scale-[0.99] transition-transform shadow-ios"
+      className="relative w-full max-w-[320px] mx-auto rounded-3xl overflow-hidden text-left active:scale-[0.99] transition-transform shadow-ios"
       style={{
-        aspectRatio: "1 / 1.05",
+        aspectRatio: "1 / 1",
         background:
           "radial-gradient(ellipse 80% 55% at 50% 0%, #3A1E66 0%, #1A0E2E 55%, #0E0820 100%)",
       }}
@@ -115,8 +125,21 @@ export function HubPortalCard() {
             Friends hub
           </span>
         </div>
-        <div className="w-7 h-7 grid place-items-center rounded-full bg-white/15 backdrop-blur-md">
-          <ArrowUpRight className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+        <div className="relative">
+          <div className="w-7 h-7 grid place-items-center rounded-full bg-white/15 backdrop-blur-md">
+            <ArrowUpRight className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+          </div>
+          {notifCount > 0 && (
+            <span
+              className="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] px-1 grid place-items-center rounded-full text-[10px] font-bold text-black"
+              style={{
+                background: "linear-gradient(135deg, #FFE0B8 0%, #EB5E33 100%)",
+                boxShadow: "0 0 8px 1px rgba(235,94,51,0.7)",
+              }}
+            >
+              {notifCount > 9 ? "9+" : notifCount}
+            </span>
+          )}
         </div>
       </div>
 
@@ -126,17 +149,25 @@ export function HubPortalCard() {
           const f = friends[i] ?? null;
           const left = `${p.x * 100}%`;
           const top = `${p.y * 100}%`;
-          const size = i === 2 ? 44 : i === 1 || i === 3 ? 38 : 32;
+          const size = i === 1 ? 48 : 40;
           return (
             <div
               key={i}
-              className="absolute -translate-x-1/2 -translate-y-1/2"
+              className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
               style={{ left, top, animation: `hpc-float 6s ease-in-out ${i * 0.25}s infinite` }}
             >
               {f ? (
                 <FilledStar friend={f} size={size} />
               ) : (
                 <EmptyStar size={size} />
+              )}
+              {f && (
+                <span
+                  className="mt-1 text-[10px] font-semibold text-white/95 truncate max-w-[72px] text-center"
+                  style={{ textShadow: "0 1px 4px rgba(0,0,0,0.7)" }}
+                >
+                  {(f.full_name || "Friend").split(" ")[0]}
+                </span>
               )}
             </div>
           );
