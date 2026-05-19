@@ -814,14 +814,20 @@
     "unlocked": "{{count}} unlocked",
     "stats": {
       "listening": "Listening",
-      "completedTracks": "Completed Tracks",
+      "completedTracks": "Audio Tracks",
       "journalEntries": "Journal Entries",
       "breathingSessions": "Breathing Sessions",
-      "reflections": "Reflections",
+      "reflections": "Guided Reflections",
       "emotionNamings": "Emotion Namings",
       "moodCheckins": "Mood Check-ins",
       "focusTime": "Focus Time",
-      "onlineSessions": "Online Sessions",
+      "onlineSessions": "App Visits",
+      "focusSessions": "Focus Sessions",
+      "meditationMinutes": "Meditation",
+      "fastingSessions": "Fasts Completed",
+      "habitsFormed": "Habits Formed",
+      "friends": "Friends",
+      "trophies": "Trophies",
       "min": "min"
     }
   },
