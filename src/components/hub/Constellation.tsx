@@ -45,9 +45,10 @@ export function Constellation({ friends, onAdd }: Props) {
         }}
       />
       {/* Connecting arc line behind the stars */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden viewBox="0 0 100 78" preserveAspectRatio="none">
-        <path d="M 10 30 Q 50 4 90 30" stroke="rgba(255,255,255,0.18)" strokeWidth="0.3" strokeDasharray="0.8 1.2" fill="none" />
-        <path d="M 20 62 Q 50 46 80 62" stroke="rgba(255,255,255,0.14)" strokeWidth="0.3" strokeDasharray="0.8 1.2" fill="none" />
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden viewBox="0 0 100 100" preserveAspectRatio="none">
+        <path d="M 14 18 Q 50 6 86 18" stroke="rgba(255,255,255,0.16)" strokeWidth="0.3" strokeDasharray="0.8 1.2" fill="none" />
+        <path d="M 22 50 Q 50 38 78 50" stroke="rgba(255,255,255,0.14)" strokeWidth="0.3" strokeDasharray="0.8 1.2" fill="none" />
+        <path d="M 34 82 Q 50 74 66 82" stroke="rgba(255,255,255,0.12)" strokeWidth="0.3" strokeDasharray="0.8 1.2" fill="none" />
       </svg>
       {/* Tiny twinkle stars */}
       <TwinkleField />
