@@ -67,6 +67,7 @@ import { StreakGoalCompletionCelebration } from '@/components/app/StreakGoalComp
 import { PaywallSheet } from '@/components/app/PaywallSheet';
 import { ChallengeCompleteSummary } from '@/components/app/ChallengeCompleteSummary';
 import { ChallengeDayCelebration } from '@/components/app/ChallengeDayCelebration';
+import { RoutineEndedCelebration } from '@/components/app/RoutineEndedCelebration';
 import { PlusGateSheet } from '@/components/app/PlusGateSheet';
 import { StepCompletionCelebration } from '@/components/app/StepCompletionCelebration';
 import { ProjectCompletionCelebration } from '@/components/app/ProjectCompletionCelebration';
@@ -129,6 +130,8 @@ export default function AppTest() {
   const [showChallengeSummary, setShowChallengeSummary] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showChallengeDayCelebration, setShowChallengeDayCelebration] = useState(false);
+  const [showRoutineEnded, setShowRoutineEnded] = useState(false);
+  const [routineEndedTest, setRoutineEndedTest] = useState<{ totalDays: number | null; withBadge: boolean }>({ totalDays: 30, withBadge: false });
   const [challengeDayTest, setChallengeDayTest] = useState(3);
   const [showStepCelebration, setShowStepCelebration] = useState(false);
   const [purchaseCelebrationPlan, setPurchaseCelebrationPlan] = useState<'monthly' | 'annual' | null>(null);
@@ -894,6 +897,16 @@ export default function AppTest() {
             challengeEmoji="💪"
             currentDay={challengeDayTest}
             totalDays={28}
+          />
+          <RoutineEndedCelebration
+            open={showRoutineEnded}
+            onClose={() => setShowRoutineEnded(false)}
+            routineTitle="Morning Glow Up Routine"
+            routineEmoji="🌅"
+            totalDays={routineEndedTest.totalDays}
+            badgeImageUrl={routineEndedTest.withBadge ? 'https://api.dicebear.com/7.x/shapes/svg?seed=routine' : null}
+            isAddingAgain={false}
+            onAddAgain={() => setShowRoutineEnded(false)}
           />
           <StepCompletionCelebration
             open={showStepCelebration}
