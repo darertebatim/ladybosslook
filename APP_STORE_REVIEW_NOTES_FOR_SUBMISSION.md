@@ -150,24 +150,31 @@ This background audio capability is essential for users to listen to educational
 
 ## What's New in Version 1.2.1005
 
-**Friends Hub in Chats (NEW):**
-Rilo now includes a private 1:1 messaging feature called "Friends" inside the Chats tab. This is **not a social network or public feed** — it is a closed, invitation-based direct messaging tool that only allows communication between two users who have explicitly added each other as friends.
+**Friends Hub (NEW — at /app/hub):**
+Rilo now includes a private "Friends Hub" — a closed, invitation-only space where a user can connect with people they personally know via a unique friend code. **This is not a social network, not a public feed, and not a discovery surface.** There is no way to browse, search, or follow strangers.
 
 How it works:
-1. **Log in** with the test account → tap the **Chats tab** in the bottom navigation
-2. Tap **Friends** → see the list of accepted friends (empty by default for a fresh account)
-3. Tap **Add Friend** → search by username/email or share an invite link. The other user must accept the request before any messaging is possible.
-4. Once a friendship is mutual, tap a friend to open a **private 1:1 direct message thread** (text only)
-5. Users can **block, remove, or report** any friend at any time from the chat header
+1. **Log in** with the test account → tap the **Friends Hub** entry (constellation/star icon) to open `/app/hub`
+2. The hub renders the user's accepted friends as glowing stars in a "constellation". A fresh account starts empty.
+3. Tap **Add friend** → enter another user's **friend code** (or share your own code). The other user must explicitly accept the friend request before any connection is created. No phone-book scanning, no email harvesting, no location-based discovery.
+4. Tap a friend's star to open the **Friend Detail sheet**, where the user can:
+   - **Send a direct message** (private 1:1 text only — no group chats, no public posts)
+   - **Gift a moment** (share a personal reflection/photo with that one friend)
+   - **Gift a playlist / dedicate audio** (send a curated audio item to that friend)
+   - **Remove, block, or report** the friend at any time
+5. **Notifications bell** in the hub shows incoming friend requests and gifts — nothing is auto-accepted.
 
-Key compliance points for review:
-- **Direct messaging only** — no public posts, no feeds, no group chats, no discovery of strangers
-- **Mutual consent required** — messaging is impossible until both users accept the friendship
-- **User-generated content moderation** — every message can be reported; reported content and users are reviewed within 24 hours and removable. Users can block any other user instantly, which immediately hides all their content and prevents further contact (per Guideline 1.2).
-- **No location sharing, no profile browsing of non-friends, no follower system**
-- All friend and message data is stored securely in Supabase with row-level security; users can delete their account at any time, which removes all friendships and message history.
+Key compliance points for review (Guideline 1.2 — UGC):
+- **Invitation-only, mutual consent required** — no messaging, gifting, or visibility is possible until both users accept the friend request via friend code.
+- **No public feed, no discovery, no follower system, no location sharing.**
+- **Direct messages are strictly 1:1 and text-only.** No group chats.
+- **Block / Remove / Report** are available on every friend and every message; blocking is instant and immediately hides all content and prevents further contact.
+- **Reported content and users are reviewed within 24 hours** and can be removed by moderators.
+- All friend, message, and gift data is stored in Supabase with row-level security so users can only access their own data. Deleting the account immediately removes all friendships, messages, and gifts.
 
-No new permissions or background modes are introduced in this version.
+The existing **Chats tab** continues to host the support/community chat threads only — Friends Hub is a separate surface.
+
+No new permissions, no new background modes, and no new third-party SDKs are introduced in this version.
 
 ---
 
