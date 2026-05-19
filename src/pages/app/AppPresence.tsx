@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, Heart, User, Settings, Sparkles, SmilePlus, Focus, Wifi, BookOpen, Trophy, Users, Sprout, Timer, Utensils } from 'lucide-react';
+import { Flame, Calendar, RotateCcw, Headphones, BookHeart, Wind, CheckCircle2, Heart, User, Settings, Sparkles, SmilePlus, Focus, Wifi, BookOpen, Trophy, Users, Sprout, Timer, Utensils, Flower2 } from 'lucide-react';
 import { usePresenceStats } from '@/hooks/usePresenceStats';
 import { useUserPresence } from '@/hooks/useUserPresence';
 import { useUserStreak, useSetStreakGoal, useRecoverStreak } from '@/hooks/useTaskPlanner';
@@ -238,7 +238,7 @@ const AppPresence = () => {
                   isLoading={isLoading}
                 />
                 <ActivityStatCard 
-                  icon={Sprout}
+                  icon={Flower2}
                   label={t('presence.stats.meditationMinutes')}
                   value={`${stats?.meditationMinutes || 0} ${t('presence.stats.min')}`}
                   iconColor="text-emerald-600"
