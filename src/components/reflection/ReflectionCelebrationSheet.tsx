@@ -92,7 +92,7 @@ export function ReflectionCelebrationSheet({
           <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3 bg-purple-200">
             <FluentEmoji emoji="📓" size={40} />
           </div>
-          <p className="text-sm font-medium text-foreground/50 mb-1">
+          <p className="text-base font-semibold text-black mb-1">
             Nice work — you reflected today.
           </p>
           <h2 className="text-xl font-bold text-foreground leading-snug">
