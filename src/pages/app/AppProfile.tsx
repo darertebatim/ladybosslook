@@ -633,56 +633,56 @@ const AppProfile = () => {
 
         {/* Journal Stats */}
         <Collapsible open={openSections.has('journal')} onOpenChange={() => toggleSection('journal')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card-warm rounded-2xl shadow-card-warm active:bg-[hsl(var(--tint-peach))]/40 transition-colors">
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
-                <BookOpen className="h-4 w-4 text-primary" />
+              <div className="h-9 w-9 rounded-xl bg-[hsl(var(--tint-peach))] flex items-center justify-center">
+                <BookOpen className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
               </div>
-              <span className="font-medium text-sm">{t('profile.sections.journal')}</span>
+              <span className="font-medium text-sm text-[hsl(var(--fg-warm))]">{t('profile.sections.journal')}</span>
             </div>
-            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('journal') ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`h-4 w-4 text-[hsl(var(--fg-warm-muted))] transition-transform duration-200 ${openSections.has('journal') ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-1">
-            <JournalStats className="rounded-2xl shadow-ios border-0" />
+            <JournalStats className="rounded-2xl shadow-card-warm border-0" />
           </CollapsibleContent>
         </Collapsible>
 
         {/* My Programs */}
         <Collapsible open={openSections.has('programs')} onOpenChange={() => toggleSection('programs')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card-warm rounded-2xl shadow-card-warm active:bg-[hsl(var(--tint-peach))]/40 transition-colors">
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
-                <BookOpen className="h-4 w-4 text-primary" />
+              <div className="h-9 w-9 rounded-xl bg-[hsl(var(--tint-peach))] flex items-center justify-center">
+                <BookOpen className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
               </div>
-              <span className="font-medium text-sm">{t('profile.sections.programs')}</span>
+              <span className="font-medium text-sm text-[hsl(var(--fg-warm))]">{t('profile.sections.programs')}</span>
             </div>
             <div className="flex items-center gap-2">
-              {programCount > 0 && <Badge variant="secondary" className="text-xs">{programCount}</Badge>}
-              <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('programs') ? 'rotate-180' : ''}`} />
+              {programCount > 0 && <Badge variant="secondary" className="text-xs bg-[hsl(var(--tint-peach))] text-[hsl(var(--brand-primary))] border-0">{programCount}</Badge>}
+              <ChevronDown className={`h-4 w-4 text-[hsl(var(--fg-warm-muted))] transition-transform duration-200 ${openSections.has('programs') ? 'rotate-180' : ''}`} />
             </div>
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-1">
-            <Card className="rounded-2xl shadow-ios border-0 bg-card">
+            <Card className="rounded-2xl shadow-card-warm border-0 bg-card-warm">
               <CardContent className="pt-4">
                 {enrollments && enrollments.length > 0 ? (
                   <div className="space-y-2">
                     {enrollments.map((enrollment) => (
-                      <Link key={enrollment.id} to={`/app/myprograms/${enrollment.program_slug || enrollment.course_name}`} className="flex items-center justify-between p-3 bg-muted/30 rounded-xl active:bg-muted/50 transition-colors">
+                      <Link key={enrollment.id} to={`/app/myprograms/${enrollment.program_slug || enrollment.course_name}`} className="flex items-center justify-between p-3 bg-[hsl(var(--tint-peach))]/35 rounded-xl active:bg-[hsl(var(--tint-peach))]/60 transition-colors">
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium truncate">{enrollment.course_name}</p>
-                          <p className="text-xs text-muted-foreground">{t('profile.enrolled', { date: format(new Date(enrollment.enrolled_at), 'MMM d, yyyy') })}</p>
+                          <p className="text-sm font-medium truncate text-[hsl(var(--fg-warm))]">{enrollment.course_name}</p>
+                          <p className="text-xs text-[hsl(var(--fg-warm-muted))]">{t('profile.enrolled', { date: format(new Date(enrollment.enrolled_at), 'MMM d, yyyy') })}</p>
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge variant="secondary" className="text-xs">{(enrollment.program_rounds as any)?.status || 'active'}</Badge>
-                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                          <ChevronRight className="h-4 w-4 text-[hsl(var(--fg-warm-muted))]" />
                         </div>
                       </Link>
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-6">
-                    <BookOpen className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground">{t('profile.noCourses')}</p>
+                    <BookOpen className="h-8 w-8 mx-auto text-[hsl(var(--fg-warm-muted))] mb-2" />
+                    <p className="text-sm text-[hsl(var(--fg-warm-muted))]">{t('profile.noCourses')}</p>
                     <Button variant="link" size="sm" asChild><Link to="/app/store">{t('profile.browsePrograms')}</Link></Button>
                   </div>
                 )}
@@ -693,36 +693,36 @@ const AppProfile = () => {
 
         {/* Wallet & Credits */}
         <Collapsible open={openSections.has('wallet')} onOpenChange={() => toggleSection('wallet')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card-warm rounded-2xl shadow-card-warm active:bg-[hsl(var(--tint-peach))]/40 transition-colors">
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Wallet className="h-4 w-4 text-primary" />
+              <div className="h-9 w-9 rounded-xl bg-[hsl(var(--tint-peach))] flex items-center justify-center">
+                <Wallet className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
               </div>
-              <span className="font-medium text-sm">{t('profile.sections.wallet')}</span>
+              <span className="font-medium text-sm text-[hsl(var(--fg-warm))]">{t('profile.sections.wallet')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground font-medium">${creditBalance}</span>
-              <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('wallet') ? 'rotate-180' : ''}`} />
+              <span className="text-xs text-[hsl(var(--fg-warm-muted))] font-medium">${creditBalance}</span>
+              <ChevronDown className={`h-4 w-4 text-[hsl(var(--fg-warm-muted))] transition-transform duration-200 ${openSections.has('wallet') ? 'rotate-180' : ''}`} />
             </div>
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-1">
-            <Card className="rounded-2xl shadow-ios border-0 bg-card">
+            <Card className="rounded-2xl shadow-card-warm border-0 bg-card-warm">
               <CardContent className="space-y-3 pt-4">
-                <div className="flex items-center justify-between p-4 bg-primary/5 rounded-xl">
+                <div className="flex items-center justify-between p-4 bg-[hsl(var(--tint-peach))]/40 rounded-xl">
                   <div>
-                    <p className="text-xs text-muted-foreground">{t('profile.currentBalance')}</p>
-                    <p className="text-2xl font-bold">{wallet?.credits_balance || 0} {t('profile.credits')}</p>
+                    <p className="text-xs text-[hsl(var(--fg-warm-muted))]">{t('profile.currentBalance')}</p>
+                    <p className="text-2xl font-bold text-[hsl(var(--fg-warm))]">{wallet?.credits_balance || 0} {t('profile.credits')}</p>
                   </div>
-                  <Wallet className="h-8 w-8 text-primary/30" />
+                  <Wallet className="h-8 w-8 text-[hsl(var(--brand-primary))]/40" />
                 </div>
                 {transactions && transactions.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-xs font-medium text-muted-foreground">{t('profile.recentTransactions')}</p>
+                    <p className="text-xs font-medium text-[hsl(var(--fg-warm-muted))]">{t('profile.recentTransactions')}</p>
                     {transactions.map((tx) => (
-                      <div key={tx.id} className="flex items-center justify-between py-2 px-3 bg-muted/30 rounded-lg">
+                      <div key={tx.id} className="flex items-center justify-between py-2 px-3 bg-[hsl(var(--tint-peach))]/30 rounded-lg">
                         <div className="flex items-center gap-2">
                           {tx.amount > 0 ? <TrendingUp className="h-4 w-4 text-emerald-500" /> : <TrendingDown className="h-4 w-4 text-destructive" />}
-                          <span className="text-sm truncate max-w-[140px]">{tx.description || tx.transaction_type}</span>
+                          <span className="text-sm truncate max-w-[140px] text-[hsl(var(--fg-warm))]">{tx.description || tx.transaction_type}</span>
                         </div>
                         <span className={`text-sm font-medium ${tx.amount > 0 ? 'text-emerald-600' : 'text-destructive'}`}>
                           {tx.amount > 0 ? '+' : ''}{tx.amount}
@@ -738,28 +738,28 @@ const AppProfile = () => {
 
         {/* Order History */}
         <Collapsible open={openSections.has('orders')} onOpenChange={() => toggleSection('orders')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors">
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card-warm rounded-2xl shadow-card-warm active:bg-[hsl(var(--tint-peach))]/40 transition-colors">
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Receipt className="h-4 w-4 text-primary" />
+              <div className="h-9 w-9 rounded-xl bg-[hsl(var(--tint-peach))] flex items-center justify-center">
+                <Receipt className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
               </div>
-              <span className="font-medium text-sm">{t('profile.sections.orders')}</span>
+              <span className="font-medium text-sm text-[hsl(var(--fg-warm))]">{t('profile.sections.orders')}</span>
             </div>
-            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openSections.has('orders') ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`h-4 w-4 text-[hsl(var(--fg-warm-muted))] transition-transform duration-200 ${openSections.has('orders') ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-1">
-            <Card className="rounded-2xl shadow-ios border-0 bg-card">
+            <Card className="rounded-2xl shadow-card-warm border-0 bg-card-warm">
               <CardContent className="pt-4">
                 {orders && orders.length > 0 ? (
                   <div className="space-y-2">
                     {orders.map((order) => (
-                      <div key={order.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
+                      <div key={order.id} className="flex items-center justify-between p-3 bg-[hsl(var(--tint-peach))]/30 rounded-xl">
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium truncate">{order.product_name}</p>
-                          <p className="text-xs text-muted-foreground">{format(new Date(order.created_at), 'MMM d, yyyy')}</p>
+                          <p className="text-sm font-medium truncate text-[hsl(var(--fg-warm))]">{order.product_name}</p>
+                          <p className="text-xs text-[hsl(var(--fg-warm-muted))]">{format(new Date(order.created_at), 'MMM d, yyyy')}</p>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
-                          <span className="text-sm font-medium">{formatCurrency(order.amount, order.currency || 'usd')}</span>
+                          <span className="text-sm font-medium text-[hsl(var(--fg-warm))]">{formatCurrency(order.amount, order.currency || 'usd')}</span>
                           <Badge variant={getStatusBadgeVariant(order.status || 'completed')}>
                             {order.refunded ? t('profile.refunded') : (order.status || t('profile.completed'))}
                           </Badge>
@@ -769,8 +769,8 @@ const AppProfile = () => {
                   </div>
                 ) : (
                   <div className="text-center py-6">
-                    <Receipt className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground">{t('profile.noOrders')}</p>
+                    <Receipt className="h-8 w-8 mx-auto text-[hsl(var(--fg-warm-muted))] mb-2" />
+                    <p className="text-sm text-[hsl(var(--fg-warm-muted))]">{t('profile.noOrders')}</p>
                   </div>
                 )}
               </CardContent>
@@ -782,15 +782,15 @@ const AppProfile = () => {
         <SyncStatusCard />
         <button
           onClick={() => navigate('/app/settings')}
-          className="flex items-center justify-between w-full p-4 bg-card rounded-2xl shadow-ios active:bg-muted/50 transition-colors"
+          className="flex items-center justify-between w-full p-4 bg-card-warm rounded-2xl shadow-card-warm active:bg-[hsl(var(--tint-peach))]/40 transition-colors"
         >
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-muted flex items-center justify-center">
-              <Settings className="h-4 w-4 text-muted-foreground" />
+            <div className="h-9 w-9 rounded-xl bg-[hsl(var(--tint-peach))] flex items-center justify-center">
+              <Settings className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
             </div>
-            <span className="font-medium text-sm">{t('profile.settings')}</span>
+            <span className="font-medium text-sm text-[hsl(var(--fg-warm))]">{t('profile.settings')}</span>
           </div>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          <ChevronRight className="h-4 w-4 text-[hsl(var(--fg-warm-muted))]" />
         </button>
 
       </div>
