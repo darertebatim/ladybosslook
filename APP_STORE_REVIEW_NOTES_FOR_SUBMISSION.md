@@ -151,28 +151,34 @@ This background audio capability is essential for users to listen to educational
 ## What's New in Version 1.2.1005
 
 **Friends Hub (NEW — at /app/hub):**
-Rilo now includes a private "Friends Hub" — a closed, invitation-only space where a user can connect with people they personally know via a unique friend code. **This is not a social network, not a public feed, and not a discovery surface.** There is no way to browse, search, or follow strangers.
+Rilo now includes a private **Friends Hub** where users connect only through friend codes and mutual acceptance. **It is not a social network, not a public feed, and not a stranger-discovery surface.**
 
 How it works:
-1. **Log in** with the test account → tap the **Friends Hub** entry (constellation/star icon) to open `/app/hub`
-2. The hub renders the user's accepted friends as glowing stars in a "constellation". A fresh account starts empty.
-3. Tap **Add friend** → enter another user's **friend code** (or share your own code). The other user must explicitly accept the friend request before any connection is created. No phone-book scanning, no email harvesting, no location-based discovery.
-4. Tap a friend's star to open the **Friend Detail sheet**, where the user can:
-   - **Send a direct message** (private 1:1 text only — no group chats, no public posts)
-   - **Gift a moment** (share a personal reflection/photo with that one friend)
-   - **Gift a playlist / dedicate audio** (send a curated audio item to that friend)
-   - **Remove, block, or report** the friend at any time
-5. **Notifications bell** in the hub shows incoming friend requests and gifts — nothing is auto-accepted.
+1. **Log in** with the test account → open **Friends Hub** at `/app/hub`
+2. The main screen shows accepted friends as glowing stars in a constellation view
+3. Tap **Add friend** to either:
+   - **Invite friends** by sharing a link
+   - **Enter code** to send a request using an 8-letter friend code
+   - Open **My code** to show the user's own QR code + friend code
+4. Friend connections are only created after the other person accepts the pending request
+5. After a friendship is accepted, tapping a friend's star opens a detail sheet where the user can:
+   - **Inspire** them by sending a moment/dedication
+   - **Gift a playlist**
+   - View a simple shared activity history
+   - **Remove friend**
+6. The notification bell in the hub shows pending friend requests and received dedications
 
-Key compliance points for review (Guideline 1.2 — UGC):
-- **Invitation-only, mutual consent required** — no messaging, gifting, or visibility is possible until both users accept the friend request via friend code.
-- **No public feed, no discovery, no follower system, no location sharing.**
-- **Direct messages are strictly 1:1 and text-only.** No group chats.
-- **Block / Remove / Report** are available on every friend and every message; blocking is instant and immediately hides all content and prevents further contact.
-- **Reported content and users are reviewed within 24 hours** and can be removed by moderators.
-- All friend, message, and gift data is stored in Supabase with row-level security so users can only access their own data. Deleting the account immediately removes all friendships, messages, and gifts.
+Important clarification for review:
+- **There is no direct messaging in Friends Hub**
+- **There is no public posting, no comments, no follower model, and no profile discovery of strangers**
+- **No contacts access, location-based discovery, or phone-book scanning is used**
 
-The existing **Chats tab** continues to host the support/community chat threads only — Friends Hub is a separate surface.
+Key compliance points for review:
+- **Mutual consent is required** before users appear as friends in the hub
+- **No public social graph** — friendships are private and code-based
+- Shared content in this feature is limited to **dedications/moments** and **playlist gifts** between accepted friends
+- Users can **decline requests** and **remove friends**
+- Data is stored in Supabase with row-level security so users only access their own permitted records
 
 No new permissions, no new background modes, and no new third-party SDKs are introduced in this version.
 
