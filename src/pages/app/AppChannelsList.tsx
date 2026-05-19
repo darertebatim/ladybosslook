@@ -331,7 +331,7 @@ export default function AppChannelsList() {
             </button>
           </div>
           {/* Window into the hub */}
-          <div className="px-1 pt-5">
+          <div className="px-1 pt-5 flex justify-center">
             <HubPortalCard />
           </div>
           {/* Feedback encouragement in white space */}
