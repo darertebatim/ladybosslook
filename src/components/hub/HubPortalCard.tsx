@@ -131,10 +131,11 @@ export function HubPortalCard() {
           </div>
           {notifCount > 0 && (
             <span
-              className="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] px-1 grid place-items-center rounded-full text-[10px] font-bold text-black"
+              className="absolute -top-2 -right-2 min-w-[22px] h-[22px] px-1.5 grid place-items-center rounded-full text-[12px] font-extrabold text-white animate-pulse"
               style={{
-                background: "linear-gradient(135deg, #FFE0B8 0%, #EB5E33 100%)",
-                boxShadow: "0 0 8px 1px rgba(235,94,51,0.7)",
+                background: "linear-gradient(135deg, #FF7A3A 0%, #EB3B33 100%)",
+                border: "2px solid #0E0820",
+                boxShadow: "0 0 0 2px rgba(235,94,51,0.35), 0 0 14px 2px rgba(235,94,51,0.85)",
               }}
             >
               {notifCount > 9 ? "9+" : notifCount}
