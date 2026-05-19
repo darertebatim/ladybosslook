@@ -1015,6 +1015,38 @@ export default function AppTest() {
         </CardContent>
       </Card>
 
+      {/* Routine Ended (Re-add prompt) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-violet-500" />
+            Routine Ended (Re-add prompt)
+          </CardTitle>
+          <CardDescription>
+            Shown when a routine with an ending finishes — asks the user if they want to add it again
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => { setRoutineEndedTest({ totalDays: 7, withBadge: false }); setShowRoutineEnded(true); }} variant="outline">
+              🌅 7-day routine
+            </Button>
+            <Button onClick={() => { setRoutineEndedTest({ totalDays: 30, withBadge: false }); setShowRoutineEnded(true); }} variant="outline">
+              📅 30-day routine
+            </Button>
+            <Button onClick={() => { setRoutineEndedTest({ totalDays: 30, withBadge: true }); setShowRoutineEnded(true); }} variant="outline">
+              🏅 With badge
+            </Button>
+            <Button onClick={() => { setRoutineEndedTest({ totalDays: null, withBadge: false }); setShowRoutineEnded(true); }} variant="outline">
+              📆 End date
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Triggers in-app when end_after_days or end_date is reached. "Add it again" re-enrolls the user.
+          </p>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
