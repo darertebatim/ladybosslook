@@ -287,19 +287,35 @@ export const AudioManager = () => {
 
       // Handle playlist assignment
       if (playlistId !== undefined) {
-        // First remove existing playlist assignments
-        await supabase
+        // Check current assignment so we don't churn playlist_items on simple
+        // metadata edits (renames, description tweaks). Re-inserting bumps
+        // created_at and notifies every subscribed user as if a NEW track
+        // was added to the playlist.
+        const { data: existingItems } = await supabase
           .from('audio_playlist_items')
-          .delete()
+          .select('playlist_id')
           .eq('audio_id', id);
 
-        // Then add new assignment if playlist selected
-        if (playlistId) {
+        const currentPlaylistIds = (existingItems ?? []).map((r) => r.playlist_id);
+        const targetPlaylistId = playlistId || null;
+        const alreadyAssigned = targetPlaylistId
+          ? currentPlaylistIds.includes(targetPlaylistId) && currentPlaylistIds.length === 1
+          : currentPlaylistIds.length === 0;
+
+        if (!alreadyAssigned) {
+          // Playlist actually changed → remove old assignments
+          await supabase
+            .from('audio_playlist_items')
+            .delete()
+            .eq('audio_id', id);
+
+          // Then add new assignment if a playlist is selected
+          if (targetPlaylistId) {
           // Get max sort_order to add at end
           const { data: maxItem } = await supabase
             .from('audio_playlist_items')
             .select('sort_order')
-            .eq('playlist_id', playlistId)
+            .eq('playlist_id', targetPlaylistId)
             .order('sort_order', { ascending: false })
             .limit(1)
             .single();
@@ -308,12 +324,13 @@ export const AudioManager = () => {
           const { error: playlistError } = await supabase
             .from('audio_playlist_items')
             .insert({
-              playlist_id: playlistId,
+              playlist_id: targetPlaylistId,
               audio_id: id,
               sort_order: nextOrder,
             });
 
           if (playlistError) throw playlistError;
+          }
         }
       }
     },
