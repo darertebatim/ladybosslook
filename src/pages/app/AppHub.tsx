@@ -16,6 +16,7 @@ import { FriendDetailSheet } from "@/components/hub/FriendDetailSheet";
 import { useReceivedDedications, type DedicationWithRelations } from "@/hooks/useDedications";
 import { ChevronLeft, Bell, Settings, Gift, ChevronRight, Music, Plus } from "lucide-react";
 import { HubNotificationsSheet } from "@/components/hub/HubNotificationsSheet";
+import { HubSettingsSheet, getHideEmptyStars } from "@/components/hub/HubSettingsSheet";
 
 export default function AppHub() {
   const goBack = useGoBack("/app/home");
@@ -28,6 +29,8 @@ export default function AppHub() {
   const [giftInviteOpen, setGiftInviteOpen] = useState(false);
   const [giftPlaylistOpen, setGiftPlaylistOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [hideEmptyStars, setHideEmptyStars] = useState<boolean>(() => getHideEmptyStars());
   const [openedDedication, setOpenedDedication] = useState<DedicationWithRelations | null>(null);
   const [sendBackMoment, setSendBackMoment] = useState<null | { recipientId: string; recipientName: string | null }>(null);
   const [openFriendId, setOpenFriendId] = useState<string | null>(null);
@@ -141,6 +144,7 @@ export default function AppHub() {
             <button
               className="w-10 h-10 grid place-items-center rounded-full bg-white/10 backdrop-blur-md active:scale-90"
               aria-label="Settings"
+              onClick={() => setSettingsOpen(true)}
             >
               <Settings className="w-5 h-5 text-white" />
             </button>
@@ -165,6 +169,7 @@ export default function AppHub() {
             friends={accepted}
             onAdd={() => setAddOpen(true)}
             onFriendTap={(f) => setOpenFriendId(f.id)}
+            hideEmpty={hideEmptyStars}
           />
         </div>
 
@@ -338,6 +343,13 @@ export default function AppHub() {
           open={notifOpen}
           onOpenChange={setNotifOpen}
           onOpenDedication={(d) => setOpenedDedication(d)}
+        />
+        <HubSettingsSheet
+          open={settingsOpen}
+          onOpenChange={setSettingsOpen}
+          code={myCode ?? null}
+          hideEmptyStars={hideEmptyStars}
+          onHideEmptyStarsChange={setHideEmptyStars}
         />
         <FriendDetailSheet
           open={!!openFriendship}

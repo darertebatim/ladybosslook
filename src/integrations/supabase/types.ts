@@ -5112,11 +5112,15 @@ export type Database = {
           daily_completion: boolean
           evening_checkin: boolean
           feed_posts: boolean
+          friend_accepted: boolean
+          friend_requests: boolean
           goal_milestones: boolean
           goal_nudges: boolean
           id: string
+          moments_received: boolean
           momentum_celebration: boolean
           morning_summary: boolean
+          playlist_gifts: boolean
           session_reminders: boolean
           sleep_time: string | null
           time_period_reminders: boolean
@@ -5133,11 +5137,15 @@ export type Database = {
           daily_completion?: boolean
           evening_checkin?: boolean
           feed_posts?: boolean
+          friend_accepted?: boolean
+          friend_requests?: boolean
           goal_milestones?: boolean
           goal_nudges?: boolean
           id?: string
+          moments_received?: boolean
           momentum_celebration?: boolean
           morning_summary?: boolean
+          playlist_gifts?: boolean
           session_reminders?: boolean
           sleep_time?: string | null
           time_period_reminders?: boolean
@@ -5154,11 +5162,15 @@ export type Database = {
           daily_completion?: boolean
           evening_checkin?: boolean
           feed_posts?: boolean
+          friend_accepted?: boolean
+          friend_requests?: boolean
           goal_milestones?: boolean
           goal_nudges?: boolean
           id?: string
+          moments_received?: boolean
           momentum_celebration?: boolean
           morning_summary?: boolean
+          playlist_gifts?: boolean
           session_reminders?: boolean
           sleep_time?: string | null
           time_period_reminders?: boolean
@@ -5937,6 +5949,7 @@ export type Database = {
         Returns: Json
       }
       publish_due_scheduled_posts: { Args: never; Returns: Json }
+      regenerate_my_friend_code: { Args: never; Returns: string }
     }
     Enums: {
       app_role: "admin" | "user"

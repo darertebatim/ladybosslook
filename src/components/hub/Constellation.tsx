@@ -34,9 +34,10 @@ interface Props {
   friends: FriendProfile[];
   onAdd: () => void;
   onFriendTap?: (friend: FriendProfile) => void;
+  hideEmpty?: boolean;
 }
 
-export function Constellation({ friends, onAdd, onFriendTap }: Props) {
+export function Constellation({ friends, onAdd, onFriendTap, hideEmpty }: Props) {
   const slots = useMemo(() => {
     const count = visibleCount(friends.length);
     return SPOTS.slice(0, count).map((spot, i) => ({ ...spot, friend: friends[i] ?? null }));
@@ -86,7 +87,7 @@ export function Constellation({ friends, onAdd, onFriendTap }: Props) {
                 delay={i * 0.18}
                 onTap={onFriendTap}
               />
-            ) : (
+            ) : hideEmpty ? null : (
               <EmptyStar size={size} delay={i * 0.18} onAdd={onAdd} />
             )}
           </div>
