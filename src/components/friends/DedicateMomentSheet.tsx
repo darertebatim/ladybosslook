@@ -81,26 +81,51 @@ export function DedicateMomentSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="rounded-t-[28px] border-0 p-0 max-h-[92dvh] flex flex-col"
+        className="dark rounded-t-[28px] border-0 p-0 max-h-[92dvh] flex flex-col text-white overflow-hidden"
+        style={{
+          background:
+            "radial-gradient(ellipse 90% 55% at 50% 0%, #3A1E66 0%, #1A0E2E 55%, #0E0820 100%)",
+        }}
       >
-        <div className="flex-1 overflow-y-auto p-6 pt-5 pb-4">
-          <div className="mx-auto w-10 h-1.5 rounded-full bg-black/15 mb-4" />
+        {/* Aurora nebula glow */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 65% 35% at 25% 10%, rgba(235,94,51,0.20), transparent 65%), radial-gradient(ellipse 55% 35% at 80% 50%, rgba(178,140,255,0.22), transparent 65%)",
+          }}
+        />
+        {/* Twinkle stars */}
+        <svg className="pointer-events-none absolute inset-0 w-full h-full" aria-hidden>
+          {Array.from({ length: 22 }).map((_, i) => {
+            const seed = (i * 9301 + 49297) % 233280;
+            const x = (seed % 97) / 97;
+            const y = ((seed * 7) % 89) / 89;
+            const r = 0.6 + ((seed % 13) / 13) * 1.2;
+            const o = 0.3 + ((seed % 11) / 11) * 0.5;
+            return <circle key={i} cx={`${x * 100}%`} cy={`${y * 60}%`} r={r} fill="#fff" opacity={o} />;
+          })}
+        </svg>
+
+        <div className="relative flex-1 overflow-y-auto p-6 pt-5 pb-4">
+          <div className="mx-auto w-10 h-1.5 rounded-full bg-white/25 mb-4" />
           <div className="flex items-center gap-2 mb-1">
-            <Sparkles className="w-4 h-4 text-[hsl(var(--brand-primary))]" />
-            <h2 className="text-xl font-bold text-black dark:text-white">
+            <Sparkles className="w-4 h-4 text-[#FFE0B8]" />
+            <h2 className="text-xl font-bold text-white">
               {heading}
             </h2>
           </div>
-          <p className="text-sm text-[hsl(var(--fg-warm-muted))] mb-5">
+          <p className="text-sm text-white/65 mb-5">
             {subheading}
           </p>
 
           {isLoading ? (
-            <div className="py-10 text-center text-sm text-[hsl(var(--fg-warm-muted))]">Loading…</div>
+            <div className="py-10 text-center text-sm text-white/60">Loading…</div>
           ) : moments.length === 0 ? (
             <div className="py-10 text-center">
               <div className="text-5xl mb-3">🌱</div>
-              <p className="text-sm text-[hsl(var(--fg-warm-muted))] max-w-[28ch] mx-auto">
+              <p className="text-sm text-white/70 max-w-[28ch] mx-auto">
                 Finish a breathe, reflection or routine to earn a moment to give.
               </p>
             </div>
@@ -128,7 +153,7 @@ export function DedicateMomentSheet({
                   value={hint}
                   onChange={(e) => setHint(e.target.value.slice(0, 40))}
                   placeholder="Their first name (optional)"
-                  className="mt-4 w-full p-4 rounded-2xl bg-white border border-black/10 text-black placeholder:text-black/40 outline-none shadow-ios text-[15px]"
+                  className="mt-4 w-full p-4 rounded-2xl bg-white/10 border border-white/15 text-white placeholder:text-white/40 outline-none backdrop-blur-md text-[15px]"
                 />
               )}
               {/* No user-written messages — UGC between users is not allowed. */}
@@ -137,16 +162,20 @@ export function DedicateMomentSheet({
         </div>
         {moments.length > 0 && (
           <div
-            className="shrink-0 px-6 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] bg-background border-t border-black/5"
+            className="relative shrink-0 px-6 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] border-t border-white/10"
+            style={{ background: "rgba(14,8,32,0.85)", backdropFilter: "blur(14px)" }}
           >
             <button
               onClick={submit}
               disabled={!selectedId || pending}
               style={{
-                backgroundColor: !selectedId || pending ? "#E5E5E5" : "#EB5E33",
-                color: !selectedId || pending ? "#8A8A8A" : "#FFFFFF",
+                background: !selectedId || pending
+                  ? "rgba(255,255,255,0.10)"
+                  : "linear-gradient(135deg, #FFE0B8 0%, #FFB088 50%, #EB5E33 100%)",
+                color: !selectedId || pending ? "rgba(255,255,255,0.45)" : "#000000",
+                boxShadow: !selectedId || pending ? "none" : "0 8px 24px -8px rgba(235,94,51,0.55)",
               }}
-              className="w-full min-h-12 py-3.5 rounded-2xl font-semibold shadow-ios active:scale-[0.98] transition-transform"
+              className="w-full min-h-12 py-3.5 rounded-2xl font-semibold active:scale-[0.98] transition-transform"
             >
               {ctaLabel}
             </button>
