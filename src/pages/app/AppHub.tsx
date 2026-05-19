@@ -143,7 +143,9 @@ export default function AppHub() {
           <p className="text-white/65 text-[12px] mt-0.5">
             {accepted.length === 0
               ? "Light up the sky with friends."
-              : `${accepted.length} ${accepted.length === 1 ? "star" : "stars"} shining with you.`}
+              : accepted.length <= 9
+                ? `${accepted.length} ${accepted.length === 1 ? "star" : "stars"} shining with you.`
+                : `Your inner circle of 9 — ${accepted.length - 9} more below.`}
           </p>
         </div>
 
@@ -151,6 +153,53 @@ export default function AppHub() {
         <div className="relative z-10 px-3 mt-1">
           <Constellation friends={accepted} onAdd={() => setAddOpen(true)} />
         </div>
+
+        {/* Overflow: all friends beyond the 9-star inner circle */}
+        {accepted.length > 9 && (
+          <div className="relative z-10 px-4 mt-4">
+            <div className="flex items-baseline justify-between mb-2">
+              <h2 className="text-white text-[13px] font-bold tracking-wide">
+                All friends
+              </h2>
+              <span className="text-white/55 text-[12px] font-medium">
+                {accepted.length}
+              </span>
+            </div>
+            <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1">
+              {accepted.slice(9).map((f) => {
+                const initial = (f.full_name || "?").charAt(0).toUpperCase();
+                return (
+                  <div key={f.id} className="shrink-0 w-[64px] flex flex-col items-center">
+                    {f.avatar_url ? (
+                      <img
+                        src={f.avatar_url}
+                        alt=""
+                        className="w-12 h-12 rounded-full object-cover"
+                        style={{ border: "1.5px solid rgba(255,255,255,0.7)" }}
+                      />
+                    ) : (
+                      <div
+                        className="w-12 h-12 rounded-full grid place-items-center text-base font-bold text-black"
+                        style={{
+                          background: "linear-gradient(135deg, #FFE0B8 0%, #FFB088 60%, #EB5E33 100%)",
+                          border: "1.5px solid rgba(255,255,255,0.7)",
+                        }}
+                      >
+                        {initial}
+                      </div>
+                    )}
+                    <span
+                      className="mt-1 text-[10px] font-medium text-white/85 truncate max-w-[60px] text-center"
+                      style={{ textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}
+                    >
+                      {f.full_name?.split(" ")[0] || "Friend"}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Invite banner */}
         <div className="relative z-10 px-4 mt-5">
