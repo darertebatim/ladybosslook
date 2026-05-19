@@ -16,7 +16,7 @@ import {
   ChevronDown, Settings, Camera, Globe, Heart, Briefcase, Instagram, Send, MessageSquare
 } from 'lucide-react';
 import { JournalStats } from '@/components/app/JournalStats';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { PageHeader } from '@/components/app/ui/PageHeader';
 import { IOSIconButton } from '@/components/app/ui/IOSIconButton';
 import { useToast } from '@/hooks/use-toast';
