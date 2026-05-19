@@ -1309,7 +1309,7 @@ export default function RoutinesBank() {
                                   <span>•</span>
                                   <span className="flex items-center gap-1">
                                     {routine.schedule_type === 'weekly' ? <Calendar className="h-3 w-3" /> : routine.schedule_type === 'project' ? '🎯' : routine.schedule_type === 'program' ? '🎓' : <Flame className="h-3 w-3" />}
-                                    {routine.schedule_type === 'weekly' ? 'Weekly' : routine.schedule_type === 'project' ? 'Project' : routine.schedule_type === 'program' ? 'Program' : 'Challenge'}
+                                    {routine.schedule_type === 'weekly' ? 'Weekly' : routine.schedule_type === 'project' ? 'Project' : routine.schedule_type === 'program' ? 'Program' : 'Drip'}
                                   </span>
                                 </>
                               )}
@@ -1646,7 +1646,7 @@ export default function RoutinesBank() {
                     <div className="grid grid-cols-4 gap-2">
                       {[
                         { value: 'daily', label: 'Normal', desc: 'Tasks with their own repeat settings', icon: '☀️' },
-                        { value: 'challenge', label: 'Challenge', desc: 'Sequential drip (Day 1, 2...)', icon: '🔥' },
+                        { value: 'challenge', label: 'Drip', desc: 'Sequential drip (Day 1, 2...)', icon: '💧' },
                         { value: 'project', label: 'Project', desc: 'Ordered steps toward a goal', icon: '🎯' },
                         { value: 'program', label: 'Program', desc: 'Auto-enroll in a program', icon: '🎓' },
                       ].map(opt => (
