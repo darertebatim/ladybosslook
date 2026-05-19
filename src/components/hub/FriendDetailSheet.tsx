@@ -278,11 +278,6 @@ export function FriendDetailSheet({
                       <div className="text-[13px] font-semibold text-white truncate mt-0.5">
                         {x.moment?.title || "A moment"}
                       </div>
-                      {x.message && (
-                        <div className="text-[12px] text-white/70 mt-0.5 line-clamp-2">
-                          "{x.message}"
-                        </div>
-                      )}
                     </div>
                     <div className="text-[10px] text-white/45 shrink-0 pt-0.5">
                       {formatWhen(x.created_at)}
