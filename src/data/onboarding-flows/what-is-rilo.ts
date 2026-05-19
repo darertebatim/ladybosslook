@@ -108,21 +108,21 @@ export const whatIsRiloFlow: OnboardingFlow = {
       ],
       buttonLabel: 'Continue',
     },
-    // Daily Reset prompt — placed right before the AI building step
+    // The Check Ins prompt — placed right before the AI building step
     {
       id: 'wir-daily-reset-prompt',
       type: 'daily-reset-prompt',
-      title: 'Enable Daily Reset?',
-      subtitle: 'Your routine resets every morning so you can start each day fresh.',
-      buttonLabel: 'Yes, enable it',
+      title: 'Add The Check Ins?',
+      subtitle: 'Three small check-ins a day — mood, breath, a few words. Five minutes to take back your day.',
+      buttonLabel: 'Yes, add it',
       secondaryButtonLabel: 'Maybe later',
     },
-    // Push permission — after Daily Reset so reminders reinforce the new ritual
+    // Push permission — after The Check Ins so reminders reinforce the new ritual
     {
       id: 'wir-push-permission',
       type: 'welcome-aboard',
       title: 'With reminders, routines feel 80% easier.',
-      subtitle: 'Get gentle nudges to keep your daily reset on track.',
+      subtitle: 'Get gentle nudges so your Check Ins stay on track.',
       buttonLabel: 'Turn on notifications',
       secondaryButtonLabel: 'Maybe later',
     },
