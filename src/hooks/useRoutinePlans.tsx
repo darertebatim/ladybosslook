@@ -507,7 +507,7 @@ export function useAddRoutinePlan() {
           if (planScheduleType === 'weekly' && (task as any).schedule_days?.length > 0) {
             repeatPattern = 'custom';
             repeatDays = (task as any).schedule_days;
-          } else if (planScheduleType === 'challenge' && (task as any).drip_day) {
+          } else if (planScheduleType === 'drip' && (task as any).drip_day) {
             repeatPattern = 'none';
             const dripDay = (task as any).drip_day as number;
             const taskDate = new Date(today);
