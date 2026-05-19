@@ -183,7 +183,11 @@ export default function AppHub() {
               {accepted.slice(9).map((f) => {
                 const initial = (f.full_name || "?").charAt(0).toUpperCase();
                 return (
-                  <div key={f.id} className="shrink-0 w-[64px] flex flex-col items-center">
+                  <button
+                    key={f.id}
+                    onClick={() => setOpenFriendId(f.id)}
+                    className="shrink-0 w-[64px] flex flex-col items-center active:scale-95 transition-transform"
+                  >
                     {f.avatar_url ? (
                       <img
                         src={f.avatar_url}
@@ -208,7 +212,7 @@ export default function AppHub() {
                     >
                       {f.full_name?.split(" ")[0] || "Friend"}
                     </span>
-                  </div>
+                  </button>
                 );
               })}
             </div>
