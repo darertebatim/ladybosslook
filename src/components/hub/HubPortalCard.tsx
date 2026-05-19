@@ -52,7 +52,7 @@ export function HubPortalCard() {
     <button
       type="button"
       onClick={() => navigate("/app/hub")}
-      aria-label="Open your hub"
+      aria-label="Open your friends hub"
       className="relative w-full rounded-3xl overflow-hidden text-left active:scale-[0.99] transition-transform shadow-ios"
       style={{
         aspectRatio: "1 / 1.05",
@@ -112,7 +112,7 @@ export function HubPortalCard() {
         <div className="flex items-center gap-1.5">
           <Sparkles className="w-3.5 h-3.5 text-white/90" />
           <span className="text-[10px] uppercase tracking-[0.14em] font-bold text-white/85">
-            Your hub
+            Friends hub
           </span>
         </div>
         <div className="w-7 h-7 grid place-items-center rounded-full bg-white/15 backdrop-blur-md">

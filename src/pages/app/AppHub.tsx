@@ -62,7 +62,7 @@ export default function AppHub() {
 
   return (
     <SlideUpPage defaultBack="/app/home">
-      <SEOHead title="Hub · Rilo" description="Your circle of friends, glowing together." />
+      <SEOHead title="Friends Hub · Rilo" description="Your friends, glowing together." />
       <div
         className="min-h-[100dvh] relative overflow-hidden"
         style={{
@@ -118,7 +118,7 @@ export default function AppHub() {
 
         {/* Title */}
         <div className="relative z-10 px-6 mt-1 text-center">
-          <h1 className="text-white text-[22px] font-bold tracking-tight">Your circle</h1>
+          <h1 className="text-white text-[22px] font-bold tracking-tight">Your friends</h1>
           <p className="text-white/65 text-[12px] mt-0.5">
             {accepted.length === 0
               ? "Light up the sky with friends."
