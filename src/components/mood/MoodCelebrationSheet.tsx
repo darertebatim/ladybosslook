@@ -17,7 +17,7 @@ import { triggerSoftReview } from '@/lib/appReview';
 import journalImg from '@/assets/mood-card-journal.png';
 import breathingImg from '@/assets/mood-card-breathing.png';
 import reflectImg from '@/assets/mood-card-reflect.png';
-import planImg from '@/assets/mood-card-plan.png';
+import talkImg from '@/assets/mood-card-talk.png';
 
 interface MoodData {
   value: string;
@@ -37,7 +37,7 @@ const ACTIONS = [
   { labelKey: 'moodPage.celebration.actions.journal', image: journalImg, routeKey: 'journal' as const, route: undefined as string | undefined },
   { labelKey: 'moodPage.celebration.actions.breathe', image: breathingImg, route: '/app/breathe', routeKey: undefined as 'journal' | undefined },
   { labelKey: 'moodPage.celebration.actions.reflect', image: reflectImg, route: '/app/reflections', routeKey: undefined as 'journal' | undefined },
-  { labelKey: 'moodPage.celebration.actions.plan', image: planImg, route: '/app/aiplanner', routeKey: undefined as 'journal' | undefined },
+  { labelKey: 'moodPage.celebration.actions.talk', image: talkImg, route: '/app/channels', routeKey: undefined as 'journal' | undefined },
 ];
 
 interface MoodCelebrationSheetProps {
