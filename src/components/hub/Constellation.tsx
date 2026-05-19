@@ -34,7 +34,7 @@ export function Constellation({ friends, onAdd }: Props) {
   }, [friends]);
 
   return (
-    <div className="relative w-full" style={{ aspectRatio: "1 / 0.78" }}>
+    <div className="relative w-full" style={{ aspectRatio: "1 / 0.95" }}>
       {/* Subtle background nebula — dimmed so stars stay foreground */}
       <div
         aria-hidden
