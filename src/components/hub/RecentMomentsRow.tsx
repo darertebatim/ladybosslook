@@ -4,7 +4,7 @@ import type { UserMoment } from "@/hooks/useMoments";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import { defaultEmojiForKind, labelForKind } from "@/lib/moments";
 import { SendMomentToFriendSheet } from "@/components/hub/SendMomentToFriendSheet";
-import { Sparkles, Gift } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 function relTime(iso: string) {
   const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60_000);
