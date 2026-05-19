@@ -433,7 +433,11 @@ const AppProfile = () => {
 
         {/* Stats row */}
         <div className="flex gap-2">
-          <StatPill label={t('profile.sections.journal')} value={daysThisMonth} icon={CalendarIcon} />
+          <StatPill
+            label="Member since"
+            value={user?.created_at ? format(new Date(user.created_at), 'MMM yyyy') : '—'}
+            icon={Sparkles}
+          />
           <StatPill label={t('profile.sections.programs')} value={programCount} icon={BookOpen} />
           <StatPill label={t('profile.credits')} value={creditBalance} icon={Wallet} />
         </div>
