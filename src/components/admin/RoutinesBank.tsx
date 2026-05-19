@@ -199,7 +199,7 @@ export default function RoutinesBank() {
     category: 'general',
     color: 'yellow',
     emoji: '✨',
-    schedule_type: 'daily' as 'daily' | 'challenge' | 'project' | 'program',
+    schedule_type: 'daily' as 'daily' | 'drip' | 'project' | 'program',
     challenge_start_date: null as Date | null,
     start_day_of_week: null as number | null,
     start_mode: 'none' as 'none' | 'date' | 'weekday',
@@ -207,6 +207,7 @@ export default function RoutinesBank() {
     end_date: null as Date | null,
     end_after_days: null as number | null,
     badge_image_url: '',
+    is_challenge: false,
     is_focus: false,
     is_moment: false,
     linked_program_slug: null as string | null,
@@ -314,6 +315,7 @@ export default function RoutinesBank() {
           end_date: data.formData.end_mode === 'date' && data.formData.end_date ? data.formData.end_date.toISOString().split('T')[0] : null,
            end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
            badge_image_url: data.formData.badge_image_url || null,
+          is_challenge: data.formData.is_challenge,
             is_focus: data.formData.is_focus,
             is_moment: data.formData.is_moment,
             linked_program_slug: data.formData.schedule_type === 'program' ? data.formData.linked_program_slug : null,
@@ -397,6 +399,7 @@ export default function RoutinesBank() {
           end_date: data.formData.end_mode === 'date' && data.formData.end_date ? data.formData.end_date.toISOString().split('T')[0] : null,
            end_after_days: data.formData.end_mode === 'after_days' ? data.formData.end_after_days : null,
            badge_image_url: data.formData.badge_image_url || null,
+          is_challenge: data.formData.is_challenge,
             is_focus: data.formData.is_focus,
             is_moment: data.formData.is_moment,
             linked_program_slug: data.formData.schedule_type === 'program' ? data.formData.linked_program_slug : null,
@@ -606,7 +609,7 @@ export default function RoutinesBank() {
       category: 'general',
       color: 'yellow',
       emoji: '✨',
-      schedule_type: 'daily' as 'daily' | 'challenge' | 'project' | 'program',
+      schedule_type: 'daily' as 'daily' | 'drip' | 'project' | 'program',
       challenge_start_date: null,
       start_day_of_week: null,
       start_mode: 'none',
@@ -614,6 +617,7 @@ export default function RoutinesBank() {
       end_date: null,
       end_after_days: null,
       badge_image_url: '',
+      is_challenge: false,
       is_focus: false,
       is_moment: false,
       linked_program_slug: null,
@@ -638,7 +642,7 @@ export default function RoutinesBank() {
       category: routine.category,
       color: routine.color,
       emoji: routine.emoji,
-      schedule_type: (['challenge', 'project', 'program'].includes(routine.schedule_type) ? routine.schedule_type : 'daily') as 'daily' | 'challenge' | 'project' | 'program',
+      schedule_type: (['drip', 'project', 'program'].includes(routine.schedule_type) ? routine.schedule_type : 'daily') as 'daily' | 'drip' | 'project' | 'program',
       challenge_start_date: (routine as any).challenge_start_date ? new Date((routine as any).challenge_start_date) : null,
       start_day_of_week: (routine as any).start_day_of_week ?? null,
       start_mode: (routine as any).start_day_of_week != null ? 'weekday' : ((routine as any).challenge_start_date ? 'date' : 'none'),
@@ -646,6 +650,7 @@ export default function RoutinesBank() {
       end_date: (routine as any).end_date ? new Date((routine as any).end_date) : null,
       end_after_days: (routine as any).end_after_days ?? null,
       badge_image_url: (routine as any).badge_image_url || '',
+      is_challenge: (routine as any).is_challenge ?? false,
       is_focus: (routine as any).is_focus ?? false,
       is_moment: (routine as any).is_moment ?? false,
       linked_program_slug: (routine as any).linked_program_slug ?? null,
@@ -786,7 +791,7 @@ export default function RoutinesBank() {
       section_id: sectionId,
       task_order: localTasks.filter(t => t.section_id === sectionId).length,
       schedule_days: [],
-      drip_day: formData.schedule_type === 'challenge' ? localTasks.length + 1 : formData.schedule_type === 'project' ? localTasks.length + 1 : null,
+      drip_day: formData.schedule_type === 'drip' ? localTasks.length + 1 : formData.schedule_type === 'project' ? localTasks.length + 1 : null,
       monthly_day: null,
       is_once: task.repeat_pattern === 'none',
       duration_minutes: (task as any).duration_minutes ?? null,
@@ -1065,7 +1070,7 @@ export default function RoutinesBank() {
     : selectedCategory === 'featured'
     ? routines.filter(r => r.is_featured)
     : selectedCategory === 'challenges'
-    ? routines.filter(r => r.schedule_type === 'challenge')
+    ? routines.filter(r => r.schedule_type === 'drip')
     : selectedCategory === 'projects'
     ? routines.filter(r => r.schedule_type === 'project')
     : selectedCategory === 'programs'
@@ -1092,7 +1097,7 @@ export default function RoutinesBank() {
   const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const renderTaskScheduleConfig = (task: LocalTask) => {
-    if (formData.schedule_type === 'challenge') {
+    if (formData.schedule_type === 'drip') {
       return (
         <div className="flex items-center gap-1">
           <span className="text-[10px] text-muted-foreground">Day</span>
@@ -1308,7 +1313,7 @@ export default function RoutinesBank() {
                                 <>
                                   <span>•</span>
                                   <span className="flex items-center gap-1">
-                                    {routine.schedule_type === 'weekly' ? <Calendar className="h-3 w-3" /> : routine.schedule_type === 'project' ? '🎯' : routine.schedule_type === 'program' ? '🎓' : <Flame className="h-3 w-3" />}
+                                    {routine.schedule_type === 'weekly' ? <Calendar className="h-3 w-3" /> : routine.schedule_type === 'project' ? '🎯' : routine.schedule_type === 'program' ? '🎓' : '💧'}
                                     {routine.schedule_type === 'weekly' ? 'Weekly' : routine.schedule_type === 'project' ? 'Project' : routine.schedule_type === 'program' ? 'Program' : 'Drip'}
                                   </span>
                                 </>
@@ -1646,7 +1651,7 @@ export default function RoutinesBank() {
                     <div className="grid grid-cols-4 gap-2">
                       {[
                         { value: 'daily', label: 'Normal', desc: 'Tasks with their own repeat settings', icon: '☀️' },
-                        { value: 'challenge', label: 'Drip', desc: 'Sequential drip (Day 1, 2...)', icon: '💧' },
+                         { value: 'drip', label: 'Drip', desc: 'Sequential drip (Day 1, 2...)', icon: '💧' },
                         { value: 'project', label: 'Project', desc: 'Ordered steps toward a goal', icon: '🎯' },
                         { value: 'program', label: 'Program', desc: 'Auto-enroll in a program', icon: '🎓' },
                       ].map(opt => (
@@ -1870,7 +1875,7 @@ export default function RoutinesBank() {
                           className="w-12 h-12 rounded-lg object-cover"
                         />
                         <div className="text-xs text-muted-foreground">
-                          {formData.schedule_type === 'challenge'
+                           {formData.schedule_type === 'drip'
                             ? `Users will earn this badge when they complete all ${formData.end_after_days || '?'} days`
                             : formData.schedule_type === 'project'
                             ? 'Users will earn this badge when they complete all steps'
@@ -1880,6 +1885,18 @@ export default function RoutinesBank() {
                         </div>
                       </div>
                     )}
+                  </div>
+
+                  {/* Challenge Toggle (works for any routine type) */}
+                  <div className="flex items-center justify-between border-t pt-4">
+                    <div>
+                      <Label className="text-xs font-medium">🏆 Challenge</Label>
+                      <p className="text-xs text-muted-foreground">Show the Challenge Day Celebration when user completes all tasks each day</p>
+                    </div>
+                    <Switch
+                      checked={formData.is_challenge}
+                      onCheckedChange={(checked) => setFormData({ ...formData, is_challenge: checked })}
+                    />
                   </div>
 
                   {/* Focus Routine Toggle */}
@@ -2155,7 +2172,7 @@ export default function RoutinesBank() {
                      const weeklyTasks = uncategorizedTasks.filter(t => t.schedule_days && t.schedule_days.length > 0 && !t.is_once);
                      const monthlyTasks = uncategorizedTasks.filter(t => t.monthly_day != null && !t.is_once);
                      const onceTasks = uncategorizedTasks.filter(t => t.is_once === true);
-                     const showGroups = formData.schedule_type !== 'challenge' && (dailyTasks.length > 0 || weeklyTasks.length > 0 || monthlyTasks.length > 0 || onceTasks.length > 0 || localSections.length === 0);
+                     const showGroups = formData.schedule_type !== 'drip' && (dailyTasks.length > 0 || weeklyTasks.length > 0 || monthlyTasks.length > 0 || onceTasks.length > 0 || localSections.length === 0);
 
                     if (!showGroups && uncategorizedTasks.length === 0 && localSections.length > 0) return null;
 
@@ -2226,7 +2243,7 @@ export default function RoutinesBank() {
                       </DndContext>
                     );
                     // For challenge/project mode, show flat list
-                    if (formData.schedule_type === 'challenge' || formData.schedule_type === 'project') {
+                    if (formData.schedule_type === 'drip' || formData.schedule_type === 'project') {
                       const modeLabel = formData.schedule_type === 'project' ? 'Steps' : 'Tasks';
                       return (uncategorizedTasks.length > 0 || localSections.length === 0) && (
                         <div className="border rounded-lg overflow-hidden border-dashed">
