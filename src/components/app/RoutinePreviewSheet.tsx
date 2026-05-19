@@ -99,7 +99,7 @@ interface RoutinePreviewSheetProps {
   routineTitle: string;
   routineColor?: string | null;
   defaultTag?: string | null;
-  scheduleType?: 'daily' | 'weekly' | 'challenge' | 'project' | 'program';
+  scheduleType?: 'daily' | 'weekly' | 'drip' | 'project' | 'program';
   challengeStartDate?: string | null;
   startDayOfWeek?: number | null;
   endMode?: string | null;
@@ -549,7 +549,7 @@ export function RoutinePreviewSheet({
                 </div>
               </div>
             )}
-            {scheduleType === 'challenge' ? (
+            {scheduleType === 'drip' ? (
                 <>
                   {/* Pro-task at top for challenges */}
                   {displayTasks.length > tasks.length && (

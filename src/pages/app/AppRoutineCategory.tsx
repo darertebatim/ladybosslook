@@ -30,7 +30,7 @@ export default function AppRoutineCategory() {
 
   const displayedRoutines = useMemo(() => {
     if (!routines) return [];
-    if (isChallenges) return routines.filter(r => r.schedule_type === 'challenge');
+    if (isChallenges) return routines.filter(r => r.schedule_type === 'drip');
     if (isProjects) return routines.filter(r => r.schedule_type === 'project');
     if (isReset) return routines.filter(r => (r as any).is_focus === true);
     if (isPopular) return routines.filter(r => r.is_popular === true);
