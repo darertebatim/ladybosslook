@@ -246,6 +246,11 @@ export default function AppHub() {
           recipientId={sendBackMoment?.recipientId ?? null}
           recipientName={sendBackMoment?.recipientName ?? null}
         />
+        <HubNotificationsSheet
+          open={notifOpen}
+          onOpenChange={setNotifOpen}
+          onOpenDedication={(d) => setOpenedDedication(d)}
+        />
       </div>
     </SlideUpPage>
   );
