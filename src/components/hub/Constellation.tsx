@@ -63,23 +63,11 @@ export function Constellation({ friends, onAdd }: Props) {
             {s.friend ? (
               <FilledStar friend={s.friend} size={size} delay={i * 0.18} />
             ) : (
-              <EmptyStar size={size} delay={i * 0.18} />
+              <EmptyStar size={size} delay={i * 0.18} onAdd={onAdd} />
             )}
           </div>
         );
       })}
-
-      {/* Center add friend pill */}
-      <button
-        onClick={onAdd}
-        className="absolute left-1/2 -translate-x-1/2 bottom-[-18px] inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-white shadow-ios active:scale-95 transition-transform"
-        style={{ color: "#EB5E33" }}
-      >
-        <span className="grid place-items-center w-6 h-6 rounded-full" style={{ backgroundColor: "#EB5E33" }}>
-          <Plus className="w-3.5 h-3.5" color="#FFFFFF" strokeWidth={3} />
-        </span>
-        <span className="text-[14px] font-bold">Add friend</span>
-      </button>
     </div>
   );
 }
@@ -136,11 +124,14 @@ function FilledStar({ friend, size, delay }: { friend: FriendProfile; size: numb
   );
 }
 
-function EmptyStar({ size, delay }: { size: number; delay: number }) {
-  // Real 5-point star outline at full slot size, no surrounding circle
+function EmptyStar({ size, delay, onAdd }: { size: number; delay: number; onAdd: () => void }) {
+  // Tappable 5-point star outline with a centered + to invite a friend
   return (
-    <div
-      className="grid place-items-center"
+    <button
+      type="button"
+      onClick={onAdd}
+      aria-label="Add friend"
+      className="relative grid place-items-center active:scale-90 transition-transform"
       style={{
         width: size,
         height: size,
@@ -156,7 +147,13 @@ function EmptyStar({ size, delay }: { size: number; delay: number }) {
           fill="rgba(255,255,255,0.04)"
         />
       </svg>
-    </div>
+      <Plus
+        className="absolute"
+        style={{ width: size * 0.32, height: size * 0.32, color: "rgba(255,255,255,0.85)" }}
+        strokeWidth={2.5}
+        aria-hidden
+      />
+    </button>
   );
 }
 
