@@ -12,14 +12,14 @@ import { triggerSoftReview } from '@/lib/appReview';
 
 import academyImg from '@/assets/reflection-card-academy.png';
 import listenImg from '@/assets/reflection-card-listen.png';
-import timerImg from '@/assets/reflection-card-timer.png';
 import presenceImg from '@/assets/reflection-card-presence.png';
+import breatheImg from '@/assets/mood-card-breathing.png';
 
 const ACTIONS = [
-  { label: 'Academy', image: academyImg, route: '/app/courses' },
+  { label: 'Education', image: academyImg, route: '/app/player?category=education' },
   { label: 'Listen', image: listenImg, route: '/app/player' },
-  { label: 'Focus Timer', image: timerImg, route: '/app/timer' },
-  { label: 'My Presence', image: presenceImg, route: '/app/presence' },
+  { label: 'Breathe', image: breatheImg, route: '/app/breathe' },
+  { label: 'Self-Care Goals', image: presenceImg, route: '/app/balance' },
 ];
 
 interface ReflectionCelebrationSheetProps {
