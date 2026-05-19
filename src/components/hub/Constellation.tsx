@@ -7,18 +7,20 @@ import type { FriendProfile } from "@/hooks/useFriends";
  * Top arc: 5 slots curving across the top.
  * Bottom arc: 4 slots curving below, offset between top ones.
  */
+// 3 rows: 4 / 3 / 2 stars, larger and more relaxed
 const SPOTS: Array<{ x: number; y: number; size: number }> = [
-  // Top arc (left -> right), gentle dip in the middle
-  { x: 0.10, y: 0.30, size: 0.95 },
-  { x: 0.30, y: 0.18, size: 1.05 },
-  { x: 0.50, y: 0.12, size: 1.2 },
-  { x: 0.70, y: 0.18, size: 1.05 },
-  { x: 0.90, y: 0.30, size: 0.95 },
-  // Bottom arc, offset between
-  { x: 0.20, y: 0.62, size: 1.0 },
-  { x: 0.40, y: 0.55, size: 1.1 },
-  { x: 0.60, y: 0.55, size: 1.1 },
-  { x: 0.80, y: 0.62, size: 1.0 },
+  // Row 1 — 4 stars
+  { x: 0.14, y: 0.18, size: 1.0 },
+  { x: 0.38, y: 0.14, size: 1.15 },
+  { x: 0.62, y: 0.14, size: 1.15 },
+  { x: 0.86, y: 0.18, size: 1.0 },
+  // Row 2 — 3 stars
+  { x: 0.22, y: 0.50, size: 1.1 },
+  { x: 0.50, y: 0.46, size: 1.25 },
+  { x: 0.78, y: 0.50, size: 1.1 },
+  // Row 3 — 2 stars
+  { x: 0.34, y: 0.82, size: 1.1 },
+  { x: 0.66, y: 0.82, size: 1.1 },
 ];
 
 interface Props {
@@ -53,7 +55,7 @@ export function Constellation({ friends, onAdd }: Props) {
       {slots.map((s, i) => {
         const left = `${s.x * 100}%`;
         const top = `${s.y * 100}%`;
-        const size = 46 * s.size;
+        const size = 64 * s.size;
         return (
           <div
             key={i}
