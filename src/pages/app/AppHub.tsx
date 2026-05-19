@@ -12,6 +12,7 @@ import { GiftMomentInviteSheet } from "@/components/hub/GiftMomentInviteSheet";
 import { GiftPlaylistInviteSheet } from "@/components/hub/GiftPlaylistInviteSheet";
 import { DedicationReceivedSheet } from "@/components/friends/DedicationReceivedSheet";
 import { DedicateMomentSheet } from "@/components/friends/DedicateMomentSheet";
+import { FriendDetailSheet } from "@/components/hub/FriendDetailSheet";
 import { useReceivedDedications, type DedicationWithRelations } from "@/hooks/useDedications";
 import { ChevronLeft, Bell, Settings, Gift, ChevronRight, Music, Plus } from "lucide-react";
 import { HubNotificationsSheet } from "@/components/hub/HubNotificationsSheet";
@@ -29,6 +30,7 @@ export default function AppHub() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [openedDedication, setOpenedDedication] = useState<DedicationWithRelations | null>(null);
   const [sendBackMoment, setSendBackMoment] = useState<null | { recipientId: string; recipientName: string | null }>(null);
+  const [openFriendId, setOpenFriendId] = useState<string | null>(null);
 
   const { data: receivedDedications = [] } = useReceivedDedications();
   const unseenDedication = useMemo(
@@ -54,6 +56,14 @@ export default function AppHub() {
       .filter((f) => f.friendship.status === "accepted")
       .map((f) => f.other),
     [friendships],
+  );
+
+  const openFriendship = useMemo(
+    () =>
+      friendships.find(
+        (f) => f.friendship.status === "accepted" && f.other.id === openFriendId,
+      ) ?? null,
+    [friendships, openFriendId],
   );
 
   const displayName = (user?.user_metadata as any)?.full_name || (user?.email?.split("@")[0] ?? null);
@@ -151,7 +161,11 @@ export default function AppHub() {
 
         {/* Constellation scene */}
         <div className="relative z-10 px-3 mt-1">
-          <Constellation friends={accepted} onAdd={() => setAddOpen(true)} />
+          <Constellation
+            friends={accepted}
+            onAdd={() => setAddOpen(true)}
+            onFriendTap={(f) => setOpenFriendId(f.id)}
+          />
         </div>
 
         {/* Overflow: all friends beyond the 9-star inner circle */}
@@ -320,6 +334,19 @@ export default function AppHub() {
           open={notifOpen}
           onOpenChange={setNotifOpen}
           onOpenDedication={(d) => setOpenedDedication(d)}
+        />
+        <FriendDetailSheet
+          open={!!openFriendship}
+          onOpenChange={(v) => !v && setOpenFriendId(null)}
+          friendship={openFriendship}
+          onInspire={() => {
+            if (!openFriendship) return;
+            setSendBackMoment({
+              recipientId: openFriendship.other.id,
+              recipientName: openFriendship.other.full_name,
+            });
+          }}
+          onGiftPlaylist={() => setGiftPlaylistOpen(true)}
         />
       </div>
     </SlideUpPage>
