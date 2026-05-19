@@ -75,7 +75,7 @@ export function SendMomentToFriendSheet({ moment, open, onOpenChange }: Props) {
             </button>
             <div className="flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-white" />
-              <h2 className="text-[17px] font-bold text-white">Dedicate this</h2>
+              <h2 className="text-[17px] font-bold text-white">Inspire a friend</h2>
             </div>
             <div className="w-9" />
           </div>
@@ -178,7 +178,7 @@ export function SendMomentToFriendSheet({ moment, open, onOpenChange }: Props) {
               }}
               className="w-full min-h-12 py-3.5 rounded-2xl font-semibold shadow-ios active:scale-[0.98] transition-transform"
             >
-              {send.isPending ? "Sending…" : "Send dedication"}
+              {send.isPending ? "Sending…" : "Inspire"}
             </button>
           </div>
         )}

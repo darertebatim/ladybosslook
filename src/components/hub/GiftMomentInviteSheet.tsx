@@ -40,7 +40,7 @@ export function GiftMomentInviteSheet({ open, onOpenChange, myCode }: Props) {
       const text = buildMessage(m.title, url, myCode);
       try {
         if (Capacitor.isNativePlatform()) {
-          await CapShare.share({ title: "A gift from Rilo", text, url, dialogTitle: "Gift this moment" });
+          await CapShare.share({ title: "Inspire a friend on Rilo", text, url, dialogTitle: "Inspire a friend" });
         } else if (typeof navigator !== "undefined" && (navigator as any).share) {
           await (navigator as any).share({ title: "A gift from Rilo", text, url });
         } else {
@@ -92,7 +92,7 @@ export function GiftMomentInviteSheet({ open, onOpenChange, myCode }: Props) {
             >
               <X className="w-4 h-4 text-white" />
             </button>
-            <h2 className="text-[17px] font-bold text-white">Gift a moment</h2>
+            <h2 className="text-[17px] font-bold text-white">Inspire a friend</h2>
             <div className="w-9" />
           </div>
 
@@ -173,7 +173,7 @@ export function GiftMomentInviteSheet({ open, onOpenChange, myCode }: Props) {
                       {isPending ? (
                         <><Loader2 className="w-3 h-3 animate-spin" /> Preparing…</>
                       ) : (
-                        <><Gift className="w-3 h-3" /> Gift</>
+                        <><Sparkles className="w-3 h-3" /> Inspire</>
                       )}
                     </span>
                   </button>
