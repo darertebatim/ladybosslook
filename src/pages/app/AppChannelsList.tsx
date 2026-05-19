@@ -24,6 +24,7 @@ import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreview
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import feedbackIllustration from '@/assets/feedback-illustration.png';
+import { HubPortalCard } from '@/components/hub/HubPortalCard';
 
 const SYNTHETIC_CHANNEL_TASK: RoutinePlanTask = {
   id: 'synthetic-channel-task',
@@ -328,6 +329,10 @@ export default function AppChannelsList() {
               </div>
               <ChevronRight className="h-4 w-4 text-fg-warm-muted/60 shrink-0" />
             </button>
+          </div>
+          {/* Window into the hub */}
+          <div className="px-1 pt-5">
+            <HubPortalCard />
           </div>
           {/* Feedback encouragement in white space */}
           <button
