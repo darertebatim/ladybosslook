@@ -17,6 +17,8 @@ import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 import { useUnreadChat } from '@/hooks/useUnreadChat';
 import { useChatNotifications } from '@/hooks/useChatNotifications';
 import { useUnreadFeedCount } from '@/hooks/useFeed';
+import { useFriendships } from '@/hooks/useFriends';
+import { useReceivedDedications } from '@/hooks/useDedications';
 import { cn } from '@/lib/utils';
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
 import { usePushNotificationFlow } from '@/hooks/usePushNotificationFlow';
@@ -151,6 +153,17 @@ const NativeAppLayout = () => {
   // Get unread feed count for Channels badge
   const { data: unreadFeedCount = 0 } = useUnreadFeedCount();
 
+  // Friend Hub unread: pending friend requests + unseen dedications
+  const { data: friendships = [] } = useFriendships();
+  const { data: receivedDedications = [] } = useReceivedDedications();
+  const friendHubCount =
+    friendships.filter(
+      (f) => f.friendship.status === 'pending' && f.friendship.addressee_id === user?.id,
+    ).length +
+    receivedDedications.filter((d) => !d.dedication.seen_at).length;
+
+  const chatsBadgeCount = unreadFeedCount + friendHubCount;
+
   // Get streak count for Presence nav badge
   const { data: streakCount = 0 } = useQuery({
     queryKey: ['nav-streak', user?.id],
@@ -181,7 +194,7 @@ const NativeAppLayout = () => {
     { path: '/app/home', icon: Home, label: t('nav.home'), tourClass: 'tour-nav-home' },
     { path: '/app/tools', icon: Compass, label: t('nav.tools'), tourClass: 'tour-nav-explore' },
     { path: '/app/player', icon: Music, label: t('nav.listen'), tourClass: 'tour-nav-listen' },
-    { path: '/app/channels', icon: Users, label: t('nav.chats'), showBadge: unreadFeedCount > 0, badgeCount: unreadFeedCount, tourClass: 'tour-nav-channels' },
+    { path: '/app/channels', icon: Users, label: t('nav.chats'), showBadge: chatsBadgeCount > 0, badgeCount: chatsBadgeCount, tourClass: 'tour-nav-channels' },
   ];
 
   // Tab bar actual height: grid content (~48px for compact) + safe area inset
