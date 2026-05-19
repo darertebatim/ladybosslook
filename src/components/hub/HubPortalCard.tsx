@@ -63,7 +63,7 @@ export function HubPortalCard() {
       type="button"
       onClick={() => navigate("/app/hub")}
       aria-label="Open your friends hub"
-      className="relative w-full max-w-[320px] mx-auto rounded-3xl overflow-hidden text-left active:scale-[0.99] transition-transform shadow-ios"
+      className="relative block w-full max-w-[280px] mx-auto rounded-3xl overflow-hidden text-left active:scale-[0.99] transition-transform shadow-ios"
       style={{
         aspectRatio: "1 / 1",
         background:
