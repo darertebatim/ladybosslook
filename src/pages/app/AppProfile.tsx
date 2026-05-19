@@ -13,9 +13,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import {
   User, Mail, Phone, MapPin, Calendar as CalendarIcon, BookOpen, Wallet,
   Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight,
-  ChevronDown, Settings, Camera, Globe, Heart, Briefcase, Instagram, Send, MessageSquare
+  ChevronDown, Settings, Camera, Globe, Heart, Briefcase, Instagram, Send, MessageSquare, Sparkles
 } from 'lucide-react';
-import { JournalStats } from '@/components/app/JournalStats';
 import { useNavigate, Link } from 'react-router-dom';
 import { PageHeader } from '@/components/app/ui/PageHeader';
 import { IOSIconButton } from '@/components/app/ui/IOSIconButton';
@@ -632,20 +631,19 @@ const AppProfile = () => {
         </Card>
 
         {/* Journal Stats */}
-        <Collapsible open={openSections.has('journal')} onOpenChange={() => toggleSection('journal')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card-warm rounded-2xl shadow-card-warm active:bg-[hsl(var(--tint-peach))]/40 transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-xl bg-[hsl(var(--tint-peach))] flex items-center justify-center">
-                <BookOpen className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
-              </div>
-              <span className="font-medium text-sm text-[hsl(var(--fg-warm))]">{t('profile.sections.journal')}</span>
+        {/* Presence link */}
+        <button
+          onClick={() => navigate('/app/presence')}
+          className="flex items-center justify-between w-full p-4 bg-card-warm rounded-2xl shadow-card-warm active:bg-[hsl(var(--tint-peach))]/40 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-[hsl(var(--tint-peach))] flex items-center justify-center">
+              <Sparkles className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
             </div>
-            <ChevronDown className={`h-4 w-4 text-[hsl(var(--fg-warm-muted))] transition-transform duration-200 ${openSections.has('journal') ? 'rotate-180' : ''}`} />
-          </CollapsibleTrigger>
-          <CollapsibleContent className="mt-1">
-            <JournalStats className="rounded-2xl shadow-card-warm border-0" />
-          </CollapsibleContent>
-        </Collapsible>
+            <span className="font-medium text-sm text-[hsl(var(--fg-warm))]">Presence</span>
+          </div>
+          <ChevronRight className="h-4 w-4 text-[hsl(var(--fg-warm-muted))]" />
+        </button>
 
         {/* My Programs */}
         <Collapsible open={openSections.has('programs')} onOpenChange={() => toggleSection('programs')}>
