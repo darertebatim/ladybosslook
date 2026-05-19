@@ -1423,7 +1423,7 @@ const AppTaskCreate = ({
         {/* Add to Calendar — Plus only, requires a specific time.
             Visible in web preview so the design can be reviewed; actual
             sync only fires on native (gracefully no-ops on web). */}
-        {scheduledTime && (
+        {(
           <div className="flex items-center justify-between py-2 px-4 border-b border-muted/30">
             <div className="flex items-center gap-3">
               <CalendarPlus className={cn("h-5 w-5", calendarSyncEnabled ? "text-primary" : "text-black")} />
@@ -1446,6 +1446,11 @@ const AppTaskCreate = ({
                 if (checked && !isSubscribed) {
                   haptic.light();
                   setShowCalendarPaywall(true);
+                  return;
+                }
+                if (checked && !scheduledTime) {
+                  haptic.light();
+                  toast('Please choose a specific time first');
                   return;
                 }
                 setCalendarSyncEnabled(checked);
