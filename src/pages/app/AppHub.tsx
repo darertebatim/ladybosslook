@@ -139,7 +139,7 @@ export default function AppHub() {
 
         {/* Title */}
         <div className="relative z-10 px-6 mt-1 text-center">
-          <h1 className="text-white text-[22px] font-bold tracking-tight">Your friends</h1>
+          <h1 className="text-white text-[32px] font-bold tracking-tight leading-tight">Your friends</h1>
           <p className="text-white/65 text-[12px] mt-0.5">
             {accepted.length === 0
               ? "Light up the sky with friends."
