@@ -427,10 +427,9 @@ export default function AppInspireDetail() {
               </div>
             )}
 
-            {/* Start/End + Badge row */}
-            <div className={cn("mt-4 flex gap-3", (routine as any).badge_image_url ? "" : "")}>
-              {/* Left: Start & End banners */}
-              <div className={cn("flex flex-row gap-2", (routine as any).badge_image_url ? "flex-1" : "w-full")}>
+            {/* Start/End row */}
+            <div className="mt-4 flex gap-3">
+              <div className="flex flex-row gap-2 w-full">
                 <div className={cn(
                   'flex-1 min-w-0 flex items-center gap-2 rounded-xl px-3 py-2.5 border',
                   startInfo.isFuture 
@@ -457,21 +456,37 @@ export default function AppInspireDetail() {
                   </div>
                 )}
               </div>
+            </div>
 
-              {/* Right: Badge preview */}
-              {(routine as any).badge_image_url && (
-                <div className="flex flex-col items-center justify-center shrink-0">
-                  <div className="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-amber-300 bg-amber-50 shadow-md">
-                    <img 
-                      src={(routine as any).badge_image_url} 
-                      alt={t('inspirePage.challengeBadgeAlt')} 
+            {/* Trophy banner — earned by completing the challenge */}
+            {(routine as any).badge_image_url && (
+              <div
+                className="mt-3 flex items-center gap-3 rounded-2xl p-3 border border-amber-200 dark:border-amber-800/60"
+                style={{ background: 'linear-gradient(135deg, #FFF8E7 0%, #FFE9C2 100%)' }}
+              >
+                <div className="relative shrink-0">
+                  <div className="absolute inset-0 rounded-2xl bg-amber-300/40 blur-xl" />
+                  <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-white shadow-[0_6px_16px_-4px_rgba(217,119,6,0.45)] ring-2 ring-amber-300/70">
+                    <img
+                      src={(routine as any).badge_image_url}
+                      alt={t('inspirePage.challengeBadgeAlt')}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <span className="text-[10px] text-amber-600 font-semibold mt-1">{t('inspirePage.badge', { defaultValue: 'Badge' })}</span>
                 </div>
-              )}
-            </div>
+                <div className="flex-1 min-w-0">
+                  <span className="text-[10px] font-bold tracking-widest uppercase text-amber-700">
+                    🏆 {t('routinePreview.trophyLabel', { defaultValue: 'Trophy' })}
+                  </span>
+                  <p className="text-[13px] font-semibold text-amber-900 leading-snug mt-0.5">
+                    {t('routinePreview.trophyTitle', { defaultValue: 'Complete the challenge to earn this trophy' })}
+                  </p>
+                  <p className="text-[11px] text-amber-800/80 leading-snug mt-0.5">
+                    {t('routinePreview.trophySubtitle', { defaultValue: "Finish every day of the drip and it's yours." })}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Description — rendered as rich HTML */}
