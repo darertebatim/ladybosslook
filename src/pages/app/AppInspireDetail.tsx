@@ -359,12 +359,30 @@ export default function AppInspireDetail() {
         {/* Intro Audio */}
         {(routine as any).audio_url && (
           <div className="px-4 pt-4">
-            <audio
-              src={(routine as any).audio_url}
-              controls
-              preload="metadata"
-              className="w-full"
-            />
+            <div
+              className="rounded-2xl p-3.5 border border-orange-100 dark:border-orange-900/40"
+              style={{ background: 'linear-gradient(135deg, #FFF7F1 0%, #FFE9D6 100%)' }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-7 h-7 rounded-full bg-white/80 flex items-center justify-center shadow-sm">
+                  <span className="text-sm">🎧</span>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold tracking-widest uppercase text-orange-700">
+                    Intro
+                  </p>
+                  <p className="text-[13px] font-semibold text-orange-900 leading-tight">
+                    Listen before you start
+                  </p>
+                </div>
+              </div>
+              <audio
+                src={(routine as any).audio_url}
+                controls
+                preload="metadata"
+                className="w-full h-10"
+              />
+            </div>
           </div>
         )}
 
@@ -375,7 +393,9 @@ export default function AppInspireDetail() {
           {/* Subtitle & Badges */}
           <div className="pt-4">
             {routine.subtitle && (
-              <p className="text-foreground">{routine.subtitle}</p>
+              <p className="text-[17px] leading-snug font-semibold text-foreground tracking-tight">
+                {routine.subtitle}
+              </p>
             )}
             <HostBadges contentType="routine" contentId={routine.id} size="md" className="mt-3" />
             
@@ -406,12 +426,12 @@ export default function AppInspireDetail() {
                 </span>
               )}
               {routine.category && (
-                <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-muted text-muted-foreground">
+                <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-700 dark:bg-orange-950/50 dark:text-orange-300">
                   {categories.find(c => c.slug === routine.category)?.name || routine.category}
                 </span>
               )}
               {routine.tasks && routine.tasks.length > 0 && (
-               <span className="text-sm text-foreground">
+                <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-foreground/5 text-foreground/70">
                    {routine.tasks.length} {isProject ? t(routine.tasks.length === 1 ? 'inspirePage.step' : 'inspirePage.steps') : t(routine.tasks.length === 1 ? 'inspirePage.task' : 'inspirePage.tasks')}
                 </span>
               )}
