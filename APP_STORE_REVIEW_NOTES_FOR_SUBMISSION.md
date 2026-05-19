@@ -145,6 +145,33 @@ The app includes persistent audio playback for educational content. This is the 
 This background audio capability is essential for users to listen to educational audio courses and podcasts while multitasking, driving, or exercising - a core use case for our learning platform.
 
 **What's New in Version 1.1.1:**
+
+---
+
+## What's New in Version 1.2.1005
+
+**Friends Hub in Chats (NEW):**
+Rilo now includes a private 1:1 messaging feature called "Friends" inside the Chats tab. This is **not a social network or public feed** — it is a closed, invitation-based direct messaging tool that only allows communication between two users who have explicitly added each other as friends.
+
+How it works:
+1. **Log in** with the test account → tap the **Chats tab** in the bottom navigation
+2. Tap **Friends** → see the list of accepted friends (empty by default for a fresh account)
+3. Tap **Add Friend** → search by username/email or share an invite link. The other user must accept the request before any messaging is possible.
+4. Once a friendship is mutual, tap a friend to open a **private 1:1 direct message thread** (text only)
+5. Users can **block, remove, or report** any friend at any time from the chat header
+
+Key compliance points for review:
+- **Direct messaging only** — no public posts, no feeds, no group chats, no discovery of strangers
+- **Mutual consent required** — messaging is impossible until both users accept the friendship
+- **User-generated content moderation** — every message can be reported; reported content and users are reviewed within 24 hours and removable. Users can block any other user instantly, which immediately hides all their content and prevents further contact (per Guideline 1.2).
+- **No location sharing, no profile browsing of non-friends, no follower system**
+- All friend and message data is stored securely in Supabase with row-level security; users can delete their account at any time, which removes all friendships and message history.
+
+No new permissions or background modes are introduced in this version.
+
+---
+
+**Previous version notes (1.1.1):**
 - NEW: Simora+ subscription — unlock premium tools (Fasting, Emotions, Soundscapes, premium playlists & breathing exercises) with monthly or annual plans
 - NEW: Rate Simora — rate the app from Profile settings, promo banners, or deep links
 - Paywall with multiple design variants, Terms/Privacy/Restore links for full App Store compliance
