@@ -153,20 +153,24 @@ This background audio capability is essential for users to listen to educational
 **Friends Hub (NEW — at /app/hub):**
 Rilo now includes a private **Friends Hub** where users connect only through friend codes and mutual acceptance. **It is not a social network, not a public feed, and not a stranger-discovery surface.**
 
+How to find it:
+1. **Log in** with the test account
+2. Open the **Chats** tab from the bottom navigation menu
+3. Tap the **Hub** window/card at the top of the Chats screen — this opens **Friends Hub** at `/app/hub`
+
 How it works:
-1. **Log in** with the test account → open **Friends Hub** at `/app/hub`
-2. The main screen shows accepted friends as glowing stars in a constellation view
-3. Tap **Add friend** to either:
+1. The main screen shows accepted friends as glowing stars in a constellation view
+2. Tap **Add friend** to either:
    - **Invite friends** by sharing a link
    - **Enter code** to send a request using an 8-letter friend code
    - Open **My code** to show the user's own QR code + friend code
-4. Friend connections are only created after the other person accepts the pending request
-5. After a friendship is accepted, tapping a friend's star opens a detail sheet where the user can:
+3. Friend connections are only created after the other person accepts the pending request
+4. After a friendship is accepted, tapping a friend's star opens a detail sheet where the user can:
    - **Inspire** them by sending a moment/dedication
    - **Gift a playlist**
    - View a simple shared activity history
    - **Remove friend**
-6. The notification bell in the hub shows pending friend requests and received dedications
+5. The notification bell in the hub shows pending friend requests and received dedications
 
 Important clarification for review:
 - **There is no direct messaging in Friends Hub**
