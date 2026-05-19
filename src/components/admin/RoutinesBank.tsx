@@ -1850,33 +1850,37 @@ export default function RoutinesBank() {
                     )}
                   </div>
 
-                  {/* Challenge Badge (only for challenge type) */}
-                  {formData.schedule_type === 'challenge' && (
-                    <div className="space-y-2 border-t pt-4">
-                      <Label className="text-xs flex items-center gap-1.5">
-                        🏆 Completion Badge
-                        <span className="text-muted-foreground font-normal">(awarded when challenge is finished)</span>
-                      </Label>
-                      <ImageUploader
-                        label="Badge Image (square)"
-                        value={formData.badge_image_url}
-                        onChange={(url) => setFormData({ ...formData, badge_image_url: url })}
-                        folder="challenge-badges"
-                      />
-                      {formData.badge_image_url && (
-                        <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                          <img
-                            src={formData.badge_image_url}
-                            alt="Badge preview"
-                            className="w-12 h-12 rounded-lg object-cover"
-                          />
-                          <div className="text-xs text-muted-foreground">
-                            Users will earn this badge when they complete all {formData.end_after_days || '?'} days
-                          </div>
+                  {/* Completion Badge (available for all routine types) */}
+                  <div className="space-y-2 border-t pt-4">
+                    <Label className="text-xs flex items-center gap-1.5">
+                      🏆 Completion Badge
+                      <span className="text-muted-foreground font-normal">(awarded when the routine is finished)</span>
+                    </Label>
+                    <ImageUploader
+                      label="Badge Image (square)"
+                      value={formData.badge_image_url}
+                      onChange={(url) => setFormData({ ...formData, badge_image_url: url })}
+                      folder="challenge-badges"
+                    />
+                    {formData.badge_image_url && (
+                      <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                        <img
+                          src={formData.badge_image_url}
+                          alt="Badge preview"
+                          className="w-12 h-12 rounded-lg object-cover"
+                        />
+                        <div className="text-xs text-muted-foreground">
+                          {formData.schedule_type === 'challenge'
+                            ? `Users will earn this badge when they complete all ${formData.end_after_days || '?'} days`
+                            : formData.schedule_type === 'project'
+                            ? 'Users will earn this badge when they complete all steps'
+                            : formData.schedule_type === 'program'
+                            ? 'Users will earn this badge when they finish the program'
+                            : 'Users will earn this badge when they complete this routine'}
                         </div>
-                      )}
-                    </div>
-                  )}
+                      </div>
+                    )}
+                  </div>
 
                   {/* Focus Routine Toggle */}
                   <div className="flex items-center justify-between border-t pt-4">
