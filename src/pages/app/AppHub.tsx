@@ -145,10 +145,10 @@ export default function AppHub() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-[10px] uppercase tracking-wider font-bold text-white/85">
-                Gift a moment
+                Inspire a friend
               </div>
               <div className="text-[14px] font-bold text-white leading-tight mt-0.5">
-                Inspire a friend with what worked for you
+                Share a moment that worked for you
               </div>
             </div>
             <ChevronRight className="w-4 h-4 text-white/90 shrink-0" />
