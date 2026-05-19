@@ -13,7 +13,7 @@ import { GiftPlaylistInviteSheet } from "@/components/hub/GiftPlaylistInviteShee
 import { DedicationReceivedSheet } from "@/components/friends/DedicationReceivedSheet";
 import { DedicateMomentSheet } from "@/components/friends/DedicateMomentSheet";
 import { useReceivedDedications, type DedicationWithRelations } from "@/hooks/useDedications";
-import { ChevronLeft, Bell, Settings, Gift, ChevronRight, Music } from "lucide-react";
+import { ChevronLeft, Bell, Settings, Gift, ChevronRight, Music, Plus } from "lucide-react";
 import { HubNotificationsSheet } from "@/components/hub/HubNotificationsSheet";
 
 export default function AppHub() {
@@ -64,7 +64,7 @@ export default function AppHub() {
     <SlideUpPage defaultBack="/app/home">
       <SEOHead title="Friends Hub · Rilo" description="Your friends, glowing together." />
       <div
-        className="min-h-[100dvh] relative overflow-hidden"
+        className="min-h-[100dvh] relative"
         style={{
           background:
             "radial-gradient(ellipse 80% 50% at 50% 0%, #3A1E66 0%, #1A0E2E 55%, #0E0820 100%)",
@@ -77,8 +77,14 @@ export default function AppHub() {
           @keyframes hub-pulse { 0%,100% { opacity: 0.55; } 50% { opacity: 0.9; } }
         `}</style>
 
-        {/* Top bar */}
-        <div className="relative z-10 pt-[max(env(safe-area-inset-top),12px)] px-4 flex items-center justify-between">
+        {/* Top bar — sticky */}
+        <div
+          className="sticky top-0 z-30 pt-[max(env(safe-area-inset-top),12px)] pb-2 px-4 flex items-center justify-between backdrop-blur-xl"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(58,30,102,0.85) 0%, rgba(58,30,102,0.55) 70%, rgba(58,30,102,0) 100%)",
+          }}
+        >
           <button
             onClick={goBack}
             className="w-10 h-10 grid place-items-center rounded-full bg-white/10 backdrop-blur-md active:scale-90"
@@ -87,6 +93,21 @@ export default function AppHub() {
             <ChevronLeft className="w-5 h-5 text-white" />
           </button>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setAddOpen(true)}
+              className="h-10 pl-2.5 pr-3.5 grid grid-flow-col items-center gap-1.5 rounded-full bg-white active:scale-95 shadow-ios"
+              aria-label="Add friend"
+            >
+              <span
+                className="w-6 h-6 grid place-items-center rounded-full"
+                style={{ background: "linear-gradient(135deg, #FFB088 0%, #EB5E33 100%)" }}
+              >
+                <Plus className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+              </span>
+              <span className="text-[13px] font-bold text-[hsl(var(--brand-primary))] leading-none">
+                Add friend
+              </span>
+            </button>
             <button
               onClick={() => setNotifOpen(true)}
               className="w-10 h-10 grid place-items-center rounded-full bg-white/10 backdrop-blur-md active:scale-90"
