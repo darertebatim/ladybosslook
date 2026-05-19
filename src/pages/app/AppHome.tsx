@@ -41,6 +41,7 @@ import { toast } from 'sonner';
 import { useWeeklyTaskCompletion, useDateRangeTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
 import { useBadgeCelebration } from '@/hooks/useBadgeCelebration';
 import { useChallengeDayCelebration } from '@/hooks/useChallengeDayCelebration';
+import { useRoutineEndedCelebration } from '@/hooks/useRoutineEndedCelebration';
 import { useGoldStreak, useGoldDatesThisWeek, useUpdateGoldStreak } from '@/hooks/useGoldStreak';
 import { useTodayMood } from '@/hooks/useMoodLogs';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -678,6 +679,15 @@ const AppHome = () => {
     completedTaskIds,
     todayDateStr,
   );
+
+  // Routine ended celebration (asks user to re-add the routine)
+  const {
+    endedData: routineEndedData,
+    showCelebration: showRoutineEnded,
+    closeCelebration: closeRoutineEnded,
+    addAgain: addRoutineAgain,
+    isAddingAgain: isAddingRoutineAgain,
+  } = useRoutineEndedCelebration(todayDateStr);
 
   const handleStreakIncrease = useCallback(() => {
     // Spotlight: finish the tour as soon as user completes a task
@@ -1427,6 +1437,11 @@ const AppHome = () => {
           challengeDayCelebration={challengeDayCelebration}
           closeChallengeDayCelebration={closeChallengeDayCelebration}
           showChallengeDayCelebration={showChallengeDayCelebration}
+          routineEndedData={routineEndedData}
+          showRoutineEnded={showRoutineEnded}
+          closeRoutineEnded={closeRoutineEnded}
+          onAddRoutineAgain={addRoutineAgain}
+          isAddingRoutineAgain={isAddingRoutineAgain}
           stepCelebration={stepCelebration}
           onCloseStepCelebration={handleCloseStepCelebration}
           projectCompletion={projectCompletion}
