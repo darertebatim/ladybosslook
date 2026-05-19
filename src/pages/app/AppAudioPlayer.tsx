@@ -257,6 +257,13 @@ export default function AppAudioPlayer() {
     enabled: !!audioId,
   });
 
+  // Track whether this audio was already completed before this session,
+  // so we only show the celebration the FIRST time a user finishes it.
+  const wasAlreadyCompletedRef = useRef(false);
+  useEffect(() => {
+    wasAlreadyCompletedRef.current = !!savedProgress?.completed;
+  }, [audioId, savedProgress?.completed]);
+
   // Check if a track is available based on drip delay - uses first_session_date
   // drip_delay_days=0 = immediate, 1 = at first session, 2 = 1 day after first session, etc.
   const getTrackAvailability = (dripDelayDays: number) => {
