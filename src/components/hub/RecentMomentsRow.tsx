@@ -80,7 +80,7 @@ export function RecentMomentsRow() {
                   className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full text-white text-[11px] font-bold"
                   style={{ backgroundColor: "#EB5E33" }}
                 >
-                  <Gift className="w-3 h-3" /> Gift
+                  <Sparkles className="w-3 h-3" /> Inspire
                 </span>
                 )}
               </button>
