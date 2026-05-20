@@ -30,11 +30,11 @@ const CONTEXT_ICON_MAP: Record<string, React.ComponentType<{ className?: string 
 
 // 5-level mood system (labels/buttonText resolved via i18n at render time)
 const MOODS = [
-  { value: 'great', emoji: '😄', bgColor: 'bg-yellow-200' },
-  { value: 'good', emoji: '🙂', bgColor: 'bg-green-200' },
-  { value: 'okay', emoji: '😐', bgColor: 'bg-blue-200' },
-  { value: 'not_great', emoji: '😔', bgColor: 'bg-purple-200' },
-  { value: 'bad', emoji: '😢', bgColor: 'bg-red-200' },
+  { value: 'great', emoji: '😄', bgColor: 'bg-yellow-200', sheetBg: 'bg-yellow-100', accent: 'text-yellow-700' },
+  { value: 'good', emoji: '🙂', bgColor: 'bg-green-200', sheetBg: 'bg-green-100', accent: 'text-green-700' },
+  { value: 'okay', emoji: '😐', bgColor: 'bg-blue-200', sheetBg: 'bg-blue-100', accent: 'text-blue-700' },
+  { value: 'not_great', emoji: '😔', bgColor: 'bg-purple-200', sheetBg: 'bg-purple-100', accent: 'text-purple-700' },
+  { value: 'bad', emoji: '😢', bgColor: 'bg-red-200', sheetBg: 'bg-red-100', accent: 'text-red-700' },
 ] as const;
 
 export function MoodDashboard() {
