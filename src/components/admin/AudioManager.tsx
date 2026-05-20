@@ -736,6 +736,22 @@ export const AudioManager = () => {
               </p>
             </div>
 
+            <div className="flex items-center justify-between rounded-md border p-3">
+              <div>
+                <Label htmlFor="edit_is_hot" className="text-sm font-medium">
+                  🔥 Hot Track
+                </Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Feature this track at the top of the Listen page.
+                </p>
+              </div>
+              <Switch
+                id="edit_is_hot"
+                checked={formData.is_hot}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_hot: checked })}
+              />
+            </div>
+
             <div className="flex justify-end gap-2">
               <Button
                 type="button"
