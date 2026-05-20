@@ -518,9 +518,18 @@ const AppStore = () => {
             {/* What do you need? */}
             {!searchQuery && (
               <section>
-                <h2 className="text-base font-bold text-fg-warm mb-2 px-1">
-                  {t("tier1.tasksBank.startHere", "What do you need? (Self care goals)")}
-                </h2>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h2 className="text-base font-bold text-fg-warm">
+                    {t("tier1.tasksBank.startHere", "What do you need? (Self care goals)")}
+                  </h2>
+                  <button
+                    onClick={() => navigate('/app/tasksbank')}
+                    className="text-xs text-primary font-medium flex items-center gap-1"
+                  >
+                    {t("toolsPage.all", "All")}{" "}
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
                 <div className="grid grid-cols-2 gap-2.5">
                   {[
                     { slug: 'sleep', emoji: '💤', question: 'Sleep better tonight?' },
