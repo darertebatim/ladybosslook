@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChartColumn, Check } from 'lucide-react';
+import { ChartColumn, Check, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useAutoCompleteProTask } from '@/hooks/useAutoCompleteProTask';
@@ -15,6 +15,7 @@ import { MoodRoutinePromptSheet } from './MoodRoutinePromptSheet';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { getSubmoods } from '@/lib/submoods';
 
 // 5-level mood system (labels/buttonText resolved via i18n at render time)
 const MOODS = [
@@ -52,6 +53,8 @@ export function MoodDashboard() {
   };
 
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [step, setStep] = useState<1 | 2>(1);
+  const [selectedSubmoods, setSelectedSubmoods] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
@@ -65,6 +68,20 @@ export function MoodDashboard() {
   const handleMoodSelect = useCallback((moodValue: string) => {
     haptic.selection();
     setSelectedMood(moodValue);
+    setSelectedSubmoods([]);
+    setStep(2);
+  }, []);
+
+  const handleToggleSubmood = useCallback((label: string) => {
+    haptic.selection();
+    setSelectedSubmoods((prev) =>
+      prev.includes(label) ? prev.filter((s) => s !== label) : [...prev, label]
+    );
+  }, []);
+
+  const handleBackToMoods = useCallback(() => {
+    haptic.light();
+    setStep(1);
   }, []);
 
   const handleSubmit = useCallback(async () => {
@@ -76,9 +93,13 @@ export function MoodDashboard() {
     try {
       // Save mood check-in in emotion logs (separate from journal entries)
       const moodLabel = t(`moodPage.moods.${selectedMood}`, { defaultValue: selectedMood });
+      const baseContent = t('moodPage.feelingDailyText', { mood: moodLabel.toLowerCase() });
+      const content = selectedSubmoods.length > 0
+        ? `${baseContent} (${selectedSubmoods.join(', ')})`
+        : baseContent;
       await createMoodLog.mutateAsync({
         mood: selectedMood,
-        content: t('moodPage.feelingDailyText', { mood: moodLabel.toLowerCase() }),
+        content,
       });
 
       // Auto-complete any mood pro tasks for today
@@ -94,7 +115,7 @@ export function MoodDashboard() {
       toast.error(t('moodPage.logFailed'));
       setIsSubmitting(false);
     }
-  }, [selectedMood, autoCompleteMood, createMoodLog, t]);
+  }, [selectedMood, selectedSubmoods, autoCompleteMood, createMoodLog, t]);
 
   const handleCelebrationDone = useCallback(() => {
     navigate('/app/home');
@@ -167,11 +188,13 @@ export function MoodDashboard() {
   };
 
   const selectedMoodData = selectedMood ? MOODS.find(m => m.value === selectedMood) : null;
+  const submoods = getSubmoods(selectedMood);
 
   return (
     <>
       <div className="flex flex-col h-full">
-        {/* Mood Grid */}
+        {/* Step 1: Mood Grid */}
+        {step === 1 && (
         <div className="flex-1 flex flex-col justify-center px-4">
           {/* Title - always visible */}
           <div className="text-center mb-6">
@@ -242,12 +265,63 @@ export function MoodDashboard() {
             ))}
           </div>
         </div>
+        )}
+
+        {/* Step 2: Submood selection */}
+        {step === 2 && selectedMoodData && (
+          <div className="flex-1 flex flex-col px-4 overflow-y-auto">
+            <div className="flex items-center justify-between pb-2">
+              <button
+                onClick={handleBackToMoods}
+                className="w-10 h-10 rounded-full flex items-center justify-center active:scale-95 transition-transform"
+                aria-label="Back to moods"
+              >
+                <ArrowLeft className="h-5 w-5 text-foreground" />
+              </button>
+              <span className="text-sm font-medium text-foreground">Today</span>
+              <div className="w-10" />
+            </div>
+
+            <div className="flex flex-col items-center mt-4 mb-6">
+              <div className={cn(
+                'w-24 h-24 rounded-full flex items-center justify-center',
+                selectedMoodData.bgColor
+              )}>
+                <FluentEmoji emoji={selectedMoodData.emoji} size={56} />
+              </div>
+              <h2 className="mt-5 text-center text-2xl font-bold text-foreground px-4 leading-tight">
+                How would you describe how you're feeling?
+              </h2>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-2 pb-6">
+              {submoods.map((label) => {
+                const active = selectedSubmoods.includes(label);
+                return (
+                  <button
+                    key={label}
+                    onClick={() => handleToggleSubmood(label)}
+                    className={cn(
+                      'px-5 py-2.5 rounded-full text-base font-medium transition-all active:scale-95',
+                      active
+                        ? 'bg-foreground text-background'
+                        : 'bg-white text-foreground shadow-sm'
+                    )}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Bottom Action Bar with iOS safe area */}
         <div 
           className="shrink-0 px-4 pt-4"
           style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}
         >
+          {step === 1 ? (
           <div className="flex items-center gap-3">
             {/* Stats Button */}
             <button
@@ -262,7 +336,7 @@ export function MoodDashboard() {
 
             {/* Main "I feel..." Button */}
             <Button
-              onClick={handleSubmit}
+              onClick={() => selectedMood && setStep(2)}
               disabled={!selectedMood || isSubmitting}
               className={cn(
                 'flex-1 h-12 rounded-full font-semibold text-base transition-all',
@@ -271,11 +345,9 @@ export function MoodDashboard() {
                   : 'bg-muted text-muted-foreground cursor-not-allowed'
               )}
             >
-              {isSubmitting
-                ? t('moodPage.saving')
-                : selectedMoodData
-                  ? t(`moodPage.buttonText.${selectedMoodData.value}`)
-                  : t('moodPage.iFeel')}
+              {selectedMoodData
+                ? t(`moodPage.buttonText.${selectedMoodData.value}`)
+                : t('moodPage.iFeel')}
             </Button>
 
             {/* Add to Routines Button - icon only */}
@@ -288,6 +360,15 @@ export function MoodDashboard() {
               size="default"
             />
           </div>
+          ) : (
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="w-full h-14 rounded-full font-semibold text-base bg-foreground text-background hover:bg-foreground/90"
+            >
+              {isSubmitting ? t('moodPage.saving') : "Here's how I feel."}
+            </Button>
+          )}
         </div>
       </div>
 
