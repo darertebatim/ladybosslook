@@ -95,6 +95,23 @@ export default function AppPlayer() {
 
   const { playlists, playlistItems, progressData, enrollments, savedPlaylistIds, isLoading } =
     usePlayerData();
+
+  // Hot Tracks — individually featured audio tracks shown above All Playlists
+  const { data: hotTracks = [] } = useQuery({
+    queryKey: ["hot-tracks"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("audio_content")
+        .select("id, title, cover_image_url, category, duration_seconds")
+        .eq("is_hot", true)
+        .order("published_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return data || [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   const userLang = useUserPreferredLanguage();
   const [showLangPopup, setShowLangPopup] = useState(false);
   const [showLangHint, setShowLangHint] = useState(false);
