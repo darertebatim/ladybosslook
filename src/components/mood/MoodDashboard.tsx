@@ -216,7 +216,10 @@ export function MoodDashboard() {
 
   return (
     <>
-      <div className="flex flex-col h-full">
+      <div className={cn(
+        "flex flex-col h-full transition-colors duration-300 -mx-0",
+        step !== 1 && selectedMoodData ? `${selectedMoodData.sheetBg} -mt-[80px] pt-[80px]` : ""
+      )}>
         {/* Step 1: Mood Grid */}
         {step === 1 && (
         <div className="flex-1 flex flex-col justify-center px-4">
