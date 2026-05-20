@@ -5,11 +5,20 @@ import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
 import { TaskTemplate, TaskColor } from '@/hooks/useTaskPlanner';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { RoutinePreviewSheet, EditedTask, ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
-import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
+import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import type { ProLinkType } from '@/lib/proTaskTypes';
 import { AmbientGlow } from './visuals/AmbientGlow';
+import {
+  getOrCreateMyRilo,
+  fetchMyRiloTaskTitles,
+  getNextOrderIndex,
+  MY_RILO_TITLE,
+  MY_RILO_EMOJI,
+} from '@/lib/myRilo';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface SuggestedTask {
   id: string;
@@ -46,8 +55,9 @@ const CATEGORY_LABELS: Record<string, string> = {
 export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Props) {
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
   const [showPreview, setShowPreview] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const { user } = useAuth();
-  const addRoutinePlan = useAddRoutinePlan();
+  const queryClient = useQueryClient();
 
   const diagnosisData = useMemo(() => {
     try {
@@ -170,28 +180,80 @@ export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Pro
 
   const handleSave = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
     if (!user) return;
+    setIsSaving(true);
     try {
-      await addRoutinePlan.mutateAsync({
-        planId: 'synthetic-selfcare-quiz',
-        selectedTaskIds,
-        editedTasks: editedTasks.map(t => ({
-          id: t.id,
-          title: t.title,
-          icon: t.icon,
-          color: t.color,
-          repeatPattern: t.repeatPattern,
-          scheduledTime: t.scheduledTime,
-          tag: t.tag,
-          linked_playlist_id: t.linked_playlist_id,
-          pro_link_type: t.pro_link_type,
-          pro_link_value: t.pro_link_value,
-        })),
-        syntheticTasks: routineTasks,
-        syntheticPlanTitle: 'Self-Care Gap Plan',
-        syntheticPlanIcon: '🌿',
-        syntheticPlanCategoryName: 'Self-Care Gap Plan',
-      });
-      toast.success('Routine created! 🎉');
+      // Append picks to the user's single "My Rilo" routine (create if missing).
+      const routineId = await getOrCreateMyRilo(user.id);
+      const existingTitles = await fetchMyRiloTaskTitles(user.id, routineId);
+      const startOrder = await getNextOrderIndex(user.id);
+
+      const editedById = new Map(editedTasks.map(t => [t.id, t]));
+      const sourceById = new Map(routineTasks.map(t => [t.id, t]));
+
+      const rows: any[] = [];
+      let idx = 0;
+      for (const id of selectedTaskIds) {
+        const edited = editedById.get(id);
+        const src = sourceById.get(id);
+        const template = taskTemplates.find(t => t.id === id);
+        const title = (edited?.title || src?.title || template?.title || '').trim();
+        if (!title) continue;
+        const key = title.toLowerCase();
+        if (existingTitles.has(key)) continue; // dedupe
+        existingTitles.add(key);
+
+        const proLinkType =
+          (edited?.pro_link_type as ProLinkType | null | undefined) ??
+          src?.pro_link_type ??
+          null;
+        const proLinkValue =
+          edited?.pro_link_value ?? src?.pro_link_value ?? null;
+
+        rows.push({
+          user_id: user.id,
+          title,
+          emoji: edited?.icon || src?.icon || template?.emoji || MY_RILO_EMOJI,
+          color:
+            edited?.color ||
+            src?.color ||
+            ROUTINE_COLOR_CYCLE[idx % ROUTINE_COLOR_CYCLE.length],
+          repeat_pattern: edited?.repeatPattern || 'daily',
+          repeat_days: null,
+          scheduled_time: edited?.scheduledTime || null,
+          time_period: template?.time_period || null,
+          tag: proLinkType ? 'pro' : (edited?.tag ?? MY_RILO_TITLE),
+          linked_playlist_id:
+            proLinkType === 'playlist'
+              ? (proLinkValue as string | null)
+              : null,
+          pro_link_type: proLinkType,
+          pro_link_value: proLinkValue,
+          is_active: true,
+          order_index: startOrder + idx,
+          source_routine_id: routineId,
+        });
+        idx++;
+      }
+
+      if (rows.length > 0) {
+        const { error: insErr } = await supabase
+          .from('user_tasks')
+          .insert(rows);
+        if (insErr) throw insErr;
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
+      queryClient.invalidateQueries({ queryKey: ['routine-user-tasks-emojis'] });
+      queryClient.invalidateQueries({ queryKey: ['routine-user-task-ids'] });
+      queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
+
+      toast.success(
+        rows.length > 0
+          ? `Added ${rows.length} to My Rilo 🔥`
+          : 'Already in My Rilo',
+      );
       // Persist the chosen tasks so the routine-reveal step can show them.
       try {
         const editedById = new Map(editedTasks.map(t => [t.id, t]));
@@ -212,8 +274,10 @@ export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Pro
       setShowPreview(false);
       onNext();
     } catch (err) {
-      console.error('Failed to create routine:', err);
-      toast.error('Failed to create routine');
+      console.error('Failed to add to My Rilo:', err);
+      toast.error('Failed to add to My Rilo');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -335,11 +399,11 @@ export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Pro
         open={showPreview}
         onOpenChange={setShowPreview}
         tasks={routineTasks}
-        routineTitle="Self-Care Gap Plan"
-        routineColor="mint"
-        routineBankId="synthetic-selfcare-quiz"
+        routineTitle={MY_RILO_TITLE}
+        routineColor="pink"
+        routineBankId="my-rilo"
         onSave={handleSave}
-        isSaving={addRoutinePlan.isPending}
+        isSaving={isSaving}
       />
     </div>
   );
