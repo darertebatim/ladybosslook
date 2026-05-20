@@ -14,7 +14,7 @@ import { ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useTaskBankSelection } from '@/hooks/useTaskBankSelection';
 import { getOrCreateMyRilo, fetchMyRiloTaskTitles, getNextOrderIndex, MY_RILO_TITLE } from '@/lib/myRilo';
@@ -143,20 +143,43 @@ export default function AppTasksBankCategory() {
         if (error) throw error;
       }
 
-      toast({
-        title: rows.length > 0
-          ? `Added ${rows.length} to ${MY_RILO_TITLE} 🔥`
-          : `Already in ${MY_RILO_TITLE}`,
-      });
       setSelectedTasks(new Set());
       queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
       queryClient.invalidateQueries({ queryKey: ['routine-user-tasks-emojis'] });
       queryClient.invalidateQueries({ queryKey: ['routine-user-task-ids'] });
       queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
+
+      const added = rows.length;
+      toast.custom((id) => (
+        <div className="flex items-center gap-3 rounded-2xl bg-background border border-border shadow-2xl px-4 py-3 pr-4 w-[88vw] max-w-[420px]">
+          <div className="shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FFD49A] via-[#EC4899] to-[#8A5CF0] flex items-center justify-center shadow-ios">
+            <FluentEmoji emoji="🔥" size={26} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[15px] font-extrabold text-foreground leading-tight truncate">
+              {added > 0 ? `Added ${added} to ${MY_RILO_TITLE}` : `Already in ${MY_RILO_TITLE}`}
+            </p>
+            <p className="text-[12px] text-muted-foreground leading-tight mt-0.5">
+              {added > 0 ? 'Ready in your home planner' : 'These tasks are already there'}
+            </p>
+          </div>
+          <button
+            onClick={() => { toast.dismiss(id); navigate('/app/home'); }}
+            className="shrink-0 h-10 px-4 rounded-xl bg-foreground text-background text-sm font-bold active:scale-95 transition-transform"
+          >
+            Open
+          </button>
+        </div>
+      ), { duration: 5000 });
+
+      // Auto-navigate to home planner so the user sees the new tasks immediately.
+      if (added > 0) {
+        setTimeout(() => navigate('/app/home'), 350);
+      }
     } catch (err) {
       console.error('Failed to add to My Rilo Self Care:', err);
-      toast({ title: t('tier1.tasksBank.createFailed'), variant: 'destructive' });
+      toast.error(t('tier1.tasksBank.createFailed'));
     } finally {
       setIsAdding(false);
     }
