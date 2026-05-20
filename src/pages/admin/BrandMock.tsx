@@ -152,7 +152,312 @@ export default function BrandMock() {
         </button>
       </div>
 
-      {/* ── Phone Frame ── */}
+      {/* ═══════════════════════════════════════════════ */}
+      {/* ── 🆕 My Rilo Home (NEW default home) ── */}
+      {/* ═══════════════════════════════════════════════ */}
+      <div className="pt-2">
+        <h2 className="text-xl font-bold text-foreground text-center mb-1">🧡 My Rilo — new default home</h2>
+        <p className="text-center text-muted-foreground text-sm mb-6 max-w-[560px] mx-auto">
+          Replaces the Planner as the home tab. ADHD-friendly: one hero, one decision, no list to scroll. Planner moves to its own tab.
+        </p>
+      </div>
+      <div className="flex justify-center">
+        <div
+          className="relative w-[375px] rounded-[40px] shadow-2xl overflow-hidden transition-colors duration-500 flex flex-col"
+          style={{
+            background: darkMode
+              ? 'linear-gradient(180deg, #1A0F08 0%, #251510 100%)'
+              : `linear-gradient(180deg, ${O.bgWarm} 0%, #FFFFFF 55%)`,
+            border: `3px solid ${darkMode ? '#3D2A1A' : '#E8D6C8'}`,
+            minHeight: 780,
+          }}
+        >
+          {/* Status bar */}
+          <div className="flex items-center justify-between px-8 pt-4 pb-2">
+            <span className="text-xs font-semibold" style={{ color: fgMuted }}>9:41</span>
+            <div className="flex gap-1.5">
+              <div className="w-4 h-2 rounded-sm" style={{ background: fgMuted }} />
+              <div className="w-4 h-2 rounded-sm" style={{ background: fgMuted }} />
+            </div>
+          </div>
+
+          {/* Header — minimal: menu / brand mark / streak */}
+          <div className="px-5 pt-1 pb-2 grid grid-cols-[auto_1fr_auto] items-center h-10">
+            <button className="p-1.5 -ml-1" style={{ color: fg }}>
+              <Menu className="w-[18px] h-[18px]" />
+            </button>
+            <div className="flex justify-center items-center gap-1.5">
+              <span className="text-[14px] font-bold tracking-tight" style={{ color: fg }}>My Rilo</span>
+            </div>
+            <button
+              className="flex items-center gap-1 px-2.5 py-1 rounded-full"
+              style={{
+                background: `linear-gradient(135deg, ${O.primaryL}, ${O.primary})`,
+                color: '#fff',
+                boxShadow: '0 2px 8px rgba(235,94,51,0.35)',
+              }}
+            >
+              <Flame className="w-3.5 h-3.5 fill-current" />
+              <span className="text-[13px] font-bold">12</span>
+            </button>
+          </div>
+
+          {/* Greeting — warm, single line */}
+          <div className="px-5 pt-3 pb-1">
+            <div className="text-[12px] font-semibold uppercase tracking-wider" style={{ color: O.primary }}>
+              Good morning, Sara
+            </div>
+            <div className="text-[22px] font-bold leading-tight mt-1" style={{ color: fg }}>
+              One small thing — that's all.
+            </div>
+          </div>
+
+          {/* HERO — the ONE focus card, dominant */}
+          <div className="px-4 pt-4 pb-3">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-[32px] p-5 relative overflow-hidden"
+              style={{
+                background: darkMode
+                  ? `linear-gradient(160deg, ${O.peachDark} 0%, #2A1810 100%)`
+                  : `linear-gradient(160deg, ${O.peach} 0%, ${O.peachMid} 100%)`,
+                boxShadow: darkMode
+                  ? '0 16px 40px rgba(0,0,0,0.5)'
+                  : '0 16px 40px rgba(235,94,51,0.25)',
+                minHeight: 280,
+              }}
+            >
+              {/* Soft halo */}
+              <div
+                className="absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-40"
+                style={{ background: darkMode ? O.primaryD : '#FFFFFF', filter: 'blur(30px)' }}
+              />
+
+              <div className="relative z-10 flex flex-col h-full">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <Sparkles className="w-3.5 h-3.5" style={{ color: O.primary }} />
+                  <div className="text-[10px] font-bold tracking-[0.15em] uppercase" style={{ color: O.primary }}>
+                    Right now
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 mb-5">
+                  <div
+                    className="w-[72px] h-[72px] rounded-3xl flex items-center justify-center shrink-0"
+                    style={{
+                      background: darkMode ? '#1A0F08' : '#FFFFFF',
+                      boxShadow: '0 6px 16px rgba(0,0,0,0.10)',
+                    }}
+                  >
+                    <FluentEmoji emoji="🧘‍♀️" size={48} />
+                  </div>
+                  <div className="flex-1 min-w-0 pt-1">
+                    <div className="text-[24px] font-bold leading-[1.1]" style={{ color: fg }}>
+                      2-min breath
+                    </div>
+                    <div className="text-[13px] mt-1.5 leading-snug" style={{ color: darkMode ? '#D9B89A' : '#6B4D33' }}>
+                      Mornings feel rushed. Start tiny.
+                    </div>
+                  </div>
+                </div>
+
+                {/* Big Start button */}
+                <button
+                  className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-[16px] font-bold"
+                  style={{
+                    background: O.primary,
+                    color: '#FFFFFF',
+                    boxShadow: '0 8px 20px rgba(235,94,51,0.45)',
+                  }}
+                >
+                  <Play className="w-[18px] h-[18px]" fill="#FFFFFF" />
+                  Start now
+                </button>
+
+                {/* Tiny secondary actions */}
+                <div className="flex items-center justify-center gap-5 mt-3 pt-1">
+                  <button className="text-[12px] font-semibold" style={{ color: darkMode ? '#D9B89A' : '#6B4D33' }}>
+                    Swap →
+                  </button>
+                  <div className="w-px h-3" style={{ background: darkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.10)' }} />
+                  <button className="text-[12px] font-semibold" style={{ color: darkMode ? '#D9B89A' : '#6B4D33' }}>
+                    Snooze 15m
+                  </button>
+                  <div className="w-px h-3" style={{ background: darkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.10)' }} />
+                  <button className="text-[12px] font-semibold" style={{ color: darkMode ? '#D9B89A' : '#6B4D33' }}>
+                    Done ✓
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* 3 passive stat chips — at-a-glance, no pressure */}
+          <div className="px-4 pb-3">
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { icon: '🔥', label: '12 day streak', value: '12d' },
+                { icon: '✅', label: 'Done today', value: '2/5' },
+                { icon: '💛', label: 'Mood', value: 'Calm' },
+              ].map((s) => (
+                <div
+                  key={s.label}
+                  className="rounded-2xl py-2.5 px-2 flex flex-col items-center"
+                  style={{
+                    background: darkMode ? 'rgba(255,255,255,0.04)' : '#FFFFFF',
+                    border: `1px solid ${darkMode ? '#3D2A1A' : O.border}`,
+                  }}
+                >
+                  <FluentEmoji emoji={s.icon} size={18} />
+                  <div className="text-[13px] font-bold mt-0.5" style={{ color: fg }}>{s.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Up-next peek — just ONE, collapsed, no checkbox */}
+          <div className="px-5 pt-1 pb-2 flex items-center justify-between">
+            <div className="text-[11px] font-bold uppercase tracking-wider" style={{ color: fgMuted }}>After this</div>
+            <button className="text-[11px] font-semibold" style={{ color: O.primary }}>See plan →</button>
+          </div>
+          <div className="px-4 pb-3">
+            <div
+              className="flex items-center gap-3 px-3 py-2.5 rounded-2xl"
+              style={{
+                background: darkMode ? 'rgba(255,255,255,0.03)' : '#FFFFFF',
+                border: `1px solid ${darkMode ? '#3D2A1A' : O.border}`,
+              }}
+            >
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: darkMode ? O.skyDark : O.skyMid + '66' }}
+              >
+                <FluentEmoji emoji="💧" size={20} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[13.5px] font-semibold" style={{ color: fg }}>A glass of water</div>
+                <div className="text-[11px]" style={{ color: fgMuted }}>1 min · easy win</div>
+              </div>
+              <ChevronRight className="w-4 h-4" style={{ color: fgMuted }} />
+            </div>
+          </div>
+
+          {/* Rilo note — single warm sentence */}
+          <div className="px-4 pb-3">
+            <div
+              className="rounded-2xl p-3 flex gap-2.5 items-center"
+              style={{
+                background: darkMode ? 'rgba(255,255,255,0.04)' : '#FFF8F3',
+                border: `1px dashed ${darkMode ? '#3D2A1A' : O.peachMid}`,
+              }}
+            >
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
+                style={{ background: `linear-gradient(135deg, ${O.primaryL}, ${O.primary})` }}
+              >
+                <FluentEmoji emoji="🧡" size={16} />
+              </div>
+              <div className="flex-1 text-[12.5px] leading-snug" style={{ color: fg }}>
+                You showed up yesterday. That counts. 🧡
+              </div>
+            </div>
+          </div>
+
+          {/* Talk to Rilo — bottom entry */}
+          <div className="px-4 pb-6 pt-1 mt-auto">
+            <button
+              className="w-full flex items-center gap-2 rounded-full pl-4 pr-1.5 py-1.5"
+              style={{
+                background: darkMode ? 'rgba(255,255,255,0.06)' : '#FFFFFF',
+                border: `1px solid ${darkMode ? '#3D2A1A' : O.border}`,
+                boxShadow: darkMode ? 'none' : '0 6px 18px rgba(60,30,10,0.08)',
+              }}
+            >
+              <span className="text-[13px] flex-1 text-left py-1.5" style={{ color: fgMuted }}>
+                Talk to Rilo…
+              </span>
+              <span className="w-8 h-8 rounded-full flex items-center justify-center" style={{ color: fgMuted }}>
+                <Mic className="w-[18px] h-[18px]" />
+              </span>
+              <span
+                className="w-9 h-9 rounded-full flex items-center justify-center"
+                style={{
+                  background: O.primary,
+                  color: '#FFFFFF',
+                  boxShadow: '0 2px 8px rgba(235,94,51,0.35)',
+                }}
+              >
+                <ArrowUp className="w-[18px] h-[18px]" />
+              </span>
+            </button>
+          </div>
+
+          {/* Bottom nav — My Rilo replaces Home; Planner is its own tab */}
+          <div
+            className="grid grid-cols-4 px-2 py-2 mx-3 mb-3 rounded-[28px]"
+            style={{
+              background: darkMode
+                ? 'linear-gradient(180deg, rgba(60,40,25,0.55), rgba(40,25,15,0.65))'
+                : 'linear-gradient(180deg, rgba(255,255,255,0.62), rgba(255,248,243,0.72))',
+              backdropFilter: 'blur(40px) saturate(1.8)',
+              border: darkMode ? '0.5px solid rgba(255,200,160,0.18)' : '0.5px solid rgba(255,255,255,0.65)',
+              boxShadow: '0 -4px 30px rgba(0,0,0,0.06)',
+            }}
+          >
+            {[
+              { icon: Sparkles, label: 'My Rilo', active: true },
+              { icon: Calendar, label: 'Planner' },
+              { icon: Music, label: 'Listen' },
+              { icon: Users, label: 'Chats', badge: 3 },
+            ].map((item) => (
+              <div key={item.label} className="flex flex-col items-center gap-0.5 relative">
+                <div className="relative w-10 h-10 flex items-center justify-center">
+                  {item.active && (
+                    <div
+                      className="absolute inset-0 rounded-2xl"
+                      style={{
+                        background: darkMode ? 'rgba(235,94,51,0.15)' : 'rgba(235,94,51,0.10)',
+                        border: `0.5px solid ${O.primary}25`,
+                      }}
+                    />
+                  )}
+                  <item.icon
+                    className="w-[22px] h-[22px] relative"
+                    style={{ color: item.active ? O.primary : fgMuted, strokeWidth: item.active ? 2.2 : 1.6 }}
+                  />
+                  {item.badge && (
+                    <div
+                      className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 rounded-full flex items-center justify-center px-1"
+                      style={{ background: O.accent }}
+                    >
+                      <span className="text-[9px] font-bold text-white">{item.badge}</span>
+                    </div>
+                  )}
+                </div>
+                <span
+                  className="text-[10px] leading-tight"
+                  style={{ color: item.active ? O.primary : fgMuted, fontWeight: item.active ? 600 : 400 }}
+                >
+                  {item.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Concept notes */}
+      <div className="max-w-[640px] mx-auto pt-2 pb-6 text-[13px] leading-relaxed text-muted-foreground space-y-2">
+        <p><strong className="text-foreground">Home tab = My Rilo</strong>, not Planner. The full planner gets its own bottom tab.</p>
+        <p><strong className="text-foreground">One hero, one decision.</strong> "Right now" is the only thing that competes for attention. Start / Swap / Snooze / Done — that's it.</p>
+        <p><strong className="text-foreground">Stats are passive.</strong> 3 small chips, no progress pressure, no streaks at risk.</p>
+        <p><strong className="text-foreground">After this</strong> shows exactly 1 next item with a tiny link to the full plan — for users who want to peek.</p>
+        <p><strong className="text-foreground">Rilo note</strong> = one warm sentence, never a list of tips. Talk to Rilo lives at the bottom and expands into chat.</p>
+        <p className="text-xs italic">Below: the older Coach Home sketch for comparison.</p>
+      </div>
+
+      {/* ── Original Phone Frame (legacy planner-style home) ── */}
       <div className="flex justify-center">
         <div
           className="relative w-[375px] rounded-[40px] shadow-2xl overflow-hidden transition-colors duration-500"
