@@ -36,6 +36,9 @@ import {
 } from "@/components/app/LanguageSettingsHintPopup";
 import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
 import { useMediaCategories } from "@/hooks/useMediaCategories";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { CachedImage } from "@/components/ui/CachedImage";
 
 const LANGUAGE_OPTIONS = [
   { value: "all", labelKey: "player.languages.all", flag: "🌐" },
