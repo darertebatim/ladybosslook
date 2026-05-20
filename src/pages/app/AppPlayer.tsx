@@ -554,11 +554,16 @@ export default function AppPlayer() {
                     {t("player.hotTracks", "Hot Tracks")}
                   </h2>
                 </div>
-                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pt-1 pb-2 scrollbar-hide">
+                <div
+                  className="flex gap-3 overflow-x-auto -mx-4 px-4 pt-1 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4"
+                  style={{ WebkitOverflowScrolling: "touch" }}
+                >
                   {hotTracks.map((track: any) => {
                     const playlistCover =
                       track.audio_playlist_items?.[0]?.audio_playlists?.cover_image_url || null;
                     const cover = track.cover_image_url || playlistCover;
+                    const playlistName =
+                      track.audio_playlist_items?.[0]?.audio_playlists?.name || null;
                     return (
                     <button
                       key={track.id}
@@ -566,24 +571,46 @@ export default function AppPlayer() {
                         haptic.light();
                         navigate(`/app/player/${track.id}`);
                       }}
-                      className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
+                      className="shrink-0 w-[85%] snap-start text-left transition-transform active:scale-[0.98]"
                     >
-                      <div className="h-32 w-32 rounded-2xl overflow-hidden bg-muted shadow-ios mb-1.5">
+                      <div className="relative aspect-[16/10] w-full rounded-3xl overflow-hidden bg-muted shadow-ios">
                         {cover ? (
                           <CachedImage
                             src={cover}
                             alt={track.title}
-                            className="w-full h-full object-cover"
+                            className="absolute inset-0 w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <FluentEmoji emoji="🎧" size={36} />
+                          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-orange-300 to-orange-500">
+                            <FluentEmoji emoji="🎧" size={56} />
                           </div>
                         )}
+                        {/* Gradient overlay for legibility */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                        {/* Hot badge */}
+                        <div className="absolute top-3 left-3 flex items-center gap-1 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-ios">
+                          <FluentEmoji emoji="🔥" size={12} />
+                          HOT
+                        </div>
+                        {/* Bottom content */}
+                        <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            {playlistName && (
+                              <p className="text-[10px] font-semibold uppercase tracking-wider text-white/80 truncate">
+                                {playlistName}
+                              </p>
+                            )}
+                            <p className="text-base font-bold text-white line-clamp-2 leading-tight">
+                              {track.title}
+                            </p>
+                          </div>
+                          <div className="shrink-0 h-11 w-11 rounded-full bg-white flex items-center justify-center shadow-ios">
+                            <svg viewBox="0 0 24 24" className="h-5 w-5 fill-orange-500 ml-0.5">
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-xs font-medium line-clamp-2 leading-tight text-fg-warm">
-                        {track.title}
-                      </p>
                     </button>
                     );
                   })}
