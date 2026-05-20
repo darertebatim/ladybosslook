@@ -42,6 +42,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { CachedImage } from "@/components/ui/CachedImage";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
+import { PersianFlag } from "@/components/ui/PersianFlag";
 import { RoutineBankCard } from "@/components/app/RoutineBankCard";
 import { ToolShortcuts } from "@/components/app/ToolShortcuts";
 import {
