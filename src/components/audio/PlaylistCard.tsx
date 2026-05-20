@@ -5,6 +5,7 @@ import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 import { CachedImage } from '@/components/ui/CachedImage';
+import { HostBadges } from '@/components/app/HostBadges';
 import { cn } from '@/lib/utils';
 
 const LANG_FLAGS: Record<string, string> = {
@@ -148,6 +149,14 @@ export const PlaylistCard = memo(function PlaylistCard({
           <h3 className="text-[16px] font-bold leading-tight mt-1 line-clamp-2 text-fg-warm">
             {name}
           </h3>
+
+          <HostBadges
+            contentType="playlist"
+            contentId={id}
+            size="sm"
+            prefix="with"
+            className="mt-1 text-fg-warm-muted"
+          />
 
           <div className="mt-2 flex items-center gap-1.5 flex-wrap">
             {isFollowing && (
