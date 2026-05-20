@@ -103,10 +103,10 @@ export const PlaylistCard = memo(function PlaylistCard({
       )}
       onClick={handleClick}
     >
-      <div className="flex items-center gap-3 p-2">
-        {/* 72×72 tile — cover image when present, else solid color + emoji */}
+      <div className="flex items-center gap-3.5 p-2.5">
+        {/* 96×96 tile — cover image when present, else solid color + emoji */}
         <div
-          className="relative h-[72px] w-[72px] shrink-0 rounded-xl overflow-hidden flex items-center justify-center"
+          className="relative h-[96px] w-[96px] shrink-0 rounded-2xl overflow-hidden flex items-center justify-center"
           style={{ background: tile.bg }}
         >
           {coverImageUrl ? (
@@ -118,7 +118,7 @@ export const PlaylistCard = memo(function PlaylistCard({
               className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
-            <FluentEmoji emoji={tile.emoji} size={36} />
+            <FluentEmoji emoji={tile.emoji} size={48} />
           )}
 
           {isLocked && !isFree && (
@@ -139,42 +139,42 @@ export const PlaylistCard = memo(function PlaylistCard({
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 text-[11px] text-fg-warm-muted">
+          <div className="flex items-center gap-1.5 text-[12px] text-fg-warm-muted">
             {category && <span className="font-medium capitalize">{categoryLabel || category}</span>}
             {category && totalDuration > 0 && <span>·</span>}
             {totalDuration > 0 && <span>{formatDuration(totalDuration)}</span>}
           </div>
 
-          <h3 className="text-[14px] font-bold leading-tight mt-0.5 line-clamp-2 text-fg-warm">
+          <h3 className="text-[16px] font-bold leading-tight mt-1 line-clamp-2 text-fg-warm">
             {name}
           </h3>
 
-          <div className="mt-1 flex items-center gap-1.5">
+          <div className="mt-2 flex items-center gap-1.5 flex-wrap">
             {isFollowing && (
-              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-brand/10 text-brand">
-                <Check className="h-2.5 w-2.5" /> FOLLOWING
+              <span className="inline-flex items-center gap-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand/10 text-brand">
+                <Check className="h-3 w-3" /> FOLLOWING
               </span>
             )}
             {requiresSubscription && !isSubscribed && (
-              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-200 text-amber-700">
-                <Crown className="h-2.5 w-2.5" /> PLUS
+              <span className="inline-flex items-center gap-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-700">
+                <Crown className="h-3 w-3" /> PLUS
               </span>
             )}
             {isFree && !isLocked && !requiresSubscription && !isSubscribed && (
-              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#E2F9F0] text-[#065F46]">
+              <span className="inline-flex items-center gap-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E2F9F0] text-[#065F46]">
                 🔥 FREE
               </span>
             )}
             {language && language !== 'all' && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-fg-warm-muted">
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-fg-warm-muted">
                 {language === 'persian'
-                  ? <PersianFlag size={12} />
-                  : LANG_FLAGS[language] && <span className="text-[13px] leading-none">{LANG_FLAGS[language]}</span>}
+                  ? <PersianFlag size={14} />
+                  : LANG_FLAGS[language] && <span className="text-[14px] leading-none">{LANG_FLAGS[language]}</span>}
                 {LANG_LABELS[language] && <span>{LANG_LABELS[language]}</span>}
               </span>
             )}
             {(!isLocked || isFree) && progressPercentage > 0 && (
-              <span className="text-[10px] text-fg-warm-muted font-medium">
+              <span className="text-[11px] text-fg-warm-muted font-medium">
                 {Math.round(progressPercentage)}%
               </span>
             )}
