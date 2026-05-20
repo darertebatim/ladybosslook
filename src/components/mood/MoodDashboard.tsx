@@ -119,17 +119,12 @@ export function MoodDashboard() {
     haptic.medium();
     
     try {
-      // Save mood check-in in emotion logs (separate from journal entries)
-      const moodLabel = t(`moodPage.moods.${selectedMood}`, { defaultValue: selectedMood });
-      const baseContent = t('moodPage.feelingDailyText', { mood: moodLabel.toLowerCase() });
-      const parts = [baseContent];
-      if (selectedSubmoods.length > 0) parts.push(`(${selectedSubmoods.join(', ')})`);
-      if (selectedContexts.length > 0) parts.push(`· ${selectedContexts.join(', ')}`);
-      if (contextNote.trim()) parts.push(`— ${contextNote.trim()}`);
-      const content = parts.join(' ');
+      // Save mood check-in with structured fields for pattern analysis
       await createMoodLog.mutateAsync({
         mood: selectedMood,
-        content,
+        submoods: selectedSubmoods,
+        contexts: selectedContexts,
+        note: contextNote.trim() || undefined,
       });
 
       // Auto-complete any mood pro tasks for today

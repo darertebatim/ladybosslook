@@ -27,6 +27,7 @@ export interface CreateEmotionLogPayload {
   valence: string;
   contexts: string[];
   notes: string | null;
+  submoods?: string[] | null;
 }
 
 export interface DeleteEmotionLogPayload {
@@ -122,7 +123,8 @@ async function execCreateEmotionLog(p: CreateEmotionLogPayload): Promise<void> {
       valence: p.valence,
       contexts: p.contexts,
       notes: p.notes,
-    });
+      submoods: p.submoods ?? null,
+    } as any);
   if (error && !isDuplicate(error)) throw error;
 }
 

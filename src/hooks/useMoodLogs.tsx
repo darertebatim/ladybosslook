@@ -16,17 +16,24 @@ export interface MoodLog {
   mood: string;
   content: string;
   created_at: string;
+  submoods?: string[];
+  contexts?: string[];
+  notes?: string | null;
 }
 
 export interface MoodDay {
   date: string;
   mood: string;
   count: number;
+  entries?: MoodLog[];
 }
 
 export interface CreateMoodLogInput {
   mood: string;
   content?: string;
+  submoods?: string[];
+  contexts?: string[];
+  note?: string;
 }
 
 const MOOD_VALENCE_MAP: Record<string, string> = {
@@ -50,12 +57,14 @@ export function useCreateMoodLog() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ mood, content }: CreateMoodLogInput): Promise<MoodLog> => {
+    mutationFn: async ({ mood, content, submoods, contexts, note }: CreateMoodLogInput): Promise<MoodLog> => {
       if (!user?.id) throw new Error('Not authenticated');
 
       const clientId = crypto.randomUUID();
       const nowIso = new Date().toISOString();
       const valence = MOOD_VALENCE_MAP[mood] ?? 'neutral';
+
+      const noteText = note?.trim() || content || null;
 
       const payload: CreateEmotionLogPayload = {
         clientId,
@@ -63,8 +72,9 @@ export function useCreateMoodLog() {
         category: 'mood_checkin',
         emotion: mood,
         valence,
-        contexts: [],
-        notes: content ?? null,
+        contexts: contexts ?? [],
+        notes: noteText,
+        submoods: submoods ?? [],
       };
 
       const result = await runWithOfflineFallback({
@@ -79,9 +89,11 @@ export function useCreateMoodLog() {
               category: 'mood_checkin',
               emotion: mood,
               valence,
-              notes: content ?? null,
-            })
-            .select('id, emotion, notes, created_at')
+              notes: noteText,
+              contexts: contexts ?? [],
+              submoods: submoods ?? [],
+            } as any)
+            .select('id, emotion, notes, created_at, contexts, submoods')
             .single();
           if (error) throw error;
           return data;
@@ -96,12 +108,18 @@ export function useCreateMoodLog() {
             mood: result.data.emotion,
             content: result.data.notes || toDefaultMoodContent(result.data.emotion),
             created_at: result.data.created_at,
+            submoods: (result.data as any).submoods ?? submoods ?? [],
+            contexts: (result.data as any).contexts ?? contexts ?? [],
+            notes: result.data.notes ?? null,
           }
         : {
             id: clientId,
             mood,
-            content: content || toDefaultMoodContent(mood),
+            content: noteText || toDefaultMoodContent(mood),
             created_at: nowIso,
+            submoods: submoods ?? [],
+            contexts: contexts ?? [],
+            notes: noteText,
           };
     },
     onSuccess: (data) => {
@@ -140,7 +158,7 @@ export function useMoodLogs() {
       const [emotionResult, journalResult] = await Promise.all([
         supabase
           .from('emotion_logs')
-          .select('id, emotion, notes, created_at')
+          .select('id, emotion, notes, created_at, contexts, submoods')
           .eq('user_id', user.id)
           .eq('category', 'mood_checkin')
           .order('created_at', { ascending: false }),
@@ -155,11 +173,14 @@ export function useMoodLogs() {
       if (emotionResult.error) throw emotionResult.error;
       if (journalResult.error) throw journalResult.error;
 
-      const emotionLogs: MoodLog[] = (emotionResult.data || []).map((entry) => ({
+      const emotionLogs: MoodLog[] = (emotionResult.data || []).map((entry: any) => ({
         id: entry.id,
         mood: entry.emotion,
         content: entry.notes || toDefaultMoodContent(entry.emotion),
         created_at: entry.created_at,
+        submoods: entry.submoods ?? [],
+        contexts: entry.contexts ?? [],
+        notes: entry.notes ?? null,
       }));
 
       const journalLogs: MoodLog[] = (journalResult.data || []).map((entry) => ({
@@ -193,7 +214,7 @@ export function useMoodLogsForMonth(month: Date) {
       const [emotionResult, journalResult] = await Promise.all([
         supabase
           .from('emotion_logs')
-          .select('id, emotion, created_at')
+          .select('id, emotion, notes, contexts, submoods, created_at')
           .eq('user_id', user.id)
           .eq('category', 'mood_checkin')
           .gte('created_at', monthStart.toISOString())
@@ -201,7 +222,7 @@ export function useMoodLogsForMonth(month: Date) {
           .order('created_at', { ascending: false }),
         supabase
           .from('free_form_reflections')
-          .select('id, mood, created_at')
+          .select('id, mood, content, created_at')
           .eq('user_id', user.id)
           .not('mood', 'is', null)
           .gte('created_at', monthStart.toISOString())
@@ -212,14 +233,24 @@ export function useMoodLogsForMonth(month: Date) {
       if (emotionResult.error) throw emotionResult.error;
       if (journalResult.error) throw journalResult.error;
 
-      const mergedEntries = [
-        ...(emotionResult.data || []).map((entry) => ({
+      const mergedEntries: MoodLog[] = [
+        ...(emotionResult.data || []).map((entry: any) => ({
+          id: entry.id,
           mood: entry.emotion,
+          content: entry.notes || toDefaultMoodContent(entry.emotion),
           created_at: entry.created_at,
+          submoods: entry.submoods ?? [],
+          contexts: entry.contexts ?? [],
+          notes: entry.notes ?? null,
         })),
-        ...(journalResult.data || []).map((entry) => ({
+        ...(journalResult.data || []).map((entry: any) => ({
+          id: entry.id,
           mood: entry.mood || 'okay',
+          content: entry.content,
           created_at: entry.created_at,
+          submoods: [],
+          contexts: [],
+          notes: entry.content ?? null,
         })),
       ];
 
@@ -232,11 +263,13 @@ export function useMoodLogsForMonth(month: Date) {
 
         if (existing) {
           existing.count += 1;
+          existing.entries = [...(existing.entries ?? []), entry];
         } else {
           moodMap.set(dateKey, {
             date: dateKey,
             mood: entry.mood,
             count: 1,
+            entries: [entry],
           });
         }
       });

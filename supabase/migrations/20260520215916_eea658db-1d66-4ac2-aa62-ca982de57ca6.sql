@@ -1,0 +1,1 @@
+ALTER TABLE public.emotion_logs ADD COLUMN IF NOT EXISTS submoods text[] DEFAULT NULL;
