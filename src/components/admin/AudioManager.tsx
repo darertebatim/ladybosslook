@@ -248,6 +248,7 @@ export const AudioManager = () => {
         title: "",
         description: "",
         playlist_id: "",
+        is_hot: false,
       });
       setAudioFiles([]);
       setCoverFile(null);
@@ -462,6 +463,7 @@ export const AudioManager = () => {
       title: audio.title,
       description: audio.description || "",
       playlist_id: audio.audio_playlist_items?.[0]?.playlist_id || "",
+      is_hot: !!audio.is_hot,
     });
     setIsEditDialogOpen(true);
   };
@@ -475,6 +477,7 @@ export const AudioManager = () => {
       updates: {
         title: formData.title,
         description: formData.description,
+        is_hot: formData.is_hot,
       },
       playlistId: formData.playlist_id,
     });
