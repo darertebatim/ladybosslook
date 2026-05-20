@@ -54,7 +54,7 @@ import { SelfCareGoalsCategoryCard } from "@/components/app/SelfCareGoalsCategor
 import { useTaskTemplates } from "@/hooks/useTaskPlanner";
 import { ActiveRoundsCarousel } from "@/components/dashboard/ActiveRoundsCarousel";
 import { useNewHomeData } from "@/hooks/useNewHomeData";
-import { useUserPreferredLanguage } from "@/hooks/useUserPreferredLanguage";
+import { useUserPreferredLanguage, preferredLanguageSorter } from "@/hooks/useUserPreferredLanguage";
 import {
   LanguageSettingsHintPopup,
   shouldShowLanguageSettingsHint,
@@ -184,21 +184,28 @@ const AppStore = () => {
   });
 
   const meditatePlaylists = useMemo(
-    () => audioPlaylists?.filter((p) => p.category === "meditate") || [],
-    [audioPlaylists],
+    () =>
+      (audioPlaylists?.filter((p) => p.category === "meditate") || [])
+        .slice()
+        .sort(preferredLanguageSorter(userLang)),
+    [audioPlaylists, userLang],
   );
   const soundscapePlaylists = useMemo(
-    () => audioPlaylists?.filter((p) => p.category === "soundscape") || [],
-    [audioPlaylists],
+    () =>
+      (audioPlaylists?.filter((p) => p.category === "soundscape") || [])
+        .slice()
+        .sort(preferredLanguageSorter(userLang)),
+    [audioPlaylists, userLang],
   );
 
   // Combined list for the "Playlists" hub section under Self-Care Routines.
   // Surfaces every listenable playlist (meditate + soundscape + audiobook +
   // podcast) in one rail so users can discover audio content without scrolling
-  // past Programs / Courses first.
+  // past Programs / Courses first. Sorted by admin sort_order ASC (from query),
+  // then re-grouped so the user's preferred language comes first.
   const allListenPlaylists = useMemo(
-    () => audioPlaylists || [],
-    [audioPlaylists],
+    () => (audioPlaylists || []).slice().sort(preferredLanguageSorter(userLang)),
+    [audioPlaylists, userLang],
   );
 
   // Fetch routines bank and task templates for explore sections
