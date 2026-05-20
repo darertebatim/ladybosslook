@@ -153,7 +153,387 @@ export default function BrandMock() {
       </div>
 
       {/* ═══════════════════════════════════════════════ */}
-      {/* ── 🆕 My Rilo Home (NEW default home) ── */}
+      {/* ── 🆕 My Rilo — PATH version (v3, dynamic timeline) ── */}
+      {/* ═══════════════════════════════════════════════ */}
+      <div className="pt-2">
+        <h2 className="text-xl font-bold text-foreground text-center mb-1">🛤️ My Rilo — Path (v3)</h2>
+        <p className="text-center text-muted-foreground text-sm mb-6 max-w-[600px] mx-auto">
+          A dynamic, hand-picked path for today. Pulls from <strong>My Rilo Self Care</strong>, the <strong>Self-Care Quiz</strong>, <strong>Playlists & tracks</strong>, <strong>Routines</strong>, and <strong>Reads</strong>. Like BetterMe/Calm "My plan" — but for mental health, with Rilo as the guide.
+        </p>
+      </div>
+      <div className="flex justify-center">
+        <div
+          className="relative w-[375px] rounded-[40px] shadow-2xl overflow-hidden transition-colors duration-500 flex flex-col"
+          style={{
+            background: darkMode
+              ? 'linear-gradient(180deg, #1A0F08 0%, #221310 60%, #1A0F08 100%)'
+              : `linear-gradient(180deg, ${O.bgWarm} 0%, #FFFFFF 50%, ${O.bgWarm} 100%)`,
+            border: `3px solid ${darkMode ? '#3D2A1A' : '#E8D6C8'}`,
+            minHeight: 880,
+          }}
+        >
+          {/* Status bar */}
+          <div className="flex items-center justify-between px-8 pt-4 pb-2">
+            <span className="text-xs font-semibold" style={{ color: fgMuted }}>9:41</span>
+            <div className="flex gap-1.5">
+              <div className="w-4 h-2 rounded-sm" style={{ background: fgMuted }} />
+              <div className="w-4 h-2 rounded-sm" style={{ background: fgMuted }} />
+            </div>
+          </div>
+
+          {/* Soft warm halo behind hero greeting */}
+          <div
+            className="absolute top-12 -right-16 w-56 h-56 rounded-full opacity-50 pointer-events-none"
+            style={{
+              background: darkMode
+                ? `radial-gradient(circle, ${O.primaryD} 0%, transparent 70%)`
+                : `radial-gradient(circle, ${O.peachMid} 0%, transparent 70%)`,
+              filter: 'blur(20px)',
+            }}
+          />
+
+          {/* Header — title + streak */}
+          <div className="px-5 pt-2 pb-1 grid grid-cols-[auto_1fr_auto] items-center relative z-10">
+            <button className="p-1.5 -ml-1" style={{ color: fg }}>
+              <Menu className="w-[18px] h-[18px]" />
+            </button>
+            <div className="text-center text-[13px] font-bold tracking-tight" style={{ color: fg }}>My Rilo</div>
+            <button
+              className="flex items-center gap-1 px-2.5 py-1 rounded-full"
+              style={{
+                background: `linear-gradient(135deg, ${O.primaryL}, ${O.primary})`,
+                color: '#fff',
+                boxShadow: '0 2px 8px rgba(235,94,51,0.35)',
+              }}
+            >
+              <Flame className="w-3.5 h-3.5 fill-current" />
+              <span className="text-[13px] font-bold">12</span>
+            </button>
+          </div>
+
+          {/* Hero greeting */}
+          <div className="px-5 pt-4 pb-3 relative z-10">
+            <div className="text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: O.primary }}>
+              Wednesday · May 20
+            </div>
+            <div className="text-[28px] font-bold leading-[1.05] mt-1.5" style={{ color: fg }}>
+              Your path for today
+            </div>
+            <div className="text-[13px] mt-1.5" style={{ color: fgMuted }}>
+              5 small steps · ~18 min total · pick your pace
+            </div>
+
+            {/* Progress dots */}
+            <div className="flex items-center gap-1.5 mt-3">
+              {[true, true, false, false, false].map((done, i) => (
+                <div
+                  key={i}
+                  className="h-1.5 flex-1 rounded-full"
+                  style={{
+                    background: done ? O.primary : (darkMode ? 'rgba(255,255,255,0.10)' : O.border),
+                  }}
+                />
+              ))}
+              <span className="text-[11px] font-bold ml-1" style={{ color: fgMuted }}>2/5</span>
+            </div>
+          </div>
+
+          {/* ── THE PATH ── */}
+          <div className="px-4 pt-3 pb-4 relative">
+            {/* Vertical dotted spine */}
+            <div
+              className="absolute left-[34px] top-8 bottom-8 w-px"
+              style={{
+                backgroundImage: `linear-gradient(${darkMode ? 'rgba(255,200,160,0.25)' : O.peachMid} 50%, transparent 50%)`,
+                backgroundSize: '1px 6px',
+              }}
+            />
+
+            {/* ── MORNING section ── */}
+            <div className="flex items-center gap-2 mb-3 pl-1">
+              <div className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: fgMuted }}>
+                ☀️ Morning · done
+              </div>
+              <div className="flex-1 h-px" style={{ background: darkMode ? 'rgba(255,200,160,0.12)' : O.border }} />
+            </div>
+
+            {/* Step 1 — completed: Mood check-in */}
+            <PathStep
+              done
+              icon="💛"
+              accent={O.yellowMid}
+              accentDark={O.yellowDark}
+              kicker="Mood check-in"
+              kickerColor="#A86C1A"
+              kickerColorDark="#E8C879"
+              title="Feeling: Calm"
+              meta="1 min · logged at 7:42"
+              darkMode={darkMode}
+              fg={fg}
+              fgMuted={fgMuted}
+              border={border}
+              cardBg={cardBg}
+              O={O}
+            />
+
+            {/* Step 2 — completed: Breath */}
+            <PathStep
+              done
+              icon="🌬️"
+              accent={O.mintMid}
+              accentDark={O.mintDark}
+              kicker="Breathwork"
+              kickerColor="#1F7A5A"
+              kickerColorDark="#7FD9B5"
+              title="2-min reset breath"
+              meta="2 min · Calm pattern"
+              darkMode={darkMode}
+              fg={fg}
+              fgMuted={fgMuted}
+              border={border}
+              cardBg={cardBg}
+              O={O}
+            />
+
+            {/* ── RIGHT NOW section ── */}
+            <div className="flex items-center gap-2 mb-3 mt-5 pl-1">
+              <div className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: O.primary }}>
+                ✨ Right now
+              </div>
+              <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${O.primary}55, transparent)` }} />
+            </div>
+
+            {/* Step 3 — ACTIVE big card: Self-Care Quiz suggestion */}
+            <div className="relative pl-[60px] mb-5">
+              {/* Active checkpoint */}
+              <div
+                className="absolute left-[18px] top-6 w-[34px] h-[34px] rounded-full flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(135deg, ${O.primaryL}, ${O.primary})`,
+                  boxShadow: `0 0 0 5px ${darkMode ? 'rgba(235,94,51,0.18)' : 'rgba(235,94,51,0.15)'}, 0 6px 16px rgba(235,94,51,0.4)`,
+                }}
+              >
+                <Play className="w-3.5 h-3.5 text-white" fill="#fff" />
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-[28px] p-5 relative overflow-hidden"
+                style={{
+                  background: darkMode
+                    ? `linear-gradient(160deg, ${O.peachDark} 0%, #2A1810 100%)`
+                    : `linear-gradient(160deg, ${O.peach} 0%, ${O.peachMid} 100%)`,
+                  boxShadow: darkMode
+                    ? '0 14px 36px rgba(0,0,0,0.5)'
+                    : '0 14px 36px rgba(235,94,51,0.22)',
+                }}
+              >
+                <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full opacity-40" style={{ background: darkMode ? O.primaryD : '#fff', filter: 'blur(24px)' }} />
+
+                <div className="relative z-10">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <Sparkles className="w-3 h-3" style={{ color: O.primary }} />
+                    <div className="text-[10px] font-bold tracking-[0.15em] uppercase" style={{ color: O.primary }}>
+                      Rilo picked this for you
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 mb-4">
+                    <div
+                      className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0"
+                      style={{ background: darkMode ? '#1A0F08' : '#fff', boxShadow: '0 6px 14px rgba(0,0,0,0.10)' }}
+                    >
+                      <FluentEmoji emoji="🧠" size={40} />
+                    </div>
+                    <div className="flex-1 pt-0.5">
+                      <div className="text-[11px] font-bold uppercase tracking-wider" style={{ color: darkMode ? '#D9B89A' : '#8A5A30' }}>
+                        From your quiz
+                      </div>
+                      <div className="text-[20px] font-bold leading-[1.15] mt-0.5" style={{ color: fg }}>
+                        Quiet the inner critic
+                      </div>
+                      <div className="text-[12px] mt-1 leading-snug" style={{ color: darkMode ? '#D9B89A' : '#6B4D33' }}>
+                        A 5-min guided reframe · Self-talk
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[15px] font-bold"
+                    style={{
+                      background: O.primary,
+                      color: '#fff',
+                      boxShadow: '0 8px 18px rgba(235,94,51,0.4)',
+                    }}
+                  >
+                    <Play className="w-[16px] h-[16px]" fill="#fff" />
+                    Start now · 5 min
+                  </button>
+
+                  <div className="flex items-center justify-center gap-4 mt-2.5">
+                    <button className="text-[11.5px] font-semibold" style={{ color: darkMode ? '#D9B89A' : '#6B4D33' }}>Swap →</button>
+                    <div className="w-px h-3" style={{ background: darkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.10)' }} />
+                    <button className="text-[11.5px] font-semibold" style={{ color: darkMode ? '#D9B89A' : '#6B4D33' }}>Snooze 15m</button>
+                    <div className="w-px h-3" style={{ background: darkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.10)' }} />
+                    <button className="text-[11.5px] font-semibold" style={{ color: darkMode ? '#D9B89A' : '#6B4D33' }}>Skip</button>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* ── LATER section ── */}
+            <div className="flex items-center gap-2 mb-3 pl-1">
+              <div className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: fgMuted }}>
+                🌙 Later today
+              </div>
+              <div className="flex-1 h-px" style={{ background: darkMode ? 'rgba(255,200,160,0.12)' : O.border }} />
+            </div>
+
+            {/* Step 4 — upcoming: Playlist track */}
+            <PathStep
+              icon="🎧"
+              accent={O.lavenderMid}
+              accentDark={O.lavenderDark}
+              kicker="Listen · Playlist"
+              kickerColor="#6B3FA0"
+              kickerColorDark="#C9A8FF"
+              title="Soft Focus — Track 3"
+              meta="6 min · from your Calm playlist"
+              darkMode={darkMode}
+              fg={fg}
+              fgMuted={fgMuted}
+              border={border}
+              cardBg={cardBg}
+              O={O}
+            />
+
+            {/* Step 5 — upcoming: Read */}
+            <PathStep
+              icon="📖"
+              accent={O.skyMid}
+              accentDark={O.skyDark}
+              kicker="Read"
+              kickerColor="#2B5A9E"
+              kickerColorDark="#9EC2FF"
+              title="When 'enough' feels impossible"
+              meta="4 min read · from Rilo Stories"
+              darkMode={darkMode}
+              fg={fg}
+              fgMuted={fgMuted}
+              border={border}
+              cardBg={cardBg}
+              O={O}
+            />
+
+            {/* End-of-path reward */}
+            <div className="relative pl-[60px] mt-4">
+              <div
+                className="absolute left-[22px] top-3 w-[26px] h-[26px] rounded-full flex items-center justify-center"
+                style={{ background: darkMode ? '#3D2A1A' : '#fff', border: `2px dashed ${O.primary}`}}
+              >
+                <FluentEmoji emoji="🏆" size={14} />
+              </div>
+              <div
+                className="rounded-2xl p-3 flex items-center gap-2.5"
+                style={{
+                  background: darkMode ? 'rgba(255,255,255,0.04)' : '#FFF8F3',
+                  border: `1px dashed ${darkMode ? '#3D2A1A' : O.peachMid}`,
+                }}
+              >
+                <div className="flex-1 text-[12px] leading-snug" style={{ color: fg }}>
+                  Finish the path → <strong>+1 day streak</strong> & a new affirmation 🧡
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Talk to Rilo */}
+          <div className="px-4 pb-4 pt-2 mt-auto relative z-10">
+            <button
+              className="w-full flex items-center gap-2 rounded-full pl-4 pr-1.5 py-1.5"
+              style={{
+                background: darkMode ? 'rgba(255,255,255,0.06)' : '#FFFFFF',
+                border: `1px solid ${darkMode ? '#3D2A1A' : O.border}`,
+                boxShadow: darkMode ? 'none' : '0 6px 18px rgba(60,30,10,0.08)',
+              }}
+            >
+              <span className="text-[13px] flex-1 text-left py-1.5" style={{ color: fgMuted }}>
+                Ask Rilo to change your path…
+              </span>
+              <span
+                className="w-9 h-9 rounded-full flex items-center justify-center"
+                style={{ background: O.primary, color: '#fff', boxShadow: '0 2px 8px rgba(235,94,51,0.35)' }}
+              >
+                <ArrowUp className="w-[18px] h-[18px]" />
+              </span>
+            </button>
+          </div>
+
+          {/* Bottom nav */}
+          <div
+            className="grid grid-cols-4 px-2 py-2 mx-3 mb-3 rounded-[28px]"
+            style={{
+              background: darkMode
+                ? 'linear-gradient(180deg, rgba(60,40,25,0.55), rgba(40,25,15,0.65))'
+                : 'linear-gradient(180deg, rgba(255,255,255,0.62), rgba(255,248,243,0.72))',
+              backdropFilter: 'blur(40px) saturate(1.8)',
+              border: darkMode ? '0.5px solid rgba(255,200,160,0.18)' : '0.5px solid rgba(255,255,255,0.65)',
+              boxShadow: '0 -4px 30px rgba(0,0,0,0.06)',
+            }}
+          >
+            {[
+              { icon: Sparkles, label: 'My Rilo', active: true },
+              { icon: Calendar, label: 'Planner' },
+              { icon: Music, label: 'Listen' },
+              { icon: Users, label: 'Chats', badge: 3 },
+            ].map((item) => (
+              <div key={item.label} className="flex flex-col items-center gap-0.5 relative">
+                <div className="relative w-10 h-10 flex items-center justify-center">
+                  {item.active && (
+                    <div
+                      className="absolute inset-0 rounded-2xl"
+                      style={{
+                        background: darkMode ? 'rgba(235,94,51,0.15)' : 'rgba(235,94,51,0.10)',
+                        border: `0.5px solid ${O.primary}25`,
+                      }}
+                    />
+                  )}
+                  <item.icon
+                    className="w-[22px] h-[22px] relative"
+                    style={{ color: item.active ? O.primary : fgMuted, strokeWidth: item.active ? 2.2 : 1.6 }}
+                  />
+                  {item.badge && (
+                    <div
+                      className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 rounded-full flex items-center justify-center px-1"
+                      style={{ background: O.accent }}
+                    >
+                      <span className="text-[9px] font-bold text-white">{item.badge}</span>
+                    </div>
+                  )}
+                </div>
+                <span
+                  className="text-[10px] leading-tight"
+                  style={{ color: item.active ? O.primary : fgMuted, fontWeight: item.active ? 600 : 400 }}
+                >
+                  {item.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-[640px] mx-auto pt-2 pb-4 text-[13px] leading-relaxed text-muted-foreground space-y-2">
+        <p><strong className="text-foreground">A path, not a list.</strong> Vertical timeline with checkpoints. Each step is a real piece of content: mood, breath, quiz suggestion, playlist track, read, routine.</p>
+        <p><strong className="text-foreground">Sections compress overwhelm.</strong> "Done · Right now · Later" replaces 12 task rows. Only the <em>Right now</em> card is big — everything else is a small peek you can tap.</p>
+        <p><strong className="text-foreground">Dynamic & hand-picked.</strong> Rilo picks the active card from: quiz priorities, My Rilo routine, today's recommended playlist track, stories, and breathwork. Swap / Snooze / Skip lets the user steer.</p>
+        <p><strong className="text-foreground">Ends with a reward.</strong> Streak bump + affirmation at the end of the path — a clear finish line, ADHD-friendly.</p>
+        <p className="text-xs italic">Below: the older "single hero" v2 sketch and the legacy planner.</p>
+      </div>
+
+      {/* ═══════════════════════════════════════════════ */}
+      {/* ── My Rilo Home v2 (single-hero version) ── */}
       {/* ═══════════════════════════════════════════════ */}
       <div className="pt-2">
         <h2 className="text-xl font-bold text-foreground text-center mb-1">🧡 My Rilo — new default home</h2>
