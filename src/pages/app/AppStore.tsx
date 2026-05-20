@@ -1032,13 +1032,13 @@ const AppStore = () => {
                         </div>
                         {playlist.requires_subscription ? (
                           !isSubscribed && (
-                          <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-1 rounded-full flex items-center gap-1 shadow-ios">
+                          <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
                             <Crown className="h-2.5 w-2.5" /> PLUS
                           </div>
                           )
                         ) : (
                           !isSubscribed && (
-                          <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-1 rounded-full flex items-center gap-1 shadow-ios">
+                          <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
                             <FluentEmoji emoji="🔥" size={10} />{" "}
                             {t("toolsPage.free")}
                           </div>
