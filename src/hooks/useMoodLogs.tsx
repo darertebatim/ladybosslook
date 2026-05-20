@@ -214,7 +214,7 @@ export function useMoodLogsForMonth(month: Date) {
       const [emotionResult, journalResult] = await Promise.all([
         supabase
           .from('emotion_logs')
-          .select('id, emotion, created_at')
+          .select('id, emotion, notes, contexts, submoods, created_at')
           .eq('user_id', user.id)
           .eq('category', 'mood_checkin')
           .gte('created_at', monthStart.toISOString())
@@ -222,7 +222,7 @@ export function useMoodLogsForMonth(month: Date) {
           .order('created_at', { ascending: false }),
         supabase
           .from('free_form_reflections')
-          .select('id, mood, created_at')
+          .select('id, mood, content, created_at')
           .eq('user_id', user.id)
           .not('mood', 'is', null)
           .gte('created_at', monthStart.toISOString())
@@ -233,14 +233,24 @@ export function useMoodLogsForMonth(month: Date) {
       if (emotionResult.error) throw emotionResult.error;
       if (journalResult.error) throw journalResult.error;
 
-      const mergedEntries = [
-        ...(emotionResult.data || []).map((entry) => ({
+      const mergedEntries: MoodLog[] = [
+        ...(emotionResult.data || []).map((entry: any) => ({
+          id: entry.id,
           mood: entry.emotion,
+          content: entry.notes || toDefaultMoodContent(entry.emotion),
           created_at: entry.created_at,
+          submoods: entry.submoods ?? [],
+          contexts: entry.contexts ?? [],
+          notes: entry.notes ?? null,
         })),
-        ...(journalResult.data || []).map((entry) => ({
+        ...(journalResult.data || []).map((entry: any) => ({
+          id: entry.id,
           mood: entry.mood || 'okay',
+          content: entry.content,
           created_at: entry.created_at,
+          submoods: [],
+          contexts: [],
+          notes: entry.content ?? null,
         })),
       ];
 
@@ -253,11 +263,13 @@ export function useMoodLogsForMonth(month: Date) {
 
         if (existing) {
           existing.count += 1;
+          existing.entries = [...(existing.entries ?? []), entry];
         } else {
           moodMap.set(dateKey, {
             date: dateKey,
             mood: entry.mood,
             count: 1,
+            entries: [entry],
           });
         }
       });
