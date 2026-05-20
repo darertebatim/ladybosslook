@@ -91,14 +91,52 @@ const AppStore = () => {
   const homeDataQuery = useNewHomeData();
   const { activeRounds = [], nextSessionMap = {} } = homeDataQuery as any;
 
-  // Map program slug → cover image for active rounds
+  // Map program slug → cover image for active rounds.
+  // Start with what's in the platform-filtered catalog, then backfill any
+  // enrollment slugs that weren't included (e.g. programs not available on
+  // this platform) by querying program_catalog directly.
+  const enrolledSlugs = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          (activeRounds || [])
+            .map((e: any) => e?.program_slug)
+            .filter(Boolean),
+        ),
+      ) as string[],
+    [activeRounds],
+  );
+
+  const missingSlugs = useMemo(
+    () => enrolledSlugs.filter((s) => !programs.some((p) => p.slug === s)),
+    [enrolledSlugs, programs],
+  );
+
+  const { data: extraProgramImages = {} } = useQuery({
+    queryKey: ["enrollment-cover-images", missingSlugs.sort().join(",")],
+    enabled: missingSlugs.length > 0,
+    staleTime: 1000 * 60 * 5,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("program_catalog")
+        .select("slug, cover_image_url")
+        .in("slug", missingSlugs);
+      if (error) throw error;
+      const map: Record<string, string> = {};
+      (data || []).forEach((row: any) => {
+        if (row.slug && row.cover_image_url) map[row.slug] = row.cover_image_url;
+      });
+      return map;
+    },
+  });
+
   const programImageMap = useMemo(() => {
-    const map: Record<string, string> = {};
+    const map: Record<string, string> = { ...(extraProgramImages as Record<string, string>) };
     programs.forEach((p) => {
       if (p.slug && p.image) map[p.slug] = p.image;
     });
     return map;
-  }, [programs]);
+  }, [programs, extraProgramImages]);
 
   const isEnrolled = (slug: string) => {
     return enrollments.includes(slug);
