@@ -442,66 +442,6 @@ const AppStore = () => {
                 </div>
               </section>
             )}
-            {/* What do you need? */}
-            {!searchQuery && (
-              <section>
-                <h2 className="text-base font-bold text-fg-warm mb-2 px-1">
-                  {t("tier1.tasksBank.startHere", "What do you need?")}
-                </h2>
-                <div className="grid grid-cols-2 gap-2.5">
-                  {[
-                    { slug: 'sleep', emoji: '💤', question: 'Sleep better tonight?' },
-                    { slug: 'connection', emoji: '💕', question: 'Feel more connected?' },
-                    { slug: 'movement', emoji: '🚶', question: 'Move your body?' },
-                    { slug: 'nutrition', emoji: '🥗', question: 'Eat or drink Better?' },
-                  ].map((c) => (
-                    <button
-                      key={c.slug}
-                      onClick={() => navigate(`/app/tasksbank/${c.slug}`)}
-                      className="relative rounded-2xl text-left p-3 flex flex-col gap-1.5 bg-card active:scale-[0.97] transition-transform shadow-ios"
-                    >
-                      <FluentEmoji emoji={c.emoji} size={28} />
-                      <p className="text-[14px] font-bold text-foreground leading-tight">
-                        {c.question}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Self-Care Routines */}
-            {!searchQuery && selfcareRoutines && selfcareRoutines.length > 0 && (
-              <section>
-                <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-base font-bold text-fg-warm">
-                    Self-Care Routines
-                  </h2>
-                  <button
-                    onClick={() => navigate('/app/routines/category/selfcareroutines')}
-                    className="text-xs text-primary font-medium flex items-center gap-0.5"
-                  >
-                    {t("toolsPage.all")}{" "}
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-                 <div
-                   className="flex gap-3 overflow-x-auto overflow-y-visible -mx-4 px-4 pt-3 pb-2 scrollbar-hide"
-                   style={{ WebkitOverflowScrolling: "touch" }}
-                 >
-                  {selfcareRoutines.slice(0, 8).map((routine) => (
-                    <div key={routine.id} className="shrink-0 w-40">
-                      <RoutineBankCard
-                        hideFocusBadge
-                        routine={routine}
-                        onClick={() => navigate(`/app/routines/${routine.id}`)}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
             {/* Playlists — combined audio rail (meditate + soundscape + audiobook + podcast) */}
             {!searchQuery && allListenPlaylists.length > 0 && (
               <section>
@@ -574,6 +514,67 @@ const AppStore = () => {
                 </div>
               </section>
             )}
+
+            {/* What do you need? */}
+            {!searchQuery && (
+              <section>
+                <h2 className="text-base font-bold text-fg-warm mb-2 px-1">
+                  {t("tier1.tasksBank.startHere", "What do you need?")}
+                </h2>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {[
+                    { slug: 'sleep', emoji: '💤', question: 'Sleep better tonight?' },
+                    { slug: 'connection', emoji: '💕', question: 'Feel more connected?' },
+                    { slug: 'movement', emoji: '🚶', question: 'Move your body?' },
+                    { slug: 'nutrition', emoji: '🥗', question: 'Eat or drink Better?' },
+                  ].map((c) => (
+                    <button
+                      key={c.slug}
+                      onClick={() => navigate(`/app/tasksbank/${c.slug}`)}
+                      className="relative rounded-2xl text-left p-3 flex flex-col gap-1.5 bg-card active:scale-[0.97] transition-transform shadow-ios"
+                    >
+                      <FluentEmoji emoji={c.emoji} size={28} />
+                      <p className="text-[14px] font-bold text-foreground leading-tight">
+                        {c.question}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Self-Care Routines */}
+            {!searchQuery && selfcareRoutines && selfcareRoutines.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h2 className="text-base font-bold text-fg-warm">
+                    Self-Care Routines
+                  </h2>
+                  <button
+                    onClick={() => navigate('/app/routines/category/selfcareroutines')}
+                    className="text-xs text-primary font-medium flex items-center gap-0.5"
+                  >
+                    {t("toolsPage.all")}{" "}
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                 <div
+                   className="flex gap-3 overflow-x-auto overflow-y-visible -mx-4 px-4 pt-3 pb-2 scrollbar-hide"
+                   style={{ WebkitOverflowScrolling: "touch" }}
+                 >
+                  {selfcareRoutines.slice(0, 8).map((routine) => (
+                    <div key={routine.id} className="shrink-0 w-40">
+                      <RoutineBankCard
+                        hideFocusBadge
+                        routine={routine}
+                        onClick={() => navigate(`/app/routines/${routine.id}`)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
 
             {/* Routines Templates Section */}
             {!searchQuery && displayRoutines.length > 0 && (
