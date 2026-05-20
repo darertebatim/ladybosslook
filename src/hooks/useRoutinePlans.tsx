@@ -353,6 +353,7 @@ export function useAddRoutinePlan() {
       syntheticPlanTitle,
       syntheticPlanIcon,
       syntheticPlanCategoryName,
+      skipRoutineCreation,
     }: { 
       planId: string; 
       selectedTaskIds?: string[]; 
@@ -372,6 +373,9 @@ export function useAddRoutinePlan() {
       syntheticPlanTitle?: string;
       syntheticPlanIcon?: string;
       syntheticPlanCategoryName?: string;
+      // When true, skip creating a user_routines_bank row for synthetic plans
+      // and just insert standalone tasks into the planner.
+      skipRoutineCreation?: boolean;
     }) => {
       if (!user) throw new Error('Must be logged in');
 
@@ -471,7 +475,7 @@ export function useAddRoutinePlan() {
       // routine shows up in "My Routines" and the Routine Player — exactly like
       // a manually-created routine from the Routine Builder.
       let syntheticRoutineId: string | null = null;
-      if (isSyntheticPlan && tasks && tasks.length > 0) {
+      if (isSyntheticPlan && !skipRoutineCreation && tasks && tasks.length > 0) {
         const { data: newRoutine, error: routineError } = await supabase
           .from('user_routines_bank')
           .insert({
