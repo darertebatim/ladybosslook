@@ -16,7 +16,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { GripVertical, ArrowUp, ArrowDown, Save, Calendar, Zap } from "lucide-react";
+import { GripVertical, ArrowUp, ArrowDown, Save, Calendar, Zap, Flame } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DRIP_SCHEDULE_TEMPLATES } from "@/lib/dripContent";
 
@@ -51,7 +51,8 @@ export const PlaylistTracksManager = ({
           audio_content (
             id,
             title,
-            duration_seconds
+            duration_seconds,
+            is_hot
           )
         `)
         .eq('playlist_id', playlistId)
@@ -155,6 +156,31 @@ export const PlaylistTracksManager = ({
     updateTracksMutation.mutate();
   };
 
+  const toggleHotMutation = useMutation({
+    mutationFn: async ({ audioId, nextValue }: { audioId: string; nextValue: boolean }) => {
+      const { error } = await supabase
+        .from('audio_content')
+        .update({ is_hot: nextValue })
+        .eq('id', audioId);
+      if (error) throw error;
+    },
+    onSuccess: (_data, variables) => {
+      setTracks((prev) =>
+        prev.map((t) =>
+          t.audio_id === variables.audioId
+            ? { ...t, audio_content: { ...t.audio_content, is_hot: variables.nextValue } }
+            : t,
+        ),
+      );
+      queryClient.invalidateQueries({ queryKey: ['hot-tracks'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-audio-content'] });
+      toast.success(variables.nextValue ? 'Marked as Hot Track 🔥' : 'Removed from Hot Tracks');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to update Hot Track');
+    },
+  });
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -248,6 +274,20 @@ export const PlaylistTracksManager = ({
                   </div>
 
                   <div className="flex gap-1 flex-shrink-0">
+                    <Button
+                      variant={track.audio_content?.is_hot ? "default" : "ghost"}
+                      size="icon"
+                      onClick={() =>
+                        toggleHotMutation.mutate({
+                          audioId: track.audio_id,
+                          nextValue: !track.audio_content?.is_hot,
+                        })
+                      }
+                      title={track.audio_content?.is_hot ? "Remove from Hot Tracks" : "Mark as Hot Track"}
+                      className={`h-8 w-8 ${track.audio_content?.is_hot ? 'bg-orange-500 hover:bg-orange-600 text-white' : ''}`}
+                    >
+                      <Flame className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"
