@@ -1,0 +1,2 @@
+ALTER TABLE public.audio_content ADD COLUMN IF NOT EXISTS is_hot boolean NOT NULL DEFAULT false;
+CREATE INDEX IF NOT EXISTS idx_audio_content_is_hot ON public.audio_content (is_hot) WHERE is_hot = true;

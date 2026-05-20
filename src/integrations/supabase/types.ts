@@ -695,6 +695,7 @@ export type Database = {
           file_url: string
           id: string
           is_free: boolean
+          is_hot: boolean
           metadata: Json | null
           program_slug: string | null
           published_at: string | null
@@ -712,6 +713,7 @@ export type Database = {
           file_url: string
           id?: string
           is_free?: boolean
+          is_hot?: boolean
           metadata?: Json | null
           program_slug?: string | null
           published_at?: string | null
@@ -729,6 +731,7 @@ export type Database = {
           file_url?: string
           id?: string
           is_free?: boolean
+          is_hot?: boolean
           metadata?: Json | null
           program_slug?: string | null
           published_at?: string | null
