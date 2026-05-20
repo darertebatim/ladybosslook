@@ -216,10 +216,17 @@ export function MoodDashboard() {
 
   return (
     <>
-      <div className={cn(
-        "flex flex-col h-full transition-colors duration-300 -mx-0",
-        step !== 1 && selectedMoodData ? `${selectedMoodData.sheetBg} -mt-[80px] pt-[80px]` : ""
-      )}>
+      {/* Mood-tinted background overlay for steps 2 & 3 */}
+      {step !== 1 && selectedMoodData && (
+        <div
+          className={cn(
+            "fixed inset-0 -z-10 transition-colors duration-300",
+            selectedMoodData.sheetBg
+          )}
+          aria-hidden
+        />
+      )}
+      <div className="flex flex-col h-full">
         {/* Step 1: Mood Grid */}
         {step === 1 && (
         <div className="flex-1 flex flex-col justify-center px-4">
