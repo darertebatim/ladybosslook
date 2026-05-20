@@ -577,66 +577,67 @@ export default function AppPlayer() {
                       track.audio_playlist_items?.[0]?.audio_playlists?.language || null;
                     const langLabel = trackLang ? String(trackLang).toUpperCase() : null;
                     return (
-                    <button
-                      key={track.id}
-                      onClick={() => {
-                        haptic.light();
-                        navigate(`/app/player/${track.id}`);
-                      }}
-                      className="shrink-0 w-[85%] snap-start text-left transition-transform active:scale-[0.98]"
-                    >
-                      <div className="relative aspect-[2/1] w-full rounded-3xl overflow-hidden bg-muted shadow-ios">
-                        {cover ? (
-                          <CachedImage
-                            src={cover}
-                            alt={track.title}
-                            className="absolute inset-0 w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-orange-300 to-orange-500">
-                            <FluentEmoji emoji="🎧" size={56} />
-                          </div>
-                        )}
-                        {/* Gradient overlay for legibility */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-                        {/* Top-left: Hot + Language badges */}
-                        <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                          <div className="flex items-center gap-1 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-ios">
-                            <FluentEmoji emoji="🔥" size={12} />
-                            HOT
-                          </div>
-                          {langLabel && (
-                            <div className="bg-white/90 text-orange-600 text-[10px] font-bold px-2 py-1 rounded-full shadow-ios">
-                              {langLabel}
-                            </div>
-                          )}
-                        </div>
-                        {/* Top-right: Category badge */}
-                        {categoryLabel && (
-                          <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
-                            {categoryLabel}
-                          </div>
-                        )}
-                        {/* Bottom content */}
-                        <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between gap-3">
-                          <div className="min-w-0 flex-1">
-                            {playlistName && (
-                              <p className="text-[10px] font-semibold uppercase tracking-wider text-orange-300 truncate">
-                                {playlistName}
-                              </p>
+                      <button
+                        key={track.id}
+                        onClick={() => {
+                          haptic.light();
+                          navigate(`/app/player/${track.id}`);
+                        }}
+                        className="shrink-0 w-[85%] snap-start text-left transition-transform active:scale-[0.98]"
+                      >
+                        <div className="relative rounded-3xl p-4 bg-gradient-to-br from-orange-100 via-orange-200/80 to-orange-300/70 shadow-ios overflow-hidden">
+                          {/* Top label row */}
+                          <div className="flex items-center gap-1.5 mb-3">
+                            <FluentEmoji emoji="🔥" size={14} />
+                            <span className="text-[11px] font-bold tracking-[0.14em] uppercase text-orange-600">
+                              Hot Track
+                            </span>
+                            {langLabel && (
+                              <span className="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-white/70 text-orange-700">
+                                {langLabel}
+                              </span>
                             )}
-                            <p className="text-base font-bold text-white line-clamp-2 leading-tight">
-                              {track.title}
-                            </p>
+                            {categoryLabel && (
+                              <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/60 text-orange-700 uppercase tracking-wider truncate max-w-[45%]">
+                                {categoryLabel}
+                              </span>
+                            )}
                           </div>
-                          <div className="shrink-0 h-11 w-11 rounded-full bg-white flex items-center justify-center shadow-ios">
-                            <svg viewBox="0 0 24 24" className="h-5 w-5 fill-orange-500 ml-0.5">
+
+                          {/* Middle: cover tile + title/subtitle */}
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="shrink-0 w-16 h-16 rounded-2xl bg-white shadow-ios flex items-center justify-center overflow-hidden">
+                              {cover ? (
+                                <CachedImage
+                                  src={cover}
+                                  alt={track.title}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <FluentEmoji emoji="🎧" size={36} />
+                              )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-lg font-bold text-black leading-tight line-clamp-2">
+                                {track.title}
+                              </p>
+                              {playlistName && (
+                                <p className="text-xs text-orange-700/80 mt-0.5 truncate">
+                                  {playlistName}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* CTA */}
+                          <div className="flex items-center justify-center gap-2 w-full h-12 rounded-2xl bg-orange-500 shadow-ios">
+                            <svg viewBox="0 0 24 24" className="h-5 w-5 fill-white ml-0.5">
                               <path d="M8 5v14l11-7z" />
                             </svg>
+                            <span className="text-white font-bold text-base">Play now</span>
                           </div>
                         </div>
-                      </div>
-                    </button>
+                      </button>
                     );
                   })}
                 </div>
