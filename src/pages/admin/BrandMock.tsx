@@ -126,6 +126,78 @@ const TaskCard = ({ task, index, darkMode }: { task: typeof TASKS[0]; index: num
   </motion.div>
 );
 
+interface PathStepProps {
+  done?: boolean;
+  icon: string;
+  accent: string;
+  accentDark: string;
+  kicker: string;
+  kickerColor: string;
+  kickerColorDark: string;
+  title: string;
+  meta: string;
+  darkMode: boolean;
+  fg: string;
+  fgMuted: string;
+  border: string;
+  cardBg: string;
+  O: typeof O;
+}
+
+function PathStep({
+  done, icon, accent, accentDark, kicker, kickerColor, kickerColorDark,
+  title, meta, darkMode, fg, fgMuted, border, cardBg, O,
+}: PathStepProps) {
+  return (
+    <div className="relative pl-[60px] mb-3">
+      {/* Checkpoint dot */}
+      <div
+        className="absolute left-[22px] top-4 w-[26px] h-[26px] rounded-full flex items-center justify-center"
+        style={{
+          background: done
+            ? (darkMode ? O.success + '40' : '#DCFCE7')
+            : (darkMode ? '#2A1810' : '#FFFFFF'),
+          border: done
+            ? `2px solid ${O.success}`
+            : `2px solid ${darkMode ? '#3D2A1A' : O.border}`,
+        }}
+      >
+        {done ? (
+          <Check className="w-3 h-3" style={{ color: O.success, strokeWidth: 3 }} />
+        ) : (
+          <div className="w-1.5 h-1.5 rounded-full" style={{ background: darkMode ? '#5A4030' : O.peachMid }} />
+        )}
+      </div>
+
+      <div
+        className="flex items-center gap-3 px-3 py-2.5 rounded-2xl"
+        style={{
+          background: darkMode ? 'rgba(255,255,255,0.03)' : cardBg,
+          border: `1px solid ${darkMode ? '#3D2A1A' : border}`,
+          opacity: done ? 0.65 : 1,
+        }}
+      >
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+          style={{ background: darkMode ? accentDark : accent }}
+        >
+          <FluentEmoji emoji={icon} size={22} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: darkMode ? kickerColorDark : kickerColor }}>
+            {kicker}
+          </div>
+          <div className="text-[13.5px] font-semibold leading-tight mt-0.5" style={{ color: fg, textDecoration: done ? 'line-through' : 'none' }}>
+            {title}
+          </div>
+          <div className="text-[11px] mt-0.5" style={{ color: fgMuted }}>{meta}</div>
+        </div>
+        {!done && <ChevronRight className="w-4 h-4" style={{ color: fgMuted }} />}
+      </div>
+    </div>
+  );
+}
+
 export default function BrandMock() {
   const [darkMode, setDarkMode] = useState(false);
 
