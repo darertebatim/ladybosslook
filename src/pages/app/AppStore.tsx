@@ -77,6 +77,13 @@ const AppStore = () => {
   const userLang = useUserPreferredLanguage();
   const [showLangHint, setShowLangHint] = useState(false);
 
+  const LANG_LABELS: Record<string, string> = {
+    persian: "Persian",
+    american: "American",
+    turkish: "Türkçe",
+    spanish: "Español",
+  };
+
   useEffect(() => {
     if (userLang && shouldShowLanguageSettingsHint()) {
       const timer = setTimeout(() => setShowLangHint(true), 800);
