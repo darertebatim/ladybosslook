@@ -501,7 +501,8 @@ const AppStore = () => {
                             </div>
                           )}
                         </div>
-                        <div className="absolute -top-2.5 right-1 z-10 bg-white/95 text-fg-warm text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios capitalize">
+                        {/* Category badge — bottom left, inside cover */}
+                        <div className="absolute bottom-2 left-2 z-10 bg-white/95 text-fg-warm text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-ios capitalize">
                           <FluentEmoji
                             emoji={
                               playlist.category === "meditate"
@@ -512,7 +513,7 @@ const AppStore = () => {
                                 ? "📖"
                                 : "🎙️"
                             }
-                            size={10}
+                            size={12}
                           />
                           {playlist.category === "meditate"
                             ? "Meditate"
@@ -522,6 +523,24 @@ const AppStore = () => {
                             ? "Audiobook"
                             : "Podcast"}
                         </div>
+                        {/* Language pill — top right, inside cover */}
+                        {playlist.language && playlist.language !== "all" && (
+                          <div className="absolute top-2 right-2 z-10 bg-white/95 text-fg-warm text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1 shadow-ios">
+                            {playlist.language === "persian" ? (
+                              <PersianFlag size={12} />
+                            ) : (
+                              <span className="text-[12px] leading-none">
+                                {playlist.language === "american"
+                                  ? "🇺🇸"
+                                  : playlist.language === "turkish"
+                                  ? "🇹🇷"
+                                  : playlist.language === "spanish"
+                                  ? "🇪🇸"
+                                  : "🌐"}
+                              </span>
+                            )}
+                          </div>
+                        )}
                         {playlist.requires_subscription
                           ? !isSubscribed && (
                               <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
@@ -535,9 +554,6 @@ const AppStore = () => {
                               </div>
                             )}
                       </div>
-                      <p className="text-xs font-medium line-clamp-2 leading-tight">
-                        {playlist.name}
-                      </p>
                     </button>
                   ))}
                 </div>
