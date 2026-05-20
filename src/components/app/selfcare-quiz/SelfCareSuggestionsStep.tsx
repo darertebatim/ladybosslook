@@ -4,7 +4,7 @@ import { OnboardingStep, OnboardingAnswers } from '@/types/onboarding';
 import { TaskTemplateCard } from '@/components/app/TaskTemplateCard';
 import { TaskTemplate, TaskColor } from '@/hooks/useTaskPlanner';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { RoutinePreviewSheet, EditedTask, ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
+import { EditedTask, ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -54,7 +54,6 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Props) {
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
-  const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -174,8 +173,9 @@ export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Pro
   }, [taskTemplates, selectedTasks]);
 
   const handleBuildRoutine = () => {
-    if (selectionCount === 0) return;
-    setShowPreview(true);
+    if (selectionCount === 0 || isSaving) return;
+    // Skip the preview sheet — append straight to My Rilo Self Care.
+    handleSave(Array.from(selectedTasks), []);
   };
 
   const handleSave = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
@@ -251,8 +251,8 @@ export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Pro
 
       toast.success(
         rows.length > 0
-          ? `Added ${rows.length} to My Rilo 🔥`
-          : 'Already in My Rilo',
+          ? `Added ${rows.length} to My Rilo Self Care 🔥`
+          : 'Already in My Rilo Self Care',
       );
       // Persist the chosen tasks so the routine-reveal step can show them.
       try {
@@ -271,11 +271,10 @@ export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Pro
         onAnswer?.(step.id, payload);
         localStorage.setItem('simora_selfcare_revealed_tasks', payload);
       } catch {}
-      setShowPreview(false);
       onNext();
     } catch (err) {
-      console.error('Failed to add to My Rilo:', err);
-      toast.error('Failed to add to My Rilo');
+      console.error('Failed to add to My Rilo Self Care:', err);
+      toast.error('Failed to add to My Rilo Self Care');
     } finally {
       setIsSaving(false);
     }
@@ -380,10 +379,11 @@ export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Pro
         {selectionCount > 0 ? (
           <button
             onClick={handleBuildRoutine}
+            disabled={isSaving}
             className="w-full h-[56px] rounded-2xl text-white font-bold text-base active:opacity-80 transition-opacity flex items-center justify-center gap-2 bg-gradient-to-r from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] shadow-[0_12px_30px_-8px_rgba(138,92,240,0.55)]"
           >
             <FluentEmoji emoji="✨" size={20} />
-            Build My Routine ({selectionCount})
+            {isSaving ? 'Adding…' : `Add ${selectionCount} to My Rilo Self Care`}
           </button>
         ) : (
           <button
@@ -394,17 +394,6 @@ export function SelfCareSuggestionsStep({ step, onNext, answers, onAnswer }: Pro
           </button>
         )}
       </div>
-
-      <RoutinePreviewSheet
-        open={showPreview}
-        onOpenChange={setShowPreview}
-        tasks={routineTasks}
-        routineTitle={MY_RILO_TITLE}
-        routineColor="pink"
-        routineBankId="my-rilo"
-        onSave={handleSave}
-        isSaving={isSaving}
-      />
     </div>
   );
 }
