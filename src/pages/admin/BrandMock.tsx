@@ -232,7 +232,7 @@ export default function BrandMock() {
       <div className="pt-2">
         <h2 className="text-xl font-bold text-foreground text-center mb-1">🛤️ My Rilo — Path (v3)</h2>
         <p className="text-center text-muted-foreground text-sm mb-6 max-w-[600px] mx-auto">
-          A dynamic, hand-picked path for today. Pulls from <strong>My Rilo Self Care</strong>, the <strong>Self-Care Quiz</strong>, <strong>Playlists & tracks</strong>, <strong>Routines</strong>, and <strong>Reads</strong>. Like BetterMe/Calm "My plan" — but for mental health, with Rilo as the guide.
+          A dynamic, hand-picked path for today. Pulls from the user's <strong>own routines</strong> (My Rilo Self Care, New Mom…), the <strong>Self-Care Quiz</strong>, <strong>Playlists & tracks</strong>, and <strong>Community check-ins</strong>. Like BetterMe/Calm "My plan" — but for mental health, with Rilo as the guide.
         </p>
       </div>
       <div className="flex justify-center">
@@ -294,12 +294,12 @@ export default function BrandMock() {
               Your path for today
             </div>
             <div className="text-[13px] mt-1.5" style={{ color: fgMuted }}>
-              5 small steps · ~18 min total · pick your pace
+              6 small steps · ~22 min · 2 of your routines woven in
             </div>
 
             {/* Progress dots */}
             <div className="flex items-center gap-1.5 mt-3">
-              {[true, true, false, false, false].map((done, i) => (
+              {[true, true, false, false, false, false].map((done, i) => (
                 <div
                   key={i}
                   className="h-1.5 flex-1 rounded-full"
@@ -308,7 +308,7 @@ export default function BrandMock() {
                   }}
                 />
               ))}
-              <span className="text-[11px] font-bold ml-1" style={{ color: fgMuted }}>2/5</span>
+              <span className="text-[11px] font-bold ml-1" style={{ color: fgMuted }}>2/6</span>
             </div>
           </div>
 
@@ -464,16 +464,16 @@ export default function BrandMock() {
               <div className="flex-1 h-px" style={{ background: darkMode ? 'rgba(255,200,160,0.12)' : O.border }} />
             </div>
 
-            {/* Step 4 — upcoming: Playlist track */}
+            {/* Step 4 — upcoming: USER ROUTINE — My Rilo Self Care */}
             <PathStep
-              icon="🎧"
-              accent={O.lavenderMid}
-              accentDark={O.lavenderDark}
-              kicker="Listen · Playlist"
-              kickerColor="#6B3FA0"
-              kickerColorDark="#C9A8FF"
-              title="Soft Focus — Track 3"
-              meta="6 min · from your Calm playlist"
+              icon="🔥"
+              accent={O.peach}
+              accentDark={O.peachDark}
+              kicker="Your routine · My Rilo Self Care"
+              kickerColor={O.primary}
+              kickerColorDark="#FFB89A"
+              title="3 self-care actions · today's pick"
+              meta="8 min · Journal · Stretch · Gratitude"
               darkMode={darkMode}
               fg={fg}
               fgMuted={fgMuted}
@@ -482,16 +482,34 @@ export default function BrandMock() {
               O={O}
             />
 
-            {/* Step 5 — upcoming: Read */}
+            {/* Step 5 — upcoming: USER ROUTINE — New Mom */}
             <PathStep
-              icon="📖"
-              accent={O.skyMid}
-              accentDark={O.skyDark}
-              kicker="Read"
-              kickerColor="#2B5A9E"
-              kickerColorDark="#9EC2FF"
-              title="When 'enough' feels impossible"
-              meta="4 min read · from Rilo Stories"
+              icon="🤱"
+              accent={O.lavenderMid}
+              accentDark={O.lavenderDark}
+              kicker="Your routine · New Mom"
+              kickerColor="#6B3FA0"
+              kickerColorDark="#C9A8FF"
+              title="Postpartum reset · 2 of 4 done"
+              meta="5 min · Hydrate · Pelvic floor breath"
+              darkMode={darkMode}
+              fg={fg}
+              fgMuted={fgMuted}
+              border={border}
+              cardBg={cardBg}
+              O={O}
+            />
+
+            {/* Step 6 — upcoming: Community check-in */}
+            <PathStep
+              icon="💬"
+              accent={O.mintMid}
+              accentDark={O.mintDark}
+              kicker="Community · check in"
+              kickerColor="#1F7A5A"
+              kickerColorDark="#7FD9B5"
+              title="3 new posts in Moms Circle"
+              meta="2 min · say hi or just react ❤️"
               darkMode={darkMode}
               fg={fg}
               fgMuted={fgMuted}
