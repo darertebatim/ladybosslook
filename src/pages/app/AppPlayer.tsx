@@ -64,11 +64,11 @@ export default function AppPlayer() {
   const [preferredLanguage, setPreferredLanguage] = useState("all");
   const { categories: dbCategories } = useMediaCategories("audio");
   const categoryConfig = useMemo(() => {
-    const map: Record<string, { name: string }> = {
-      all: { name: t("player.categories.all") },
+    const map: Record<string, { name: string; emoji?: string }> = {
+      all: { name: t("player.categories.all"), emoji: "✨" },
     };
     for (const c of dbCategories as any[]) {
-      map[c.slug] = { name: c.label };
+      map[c.slug] = { name: c.label, emoji: c.emoji };
     }
     return map;
   }, [dbCategories, t]);
@@ -437,13 +437,16 @@ export default function AppPlayer() {
                         }
                       }}
                       className={cn(
-                        "shrink-0 px-3.5 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95",
+                        "shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all active:scale-95",
                         active
                           ? "bg-brand text-white shadow-ios"
                           : "bg-peach text-fg-warm-muted",
                       )}
                     >
-                      {name}
+                      {config?.emoji && (
+                        <FluentEmoji emoji={config.emoji} size={18} />
+                      )}
+                      <span>{name}</span>
                     </button>
                     {isSoundscapeLocked && (
                       <div className="absolute -bottom-0.5 -right-0.5 z-10 w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center">
