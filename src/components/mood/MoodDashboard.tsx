@@ -496,6 +496,7 @@ export function MoodDashboard() {
         open={showCelebration}
         onOpenChange={setShowCelebration}
         mood={selectedMood}
+        submoods={selectedSubmoods}
         onDone={handleCelebrationDone}
         onActionClick={handleCelebrationAction}
       />
