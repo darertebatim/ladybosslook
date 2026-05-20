@@ -18,6 +18,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { useTaskBankSelection } from '@/hooks/useTaskBankSelection';
+import { getOrCreateMyRilo, fetchMyRiloTaskTitles, getNextOrderIndex, MY_RILO_TITLE } from '@/lib/myRilo';
 
 export default function AppTasksBankCategory() {
   const { t } = useTranslation();
@@ -135,85 +136,62 @@ export default function AppTasksBankCategory() {
   const handleBuilderPreviewSave = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
     if (!user || !builderResult) return;
     try {
-      const { data: newRoutine, error: routineError } = await supabase
-        .from('user_routines_bank')
-        .insert({
-          user_id: user.id,
-          title: builderResult.title,
-          emoji: builderResult.emoji,
-          color: builderResult.color,
-          is_active: true,
-          is_user_created: true,
-          category: null,
-        } as any)
-        .select('id, routine_id')
-        .single();
-
-      if (routineError) throw routineError;
-      const routineId = (newRoutine as any).routine_id;
+      // Funnel all picks into the single "My Rilo" routine (create if missing).
+      const routineId = await getOrCreateMyRilo(user.id);
+      const existingTitles = await fetchMyRiloTaskTitles(user.id, routineId);
 
       const selectedBuilderTasks = builderResult.tasks.filter(t => selectedTaskIds.includes(t.id));
       const editedMap = new Map(editedTasks.map(e => [e.id, e]));
 
-      const { data: existingTasks } = await supabase
-        .from('user_tasks')
-        .select('order_index')
-        .eq('user_id', user.id)
-        .order('order_index', { ascending: false })
-        .limit(1);
-      const startOrder = (existingTasks?.[0]?.order_index ?? -1) + 1;
+      const startOrder = await getNextOrderIndex(user.id);
 
       const hasProTask = selectedTaskIds.some(id => id.startsWith('__pro_task_routine_'));
       const regularTasks = selectedBuilderTasks.filter(t => !t.id.startsWith('__pro_task_routine_'));
 
       if (regularTasks.length > 0) {
-        const userTasks = regularTasks.map((task: any, index: number) => {
+        const userTasks: any[] = [];
+        let idx = 0;
+        for (const task of regularTasks as any[]) {
           const edited = editedMap.get(task.id);
-          return {
+          const finalTitle = (edited?.title || task.title || '').trim();
+          if (!finalTitle) continue;
+          const key = finalTitle.toLowerCase();
+          if (existingTitles.has(key)) continue; // dedupe
+          existingTitles.add(key);
+          userTasks.push({
             user_id: user.id,
-            title: edited?.title || task.title,
+            title: finalTitle,
             emoji: edited?.icon || task.emoji || '📝',
-            color: edited?.color || task.color || ROUTINE_COLOR_CYCLE[index % ROUTINE_COLOR_CYCLE.length],
+            color: edited?.color || task.color || ROUTINE_COLOR_CYCLE[idx % ROUTINE_COLOR_CYCLE.length],
             repeat_pattern: edited?.repeatPattern || task.repeat_pattern || 'daily',
             repeat_days: task.repeat_days || null,
             scheduled_time: edited?.scheduledTime || null,
-            // Use the admin task bank's category as the tag (like FAB-added tasks)
-            tag: edited?.tag ?? task.category ?? builderResult.title,
+            tag: (edited?.pro_link_type || task.pro_link_type) ? 'pro' : (edited?.tag ?? task.category ?? MY_RILO_TITLE),
             time_period: task.time_period || null,
             linked_playlist_id: (edited?.pro_link_type || task.pro_link_type) === 'playlist' ? (edited?.pro_link_value || task.pro_link_value) : null,
             pro_link_type: edited?.pro_link_type || task.pro_link_type || null,
             pro_link_value: edited?.pro_link_value || task.pro_link_value || null,
             is_active: true,
-            order_index: startOrder + index,
+            order_index: startOrder + idx,
             goal_enabled: task.goal_enabled || false,
             goal_target: task.goal_target || null,
             goal_type: task.goal_type || null,
             goal_unit: task.goal_unit || null,
             duration_minutes: task.duration_minutes || null,
             source_routine_id: routineId,
-          };
-        });
-        await supabase.from('user_tasks').insert(userTasks);
+          });
+          idx++;
+        }
+        if (userTasks.length > 0) {
+          await supabase.from('user_tasks').insert(userTasks);
+        }
       }
 
-      if (hasProTask) {
-        const proEdited = editedTasks.find(e => e.id.startsWith('__pro_task_routine_'));
-        await supabase.from('user_tasks').insert({
-          user_id: user.id,
-          title: proEdited?.title || builderResult.title,
-          emoji: proEdited?.icon || '🎬',
-          color: proEdited?.color || 'mint',
-          repeat_pattern: 'daily',
-          tag: builderResult.title,
-          pro_link_type: 'routine',
-          pro_link_value: routineId,
-          is_active: true,
-          order_index: startOrder + regularTasks.length,
-          source_routine_id: null,
-        });
-      }
+      // Launcher task is ensured by getOrCreateMyRilo — no need to add a
+      // per-builder routine launcher; everything lives under My Rilo.
+      void hasProTask;
 
-      toast({ title: t('tier1.tasksBank.routineCreated') });
+      toast({ title: 'Added to My Rilo 🔥' });
       setShowBuilderPreview(false);
       setBuilderResult(null);
       setSelectedTasks(new Set());
