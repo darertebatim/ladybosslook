@@ -466,9 +466,9 @@ const AppStore = () => {
                           state: { from: location.pathname },
                         })
                       }
-                      className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
+                      className="shrink-0 w-40 text-left transition-transform active:scale-[0.97]"
                     >
-                      <div className="relative h-32 w-32 overflow-visible mb-1.5">
+                      <div className="relative h-40 w-40 overflow-visible mb-1.5">
                         <div className="h-full w-full rounded-2xl overflow-hidden bg-muted shadow-lg">
                           {playlist.cover_image_url ? (
                             <CachedImage
