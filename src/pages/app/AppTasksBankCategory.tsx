@@ -10,8 +10,7 @@ import { haptic } from '@/lib/haptics';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { RoutineBuilderSheet, BuilderTask } from '@/components/app/RoutineBuilderSheet';
-import { RoutinePreviewSheet, EditedTask, ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
+import { ROUTINE_COLOR_CYCLE } from '@/components/app/RoutinePreviewSheet';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -29,9 +28,7 @@ export default function AppTasksBankCategory() {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
-  const [showBuilder, setShowBuilder] = useState(false);
-  const [showBuilderPreview, setShowBuilderPreview] = useState(false);
-  const [builderResult, setBuilderResult] = useState<{ title: string; emoji: string; color: string; tasks: BuilderTask[] } | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
 
   const { selectedTasks, setSelectedTasks, handleToggleTask, handleClearSelection } = useTaskBankSelection();
 
@@ -89,111 +86,68 @@ export default function AppTasksBankCategory() {
     autoAddHandledRef.current = true;
     setSelectedTasks(new Set([addId]));
     haptic.medium();
-    // Open the builder so user can confirm and add to their routine.
-    setTimeout(() => setShowBuilder(true), 250);
     // Clean the URL so refresh/back doesn't re-trigger.
     const next = new URLSearchParams(searchParams);
     next.delete('add');
     setSearchParams(next, { replace: true });
   }, [searchParams, allTasks, setSelectedTasks, setSearchParams]);
 
-  const getBuilderTasks = useCallback((): BuilderTask[] => {
-    if (!allTasks) return [];
-    return Array.from(selectedTasks)
-      .map(id => allTasks.find(t => t.id === id))
-      .filter(Boolean)
-      .map((t, i) => ({
-        id: t!.id,
-        title: t!.title,
-        emoji: t!.emoji || '📝',
-        color: t!.color || ROUTINE_COLOR_CYCLE[i % ROUTINE_COLOR_CYCLE.length],
-        repeat_pattern: t!.repeat_pattern || 'daily',
-        repeat_days: t!.repeat_days || null,
-        description: t!.description,
-        pro_link_type: t!.pro_link_type,
-        pro_link_value: t!.pro_link_value,
-        goal_enabled: t!.goal_enabled,
-        goal_target: t!.goal_target,
-        goal_type: t!.goal_type,
-        goal_unit: t!.goal_unit,
-        time_period: t!.time_period,
-        linked_playlist_id: t!.linked_playlist_id,
-        category: t!.category,
-      }));
-  }, [allTasks, selectedTasks]);
-
-  const handleOpenBuilder = () => {
+  // Append selected tasks straight into "My Rilo Self Care" — no builder/preview UI.
+  const handleAddToMyRilo = async () => {
+    if (!user || !allTasks || selectedTasks.size === 0 || isAdding) return;
     haptic.medium();
-    setShowBuilder(true);
-  };
-
-  const handleBuilderComplete = (title: string, emoji: string, color: string, tasks: BuilderTask[]) => {
-    setShowBuilder(false);
-    setBuilderResult({ title, emoji, color, tasks });
-    setShowBuilderPreview(true);
-  };
-
-  const handleBuilderPreviewSave = async (selectedTaskIds: string[], editedTasks: EditedTask[]) => {
-    if (!user || !builderResult) return;
+    setIsAdding(true);
     try {
-      // Funnel all picks into the single "My Rilo" routine (create if missing).
       const routineId = await getOrCreateMyRilo(user.id);
       const existingTitles = await fetchMyRiloTaskTitles(user.id, routineId);
-
-      const selectedBuilderTasks = builderResult.tasks.filter(t => selectedTaskIds.includes(t.id));
-      const editedMap = new Map(editedTasks.map(e => [e.id, e]));
-
       const startOrder = await getNextOrderIndex(user.id);
 
-      const hasProTask = selectedTaskIds.some(id => id.startsWith('__pro_task_routine_'));
-      const regularTasks = selectedBuilderTasks.filter(t => !t.id.startsWith('__pro_task_routine_'));
+      const picked = Array.from(selectedTasks)
+        .filter(id => !id.startsWith('__pro_task_routine_'))
+        .map(id => allTasks.find(t => t.id === id))
+        .filter(Boolean) as typeof allTasks;
 
-      if (regularTasks.length > 0) {
-        const userTasks: any[] = [];
-        let idx = 0;
-        for (const task of regularTasks as any[]) {
-          const edited = editedMap.get(task.id);
-          const finalTitle = (edited?.title || task.title || '').trim();
-          if (!finalTitle) continue;
-          const key = finalTitle.toLowerCase();
-          if (existingTitles.has(key)) continue; // dedupe
-          existingTitles.add(key);
-          userTasks.push({
-            user_id: user.id,
-            title: finalTitle,
-            emoji: edited?.icon || task.emoji || '📝',
-            color: edited?.color || task.color || ROUTINE_COLOR_CYCLE[idx % ROUTINE_COLOR_CYCLE.length],
-            repeat_pattern: edited?.repeatPattern || task.repeat_pattern || 'daily',
-            repeat_days: task.repeat_days || null,
-            scheduled_time: edited?.scheduledTime || null,
-            tag: (edited?.pro_link_type || task.pro_link_type) ? 'pro' : (edited?.tag ?? task.category ?? MY_RILO_TITLE),
-            time_period: task.time_period || null,
-            linked_playlist_id: (edited?.pro_link_type || task.pro_link_type) === 'playlist' ? (edited?.pro_link_value || task.pro_link_value) : null,
-            pro_link_type: edited?.pro_link_type || task.pro_link_type || null,
-            pro_link_value: edited?.pro_link_value || task.pro_link_value || null,
-            is_active: true,
-            order_index: startOrder + idx,
-            goal_enabled: task.goal_enabled || false,
-            goal_target: task.goal_target || null,
-            goal_type: task.goal_type || null,
-            goal_unit: task.goal_unit || null,
-            duration_minutes: task.duration_minutes || null,
-            source_routine_id: routineId,
-          });
-          idx++;
-        }
-        if (userTasks.length > 0) {
-          await supabase.from('user_tasks').insert(userTasks);
-        }
+      const rows: any[] = [];
+      let idx = 0;
+      for (const task of picked) {
+        const finalTitle = (task.title || '').trim();
+        if (!finalTitle) continue;
+        const key = finalTitle.toLowerCase();
+        if (existingTitles.has(key)) continue; // dedupe
+        existingTitles.add(key);
+        rows.push({
+          user_id: user.id,
+          title: finalTitle,
+          emoji: task.emoji || '📝',
+          color: task.color || ROUTINE_COLOR_CYCLE[idx % ROUTINE_COLOR_CYCLE.length],
+          repeat_pattern: task.repeat_pattern || 'daily',
+          repeat_days: task.repeat_days || null,
+          scheduled_time: null,
+          tag: task.pro_link_type ? 'pro' : (task.category ?? MY_RILO_TITLE),
+          time_period: task.time_period || null,
+          linked_playlist_id: task.pro_link_type === 'playlist' ? task.pro_link_value : (task.linked_playlist_id || null),
+          pro_link_type: task.pro_link_type || null,
+          pro_link_value: task.pro_link_value || null,
+          is_active: true,
+          order_index: startOrder + idx,
+          goal_enabled: task.goal_enabled || false,
+          goal_target: task.goal_target || null,
+          goal_type: task.goal_type || null,
+          goal_unit: task.goal_unit || null,
+          source_routine_id: routineId,
+        });
+        idx++;
+      }
+      if (rows.length > 0) {
+        const { error } = await supabase.from('user_tasks').insert(rows);
+        if (error) throw error;
       }
 
-      // Launcher task is ensured by getOrCreateMyRilo — no need to add a
-      // per-builder routine launcher; everything lives under My Rilo.
-      void hasProTask;
-
-      toast({ title: 'Added to My Rilo 🔥' });
-      setShowBuilderPreview(false);
-      setBuilderResult(null);
+      toast({
+        title: rows.length > 0
+          ? `Added ${rows.length} to ${MY_RILO_TITLE} 🔥`
+          : `Already in ${MY_RILO_TITLE}`,
+      });
       setSelectedTasks(new Set());
       queryClient.invalidateQueries({ queryKey: ['user-routines-all'] });
       queryClient.invalidateQueries({ queryKey: ['routine-user-tasks-emojis'] });
@@ -201,8 +155,10 @@ export default function AppTasksBankCategory() {
       queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['new-home-data'] });
     } catch (err) {
-      console.error('Failed to create routine:', err);
+      console.error('Failed to add to My Rilo Self Care:', err);
       toast({ title: t('tier1.tasksBank.createFailed'), variant: 'destructive' });
+    } finally {
+      setIsAdding(false);
     }
   };
 
@@ -313,58 +269,17 @@ export default function AppTasksBankCategory() {
             >
               <X className="w-5 h-5" />
             </button>
-            <Button onClick={handleOpenBuilder} className="flex-1 h-14 rounded-2xl text-base font-bold gap-2 shadow-lg" size="lg">
+            <Button
+              onClick={handleAddToMyRilo}
+              disabled={isAdding}
+              className="flex-1 h-14 rounded-2xl text-base font-bold gap-2 shadow-lg"
+              size="lg"
+            >
               <FluentEmoji emoji="✨" size={20} />
-              {t('tier1.tasksBank.buildMyRoutine', { n: selectionCount })}
+              {isAdding ? 'Adding…' : `Add ${selectionCount} to ${MY_RILO_TITLE}`}
             </Button>
           </div>
         </div>
-      )}
-
-      <RoutineBuilderSheet
-        open={showBuilder}
-        onOpenChange={setShowBuilder}
-        onComplete={handleBuilderComplete}
-        initialTitle={t('tier1.tasksBank.myRoutine')}
-        initialEmoji="✨"
-        initialColor="mint"
-        initialTasks={getBuilderTasks()}
-      />
-
-      {builderResult && (
-        <RoutinePreviewSheet
-          open={showBuilderPreview}
-          onOpenChange={(open) => {
-            setShowBuilderPreview(open);
-            if (!open) setBuilderResult(null);
-          }}
-          tasks={builderResult.tasks.map((t, i) => ({
-            id: t.id,
-            plan_id: 'user-created',
-            title: t.title,
-            icon: t.emoji || '📝',
-            color: t.color,
-            task_order: i,
-            is_active: true,
-            created_at: new Date().toISOString(),
-            linked_playlist_id: t.linked_playlist_id || null,
-            pro_link_type: t.pro_link_type as any,
-            pro_link_value: t.pro_link_value || null,
-            tag: builderResult.title,
-            linked_playlist: null,
-            repeat_pattern: t.repeat_pattern,
-            repeat_days: t.repeat_days,
-            goal_enabled: t.goal_enabled,
-            goal_target: t.goal_target,
-            goal_type: t.goal_type,
-            goal_unit: t.goal_unit,
-            description: t.description,
-            time_period: t.time_period,
-          } as any))}
-          routineTitle={builderResult.title}
-          routineBankId="user-created"
-          onSave={handleBuilderPreviewSave}
-        />
       )}
     </div>
   );
