@@ -962,6 +962,24 @@ const AppStore = () => {
                           </div>
                           )
                         )}
+                        {playlist.language && playlist.language !== "all" && (
+                          <div className="absolute -top-2.5 right-1 z-10 bg-white/95 text-fg-warm text-[9px] font-bold px-1.5 py-1 rounded-full flex items-center gap-1 shadow-ios">
+                            {playlist.language === "persian" ? (
+                              <PersianFlag size={12} />
+                            ) : (
+                              <span className="text-[12px] leading-none">
+                                {playlist.language === "american"
+                                  ? "🇺🇸"
+                                  : playlist.language === "turkish"
+                                  ? "🇹🇷"
+                                  : playlist.language === "spanish"
+                                  ? "🇪🇸"
+                                  : "🌐"}
+                              </span>
+                            )}
+                            <span>{LANG_LABELS[playlist.language] || playlist.language}</span>
+                          </div>
+                        )}
                       </div>
                       <p className="text-xs font-medium line-clamp-2 leading-tight">
                         {playlist.name}
