@@ -1032,17 +1032,35 @@ const AppStore = () => {
                         </div>
                         {playlist.requires_subscription ? (
                           !isSubscribed && (
-                          <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
+                          <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-1 rounded-full flex items-center gap-1 shadow-ios">
                             <Crown className="h-2.5 w-2.5" /> PLUS
                           </div>
                           )
                         ) : (
                           !isSubscribed && (
-                          <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
+                          <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-1 rounded-full flex items-center gap-1 shadow-ios">
                             <FluentEmoji emoji="🔥" size={10} />{" "}
                             {t("toolsPage.free")}
                           </div>
                           )
+                        )}
+                        {playlist.language && playlist.language !== "all" && (
+                          <div className="absolute -top-2.5 right-1 z-10 bg-white/95 text-fg-warm text-[9px] font-bold px-1.5 py-1 rounded-full flex items-center gap-1 shadow-ios">
+                            {playlist.language === "persian" ? (
+                              <PersianFlag size={12} />
+                            ) : (
+                              <span className="text-[12px] leading-none">
+                                {playlist.language === "american"
+                                  ? "🇺🇸"
+                                  : playlist.language === "turkish"
+                                  ? "🇹🇷"
+                                  : playlist.language === "spanish"
+                                  ? "🇪🇸"
+                                  : "🌐"}
+                              </span>
+                            )}
+                            <span>{LANG_LABELS[playlist.language] || playlist.language}</span>
+                          </div>
                         )}
                       </div>
                       <p className="text-xs font-medium line-clamp-2 leading-tight">
