@@ -65,6 +65,7 @@ export function MoodDashboard() {
 
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [selectedSubmoods, setSelectedSubmoods] = useState<string[]>([]);
   const [selectedContexts, setSelectedContexts] = useState<string[]>([]);
   const [contextNote, setContextNote] = useState('');
@@ -84,7 +85,12 @@ export function MoodDashboard() {
     setSelectedSubmoods([]);
     setSelectedContexts([]);
     setContextNote('');
-    setStep(2);
+    setIsTransitioning(true);
+    // Allow the selection animation to play before swapping to step 2
+    window.setTimeout(() => {
+      setStep(2);
+      setIsTransitioning(false);
+    }, 480);
   }, []);
 
   const handleToggleSubmood = useCallback((label: string) => {
@@ -231,7 +237,10 @@ export function MoodDashboard() {
         {step === 1 && (
         <div className="flex-1 flex flex-col justify-center px-4">
           {/* Title - always visible */}
-          <div className="text-center mb-6">
+          <div className={cn(
+            "text-center mb-6 transition-all duration-300",
+            isTransitioning && "opacity-0 -translate-y-2"
+          )}>
             <span className="text-2xl font-bold text-foreground">
               {t('moodPage.howAreYouFeeling')}
             </span>
@@ -243,16 +252,19 @@ export function MoodDashboard() {
               <button
                 key={mood.value}
                 onClick={() => handleMoodSelect(mood.value)}
-                disabled={isSubmitting}
+                disabled={isSubmitting || isTransitioning}
                 className={cn(
-                  'flex flex-col items-center gap-2 transition-all',
-                  'active:scale-95 disabled:opacity-50'
+                  'flex flex-col items-center gap-2 transition-all duration-400 ease-out',
+                  'active:scale-95',
+                  isTransitioning && selectedMood !== mood.value && 'opacity-0 scale-75',
+                  isTransitioning && selectedMood === mood.value && 'scale-110'
                 )}
               >
                 <div className={cn(
                   'w-20 h-20 rounded-full flex items-center justify-center relative transition-all',
                   mood.bgColor,
-                  selectedMood === mood.value && 'ring-4 ring-foreground/20 scale-110'
+                  selectedMood === mood.value && !isTransitioning && 'ring-4 ring-foreground/20 scale-110',
+                  isTransitioning && selectedMood === mood.value && 'scale-150 shadow-2xl'
                 )}>
                   <FluentEmoji emoji={mood.emoji} size={48} />
                   {selectedMood === mood.value && (
@@ -274,16 +286,19 @@ export function MoodDashboard() {
               <button
                 key={mood.value}
                 onClick={() => handleMoodSelect(mood.value)}
-                disabled={isSubmitting}
+                disabled={isSubmitting || isTransitioning}
                 className={cn(
-                  'flex flex-col items-center gap-2 transition-all',
-                  'active:scale-95 disabled:opacity-50'
+                  'flex flex-col items-center gap-2 transition-all duration-400 ease-out',
+                  'active:scale-95',
+                  isTransitioning && selectedMood !== mood.value && 'opacity-0 scale-75',
+                  isTransitioning && selectedMood === mood.value && 'scale-110'
                 )}
               >
                 <div className={cn(
                   'w-20 h-20 rounded-full flex items-center justify-center relative transition-all',
                   mood.bgColor,
-                  selectedMood === mood.value && 'ring-4 ring-foreground/20 scale-110'
+                  selectedMood === mood.value && !isTransitioning && 'ring-4 ring-foreground/20 scale-110',
+                  isTransitioning && selectedMood === mood.value && 'scale-150 shadow-2xl'
                 )}>
                   <FluentEmoji emoji={mood.emoji} size={48} />
                   {selectedMood === mood.value && (
@@ -303,7 +318,7 @@ export function MoodDashboard() {
 
         {/* Step 2: Submood selection */}
         {step === 2 && selectedMoodData && (
-          <div className="flex-1 flex flex-col px-4 overflow-y-auto">
+          <div className="flex-1 flex flex-col px-4 overflow-y-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center justify-between pb-2">
               <button
                 onClick={handleStepBack}
