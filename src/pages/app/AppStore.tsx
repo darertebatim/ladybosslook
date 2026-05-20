@@ -585,37 +585,6 @@ const AppStore = () => {
             )}
 
 
-            {/* Routines Templates Section */}
-            {!searchQuery && displayRoutines.length > 0 && (
-              <section>
-                <div className="flex items-center justify-between mb-2 px-1">
-                  <h2 className="text-base font-bold text-fg-warm">
-                    {t("toolsPage.routinesTemplates")}
-                  </h2>
-                  <Link
-                    to="/app/routines"
-                    className="text-xs text-primary font-medium flex items-center gap-0.5"
-                  >
-                    {t("toolsPage.all")}{" "}
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
-                <div
-                  className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4"
-                  style={{ WebkitOverflowScrolling: "touch" }}
-                >
-                  {displayRoutines.map((r) => (
-                    <div key={r.id} className="shrink-0 w-[85%] snap-start">
-                      <FeaturedRoutineCard
-                        routine={r}
-                        categoryName={categoryNameMap.get(r.category)}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
             {/* My Programs (active rounds) — only shown for users with active enrollments */}
             {!searchQuery && (
               <ActiveRoundsCarousel
