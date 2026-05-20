@@ -4,6 +4,14 @@ export const MY_RILO_TITLE = 'My Rilo Self Care';
 export const MY_RILO_EMOJI = '🔥';
 export const MY_RILO_COLOR = 'pink';
 
+// Legacy titles that should be absorbed into "My Rilo Self Care".
+const LEGACY_TITLES = [
+  'My Rilo',
+  'Self-Care Gap Plan',
+  'My Self-Care Routine',
+  'روتین خودمراقبتی من',
+];
+
 const inflight = new Map<string, Promise<string>>();
 
 /**
@@ -17,7 +25,7 @@ export async function getOrCreateMyRilo(userId: string): Promise<string> {
   if (cached) return cached;
 
   const run = (async (): Promise<string> => {
-    // 1. Look up existing
+    // 1. Look up existing My Rilo Self Care
     const { data: existing } = await supabase
       .from('user_routines_bank')
       .select('routine_id')
@@ -29,7 +37,35 @@ export async function getOrCreateMyRilo(userId: string): Promise<string> {
       .maybeSingle();
     if (existing?.routine_id) return existing.routine_id as string;
 
-    // 2. Create routine row
+    // 2. Absorb any legacy self-care routine: rename it in place + retag tasks.
+    const { data: legacy } = await supabase
+      .from('user_routines_bank')
+      .select('routine_id')
+      .eq('user_id', userId)
+      .eq('is_user_created', true)
+      .in('title', LEGACY_TITLES)
+      .order('routine_id', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (legacy?.routine_id) {
+      const legacyId = legacy.routine_id as string;
+      await supabase
+        .from('user_routines_bank')
+        .update({ title: MY_RILO_TITLE, emoji: MY_RILO_EMOJI, color: MY_RILO_COLOR })
+        .eq('user_id', userId)
+        .eq('routine_id', legacyId);
+      // Update launcher task if present
+      await supabase
+        .from('user_tasks')
+        .update({ title: MY_RILO_TITLE, tag: MY_RILO_TITLE, emoji: MY_RILO_EMOJI, color: MY_RILO_COLOR })
+        .eq('user_id', userId)
+        .eq('pro_link_type', 'routine')
+        .eq('pro_link_value', legacyId);
+      await ensureLauncherTask(userId, legacyId);
+      return legacyId;
+    }
+
+    // 3. Create routine row
     const { data: created, error } = await supabase
       .from('user_routines_bank')
       .insert({
@@ -46,7 +82,7 @@ export async function getOrCreateMyRilo(userId: string): Promise<string> {
     if (error || !created) throw error || new Error('Failed to create My Rilo');
     const routineId = (created as any).routine_id as string;
 
-    // 3. Ensure planner launcher task exists
+    // 4. Ensure planner launcher task exists
     await ensureLauncherTask(userId, routineId);
 
     return routineId;
