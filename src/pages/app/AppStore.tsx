@@ -173,7 +173,7 @@ const AppStore = () => {
       const { data, error } = await supabase
         .from("audio_playlists")
         .select(
-          "id, name, cover_image_url, category, is_free, is_hidden, requires_subscription",
+          "id, name, cover_image_url, category, is_free, is_hidden, requires_subscription, language",
         )
         .eq("is_hidden", false)
         .in("category", ["meditate", "soundscape", "audiobook", "podcast"])
