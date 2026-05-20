@@ -30,11 +30,11 @@ const CONTEXT_ICON_MAP: Record<string, React.ComponentType<{ className?: string 
 
 // 5-level mood system (labels/buttonText resolved via i18n at render time)
 const MOODS = [
-  { value: 'great', emoji: '😄', bgColor: 'bg-yellow-200' },
-  { value: 'good', emoji: '🙂', bgColor: 'bg-green-200' },
-  { value: 'okay', emoji: '😐', bgColor: 'bg-blue-200' },
-  { value: 'not_great', emoji: '😔', bgColor: 'bg-purple-200' },
-  { value: 'bad', emoji: '😢', bgColor: 'bg-red-200' },
+  { value: 'great', emoji: '😄', bgColor: 'bg-yellow-200', sheetBg: 'bg-yellow-100', accent: 'text-yellow-700' },
+  { value: 'good', emoji: '🙂', bgColor: 'bg-green-200', sheetBg: 'bg-green-100', accent: 'text-green-700' },
+  { value: 'okay', emoji: '😐', bgColor: 'bg-blue-200', sheetBg: 'bg-blue-100', accent: 'text-blue-700' },
+  { value: 'not_great', emoji: '😔', bgColor: 'bg-purple-200', sheetBg: 'bg-purple-100', accent: 'text-purple-700' },
+  { value: 'bad', emoji: '😢', bgColor: 'bg-red-200', sheetBg: 'bg-red-100', accent: 'text-red-700' },
 ] as const;
 
 export function MoodDashboard() {
@@ -216,6 +216,16 @@ export function MoodDashboard() {
 
   return (
     <>
+      {/* Full-screen background — amber default, mood-tinted on steps 2/3 */}
+      <div
+        className={cn(
+          "fixed inset-0 -z-10 transition-colors duration-300",
+          step !== 1 && selectedMoodData
+            ? selectedMoodData.sheetBg
+            : "bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20"
+        )}
+        aria-hidden
+      />
       <div className="flex flex-col h-full">
         {/* Step 1: Mood Grid */}
         {step === 1 && (

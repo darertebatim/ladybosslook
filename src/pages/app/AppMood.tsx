@@ -13,7 +13,7 @@ export default function AppMood() {
         description={t('moodPage.seoDescription')}
       />
       <div 
-        className="bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 flex flex-col"
+        className="flex flex-col"
         style={{ height: '100dvh' }}
       >
         {/* Header with iOS safe area */}
