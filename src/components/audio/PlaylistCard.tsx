@@ -123,8 +123,26 @@ export const PlaylistCard = memo(function PlaylistCard({
           )}
 
           {isLocked && !isFree && (
-            <div className="absolute bottom-1 left-1 z-10 h-5 w-5 rounded-full bg-black/55 flex items-center justify-center">
+            <div className="absolute top-1.5 left-1.5 z-10 h-5 w-5 rounded-full bg-black/55 flex items-center justify-center">
               <Lock className="h-2.5 w-2.5 text-white" />
+            </div>
+          )}
+
+          {/* Language pill — top right */}
+          {language && language !== 'all' && (
+            <div className="absolute top-1.5 right-1.5 z-10 inline-flex items-center gap-1 rounded-full bg-black/55 backdrop-blur-md px-1.5 py-0.5">
+              {language === 'persian'
+                ? <PersianFlag size={12} />
+                : LANG_FLAGS[language] && <span className="text-[11px] leading-none">{LANG_FLAGS[language]}</span>}
+              <span className="text-[9px] font-semibold text-white leading-none">{LANG_LABELS[language]}</span>
+            </div>
+          )}
+
+          {/* Category badge — bottom left */}
+          {category && (
+            <div className="absolute bottom-1.5 left-1.5 z-10 inline-flex items-center gap-1 rounded-full bg-black/55 backdrop-blur-md px-1.5 py-0.5 max-w-[calc(100%-12px)]">
+              <span className="text-[10px] leading-none shrink-0">{tile.emoji}</span>
+              <span className="text-[9px] font-semibold text-white leading-none capitalize truncate">{categoryLabel || category}</span>
             </div>
           )}
 
