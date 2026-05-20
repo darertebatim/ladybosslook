@@ -164,10 +164,30 @@ export function MoodDashboard() {
     return false; // let celebration handle navigation
   }, [existingTask, justAdded, neverPrompt, existingTaskLoading]);
 
-  const handleRoutinePromptAdd = useCallback(() => {
+  const addMoodTaskDirectly = useCallback(async () => {
+    try {
+      await addRoutinePlan.mutateAsync({
+        planId: 'synthetic-mood',
+        selectedTaskIds: [SYNTHETIC_MOOD_TASK.id],
+        editedTasks: [],
+        syntheticTasks: [SYNTHETIC_MOOD_TASK],
+      });
+      toast.success(t('moodPage.addedToRoutines'));
+      setJustAdded(true);
+    } catch (error) {
+      console.error('Failed to add mood task:', error);
+      toast.error(t('moodPage.addRoutineFailed'));
+    }
+  }, [addRoutinePlan, SYNTHETIC_MOOD_TASK, t]);
+
+  const handleRoutinePromptAdd = useCallback(async () => {
     setShowRoutinePrompt(false);
-    setShowRoutineSheet(true);
-  }, []);
+    await addMoodTaskDirectly();
+    if (pendingRoute) {
+      navigate(pendingRoute);
+      setPendingRoute(null);
+    }
+  }, [addMoodTaskDirectly, pendingRoute, navigate]);
 
   const handleRoutinePromptSkip = useCallback(() => {
     setShowRoutinePrompt(false);
@@ -191,7 +211,7 @@ export function MoodDashboard() {
     if (isAdded) {
       navigate('/app/home');
     } else {
-      setShowRoutineSheet(true);
+      void addMoodTaskDirectly();
     }
   };
 
