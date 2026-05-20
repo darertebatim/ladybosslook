@@ -493,6 +493,27 @@ const AppStore = () => {
                             </div>
                           )}
                         </div>
+                        <div className="absolute -top-2.5 right-1 z-10 bg-white/95 text-fg-warm text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios capitalize">
+                          <FluentEmoji
+                            emoji={
+                              playlist.category === "meditate"
+                                ? "🧘"
+                                : playlist.category === "soundscape"
+                                ? "🌊"
+                                : playlist.category === "audiobook"
+                                ? "📖"
+                                : "🎙️"
+                            }
+                            size={10}
+                          />
+                          {playlist.category === "meditate"
+                            ? "Meditate"
+                            : playlist.category === "soundscape"
+                            ? "Soundscape"
+                            : playlist.category === "audiobook"
+                            ? "Audiobook"
+                            : "Podcast"}
+                        </div>
                         {playlist.requires_subscription
                           ? !isSubscribed && (
                               <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
