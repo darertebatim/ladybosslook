@@ -83,6 +83,53 @@ export default function AppMoodHistory() {
                   </p>
                 </div>
               </div>
+
+              {selectedDay.mood.entries && selectedDay.mood.entries.length > 0 && (
+                <div className="mt-4 space-y-3">
+                  {selectedDay.mood.entries
+                    .slice()
+                    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                    .map((entry) => {
+                      const hasSubmoods = (entry.submoods?.length ?? 0) > 0;
+                      const hasContexts = (entry.contexts?.length ?? 0) > 0;
+                      const hasNote = !!entry.notes?.trim();
+                      return (
+                        <div key={entry.id} className="rounded-xl bg-white/60 dark:bg-white/5 p-3 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <FluentEmoji emoji={MOOD_EMOJI[entry.mood] || '😐'} size={18} />
+                            <span className="text-xs font-medium text-foreground/80">
+                              {format(new Date(entry.created_at), 'h:mm a')}
+                            </span>
+                          </div>
+                          {hasSubmoods && (
+                            <div className="flex flex-wrap gap-1.5">
+                              {entry.submoods!.map((s) => (
+                                <span key={`s-${s}`} className="text-xs px-2 py-0.5 rounded-full bg-white/80 dark:bg-white/10 text-foreground/90 font-medium">
+                                  {s}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {hasContexts && (
+                            <div className="flex flex-wrap gap-1.5">
+                              {entry.contexts!.map((c) => (
+                                <span key={`c-${c}`} className="text-xs px-2 py-0.5 rounded-full bg-foreground/10 text-foreground/80">
+                                  {c}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {hasNote && (
+                            <p className="text-sm text-foreground/80 leading-snug">"{entry.notes}"</p>
+                          )}
+                          {!hasSubmoods && !hasContexts && !hasNote && (
+                            <p className="text-xs text-muted-foreground italic">{t('moodPage.feeling', { mood: t(`moodPage.moods.${entry.mood}`, { defaultValue: entry.mood }) })}</p>
+                          )}
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
             </div>
           )}
 
