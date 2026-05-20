@@ -216,16 +216,16 @@ export function MoodDashboard() {
 
   return (
     <>
-      {/* Mood-tinted background overlay for steps 2 & 3 */}
-      {step !== 1 && selectedMoodData && (
-        <div
-          className={cn(
-            "fixed inset-0 -z-10 transition-colors duration-300",
-            selectedMoodData.sheetBg
-          )}
-          aria-hidden
-        />
-      )}
+      {/* Full-screen background — amber default, mood-tinted on steps 2/3 */}
+      <div
+        className={cn(
+          "fixed inset-0 -z-10 transition-colors duration-300",
+          step !== 1 && selectedMoodData
+            ? selectedMoodData.sheetBg
+            : "bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20"
+        )}
+        aria-hidden
+      />
       <div className="flex flex-col h-full">
         {/* Step 1: Mood Grid */}
         {step === 1 && (
