@@ -437,14 +437,16 @@ export default function AppPlayer() {
                         }
                       }}
                       className={cn(
-                        "shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all active:scale-95",
+                        "shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[13px] font-semibold leading-none whitespace-nowrap transition-all active:scale-95",
                         active
                           ? "bg-brand text-white shadow-ios"
                           : "bg-peach text-fg-warm-muted",
                       )}
                     >
                       {config?.emoji && (
-                        <FluentEmoji emoji={config.emoji} size={18} />
+                        <span className="inline-flex shrink-0 items-center justify-center w-[18px] h-[18px]">
+                          <FluentEmoji emoji={config.emoji} size={18} />
+                        </span>
                       )}
                       <span>{name}</span>
                     </button>
