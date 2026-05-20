@@ -560,8 +560,10 @@ export default function AppPlayer() {
                 >
                   {[...hotTracks]
                     .sort((a: any, b: any) => {
-                      const aMatch = userLang && a.language === userLang ? 0 : 1;
-                      const bMatch = userLang && b.language === userLang ? 0 : 1;
+                      const aLang = a.audio_playlist_items?.[0]?.audio_playlists?.language;
+                      const bLang = b.audio_playlist_items?.[0]?.audio_playlists?.language;
+                      const aMatch = userLang && aLang === userLang ? 0 : 1;
+                      const bMatch = userLang && bLang === userLang ? 0 : 1;
                       return aMatch - bMatch;
                     })
                     .map((track: any) => {
