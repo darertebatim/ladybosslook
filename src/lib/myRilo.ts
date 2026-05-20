@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 
-export const MY_RILO_TITLE = 'My Rilo';
+export const MY_RILO_TITLE = 'My Rilo Self Care';
 export const MY_RILO_EMOJI = '🔥';
 export const MY_RILO_COLOR = 'pink';
 
