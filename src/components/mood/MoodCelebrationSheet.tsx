@@ -46,6 +46,7 @@ interface MoodCelebrationSheetProps {
   mood: string | null;
   onDone: () => void;
   onActionClick?: (route: string) => boolean; // return true to intercept navigation
+  submoods?: string[];
 }
 
 export function MoodCelebrationSheet({
@@ -54,12 +55,20 @@ export function MoodCelebrationSheet({
   mood,
   onDone,
   onActionClick,
+  submoods,
 }: MoodCelebrationSheetProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const moodData = mood ? MOOD_CONFIG[mood] : null;
   const moodLabel = mood ? t(`moodPage.moods.${mood}`, { defaultValue: mood }) : '';
   const celebrationText = mood ? t(`moodPage.celebration.${mood}`, { defaultValue: '' }) : '';
+  const accentWord = (submoods && submoods.length > 0 ? submoods[0] : moodLabel).toLowerCase();
+  const accentColor = mood === 'great' ? '#CA8A04'
+    : mood === 'good' ? '#16A34A'
+    : mood === 'okay' ? '#2563EB'
+    : mood === 'not_great' ? '#9333EA'
+    : mood === 'bad' ? '#DC2626'
+    : '#000';
 
   // Fire only for positive moods (great/good) — avoid prompting after negative check-ins
   useEffect(() => {
@@ -142,7 +151,8 @@ export function MoodCelebrationSheet({
             {celebrationText}
           </p>
           <h2 className="text-xl font-bold text-foreground leading-snug">
-            {t('moodPage.celebration.heading')}
+            What's making you feel{' '}
+            <span style={{ color: accentColor }}>{accentWord}</span>?
           </h2>
         </div>
 
