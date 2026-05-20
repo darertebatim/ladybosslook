@@ -1462,6 +1462,7 @@ export type Database = {
           emotion: string
           id: string
           notes: string | null
+          submoods: string[] | null
           user_id: string
           valence: string
         }
@@ -1472,6 +1473,7 @@ export type Database = {
           emotion: string
           id?: string
           notes?: string | null
+          submoods?: string[] | null
           user_id: string
           valence: string
         }
@@ -1482,6 +1484,7 @@ export type Database = {
           emotion?: string
           id?: string
           notes?: string | null
+          submoods?: string[] | null
           user_id?: string
           valence?: string
         }
