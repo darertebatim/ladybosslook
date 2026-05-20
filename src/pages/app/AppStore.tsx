@@ -77,6 +77,13 @@ const AppStore = () => {
   const userLang = useUserPreferredLanguage();
   const [showLangHint, setShowLangHint] = useState(false);
 
+  const LANG_LABELS: Record<string, string> = {
+    persian: "Persian",
+    american: "American",
+    turkish: "Türkçe",
+    spanish: "Español",
+  };
+
   useEffect(() => {
     if (userLang && shouldShowLanguageSettingsHint()) {
       const timer = setTimeout(() => setShowLangHint(true), 800);
@@ -561,9 +568,20 @@ const AppStore = () => {
                             ? "Audiobook"
                             : "Podcast"}
                         </div>
-                        {/* Language pill — top right, inside cover */}
+                        {playlist.requires_subscription
+                          ? !isSubscribed && (
+                              <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
+                                <Crown className="h-2.5 w-2.5" /> PLUS
+                              </div>
+                            )
+                          : !isSubscribed && (
+                              <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
+                                <FluentEmoji emoji="🔥" size={10} />{" "}
+                                {t("toolsPage.free")}
+                              </div>
+                            )}
                         {playlist.language && playlist.language !== "all" && (
-                          <div className="absolute top-2 right-2 z-10 bg-white/95 text-fg-warm text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1 shadow-ios">
+                          <div className="absolute -top-2.5 right-1 z-10 bg-white/95 text-fg-warm text-[9px] font-bold px-1.5 py-1 rounded-full flex items-center gap-1 shadow-ios">
                             {playlist.language === "persian" ? (
                               <PersianFlag size={12} />
                             ) : (
@@ -577,20 +595,9 @@ const AppStore = () => {
                                   : "🌐"}
                               </span>
                             )}
+                            <span>{LANG_LABELS[playlist.language] || playlist.language}</span>
                           </div>
                         )}
-                        {playlist.requires_subscription
-                          ? !isSubscribed && (
-                              <div className="absolute -top-2.5 left-1 z-10 bg-amber-200 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
-                                <Crown className="h-2.5 w-2.5" /> PLUS
-                              </div>
-                            )
-                          : !isSubscribed && (
-                              <div className="absolute -top-2.5 left-1 z-10 bg-[#E2F9F0] text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-ios">
-                                <FluentEmoji emoji="🔥" size={10} />{" "}
-                                {t("toolsPage.free")}
-                              </div>
-                            )}
                       </div>
                     </button>
                   ))}
@@ -955,6 +962,24 @@ const AppStore = () => {
                           </div>
                           )
                         )}
+                        {playlist.language && playlist.language !== "all" && (
+                          <div className="absolute -top-2.5 right-1 z-10 bg-white/95 text-fg-warm text-[9px] font-bold px-1.5 py-1 rounded-full flex items-center gap-1 shadow-ios">
+                            {playlist.language === "persian" ? (
+                              <PersianFlag size={12} />
+                            ) : (
+                              <span className="text-[12px] leading-none">
+                                {playlist.language === "american"
+                                  ? "🇺🇸"
+                                  : playlist.language === "turkish"
+                                  ? "🇹🇷"
+                                  : playlist.language === "spanish"
+                                  ? "🇪🇸"
+                                  : "🌐"}
+                              </span>
+                            )}
+                            <span>{LANG_LABELS[playlist.language] || playlist.language}</span>
+                          </div>
+                        )}
                       </div>
                       <p className="text-xs font-medium line-clamp-2 leading-tight">
                         {playlist.name}
@@ -1018,6 +1043,24 @@ const AppStore = () => {
                             {t("toolsPage.free")}
                           </div>
                           )
+                        )}
+                        {playlist.language && playlist.language !== "all" && (
+                          <div className="absolute -top-2.5 right-1 z-10 bg-white/95 text-fg-warm text-[9px] font-bold px-1.5 py-1 rounded-full flex items-center gap-1 shadow-ios">
+                            {playlist.language === "persian" ? (
+                              <PersianFlag size={12} />
+                            ) : (
+                              <span className="text-[12px] leading-none">
+                                {playlist.language === "american"
+                                  ? "🇺🇸"
+                                  : playlist.language === "turkish"
+                                  ? "🇹🇷"
+                                  : playlist.language === "spanish"
+                                  ? "🇪🇸"
+                                  : "🌐"}
+                              </span>
+                            )}
+                            <span>{LANG_LABELS[playlist.language] || playlist.language}</span>
+                          </div>
                         )}
                       </div>
                       <p className="text-xs font-medium line-clamp-2 leading-tight">
