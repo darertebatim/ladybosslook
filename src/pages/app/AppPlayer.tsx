@@ -580,7 +580,7 @@ export default function AppPlayer() {
                     const langOption = trackLang
                       ? LANGUAGE_OPTIONS.find((o) => o.value === trackLang)
                       : null;
-                    const langLabel = trackLang ? String(trackLang).slice(0, 2).toUpperCase() : null;
+                    const langLabel = langOption ? t(langOption.labelKey) : null;
                     return (
                       <button
                         key={track.id}
