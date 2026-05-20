@@ -123,8 +123,26 @@ export const PlaylistCard = memo(function PlaylistCard({
           )}
 
           {isLocked && !isFree && (
-            <div className="absolute bottom-1 left-1 z-10 h-5 w-5 rounded-full bg-black/55 flex items-center justify-center">
+            <div className="absolute top-1.5 left-1.5 z-10 h-5 w-5 rounded-full bg-black/55 flex items-center justify-center">
               <Lock className="h-2.5 w-2.5 text-white" />
+            </div>
+          )}
+
+          {/* Language pill — top right */}
+          {language && language !== 'all' && (
+            <div className="absolute top-1.5 right-1.5 z-10 inline-flex items-center gap-1 rounded-full bg-black/55 backdrop-blur-md px-1.5 py-0.5">
+              {language === 'persian'
+                ? <PersianFlag size={12} />
+                : LANG_FLAGS[language] && <span className="text-[11px] leading-none">{LANG_FLAGS[language]}</span>}
+              <span className="text-[9px] font-semibold text-white leading-none">{LANG_LABELS[language]}</span>
+            </div>
+          )}
+
+          {/* Category badge — bottom left */}
+          {category && (
+            <div className="absolute bottom-1.5 left-1.5 z-10 inline-flex items-center gap-1 rounded-full bg-black/55 backdrop-blur-md px-1.5 py-0.5 max-w-[calc(100%-12px)]">
+              <span className="text-[10px] leading-none shrink-0">{tile.emoji}</span>
+              <span className="text-[9px] font-semibold text-white leading-none capitalize truncate">{categoryLabel || category}</span>
             </div>
           )}
 
@@ -140,11 +158,11 @@ export const PlaylistCard = memo(function PlaylistCard({
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 text-[12px] text-fg-warm-muted">
-            {category && <span className="font-medium capitalize">{categoryLabel || category}</span>}
-            {category && totalDuration > 0 && <span>·</span>}
-            {totalDuration > 0 && <span>{formatDuration(totalDuration)}</span>}
-          </div>
+          {totalDuration > 1 && (
+            <div className="flex items-center gap-1.5 text-[12px] text-fg-warm-muted">
+              <span>{formatDuration(totalDuration)}</span>
+            </div>
+          )}
 
           <h3 className="text-[16px] font-bold leading-tight mt-1 line-clamp-2 text-fg-warm">
             {name}
@@ -172,14 +190,6 @@ export const PlaylistCard = memo(function PlaylistCard({
             {isFree && !isLocked && !requiresSubscription && !isSubscribed && (
               <span className="inline-flex items-center gap-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E2F9F0] text-[#065F46]">
                 🔥 FREE
-              </span>
-            )}
-            {language && language !== 'all' && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-fg-warm-muted">
-                {language === 'persian'
-                  ? <PersianFlag size={14} />
-                  : LANG_FLAGS[language] && <span className="text-[14px] leading-none">{LANG_FLAGS[language]}</span>}
-                {LANG_LABELS[language] && <span>{LANG_LABELS[language]}</span>}
               </span>
             )}
             {(!isLocked || isFree) && progressPercentage > 0 && (
