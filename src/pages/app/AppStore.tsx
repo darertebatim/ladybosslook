@@ -519,7 +519,7 @@ const AppStore = () => {
             {!searchQuery && (
               <section>
                 <h2 className="text-base font-bold text-fg-warm mb-2 px-1">
-                  {t("tier1.tasksBank.startHere", "What do you need?")}
+                  {t("tier1.tasksBank.startHere", "What do you need? (Self care goals)")}
                 </h2>
                 <div className="grid grid-cols-2 gap-2.5">
                   {[
