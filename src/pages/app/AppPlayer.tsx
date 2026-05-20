@@ -103,7 +103,7 @@ export default function AppPlayer() {
       const { data, error } = await supabase
         .from("audio_content")
         .select(`
-          id, title, cover_image_url, category, duration_seconds,
+          id, title, cover_image_url, category, duration_seconds, language,
           audio_playlist_items ( audio_playlists ( cover_image_url, name ) )
         `)
         .eq("is_hot", true)
@@ -558,12 +558,20 @@ export default function AppPlayer() {
                   className="flex gap-3 overflow-x-auto -mx-4 px-4 pt-1 pb-2 scrollbar-hide snap-x snap-mandatory scroll-pl-4"
                   style={{ WebkitOverflowScrolling: "touch" }}
                 >
-                  {hotTracks.map((track: any) => {
+                  {[...hotTracks]
+                    .sort((a: any, b: any) => {
+                      const aMatch = userLang && a.language === userLang ? 0 : 1;
+                      const bMatch = userLang && b.language === userLang ? 0 : 1;
+                      return aMatch - bMatch;
+                    })
+                    .map((track: any) => {
                     const playlistCover =
                       track.audio_playlist_items?.[0]?.audio_playlists?.cover_image_url || null;
                     const cover = track.cover_image_url || playlistCover;
                     const playlistName =
                       track.audio_playlist_items?.[0]?.audio_playlists?.name || null;
+                    const categoryLabel = categoryConfig[track.category]?.name || track.category;
+                    const langLabel = track.language ? String(track.language).toUpperCase() : null;
                     return (
                     <button
                       key={track.id}
@@ -573,7 +581,7 @@ export default function AppPlayer() {
                       }}
                       className="shrink-0 w-[85%] snap-start text-left transition-transform active:scale-[0.98]"
                     >
-                      <div className="relative aspect-[16/10] w-full rounded-3xl overflow-hidden bg-muted shadow-ios">
+                      <div className="relative aspect-[2/1] w-full rounded-3xl overflow-hidden bg-muted shadow-ios">
                         {cover ? (
                           <CachedImage
                             src={cover}
@@ -587,16 +595,29 @@ export default function AppPlayer() {
                         )}
                         {/* Gradient overlay for legibility */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-                        {/* Hot badge */}
-                        <div className="absolute top-3 left-3 flex items-center gap-1 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-ios">
-                          <FluentEmoji emoji="🔥" size={12} />
-                          HOT
+                        {/* Top-left: Hot + Language badges */}
+                        <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                          <div className="flex items-center gap-1 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-ios">
+                            <FluentEmoji emoji="🔥" size={12} />
+                            HOT
+                          </div>
+                          {langLabel && (
+                            <div className="bg-white/90 text-orange-600 text-[10px] font-bold px-2 py-1 rounded-full shadow-ios">
+                              {langLabel}
+                            </div>
+                          )}
                         </div>
+                        {/* Top-right: Category badge */}
+                        {categoryLabel && (
+                          <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
+                            {categoryLabel}
+                          </div>
+                        )}
                         {/* Bottom content */}
                         <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between gap-3">
                           <div className="min-w-0 flex-1">
                             {playlistName && (
-                              <p className="text-[10px] font-semibold uppercase tracking-wider text-white/80 truncate">
+                              <p className="text-[10px] font-semibold uppercase tracking-wider text-orange-300 truncate">
                                 {playlistName}
                               </p>
                             )}
