@@ -102,7 +102,10 @@ export default function AppPlayer() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("audio_content")
-        .select("id, title, cover_image_url, category, duration_seconds")
+        .select(`
+          id, title, cover_image_url, category, duration_seconds,
+          audio_playlist_items ( audio_playlists ( cover_image_url, name ) )
+        `)
         .eq("is_hot", true)
         .order("published_at", { ascending: false })
         .limit(20);
@@ -552,7 +555,11 @@ export default function AppPlayer() {
                   </h2>
                 </div>
                 <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pt-1 pb-2 scrollbar-hide">
-                  {hotTracks.map((track: any) => (
+                  {hotTracks.map((track: any) => {
+                    const playlistCover =
+                      track.audio_playlist_items?.[0]?.audio_playlists?.cover_image_url || null;
+                    const cover = track.cover_image_url || playlistCover;
+                    return (
                     <button
                       key={track.id}
                       onClick={() => {
@@ -562,9 +569,9 @@ export default function AppPlayer() {
                       className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
                     >
                       <div className="h-32 w-32 rounded-2xl overflow-hidden bg-muted shadow-ios mb-1.5">
-                        {track.cover_image_url ? (
+                        {cover ? (
                           <CachedImage
-                            src={track.cover_image_url}
+                            src={cover}
                             alt={track.title}
                             className="w-full h-full object-cover"
                           />
@@ -578,7 +585,8 @@ export default function AppPlayer() {
                         {track.title}
                       </p>
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
