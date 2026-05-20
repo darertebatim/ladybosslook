@@ -104,7 +104,7 @@ export default function AppPlayer() {
         .from("audio_content")
         .select(`
           id, title, cover_image_url, category, duration_seconds,
-          audio_playlist_items ( audio_playlists ( cover_image_url, name, language ) )
+          audio_playlist_items ( audio_playlists ( cover_image_url, name, language, category ) )
         `)
         .eq("is_hot", true)
         .order("published_at", { ascending: false })
@@ -572,10 +572,15 @@ export default function AppPlayer() {
                     const cover = track.cover_image_url || playlistCover;
                     const playlistName =
                       track.audio_playlist_items?.[0]?.audio_playlists?.name || null;
-                    const categoryLabel = categoryConfig[track.category]?.name || track.category;
+                    const playlistCategory =
+                      track.audio_playlist_items?.[0]?.audio_playlists?.category || track.category;
+                    const categoryLabel = categoryConfig[playlistCategory]?.name || playlistCategory;
                     const trackLang =
                       track.audio_playlist_items?.[0]?.audio_playlists?.language || null;
-                    const langLabel = trackLang ? String(trackLang).toUpperCase() : null;
+                    const langOption = trackLang
+                      ? LANGUAGE_OPTIONS.find((o) => o.value === trackLang)
+                      : null;
+                    const langLabel = trackLang ? String(trackLang).slice(0, 2).toUpperCase() : null;
                     return (
                       <button
                         key={track.id}
@@ -593,7 +598,12 @@ export default function AppPlayer() {
                               Hot Track
                             </span>
                             {langLabel && (
-                              <span className="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-white/70 text-orange-700">
+                              <span className="ml-1 inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-white/70 text-orange-700">
+                                {trackLang === "persian" ? (
+                                  <PersianFlag size={12} />
+                                ) : langOption?.flag ? (
+                                  <span className="text-[12px] leading-none">{langOption.flag}</span>
+                                ) : null}
                                 {langLabel}
                               </span>
                             )}
