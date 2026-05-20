@@ -100,6 +100,7 @@ export const AudioManager = () => {
     title: "",
     description: "",
     playlist_id: "",
+    is_hot: false,
   });
 
   // Fetch playlists
@@ -247,6 +248,7 @@ export const AudioManager = () => {
         title: "",
         description: "",
         playlist_id: "",
+        is_hot: false,
       });
       setAudioFiles([]);
       setCoverFile(null);
@@ -461,6 +463,7 @@ export const AudioManager = () => {
       title: audio.title,
       description: audio.description || "",
       playlist_id: audio.audio_playlist_items?.[0]?.playlist_id || "",
+      is_hot: !!audio.is_hot,
     });
     setIsEditDialogOpen(true);
   };
@@ -474,6 +477,7 @@ export const AudioManager = () => {
       updates: {
         title: formData.title,
         description: formData.description,
+        is_hot: formData.is_hot,
       },
       playlistId: formData.playlist_id,
     });
@@ -647,7 +651,12 @@ export const AudioManager = () => {
             <TableBody>
               {audioContent?.map((audio) => (
                 <TableRow key={audio.id}>
-                  <TableCell className="font-medium">{audio.title}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-2">
+                      {audio.is_hot && <Badge className="bg-orange-500 hover:bg-orange-500">🔥 Hot</Badge>}
+                      <span>{audio.title}</span>
+                    </div>
+                  </TableCell>
                   <TableCell>
                     {audio.audio_playlist_items?.[0]?.audio_playlists?.name ? (
                       <Badge variant="secondary">
@@ -730,6 +739,22 @@ export const AudioManager = () => {
               <p className="text-xs text-muted-foreground mt-1">
                 Access control and category are managed at the playlist level. Track order within playlists is managed in the Playlist Tracks Manager.
               </p>
+            </div>
+
+            <div className="flex items-center justify-between rounded-md border p-3">
+              <div>
+                <Label htmlFor="edit_is_hot" className="text-sm font-medium">
+                  🔥 Hot Track
+                </Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Feature this track at the top of the Listen page.
+                </p>
+              </div>
+              <Switch
+                id="edit_is_hot"
+                checked={formData.is_hot}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_hot: checked })}
+              />
             </div>
 
             <div className="flex justify-end gap-2">

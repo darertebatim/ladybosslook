@@ -36,6 +36,9 @@ import {
 } from "@/components/app/LanguageSettingsHintPopup";
 import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
 import { useMediaCategories } from "@/hooks/useMediaCategories";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { CachedImage } from "@/components/ui/CachedImage";
 
 const LANGUAGE_OPTIONS = [
   { value: "all", labelKey: "player.languages.all", flag: "🌐" },
@@ -92,6 +95,23 @@ export default function AppPlayer() {
 
   const { playlists, playlistItems, progressData, enrollments, savedPlaylistIds, isLoading } =
     usePlayerData();
+
+  // Hot Tracks — individually featured audio tracks shown above All Playlists
+  const { data: hotTracks = [] } = useQuery({
+    queryKey: ["hot-tracks"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("audio_content")
+        .select("id, title, cover_image_url, category, duration_seconds")
+        .eq("is_hot", true)
+        .order("published_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return data || [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   const userLang = useUserPreferredLanguage();
   const [showLangPopup, setShowLangPopup] = useState(false);
   const [showLangHint, setShowLangHint] = useState(false);
@@ -515,6 +535,50 @@ export default function AppPlayer() {
                 </div>
                 <div className="flex flex-col gap-3">
                   {continueListening.slice(0, 4).map(renderCard)}
+                </div>
+              </div>
+            )}
+
+          {/* Hot Tracks — individually featured audios */}
+          {progressFilter === "all" &&
+            selectedCategory === "all" &&
+            !searchQuery &&
+            hotTracks.length > 0 && (
+              <div className="px-4 pt-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <FluentEmoji emoji="🔥" size={16} />
+                  <h2 className="text-[11px] font-bold text-fg-warm-muted uppercase tracking-[0.12em]">
+                    {t("player.hotTracks", "Hot Tracks")}
+                  </h2>
+                </div>
+                <div className="flex items-start gap-3 overflow-x-auto -mx-4 px-4 pt-1 pb-2 scrollbar-hide">
+                  {hotTracks.map((track: any) => (
+                    <button
+                      key={track.id}
+                      onClick={() => {
+                        haptic.light();
+                        navigate(`/app/player/${track.id}`);
+                      }}
+                      className="shrink-0 w-32 text-left transition-transform active:scale-[0.97]"
+                    >
+                      <div className="h-32 w-32 rounded-2xl overflow-hidden bg-muted shadow-ios mb-1.5">
+                        {track.cover_image_url ? (
+                          <CachedImage
+                            src={track.cover_image_url}
+                            alt={track.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <FluentEmoji emoji="🎧" size={36} />
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-xs font-medium line-clamp-2 leading-tight text-fg-warm">
+                        {track.title}
+                      </p>
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
