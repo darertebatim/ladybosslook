@@ -100,6 +100,7 @@ export const AudioManager = () => {
     title: "",
     description: "",
     playlist_id: "",
+    is_hot: false,
   });
 
   // Fetch playlists
