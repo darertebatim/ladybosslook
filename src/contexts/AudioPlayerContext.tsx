@@ -480,10 +480,13 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     setPlaybackRateState(rate);
   }, []);
 
-  const skipForward = useCallback((seconds = 15) => {
+  const skipForward = useCallback(async (seconds = 15) => {
     if (useNative.current) {
-      const newTime = Math.min((currentTime || 0) + seconds, duration || Infinity);
-      nativeAudioSeek(newTime);
+      // Read native current time (poller is paused while audio is paused, so React state can be stale).
+      const live = await nativeAudioGetCurrentTime();
+      const base = live || currentTime || 0;
+      const newTime = Math.min(base + seconds, duration || Infinity);
+      await nativeAudioSeek(newTime);
       setCurrentTime(newTime);
     } else if (audioRef.current) {
       audioRef.current.currentTime = Math.min(
@@ -493,10 +496,12 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     }
   }, [duration, currentTime]);
 
-  const skipBack = useCallback((seconds = 15) => {
+  const skipBack = useCallback(async (seconds = 15) => {
     if (useNative.current) {
-      const newTime = Math.max((currentTime || 0) - seconds, 0);
-      nativeAudioSeek(newTime);
+      const live = await nativeAudioGetCurrentTime();
+      const base = live || currentTime || 0;
+      const newTime = Math.max(base - seconds, 0);
+      await nativeAudioSeek(newTime);
       setCurrentTime(newTime);
     } else if (audioRef.current) {
       audioRef.current.currentTime = Math.max(
