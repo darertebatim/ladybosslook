@@ -113,7 +113,8 @@ export const ProgressBar = ({
           )}
           style={{ 
             left: `${displayProgress}%`, 
-            transform: `translate(-50%, -50%)${isDragging ? ' scale(1.2)' : ''}` 
+            transform: `translate(-50%, -50%)${isDragging ? ' scale(1.2)' : ''}`,
+            pointerEvents: 'none',
           }}
         />
       </div>
