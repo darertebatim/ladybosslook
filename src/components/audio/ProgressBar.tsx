@@ -19,6 +19,7 @@ export const ProgressBar = ({
   const [isDragging, setIsDragging] = useState(false);
   const [dragProgress, setDragProgress] = useState(0);
   const progressRef = useRef<HTMLDivElement>(null);
+  const activePointerId = useRef<number | null>(null);
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const displayProgress = isDragging ? dragProgress : progress;
@@ -36,69 +37,30 @@ export const ProgressBar = ({
     return (x / rect.width) * 100;
   }, []);
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+  // Pointer events unify mouse + touch + pen and work reliably on iOS WebView.
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    activePointerId.current = e.pointerId;
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* noop */ }
     setIsDragging(true);
+    const newProgress = calculateProgress(e.clientX);
+    setDragProgress(newProgress);
+    // Commit immediately so a simple tap seeks within the gesture.
+    onSeek((newProgress / 100) * duration);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (activePointerId.current !== e.pointerId) return;
     const newProgress = calculateProgress(e.clientX);
     setDragProgress(newProgress);
   };
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging) return;
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (activePointerId.current !== e.pointerId) return;
     const newProgress = calculateProgress(e.clientX);
-    setDragProgress(newProgress);
-  }, [isDragging, calculateProgress]);
-
-  const handleMouseUp = useCallback((e: MouseEvent) => {
-    if (!isDragging) return;
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* noop */ }
+    activePointerId.current = null;
     setIsDragging(false);
-    const newProgress = calculateProgress(e.clientX);
     onSeek((newProgress / 100) * duration);
-  }, [isDragging, calculateProgress, duration, onSeek]);
-
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    setIsDragging(true);
-    const newProgress = calculateProgress(e.touches[0].clientX);
-    setDragProgress(newProgress);
-    // Commit seek synchronously inside the user gesture so iOS native
-    // audio bridge accepts it (gesture chain must not be broken by async).
-    onSeek((newProgress / 100) * duration);
-  };
-
-  const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (!isDragging) return;
-    const newProgress = calculateProgress(e.touches[0].clientX);
-    setDragProgress(newProgress);
-  }, [isDragging, calculateProgress]);
-
-  const handleTouchEnd = useCallback((e: TouchEvent) => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    const touch = e.changedTouches[0];
-    const newProgress = calculateProgress(touch.clientX);
-    onSeek((newProgress / 100) * duration);
-  }, [isDragging, calculateProgress, duration, onSeek]);
-
-  // Add/remove event listeners for dragging
-  React.useEffect(() => {
-    if (isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-      document.addEventListener("touchmove", handleTouchMove);
-      document.addEventListener("touchend", handleTouchEnd);
-    }
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
-
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDragging) {
-      const newProgress = calculateProgress(e.clientX);
-      onSeek((newProgress / 100) * duration);
-    }
   };
 
   const isGlass = variant === "glass";
@@ -109,12 +71,14 @@ export const ProgressBar = ({
         ref={progressRef}
         className={cn(
           "relative cursor-pointer group",
-          "min-h-[44px] flex items-center", // iOS touch target
+          "min-h-[44px] flex items-center touch-none select-none", // iOS touch target — touch-none prevents scroll cancellation
           isGlass ? "px-1" : ""
         )}
-        onClick={handleClick}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
+        style={{ touchAction: "none" }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
       >
         {/* Track background */}
         <div 
@@ -149,7 +113,8 @@ export const ProgressBar = ({
           )}
           style={{ 
             left: `${displayProgress}%`, 
-            transform: `translate(-50%, -50%)${isDragging ? ' scale(1.2)' : ''}` 
+            transform: `translate(-50%, -50%)${isDragging ? ' scale(1.2)' : ''}`,
+            pointerEvents: 'none',
           }}
         />
       </div>
