@@ -51,6 +51,10 @@ interface AudioPlayerContextType {
   isBuffering: boolean;
   nextTrack: TrackInfo | null;
   hasNextTrack: boolean;
+
+  // Sleep timer
+  sleepMode: SleepMode;
+  sleepRemainingSeconds: number | null; // null when not a timed mode
   
   // Actions
   playTrack: (track: TrackInfo, startPosition?: number) => void;
@@ -64,7 +68,13 @@ interface AudioPlayerContextType {
   setPlaylistContext: (context: PlaylistContext) => void;
   setOnTrackComplete: (callback: (() => void) | null) => void;
   playNextTrack: () => void;
+  setSleepMode: (mode: SleepMode) => void;
 }
+
+export type SleepMode =
+  | { kind: 'off' }
+  | { kind: 'end-of-track' }
+  | { kind: 'timer'; minutes: number; endsAt: number /* epoch ms */ };
 
 const AudioPlayerContext = createContext<AudioPlayerContextType | null>(null);
 
