@@ -222,7 +222,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     }
     
     onTrackCompleteRef.current?.();
-  }, [user?.id, duration, queryClient]);
+  }, [user?.id, duration, queryClient, sleepMode]);
 
   // ===== Native audio callbacks =====
   useEffect(() => {
