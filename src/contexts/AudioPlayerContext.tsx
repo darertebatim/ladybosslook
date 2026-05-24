@@ -574,6 +574,53 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     }
   }, [nextTrack, playTrack, playlistContext]);
 
+  // ===== Sleep mode controls =====
+  const clearSleepTimers = useCallback(() => {
+    if (sleepTimeoutRef.current) {
+      clearTimeout(sleepTimeoutRef.current);
+      sleepTimeoutRef.current = null;
+    }
+    if (sleepTickRef.current) {
+      clearInterval(sleepTickRef.current);
+      sleepTickRef.current = null;
+    }
+  }, []);
+
+  const setSleepMode = useCallback((mode: SleepMode) => {
+    clearSleepTimers();
+    setSleepModeState(mode);
+
+    if (mode.kind === 'timer') {
+      const tick = () => {
+        const remaining = Math.max(0, Math.ceil((mode.endsAt - Date.now()) / 1000));
+        setSleepRemainingSeconds(remaining);
+        if (remaining <= 0) {
+          // Pause playback
+          if (useNative.current) {
+            nativeAudioPause();
+          } else {
+            audioRef.current?.pause();
+          }
+          setIsPlaying(false);
+          setSleepModeState({ kind: 'off' });
+          setSleepRemainingSeconds(null);
+          clearSleepTimers();
+        }
+      };
+      tick();
+      sleepTickRef.current = setInterval(tick, 1000);
+    } else if (mode.kind === 'end-of-track') {
+      setSleepRemainingSeconds(null);
+    } else {
+      setSleepRemainingSeconds(null);
+    }
+  }, [clearSleepTimers]);
+
+  // Cleanup sleep timers on unmount
+  useEffect(() => {
+    return () => clearSleepTimers();
+  }, [clearSleepTimers]);
+
   return (
     <AudioPlayerContext.Provider
       value={{
@@ -586,6 +633,8 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         isBuffering,
         nextTrack,
         hasNextTrack,
+        sleepMode,
+        sleepRemainingSeconds,
         playTrack,
         pause,
         resume,
@@ -597,6 +646,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         setPlaylistContext,
         setOnTrackComplete,
         playNextTrack,
+        setSleepMode,
       }}
     >
       {children}
