@@ -100,6 +100,12 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const [isBuffering, setIsBuffering] = useState(false);
   const [playlistContext, setPlaylistContextState] = useState<PlaylistContext | null>(null);
 
+  // ===== Sleep timer state =====
+  const [sleepMode, setSleepModeState] = useState<SleepMode>({ kind: 'off' });
+  const [sleepRemainingSeconds, setSleepRemainingSeconds] = useState<number | null>(null);
+  const sleepTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const sleepTickRef = useRef<NodeJS.Timeout | null>(null);
+
   // Calculate next available track
   const getNextAvailableTrack = useCallback((): TrackInfo | null => {
     if (!playlistContext || playlistContext.currentIndex < 0) return null;
@@ -132,6 +138,13 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   // ===== Track completion handler (shared between web & native) =====
   const handleTrackEnded = useCallback(async () => {
     setIsPlaying(false);
+
+    // End-of-track sleep mode: when track finishes, stay paused & clear mode.
+    if (sleepMode.kind === 'end-of-track') {
+      setSleepModeState({ kind: 'off' });
+      onTrackCompleteRef.current?.();
+      return;
+    }
     
     const track = currentTrackRef.current;
     
