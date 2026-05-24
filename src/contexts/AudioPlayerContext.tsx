@@ -51,6 +51,10 @@ interface AudioPlayerContextType {
   isBuffering: boolean;
   nextTrack: TrackInfo | null;
   hasNextTrack: boolean;
+
+  // Sleep timer
+  sleepMode: SleepMode;
+  sleepRemainingSeconds: number | null; // null when not a timed mode
   
   // Actions
   playTrack: (track: TrackInfo, startPosition?: number) => void;
@@ -64,7 +68,13 @@ interface AudioPlayerContextType {
   setPlaylistContext: (context: PlaylistContext) => void;
   setOnTrackComplete: (callback: (() => void) | null) => void;
   playNextTrack: () => void;
+  setSleepMode: (mode: SleepMode) => void;
 }
+
+export type SleepMode =
+  | { kind: 'off' }
+  | { kind: 'end-of-track' }
+  | { kind: 'timer'; minutes: number; endsAt: number /* epoch ms */ };
 
 const AudioPlayerContext = createContext<AudioPlayerContextType | null>(null);
 
@@ -89,6 +99,12 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const [isLoading, setIsLoading] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
   const [playlistContext, setPlaylistContextState] = useState<PlaylistContext | null>(null);
+
+  // ===== Sleep timer state =====
+  const [sleepMode, setSleepModeState] = useState<SleepMode>({ kind: 'off' });
+  const [sleepRemainingSeconds, setSleepRemainingSeconds] = useState<number | null>(null);
+  const sleepTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const sleepTickRef = useRef<NodeJS.Timeout | null>(null);
 
   // Calculate next available track
   const getNextAvailableTrack = useCallback((): TrackInfo | null => {
@@ -122,6 +138,13 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   // ===== Track completion handler (shared between web & native) =====
   const handleTrackEnded = useCallback(async () => {
     setIsPlaying(false);
+
+    // End-of-track sleep mode: when track finishes, stay paused & clear mode.
+    if (sleepMode.kind === 'end-of-track') {
+      setSleepModeState({ kind: 'off' });
+      onTrackCompleteRef.current?.();
+      return;
+    }
     
     const track = currentTrackRef.current;
     
@@ -199,7 +222,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     }
     
     onTrackCompleteRef.current?.();
-  }, [user?.id, duration, queryClient]);
+  }, [user?.id, duration, queryClient, sleepMode]);
 
   // ===== Native audio callbacks =====
   useEffect(() => {
@@ -551,6 +574,53 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     }
   }, [nextTrack, playTrack, playlistContext]);
 
+  // ===== Sleep mode controls =====
+  const clearSleepTimers = useCallback(() => {
+    if (sleepTimeoutRef.current) {
+      clearTimeout(sleepTimeoutRef.current);
+      sleepTimeoutRef.current = null;
+    }
+    if (sleepTickRef.current) {
+      clearInterval(sleepTickRef.current);
+      sleepTickRef.current = null;
+    }
+  }, []);
+
+  const setSleepMode = useCallback((mode: SleepMode) => {
+    clearSleepTimers();
+    setSleepModeState(mode);
+
+    if (mode.kind === 'timer') {
+      const tick = () => {
+        const remaining = Math.max(0, Math.ceil((mode.endsAt - Date.now()) / 1000));
+        setSleepRemainingSeconds(remaining);
+        if (remaining <= 0) {
+          // Pause playback
+          if (useNative.current) {
+            nativeAudioPause();
+          } else {
+            audioRef.current?.pause();
+          }
+          setIsPlaying(false);
+          setSleepModeState({ kind: 'off' });
+          setSleepRemainingSeconds(null);
+          clearSleepTimers();
+        }
+      };
+      tick();
+      sleepTickRef.current = setInterval(tick, 1000);
+    } else if (mode.kind === 'end-of-track') {
+      setSleepRemainingSeconds(null);
+    } else {
+      setSleepRemainingSeconds(null);
+    }
+  }, [clearSleepTimers]);
+
+  // Cleanup sleep timers on unmount
+  useEffect(() => {
+    return () => clearSleepTimers();
+  }, [clearSleepTimers]);
+
   return (
     <AudioPlayerContext.Provider
       value={{
@@ -563,6 +633,8 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         isBuffering,
         nextTrack,
         hasNextTrack,
+        sleepMode,
+        sleepRemainingSeconds,
         playTrack,
         pause,
         resume,
@@ -574,6 +646,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         setPlaylistContext,
         setOnTrackComplete,
         playNextTrack,
+        setSleepMode,
       }}
     >
       {children}
