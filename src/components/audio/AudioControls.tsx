@@ -265,13 +265,13 @@ interface SleepSheetProps {
 }
 
 function SleepSheet({ open, onOpenChange, sleepMode, onPick }: SleepSheetProps) {
-  const options: { label: string; build: () => SleepMode }[] = [
-    { label: '5 minutes', build: () => ({ kind: 'timer', minutes: 5, endsAt: Date.now() + 5 * 60 * 1000 }) },
-    { label: '10 minutes', build: () => ({ kind: 'timer', minutes: 10, endsAt: Date.now() + 10 * 60 * 1000 }) },
-    { label: '15 minutes', build: () => ({ kind: 'timer', minutes: 15, endsAt: Date.now() + 15 * 60 * 1000 }) },
-    { label: '30 minutes', build: () => ({ kind: 'timer', minutes: 30, endsAt: Date.now() + 30 * 60 * 1000 }) },
-    { label: '45 minutes', build: () => ({ kind: 'timer', minutes: 45, endsAt: Date.now() + 45 * 60 * 1000 }) },
-    { label: '60 minutes', build: () => ({ kind: 'timer', minutes: 60, endsAt: Date.now() + 60 * 60 * 1000 }) },
+  const options: { label: string; minutes: number }[] = [
+    { label: '5 minutes', minutes: 5 },
+    { label: '10 minutes', minutes: 10 },
+    { label: '15 minutes', minutes: 15 },
+    { label: '30 minutes', minutes: 30 },
+    { label: '45 minutes', minutes: 45 },
+    { label: '60 minutes', minutes: 60 },
   ];
 
   return (
@@ -296,11 +296,17 @@ function SleepSheet({ open, onOpenChange, sleepMode, onPick }: SleepSheetProps) 
 
           <div className="grid grid-cols-2 gap-2">
             {options.map((opt) => {
-              const active = sleepMode.kind === 'timer' && sleepMode.minutes === opt.build().minutes;
+              const active = sleepMode.kind === 'timer' && sleepMode.minutes === opt.minutes;
               return (
                 <button
                   key={opt.label}
-                  onClick={() => onPick(opt.build())}
+                  onClick={() =>
+                    onPick({
+                      kind: 'timer',
+                      minutes: opt.minutes,
+                      endsAt: Date.now() + opt.minutes * 60 * 1000,
+                    })
+                  }
                   className={cn(
                     "px-4 py-4 rounded-2xl text-center font-semibold active:scale-[0.99] transition",
                     active
