@@ -164,7 +164,8 @@ export async function nativeAudioStop(): Promise<void> {
 export async function nativeAudioSeek(timeInSeconds: number): Promise<void> {
   if (!plugin) return;
   try {
-    await plugin.seek({ audioId: AUDIO_ID, timeInSeconds });
+    const normalizedTimeInSeconds = Math.max(0, Math.round(timeInSeconds));
+    await plugin.seek({ audioId: AUDIO_ID, timeInSeconds: normalizedTimeInSeconds });
   } catch (e) {
     console.warn('[NativeAudio] Seek failed:', e);
   }

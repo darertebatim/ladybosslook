@@ -463,13 +463,14 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
 
   const seek = useCallback((time: number) => {
     if (useNative.current) {
-      nativeAudioSeek(time);
-      setCurrentTime(time);
+      const normalizedTime = Math.max(0, Math.min(Math.round(time), duration || Infinity));
+      nativeAudioSeek(normalizedTime);
+      setCurrentTime(normalizedTime);
     } else if (audioRef.current) {
       audioRef.current.currentTime = time;
       setCurrentTime(time);
     }
-  }, []);
+  }, [duration]);
 
   const setPlaybackRate = useCallback((rate: number) => {
     if (useNative.current) {
@@ -485,7 +486,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       // Read native current time (poller is paused while audio is paused, so React state can be stale).
       const live = await nativeAudioGetCurrentTime();
       const base = live || currentTime || 0;
-      const newTime = Math.min(base + seconds, duration || Infinity);
+      const newTime = Math.max(0, Math.min(Math.round(base + seconds), duration || Infinity));
       await nativeAudioSeek(newTime);
       setCurrentTime(newTime);
     } else if (audioRef.current) {
@@ -500,7 +501,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     if (useNative.current) {
       const live = await nativeAudioGetCurrentTime();
       const base = live || currentTime || 0;
-      const newTime = Math.max(base - seconds, 0);
+      const newTime = Math.max(Math.round(base - seconds), 0);
       await nativeAudioSeek(newTime);
       setCurrentTime(newTime);
     } else if (audioRef.current) {
