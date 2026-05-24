@@ -82,6 +82,7 @@ export const AudioControls = ({
 
   if (isGlass) {
     return (
+      <>
       <div className="flex items-center justify-center gap-6 py-4">
       {/* Skip Back */}
         <div className="flex flex-col items-center gap-1">
