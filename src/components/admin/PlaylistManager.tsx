@@ -1066,6 +1066,14 @@ export const PlaylistManager = () => {
             )}
             AI: Free Programs
           </Button>
+          <Button
+            onClick={() => setIsTagsBankOpen(true)}
+            size="sm"
+            variant="outline"
+          >
+            <Tag className="mr-2 h-4 w-4" />
+            Manage Tags
+          </Button>
           {(playlists || []).some((p: any) => p.cover_image_url && !p.cover_image_url.endsWith('.webp')) && (
             <Button variant="outline" size="sm" onClick={async () => {
               const items = (playlists || [])
