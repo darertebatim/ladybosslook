@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Play, Flame, Sparkles, Check, ArrowUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import { useTodayPath, useSkipPathStep } from "@/hooks/useTodayPath";
@@ -481,34 +481,7 @@ export default function AppMyRiloPath() {
           {reward && <RewardRow step={reward} />}
         </div>
 
-        {/* Talk to Rilo (visual placeholder for Phase 1) */}
-        <div className="px-4 pb-8 pt-2 relative z-10">
-          <div
-            className="w-full flex items-center gap-2 rounded-full pl-4 pr-1.5 py-1.5"
-            style={{
-              background: "#FFFFFF",
-              border: `1px solid ${O.border}`,
-              boxShadow: "0 6px 18px rgba(60,30,10,0.08)",
-            }}
-          >
-            <span
-              className="text-[13px] flex-1 text-left py-1.5"
-              style={{ color: O.fgMuted }}
-            >
-              Ask Rilo to change your path…
-            </span>
-            <span
-              className="w-9 h-9 rounded-full flex items-center justify-center"
-              style={{
-                background: O.primary,
-                color: "#fff",
-                boxShadow: "0 2px 8px rgba(235,94,51,0.35)",
-              }}
-            >
-              <ArrowUp className="w-[18px] h-[18px]" />
-            </span>
-          </div>
-        </div>
+        <div className="pb-8" />
       </div>
     </>
   );
