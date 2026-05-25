@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Play, Flame, Sparkles, Check, ArrowUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import { useTodayPath, useSkipPathStep } from "@/hooks/useTodayPath";
