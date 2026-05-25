@@ -14,6 +14,7 @@ export type PathStepKind =
   | "routine"
   | "community"
   | "playlist"
+  | "reset"
   | "reward";
 
 export interface PathStep {
@@ -62,6 +63,14 @@ export interface PathInputs {
     coverEmoji?: string | null;
     category?: string | null;
   } | null;
+  /** Today's featured reset (one of: a specific breathing exercise or reflection). */
+  featuredReset?: {
+    kind: "breath" | "reflection";
+    id: string;
+    title: string;
+    emoji: string | null;
+    category?: string | null;
+  } | null;
 }
 
 const TINT_BY_COLOR: Record<string, PathStep["tint"]> = {
@@ -99,20 +108,7 @@ export function buildDayOnePath(inputs: PathInputs): PathStep[] {
     skippable: false,
   });
 
-  steps.push({
-    id: "breath:default",
-    kind: "breath",
-    ref: "default",
-    emoji: "🌬️",
-    kicker: "Breathwork",
-    title: "2-min reset breath",
-    meta: "2 min · Calm pattern",
-    estMinutes: 2,
-    done: false,
-    startHref: "/app/breathe",
-    tint: "mint",
-    skippable: true,
-  });
+  steps.push(buildResetStep(inputs));
 
   steps.push({
     id: "routine:pick_first",
@@ -172,20 +168,7 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
     });
   }
 
-  steps.push({
-    id: "breath:default",
-    kind: "breath",
-    ref: "default",
-    emoji: "🌬️",
-    kicker: "Breathwork",
-    title: "2-min reset breath",
-    meta: "2 min · Calm pattern",
-    estMinutes: 2,
-    done: false,
-    startHref: "/app/breathe",
-    tint: "mint",
-    skippable: true,
-  });
+  steps.push(buildResetStep(inputs));
 
   if (inputs.hasQuizResult && inputs.quizTopCategory) {
     steps.push({
@@ -227,6 +210,47 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
   steps.push(rewardStep());
 
   return filterDismissed(steps, inputs.dismissedIds).slice(0, 8);
+}
+
+/**
+ * Reset step: either a specific breathing exercise OR a specific reflection.
+ * Picked upstream in useTodayPath (deterministic per day). Falls back to the
+ * generic /app/breathe page if nothing pre-picked.
+ */
+function buildResetStep(inputs: PathInputs): PathStep {
+  const r = inputs.featuredReset;
+  if (!r) {
+    return {
+      id: "breath:default",
+      kind: "breath", ref: "default",
+      emoji: "🌬️", kicker: "Breathwork",
+      title: "2-min reset breath", meta: "2 min · Calm pattern",
+      estMinutes: 2, done: false,
+      startHref: "/app/breathe", tint: "mint", skippable: true,
+    };
+  }
+  if (r.kind === "breath") {
+    return {
+      id: `reset:breath:${r.id}`,
+      kind: "reset", ref: r.id,
+      emoji: r.emoji || "🌬️",
+      kicker: r.category ? `Breathwork · ${r.category}` : "Breathwork",
+      title: r.title, meta: "2–3 min · guided breath",
+      estMinutes: 3, done: false,
+      startHref: `/app/breathe?exercise=${r.id}`,
+      tint: "mint", skippable: true,
+    };
+  }
+  return {
+    id: `reset:reflection:${r.id}`,
+    kind: "reset", ref: r.id,
+    emoji: r.emoji || "📓",
+    kicker: r.category ? `Reflection · ${r.category}` : "Reflection",
+    title: r.title, meta: "2 min · journal prompt",
+    estMinutes: 2, done: false,
+    startHref: `/app/reflections/${r.id}`,
+    tint: "lavender", skippable: true,
+  };
 }
 
 function rewardStep(): PathStep {
