@@ -103,6 +103,42 @@ export function useTodayPath() {
           }
         : null;
 
+      // Featured reset: pick ONE of {breathing exercise, reflection} per day.
+      // Deterministic by date so it's stable within the day, rotates tomorrow.
+      const [breathRes, reflectionRes] = await Promise.all([
+        supabase
+          .from("breathing_exercises")
+          .select("id, name, category, emoji")
+          .eq("is_active", true)
+          .eq("is_premium", false)
+          .order("sort_order", { ascending: true })
+          .limit(50),
+        supabase
+          .from("reflections")
+          .select("id, title, category, emoji")
+          .eq("is_active", true)
+          .eq("is_free", true)
+          .order("sort_order", { ascending: true })
+          .limit(50),
+      ]);
+      const breaths = breathRes.data ?? [];
+      const reflections = reflectionRes.data ?? [];
+      // Deterministic day seed (YYYYMMDD as int)
+      const seed = parseInt(today.replace(/-/g, ""), 10) || 0;
+      // Alternate kind by parity of seed so user sees variety
+      const useBreath = seed % 2 === 0 ? breaths.length > 0 : reflections.length === 0;
+      let featuredReset: {
+        kind: "breath" | "reflection"; id: string; title: string;
+        emoji: string | null; category: string | null;
+      } | null = null;
+      if (useBreath && breaths.length > 0) {
+        const b = breaths[seed % breaths.length] as any;
+        featuredReset = { kind: "breath", id: b.id, title: b.name, emoji: b.emoji, category: b.category };
+      } else if (reflections.length > 0) {
+        const r = reflections[seed % reflections.length] as any;
+        featuredReset = { kind: "reflection", id: r.id, title: r.title, emoji: r.emoji, category: r.category };
+      }
+
       const moodLatest = (moodRes.data ?? [])[0] as
         | { id: string; valence: string | null; created_at: string | null }
         | undefined;
@@ -188,6 +224,7 @@ export function useTodayPath() {
         dismissedIds,
         isDayOne,
         featuredPlaylist,
+        featuredReset,
       };
 
       let steps = isDayOne ? buildDayOnePath(inputs) : buildStandardPath(inputs);
