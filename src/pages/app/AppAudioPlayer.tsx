@@ -709,6 +709,19 @@ export default function AppAudioPlayer() {
         </div>
       </div>
 
+      {/* Plus upsell — overlay layer below the header, doesn't shift content */}
+      <div
+        className="fixed left-0 right-0 z-40 px-4 pointer-events-none"
+        style={{ top: 'calc(48px + env(safe-area-inset-top, 0px))' }}
+      >
+        <div className="pointer-events-auto">
+          <PlusUpsellBanner
+            title="Unlock the full audio library"
+            subtitle="Every session, unlocked"
+          />
+        </div>
+      </div>
+
       {/* Header Spacer */}
       <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
 
