@@ -741,7 +741,7 @@ export default function AppAudioPlayer() {
 
           {/* Title & Description - Compact */}
           <div className="text-center shrink-0">
-            <h1 className="text-lg font-bold leading-tight line-clamp-2 text-fg-warm">{audio.title}</h1>
+            <h1 className="text-lg font-bold leading-tight truncate text-fg-warm">{audio.title}</h1>
             {audio.description && (
               <p className="text-fg-warm-muted text-sm line-clamp-1 mt-1">{audio.description}</p>
             )}
