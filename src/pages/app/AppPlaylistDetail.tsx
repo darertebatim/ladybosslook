@@ -46,6 +46,7 @@ import { PersianFlag } from "@/components/ui/PersianFlag";
 import { useSubscription } from "@/hooks/useSubscription";
 import { PaywallSheet } from "@/components/app/PaywallSheet";
 import { PlusUpsellBanner } from "@/components/app/PlusUpsellBanner";
+import { PlaylistTagChips } from "@/components/app/PlaylistTagChips";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
