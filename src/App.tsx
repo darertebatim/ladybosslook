@@ -136,6 +136,7 @@ const ReadingManager = lazy(() => import("@/pages/admin/ReadingManager"));
 const QuizzesAdmin = lazy(() => import("@/pages/admin/Quizzes"));
 const AnalyticsAdmin = lazy(() => import("@/pages/admin/Analytics"));
 const InstructorsAdmin = lazy(() => import("@/pages/admin/Instructors"));
+const MyRiloEngine = lazy(() => import("@/pages/admin/MyRiloEngine"));
 const AppRead = lazy(() => import("@/pages/app/AppRead"));
 const AppReadDetail = lazy(() => import("@/pages/app/AppReadDetail"));
 const AppReadReader = lazy(() => import("@/pages/app/AppReadReader"));
@@ -462,6 +463,7 @@ const App = () => (
                       <Route path="read" element={<ProtectedRoute requiredPage="tools"><ReadingManager /></ProtectedRoute>} />
                       <Route path="quizzes" element={<ProtectedRoute requiredPage="tools"><QuizzesAdmin /></ProtectedRoute>} />
                       <Route path="analytics" element={<ProtectedRoute requiredPage="overview"><AnalyticsAdmin /></ProtectedRoute>} />
+                      <Route path="my-rilo" element={<ProtectedRoute requiredPage="tools"><MyRiloEngine /></ProtectedRoute>} />
                     </Route>
                   )}
                   

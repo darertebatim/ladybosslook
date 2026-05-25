@@ -13,6 +13,7 @@ export type PathStepKind =
   | "quiz_pick"
   | "routine"
   | "community"
+  | "playlist"
   | "reward";
 
 export interface PathStep {
@@ -54,6 +55,13 @@ export interface PathInputs {
   dismissedIds: Set<string>;
   /** True when user has no routines AND no quiz result. */
   isDayOne: boolean;
+  /** Today's featured playlist (picked deterministically by the engine). */
+  featuredPlaylist?: {
+    id: string;
+    name: string;
+    coverEmoji?: string | null;
+    category?: string | null;
+  } | null;
 }
 
 const TINT_BY_COLOR: Record<string, PathStep["tint"]> = {
@@ -144,6 +152,25 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
     tint: "yellow",
     skippable: !inputs.hasMoodTodayLog,
   });
+
+  // After mood: a ready-to-play playlist (priority placement).
+  if (inputs.featuredPlaylist) {
+    const p = inputs.featuredPlaylist;
+    steps.push({
+      id: `playlist:${p.id}`,
+      kind: "playlist",
+      ref: p.id,
+      emoji: p.coverEmoji || "🎧",
+      kicker: p.category ? `Playlist · ${p.category}` : "Today's playlist",
+      title: p.name,
+      meta: "Tap to play",
+      estMinutes: 10,
+      done: false,
+      startHref: `/app/player/playlist/${p.id}`,
+      tint: "sky",
+      skippable: true,
+    });
+  }
 
   steps.push({
     id: "breath:default",
