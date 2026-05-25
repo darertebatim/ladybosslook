@@ -2671,6 +2671,39 @@ export type Database = {
         }
         Relationships: []
       }
+      path_step_actions: {
+        Row: {
+          action: string
+          created_at: string
+          effective_until: string | null
+          id: string
+          step_kind: string
+          step_ref: string
+          swap_target: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          effective_until?: string | null
+          id?: string
+          step_kind: string
+          step_ref: string
+          swap_target?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          effective_until?: string | null
+          id?: string
+          step_kind?: string
+          step_ref?: string
+          swap_target?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       period_logs: {
         Row: {
           created_at: string
