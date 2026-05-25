@@ -204,22 +204,25 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
     });
   }
 
-  inputs.activeRoutines.forEach((r, idx) => {
+  // Show only the first active routine — it points to the Planner where
+  // the user follows their day. Keeps the path short and focused.
+  const firstRoutine = inputs.activeRoutines[0];
+  if (firstRoutine) {
     steps.push({
-      id: `routine:${r.routineId}`,
+      id: `routine:${firstRoutine.routineId}`,
       kind: "routine",
-      ref: r.routineId,
-      emoji: r.emoji || "🔥",
-      kicker: "Your routine",
-      title: r.title,
-      meta: "today's pick",
+      ref: firstRoutine.routineId,
+      emoji: firstRoutine.emoji || "🔥",
+      kicker: "Open your Planner",
+      title: firstRoutine.title,
+      meta: "Follow today's plan",
       estMinutes: 5,
       done: false,
-      startHref: `/app/routines/${r.routineId}`,
-      tint: tintForRoutine(r.color, idx),
+      startHref: "/app/home",
+      tint: tintForRoutine(firstRoutine.color, 0),
       skippable: true,
     });
-  });
+  }
 
   steps.push(rewardStep());
 
