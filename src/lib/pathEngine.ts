@@ -188,7 +188,7 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
       meta: "today's pick",
       estMinutes: 5,
       done: false,
-      startHref: `/app/routine/${r.routineId}`,
+      startHref: `/app/routines/${r.routineId}`,
       tint: tintForRoutine(r.color, idx),
       skippable: true,
     });
