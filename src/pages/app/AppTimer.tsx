@@ -921,7 +921,12 @@ function AppTimerInner() {
               ref={rulerRef}
               className="overflow-x-auto scrollbar-hide"
               onScroll={handleRulerScroll}
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch',
+                touchAction: 'pan-x',
+              }}
             >
               {isPomodoro ? (
                 /* Pomodoro: 5-min steps only */

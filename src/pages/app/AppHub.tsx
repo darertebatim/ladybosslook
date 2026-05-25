@@ -184,7 +184,10 @@ export default function AppHub() {
                 {accepted.length}
               </span>
             </div>
-            <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1">
+            <div
+              className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1"
+              style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}
+            >
               {accepted.slice(9).map((f) => {
                 const initial = (f.full_name || "?").charAt(0).toUpperCase();
                 return (
@@ -278,7 +281,10 @@ export default function AppHub() {
             <div className="text-white/80 text-[11px] uppercase tracking-wider font-semibold mb-2">
               For you {unseenDedication && <span className="ml-1 text-[hsl(var(--brand-primary))]">●</span>}
             </div>
-            <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1">
+            <div
+              className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1"
+              style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}
+            >
               {receivedDedications.slice(0, 6).map((d) => (
                 <button
                   key={d.dedication.id}

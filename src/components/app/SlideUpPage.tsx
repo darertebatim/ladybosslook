@@ -1,5 +1,4 @@
 import { ReactNode, createContext, useCallback, useContext, useState } from 'react';
-import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useGoBack } from '@/hooks/useGoBack';
 import { haptic } from '@/lib/haptics';
@@ -35,6 +34,9 @@ export function SlideUpPage({ children, defaultBack = '/app/home', className }: 
   const goBack = useGoBack(defaultBack);
   const navigate = useNavigate();
   const [isClosing, setIsClosing] = useState(false);
+  const pageClassName = ['slide-up-page', isClosing ? 'slide-up-page--closing' : '', className]
+    .filter(Boolean)
+    .join(' ');
 
   const slideClose = useCallback((to?: string) => {
     if (isClosing) return;
@@ -48,15 +50,9 @@ export function SlideUpPage({ children, defaultBack = '/app/home', className }: 
 
   return (
     <SlideUpContext.Provider value={{ slideClose, isClosing }}>
-      <motion.div
-        initial={{ y: '100%' }}
-        animate={{ y: isClosing ? '100%' : 0 }}
-        transition={{ type: 'spring', stiffness: 320, damping: 32, mass: 0.9 }}
-        className={className}
-        style={{ width: '100%' }}
-      >
+      <div className={pageClassName} style={{ width: '100%', minHeight: '100%' }}>
         {children}
-      </motion.div>
+      </div>
     </SlideUpContext.Provider>
   );
 }

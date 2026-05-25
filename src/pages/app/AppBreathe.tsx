@@ -186,7 +186,10 @@ export default function AppBreathe() {
         <div className="px-4 pt-2 pb-3">
           <div
             className="flex gap-2 overflow-x-auto no-scrollbar"
-            style={{ touchAction: "pan-x pan-y" }}
+            style={{
+              WebkitOverflowScrolling: "touch",
+              touchAction: "pan-x",
+            }}
           >
             {BREATHING_CATEGORIES.map((cat) => (
               <button
