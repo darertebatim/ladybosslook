@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { haptic } from '@/lib/haptics';
-import { Home, MessageCircle, Compass, Music, Users, Flame, CalendarPlus, Play, Sparkles } from 'lucide-react';
+import { Home, MessageCircle, Compass, Music, Users, Flame, CalendarPlus, Play, Sparkles, Route } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, LayoutGroup } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
@@ -192,6 +192,7 @@ const NativeAppLayout = () => {
 
   const navItems = [
     { path: '/app/home', icon: Home, label: t('nav.home'), tourClass: 'tour-nav-home' },
+    { path: '/app/my-rilo', icon: Route, label: t('nav.myRilo'), tourClass: 'tour-nav-my-rilo' },
     { path: '/app/tools', icon: Compass, label: t('nav.tools'), tourClass: 'tour-nav-explore' },
     { path: '/app/player', icon: Music, label: t('nav.listen'), tourClass: 'tour-nav-listen' },
     { path: '/app/channels', icon: Users, label: t('nav.chats'), showBadge: chatsBadgeCount > 0, badgeCount: chatsBadgeCount, tourClass: 'tour-nav-channels' },
@@ -248,7 +249,7 @@ const NativeAppLayout = () => {
                 : 'bg-gradient-to-b from-white/65 to-bg-warm/75 border-white/65 dark:from-[#3C2819]/55 dark:to-[#28190F]/65 dark:border-[hsl(var(--brand-primary)/0.18)]',
             )}
           >
-            <div className="grid grid-cols-4 items-center">
+            <div className="grid grid-cols-5 items-center">
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path ||
                   (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
