@@ -399,7 +399,7 @@ export default function AppMyRiloPath() {
     <>
       <SEOHead title="My Rilo · Path for Today" description="Your dynamic daily path, hand-picked by Rilo." />
       <div
-        className="min-h-[100dvh] relative"
+        className="min-h-[100dvh] relative overflow-x-hidden w-full max-w-full"
         style={{
           background: `linear-gradient(180deg, ${O.bgWarm} 0%, #FFFFFF 50%, ${O.bgWarm} 100%)`,
           color: O.fg,
