@@ -153,6 +153,25 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
     skippable: !inputs.hasMoodTodayLog,
   });
 
+  // After mood: a ready-to-play playlist (priority placement).
+  if (inputs.featuredPlaylist) {
+    const p = inputs.featuredPlaylist;
+    steps.push({
+      id: `playlist:${p.id}`,
+      kind: "playlist",
+      ref: p.id,
+      emoji: p.coverEmoji || "🎧",
+      kicker: p.category ? `Playlist · ${p.category}` : "Today's playlist",
+      title: p.name,
+      meta: "Tap to play",
+      estMinutes: 10,
+      done: false,
+      startHref: `/app/player/playlist/${p.id}`,
+      tint: "sky",
+      skippable: true,
+    });
+  }
+
   steps.push({
     id: "breath:default",
     kind: "breath",
