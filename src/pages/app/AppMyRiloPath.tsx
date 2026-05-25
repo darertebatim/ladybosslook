@@ -322,6 +322,11 @@ export default function AppMyRiloPath() {
   const { user } = useAuth();
   const { data, isLoading } = useTodayPath();
   const skip = useSkipPathStep();
+  const snooze = useSnoozePathStep();
+  const swap = useSwapPathStep();
+  const skipTomorrow = useSkipTomorrowPathStep();
+
+  const [swapTarget, setSwapTarget] = useState<PathStep | null>(null);
 
   if (!user) return null;
 
@@ -348,7 +353,39 @@ export default function AppMyRiloPath() {
   const handleStart = (step: PathStep) => navigate(step.startHref);
   const handleSkip = (step: PathStep) => {
     if (step.kind === "reward") return;
+    haptic.light();
     skip.mutate(step);
+    // Offer skip-tomorrow follow-up
+    toast({
+      title: "Skipped for today",
+      description: "Tap to also skip tomorrow.",
+      action: (
+        <button
+          onClick={() => {
+            haptic.medium();
+            skipTomorrow.mutate(step);
+          }}
+          className="text-[12px] font-bold px-3 py-1.5 rounded-lg"
+          style={{ background: "#EB5E33", color: "#fff" }}
+        >
+          Skip tomorrow too
+        </button>
+      ),
+    });
+  };
+
+  const handleSnooze = (step: PathStep) => {
+    haptic.light();
+    snooze.mutate({ step, minutes: 15 });
+    toast({ title: "Snoozed 15 min", description: "Rilo will bring this back later." });
+  };
+
+  const handlePickSwap = (target: PathStep) => {
+    if (!swapTarget) return;
+    haptic.medium();
+    swap.mutate({ step: swapTarget, target });
+    setSwapTarget(null);
+    toast({ title: "Swapped", description: `Showing "${target.title}" instead.` });
   };
 
   const routinesWoven = nonReward.filter((s) => s.kind === "routine").length;
@@ -475,6 +512,8 @@ export default function AppMyRiloPath() {
                 step={activeStep}
                 onStart={() => handleStart(activeStep)}
                 onSkip={activeStep.skippable ? () => handleSkip(activeStep) : undefined}
+                onSwap={activeStep.skippable ? () => setSwapTarget(activeStep) : undefined}
+                onSnooze={activeStep.skippable ? () => handleSnooze(activeStep) : undefined}
               />
             </>
           )}
@@ -499,6 +538,14 @@ export default function AppMyRiloPath() {
 
         <div className="pb-8" />
       </div>
+
+      <SwapSheet
+        open={!!swapTarget}
+        onOpenChange={(v) => !v && setSwapTarget(null)}
+        current={swapTarget}
+        candidates={swapTarget && data ? data.candidatesFor(swapTarget) : []}
+        onPick={handlePickSwap}
+      />
     </>
   );
 }
