@@ -39,6 +39,7 @@ import { useMediaCategories } from "@/hooks/useMediaCategories";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CachedImage } from "@/components/ui/CachedImage";
+import { usePlaylistTags, usePlaylistTagLinks } from "@/hooks/usePlaylistTags";
 
 const LANGUAGE_OPTIONS = [
   { value: "all", labelKey: "player.languages.all", flag: "🌐" },
@@ -55,6 +56,7 @@ export default function AppPlayer() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
   const [progressFilter, setProgressFilter] = useState<
     "all" | "following" | "in_progress" | "completed"
   >("all");
@@ -63,6 +65,16 @@ export default function AppPlayer() {
   const hasSoundscapeAccess = hasAccessToProgram("simora-plus");
   const [preferredLanguage, setPreferredLanguage] = useState("all");
   const { categories: dbCategories } = useMediaCategories("audio");
+  const { data: playlistTags = [] } = usePlaylistTags();
+  const { data: playlistTagLinks = [] } = usePlaylistTagLinks();
+  const playlistIdsByTag = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const link of playlistTagLinks) {
+      if (!map.has(link.tag_id)) map.set(link.tag_id, new Set());
+      map.get(link.tag_id)!.add(link.playlist_id);
+    }
+    return map;
+  }, [playlistTagLinks]);
   const categoryConfig = useMemo(() => {
     const map: Record<string, { name: string; emoji?: string }> = {
       all: { name: t("player.categories.all"), emoji: "✨" },
@@ -256,6 +268,10 @@ export default function AppPlayer() {
       ?.filter(
         (p) => selectedCategory === "all" || p.category === selectedCategory,
       )
+      ?.filter((p) => {
+        if (!selectedTagId) return true;
+        return playlistIdsByTag.get(selectedTagId)?.has(p.id) ?? false;
+      })
       ?.filter(filterPlaylistBySearch)
       ?.filter(filterPlaylistByProgress)
       ?.sort(preferredLanguageSorter(userLang)) || [];
@@ -459,6 +475,49 @@ export default function AppPlayer() {
                 );
               })}
             </div>
+
+            {playlistTags.length > 0 && (
+              <div
+                className="flex gap-2 overflow-x-auto pb-1 mt-2 scrollbar-hide"
+                style={{ touchAction: "pan-x", WebkitOverflowScrolling: "touch" }}
+              >
+                <button
+                  onClick={() => {
+                    haptic.selection();
+                    setSelectedTagId(null);
+                  }}
+                  className={cn(
+                    "shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95",
+                    selectedTagId === null
+                      ? "bg-card text-fg-warm shadow-ios"
+                      : "text-fg-warm-muted",
+                  )}
+                >
+                  All Topics
+                </button>
+                {playlistTags.map((tag) => {
+                  const active = selectedTagId === tag.id;
+                  return (
+                    <button
+                      key={tag.id}
+                      onClick={() => {
+                        haptic.selection();
+                        setSelectedTagId(active ? null : tag.id);
+                      }}
+                      className={cn(
+                        "shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95",
+                        active
+                          ? "bg-card text-fg-warm shadow-ios"
+                          : "text-fg-warm-muted",
+                      )}
+                    >
+                      {tag.emoji && <span>{tag.emoji}</span>}
+                      <span>{tag.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Status filters + Language globe */}
             <div className="tour-player-progress-filter flex items-center justify-between mt-2 gap-2">

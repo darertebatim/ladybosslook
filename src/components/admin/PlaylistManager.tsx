@@ -37,6 +37,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { HostPicker, HostAssignment, saveContentHosts, loadContentHosts } from "@/components/admin/HostPicker";
+import { PlaylistTagsBankDialog } from "@/components/admin/PlaylistTagsBankDialog";
+import { PlaylistTagPicker } from "@/components/admin/PlaylistTagPicker";
+import { useSavePlaylistTagLinks } from "@/hooks/usePlaylistTags";
+import { Tag } from "lucide-react";
 
 type DisplayMode = 'tracks' | 'modules' | 'both';
 
@@ -74,6 +78,8 @@ interface PlaylistFormProps {
   fileInputRef: React.RefObject<HTMLInputElement>;
   hosts: HostAssignment[];
   setHosts: (hosts: HostAssignment[]) => void;
+  tagIds: string[];
+  setTagIds: (ids: string[]) => void;
 }
 
 const PlaylistForm = ({ 
@@ -94,6 +100,8 @@ const PlaylistForm = ({
   fileInputRef,
   hosts,
   setHosts,
+  tagIds,
+  setTagIds,
 }: PlaylistFormProps) => (
   <form onSubmit={onSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
     <div>
@@ -307,6 +315,12 @@ const PlaylistForm = ({
       hint="Who presents this playlist? Shown to users on the playlist page."
     />
 
+    <PlaylistTagPicker
+      value={tagIds}
+      onChange={setTagIds}
+      hint="Group playlists by subject (e.g. For Immigrants, Self-Care)."
+    />
+
     <div className="flex justify-end gap-2 pt-2 sticky bottom-0 bg-background">
       <Button type="button" variant="outline" onClick={onCancel}>
         Cancel
@@ -378,6 +392,11 @@ export const PlaylistManager = () => {
 
   const [createHosts, setCreateHosts] = useState<HostAssignment[]>([]);
   const [editHosts, setEditHosts] = useState<HostAssignment[]>([]);
+
+  const [createTagIds, setCreateTagIds] = useState<string[]>([]);
+  const [editTagIds, setEditTagIds] = useState<string[]>([]);
+  const [isTagsBankOpen, setIsTagsBankOpen] = useState(false);
+  const saveTagLinks = useSavePlaylistTagLinks();
 
   // Fetch playlists with item count
   const { data: playlists } = useQuery({
@@ -646,6 +665,7 @@ export const PlaylistManager = () => {
 
       if (error) throw error;
       if (created?.id) await saveContentHosts('playlist', created.id, createHosts);
+      if (created?.id) await saveTagLinks.mutateAsync({ playlistId: created.id, tagIds: createTagIds });
     },
     onSuccess: () => {
       toast.success('Playlist created successfully');
@@ -668,6 +688,7 @@ export const PlaylistManager = () => {
 
       if (error) throw error;
       await saveContentHosts('playlist', id, editHosts);
+      await saveTagLinks.mutateAsync({ playlistId: id, tagIds: editTagIds });
     },
     onSuccess: () => {
       toast.success('Playlist updated successfully');
@@ -927,6 +948,15 @@ export const PlaylistManager = () => {
     } catch {
       setEditHosts([]);
     }
+    try {
+      const { data: links } = await supabase
+        .from('audio_playlist_tag_links')
+        .select('tag_id')
+        .eq('playlist_id', playlist.id);
+      setEditTagIds((links || []).map((l: any) => l.tag_id));
+    } catch {
+      setEditTagIds([]);
+    }
     setIsEditDialogOpen(true);
   };
 
@@ -934,6 +964,7 @@ export const PlaylistManager = () => {
     setIsCreateDialogOpen(false);
     resetCreateForm();
     setCreateHosts([]);
+    setCreateTagIds([]);
   };
 
   const handleCloseEdit = () => {
@@ -941,6 +972,7 @@ export const PlaylistManager = () => {
     resetEditForm();
     setEditingPlaylist(null);
     setEditHosts([]);
+    setEditTagIds([]);
   };
 
   const handleUpdate = (e: React.FormEvent) => {
@@ -1033,6 +1065,14 @@ export const PlaylistManager = () => {
               <Wand2 className="mr-2 h-4 w-4" />
             )}
             AI: Free Programs
+          </Button>
+          <Button
+            onClick={() => setIsTagsBankOpen(true)}
+            size="sm"
+            variant="outline"
+          >
+            <Tag className="mr-2 h-4 w-4" />
+            Manage Tags
           </Button>
           {(playlists || []).some((p: any) => p.cover_image_url && !p.cover_image_url.endsWith('.webp')) && (
             <Button variant="outline" size="sm" onClick={async () => {
@@ -1216,6 +1256,8 @@ export const PlaylistManager = () => {
             fileInputRef={createFileInputRef}
             hosts={createHosts}
             setHosts={setCreateHosts}
+            tagIds={createTagIds}
+            setTagIds={setCreateTagIds}
           />
         </DialogContent>
       </Dialog>
@@ -1243,6 +1285,8 @@ export const PlaylistManager = () => {
             fileInputRef={editFileInputRef}
             hosts={editHosts}
             setHosts={setEditHosts}
+            tagIds={editTagIds}
+            setTagIds={setEditTagIds}
           />
         </DialogContent>
       </Dialog>
@@ -1263,6 +1307,8 @@ export const PlaylistManager = () => {
           />
         </>
       )}
+
+      <PlaylistTagsBankDialog open={isTagsBankOpen} onOpenChange={setIsTagsBankOpen} />
     </Card>
   );
 };
