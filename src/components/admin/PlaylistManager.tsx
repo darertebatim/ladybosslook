@@ -393,6 +393,11 @@ export const PlaylistManager = () => {
   const [createHosts, setCreateHosts] = useState<HostAssignment[]>([]);
   const [editHosts, setEditHosts] = useState<HostAssignment[]>([]);
 
+  const [createTagIds, setCreateTagIds] = useState<string[]>([]);
+  const [editTagIds, setEditTagIds] = useState<string[]>([]);
+  const [isTagsBankOpen, setIsTagsBankOpen] = useState(false);
+  const saveTagLinks = useSavePlaylistTagLinks();
+
   // Fetch playlists with item count
   const { data: playlists } = useQuery({
     queryKey: ['audio-playlists-with-count'],
@@ -1230,6 +1235,8 @@ export const PlaylistManager = () => {
             fileInputRef={createFileInputRef}
             hosts={createHosts}
             setHosts={setCreateHosts}
+            tagIds={createTagIds}
+            setTagIds={setCreateTagIds}
           />
         </DialogContent>
       </Dialog>
