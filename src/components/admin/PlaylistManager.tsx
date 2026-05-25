@@ -37,6 +37,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { HostPicker, HostAssignment, saveContentHosts, loadContentHosts } from "@/components/admin/HostPicker";
+import { PlaylistTagsBankDialog } from "@/components/admin/PlaylistTagsBankDialog";
+import { PlaylistTagPicker } from "@/components/admin/PlaylistTagPicker";
+import { useSavePlaylistTagLinks } from "@/hooks/usePlaylistTags";
+import { Tag } from "lucide-react";
 
 type DisplayMode = 'tracks' | 'modules' | 'both';
 
@@ -74,6 +78,8 @@ interface PlaylistFormProps {
   fileInputRef: React.RefObject<HTMLInputElement>;
   hosts: HostAssignment[];
   setHosts: (hosts: HostAssignment[]) => void;
+  tagIds: string[];
+  setTagIds: (ids: string[]) => void;
 }
 
 const PlaylistForm = ({ 
@@ -94,6 +100,8 @@ const PlaylistForm = ({
   fileInputRef,
   hosts,
   setHosts,
+  tagIds,
+  setTagIds,
 }: PlaylistFormProps) => (
   <form onSubmit={onSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
     <div>
@@ -305,6 +313,12 @@ const PlaylistForm = ({
       value={hosts}
       onChange={setHosts}
       hint="Who presents this playlist? Shown to users on the playlist page."
+    />
+
+    <PlaylistTagPicker
+      value={tagIds}
+      onChange={setTagIds}
+      hint="Group playlists by subject (e.g. For Immigrants, Self-Care)."
     />
 
     <div className="flex justify-end gap-2 pt-2 sticky bottom-0 bg-background">
