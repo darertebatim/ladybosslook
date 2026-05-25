@@ -41,7 +41,7 @@ export function useTodayPath() {
       const [moodRes, quizRes, routinesRes, dismissalsRes, streakRes, actionsRes] = await Promise.all([
         supabase
           .from("emotion_logs")
-          .select("id, mood")
+          .select("id, valence, created_at")
           .eq("user_id", userId)
           .eq("category", "mood_checkin")
           .order("created_at", { ascending: false })
@@ -76,20 +76,28 @@ export function useTodayPath() {
           .eq("user_id", userId),
       ]);
 
-      const todayMoodLog = (moodRes.data ?? []).find((r: any) =>
-        typeof r === "object" && r && (r as any).id &&
-        // mood was logged today (created_at filter rebuilt client-side from ISO)
-        true,
-      );
-      // We re-filter today-only client-side using the row we fetched.
-      const moodToday = (moodRes.data ?? [])[0] as any | undefined;
-      const moodTodayCreated = moodToday?.id ? true : false;
-      // For "is mood logged today", trust the original day filter again:
-      const hasMoodTodayLog = !!moodToday && new Date(moodToday.created_at ?? Date.now())
-        .toISOString()
-        .slice(0, 10) === today;
+      const moodLatest = (moodRes.data ?? [])[0] as
+        | { id: string; valence: string | null; created_at: string | null }
+        | undefined;
+      const hasMoodTodayLog =
+        !!moodLatest?.created_at &&
+        new Date(moodLatest.created_at).toISOString().slice(0, 10) === today;
 
-      const recentMoodLabel = (moodToday?.mood as ScoringContext["todayMood"]) ?? null;
+      // Map valence → coarse mood label used by the scorer.
+      const valenceToMood: Record<string, ScoringContext["todayMood"]> = {
+        positive: "happy",
+        very_positive: "happy",
+        calm: "calm",
+        neutral: "calm",
+        low: "sad",
+        very_low: "sad",
+        negative: "stressed",
+        anxious: "anxious",
+        tired: "tired",
+      };
+      const recentMoodLabel = hasMoodTodayLog && moodLatest?.valence
+        ? (valenceToMood[moodLatest.valence] ?? null)
+        : null;
 
       const quizGaps = (quizRes.data?.gap_categories as string[] | null) ?? null;
       const hasQuizResult = !!quizGaps && quizGaps.length > 0;
