@@ -964,6 +964,7 @@ export const PlaylistManager = () => {
     setIsCreateDialogOpen(false);
     resetCreateForm();
     setCreateHosts([]);
+    setCreateTagIds([]);
   };
 
   const handleCloseEdit = () => {
@@ -971,6 +972,7 @@ export const PlaylistManager = () => {
     resetEditForm();
     setEditingPlaylist(null);
     setEditHosts([]);
+    setEditTagIds([]);
   };
 
   const handleUpdate = (e: React.FormEvent) => {
