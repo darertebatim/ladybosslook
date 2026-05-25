@@ -523,6 +523,7 @@ const App = () => (
                     <Route path="/app/settings" element={<ProtectedRoute><AppSettings /></ProtectedRoute>} />
                     <Route path="/app/friends" element={<ProtectedRoute><AppFriends /></ProtectedRoute>} />
                     <Route path="/app/hub" element={<ProtectedRoute><AppHub /></ProtectedRoute>} />
+                    <Route path="/app/my-rilo" element={<ProtectedRoute><AppMyRiloPath /></ProtectedRoute>} />
                     <Route path="/app/onboarding/:flowId" element={<AppOnboarding />} />
                     <Route path="/app/reflections/notes/free/:noteId" element={<ProtectedRoute><AppFreeFormNoteDetail /></ProtectedRoute>} />
                     <Route path="/app/reflections/notes/:reflectionId" element={<ProtectedRoute><AppReflectionNoteDetail /></ProtectedRoute>} />
