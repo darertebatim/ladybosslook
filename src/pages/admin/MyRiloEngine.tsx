@@ -49,7 +49,8 @@ const roadmap = [
   { title: "Routine ordering", desc: "By recency-of-use, user-defined order, or mood fit." },
 ];
 
-const StepRow = ({ s }: { s: typeof dayOneFlow[number] & { isNew?: boolean } }) => (
+type FlowStep = { emoji: string; title: string; meta: string; kind: string; isNew?: boolean };
+const StepRow = ({ s }: { s: FlowStep }) => (
   <div className="flex items-start gap-3 py-2.5">
     <div className="text-2xl leading-none">{s.emoji}</div>
     <div className="flex-1 min-w-0">
