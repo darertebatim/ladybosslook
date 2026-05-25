@@ -1,12 +1,22 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
-import { useTodayPath, useSkipPathStep } from "@/hooks/useTodayPath";
+import {
+  useTodayPath,
+  useSkipPathStep,
+  useSnoozePathStep,
+  useSwapPathStep,
+  useSkipTomorrowPathStep,
+} from "@/hooks/useTodayPath";
 import { useAuth } from "@/hooks/useAuth";
 import { useGoBack } from "@/hooks/useGoBack";
 import type { PathStep } from "@/lib/pathEngine";
+import { SwapSheet } from "@/components/path/SwapSheet";
+import { haptic } from "@/lib/haptics";
+import { toast } from "@/hooks/use-toast";
 
 // ── Orange Palette (mirrors /admin/brand/mock) ──
 const O = {
@@ -140,8 +150,14 @@ function InlinePathRow({
 }
 
 function PathHero({
-  step, onStart, onSkip,
-}: { step: PathStep; onStart: () => void; onSkip?: () => void }) {
+  step, onStart, onSkip, onSwap, onSnooze,
+}: {
+  step: PathStep;
+  onStart: () => void;
+  onSkip?: () => void;
+  onSwap?: () => void;
+  onSnooze?: () => void;
+}) {
   const kickerColor = TINT_KICKER[step.tint];
   return (
     <div className="relative pl-[60px] mb-5">
@@ -225,16 +241,16 @@ function PathHero({
           {step.skippable && onSkip && (
             <div className="flex items-center justify-center gap-4 mt-2.5">
               <button
-                disabled
-                className="text-[11.5px] font-semibold opacity-60 cursor-not-allowed"
+                onClick={onSwap}
+                className="text-[11.5px] font-semibold active:scale-95"
                 style={{ color: "#6B4D33" }}
               >
                 Swap →
               </button>
               <div className="w-px h-3" style={{ background: "rgba(0,0,0,0.10)" }} />
               <button
-                disabled
-                className="text-[11.5px] font-semibold opacity-60 cursor-not-allowed"
+                onClick={onSnooze}
+                className="text-[11.5px] font-semibold active:scale-95"
                 style={{ color: "#6B4D33" }}
               >
                 Snooze 15m
