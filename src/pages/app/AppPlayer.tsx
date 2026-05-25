@@ -476,6 +476,49 @@ export default function AppPlayer() {
               })}
             </div>
 
+            {playlistTags.length > 0 && (
+              <div
+                className="flex gap-2 overflow-x-auto pb-1 mt-2 scrollbar-hide"
+                style={{ touchAction: "pan-x", WebkitOverflowScrolling: "touch" }}
+              >
+                <button
+                  onClick={() => {
+                    haptic.selection();
+                    setSelectedTagId(null);
+                  }}
+                  className={cn(
+                    "shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95",
+                    selectedTagId === null
+                      ? "bg-card text-fg-warm shadow-ios"
+                      : "text-fg-warm-muted",
+                  )}
+                >
+                  All Topics
+                </button>
+                {playlistTags.map((tag) => {
+                  const active = selectedTagId === tag.id;
+                  return (
+                    <button
+                      key={tag.id}
+                      onClick={() => {
+                        haptic.selection();
+                        setSelectedTagId(active ? null : tag.id);
+                      }}
+                      className={cn(
+                        "shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95",
+                        active
+                          ? "bg-card text-fg-warm shadow-ios"
+                          : "text-fg-warm-muted",
+                      )}
+                    >
+                      {tag.emoji && <span>{tag.emoji}</span>}
+                      <span>{tag.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
             {/* Status filters + Language globe */}
             <div className="tour-player-progress-filter flex items-center justify-between mt-2 gap-2">
               <div className="flex gap-1.5">
