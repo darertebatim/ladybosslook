@@ -1079,33 +1079,52 @@ const AppHome = () => {
         {/* Scroll container */}
         <div ref={homeScrollRef} className="flex-1 overflow-y-auto overscroll-contain" data-home-scroll-container="true">
           <div className="px-4 pt-6 pb-4 pb-safe">
-            {/* Notification Banner - prompts users to enable notifications */}
-            <NotificationBanner onEnableClick={() => setShowNotificationFlow(true)} />
-
-            {/* Welcome Spotlight Banner — invites the user to take the 3-step tour */}
-            <WelcomeSpotlightBanner
-              onStart={() => setSpotlightStep('tap')}
-              onVisibilityChange={setHasWelcomeBanner}
+            {/*
+              Unified banner stack — ONLY ONE banner shows at a time.
+              Priority (top → bottom):
+              1. NotificationBanner   (enable push permission)
+              2. WelcomeSpotlight     (new-user tour invite)
+              3. SelfCareQuiz         (60-second self-care assessment)
+              4. PromoBanner          (admin-scheduled promos)
+              5. HomeBanner           (admin-curated content / box banners)
+              6. MoodCheckIn          (daily mood prompt)
+              7. WeeklyReview         (weekend review prompt)
+              Each banner reports its own visibility; lower-priority banners
+              are gated on every higher-priority banner being hidden.
+            */}
+            <NotificationBanner
+              onEnableClick={() => setShowNotificationFlow(true)}
+              onVisibilityChange={setHasNotificationBanner}
             />
 
-            {/* Self-Care Quiz Banner — highest priority, shown before everything */}
-            <SelfCareQuizBanner className="mb-2" onVisibilityChange={setHasSelfCareQuizBanner} />
-
-            {/* Promo & Home Banners — shown after self-care quiz is dismissed/completed */}
-            {!hasSelfCareQuizBanner && (
-              <>
-                <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
-                <div className="tour-banner">
-                  <HomeBanner location="home_top" onVisibilityChange={setHasHomeBanner} className="py-2" />
-                </div>
-              </>
+            {!hasNotificationBanner && (
+              <WelcomeSpotlightBanner
+                onStart={() => setSpotlightStep('tap')}
+                onVisibilityChange={setHasWelcomeBannerVisible}
+              />
             )}
 
-            {/* Mood Check-in Banner — only after all promo/home banners are dismissed */}
-            {!hasSelfCareQuizBanner && !hasPromoBanner && !hasHomeBanner && <MoodCheckInBanner onVisibilityChange={setHasMoodBanner} />}
+            {!hasNotificationBanner && !hasWelcomeBannerVisible && (
+              <SelfCareQuizBanner className="mb-2" onVisibilityChange={setHasSelfCareQuizBanner} />
+            )}
 
-            {/* Weekly Review Banner — shows when mood banner is dismissed, on weekends */}
-            {!hasSelfCareQuizBanner && !hasPromoBanner && !hasHomeBanner && !hasMoodBanner && <WeeklyReviewBanner onVisibilityChange={setHasWeeklyBanner} />}
+            {!hasNotificationBanner && !hasWelcomeBannerVisible && !hasSelfCareQuizBanner && (
+              <PromoBanner location="home_top" className="py-2" onVisibilityChange={setHasPromoBanner} />
+            )}
+
+            {!hasNotificationBanner && !hasWelcomeBannerVisible && !hasSelfCareQuizBanner && !hasPromoBanner && (
+              <div className="tour-banner">
+                <HomeBanner location="home_top" onVisibilityChange={setHasHomeBanner} className="py-2" />
+              </div>
+            )}
+
+            {!hasNotificationBanner && !hasWelcomeBannerVisible && !hasSelfCareQuizBanner && !hasPromoBanner && !hasHomeBanner && (
+              <MoodCheckInBanner onVisibilityChange={setHasMoodBanner} />
+            )}
+
+            {!hasNotificationBanner && !hasWelcomeBannerVisible && !hasSelfCareQuizBanner && !hasPromoBanner && !hasHomeBanner && !hasMoodBanner && (
+              <WeeklyReviewBanner onVisibilityChange={setHasWeeklyBanner} />
+            )}
 
             {/* My Shortcuts — temporarily hidden, will be restored later */}
             {false && !hasSelfCareQuizBanner && !hasPromoBanner && !hasHomeBanner && !hasMoodBanner && !hasWeeklyBanner && (
