@@ -783,6 +783,39 @@ export type Database = {
           },
         ]
       }
+      audio_playlist_tag_links: {
+        Row: {
+          created_at: string
+          playlist_id: string
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string
+          playlist_id: string
+          tag_id: string
+        }
+        Update: {
+          created_at?: string
+          playlist_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audio_playlist_tag_links_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "audio_playlists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audio_playlist_tag_links_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "playlist_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audio_playlists: {
         Row: {
           available_on_mobile: boolean
@@ -2839,6 +2872,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      playlist_tags: {
+        Row: {
+          created_at: string
+          emoji: string | null
+          id: string
+          label: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          label: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          label?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       playlist_update_notification_reads: {
         Row: {
