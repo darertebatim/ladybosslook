@@ -523,7 +523,6 @@ const App = () => (
                     <Route path="/app/settings" element={<ProtectedRoute><AppSettings /></ProtectedRoute>} />
                     <Route path="/app/friends" element={<ProtectedRoute><AppFriends /></ProtectedRoute>} />
                     <Route path="/app/hub" element={<ProtectedRoute><AppHub /></ProtectedRoute>} />
-                    <Route path="/app/my-rilo" element={<ProtectedRoute><AppMyRiloPath /></ProtectedRoute>} />
                     <Route path="/app/onboarding/:flowId" element={<AppOnboarding />} />
                     <Route path="/app/reflections/notes/free/:noteId" element={<ProtectedRoute><AppFreeFormNoteDetail /></ProtectedRoute>} />
                     <Route path="/app/reflections/notes/:reflectionId" element={<ProtectedRoute><AppReflectionNoteDetail /></ProtectedRoute>} />
@@ -542,6 +541,7 @@ const App = () => (
                     <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                       <Route index element={<Navigate to="/app/home" replace />} />
                       <Route path="home" element={<AppHome />} />
+                      <Route path="my-rilo" element={<AppMyRiloPath />} />
                       <Route path="myprograms" element={<AppPrograms />} />
                       <Route path="programs" element={<Navigate to="/app/myprograms" replace />} />
                       <Route path="tools" element={<AppStore />} />
