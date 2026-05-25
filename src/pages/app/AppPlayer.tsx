@@ -673,7 +673,7 @@ export default function AppPlayer() {
             <HomeBanner location="listen" className="mb-2" />
             <PlusUpsellBanner
               title="Unlock the full audio library"
-              subtitle="Hundreds of guided sessions with Plus"
+              subtitle="Every session, unlocked"
               className="mb-2"
             />
 
