@@ -2,6 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { CheckCircle2, Clock, Sparkles } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Admin documentation page for the My Rilo "Path" engine.
@@ -10,17 +12,17 @@ import { CheckCircle2, Clock, Sparkles } from "lucide-react";
 
 const dayOneFlow = [
   { emoji: "🧠", title: "Take the 60-second Self-Care Quiz", meta: "3 min · personalize your path", kind: "quiz_pick" },
-  { emoji: "🌬️", title: "2-min reset breath", meta: "2 min · Calm pattern", kind: "breath" },
+  { emoji: "🌬️", title: "Reset: a breath OR reflection (random daily)", meta: "2–3 min · alternates breath ↔ reflection by date", kind: "reset", isNew: true },
   { emoji: "✨", title: "Browse routines (pick your first)", meta: "1 min", kind: "routine" },
   { emoji: "🏆", title: "+1 day streak & a new affirmation", meta: "Reward", kind: "reward" },
 ];
 
 const standardFlow = [
   { emoji: "💛", title: "Mood check-in", meta: "1 min · pick your mood", kind: "mood" },
-  { emoji: "🎧", title: "Today's playlist (ready to play)", meta: "Auto-picked: top sort_order, available on mobile", kind: "playlist", isNew: true },
-  { emoji: "🌬️", title: "2-min reset breath", meta: "2 min · Calm pattern", kind: "breath" },
+  { emoji: "🎧", title: "Today's playlist (ready to play)", meta: "Language match → sort_order", kind: "playlist" },
+  { emoji: "🌬️", title: "Reset: a breath OR reflection (random daily)", meta: "2–3 min · alternates by date · deep-links to specific item", kind: "reset", isNew: true },
   { emoji: "🧠", title: "Rilo-picked from your quiz (top gap category)", meta: "5 min · Self-care", kind: "quiz_pick" },
-  { emoji: "🔥", title: "Each of your active routines (up to 4)", meta: "today's pick · 5 min each", kind: "routine" },
+  { emoji: "🔥", title: "Open your Planner (first active routine)", meta: "Navigates to /app/home", kind: "routine" },
   { emoji: "🏆", title: "+1 day streak & a new affirmation", meta: "Reward (always last, never skippable)", kind: "reward" },
 ];
 
@@ -29,6 +31,8 @@ const dataSources = [
   { table: "selfcare_quiz_results", purpose: "gap_categories[0] used for quiz_pick step" },
   { table: "user_routines_bank", purpose: "Up to 4 active routines, weaved into path" },
   { table: "audio_playlists", purpose: "Featured playlist (deterministic: lowest sort_order, available + not hidden)" },
+  { table: "breathing_exercises", purpose: "Reset pool — active + not premium; one picked per day by date seed" },
+  { table: "reflections", purpose: "Reset pool — active + is_free; one picked per day by date seed" },
   { table: "path_dismissals", purpose: "Per-day skip list, filtered from steps" },
   { table: "path_step_actions", purpose: "snooze (15m default) · swap · skip_tomorrow" },
   { table: "user_streaks", purpose: "Current streak displayed in header" },
@@ -36,7 +40,7 @@ const dataSources = [
 
 const roadmap = [
   { title: "Time-of-day awareness", desc: "Mood pinned to morning, community in evening, length adapts by clock bucket." },
-  { title: "Mood-driven reorder", desc: "Push breath up when stressed/anxious; drop long routines when tired; surface community when happy." },
+  { title: "Mood-driven reset pick", desc: "After mood log: stressed → calm breath, tired → energize breath, sad → self-compassion reflection, happy → gratitude reflection. Today: random by date." },
   { title: "Novelty / anti-repetition", desc: "7-day completion history demotes yesterday's steps; rotate breath patterns." },
   { title: "Length budgeting", desc: "User picks 'I have 10 min' → engine trims to fit." },
   { title: "Streak / momentum nudges", desc: "Celebration steps on day-7, day-30, recovery shields." },
@@ -58,6 +62,110 @@ const StepRow = ({ s }: { s: typeof dayOneFlow[number] & { isNew?: boolean } }) 
     </div>
   </div>
 );
+
+function useResetInventory() {
+  return useQuery({
+    queryKey: ["myrilo-reset-inventory"],
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const [b, r] = await Promise.all([
+        supabase.from("breathing_exercises")
+          .select("id, name, category, emoji, is_premium, is_active")
+          .order("category").order("sort_order", { ascending: true }),
+        supabase.from("reflections")
+          .select("id, title, category, emoji, is_free, is_active")
+          .order("category").order("sort_order", { ascending: true }),
+      ]);
+      return { breaths: b.data ?? [], reflections: r.data ?? [] };
+    },
+  });
+}
+
+function groupByCategory<T extends { category: string | null }>(rows: T[]) {
+  const out = new Map<string, T[]>();
+  for (const r of rows) {
+    const k = r.category || "uncategorized";
+    if (!out.has(k)) out.set(k, []);
+    out.get(k)!.push(r);
+  }
+  return Array.from(out.entries()).sort(([a], [b]) => a.localeCompare(b));
+}
+
+function ResetInventoryCard() {
+  const { data, isLoading } = useResetInventory();
+  const breaths = data?.breaths ?? [];
+  const reflections = data?.reflections ?? [];
+  const breathsEligible = breaths.filter((b: any) => b.is_active && !b.is_premium);
+  const reflectionsEligible = reflections.filter((r: any) => r.is_active && r.is_free);
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Reset pool — current inventory</CardTitle>
+        <CardDescription>
+          What the engine can pick from for the "Reset" step. Eligibility: breath = <code>is_active &amp;&amp; !is_premium</code>; reflection = <code>is_active &amp;&amp; is_free</code>.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="text-sm space-y-4">
+        {isLoading ? (
+          <div className="text-muted-foreground">Loading…</div>
+        ) : (
+          <>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <div className="rounded-lg border p-3">
+                <div className="font-medium">🌬️ Breathing exercises</div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  {breathsEligible.length} eligible · {breaths.length} total
+                </div>
+              </div>
+              <div className="rounded-lg border p-3">
+                <div className="font-medium">📓 Reflections</div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  {reflectionsEligible.length} eligible · {reflections.length} total
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="font-medium mb-1">Breaths by category</div>
+              <div className="divide-y">
+                {groupByCategory(breathsEligible as any).map(([cat, rows]) => (
+                  <div key={cat} className="py-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge variant="outline" className="text-[10px] font-mono">{cat}</Badge>
+                      <span className="text-xs text-muted-foreground">{rows.length} items</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {rows.slice(0, 6).map((r: any) => `${r.emoji ?? ""} ${r.name}`).join(" · ")}
+                      {rows.length > 6 ? ` · +${rows.length - 6} more` : ""}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="font-medium mb-1">Reflections by category</div>
+              <div className="divide-y">
+                {groupByCategory(reflectionsEligible as any).map(([cat, rows]) => (
+                  <div key={cat} className="py-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge variant="outline" className="text-[10px] font-mono">{cat}</Badge>
+                      <span className="text-xs text-muted-foreground">{rows.length} items</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {rows.slice(0, 6).map((r: any) => `${r.emoji ?? ""} ${r.title}`).join(" · ")}
+                      {rows.length > 6 ? ` · +${rows.length - 6} more` : ""}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function MyRiloEngine() {
   return (
@@ -130,6 +238,8 @@ export default function MyRiloEngine() {
           </div>
         </CardContent>
       </Card>
+
+      <ResetInventoryCard />
 
       <Card>
         <CardHeader>
