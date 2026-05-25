@@ -948,6 +948,15 @@ export const PlaylistManager = () => {
     } catch {
       setEditHosts([]);
     }
+    try {
+      const { data: links } = await supabase
+        .from('audio_playlist_tag_links')
+        .select('tag_id')
+        .eq('playlist_id', playlist.id);
+      setEditTagIds((links || []).map((l: any) => l.tag_id));
+    } catch {
+      setEditTagIds([]);
+    }
     setIsEditDialogOpen(true);
   };
 
