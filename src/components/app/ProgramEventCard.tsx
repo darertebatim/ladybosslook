@@ -169,16 +169,23 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
     }
 
     // Mark playlist_update as read on tap
-    if (isPlaylistUpdate && event.playlistId && event.audioId) {
+    if (isPlaylistUpdate && event.playlistId) {
       try {
         const { supabase } = await import('@/integrations/supabase/client');
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          await supabase.from('playlist_update_notification_reads').insert({
-            user_id: user.id,
-            playlist_id: event.playlistId,
-            audio_id: event.audioId,
-          });
+          const ids = (event.audioIds && event.audioIds.length > 0)
+            ? event.audioIds
+            : (event.audioId ? [event.audioId] : []);
+          if (ids.length > 0) {
+            await supabase.from('playlist_update_notification_reads').insert(
+              ids.map((audio_id) => ({
+                user_id: user.id,
+                playlist_id: event.playlistId!,
+                audio_id,
+              }))
+            );
+          }
         }
       } catch (err) {
         console.error('Failed to mark playlist update as read:', err);

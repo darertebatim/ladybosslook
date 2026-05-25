@@ -23,6 +23,9 @@ export interface ProgramEvent {
   audioId?: string;
   audioTitle?: string;
   coverImageUrl?: string;
+  // Aggregated playlist_update specific
+  audioIds?: string[];
+  audioCount?: number;
 }
 
 interface PlannerProgramCompletion {
@@ -206,14 +209,20 @@ export function useProgramEventsForDate(date: Date) {
 
       // Process playlist update events (new audio added to a playlist user has access to)
       for (const pu of (data.playlist_updates || [])) {
+        const count: number = pu.audioCount ?? 1;
+        const playlistName: string = pu.title || 'Playlist';
+        const displayTitle = count > 1
+          ? `${count} new audios in ${playlistName}`
+          : (pu.firstAudioTitle || playlistName);
         events.push({
           id: pu.id,
           type: 'playlist_update',
-          title: pu.title,
+          title: displayTitle,
           isCompleted: false,
           playlistId: pu.playlistId,
-          audioId: pu.audioId,
-          audioTitle: pu.audioTitle,
+          audioIds: Array.isArray(pu.audioIds) ? pu.audioIds : [],
+          audioCount: count,
+          audioTitle: pu.firstAudioTitle,
           coverImageUrl: pu.coverImageUrl,
         });
       }
