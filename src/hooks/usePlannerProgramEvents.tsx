@@ -23,6 +23,9 @@ export interface ProgramEvent {
   audioId?: string;
   audioTitle?: string;
   coverImageUrl?: string;
+  // Aggregated playlist_update specific
+  audioIds?: string[];
+  audioCount?: number;
 }
 
 interface PlannerProgramCompletion {
