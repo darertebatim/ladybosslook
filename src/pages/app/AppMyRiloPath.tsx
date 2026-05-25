@@ -415,7 +415,13 @@ export default function AppMyRiloPath() {
         />
 
         {/* Header */}
-        <div className="px-5 pt-4 pb-1 grid grid-cols-[auto_1fr_auto] items-center relative z-10">
+        <div
+          className="sticky top-0 z-30 px-5 pt-4 pb-3 grid grid-cols-[auto_1fr_auto] items-center backdrop-blur-xl"
+          style={{
+            background: "rgba(255,248,243,0.78)",
+            boxShadow: "0 1px 0 rgba(245,220,200,0.5)",
+          }}
+        >
           <button
             onClick={goBack}
             className="p-1.5 -ml-1 active:scale-95"
@@ -424,7 +430,7 @@ export default function AppMyRiloPath() {
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <div className="text-center text-[13px] font-bold tracking-tight" style={{ color: O.fg }}>
+          <div className="text-center text-[15px] font-bold tracking-tight" style={{ color: O.fg }}>
             My Rilo
           </div>
           <div
