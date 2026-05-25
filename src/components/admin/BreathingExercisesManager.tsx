@@ -270,6 +270,7 @@ export function BreathingExercisesManager() {
                   <SelectItem value="focus">🎯 Focus</SelectItem>
                   <SelectItem value="calm">🧘 Calm</SelectItem>
                   <SelectItem value="night">🌙 Night</SelectItem>
+                  <SelectItem value="emotion-based">💗 Emotion-Based</SelectItem>
                 </SelectContent>
               </Select>
             </div>
