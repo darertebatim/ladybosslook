@@ -633,7 +633,7 @@ export default function AppPlayer() {
                               )}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="text-lg font-bold text-black leading-tight line-clamp-2">
+                              <p className="text-lg font-bold text-black leading-tight truncate">
                                 {track.title}
                               </p>
                               {playlistName && (
