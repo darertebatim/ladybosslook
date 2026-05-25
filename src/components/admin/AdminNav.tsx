@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, GraduationCap, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft, Sparkles, Palette, FlaskConical, Smartphone, Image, Video, FileText, BookOpen, Brain, BarChart3, UserPlus, Library } from 'lucide-react';
+import { LayoutDashboard, Users, GraduationCap, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft, Sparkles, Palette, FlaskConical, Smartphone, Image, Video, FileText, BookOpen, Brain, BarChart3, UserPlus, Library, Route as RouteIcon } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,6 +30,7 @@ const menuItems = [
   { title: 'Documents', url: '/admin/documents', icon: FileText, pageSlug: 'system' },
   { title: 'Reading', url: '/admin/read', icon: BookOpen, pageSlug: 'tools' },
   { title: 'Quizzes', url: '/admin/quizzes', icon: Brain, pageSlug: 'tools' },
+  { title: 'My Rilo Engine', url: '/admin/my-rilo', icon: RouteIcon, pageSlug: 'tools' },
   
   { title: 'Brand', url: '/admin/brand', icon: Palette, pageSlug: 'system' },
   { title: 'App Test', url: '/admin/app', icon: Smartphone, pageSlug: 'system' },
