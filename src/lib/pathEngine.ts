@@ -240,3 +240,82 @@ export function summarizePath(steps: PathStep[]): {
   const totalMinutes = nonReward.reduce((sum, s) => sum + s.estMinutes, 0);
   return { total, doneCount, activeIndex, totalMinutes };
 }
+
+/**
+ * Build the alternate-candidate pool used by the Swap sheet. These are
+ * extra PathStep options the user can pick in place of a current step.
+ * The pool intentionally over-produces — the scorer (pathScorer.ts) ranks
+ * and trims the list before display.
+ */
+export function buildCandidatePool(inputs: PathInputs): PathStep[] {
+  const pool: PathStep[] = [];
+
+  // Breath alternates
+  pool.push({
+    id: "breath:box4",
+    kind: "breath", ref: "box4", emoji: "🟦",
+    kicker: "Breathwork", title: "Box breathing · 4-4-4-4",
+    meta: "4 min · Focus pattern", estMinutes: 4, done: false,
+    startHref: "/app/breathe", tint: "sky", skippable: true,
+  });
+  pool.push({
+    id: "breath:478",
+    kind: "breath", ref: "478", emoji: "💤",
+    kicker: "Breathwork", title: "4-7-8 · Wind-down breath",
+    meta: "3 min · Calming", estMinutes: 3, done: false,
+    startHref: "/app/breathe", tint: "lavender", skippable: true,
+  });
+
+  // Reflection / journaling
+  pool.push({
+    id: "quiz_pick:reflect",
+    kind: "quiz_pick", ref: "reflect", emoji: "📓",
+    kicker: "Reflection", title: "60-sec journal",
+    meta: "1 min · One sentence is enough", estMinutes: 1, done: false,
+    startHref: "/app/tools/reflections", tint: "peach", skippable: true,
+  });
+
+  // Listen alternates
+  pool.push({
+    id: "quiz_pick:listen",
+    kind: "quiz_pick", ref: "listen", emoji: "🎧",
+    kicker: "Listen", title: "A calm 5-min playlist",
+    meta: "5 min · Reset audio", estMinutes: 5, done: false,
+    startHref: "/app/player", tint: "mint", skippable: true,
+  });
+
+  // Community check-in
+  pool.push({
+    id: "community:peek",
+    kind: "community", ref: "peek", emoji: "💬",
+    kicker: "Community", title: "Peek at today's check-ins",
+    meta: "2 min · You're not alone", estMinutes: 2, done: false,
+    startHref: "/app/channels", tint: "pink", skippable: true,
+  });
+
+  // Mood
+  if (!inputs.hasMoodTodayLog) {
+    pool.push({
+      id: "mood:today",
+      kind: "mood", ref: "today", emoji: "💛",
+      kicker: "Mood check-in", title: "How are you feeling?",
+      meta: "1 min · pick your mood", estMinutes: 1, done: false,
+      startHref: "/app/mood", tint: "yellow", skippable: true,
+    });
+  }
+
+  // Each routine the user owns (in case they want to swap one for another)
+  inputs.activeRoutines.forEach((r, idx) => {
+    pool.push({
+      id: `routine:${r.routineId}`,
+      kind: "routine", ref: r.routineId,
+      emoji: r.emoji || "🔥",
+      kicker: "Your routine", title: r.title,
+      meta: "today's pick", estMinutes: 5, done: false,
+      startHref: `/app/routines/${r.routineId}`,
+      tint: tintForRoutine(r.color, idx), skippable: true,
+    });
+  });
+
+  return pool;
+}
