@@ -665,6 +665,7 @@ export const PlaylistManager = () => {
 
       if (error) throw error;
       if (created?.id) await saveContentHosts('playlist', created.id, createHosts);
+      if (created?.id) await saveTagLinks.mutateAsync({ playlistId: created.id, tagIds: createTagIds });
     },
     onSuccess: () => {
       toast.success('Playlist created successfully');
@@ -687,6 +688,7 @@ export const PlaylistManager = () => {
 
       if (error) throw error;
       await saveContentHosts('playlist', id, editHosts);
+      await saveTagLinks.mutateAsync({ playlistId: id, tagIds: editTagIds });
     },
     onSuccess: () => {
       toast.success('Playlist updated successfully');
