@@ -268,6 +268,10 @@ export default function AppPlayer() {
       ?.filter(
         (p) => selectedCategory === "all" || p.category === selectedCategory,
       )
+      ?.filter((p) => {
+        if (!selectedTagId) return true;
+        return playlistIdsByTag.get(selectedTagId)?.has(p.id) ?? false;
+      })
       ?.filter(filterPlaylistBySearch)
       ?.filter(filterPlaylistByProgress)
       ?.sort(preferredLanguageSorter(userLang)) || [];
