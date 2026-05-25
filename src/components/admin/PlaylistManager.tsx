@@ -1307,6 +1307,8 @@ export const PlaylistManager = () => {
           />
         </>
       )}
+
+      <PlaylistTagsBankDialog open={isTagsBankOpen} onOpenChange={setIsTagsBankOpen} />
     </Card>
   );
 };
