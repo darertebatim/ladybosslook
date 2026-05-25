@@ -1264,6 +1264,8 @@ export const PlaylistManager = () => {
             fileInputRef={editFileInputRef}
             hosts={editHosts}
             setHosts={setEditHosts}
+            tagIds={editTagIds}
+            setTagIds={setEditTagIds}
           />
         </DialogContent>
       </Dialog>
