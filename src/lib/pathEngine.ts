@@ -341,8 +341,8 @@ export function buildCandidatePool(inputs: PathInputs): PathStep[] {
       kind: "routine", ref: r.routineId,
       emoji: r.emoji || "🔥",
       kicker: "Your routine", title: r.title,
-      meta: "today's pick", estMinutes: 5, done: false,
-      startHref: `/app/routines/${r.routineId}`,
+      meta: "Open in Planner", estMinutes: 5, done: false,
+      startHref: "/app/home",
       tint: tintForRoutine(r.color, idx), skippable: true,
     });
   });
