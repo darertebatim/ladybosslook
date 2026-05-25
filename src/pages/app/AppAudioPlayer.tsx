@@ -9,6 +9,7 @@ import { ProgressBar } from "@/components/audio/ProgressBar";
 import { TrackCompletionCelebration } from "@/components/audio/TrackCompletionCelebration";
 import { PromoBanner } from "@/components/app/PromoBanner";
 import { PromoBannerGatedUpNext } from "@/components/app/PromoBannerGatedUpNext";
+import { PlusUpsellBanner } from "@/components/app/PlusUpsellBanner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -705,6 +706,19 @@ export default function AppAudioPlayer() {
               </SheetContent>
             </Sheet>
           )}
+        </div>
+      </div>
+
+      {/* Plus upsell — overlay layer below the header, doesn't shift content */}
+      <div
+        className="fixed left-0 right-0 z-40 px-4 pointer-events-none"
+        style={{ top: 'calc(48px + env(safe-area-inset-top, 0px))' }}
+      >
+        <div className="pointer-events-auto">
+          <PlusUpsellBanner
+            title="Unlock the full audio library"
+            subtitle="Every session, unlocked"
+          />
         </div>
       </div>
 
