@@ -106,6 +106,7 @@ const AppTasksBankCategory = lazy(() => import("@/pages/app/AppTasksBankCategory
 const AppTaskDrafts = lazy(() => import("@/pages/app/AppTaskDrafts"));
 const AppFriends = lazy(() => import("@/pages/app/AppFriends"));
 const AppHub = lazy(() => import("@/pages/app/AppHub"));
+const AppMyRiloPath = lazy(() => import("@/pages/app/AppMyRiloPath"));
 
 const Users = lazy(() => import("@/pages/admin/Users"));
 const Enrollment = lazy(() => import("@/pages/admin/Enrollment"));
