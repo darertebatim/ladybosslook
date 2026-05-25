@@ -41,6 +41,7 @@ export const BREATHING_CATEGORIES = [
   { value: 'focus', label: 'Focus', emoji: '🎯', icon: 'Target', color: 'blue' },
   { value: 'calm', label: 'Calm', emoji: '🧘', icon: 'Leaf', color: 'green' },
   { value: 'night', label: 'Night', emoji: '🌙', icon: 'Moon', color: 'indigo' },
+  { value: 'emotion-based', label: 'Emotion-Based', emoji: '💗', icon: 'Heart', color: 'pink' },
 ] as const;
 
 // Fetch all breathing exercises
