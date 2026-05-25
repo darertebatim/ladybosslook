@@ -76,6 +76,24 @@ export function useTodayPath() {
           .eq("user_id", userId),
       ]);
 
+      // Fetch a featured playlist (deterministic pick: lowest sort_order, available on mobile, not hidden).
+      const playlistRes = await supabase
+        .from("audio_playlists")
+        .select("id, name, category, cover_image_url")
+        .eq("available_on_mobile", true)
+        .eq("is_hidden", false)
+        .order("sort_order", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      const featuredPlaylist = playlistRes.data
+        ? {
+            id: playlistRes.data.id as string,
+            name: (playlistRes.data.name as string) || "Today's playlist",
+            category: (playlistRes.data.category as string | null) ?? null,
+            coverEmoji: null,
+          }
+        : null;
+
       const moodLatest = (moodRes.data ?? [])[0] as
         | { id: string; valence: string | null; created_at: string | null }
         | undefined;
@@ -160,6 +178,7 @@ export function useTodayPath() {
         activeRoutines,
         dismissedIds,
         isDayOne,
+        featuredPlaylist,
       };
 
       let steps = isDayOne ? buildDayOnePath(inputs) : buildStandardPath(inputs);
