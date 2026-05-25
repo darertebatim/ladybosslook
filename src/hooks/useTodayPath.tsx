@@ -10,6 +10,7 @@ import {
   type PathStep,
 } from "@/lib/pathEngine";
 import { rankCandidates, type ScoringContext } from "@/lib/pathScorer";
+import { useUserPreferredLanguage } from "@/hooks/useUserPreferredLanguage";
 
 interface TodayPathResult {
   steps: PathStep[];
@@ -22,6 +23,7 @@ interface TodayPathResult {
 
 export function useTodayPath() {
   const { user } = useAuth();
+  const preferredLanguage = useUserPreferredLanguage();
   const today = getLocalDateStr();
   const nowIso = new Date().toISOString();
   const yesterday = (() => {
@@ -31,7 +33,7 @@ export function useTodayPath() {
   })();
 
   return useQuery<TodayPathResult>({
-    queryKey: ["today-path", user?.id, today],
+    queryKey: ["today-path", user?.id, today, preferredLanguage],
     enabled: !!user?.id,
     staleTime: 30_000,
     queryFn: async () => {
@@ -76,20 +78,27 @@ export function useTodayPath() {
           .eq("user_id", userId),
       ]);
 
-      // Fetch a featured playlist (deterministic pick: lowest sort_order, available on mobile, not hidden).
+      // Fetch featured playlists (mobile + visible). Order: language match first,
+      // then sort_order. Pick the top of the list.
       const playlistRes = await supabase
         .from("audio_playlists")
-        .select("id, name, category, cover_image_url")
+        .select("id, name, category, cover_image_url, language")
         .eq("available_on_mobile", true)
         .eq("is_hidden", false)
         .order("sort_order", { ascending: true })
-        .limit(1)
-        .maybeSingle();
-      const featuredPlaylist = playlistRes.data
+        .limit(12);
+      const playlists = (playlistRes.data ?? []) as Array<{
+        id: string; name: string; category: string | null; language: string | null;
+      }>;
+      const preferred = preferredLanguage
+        ? playlists.find((p) => p.language === preferredLanguage)
+        : null;
+      const picked = preferred ?? playlists[0] ?? null;
+      const featuredPlaylist = picked
         ? {
-            id: playlistRes.data.id as string,
-            name: (playlistRes.data.name as string) || "Today's playlist",
-            category: (playlistRes.data.category as string | null) ?? null,
+            id: picked.id,
+            name: picked.name || "Today's playlist",
+            category: picked.category,
             coverEmoji: null,
           }
         : null;
