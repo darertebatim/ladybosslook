@@ -7,13 +7,14 @@ interface NotificationBannerProps {
   onEnableClick: () => void;
   /** Bypass all gating (debug/native/dismissal/permission) for admin previews */
   forceShow?: boolean;
+  onVisibilityChange?: (visible: boolean) => void;
 }
 
 /**
  * Persistent banner on home page for users who haven't enabled notifications
  * Reappears daily after dismissal
  */
-export function NotificationBanner({ onEnableClick, forceShow }: NotificationBannerProps) {
+export function NotificationBanner({ onEnableClick, forceShow, onVisibilityChange }: NotificationBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isPreEnrolled, setIsPreEnrolled] = useState(false);
 
@@ -63,6 +64,10 @@ export function NotificationBanner({ onEnableClick, forceShow }: NotificationBan
 
     setIsVisible(true);
   }, [forceShow]);
+
+  useEffect(() => {
+    onVisibilityChange?.(isVisible);
+  }, [isVisible, onVisibilityChange]);
 
   // Check on mount
   useEffect(() => {
