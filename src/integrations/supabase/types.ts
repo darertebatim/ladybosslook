@@ -2644,6 +2644,33 @@ export type Database = {
         }
         Relationships: []
       }
+      path_dismissals: {
+        Row: {
+          dismissed_at: string
+          dismissed_date: string
+          id: string
+          step_kind: string
+          step_ref: string
+          user_id: string
+        }
+        Insert: {
+          dismissed_at?: string
+          dismissed_date: string
+          id?: string
+          step_kind: string
+          step_ref: string
+          user_id: string
+        }
+        Update: {
+          dismissed_at?: string
+          dismissed_date?: string
+          id?: string
+          step_kind?: string
+          step_ref?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       period_logs: {
         Row: {
           created_at: string
