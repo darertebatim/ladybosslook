@@ -13,6 +13,7 @@ export type PathStepKind =
   | "quiz_pick"
   | "routine"
   | "community"
+  | "playlist"
   | "reward";
 
 export interface PathStep {
@@ -54,6 +55,13 @@ export interface PathInputs {
   dismissedIds: Set<string>;
   /** True when user has no routines AND no quiz result. */
   isDayOne: boolean;
+  /** Today's featured playlist (picked deterministically by the engine). */
+  featuredPlaylist?: {
+    id: string;
+    name: string;
+    coverEmoji?: string | null;
+    category?: string | null;
+  } | null;
 }
 
 const TINT_BY_COLOR: Record<string, PathStep["tint"]> = {
