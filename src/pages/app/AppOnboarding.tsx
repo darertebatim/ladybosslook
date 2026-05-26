@@ -12,6 +12,7 @@ import { selfcareQuizFlow } from '@/data/onboarding-flows/selfcare-quiz';
 import { selfcareWeeklyReviewFlow } from '@/data/onboarding-flows/selfcare-weekly-review';
 import { whatIsRiloFlow } from '@/data/onboarding-flows/what-is-rilo';
 import { riloDoorsFlow } from '@/data/onboarding-flows/rilo-doors';
+import { LANG_LABEL_TO_ISO } from '@/components/admin/onboarding/RiloDoorsScreens';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
@@ -98,12 +99,13 @@ export default function AppOnboarding() {
     if (rawFlow.id === 'rilo-doors') {
       const lang = answers['rd-language'];
       const langStr = Array.isArray(lang) ? lang[0] : lang;
+      const langIso = langStr ? (LANG_LABEL_TO_ISO[langStr] || String(langStr).toLowerCase()) : '';
       const primary = answers['rd-door-primary'];
       const primaryStr = Array.isArray(primary) ? primary[0] : primary;
       steps = steps.filter(s => {
         // Hide language-switch step if user picked English (or hasn't picked yet)
         if (s.id === 'rd-language-switch') {
-          return !!langStr && langStr !== 'en' && langStr !== 'english';
+          return !!langIso && langIso !== 'en';
         }
         // Hide non-matching sharpener branches
         if (s.doorBranch) return s.doorBranch === primaryStr;
@@ -245,12 +247,13 @@ export default function AppOnboarding() {
         try {
           const lang = answers['rd-language'];
           const langStr = Array.isArray(lang) ? lang[0] : lang;
-          if (langStr) {
-            localStorage.setItem('simora_onboarding_language', String(langStr));
+          const langIso = langStr ? (LANG_LABEL_TO_ISO[String(langStr)] || String(langStr).toLowerCase()) : '';
+          if (langIso) {
+            localStorage.setItem('simora_onboarding_language', langIso);
             const switchChoice = answers['rd-language-switch'];
             const switchStr = Array.isArray(switchChoice) ? switchChoice[0] : switchChoice;
             if (switchStr === 'yes') {
-              localStorage.setItem('i18nextLng', String(langStr));
+              localStorage.setItem('i18nextLng', langIso);
             }
           }
           const nickname = answers['rd-nickname'];
