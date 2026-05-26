@@ -80,41 +80,41 @@ const scenarios = [
   {
     name: "A · Emotion (sad) + Self-Care",
     days: [
-      "Day 1: Playlist tagged 'sadness/depressed' → emotion-tagged breath → Browse routines → Self-Care Quiz teaser",
-      "Day 2: Self-Care Quiz (secondary signature) → second emotion-tagged step → reflection reset → continue routine",
-      "Day 3: Routine first → Self-Care deeper (quiz outcome routine) → bilingual-or-emotion playlist → reset",
+      "Day 1: Playlist tagged 'sadness/depressed' → Reset (sadness-tagged) → Browse routines → Self-Care Quiz teaser",
+      "Day 2: Self-Care Quiz (secondary signature) → second emotion-tagged step → Reset (sadness-tagged) → continue routine",
+      "Day 3: Routine first → Self-Care deeper (quiz outcome routine) → bilingual-or-emotion playlist → Reset (sadness-tagged)",
     ],
   },
   {
     name: "B · Immigrant + Productivity",
     days: [
       "Day 1: Bilingual Strength playlist → bilingual sleep story → Browse routines → Planner Onboarding teaser (productivity is secondary, so it still gets seeded)",
-      "Day 2: Planner Onboarding + pick first routine (secondary signature) → bilingual continue (primary deeper) → reset",
-      "Day 3: Routine first → 'Plan tomorrow' (secondary deeper) → bilingual playlist → reset",
+      "Day 2: Planner Onboarding + pick first routine (secondary signature) → bilingual continue (primary deeper) → Reset (bilingual if available, else generic)",
+      "Day 3: Routine first → 'Plan tomorrow' (secondary deeper) → bilingual playlist → Reset (bilingual if available, else generic)",
     ],
   },
   {
     name: "C · Productivity + Emotion (anxious)",
     days: [
-      "Day 1: Open Planner → Rilo Planner Onboarding → pick first routine → Browse routines → emotion-tagged anxiety breath (because emotion is secondary)",
-      "Day 2: Anxiety-tagged playlist (secondary signature) → 1 quick routine task (primary deeper) → reflection reset",
-      "Day 3: Routine first → anxiety reflection (secondary deeper) → playlist → reset",
+      "Day 1: Open Planner → Rilo Planner Onboarding → pick first routine → Browse routines → Reset (anxiety-tagged, because emotion is secondary)",
+      "Day 2: Anxiety-tagged playlist (secondary signature) → 1 quick routine task (primary deeper) → Reset (anxiety-tagged)",
+      "Day 3: Routine first → anxiety-tagged reflection step (secondary deeper) → playlist → Reset (anxiety-tagged)",
     ],
   },
   {
     name: "D · Self-Care only (no secondary)",
     days: [
-      "Day 1: Self-Care Quiz → quiz-outcome reset → Browse routines → Planner Onboarding teaser (productivity not picked)",
-      "Day 2: Primary deeper (open today's reset) → routine continue → reset → playlist",
-      "Day 3: Routine first → reset → playlist → reward",
+      "Day 1: Self-Care Quiz → Reset (quiz-outcome flavored) → Browse routines → Planner Onboarding teaser (productivity not picked)",
+      "Day 2: Primary deeper (= Reset, quiz-outcome flavored) → routine continue → playlist → reward",
+      "Day 3: Routine first → Reset (quiz-outcome flavored) → playlist → reward",
     ],
   },
   {
     name: "E · Exploring + Emotion (lonely)",
     days: [
-      "Day 1: Curated tour (1 playlist + quiz + planner peek) → lonely/homesick-tagged breath → Browse routines",
-      "Day 2: Lonely playlist (secondary signature) → exploring deeper (1 reset) → routine",
-      "Day 3: Routine first → lonely reflection → playlist → reset",
+      "Day 1: Curated tour (1 playlist + quiz + planner peek) → Reset (lonely-tagged) → Browse routines",
+      "Day 2: Lonely-tagged playlist (secondary signature) → exploring deeper (Browse routines + 1 Reset) → routine",
+      "Day 3: Routine first → Reset (lonely-tagged) → playlist → reward",
     ],
   },
 ];
