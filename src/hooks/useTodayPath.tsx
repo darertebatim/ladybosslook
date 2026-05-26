@@ -87,7 +87,7 @@ export function useTodayPath() {
       const [playlistRes, hotTracksRes] = await Promise.all([
         supabase
           .from("audio_playlists")
-          .select("id, name, category, cover_image_url, language, requires_subscription")
+          .select("id, name, category, cover_image_url, language, requires_subscription, tracks_standalone")
           .eq("available_on_mobile", true)
           .eq("is_hidden", false)
           .order("sort_order", { ascending: true })
@@ -106,6 +106,7 @@ export function useTodayPath() {
       const allPlaylists = (playlistRes.data ?? []) as Array<{
         id: string; name: string; category: string | null;
         language: string | null; requires_subscription: boolean | null;
+        tracks_standalone: boolean | null;
       }>;
       const hotTracks = (hotTracksRes.data ?? []) as Array<{
         id: string; title: string; category: string | null;
@@ -307,6 +308,21 @@ export function useTodayPath() {
         | { kind: "track"; id: string; title: string; category: string | null; coverEmoji: string | null; mode?: "continue" | "smart_next" | "default"; resumeAudioId?: string | null }
         | { kind: "playlist"; id: string; title: string; category: string | null; coverEmoji: string | null; mode?: "continue" | "smart_next" | "default"; resumeAudioId?: string | null };
       let featuredAudio: FeaturedAudio | null = null;
+      type SecondaryAudio =
+        | { kind: "track"; id: string; title: string; category: string | null; coverEmoji: string | null }
+        | { kind: "playlist"; id: string; title: string; category: string | null; coverEmoji: string | null };
+      let secondaryAudio: SecondaryAudio | null = null;
+
+      // Educational categories get the hero slot; everything else is fair game
+      // for the secondary slot (and can be surfaced as a standalone track when
+      // the playlist is flagged tracks_standalone).
+      const EDU_CATEGORIES = new Set(["course", "audiobook", "podcast", "masterclass"]);
+      const eduPlaylists = accessiblePlaylists.filter(
+        (p) => p.category && EDU_CATEGORIES.has(p.category),
+      );
+      const otherPlaylists = accessiblePlaylists.filter(
+        (p) => !p.category || !EDU_CATEGORIES.has(p.category),
+      );
 
       if (continuePick) {
         const pl = accessibleById.get(continuePick.playlistId)!;
@@ -329,20 +345,14 @@ export function useTodayPath() {
           coverEmoji: null,
           mode: "smart_next",
         };
-      } else if (useTrack) {
-        // Hot tracks don't carry the playlist's mood category, so just rotate
-        // deterministically. Admin curates this list.
-        const t = hotTracks[seed % hotTracks.length];
-        featuredAudio = { kind: "track", id: t.id, title: t.title, category: t.category, coverEmoji: null };
       } else {
-        const matched = intentCategory
-          ? accessiblePlaylists.filter((p) => p.category === intentCategory)
-          : [];
-        const pool = matched.length ? matched : accessiblePlaylists;
-        const preferred = preferredLanguage
-          ? pool.find((p) => p.language === preferredLanguage)
+        // Hero: prefer educational playlists. Fall back to any accessible
+        // playlist when no education content is available yet.
+        const eduPool = eduPlaylists.length ? eduPlaylists : accessiblePlaylists;
+        const eduPreferred = preferredLanguage
+          ? eduPool.find((p) => p.language === preferredLanguage)
           : null;
-        const picked = preferred ?? pool[seed % Math.max(pool.length, 1)] ?? pool[0] ?? null;
+        const picked = eduPreferred ?? eduPool[seed % Math.max(eduPool.length, 1)] ?? null;
         if (picked) {
           featuredAudio = {
             kind: "playlist",
@@ -350,6 +360,75 @@ export function useTodayPath() {
             title: picked.name || "Today's playlist",
             category: picked.category,
             coverEmoji: null,
+          };
+        }
+      }
+
+      // Secondary: a non-educational pick. Prefer intent category (mood/time),
+      // and rotate between playlist and standalone-track each day. Standalone
+      // tracks only come from playlists flagged tracks_standalone.
+      const heroId = featuredAudio?.id ?? null;
+      const secPool = (() => {
+        const intentMatch = intentCategory
+          ? otherPlaylists.filter((p) => p.category === intentCategory)
+          : [];
+        const pool = intentMatch.length ? intentMatch : otherPlaylists;
+        return pool.filter((p) => p.id !== heroId);
+      })();
+      if (secPool.length > 0) {
+        const standalonePool = secPool.filter((p) => p.tracks_standalone);
+        const wantTrack = (preferTrack || trackByRotation) && standalonePool.length > 0;
+        if (wantTrack) {
+          const pl = standalonePool[seed % standalonePool.length];
+          // Pick one track from that playlist (free for non-Plus)
+          let tq = supabase
+            .from("audio_playlist_items")
+            .select("audio_content:audio_id (id, title, is_free, cover_image_url)")
+            .eq("playlist_id", pl.id)
+            .order("position", { ascending: true })
+            .limit(20);
+          const tRes = await tq;
+          const tracks = ((tRes.data ?? []) as any[])
+            .map((r) => r.audio_content)
+            .filter((a) => a && (isSubscribed || a.is_free));
+          if (tracks.length > 0) {
+            const t = tracks[seed % tracks.length];
+            secondaryAudio = {
+              kind: "track",
+              id: t.id,
+              title: t.title,
+              category: pl.category,
+              coverEmoji: null,
+            };
+          } else {
+            secondaryAudio = {
+              kind: "playlist",
+              id: pl.id,
+              title: pl.name,
+              category: pl.category,
+              coverEmoji: null,
+            };
+          }
+        } else {
+          const preferred = preferredLanguage
+            ? secPool.find((p) => p.language === preferredLanguage)
+            : null;
+          const pl = preferred ?? secPool[seed % secPool.length];
+          secondaryAudio = {
+            kind: "playlist",
+            id: pl.id,
+            title: pl.name,
+            category: pl.category,
+            coverEmoji: null,
+          };
+        }
+      } else if (useTrack && hotTracks.length > 0) {
+        // Last-resort: surface a hot track if we couldn't build a secondary
+        const t = hotTracks[seed % hotTracks.length];
+        if (t.id !== heroId) {
+          secondaryAudio = {
+            kind: "track", id: t.id, title: t.title,
+            category: t.category, coverEmoji: null,
           };
         }
       }
@@ -428,6 +507,7 @@ export function useTodayPath() {
         dismissedIds,
         isDayOne,
         featuredAudio,
+        secondaryAudio,
         lockedTeaser,
         featuredReset,
       };

@@ -68,6 +68,14 @@ export interface PathInputs {
     /** If set, navigate to this specific track (used for Continue to resume). */
     resumeAudioId?: string | null;
   } | null;
+  /** Secondary audio (non-educational): a playlist or standalone track. */
+  secondaryAudio?: {
+    kind: "track" | "playlist";
+    id: string;
+    title: string;
+    coverEmoji?: string | null;
+    category?: string | null;
+  } | null;
   /** Optional locked Plus playlist teaser for non-Plus users. */
   lockedTeaser?: {
     id: string;
@@ -194,6 +202,30 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
       done: false,
       startHref: href,
       tint: "sky",
+      skippable: true,
+    });
+  }
+
+  // Secondary audio pick: a non-educational playlist OR a standalone track
+  // (sleep stories, meditations, soundscapes). Always offered alongside the
+  // educational hero so users get a quick, low-commitment option too.
+  if (inputs.secondaryAudio) {
+    const s = inputs.secondaryAudio;
+    const isTrack = s.kind === "track";
+    steps.push({
+      id: `${isTrack ? "track" : "playlist"}:${s.id}`,
+      kind: "playlist",
+      ref: s.id,
+      emoji: s.coverEmoji || (isTrack ? "🎵" : "🎧"),
+      kicker: s.category
+        ? `${isTrack ? "Track" : "Playlist"} · ${s.category}`
+        : isTrack ? "Quick listen" : "Also for you",
+      title: s.title,
+      meta: isTrack ? "Tap to play · ~5 min" : "Tap to play",
+      estMinutes: isTrack ? 5 : 10,
+      done: false,
+      startHref: isTrack ? `/app/player/${s.id}` : `/app/player/playlist/${s.id}`,
+      tint: "lavender",
       skippable: true,
     });
   }
