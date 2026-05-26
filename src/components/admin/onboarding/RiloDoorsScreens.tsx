@@ -215,7 +215,7 @@ export function DoorCardsGlassScreen({
       </motion.div>
 
       <div className="flex-1 space-y-3">
-        {doors.map((d, i) => {
+        {DOORS.map((d, i) => {
           const isPicked = picked === d.key;
           return (
             <motion.button

@@ -98,7 +98,7 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
     case 'door-language-switch':
       return <DoorLanguageSwitchScreen step={step} onNext={onNext} onAnswer={onAnswer} answers={answers} />;
     case 'door-cards-glass':
-      return <DoorCardsGlassScreen step={step} onNext={onNext} onAnswer={onAnswer} answers={answers} />;
+      return <DoorCardsGlassScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
     case 'door-emotion-picker':
       return <DoorEmotionPickerScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
     case 'door-selfcare-offers':
