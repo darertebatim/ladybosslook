@@ -21,14 +21,13 @@ const standardFlow = [
   { emoji: "💛", title: "Mood check-in", meta: "1 min · pick your mood", kind: "mood" },
   { emoji: "🎧", title: "Today's playlist (ready to play)", meta: "Language match → sort_order", kind: "playlist" },
   { emoji: "🌬️", title: "Reset: a breath OR reflection (random daily)", meta: "2–3 min · alternates by date · deep-links to specific item", kind: "reset", isNew: true },
-  { emoji: "🧠", title: "Rilo-picked from your quiz (top gap category)", meta: "5 min · Self-care", kind: "quiz_pick" },
-  { emoji: "🔥", title: "Open your Planner (first active routine)", meta: "Navigates to /app/home", kind: "routine" },
+  { emoji: "🔥", title: "Open your Planner (first active routine)", meta: "Quiz outcome already provisioned the routine — navigates to /app/home", kind: "routine" },
   { emoji: "🏆", title: "+1 day streak & a new affirmation", meta: "Reward (always last, never skippable)", kind: "reward" },
 ];
 
 const dataSources = [
   { table: "emotion_logs", purpose: "Today's mood check-in + valence → mood label for scorer" },
-  { table: "selfcare_quiz_results", purpose: "gap_categories[0] used for quiz_pick step" },
+  { table: "selfcare_quiz_results", purpose: "Quiz outcome → routine provisioned via provisionRiloPicks (no separate quiz_pick step)" },
   { table: "user_routines_bank", purpose: "Up to 4 active routines, weaved into path" },
   { table: "audio_playlists", purpose: "Featured playlist (deterministic: lowest sort_order, available + not hidden)" },
   { table: "breathing_exercises", purpose: "Reset pool — active + not premium; one picked per day by date seed" },
