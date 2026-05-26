@@ -29,7 +29,7 @@ const DOORS: {
   {
     key: 'emotion',
     emoji: '💗',
-    label: "I'm feeling something heavy",
+    label: "I'm feeling heavy emotions",
     blurb: 'Anxiety, sadness, anger — let Rilo help you breathe through it.',
     tint: 'rgba(244,114,182,0.55)',
     ring: 'from-pink-300 via-pink-400 to-rose-300',
@@ -47,7 +47,7 @@ const DOORS: {
   {
     key: 'immigrant',
     emoji: '🌍',
-    label: "I'm looking for guidance as an immigrant",
+    label: "Guidance as an immigrant",
     blurb: 'Belong in two languages — for homesickness, identity, starting over.',
     tint: 'rgba(167,139,250,0.55)',
     ring: 'from-violet-300 via-purple-300 to-fuchsia-300',
