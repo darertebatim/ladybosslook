@@ -281,9 +281,6 @@ export function DoorCardsGlassScreen({
                   <p className="text-[17px] font-bold text-[#2A1810] leading-tight">
                     {d.label}
                   </p>
-                  <p className="text-[13px] text-[#6b5a4a] mt-0.5 leading-snug">
-                    {d.blurb}
-                  </p>
                 </div>
               </div>
             </motion.button>
