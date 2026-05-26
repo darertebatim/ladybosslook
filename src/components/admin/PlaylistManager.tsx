@@ -53,6 +53,7 @@ interface PlaylistFormData {
   is_free: boolean;
   requires_subscription: boolean;
   available_on_mobile: boolean;
+  tracks_standalone: boolean;
   category: 'audiobook' | 'course' | 'podcast' | 'meditate' | 'workout' | 'soundscape' | 'affirmations';
   sort_order: number;
   display_mode: DisplayMode;
@@ -278,6 +279,17 @@ const PlaylistForm = ({
       <Label htmlFor="playlist_available_mobile">Show in iOS app (Player tab)</Label>
     </div>
 
+    <div className="flex items-center space-x-2">
+      <Switch
+        id="playlist_tracks_standalone"
+        checked={formData.tracks_standalone}
+        onCheckedChange={(checked) => setFormData({ ...formData, tracks_standalone: checked })}
+      />
+      <Label htmlFor="playlist_tracks_standalone">
+        Tracks work standalone (sleep stories, meditations, soundscapes) — Rilo can suggest individual tracks
+      </Label>
+    </div>
+
     <div>
       <Label htmlFor="playlist_language">Language</Label>
       <Select
@@ -369,6 +381,7 @@ export const PlaylistManager = () => {
     is_free: true,
     requires_subscription: false,
     available_on_mobile: true,
+    tracks_standalone: false,
     category: "audiobook",
     sort_order: 0,
     display_mode: "tracks",
@@ -383,6 +396,7 @@ export const PlaylistManager = () => {
     is_free: true,
     requires_subscription: false,
     available_on_mobile: true,
+    tracks_standalone: false,
     category: "audiobook",
     sort_order: 0,
     display_mode: "tracks",
@@ -655,6 +669,7 @@ export const PlaylistManager = () => {
           is_free: createFormData.is_free,
           requires_subscription: createFormData.requires_subscription,
           available_on_mobile: createFormData.available_on_mobile,
+          tracks_standalone: createFormData.tracks_standalone,
           sort_order: createFormData.sort_order,
           display_mode: createFormData.display_mode,
           cover_image_url: createFormData.cover_image_url || null,
@@ -749,6 +764,7 @@ export const PlaylistManager = () => {
       is_free: true,
       requires_subscription: false,
       available_on_mobile: true,
+      tracks_standalone: false,
       category: "audiobook",
       sort_order: 0,
       display_mode: "tracks",
@@ -765,6 +781,7 @@ export const PlaylistManager = () => {
       is_free: true,
       requires_subscription: false,
       available_on_mobile: true,
+      tracks_standalone: false,
       category: "audiobook",
       sort_order: 0,
       display_mode: "tracks",
@@ -937,6 +954,7 @@ export const PlaylistManager = () => {
       is_free: playlist.is_free,
       requires_subscription: playlist.requires_subscription ?? false,
       available_on_mobile: playlist.available_on_mobile ?? true,
+      tracks_standalone: playlist.tracks_standalone ?? false,
       category: playlist.category || "audiobook",
       sort_order: playlist.sort_order,
       display_mode: playlist.display_mode || "tracks",
@@ -989,6 +1007,7 @@ export const PlaylistManager = () => {
         is_free: editFormData.is_free,
         requires_subscription: editFormData.requires_subscription,
         available_on_mobile: editFormData.available_on_mobile,
+        tracks_standalone: editFormData.tracks_standalone,
         sort_order: editFormData.sort_order,
         display_mode: editFormData.display_mode,
         cover_image_url: editFormData.cover_image_url || null,

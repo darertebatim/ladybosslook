@@ -832,6 +832,7 @@ export type Database = {
           program_slug: string | null
           requires_subscription: boolean
           sort_order: number
+          tracks_standalone: boolean
         }
         Insert: {
           available_on_mobile?: boolean
@@ -848,6 +849,7 @@ export type Database = {
           program_slug?: string | null
           requires_subscription?: boolean
           sort_order?: number
+          tracks_standalone?: boolean
         }
         Update: {
           available_on_mobile?: boolean
@@ -864,6 +866,7 @@ export type Database = {
           program_slug?: string | null
           requires_subscription?: boolean
           sort_order?: number
+          tracks_standalone?: boolean
         }
         Relationships: []
       }

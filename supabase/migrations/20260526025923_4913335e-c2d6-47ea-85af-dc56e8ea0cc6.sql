@@ -1,0 +1,2 @@
+ALTER TABLE public.audio_playlists ADD COLUMN IF NOT EXISTS tracks_standalone boolean NOT NULL DEFAULT false;
+COMMENT ON COLUMN public.audio_playlists.tracks_standalone IS 'When true, tracks in this playlist work as standalone pieces (sleep stories, meditations, soundscapes) and can be surfaced individually by the My Rilo path engine.';
