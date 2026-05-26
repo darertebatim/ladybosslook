@@ -1,133 +1,187 @@
+## Goal
 
-# My Rilo — Path (v3): how it would actually work
+Flexible **multi-dimensional tag system** for audios, playlists, reflections, and breathing exercises. Open-ended so we can add new dimensions anytime without code changes. Plus two admin pages: **Tag Schema** (manage dimensions/tags) and **Content Tagging** (apply tags to content).
 
-The mock at `/admin/brand/mock` is a static picture. To turn it into a real screen, we need three things working together: a **path engine** (the brain that decides today's steps), a **path screen** (renders those steps as a live timeline), and **step actions** (Start / Swap / Snooze / Skip + completion).
-
-I'd ship it in 4 phases so you can use it after Phase 1 instead of waiting for everything.
-
----
-
-## How the Path engine works (the brain)
-
-Every time the user opens the screen, a `useTodayPath()` hook assembles **5–8 steps** for today by pulling from real data, deduping against what's already done, and ordering them by time-of-day buckets (Morning · Right now · Later).
-
-**Source pool** (each source produces zero, one, or more candidates):
-
-| Source | Pulled from | Becomes a step when… |
-|---|---|---|
-| Mood check-in | `mood_logs` for today | No log yet today |
-| Breath | `useBreathingExercises` | Always (1 short pattern) |
-| Rilo's pick | Self-Care Quiz top categories → matched task / playlist / story | Quiz has been taken |
-| User routines | `user_routines_bank` where `is_active` | One step per active routine, with live "X of Y done" |
-| Community | Joined chats with unread posts | At least 1 unread |
-| Playlist | Last-played or recommended track | A track exists & isn't done today |
-| End-of-path reward | streak service | Always (last item) |
-
-**Picker rules:**
-- Time-bucket assignment is implicit: anything completed before now → Morning · done. First non-done → Right now (active hero). Everything after → Later.
-- Dedupe: never include a step whose underlying action is already completed today (mood logged, routine 100% done, etc.).
-- Cap: max 8 steps. If too many candidates, drop community/playlist first.
-- Deterministic per (userId, date) so it doesn't reshuffle on refresh.
-
-**Active card promotion:** the first non-done step gets the big peach hero card with Start / Swap / Snooze / Skip. All others render as the compact `PathStep` row from the mock.
+Multi-door is native — anything can carry tags from multiple dimensions (e.g. "Homesick" breathe = `door:emotion` + `door:immigrant` + `emotion:homesick` + `immigrant:homesickness`).
 
 ---
 
-## How the Path screen works
-
-New route `/app/my-rilo` rendered by a new `AppMyRiloPath.tsx`:
+## 1. Architecture
 
 ```text
-┌─────────────────────────────┐
-│ Header: My Rilo  · streak 🔥│
-│ "Your path for today"       │
-│ 6 steps · ~22 min · 2/6 ▰▰░░│
-├─────────────────────────────┤
-│ ☀️ Morning · done           │
-│  ●─ 💛 Mood: Calm  ✓        │
-│  ●─ 🌬️ 2-min breath ✓       │
-│ ✨ Right now                │
-│  ▶ [HERO ACTIVE CARD]       │
-│      Start · Swap · Snooze  │
-│ 🌙 Later today              │
-│  ○─ 🔥 My Rilo Self Care    │
-│  ○─ 🤱 New Mom routine      │
-│  ○─ 💬 Community check-in   │
-│  ◌─ 🏆 +1 streak reward     │
-├─────────────────────────────┤
-│ [Ask Rilo to change path…]  │
-└─────────────────────────────┘
+tag_dimensions          tags
+─────────────           ────
+id                      id
+slug (unique)           dimension_id  ← FK
+label                   slug          (unique per dimension)
+emoji                   label
+sort_order              emoji
+description             sort_order
+is_multi_select         description
+                        is_active
+
+content_tags
+────────────
+content_type   ('audio'|'playlist'|'reflection'|'breathing')
+content_id     uuid
+tag_id         FK → tags
+PK (content_type, content_id, tag_id)
 ```
 
-Completing a step (via Start → child screen → done) refetches the path; the hero promotes to the next pending step automatically.
+One polymorphic link table — adding a 5th content type later = one enum value, no new table. No hard rule of "one door per content" — it's all just tags across dimensions.
 
 ---
 
-## How step actions work
+## 2. Seed dimensions (v1) — all editable later
 
-- **Start** — navigates into the existing screen for that step (mood check-in, breath player, routine player, playlist track, community chat, quiz pick page). Already built — we just wire links.
-- **Skip** — marks the step `dismissed_today` in a new tiny `path_dismissals` table. Won't show again today.
-- **Snooze 15m** — pushes the step to Later bucket and sets `snoozed_until` timestamp. Hero promotes to the next step in the meantime.
-- **Swap** — opens a sheet with 2–3 alternate candidates from the same source (e.g. swap "Quiet inner critic" for another quiz pick).
+### Door (4)
+`selfcare`, `emotion`, `immigrant`, `productivity`
 
-For Phase 1 we only build **Start + Skip**. Swap/Snooze come in Phase 3.
+### Emotion (13) — from your breathe library
+`anxiety`, `worry`, `fear`, `envy`, `anger`, `sadness`, `irritation`, `overwhelm`, `stressed`, `exhausted`, `lonely`, `missing-someone`, `homesick`
++ optional: `depressed`, `low-energy`
+(Detailed mood-checklist sub-tags can come later as their own dimension.)
+
+### Self-care cluster (4)
+`body`, `mind`, `people`, `environment`
+(Matches Self-Care Quiz `CLUSTER_MAP` in `src/utils/selfcare-scoring.ts`.)
+
+### Self-care category (14) — reuse your existing task categories
+`sleep`, `nutrition`, `movement`, `calm`, `Presence`, `gratitude`, `self-kindness`, `TidyUp`, `productivity`, `hygiene`, `Evening`, `easy-win`, `connection`, `LovedOnes`
+(Pulled straight from `CLUSTER_MAP`. Each one will be linked to its cluster via the same tag system — see §3.)
+
+### Immigrant theme (7)
+`homesickness`, `identity`, `career`, `finance`, `english`, `community`, `healthcare`
+
+### Productivity (seed — adjust freely in admin)
+`focus`, `planning`, `deep-work`, `procrastination`, `motivation`, `morning-routine`, `evening-routine`
+
+### Format (6) — no `reset`
+`meditation`, `sleep-story`, `education`, `podcast`, `breathe`, `reflection`
+
+### Language (optional)
+`en`, `fa`, `tr`, `es`
 
 ---
 
-## Phasing
+## 3. Cross-door & cluster-to-category mapping
 
-**Phase 1 — Build it as a sibling page (ship-able, low blast radius)**
-- New route `/app/my-rilo` (existing Home tab unchanged)
-- `useTodayPath()` engine with: mood, breath, user routines, quiz pick, community, end-of-path reward
-- Time-bucket grouping, active hero, compact rows
-- Start + Skip actions only
-- `path_dismissals` table for Skip
-- Day 1 detection → renders the 3-step starter path (Quiz hero → breath → pick routine)
-- Empty/no-quiz/no-routine fallback path
-- Static "Ask Rilo…" pill (no AI yet, just visual)
-- Add temp entry in the Hub menu so you can open it to test
+Two pieces of "join" logic, both handled by the same `content_tags` table:
 
-**Phase 2 — Navigation swap**
-- Bottom tab: "Home" becomes "My Rilo" pointing to `/app/my-rilo`
-- Existing planner moves to its own "Planner" tab
-- Update deep links, redirects from `/app/home`, and any code that assumes Home === Planner
+**Multi-door content** — a track tagged with both `door:emotion` and `door:immigrant` shows up in both doors' My Rilo queries. Example: "Homesick" breathe →
+`door:emotion`, `door:immigrant`, `emotion:homesick`, `immigrant:homesickness`, `format:breathe`.
 
-**Phase 3 — Full actions**
-- Swap (alternate-candidates sheet)
-- Snooze 15m (snoozed_until logic)
-- "Skip-tomorrow" memory so dismissed picks don't reappear next day
+**Self-care cluster ↔ category** — to avoid duplicating the cluster map, we store the parent cluster on each category tag (a new optional `parent_tag_id` column on `tags`). The admin Tag Schema page lets you set: `sleep → body`, `calm → mind`, etc. Then any content tagged `selfcare-category:sleep` automatically counts toward `selfcare-cluster:body` at query time (resolved in a `useTaggedContent` hook).
 
-**Phase 4 — "Ask Rilo to change your path"**
-- Lovable AI Gateway edge function (Gemini 2.5 Pro) with tools to insert/remove/swap path steps
-- Free-text input mutates today's path live
+---
+
+## 4. Database migration
+
+One migration that:
+
+1. Creates `tag_dimensions` + `tags` + `content_tags` with GRANTs (admin write, authenticated read) and RLS
+2. Seeds the dimensions and tags listed in §2
+3. Sets `parent_tag_id` for the 14 self-care categories → 4 clusters per `CLUSTER_MAP`
+4. Migrates existing `playlist_tags` rows (currently the 3 door-like tags: immigrant/self-care/emotion) into the new `tags` table under the `door` dimension
+5. Migrates `audio_playlist_tag_links` rows → `content_tags` (with `content_type='playlist'`)
+6. Drops `playlist_tags` and `audio_playlist_tag_links` after verification
+
+---
+
+## 5. Auto-tag seed pass (one-time SQL, included in migration)
+
+Best-guess tags from title patterns so you start with ~70% coverage and use the admin page to fix the rest.
+
+| Pattern (ILIKE on title/description) | Tags added |
+|---|---|
+| `%homesick%` | door:emotion, door:immigrant, emotion:homesick, immigrant:homesickness |
+| `%anxiety%`, `%anxious%` | door:emotion, emotion:anxiety |
+| `%worry%`, `%worrying%` | door:emotion, emotion:worry |
+| `%stress%` | door:emotion, emotion:stressed |
+| `%overwhelm%` | door:emotion, emotion:overwhelm |
+| `%exhaust%`, `%tired%` | door:emotion, emotion:exhausted |
+| `%lonely%`, `%loneliness%` | door:emotion, emotion:lonely |
+| `%missing%` | door:emotion, emotion:missing-someone |
+| `%anger%`, `%angry%` | door:emotion, emotion:anger |
+| `%sad%` | door:emotion, emotion:sadness |
+| `%fear%`, `%afraid%` | door:emotion, emotion:fear |
+| `%envy%`, `%jealous%` | door:emotion, emotion:envy |
+| `%irritat%` | door:emotion, emotion:irritation |
+| title contains "sleep story" | format:sleep-story |
+| title contains "meditation" | format:meditation |
+| title contains "(FA)" | language:fa |
+| Immigrant series titles (Homesickness / Identity / Career / Financial / English / Community / Healthcare) | door:immigrant + matching immigrant:* |
+| Self-care reset / 4-cluster series | door:selfcare + matching cluster |
+| All `breathing_exercises.*` | format:breathe (+ emotion guessed from category) |
+| All `reflections.*` | format:reflection |
+
+You'll review/fix in admin afterward.
+
+---
+
+## 6. Admin — two new pages
+
+### A. `/admin/content/tag-schema`
+Two-pane manager.
+
+```text
+┌─ Dimensions ───────────────┐  ┌─ Tags in "Self-care category" ─┐
+│ • Door                     │  │ 💤 sleep         → body         │
+│ • Emotion                  │  │ 🥗 nutrition     → body         │
+│ • Self-care cluster        │  │ 🏃 movement      → body         │
+│ • Self-care category [act.]│  │ 🧘 calm          → mind         │
+│ • Immigrant theme          │  │ 🙏 gratitude     → mind         │
+│ • Productivity             │  │ ... [+ Add tag]                 │
+│ • Format                   │  │                                 │
+│ • Language                 │  │ Edit: parent tag, emoji, label  │
+│ [+ Add dimension]          │  │                                 │
+└────────────────────────────┘  └─────────────────────────────────┘
+```
+
+Inline create/edit/delete/reorder for both. `is_multi_select` controls picker UX. `parent_tag_id` shown when relevant (the cluster→category link).
+
+### B. `/admin/content/tagging`
+Review and edit tags on actual content.
+
+```text
+[Tabs: Audios | Playlists | Reflections | Breathes]
+[Filter: any dimension ▾] [Untagged only ☐] [Search…]
+
+[emoji] Title                  [door chips] [emotion chips] [format]   [Edit]
+[emoji] Title                  …                                       [Edit]
+```
+
+Edit drawer = one chip section per dimension, multi-select where allowed. Same UX as today's `PlaylistTagPicker`, just grouped.
+
+Added under existing "Content" admin nav.
+
+---
+
+## 7. What this does NOT do (next step, not now)
+
+- No onboarding wiring
+- No My Rilo recommendation queries
+- No frontend changes outside admin
+
+Once tags are clean across all ~317 pieces of content (192 audios + 34 playlists + 65 reflections + 26 breathes), the onboarding → My Rilo mapping becomes one `content_tags` query per door.
 
 ---
 
 ## Technical details
 
-**New files (Phase 1):**
-- `src/pages/app/AppMyRiloPath.tsx` — the page (copy structure from the v3 mock)
-- `src/hooks/useTodayPath.tsx` — engine + React Query cache
-- `src/lib/pathEngine.ts` — pure picker (testable, no React)
-- `src/components/path/PathStep.tsx` — extracted from mock
-- `src/components/path/PathActiveHero.tsx` — extracted from mock
-- `src/components/path/PathHeader.tsx` — title + progress dots
-- `src/components/path/PathRewardCard.tsx` — end reward
-- One new migration: `path_dismissals (user_id, date, step_kind, step_ref, dismissed_at)` with RLS
+**New tables:** `tag_dimensions`, `tags` (with `parent_tag_id`), `content_tags` — full GRANTs + RLS (admin write, authenticated read).
+**Dropped after migration:** `playlist_tags`, `audio_playlist_tag_links`.
+**Updated files:**
+- `src/hooks/usePlaylistTags.ts` → replaced by `src/hooks/useTags.ts` (reads dimensions + tags) and `src/hooks/useContentTags.ts` (reads/writes `content_tags`)
+- `src/components/admin/PlaylistTagPicker.tsx` → generic `TagPicker.tsx` grouped by dimension
+- `src/components/admin/PlaylistTagsBankDialog.tsx` → replaced by new Tag Schema page
+- `src/components/app/PlaylistTagChips.tsx` → reads `content_tags` for `content_type='playlist'`
+- Admin nav: add "Tag Schema" + "Content Tagging" under Content section
+**New files:**
+- `src/pages/admin/TagSchema.tsx`
+- `src/pages/admin/ContentTagging.tsx`
+- `src/components/admin/TagPicker.tsx`
+- `src/hooks/useTagDimensions.ts`, `useTags.ts`, `useContentTags.ts`
+- Migration: schema + GRANTs + RLS + seed dimensions/tags + cluster mapping + auto-tag pass + data migration from old playlist_tags
 
-**Reused (no changes):**
-- `useMoodLogs`, `useBreathingExercises`, `useUserChallenges`, `usePrograms`, `useMyRecentMoments`, `usePlaylistRoutine`, `useAudioRoutine`, `useTodayProLinkCompletions`, `getOrCreateMyRilo`, `useSelfCareBalance`
-- `ZStackContext`, `getLocalDateStr()`, `useGoBack()`, `shadow-ios`, orange tokens
-
-**Performance:** all source queries run in parallel via React Query; the picker is sync. Cached per (userId, date). Refetch on completion via query invalidation, not polling.
-
-**What's NOT changing in Phase 1:** Home tab, Planner, routes from any other page. The mock stays at `/admin/brand/mock` for reference.
-
----
-
-## Open decisions before I start
-
-I need 2 answers (I'll ask via choice questions right after you approve this plan):
-
-1. Phasing — Phase 1 only (recommended), Phase 1+2, or all phases in one push?
-2. Fallback path for new users with no routines & no quiz — Day 1 flow, generic 3-step, or hybrid with quiz banner?
+Ready to build on approval. After the migration runs, we'll do a quick audit in the new admin page to fix the auto-tagged content before wiring up onboarding.
