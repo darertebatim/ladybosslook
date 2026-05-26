@@ -18,7 +18,7 @@ const doorSignatures = [
     emoji: "🧠",
     label: "Self-Care",
     signature: "60-sec Self-Care Quiz → personalized reset",
-    deeper: "Open today's reset (breath OR reflection, door-flavored)",
+    deeper: "Open today's Reset (door-flavored)",
   },
   {
     door: "immigrant",
@@ -46,7 +46,7 @@ const doorSignatures = [
     emoji: "✨",
     label: "Exploring",
     signature: "Curated tour: 1 playlist + Self-Care Quiz + Planner peek",
-    deeper: "Browse routines · 1 reset",
+    deeper: "Browse routines · 1 Reset",
   },
 ];
 
