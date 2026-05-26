@@ -114,6 +114,110 @@ export function useTodayPath() {
         ? allPlaylists
         : allPlaylists.filter((p) => !p.requires_subscription);
 
+      // ── Continuity signals from audio_progress ────────────────────────
+      // Pull recent listening so we can: (a) resurface an in-progress playlist
+      // as "Continue", and (b) suggest a follow-up similar to the last
+      // completed playlist when nothing is in-progress.
+      const sinceIso = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const progressRes = await supabase
+        .from("audio_progress")
+        .select("audio_id, completed, current_position_seconds, last_played_at")
+        .eq("user_id", userId)
+        .gte("last_played_at", sinceIso)
+        .order("last_played_at", { ascending: false })
+        .limit(50);
+      const progressRows = (progressRes.data ?? []) as Array<{
+        audio_id: string; completed: boolean | null;
+        current_position_seconds: number | null; last_played_at: string | null;
+      }>;
+
+      // Map audio_id → playlist_id(s)
+      const audioIds = progressRows.map((r) => r.audio_id);
+      const itemsRes = audioIds.length
+        ? await supabase
+            .from("audio_playlist_items")
+            .select("audio_id, playlist_id")
+            .in("audio_id", audioIds)
+        : { data: [] as Array<{ audio_id: string; playlist_id: string }> };
+      const audioToPlaylists = new Map<string, string[]>();
+      for (const it of (itemsRes.data ?? []) as Array<{ audio_id: string; playlist_id: string }>) {
+        const arr = audioToPlaylists.get(it.audio_id) ?? [];
+        arr.push(it.playlist_id);
+        audioToPlaylists.set(it.audio_id, arr);
+      }
+      const accessibleById = new Map(accessiblePlaylists.map((p) => [p.id, p]));
+
+      // (a) In-progress: most recent row that's not completed and has real progress
+      let continuePick: { playlistId: string; audioId: string } | null = null;
+      for (const row of progressRows) {
+        if (row.completed) continue;
+        if ((row.current_position_seconds ?? 0) < 30) continue;
+        const plIds = audioToPlaylists.get(row.audio_id) ?? [];
+        const accessiblePl = plIds.find((id) => accessibleById.has(id));
+        if (accessiblePl) {
+          continuePick = { playlistId: accessiblePl, audioId: row.audio_id };
+          break;
+        }
+      }
+
+      // (b) Smart next: most recent completed row's playlist → find a similar one
+      let smartNextPick: { playlist: typeof accessiblePlaylists[number] } | null = null;
+      if (!continuePick) {
+        const lastCompleted = progressRows.find((r) => r.completed);
+        if (lastCompleted) {
+          const plIds = audioToPlaylists.get(lastCompleted.audio_id) ?? [];
+          const seedPlaylistIds = plIds.filter((id) => accessibleById.has(id));
+          if (seedPlaylistIds.length) {
+            // Fetch tag links for the seed playlist(s)
+            const tagRes = await supabase
+              .from("audio_playlist_tag_links")
+              .select("playlist_id, tag_id")
+              .in("playlist_id", seedPlaylistIds);
+            const seedTagIds = new Set(
+              ((tagRes.data ?? []) as Array<{ tag_id: string }>).map((t) => t.tag_id),
+            );
+            const seedCategories = new Set(
+              seedPlaylistIds
+                .map((id) => accessibleById.get(id)?.category)
+                .filter(Boolean) as string[],
+            );
+            // Candidate pool: accessible, not the seed playlist itself, not
+            // already in user's recent progress (so we suggest something new)
+            const recentPlaylistIds = new Set<string>();
+            for (const r of progressRows) {
+              for (const pid of audioToPlaylists.get(r.audio_id) ?? []) {
+                recentPlaylistIds.add(pid);
+              }
+            }
+            const candidatePool = accessiblePlaylists.filter(
+              (p) => !seedPlaylistIds.includes(p.id) && !recentPlaylistIds.has(p.id),
+            );
+            // Score: +2 shared tag, +1 same category
+            let candidateTagMap = new Map<string, Set<string>>();
+            if (seedTagIds.size > 0 && candidatePool.length > 0) {
+              const candTagRes = await supabase
+                .from("audio_playlist_tag_links")
+                .select("playlist_id, tag_id")
+                .in("playlist_id", candidatePool.map((p) => p.id));
+              for (const t of (candTagRes.data ?? []) as Array<{ playlist_id: string; tag_id: string }>) {
+                const set = candidateTagMap.get(t.playlist_id) ?? new Set<string>();
+                set.add(t.tag_id);
+                candidateTagMap.set(t.playlist_id, set);
+              }
+            }
+            let best: { p: typeof accessiblePlaylists[number]; score: number } | null = null;
+            for (const p of candidatePool) {
+              let score = 0;
+              if (p.category && seedCategories.has(p.category)) score += 1;
+              const tags = candidateTagMap.get(p.id);
+              if (tags) for (const t of tags) if (seedTagIds.has(t)) score += 2;
+              if (score > 0 && (!best || score > best.score)) best = { p, score };
+            }
+            if (best) smartNextPick = { playlist: best.p };
+          }
+        }
+      }
+
       // Featured reset: pick ONE of {breathing exercise, reflection} per day.
       // Deterministic by date so it's stable within the day, rotates tomorrow.
       const [breathRes, reflectionRes] = await Promise.all([
@@ -200,11 +304,32 @@ export function useTodayPath() {
       const useTrack = (preferTrack || trackByRotation) && hotTracks.length > 0;
 
       type FeaturedAudio =
-        | { kind: "track"; id: string; title: string; category: string | null; coverEmoji: string | null }
-        | { kind: "playlist"; id: string; title: string; category: string | null; coverEmoji: string | null };
+        | { kind: "track"; id: string; title: string; category: string | null; coverEmoji: string | null; mode?: "continue" | "smart_next" | "default"; resumeAudioId?: string | null }
+        | { kind: "playlist"; id: string; title: string; category: string | null; coverEmoji: string | null; mode?: "continue" | "smart_next" | "default"; resumeAudioId?: string | null };
       let featuredAudio: FeaturedAudio | null = null;
 
-      if (useTrack) {
+      if (continuePick) {
+        const pl = accessibleById.get(continuePick.playlistId)!;
+        featuredAudio = {
+          kind: "playlist",
+          id: pl.id,
+          title: pl.name || "Continue listening",
+          category: pl.category,
+          coverEmoji: null,
+          mode: "continue",
+          resumeAudioId: continuePick.audioId,
+        };
+      } else if (smartNextPick) {
+        const pl = smartNextPick.playlist;
+        featuredAudio = {
+          kind: "playlist",
+          id: pl.id,
+          title: pl.name || "Picked for you",
+          category: pl.category,
+          coverEmoji: null,
+          mode: "smart_next",
+        };
+      } else if (useTrack) {
         // Hot tracks don't carry the playlist's mood category, so just rotate
         // deterministically. Admin curates this list.
         const t = hotTracks[seed % hotTracks.length];

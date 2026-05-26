@@ -63,6 +63,10 @@ export interface PathInputs {
     title: string;
     coverEmoji?: string | null;
     category?: string | null;
+    /** "continue" = resume in-progress playlist; "smart_next" = follow-up to last completed; default = normal pick. */
+    mode?: "continue" | "smart_next" | "default";
+    /** If set, navigate to this specific track (used for Continue to resume). */
+    resumeAudioId?: string | null;
   } | null;
   /** Optional locked Plus playlist teaser for non-Plus users. */
   lockedTeaser?: {
@@ -160,19 +164,35 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
   if (inputs.featuredAudio) {
     const a = inputs.featuredAudio;
     const isTrack = a.kind === "track";
+    const mode = a.mode ?? "default";
+    const kicker =
+      mode === "continue"
+        ? a.category ? `Continue · ${a.category}` : "Continue listening"
+        : mode === "smart_next"
+          ? a.category ? `More like this · ${a.category}` : "Picked for you next"
+          : a.category
+            ? `${isTrack ? "Track" : "Playlist"} · ${a.category}`
+            : isTrack ? "Today's track" : "Today's playlist";
+    const meta =
+      mode === "continue"
+        ? "Tap to resume"
+        : isTrack ? "Tap to play · ~5 min" : "Tap to play";
+    const href = a.resumeAudioId
+      ? `/app/player/${a.resumeAudioId}`
+      : isTrack
+        ? `/app/player/${a.id}`
+        : `/app/player/playlist/${a.id}`;
     steps.push({
       id: `${isTrack ? "track" : "playlist"}:${a.id}`,
       kind: "playlist", // reuse rendering bucket
       ref: a.id,
       emoji: a.coverEmoji || (isTrack ? "🎵" : "🎧"),
-      kicker: a.category
-        ? `${isTrack ? "Track" : "Playlist"} · ${a.category}`
-        : isTrack ? "Today's track" : "Today's playlist",
+      kicker,
       title: a.title,
-      meta: isTrack ? "Tap to play · ~5 min" : "Tap to play",
+      meta,
       estMinutes: isTrack ? 5 : 10,
       done: false,
-      startHref: isTrack ? `/app/player/${a.id}` : `/app/player/playlist/${a.id}`,
+      startHref: href,
       tint: "sky",
       skippable: true,
     });
