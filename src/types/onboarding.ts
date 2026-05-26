@@ -59,6 +59,8 @@ export type OnboardingStepType =
   | 'rilo-building-plan'
   | 'rilo-commit'
   | 'rilo-language-bubbles'
+  | 'door-nickname'
+  | 'door-language-switch'
   | 'door-cards-glass'
   | 'door-emotion-picker'
   | 'door-selfcare-offers'
