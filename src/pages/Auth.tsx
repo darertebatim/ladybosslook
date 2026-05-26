@@ -51,16 +51,16 @@ export default function Auth() {
 
   // Read redirect param from URL (e.g. /auth?redirect=/cart)
   const searchParams = new URLSearchParams(window.location.search);
-  const redirectPath = searchParams.get('redirect') || '/app/home';
+  const redirectPath = searchParams.get('redirect') || '/app/my-rilo';
   const hasCustomRedirect = searchParams.has('redirect');
 
   // Redirect if already authenticated, or to onboarding if not seen yet
   useEffect(() => {
     if (user) {
-      const hasSeenWhatIsRilo = localStorage.getItem('simora_onboarding_completed_what-is-rilo') === 'true';
-      // First sign-in/up: show "What is Rilo?" teach onboarding once
-      if (!hasSeenWhatIsRilo && !hasCustomRedirect) {
-        navigate('/app/onboarding/what-is-rilo', { replace: true });
+      const hasSeenDoors = localStorage.getItem('simora_onboarding_completed_rilo-doors') === 'true';
+      // First sign-in/up: show "Rilo Doors" onboarding once
+      if (!hasSeenDoors && !hasCustomRedirect) {
+        navigate('/app/onboarding/rilo-doors', { replace: true });
       } else {
         navigate(redirectPath);
       }
