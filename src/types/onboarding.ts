@@ -58,7 +58,13 @@ export type OnboardingStepType =
   | 'rilo-week-plans'
   | 'rilo-building-plan'
   | 'rilo-commit'
-  | 'rilo-language-bubbles';
+  | 'rilo-language-bubbles'
+  | 'door-cards-glass'
+  | 'door-emotion-picker'
+  | 'door-selfcare-offers'
+  | 'door-immigrant-picker'
+  | 'meet-rilo-intro'
+  | 'open-the-door';
 
 export interface OnboardingOptionVariant {
   cluster: string;
@@ -109,6 +115,12 @@ export interface OnboardingStep {
   bucket?: 'morning' | 'afternoon' | 'evening';
   /** For 'rilo-pick-tasks' steps: pre-defined task suggestions (label + emoji) */
   pickerTasks?: { label: string; emoji: string }[];
+  /** For door-cards-glass: which selection slot ('primary' | 'secondary') */
+  doorSlot?: 'primary' | 'secondary';
+  /** For door-cards-glass-secondary: hides whichever door was picked as primary */
+  excludePrimary?: boolean;
+  /** Which door this sharpener step belongs to — used by AppOnboarding to skip non-matching steps */
+  doorBranch?: 'emotion' | 'selfcare' | 'immigrant' | 'productivity' | 'exploring';
 }
 
 export type OnboardingAnswers = Record<string, string | string[]>;
