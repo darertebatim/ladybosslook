@@ -18,7 +18,7 @@ const doorSignatures = [
     emoji: "🧠",
     label: "Self-Care",
     signature: "60-sec Self-Care Quiz → personalized reset",
-    deeper: "Open today's reset (breath OR reflection, door-flavored)",
+    deeper: "Open today's Reset (door-flavored)",
   },
   {
     door: "immigrant",
@@ -46,13 +46,13 @@ const doorSignatures = [
     emoji: "✨",
     label: "Exploring",
     signature: "Curated tour: 1 playlist + Self-Care Quiz + Planner peek",
-    deeper: "Browse routines · 1 reset",
+    deeper: "Browse routines · 1 Reset",
   },
 ];
 
 const day1Flow = [
   { emoji: "🚪", title: "Primary door signature step", meta: "Hero — door-flavored (see table above)", kind: "door_signature", isNew: true },
-  { emoji: "🌬️", title: "Door-flavored reset", meta: "Emotion → emotion-tagged · Immigrant → bilingual if available · else generic 2-min calm", kind: "reset", isNew: true },
+  { emoji: "🌬️", title: "Reset (door-flavored)", meta: "See Vocabulary card above", kind: "reset", isNew: true },
   { emoji: "✨", title: "Browse routines (pick your first)", meta: "Always shown on Day 1", kind: "routine" },
   { emoji: "🧠", title: "Self-Care Quiz teaser", meta: "Injected if Self-Care isn't a chosen door & quiz not done · skippable", kind: "quiz_pick", isNew: true },
   { emoji: "📋", title: "Rilo Planner Onboarding teaser", meta: "Injected if Productivity isn't a chosen door & planner onboarding not done · skippable", kind: "planner_onb", isNew: true },
@@ -62,7 +62,7 @@ const day1Flow = [
 const day2Flow = [
   { emoji: "🚪", title: "Secondary door signature step", meta: "Hero — secondary door's signature (fallback: primary deeper)", kind: "door_signature", isNew: true },
   { emoji: "🔁", title: "Primary door deeper step", meta: "Booster — keeps primary thread alive", kind: "door_deeper", isNew: true },
-  { emoji: "🌬️", title: "Reset (door-flavored)", meta: "Alternates breath ↔ reflection by date seed", kind: "reset" },
+  { emoji: "🌬️", title: "Reset (door-flavored)", meta: "See Vocabulary card above", kind: "reset" },
   { emoji: "🔥", title: "Continue routine from Day 1", meta: "Picks the first active routine", kind: "routine" },
   { emoji: "🏆", title: "Streak + affirmation", meta: "Always last", kind: "reward" },
 ];
@@ -71,7 +71,7 @@ const day3Flow = [
   { emoji: "🌱", title: "Habit cement: today's routine", meta: "Lead with routine — turns 'try' into 'rhythm'", kind: "routine", isNew: true },
   { emoji: "🚪", title: "Secondary door deeper step", meta: "Keeps secondary alive", kind: "door_deeper" },
   { emoji: "🎧", title: "Featured playlist", meta: "Door-aware pick (emotion tag, bilingual, etc.)", kind: "playlist" },
-  { emoji: "🌬️", title: "Reset", meta: "Breath OR reflection (date seed)", kind: "reset" },
+  { emoji: "🌬️", title: "Reset (door-flavored)", meta: "See Vocabulary card above", kind: "reset" },
   { emoji: "🏆", title: "Streak + affirmation", meta: "Always last", kind: "reward" },
 ];
 
@@ -80,41 +80,41 @@ const scenarios = [
   {
     name: "A · Emotion (sad) + Self-Care",
     days: [
-      "Day 1: Playlist tagged 'sadness/depressed' → emotion-tagged breath → Browse routines → Self-Care Quiz teaser",
-      "Day 2: Self-Care Quiz (secondary signature) → second emotion-tagged step → reflection reset → continue routine",
-      "Day 3: Routine first → Self-Care deeper (quiz outcome routine) → bilingual-or-emotion playlist → reset",
+      "Day 1: Playlist tagged 'sadness/depressed' → Reset (sadness-tagged) → Browse routines → Self-Care Quiz teaser",
+      "Day 2: Self-Care Quiz (secondary signature) → second emotion-tagged step → Reset (sadness-tagged) → continue routine",
+      "Day 3: Routine first → Self-Care deeper (quiz outcome routine) → bilingual-or-emotion playlist → Reset (sadness-tagged)",
     ],
   },
   {
     name: "B · Immigrant + Productivity",
     days: [
       "Day 1: Bilingual Strength playlist → bilingual sleep story → Browse routines → Planner Onboarding teaser (productivity is secondary, so it still gets seeded)",
-      "Day 2: Planner Onboarding + pick first routine (secondary signature) → bilingual continue (primary deeper) → reset",
-      "Day 3: Routine first → 'Plan tomorrow' (secondary deeper) → bilingual playlist → reset",
+      "Day 2: Planner Onboarding + pick first routine (secondary signature) → bilingual continue (primary deeper) → Reset (bilingual if available, else generic)",
+      "Day 3: Routine first → 'Plan tomorrow' (secondary deeper) → bilingual playlist → Reset (bilingual if available, else generic)",
     ],
   },
   {
     name: "C · Productivity + Emotion (anxious)",
     days: [
-      "Day 1: Open Planner → Rilo Planner Onboarding → pick first routine → Browse routines → emotion-tagged anxiety breath (because emotion is secondary)",
-      "Day 2: Anxiety-tagged playlist (secondary signature) → 1 quick routine task (primary deeper) → reflection reset",
-      "Day 3: Routine first → anxiety reflection (secondary deeper) → playlist → reset",
+      "Day 1: Open Planner → Rilo Planner Onboarding → pick first routine → Browse routines → Reset (anxiety-tagged, because emotion is secondary)",
+      "Day 2: Anxiety-tagged playlist (secondary signature) → 1 quick routine task (primary deeper) → Reset (anxiety-tagged)",
+      "Day 3: Routine first → anxiety-tagged reflection step (secondary deeper) → playlist → Reset (anxiety-tagged)",
     ],
   },
   {
     name: "D · Self-Care only (no secondary)",
     days: [
-      "Day 1: Self-Care Quiz → quiz-outcome reset → Browse routines → Planner Onboarding teaser (productivity not picked)",
-      "Day 2: Primary deeper (open today's reset) → routine continue → reset → playlist",
-      "Day 3: Routine first → reset → playlist → reward",
+      "Day 1: Self-Care Quiz → Reset (quiz-outcome flavored) → Browse routines → Planner Onboarding teaser (productivity not picked)",
+      "Day 2: Primary deeper (= Reset, quiz-outcome flavored) → routine continue → playlist → reward",
+      "Day 3: Routine first → Reset (quiz-outcome flavored) → playlist → reward",
     ],
   },
   {
     name: "E · Exploring + Emotion (lonely)",
     days: [
-      "Day 1: Curated tour (1 playlist + quiz + planner peek) → lonely/homesick-tagged breath → Browse routines",
-      "Day 2: Lonely playlist (secondary signature) → exploring deeper (1 reset) → routine",
-      "Day 3: Routine first → lonely reflection → playlist → reset",
+      "Day 1: Curated tour (1 playlist + quiz + planner peek) → Reset (lonely-tagged) → Browse routines",
+      "Day 2: Lonely-tagged playlist (secondary signature) → exploring deeper (Browse routines + 1 Reset) → routine",
+      "Day 3: Routine first → Reset (lonely-tagged) → playlist → reward",
     ],
   },
 ];
@@ -141,7 +141,7 @@ const emotionTagMap = [
 const standardFlow = [
   { emoji: "💛", title: "Mood check-in", meta: "1 min · pick your mood", kind: "mood" },
   { emoji: "🎧", title: "Today's playlist (ready to play)", meta: "Language match → sort_order", kind: "playlist" },
-  { emoji: "🌬️", title: "Reset: a breath OR reflection (random daily)", meta: "2–3 min · alternates by date · deep-links to specific item", kind: "reset", isNew: true },
+  { emoji: "🌬️", title: "Reset", meta: "See Vocabulary card above (Day 4+: no door flavor, generic pool)", kind: "reset", isNew: true },
   { emoji: "🔥", title: "Open your Planner (first active routine)", meta: "Quiz outcome already provisioned the routine — navigates to /app/home", kind: "routine" },
   { emoji: "🏆", title: "+1 day streak & a new affirmation", meta: "Reward (always last, never skippable)", kind: "reward" },
 ];
@@ -298,6 +298,39 @@ export default function MyRiloEngine() {
           Source: <code className="text-xs">src/lib/pathEngine.ts</code> + <code className="text-xs">src/hooks/useTodayPath.tsx</code>
         </p>
       </div>
+
+      <Card className="border-primary/40">
+        <CardHeader>
+          <CardTitle className="text-base">Vocabulary</CardTitle>
+          <CardDescription>One definition, used everywhere on this page.</CardDescription>
+        </CardHeader>
+        <CardContent className="text-sm space-y-3">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg">🌬️</span>
+              <span className="font-semibold">Reset</span>
+              <Badge variant="outline" className="text-[10px] font-mono">reset</Badge>
+            </div>
+            <p className="text-muted-foreground text-xs leading-relaxed">
+              A single 2–3 min step that resolves to <strong>one breath OR one reflection</strong>, picked deterministically by date seed (alternates day-to-day, deep-links to the specific item). It is <strong>always one item</strong>, never both.
+            </p>
+            <p className="text-muted-foreground text-xs leading-relaxed mt-1.5">
+              <strong>"Door-flavored"</strong> means the picker is filtered by the user's door before the date seed runs:
+            </p>
+            <ul className="text-xs text-muted-foreground list-disc list-inside ml-2 mt-1 space-y-0.5">
+              <li><strong>Emotion door</strong> → only items tagged with the picked emotion slug (strict)</li>
+              <li><strong>Immigrant door</strong> → bilingual item if one exists, else generic</li>
+              <li><strong>Self-Care door</strong> → quiz-outcome category if available, else generic</li>
+              <li><strong>Productivity / Exploring / no match</strong> → generic 2-min calm pool</li>
+              <li><strong>Day 4+ (Standard flow)</strong> → no door flavor, generic pool only</li>
+            </ul>
+          </div>
+          <Separator />
+          <div className="text-xs text-muted-foreground">
+            Whenever you see <em>"Reset"</em>, <em>"reset"</em>, or <em>"door-flavored reset"</em> below — it means this exact step. There is no second concept.
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
