@@ -191,7 +191,7 @@ const NativeAppLayout = () => {
     location.pathname === '/app/projects';
 
   const navItems = [
-    { path: '/app/home', icon: Home, label: t('nav.home'), tourClass: 'tour-nav-home' },
+    { path: '/app/home', icon: ClipboardList, label: t('nav.home'), tourClass: 'tour-nav-home' },
     { path: '/app/tools', icon: Compass, label: t('nav.tools'), tourClass: 'tour-nav-explore' },
     { path: '/app/my-rilo', icon: Route, label: t('nav.myRilo'), tourClass: 'tour-nav-my-rilo' },
     { path: '/app/player', icon: Music, label: t('nav.listen'), tourClass: 'tour-nav-listen' },
