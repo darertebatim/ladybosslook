@@ -545,7 +545,7 @@ const App = () => (
                     
                     {/* App Routes */}
                     <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-                      <Route index element={<Navigate to="/app/home" replace />} />
+                      <Route index element={<Navigate to="/app/my-rilo" replace />} />
                       <Route path="home" element={<AppHome />} />
                       <Route path="my-rilo" element={<AppMyRiloPath />} />
                       <Route path="myprograms" element={<AppPrograms />} />
