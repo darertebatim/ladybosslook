@@ -10,11 +10,129 @@ import { supabase } from "@/integrations/supabase/client";
  * Source of truth: src/lib/pathEngine.ts + src/hooks/useTodayPath.tsx
  */
 
-const dayOneFlow = [
-  { emoji: "🧠", title: "Take the 60-second Self-Care Quiz", meta: "3 min · personalize your path", kind: "quiz_pick" },
-  { emoji: "🌬️", title: "Reset: a breath OR reflection (random daily)", meta: "2–3 min · alternates breath ↔ reflection by date", kind: "reset", isNew: true },
-  { emoji: "✨", title: "Browse routines (pick your first)", meta: "1 min", kind: "routine" },
-  { emoji: "🏆", title: "+1 day streak & a new affirmation", meta: "Reward", kind: "reward" },
+/* ─────────── Door-aware Day 1–3 path (NEW) ─────────── */
+
+const doorSignatures = [
+  {
+    door: "selfcare",
+    emoji: "🧠",
+    label: "Self-Care",
+    signature: "60-sec Self-Care Quiz → personalized reset",
+    deeper: "Open today's reset (breath OR reflection, door-flavored)",
+  },
+  {
+    door: "immigrant",
+    emoji: "🌍",
+    label: "Immigrant / Bilingual",
+    signature: "Open Bilingual Strength playlist (+ sleep story series)",
+    deeper: "Continue the bilingual series · emotion-tagged breath",
+  },
+  {
+    door: "productivity",
+    emoji: "📋",
+    label: "Productivity",
+    signature: "Open Planner → Rilo Planner Onboarding → pick first routine",
+    deeper: "Plan tomorrow · 1 quick routine task",
+  },
+  {
+    door: "emotion",
+    emoji: "💛",
+    label: "Emotion",
+    signature: "Tag-matched playlist for picked emotion + matching breath + reflection",
+    deeper: "Second emotion-tagged step (breath ↔ reflection alternate)",
+  },
+  {
+    door: "exploring",
+    emoji: "✨",
+    label: "Exploring",
+    signature: "Curated tour: 1 playlist + Self-Care Quiz + Planner peek",
+    deeper: "Browse routines · 1 reset",
+  },
+];
+
+const day1Flow = [
+  { emoji: "🚪", title: "Primary door signature step", meta: "Hero — door-flavored (see table above)", kind: "door_signature", isNew: true },
+  { emoji: "🌬️", title: "Door-flavored reset", meta: "Emotion → emotion-tagged · Immigrant → bilingual if available · else generic 2-min calm", kind: "reset", isNew: true },
+  { emoji: "✨", title: "Browse routines (pick your first)", meta: "Always shown on Day 1", kind: "routine" },
+  { emoji: "🧠", title: "Self-Care Quiz teaser", meta: "Injected if Self-Care isn't a chosen door & quiz not done · skippable", kind: "quiz_pick", isNew: true },
+  { emoji: "📋", title: "Rilo Planner Onboarding teaser", meta: "Injected if Productivity isn't a chosen door & planner onboarding not done · skippable", kind: "planner_onb", isNew: true },
+  { emoji: "🏆", title: "+1 day streak & a new affirmation", meta: "Always last", kind: "reward" },
+];
+
+const day2Flow = [
+  { emoji: "🚪", title: "Secondary door signature step", meta: "Hero — secondary door's signature (fallback: primary deeper)", kind: "door_signature", isNew: true },
+  { emoji: "🔁", title: "Primary door deeper step", meta: "Booster — keeps primary thread alive", kind: "door_deeper", isNew: true },
+  { emoji: "🌬️", title: "Reset (door-flavored)", meta: "Alternates breath ↔ reflection by date seed", kind: "reset" },
+  { emoji: "🔥", title: "Continue routine from Day 1", meta: "Picks the first active routine", kind: "routine" },
+  { emoji: "🏆", title: "Streak + affirmation", meta: "Always last", kind: "reward" },
+];
+
+const day3Flow = [
+  { emoji: "🌱", title: "Habit cement: today's routine", meta: "Lead with routine — turns 'try' into 'rhythm'", kind: "routine", isNew: true },
+  { emoji: "🚪", title: "Secondary door deeper step", meta: "Keeps secondary alive", kind: "door_deeper" },
+  { emoji: "🎧", title: "Featured playlist", meta: "Door-aware pick (emotion tag, bilingual, etc.)", kind: "playlist" },
+  { emoji: "🌬️", title: "Reset", meta: "Breath OR reflection (date seed)", kind: "reset" },
+  { emoji: "🏆", title: "Streak + affirmation", meta: "Always last", kind: "reward" },
+];
+
+/* Example scenarios — primary × secondary combinations */
+const scenarios = [
+  {
+    name: "A · Emotion (sad) + Self-Care",
+    days: [
+      "Day 1: Playlist tagged 'sadness/depressed' → emotion-tagged breath → Browse routines → Self-Care Quiz teaser",
+      "Day 2: Self-Care Quiz (secondary signature) → second emotion-tagged step → reflection reset → continue routine",
+      "Day 3: Routine first → Self-Care deeper (quiz outcome routine) → bilingual-or-emotion playlist → reset",
+    ],
+  },
+  {
+    name: "B · Immigrant + Productivity",
+    days: [
+      "Day 1: Bilingual Strength playlist → bilingual sleep story → Browse routines → Planner Onboarding teaser (productivity is secondary, so it still gets seeded)",
+      "Day 2: Planner Onboarding + pick first routine (secondary signature) → bilingual continue (primary deeper) → reset",
+      "Day 3: Routine first → 'Plan tomorrow' (secondary deeper) → bilingual playlist → reset",
+    ],
+  },
+  {
+    name: "C · Productivity + Emotion (anxious)",
+    days: [
+      "Day 1: Open Planner → Rilo Planner Onboarding → pick first routine → Browse routines → emotion-tagged anxiety breath (because emotion is secondary)",
+      "Day 2: Anxiety-tagged playlist (secondary signature) → 1 quick routine task (primary deeper) → reflection reset",
+      "Day 3: Routine first → anxiety reflection (secondary deeper) → playlist → reset",
+    ],
+  },
+  {
+    name: "D · Self-Care only (no secondary)",
+    days: [
+      "Day 1: Self-Care Quiz → quiz-outcome reset → Browse routines → Planner Onboarding teaser (productivity not picked)",
+      "Day 2: Primary deeper (open today's reset) → routine continue → reset → playlist",
+      "Day 3: Routine first → reset → playlist → reward",
+    ],
+  },
+  {
+    name: "E · Exploring + Emotion (lonely)",
+    days: [
+      "Day 1: Curated tour (1 playlist + quiz + planner peek) → lonely/homesick-tagged breath → Browse routines",
+      "Day 2: Lonely playlist (secondary signature) → exploring deeper (1 reset) → routine",
+      "Day 3: Routine first → lonely reflection → playlist → reset",
+    ],
+  },
+];
+
+/* Emotion → tag-slug mapping (mirrors useTodayPath.tsx — strict match, fallback to general calm) */
+const emotionTagMap = [
+  { key: "sad", slugs: ["sadness", "depressed"] },
+  { key: "anxious", slugs: ["anxiety", "worry"] },
+  { key: "angry", slugs: ["anger", "irritation"] },
+  { key: "lonely", slugs: ["lonely", "missing-someone", "homesick"] },
+  { key: "overwhelmed", slugs: ["overwhelm", "stressed"] },
+  { key: "tired", slugs: ["exhausted", "low-energy"] },
+  { key: "numb", slugs: ["depressed", "low-energy"] },
+  { key: "jealous", slugs: ["envy"] },
+  { key: "restless", slugs: ["worry", "stressed"] },
+  { key: "scared", slugs: ["fear", "anxiety"] },
+  { key: "guilty", slugs: [], note: "no tag yet → falls back to general calm" },
+  { key: "ashamed", slugs: [], note: "no tag yet → falls back to general calm" },
 ];
 
 const standardFlow = [
@@ -199,27 +317,119 @@ export default function MyRiloEngine() {
         </CardContent>
       </Card>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Door signatures</CardTitle>
+          <CardDescription>
+            Each Rilo Door has a <strong>signature step</strong> (Day 1 hero) and a <strong>deeper step</strong> (Day 2/3 booster).
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="text-sm">
+          <div className="divide-y">
+            {doorSignatures.map((d) => (
+              <div key={d.door} className="py-2.5 flex items-start gap-3">
+                <div className="text-xl leading-none">{d.emoji}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-medium">{d.label}</span>
+                    <Badge variant="outline" className="text-[10px] font-mono">{d.door}</Badge>
+                  </div>
+                  <div className="text-xs mt-0.5"><span className="text-muted-foreground">Signature:</span> {d.signature}</div>
+                  <div className="text-xs mt-0.5"><span className="text-muted-foreground">Deeper:</span> {d.deeper}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid md:grid-cols-3 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Day-1 Flow</CardTitle>
-            <CardDescription>New user · no routines · no quiz result</CardDescription>
+            <CardTitle className="text-base">Day 1 · Door tease</CardTitle>
+            <CardDescription>Primary door's signature is the hero. No mood check-in.</CardDescription>
           </CardHeader>
           <CardContent className="divide-y">
-            {dayOneFlow.map((s, i) => <StepRow key={i} s={s} />)}
+            {day1Flow.map((s, i) => <StepRow key={i} s={s} />)}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Standard Flow</CardTitle>
-            <CardDescription>Returning user · order is fixed (no scoring yet)</CardDescription>
+            <CardTitle className="text-base">Day 2 · Secondary + reinforce</CardTitle>
+            <CardDescription>Secondary signature leads, primary stays alive.</CardDescription>
           </CardHeader>
           <CardContent className="divide-y">
-            {standardFlow.map((s, i) => <StepRow key={i} s={s} />)}
+            {day2Flow.map((s, i) => <StepRow key={i} s={s} />)}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Day 3 · Habit cement</CardTitle>
+            <CardDescription>Routine first. Standard flow takes over after Day 3.</CardDescription>
+          </CardHeader>
+          <CardContent className="divide-y">
+            {day3Flow.map((s, i) => <StepRow key={i} s={s} />)}
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Example 3-day scenarios</CardTitle>
+          <CardDescription>Primary × Secondary door combinations and the resulting path.</CardDescription>
+        </CardHeader>
+        <CardContent className="text-sm space-y-4">
+          {scenarios.map((s) => (
+            <div key={s.name} className="rounded-lg border p-3">
+              <div className="font-medium mb-1.5">{s.name}</div>
+              <ul className="space-y-1 text-xs text-muted-foreground">
+                {s.days.map((d, i) => <li key={i}>• {d}</li>)}
+              </ul>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Emotion → tag-slug map</CardTitle>
+          <CardDescription>
+            Strict match. Used when primary door = emotion. Source: <code className="text-xs">useTodayPath.tsx · EMOTION_KEY_TO_TAG_SLUGS</code>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="divide-y text-sm">
+            {emotionTagMap.map((e) => (
+              <div key={e.key} className="py-2 flex items-start gap-3">
+                <code className="text-xs bg-muted px-2 py-0.5 rounded shrink-0">{e.key}</code>
+                <div className="flex-1 text-xs">
+                  {e.slugs.length > 0 ? (
+                    <div className="flex flex-wrap gap-1">
+                      {e.slugs.map((s) => (
+                        <Badge key={s} variant="outline" className="text-[10px] font-mono">{s}</Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground italic">{e.note}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Standard Flow (Day 4+)</CardTitle>
+          <CardDescription>Returning user · once the 3-day door path is complete</CardDescription>
+        </CardHeader>
+        <CardContent className="divide-y">
+          {standardFlow.map((s, i) => <StepRow key={i} s={s} />)}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
