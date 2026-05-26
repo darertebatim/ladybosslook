@@ -31,7 +31,6 @@ const menuItems = [
   { title: 'Reading', url: '/admin/read', icon: BookOpen, pageSlug: 'tools' },
   { title: 'Quizzes', url: '/admin/quizzes', icon: Brain, pageSlug: 'tools' },
   { title: 'My Rilo Engine', url: '/admin/my-rilo', icon: RouteIcon, pageSlug: 'tools' },
-  { title: 'Tag Schema', url: '/admin/tags/schema', icon: Tags, pageSlug: 'tools' },
   { title: 'Content Tagging', url: '/admin/tags/content', icon: TagsIcon, pageSlug: 'tools' },
   
   { title: 'Brand', url: '/admin/brand', icon: Palette, pageSlug: 'system' },
