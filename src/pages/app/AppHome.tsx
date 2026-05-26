@@ -79,6 +79,17 @@ const AppHome = () => {
   const {
     user
   } = useAuth();
+  // First-time Planner visitors get the "What is Rilo?" teach flow.
+  // Rilo Doors (post-auth) is the primary onboarding; this teaches the Planner
+  // surface specifically and only fires once per device.
+  useEffect(() => {
+    const seen = localStorage.getItem('simora_onboarding_completed_what-is-rilo') === 'true';
+    const dismissed = localStorage.getItem('simora_onboarding_planner_intro_dismissed') === 'true';
+    if (!seen && !dismissed) {
+      localStorage.setItem('simora_onboarding_planner_intro_dismissed', 'true');
+      navigate('/app/onboarding/what-is-rilo', { replace: true });
+    }
+  }, [navigate]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchParams, setSearchParams] = useSearchParams();
   const taskFilter = searchParams.get('filter') || 'all';
