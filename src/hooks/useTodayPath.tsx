@@ -304,11 +304,32 @@ export function useTodayPath() {
       const useTrack = (preferTrack || trackByRotation) && hotTracks.length > 0;
 
       type FeaturedAudio =
-        | { kind: "track"; id: string; title: string; category: string | null; coverEmoji: string | null }
-        | { kind: "playlist"; id: string; title: string; category: string | null; coverEmoji: string | null };
+        | { kind: "track"; id: string; title: string; category: string | null; coverEmoji: string | null; mode?: "continue" | "smart_next" | "default"; resumeAudioId?: string | null }
+        | { kind: "playlist"; id: string; title: string; category: string | null; coverEmoji: string | null; mode?: "continue" | "smart_next" | "default"; resumeAudioId?: string | null };
       let featuredAudio: FeaturedAudio | null = null;
 
-      if (useTrack) {
+      if (continuePick) {
+        const pl = accessibleById.get(continuePick.playlistId)!;
+        featuredAudio = {
+          kind: "playlist",
+          id: pl.id,
+          title: pl.name || "Continue listening",
+          category: pl.category,
+          coverEmoji: null,
+          mode: "continue",
+          resumeAudioId: continuePick.audioId,
+        };
+      } else if (smartNextPick) {
+        const pl = smartNextPick.playlist;
+        featuredAudio = {
+          kind: "playlist",
+          id: pl.id,
+          title: pl.name || "Picked for you",
+          category: pl.category,
+          coverEmoji: null,
+          mode: "smart_next",
+        };
+      } else if (useTrack) {
         // Hot tracks don't carry the playlist's mood category, so just rotate
         // deterministically. Admin curates this list.
         const t = hotTracks[seed % hotTracks.length];
