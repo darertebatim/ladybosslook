@@ -117,10 +117,10 @@ export function buildDayOnePath(inputs: PathInputs): PathStep[] {
     emoji: "✨",
     kicker: "Pick your first routine",
     title: "Browse routines",
-    meta: "1 min · Morning Reset · New Mom · Anxiety…",
+    meta: "Open your Planner",
     estMinutes: 1,
     done: false,
-    startHref: "/app/tools/tasks",
+    startHref: "/app/home",
     tint: "lavender",
     skippable: false,
   });
@@ -169,23 +169,6 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
   }
 
   steps.push(buildResetStep(inputs));
-
-  if (inputs.hasQuizResult && inputs.quizTopCategory) {
-    steps.push({
-      id: `quiz_pick:${inputs.quizTopCategory}`,
-      kind: "quiz_pick",
-      ref: inputs.quizTopCategory,
-      emoji: "🧠",
-      kicker: "Rilo picked from your quiz",
-      title: humanizeCategory(inputs.quizTopCategory),
-      meta: "5 min · Self-care",
-      estMinutes: 5,
-      done: false,
-      startHref: "/app/tools/tasks",
-      tint: "peach",
-      skippable: true,
-    });
-  }
 
   // Show only the first active routine — it points to the Planner where
   // the user follows their day. Keeps the path short and focused.
