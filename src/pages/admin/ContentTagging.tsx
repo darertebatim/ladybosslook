@@ -171,7 +171,59 @@ function ContentList({ contentType }: { contentType: ContentType }) {
     });
   }, [items, search, untaggedOnly, filterTagId, linksByContentId]);
 
+  const grouped = useMemo(() => {
+    if (contentType !== "audio") return null;
+    const map = new Map<string, ContentRow[]>();
+    filtered.forEach((it) => {
+      const g = it.groupName || "— No playlist —";
+      if (!map.has(g)) map.set(g, []);
+      map.get(g)!.push(it);
+    });
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [filtered, contentType]);
+
   const editingItem = items.find((i) => i.id === editingId);
+
+  const renderRow = (it: ContentRow) => {
+    const itemTagIds = linksByContentId[it.id] || [];
+    return (
+      <div
+        key={it.id}
+        className="p-2.5 flex items-center justify-between gap-2 hover:bg-muted/40"
+      >
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          {it.emoji && <span className="text-lg">{it.emoji}</span>}
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-medium truncate">{it.title}</div>
+            <div className="flex flex-wrap gap-1 mt-1">
+              {itemTagIds.length === 0 && (
+                <span className="text-[11px] text-muted-foreground italic">
+                  untagged
+                </span>
+              )}
+              {itemTagIds.map((tid) => {
+                const t = tagsById[tid];
+                if (!t) return null;
+                const d = dimsById[t.dimension_id];
+                return (
+                  <span
+                    key={tid}
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] bg-muted"
+                    title={d?.label}
+                  >
+                    {t.emoji} {t.label}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+        <Button size="sm" variant="outline" onClick={() => setEditingId(it.id)}>
+          Edit
+        </Button>
+      </div>
+    );
+  };
 
   return (
     <Card className="p-4 space-y-3">
@@ -218,46 +270,16 @@ function ContentList({ contentType }: { contentType: ContentType }) {
         <p className="text-sm text-muted-foreground">Loading…</p>
       ) : (
         <div className="border rounded-md divide-y max-h-[70vh] overflow-y-auto">
-          {filtered.map((it) => {
-            const itemTagIds = linksByContentId[it.id] || [];
-            return (
-              <div
-                key={it.id}
-                className="p-2.5 flex items-center justify-between gap-2 hover:bg-muted/40"
-              >
-                <div className="flex items-center gap-2 min-w-0 flex-1">
-                  {it.emoji && <span className="text-lg">{it.emoji}</span>}
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-medium truncate">{it.title}</div>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {itemTagIds.length === 0 && (
-                        <span className="text-[11px] text-muted-foreground italic">
-                          untagged
-                        </span>
-                      )}
-                      {itemTagIds.map((tid) => {
-                        const t = tagsById[tid];
-                        if (!t) return null;
-                        const d = dimsById[t.dimension_id];
-                        return (
-                          <span
-                            key={tid}
-                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] bg-muted"
-                            title={d?.label}
-                          >
-                            {t.emoji} {t.label}
-                          </span>
-                        );
-                      })}
-                    </div>
+          {grouped
+            ? grouped.map(([groupName, rows]) => (
+                <div key={groupName}>
+                  <div className="sticky top-0 z-10 bg-muted/80 backdrop-blur px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground border-b">
+                    {groupName} <span className="opacity-60">· {rows.length}</span>
                   </div>
+                  <div className="divide-y">{rows.map(renderRow)}</div>
                 </div>
-                <Button size="sm" variant="outline" onClick={() => setEditingId(it.id)}>
-                  Edit
-                </Button>
-              </div>
-            );
-          })}
+              ))
+            : filtered.map(renderRow)}
           {filtered.length === 0 && (
             <p className="p-4 text-sm text-muted-foreground text-center">No content.</p>
           )}
