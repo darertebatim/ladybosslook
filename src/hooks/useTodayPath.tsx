@@ -192,24 +192,8 @@ export function useTodayPath() {
       // For the immigrant door: prefer "Bilingual Strength" series.
       let doorAudioOverride: typeof accessiblePlaylists[number] | null = null;
       if (hasDoorContext && doorPrimary === "emotion" && emotionKeys.length > 0) {
-        const EMOTION_KEY_TO_TAG_SLUGS: Record<string, string[]> = {
-          sad: ["sadness", "depressed"],
-          anxious: ["anxiety", "worry"],
-          angry: ["anger", "irritation"],
-          lonely: ["lonely", "missing-someone", "homesick"],
-          overwhelmed: ["overwhelm", "stressed"],
-          tired: ["exhausted", "low-energy"],
-          numb: ["depressed", "low-energy"],
-          guilty: [],
-          jealous: ["envy"],
-          restless: ["worry", "stressed"],
-          scared: ["fear", "anxiety"],
-          ashamed: [],
-        };
-        const wantedSlugs = new Set<string>();
-        for (const k of emotionKeys) {
-          for (const s of EMOTION_KEY_TO_TAG_SLUGS[k] ?? []) wantedSlugs.add(s);
-        }
+        // Picker keys ARE tag slugs (see RiloDoorsScreens · EMOTION_TOP5/REST).
+        const wantedSlugs = new Set<string>(emotionKeys);
         if (wantedSlugs.size > 0 && accessiblePlaylists.length > 0) {
           const { data: tagRows } = await supabase
             .from("tags")
