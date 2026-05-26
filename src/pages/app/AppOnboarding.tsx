@@ -11,6 +11,7 @@ import { weeklyReviewFlow } from '@/data/onboarding-flows/weekly-review';
 import { selfcareQuizFlow } from '@/data/onboarding-flows/selfcare-quiz';
 import { selfcareWeeklyReviewFlow } from '@/data/onboarding-flows/selfcare-weekly-review';
 import { whatIsRiloFlow } from '@/data/onboarding-flows/what-is-rilo';
+import { riloDoorsFlow } from '@/data/onboarding-flows/rilo-doors';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,7 +23,7 @@ import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
 import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
 import { Analytics } from '@/lib/firebaseAnalytics';
 import { provisionRiloPicks } from '@/lib/onboarding/provisionRiloPicks';
-const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow, preAuthWelcomeFlow, weeklyReviewFlow, selfcareQuizFlow, selfcareWeeklyReviewFlow, whatIsRiloFlow];
+const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow, preAuthWelcomeFlow, weeklyReviewFlow, selfcareQuizFlow, selfcareWeeklyReviewFlow, whatIsRiloFlow, riloDoorsFlow];
 
 function preloadImages(srcs: string[]) {
   srcs.forEach(src => {
