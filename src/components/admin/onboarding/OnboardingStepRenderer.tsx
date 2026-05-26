@@ -45,6 +45,7 @@ import {
   OpenTheDoorScreen,
   DoorNicknameScreen,
   DoorLanguageSwitchScreen,
+  RiloDoorsLoaderScreen,
 } from '@/components/admin/onboarding/RiloDoorsScreens';
 
 function OptionEmoji({ emoji, size }: { emoji: string; size: number }) {
@@ -108,6 +109,8 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <MeetRiloIntroScreen step={step} onNext={onNext} />;
     case 'open-the-door':
       return <OpenTheDoorScreen step={step} onNext={onNext} answers={answers} />;
+    case 'rilo-doors-loader':
+      return <RiloDoorsLoaderScreen step={step} onNext={onNext} />;
     case 'greeting':
       return <GreetingScreen step={step} onNext={onNext} />;
     case 'multi-select':
