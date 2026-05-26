@@ -53,6 +53,7 @@ interface PlaylistFormData {
   is_free: boolean;
   requires_subscription: boolean;
   available_on_mobile: boolean;
+  tracks_standalone: boolean;
   category: 'audiobook' | 'course' | 'podcast' | 'meditate' | 'workout' | 'soundscape' | 'affirmations';
   sort_order: number;
   display_mode: DisplayMode;
