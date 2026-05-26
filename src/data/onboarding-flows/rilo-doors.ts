@@ -77,11 +77,6 @@ export const riloDoorsFlow: OnboardingFlow = {
       doorBranch: 'emotion',
     },
     {
-      id: 'rd-sharp-selfcare',
-      type: 'door-selfcare-offers',
-      doorBranch: 'selfcare',
-    },
-    {
       id: 'rd-sharp-immigrant',
       type: 'door-immigrant-picker',
       doorBranch: 'immigrant',
