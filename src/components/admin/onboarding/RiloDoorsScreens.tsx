@@ -649,7 +649,7 @@ export function DoorImmigrantPickerScreen({
 
       <div className="flex flex-wrap gap-2.5 content-start mb-5">
         {IMMIGRANT_TAGS.map((t, i) => (
-          <EmotionChip
+          <EmotionTile
             key={t.key}
             emoji={t.emoji}
             label={t.label}
