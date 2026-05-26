@@ -47,7 +47,7 @@ const DOORS: {
   {
     key: 'immigrant',
     emoji: '🌍',
-    label: "I'm an immigrant woman",
+    label: "I'm looking for guidance as an immigrant",
     blurb: 'Belong in two languages — for homesickness, identity, starting over.',
     tint: 'rgba(167,139,250,0.55)',
     ring: 'from-violet-300 via-purple-300 to-fuchsia-300',
