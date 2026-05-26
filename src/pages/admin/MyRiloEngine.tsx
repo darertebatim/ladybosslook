@@ -327,7 +327,7 @@ export default function MyRiloEngine() {
           </div>
           <Separator />
           <div className="text-xs text-muted-foreground">
-            Whenever you see <em>"Reset"</em>, <em>"reset"</em>, or <em>"door-flavored reset"</em> below — it means this exact step. There is no second concept.
+            Whenever you see <em>"Check In"</em> or <em>"door-flavored Check In"</em> below — it means this exact step. There is no second concept. (Inspired by the Mighty Check Ins framework: a tiny, deliberate interrupt that hands control back.)
           </div>
         </CardContent>
       </Card>
