@@ -11,6 +11,7 @@ import {
 } from "@/lib/pathEngine";
 import { rankCandidates, type ScoringContext } from "@/lib/pathScorer";
 import { useUserPreferredLanguage } from "@/hooks/useUserPreferredLanguage";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface TodayPathResult {
   steps: PathStep[];
@@ -24,6 +25,7 @@ interface TodayPathResult {
 export function useTodayPath() {
   const { user } = useAuth();
   const preferredLanguage = useUserPreferredLanguage();
+  const { isSubscribed } = useSubscription();
   const today = getLocalDateStr();
   const nowIso = new Date().toISOString();
   const yesterday = (() => {
@@ -33,7 +35,7 @@ export function useTodayPath() {
   })();
 
   return useQuery<TodayPathResult>({
-    queryKey: ["today-path", user?.id, today, preferredLanguage],
+    queryKey: ["today-path", user?.id, today, preferredLanguage, isSubscribed],
     enabled: !!user?.id,
     staleTime: 30_000,
     queryFn: async () => {
@@ -78,30 +80,39 @@ export function useTodayPath() {
           .eq("user_id", userId),
       ]);
 
-      // Fetch featured playlists (mobile + visible). Order: language match first,
-      // then sort_order. Pick the top of the list.
-      const playlistRes = await supabase
-        .from("audio_playlists")
-        .select("id, name, category, cover_image_url, language")
-        .eq("available_on_mobile", true)
-        .eq("is_hidden", false)
-        .order("sort_order", { ascending: true })
-        .limit(12);
-      const playlists = (playlistRes.data ?? []) as Array<{
-        id: string; name: string; category: string | null; language: string | null;
+      // ── Audio picker ────────────────────────────────────────────────────
+      // Pull playlists + hot tracks. Free-first for non-Plus users; Plus users
+      // see everything. Pick category by mood/time/quiz; alternate track vs
+      // playlist by daily seed so the user sees variety.
+      const [playlistRes, hotTracksRes] = await Promise.all([
+        supabase
+          .from("audio_playlists")
+          .select("id, name, category, cover_image_url, language, requires_subscription")
+          .eq("available_on_mobile", true)
+          .eq("is_hidden", false)
+          .order("sort_order", { ascending: true })
+          .limit(60),
+        (() => {
+          let q = supabase
+            .from("audio_content")
+            .select("id, title, cover_image_url, is_free, is_hot, category, sort_order")
+            .eq("is_hot", true)
+            .order("sort_order", { ascending: true })
+            .limit(30);
+          if (!isSubscribed) q = q.eq("is_free", true);
+          return q;
+        })(),
+      ]);
+      const allPlaylists = (playlistRes.data ?? []) as Array<{
+        id: string; name: string; category: string | null;
+        language: string | null; requires_subscription: boolean | null;
       }>;
-      const preferred = preferredLanguage
-        ? playlists.find((p) => p.language === preferredLanguage)
-        : null;
-      const picked = preferred ?? playlists[0] ?? null;
-      const featuredPlaylist = picked
-        ? {
-            id: picked.id,
-            name: picked.name || "Today's playlist",
-            category: picked.category,
-            coverEmoji: null,
-          }
-        : null;
+      const hotTracks = (hotTracksRes.data ?? []) as Array<{
+        id: string; title: string; category: string | null;
+      }>;
+      const accessiblePlaylists = isSubscribed
+        ? allPlaylists
+        : allPlaylists.filter((p) => !p.requires_subscription);
 
       // Featured reset: pick ONE of {breathing exercise, reflection} per day.
       // Deterministic by date so it's stable within the day, rotates tomorrow.
@@ -162,9 +173,77 @@ export function useTodayPath() {
         ? (valenceToMood[moodLatest.valence] ?? null)
         : null;
 
-      const quizGaps = (quizRes.data?.gap_categories as string[] | null) ?? null;
-      const hasQuizResult = !!quizGaps && quizGaps.length > 0;
-      const quizTopCategory = hasQuizResult ? quizGaps![0] : null;
+      // ── Pick featured audio (track OR playlist) using mood / time / quiz ──
+      const hourNow = new Date().getHours();
+      let intentCategory: string | null = null;
+      let preferTrack = false;
+      if (recentMoodLabel === "tired" || hourNow >= 20 || hourNow < 6) {
+        intentCategory = "sleepstory"; preferTrack = true;
+      } else if (["anxious", "stressed", "sad"].includes(recentMoodLabel ?? "")) {
+        intentCategory = "meditate"; preferTrack = true;
+      } else if (hourNow >= 6 && hourNow < 11) {
+        intentCategory = "soundscape";
+      }
+      const quizGapsRaw = (quizRes.data?.gap_categories as string[] | null) ?? null;
+      const topGap = quizGapsRaw && quizGapsRaw.length > 0 ? quizGapsRaw[0] : null;
+      if (!intentCategory && topGap) {
+        const map: Record<string, string> = {
+          sleep: "sleepstory", rest: "sleepstory",
+          calm: "meditate", stress: "meditate", mindfulness: "meditate", anxiety: "meditate",
+          focus: "soundscape", energy: "soundscape",
+        };
+        const m = map[topGap];
+        if (m) { intentCategory = m; preferTrack = m !== "soundscape"; }
+      }
+      // Daily rotation: even days lean track, odd days lean playlist
+      const trackByRotation = seed % 2 === 0;
+      const useTrack = (preferTrack || trackByRotation) && hotTracks.length > 0;
+
+      type FeaturedAudio =
+        | { kind: "track"; id: string; title: string; category: string | null; coverEmoji: string | null }
+        | { kind: "playlist"; id: string; title: string; category: string | null; coverEmoji: string | null };
+      let featuredAudio: FeaturedAudio | null = null;
+
+      if (useTrack) {
+        // Hot tracks don't carry the playlist's mood category, so just rotate
+        // deterministically. Admin curates this list.
+        const t = hotTracks[seed % hotTracks.length];
+        featuredAudio = { kind: "track", id: t.id, title: t.title, category: t.category, coverEmoji: null };
+      } else {
+        const matched = intentCategory
+          ? accessiblePlaylists.filter((p) => p.category === intentCategory)
+          : [];
+        const pool = matched.length ? matched : accessiblePlaylists;
+        const preferred = preferredLanguage
+          ? pool.find((p) => p.language === preferredLanguage)
+          : null;
+        const picked = preferred ?? pool[seed % Math.max(pool.length, 1)] ?? pool[0] ?? null;
+        if (picked) {
+          featuredAudio = {
+            kind: "playlist",
+            id: picked.id,
+            title: picked.name || "Today's playlist",
+            category: picked.category,
+            coverEmoji: null,
+          };
+        }
+      }
+
+      // Occasional locked Plus teaser for non-Plus users (every 5th day)
+      let lockedTeaser: { id: string; title: string; category: string | null } | null = null;
+      if (!isSubscribed && seed % 5 === 0) {
+        const lockedPool = allPlaylists.filter((p) => p.requires_subscription);
+        if (lockedPool.length > 0) {
+          const matched = intentCategory
+            ? lockedPool.filter((p) => p.category === intentCategory)
+            : lockedPool;
+          const t = (matched.length ? matched : lockedPool)[seed % Math.max((matched.length ? matched : lockedPool).length, 1)];
+          if (t) lockedTeaser = { id: t.id, title: t.name, category: t.category };
+        }
+      }
+
+      const hasQuizResult = !!quizGapsRaw && quizGapsRaw.length > 0;
+      const quizTopCategory = topGap;
 
       const activeRoutines = (routinesRes.data ?? []).map((r: any) => ({
         routineId: r.routine_id as string,
@@ -223,7 +302,8 @@ export function useTodayPath() {
         activeRoutines,
         dismissedIds,
         isDayOne,
-        featuredPlaylist,
+        featuredAudio,
+        lockedTeaser,
         featuredReset,
       };
 
