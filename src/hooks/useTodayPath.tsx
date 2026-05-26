@@ -624,6 +624,8 @@ export function useTodayPath() {
         }
       }
 
+      const tappedToday = getTappedStepIds(today);
+
       steps = steps.map((s) => {
         if (s.done) return s;
         let done = false;
