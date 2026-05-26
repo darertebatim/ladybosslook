@@ -22,6 +22,7 @@ import {
 import { useAllTags } from "@/hooks/useTags";
 import { useTagDimensions } from "@/hooks/useTagDimensions";
 import { TagPicker } from "@/components/admin/TagPicker";
+import TagSchema from "@/pages/admin/TagSchema";
 import {
   Accordion,
   AccordionItem,
@@ -45,6 +46,7 @@ const TYPE_TABS: { value: ContentType; label: string }[] = [
 
 export default function ContentTagging() {
   const [tab, setTab] = useState<ContentType>("playlist");
+  const [topTab, setTopTab] = useState<"content" | "schema">("content");
 
   return (
     <div className="space-y-4">
@@ -55,25 +57,35 @@ export default function ContentTagging() {
         </p>
       </div>
 
-      <PendingReview />
-
-      <Tabs value={tab} onValueChange={(v) => setTab(v as ContentType)}>
+      <Tabs value={topTab} onValueChange={(v) => setTopTab(v as "content" | "schema")}>
         <TabsList>
-          {TYPE_TABS.map((t) => (
-            <TabsTrigger key={t.value} value={t.value}>
-              {t.label}
-            </TabsTrigger>
-          ))}
+          <TabsTrigger value="content">Content</TabsTrigger>
+          <TabsTrigger value="schema">Tag Schema</TabsTrigger>
         </TabsList>
-        {TYPE_TABS.map((t) => (
-          <TabsContent key={t.value} value={t.value}>
-            {t.value === "playlist" ? (
-              <PlaylistList />
-            ) : (
-              <ContentList contentType={t.value} />
-            )}
-          </TabsContent>
-        ))}
+        <TabsContent value="content" className="space-y-4">
+          <PendingReview />
+          <Tabs value={tab} onValueChange={(v) => setTab(v as ContentType)}>
+            <TabsList>
+              {TYPE_TABS.map((t) => (
+                <TabsTrigger key={t.value} value={t.value}>
+                  {t.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {TYPE_TABS.map((t) => (
+              <TabsContent key={t.value} value={t.value}>
+                {t.value === "playlist" ? (
+                  <PlaylistList />
+                ) : (
+                  <ContentList contentType={t.value} />
+                )}
+              </TabsContent>
+            ))}
+          </Tabs>
+        </TabsContent>
+        <TabsContent value="schema">
+          <TagSchema />
+        </TabsContent>
       </Tabs>
     </div>
   );
