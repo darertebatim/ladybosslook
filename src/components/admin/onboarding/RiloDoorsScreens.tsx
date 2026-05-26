@@ -675,6 +675,51 @@ export function MeetRiloIntroScreen({
   step: OnboardingStep;
   onNext: () => void;
 }) {
+  // Page 1 — "A whole library, ready for you"
+  // Show a fanned stack of content cards so the user feels the breadth of Rilo's library.
+  const LIBRARY = [
+    {
+      emoji: '🎧',
+      kind: 'Sleep stories',
+      line: 'Drift off in 10 min',
+      bg: 'from-violet-200 to-indigo-200',
+      rotate: -10,
+      x: -90,
+      y: 30,
+      z: 1,
+    },
+    {
+      emoji: '🧘',
+      kind: 'Meditations',
+      line: 'Calm in 5',
+      bg: 'from-emerald-200 to-teal-200',
+      rotate: -3,
+      x: -32,
+      y: 6,
+      z: 2,
+    },
+    {
+      emoji: '📚',
+      kind: 'Mini-courses',
+      line: 'Self-care, rebuilt',
+      bg: 'from-amber-200 to-orange-200',
+      rotate: 5,
+      x: 30,
+      y: 0,
+      z: 3,
+    },
+    {
+      emoji: '🌬️',
+      kind: 'Breathwork',
+      line: 'Reset anytime',
+      bg: 'from-sky-200 to-cyan-200',
+      rotate: 12,
+      x: 90,
+      y: 28,
+      z: 2,
+    },
+  ];
+
   return (
     <GlassShell>
       <motion.div
@@ -684,83 +729,68 @@ export function MeetRiloIntroScreen({
         className="mt-2 mb-5 text-center"
       >
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#EB5E33]">
-          A quick tour
+          Welcome to Rilo
         </p>
         <h1 className="mt-2 text-[28px] leading-[1.1] font-bold text-[#2A1810]">
-          {step.title || 'This is My Rilo.'}
+          {step.title || 'A whole library,\nready for you.'}
         </h1>
         <p className="mt-2 text-[14.5px] text-[#5a4a3a] leading-snug max-w-[320px] mx-auto">
           {step.subtitle ||
-            'Your wellness home — one calm place for your day, your tools, and the path that grows with you.'}
+            'Hundreds of sessions — meditations, sleep stories, courses, breathwork. All in one calm place.'}
         </p>
       </motion.div>
 
-      {/* Mock My Rilo card stack */}
+      {/* Fanned content cards */}
       <div className="flex-1 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92, y: 18 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
-          className="relative w-[300px] rounded-[32px] bg-white/65 backdrop-blur-2xl border border-white/70 shadow-ios p-4 pb-5"
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#EB5E33]">
-                My Rilo · Today
-              </p>
-              <p className="text-[18px] font-bold text-[#2A1810] leading-tight">
-                Good morning ☀️
-              </p>
-            </div>
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FFD2BA] to-[#F5A623]/60 flex items-center justify-center shadow-ios">
-              <span className="text-[14px] font-bold text-[#2A1810]">R</span>
-            </div>
-          </div>
+        <div className="relative w-[300px] h-[280px]">
+          {LIBRARY.map((c, i) => (
+            <motion.div
+              key={c.kind}
+              initial={{ opacity: 0, y: 40, rotate: 0, scale: 0.9 }}
+              animate={{ opacity: 1, y: c.y, rotate: c.rotate, scale: 1 }}
+              transition={{
+                delay: 0.2 + i * 0.12,
+                duration: 0.6,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              style={{
+                left: '50%',
+                top: 0,
+                transform: `translateX(calc(-50% + ${c.x}px))`,
+                zIndex: c.z,
+              }}
+              className={cn(
+                'absolute w-[150px] h-[200px] rounded-[26px] border border-white/80 shadow-ios p-4 flex flex-col justify-between',
+                'bg-gradient-to-br',
+                c.bg,
+              )}
+            >
+              <div className="w-12 h-12 rounded-2xl bg-white/70 backdrop-blur-xl flex items-center justify-center shadow-ios">
+                <FluentEmoji emoji={c.emoji} size={28} />
+              </div>
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#2A1810]/70">
+                  {c.kind}
+                </p>
+                <p className="mt-1 text-[14px] font-bold text-[#2A1810] leading-tight">
+                  {c.line}
+                </p>
+              </div>
+            </motion.div>
+          ))}
 
-          {/* Stream of glass mini-cards */}
-          <div className="space-y-2.5">
-            {[
-              { emoji: '💗', tag: 'Path · Step 2', label: 'Calm a feeling', bg: 'bg-pink-100/80' },
-              { emoji: '🌬️', tag: 'Tool · 4 min', label: 'Breathing reset', bg: 'bg-emerald-100/80' },
-              { emoji: '🎵', tag: 'Playlist', label: 'Soft mornings', bg: 'bg-violet-100/80' },
-              { emoji: '📓', tag: 'Reflection', label: 'One line about today', bg: 'bg-amber-100/80' },
-            ].map((row, i) => (
-              <motion.div
-                key={row.label}
-                initial={{ opacity: 0, x: 12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.35 + i * 0.1, duration: 0.4 }}
-                className="flex items-center gap-3 rounded-2xl bg-white/75 border border-white/80 p-2.5 shadow-ios"
-              >
-                <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center shrink-0', row.bg)}>
-                  <FluentEmoji emoji={row.emoji} size={24} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[#EB5E33]">
-                    {row.tag}
-                  </p>
-                  <p className="text-[13.5px] font-semibold text-[#2A1810] leading-tight truncate">
-                    {row.label}
-                  </p>
-                </div>
-                <div className="w-5 h-5 rounded-full border-2 border-[#EB5E33]/40" />
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Floating tab bar hint */}
+          {/* Count chip floating below the fan */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.85, duration: 0.4 }}
-            className="mt-4 mx-auto w-[170px] h-9 rounded-full bg-white/85 border border-white/80 shadow-ios flex items-center justify-around"
+            transition={{ delay: 0.95, duration: 0.4 }}
+            className="absolute left-1/2 -translate-x-1/2 bottom-0 px-4 py-2 rounded-full bg-white/85 backdrop-blur-xl border border-white/80 shadow-ios"
           >
-            {['🏠', '🧰', '🎧', '💬'].map((e) => (
-              <FluentEmoji key={e} emoji={e} size={16} />
-            ))}
+            <p className="text-[12px] font-semibold text-[#2A1810]">
+              <span className="text-[#EB5E33]">+ 200 sessions</span> in your language
+            </p>
           </motion.div>
-        </motion.div>
+        </div>
       </div>
 
       <div className="pt-4">
