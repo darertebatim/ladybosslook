@@ -12,6 +12,7 @@ import { selfcareQuizFlow } from '@/data/onboarding-flows/selfcare-quiz';
 import { selfcareWeeklyReviewFlow } from '@/data/onboarding-flows/selfcare-weekly-review';
 import { whatIsRiloFlow } from '@/data/onboarding-flows/what-is-rilo';
 import { riloDoorsFlow } from '@/data/onboarding-flows/rilo-doors';
+import { LANG_LABEL_TO_ISO } from '@/components/admin/onboarding/RiloDoorsScreens';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
@@ -98,12 +99,13 @@ export default function AppOnboarding() {
     if (rawFlow.id === 'rilo-doors') {
       const lang = answers['rd-language'];
       const langStr = Array.isArray(lang) ? lang[0] : lang;
+      const langIso = langStr ? (LANG_LABEL_TO_ISO[langStr] || String(langStr).toLowerCase()) : '';
       const primary = answers['rd-door-primary'];
       const primaryStr = Array.isArray(primary) ? primary[0] : primary;
       steps = steps.filter(s => {
         // Hide language-switch step if user picked English (or hasn't picked yet)
         if (s.id === 'rd-language-switch') {
-          return !!langStr && langStr !== 'en' && langStr !== 'english';
+          return !!langIso && langIso !== 'en';
         }
         // Hide non-matching sharpener branches
         if (s.doorBranch) return s.doorBranch === primaryStr;
@@ -245,12 +247,13 @@ export default function AppOnboarding() {
         try {
           const lang = answers['rd-language'];
           const langStr = Array.isArray(lang) ? lang[0] : lang;
-          if (langStr) {
-            localStorage.setItem('simora_onboarding_language', String(langStr));
+          const langIso = langStr ? (LANG_LABEL_TO_ISO[String(langStr)] || String(langStr).toLowerCase()) : '';
+          if (langIso) {
+            localStorage.setItem('simora_onboarding_language', langIso);
             const switchChoice = answers['rd-language-switch'];
             const switchStr = Array.isArray(switchChoice) ? switchChoice[0] : switchChoice;
             if (switchStr === 'yes') {
-              localStorage.setItem('i18nextLng', String(langStr));
+              localStorage.setItem('i18nextLng', langIso);
             }
           }
           const nickname = answers['rd-nickname'];
@@ -293,9 +296,10 @@ export default function AppOnboarding() {
 
   const step = flow.steps[currentStep];
   const progress = ((currentStep + 1) / flow.steps.length) * 100;
+  const isRiloDoors = flowId === 'rilo-doors';
 
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col">
+    <div className={`fixed inset-0 z-50 flex flex-col ${isRiloDoors ? 'bg-[#FFF8F2]' : 'bg-white'}`}>
       {/* Navigation bar — hidden on paywall steps (they have their own controls).
           On AI screens (rilo-week-plans) we show only the back button — no progress bar, no top Skip. */}
       {step.type !== 'paywall' && (
@@ -306,6 +310,24 @@ export default function AppOnboarding() {
           >
             <button onClick={goBack} className="active:opacity-60 p-1">
               <ChevronLeft className="h-5 w-5 text-[#1a1f3d]" />
+            </button>
+          </div>
+        ) : isRiloDoors ? (
+          <div
+            className="absolute left-0 right-0 top-0 z-30 px-4 py-2 flex items-center"
+            style={{ paddingTop: 'env(safe-area-inset-top, 44px)' }}
+          >
+            <button onClick={goBack} className="mr-2 active:opacity-60 p-1">
+              <ChevronLeft className="h-5 w-5 text-[#2A1810]" />
+            </button>
+            <div className="flex-1 h-[3px] bg-[#2A1810]/10 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-[#EB5E33] to-[#F5A623] rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <button onClick={handleClose} className="ml-2 active:opacity-60 p-1 text-xs text-[#2A1810]/70 font-medium">
+              Skip
             </button>
           </div>
         ) : (
@@ -328,7 +350,7 @@ export default function AppOnboarding() {
       )}
 
       {/* Step content - full screen with slide transition */}
-      <div className="flex-1 overflow-hidden relative bg-black">
+      <div className={`flex-1 overflow-hidden relative ${isRiloDoors ? 'bg-[#FFF8F2]' : 'bg-black'}`}>
         <AnimatePresence mode="wait" custom={direction}>
           {step.type === 'rilo-week-plans' ? (
             <motion.div

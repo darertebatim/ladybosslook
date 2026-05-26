@@ -5,6 +5,14 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 
+/* ─── Label → ISO map (used by AppOnboarding too) ──────────────── */
+export const LANG_LABEL_TO_ISO: Record<string, string> = {
+  'English only': 'en',
+  'Persian': 'fa',
+  'Turkish': 'tr',
+  'Spanish': 'es',
+};
+
 /* ─── Door catalog ─────────────────────────────────────────────── */
 
 type DoorKey = 'emotion' | 'selfcare' | 'immigrant' | 'productivity' | 'exploring';
@@ -801,6 +809,145 @@ export function OpenTheDoorScreen({
       </div>
       <div className="pt-2">
         <GlassCTA onClick={onNext}>{step.buttonLabel || 'Enter My Rilo'}</GlassCTA>
+      </div>
+    </GlassShell>
+  );
+}
+
+/* ─── 7. Nickname (glass) ──────────────────────────────────────── */
+
+export function DoorNicknameScreen({
+  step,
+  onNext,
+  onAnswer,
+  answers,
+}: {
+  step: OnboardingStep;
+  onNext: () => void;
+  onAnswer?: (id: string, val: string | string[]) => void;
+  answers?: OnboardingAnswers;
+}) {
+  const initial = (answers?.[step.id] as string) || '';
+  const [value, setValue] = useState(initial);
+  const trimmed = value.trim();
+
+  const submit = () => {
+    if (!trimmed) return;
+    haptic.success();
+    onAnswer?.(step.id, trimmed);
+    onNext();
+  };
+
+  return (
+    <GlassShell>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-8 mt-6"
+      >
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#EB5E33]">
+          Welcome
+        </p>
+        <h1 className="mt-2 text-[30px] leading-[1.1] font-bold text-[#2A1810]">
+          {step.title || 'Hi — what should we call you?'}
+        </h1>
+        {step.subtitle && (
+          <p className="mt-3 text-[15px] text-[#5a4a3a] leading-snug">{step.subtitle}</p>
+        )}
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15, duration: 0.5 }}
+        className="flex-1"
+      >
+        <div className="rounded-[22px] bg-white/55 backdrop-blur-2xl border border-white/70 shadow-ios p-4">
+          <input
+            autoFocus
+            type="text"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
+            placeholder="Your first name"
+            className="w-full bg-transparent outline-none text-[20px] font-semibold text-[#2A1810] placeholder:text-[#bba99a] py-2"
+          />
+        </div>
+      </motion.div>
+
+      <div className="pt-4">
+        <GlassCTA onClick={submit} disabled={!trimmed}>
+          {step.buttonLabel || 'Continue'}
+        </GlassCTA>
+      </div>
+    </GlassShell>
+  );
+}
+
+/* ─── 8. Language switch (glass) ───────────────────────────────── */
+
+export function DoorLanguageSwitchScreen({
+  step,
+  onNext,
+  onAnswer,
+  answers,
+}: {
+  step: OnboardingStep;
+  onNext: () => void;
+  onAnswer?: (id: string, val: string | string[]) => void;
+  answers?: OnboardingAnswers;
+}) {
+  const langLabel = (answers?.['rd-language'] as string) || '';
+  const pretty =
+    langLabel === 'English only' ? 'English' : langLabel || 'this language';
+
+  const pick = (val: 'yes' | 'no') => {
+    haptic.selection();
+    onAnswer?.(step.id, val);
+    setTimeout(onNext, 250);
+  };
+
+  return (
+    <GlassShell>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-8 mt-6"
+      >
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#EB5E33]">
+          Quick check
+        </p>
+        <h1 className="mt-2 text-[28px] leading-[1.1] font-bold text-[#2A1810]">
+          Switch the app to {pretty} too?
+        </h1>
+        <p className="mt-3 text-[15px] text-[#5a4a3a] leading-snug">
+          {step.subtitle || 'Or keep the interface in English — your choice.'}
+        </p>
+      </motion.div>
+
+      <div className="flex-1" />
+
+      <div className="space-y-3 pb-2">
+        <motion.button
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          onClick={() => pick('yes')}
+          className="w-full py-4 rounded-2xl font-bold text-base text-white bg-gradient-to-r from-[#EB5E33] to-[#F5A623] shadow-ios active:scale-[0.98] transition-all"
+        >
+          {step.buttonLabel || `Switch to ${pretty}`}
+        </motion.button>
+        <motion.button
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.18 }}
+          onClick={() => pick('no')}
+          className="w-full py-4 rounded-2xl font-semibold text-base text-[#2A1810] bg-white/65 backdrop-blur-2xl border border-white/70 shadow-ios active:scale-[0.98] transition-all"
+        >
+          {step.secondaryButtonLabel || 'Keep English'}
+        </motion.button>
       </div>
     </GlassShell>
   );
