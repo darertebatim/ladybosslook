@@ -114,7 +114,7 @@ export default function AppFasting() {
         className="flex items-center justify-between px-4 pb-2"
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
       >
-        <BackButton to="/app/home" />
+        <BackButton />
         <h1 className="font-semibold text-lg">{t('tier1.fasting.title')}</h1>
         <button
           onClick={() => setStatsOpen(true)}

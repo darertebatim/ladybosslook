@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 
 interface CloseButtonProps {
-  /** Explicit destination. If not provided, checks location.state.from, then falls back to /app/home */
+  /** Explicit destination. If not provided, checks location.state.from, then falls back to /app/my-rilo */
   to?: string;
   /** Optional click handler that runs before navigation */
   onClick?: () => void;
@@ -33,8 +33,8 @@ export function CloseButton({
   let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void } | null = null;
   try { routinePlayer = useRoutinePlayerContext(); } catch { /* provider not available */ }
 
-  // Determine destination: explicit to > referrer state > fallback home
-  const destination = to || (location.state as { from?: string })?.from || '/app/home';
+  // Determine destination: explicit to > referrer state > fallback My Rilo (new home base)
+  const destination = to || (location.state as { from?: string })?.from || '/app/my-rilo';
 
   const handleClick = () => {
     haptic.light();

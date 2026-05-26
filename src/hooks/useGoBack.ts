@@ -3,9 +3,9 @@ import { useCallback } from 'react';
 
 /**
  * Safe go-back hook. If there's browser history, navigates back.
- * Otherwise navigates to the provided fallback route (default: /app/home).
+ * Otherwise navigates to the provided fallback route (default: /app/my-rilo).
  */
-export function useGoBack(fallback = '/app/home') {
+export function useGoBack(fallback = '/app/my-rilo') {
   const navigate = useNavigate();
   const location = useLocation();
 

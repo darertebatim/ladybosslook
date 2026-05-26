@@ -247,7 +247,7 @@ const AppWater = () => {
           className="relative z-10 flex items-center justify-between px-4 pt-3"
           style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
         >
-          <BackButtonCircle to="/app/home" className="bg-white/40 text-sky-700" />
+          <BackButtonCircle className="bg-white/40 text-sky-700" />
           
           <h1 className="text-lg font-semibold text-sky-800">{formatDate()}</h1>
           

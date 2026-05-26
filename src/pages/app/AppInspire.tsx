@@ -130,7 +130,7 @@ export default function AppInspire() {
       >
         <div className="px-4 pt-3 pb-3 flex items-center justify-between min-h-[52px] gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <BackButton to="/app/home" showLabel={false} className="-ml-2" />
+            <BackButton showLabel={false} className="-ml-2" />
             <CalendarPlus className="w-5 h-5 text-[hsl(var(--brand-primary))] shrink-0" />
             <h1 className="text-xl font-bold text-fg-warm truncate">
               {t('inspirePage.title')}

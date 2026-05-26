@@ -197,7 +197,6 @@ const AppPeriod = () => {
           }}
         >
           <BackButtonCircle
-            to="/app/home"
             className="bg-white/60 text-pink-700"
           />
 
