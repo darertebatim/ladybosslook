@@ -1004,46 +1004,63 @@ export function DoorLanguageSwitchScreen({
   };
 
   return (
-    <GlassShell>
+    <div className="relative h-full w-full overflow-hidden">
+      <MeshBg />
+      {/* dim layer to suggest a sheet over the prior screen */}
+      <div className="absolute inset-0 bg-black/30 z-[5]" />
+
+      {/* half-page bottom sheet */}
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="mb-8 mt-6"
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        transition={{ type: 'spring', stiffness: 340, damping: 34 }}
+        className="absolute inset-x-0 bottom-0 z-10 rounded-t-[28px] bg-[#FFF8F2] shadow-[0_-12px_40px_rgba(0,0,0,0.18)]"
+        style={{
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
+        }}
       >
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#EB5E33]">
-          Quick check
-        </p>
-        <h1 className="mt-2 text-[28px] leading-[1.1] font-bold text-[#2A1810]">
-          Switch the app to {pretty} too?
-        </h1>
-        <p className="mt-3 text-[15px] text-[#5a4a3a] leading-snug">
-          {step.subtitle || 'Or keep the interface in English — your choice.'}
-        </p>
+        {/* grabber */}
+        <div className="flex justify-center pt-3">
+          <div className="h-1.5 w-10 rounded-full bg-black/15" />
+        </div>
+
+        <div className="px-5 pt-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#EB5E33]">
+            Quick check
+          </p>
+          <h1 className="mt-2 text-[24px] leading-[1.15] font-bold text-[#2A1810]">
+            Switch the app to {pretty} too?
+          </h1>
+          <p className="mt-2 text-[14px] text-[#5a4a3a] leading-snug">
+            {step.subtitle || 'Or keep the interface in English — your choice.'}
+          </p>
+
+          <p className="mt-4 text-[12px] text-[#8a7866] italic">
+            * You can always change the language in Settings.
+          </p>
+        </div>
+
+        <div className="px-5 pt-6 pb-2 flex gap-3">
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.12 }}
+            onClick={() => pick('no')}
+            className="flex-1 py-4 rounded-2xl font-bold text-base text-white bg-gradient-to-r from-[#EB5E33] to-[#F5A623] shadow-ios active:scale-[0.98] transition-all"
+          >
+            {step.secondaryButtonLabel || 'Keep English'}
+          </motion.button>
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.18 }}
+            onClick={() => pick('yes')}
+            className="flex-1 py-4 rounded-2xl font-semibold text-base text-[#2A1810] bg-white border border-black/5 shadow-ios active:scale-[0.98] transition-all"
+          >
+            {step.buttonLabel || `Switch to ${pretty}`}
+          </motion.button>
+        </div>
       </motion.div>
-
-      <div className="flex-1" />
-
-      <div className="space-y-3 pb-2">
-        <motion.button
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          onClick={() => pick('yes')}
-          className="w-full py-4 rounded-2xl font-bold text-base text-white bg-gradient-to-r from-[#EB5E33] to-[#F5A623] shadow-ios active:scale-[0.98] transition-all"
-        >
-          {step.buttonLabel || `Switch to ${pretty}`}
-        </motion.button>
-        <motion.button
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.18 }}
-          onClick={() => pick('no')}
-          className="w-full py-4 rounded-2xl font-semibold text-base text-[#2A1810] bg-white/65 backdrop-blur-2xl border border-white/70 shadow-ios active:scale-[0.98] transition-all"
-        >
-          {step.secondaryButtonLabel || 'Keep English'}
-        </motion.button>
-      </div>
-    </GlassShell>
+    </div>
   );
 }
