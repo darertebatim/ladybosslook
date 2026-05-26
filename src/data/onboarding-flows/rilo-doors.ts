@@ -16,7 +16,7 @@ export const riloDoorsFlow: OnboardingFlow = {
   steps: [
     {
       id: 'rd-nickname',
-      type: 'text-input',
+      type: 'door-nickname',
       title: 'Hi — what should we call you?',
       subtitle: 'Just a first name is perfect.',
       buttonLabel: 'Continue',
@@ -26,10 +26,16 @@ export const riloDoorsFlow: OnboardingFlow = {
       type: 'rilo-language-bubbles',
       title: 'Which language feels most like home?',
       subtitle: 'We use this for your content.',
+      options: [
+        { label: 'English only', emoji: '🇺🇸' },
+        { label: 'Persian', emoji: 'flag:persian' },
+        { label: 'Turkish', emoji: '🇹🇷' },
+        { label: 'Spanish', emoji: '🇪🇸' },
+      ],
     },
     {
       id: 'rd-language-switch',
-      type: 'yes-no',
+      type: 'door-language-switch',
       title: 'Switch the app to this language too?',
       subtitle: 'Or keep the interface in English — your choice.',
       buttonLabel: 'Switch it',
