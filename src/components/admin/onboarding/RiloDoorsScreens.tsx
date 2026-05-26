@@ -178,29 +178,17 @@ function GhostCTA({
   );
 }
 
-/* ─── 1. Door Cards (primary & secondary) ──────────────────────── */
+/* ─── 1. Door Cards ────────────────────────────────────────────── */
 
 export function DoorCardsGlassScreen({
   step,
   onNext,
   onAnswer,
-  answers,
 }: {
   step: OnboardingStep;
   onNext: () => void;
   onAnswer?: (id: string, val: string | string[]) => void;
-  answers?: OnboardingAnswers;
 }) {
-  const slot = step.doorSlot || 'primary';
-  const primary = (answers?.['rd-door-primary'] as string) || '';
-
-  const doors = useMemo(() => {
-    if (slot === 'secondary' && primary) {
-      return DOORS.filter((d) => d.key !== primary);
-    }
-    return DOORS;
-  }, [slot, primary]);
-
   const [picked, setPicked] = useState<DoorKey | null>(null);
 
   const handlePick = (k: DoorKey) => {
