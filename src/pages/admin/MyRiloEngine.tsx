@@ -299,6 +299,39 @@ export default function MyRiloEngine() {
         </p>
       </div>
 
+      <Card className="border-primary/40">
+        <CardHeader>
+          <CardTitle className="text-base">Vocabulary</CardTitle>
+          <CardDescription>One definition, used everywhere on this page.</CardDescription>
+        </CardHeader>
+        <CardContent className="text-sm space-y-3">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg">🌬️</span>
+              <span className="font-semibold">Reset</span>
+              <Badge variant="outline" className="text-[10px] font-mono">reset</Badge>
+            </div>
+            <p className="text-muted-foreground text-xs leading-relaxed">
+              A single 2–3 min step that resolves to <strong>one breath OR one reflection</strong>, picked deterministically by date seed (alternates day-to-day, deep-links to the specific item). It is <strong>always one item</strong>, never both.
+            </p>
+            <p className="text-muted-foreground text-xs leading-relaxed mt-1.5">
+              <strong>"Door-flavored"</strong> means the picker is filtered by the user's door before the date seed runs:
+            </p>
+            <ul className="text-xs text-muted-foreground list-disc list-inside ml-2 mt-1 space-y-0.5">
+              <li><strong>Emotion door</strong> → only items tagged with the picked emotion slug (strict)</li>
+              <li><strong>Immigrant door</strong> → bilingual item if one exists, else generic</li>
+              <li><strong>Self-Care door</strong> → quiz-outcome category if available, else generic</li>
+              <li><strong>Productivity / Exploring / no match</strong> → generic 2-min calm pool</li>
+              <li><strong>Day 4+ (Standard flow)</strong> → no door flavor, generic pool only</li>
+            </ul>
+          </div>
+          <Separator />
+          <div className="text-xs text-muted-foreground">
+            Whenever you see <em>"Reset"</em>, <em>"reset"</em>, or <em>"door-flavored reset"</em> below — it means this exact step. There is no second concept.
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
