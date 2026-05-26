@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { endOfDay, startOfDay } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { getLocalDateStr } from "@/lib/localDate";
@@ -260,7 +261,7 @@ export function useTodayPath() {
         | undefined;
       const hasMoodTodayLog =
         !!moodLatest?.created_at &&
-        new Date(moodLatest.created_at).toISOString().slice(0, 10) === today;
+        getLocalDateStr(new Date(moodLatest.created_at)) === today;
 
       // Map valence → coarse mood label used by the scorer.
       const valenceToMood: Record<string, ScoringContext["todayMood"]> = {
@@ -533,8 +534,8 @@ export function useTodayPath() {
       // (breathing_sessions, reflections, audio_progress, task_completions).
       // Each path suggestion behaves like a pro-task: complete the underlying
       // activity today and the step ticks off automatically.
-      const todayStartIso = `${today}T00:00:00.000Z`;
-      const todayEndIso = `${today}T23:59:59.999Z`;
+      const todayStartIso = startOfDay(new Date()).toISOString();
+      const todayEndIso = endOfDay(new Date()).toISOString();
       const [breatheRes, reflResRes, freeReflRes, taskCompRes] = await Promise.all([
         supabase
           .from("breathing_sessions")
@@ -588,7 +589,7 @@ export function useTodayPath() {
       const completedAudioIds = new Set<string>();
       const completedPlaylistIds = new Set<string>();
       for (const r of progressRows) {
-        if (!r.last_played_at || r.last_played_at.slice(0, 10) !== today) continue;
+        if (!r.last_played_at || getLocalDateStr(new Date(r.last_played_at)) !== today) continue;
         const meaningfulListen =
           r.completed === true || (r.current_position_seconds ?? 0) >= 30;
         if (!meaningfulListen) continue;
