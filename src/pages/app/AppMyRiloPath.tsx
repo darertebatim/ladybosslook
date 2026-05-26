@@ -10,7 +10,9 @@ import {
   useSnoozePathStep,
   useSwapPathStep,
   useSkipTomorrowPathStep,
+  markStepTapped,
 } from "@/hooks/useTodayPath";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useGoBack } from "@/hooks/useGoBack";
 import type { PathStep } from "@/lib/pathEngine";
@@ -318,6 +320,7 @@ function RewardRow({ step }: { step: PathStep }) {
 
 export default function AppMyRiloPath() {
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const goBack = useGoBack("/app/home");
   const { user } = useAuth();
   const { data, isLoading } = useTodayPath();
@@ -350,7 +353,16 @@ export default function AppMyRiloPath() {
   const nonReward = steps.filter((s) => s.kind !== "reward");
   const reward = steps.find((s) => s.kind === "reward");
 
-  const handleStart = (step: PathStep) => navigate(step.startHref);
+  const handleStart = (step: PathStep) => {
+    // Tap = done (mirrors pro-link shortcut behaviour). Steps that already
+    // have a real DB completion signal (audio progress, breath session,
+    // reflection, task completion) will continue to use those — this just
+    // covers steps like the "Open your planner" routine card where the
+    // user's tap IS the completion intent.
+    markStepTapped(step.id);
+    qc.invalidateQueries({ queryKey: ["today-path"] });
+    navigate(step.startHref);
+  };
   const handleSkip = (step: PathStep) => {
     if (step.kind === "reward") return;
     haptic.light();
