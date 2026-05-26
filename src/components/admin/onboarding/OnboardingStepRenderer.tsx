@@ -36,6 +36,14 @@ import { RiloPickTasksScreen } from '@/components/admin/onboarding/RiloPickTasks
 import { RiloWeekPlansScreen } from '@/components/admin/onboarding/RiloWeekPlansScreen';
 import { RiloBuildingPlanScreen } from '@/components/admin/onboarding/RiloBuildingPlanScreen';
 import { RiloCommitScreen } from '@/components/admin/onboarding/RiloCommitScreen';
+import {
+  DoorCardsGlassScreen,
+  DoorEmotionPickerScreen,
+  DoorSelfcareOffersScreen,
+  DoorImmigrantPickerScreen,
+  MeetRiloIntroScreen,
+  OpenTheDoorScreen,
+} from '@/components/admin/onboarding/RiloDoorsScreens';
 
 function OptionEmoji({ emoji, size }: { emoji: string; size: number }) {
   if (emoji === 'flag:persian') return <PersianFlag size={size} />;
@@ -82,6 +90,18 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <RiloCommitScreen step={step} onNext={onNext} />;
     case 'rilo-language-bubbles':
       return <RiloLanguageBubblesScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'door-cards-glass':
+      return <DoorCardsGlassScreen step={step} onNext={onNext} onAnswer={onAnswer} answers={answers} />;
+    case 'door-emotion-picker':
+      return <DoorEmotionPickerScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'door-selfcare-offers':
+      return <DoorSelfcareOffersScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'door-immigrant-picker':
+      return <DoorImmigrantPickerScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'meet-rilo-intro':
+      return <MeetRiloIntroScreen step={step} onNext={onNext} />;
+    case 'open-the-door':
+      return <OpenTheDoorScreen step={step} onNext={onNext} answers={answers} />;
     case 'greeting':
       return <GreetingScreen step={step} onNext={onNext} />;
     case 'multi-select':

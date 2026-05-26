@@ -11,6 +11,7 @@ import { weeklyReviewFlow } from '@/data/onboarding-flows/weekly-review';
 import { selfcareQuizFlow } from '@/data/onboarding-flows/selfcare-quiz';
 import { selfcareWeeklyReviewFlow } from '@/data/onboarding-flows/selfcare-weekly-review';
 import { whatIsRiloFlow } from '@/data/onboarding-flows/what-is-rilo';
+import { riloDoorsFlow } from '@/data/onboarding-flows/rilo-doors';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,7 +23,7 @@ import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
 import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
 import { Analytics } from '@/lib/firebaseAnalytics';
 import { provisionRiloPicks } from '@/lib/onboarding/provisionRiloPicks';
-const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow, preAuthWelcomeFlow, weeklyReviewFlow, selfcareQuizFlow, selfcareWeeklyReviewFlow, whatIsRiloFlow];
+const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow, preAuthWelcomeFlow, weeklyReviewFlow, selfcareQuizFlow, selfcareWeeklyReviewFlow, whatIsRiloFlow, riloDoorsFlow];
 
 function preloadImages(srcs: string[]) {
   srcs.forEach(src => {
@@ -71,12 +72,6 @@ export default function AppOnboarding() {
   const { isSubscribed } = useSubscription();
   const rawFlow = allFlows.find(f => f.id === flowId);
 
-  // Filter out paywall steps for subscribed users
-  const flow = rawFlow ? {
-    ...rawFlow,
-    steps: isSubscribed ? rawFlow.steps.filter(s => s.type !== 'paywall') : rawFlow.steps,
-  } : undefined;
-
   // Restore progress from localStorage
   const progressKey = `simora_onboarding_progress_${flowId}`;
   const completedKey = `simora_onboarding_completed_${flowId}`;
@@ -95,6 +90,28 @@ export default function AppOnboarding() {
   });
   const [answers, setAnswers] = useState<OnboardingAnswers>({});
   const [direction, setDirection] = useState(1); // 1 = forward, -1 = back
+
+  // Filter steps based on subscription + Rilo Doors branching (uses live answers)
+  const flow = (() => {
+    if (!rawFlow) return undefined;
+    let steps = isSubscribed ? rawFlow.steps.filter(s => s.type !== 'paywall') : rawFlow.steps;
+    if (rawFlow.id === 'rilo-doors') {
+      const lang = answers['rd-language'];
+      const langStr = Array.isArray(lang) ? lang[0] : lang;
+      const primary = answers['rd-door-primary'];
+      const primaryStr = Array.isArray(primary) ? primary[0] : primary;
+      steps = steps.filter(s => {
+        // Hide language-switch step if user picked English (or hasn't picked yet)
+        if (s.id === 'rd-language-switch') {
+          return !!langStr && langStr !== 'en' && langStr !== 'english';
+        }
+        // Hide non-matching sharpener branches
+        if (s.doorBranch) return s.doorBranch === primaryStr;
+        return true;
+      });
+    }
+    return { ...rawFlow, steps };
+  })();
 
   // Preload images on mount + fire onboarding_started (once per flow)
   useEffect(() => {
@@ -223,6 +240,25 @@ export default function AppOnboarding() {
           );
         }
         navigate('/app/home');
+      } else if (flowId === 'rilo-doors') {
+        // Persist preferred language + (optional) UI language switch
+        try {
+          const lang = answers['rd-language'];
+          const langStr = Array.isArray(lang) ? lang[0] : lang;
+          if (langStr) {
+            localStorage.setItem('simora_onboarding_language', String(langStr));
+            const switchChoice = answers['rd-language-switch'];
+            const switchStr = Array.isArray(switchChoice) ? switchChoice[0] : switchChoice;
+            if (switchStr === 'yes') {
+              localStorage.setItem('i18nextLng', String(langStr));
+            }
+          }
+          const nickname = answers['rd-nickname'];
+          if (nickname) {
+            localStorage.setItem('simora_onboarding_nickname', typeof nickname === 'string' ? nickname : nickname[0] || '');
+          }
+        } catch {}
+        navigate('/app/my-rilo');
       } else {
         navigate('/auth?mode=signup');
       }
