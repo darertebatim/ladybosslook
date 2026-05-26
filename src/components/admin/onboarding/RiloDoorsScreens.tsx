@@ -218,11 +218,8 @@ export function DoorCardsGlassScreen({
         transition={{ duration: 0.4 }}
         className="mb-6"
       >
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#EB5E33]">
-          {slot === 'primary' ? 'Step 1 of 2' : 'Step 2 of 2'}
-        </p>
-        <h1 className="mt-2 text-[28px] leading-[1.15] font-bold text-[#2A1810]">
-          {step.title || (slot === 'primary' ? 'Which door is yours\nright now?' : 'And a second one?')}
+        <h1 className="text-[28px] leading-[1.15] font-bold text-[#2A1810]">
+          {step.title || 'Which door is yours\nright now?'}
         </h1>
         {step.subtitle && (
           <p className="mt-2 text-[15px] text-[#5a4a3a] leading-snug">{step.subtitle}</p>
@@ -287,19 +284,6 @@ export function DoorCardsGlassScreen({
           );
         })}
       </div>
-
-      {slot === 'secondary' && (
-        <div className="pt-4">
-          <GhostCTA
-            onClick={() => {
-              onAnswer?.(step.id, 'skip');
-              onNext();
-            }}
-          >
-            Just one door is enough →
-          </GhostCTA>
-        </div>
-      )}
     </GlassShell>
   );
 }
