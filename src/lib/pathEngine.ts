@@ -63,6 +63,10 @@ export interface PathInputs {
     title: string;
     coverEmoji?: string | null;
     category?: string | null;
+    /** "continue" = resume in-progress playlist; "smart_next" = follow-up to last completed; default = normal pick. */
+    mode?: "continue" | "smart_next" | "default";
+    /** If set, navigate to this specific track (used for Continue to resume). */
+    resumeAudioId?: string | null;
   } | null;
   /** Optional locked Plus playlist teaser for non-Plus users. */
   lockedTeaser?: {
