@@ -28,6 +28,7 @@ interface ContentRow {
   title: string;
   emoji?: string | null;
   subtitle?: string | null;
+  groupName?: string | null;
 }
 
 const TYPE_TABS: { value: ContentType; label: string }[] = [
@@ -74,11 +75,23 @@ function useContentList(contentType: ContentType) {
       if (contentType === "audio") {
         const { data, error } = await supabase
           .from("audio_content")
-          .select("id, title, description")
+          .select(
+            "id, title, description, sort_order, audio_playlist_items(playlist:audio_playlists(name))"
+          )
           .order("title", { ascending: true })
-          .limit(1000);
+          .limit(2000);
         if (error) throw error;
-        return (data || []).map((r: any) => ({ id: r.id, title: r.title, subtitle: r.description }));
+        return (data || []).map((r: any) => {
+          const names: string[] = (r.audio_playlist_items || [])
+            .map((api: any) => api?.playlist?.name)
+            .filter(Boolean);
+          return {
+            id: r.id,
+            title: r.title,
+            subtitle: r.description,
+            groupName: names[0] || "— No playlist —",
+          };
+        });
       }
       if (contentType === "playlist") {
         const { data, error } = await supabase
