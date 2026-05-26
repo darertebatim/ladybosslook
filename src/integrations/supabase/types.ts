@@ -1279,6 +1279,35 @@ export type Database = {
           },
         ]
       }
+      content_tags: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          tag_id: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          tag_id: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_enrollments: {
         Row: {
           course_name: string
@@ -4867,6 +4896,102 @@ export type Database = {
             columns: ["subtask_id"]
             isOneToOne: false
             referencedRelation: "user_subtasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tag_dimensions: {
+        Row: {
+          created_at: string
+          description: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean
+          is_multi_select: boolean
+          label: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean
+          is_multi_select?: boolean
+          label: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean
+          is_multi_select?: boolean
+          label?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          created_at: string
+          description: string | null
+          dimension_id: string
+          emoji: string | null
+          id: string
+          is_active: boolean
+          label: string
+          parent_tag_id: string | null
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          dimension_id: string
+          emoji?: string | null
+          id?: string
+          is_active?: boolean
+          label: string
+          parent_tag_id?: string | null
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          dimension_id?: string
+          emoji?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string
+          parent_tag_id?: string | null
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tags_dimension_id_fkey"
+            columns: ["dimension_id"]
+            isOneToOne: false
+            referencedRelation: "tag_dimensions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tags_parent_tag_id_fkey"
+            columns: ["parent_tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
             referencedColumns: ["id"]
           },
         ]
