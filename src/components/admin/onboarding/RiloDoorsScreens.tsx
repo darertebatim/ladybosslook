@@ -616,7 +616,6 @@ export function DoorImmigrantPickerScreen({
   onAnswer?: (id: string, val: string | string[]) => void;
 }) {
   const [picked, setPicked] = useState<string[]>([]);
-  const [added, setAdded] = useState(false);
 
   const toggle = (k: string) => {
     haptic.selection();
@@ -624,7 +623,7 @@ export function DoorImmigrantPickerScreen({
   };
 
   const handleContinue = () => {
-    onAnswer?.(step.id, [...picked, added ? 'bilingual_strength_added' : 'no_add']);
+    onAnswer?.(step.id, picked.length ? picked : ['unknown']);
     onNext();
   };
 
@@ -660,38 +659,7 @@ export function DoorImmigrantPickerScreen({
         ))}
       </div>
 
-      {/* Starter offer */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25 }}
-        className="rounded-[22px] bg-white/55 backdrop-blur-2xl border border-white/70 shadow-ios p-5 mb-5"
-      >
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-violet-100/80 flex items-center justify-center">
-            <FluentEmoji emoji="🌉" size={28} />
-          </div>
-          <div>
-            <p className="text-[16px] font-bold text-[#2A1810]">Bilingual Strength</p>
-            <p className="text-[12px] text-[#6b5a4a]">A starter playlist for you</p>
-          </div>
-        </div>
-        <p className="text-[14px] text-[#5a4a3a] mb-3 leading-snug">
-          Voices, reflections, and breathwork made for two-language hearts.
-        </p>
-        <button
-          onClick={added ? undefined : () => { haptic.success(); setAdded(true); }}
-          disabled={added}
-          className={cn(
-            'w-full py-3 rounded-xl font-semibold text-[14px] transition-all active:scale-[0.98]',
-            added ? 'bg-violet-500/90 text-white' : 'bg-[#2A1810] text-white'
-          )}
-        >
-          {added ? '✓ Added to My Rilo' : 'Add to My Rilo'}
-        </button>
-      </motion.div>
-
-      <div className="pt-1">
+      <div className="pt-5">
         <GlassCTA onClick={handleContinue}>Continue</GlassCTA>
       </div>
     </GlassShell>
