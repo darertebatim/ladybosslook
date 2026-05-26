@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -601,8 +601,12 @@ function EditDrawer({
 }
 
 function usePendingUntagged() {
+  const cutoff =
+    typeof window !== "undefined"
+      ? localStorage.getItem("admin-pending-cutoff") || ""
+      : "";
   return useQuery({
-    queryKey: ["admin-pending-untagged"],
+    queryKey: ["admin-pending-untagged", cutoff],
     queryFn: async () => {
       const [pl, au, re, br, links] = await Promise.all([
         supabase
@@ -666,7 +670,7 @@ function usePendingUntagged() {
           });
       });
       rows.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
-      return rows;
+      return cutoff ? rows.filter((r) => r.created_at > cutoff) : rows;
     },
     staleTime: 30 * 1000,
   });
@@ -681,6 +685,7 @@ const TYPE_BADGE: Record<ContentType, { label: string; cls: string }> = {
 
 function PendingReview() {
   const { data: pending = [], isLoading } = usePendingUntagged();
+  const qc = useQueryClient();
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState<
     | { contentType: ContentType; item: ContentRow }
@@ -690,6 +695,12 @@ function PendingReview() {
   const visible = expanded ? pending : pending.slice(0, 8);
 
   if (isLoading) return null;
+
+  const dismissAll = () => {
+    if (!confirm("Mark all current items as reviewed? Only future additions will appear here.")) return;
+    localStorage.setItem("admin-pending-cutoff", new Date().toISOString());
+    qc.invalidateQueries({ queryKey: ["admin-pending-untagged"] });
+  };
 
   return (
     <Card className="p-4 space-y-3 border-amber-500/40 bg-amber-50/40 dark:bg-amber-500/5">
@@ -705,11 +716,18 @@ function PendingReview() {
             New playlists, audios, reflections and breathes appear here until you tag them.
           </p>
         </div>
-        {pending.length > 8 && (
-          <Button size="sm" variant="ghost" onClick={() => setExpanded((v) => !v)}>
-            {expanded ? "Show less" : `Show all (${pending.length})`}
-          </Button>
-        )}
+        <div className="flex items-center gap-1">
+          {pending.length > 0 && (
+            <Button size="sm" variant="ghost" onClick={dismissAll}>
+              Mark all reviewed
+            </Button>
+          )}
+          {pending.length > 8 && (
+            <Button size="sm" variant="ghost" onClick={() => setExpanded((v) => !v)}>
+              {expanded ? "Show less" : `Show all (${pending.length})`}
+            </Button>
+          )}
+        </div>
       </div>
 
       {pending.length === 0 ? (
