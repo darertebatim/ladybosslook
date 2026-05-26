@@ -466,7 +466,7 @@ const App = () => (
                       <Route path="quizzes" element={<ProtectedRoute requiredPage="tools"><QuizzesAdmin /></ProtectedRoute>} />
                       <Route path="analytics" element={<ProtectedRoute requiredPage="overview"><AnalyticsAdmin /></ProtectedRoute>} />
                       <Route path="my-rilo" element={<ProtectedRoute requiredPage="tools"><MyRiloEngine /></ProtectedRoute>} />
-                      <Route path="tags/schema" element={<ProtectedRoute requiredPage="tools"><TagSchemaPage /></ProtectedRoute>} />
+                      <Route path="tags/schema" element={<Navigate to="/admin/tags/content" replace />} />
                       <Route path="tags/content" element={<ProtectedRoute requiredPage="tools"><ContentTaggingPage /></ProtectedRoute>} />
                     </Route>
                   )}
