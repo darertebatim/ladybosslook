@@ -507,6 +507,7 @@ export function useTodayPath() {
         dismissedIds,
         isDayOne,
         featuredAudio,
+        secondaryAudio,
         lockedTeaser,
         featuredReset,
       };
