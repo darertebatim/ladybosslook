@@ -1056,10 +1056,10 @@ export function DoorLanguageSwitchScreen({
 /* ─── 9. Rilo Doors Loader — final building screen ─────────────── */
 
 const LOADER_LIBRARY = [
-  { emoji: '🎧', kind: 'Sleep stories', bg: 'from-violet-200 to-indigo-200', rotate: -10, x: -90, y: 30, z: 1 },
-  { emoji: '🧘', kind: 'Meditations', bg: 'from-emerald-200 to-teal-200', rotate: -3, x: -32, y: 6, z: 2 },
-  { emoji: '📚', kind: 'Mini-courses', bg: 'from-amber-200 to-orange-200', rotate: 5, x: 30, y: 0, z: 3 },
-  { emoji: '🌬️', kind: 'Breathwork', bg: 'from-sky-200 to-cyan-200', rotate: 12, x: 90, y: 28, z: 2 },
+  { emoji: '🎧', kind: 'Sleep stories', bg: 'from-violet-200 to-indigo-200', rotate: -12, x: -110, y: 24, z: 1 },
+  { emoji: '🧘', kind: 'Meditations', bg: 'from-emerald-200 to-teal-200', rotate: -5, x: -38, y: 4, z: 2 },
+  { emoji: '📚', kind: 'Mini-courses', bg: 'from-amber-200 to-orange-200', rotate: 5, x: 38, y: 0, z: 3 },
+  { emoji: '🌬️', kind: 'Breathwork', bg: 'from-sky-200 to-cyan-200', rotate: 12, x: 110, y: 22, z: 2 },
 ];
 
 const LOADER_PILLARS = [
@@ -1082,7 +1082,7 @@ const LOADER_PHASES = [
   { caption: 'Almost ready…', sub: 'Picking your playlists.' },
 ];
 
-const PHASE_MS = 1900;
+const PHASE_MS = 2800;
 
 export function RiloDoorsLoaderScreen({
   step,
@@ -1133,24 +1133,24 @@ export function RiloDoorsLoaderScreen({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.45 }}
-              className="relative w-[300px] h-[260px]"
+              className="relative w-full max-w-[360px] h-[240px]"
             >
               {LOADER_LIBRARY.map((c, i) => (
                 <motion.div
                   key={c.kind}
                   initial={{ opacity: 0, y: 40, rotate: 0 }}
-                  animate={{ opacity: 1, y: c.y, rotate: c.rotate }}
-                  transition={{ delay: 0.1 + i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ left: '50%', top: 0, transform: `translateX(calc(-50% + ${c.x}px))`, zIndex: c.z }}
+                  animate={{ opacity: 1, y: c.y, rotate: c.rotate, x: c.x }}
+                  transition={{ delay: 0.1 + i * 0.12, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ left: '50%', top: 0, marginLeft: -55, zIndex: c.z }}
                   className={cn(
-                    'absolute w-[140px] h-[190px] rounded-[26px] border border-white/80 shadow-ios p-4 flex flex-col justify-between',
+                    'absolute w-[110px] h-[160px] rounded-[24px] border border-white/80 shadow-ios p-3 flex flex-col justify-between',
                     'bg-gradient-to-br', c.bg,
                   )}
                 >
-                  <div className="w-11 h-11 rounded-2xl bg-white/70 backdrop-blur-xl flex items-center justify-center shadow-ios">
-                    <FluentEmoji emoji={c.emoji} size={26} />
+                  <div className="w-10 h-10 rounded-2xl bg-white/70 backdrop-blur-xl flex items-center justify-center shadow-ios">
+                    <FluentEmoji emoji={c.emoji} size={22} />
                   </div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#2A1810]/80">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#2A1810]/80 leading-tight">
                     {c.kind}
                   </p>
                 </motion.div>
@@ -1247,6 +1247,17 @@ export function RiloDoorsLoaderScreen({
             transition={{ duration: 0.5, ease: 'easeOut' }}
             className="h-full rounded-full bg-gradient-to-r from-[#EB5E33] to-[#F5A623]"
           />
+        </div>
+
+        <div className="mt-3 flex items-center justify-center gap-2">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            className="w-3.5 h-3.5 rounded-full border-2 border-[#EB5E33]/30 border-t-[#EB5E33]"
+          />
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#EB5E33]/80">
+            Loading
+          </p>
         </div>
       </div>
     </GlassShell>
