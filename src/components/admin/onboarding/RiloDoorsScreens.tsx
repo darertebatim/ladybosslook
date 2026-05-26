@@ -196,7 +196,7 @@ export function DoorCardsGlassScreen({
   const [picked, setPicked] = useState<DoorKey | null>(null);
 
   const handlePick = (k: DoorKey) => {
-    haptic('select');
+    haptic.selection();
     setPicked(k);
     onAnswer?.(step.id, k);
     setTimeout(onNext, 420);
@@ -334,7 +334,7 @@ export function DoorEmotionPickerScreen({
   const [dontKnow, setDontKnow] = useState(false);
 
   const toggle = (k: string) => {
-    haptic('select');
+    haptic.selection();
     if (dontKnow) setDontKnow(false);
     setPicked((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]));
   };
@@ -376,7 +376,7 @@ export function DoorEmotionPickerScreen({
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
-            onClick={() => { haptic('select'); setExpanded(true); }}
+            onClick={() => { haptic.selection(); setExpanded(true); }}
             className="px-4 py-2.5 rounded-full bg-white/60 backdrop-blur-xl border border-white/70 shadow-ios text-[14px] font-medium text-[#5a4a3a] active:scale-95 transition-all"
           >
             Not these · show more
@@ -394,7 +394,7 @@ export function DoorEmotionPickerScreen({
       <div className="pt-5 space-y-2">
         <button
           onClick={() => {
-            haptic('select');
+            haptic.selection();
             setDontKnow((v) => !v);
             if (!dontKnow) setPicked([]);
           }}
@@ -464,7 +464,7 @@ export function DoorSelfcareOffersScreen({
   const [quizChoice, setQuizChoice] = useState<'yes' | 'later' | null>(null);
 
   const handleAddReset = () => {
-    haptic('success');
+    haptic.success();
     setResetAdded(true);
   };
 
@@ -550,7 +550,7 @@ export function DoorSelfcareOffersScreen({
           </p>
           <div className="grid grid-cols-2 gap-2">
             <button
-              onClick={() => { haptic('select'); setQuizChoice('yes'); }}
+              onClick={() => { haptic.selection(); setQuizChoice('yes'); }}
               className={cn(
                 'py-3 rounded-xl font-semibold text-[14px] transition-all active:scale-[0.97]',
                 quizChoice === 'yes'
@@ -561,7 +561,7 @@ export function DoorSelfcareOffersScreen({
               Yes, let's go
             </button>
             <button
-              onClick={() => { haptic('select'); setQuizChoice('later'); }}
+              onClick={() => { haptic.selection(); setQuizChoice('later'); }}
               className={cn(
                 'py-3 rounded-xl font-semibold text-[14px] transition-all active:scale-[0.97]',
                 quizChoice === 'later'
@@ -607,7 +607,7 @@ export function DoorImmigrantPickerScreen({
   const [added, setAdded] = useState(false);
 
   const toggle = (k: string) => {
-    haptic('select');
+    haptic.selection();
     setPicked((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]));
   };
 
@@ -668,7 +668,7 @@ export function DoorImmigrantPickerScreen({
           Voices, reflections, and breathwork made for two-language hearts.
         </p>
         <button
-          onClick={added ? undefined : () => { haptic('success'); setAdded(true); }}
+          onClick={added ? undefined : () => { haptic.success(); setAdded(true); }}
           disabled={added}
           className={cn(
             'w-full py-3 rounded-xl font-semibold text-[14px] transition-all active:scale-[0.98]',
