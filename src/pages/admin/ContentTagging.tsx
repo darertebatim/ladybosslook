@@ -22,6 +22,12 @@ import {
 import { useAllTags } from "@/hooks/useTags";
 import { useTagDimensions } from "@/hooks/useTagDimensions";
 import { TagPicker } from "@/components/admin/TagPicker";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 
 interface ContentRow {
   id: string;
@@ -32,14 +38,13 @@ interface ContentRow {
 }
 
 const TYPE_TABS: { value: ContentType; label: string }[] = [
-  { value: "audio", label: "Audios" },
   { value: "playlist", label: "Playlists" },
   { value: "reflection", label: "Reflections" },
   { value: "breathing", label: "Breathes" },
 ];
 
 export default function ContentTagging() {
-  const [tab, setTab] = useState<ContentType>("audio");
+  const [tab, setTab] = useState<ContentType>("playlist");
 
   return (
     <div className="space-y-4">
@@ -60,7 +65,11 @@ export default function ContentTagging() {
         </TabsList>
         {TYPE_TABS.map((t) => (
           <TabsContent key={t.value} value={t.value}>
-            <ContentList contentType={t.value} />
+            {t.value === "playlist" ? (
+              <PlaylistList />
+            ) : (
+              <ContentList contentType={t.value} />
+            )}
           </TabsContent>
         ))}
       </Tabs>
