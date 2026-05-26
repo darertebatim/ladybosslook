@@ -5,6 +5,14 @@ import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 
+/* ─── Label → ISO map (used by AppOnboarding too) ──────────────── */
+export const LANG_LABEL_TO_ISO: Record<string, string> = {
+  'English only': 'en',
+  'Persian': 'fa',
+  'Turkish': 'tr',
+  'Spanish': 'es',
+};
+
 /* ─── Door catalog ─────────────────────────────────────────────── */
 
 type DoorKey = 'emotion' | 'selfcare' | 'immigrant' | 'productivity' | 'exploring';
