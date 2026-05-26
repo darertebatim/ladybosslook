@@ -68,6 +68,14 @@ export interface PathInputs {
     /** If set, navigate to this specific track (used for Continue to resume). */
     resumeAudioId?: string | null;
   } | null;
+  /** Secondary audio (non-educational): a playlist or standalone track. */
+  secondaryAudio?: {
+    kind: "track" | "playlist";
+    id: string;
+    title: string;
+    coverEmoji?: string | null;
+    category?: string | null;
+  } | null;
   /** Optional locked Plus playlist teaser for non-Plus users. */
   lockedTeaser?: {
     id: string;
