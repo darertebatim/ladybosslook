@@ -374,47 +374,51 @@ export function DoorEmotionPickerScreen({
         </p>
       </motion.div>
 
-      <div className="flex-1 flex flex-wrap gap-2.5 content-start">
+      <div className="flex-1 grid grid-cols-2 gap-2.5 content-start auto-rows-min">
         {EMOTION_TOP5.map((e, i) => (
-          <EmotionChip key={e.key} {...e} picked={picked.includes(e.key)} onClick={() => toggle(e.key)} delay={i * 0.04} />
+          <EmotionTile key={e.key} {...e} picked={picked.includes(e.key)} onClick={() => toggle(e.key)} delay={i * 0.04} />
         ))}
 
-        {!expanded && (
+        <AnimatePresence>
+          {expanded &&
+            EMOTION_REST.map((e, i) => (
+              <EmotionTile key={e.key} {...e} picked={picked.includes(e.key)} onClick={() => toggle(e.key)} delay={i * 0.03} />
+            ))}
+        </AnimatePresence>
+
+        {!expanded ? (
           <motion.button
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
             onClick={() => { haptic.selection(); setExpanded(true); }}
-            className="px-4 py-2.5 rounded-full bg-white/60 backdrop-blur-xl border border-white/70 shadow-ios text-[14px] font-medium text-[#5a4a3a] active:scale-95 transition-all"
+            className="py-4 rounded-2xl bg-white border border-[#E8DCC9] text-[14px] font-semibold text-[#6b5a4a] active:scale-[0.97] transition-all"
           >
-            Not these · show more
+            Show more
           </motion.button>
-        )}
+        ) : null}
 
-        <AnimatePresence>
-          {expanded &&
-            EMOTION_REST.map((e, i) => (
-              <EmotionChip key={e.key} {...e} picked={picked.includes(e.key)} onClick={() => toggle(e.key)} delay={i * 0.03} />
-            ))}
-        </AnimatePresence>
-      </div>
-
-      <div className="pt-5 space-y-2">
-        <button
+        <motion.button
+          layout
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
           onClick={() => {
             haptic.selection();
             setDontKnow((v) => !v);
             if (!dontKnow) setPicked([]);
           }}
           className={cn(
-            'w-full py-3 rounded-2xl font-medium text-[14px] transition-all active:scale-[0.98]',
+            'py-4 rounded-2xl font-semibold text-[14px] transition-all active:scale-[0.97] border',
             dontKnow
-              ? 'bg-[#2A1810] text-white shadow-ios'
-              : 'bg-white/55 backdrop-blur-xl border border-white/70 text-[#5a4a3a] shadow-ios'
+              ? 'bg-[#2A1810] text-white border-transparent'
+              : 'bg-white text-[#6b5a4a] border-[#E8DCC9]'
           )}
         >
-          I don't know — surprise me
-        </button>
+          I'm not sure
+        </motion.button>
+      </div>
+
+      <div className="pt-5">
         <GlassCTA onClick={handleNext} disabled={!canContinue}>
           Continue
         </GlassCTA>
@@ -423,7 +427,7 @@ export function DoorEmotionPickerScreen({
   );
 }
 
-function EmotionChip({
+function EmotionTile({
   emoji,
   label,
   picked,
@@ -445,14 +449,14 @@ function EmotionChip({
       transition={{ duration: 0.25, delay }}
       onClick={onClick}
       className={cn(
-        'flex items-center gap-2 px-4 py-2.5 rounded-full backdrop-blur-xl border shadow-ios transition-all active:scale-95',
+        'flex items-center gap-2.5 px-4 py-4 rounded-2xl border transition-all active:scale-[0.97]',
         picked
-          ? 'bg-gradient-to-r from-[#EB5E33] to-[#F5A623] text-white border-transparent'
-          : 'bg-white/60 border-white/70 text-[#2A1810]'
+          ? 'bg-gradient-to-br from-[#EB5E33] to-[#F5A623] text-white border-transparent shadow-[0_8px_20px_-8px_rgba(235,94,51,0.5)]'
+          : 'bg-white text-[#2A1810] border-[#E8DCC9]'
       )}
     >
-      <FluentEmoji emoji={emoji} size={20} />
-      <span className="text-[14px] font-semibold">{label}</span>
+      <FluentEmoji emoji={emoji} size={22} />
+      <span className="text-[15px] font-semibold">{label}</span>
     </motion.button>
   );
 }
