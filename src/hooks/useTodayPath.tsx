@@ -652,6 +652,9 @@ export function useTodayPath() {
           default:
             break;
         }
+        // "Tap = done" fallback: any step the user opened today counts as
+        // completed, mirroring pro-link shortcut behaviour.
+        if (!done && tappedToday.has(s.id)) done = true;
         return done ? { ...s, done: true } : s;
       });
 
