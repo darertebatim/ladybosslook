@@ -56,11 +56,18 @@ export interface PathInputs {
   dismissedIds: Set<string>;
   /** True when user has no routines AND no quiz result. */
   isDayOne: boolean;
-  /** Today's featured playlist (picked deterministically by the engine). */
-  featuredPlaylist?: {
+  /** Today's featured audio — either a single track or a playlist. */
+  featuredAudio?: {
+    kind: "track" | "playlist";
     id: string;
-    name: string;
+    title: string;
     coverEmoji?: string | null;
+    category?: string | null;
+  } | null;
+  /** Optional locked Plus playlist teaser for non-Plus users. */
+  lockedTeaser?: {
+    id: string;
+    title: string;
     category?: string | null;
   } | null;
   /** Today's featured reset (one of: a specific breathing exercise or reflection). */
@@ -150,20 +157,42 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
   });
 
   // After mood: a ready-to-play playlist (priority placement).
-  if (inputs.featuredPlaylist) {
-    const p = inputs.featuredPlaylist;
+  if (inputs.featuredAudio) {
+    const a = inputs.featuredAudio;
+    const isTrack = a.kind === "track";
     steps.push({
-      id: `playlist:${p.id}`,
+      id: `${isTrack ? "track" : "playlist"}:${a.id}`,
+      kind: "playlist", // reuse rendering bucket
+      ref: a.id,
+      emoji: a.coverEmoji || (isTrack ? "🎵" : "🎧"),
+      kicker: a.category
+        ? `${isTrack ? "Track" : "Playlist"} · ${a.category}`
+        : isTrack ? "Today's track" : "Today's playlist",
+      title: a.title,
+      meta: isTrack ? "Tap to play · ~5 min" : "Tap to play",
+      estMinutes: isTrack ? 5 : 10,
+      done: false,
+      startHref: isTrack ? `/app/player/${a.id}` : `/app/player/playlist/${a.id}`,
+      tint: "sky",
+      skippable: true,
+    });
+  }
+
+  // Optional locked Plus teaser
+  if (inputs.lockedTeaser) {
+    const t = inputs.lockedTeaser;
+    steps.push({
+      id: `playlist:${t.id}`,
       kind: "playlist",
-      ref: p.id,
-      emoji: p.coverEmoji || "🎧",
-      kicker: p.category ? `Playlist · ${p.category}` : "Today's playlist",
-      title: p.name,
-      meta: "Tap to play",
+      ref: t.id,
+      emoji: "🔒",
+      kicker: t.category ? `Plus · ${t.category}` : "Plus · Preview",
+      title: t.title,
+      meta: "Unlock with Rilo Plus",
       estMinutes: 10,
       done: false,
-      startHref: `/app/player/playlist/${p.id}`,
-      tint: "sky",
+      startHref: `/app/player/playlist/${t.id}`,
+      tint: "lavender",
       skippable: true,
     });
   }
