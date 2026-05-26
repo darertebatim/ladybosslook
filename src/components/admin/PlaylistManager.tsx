@@ -279,6 +279,17 @@ const PlaylistForm = ({
       <Label htmlFor="playlist_available_mobile">Show in iOS app (Player tab)</Label>
     </div>
 
+    <div className="flex items-center space-x-2">
+      <Switch
+        id="playlist_tracks_standalone"
+        checked={formData.tracks_standalone}
+        onCheckedChange={(checked) => setFormData({ ...formData, tracks_standalone: checked })}
+      />
+      <Label htmlFor="playlist_tracks_standalone">
+        Tracks work standalone (sleep stories, meditations, soundscapes) — Rilo can suggest individual tracks
+      </Label>
+    </div>
+
     <div>
       <Label htmlFor="playlist_language">Language</Label>
       <Select
