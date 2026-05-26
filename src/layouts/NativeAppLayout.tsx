@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { haptic } from '@/lib/haptics';
-import { Home, MessageCircle, Compass, Music, Users, Flame, CalendarPlus, Play, Sparkles, Route } from 'lucide-react';
+import { Home, MessageCircle, Compass, Music, Users, Flame, CalendarPlus, Play, Sparkles, Route, ClipboardList } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, LayoutGroup } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
@@ -191,7 +191,7 @@ const NativeAppLayout = () => {
     location.pathname === '/app/projects';
 
   const navItems = [
-    { path: '/app/home', icon: Home, label: t('nav.home'), tourClass: 'tour-nav-home' },
+    { path: '/app/home', icon: ClipboardList, label: t('nav.home'), tourClass: 'tour-nav-home' },
     { path: '/app/tools', icon: Compass, label: t('nav.tools'), tourClass: 'tour-nav-explore' },
     { path: '/app/my-rilo', icon: Route, label: t('nav.myRilo'), tourClass: 'tour-nav-my-rilo' },
     { path: '/app/player', icon: Music, label: t('nav.listen'), tourClass: 'tour-nav-listen' },
