@@ -1055,3 +1055,203 @@ export function DoorLanguageSwitchScreen({
     </div>
   );
 }
+
+/* ─── 9. Rilo Doors Loader — final building screen ─────────────── */
+
+const LOADER_LIBRARY = [
+  { emoji: '🎧', kind: 'Sleep stories', bg: 'from-violet-200 to-indigo-200', rotate: -10, x: -90, y: 30, z: 1 },
+  { emoji: '🧘', kind: 'Meditations', bg: 'from-emerald-200 to-teal-200', rotate: -3, x: -32, y: 6, z: 2 },
+  { emoji: '📚', kind: 'Mini-courses', bg: 'from-amber-200 to-orange-200', rotate: 5, x: 30, y: 0, z: 3 },
+  { emoji: '🌬️', kind: 'Breathwork', bg: 'from-sky-200 to-cyan-200', rotate: 12, x: 90, y: 28, z: 2 },
+];
+
+const LOADER_PILLARS = [
+  { emoji: '💛', tag: 'When emotions hit', line: 'Rilo meets the feeling, not just the task.', bg: 'from-pink-100 to-rose-100', ring: 'bg-pink-200/70' },
+  { emoji: '🌱', tag: 'When self-care slips', line: 'We rebuild it, one small step at a time.', bg: 'from-emerald-100 to-teal-100', ring: 'bg-emerald-200/70' },
+  { emoji: '🌍', tag: 'Living between two worlds', line: 'For the immigrant heart — in your language.', bg: 'from-violet-100 to-fuchsia-100', ring: 'bg-violet-200/70' },
+];
+
+const LOADER_PATH = [
+  { emoji: '🌅', label: 'Morning calm' },
+  { emoji: '🎧', label: 'A playlist for you' },
+  { emoji: '🌿', label: 'A small reset' },
+  { emoji: '🌙', label: 'Wind down' },
+];
+
+const LOADER_PHASES = [
+  { caption: 'Opening your library…', sub: 'Hundreds of sessions in one calm place.' },
+  { caption: 'Reading what you carry…', sub: 'Made for the parts apps usually skip.' },
+  { caption: 'Laying your path…', sub: 'A few small steps, lined up just for you.' },
+  { caption: 'Almost ready…', sub: 'Picking your playlists.' },
+];
+
+const PHASE_MS = 1900;
+
+export function RiloDoorsLoaderScreen({
+  step,
+  onNext,
+}: {
+  step: OnboardingStep;
+  onNext: () => void;
+}) {
+  const [phase, setPhase] = useState(0);
+
+  useEffect(() => {
+    const total = LOADER_PHASES.length;
+    const timers: number[] = [];
+    for (let i = 1; i < total; i++) {
+      timers.push(window.setTimeout(() => setPhase(i), PHASE_MS * i));
+    }
+    timers.push(window.setTimeout(() => { haptic.light(); onNext(); }, PHASE_MS * total + 400));
+    return () => { timers.forEach((t) => window.clearTimeout(t)); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const current = LOADER_PHASES[phase];
+  const progress = ((phase + 1) / LOADER_PHASES.length) * 100;
+
+  return (
+    <GlassShell>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45 }}
+        className="mt-2 mb-4 text-center"
+      >
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#EB5E33]">
+          ✨ Building your Rilo
+        </p>
+        <h1 className="mt-2 text-[26px] leading-[1.15] font-bold text-[#2A1810]">
+          {step.title || 'Building your path…'}
+        </h1>
+      </motion.div>
+
+      {/* Stage that swaps between phase visuals */}
+      <div className="flex-1 flex items-center justify-center min-h-[300px]">
+        <AnimatePresence mode="wait">
+          {phase === 0 && (
+            <motion.div
+              key="library"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.45 }}
+              className="relative w-[300px] h-[260px]"
+            >
+              {LOADER_LIBRARY.map((c, i) => (
+                <motion.div
+                  key={c.kind}
+                  initial={{ opacity: 0, y: 40, rotate: 0 }}
+                  animate={{ opacity: 1, y: c.y, rotate: c.rotate }}
+                  transition={{ delay: 0.1 + i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ left: '50%', top: 0, transform: `translateX(calc(-50% + ${c.x}px))`, zIndex: c.z }}
+                  className={cn(
+                    'absolute w-[140px] h-[190px] rounded-[26px] border border-white/80 shadow-ios p-4 flex flex-col justify-between',
+                    'bg-gradient-to-br', c.bg,
+                  )}
+                >
+                  <div className="w-11 h-11 rounded-2xl bg-white/70 backdrop-blur-xl flex items-center justify-center shadow-ios">
+                    <FluentEmoji emoji={c.emoji} size={26} />
+                  </div>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#2A1810]/80">
+                    {c.kind}
+                  </p>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+
+          {phase === 1 && (
+            <motion.div
+              key="pillars"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.45 }}
+              className="w-full flex flex-col gap-3"
+            >
+              {LOADER_PILLARS.map((p, i) => (
+                <motion.div
+                  key={p.tag}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 + i * 0.12, duration: 0.4 }}
+                  className={cn(
+                    'relative rounded-[22px] p-3.5 pl-[64px] border border-white/80 shadow-ios',
+                    'bg-gradient-to-br', p.bg,
+                  )}
+                >
+                  <div className={cn(
+                    'absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-2xl flex items-center justify-center shadow-ios border border-white/80',
+                    p.ring,
+                  )}>
+                    <FluentEmoji emoji={p.emoji} size={24} />
+                  </div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#2A1810]/70">
+                    {p.tag}
+                  </p>
+                  <p className="mt-0.5 text-[13.5px] font-bold text-[#2A1810] leading-snug">
+                    {p.line}
+                  </p>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+
+          {(phase === 2 || phase === 3) && (
+            <motion.div
+              key="path"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.45 }}
+              className="w-full flex flex-col gap-3 items-center"
+            >
+              {LOADER_PATH.map((s, i) => (
+                <motion.div
+                  key={s.label}
+                  initial={{ opacity: 0, scale: 0.85, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ delay: 0.1 + i * 0.18, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+                  className="flex items-center gap-3 w-[260px]"
+                  style={{ transform: `translateX(${i % 2 === 0 ? -20 : 20}px)` }}
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-white/85 backdrop-blur-xl flex items-center justify-center shadow-ios border border-white/80">
+                    <FluentEmoji emoji={s.emoji} size={26} />
+                  </div>
+                  <div className="flex-1 px-4 py-2.5 rounded-2xl bg-white/70 backdrop-blur-xl border border-white/70 shadow-ios">
+                    <p className="text-[13.5px] font-bold text-[#2A1810]">{s.label}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Caption + progress */}
+      <div className="pt-3 pb-2 text-center">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={current.caption}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.3 }}
+          >
+            <p className="text-[15px] font-bold text-[#2A1810]">{current.caption}</p>
+            <p className="mt-1 text-[13px] text-[#5a4a3a]">{current.sub}</p>
+          </motion.div>
+        </AnimatePresence>
+
+        <div className="mt-4 mx-auto w-[220px] h-1.5 rounded-full bg-black/8 overflow-hidden">
+          <motion.div
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="h-full rounded-full bg-gradient-to-r from-[#EB5E33] to-[#F5A623]"
+          />
+        </div>
+      </div>
+    </GlassShell>
+  );
+}
