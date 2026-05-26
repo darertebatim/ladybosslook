@@ -2,7 +2,7 @@ import { OnboardingFlow } from '@/types/onboarding';
 
 export const whatIsRiloFlow: OnboardingFlow = {
   id: 'what-is-rilo',
-  name: 'What is Rilo? (Teach)',
+  name: 'Rilo planner onboarding',
   description: '3 screens, 15 seconds, no input. Shows post-auth, before the planner.',
   appName: 'Rilo',
   createdAt: '2026-04-29',
