@@ -616,7 +616,6 @@ export function DoorImmigrantPickerScreen({
   onAnswer?: (id: string, val: string | string[]) => void;
 }) {
   const [picked, setPicked] = useState<string[]>([]);
-  const [added, setAdded] = useState(false);
 
   const toggle = (k: string) => {
     haptic.selection();
@@ -624,7 +623,7 @@ export function DoorImmigrantPickerScreen({
   };
 
   const handleContinue = () => {
-    onAnswer?.(step.id, [...picked, added ? 'bilingual_strength_added' : 'no_add']);
+    onAnswer?.(step.id, picked.length ? picked : ['unknown']);
     onNext();
   };
 
