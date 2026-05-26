@@ -57,6 +57,7 @@ export function useSaveContentTags() {
     },
     onSuccess: (_d, vars) => {
       qc.invalidateQueries({ queryKey: ["content-tags", vars.contentType] });
+      qc.invalidateQueries({ queryKey: ["admin-pending-untagged"] });
     },
     onError: (e: any) => toast.error(e?.message || "Failed to save tags"),
   });
