@@ -408,15 +408,11 @@ export default function MyRiloEngine() {
               <div key={e.key} className="py-2 flex items-start gap-3">
                 <code className="text-xs bg-muted px-2 py-0.5 rounded shrink-0">{e.key}</code>
                 <div className="flex-1 text-xs">
-                  {e.slugs.length > 0 ? (
-                    <div className="flex flex-wrap gap-1">
-                      {e.slugs.map((s) => (
-                        <Badge key={s} variant="outline" className="text-[10px] font-mono">{s}</Badge>
-                      ))}
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground italic">{e.note}</span>
-                  )}
+                  <div className="flex flex-wrap gap-1">
+                    {e.slugs.map((s) => (
+                      <Badge key={s} variant="outline" className="text-[10px] font-mono">{s}</Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
