@@ -55,6 +55,8 @@ export default function ContentTagging() {
         </p>
       </div>
 
+      <PendingReview />
+
       <Tabs value={tab} onValueChange={(v) => setTab(v as ContentType)}>
         <TabsList>
           {TYPE_TABS.map((t) => (
@@ -595,5 +597,166 @@ function EditDrawer({
         )}
       </SheetContent>
     </Sheet>
+  );
+}
+
+function usePendingUntagged() {
+  return useQuery({
+    queryKey: ["admin-pending-untagged"],
+    queryFn: async () => {
+      const [pl, au, re, br, links] = await Promise.all([
+        supabase
+          .from("audio_playlists")
+          .select("id, name, created_at")
+          .order("created_at", { ascending: false })
+          .limit(500),
+        supabase
+          .from("audio_content")
+          .select("id, title, created_at")
+          .order("created_at", { ascending: false })
+          .limit(500),
+        supabase
+          .from("reflections")
+          .select("id, title, created_at")
+          .order("created_at", { ascending: false })
+          .limit(500),
+        supabase
+          .from("breathing_exercises")
+          .select("id, name, emoji, created_at")
+          .order("created_at", { ascending: false })
+          .limit(500),
+        supabase
+          .from("content_tags")
+          .select("content_type, content_id"),
+      ]);
+
+      const tagged = new Set<string>();
+      (links.data || []).forEach((l: any) =>
+        tagged.add(`${l.content_type}:${l.content_id}`)
+      );
+
+      type Pending = {
+        contentType: ContentType;
+        id: string;
+        title: string;
+        emoji?: string | null;
+        created_at: string;
+      };
+      const rows: Pending[] = [];
+      (pl.data || []).forEach((r: any) => {
+        if (!tagged.has(`playlist:${r.id}`))
+          rows.push({ contentType: "playlist", id: r.id, title: r.name, created_at: r.created_at });
+      });
+      (au.data || []).forEach((r: any) => {
+        if (!tagged.has(`audio:${r.id}`))
+          rows.push({ contentType: "audio", id: r.id, title: r.title, created_at: r.created_at });
+      });
+      (re.data || []).forEach((r: any) => {
+        if (!tagged.has(`reflection:${r.id}`))
+          rows.push({ contentType: "reflection", id: r.id, title: r.title, created_at: r.created_at });
+      });
+      (br.data || []).forEach((r: any) => {
+        if (!tagged.has(`breathing:${r.id}`))
+          rows.push({
+            contentType: "breathing",
+            id: r.id,
+            title: r.name,
+            emoji: r.emoji,
+            created_at: r.created_at,
+          });
+      });
+      rows.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+      return rows;
+    },
+    staleTime: 30 * 1000,
+  });
+}
+
+const TYPE_BADGE: Record<ContentType, { label: string; cls: string }> = {
+  playlist: { label: "Playlist", cls: "bg-blue-500/15 text-blue-700 dark:text-blue-300" },
+  audio: { label: "Audio", cls: "bg-purple-500/15 text-purple-700 dark:text-purple-300" },
+  reflection: { label: "Reflection", cls: "bg-pink-500/15 text-pink-700 dark:text-pink-300" },
+  breathing: { label: "Breathe", cls: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" },
+};
+
+function PendingReview() {
+  const { data: pending = [], isLoading } = usePendingUntagged();
+  const [expanded, setExpanded] = useState(false);
+  const [editing, setEditing] = useState<
+    | { contentType: ContentType; item: ContentRow }
+    | null
+  >(null);
+
+  const visible = expanded ? pending : pending.slice(0, 8);
+
+  if (isLoading) return null;
+
+  return (
+    <Card className="p-4 space-y-3 border-amber-500/40 bg-amber-50/40 dark:bg-amber-500/5">
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <h2 className="text-sm font-semibold flex items-center gap-2">
+            ⏳ Waiting to be tagged
+            <span className="text-xs font-normal text-muted-foreground">
+              ({pending.length})
+            </span>
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            New playlists, audios, reflections and breathes appear here until you tag them.
+          </p>
+        </div>
+        {pending.length > 8 && (
+          <Button size="sm" variant="ghost" onClick={() => setExpanded((v) => !v)}>
+            {expanded ? "Show less" : `Show all (${pending.length})`}
+          </Button>
+        )}
+      </div>
+
+      {pending.length === 0 ? (
+        <p className="text-xs text-muted-foreground italic">
+          🎉 Everything is tagged. Nothing waiting.
+        </p>
+      ) : (
+        <div className="border rounded-md divide-y bg-background">
+          {visible.map((p) => {
+            const badge = TYPE_BADGE[p.contentType];
+            return (
+              <div
+                key={`${p.contentType}:${p.id}`}
+                className="p-2.5 flex items-center justify-between gap-2 hover:bg-muted/40"
+              >
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <span
+                    className={`text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded ${badge.cls}`}
+                  >
+                    {badge.label}
+                  </span>
+                  {p.emoji && <span className="text-base">{p.emoji}</span>}
+                  <div className="text-sm font-medium truncate">{p.title}</div>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() =>
+                    setEditing({
+                      contentType: p.contentType,
+                      item: { id: p.id, title: p.title, emoji: p.emoji },
+                    })
+                  }
+                >
+                  Tag now
+                </Button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <EditDrawer
+        contentType={editing?.contentType ?? "playlist"}
+        item={editing?.item ?? null}
+        initialTagIds={[]}
+        onClose={() => setEditing(null)}
+      />
+    </Card>
   );
 }
