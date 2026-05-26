@@ -306,23 +306,27 @@ export function DoorCardsGlassScreen({
 
 /* ─── 2. Emotion picker (5 + not these + I don't know) ─────────── */
 
+// Keys are tag slugs from public.tags (EMOTION dimension) — 1:1 mapping so
+// every pick deterministically resolves to tagged playlists/breaths/reflections.
 const EMOTION_TOP5 = [
-  { key: 'stress', emoji: '😣', label: 'Stress' },
+  { key: 'stressed', emoji: '😖', label: 'Stressed' },
+  { key: 'anxiety', emoji: '😰', label: 'Anxiety' },
+  { key: 'sadness', emoji: '😢', label: 'Sadness' },
   { key: 'anger', emoji: '😠', label: 'Anger' },
-  { key: 'sad', emoji: '😔', label: 'Sad' },
-  { key: 'worried', emoji: '😟', label: 'Worried' },
-  { key: 'overwhelmed', emoji: '😵‍💫', label: 'Overwhelmed' },
+  { key: 'overwhelm', emoji: '🤯', label: 'Overwhelm' },
 ];
 
 const EMOTION_REST = [
+  { key: 'worry', emoji: '😟', label: 'Worry' },
+  { key: 'fear', emoji: '😨', label: 'Fear' },
+  { key: 'irritation', emoji: '😤', label: 'Irritation' },
+  { key: 'exhausted', emoji: '😩', label: 'Exhausted' },
+  { key: 'low-energy', emoji: '🪫', label: 'Low energy' },
   { key: 'lonely', emoji: '🥺', label: 'Lonely' },
-  { key: 'tired', emoji: '😴', label: 'Tired' },
-  { key: 'numb', emoji: '😐', label: 'Numb' },
-  { key: 'guilty', emoji: '😞', label: 'Guilty' },
-  { key: 'jealous', emoji: '🥴', label: 'Jealous' },
-  { key: 'restless', emoji: '😬', label: 'Restless' },
-  { key: 'scared', emoji: '😨', label: 'Scared' },
-  { key: 'ashamed', emoji: '😶', label: 'Ashamed' },
+  { key: 'missing-someone', emoji: '💭', label: 'Missing someone' },
+  { key: 'homesick', emoji: '🏡', label: 'Homesick' },
+  { key: 'depressed', emoji: '😞', label: 'Depressed' },
+  { key: 'envy', emoji: '😒', label: 'Envy' },
 ];
 
 export function DoorEmotionPickerScreen({

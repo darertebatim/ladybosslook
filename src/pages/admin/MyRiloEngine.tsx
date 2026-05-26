@@ -119,20 +119,23 @@ const scenarios = [
   },
 ];
 
-/* Emotion → tag-slug mapping (mirrors useTodayPath.tsx — strict match, fallback to general calm) */
+/* Emotion picker → tag-slug mapping (1:1; picker keys ARE tag slugs). */
 const emotionTagMap = [
-  { key: "sad", slugs: ["sadness", "depressed"] },
-  { key: "anxious", slugs: ["anxiety", "worry"] },
-  { key: "angry", slugs: ["anger", "irritation"] },
-  { key: "lonely", slugs: ["lonely", "missing-someone", "homesick"] },
-  { key: "overwhelmed", slugs: ["overwhelm", "stressed"] },
-  { key: "tired", slugs: ["exhausted", "low-energy"] },
-  { key: "numb", slugs: ["depressed", "low-energy"] },
-  { key: "jealous", slugs: ["envy"] },
-  { key: "restless", slugs: ["worry", "stressed"] },
-  { key: "scared", slugs: ["fear", "anxiety"] },
-  { key: "guilty", slugs: [], note: "no tag yet → falls back to general calm" },
-  { key: "ashamed", slugs: [], note: "no tag yet → falls back to general calm" },
+  { key: "stressed", slugs: ["stressed"] },
+  { key: "anxiety", slugs: ["anxiety"] },
+  { key: "sadness", slugs: ["sadness"] },
+  { key: "anger", slugs: ["anger"] },
+  { key: "overwhelm", slugs: ["overwhelm"] },
+  { key: "worry", slugs: ["worry"] },
+  { key: "fear", slugs: ["fear"] },
+  { key: "irritation", slugs: ["irritation"] },
+  { key: "exhausted", slugs: ["exhausted"] },
+  { key: "low-energy", slugs: ["low-energy"] },
+  { key: "lonely", slugs: ["lonely"] },
+  { key: "missing-someone", slugs: ["missing-someone"] },
+  { key: "homesick", slugs: ["homesick"] },
+  { key: "depressed", slugs: ["depressed"] },
+  { key: "envy", slugs: ["envy"] },
 ];
 
 const standardFlow = [
@@ -405,15 +408,11 @@ export default function MyRiloEngine() {
               <div key={e.key} className="py-2 flex items-start gap-3">
                 <code className="text-xs bg-muted px-2 py-0.5 rounded shrink-0">{e.key}</code>
                 <div className="flex-1 text-xs">
-                  {e.slugs.length > 0 ? (
-                    <div className="flex flex-wrap gap-1">
-                      {e.slugs.map((s) => (
-                        <Badge key={s} variant="outline" className="text-[10px] font-mono">{s}</Badge>
-                      ))}
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground italic">{e.note}</span>
-                  )}
+                  <div className="flex flex-wrap gap-1">
+                    {e.slugs.map((s) => (
+                      <Badge key={s} variant="outline" className="text-[10px] font-mono">{s}</Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
