@@ -206,6 +206,30 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
     });
   }
 
+  // Secondary audio pick: a non-educational playlist OR a standalone track
+  // (sleep stories, meditations, soundscapes). Always offered alongside the
+  // educational hero so users get a quick, low-commitment option too.
+  if (inputs.secondaryAudio) {
+    const s = inputs.secondaryAudio;
+    const isTrack = s.kind === "track";
+    steps.push({
+      id: `${isTrack ? "track" : "playlist"}:${s.id}`,
+      kind: "playlist",
+      ref: s.id,
+      emoji: s.coverEmoji || (isTrack ? "🎵" : "🎧"),
+      kicker: s.category
+        ? `${isTrack ? "Track" : "Playlist"} · ${s.category}`
+        : isTrack ? "Quick listen" : "Also for you",
+      title: s.title,
+      meta: isTrack ? "Tap to play · ~5 min" : "Tap to play",
+      estMinutes: isTrack ? 5 : 10,
+      done: false,
+      startHref: isTrack ? `/app/player/${s.id}` : `/app/player/playlist/${s.id}`,
+      tint: "lavender",
+      skippable: true,
+    });
+  }
+
   // Optional locked Plus teaser
   if (inputs.lockedTeaser) {
     const t = inputs.lockedTeaser;
