@@ -495,7 +495,12 @@ export function useTodayPath() {
         const standalonePool = secPool.filter((p) => p.tracks_standalone);
         const wantTrack = (preferTrack || trackByRotation) && standalonePool.length > 0;
         if (wantTrack) {
-          const pl = standalonePool[seed % standalonePool.length];
+          // Prefer a standalone playlist matching the user's preferred language;
+          // fall back to date-seed pick across the full standalone pool.
+          const preferredStandalone = preferredLanguage
+            ? standalonePool.find((p) => p.language === preferredLanguage)
+            : null;
+          const pl = preferredStandalone ?? standalonePool[seed % standalonePool.length];
           // Pick one track from that playlist (free for non-Plus)
           let tq = supabase
             .from("audio_playlist_items")
