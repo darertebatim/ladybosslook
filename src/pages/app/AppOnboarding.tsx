@@ -350,7 +350,7 @@ export default function AppOnboarding() {
       )}
 
       {/* Step content - full screen with slide transition */}
-      <div className="flex-1 overflow-hidden relative bg-black">
+      <div className={`flex-1 overflow-hidden relative ${isRiloDoors ? 'bg-[#FFF8F2]' : 'bg-black'}`}>
         <AnimatePresence mode="wait" custom={direction}>
           {step.type === 'rilo-week-plans' ? (
             <motion.div
