@@ -52,7 +52,7 @@ const doorSignatures = [
 
 const day1Flow = [
   { emoji: "🚪", title: "Primary door signature step", meta: "Hero — door-flavored (see table above)", kind: "door_signature", isNew: true },
-  { emoji: "🌬️", title: "Door-flavored reset", meta: "Emotion → emotion-tagged · Immigrant → bilingual if available · else generic 2-min calm", kind: "reset", isNew: true },
+  { emoji: "🌬️", title: "Reset (door-flavored)", meta: "See Vocabulary card above", kind: "reset", isNew: true },
   { emoji: "✨", title: "Browse routines (pick your first)", meta: "Always shown on Day 1", kind: "routine" },
   { emoji: "🧠", title: "Self-Care Quiz teaser", meta: "Injected if Self-Care isn't a chosen door & quiz not done · skippable", kind: "quiz_pick", isNew: true },
   { emoji: "📋", title: "Rilo Planner Onboarding teaser", meta: "Injected if Productivity isn't a chosen door & planner onboarding not done · skippable", kind: "planner_onb", isNew: true },
@@ -62,7 +62,7 @@ const day1Flow = [
 const day2Flow = [
   { emoji: "🚪", title: "Secondary door signature step", meta: "Hero — secondary door's signature (fallback: primary deeper)", kind: "door_signature", isNew: true },
   { emoji: "🔁", title: "Primary door deeper step", meta: "Booster — keeps primary thread alive", kind: "door_deeper", isNew: true },
-  { emoji: "🌬️", title: "Reset (door-flavored)", meta: "Alternates breath ↔ reflection by date seed", kind: "reset" },
+  { emoji: "🌬️", title: "Reset (door-flavored)", meta: "See Vocabulary card above", kind: "reset" },
   { emoji: "🔥", title: "Continue routine from Day 1", meta: "Picks the first active routine", kind: "routine" },
   { emoji: "🏆", title: "Streak + affirmation", meta: "Always last", kind: "reward" },
 ];
@@ -71,7 +71,7 @@ const day3Flow = [
   { emoji: "🌱", title: "Habit cement: today's routine", meta: "Lead with routine — turns 'try' into 'rhythm'", kind: "routine", isNew: true },
   { emoji: "🚪", title: "Secondary door deeper step", meta: "Keeps secondary alive", kind: "door_deeper" },
   { emoji: "🎧", title: "Featured playlist", meta: "Door-aware pick (emotion tag, bilingual, etc.)", kind: "playlist" },
-  { emoji: "🌬️", title: "Reset", meta: "Breath OR reflection (date seed)", kind: "reset" },
+  { emoji: "🌬️", title: "Reset (door-flavored)", meta: "See Vocabulary card above", kind: "reset" },
   { emoji: "🏆", title: "Streak + affirmation", meta: "Always last", kind: "reward" },
 ];
 
@@ -141,7 +141,7 @@ const emotionTagMap = [
 const standardFlow = [
   { emoji: "💛", title: "Mood check-in", meta: "1 min · pick your mood", kind: "mood" },
   { emoji: "🎧", title: "Today's playlist (ready to play)", meta: "Language match → sort_order", kind: "playlist" },
-  { emoji: "🌬️", title: "Reset: a breath OR reflection (random daily)", meta: "2–3 min · alternates by date · deep-links to specific item", kind: "reset", isNew: true },
+  { emoji: "🌬️", title: "Reset", meta: "See Vocabulary card above (Day 4+: no door flavor, generic pool)", kind: "reset", isNew: true },
   { emoji: "🔥", title: "Open your Planner (first active routine)", meta: "Quiz outcome already provisioned the routine — navigates to /app/home", kind: "routine" },
   { emoji: "🏆", title: "+1 day streak & a new affirmation", meta: "Reward (always last, never skippable)", kind: "reward" },
 ];
