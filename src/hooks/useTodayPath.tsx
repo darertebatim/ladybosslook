@@ -6,9 +6,11 @@ import { getLocalDateStr } from "@/lib/localDate";
 import {
   buildDayOnePath,
   buildStandardPath,
+  buildDoorPath,
   buildCandidatePool,
   summarizePath,
   type PathStep,
+  type DoorKey,
 } from "@/lib/pathEngine";
 import { rankCandidates, type ScoringContext } from "@/lib/pathScorer";
 import { useUserPreferredLanguage } from "@/hooks/useUserPreferredLanguage";
@@ -68,7 +70,7 @@ export function useTodayPath() {
       const userId = user!.id;
 
       // Fire all source queries in parallel.
-      const [moodRes, quizRes, routinesRes, dismissalsRes, streakRes, actionsRes] = await Promise.all([
+      const [moodRes, quizRes, routinesRes, dismissalsRes, streakRes, actionsRes, doorAnsRes, plannerOnbRes] = await Promise.all([
         supabase
           .from("emotion_logs")
           .select("id, valence, created_at")
@@ -104,7 +106,50 @@ export function useTodayPath() {
           .from("path_step_actions")
           .select("action, step_kind, step_ref, effective_until, swap_target, created_at")
           .eq("user_id", userId),
+        supabase
+          .from("onboarding_answers")
+          .select("step_id, answer, created_at")
+          .eq("user_id", userId)
+          .eq("flow_id", "rilo-doors")
+          .order("created_at", { ascending: false })
+          .limit(20),
+        supabase
+          .from("onboarding_answers")
+          .select("step_id")
+          .eq("user_id", userId)
+          .eq("flow_id", "what-is-rilo")
+          .limit(1),
       ]);
+
+      // ── Rilo Doors context ─────────────────────────────────────────────
+      // Latest answer per step_id (rows are returned newest-first).
+      const doorAnswers: Record<string, string[]> = {};
+      for (const row of (doorAnsRes.data ?? []) as Array<{ step_id: string; answer: any }>) {
+        if (doorAnswers[row.step_id]) continue;
+        const v = Array.isArray(row.answer) ? row.answer : row.answer != null ? [row.answer] : [];
+        doorAnswers[row.step_id] = v.map((x: any) => String(x));
+      }
+      const doorPrimary = (doorAnswers["rd-door-primary"]?.[0] ?? null) as DoorKey | null;
+      const doorSecondary = (doorAnswers["rd-door-secondary"]?.[0] ?? null) as DoorKey | null;
+      const emotionKeys = (doorAnswers["rd-sharp-emotion"] ?? []).filter((k) => k && k !== "unknown");
+      const immigrantKeys = (doorAnswers["rd-sharp-immigrant"] ?? []).filter((k) => k && k !== "unknown");
+      const hasDoorContext = !!doorPrimary;
+      const plannerOnboardingDone =
+        ((plannerOnbRes.data ?? []) as any[]).length > 0 ||
+        (typeof localStorage !== "undefined" &&
+          localStorage.getItem("simora_onboarding_completed_what-is-rilo") === "true");
+
+      // Days since signup (capped at 2 → Day 3+ behaves the same).
+      const signupIso = (user as any)?.created_at as string | undefined;
+      const daysSinceSignup = signupIso
+        ? Math.min(
+            Math.max(
+              Math.floor((Date.now() - new Date(signupIso).getTime()) / (24 * 60 * 60 * 1000)),
+              0,
+            ),
+            2,
+          )
+        : 0;
 
       // ── Audio picker ────────────────────────────────────────────────────
       // Pull playlists + hot tracks. Free-first for non-Plus users; Plus users
@@ -140,6 +185,53 @@ export function useTodayPath() {
       const accessiblePlaylists = isSubscribed
         ? allPlaylists
         : allPlaylists.filter((p) => !p.requires_subscription);
+
+      // ── Door-flavored audio override (emotion/immigrant) ──────────────
+      // For the emotion door: prefer playlists tagged with the user's picked
+      // emotion slugs (strict match; we fall back to general calm below).
+      // For the immigrant door: prefer "Bilingual Strength" series.
+      let doorAudioOverride: typeof accessiblePlaylists[number] | null = null;
+      if (hasDoorContext && doorPrimary === "emotion" && emotionKeys.length > 0) {
+        const EMOTION_KEY_TO_TAG_SLUGS: Record<string, string[]> = {
+          sad: ["sadness", "depressed"],
+          anxious: ["anxiety", "worry"],
+          angry: ["anger", "irritation"],
+          lonely: ["lonely", "missing-someone", "homesick"],
+          overwhelmed: ["overwhelm", "stressed"],
+          tired: ["exhausted", "low-energy"],
+          numb: ["depressed", "low-energy"],
+          guilty: [],
+          jealous: ["envy"],
+          restless: ["worry", "stressed"],
+          scared: ["fear", "anxiety"],
+          ashamed: [],
+        };
+        const wantedSlugs = new Set<string>();
+        for (const k of emotionKeys) {
+          for (const s of EMOTION_KEY_TO_TAG_SLUGS[k] ?? []) wantedSlugs.add(s);
+        }
+        if (wantedSlugs.size > 0 && accessiblePlaylists.length > 0) {
+          const { data: tagRows } = await supabase
+            .from("tags")
+            .select("id, slug")
+            .in("slug", [...wantedSlugs]);
+          const tagIds = ((tagRows ?? []) as Array<{ id: string }>).map((t) => t.id);
+          if (tagIds.length > 0) {
+            const { data: linkRows } = await supabase
+              .from("audio_playlist_tag_links")
+              .select("playlist_id")
+              .in("tag_id", tagIds);
+            const matchedIds = new Set(
+              ((linkRows ?? []) as Array<{ playlist_id: string }>).map((l) => l.playlist_id),
+            );
+            doorAudioOverride =
+              accessiblePlaylists.find((p) => matchedIds.has(p.id)) ?? null;
+          }
+        }
+      } else if (hasDoorContext && doorPrimary === "immigrant") {
+        doorAudioOverride =
+          accessiblePlaylists.find((p) => /bilingual/i.test(p.name)) ?? null;
+      }
 
       // ── Continuity signals from audio_progress ────────────────────────
       // Pull recent listening so we can: (a) resurface an in-progress playlist
@@ -265,6 +357,17 @@ export function useTodayPath() {
       ]);
       const breaths = breathRes.data ?? [];
       const reflections = reflectionRes.data ?? [];
+
+      // Door-flavored reset: emotion/immigrant doors prefer `emotion-based`
+      // category breath/reflection content; fall back to the rotation below.
+      const wantEmotionFlavor = hasDoorContext &&
+        (doorPrimary === "emotion" || doorPrimary === "immigrant");
+      const flavoredBreaths = wantEmotionFlavor
+        ? (breaths as any[]).filter((b) => b.category === "emotion-based")
+        : [];
+      const flavoredReflections = wantEmotionFlavor
+        ? (reflections as any[]).filter((r) => r.category === "emotion-based")
+        : [];
       // Deterministic day seed (YYYYMMDD as int)
       const seed = parseInt(today.replace(/-/g, ""), 10) || 0;
       // Alternate kind by parity of seed so user sees variety
@@ -273,11 +376,13 @@ export function useTodayPath() {
         kind: "breath" | "reflection"; id: string; title: string;
         emoji: string | null; category: string | null;
       } | null = null;
-      if (useBreath && breaths.length > 0) {
-        const b = breaths[seed % breaths.length] as any;
+      const breathPool = flavoredBreaths.length > 0 ? flavoredBreaths : (breaths as any[]);
+      const reflectionPool = flavoredReflections.length > 0 ? flavoredReflections : (reflections as any[]);
+      if (useBreath && breathPool.length > 0) {
+        const b = breathPool[seed % breathPool.length];
         featuredReset = { kind: "breath", id: b.id, title: b.name, emoji: b.emoji, category: b.category };
-      } else if (reflections.length > 0) {
-        const r = reflections[seed % reflections.length] as any;
+      } else if (reflectionPool.length > 0) {
+        const r = reflectionPool[seed % reflectionPool.length];
         featuredReset = { kind: "reflection", id: r.id, title: r.title, emoji: r.emoji, category: r.category };
       }
 
@@ -378,7 +483,8 @@ export function useTodayPath() {
         const eduPreferred = preferredLanguage
           ? eduPool.find((p) => p.language === preferredLanguage)
           : null;
-        const picked = eduPreferred ?? eduPool[seed % Math.max(eduPool.length, 1)] ?? null;
+        // Door override wins over the default educational pick.
+        const picked = doorAudioOverride ?? eduPreferred ?? eduPool[seed % Math.max(eduPool.length, 1)] ?? null;
         if (picked) {
           featuredAudio = {
             kind: "playlist",
@@ -536,9 +642,21 @@ export function useTodayPath() {
         secondaryAudio,
         lockedTeaser,
         featuredReset,
+        doorContext: hasDoorContext
+          ? {
+              primary: doorPrimary,
+              secondary: doorSecondary,
+              emotionKeys,
+              immigrantKeys,
+            }
+          : null,
+        daysSinceSignup,
+        plannerOnboardingDone,
       };
 
-      let steps = isDayOne ? buildDayOnePath(inputs) : buildStandardPath(inputs);
+      let steps = hasDoorContext
+        ? buildDoorPath(inputs)
+        : isDayOne ? buildDayOnePath(inputs) : buildStandardPath(inputs);
 
       // Apply swaps: replace step with its swap_target from the candidate pool
       if (swapMap.size > 0) {
