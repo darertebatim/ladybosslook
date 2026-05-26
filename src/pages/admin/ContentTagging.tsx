@@ -55,6 +55,8 @@ export default function ContentTagging() {
         </p>
       </div>
 
+      <PendingReview />
+
       <Tabs value={tab} onValueChange={(v) => setTab(v as ContentType)}>
         <TabsList>
           {TYPE_TABS.map((t) => (
