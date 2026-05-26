@@ -34,26 +34,11 @@ export const riloDoorsFlow: OnboardingFlow = {
       ],
     },
     {
-      id: 'rd-language-switch',
-      type: 'door-language-switch',
-      title: 'Switch the app to this language too?',
-      subtitle: 'Or keep the interface in English — your choice.',
-      buttonLabel: 'Switch it',
-      secondaryButtonLabel: 'Keep English',
-    },
-    {
       id: 'rd-door-primary',
       type: 'door-cards-glass',
       doorSlot: 'primary',
       title: 'Which door is yours\nright now?',
       subtitle: 'Pick the one that needs you most.',
-    },
-    {
-      id: 'rd-door-secondary',
-      type: 'door-cards-glass',
-      doorSlot: 'secondary',
-      title: 'And a second one?',
-      subtitle: 'Optional — you can always add more later.',
     },
     /* ─── Sharpeners (only one runs based on primary) ─── */
     {
