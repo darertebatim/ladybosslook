@@ -87,7 +87,7 @@ export function useTodayPath() {
       const [playlistRes, hotTracksRes] = await Promise.all([
         supabase
           .from("audio_playlists")
-          .select("id, name, category, cover_image_url, language, requires_subscription")
+          .select("id, name, category, cover_image_url, language, requires_subscription, tracks_standalone")
           .eq("available_on_mobile", true)
           .eq("is_hidden", false)
           .order("sort_order", { ascending: true })
@@ -106,6 +106,7 @@ export function useTodayPath() {
       const allPlaylists = (playlistRes.data ?? []) as Array<{
         id: string; name: string; category: string | null;
         language: string | null; requires_subscription: boolean | null;
+        tracks_standalone: boolean | null;
       }>;
       const hotTracks = (hotTracksRes.data ?? []) as Array<{
         id: string; title: string; category: string | null;
