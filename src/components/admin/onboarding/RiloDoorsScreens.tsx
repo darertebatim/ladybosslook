@@ -811,12 +811,30 @@ export function OpenTheDoorScreen({
   onNext: () => void;
   answers?: OnboardingAnswers;
 }) {
-  const PATH_STEPS = [
-    { emoji: '🚪', label: 'Pick a door', tint: 'from-pink-200 to-rose-200' },
-    { emoji: '🌬️', label: '4-min breath', tint: 'from-emerald-200 to-teal-200' },
-    { emoji: '🎧', label: 'A calming listen', tint: 'from-violet-200 to-fuchsia-200' },
-    { emoji: '📓', label: 'Tiny reflection', tint: 'from-amber-200 to-orange-200' },
-    { emoji: '✨', label: 'A softer you', tint: 'from-yellow-200 to-amber-300' },
+  // Page 2 — "Built around what you carry"
+  // Three soft pillars showing Rilo recognizes the user's reality, not just tasks.
+  const PILLARS = [
+    {
+      emoji: '💛',
+      tag: 'When emotions hit',
+      line: 'Rilo meets the feeling, not just the task.',
+      bg: 'from-pink-100 to-rose-100',
+      ring: 'bg-pink-200/70',
+    },
+    {
+      emoji: '🌱',
+      tag: 'When self-care slips',
+      line: 'We rebuild it, one small step at a time.',
+      bg: 'from-emerald-100 to-teal-100',
+      ring: 'bg-emerald-200/70',
+    },
+    {
+      emoji: '🌍',
+      tag: 'Living between two worlds',
+      line: 'For the immigrant heart — in your language.',
+      bg: 'from-violet-100 to-fuchsia-100',
+      ring: 'bg-violet-200/70',
+    },
   ];
 
   return (
@@ -825,83 +843,54 @@ export function OpenTheDoorScreen({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45 }}
-        className="mt-2 mb-4 text-center"
+        className="mt-2 mb-5 text-center"
       >
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#EB5E33]">
-          A quick tour
+          Built for you
         </p>
         <h1 className="mt-2 text-[28px] leading-[1.1] font-bold text-[#2A1810]">
-          {step.title || 'Every door opens a Path.'}
+          {step.title || 'Made for the parts\napps usually skip.'}
         </h1>
         <p className="mt-2 text-[14.5px] text-[#5a4a3a] leading-snug max-w-[320px] mx-auto">
           {step.subtitle ||
-            'A few small steps, lined up just for you. Pick a door — Rilo lays the path.'}
+            'Three quiet things Rilo is really good at — pick the one that sounds like you.'}
         </p>
       </motion.div>
 
-      {/* Winding path illustration */}
-      <div className="flex-1 relative flex items-center justify-center">
-        {/* Dashed thread */}
-        <svg
-          className="absolute inset-0 w-full h-full"
-          viewBox="0 0 300 420"
-          preserveAspectRatio="none"
-          fill="none"
-        >
-          <motion.path
-            d="M60 30 Q 230 90, 70 170 T 240 320 Q 120 380, 200 410"
-            stroke="#EB5E33"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeDasharray="4 8"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 0.6 }}
-            transition={{ duration: 1.6, ease: 'easeInOut', delay: 0.3 }}
-          />
-        </svg>
-
-        <div className="relative w-full max-w-[300px] h-[420px]">
-          {PATH_STEPS.map((s, i) => {
-            // Zig-zag positions
-            const positions = [
-              { top: '0%', left: '4%' },
-              { top: '20%', right: '4%' },
-              { top: '42%', left: '6%' },
-              { top: '64%', right: '4%' },
-              { top: '86%', left: '24%' },
-            ];
-            const pos = positions[i];
-            return (
-              <motion.div
-                key={s.label}
-                initial={{ opacity: 0, scale: 0.6, y: 12 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{
-                  delay: 0.5 + i * 0.18,
-                  duration: 0.55,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-                style={pos}
-                className="absolute flex items-center gap-2"
-              >
-                <div
-                  className={cn(
-                    'w-14 h-14 rounded-2xl flex items-center justify-center shadow-ios border border-white/70',
-                    'bg-gradient-to-br',
-                    s.tint
-                  )}
-                >
-                  <FluentEmoji emoji={s.emoji} size={30} />
-                </div>
-                <div className="px-2.5 py-1 rounded-full bg-white/80 backdrop-blur-xl border border-white/70 shadow-ios">
-                  <p className="text-[11px] font-semibold text-[#2A1810] whitespace-nowrap">
-                    {s.label}
-                  </p>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
+      {/* Stacked recognition pillars */}
+      <div className="flex-1 flex flex-col justify-center gap-3.5">
+        {PILLARS.map((p, i) => (
+          <motion.div
+            key={p.tag}
+            initial={{ opacity: 0, y: 18, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{
+              delay: 0.2 + i * 0.18,
+              duration: 0.55,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className={cn(
+              'relative rounded-[24px] p-4 pl-[72px] border border-white/80 shadow-ios',
+              'bg-gradient-to-br',
+              p.bg,
+            )}
+          >
+            <div
+              className={cn(
+                'absolute left-3 top-1/2 -translate-y-1/2 w-12 h-12 rounded-2xl flex items-center justify-center shadow-ios border border-white/80',
+                p.ring,
+              )}
+            >
+              <FluentEmoji emoji={p.emoji} size={28} />
+            </div>
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-[#2A1810]/70">
+              {p.tag}
+            </p>
+            <p className="mt-1 text-[14.5px] font-bold text-[#2A1810] leading-snug">
+              {p.line}
+            </p>
+          </motion.div>
+        ))}
       </div>
 
       <div className="pt-4">
