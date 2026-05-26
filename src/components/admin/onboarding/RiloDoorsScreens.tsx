@@ -33,7 +33,7 @@ const DOORS: {
     label: 'Self-care',
     blurb: 'Find what you keep skipping.',
     tint: 'rgba(110,231,183,0.55)',
-    ring: 'from-emerald-300 via-teal-300 to-mint-300',
+    ring: 'from-emerald-300 via-teal-300 to-emerald-200',
     bubble: 'bg-emerald-100/80',
   },
   {
@@ -60,7 +60,7 @@ const DOORS: {
     label: 'Just exploring',
     blurb: 'Show me what Rilo can do.',
     tint: 'rgba(251,146,60,0.55)',
-    ring: 'from-orange-300 via-amber-300 to-peach-300',
+    ring: 'from-orange-300 via-amber-300 to-orange-200',
     bubble: 'bg-orange-100/80',
   },
 ];
