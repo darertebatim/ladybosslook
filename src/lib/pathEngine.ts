@@ -90,7 +90,21 @@ export interface PathInputs {
     emoji: string | null;
     category?: string | null;
   } | null;
+  /** Rilo Doors onboarding picks. When `primary` is set, the door-aware
+   *  builder runs instead of the legacy buildStandardPath. */
+  doorContext?: {
+    primary: DoorKey | null;
+    secondary: DoorKey | null;
+    emotionKeys: string[]; // raw picker keys (e.g. "lonely", "anxious")
+    immigrantKeys: string[];
+  } | null;
+  /** 0-based days since signup, capped at 3 (Day 1 = 0). */
+  daysSinceSignup?: number;
+  /** True when user has finished the planner onboarding flow at least once. */
+  plannerOnboardingDone?: boolean;
 }
+
+export type DoorKey = "emotion" | "selfcare" | "immigrant" | "productivity" | "exploring";
 
 const TINT_BY_COLOR: Record<string, PathStep["tint"]> = {
   yellow: "yellow",
@@ -106,6 +120,193 @@ function tintForRoutine(color: string | null | undefined, idx: number): PathStep
   if (color && TINT_BY_COLOR[color]) return TINT_BY_COLOR[color];
   const cycle: PathStep["tint"][] = ["peach", "lavender", "mint", "sky", "pink", "yellow"];
   return cycle[idx % cycle.length];
+}
+
+/* ─── Door-aware path ────────────────────────────────────────────────── */
+
+/** "Browse routines" Day-1 step — always offered for new users. */
+function browseRoutinesStep(): PathStep {
+  return {
+    id: "routine:pick_first",
+    kind: "routine", ref: "pick_first",
+    emoji: "✨", kicker: "Pick your first routine",
+    title: "Browse routines", meta: "Open your Planner",
+    estMinutes: 1, done: false,
+    startHref: "/app/home", tint: "lavender", skippable: true,
+  };
+}
+
+/** Self-Care Quiz teaser — used when self-care isn't a door pick. */
+function selfcareQuizStep(): PathStep {
+  return {
+    id: "quiz_pick:onboarding",
+    kind: "quiz_pick", ref: "onboarding",
+    emoji: "🧠", kicker: "Self-care snapshot",
+    title: "Take the 60-sec Self-Care Quiz",
+    meta: "3 min · personalize your path",
+    estMinutes: 3, done: false,
+    startHref: "/app/onboarding/selfcare-quiz",
+    tint: "peach", skippable: true,
+  };
+}
+
+/** Planner / What-is-Rilo onboarding teaser. */
+function plannerIntroStep(): PathStep {
+  return {
+    id: "quiz_pick:planner_intro",
+    kind: "quiz_pick", ref: "planner_intro",
+    emoji: "🗓️", kicker: "Get the Planner",
+    title: "Rilo Planner onboarding",
+    meta: "2 min · how the Planner works",
+    estMinutes: 2, done: false,
+    startHref: "/app/onboarding/what-is-rilo",
+    tint: "sky", skippable: true,
+  };
+}
+
+/** Featured-audio → PathStep (uses the same logic as buildStandardPath). */
+function audioToStep(a: NonNullable<PathInputs["featuredAudio"]>, opts?: { kicker?: string; tint?: PathStep["tint"] }): PathStep {
+  const isTrack = a.kind === "track";
+  const mode = a.mode ?? "default";
+  const kicker = opts?.kicker ?? (mode === "continue"
+    ? a.category ? `Continue · ${a.category}` : "Continue listening"
+    : mode === "smart_next"
+      ? a.category ? `More like this · ${a.category}` : "Picked for you next"
+      : a.category
+        ? `${isTrack ? "Track" : "Playlist"} · ${a.category}`
+        : isTrack ? "Today's track" : "Today's playlist");
+  const href = a.resumeAudioId
+    ? `/app/player/${a.resumeAudioId}`
+    : isTrack ? `/app/player/${a.id}` : `/app/player/playlist/${a.id}`;
+  return {
+    id: `${isTrack ? "track" : "playlist"}:${a.id}`,
+    kind: "playlist", ref: a.id,
+    emoji: a.coverEmoji || (isTrack ? "🎵" : "🎧"),
+    kicker, title: a.title,
+    meta: mode === "continue" ? "Tap to resume" : isTrack ? "Tap to play · ~5 min" : "Tap to play",
+    estMinutes: isTrack ? 5 : 10, done: false,
+    startHref: href, tint: opts?.tint ?? "sky", skippable: true,
+  };
+}
+
+/** Door-aware signature step (the "wow" of the day). */
+function signatureStepForDoor(door: DoorKey, inputs: PathInputs): PathStep | null {
+  switch (door) {
+    case "selfcare":
+      return inputs.hasQuizResult
+        ? buildResetStep(inputs)
+        : selfcareQuizStep();
+    case "productivity":
+      return inputs.plannerOnboardingDone
+        ? browseRoutinesStep()
+        : plannerIntroStep();
+    case "immigrant":
+    case "emotion":
+    case "exploring":
+      // These doors rely on the door-flavored featuredAudio computed upstream.
+      return inputs.featuredAudio
+        ? audioToStep(inputs.featuredAudio, {
+            kicker:
+              door === "immigrant" ? "Bilingual Strength" :
+              door === "emotion" ? "For your emotions" :
+              "Today's pick",
+            tint: door === "emotion" ? "pink" : door === "immigrant" ? "lavender" : "sky",
+          })
+        : null;
+  }
+}
+
+/**
+ * Door-aware path builder.
+ *
+ * Day 1 = primary signature + door-flavored reset + browse routines.
+ * Day 2 = secondary signature + primary booster (audio).
+ * Day 3 = habit cement (routine) + secondary deeper.
+ *
+ * Always injects:
+ *  - Self-Care Quiz teaser when neither door is `selfcare` (and quiz not done).
+ *  - Planner onboarding teaser when neither door is `productivity` (and not done).
+ */
+export function buildDoorPath(inputs: PathInputs): PathStep[] {
+  const ctx = inputs.doorContext!;
+  const day = Math.min(Math.max(inputs.daysSinceSignup ?? 0, 0), 2); // 0,1,2
+  const steps: PathStep[] = [];
+
+  const primary = ctx.primary;
+  const secondary = ctx.secondary;
+
+  // ── Hero by day ────────────────────────────────────────────────────
+  if (day === 0) {
+    // Day 1 — primary signature
+    const sig = primary ? signatureStepForDoor(primary, inputs) : null;
+    if (sig) steps.push(sig);
+    steps.push(buildResetStep(inputs));
+  } else if (day === 1) {
+    // Day 2 — secondary signature + primary booster
+    const sec = secondary ? signatureStepForDoor(secondary, inputs) : null;
+    if (sec) steps.push(sec);
+    const primaryBooster = primary && primary !== "selfcare" && primary !== "productivity" && inputs.secondaryAudio
+      ? audioToStep({ ...inputs.secondaryAudio, mode: "default" }, { kicker: "More from your door", tint: "mint" })
+      : null;
+    if (primaryBooster) steps.push(primaryBooster);
+    steps.push(buildResetStep(inputs));
+  } else {
+    // Day 3 — habit cement: real routine if any, else browse + audio
+    const firstRoutine = inputs.activeRoutines[0];
+    if (firstRoutine) {
+      steps.push({
+        id: `routine:${firstRoutine.routineId}`,
+        kind: "routine", ref: firstRoutine.routineId,
+        emoji: firstRoutine.emoji || "🔥",
+        kicker: "Habit time", title: firstRoutine.title,
+        meta: "Follow today's plan", estMinutes: 5, done: false,
+        startHref: "/app/home",
+        tint: tintForRoutine(firstRoutine.color, 0), skippable: true,
+      });
+    } else {
+      steps.push(browseRoutinesStep());
+    }
+    if (inputs.featuredAudio) steps.push(audioToStep(inputs.featuredAudio));
+    steps.push(buildResetStep(inputs));
+  }
+
+  // ── Always present on Day 1: Browse routines (pick your first) ─────
+  if (day === 0 && !steps.some((s) => s.id === "routine:pick_first")) {
+    steps.push(browseRoutinesStep());
+  }
+
+  // ── Always-on teasers: quiz + planner onboarding when missing ──────
+  const doors = new Set<DoorKey | null>([primary, secondary]);
+  const hasSelfcareDoor = doors.has("selfcare");
+  const hasProductivityDoor = doors.has("productivity");
+  if (!hasSelfcareDoor && !inputs.hasQuizResult && !steps.some((s) => s.id === "quiz_pick:onboarding")) {
+    steps.push(selfcareQuizStep());
+  }
+  if (!hasProductivityDoor && !inputs.plannerOnboardingDone && !steps.some((s) => s.id === "quiz_pick:planner_intro")) {
+    steps.push(plannerIntroStep());
+  }
+
+  // Secondary audio as a low-commitment extra (Day 1 only — keeps Day 2+ focused).
+  if (day === 0 && inputs.secondaryAudio) {
+    const s = inputs.secondaryAudio;
+    const isTrack = s.kind === "track";
+    const id = `${isTrack ? "track" : "playlist"}:${s.id}`;
+    if (!steps.some((x) => x.id === id)) {
+      steps.push({
+        id, kind: "playlist", ref: s.id,
+        emoji: s.coverEmoji || (isTrack ? "🎵" : "🎧"),
+        kicker: s.category ? `${isTrack ? "Track" : "Playlist"} · ${s.category}` : "Also for you",
+        title: s.title,
+        meta: isTrack ? "Tap to play · ~5 min" : "Tap to play",
+        estMinutes: isTrack ? 5 : 10, done: false,
+        startHref: isTrack ? `/app/player/${s.id}` : `/app/player/playlist/${s.id}`,
+        tint: "lavender", skippable: true,
+      });
+    }
+  }
+
+  steps.push(rewardStep());
+  return filterDismissed(steps, inputs.dismissedIds).slice(0, 8);
 }
 
 /** Day-1 starter path for brand-new users (no routines + no quiz). */
