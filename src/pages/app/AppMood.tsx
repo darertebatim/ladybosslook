@@ -21,7 +21,7 @@ export default function AppMood() {
           className="shrink-0 px-4 flex items-center gap-3"
           style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)', paddingBottom: '12px' }}
         >
-          <BackButton to="/app/home" />
+          <BackButton />
           <h1 className="text-xl font-semibold flex-1">{t('moodPage.title')}</h1>
         </header>
 
