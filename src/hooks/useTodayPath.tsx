@@ -23,6 +23,31 @@ interface TodayPathResult {
   candidatesFor: (step: PathStep) => Array<PathStep & { _score: number }>;
 }
 
+/**
+ * Local "tap = done" log for path steps that don't have a natural DB signal
+ * (e.g. the "Open your planner" routine card). Mirrors how pro-link
+ * shortcuts treat a tap as completion. Scoped per local day.
+ */
+const tappedStorageKey = (day: string) => `simora_path_tapped_${day}`;
+export function getTappedStepIds(day: string = getLocalDateStr()): Set<string> {
+  try {
+    const raw = localStorage.getItem(tappedStorageKey(day));
+    if (!raw) return new Set();
+    const arr = JSON.parse(raw) as string[];
+    return new Set(Array.isArray(arr) ? arr : []);
+  } catch {
+    return new Set();
+  }
+}
+export function markStepTapped(stepId: string, day: string = getLocalDateStr()) {
+  try {
+    const set = getTappedStepIds(day);
+    if (set.has(stepId)) return;
+    set.add(stepId);
+    localStorage.setItem(tappedStorageKey(day), JSON.stringify([...set]));
+  } catch {}
+}
+
 export function useTodayPath() {
   const { user } = useAuth();
   const preferredLanguage = useUserPreferredLanguage();
