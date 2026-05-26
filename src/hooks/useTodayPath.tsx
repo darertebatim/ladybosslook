@@ -528,6 +528,112 @@ export function useTodayPath() {
         });
       }
 
+      // ── Mark path steps as done from activity tables ──────────────────
+      // Reuses the same signals the pro-link/shortcut completion tracker uses
+      // (breathing_sessions, reflections, audio_progress, task_completions).
+      // Each path suggestion behaves like a pro-task: complete the underlying
+      // activity today and the step ticks off automatically.
+      const todayStartIso = `${today}T00:00:00.000Z`;
+      const todayEndIso = `${today}T23:59:59.999Z`;
+      const [breatheRes, reflResRes, freeReflRes, taskCompRes] = await Promise.all([
+        supabase
+          .from("breathing_sessions")
+          .select("id")
+          .eq("user_id", userId)
+          .gte("completed_at", todayStartIso)
+          .lte("completed_at", todayEndIso)
+          .limit(1),
+        supabase
+          .from("user_reflection_responses" as any)
+          .select("id")
+          .eq("user_id", userId)
+          .gte("completed_at", todayStartIso)
+          .lte("completed_at", todayEndIso)
+          .limit(1),
+        supabase
+          .from("free_form_reflections")
+          .select("id")
+          .eq("user_id", userId)
+          .gte("created_at", todayStartIso)
+          .lte("created_at", todayEndIso)
+          .limit(1),
+        supabase
+          .from("task_completions")
+          .select("task_id")
+          .eq("user_id", userId)
+          .eq("completed_date", today),
+      ]);
+      const breatheDoneToday = (breatheRes.data ?? []).length > 0;
+      const reflectionDoneToday =
+        ((reflResRes.data ?? []) as any[]).length > 0 ||
+        (freeReflRes.data ?? []).length > 0;
+
+      // Routine completion: resolve completed task_ids → source_routine_id
+      const completedRoutineIds = new Set<string>();
+      const completedTaskIds = (taskCompRes.data ?? []).map((c: any) => c.task_id);
+      if (completedTaskIds.length > 0) {
+        const { data: taskRows } = await supabase
+          .from("user_tasks")
+          .select("source_routine_id")
+          .eq("user_id", userId)
+          .in("id", completedTaskIds);
+        for (const r of (taskRows ?? []) as Array<{ source_routine_id: string | null }>) {
+          if (r.source_routine_id) completedRoutineIds.add(r.source_routine_id);
+        }
+      }
+
+      // Audio completion: any track played today with `completed = true`.
+      // Also collect playlist ids for those completed tracks so playlist-level
+      // steps can tick off when the user finishes any item.
+      const completedAudioIds = new Set<string>();
+      const completedPlaylistIds = new Set<string>();
+      for (const r of progressRows) {
+        if (!r.completed) continue;
+        if (!r.last_played_at || r.last_played_at.slice(0, 10) !== today) continue;
+        completedAudioIds.add(r.audio_id);
+        for (const pid of audioToPlaylists.get(r.audio_id) ?? []) {
+          completedPlaylistIds.add(pid);
+        }
+      }
+
+      steps = steps.map((s) => {
+        if (s.done) return s;
+        let done = false;
+        switch (s.kind) {
+          case "breath":
+            done = breatheDoneToday;
+            break;
+          case "reset":
+            // Step id is `reset:breath:<id>` or `reset:reflection:<id>`
+            if (s.id.startsWith("reset:breath:")) done = breatheDoneToday;
+            else if (s.id.startsWith("reset:reflection:")) done = reflectionDoneToday;
+            break;
+          case "routine":
+            if (s.ref && s.ref !== "pick_first") {
+              done = completedRoutineIds.has(s.ref);
+            }
+            break;
+          case "playlist":
+            // Step id encodes "track:<id>" or "playlist:<id>"
+            if (s.id.startsWith("track:")) done = completedAudioIds.has(s.ref);
+            else if (s.id.startsWith("playlist:")) done = completedPlaylistIds.has(s.ref);
+            break;
+          case "quiz_pick":
+            if (s.ref === "onboarding") done = hasQuizResult;
+            break;
+          default:
+            break;
+        }
+        return done ? { ...s, done: true } : s;
+      });
+
+      // Reward auto-completes when every other step is done.
+      const nonReward = steps.filter((s) => s.kind !== "reward");
+      const allDone = nonReward.length > 0 && nonReward.every((s) => s.done);
+      if (allDone) {
+        steps = steps.map((s) => (s.kind === "reward" ? { ...s, done: true } : s));
+      }
+
       const summary = summarizePath(steps);
       const streak = (streakRes.data?.current_streak as number | undefined) ?? 0;
 
