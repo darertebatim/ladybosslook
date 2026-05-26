@@ -97,9 +97,16 @@ export default function AppOnboarding() {
     if (!rawFlow) return undefined;
     let steps = isSubscribed ? rawFlow.steps.filter(s => s.type !== 'paywall') : rawFlow.steps;
     if (rawFlow.id === 'rilo-doors') {
+      const lang = answers['rd-language'];
+      const langStr = Array.isArray(lang) ? lang[0] : lang;
+      const langIso = langStr ? (LANG_LABEL_TO_ISO[langStr] || String(langStr).toLowerCase()) : '';
       const primary = answers['rd-door-primary'];
       const primaryStr = Array.isArray(primary) ? primary[0] : primary;
       steps = steps.filter(s => {
+        // Hide language-switch step if user picked English (or hasn't picked yet)
+        if (s.id === 'rd-language-switch') {
+          return !!langIso && langIso !== 'en';
+        }
         // Hide non-matching sharpener branches
         if (s.doorBranch) return s.doorBranch === primaryStr;
         return true;
@@ -236,14 +243,16 @@ export default function AppOnboarding() {
         }
         navigate('/app/home');
       } else if (flowId === 'rilo-doors') {
-        // Persist preferred language + auto-switch UI language for non-English
+        // Persist preferred language + (optional) UI language switch
         try {
           const lang = answers['rd-language'];
           const langStr = Array.isArray(lang) ? lang[0] : lang;
           const langIso = langStr ? (LANG_LABEL_TO_ISO[String(langStr)] || String(langStr).toLowerCase()) : '';
           if (langIso) {
             localStorage.setItem('simora_onboarding_language', langIso);
-            if (langIso !== 'en') {
+            const switchChoice = answers['rd-language-switch'];
+            const switchStr = Array.isArray(switchChoice) ? switchChoice[0] : switchChoice;
+            if (switchStr === 'yes') {
               localStorage.setItem('i18nextLng', langIso);
             }
           }
