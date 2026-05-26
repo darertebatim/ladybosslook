@@ -72,12 +72,6 @@ export default function AppOnboarding() {
   const { isSubscribed } = useSubscription();
   const rawFlow = allFlows.find(f => f.id === flowId);
 
-  // Filter out paywall steps for subscribed users
-  const flow = rawFlow ? {
-    ...rawFlow,
-    steps: isSubscribed ? rawFlow.steps.filter(s => s.type !== 'paywall') : rawFlow.steps,
-  } : undefined;
-
   // Restore progress from localStorage
   const progressKey = `simora_onboarding_progress_${flowId}`;
   const completedKey = `simora_onboarding_completed_${flowId}`;
@@ -96,6 +90,28 @@ export default function AppOnboarding() {
   });
   const [answers, setAnswers] = useState<OnboardingAnswers>({});
   const [direction, setDirection] = useState(1); // 1 = forward, -1 = back
+
+  // Filter steps based on subscription + Rilo Doors branching (uses live answers)
+  const flow = (() => {
+    if (!rawFlow) return undefined;
+    let steps = isSubscribed ? rawFlow.steps.filter(s => s.type !== 'paywall') : rawFlow.steps;
+    if (rawFlow.id === 'rilo-doors') {
+      const lang = answers['rd-language'];
+      const langStr = Array.isArray(lang) ? lang[0] : lang;
+      const primary = answers['rd-door-primary'];
+      const primaryStr = Array.isArray(primary) ? primary[0] : primary;
+      steps = steps.filter(s => {
+        // Hide language-switch step if user picked English (or hasn't picked yet)
+        if (s.id === 'rd-language-switch') {
+          return !!langStr && langStr !== 'en' && langStr !== 'english';
+        }
+        // Hide non-matching sharpener branches
+        if (s.doorBranch) return s.doorBranch === primaryStr;
+        return true;
+      });
+    }
+    return { ...rawFlow, steps };
+  })();
 
   // Preload images on mount + fire onboarding_started (once per flow)
   useEffect(() => {
