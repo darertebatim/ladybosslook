@@ -582,14 +582,16 @@ export function useTodayPath() {
         }
       }
 
-      // Audio completion: any track played today with `completed = true`.
-      // Also collect playlist ids for those completed tracks so playlist-level
-      // steps can tick off when the user finishes any item.
+      // Audio completion: counts as done when the user actually listened
+      // today — either finished the track (`completed`) OR played past 30s.
+      // This matches how pro-task playlist steps tick off after a real listen.
       const completedAudioIds = new Set<string>();
       const completedPlaylistIds = new Set<string>();
       for (const r of progressRows) {
-        if (!r.completed) continue;
         if (!r.last_played_at || r.last_played_at.slice(0, 10) !== today) continue;
+        const meaningfulListen =
+          r.completed === true || (r.current_position_seconds ?? 0) >= 30;
+        if (!meaningfulListen) continue;
         completedAudioIds.add(r.audio_id);
         for (const pid of audioToPlaylists.get(r.audio_id) ?? []) {
           completedPlaylistIds.add(pid);
