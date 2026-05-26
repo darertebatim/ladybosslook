@@ -24,8 +24,8 @@ export const riloDoorsFlow: OnboardingFlow = {
     {
       id: 'rd-language',
       type: 'rilo-language-bubbles',
-      title: 'Which language feels most like home?',
-      subtitle: 'We use this for your content.',
+      title: 'In which language\nshould we serve content?',
+      subtitle: 'Audio, articles & guided sessions — in a language that feels like home.',
       options: [
         { label: 'English only', emoji: '🇺🇸' },
         { label: 'Persian', emoji: 'flag:persian' },
