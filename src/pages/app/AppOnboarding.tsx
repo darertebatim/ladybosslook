@@ -240,6 +240,25 @@ export default function AppOnboarding() {
           );
         }
         navigate('/app/home');
+      } else if (flowId === 'rilo-doors') {
+        // Persist preferred language + (optional) UI language switch
+        try {
+          const lang = answers['rd-language'];
+          const langStr = Array.isArray(lang) ? lang[0] : lang;
+          if (langStr) {
+            localStorage.setItem('simora_onboarding_language', String(langStr));
+            const switchChoice = answers['rd-language-switch'];
+            const switchStr = Array.isArray(switchChoice) ? switchChoice[0] : switchChoice;
+            if (switchStr === 'yes') {
+              localStorage.setItem('i18nextLng', String(langStr));
+            }
+          }
+          const nickname = answers['rd-nickname'];
+          if (nickname) {
+            localStorage.setItem('simora_onboarding_nickname', typeof nickname === 'string' ? nickname : nickname[0] || '');
+          }
+        } catch {}
+        navigate('/app/my-rilo');
       } else {
         navigate('/auth?mode=signup');
       }
