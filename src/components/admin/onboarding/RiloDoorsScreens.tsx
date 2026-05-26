@@ -705,42 +705,94 @@ export function MeetRiloIntroScreen({
 }) {
   return (
     <GlassShell>
-      <div className="flex-1 flex flex-col items-center justify-center text-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="relative w-44 h-44 rounded-[44px] bg-white/55 backdrop-blur-2xl border border-white/70 shadow-ios flex items-center justify-center mb-8"
-        >
-          {/* Pulsing aura */}
-          <motion.div
-            className="absolute inset-0 rounded-[44px] bg-gradient-to-br from-[#EB5E33]/30 to-[#F5A623]/30 blur-2xl"
-            animate={{ opacity: [0.4, 0.7, 0.4], scale: [1, 1.08, 1] }}
-            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <FluentEmoji emoji="🌅" size={96} />
-        </motion.div>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="text-[30px] leading-[1.1] font-bold text-[#2A1810]"
-        >
-          {step.title || 'Meet My Rilo.'}
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45, duration: 0.5 }}
-          className="mt-3 text-[16px] text-[#5a4a3a] leading-snug max-w-[300px]"
-        >
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45 }}
+        className="mt-2 mb-5 text-center"
+      >
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#EB5E33]">
+          A quick tour
+        </p>
+        <h1 className="mt-2 text-[28px] leading-[1.1] font-bold text-[#2A1810]">
+          {step.title || 'This is My Rilo.'}
+        </h1>
+        <p className="mt-2 text-[14.5px] text-[#5a4a3a] leading-snug max-w-[320px] mx-auto">
           {step.subtitle ||
-            'Your wellness home. Calm tools, gentle routines, and a path that grows with you — all in one place.'}
-        </motion.p>
+            'Your wellness home — one calm place for your day, your tools, and the path that grows with you.'}
+        </p>
+      </motion.div>
+
+      {/* Mock My Rilo card stack */}
+      <div className="flex-1 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.92, y: 18 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+          className="relative w-[300px] rounded-[32px] bg-white/65 backdrop-blur-2xl border border-white/70 shadow-ios p-4 pb-5"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#EB5E33]">
+                My Rilo · Today
+              </p>
+              <p className="text-[18px] font-bold text-[#2A1810] leading-tight">
+                Good morning ☀️
+              </p>
+            </div>
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FFD2BA] to-[#F5A623]/60 flex items-center justify-center shadow-ios">
+              <span className="text-[14px] font-bold text-[#2A1810]">R</span>
+            </div>
+          </div>
+
+          {/* Stream of glass mini-cards */}
+          <div className="space-y-2.5">
+            {[
+              { emoji: '💗', tag: 'Path · Step 2', label: 'Calm a feeling', bg: 'bg-pink-100/80' },
+              { emoji: '🌬️', tag: 'Tool · 4 min', label: 'Breathing reset', bg: 'bg-emerald-100/80' },
+              { emoji: '🎵', tag: 'Playlist', label: 'Soft mornings', bg: 'bg-violet-100/80' },
+              { emoji: '📓', tag: 'Reflection', label: 'One line about today', bg: 'bg-amber-100/80' },
+            ].map((row, i) => (
+              <motion.div
+                key={row.label}
+                initial={{ opacity: 0, x: 12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.35 + i * 0.1, duration: 0.4 }}
+                className="flex items-center gap-3 rounded-2xl bg-white/75 border border-white/80 p-2.5 shadow-ios"
+              >
+                <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center shrink-0', row.bg)}>
+                  <FluentEmoji emoji={row.emoji} size={24} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[#EB5E33]">
+                    {row.tag}
+                  </p>
+                  <p className="text-[13.5px] font-semibold text-[#2A1810] leading-tight truncate">
+                    {row.label}
+                  </p>
+                </div>
+                <div className="w-5 h-5 rounded-full border-2 border-[#EB5E33]/40" />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Floating tab bar hint */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.85, duration: 0.4 }}
+            className="mt-4 mx-auto w-[170px] h-9 rounded-full bg-white/85 border border-white/80 shadow-ios flex items-center justify-around"
+          >
+            {['🏠', '🧰', '🎧', '💬'].map((e) => (
+              <FluentEmoji key={e} emoji={e} size={16} />
+            ))}
+          </motion.div>
+        </motion.div>
       </div>
-      <div className="pt-2">
-        <GlassCTA onClick={onNext}>{step.buttonLabel || 'Show me'}</GlassCTA>
+
+      <div className="pt-4">
+        <GlassCTA onClick={onNext}>{step.buttonLabel || 'Next'}</GlassCTA>
       </div>
     </GlassShell>
   );
@@ -757,58 +809,101 @@ export function OpenTheDoorScreen({
   onNext: () => void;
   answers?: OnboardingAnswers;
 }) {
-  const primary = (answers?.['rd-door-primary'] as string) || 'exploring';
-  const door = DOORS.find((d) => d.key === primary) || DOORS[4];
-  const nickname = (answers?.['rd-nickname'] as string) || '';
+  const PATH_STEPS = [
+    { emoji: '🚪', label: 'Pick a door', tint: 'from-pink-200 to-rose-200' },
+    { emoji: '🌬️', label: '4-min breath', tint: 'from-emerald-200 to-teal-200' },
+    { emoji: '🎧', label: 'A calming listen', tint: 'from-violet-200 to-fuchsia-200' },
+    { emoji: '📓', label: 'Tiny reflection', tint: 'from-amber-200 to-orange-200' },
+    { emoji: '✨', label: 'A softer you', tint: 'from-yellow-200 to-amber-300' },
+  ];
 
   return (
     <GlassShell>
-      <div className="flex-1 flex flex-col items-center justify-center text-center">
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-          className="text-xs font-semibold uppercase tracking-[0.22em] text-[#EB5E33] mb-3"
-        >
-          You're in
-        </motion.p>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45 }}
+        className="mt-2 mb-4 text-center"
+      >
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#EB5E33]">
+          A quick tour
+        </p>
+        <h1 className="mt-2 text-[28px] leading-[1.1] font-bold text-[#2A1810]">
+          {step.title || 'Every door opens a Path.'}
+        </h1>
+        <p className="mt-2 text-[14.5px] text-[#5a4a3a] leading-snug max-w-[320px] mx-auto">
+          {step.subtitle ||
+            'A few small steps, lined up just for you. Pick a door — Rilo lays the path.'}
+        </p>
+      </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mb-7"
+      {/* Winding path illustration */}
+      <div className="flex-1 relative flex items-center justify-center">
+        {/* Dashed thread */}
+        <svg
+          className="absolute inset-0 w-full h-full"
+          viewBox="0 0 300 420"
+          preserveAspectRatio="none"
+          fill="none"
         >
-          <motion.div
-            className="absolute inset-0 rounded-[40px] blur-3xl"
-            style={{ background: door.tint }}
-            animate={{ opacity: [0.5, 0.85, 0.5], scale: [1, 1.15, 1] }}
-            transition={{ duration: 3.6, repeat: Infinity, ease: 'easeInOut' }}
+          <motion.path
+            d="M60 30 Q 230 90, 70 170 T 240 320 Q 120 380, 200 410"
+            stroke="#EB5E33"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeDasharray="4 8"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 0.6 }}
+            transition={{ duration: 1.6, ease: 'easeInOut', delay: 0.3 }}
           />
-          <div className={cn('relative w-36 h-36 rounded-[40px] flex items-center justify-center', door.bubble, 'backdrop-blur-xl border border-white/70 shadow-ios')}>
-            <FluentEmoji emoji={door.emoji} size={80} />
-          </div>
-        </motion.div>
+        </svg>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="text-[28px] leading-[1.15] font-bold text-[#2A1810]"
-        >
-          {nickname ? `Open your door, ${nickname}.` : 'Open your door.'}
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.55, duration: 0.5 }}
-          className="mt-3 text-[15px] text-[#5a4a3a] leading-snug max-w-[300px]"
-        >
-          My Rilo is ready with what fits you today.
-        </motion.p>
+        <div className="relative w-full max-w-[300px] h-[420px]">
+          {PATH_STEPS.map((s, i) => {
+            // Zig-zag positions
+            const positions = [
+              { top: '0%', left: '4%' },
+              { top: '20%', right: '4%' },
+              { top: '42%', left: '6%' },
+              { top: '64%', right: '4%' },
+              { top: '86%', left: '24%' },
+            ];
+            const pos = positions[i];
+            return (
+              <motion.div
+                key={s.label}
+                initial={{ opacity: 0, scale: 0.6, y: 12 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{
+                  delay: 0.5 + i * 0.18,
+                  duration: 0.55,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                style={pos}
+                className="absolute flex items-center gap-2"
+              >
+                <div
+                  className={cn(
+                    'w-14 h-14 rounded-2xl flex items-center justify-center shadow-ios border border-white/70',
+                    'bg-gradient-to-br',
+                    s.tint
+                  )}
+                >
+                  <FluentEmoji emoji={s.emoji} size={30} />
+                </div>
+                <div className="px-2.5 py-1 rounded-full bg-white/80 backdrop-blur-xl border border-white/70 shadow-ios">
+                  <p className="text-[11px] font-semibold text-[#2A1810] whitespace-nowrap">
+                    {s.label}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
-      <div className="pt-2">
-        <GlassCTA onClick={onNext}>{step.buttonLabel || 'Enter My Rilo'}</GlassCTA>
+
+      <div className="pt-4">
+        <GlassCTA onClick={onNext}>{step.buttonLabel || "Let's pick yours"}</GlassCTA>
       </div>
     </GlassShell>
   );

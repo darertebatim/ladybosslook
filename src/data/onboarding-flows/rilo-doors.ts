@@ -14,6 +14,21 @@ export const riloDoorsFlow: OnboardingFlow = {
   appName: 'Rilo',
   createdAt: '2026-05-26',
   steps: [
+    /* ─── Intro: show what My Rilo & Paths look like ─── */
+    {
+      id: 'rd-meet-rilo',
+      type: 'meet-rilo-intro',
+      title: 'This is My Rilo.',
+      subtitle: 'Your wellness home — one calm place for your day, your tools, and the path that grows with you.',
+      buttonLabel: 'Next',
+    },
+    {
+      id: 'rd-open-door',
+      type: 'open-the-door',
+      title: 'Every door opens a Path.',
+      subtitle: 'A few small steps, lined up just for you. Pick a door — Rilo lays the path.',
+      buttonLabel: "Let's pick yours",
+    },
     {
       id: 'rd-nickname',
       type: 'door-nickname',
@@ -70,19 +85,6 @@ export const riloDoorsFlow: OnboardingFlow = {
       id: 'rd-sharp-immigrant',
       type: 'door-immigrant-picker',
       doorBranch: 'immigrant',
-    },
-    /* ─── Outro ─── */
-    {
-      id: 'rd-meet-rilo',
-      type: 'meet-rilo-intro',
-      title: 'Meet My Rilo.',
-      subtitle: 'Your wellness home — calm tools, gentle routines, and a path built for you.',
-      buttonLabel: 'Show me',
-    },
-    {
-      id: 'rd-open-door',
-      type: 'open-the-door',
-      buttonLabel: 'Enter My Rilo',
     },
   ],
 };
