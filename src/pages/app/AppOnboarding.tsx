@@ -296,9 +296,10 @@ export default function AppOnboarding() {
 
   const step = flow.steps[currentStep];
   const progress = ((currentStep + 1) / flow.steps.length) * 100;
+  const isRiloDoors = flowId === 'rilo-doors';
 
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col">
+    <div className={`fixed inset-0 z-50 flex flex-col ${isRiloDoors ? 'bg-[#FFF8F2]' : 'bg-white'}`}>
       {/* Navigation bar — hidden on paywall steps (they have their own controls).
           On AI screens (rilo-week-plans) we show only the back button — no progress bar, no top Skip. */}
       {step.type !== 'paywall' && (
@@ -309,6 +310,24 @@ export default function AppOnboarding() {
           >
             <button onClick={goBack} className="active:opacity-60 p-1">
               <ChevronLeft className="h-5 w-5 text-[#1a1f3d]" />
+            </button>
+          </div>
+        ) : isRiloDoors ? (
+          <div
+            className="absolute left-0 right-0 top-0 z-30 px-4 py-2 flex items-center"
+            style={{ paddingTop: 'env(safe-area-inset-top, 44px)' }}
+          >
+            <button onClick={goBack} className="mr-2 active:opacity-60 p-1">
+              <ChevronLeft className="h-5 w-5 text-[#2A1810]" />
+            </button>
+            <div className="flex-1 h-[3px] bg-[#2A1810]/10 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-[#EB5E33] to-[#F5A623] rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <button onClick={handleClose} className="ml-2 active:opacity-60 p-1 text-xs text-[#2A1810]/70 font-medium">
+              Skip
             </button>
           </div>
         ) : (
