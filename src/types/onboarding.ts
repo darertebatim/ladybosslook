@@ -66,7 +66,8 @@ export type OnboardingStepType =
   | 'door-selfcare-offers'
   | 'door-immigrant-picker'
   | 'meet-rilo-intro'
-  | 'open-the-door';
+  | 'open-the-door'
+  | 'rilo-doors-loader';
 
 export interface OnboardingOptionVariant {
   cluster: string;
