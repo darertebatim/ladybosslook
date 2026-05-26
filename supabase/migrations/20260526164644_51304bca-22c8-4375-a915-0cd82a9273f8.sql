@@ -1,0 +1,2 @@
+UPDATE public.tags SET slug='emotional-wellness', label='Emotional wellness', emoji='💗', description='Emotional challenges immigrants face — homesickness, loneliness, bilingual identity, cultural grief'
+WHERE dimension_id = (SELECT id FROM public.tag_dimensions WHERE slug='immigrant') AND slug='homesickness';
