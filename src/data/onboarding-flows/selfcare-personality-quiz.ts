@@ -266,7 +266,7 @@ export const selfcarePersonalityQuizFlow: OnboardingFlow = {
     {
       id: 'scp-diagnosis',
       type: 'scp-diagnosis',
-      title: 'Building your self-care plan…',
+      title: 'Scanning your habits…',
     },
     {
       id: 'scp-reveal',
@@ -278,19 +278,27 @@ export const selfcarePersonalityQuizFlow: OnboardingFlow = {
       id: 'scp-focus',
       type: 'scp-focus',
       title: 'Where to focus',
-      buttonLabel: 'See my tasks',
+      buttonLabel: 'See Suggested Goals →',
     },
     {
       id: 'scp-tasks',
       type: 'scp-tasks',
-      title: 'Your tasks',
-      buttonLabel: 'Add these to my routine',
+      title: 'Suggested Goals for You',
+      buttonLabel: 'Add to My Rilo Self Care',
     },
     {
-      id: 'scp-content',
-      type: 'scp-content',
-      title: 'Your self-care library',
-      buttonLabel: 'Done',
+      id: 'scp-celebration',
+      type: 'scp-celebration',
+      title: 'You showed up\nfor yourself today.',
+      buttonLabel: "Let's do it!",
+    },
+    {
+      id: 'scp-push-permission',
+      type: 'scp-push-permission',
+      title: 'Gentle nudges,\nnot noisy alerts.',
+      subtitle: "We'll send a soft reminder when it's time to show up for one of your goals.",
+      buttonLabel: 'Turn on reminders',
+      secondaryButtonLabel: 'Maybe later',
     },
   ],
 };

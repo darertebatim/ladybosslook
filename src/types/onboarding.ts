@@ -77,7 +77,10 @@ export type OnboardingStepType =
   | 'scp-reveal'
   | 'scp-focus'
   | 'scp-tasks'
-  | 'scp-content';
+  | 'scp-content'
+  | 'scp-celebration'
+  | 'scp-push-permission';
+
 
 export interface OnboardingOptionVariant {
   cluster: string;
