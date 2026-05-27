@@ -110,8 +110,12 @@ function SingleSelectInner({
 }: BaseProps & { title: string; options: { label: string; emoji?: string }[] }) {
   const selected = (answers?.[step.id] as string) || '';
   return (
-    <div className="absolute inset-0 flex flex-col px-5 pt-4 pb-6 bg-white overflow-y-auto">
-      <div className="max-w-md mx-auto w-full flex-1 flex flex-col">
+    <div className="absolute inset-0 flex flex-col px-5 pt-4 pb-6 overflow-y-auto bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]">
+      {/* ambient blobs to echo the brand gradient */}
+      <div className="pointer-events-none absolute -top-24 -left-16 w-72 h-72 rounded-full bg-[#FFD49A]/45 blur-3xl" />
+      <div className="pointer-events-none absolute top-1/3 -right-20 w-80 h-80 rounded-full bg-[#FFB4C8]/40 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 left-1/4 w-72 h-72 rounded-full bg-[#D9C6FF]/45 blur-3xl" />
+      <div className="relative max-w-md mx-auto w-full flex-1 flex flex-col">
         <h2 className="text-[22px] leading-[1.25] font-semibold text-[#1a1f3d] mb-5 mt-2">{title}</h2>
         <div className="space-y-2.5 flex-1">
           {options.map((opt) => {
@@ -124,8 +128,10 @@ function SingleSelectInner({
                   onAnswer?.(step.id, opt.label);
                   setTimeout(() => onNext(), 180);
                 }}
-                className={`w-full text-left px-4 py-4 rounded-2xl border-2 transition-all active:scale-[0.98] ${
-                  isSel ? 'border-[#1a1f3d] bg-[#1a1f3d]/5' : 'border-black/10 bg-white'
+                className={`w-full text-left px-4 py-4 rounded-2xl border transition-all active:scale-[0.98] backdrop-blur-md shadow-ios ${
+                  isSel
+                    ? 'border-[#1a1f3d]/70 bg-white/90'
+                    : 'border-white/60 bg-white/65'
                 }`}
               >
                 <div className="flex items-center gap-3">
