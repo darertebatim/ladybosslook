@@ -8,6 +8,7 @@ import { quickStartFlow } from '@/data/onboarding-flows/quick-start';
 import { preAuthWelcomeFlow } from '@/data/onboarding-flows/pre-auth-welcome';
 import { weeklyReviewFlow } from '@/data/onboarding-flows/weekly-review';
 import { selfcareQuizFlow } from '@/data/onboarding-flows/selfcare-quiz';
+import { selfcarePersonalityQuizFlow } from '@/data/onboarding-flows/selfcare-personality-quiz';
 import { selfcareWeeklyReviewFlow } from '@/data/onboarding-flows/selfcare-weekly-review';
 import { whatIsRiloFlow } from '@/data/onboarding-flows/what-is-rilo';
 import { riloDoorsFlow } from '@/data/onboarding-flows/rilo-doors';
@@ -17,7 +18,7 @@ import { toast } from 'sonner';
 import OnboardingAnswers from './OnboardingAnswers';
 
 export default function Onboarding() {
-  const flows = [riloDoorsFlow, whatIsRiloFlow, preAuthWelcomeFlow, dearMeFlow, mePlusFlow, quickStartFlow, weeklyReviewFlow, selfcareQuizFlow, selfcareWeeklyReviewFlow];
+  const flows = [riloDoorsFlow, whatIsRiloFlow, preAuthWelcomeFlow, dearMeFlow, mePlusFlow, quickStartFlow, weeklyReviewFlow, selfcareQuizFlow, selfcarePersonalityQuizFlow, selfcareWeeklyReviewFlow];
   const { flowId: defaultFlowId } = useDefaultOnboarding();
   const setDefaultMutation = useSetDefaultOnboarding();
 
