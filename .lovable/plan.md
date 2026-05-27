@@ -1,187 +1,58 @@
 ## Goal
 
-Flexible **multi-dimensional tag system** for audios, playlists, reflections, and breathing exercises. Open-ended so we can add new dimensions anytime without code changes. Plus two admin pages: **Tag Schema** (manage dimensions/tags) and **Content Tagging** (apply tags to content).
+Today's streak celebrations (first-action, Silver/Almost-Gold/Gold badge, 7-day Gold streak, challenge-day shield) only fire while you're physically on the Home/planner page. If you complete a task from My Rilo and never return to Home that day, you miss them.
 
-Multi-door is native — anything can carry tags from multiple dimensions (e.g. "Homesick" breathe = `door:emotion` + `door:immigrant` + `emotion:homesick` + `immigrant:homesickness`).
+Goal: make those celebrations **page-agnostic + deferred**. They queue up when triggered from anywhere, and pop the next time you land on either **/app/home** or **/app/my-rilo** — whichever comes first.
 
----
+## How it works
 
-## 1. Architecture
+The current hooks use in-memory refs (`prevCompletedRef`) to detect "new completion just happened." That dies on unmount. Replace that with **persisted-state detection**: compare today's live data against a localStorage snapshot of "last-seen data." Triggers become idempotent — refresh, navigation, app reopen all behave the same.
 
-```text
-tag_dimensions          tags
-─────────────           ────
-id                      id
-slug (unique)           dimension_id  ← FK
-label                   slug          (unique per dimension)
-emoji                   label
-sort_order              emoji
-description             sort_order
-is_multi_select         description
-                        is_active
-
-content_tags
-────────────
-content_type   ('audio'|'playlist'|'reflection'|'breathing')
-content_id     uuid
-tag_id         FK → tags
-PK (content_type, content_id, tag_id)
-```
-
-One polymorphic link table — adding a 5th content type later = one enum value, no new table. No hard rule of "one door per content" — it's all just tags across dimensions.
-
----
-
-## 2. Seed dimensions (v1) — all editable later
-
-### Door (4)
-`selfcare`, `emotion`, `immigrant`, `productivity`
-
-### Emotion (13) — from your breathe library
-`anxiety`, `worry`, `fear`, `envy`, `anger`, `sadness`, `irritation`, `overwhelm`, `stressed`, `exhausted`, `lonely`, `missing-someone`, `homesick`
-+ optional: `depressed`, `low-energy`
-(Detailed mood-checklist sub-tags can come later as their own dimension.)
-
-### Self-care cluster (4)
-`body`, `mind`, `people`, `environment`
-(Matches Self-Care Quiz `CLUSTER_MAP` in `src/utils/selfcare-scoring.ts`.)
-
-### Self-care category (14) — reuse your existing task categories
-`sleep`, `nutrition`, `movement`, `calm`, `Presence`, `gratitude`, `self-kindness`, `TidyUp`, `productivity`, `hygiene`, `Evening`, `easy-win`, `connection`, `LovedOnes`
-(Pulled straight from `CLUSTER_MAP`. Each one will be linked to its cluster via the same tag system — see §3.)
-
-### Immigrant theme (7)
-`homesickness`, `identity`, `career`, `finance`, `english`, `community`, `healthcare`
-
-### Productivity (seed — adjust freely in admin)
-`focus`, `planning`, `deep-work`, `procrastination`, `motivation`, `morning-routine`, `evening-routine`
-
-### Format (6) — no `reset`
-`meditation`, `sleep-story`, `education`, `podcast`, `breathe`, `reflection`
-
-### Language (optional)
-`en`, `fa`, `tr`, `es`
-
----
-
-## 3. Cross-door & cluster-to-category mapping
-
-Two pieces of "join" logic, both handled by the same `content_tags` table:
-
-**Multi-door content** — a track tagged with both `door:emotion` and `door:immigrant` shows up in both doors' My Rilo queries. Example: "Homesick" breathe →
-`door:emotion`, `door:immigrant`, `emotion:homesick`, `immigrant:homesickness`, `format:breathe`.
-
-**Self-care cluster ↔ category** — to avoid duplicating the cluster map, we store the parent cluster on each category tag (a new optional `parent_tag_id` column on `tags`). The admin Tag Schema page lets you set: `sleep → body`, `calm → mind`, etc. Then any content tagged `selfcare-category:sleep` automatically counts toward `selfcare-cluster:body` at query time (resolved in a `useTaggedContent` hook).
-
----
-
-## 4. Database migration
-
-One migration that:
-
-1. Creates `tag_dimensions` + `tags` + `content_tags` with GRANTs (admin write, authenticated read) and RLS
-2. Seeds the dimensions and tags listed in §2
-3. Sets `parent_tag_id` for the 14 self-care categories → 4 clusters per `CLUSTER_MAP`
-4. Migrates existing `playlist_tags` rows (currently the 3 door-like tags: immigrant/self-care/emotion) into the new `tags` table under the `door` dimension
-5. Migrates `audio_playlist_tag_links` rows → `content_tags` (with `content_type='playlist'`)
-6. Drops `playlist_tags` and `audio_playlist_tag_links` after verification
-
----
-
-## 5. Auto-tag seed pass (one-time SQL, included in migration)
-
-Best-guess tags from title patterns so you start with ~70% coverage and use the admin page to fix the rest.
-
-| Pattern (ILIKE on title/description) | Tags added |
-|---|---|
-| `%homesick%` | door:emotion, door:immigrant, emotion:homesick, immigrant:homesickness |
-| `%anxiety%`, `%anxious%` | door:emotion, emotion:anxiety |
-| `%worry%`, `%worrying%` | door:emotion, emotion:worry |
-| `%stress%` | door:emotion, emotion:stressed |
-| `%overwhelm%` | door:emotion, emotion:overwhelm |
-| `%exhaust%`, `%tired%` | door:emotion, emotion:exhausted |
-| `%lonely%`, `%loneliness%` | door:emotion, emotion:lonely |
-| `%missing%` | door:emotion, emotion:missing-someone |
-| `%anger%`, `%angry%` | door:emotion, emotion:anger |
-| `%sad%` | door:emotion, emotion:sadness |
-| `%fear%`, `%afraid%` | door:emotion, emotion:fear |
-| `%envy%`, `%jealous%` | door:emotion, emotion:envy |
-| `%irritat%` | door:emotion, emotion:irritation |
-| title contains "sleep story" | format:sleep-story |
-| title contains "meditation" | format:meditation |
-| title contains "(FA)" | language:fa |
-| Immigrant series titles (Homesickness / Identity / Career / Financial / English / Community / Healthcare) | door:immigrant + matching immigrant:* |
-| Self-care reset / 4-cluster series | door:selfcare + matching cluster |
-| All `breathing_exercises.*` | format:breathe (+ emotion guessed from category) |
-| All `reflections.*` | format:reflection |
-
-You'll review/fix in admin afterward.
-
----
-
-## 6. Admin — two new pages
-
-### A. `/admin/content/tag-schema`
-Two-pane manager.
+## Architecture
 
 ```text
-┌─ Dimensions ───────────────┐  ┌─ Tags in "Self-care category" ─┐
-│ • Door                     │  │ 💤 sleep         → body         │
-│ • Emotion                  │  │ 🥗 nutrition     → body         │
-│ • Self-care cluster        │  │ 🏃 movement      → body         │
-│ • Self-care category [act.]│  │ 🧘 calm          → mind         │
-│ • Immigrant theme          │  │ 🙏 gratitude     → mind         │
-│ • Productivity             │  │ ... [+ Add tag]                 │
-│ • Format                   │  │                                 │
-│ • Language                 │  │ Edit: parent tag, emoji, label  │
-│ [+ Add dimension]          │  │                                 │
-└────────────────────────────┘  └─────────────────────────────────┘
+AppProvidersLayout
+  └─ <GlobalCelebrationHost />        ← new, mounted once
+        ├─ subscribes to: weeklyCompletion, goldStreak, challenges
+        ├─ detects new triggers (vs localStorage snapshot)
+        ├─ writes pending celebration → state
+        └─ when pathname ∈ {/app/home, /app/my-rilo}:
+              render the modal
+              save "celebrated" flag → never replays
 ```
 
-Inline create/edit/delete/reorder for both. `is_multi_select` controls picker UX. `parent_tag_id` shown when relevant (the cluster→category link).
+AppHome keeps its existing modal mounts for now (they share the same localStorage flags, so the global one writes the flag → AppHome's instance silently skips). No risk of double-fire.
 
-### B. `/admin/content/tagging`
-Review and edit tags on actual content.
+## Scope of celebrations included
 
-```text
-[Tabs: Audios | Playlists | Reflections | Breathes]
-[Filter: any dimension ▾] [Untagged only ☐] [Search…]
+1. **First-action streak** (`StreakCelebration` with `isFirstAction=true`) — fires when `totalCompletions` goes from 0 → ≥1
+2. **Badge level-ups** (`BadgeCelebration` — Silver, Almost-Gold, Gold) — fires when today's badge tier increases
+3. **Gold streak milestone** (`GoldStreakCelebration`) — fires when consecutive gold days hits a milestone (1, 7, 30…)
+4. **Challenge day shield** (`ChallengeDayCelebration`) — fires when a challenge-day's required task is completed
 
-[emoji] Title                  [door chips] [emotion chips] [format]   [Edit]
-[emoji] Title                  …                                       [Edit]
-```
+NOT included (out of scope, keep on Home only): paywall, task detail, push onboarding, step/project completion, routine-ended sheet. Those are Home-feature-specific.
 
-Edit drawer = one chip section per dimension, multi-select where allowed. Same UX as today's `PlaylistTagPicker`, just grouped.
+## Files
 
-Added under existing "Content" admin nav.
+**New**
+- `src/hooks/useGlobalCelebrationQueue.tsx` — central queue + persisted-state detection
+- `src/components/app/GlobalCelebrationHost.tsx` — mounts the 4 modals, gates by pathname
 
----
+**Edited**
+- `src/layouts/AppProvidersLayout.tsx` — mount `<GlobalCelebrationHost />` once
+- `src/hooks/useBadgeCelebration.tsx` — add a second mode that detects via persisted snapshot (keep old in-memory mode for backwards compat with Home)
+- `src/hooks/useChallengeDayCelebration.tsx` — same
+- (Streak + gold streak triggers are simple enough to write directly inside the global hook)
 
-## 7. What this does NOT do (next step, not now)
+## Behavior verification
 
-- No onboarding wiring
-- No My Rilo recommendation queries
-- No frontend changes outside admin
+- Complete mood check-in from My Rilo → navigate to 3 other tools → return to My Rilo → 🎉 modal fires.
+- Same scenario but return to Home first → modal fires there. Coming back to My Rilo afterwards → no replay.
+- Already on Home when completion happens → fires immediately (existing path unchanged).
+- Reload mid-pending → still fires on next Home/My Rilo visit (persisted).
+- Same day, second qualifying event (e.g. first-action already done, now Silver badge unlocks) → queued + shown independently.
 
-Once tags are clean across all ~317 pieces of content (192 audios + 34 playlists + 65 reflections + 26 breathes), the onboarding → My Rilo mapping becomes one `content_tags` query per door.
+## Risk
 
----
-
-## Technical details
-
-**New tables:** `tag_dimensions`, `tags` (with `parent_tag_id`), `content_tags` — full GRANTs + RLS (admin write, authenticated read).
-**Dropped after migration:** `playlist_tags`, `audio_playlist_tag_links`.
-**Updated files:**
-- `src/hooks/usePlaylistTags.ts` → replaced by `src/hooks/useTags.ts` (reads dimensions + tags) and `src/hooks/useContentTags.ts` (reads/writes `content_tags`)
-- `src/components/admin/PlaylistTagPicker.tsx` → generic `TagPicker.tsx` grouped by dimension
-- `src/components/admin/PlaylistTagsBankDialog.tsx` → replaced by new Tag Schema page
-- `src/components/app/PlaylistTagChips.tsx` → reads `content_tags` for `content_type='playlist'`
-- Admin nav: add "Tag Schema" + "Content Tagging" under Content section
-**New files:**
-- `src/pages/admin/TagSchema.tsx`
-- `src/pages/admin/ContentTagging.tsx`
-- `src/components/admin/TagPicker.tsx`
-- `src/hooks/useTagDimensions.ts`, `useTags.ts`, `useContentTags.ts`
-- Migration: schema + GRANTs + RLS + seed dimensions/tags + cluster mapping + auto-tag pass + data migration from old playlist_tags
-
-Ready to build on approval. After the migration runs, we'll do a quick audit in the new admin page to fix the auto-tagged content before wiring up onboarding.
+- The 4 celebration modals are still mounted in `HomeCelebrations.tsx`. They use the same localStorage flags, so once the global host shows one and writes the flag, Home's instance reads it and skips on its next data update. Verified by inspecting `getCelebratedLevels()` in `useBadgeCelebration` and the equivalent keys in the others.
+- Estimated touch: ~3 new files, 3 edits, no migrations.
