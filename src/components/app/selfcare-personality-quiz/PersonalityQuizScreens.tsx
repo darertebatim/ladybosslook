@@ -811,6 +811,14 @@ export function SelfCarePersonalityQuizScreen(props: BaseProps) {
     case 'scp-loader':               return <ScpLoaderScreen {...props} />;
     case 'scp-branching-single-select': return <ScpBranchingScreen {...props} />;
     case 'scp-dynamic-aspiration':   return <ScpDynamicAspirationScreen {...props} />;
+    case 'single-select':
+      return (
+        <SingleSelectInner
+          {...props}
+          title={props.step.title || ''}
+          options={(props.step.options as any) || []}
+        />
+      );
     case 'scp-diagnosis':            return <ScpDiagnosisScreen {...props} />;
     case 'scp-reveal':               return <ScpRevealScreen {...props} />;
     case 'scp-focus':                return <ScpFocusScreen {...props} />;
