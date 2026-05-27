@@ -7,8 +7,8 @@ import { X, ChevronRight, Sparkles, Wand2 } from 'lucide-react';
 import { useSpecialBannerSettings } from '@/hooks/useSpecialBannerSettings';
 import { useTranslation } from 'react-i18next';
 
-const SELFCARE_QUIZ_COMPLETED_KEY = 'simora_onboarding_completed_selfcare-quiz';
-const SELFCARE_QUIZ_DISMISSED_KEY = 'simora_selfcare_quiz_banner_dismissed';
+const SELFCARE_QUIZ_COMPLETED_KEY = 'simora_onboarding_completed_selfcare-personality-quiz';
+const SELFCARE_QUIZ_DISMISSED_KEY = 'simora_selfcare_personality_quiz_banner_dismissed';
 
 interface SelfCareQuizBannerProps {
   className?: string;
@@ -37,7 +37,7 @@ export function SelfCareQuizBanner({ className, onVisibilityChange }: SelfCareQu
 
   const handleTap = () => {
     haptic.medium();
-    navigate('/app/onboarding/selfcare-quiz');
+    navigate('/app/onboarding/selfcare-personality-quiz');
   };
 
   const handleDismiss = (e: React.MouseEvent) => {
@@ -119,7 +119,7 @@ export function SelfCareQuizBanner({ className, onVisibilityChange }: SelfCareQu
 
           <div className="flex-1 min-w-0">
             <p className="text-white text-[14px] font-bold leading-tight">
-              Discover your self-care gaps
+              Discover your self-care Personalities
             </p>
             <p className="text-white/85 text-[11px] leading-tight mt-0.5">
               60-second AI check-in, tailored just for you
