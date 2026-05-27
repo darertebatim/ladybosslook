@@ -375,6 +375,9 @@ export default function MyRiloEngine() {
                     <Badge variant="outline" className="text-[10px] font-mono">{d.door}</Badge>
                   </div>
                   <div className="text-xs mt-0.5"><span className="text-muted-foreground">Signature:</span> {d.signature}</div>
+                  {(d as any).secondarySignature && (
+                    <div className="text-xs mt-0.5"><span className="text-muted-foreground">Secondary signature:</span> {(d as any).secondarySignature}</div>
+                  )}
                   <div className="text-xs mt-0.5"><span className="text-muted-foreground">Deeper:</span> {d.deeper}</div>
                 </div>
               </div>
