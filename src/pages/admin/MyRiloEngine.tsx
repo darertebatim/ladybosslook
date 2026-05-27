@@ -84,9 +84,9 @@ const scenarios = [
   {
     name: "A · Emotion (sad) + Self-Care",
     days: [
-      "Day 1: Playlist tagged 'sadness/depressed' → Check In (sadness-tagged) → Browse routines → Self-Care Personality Quiz teaser",
-      "Day 2: Self-Care Personality Quiz (secondary signature) → second emotion-tagged step → Check In (sadness-tagged) → continue routine",
-      "Day 3: Routine first → Self-Care deeper (quiz outcome routine) → bilingual-or-emotion playlist → Check In (sadness-tagged)",
+      "Day 1: Playlist tagged 'sadness/depressed' → Check In (sadness-tagged) → Browse routines → Self-Care Goals teaser",
+      "Day 2: Pick Self-Care Goals at /app/tasksbank (secondary signature, deep-linked to quiz-outcome cluster if available) → second emotion-tagged step → Check In (sadness-tagged) → continue routine",
+      "Day 3: Routine first → Self-Care deeper (first picked goal surfaced as task) → bilingual-or-emotion playlist → Check In (sadness-tagged)",
     ],
   },
   {
