@@ -272,6 +272,12 @@ export const selfcarePersonalityQuizFlow: OnboardingFlow = {
       id: 'scp-reveal',
       type: 'scp-reveal',
       title: 'Your personality',
+      buttonLabel: 'See where to focus',
+    },
+    {
+      id: 'scp-focus',
+      type: 'scp-focus',
+      title: 'Where to focus',
       buttonLabel: 'See my tasks',
     },
     {
