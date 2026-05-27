@@ -16,9 +16,9 @@ export const selfcarePersonalityQuizFlow: OnboardingFlow = {
     {
       id: 'scp-intro',
       type: 'scp-intro',
-      title: 'Self-Care Personality Quiz',
-      subtitle: '9 questions. About 2 minutes. The most honest portrait of how you actually take care of yourself — and what you need next.',
-      buttonLabel: 'Begin',
+      title: 'Which kind of\nself-care do you need?',
+      subtitle: 'Six personalities. One honest snapshot of how you actually take care of yourself — and the smallest next step that will finally stick.',
+      buttonLabel: 'Start the quiz →',
     },
 
     // ─── Phase 1: Q1-Q5 ──────────────────────────────────────
