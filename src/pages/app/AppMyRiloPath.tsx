@@ -498,6 +498,12 @@ export default function AppMyRiloPath() {
           </div>
         </div>
 
+        {/* Top banners (admin-curated) — under header, above date */}
+        <div className="px-4 pt-2">
+          <PromoBanner location="my_rilo_top" className="py-1" />
+          <HomeBanner location="my_rilo_top" className="py-1" />
+        </div>
+
         {/* Hero greeting */}
         <div className="px-5 pt-4 pb-3 relative z-10">
           <div
@@ -533,12 +539,6 @@ export default function AppMyRiloPath() {
               {summary.doneCount}/{summary.total}
             </span>
           </div>
-        </div>
-
-        {/* Top banners (admin-curated) */}
-        <div className="px-4 pt-1">
-          <PromoBanner location="my_rilo_top" className="py-2" />
-          <HomeBanner location="my_rilo_top" className="py-2" />
         </div>
 
         {/* THE PATH */}
