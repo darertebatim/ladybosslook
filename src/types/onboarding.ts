@@ -67,7 +67,16 @@ export type OnboardingStepType =
   | 'door-immigrant-picker'
   | 'meet-rilo-intro'
   | 'open-the-door'
-  | 'rilo-doors-loader';
+  | 'rilo-doors-loader'
+  // Self-Care Personality Quiz (v2.1)
+  | 'scp-intro'
+  | 'scp-loader'
+  | 'scp-branching-single-select'
+  | 'scp-dynamic-aspiration'
+  | 'scp-diagnosis'
+  | 'scp-reveal'
+  | 'scp-tasks'
+  | 'scp-content';
 
 export interface OnboardingOptionVariant {
   cluster: string;
