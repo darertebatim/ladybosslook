@@ -25,8 +25,8 @@ const doorSignatures = [
     door: "immigrant",
     emoji: "🌍",
     label: "Immigrant / Bilingual",
-    signature: "Open Bilingual Strength playlist (+ sleep story series)",
-    deeper: "Continue the bilingual series · emotion-tagged breath",
+    signature: "Open Bilingual Strength playlist + immigrant-tagged sleep story",
+    deeper: "Continue the bilingual series · another immigrant-tagged sleep story",
   },
   {
     door: "productivity",
@@ -39,8 +39,8 @@ const doorSignatures = [
     door: "emotion",
     emoji: "💛",
     label: "Emotion",
-    signature: "Tag-matched playlist for picked emotion + matching breath + reflection",
-    deeper: "Second emotion-tagged step (breath ↔ reflection alternate)",
+    signature: "Emotion-tagged solo meditation track + matching breath + reflection (no playlist — solo tracks only)",
+    deeper: "Emotion-tagged solo sleep story (or alternate meditation) + breath ↔ reflection",
   },
   {
     door: "exploring",
@@ -74,7 +74,7 @@ const day3Flow = [
   { emoji: "💛", title: "Mood check-in", meta: "Same as Standard Flow — opens the day", kind: "mood", isNew: true },
   { emoji: "🌱", title: "Habit cement: today's routine", meta: "Lead with routine — turns 'try' into 'rhythm'", kind: "routine", isNew: true },
   { emoji: "🚪", title: "Secondary door deeper step", meta: "Keeps secondary alive", kind: "door_deeper" },
-  { emoji: "🎧", title: "Featured playlist", meta: "Door-aware pick (emotion tag, bilingual, etc.)", kind: "playlist" },
+  { emoji: "🎧", title: "Featured audio", meta: "Door-aware pick — bilingual playlist for immigrant; solo emotion-tagged meditation/sleep story for emotion", kind: "playlist" },
   { emoji: "🌬️", title: "Check In (door-flavored)", meta: "See Vocabulary card above", kind: "reset" },
   { emoji: "🏆", title: "Streak + affirmation", meta: "Always last", kind: "reward" },
 ];
@@ -84,16 +84,16 @@ const scenarios = [
   {
     name: "A · Emotion (sad) + Self-Care",
     days: [
-      "Day 1: Playlist tagged 'sadness/depressed' → Check In (sadness-tagged) → Browse routines → Self-Care Goals teaser",
-      "Day 2: Pick Self-Care Goals at /app/tasksbank (secondary signature, deep-linked to quiz-outcome cluster if available) → second emotion-tagged step → Check In (sadness-tagged) → continue routine",
-      "Day 3: Routine first → Self-Care deeper (first picked goal surfaced as task) → bilingual-or-emotion playlist → Check In (sadness-tagged)",
+      "Day 1: Solo meditation tagged 'sadness' → Check In (sadness-tagged) → Browse routines → Self-Care Goals teaser",
+      "Day 2: Pick Self-Care Goals at /app/tasksbank (secondary signature, deep-linked to quiz-outcome cluster if available) → second sadness-tagged solo track (sleep story or meditation) → Check In (sadness-tagged) → continue routine",
+      "Day 3: Routine first → Self-Care deeper (first picked goal surfaced as task) → sadness-tagged solo track → Check In (sadness-tagged)",
     ],
   },
   {
     name: "B · Immigrant + Productivity",
     days: [
-      "Day 1: Bilingual Strength playlist → bilingual sleep story → Browse routines → Planner Onboarding teaser (productivity is secondary, so it still gets seeded)",
-      "Day 2: Planner Onboarding + pick first routine (secondary signature) → bilingual continue (primary deeper) → Check In (bilingual if available, else generic)",
+      "Day 1: Bilingual Strength playlist → immigrant-tagged sleep story → Browse routines → Planner Onboarding teaser (productivity is secondary, so it still gets seeded)",
+      "Day 2: Planner Onboarding + pick first routine (secondary signature) → another immigrant-tagged sleep story (primary deeper) → Check In (bilingual if available, else generic)",
       "Day 3: Routine first → 'Plan tomorrow' (secondary deeper) → bilingual playlist → Check In (bilingual if available, else generic)",
     ],
   },
@@ -101,24 +101,24 @@ const scenarios = [
     name: "C · Productivity + Emotion (anxious)",
     days: [
       "Day 1: Open Planner → Rilo Planner Onboarding → pick first routine → Browse routines → Check In (anxiety-tagged, because emotion is secondary)",
-      "Day 2: Anxiety-tagged playlist (secondary signature) → 1 quick routine task (primary deeper) → Check In (anxiety-tagged)",
-      "Day 3: Routine first → anxiety-tagged reflection step (secondary deeper) → playlist → Check In (anxiety-tagged)",
+      "Day 2: Anxiety-tagged solo meditation (secondary signature) → 1 quick routine task (primary deeper) → Check In (anxiety-tagged)",
+      "Day 3: Routine first → anxiety-tagged reflection step (secondary deeper) → anxiety-tagged solo sleep story → Check In (anxiety-tagged)",
     ],
   },
   {
     name: "D · Self-Care only (no secondary)",
     days: [
       "Day 1: Self-Care Personality Quiz → Check In (quiz-outcome flavored) → Browse routines → Planner Onboarding teaser (productivity not picked)",
-      "Day 2: Primary deeper (= Check In, quiz-outcome flavored) → routine continue → playlist → reward",
-      "Day 3: Routine first → Check In (quiz-outcome flavored) → playlist → reward",
+      "Day 2: Primary deeper (= Check In, quiz-outcome flavored) → routine continue → generic playlist → reward",
+      "Day 3: Routine first → Check In (quiz-outcome flavored) → generic playlist → reward",
     ],
   },
   {
     name: "E · Exploring + Emotion (lonely)",
     days: [
       "Day 1: Curated tour (1 playlist + quiz + planner peek) → Check In (lonely-tagged) → Browse routines",
-      "Day 2: Lonely-tagged playlist (secondary signature) → exploring deeper (Browse routines + 1 Check In) → routine",
-      "Day 3: Routine first → Check In (lonely-tagged) → playlist → reward",
+      "Day 2: Lonely-tagged solo meditation (secondary signature) → exploring deeper (Browse routines + 1 Check In) → routine",
+      "Day 3: Routine first → Check In (lonely-tagged) → lonely-tagged solo sleep story → reward",
     ],
   },
 ];
