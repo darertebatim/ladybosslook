@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Sparkles } from 'lucide-react';
 import type { OnboardingStep, OnboardingAnswers, OnboardingOptionVariant } from '@/types/onboarding';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -15,6 +15,10 @@ import {
   type FinalResult,
   type Cluster,
 } from '@/utils/selfcare-personality-scoring';
+import { SelfCareSuggestionsStep } from '@/components/app/selfcare-quiz/SelfCareSuggestionsStep';
+import { SelfCareRiloCelebrationStep } from '@/components/app/selfcare-quiz/SelfCareRiloCelebrationStep';
+import { SelfCarePushPermissionStep } from '@/components/app/selfcare-quiz/SelfCarePushPermissionStep';
+import { AmbientGlow } from '@/components/app/selfcare-quiz/visuals/AmbientGlow';
 
 /* ──────────────────────────────────────────────────────────────
  * Self-Care Personality Quiz (v2.1) — minimal, mobile-first screens.
@@ -180,47 +184,228 @@ export function ScpLoaderScreen({ step, onNext }: BaseProps) {
   );
 }
 
-/* ── diagnosis (call edge fn, then advance) ─────────────────── */
+/* ── diagnosis (rich scanning loader, mirrors Self-Care Quiz) ─ */
+
+const SCAN_CATEGORIES: { key: string; emoji: string; label: string }[] = [
+  { key: 'calm', emoji: '🧘', label: 'Calm' },
+  { key: 'sleep', emoji: '😴', label: 'Sleep' },
+  { key: 'nutrition', emoji: '🥗', label: 'Nutrition' },
+  { key: 'movement', emoji: '🏃', label: 'Movement' },
+  { key: 'hygiene', emoji: '🧴', label: 'Hygiene' },
+  { key: 'Presence', emoji: '🧠', label: 'Presence' },
+  { key: 'connection', emoji: '💬', label: 'Connection' },
+  { key: 'self-kindness', emoji: '💚', label: 'Self-Kindness' },
+  { key: 'gratitude', emoji: '🙏', label: 'Gratitude' },
+  { key: 'productivity', emoji: '📋', label: 'Productivity' },
+  { key: 'TidyUp', emoji: '🧹', label: 'Tidy Up' },
+  { key: 'Evening', emoji: '🌙', label: 'Evening' },
+  { key: 'LovedOnes', emoji: '🥰', label: 'Loved Ones' },
+  { key: 'easy-win', emoji: '✨', label: 'Easy Win' },
+];
+
+const SCAN_STATUS_MESSAGES = [
+  { title: 'Reading your personality…', sub: 'Looking at how you take care of yourself' },
+  { title: 'Mapping your gaps…', sub: `Comparing across ${SCAN_CATEGORIES.length} areas` },
+  { title: 'Finding what to focus on…', sub: 'Where the smallest shift will matter most' },
+  { title: 'Shaping your plan…', sub: 'Picking goals that fit where you are' },
+  { title: 'Almost there…', sub: 'Preparing your starter goals' },
+];
+
+/** Normalize personality-quiz category keys to the keys the
+ *  SelfCareSuggestionsStep uses for labels/emojis/grouping. */
+const normalizeCategoryKey = (key: string): string =>
+  key === 'selfkind' ? 'self-kindness' : key;
 
 export function ScpDiagnosisScreen({ step, onNext, onAnswer, answers }: BaseProps) {
-  const [status, setStatus] = useState<'loading' | 'done' | 'error'>('loading');
+  const [statusIdx, setStatusIdx] = useState(0);
+  const [scanIdx, setScanIdx] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [scannedResults, setScannedResults] = useState<Record<string, 'good' | 'gap' | null>>({});
+  const [done, setDone] = useState(false);
 
+  // Rotating status copy
+  useEffect(() => {
+    const t = window.setInterval(
+      () => setStatusIdx((i) => (i + 1) % SCAN_STATUS_MESSAGES.length),
+      2000,
+    );
+    return () => window.clearInterval(t);
+  }, []);
+
+  // Smooth progress bar
+  useEffect(() => {
+    const t = window.setInterval(
+      () => setProgress((p) => Math.min(p + 1.4, done ? 100 : 95)),
+      100,
+    );
+    return () => window.clearInterval(t);
+  }, [done]);
+
+  // Scanning animation across the category chips
+  useEffect(() => {
+    let idx = 0;
+    const t = window.setInterval(() => {
+      idx = (idx + 1) % SCAN_CATEGORIES.length;
+      setScanIdx(idx);
+      setScannedResults((prev) => {
+        const next = { ...prev };
+        const cat = SCAN_CATEGORIES[idx].key;
+        if (!next[cat]) next[cat] = Math.random() > 0.55 ? 'good' : null;
+        return next;
+      });
+    }, 320);
+    return () => window.clearInterval(t);
+  }, []);
+
+  // Call edge fn, persist result, then auto-advance
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      let merged: any;
       try {
-        const { data, error } = await supabase.functions.invoke('selfcare-personality-diagnosis', {
-          body: { answers },
-        });
-        if (cancelled) return;
+        const { data, error } = await supabase.functions.invoke(
+          'selfcare-personality-diagnosis',
+          { body: { answers } },
+        );
         if (error) throw error;
-        // Persist server result alongside client-resolved fallback.
         const local = resolveFinalResult(answers || {});
-        const merged = { ...local, ...(data || {}) };
-        onAnswer?.(step.id, JSON.stringify(merged));
-        setStatus('done');
-        setTimeout(() => onNext(), 900);
-      } catch (e) {
-        // Fall back to local result so the flow never blocks.
+        merged = { ...local, ...(data || {}) };
+      } catch {
         const local = resolveFinalResult(answers || {});
-        onAnswer?.(step.id, JSON.stringify({ ...local, suggested_tasks: [] }));
-        setStatus('done');
-        setTimeout(() => onNext(), 600);
+        merged = { ...local, suggested_tasks: [] };
       }
+      if (cancelled) return;
+
+      // Persist personality-shaped result (used by reveal/focus screens).
+      onAnswer?.(step.id, JSON.stringify(merged));
+
+      // Bridge: write the same shape SelfCareSuggestionsStep expects so we
+      // can reuse it for the tasks screen — with normalized category keys.
+      const gap = [
+        normalizeCategoryKey(merged.primary_category),
+        normalizeCategoryKey(merged.secondary_category),
+      ].filter(Boolean);
+      const normalizedTasks = (merged.suggested_tasks || []).map((t: any) => ({
+        ...t,
+        category: normalizeCategoryKey(t.category || ''),
+      }));
+      onAnswer?.(
+        'sc-diagnosis-data',
+        JSON.stringify({
+          gap_categories: gap,
+          suggested_tasks: normalizedTasks,
+          top_cluster: merged.primary_cluster,
+        }),
+      );
+
+      // Light up the gap chips, finish the bar, then move on.
+      setScannedResults((prev) => {
+        const next = { ...prev };
+        SCAN_CATEGORIES.forEach((c) => {
+          next[c.key] = gap.includes(c.key) ? 'gap' : (next[c.key] ?? 'good');
+        });
+        return next;
+      });
+      setDone(true);
+      window.setTimeout(() => onNext(), 1100);
     })();
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const currentStatus = SCAN_STATUS_MESSAGES[statusIdx];
+
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-[#FFF1E0] to-[#F0E6FF] px-6 text-center">
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
-        className="w-16 h-16 rounded-full border-4 border-[#1a1f3d]/15 border-t-[#1a1f3d] mb-6"
-      />
-      <p className="text-[18px] font-semibold text-[#1a1f3d] mb-2">{step.title || 'Building your self-care plan…'}</p>
-      <p className="text-sm text-[#1a1f3d]/60">Reading what you shared</p>
+    <div className="absolute inset-0 flex flex-col overflow-hidden bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]">
+      <AmbientGlow palette="warm" />
+
+      {/* Hero */}
+      <div className="shrink-0 relative z-10 pt-10 pb-3 flex justify-center">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 18 }}
+          className="relative w-[110px] h-[110px] rounded-full bg-gradient-to-br from-[#FFD49A] via-[#F08A3E] to-[#EC4899] shadow-[0_18px_38px_-12px_rgba(236,72,153,0.55)] flex items-center justify-center"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+            className="absolute inset-[-12px] rounded-full border-2 border-dashed border-[#F08A3E]/40"
+          />
+          <FluentEmoji emoji={done ? '✨' : '🔍'} size={56} />
+        </motion.div>
+      </div>
+
+      <div className="flex-1 relative z-10 px-5 pt-5 overflow-y-auto">
+        <div className="text-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={statusIdx}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+            >
+              <p className="text-lg font-bold text-foreground">
+                {done ? 'Your plan is ready ✨' : currentStatus.title}
+              </p>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                {done ? 'Bringing you to your starter goals' : currentStatus.sub}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        <div className="mt-4 w-full h-2 bg-muted rounded-full overflow-hidden">
+          <motion.div
+            className="h-full rounded-full bg-gradient-to-r from-primary via-primary to-accent"
+            style={{ width: `${progress}%` }}
+            transition={{ duration: 0.1 }}
+          />
+        </div>
+
+        <div className="grid grid-cols-3 gap-2 mt-4">
+          {SCAN_CATEGORIES.map((cat, i) => {
+            const isActive = i === scanIdx && !done;
+            const result = scannedResults[cat.key];
+            return (
+              <motion.div
+                key={cat.key}
+                className={`flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-xs font-medium border transition-all duration-200 ${
+                  isActive
+                    ? 'border-primary bg-primary/10 shadow-sm scale-[1.03]'
+                    : result === 'gap'
+                      ? 'border-accent/40 bg-accent/10'
+                      : result === 'good'
+                        ? 'border-primary/20 bg-primary/5'
+                        : 'border-border bg-muted/30'
+                }`}
+              >
+                <span className="text-sm">{cat.emoji}</span>
+                <span className={`truncate ${result ? 'text-foreground' : 'text-muted-foreground'}`}>
+                  {cat.label}
+                </span>
+                {result === 'good' && !isActive && <span className="ml-auto text-primary text-[10px]">✓</span>}
+                {result === 'gap' && !isActive && <span className="ml-auto text-accent text-[10px]">!</span>}
+                {isActive && (
+                  <motion.div
+                    className="ml-auto h-3 w-3 rounded-full border-2 border-primary border-t-transparent"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 0.6, repeat: Infinity, ease: 'linear' }}
+                  />
+                )}
+              </motion.div>
+            );
+          })}
+        </div>
+
+        <p className="mt-3 text-center text-[11px] text-muted-foreground">
+          {done
+            ? 'Done scanning'
+            : `Checking ${Math.min(scanIdx + 1, SCAN_CATEGORIES.length)} of ${SCAN_CATEGORIES.length} categories`}
+        </p>
+        <div className="h-10" />
+      </div>
     </div>
   );
 }
@@ -487,8 +672,25 @@ export function SelfCarePersonalityQuizScreen(props: BaseProps) {
     case 'scp-diagnosis':            return <ScpDiagnosisScreen {...props} />;
     case 'scp-reveal':               return <ScpRevealScreen {...props} />;
     case 'scp-focus':                return <ScpFocusScreen {...props} />;
-    case 'scp-tasks':                return <ScpTasksScreen {...props} />;
-    case 'scp-content':              return <ScpContentScreen {...props} />;
+    case 'scp-tasks':
+      return (
+        <SelfCareSuggestionsStep
+          step={props.step}
+          onNext={props.onNext}
+          onAnswer={props.onAnswer}
+          answers={props.answers}
+        />
+      );
+    case 'scp-celebration':
+      return (
+        <SelfCareRiloCelebrationStep
+          step={props.step}
+          onNext={props.onNext}
+          answers={props.answers}
+        />
+      );
+    case 'scp-push-permission':
+      return <SelfCarePushPermissionStep step={props.step} onNext={props.onNext} />;
     default:                         return null;
   }
 }
