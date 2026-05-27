@@ -79,6 +79,7 @@ export type OnboardingStepType =
   | 'scp-tasks'
   | 'scp-content';
 
+
 export interface OnboardingOptionVariant {
   cluster: string;
   title: string;
