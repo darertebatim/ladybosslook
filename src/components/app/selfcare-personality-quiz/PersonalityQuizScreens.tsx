@@ -233,31 +233,6 @@ export function ScpIntroScreen({ step, onNext }: BaseProps) {
   );
 }
 
-/* legacy intro kept for reference — replaced above */
-function ScpIntroScreenLegacy({ step, onNext }: BaseProps) {
-  return (
-    <div className="absolute inset-0 flex flex-col items-center justify-between px-6 pt-20 pb-8 bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]">
-      <div className="flex-1 flex flex-col items-center justify-center text-center max-w-md">
-        <motion.div
-          initial={{ scale: 0.6, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="w-28 h-28 rounded-full bg-white/70 backdrop-blur shadow-ios flex items-center justify-center mb-8"
-        >
-          <FluentEmoji emoji="✨" size={64} />
-        </motion.div>
-        <h1 className="text-3xl font-bold text-[#1a1f3d] mb-4 leading-tight">{step.title}</h1>
-        <p className="text-base text-[#1a1f3d]/70 leading-relaxed">{step.subtitle}</p>
-      </div>
-      <button
-        onClick={() => { haptic.light(); onNext(); }}
-        className="w-full max-w-md py-4 rounded-full bg-[#1a1f3d] text-white font-semibold text-base active:opacity-80"
-      >
-        {step.buttonLabel || 'Begin'}
-      </button>
-    </div>
-  );
-}
 
 /* ── single-select (used for plain + resolved branching) ────── */
 
