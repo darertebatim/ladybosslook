@@ -234,6 +234,11 @@ export default function AppOnboarding() {
         try { localStorage.removeItem('simora_selfcare_plus_choice'); } catch {}
         navigate(choice === 'accepted' ? '/app/home?paywall=1' : '/app/home');
       } else if (flowId === 'selfcare-personality-quiz') {
+        // Don't auto-trigger the "What is Rilo?" planner intro after the
+        // personality quiz — the user already went through a long flow.
+        try {
+          localStorage.setItem('simora_onboarding_planner_intro_dismissed', 'true');
+        } catch {}
         navigate('/app/home');
       } else if (flowId === 'what-is-rilo') {
         // Persist the user's morning / afternoon / evening picks as real

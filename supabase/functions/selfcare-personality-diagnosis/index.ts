@@ -152,18 +152,30 @@ serve(async (req) => {
       .order("is_popular", { ascending: false })
       .limit(30);
 
-    // Pick primary first, fill from secondary.
+    // Mix primary + secondary so users don't see one category only.
+    // ~60/40 split (ceil for primary), fall back to the other side
+    // when one category doesn't have enough candidates.
     const primary = (tasks || []).filter((t) => t.category === base.pcat);
     const secondary = (tasks || []).filter((t) => t.category === base.scat);
-    const suggested: any[] = [];
-    for (const t of primary) { if (suggested.length >= taskCount) break; suggested.push(t); }
-    for (const t of secondary) { if (suggested.length >= taskCount) break; suggested.push(t); }
+    const primaryTarget = Math.min(primary.length, Math.ceil(taskCount * 0.6));
+    const secondaryTarget = Math.min(secondary.length, taskCount - primaryTarget);
+    const finalPrimaryCount = Math.min(primary.length, taskCount - secondaryTarget);
+    const suggested: any[] = [
+      ...primary.slice(0, finalPrimaryCount),
+      ...secondary.slice(0, secondaryTarget),
+    ];
+    // Top up from whichever side still has items, in case totals fell short.
+    for (const t of [...primary.slice(finalPrimaryCount), ...secondary.slice(secondaryTarget)]) {
+      if (suggested.length >= taskCount) break;
+      suggested.push(t);
+    }
 
     // Persist (best-effort)
     if (userId) {
       try {
-        await admin.from("selfcare_personality_results").insert({
+        const { error: insertErr } = await admin.from("selfcare_personality_results").insert({
           user_id: userId,
+          taken_at: new Date().toISOString(),
           personality,
           primary_cluster: base.pc,
           secondary_cluster: base.sc,
@@ -175,6 +187,7 @@ serve(async (req) => {
           answers: a,
           quiz_version: "v2.1",
         });
+        if (insertErr) console.warn("[scp-diagnosis] insert error:", insertErr);
       } catch (e) {
         console.warn("[scp-diagnosis] insert failed:", e);
       }
