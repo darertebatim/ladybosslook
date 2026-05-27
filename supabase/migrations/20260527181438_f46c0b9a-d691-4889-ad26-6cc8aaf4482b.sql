@@ -1,0 +1,1 @@
+ALTER TABLE public.selfcare_personality_results ALTER COLUMN taken_at SET DEFAULT now();
