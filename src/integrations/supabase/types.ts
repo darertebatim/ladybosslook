@@ -2580,6 +2580,27 @@ export type Database = {
           },
         ]
       }
+      my_rilo_path_trophies: {
+        Row: {
+          created_at: string
+          earned_date: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          earned_date: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          earned_date?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       onboarding_answers: {
         Row: {
           answer: Json

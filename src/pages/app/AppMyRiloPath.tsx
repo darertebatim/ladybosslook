@@ -19,6 +19,10 @@ import type { PathStep } from "@/lib/pathEngine";
 import { SwapSheet } from "@/components/path/SwapSheet";
 import { haptic } from "@/lib/haptics";
 import { toast } from "@/hooks/use-toast";
+import {
+  useMyRiloPathTrophies,
+  useAwardPathTrophyOnComplete,
+} from "@/hooks/useMyRiloPathTrophies";
 
 // ── Orange Palette (mirrors /admin/brand/mock) ──
 const O = {
@@ -330,6 +334,12 @@ export default function AppMyRiloPath() {
   const skipTomorrow = useSkipTomorrowPathStep();
 
   const [swapTarget, setSwapTarget] = useState<PathStep | null>(null);
+  const { data: trophyCount = 0 } = useMyRiloPathTrophies();
+
+  const isPathComplete = !!data
+    && data.summary.total > 0
+    && data.summary.doneCount >= data.summary.total;
+  useAwardPathTrophyOnComplete(isPathComplete);
 
   if (!user) return null;
 
@@ -445,23 +455,45 @@ export default function AppMyRiloPath() {
           <div className="text-center text-[15px] font-bold tracking-tight" style={{ color: O.fg }}>
             My Rilo
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              haptic.light();
-              navigate("/app/presence");
-            }}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-full active:scale-95 transition-transform"
-            style={{
-              background: `linear-gradient(135deg, ${O.primaryL}, ${O.primary})`,
-              color: "#fff",
-              boxShadow: "0 2px 8px rgba(235,94,51,0.35)",
-            }}
-            aria-label={`Streak: ${streak} days · open Presence`}
-          >
-            <Flame className="w-3.5 h-3.5 fill-current" />
-            <span className="text-[13px] font-bold">{streak}</span>
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                haptic.light();
+                navigate("/app/presence");
+              }}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-full active:scale-95 transition-transform"
+              style={{
+                background: "#FFFFFF",
+                color: O.primary,
+                border: `1px solid ${O.border}`,
+                boxShadow: "0 2px 8px rgba(235,94,51,0.18)",
+              }}
+              aria-label={`Path trophies: ${trophyCount}`}
+            >
+              <span className="text-[13px] leading-none">🏆</span>
+              <span className="text-[13px] font-bold" style={{ color: O.fg }}>
+                {trophyCount}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                haptic.light();
+                navigate("/app/presence");
+              }}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-full active:scale-95 transition-transform"
+              style={{
+                background: `linear-gradient(135deg, ${O.primaryL}, ${O.primary})`,
+                color: "#fff",
+                boxShadow: "0 2px 8px rgba(235,94,51,0.35)",
+              }}
+              aria-label={`Streak: ${streak} days · open Presence`}
+            >
+              <Flame className="w-3.5 h-3.5 fill-current" />
+              <span className="text-[13px] font-bold">{streak}</span>
+            </button>
+          </div>
         </div>
 
         {/* Hero greeting */}
