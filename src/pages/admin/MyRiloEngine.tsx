@@ -322,8 +322,8 @@ export default function MyRiloEngine() {
               <strong>"Door-flavored"</strong> means the picker is filtered by the user's door before the date seed runs:
             </p>
             <ul className="text-xs text-muted-foreground list-disc list-inside ml-2 mt-1 space-y-0.5">
-              <li><strong>Emotion door</strong> → only items tagged with the picked emotion slug (strict)</li>
-              <li><strong>Immigrant door</strong> → bilingual item if one exists, else generic</li>
+              <li><strong>Emotion door</strong> → only solo tracks tagged with the picked emotion slug (meditations + sleep stories — no playlists per emotion)</li>
+              <li><strong>Immigrant door</strong> → bilingual playlist + immigrant-tagged sleep stories (pick from the tagged pool, not generic)</li>
               <li><strong>Self-Care door</strong> → quiz-outcome category if available, else generic</li>
               <li><strong>Productivity / Exploring / no match</strong> → generic 2-min calm pool</li>
               <li><strong>Day 4+ (Standard flow)</strong> → no door flavor, generic pool only</li>
