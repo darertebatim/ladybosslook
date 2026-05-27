@@ -336,6 +336,11 @@ export default function AppMyRiloPath() {
   const [swapTarget, setSwapTarget] = useState<PathStep | null>(null);
   const { data: trophyCount = 0 } = useMyRiloPathTrophies();
 
+  const isPathComplete = !!data
+    && data.summary.total > 0
+    && data.summary.doneCount >= data.summary.total;
+  useAwardPathTrophyOnComplete(isPathComplete);
+
   if (!user) return null;
 
   if (isLoading || !data) {
@@ -350,7 +355,6 @@ export default function AppMyRiloPath() {
   }
 
   const { steps, summary, streak, isDayOne } = data;
-  const isPathComplete = summary.total > 0 && summary.doneCount >= summary.total;
   const today = new Date();
   const weekday = today.toLocaleDateString(undefined, { weekday: "long" });
   const monthDay = today.toLocaleDateString(undefined, { month: "long", day: "numeric" });
