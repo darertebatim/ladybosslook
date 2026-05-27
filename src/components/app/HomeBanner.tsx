@@ -10,7 +10,7 @@ import { BUILD_INFO } from '@/lib/buildInfo';
 import { AppVideoPlayer } from '@/components/app/AppVideoPlayer';
 import { cn } from '@/lib/utils';
 
-type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch' | 'video_player' | 'routines_top' | 'routines_after_categories' | 'routine_player' | 'tasks_bank_top' | 'tasks_bank_after_categories';
+type DisplayLocation = 'home_top' | 'home_rituals' | 'explore' | 'explore_tools' | 'listen' | 'player' | 'programs' | 'channels' | 'watch' | 'video_player' | 'routines_top' | 'routines_after_categories' | 'routine_player' | 'tasks_bank_top' | 'tasks_bank_after_categories' | 'my_rilo_top' | 'my_rilo_bottom';
 
 function isVersionLessThan(v1: string, v2: string): boolean {
   const parts1 = v1.split('.').map(p => parseInt(p, 10) || 0);
