@@ -23,6 +23,8 @@ import {
   useMyRiloPathTrophies,
   useAwardPathTrophyOnComplete,
 } from "@/hooks/useMyRiloPathTrophies";
+import { PromoBanner } from "@/components/app/PromoBanner";
+import { HomeBanner } from "@/components/app/HomeBanner";
 
 // ── Orange Palette (mirrors /admin/brand/mock) ──
 const O = {
@@ -496,6 +498,12 @@ export default function AppMyRiloPath() {
           </div>
         </div>
 
+        {/* Top banners (admin-curated) — under header, above date */}
+        <div className="px-4 pt-2">
+          <PromoBanner location="my_rilo_top" className="py-1" />
+          <HomeBanner location="my_rilo_top" className="py-1" />
+        </div>
+
         {/* Hero greeting */}
         <div className="px-5 pt-4 pb-3 relative z-10">
           <div
@@ -590,6 +598,12 @@ export default function AppMyRiloPath() {
           )}
 
           {reward && <RewardRow step={reward} />}
+        </div>
+
+        {/* Bottom banners (admin-curated) — after the path */}
+        <div className="px-4 pb-2">
+          <PromoBanner location="my_rilo_bottom" className="py-2" />
+          <HomeBanner location="my_rilo_bottom" className="py-2" />
         </div>
 
         <div className="pb-8" />
