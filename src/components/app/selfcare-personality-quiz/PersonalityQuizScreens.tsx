@@ -13,6 +13,7 @@ import {
   applySurvivorGate,
   type Personality,
   type FinalResult,
+  type Cluster,
 } from '@/utils/selfcare-personality-scoring';
 
 /* ──────────────────────────────────────────────────────────────
@@ -261,6 +262,130 @@ export function ScpRevealScreen({ step, onNext, answers }: BaseProps) {
         onClick={() => { haptic.light(); onNext(); }}
         className="w-full max-w-md mx-auto mt-6 py-4 rounded-full bg-[#1a1f3d] text-white font-semibold text-base active:opacity-80"
       >
+        {step.buttonLabel || 'See where to focus'}
+      </button>
+    </div>
+  );
+}
+
+/* ── focus (cluster + category) ─────────────────────────────── */
+
+const CLUSTER_COPY: Record<Cluster, { label: string; emoji: string; blurb: string }> = {
+  body:        { label: 'Body',        emoji: '🌿', blurb: 'How you sleep, move, eat, and feel in your skin.' },
+  mind:        { label: 'Mind',        emoji: '🧠', blurb: 'How quiet, present, and kind your inner world feels.' },
+  environment: { label: 'Environment', emoji: '🏡', blurb: 'How your days, mornings, evenings, and space hold you.' },
+  people:      { label: 'People',      emoji: '💞', blurb: 'How connected you feel to the people who matter.' },
+};
+
+const CATEGORY_COPY: Record<string, { label: string; emoji: string; line: string }> = {
+  sleep:        { label: 'Sleep',              emoji: '😴', line: 'Rest that actually restores you.' },
+  movement:     { label: 'Movement',           emoji: '🚶‍♀️', line: 'Gentle motion to come back to your body.' },
+  nutrition:    { label: 'Nourishment',        emoji: '🥣', line: 'Eating in a way that feels caring.' },
+  hygiene:      { label: 'Comfort in your body', emoji: '🛁', line: 'Small rituals that feel like home.' },
+  calm:         { label: 'Calm',               emoji: '🌬️', line: 'Quieting the noise inside.' },
+  Presence:     { label: 'Presence',           emoji: '🌅', line: 'Coming back to right now.' },
+  selfkind:     { label: 'Self-Kindness',      emoji: '💗', line: 'Speaking to yourself like a friend.' },
+  gratitude:    { label: 'Gratitude',          emoji: '✨', line: 'Noticing the good already here.' },
+  connection:   { label: 'Connection',         emoji: '🤝', line: 'Feeling less alone, more held.' },
+  LovedOnes:    { label: 'Loved Ones',         emoji: '💞', line: 'Pouring into the people closest to you.' },
+  'easy-win':   { label: 'Easy Wins',          emoji: '🌱', line: 'One small, doable thing today.' },
+  Evening:      { label: 'Evenings',           emoji: '🌙', line: 'Winding down with intention.' },
+  productivity: { label: 'Flow of your day',   emoji: '🗓️', line: 'Feeling more in control of your time.' },
+  TidyUp:       { label: 'A restoring space',  emoji: '🧹', line: 'A space that helps you breathe.' },
+};
+
+function categoryCopy(key: string) {
+  return CATEGORY_COPY[key] || { label: key, emoji: '✨', line: 'A focus area shaped for you.' };
+}
+
+export function ScpFocusScreen({ step, onNext, answers }: BaseProps) {
+  const result = useResult(answers);
+  const copy = PERSONALITY_COPY[result.personality] || PERSONALITY_COPY.ghost;
+  const primaryCluster = CLUSTER_COPY[result.primary_cluster];
+  const secondaryCluster = CLUSTER_COPY[result.secondary_cluster];
+  const primaryCat = categoryCopy(result.primary_category);
+  const secondaryCat = categoryCopy(result.secondary_category);
+
+  return (
+    <div className="absolute inset-0 flex flex-col px-6 pt-14 pb-8 bg-gradient-to-b from-[#FFF1E0] via-white to-[#F0E6FF] overflow-y-auto">
+      <div className="flex-1 flex flex-col max-w-md mx-auto w-full">
+        <p className="text-xs uppercase tracking-[0.18em] text-[#1a1f3d]/50 text-center mb-2">For {copy.name}</p>
+        <h2 className="text-[26px] font-bold text-[#1a1f3d] text-center mb-2 leading-tight">
+          Here's where to focus right now
+        </h2>
+        <p className="text-[14px] text-[#1a1f3d]/65 text-center mb-7 leading-relaxed">
+          Based on what you shared, these two areas will move you the most this week.
+        </p>
+
+        {/* Primary */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="rounded-3xl p-5 mb-3 shadow-ios"
+          style={{ background: 'linear-gradient(135deg, #FFE7B3 0%, #FFD6E0 100%)' }}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-[10px] font-bold tracking-[0.16em] uppercase text-[#7A2E0E] bg-white/60 backdrop-blur px-2 py-0.5 rounded-full">
+              Primary focus
+            </span>
+          </div>
+          <div className="flex items-start gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-white/80 flex items-center justify-center shrink-0">
+              <FluentEmoji emoji={primaryCat.emoji} size={28} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] uppercase tracking-wider text-[#1a1f3d]/60">
+                {primaryCluster?.emoji} {primaryCluster?.label}
+              </p>
+              <p className="text-[18px] font-bold text-[#1a1f3d] leading-tight">
+                {primaryCat.label}
+              </p>
+              <p className="text-[13px] text-[#1a1f3d]/75 mt-1 leading-snug">
+                {primaryCat.line}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Secondary */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.1 }}
+          className="rounded-3xl p-5 bg-white border border-black/10"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-[10px] font-bold tracking-[0.16em] uppercase text-[#1a1f3d]/60 bg-[#1a1f3d]/5 px-2 py-0.5 rounded-full">
+              Then this
+            </span>
+          </div>
+          <div className="flex items-start gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-[#1a1f3d]/5 flex items-center justify-center shrink-0">
+              <FluentEmoji emoji={secondaryCat.emoji} size={26} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] uppercase tracking-wider text-[#1a1f3d]/55">
+                {secondaryCluster?.emoji} {secondaryCluster?.label}
+              </p>
+              <p className="text-[17px] font-semibold text-[#1a1f3d] leading-tight">
+                {secondaryCat.label}
+              </p>
+              <p className="text-[13px] text-[#1a1f3d]/65 mt-1 leading-snug">
+                {secondaryCat.line}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        <p className="text-[12px] text-[#1a1f3d]/50 text-center mt-5 leading-relaxed">
+          Your starter tasks will mix from both — most from your primary focus.
+        </p>
+      </div>
+      <button
+        onClick={() => { haptic.light(); onNext(); }}
+        className="w-full max-w-md mx-auto mt-6 py-4 rounded-full bg-[#1a1f3d] text-white font-semibold text-base active:opacity-80"
+      >
         {step.buttonLabel || 'See my tasks'}
       </button>
     </div>
@@ -361,6 +486,7 @@ export function SelfCarePersonalityQuizScreen(props: BaseProps) {
     case 'scp-dynamic-aspiration':   return <ScpDynamicAspirationScreen {...props} />;
     case 'scp-diagnosis':            return <ScpDiagnosisScreen {...props} />;
     case 'scp-reveal':               return <ScpRevealScreen {...props} />;
+    case 'scp-focus':                return <ScpFocusScreen {...props} />;
     case 'scp-tasks':                return <ScpTasksScreen {...props} />;
     case 'scp-content':              return <ScpContentScreen {...props} />;
     default:                         return null;

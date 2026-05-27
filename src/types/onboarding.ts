@@ -75,6 +75,7 @@ export type OnboardingStepType =
   | 'scp-dynamic-aspiration'
   | 'scp-diagnosis'
   | 'scp-reveal'
+  | 'scp-focus'
   | 'scp-tasks'
   | 'scp-content';
 
