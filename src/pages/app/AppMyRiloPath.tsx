@@ -445,17 +445,23 @@ export default function AppMyRiloPath() {
           <div className="text-center text-[15px] font-bold tracking-tight" style={{ color: O.fg }}>
             My Rilo
           </div>
-          <div
-            className="flex items-center gap-1 px-2.5 py-1 rounded-full"
+          <button
+            type="button"
+            onClick={() => {
+              haptic.light();
+              navigate("/app/presence");
+            }}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-full active:scale-95 transition-transform"
             style={{
               background: `linear-gradient(135deg, ${O.primaryL}, ${O.primary})`,
               color: "#fff",
               boxShadow: "0 2px 8px rgba(235,94,51,0.35)",
             }}
+            aria-label={`Streak: ${streak} days · open Presence`}
           >
             <Flame className="w-3.5 h-3.5 fill-current" />
             <span className="text-[13px] font-bold">{streak}</span>
-          </div>
+          </button>
         </div>
 
         {/* Hero greeting */}
