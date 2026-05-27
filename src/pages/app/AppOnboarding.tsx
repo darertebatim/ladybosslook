@@ -233,6 +233,8 @@ export default function AppOnboarding() {
         }
         try { localStorage.removeItem('simora_selfcare_plus_choice'); } catch {}
         navigate(choice === 'accepted' ? '/app/home?paywall=1' : '/app/home');
+      } else if (flowId === 'selfcare-personality-quiz') {
+        navigate('/app/home');
       } else if (flowId === 'what-is-rilo') {
         // Persist the user's morning / afternoon / evening picks as real
         // recurring tasks on their planner. Fire-and-forget so navigation
