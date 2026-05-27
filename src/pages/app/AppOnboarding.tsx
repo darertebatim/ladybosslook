@@ -239,7 +239,14 @@ export default function AppOnboarding() {
         try {
           localStorage.setItem('simora_onboarding_planner_intro_dismissed', 'true');
         } catch {}
-        navigate('/app/home');
+        const plusChoice = answers?.['scp-plus-intro'];
+        const fromState = Array.isArray(plusChoice) ? plusChoice[0] : plusChoice;
+        let choice = fromState;
+        if (!choice) {
+          try { choice = localStorage.getItem('simora_selfcare_plus_choice') || undefined; } catch {}
+        }
+        try { localStorage.removeItem('simora_selfcare_plus_choice'); } catch {}
+        navigate(choice === 'accepted' ? '/app/home?paywall=1' : '/app/home');
       } else if (flowId === 'what-is-rilo') {
         // Persist the user's morning / afternoon / evening picks as real
         // recurring tasks on their planner. Fire-and-forget so navigation
