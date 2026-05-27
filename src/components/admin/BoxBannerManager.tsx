@@ -39,6 +39,8 @@ const DISPLAY_LOCATION_OPTIONS: { value: DisplayLocation; label: string }[] = [
   { value: 'routine_player', label: '🎬 Routine Player' },
   { value: 'tasks_bank_top', label: '☑️ Tasks Bank - Top' },
   { value: 'tasks_bank_after_categories', label: '☑️ Tasks Bank - Under Categories' },
+  { value: 'my_rilo_top', label: '🧡 My Rilo - Top' },
+  { value: 'my_rilo_bottom', label: '🧡 My Rilo - Bottom (after path)' },
 ];
 
 interface BoxBanner {
