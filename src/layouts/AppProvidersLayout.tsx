@@ -3,6 +3,7 @@ import { AudioPlayerProvider } from '@/contexts/AudioPlayerContext';
 import { RoutinePlayerProvider } from '@/components/app/RoutinePlayerProvider';
 import { useClaimPendingDedication } from '@/hooks/useClaimPendingDedication';
 import { useClaimPendingPlaylistGift } from '@/hooks/useClaimPendingPlaylistGift';
+import { GlobalCelebrationHost } from '@/components/app/GlobalCelebrationHost';
 
 function DedicationClaimer() {
   useClaimPendingDedication();
@@ -21,6 +22,7 @@ export function AppProvidersLayout() {
       <RoutinePlayerProvider>
         <DedicationClaimer />
         <Outlet />
+        <GlobalCelebrationHost />
       </RoutinePlayerProvider>
     </AudioPlayerProvider>
   );
