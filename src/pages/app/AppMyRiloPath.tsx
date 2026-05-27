@@ -19,6 +19,10 @@ import type { PathStep } from "@/lib/pathEngine";
 import { SwapSheet } from "@/components/path/SwapSheet";
 import { haptic } from "@/lib/haptics";
 import { toast } from "@/hooks/use-toast";
+import {
+  useMyRiloPathTrophies,
+  useAwardPathTrophyOnComplete,
+} from "@/hooks/useMyRiloPathTrophies";
 
 // ── Orange Palette (mirrors /admin/brand/mock) ──
 const O = {
@@ -330,6 +334,7 @@ export default function AppMyRiloPath() {
   const skipTomorrow = useSkipTomorrowPathStep();
 
   const [swapTarget, setSwapTarget] = useState<PathStep | null>(null);
+  const { data: trophyCount = 0 } = useMyRiloPathTrophies();
 
   if (!user) return null;
 
@@ -345,6 +350,7 @@ export default function AppMyRiloPath() {
   }
 
   const { steps, summary, streak, isDayOne } = data;
+  const isPathComplete = summary.total > 0 && summary.doneCount >= summary.total;
   const today = new Date();
   const weekday = today.toLocaleDateString(undefined, { weekday: "long" });
   const monthDay = today.toLocaleDateString(undefined, { month: "long", day: "numeric" });
