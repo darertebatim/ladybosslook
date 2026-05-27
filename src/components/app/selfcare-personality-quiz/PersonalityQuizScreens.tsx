@@ -74,6 +74,167 @@ const PERSONALITY_COPY: Record<Personality, { name: string; emoji: string; tagli
 /* ── intro ──────────────────────────────────────────────────── */
 
 export function ScpIntroScreen({ step, onNext }: BaseProps) {
+  // Six personalities, each a floating chip that blooms in.
+  // Positions are tuned to fan out around the central sparkle bloom.
+  const chips: Array<{ name: string; emoji: string; x: number; y: number; rot: number; tint: string }> = [
+    { name: 'Giver',         emoji: '💗', x: -118, y: -84, rot: -8, tint: '#FFE0EC' },
+    { name: 'Achiever',      emoji: '🎯', x:  118, y: -96, rot:  9, tint: '#FFE7C9' },
+    { name: 'Survivor',      emoji: '🌱', x: -134, y:  18, rot: -4, tint: '#E1F4D6' },
+    { name: 'Ghost',         emoji: '🌙', x:  134, y:  30, rot:  6, tint: '#E5D6FF' },
+    { name: 'Perfectionist', emoji: '✨', x:  -90, y: 118, rot: -7, tint: '#FFE3D1' },
+    { name: 'Ruminator',     emoji: '🌊', x:  100, y: 132, rot:  5, tint: '#D6ECFF' },
+  ];
+  return (
+    <div className="absolute inset-0 flex flex-col overflow-hidden bg-gradient-to-b from-[#FFF4DC] via-[#FFE0E6] to-[#F0E6FF]">
+      {/* Ambient sunrise glow */}
+      <div className="pointer-events-none absolute inset-0">
+        <div
+          className="absolute -top-24 left-1/2 -translate-x-1/2 w-[460px] h-[460px] rounded-full blur-3xl opacity-70"
+          style={{ background: 'radial-gradient(circle, #FFD49A 0%, transparent 70%)' }}
+        />
+        <div
+          className="absolute top-1/3 -right-24 w-[280px] h-[280px] rounded-full blur-3xl opacity-55"
+          style={{ background: 'radial-gradient(circle, #FFB4C8 0%, transparent 70%)' }}
+        />
+        <div
+          className="absolute bottom-0 -left-20 w-[320px] h-[320px] rounded-full blur-3xl opacity-55"
+          style={{ background: 'radial-gradient(circle, #D9C6FF 0%, transparent 70%)' }}
+        />
+        {Array.from({ length: 12 }).map((_, i) => {
+          const left = (i * 41 + 7) % 100;
+          const top = (i * 59 + 11) % 100;
+          const delay = (i % 6) * 0.35;
+          return (
+            <motion.span
+              key={i}
+              initial={{ opacity: 0, scale: 0.4 }}
+              animate={{ opacity: [0, 0.85, 0], scale: [0.4, 1, 0.4] }}
+              transition={{ duration: 2.2, delay, repeat: Infinity, repeatDelay: 1.6 }}
+              className="absolute text-[10px]"
+              style={{ left: `${left}%`, top: `${top}%`, color: '#A0123F', opacity: 0.55 }}
+            >
+              ✨
+            </motion.span>
+          );
+        })}
+      </div>
+
+      {/* Visual stage */}
+      <div className="relative flex-1 flex items-center justify-center px-6">
+        <div className="relative w-full max-w-[320px] h-[320px] flex items-center justify-center">
+          {/* Central sparkle bloom */}
+          <motion.div
+            initial={{ scale: 0.4, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="relative z-20 w-24 h-24 rounded-[28px] flex items-center justify-center shadow-[0_22px_50px_-12px_rgba(236,72,153,0.55)]"
+            style={{
+              background:
+                'linear-gradient(135deg, #F08A3E 0%, #EC4899 55%, #8A5CF0 100%)',
+            }}
+          >
+            <Sparkles className="w-11 h-11 text-white" strokeWidth={2.4} />
+            {[0, 1].map((i) => (
+              <motion.span
+                key={i}
+                initial={{ scale: 0.6, opacity: 0.65 }}
+                animate={{ scale: 2.2, opacity: 0 }}
+                transition={{ duration: 1.6, delay: 0.3 + i * 0.5, repeat: Infinity, ease: 'easeOut' }}
+                className="absolute inset-0 rounded-[28px] border-2 border-white/70"
+              />
+            ))}
+          </motion.div>
+
+          {/* Floating personality chips */}
+          {chips.map((c, i) => (
+            <motion.div
+              key={c.name}
+              initial={{ opacity: 0, scale: 0.5, x: 0, y: 0 }}
+              animate={{ opacity: 1, scale: 1, x: c.x, y: c.y }}
+              transition={{
+                delay: 0.5 + i * 0.09,
+                duration: 0.55,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="absolute z-10"
+              style={{ transform: `translate(${c.x}px, ${c.y}px)` }}
+            >
+              <motion.div
+                animate={{ y: [0, -4, 0], rotate: [c.rot, c.rot + 1.5, c.rot] }}
+                transition={{
+                  duration: 4 + (i % 3) * 0.6,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  delay: i * 0.2,
+                }}
+                className="flex items-center gap-1.5 pl-1.5 pr-3 py-1.5 rounded-full backdrop-blur-md shadow-ios border border-white/70"
+                style={{ background: `${c.tint}EE` }}
+              >
+                <span className="w-6 h-6 rounded-full bg-white/85 flex items-center justify-center">
+                  <FluentEmoji emoji={c.emoji} size={16} />
+                </span>
+                <span className="text-[11px] font-semibold text-[#1a1f3d] whitespace-nowrap">
+                  {c.name}
+                </span>
+              </motion.div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Copy + CTA */}
+      <div className="relative shrink-0 px-6 pb-10">
+        <motion.p
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+          className="text-center text-[11px] font-bold uppercase tracking-[0.2em] text-[#B8590E] mb-2"
+        >
+          ✨ Self-Care Personality
+        </motion.p>
+        <motion.h1
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.25 }}
+          className="text-[28px] leading-[1.18] font-bold text-[#1a1f3d] text-center whitespace-pre-line"
+        >
+          {step.title}
+        </motion.h1>
+        {step.subtitle && (
+          <motion.p
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+            className="mt-3 text-center text-[14px] leading-snug text-[#1a1f3d]/70 max-w-md mx-auto"
+          >
+            {step.subtitle}
+          </motion.p>
+        )}
+        <motion.button
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.55 }}
+          onClick={() => { haptic.light(); onNext(); }}
+          className="mt-6 w-full h-[56px] rounded-2xl text-white font-semibold text-[16px] active:opacity-80 transition-opacity bg-gradient-to-r from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] shadow-[0_12px_30px_-8px_rgba(138,92,240,0.55)]"
+          style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        >
+          {step.buttonLabel || 'Begin'}
+        </motion.button>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.7 }}
+          className="mt-3 text-center text-[12px] font-semibold text-[#1a1f3d]/55"
+        >
+          9 questions · ~2 minutes · honest answers welcome
+        </motion.p>
+      </div>
+    </div>
+  );
+}
+
+/* legacy intro kept for reference — replaced above */
+function ScpIntroScreenLegacy({ step, onNext }: BaseProps) {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-between px-6 pt-20 pb-8 bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]">
       <div className="flex-1 flex flex-col items-center justify-center text-center max-w-md">
