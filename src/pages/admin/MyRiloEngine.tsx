@@ -52,6 +52,7 @@ const doorSignatures = [
 
 const day1Flow = [
   { emoji: "🚪", title: "Primary door signature step", meta: "Hero — door-flavored (see table above)", kind: "door_signature", isNew: true },
+  { emoji: "💛", title: "Mood check-in", meta: "Same as Standard Flow — tags downstream steps", kind: "mood", isNew: true },
   { emoji: "🌬️", title: "Check In (door-flavored)", meta: "See Vocabulary card above", kind: "reset", isNew: true },
   { emoji: "✨", title: "Browse routines (pick your first)", meta: "Always shown on Day 1", kind: "routine" },
   { emoji: "🧠", title: "Self-Care Personality Quiz teaser", meta: "Injected if Self-Care isn't a chosen door & quiz not done · skippable", kind: "quiz_pick", isNew: true },
@@ -60,6 +61,7 @@ const day1Flow = [
 ];
 
 const day2Flow = [
+  { emoji: "💛", title: "Mood check-in", meta: "Same as Standard Flow — opens the day", kind: "mood", isNew: true },
   { emoji: "🚪", title: "Secondary door signature step", meta: "Hero — secondary door's signature (fallback: primary deeper)", kind: "door_signature", isNew: true },
   { emoji: "🔁", title: "Primary door deeper step", meta: "Booster — keeps primary thread alive", kind: "door_deeper", isNew: true },
   { emoji: "🌬️", title: "Check In (door-flavored)", meta: "See Vocabulary card above", kind: "reset" },
@@ -68,6 +70,7 @@ const day2Flow = [
 ];
 
 const day3Flow = [
+  { emoji: "💛", title: "Mood check-in", meta: "Same as Standard Flow — opens the day", kind: "mood", isNew: true },
   { emoji: "🌱", title: "Habit cement: today's routine", meta: "Lead with routine — turns 'try' into 'rhythm'", kind: "routine", isNew: true },
   { emoji: "🚪", title: "Secondary door deeper step", meta: "Keeps secondary alive", kind: "door_deeper" },
   { emoji: "🎧", title: "Featured playlist", meta: "Door-aware pick (emotion tag, bilingual, etc.)", kind: "playlist" },
@@ -383,7 +386,7 @@ export default function MyRiloEngine() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Day 1 · Door tease</CardTitle>
-            <CardDescription>Primary door's signature is the hero. No mood check-in.</CardDescription>
+            <CardDescription>Primary door's signature is the hero, right after mood check-in.</CardDescription>
           </CardHeader>
           <CardContent className="divide-y">
             {day1Flow.map((s, i) => <StepRow key={i} s={s} />)}
