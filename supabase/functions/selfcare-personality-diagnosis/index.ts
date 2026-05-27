@@ -133,6 +133,21 @@ serve(async (req) => {
     const personality = applyGate(scored, a);
     const base = { ...DEFAULTS[personality] };
 
+    // Guarantee primary !== secondary category.
+    // If overrides (or defaults) collapse them, fall back to a sensible
+    // alternative within the same personality's cluster.
+    const FALLBACK_BY_CLUSTER: Record<Cluster, string[]> = {
+      body:        ["sleep", "movement", "nutrition", "hygiene"],
+      mind:        ["calm", "Presence", "selfkind", "gratitude"],
+      environment: ["productivity", "TidyUp", "Evening", "easy-win"],
+      people:      ["connection", "LovedOnes"],
+    };
+    if (base.pcat === base.scat) {
+      const pool = FALLBACK_BY_CLUSTER[base.sc] || [];
+      const alt = pool.find((c) => c !== base.pcat);
+      if (alt) base.scat = alt;
+    }
+
     // Minimal override logic — kept simple; mirrors client where it matters
     const q9 = Q9[String(a["scp-q9"] || "")] || { level: "unknown" as Readiness, count: 3 };
     let taskCount = q9.count;
