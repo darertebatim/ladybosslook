@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Sparkles } from 'lucide-react';
 import type { OnboardingStep, OnboardingAnswers, OnboardingOptionVariant } from '@/types/onboarding';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -15,6 +15,10 @@ import {
   type FinalResult,
   type Cluster,
 } from '@/utils/selfcare-personality-scoring';
+import { SelfCareSuggestionsStep } from '@/components/app/selfcare-quiz/SelfCareSuggestionsStep';
+import { SelfCareRiloCelebrationStep } from '@/components/app/selfcare-quiz/SelfCareRiloCelebrationStep';
+import { SelfCarePushPermissionStep } from '@/components/app/selfcare-quiz/SelfCarePushPermissionStep';
+import { AmbientGlow } from '@/components/app/selfcare-quiz/visuals/AmbientGlow';
 
 /* ──────────────────────────────────────────────────────────────
  * Self-Care Personality Quiz (v2.1) — minimal, mobile-first screens.
