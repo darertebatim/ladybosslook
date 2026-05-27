@@ -9,6 +9,7 @@ import { quickStartFlow } from '@/data/onboarding-flows/quick-start';
 import { preAuthWelcomeFlow } from '@/data/onboarding-flows/pre-auth-welcome';
 import { weeklyReviewFlow } from '@/data/onboarding-flows/weekly-review';
 import { selfcareQuizFlow } from '@/data/onboarding-flows/selfcare-quiz';
+import { selfcarePersonalityQuizFlow } from '@/data/onboarding-flows/selfcare-personality-quiz';
 import { selfcareWeeklyReviewFlow } from '@/data/onboarding-flows/selfcare-weekly-review';
 import { whatIsRiloFlow } from '@/data/onboarding-flows/what-is-rilo';
 import { riloDoorsFlow } from '@/data/onboarding-flows/rilo-doors';
@@ -24,7 +25,7 @@ import meplusPaywall3 from '@/assets/meplus-paywall-3.png';
 import meplusCommunityFooter from '@/assets/onboarding/meplus-community-footer.png';
 import { Analytics } from '@/lib/firebaseAnalytics';
 import { provisionRiloPicks } from '@/lib/onboarding/provisionRiloPicks';
-const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow, preAuthWelcomeFlow, weeklyReviewFlow, selfcareQuizFlow, selfcareWeeklyReviewFlow, whatIsRiloFlow, riloDoorsFlow];
+const allFlows = [dearMeFlow, mePlusFlow, quickStartFlow, preAuthWelcomeFlow, weeklyReviewFlow, selfcareQuizFlow, selfcarePersonalityQuizFlow, selfcareWeeklyReviewFlow, whatIsRiloFlow, riloDoorsFlow];
 
 function preloadImages(srcs: string[]) {
   srcs.forEach(src => {
@@ -232,6 +233,8 @@ export default function AppOnboarding() {
         }
         try { localStorage.removeItem('simora_selfcare_plus_choice'); } catch {}
         navigate(choice === 'accepted' ? '/app/home?paywall=1' : '/app/home');
+      } else if (flowId === 'selfcare-personality-quiz') {
+        navigate('/app/home');
       } else if (flowId === 'what-is-rilo') {
         // Persist the user's morning / afternoon / evening picks as real
         // recurring tasks on their planner. Fire-and-forget so navigation
