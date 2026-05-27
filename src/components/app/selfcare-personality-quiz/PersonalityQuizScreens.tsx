@@ -672,8 +672,25 @@ export function SelfCarePersonalityQuizScreen(props: BaseProps) {
     case 'scp-diagnosis':            return <ScpDiagnosisScreen {...props} />;
     case 'scp-reveal':               return <ScpRevealScreen {...props} />;
     case 'scp-focus':                return <ScpFocusScreen {...props} />;
-    case 'scp-tasks':                return <ScpTasksScreen {...props} />;
-    case 'scp-content':              return <ScpContentScreen {...props} />;
+    case 'scp-tasks':
+      return (
+        <SelfCareSuggestionsStep
+          step={props.step}
+          onNext={props.onNext}
+          onAnswer={props.onAnswer}
+          answers={props.answers}
+        />
+      );
+    case 'scp-celebration':
+      return (
+        <SelfCareRiloCelebrationStep
+          step={props.step}
+          onNext={props.onNext}
+          answers={props.answers}
+        />
+      );
+    case 'scp-push-permission':
+      return <SelfCarePushPermissionStep step={props.step} onNext={props.onNext} />;
     default:                         return null;
   }
 }
