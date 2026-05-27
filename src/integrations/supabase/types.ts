@@ -4794,6 +4794,57 @@ export type Database = {
         }
         Relationships: []
       }
+      selfcare_personality_results: {
+        Row: {
+          answers: Json
+          created_at: string
+          id: string
+          personality: string
+          primary_category: string
+          primary_cluster: string
+          quiz_version: string
+          readiness_level: string
+          secondary_category: string
+          secondary_cluster: string
+          suggested_task_ids: string[]
+          taken_at: string
+          task_count: number
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          created_at?: string
+          id?: string
+          personality: string
+          primary_category: string
+          primary_cluster: string
+          quiz_version?: string
+          readiness_level: string
+          secondary_category: string
+          secondary_cluster: string
+          suggested_task_ids?: string[]
+          taken_at?: string
+          task_count?: number
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          id?: string
+          personality?: string
+          primary_category?: string
+          primary_cluster?: string
+          quiz_version?: string
+          readiness_level?: string
+          secondary_category?: string
+          secondary_cluster?: string
+          suggested_task_ids?: string[]
+          taken_at?: string
+          task_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       selfcare_quiz_results: {
         Row: {
           ai_insight: string | null
