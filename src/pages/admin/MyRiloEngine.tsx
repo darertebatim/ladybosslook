@@ -18,6 +18,7 @@ const doorSignatures = [
     emoji: "🧠",
     label: "Self-Care",
     signature: "Self-Care Personality Quiz → personalized Check In",
+    secondarySignature: "Pick Self-Care Goals (/app/tasksbank) → seeds My Rilo Self Care",
     deeper: "Open today's Check In (door-flavored)",
   },
   {
