@@ -54,7 +54,7 @@ const day1Flow = [
   { emoji: "🚪", title: "Primary door signature step", meta: "Hero — door-flavored (see table above)", kind: "door_signature", isNew: true },
   { emoji: "🌬️", title: "Check In (door-flavored)", meta: "See Vocabulary card above", kind: "reset", isNew: true },
   { emoji: "✨", title: "Browse routines (pick your first)", meta: "Always shown on Day 1", kind: "routine" },
-  { emoji: "🧠", title: "Self-Care Quiz teaser", meta: "Injected if Self-Care isn't a chosen door & quiz not done · skippable", kind: "quiz_pick", isNew: true },
+  { emoji: "🧠", title: "Self-Care Personality Quiz teaser", meta: "Injected if Self-Care isn't a chosen door & quiz not done · skippable", kind: "quiz_pick", isNew: true },
   { emoji: "📋", title: "Rilo Planner Onboarding teaser", meta: "Injected if Productivity isn't a chosen door & planner onboarding not done · skippable", kind: "planner_onb", isNew: true },
   { emoji: "🏆", title: "+1 day streak & a new affirmation", meta: "Always last", kind: "reward" },
 ];
@@ -80,8 +80,8 @@ const scenarios = [
   {
     name: "A · Emotion (sad) + Self-Care",
     days: [
-      "Day 1: Playlist tagged 'sadness/depressed' → Check In (sadness-tagged) → Browse routines → Self-Care Quiz teaser",
-      "Day 2: Self-Care Quiz (secondary signature) → second emotion-tagged step → Check In (sadness-tagged) → continue routine",
+      "Day 1: Playlist tagged 'sadness/depressed' → Check In (sadness-tagged) → Browse routines → Self-Care Personality Quiz teaser",
+      "Day 2: Self-Care Personality Quiz (secondary signature) → second emotion-tagged step → Check In (sadness-tagged) → continue routine",
       "Day 3: Routine first → Self-Care deeper (quiz outcome routine) → bilingual-or-emotion playlist → Check In (sadness-tagged)",
     ],
   },
@@ -104,7 +104,7 @@ const scenarios = [
   {
     name: "D · Self-Care only (no secondary)",
     days: [
-      "Day 1: Self-Care Quiz → Check In (quiz-outcome flavored) → Browse routines → Planner Onboarding teaser (productivity not picked)",
+      "Day 1: Self-Care Personality Quiz → Check In (quiz-outcome flavored) → Browse routines → Planner Onboarding teaser (productivity not picked)",
       "Day 2: Primary deeper (= Check In, quiz-outcome flavored) → routine continue → playlist → reward",
       "Day 3: Routine first → Check In (quiz-outcome flavored) → playlist → reward",
     ],
