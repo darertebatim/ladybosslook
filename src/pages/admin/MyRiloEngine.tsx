@@ -57,7 +57,6 @@ const day1Flow = [
   { emoji: "🌬️", title: "Check In (door-flavored)", meta: "See Vocabulary card above", kind: "reset", isNew: true },
   { emoji: "✨", title: "Browse routines (pick your first)", meta: "Always shown on Day 1", kind: "routine" },
   { emoji: "🧠", title: "Self-Care Personality Quiz teaser", meta: "Injected if Self-Care isn't a chosen door & quiz not done · skippable", kind: "quiz_pick", isNew: true },
-  { emoji: "📋", title: "Rilo Planner Onboarding teaser", meta: "Injected if Productivity isn't a chosen door & planner onboarding not done · skippable", kind: "planner_onb", isNew: true },
   { emoji: "🏆", title: "+1 day streak & a new affirmation", meta: "Always last", kind: "reward" },
 ];
 
@@ -65,6 +64,7 @@ const day2Flow = [
   { emoji: "💛", title: "Mood check-in", meta: "Same as Standard Flow — opens the day", kind: "mood", isNew: true },
   { emoji: "🚪", title: "Secondary door signature step", meta: "Hero — secondary door's signature (fallback: primary deeper)", kind: "door_signature", isNew: true },
   { emoji: "🔁", title: "Primary door deeper step", meta: "Booster — keeps primary thread alive", kind: "door_deeper", isNew: true },
+  { emoji: "📋", title: "Rilo Planner Onboarding teaser", meta: "Injected if Productivity isn't a chosen door & planner onboarding not done · skippable — moved to Day 2 so Day 1 isn't overwhelming", kind: "planner_onb", isNew: true },
   { emoji: "🌬️", title: "Check In (door-flavored)", meta: "See Vocabulary card above", kind: "reset" },
   { emoji: "🔥", title: "Continue routine from Day 1", meta: "Picks the first active routine", kind: "routine" },
   { emoji: "🏆", title: "Streak + affirmation", meta: "Always last", kind: "reward" },
