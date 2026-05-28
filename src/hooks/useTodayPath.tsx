@@ -588,7 +588,7 @@ export function useTodayPath() {
             coverImageUrl: (pl as any).cover_image_url ?? null,
           };
         }
-      } else if (useTrack && hotTracks.length > 0) {
+      } else if (!secondaryAudio && useTrack && hotTracks.length > 0) {
         // Last-resort: surface a hot track if we couldn't build a secondary
         const t = hotTracks[seed % hotTracks.length];
         if (t.id !== heroId) {
