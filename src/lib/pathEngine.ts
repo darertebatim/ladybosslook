@@ -40,6 +40,8 @@ export interface PathStep {
   tint: "yellow" | "mint" | "peach" | "lavender" | "pink" | "sky";
   /** Allow Skip action. Reward is never skippable. */
   skippable?: boolean;
+  /** Optional cover image URL — for playlist/track steps, used instead of emoji tile. */
+  coverImageUrl?: string | null;
 }
 
 export interface PathInputs {
@@ -62,6 +64,7 @@ export interface PathInputs {
     id: string;
     title: string;
     coverEmoji?: string | null;
+    coverImageUrl?: string | null;
     category?: string | null;
     /** "continue" = resume in-progress playlist; "smart_next" = follow-up to last completed; default = normal pick. */
     mode?: "continue" | "smart_next" | "default";
@@ -74,6 +77,7 @@ export interface PathInputs {
     id: string;
     title: string;
     coverEmoji?: string | null;
+    coverImageUrl?: string | null;
     category?: string | null;
   } | null;
   /** Optional locked Plus playlist teaser for non-Plus users. */
@@ -81,6 +85,7 @@ export interface PathInputs {
     id: string;
     title: string;
     category?: string | null;
+    coverImageUrl?: string | null;
   } | null;
   /** Today's featured reset (one of: a specific breathing exercise or reflection). */
   featuredReset?: {
@@ -186,6 +191,7 @@ function audioToStep(a: NonNullable<PathInputs["featuredAudio"]>, opts?: { kicke
     meta: mode === "continue" ? "Tap to resume" : isTrack ? "Tap to play · ~5 min" : "Tap to play",
     estMinutes: isTrack ? 5 : 10, done: false,
     startHref: href, tint: opts?.tint ?? "sky", skippable: true,
+    coverImageUrl: a.coverImageUrl ?? null,
   };
 }
 
@@ -301,6 +307,7 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
         estMinutes: isTrack ? 5 : 10, done: false,
         startHref: isTrack ? `/app/player/${s.id}` : `/app/player/playlist/${s.id}`,
         tint: "lavender", skippable: true,
+        coverImageUrl: s.coverImageUrl ?? null,
       });
     }
   }
@@ -404,6 +411,7 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
       startHref: href,
       tint: "sky",
       skippable: true,
+      coverImageUrl: a.coverImageUrl ?? null,
     });
   }
 
@@ -423,6 +431,7 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
       startHref: `/app/player/playlist/${t.id}`,
       tint: "lavender",
       skippable: true,
+      coverImageUrl: t.coverImageUrl ?? null,
     });
   }
 
@@ -469,6 +478,7 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
       startHref: isTrack ? `/app/player/${s.id}` : `/app/player/playlist/${s.id}`,
       tint: "lavender",
       skippable: true,
+      coverImageUrl: s.coverImageUrl ?? null,
     });
   }
 

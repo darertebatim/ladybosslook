@@ -420,12 +420,12 @@ export function useTodayPath() {
       const useTrack = (preferTrack || trackByRotation) && hotTracks.length > 0;
 
       type FeaturedAudio =
-        | { kind: "track"; id: string; title: string; category: string | null; coverEmoji: string | null; mode?: "continue" | "smart_next" | "default"; resumeAudioId?: string | null }
-        | { kind: "playlist"; id: string; title: string; category: string | null; coverEmoji: string | null; mode?: "continue" | "smart_next" | "default"; resumeAudioId?: string | null };
+        | { kind: "track"; id: string; title: string; category: string | null; coverEmoji: string | null; coverImageUrl: string | null; mode?: "continue" | "smart_next" | "default"; resumeAudioId?: string | null }
+        | { kind: "playlist"; id: string; title: string; category: string | null; coverEmoji: string | null; coverImageUrl: string | null; mode?: "continue" | "smart_next" | "default"; resumeAudioId?: string | null };
       let featuredAudio: FeaturedAudio | null = null;
       type SecondaryAudio =
-        | { kind: "track"; id: string; title: string; category: string | null; coverEmoji: string | null }
-        | { kind: "playlist"; id: string; title: string; category: string | null; coverEmoji: string | null };
+        | { kind: "track"; id: string; title: string; category: string | null; coverEmoji: string | null; coverImageUrl: string | null }
+        | { kind: "playlist"; id: string; title: string; category: string | null; coverEmoji: string | null; coverImageUrl: string | null };
       let secondaryAudio: SecondaryAudio | null = null;
 
       // Educational categories get the hero slot; everything else is fair game
@@ -447,6 +447,7 @@ export function useTodayPath() {
           title: pl.name || "Continue listening",
           category: pl.category,
           coverEmoji: null,
+          coverImageUrl: (pl as any).cover_image_url ?? null,
           mode: "continue",
           resumeAudioId: continuePick.audioId,
         };
@@ -458,6 +459,7 @@ export function useTodayPath() {
           title: pl.name || "Picked for you",
           category: pl.category,
           coverEmoji: null,
+          coverImageUrl: (pl as any).cover_image_url ?? null,
           mode: "smart_next",
         };
       } else {
@@ -476,6 +478,7 @@ export function useTodayPath() {
             title: picked.name || "Today's playlist",
             category: picked.category,
             coverEmoji: null,
+            coverImageUrl: (picked as any).cover_image_url ?? null,
           };
         }
       }
@@ -520,6 +523,7 @@ export function useTodayPath() {
               title: t.title,
               category: pl.category,
               coverEmoji: null,
+              coverImageUrl: (t as any).cover_image_url ?? (pl as any).cover_image_url ?? null,
             };
           } else {
             secondaryAudio = {
@@ -528,6 +532,7 @@ export function useTodayPath() {
               title: pl.name,
               category: pl.category,
               coverEmoji: null,
+              coverImageUrl: (pl as any).cover_image_url ?? null,
             };
           }
         } else {
@@ -541,6 +546,7 @@ export function useTodayPath() {
             title: pl.name,
             category: pl.category,
             coverEmoji: null,
+            coverImageUrl: (pl as any).cover_image_url ?? null,
           };
         }
       } else if (useTrack && hotTracks.length > 0) {
@@ -550,12 +556,13 @@ export function useTodayPath() {
           secondaryAudio = {
             kind: "track", id: t.id, title: t.title,
             category: t.category, coverEmoji: null,
+            coverImageUrl: (t as any).cover_image_url ?? null,
           };
         }
       }
 
       // Occasional locked Plus teaser for non-Plus users (every 5th day)
-      let lockedTeaser: { id: string; title: string; category: string | null } | null = null;
+      let lockedTeaser: { id: string; title: string; category: string | null; coverImageUrl: string | null } | null = null;
       if (!isSubscribed && seed % 5 === 0) {
         const lockedPool = allPlaylists.filter((p) => p.requires_subscription);
         if (lockedPool.length > 0) {
@@ -563,7 +570,7 @@ export function useTodayPath() {
             ? lockedPool.filter((p) => p.category === intentCategory)
             : lockedPool;
           const t = (matched.length ? matched : lockedPool)[seed % Math.max((matched.length ? matched : lockedPool).length, 1)];
-          if (t) lockedTeaser = { id: t.id, title: t.name, category: t.category };
+          if (t) lockedTeaser = { id: t.id, title: t.name, category: t.category, coverImageUrl: (t as any).cover_image_url ?? null };
         }
       }
 
