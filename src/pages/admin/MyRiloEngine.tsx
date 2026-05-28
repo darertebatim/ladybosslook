@@ -389,37 +389,40 @@ export default function MyRiloEngine() {
         </CardContent>
       </Card>
 
-      <div className="grid md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Day 1 · Door tease</CardTitle>
-            <CardDescription>Primary door's signature is the hero, right after mood check-in.</CardDescription>
-          </CardHeader>
-          <CardContent className="divide-y">
-            {day1Flow.map((s, i) => <StepRow key={i} s={s} />)}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Day 2 · Secondary + reinforce</CardTitle>
-            <CardDescription>Secondary signature leads, primary stays alive.</CardDescription>
-          </CardHeader>
-          <CardContent className="divide-y">
-            {day2Flow.map((s, i) => <StepRow key={i} s={s} />)}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Day 3 · Habit cement</CardTitle>
-            <CardDescription>Routine first. Standard flow takes over after Day 3.</CardDescription>
-          </CardHeader>
-          <CardContent className="divide-y">
-            {day3Flow.map((s, i) => <StepRow key={i} s={s} />)}
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Starter Pool (replaces Day 1–3)</CardTitle>
+          <CardDescription>
+            One shared pool of "once" cards. Each day the engine pins <strong>Mood</strong> + <strong>Check In</strong> and adds the <strong>top 3 eligible</strong> pool slots by priority.
+            Tapping or skipping a slot retires it cross-day (so a missed Day 1 just resurfaces the next day — no "stuck" state).
+            When the pool drains, the user graduates to the Standard Flow.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="divide-y text-sm">
+            {starterPool.map((p) => (
+              <div key={p.slot} className="py-2 flex items-start gap-3">
+                <code className="text-xs bg-muted px-2 py-0.5 rounded shrink-0 font-mono w-10 text-center">{p.priority}</code>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">{p.emoji}</span>
+                    <span className="font-medium">{p.title}</span>
+                    <Badge variant="outline" className="text-[10px] font-mono">{p.slot}</Badge>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    <span className="text-foreground/70">Eligible:</span> {p.eligible} · <span className="text-foreground/70">Completed when:</span> {p.completedWhen}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 rounded-lg bg-muted/40 p-3 text-xs text-muted-foreground">
+            <strong className="text-foreground">Daily shape:</strong> Mood → up to 3 pool picks → Check In → Reward.
+            Mood + Check In never enter the pool (they recur daily). Reward is always last.
+            Most users drain the pool in 3–4 days depending on what they already had pre-auth (quiz done, planner intro seen, etc.).
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
