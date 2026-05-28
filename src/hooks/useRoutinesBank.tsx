@@ -432,9 +432,11 @@ export async function addRoutineToUserPlanner(
       pro_link_type?: string | null;
       pro_link_value?: string | null;
     }[];
+    /** Force the effective start date (overrides challenge_start_date / startDayOfWeek). */
+    startDate?: Date;
   } = {},
 ): Promise<{ success: boolean; taskCount: number }> {
-  const { selectedTaskIds, editedTasks } = opts;
+  const { selectedTaskIds, editedTasks, startDate: forcedStartDate } = opts;
 
   // Get routine details
       const { data: routine, error: routineError } = await supabase
@@ -525,7 +527,9 @@ export async function addRoutineToUserPlanner(
       
       // Calculate the effective start date
       let effectiveStartDate: Date;
-      if ((routine as any).challenge_start_date) {
+      if (forcedStartDate) {
+        effectiveStartDate = new Date(forcedStartDate);
+      } else if ((routine as any).challenge_start_date) {
         effectiveStartDate = new Date((routine as any).challenge_start_date);
       } else if (startDayOfWeek != null) {
         // Find the next occurrence of this weekday (0=Sun..6=Sat)
