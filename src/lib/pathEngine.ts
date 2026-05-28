@@ -114,6 +114,8 @@ function persistPoolSlotMap(steps: PathStep[]) {
 export interface PathInputs {
   hasMoodTodayLog: boolean;
   hasQuizResult: boolean;
+  /** True once user finished the Self-Care Personality Quiz. */
+  hasPersonalityResult?: boolean;
   quizTopCategory: string | null;
   activeRoutines: Array<{
     routineId: string;
