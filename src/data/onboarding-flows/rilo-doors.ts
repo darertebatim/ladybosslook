@@ -66,15 +66,6 @@ export const riloDoorsFlow: OnboardingFlow = {
       type: 'door-immigrant-picker',
       doorBranch: 'immigrant',
     },
-    /* ─── Push permission — reminders before building the path ─── */
-    {
-      id: 'rd-push-permission',
-      type: 'welcome-aboard',
-      title: 'With reminders, routines feel 80% easier.',
-      subtitle: 'Get gentle nudges so your Check Ins stay on track.',
-      buttonLabel: 'Turn on notifications',
-      secondaryButtonLabel: 'Maybe later',
-    },
     /* ─── Final loader: builds the path while teasing what they get ─── */
     {
       id: 'rd-building',
@@ -90,6 +81,15 @@ export const riloDoorsFlow: OnboardingFlow = {
       title: 'Everything you’d download 8 apps for.',
       subtitle: 'Calm, sleep, workouts, journal, calendar, habits, career, money — all already inside Rilo. Free.',
       buttonLabel: 'Enter Rilo',
+    },
+    /* ─── Push permission — last step before entering the app ─── */
+    {
+      id: 'rd-push-permission',
+      type: 'welcome-aboard',
+      title: 'With reminders, routines feel 80% easier.',
+      subtitle: 'Get gentle nudges so your Check Ins stay on track.',
+      buttonLabel: 'Turn on notifications',
+      secondaryButtonLabel: 'Maybe later',
     },
   ],
 };
