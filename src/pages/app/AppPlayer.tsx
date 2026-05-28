@@ -116,7 +116,7 @@ export default function AppPlayer() {
         .from("audio_content")
         .select(`
           id, title, cover_image_url, category, duration_seconds,
-          audio_playlist_items ( audio_playlists ( cover_image_url, name, language, category ) )
+          audio_playlist_items ( audio_playlists ( cover_image_url, name, language, category, is_free, requires_subscription, program_slug ) )
         `)
         .eq("is_hot", true)
         .order("published_at", { ascending: false })
