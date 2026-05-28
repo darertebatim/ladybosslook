@@ -167,10 +167,10 @@ const emotionTagMap = [
 
 const standardFlow = [
   { emoji: "💛", title: "Mood check-in", meta: "1 min · pick your mood", kind: "mood" },
-  { emoji: "🎧", title: "Today's playlist (ready to play)", meta: "Picks a playlist tagged path_role='primary' in the user's language; falls back to educational/sort_order", kind: "playlist" },
+  { emoji: "🎧", title: "Today's playlist (ready to play)", meta: "Picks a playlist tagged Path role = Primary in the user's language; falls back to educational/sort_order", kind: "playlist" },
   { emoji: "🌬️", title: "Check In", meta: "See Vocabulary card above (Day 4+: no door flavor, generic pool)", kind: "reset", isNew: true },
   { emoji: "🔥", title: "Open your Planner (first active routine)", meta: "Quiz outcome already provisioned the routine — navigates to /app/home", kind: "routine" },
-  { emoji: "🎧", title: "Secondary audio (extra)", meta: "Picks a playlist tagged path_role='secondary' in the user's language; falls back to intent/rotation · skippable", kind: "playlist", isNew: true },
+  { emoji: "🎧", title: "Secondary audio (extra)", meta: "Picks a playlist tagged Path role = Secondary in the user's language; falls back to intent/rotation · skippable", kind: "playlist", isNew: true },
   { emoji: "🔒", title: "Plus locked teaser", meta: "Shown to non-Plus users when a locked Plus playlist is available · skippable", kind: "playlist", isNew: true },
   { emoji: "🏆", title: "+1 day streak & a new affirmation", meta: "Reward (always last, never skippable)", kind: "reward" },
 ];
@@ -179,7 +179,7 @@ const dataSources = [
   { table: "emotion_logs", purpose: "Today's mood check-in + valence → mood label for scorer" },
   { table: "selfcare_quiz_results", purpose: "Quiz outcome → routine provisioned via provisionRiloPicks (no separate quiz_pick step)" },
   { table: "user_routines_bank", purpose: "Up to 4 active routines, weaved into path" },
-  { table: "audio_playlists", purpose: "Featured + secondary playlists. Selection priority: door override → playlist tagged path_role='primary' / 'secondary' (filtered by user's preferred language) → educational/intent fallback → sort_order." },
+  { table: "audio_playlists", purpose: "Featured + secondary playlists. Selection priority: door override → playlist tagged via Tag Schema · Path role = Primary / Secondary (filtered by user's preferred language) → educational/intent fallback → sort_order." },
   { table: "breathing_exercises", purpose: "Check In pool — active + not premium; one picked per day by date seed" },
   { table: "reflections", purpose: "Check In pool — active + is_free; one picked per day by date seed" },
   { table: "path_dismissals", purpose: "Per-day skip list, filtered from steps" },
