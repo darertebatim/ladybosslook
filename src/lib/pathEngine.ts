@@ -411,6 +411,7 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
       startHref: href,
       tint: "sky",
       skippable: true,
+      coverImageUrl: a.coverImageUrl ?? null,
     });
   }
 
@@ -430,6 +431,7 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
       startHref: `/app/player/playlist/${t.id}`,
       tint: "lavender",
       skippable: true,
+      coverImageUrl: t.coverImageUrl ?? null,
     });
   }
 
@@ -476,6 +478,7 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
       startHref: isTrack ? `/app/player/${s.id}` : `/app/player/playlist/${s.id}`,
       tint: "lavender",
       skippable: true,
+      coverImageUrl: s.coverImageUrl ?? null,
     });
   }
 
