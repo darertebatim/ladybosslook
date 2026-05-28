@@ -510,8 +510,14 @@ export function useTodayPath() {
         const eduPreferred = preferredLanguage
           ? eduPool.find((p) => p.language === preferredLanguage)
           : null;
-        // Door override wins over the default educational pick.
-        const picked = doorAudioOverride ?? eduPreferred ?? eduPool[seed % Math.max(eduPool.length, 1)] ?? null;
+        // Priority: door override → tagged "primary" (language-aware) →
+        // educational pick (language preferred) → daily-rotation fallback.
+        const picked =
+          doorAudioOverride ??
+          taggedPrimary ??
+          eduPreferred ??
+          eduPool[seed % Math.max(eduPool.length, 1)] ??
+          null;
         if (picked) {
           featuredAudio = {
             kind: "playlist",
@@ -535,6 +541,19 @@ export function useTodayPath() {
         doorSecondaryAudioOverride.id !== heroId
       ) {
         const pl = doorSecondaryAudioOverride;
+        secondaryAudio = {
+          kind: "playlist",
+          id: pl.id,
+          title: pl.name,
+          category: pl.category,
+          coverEmoji: null,
+          coverImageUrl: (pl as any).cover_image_url ?? null,
+        };
+      }
+      // Next priority: a playlist tagged "secondary" (language-aware), as
+      // long as it isn't already the hero.
+      if (!secondaryAudio && taggedSecondary && taggedSecondary.id !== heroId) {
+        const pl = taggedSecondary;
         secondaryAudio = {
           kind: "playlist",
           id: pl.id,
