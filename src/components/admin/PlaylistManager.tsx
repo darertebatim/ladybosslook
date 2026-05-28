@@ -37,10 +37,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { HostPicker, HostAssignment, saveContentHosts, loadContentHosts } from "@/components/admin/HostPicker";
-import { PlaylistTagsBankDialog } from "@/components/admin/PlaylistTagsBankDialog";
 import { PlaylistTagPicker } from "@/components/admin/PlaylistTagPicker";
-import { useSavePlaylistTagLinks } from "@/hooks/usePlaylistTags";
-import { Tag } from "lucide-react";
+import { useSaveContentTags } from "@/hooks/useContentTags";
 
 type DisplayMode = 'tracks' | 'modules' | 'both';
 
@@ -409,8 +407,7 @@ export const PlaylistManager = () => {
 
   const [createTagIds, setCreateTagIds] = useState<string[]>([]);
   const [editTagIds, setEditTagIds] = useState<string[]>([]);
-  const [isTagsBankOpen, setIsTagsBankOpen] = useState(false);
-  const saveTagLinks = useSavePlaylistTagLinks();
+  const saveTagLinks = useSaveContentTags();
 
   // Fetch playlists with item count
   const { data: playlists } = useQuery({
