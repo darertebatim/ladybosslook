@@ -212,17 +212,18 @@ export function useTodayPath() {
         if (roleTagIds.length > 0) {
           const tagIds = roleTagIds.map((t) => t.id);
           const { data: roleLinks } = await supabase
-            .from("audio_playlist_tag_links")
-            .select("playlist_id, tag_id")
+            .from("content_tags")
+            .select("content_id, tag_id")
+            .eq("content_type", "playlist")
             .in("tag_id", tagIds);
           const tagBySlug = new Map(roleTagIds.map((t) => [t.slug, t.id]));
           const playlistsByRole: Record<"primary" | "secondary", Set<string>> = {
             primary: new Set(),
             secondary: new Set(),
           };
-          for (const link of (roleLinks ?? []) as Array<{ playlist_id: string; tag_id: string }>) {
-            if (link.tag_id === tagBySlug.get("primary")) playlistsByRole.primary.add(link.playlist_id);
-            if (link.tag_id === tagBySlug.get("secondary")) playlistsByRole.secondary.add(link.playlist_id);
+          for (const link of (roleLinks ?? []) as Array<{ content_id: string; tag_id: string }>) {
+            if (link.tag_id === tagBySlug.get("primary")) playlistsByRole.primary.add(link.content_id);
+            if (link.tag_id === tagBySlug.get("secondary")) playlistsByRole.secondary.add(link.content_id);
           }
           const pickByRole = (role: "primary" | "secondary") => {
             const matches = accessiblePlaylists.filter((p) => playlistsByRole[role].has(p.id));
@@ -258,11 +259,12 @@ export function useTodayPath() {
           const tagIds = ((tagRows ?? []) as Array<{ id: string }>).map((t) => t.id);
           if (tagIds.length > 0) {
             const { data: linkRows } = await supabase
-              .from("audio_playlist_tag_links")
-              .select("playlist_id")
+              .from("content_tags")
+              .select("content_id")
+              .eq("content_type", "playlist")
               .in("tag_id", tagIds);
             const matchedIds = new Set(
-              ((linkRows ?? []) as Array<{ playlist_id: string }>).map((l) => l.playlist_id),
+              ((linkRows ?? []) as Array<{ content_id: string }>).map((l) => l.content_id),
             );
             doorAudioOverride =
               accessiblePlaylists.find((p) => matchedIds.has(p.id)) ?? null;
@@ -338,9 +340,10 @@ export function useTodayPath() {
           if (seedPlaylistIds.length) {
             // Fetch tag links for the seed playlist(s)
             const tagRes = await supabase
-              .from("audio_playlist_tag_links")
-              .select("playlist_id, tag_id")
-              .in("playlist_id", seedPlaylistIds);
+              .from("content_tags")
+              .select("content_id, tag_id")
+              .eq("content_type", "playlist")
+              .in("content_id", seedPlaylistIds);
             const seedTagIds = new Set(
               ((tagRes.data ?? []) as Array<{ tag_id: string }>).map((t) => t.tag_id),
             );
@@ -364,13 +367,14 @@ export function useTodayPath() {
             let candidateTagMap = new Map<string, Set<string>>();
             if (seedTagIds.size > 0 && candidatePool.length > 0) {
               const candTagRes = await supabase
-                .from("audio_playlist_tag_links")
-                .select("playlist_id, tag_id")
-                .in("playlist_id", candidatePool.map((p) => p.id));
-              for (const t of (candTagRes.data ?? []) as Array<{ playlist_id: string; tag_id: string }>) {
-                const set = candidateTagMap.get(t.playlist_id) ?? new Set<string>();
+                .from("content_tags")
+                .select("content_id, tag_id")
+                .eq("content_type", "playlist")
+                .in("content_id", candidatePool.map((p) => p.id));
+              for (const t of (candTagRes.data ?? []) as Array<{ content_id: string; tag_id: string }>) {
+                const set = candidateTagMap.get(t.content_id) ?? new Set<string>();
                 set.add(t.tag_id);
-                candidateTagMap.set(t.playlist_id, set);
+                candidateTagMap.set(t.content_id, set);
               }
             }
             let best: { p: typeof accessiblePlaylists[number]; score: number } | null = null;
