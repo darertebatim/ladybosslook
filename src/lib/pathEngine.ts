@@ -191,6 +191,7 @@ function audioToStep(a: NonNullable<PathInputs["featuredAudio"]>, opts?: { kicke
     meta: mode === "continue" ? "Tap to resume" : isTrack ? "Tap to play · ~5 min" : "Tap to play",
     estMinutes: isTrack ? 5 : 10, done: false,
     startHref: href, tint: opts?.tint ?? "sky", skippable: true,
+    coverImageUrl: a.coverImageUrl ?? null,
   };
 }
 
