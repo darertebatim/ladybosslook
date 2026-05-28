@@ -1,58 +1,44 @@
-## Goal
 
-Today's streak celebrations (first-action, Silver/Almost-Gold/Gold badge, 7-day Gold streak, challenge-day shield) only fire while you're physically on the Home/planner page. If you complete a task from My Rilo and never return to Home that day, you miss them.
+# Unify playlist tagging on one schema
 
-Goal: make those celebrations **page-agnostic + deferred**. They queue up when triggered from anywhere, and pop the next time you land on either **/app/home** or **/app/my-rilo** — whichever comes first.
+Today, playlists are tagged in two parallel systems:
 
-## How it works
+- **Legacy** — `playlist_tags` (tag definitions) + `audio_playlist_tag_links` (playlist↔tag). Used by the playlist editor and by the current `useTodayPath.tsx` lookup.
+- **New** — `tag_dimensions` + `tags` + `content_tags` (with `content_type` already supporting `"playlist"`). Used by the new `/admin/tags/content` Tag Schema page where you defined **Path role → Primary / Secondary** and dimensions like Self-care category, Immigrant theme, Productivity.
 
-The current hooks use in-memory refs (`prevCompletedRef`) to detect "new completion just happened." That dies on unmount. Replace that with **persisted-state detection**: compare today's live data against a localStorage snapshot of "last-seen data." Triggers become idempotent — refresh, navigation, app reopen all behave the same.
+Goal: one source of truth. Playlists get tagged via the new schema. Legacy tables go away.
 
-## Architecture
+## What I will build
 
-```text
-AppProvidersLayout
-  └─ <GlobalCelebrationHost />        ← new, mounted once
-        ├─ subscribes to: weeklyCompletion, goldStreak, challenges
-        ├─ detects new triggers (vs localStorage snapshot)
-        ├─ writes pending celebration → state
-        └─ when pathname ∈ {/app/home, /app/my-rilo}:
-              render the modal
-              save "celebrated" flag → never replays
-```
+1. **Migrate legacy playlist tags into the new schema** (one-time, in SQL):
+   - Create a new dimension `playlist-subject` (or reuse an existing matching dimension if you prefer — see Questions below).
+   - For each row in `playlist_tags`, insert a matching row in `tags` under that dimension (preserving slug, label, emoji, sort_order).
+   - For each row in `audio_playlist_tag_links`, insert into `content_tags` with `content_type='playlist'` pointing to the new tag id.
+   - Skip duplicates safely.
 
-AppHome keeps its existing modal mounts for now (they share the same localStorage flags, so the global one writes the flag → AppHome's instance silently skips). No risk of double-fire.
+2. **Rewire the playlist editor (`PlaylistManager.tsx` + `PlaylistTagPicker.tsx`)** to read/write `content_tags` via `useContentTagsByType('playlist')` + `useSaveContentTags()`. The picker becomes dimension-grouped (so admins can see Path role, Subject, Language, etc. side by side and tick the right tags).
 
-## Scope of celebrations included
+3. **Rewire `useTodayPath.tsx`** to query `content_tags` (joined to `tags` + `tag_dimensions`) instead of `audio_playlist_tag_links`. Primary/Secondary lookup uses the `path-role` dimension you already created.
 
-1. **First-action streak** (`StreakCelebration` with `isFirstAction=true`) — fires when `totalCompletions` goes from 0 → ≥1
-2. **Badge level-ups** (`BadgeCelebration` — Silver, Almost-Gold, Gold) — fires when today's badge tier increases
-3. **Gold streak milestone** (`GoldStreakCelebration`) — fires when consecutive gold days hits a milestone (1, 7, 30…)
-4. **Challenge day shield** (`ChallengeDayCelebration`) — fires when a challenge-day's required task is completed
+4. **Rewire `PlaylistTagChips.tsx`** (the user-facing chip strip) to read `content_tags` for the playlist.
 
-NOT included (out of scope, keep on Home only): paywall, task detail, push onboarding, step/project completion, routine-ended sheet. Those are Home-feature-specific.
+5. **Delete legacy code & tables**:
+   - Drop hook file `src/hooks/usePlaylistTags.ts`.
+   - Delete `src/components/admin/PlaylistTagsBankDialog.tsx` (legacy bank manager — replaced by Tag Schema page).
+   - Remove the "Manage tag bank" entry point from `PlaylistManager`.
+   - SQL: `DROP TABLE audio_playlist_tag_links; DROP TABLE playlist_tags;` (after data migration is verified).
 
-## Files
+## Result
 
-**New**
-- `src/hooks/useGlobalCelebrationQueue.tsx` — central queue + persisted-state detection
-- `src/components/app/GlobalCelebrationHost.tsx` — mounts the 4 modals, gates by pathname
+- Every playlist tag — including Path role: Primary/Secondary, subject, language — lives in **one** table (`content_tags`).
+- The Tag Schema admin page is the only place to define tag dimensions and tags.
+- The playlist editor shows all dimensions and you tick tags from each.
+- `useTodayPath` reads Primary/Secondary directly from the unified schema, so when you tag a new playlist (e.g. Wellness Planning Persian) as Primary + language `fa`, Persian users auto-get it.
 
-**Edited**
-- `src/layouts/AppProvidersLayout.tsx` — mount `<GlobalCelebrationHost />` once
-- `src/hooks/useBadgeCelebration.tsx` — add a second mode that detects via persisted snapshot (keep old in-memory mode for backwards compat with Home)
-- `src/hooks/useChallengeDayCelebration.tsx` — same
-- (Streak + gold streak triggers are simple enough to write directly inside the global hook)
+## Questions before I run the migration
 
-## Behavior verification
+1. **Subject tags** ("self-care", "immigrants", "planning"): do you want them migrated into a single new dimension called **"Playlist subject"**, or should I delete them entirely and rely only on your existing dimensions (Self-care category, Immigrant theme, Productivity) for subject grouping? The latter is cleaner long-term but means I won't carry the 3 legacy tags forward — you'd re-tag with the proper dimensions.
 
-- Complete mood check-in from My Rilo → navigate to 3 other tools → return to My Rilo → 🎉 modal fires.
-- Same scenario but return to Home first → modal fires there. Coming back to My Rilo afterwards → no replay.
-- Already on Home when completion happens → fires immediately (existing path unchanged).
-- Reload mid-pending → still fires on next Home/My Rilo visit (persisted).
-- Same day, second qualifying event (e.g. first-action already done, now Silver badge unlocks) → queued + shown independently.
+2. **`PlaylistTagChips`** (the public chip strip on playlist cards): which dimensions should show as user-visible chips? I'd suggest hiding internal ones (Path role) and showing only subject/category dimensions. Want me to add an `is_user_visible` flag on `tag_dimensions` for this?
 
-## Risk
-
-- The 4 celebration modals are still mounted in `HomeCelebrations.tsx`. They use the same localStorage flags, so once the global host shows one and writes the flag, Home's instance reads it and skips on its next data update. Verified by inspecting `getCelebratedLevels()` in `useBadgeCelebration` and the equivalent keys in the others.
-- Estimated touch: ~3 new files, 3 edits, no migrations.
+Once you answer those two, I'll write the migration + code changes in one pass.
