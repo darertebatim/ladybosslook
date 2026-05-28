@@ -601,11 +601,18 @@ export function useTodayPath() {
       const snoozedActive = new Set<string>();
       const swapMap = new Map<string, string>(); // original id -> swap_target id
       const skipTomorrowToday = new Set<string>();
+      // Steps deferred today via "Snooze later" — moved to end of list, not hidden.
+      const deferredToday = new Set<string>();
 
       for (const a of actions) {
         const id = `${a.step_kind}:${a.step_ref}`;
-        if (a.action === "snooze" && a.effective_until && a.effective_until > nowIso) {
-          snoozedActive.add(id);
+        if (a.action === "snooze") {
+          // New semantics: snooze = defer to end of list for today.
+          // Honor any snooze action created today (ignore stale rows from
+          // previous days, regardless of effective_until format).
+          if (a.created_at.slice(0, 10) === today) {
+            deferredToday.add(id);
+          }
         } else if (a.action === "swap") {
           // Only honor swaps created today
           if (a.created_at.slice(0, 10) === today && a.swap_target) {
@@ -621,7 +628,6 @@ export function useTodayPath() {
 
       const dismissedIds = new Set<string>([
         ...dismissed,
-        ...snoozedActive,
         ...skipTomorrowToday,
       ]);
 
