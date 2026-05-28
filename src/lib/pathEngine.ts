@@ -339,6 +339,9 @@ function deeperStepForDoor(
  *  - Planner onboarding teaser when neither door is `productivity` (and not done).
  */
 export function buildDoorPath(inputs: PathInputs): PathStep[] {
+  // Legacy day-keyed builder. The runtime now goes through
+  // `buildStarterPoolPath` (pool model) until graduation, then standard.
+  // Retained for tests / fallback.
   const ctx = inputs.doorContext!;
   const day = Math.min(Math.max(inputs.daysSinceSignup ?? 0, 0), 2); // 0,1,2
   const steps: PathStep[] = [];
