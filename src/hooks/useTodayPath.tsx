@@ -892,8 +892,35 @@ export function useSwapPathStep() {
       });
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["today-path", user?.id, today] });
+    // Optimistic: rewrite the cached path so the hero updates instantly
+    // instead of waiting for the network refetch (which can be masked by
+    // the persisted IndexedDB cache returning the prior snapshot first).
+    onMutate: async ({ step, target }) => {
+      await queryClient.cancelQueries({ queryKey: ["today-path"] });
+      const snapshots: Array<[readonly unknown[], TodayPathResult | undefined]> = [];
+      queryClient
+        .getQueriesData<TodayPathResult>({ queryKey: ["today-path"] })
+        .forEach(([key, value]) => {
+          if (!value) return;
+          snapshots.push([key, value]);
+          const newSteps = value.steps.map((s) =>
+            s.id === step.id ? { ...target, done: s.done } : s,
+          );
+          queryClient.setQueryData<TodayPathResult>(key, {
+            ...value,
+            steps: newSteps,
+            summary: summarizePath(newSteps),
+          });
+        });
+      return { snapshots };
+    },
+    onError: (_err, _vars, ctx) => {
+      ctx?.snapshots.forEach(([key, value]) => {
+        if (value) queryClient.setQueryData(key, value);
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["today-path"] });
     },
   });
 }
