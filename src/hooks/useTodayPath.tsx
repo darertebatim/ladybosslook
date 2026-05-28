@@ -8,6 +8,10 @@ import {
   buildStandardPath,
   buildDoorPath,
   buildCandidatePool,
+  buildStarterPoolPath,
+  isStarterPoolGraduated,
+  markStarterPoolSlotCompleted,
+  getPoolSlotForStepId,
   summarizePath,
   type PathStep,
   type DoorKey,
@@ -47,6 +51,10 @@ export function markStepTapped(stepId: string, day: string = getLocalDateStr()) 
     if (set.has(stepId)) return;
     set.add(stepId);
     localStorage.setItem(tappedStorageKey(day), JSON.stringify([...set]));
+    // If this step corresponds to a starter-pool slot, persist completion
+    // cross-day so the slot never resurfaces.
+    const slot = getPoolSlotForStepId(stepId);
+    if (slot) markStarterPoolSlotCompleted(slot);
   } catch {}
 }
 
@@ -672,10 +680,12 @@ export function useTodayPath() {
         plannerOnboardingDone,
       };
 
-      // All users now flow through the door-aware builder. Skipped-door users
-      // get the "exploring" door (see effectiveDoorContext above). The legacy
-      // buildDayOnePath / buildStandardPath are retained for fallback only.
-      let steps = buildDoorPath(inputs);
+      // Starter pool model: serve up to 3 prioritized pool cards per day
+      // until the pool drains, then graduate to the Standard Flow.
+      // Skipped-door users still get the pool (via "exploring" door above).
+      let steps = isStarterPoolGraduated(inputs)
+        ? buildStandardPath(inputs)
+        : buildStarterPoolPath(inputs);
 
       // Apply swaps: replace step with its swap_target from the candidate pool
       if (swapMap.size > 0) {
