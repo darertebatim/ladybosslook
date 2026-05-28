@@ -136,6 +136,7 @@ function PlaylistList() {
   const { data: audioLinks = [] } = useContentTagsByType("audio");
   const { data: tags = [] } = useAllTags();
   const { data: dimensions = [] } = useTagDimensions();
+  const applyPlaylistTags = useApplyPlaylistTagsToTracks();
 
   const [search, setSearch] = useState("");
   const [untaggedOnly, setUntaggedOnly] = useState(false);
@@ -271,6 +272,26 @@ function PlaylistList() {
                     }}
                   >
                     Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    disabled={
+                      applyPlaylistTags.isPending ||
+                      (linksByContentId[p.id] || []).length === 0 ||
+                      p.tracks.length === 0
+                    }
+                    title="Copy this playlist's tags onto every track inside it (existing track tags are preserved)."
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      applyPlaylistTags.mutate({
+                        playlistId: p.id,
+                        trackIds: p.tracks.map((t) => t.id),
+                        tagIds: linksByContentId[p.id] || [],
+                      });
+                    }}
+                  >
+                    Apply tags to tracks
                   </Button>
                 </div>
                 <AccordionContent className="bg-muted/20 pb-0">
