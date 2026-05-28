@@ -208,16 +208,16 @@ function browseRoutinesStep(): PathStep {
   };
 }
 
-/** Self-Care Quiz teaser — used when self-care isn't a door pick. */
+/** Self-Care Personality Quiz teaser — used when self-care isn't a door pick. */
 function selfcareQuizStep(): PathStep {
   return {
     id: "quiz_pick:onboarding",
     kind: "quiz_pick", ref: "onboarding",
-    emoji: "🧠", kicker: "Self-care snapshot",
-    title: "Take the 60-sec Self-Care Quiz",
+    emoji: "🧠", kicker: "Self-care personality",
+    title: "Take the Self-Care Personality Quiz",
     meta: "3 min · personalize your path",
     estMinutes: 3, done: false,
-    startHref: "/app/onboarding/selfcare-quiz",
+    startHref: "/app/onboarding/selfcare-personality-quiz",
     tint: "peach", skippable: true,
   };
 }
@@ -478,11 +478,11 @@ export function buildDayOnePath(inputs: PathInputs): PathStep[] {
     ref: "onboarding",
     emoji: "🧠",
     kicker: "Start here",
-    title: "Take the 60-second Self-Care Quiz",
+    title: "Take the Self-Care Personality Quiz",
     meta: "3 min · personalize your path",
     estMinutes: 3,
     done: false,
-    startHref: "/app/onboarding/selfcare-quiz",
+    startHref: "/app/onboarding/selfcare-personality-quiz",
     tint: "peach",
     skippable: false,
   });
