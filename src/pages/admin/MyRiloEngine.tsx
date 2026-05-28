@@ -115,9 +115,9 @@ const scenarios = [
   {
     name: "B · Immigrant + Productivity",
     days: [
-      "Day 1: Bilingual Strength playlist → immigrant-tagged sleep story → Browse routines → Planner Onboarding teaser (productivity is secondary, so it still gets seeded)",
+      "Day 1: Primary+Immigrant playlist (language-matched, e.g. Bilingual Strength EN/FA) → immigrant-tagged sleep story → Browse routines → Planner Onboarding teaser (productivity is secondary, so it still gets seeded)",
       "Day 2: Planner Onboarding + pick first routine (secondary signature) → another immigrant-tagged sleep story (primary deeper) → Check In (bilingual if available, else generic)",
-      "Day 3: Routine first → 'Plan tomorrow' (secondary deeper) → bilingual playlist → Check In (bilingual if available, else generic)",
+      "Day 3: Routine first → 'Plan tomorrow' (secondary deeper) → Primary+Immigrant playlist (language-matched) → Check In (bilingual if available, else generic)",
     ],
   },
   {
