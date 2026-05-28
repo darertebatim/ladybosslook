@@ -490,7 +490,7 @@
       "continueRoutine": "ادامه روتین ▶",
       "backToHomePlanner": "بازگشت به برنامه‌ریز",
       "actions": {
-        "journal": "نوشتن در دفترچه",
+        "journal": "یادداشت آزاد",
         "breathe": "نفس کشیدن",
         "reflect": "انتخاب یک تأمل",
         "talk": "گفت‌وگو",
