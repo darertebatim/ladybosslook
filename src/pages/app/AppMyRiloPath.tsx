@@ -166,7 +166,9 @@ function PathHero({
   onSwap?: () => void;
   onSnooze?: () => void;
 }) {
-  const kickerColor = TINT_KICKER[step.tint];
+  // Hero card always uses the brand peach/orange treatment, regardless of the
+  // step's tint. Only the inline (Later Today) rows keep per-tint colors.
+  const kickerColor = O.primary;
   return (
     <div className="relative pl-[60px] mb-5">
       {/* Active checkpoint */}
@@ -185,7 +187,7 @@ function PathHero({
         animate={{ opacity: 1, y: 0 }}
         className="rounded-[28px] p-5 relative overflow-hidden"
         style={{
-          background: TINT_HERO_BG[step.tint],
+          background: TINT_HERO_BG.peach,
           boxShadow: "0 14px 36px rgba(235,94,51,0.22)",
         }}
       >
