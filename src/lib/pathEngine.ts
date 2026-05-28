@@ -575,7 +575,7 @@ function buildResetStep(inputs: PathInputs): PathStep {
   if (!r) {
     return {
       id: "breath:default",
-      kind: "breath", ref: "default",
+      kind: "reset", ref: "default",
       emoji: "🌬️", kicker: "Breathwork",
       title: "2-min reset breath", meta: "2 min · Calm pattern",
       estMinutes: 2, done: false,
