@@ -71,6 +71,27 @@ const day2Flow = [
   { emoji: "🏆", title: "Streak + affirmation", meta: "Always last", kind: "reward" },
 ];
 
+/* ─────────── Starter Pool (current runtime model) ─────────── */
+const starterPool: Array<{
+  slot: string;
+  priority: number;
+  emoji: string;
+  title: string;
+  eligible: string;
+  completedWhen: string;
+}> = [
+  { slot: "primary_signature", priority: 95, emoji: "🚪", title: "Primary door signature", eligible: "Primary door picked", completedWhen: "User taps or skips" },
+  { slot: "secondary_signature", priority: 85, emoji: "🚪", title: "Secondary door signature", eligible: "Secondary door picked AND primary_signature done", completedWhen: "User taps or skips" },
+  { slot: "browse_routines", priority: 80, emoji: "✨", title: "Browse routines (pick your first)", eligible: "No active routines AND primary_signature done", completedWhen: "Any active routine exists OR user skips" },
+  { slot: "continue_routine", priority: 75, emoji: "🔥", title: "Continue routine", eligible: "Has ≥1 active routine AND primary_signature done", completedWhen: "User taps or skips" },
+  { slot: "primary_deeper", priority: 70, emoji: "🔁", title: "Primary door deeper", eligible: "Primary door picked AND primary_signature done", completedWhen: "User taps or skips" },
+  { slot: "secondary_deeper", priority: 65, emoji: "🔁", title: "Secondary door deeper", eligible: "Secondary door picked AND secondary_signature done", completedWhen: "User taps or skips" },
+  { slot: "selfcare_quiz", priority: 60, emoji: "🧠", title: "Self-Care Personality Quiz teaser", eligible: "Quiz not done AND no selfcare door", completedWhen: "Quiz done OR user skips" },
+  { slot: "planner_intro", priority: 55, emoji: "📋", title: "Rilo Planner Onboarding teaser", eligible: "Planner intro not done AND no productivity door", completedWhen: "Planner intro done OR user skips" },
+  { slot: "featured_audio", priority: 50, emoji: "🎧", title: "Featured audio (door-aware)", eligible: "A featured audio is available today", completedWhen: "User taps or skips" },
+  { slot: "secondary_audio", priority: 45, emoji: "🎧", title: "Secondary audio (extra)", eligible: "A secondary audio is available today", completedWhen: "User taps or skips" },
+];
+
 const day3Flow = [
   { emoji: "💛", title: "Mood check-in", meta: "Same as Standard Flow — opens the day", kind: "mood", isNew: true },
   { emoji: "🌱", title: "Habit cement: today's routine", meta: "Lead with routine — turns 'try' into 'rhythm'", kind: "routine", isNew: true },
@@ -389,37 +410,40 @@ export default function MyRiloEngine() {
         </CardContent>
       </Card>
 
-      <div className="grid md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Day 1 · Door tease</CardTitle>
-            <CardDescription>Primary door's signature is the hero, right after mood check-in.</CardDescription>
-          </CardHeader>
-          <CardContent className="divide-y">
-            {day1Flow.map((s, i) => <StepRow key={i} s={s} />)}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Day 2 · Secondary + reinforce</CardTitle>
-            <CardDescription>Secondary signature leads, primary stays alive.</CardDescription>
-          </CardHeader>
-          <CardContent className="divide-y">
-            {day2Flow.map((s, i) => <StepRow key={i} s={s} />)}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Day 3 · Habit cement</CardTitle>
-            <CardDescription>Routine first. Standard flow takes over after Day 3.</CardDescription>
-          </CardHeader>
-          <CardContent className="divide-y">
-            {day3Flow.map((s, i) => <StepRow key={i} s={s} />)}
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Starter Pool (replaces Day 1–3)</CardTitle>
+          <CardDescription>
+            One shared pool of "once" cards. Each day the engine pins <strong>Mood</strong> + <strong>Check In</strong> and adds the <strong>top 3 eligible</strong> pool slots by priority.
+            Tapping or skipping a slot retires it cross-day (so a missed Day 1 just resurfaces the next day — no "stuck" state).
+            When the pool drains, the user graduates to the Standard Flow.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="divide-y text-sm">
+            {starterPool.map((p) => (
+              <div key={p.slot} className="py-2 flex items-start gap-3">
+                <code className="text-xs bg-muted px-2 py-0.5 rounded shrink-0 font-mono w-10 text-center">{p.priority}</code>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">{p.emoji}</span>
+                    <span className="font-medium">{p.title}</span>
+                    <Badge variant="outline" className="text-[10px] font-mono">{p.slot}</Badge>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    <span className="text-foreground/70">Eligible:</span> {p.eligible} · <span className="text-foreground/70">Completed when:</span> {p.completedWhen}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 rounded-lg bg-muted/40 p-3 text-xs text-muted-foreground">
+            <strong className="text-foreground">Daily shape:</strong> Mood → up to 3 pool picks → Check In → Reward.
+            Mood + Check In never enter the pool (they recur daily). Reward is always last.
+            Most users drain the pool in 3–4 days depending on what they already had pre-auth (quiz done, planner intro seen, etc.).
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
