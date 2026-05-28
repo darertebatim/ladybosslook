@@ -201,6 +201,10 @@ export function useTodayPath() {
       // emotion slugs (strict match; we fall back to general calm below).
       // For the immigrant door: prefer "Bilingual Strength" series.
       let doorAudioOverride: typeof accessiblePlaylists[number] | null = null;
+      // Productivity door has no door-audio hero (its hero is planner intro /
+      // routines), but we still want to surface a productivity-themed playlist
+      // — "Wellness Planning" — in the SECONDARY slot.
+      let doorSecondaryAudioOverride: typeof accessiblePlaylists[number] | null = null;
       if (hasDoorContext && doorPrimary === "emotion" && emotionKeys.length > 0) {
         // Picker keys ARE tag slugs (see RiloDoorsScreens · EMOTION_TOP5/REST).
         const wantedSlugs = new Set<string>(emotionKeys);
@@ -225,6 +229,15 @@ export function useTodayPath() {
       } else if (hasDoorContext && doorPrimary === "immigrant") {
         doorAudioOverride =
           accessiblePlaylists.find((p) => /bilingual/i.test(p.name)) ?? null;
+      }
+      // Productivity door (primary OR secondary) → prefer Wellness Planning
+      // as the secondary audio pick.
+      if (
+        hasDoorContext &&
+        (doorPrimary === "productivity" || doorSecondary === "productivity")
+      ) {
+        doorSecondaryAudioOverride =
+          accessiblePlaylists.find((p) => /wellness\s*planning/i.test(p.name)) ?? null;
       }
 
       // ── Continuity signals from audio_progress ────────────────────────
