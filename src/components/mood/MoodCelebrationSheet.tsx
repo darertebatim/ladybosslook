@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -57,6 +57,8 @@ export function MoodCelebrationSheet({
 }: MoodCelebrationSheetProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = (location.state as { from?: string } | null)?.from || '/app/home';
   const moodData = mood ? MOOD_CONFIG[mood] : null;
   const moodLabel = mood ? t(`moodPage.moods.${mood}`, { defaultValue: mood }) : '';
   const celebrationText = mood ? t(`moodPage.celebration.${mood}`, { defaultValue: '' }) : '';
@@ -96,18 +98,18 @@ export function MoodCelebrationSheet({
     }
     
     onOpenChange(false);
-    navigate(route, { replace: true });
+    navigate(route, { replace: true, state: { from: returnTo } });
   };
 
   const handleDone = () => {
     haptic.light();
     onOpenChange(false);
     if (hasActivePlayer) {
-      navigate('/app/home');
+      navigate(returnTo, { replace: true });
       routinePlayer!.maximize();
       return;
     }
-    if (onActionClick?.('/app/home')) {
+    if (onActionClick?.(returnTo)) {
       return;
     }
     onDone();

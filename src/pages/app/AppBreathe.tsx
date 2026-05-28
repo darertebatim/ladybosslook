@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { Wind, BarChart3, Share2 } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { AppHeader, AppHeaderSpacer } from "@/components/app/AppHeader";
@@ -28,6 +28,7 @@ import { useTranslation } from "react-i18next";
 
 export default function AppBreathe() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const { data: exercises, isLoading } = useBreathingExercises();
@@ -130,6 +131,7 @@ export default function AppBreathe() {
       <BreathingExerciseScreen
         exercise={selectedExercise}
         onClose={handleCloseExercise}
+        returnTo={(location.state as { from?: string } | null)?.from || '/app/home'}
       />
     );
   }

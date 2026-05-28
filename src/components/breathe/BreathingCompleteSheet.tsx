@@ -29,6 +29,7 @@ interface BreathingCompleteSheetProps {
   onOpenChange: (open: boolean) => void;
   exerciseName: string;
   durationSeconds: number;
+  returnTo?: string;
 }
 
 export function BreathingCompleteSheet({
@@ -36,11 +37,12 @@ export function BreathingCompleteSheet({
   onOpenChange,
   exerciseName,
   durationSeconds,
+  returnTo: explicitReturnTo,
 }: BreathingCompleteSheetProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const returnTo = (location.state as { from?: string } | null)?.from || '/app/home';
+  const returnTo = explicitReturnTo || (location.state as { from?: string } | null)?.from || '/app/home';
   const { user } = useAuth();
 
   let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void; completeTask: () => void } | null = null;
@@ -81,7 +83,7 @@ export function BreathingCompleteSheet({
   const handleAction = (route: string) => {
     haptic.medium();
     onOpenChange(false);
-    navigate(route);
+    navigate(route, { state: { from: returnTo } });
   };
 
   const handleDone = () => {
