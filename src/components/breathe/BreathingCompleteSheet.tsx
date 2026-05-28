@@ -83,7 +83,7 @@ export function BreathingCompleteSheet({
   const handleAction = (route: string) => {
     haptic.medium();
     onOpenChange(false);
-    navigate(route);
+    navigate(route, { state: { from: returnTo } });
   };
 
   const handleDone = () => {

@@ -56,7 +56,7 @@ export function ReflectionCelebrationSheet({
   const handleAction = (action: typeof ACTIONS[number]) => {
     haptic.medium();
     onOpenChange(false);
-    navigate(action.route, { replace: true });
+    navigate(action.route, { replace: true, state: { from: returnTo } });
   };
 
   const handleDone = () => {
