@@ -619,7 +619,9 @@ export function useTodayPath() {
           }
         } else if (a.action === "swap") {
           // Only honor swaps created today
-          if (createdLocalDay === today && a.swap_target) {
+          // Actions are sorted newest-first, so keep only the most recent
+          // swap per step (don't let an older row overwrite it).
+          if (createdLocalDay === today && a.swap_target && !swapMap.has(id)) {
             swapMap.set(id, a.swap_target);
           }
         } else if (a.action === "skip_tomorrow" && a.effective_until) {
