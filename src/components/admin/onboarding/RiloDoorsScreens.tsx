@@ -123,7 +123,7 @@ function GlassShell({ children }: { children: React.ReactNode }) {
         <div
           className="flex flex-col min-h-full px-5"
           style={{
-            paddingTop: 'max(env(safe-area-inset-top, 0px), 56px)',
+            paddingTop: 'calc(env(safe-area-inset-top, 44px) + 56px)',
             paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 32px)',
           }}
         >
