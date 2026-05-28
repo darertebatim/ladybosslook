@@ -464,10 +464,11 @@ export default function AppMyRiloPath() {
 
         {/* Header */}
         <div
-          className="sticky top-0 z-30 px-5 pt-4 pb-3 grid grid-cols-[auto_1fr_auto] items-center backdrop-blur-xl"
+          className="sticky top-0 z-30 px-5 pb-3 grid grid-cols-[auto_1fr_auto] items-center backdrop-blur-xl"
           style={{
             background: "rgba(255,248,243,0.78)",
             boxShadow: "0 1px 0 rgba(245,220,200,0.5)",
+            paddingTop: "calc(env(safe-area-inset-top, 0px) + 12px)",
           }}
         >
           <button
