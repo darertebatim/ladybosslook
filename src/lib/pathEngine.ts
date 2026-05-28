@@ -307,6 +307,7 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
         estMinutes: isTrack ? 5 : 10, done: false,
         startHref: isTrack ? `/app/player/${s.id}` : `/app/player/playlist/${s.id}`,
         tint: "lavender", skippable: true,
+        coverImageUrl: s.coverImageUrl ?? null,
       });
     }
   }
