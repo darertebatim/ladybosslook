@@ -124,8 +124,18 @@ export function BreathingCompleteSheet({
           </h2>
         </div>
 
+        {/* Back to Home — moved above cards */}
+        <Button
+          onClick={handleDone}
+          variant="ghost"
+          className="w-full h-11 rounded-full text-sm bg-white text-black hover:bg-white/90 font-semibold shadow-sm mb-4 flex items-center justify-center gap-2"
+        >
+          <FluentEmoji emoji={hasActivePlayer ? '▶️' : '🏠'} size={18} />
+          <span>{hasActivePlayer ? t('breathePage.complete.continueRoutine') : t('breathePage.complete.backToHome')}</span>
+        </Button>
+
         {/* 2×2 Cards with illustrations */}
-        <div className="grid grid-cols-2 gap-3 mb-5">
+        <div className="grid grid-cols-2 gap-3">
           {ACTIONS.map((action) => {
             const label = t(action.labelKey);
             return (
@@ -150,15 +160,6 @@ export function BreathingCompleteSheet({
             );
           })}
         </div>
-
-        {/* Back to Home / Back to Player */}
-        <Button
-          onClick={handleDone}
-          variant="ghost"
-          className="w-full h-10 rounded-full text-sm bg-orange-200/60 text-orange-900 hover:bg-orange-200/80"
-        >
-          {hasActivePlayer ? t('breathePage.complete.continueRoutine') : t('breathePage.complete.backToHome')}
-        </Button>
       </SheetContent>
     </Sheet>
   );
