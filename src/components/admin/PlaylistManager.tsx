@@ -37,10 +37,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { HostPicker, HostAssignment, saveContentHosts, loadContentHosts } from "@/components/admin/HostPicker";
-import { PlaylistTagsBankDialog } from "@/components/admin/PlaylistTagsBankDialog";
 import { PlaylistTagPicker } from "@/components/admin/PlaylistTagPicker";
-import { useSavePlaylistTagLinks } from "@/hooks/usePlaylistTags";
-import { Tag } from "lucide-react";
+import { useSaveContentTags } from "@/hooks/useContentTags";
 
 type DisplayMode = 'tracks' | 'modules' | 'both';
 
@@ -409,8 +407,7 @@ export const PlaylistManager = () => {
 
   const [createTagIds, setCreateTagIds] = useState<string[]>([]);
   const [editTagIds, setEditTagIds] = useState<string[]>([]);
-  const [isTagsBankOpen, setIsTagsBankOpen] = useState(false);
-  const saveTagLinks = useSavePlaylistTagLinks();
+  const saveTagLinks = useSaveContentTags();
 
   // Fetch playlists with item count
   const { data: playlists } = useQuery({
@@ -680,7 +677,7 @@ export const PlaylistManager = () => {
 
       if (error) throw error;
       if (created?.id) await saveContentHosts('playlist', created.id, createHosts);
-      if (created?.id) await saveTagLinks.mutateAsync({ playlistId: created.id, tagIds: createTagIds });
+      if (created?.id) await saveTagLinks.mutateAsync({ contentType: 'playlist', contentId: created.id, tagIds: createTagIds });
     },
     onSuccess: () => {
       toast.success('Playlist created successfully');
@@ -703,7 +700,7 @@ export const PlaylistManager = () => {
 
       if (error) throw error;
       await saveContentHosts('playlist', id, editHosts);
-      await saveTagLinks.mutateAsync({ playlistId: id, tagIds: editTagIds });
+      await saveTagLinks.mutateAsync({ contentType: 'playlist', contentId: id, tagIds: editTagIds });
     },
     onSuccess: () => {
       toast.success('Playlist updated successfully');
@@ -968,9 +965,10 @@ export const PlaylistManager = () => {
     }
     try {
       const { data: links } = await supabase
-        .from('audio_playlist_tag_links')
+        .from('content_tags')
         .select('tag_id')
-        .eq('playlist_id', playlist.id);
+        .eq('content_type', 'playlist')
+        .eq('content_id', playlist.id);
       setEditTagIds((links || []).map((l: any) => l.tag_id));
     } catch {
       setEditTagIds([]);
@@ -1084,14 +1082,6 @@ export const PlaylistManager = () => {
               <Wand2 className="mr-2 h-4 w-4" />
             )}
             AI: Free Programs
-          </Button>
-          <Button
-            onClick={() => setIsTagsBankOpen(true)}
-            size="sm"
-            variant="outline"
-          >
-            <Tag className="mr-2 h-4 w-4" />
-            Manage Tags
           </Button>
           {(playlists || []).some((p: any) => p.cover_image_url && !p.cover_image_url.endsWith('.webp')) && (
             <Button variant="outline" size="sm" onClick={async () => {
@@ -1327,7 +1317,6 @@ export const PlaylistManager = () => {
         </>
       )}
 
-      <PlaylistTagsBankDialog open={isTagsBankOpen} onOpenChange={setIsTagsBankOpen} />
     </Card>
   );
 };
