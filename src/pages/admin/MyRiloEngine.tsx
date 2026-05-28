@@ -34,6 +34,7 @@ const doorSignatures = [
     label: "Productivity",
     signature: "Open Planner → Rilo Planner Onboarding → pick first routine",
     deeper: "Plan tomorrow · 1 quick routine task",
+    secondaryAudio: "Wellness Planning playlist (offered in the Secondary audio slot)",
   },
   {
     door: "emotion",
@@ -403,6 +404,9 @@ export default function MyRiloEngine() {
                     <div className="text-xs mt-0.5"><span className="text-muted-foreground">Secondary signature:</span> {(d as any).secondarySignature}</div>
                   )}
                   <div className="text-xs mt-0.5"><span className="text-muted-foreground">Deeper:</span> {d.deeper}</div>
+                  {(d as any).secondaryAudio && (
+                    <div className="text-xs mt-0.5"><span className="text-muted-foreground">Secondary audio:</span> {(d as any).secondaryAudio}</div>
+                  )}
                 </div>
               </div>
             ))}
