@@ -674,6 +674,21 @@ export function useTodayPath() {
         });
       }
 
+      // Apply "Snooze later" deferrals: move matched steps to the end of the
+      // list (but keep the reward step pinned as the absolute last item).
+      if (deferredToday.size > 0) {
+        const kept: typeof steps = [];
+        const deferred: typeof steps = [];
+        let reward: (typeof steps)[number] | null = null;
+        for (const s of steps) {
+          if (s.kind === "reward") { reward = s; continue; }
+          if (deferredToday.has(s.id)) deferred.push(s);
+          else kept.push(s);
+        }
+        steps = [...kept, ...deferred];
+        if (reward) steps.push(reward);
+      }
+
       // ── Mark path steps as done from activity tables ──────────────────
       // Reuses the same signals the pro-link/shortcut completion tracker uses
       // (breathing_sessions, reflections, audio_progress, task_completions).
