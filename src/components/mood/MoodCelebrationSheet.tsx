@@ -147,7 +147,27 @@ export function MoodCelebrationSheet({
         </div>
 
         {/* 2×2 Cards with illustrations */}
-        <div className="grid grid-cols-2 gap-3 mb-5">
+        {/* Maybe later + Share — moved above cards */}
+        <div className="flex gap-2 mb-4">
+          <Button
+            variant="ghost"
+            onClick={() => { haptic.light(); handleShare(); }}
+            className="h-11 px-4 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm"
+            aria-label={t('moodPage.celebration.shareAria')}
+          >
+            <Share2 className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={handleDone}
+            className="flex-1 h-11 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm flex items-center justify-center gap-2"
+          >
+            <FluentEmoji emoji={hasActivePlayer ? '▶️' : '🏠'} size={18} />
+            <span>{hasActivePlayer ? t('moodPage.celebration.continueRoutine') : t('moodPage.celebration.backToHomePlanner')}</span>
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
           {ACTIONS.map((action) => {
             const label = t(action.labelKey);
             return (
@@ -171,25 +191,6 @@ export function MoodCelebrationSheet({
             </button>
             );
           })}
-        </div>
-
-        {/* Maybe later + Share */}
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            onClick={() => { haptic.light(); handleShare(); }}
-            className="h-11 px-4 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm"
-            aria-label={t('moodPage.celebration.shareAria')}
-          >
-            <Share2 className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={handleDone}
-            className="flex-1 h-11 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm"
-          >
-            {hasActivePlayer ? t('moodPage.celebration.continueRoutine') : t('moodPage.celebration.backToHomePlanner')}
-          </Button>
         </div>
       </SheetContent>
     </Sheet>
