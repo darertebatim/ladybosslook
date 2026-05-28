@@ -39,7 +39,9 @@ import { useMediaCategories } from "@/hooks/useMediaCategories";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CachedImage } from "@/components/ui/CachedImage";
-import { usePlaylistTags, usePlaylistTagLinks } from "@/hooks/usePlaylistTags";
+import { useAllTags } from "@/hooks/useTags";
+import { useTagDimensions } from "@/hooks/useTagDimensions";
+import { useContentTagsByType } from "@/hooks/useContentTags";
 
 const LANGUAGE_OPTIONS = [
   { value: "all", labelKey: "player.languages.all", flag: "🌐" },
@@ -65,16 +67,30 @@ export default function AppPlayer() {
   const hasSoundscapeAccess = hasAccessToProgram("simora-plus");
   const [preferredLanguage, setPreferredLanguage] = useState("all");
   const { categories: dbCategories } = useMediaCategories("audio");
-  const { data: playlistTags = [] } = usePlaylistTags();
-  const { data: playlistTagLinks = [] } = usePlaylistTagLinks();
+  // Topic chips on the Player are driven by the "Door" tag dimension (4 Doors)
+  // from the unified tag schema, applied to playlists via content_tags.
+  const { data: tagDimensions = [] } = useTagDimensions();
+  const { data: allTags = [] } = useAllTags();
+  const { data: playlistContentTagLinks = [] } = useContentTagsByType("playlist");
+  const doorDimensionId = useMemo(
+    () => tagDimensions.find((d) => d.slug === "door")?.id ?? null,
+    [tagDimensions],
+  );
+  const playlistTags = useMemo(
+    () =>
+      allTags
+        .filter((t) => t.is_active !== false && t.dimension_id === doorDimensionId)
+        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)),
+    [allTags, doorDimensionId],
+  );
   const playlistIdsByTag = useMemo(() => {
     const map = new Map<string, Set<string>>();
-    for (const link of playlistTagLinks) {
+    for (const link of playlistContentTagLinks) {
       if (!map.has(link.tag_id)) map.set(link.tag_id, new Set());
-      map.get(link.tag_id)!.add(link.playlist_id);
+      map.get(link.tag_id)!.add(link.content_id);
     }
     return map;
-  }, [playlistTagLinks]);
+  }, [playlistContentTagLinks]);
   const categoryConfig = useMemo(() => {
     const map: Record<string, { name: string; emoji?: string }> = {
       all: { name: t("player.categories.all"), emoji: "✨" },
