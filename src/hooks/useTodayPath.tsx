@@ -924,7 +924,7 @@ export function useTodayPath() {
             else if (s.id.startsWith("playlist:")) done = completedPlaylistIds.has(s.ref);
             break;
           case "quiz_pick":
-            if (s.ref === "onboarding") done = hasQuizResult;
+            if (s.ref === "onboarding") done = hasPersonalityResult;
             break;
           default:
             break;
