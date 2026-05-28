@@ -802,3 +802,219 @@ export function buildCandidatePool(inputs: PathInputs): PathStep[] {
 
   return pool;
 }
+
+/* ─── Starter pool builder ───────────────────────────────────────────── */
+
+interface PoolCandidate {
+  slot: StarterPoolSlot;
+  priority: number;
+  /** Whether the slot is eligible right now (independent of completion). */
+  eligible: boolean;
+  /** Whether the slot is naturally completed via existing data flags. */
+  derivedDone: boolean;
+  /** Materialize the PathStep, tagged with poolSlot. Returns null if N/A. */
+  build: () => PathStep | null;
+}
+
+function buildPoolCandidates(inputs: PathInputs): PoolCandidate[] {
+  const ctx = inputs.doorContext ?? null;
+  const primary = ctx?.primary ?? null;
+  const secondary = ctx?.secondary ?? null;
+  const hasSelfcareDoor = primary === "selfcare" || secondary === "selfcare";
+  const hasProductivityDoor = primary === "productivity" || secondary === "productivity";
+  const completed = getStarterPoolCompleted();
+  const tag = (s: PathStep | null, slot: StarterPoolSlot): PathStep | null =>
+    s ? { ...s, poolSlot: slot } : null;
+
+  return [
+    {
+      slot: "primary_signature",
+      priority: 95,
+      eligible: !!primary,
+      derivedDone: false,
+      build: () => tag(primary ? signatureStepForDoor(primary, inputs) : null, "primary_signature"),
+    },
+    {
+      slot: "browse_routines",
+      priority: 80,
+      // Surface only after the primary signature is acknowledged (Day 2+).
+      eligible: inputs.activeRoutines.length === 0 && completed.has("primary_signature"),
+      derivedDone: inputs.activeRoutines.length > 0,
+      build: () => tag(browseRoutinesStep(), "browse_routines"),
+    },
+    {
+      slot: "secondary_signature",
+      priority: 85,
+      // Only after primary signature is done.
+      eligible: !!secondary && completed.has("primary_signature"),
+      derivedDone: false,
+      build: () => tag(secondary ? signatureStepForDoor(secondary, inputs) : null, "secondary_signature"),
+    },
+    {
+      slot: "continue_routine",
+      priority: 75,
+      eligible: inputs.activeRoutines.length > 0 && completed.has("primary_signature"),
+      derivedDone: false,
+      build: () => {
+        const r = inputs.activeRoutines[0];
+        if (!r) return null;
+        return tag({
+          id: `routine:${r.routineId}`,
+          kind: "routine", ref: r.routineId,
+          emoji: r.emoji || "🔥",
+          kicker: "Continue routine", title: r.title,
+          meta: "Pick up where you left off", estMinutes: 5, done: false,
+          startHref: "/app/home",
+          tint: tintForRoutine(r.color, 0), skippable: true,
+        }, "continue_routine");
+      },
+    },
+    {
+      slot: "primary_deeper",
+      priority: 70,
+      eligible: !!primary && completed.has("primary_signature"),
+      derivedDone: false,
+      build: () => tag(
+        primary ? deeperStepForDoor(primary, inputs, { kicker: "More from your door", tint: "peach" }) : null,
+        "primary_deeper",
+      ),
+    },
+    {
+      slot: "secondary_deeper",
+      priority: 65,
+      eligible: !!secondary && completed.has("secondary_signature"),
+      derivedDone: false,
+      build: () => tag(
+        secondary ? deeperStepForDoor(secondary, inputs, { kicker: "Keep your secondary alive", tint: "peach" }) : null,
+        "secondary_deeper",
+      ),
+    },
+    {
+      slot: "selfcare_quiz",
+      priority: 60,
+      eligible: !hasSelfcareDoor && !inputs.hasQuizResult,
+      derivedDone: inputs.hasQuizResult,
+      build: () => tag(selfcareQuizStep(), "selfcare_quiz"),
+    },
+    {
+      slot: "planner_intro",
+      priority: 55,
+      eligible: !hasProductivityDoor && !inputs.plannerOnboardingDone,
+      derivedDone: !!inputs.plannerOnboardingDone,
+      build: () => tag(plannerIntroStep(), "planner_intro"),
+    },
+    {
+      slot: "featured_audio",
+      priority: 50,
+      eligible: !!inputs.featuredAudio,
+      derivedDone: false,
+      build: () => tag(
+        inputs.featuredAudio ? audioToStep(inputs.featuredAudio) : null,
+        "featured_audio",
+      ),
+    },
+    {
+      slot: "secondary_audio",
+      priority: 45,
+      eligible: !!inputs.secondaryAudio,
+      derivedDone: false,
+      build: () => {
+        const s = inputs.secondaryAudio;
+        if (!s) return null;
+        const isTrack = s.kind === "track";
+        return tag({
+          id: `${isTrack ? "track" : "playlist"}:${s.id}`,
+          kind: "playlist", ref: s.id,
+          emoji: s.coverEmoji || (isTrack ? "🎵" : "🎧"),
+          kicker: s.category
+            ? `${isTrack ? "Track" : "Playlist"} · ${s.category}`
+            : "Also for you",
+          title: s.title,
+          meta: isTrack ? "Tap to play · ~5 min" : "Tap to play",
+          estMinutes: isTrack ? 5 : 10, done: false,
+          startHref: isTrack ? `/app/player/${s.id}` : `/app/player/playlist/${s.id}`,
+          tint: "lavender", skippable: true,
+          coverImageUrl: s.coverImageUrl ?? null,
+        }, "secondary_audio");
+      },
+    },
+  ];
+}
+
+/**
+ * Returns true when the starter pool has been fully drained — i.e. every
+ * eligible "once" slot is either completed cross-day or naturally done.
+ * When true, the runtime should switch to `buildStandardPath`.
+ */
+export function isStarterPoolGraduated(inputs: PathInputs): boolean {
+  const completed = getStarterPoolCompleted();
+  const cands = buildPoolCandidates(inputs);
+  const remaining = cands.filter(
+    (c) => c.eligible && !c.derivedDone && !completed.has(c.slot) && c.build() !== null,
+  );
+  return remaining.length === 0;
+}
+
+/**
+ * Starter-pool path builder.
+ *
+ * Shape: mood (always) → up to N pool picks → Check In (always) → reward.
+ * Pool picks are top-priority slots that are eligible, not naturally done,
+ * and not in the cross-day completed set. When the pool drains, the runtime
+ * graduates to `buildStandardPath`.
+ */
+export function buildStarterPoolPath(inputs: PathInputs, maxPoolPicks = 3): PathStep[] {
+  const completed = getStarterPoolCompleted();
+  const cands = buildPoolCandidates(inputs);
+
+  // Auto-mark derived-done slots so they never resurface.
+  for (const c of cands) {
+    if (c.derivedDone && !completed.has(c.slot)) {
+      markStarterPoolSlotCompleted(c.slot);
+      completed.add(c.slot);
+    }
+  }
+
+  // Pick top-priority slots, skipping those already done / null-built.
+  const eligible = cands
+    .filter((c) => c.eligible && !completed.has(c.slot))
+    .sort((a, b) => b.priority - a.priority);
+
+  const picks: PathStep[] = [];
+  const seenIds = new Set<string>();
+  for (const c of eligible) {
+    if (picks.length >= maxPoolPicks) break;
+    const step = c.build();
+    if (!step || seenIds.has(step.id)) continue;
+    seenIds.add(step.id);
+    picks.push(step);
+  }
+
+  const steps: PathStep[] = [];
+
+  // Mood is the daily anchor — pinned first unless logged.
+  steps.push({
+    id: "mood:today",
+    kind: "mood", ref: "today", emoji: "💛",
+    kicker: "Mood check-in",
+    title: inputs.hasMoodTodayLog ? "Mood logged" : "How are you feeling?",
+    meta: inputs.hasMoodTodayLog ? "1 min · done" : "1 min · pick your mood",
+    estMinutes: 1, done: inputs.hasMoodTodayLog,
+    startHref: "/app/mood", tint: "yellow",
+    skippable: !inputs.hasMoodTodayLog,
+  });
+
+  for (const p of picks) steps.push(p);
+
+  // Check In always present unless a pool pick already provides a reset step.
+  if (!steps.some((s) => s.kind === "reset")) {
+    steps.push(buildResetStep(inputs));
+  }
+
+  steps.push(rewardStep());
+
+  // Snapshot id→slot for downstream tap/dismiss persistence.
+  persistPoolSlotMap(steps);
+
+  return filterDismissed(steps, inputs.dismissedIds);
+}
