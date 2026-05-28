@@ -168,7 +168,7 @@ export function useTodayPath() {
       const [playlistRes, hotTracksRes] = await Promise.all([
         supabase
           .from("audio_playlists")
-          .select("id, name, category, cover_image_url, language, requires_subscription, tracks_standalone, path_role")
+          .select("id, name, category, cover_image_url, language, requires_subscription, tracks_standalone")
           .eq("available_on_mobile", true)
           .eq("is_hidden", false)
           .order("sort_order", { ascending: true })
@@ -187,7 +187,7 @@ export function useTodayPath() {
       const allPlaylists = (playlistRes.data ?? []) as Array<{
         id: string; name: string; category: string | null;
         language: string | null; requires_subscription: boolean | null;
-        tracks_standalone: boolean | null; path_role: string | null;
+        tracks_standalone: boolean | null;
       }>;
       const hotTracks = (hotTracksRes.data ?? []) as Array<{
         id: string; title: string; category: string | null;
@@ -196,23 +196,47 @@ export function useTodayPath() {
         ? allPlaylists
         : allPlaylists.filter((p) => !p.requires_subscription);
 
-      // Language-aware picker for tagged playlists. Prefer a playlist whose
-      // `path_role` matches the requested role AND whose `language` matches the
-      // user's preferred language; otherwise fall back to ANY playlist with
-      // that role (covers single-language libraries / users without a pref).
-      const pickByRole = (
-        role: "primary" | "secondary",
-      ): typeof accessiblePlaylists[number] | null => {
-        const roleMatches = accessiblePlaylists.filter((p) => p.path_role === role);
-        if (roleMatches.length === 0) return null;
-        if (preferredLanguage) {
-          const langMatch = roleMatches.find((p) => p.language === preferredLanguage);
-          if (langMatch) return langMatch;
+      // Language-aware picker for "Path role" tagged playlists. Looks up the
+      // `path-role/primary` and `path-role/secondary` tags from the tag schema
+      // and filters accessible playlists by their tag links. Prefers a row
+      // matching the user's preferred language; falls back to any tagged row.
+      let taggedPrimary: typeof accessiblePlaylists[number] | null = null;
+      let taggedSecondary: typeof accessiblePlaylists[number] | null = null;
+      if (accessiblePlaylists.length > 0) {
+        const { data: pathRoleTags } = await supabase
+          .from("tags")
+          .select("id, slug, dimension_id, tag_dimensions!inner(slug)")
+          .in("slug", ["primary", "secondary"])
+          .eq("tag_dimensions.slug", "path-role");
+        const roleTagIds = ((pathRoleTags ?? []) as Array<{ id: string; slug: string }>);
+        if (roleTagIds.length > 0) {
+          const tagIds = roleTagIds.map((t) => t.id);
+          const { data: roleLinks } = await supabase
+            .from("audio_playlist_tag_links")
+            .select("playlist_id, tag_id")
+            .in("tag_id", tagIds);
+          const tagBySlug = new Map(roleTagIds.map((t) => [t.slug, t.id]));
+          const playlistsByRole: Record<"primary" | "secondary", Set<string>> = {
+            primary: new Set(),
+            secondary: new Set(),
+          };
+          for (const link of (roleLinks ?? []) as Array<{ playlist_id: string; tag_id: string }>) {
+            if (link.tag_id === tagBySlug.get("primary")) playlistsByRole.primary.add(link.playlist_id);
+            if (link.tag_id === tagBySlug.get("secondary")) playlistsByRole.secondary.add(link.playlist_id);
+          }
+          const pickByRole = (role: "primary" | "secondary") => {
+            const matches = accessiblePlaylists.filter((p) => playlistsByRole[role].has(p.id));
+            if (matches.length === 0) return null;
+            if (preferredLanguage) {
+              const langMatch = matches.find((p) => p.language === preferredLanguage);
+              if (langMatch) return langMatch;
+            }
+            return matches[0] ?? null;
+          };
+          taggedPrimary = pickByRole("primary");
+          taggedSecondary = pickByRole("secondary");
         }
-        return roleMatches[0] ?? null;
-      };
-      const taggedPrimary = pickByRole("primary");
-      const taggedSecondary = pickByRole("secondary");
+      }
 
       // ── Door-flavored audio override (emotion/immigrant) ──────────────
       // For the emotion door: prefer playlists tagged with the user's picked
