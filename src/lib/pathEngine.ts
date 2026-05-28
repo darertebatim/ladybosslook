@@ -42,6 +42,73 @@ export interface PathStep {
   skippable?: boolean;
   /** Optional cover image URL — for playlist/track steps, used instead of emoji tile. */
   coverImageUrl?: string | null;
+  /**
+   * Optional starter-pool slot id. When set, tapping/dismissing this step
+   * marks the slot as completed cross-day, removing it from the pool
+   * permanently (until graduation to Standard flow).
+   */
+  poolSlot?: StarterPoolSlot;
+}
+
+/* ─── Starter pool model ─────────────────────────────────────────────── */
+
+export type StarterPoolSlot =
+  | "primary_signature"
+  | "secondary_signature"
+  | "primary_deeper"
+  | "secondary_deeper"
+  | "browse_routines"
+  | "continue_routine"
+  | "selfcare_quiz"
+  | "planner_intro"
+  | "featured_audio"
+  | "secondary_audio";
+
+const STARTER_POOL_KEY = "simora_starter_pool_completed";
+const STARTER_POOL_SLOT_MAP_KEY = "simora_starter_pool_slot_map";
+
+/** Read the cross-day set of completed pool slots. */
+export function getStarterPoolCompleted(): Set<StarterPoolSlot> {
+  try {
+    const raw = typeof localStorage !== "undefined" ? localStorage.getItem(STARTER_POOL_KEY) : null;
+    if (!raw) return new Set();
+    const arr = JSON.parse(raw) as string[];
+    return new Set((Array.isArray(arr) ? arr : []) as StarterPoolSlot[]);
+  } catch {
+    return new Set();
+  }
+}
+
+/** Persist a slot as completed cross-day. */
+export function markStarterPoolSlotCompleted(slot: StarterPoolSlot) {
+  try {
+    const set = getStarterPoolCompleted();
+    if (set.has(slot)) return;
+    set.add(slot);
+    localStorage.setItem(STARTER_POOL_KEY, JSON.stringify([...set]));
+  } catch {}
+}
+
+/** Look up a step's pool slot from the most recent build's id→slot map. */
+export function getPoolSlotForStepId(stepId: string): StarterPoolSlot | null {
+  try {
+    const raw = typeof localStorage !== "undefined"
+      ? localStorage.getItem(STARTER_POOL_SLOT_MAP_KEY) : null;
+    if (!raw) return null;
+    const map = JSON.parse(raw) as Record<string, StarterPoolSlot>;
+    return (map && typeof map === "object" ? map[stepId] : null) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Snapshot the current pool's id→slot mapping so dismiss/tap can resolve it later. */
+function persistPoolSlotMap(steps: PathStep[]) {
+  try {
+    const map: Record<string, StarterPoolSlot> = {};
+    for (const s of steps) if (s.poolSlot) map[s.id] = s.poolSlot;
+    localStorage.setItem(STARTER_POOL_SLOT_MAP_KEY, JSON.stringify(map));
+  } catch {}
 }
 
 export interface PathInputs {
