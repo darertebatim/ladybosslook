@@ -510,6 +510,22 @@ export function useTodayPath() {
       // and rotate between playlist and standalone-track each day. Standalone
       // tracks only come from playlists flagged tracks_standalone.
       const heroId = featuredAudio?.id ?? null;
+      // Productivity door override wins for the secondary slot when present
+      // and not already used as the hero.
+      if (
+        doorSecondaryAudioOverride &&
+        doorSecondaryAudioOverride.id !== heroId
+      ) {
+        const pl = doorSecondaryAudioOverride;
+        secondaryAudio = {
+          kind: "playlist",
+          id: pl.id,
+          title: pl.name,
+          category: pl.category,
+          coverEmoji: null,
+          coverImageUrl: (pl as any).cover_image_url ?? null,
+        };
+      }
       const secPool = (() => {
         const intentMatch = intentCategory
           ? otherPlaylists.filter((p) => p.category === intentCategory)
@@ -517,7 +533,7 @@ export function useTodayPath() {
         const pool = intentMatch.length ? intentMatch : otherPlaylists;
         return pool.filter((p) => p.id !== heroId);
       })();
-      if (secPool.length > 0) {
+      if (!secondaryAudio && secPool.length > 0) {
         const standalonePool = secPool.filter((p) => p.tracks_standalone);
         const wantTrack = (preferTrack || trackByRotation) && standalonePool.length > 0;
         if (wantTrack) {
