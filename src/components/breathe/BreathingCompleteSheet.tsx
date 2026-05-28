@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
@@ -39,6 +39,8 @@ export function BreathingCompleteSheet({
 }: BreathingCompleteSheetProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = (location.state as { from?: string } | null)?.from || '/app/home';
   const { user } = useAuth();
 
   let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void; completeTask: () => void } | null = null;
@@ -86,11 +88,11 @@ export function BreathingCompleteSheet({
     haptic.light();
     onOpenChange(false);
     if (hasActivePlayer) {
-      navigate('/app/home');
+      navigate(returnTo);
       routinePlayer!.maximize();
       return;
     }
-    navigate('/app/home');
+    navigate(returnTo);
   };
 
   return (
