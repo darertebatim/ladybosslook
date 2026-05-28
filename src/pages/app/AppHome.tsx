@@ -57,6 +57,7 @@ import { WelcomeSpotlightBanner } from '@/components/app/home/WelcomeSpotlightBa
 import { TaskCoachOverlay } from '@/components/app/home/TaskCoachOverlay';
 import { AddButtonCoachOverlay } from '@/components/app/home/AddButtonCoachOverlay';
 import { SpotlightCutout } from '@/components/app/home/SpotlightCutout';
+import { PlannerIntroSheet } from '@/components/app/home/PlannerIntroSheet';
 
 
 import coinBronze from '@/assets/coin-bronze.png';
