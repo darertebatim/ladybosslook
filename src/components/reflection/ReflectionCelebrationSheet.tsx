@@ -102,8 +102,28 @@ export function ReflectionCelebrationSheet({
           </h2>
         </div>
 
+        {/* Share + Home — moved above cards */}
+        <div className="flex gap-2 mb-4">
+          <Button
+            variant="ghost"
+            onClick={() => { haptic.light(); handleShare(); }}
+            className="h-11 px-4 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm"
+            aria-label="Share reflection"
+          >
+            <Share2 className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={handleDone}
+            className="flex-1 h-11 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm flex items-center justify-center gap-2"
+          >
+            <FluentEmoji emoji={hasActivePlayer ? '▶️' : '🏠'} size={18} />
+            <span>{hasActivePlayer ? 'Continue Routine' : 'Back to Home Planner'}</span>
+          </Button>
+        </div>
+
         {/* 2×2 cards */}
-        <div className="grid grid-cols-2 gap-3 mb-5">
+        <div className="grid grid-cols-2 gap-3">
           {ACTIONS.map((action) => (
             <button
               key={action.label}
@@ -127,25 +147,6 @@ export function ReflectionCelebrationSheet({
               </span>
             </button>
           ))}
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            onClick={() => { haptic.light(); handleShare(); }}
-            className="h-11 px-4 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm"
-            aria-label="Share reflection"
-          >
-            <Share2 className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={handleDone}
-            className="flex-1 h-11 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm"
-          >
-            {hasActivePlayer ? 'Continue Routine ▶' : 'Back to Home Planner'}
-          </Button>
         </div>
       </SheetContent>
     </Sheet>
