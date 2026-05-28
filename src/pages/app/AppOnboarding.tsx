@@ -294,6 +294,16 @@ export default function AppOnboarding() {
 
   const handleClose = () => {
     if (flowId) Analytics.onboardingSkipped(flowId, currentStep);
+    // Skipping Rilo Doors should land on My Rilo (the post-onboarding home),
+    // NOT /app/home — which would auto-launch the "What is Rilo?" planner
+    // intro and feel like a second onboarding.
+    if (flowId === 'rilo-doors') {
+      try {
+        localStorage.setItem('simora_onboarding_planner_intro_dismissed', 'true');
+      } catch {}
+      navigate('/app/my-rilo');
+      return;
+    }
     navigate('/app/home');
   };
 
