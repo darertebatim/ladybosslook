@@ -10,13 +10,16 @@ export const PlaylistTagChips = ({ playlistId }: Props) => {
     queryKey: ["playlist-tag-chips", playlistId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("audio_playlist_tag_links")
-        .select("playlist_tags(id, label, emoji, sort_order)")
-        .eq("playlist_id", playlistId);
+        .from("content_tags")
+        .select("tags!inner(id, label, emoji, sort_order, tag_dimensions!inner(slug))")
+        .eq("content_type", "playlist")
+        .eq("content_id", playlistId);
       if (error) throw error;
       return (data || [])
-        .map((r: any) => r.playlist_tags)
+        .map((r: any) => r.tags)
         .filter(Boolean)
+        // Hide internal dimensions from public chips (e.g. path-role)
+        .filter((t: any) => t?.tag_dimensions?.slug !== "path-role")
         .sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
     },
     enabled: !!playlistId,
