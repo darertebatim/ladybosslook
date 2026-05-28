@@ -6,7 +6,7 @@ import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
-import { Share2 } from 'lucide-react';
+import { Share2, X } from 'lucide-react';
 import { useShareContent } from '@/hooks/useShareContent';
 import { triggerSoftReview } from '@/lib/appReview';
 
@@ -76,19 +76,31 @@ export function ReflectionCelebrationSheet({
       onOpenChange={(isOpen) => {
         if (!isOpen) {
           handleDone();
-        } else {
-          onOpenChange(isOpen);
+          return;
         }
+        onOpenChange(isOpen);
       }}
     >
       <SheetContent
         side="bottom"
+        hideCloseButton
+        onInteractOutside={(e) => { e.preventDefault(); handleDone(); }}
+        onEscapeKeyDown={(e) => { e.preventDefault(); handleDone(); }}
         className={cn(
           'rounded-t-3xl border-0 px-5 pt-8 pb-6',
           'bg-purple-100',
         )}
         style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}
       >
+        {/* Custom X — routes through handleDone to honor returnTo */}
+        <button
+          type="button"
+          onClick={handleDone}
+          aria-label="Close"
+          className="absolute right-4 top-4 h-8 w-8 rounded-full bg-white/70 text-black flex items-center justify-center active:scale-95 transition-transform"
+        >
+          <X className="h-4 w-4" />
+        </button>
         {/* Header */}
         <div className="flex flex-col items-center text-center mb-6">
           <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3 bg-purple-200">

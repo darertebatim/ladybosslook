@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
+import { X } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
@@ -107,12 +108,24 @@ export function BreathingCompleteSheet({
     }}>
       <SheetContent
         side="bottom"
+        hideCloseButton
+        onInteractOutside={(e) => { e.preventDefault(); handleDone(); }}
+        onEscapeKeyDown={(e) => { e.preventDefault(); handleDone(); }}
         className={cn(
           "rounded-t-3xl border-0 px-5 pt-8 pb-6",
           "bg-emerald-100"
         )}
         style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}
       >
+        {/* Custom X — routes through handleDone to honor returnTo */}
+        <button
+          type="button"
+          onClick={handleDone}
+          aria-label="Close"
+          className="absolute right-4 top-4 h-8 w-8 rounded-full bg-white/70 text-black flex items-center justify-center active:scale-95 transition-transform"
+        >
+          <X className="h-4 w-4" />
+        </button>
         {/* Header: Emoji + Text */}
         <div className="flex flex-col items-center text-center mb-6">
           <div className="w-16 h-16 rounded-full bg-emerald-200 flex items-center justify-center mb-3">
