@@ -589,14 +589,14 @@ export function useTodayPath() {
       );
 
       // Apply path_step_actions
-      const actions = (actionsRes.data ?? []) as Array<{
+      const actions = ((actionsRes.data ?? []) as Array<{
         action: "snooze" | "swap" | "skip_tomorrow";
         step_kind: string;
         step_ref: string;
         effective_until: string | null;
         swap_target: string | null;
         created_at: string;
-      }>;
+      }>).slice().sort((a, b) => b.created_at.localeCompare(a.created_at));
 
       const snoozedActive = new Set<string>();
       const swapMap = new Map<string, string>(); // original id -> swap_target id
