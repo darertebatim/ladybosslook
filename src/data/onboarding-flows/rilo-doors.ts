@@ -82,5 +82,14 @@ export const riloDoorsFlow: OnboardingFlow = {
       subtitle: 'Calm, sleep, workouts, journal, calendar, habits, career, money — all already inside Rilo. Free.',
       buttonLabel: 'Enter Rilo',
     },
+    /* ─── Push permission — last step before entering the app ─── */
+    {
+      id: 'rd-push-permission',
+      type: 'welcome-aboard',
+      title: 'With reminders, routines feel 80% easier.',
+      subtitle: 'Get gentle nudges so your Check Ins stay on track.',
+      buttonLabel: 'Turn on notifications',
+      secondaryButtonLabel: 'Maybe later',
+    },
   ],
 };
