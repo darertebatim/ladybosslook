@@ -956,6 +956,82 @@ export function isStarterPoolGraduated(inputs: PathInputs): boolean {
 }
 
 /**
+ * Count of pool slots still eligible + buildable + not completed cross-day.
+ * Used by the runtime to decide pure-pool vs hybrid vs pure-standard.
+ */
+export function countRemainingPoolSlots(inputs: PathInputs): number {
+  const completed = getStarterPoolCompleted();
+  const cands = buildPoolCandidates(inputs);
+  return cands.filter(
+    (c) => c.eligible && !c.derivedDone && !completed.has(c.slot) && c.build() !== null,
+  ).length;
+}
+
+/**
+ * Hybrid path — used when the pool is running low (1–3 slots left).
+ * Layout: Mood → remaining pool picks → standard fillers (playlist/routine)
+ * → Check In → reward. Smooths the transition from pool to Standard Flow.
+ */
+export function buildHybridPath(inputs: PathInputs): PathStep[] {
+  const completed = getStarterPoolCompleted();
+  const cands = buildPoolCandidates(inputs);
+
+  // Auto-mark derived-done slots so they never resurface.
+  for (const c of cands) {
+    if (c.derivedDone && !completed.has(c.slot)) {
+      markStarterPoolSlotCompleted(c.slot);
+      completed.add(c.slot);
+    }
+  }
+
+  const eligible = cands
+    .filter((c) => c.eligible && !completed.has(c.slot))
+    .sort((a, b) => b.priority - a.priority);
+
+  const poolPicks: PathStep[] = [];
+  const seenIds = new Set<string>();
+  for (const c of eligible) {
+    const step = c.build();
+    if (!step || seenIds.has(step.id)) continue;
+    seenIds.add(step.id);
+    poolPicks.push(step);
+  }
+
+  // Build standard, strip its mood + reward (we re-add them) and inject pool
+  // picks right after mood. Dedupe vs pool ids so we don't double-show audio.
+  const standard = buildStandardPath(inputs);
+  const stdMiddle = standard.filter(
+    (s) => s.kind !== "mood" && s.kind !== "reward" && !seenIds.has(s.id),
+  );
+
+  const steps: PathStep[] = [];
+  steps.push({
+    id: "mood:today",
+    kind: "mood", ref: "today", emoji: "💛",
+    kicker: "Mood check-in",
+    title: inputs.hasMoodTodayLog ? "Mood logged" : "How are you feeling?",
+    meta: inputs.hasMoodTodayLog ? "1 min · done" : "1 min · pick your mood",
+    estMinutes: 1, done: inputs.hasMoodTodayLog,
+    startHref: "/app/mood", tint: "yellow",
+    skippable: !inputs.hasMoodTodayLog,
+  });
+
+  for (const p of poolPicks) steps.push(p);
+  for (const s of stdMiddle) steps.push(s);
+
+  // Ensure a reset (Check In) is present.
+  if (!steps.some((s) => s.kind === "reset")) {
+    steps.push(buildResetStep(inputs));
+  }
+
+  steps.push(rewardStep());
+
+  persistPoolSlotMap(steps);
+
+  return filterDismissed(steps, inputs.dismissedIds).slice(0, 8);
+}
+
+/**
  * Starter-pool path builder.
  *
  * Shape: mood (always) → up to N pool picks → Check In (always) → reward.

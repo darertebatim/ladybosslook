@@ -10,6 +10,8 @@ import {
   buildCandidatePool,
   buildStarterPoolPath,
   isStarterPoolGraduated,
+  countRemainingPoolSlots,
+  buildHybridPath,
   markStarterPoolSlotCompleted,
   getPoolSlotForStepId,
   summarizePath,
@@ -680,12 +682,18 @@ export function useTodayPath() {
         plannerOnboardingDone,
       };
 
-      // Starter pool model: serve up to 3 prioritized pool cards per day
-      // until the pool drains, then graduate to the Standard Flow.
+      // Starter pool model with hybrid blend:
+      //   • 4+ pool slots left → pure pool (3 picks/day)
+      //   • 1–3 left           → hybrid (remaining pool + standard fillers)
+      //   • 0 left             → pure Standard Flow
       // Skipped-door users still get the pool (via "exploring" door above).
-      let steps = isStarterPoolGraduated(inputs)
-        ? buildStandardPath(inputs)
-        : buildStarterPoolPath(inputs);
+      const remainingPool = countRemainingPoolSlots(inputs);
+      let steps =
+        remainingPool === 0
+          ? buildStandardPath(inputs)
+          : remainingPool < 4
+            ? buildHybridPath(inputs)
+            : buildStarterPoolPath(inputs);
 
       // Apply swaps: replace step with its swap_target from the candidate pool
       if (swapMap.size > 0) {

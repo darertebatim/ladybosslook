@@ -442,6 +442,15 @@ export default function MyRiloEngine() {
             Mood + Check In never enter the pool (they recur daily). Reward is always last.
             Most users drain the pool in 3–4 days depending on what they already had pre-auth (quiz done, planner intro seen, etc.).
           </div>
+          <div className="mt-3 rounded-lg bg-muted/40 p-3 text-xs text-muted-foreground">
+            <strong className="text-foreground">Hybrid blend (smooth landing):</strong>
+            <ul className="mt-1 space-y-0.5">
+              <li>• <strong>4+ pool slots left</strong> → pure pool (3 picks/day)</li>
+              <li>• <strong>1–3 left</strong> → hybrid: remaining pool picks first, then Standard fillers (playlist / routine) fill the rest</li>
+              <li>• <strong>0 left</strong> → pure Standard Flow</li>
+            </ul>
+            No abrupt jump — the pool gradually hands off as it drains.
+          </div>
         </CardContent>
       </Card>
 
