@@ -774,6 +774,7 @@ export function useTodayPath() {
       const inputs = {
         hasMoodTodayLog,
         hasQuizResult,
+        hasPersonalityResult,
         quizTopCategory,
         activeRoutines,
         dismissedIds,
