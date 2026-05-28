@@ -34,6 +34,7 @@ const doorSignatures = [
     label: "Productivity",
     signature: "Open Planner → Rilo Planner Onboarding → pick first routine",
     deeper: "Plan tomorrow · 1 quick routine task",
+    secondaryAudio: "Wellness Planning playlist (offered in the Secondary audio slot)",
   },
   {
     door: "emotion",
