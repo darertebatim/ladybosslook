@@ -241,6 +241,22 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
   const primary = ctx.primary;
   const secondary = ctx.secondary;
 
+  // ── Daily mood check-in always comes first until logged today ──────
+  steps.push({
+    id: "mood:today",
+    kind: "mood",
+    ref: "today",
+    emoji: "💛",
+    kicker: "Mood check-in",
+    title: inputs.hasMoodTodayLog ? "Mood logged" : "How are you feeling?",
+    meta: inputs.hasMoodTodayLog ? "1 min · done" : "1 min · pick your mood",
+    estMinutes: 1,
+    done: inputs.hasMoodTodayLog,
+    startHref: "/app/mood",
+    tint: "yellow",
+    skippable: !inputs.hasMoodTodayLog,
+  });
+
   // ── Hero by day ────────────────────────────────────────────────────
   if (day === 0) {
     // Day 1 — primary signature
