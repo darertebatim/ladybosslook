@@ -126,6 +126,9 @@ export function useCreateMoodLog() {
       queryClient.invalidateQueries({ queryKey: ['mood-logs'] });
       queryClient.invalidateQueries({ queryKey: ['mood-logs-month'] });
       queryClient.invalidateQueries({ queryKey: ['today-mood'] });
+      // Path engine reads emotion_logs to mark the Mood check-in as done.
+      // Invalidate so the My Rilo path refreshes immediately after logging.
+      queryClient.invalidateQueries({ queryKey: ['today-path'] });
       try { Analytics.moodLogged(data.mood); } catch { /* ignore */ }
       if (user?.id) {
         void recordMoment({
