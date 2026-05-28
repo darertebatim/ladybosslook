@@ -16,6 +16,12 @@ interface LanguageSettingsHintPopupProps {
  * later. Shown once per user (localStorage flag).
  */
 export function LanguageSettingsHintPopup({ open, onClose }: LanguageSettingsHintPopupProps) {
+  // Disabled: replaced by the new onboarding flows. Kept mounted so admin
+  // test page still resolves the import, but the sheet never renders.
+  void open;
+  void onClose;
+  return null;
+
   const handleClose = () => {
     localStorage.setItem(DISMISSED_KEY, 'true');
     haptic.light();
