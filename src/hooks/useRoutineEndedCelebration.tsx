@@ -114,7 +114,11 @@ export function useRoutineEndedCelebration(dateKey: string) {
     if (!endedData || !user) return;
     setIsAddingAgain(true);
     try {
-      await addRoutineToUserPlanner(user.id, endedData.routineId);
+      // Start the re-added routine from tomorrow so today's planner
+      // isn't suddenly doubled with tasks the user already saw.
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      await addRoutineToUserPlanner(user.id, endedData.routineId, { startDate: tomorrow });
       queryClient.invalidateQueries({ queryKey: ['planner-all-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['user-tasks'] });
       queryClient.invalidateQueries({ queryKey: ['user-routines-bank'] });
