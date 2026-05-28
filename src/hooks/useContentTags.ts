@@ -62,3 +62,52 @@ export function useSaveContentTags() {
     onError: (e: any) => toast.error(e?.message || "Failed to save tags"),
   });
 }
+
+/**
+ * Apply a playlist's tags onto every track inside that playlist.
+ * Existing track tags are preserved — playlist tags are merged in (union).
+ */
+export function useApplyPlaylistTagsToTracks() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      playlistId,
+      trackIds,
+      tagIds,
+    }: {
+      playlistId: string;
+      trackIds: string[];
+      tagIds: string[];
+    }) => {
+      if (tagIds.length === 0) {
+        return { inserted: 0, tracks: trackIds.length };
+      }
+      if (trackIds.length === 0) {
+        return { inserted: 0, tracks: 0 };
+      }
+      const rows = trackIds.flatMap((tid) =>
+        tagIds.map((tagId) => ({
+          content_type: "audio" as const,
+          content_id: tid,
+          tag_id: tagId,
+        })),
+      );
+      const { error } = await supabase
+        .from("content_tags")
+        .upsert(rows, {
+          onConflict: "content_type,content_id,tag_id",
+          ignoreDuplicates: true,
+        });
+      if (error) throw error;
+      return { inserted: rows.length, tracks: trackIds.length };
+    },
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["content-tags", "audio"] });
+      qc.invalidateQueries({ queryKey: ["admin-pending-untagged"] });
+      toast.success(
+        `Applied tags to ${res.tracks} track${res.tracks === 1 ? "" : "s"}.`,
+      );
+    },
+    onError: (e: any) => toast.error(e?.message || "Failed to apply tags"),
+  });
+}
