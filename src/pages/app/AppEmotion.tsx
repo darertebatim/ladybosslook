@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { EmotionDashboard } from '@/components/emotion/EmotionDashboard';
 import { EmotionSelector } from '@/components/emotion/EmotionSelector';
 import { EmotionContext } from '@/components/emotion/EmotionContext';
@@ -19,6 +19,8 @@ interface EmotionState {
 
 const AppEmotion = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = (location.state as { from?: string } | null)?.from || '/app/home';
   const [searchParams, setSearchParams] = useSearchParams();
   const { createLog } = useEmotionLogs();
   const { autoCompleteEmotion } = useAutoCompleteProTask();
@@ -66,12 +68,12 @@ const AppEmotion = () => {
 
   const handleDone = useCallback(() => {
     if (hasActivePlayer) {
-      navigate('/app/home');
+      navigate(returnTo, { replace: true });
       routinePlayer!.maximize();
       return;
     }
-    navigate('/app/home');
-  }, [navigate, hasActivePlayer, routinePlayer]);
+    navigate(returnTo, { replace: true });
+  }, [navigate, hasActivePlayer, routinePlayer, returnTo]);
 
   const handleBack = useCallback(() => {
     switch (step) {
