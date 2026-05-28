@@ -869,8 +869,39 @@ export function useSnoozePathStep() {
       });
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["today-path", user?.id, today] });
+    onMutate: async ({ step }) => {
+      await queryClient.cancelQueries({ queryKey: ["today-path"] });
+      const snapshots: Array<[readonly unknown[], TodayPathResult | undefined]> = [];
+      queryClient
+        .getQueriesData<TodayPathResult>({ queryKey: ["today-path"] })
+        .forEach(([key, value]) => {
+          if (!value) return;
+          snapshots.push([key, value]);
+          // Move the step to the end (before reward), like the builder does.
+          const kept: PathStep[] = [];
+          const deferred: PathStep[] = [];
+          let reward: PathStep | null = null;
+          for (const s of value.steps) {
+            if (s.kind === "reward") { reward = s; continue; }
+            if (s.id === step.id) deferred.push(s);
+            else kept.push(s);
+          }
+          const newSteps = [...kept, ...deferred, ...(reward ? [reward] : [])];
+          queryClient.setQueryData<TodayPathResult>(key, {
+            ...value,
+            steps: newSteps,
+            summary: summarizePath(newSteps),
+          });
+        });
+      return { snapshots };
+    },
+    onError: (_err, _vars, ctx) => {
+      ctx?.snapshots.forEach(([key, value]) => {
+        if (value) queryClient.setQueryData(key, value);
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["today-path"] });
     },
   });
 }
@@ -892,8 +923,35 @@ export function useSwapPathStep() {
       });
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["today-path", user?.id, today] });
+    // Optimistic: rewrite the cached path so the hero updates instantly
+    // instead of waiting for the network refetch (which can be masked by
+    // the persisted IndexedDB cache returning the prior snapshot first).
+    onMutate: async ({ step, target }) => {
+      await queryClient.cancelQueries({ queryKey: ["today-path"] });
+      const snapshots: Array<[readonly unknown[], TodayPathResult | undefined]> = [];
+      queryClient
+        .getQueriesData<TodayPathResult>({ queryKey: ["today-path"] })
+        .forEach(([key, value]) => {
+          if (!value) return;
+          snapshots.push([key, value]);
+          const newSteps = value.steps.map((s) =>
+            s.id === step.id ? { ...target, done: s.done } : s,
+          );
+          queryClient.setQueryData<TodayPathResult>(key, {
+            ...value,
+            steps: newSteps,
+            summary: summarizePath(newSteps),
+          });
+        });
+      return { snapshots };
+    },
+    onError: (_err, _vars, ctx) => {
+      ctx?.snapshots.forEach(([key, value]) => {
+        if (value) queryClient.setQueryData(key, value);
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["today-path"] });
     },
   });
 }
