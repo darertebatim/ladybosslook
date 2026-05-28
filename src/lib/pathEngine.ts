@@ -567,26 +567,6 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
     });
   }
 
-  // Optional locked Plus teaser
-  if (inputs.lockedTeaser) {
-    const t = inputs.lockedTeaser;
-    steps.push({
-      id: `playlist:${t.id}`,
-      kind: "playlist",
-      ref: t.id,
-      emoji: "🔒",
-      kicker: t.category ? `Plus · ${t.category}` : "Plus · Preview",
-      title: t.title,
-      meta: "Unlock with Rilo Plus",
-      estMinutes: 10,
-      done: false,
-      startHref: `/app/player/playlist/${t.id}`,
-      tint: "lavender",
-      skippable: true,
-      coverImageUrl: t.coverImageUrl ?? null,
-    });
-  }
-
   steps.push(buildResetStep(inputs));
 
   // Show only the first active routine — it points to the Planner where
@@ -609,7 +589,8 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
     });
   }
 
-  // Secondary audio pick: a non-educational playlist OR a standalone track
+  // Secondary audio pick (after the routine — low-commitment "later" option):
+  // a non-educational playlist OR a standalone track
   // (sleep stories, meditations, soundscapes). Placed after the routine so
   // the educational hero gets focus; this is a low-commitment "later" option.
   if (inputs.secondaryAudio) {
@@ -631,6 +612,26 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
       tint: "lavender",
       skippable: true,
       coverImageUrl: s.coverImageUrl ?? null,
+    });
+  }
+
+  // Optional locked Plus teaser — last before reward so it doesn't crowd the hero.
+  if (inputs.lockedTeaser) {
+    const t = inputs.lockedTeaser;
+    steps.push({
+      id: `playlist:${t.id}`,
+      kind: "playlist",
+      ref: t.id,
+      emoji: "🔒",
+      kicker: t.category ? `Plus · ${t.category}` : "Plus · Preview",
+      title: t.title,
+      meta: "Unlock with Rilo Plus",
+      estMinutes: 10,
+      done: false,
+      startHref: `/app/player/playlist/${t.id}`,
+      tint: "lavender",
+      skippable: true,
+      coverImageUrl: t.coverImageUrl ?? null,
     });
   }
 
