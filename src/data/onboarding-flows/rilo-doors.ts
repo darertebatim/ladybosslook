@@ -82,5 +82,14 @@ export const riloDoorsFlow: OnboardingFlow = {
       title: 'Building your path…',
       subtitle: 'Picking your playlists, lining up your first steps.',
     },
+    /* ─── Final teach screen: everything that's inside Rilo ─── */
+    {
+      id: 'rd-tools-hub',
+      type: 'rilo-teach',
+      illustrationLabel: 'tools-hub',
+      title: 'Everything you’d download 8 apps for.',
+      subtitle: 'Calm, sleep, workouts, journal, calendar, habits, career, money — all already inside Rilo. Free.',
+      buttonLabel: 'Enter Rilo',
+    },
   ],
 };
