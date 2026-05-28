@@ -849,15 +849,17 @@ export function useSkipPathStep() {
   });
 }
 
-/** Snooze a step for N minutes (default 15). */
+/** "Snooze later": defer a step to the end of today's list (no timer). */
 export function useSnoozePathStep() {
   const { user } = useAuth();
   const today = getLocalDateStr();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ step, minutes = 15 }: { step: PathStep; minutes?: number }) => {
+    mutationFn: async ({ step }: { step: PathStep; minutes?: number }) => {
       if (!user?.id) throw new Error("Not authenticated");
-      const until = new Date(Date.now() + minutes * 60_000).toISOString();
+      // Persist for the rest of today; the path builder filters by created_at
+      // date, so any same-day "snooze" row is treated as "move to end".
+      const until = endOfDay(new Date()).toISOString();
       const { error } = await supabase.from("path_step_actions").insert({
         user_id: user.id,
         action: "snooze",
