@@ -674,11 +674,6 @@ export default function AppPlayer() {
                             <span className="text-[11px] font-bold tracking-[0.14em] uppercase text-orange-600">
                               Hot Track
                             </span>
-                            {isLocked && (
-                              <span className="inline-flex items-center gap-0.5 bg-amber-200 text-amber-700 text-[9px] font-bold px-1.5 py-0.5 rounded-full">
-                                <Crown className="h-2.5 w-2.5" /> PLUS
-                              </span>
-                            )}
                             {langLabel && (
                               <span className="ml-1 inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-white/70 text-orange-700">
                                 {trackLang === "persian" ? (
@@ -722,7 +717,12 @@ export default function AppPlayer() {
                           </div>
 
                           {/* CTA */}
-                          <div className="flex items-center justify-center gap-2 w-full h-12 rounded-2xl bg-orange-500 shadow-ios">
+                          <div className="relative flex items-center justify-center gap-2 w-full h-12 rounded-2xl bg-orange-500 shadow-ios">
+                            {isLocked && (
+                              <span className="absolute -top-2 -left-1 z-10 inline-flex items-center gap-0.5 bg-amber-200 text-amber-700 text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-ios">
+                                <Crown className="h-2.5 w-2.5" /> PLUS
+                              </span>
+                            )}
                             {isLocked ? (
                               <>
                                 <Crown className="h-4 w-4 text-white" />
