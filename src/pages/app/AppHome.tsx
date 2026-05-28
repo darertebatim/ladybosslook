@@ -1407,6 +1407,14 @@ const AppHome = () => {
 
         {/* FAB removed — AI Planner is now in the bottom nav */}
 
+        {/* First-visit planner intro — 75% bottom sheet so users see the
+            planner behind it instead of a full-screen takeover. */}
+        <PlannerIntroSheet
+          isOpen={showPlannerIntroSheet}
+          onStart={handlePlannerIntroStart}
+          onSkip={handlePlannerIntroSkip}
+        />
+
         {/* All celebrations, modals, and sheets */}
         <HomeCelebrations
           showPaywall={showPaywall}
