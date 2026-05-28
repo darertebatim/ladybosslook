@@ -437,7 +437,7 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
   const doors = new Set<DoorKey | null>([primary, secondary]);
   const hasSelfcareDoor = doors.has("selfcare");
   const hasProductivityDoor = doors.has("productivity");
-  if (!hasSelfcareDoor && !inputs.hasQuizResult && !steps.some((s) => s.id === "quiz_pick:onboarding")) {
+  if (!hasSelfcareDoor && !inputs.hasPersonalityResult && !steps.some((s) => s.id === "quiz_pick:onboarding")) {
     steps.push(selfcareQuizStep());
   }
   // Planner onboarding teaser is intentionally deferred to Day 2+ so Day 1
