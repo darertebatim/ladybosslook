@@ -639,6 +639,23 @@ export function useTodayPath() {
 
       const isDayOne = activeRoutines.length === 0 && !hasQuizResult;
 
+      // Spec: users who skipped Rilo Doors are treated as the "Exploring" door
+      // so they still get the door-aware Day 1–3 path (curated tour + teasers)
+      // instead of the legacy flat builders.
+      const effectiveDoorContext = hasDoorContext
+        ? {
+            primary: doorPrimary,
+            secondary: doorSecondary,
+            emotionKeys,
+            immigrantKeys,
+          }
+        : {
+            primary: "exploring" as const,
+            secondary: null,
+            emotionKeys: [] as string[],
+            immigrantKeys: [] as string[],
+          };
+
       const inputs = {
         hasMoodTodayLog,
         hasQuizResult,
@@ -650,21 +667,15 @@ export function useTodayPath() {
         secondaryAudio,
         lockedTeaser,
         featuredReset,
-        doorContext: hasDoorContext
-          ? {
-              primary: doorPrimary,
-              secondary: doorSecondary,
-              emotionKeys,
-              immigrantKeys,
-            }
-          : null,
+        doorContext: effectiveDoorContext,
         daysSinceSignup,
         plannerOnboardingDone,
       };
 
-      let steps = hasDoorContext
-        ? buildDoorPath(inputs)
-        : isDayOne ? buildDayOnePath(inputs) : buildStandardPath(inputs);
+      // All users now flow through the door-aware builder. Skipped-door users
+      // get the "exploring" door (see effectiveDoorContext above). The legacy
+      // buildDayOnePath / buildStandardPath are retained for fallback only.
+      let steps = buildDoorPath(inputs);
 
       // Apply swaps: replace step with its swap_target from the candidate pool
       if (swapMap.size > 0) {
