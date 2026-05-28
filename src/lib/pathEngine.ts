@@ -114,6 +114,8 @@ function persistPoolSlotMap(steps: PathStep[]) {
 export interface PathInputs {
   hasMoodTodayLog: boolean;
   hasQuizResult: boolean;
+  /** True once user finished the Self-Care Personality Quiz. */
+  hasPersonalityResult?: boolean;
   quizTopCategory: string | null;
   activeRoutines: Array<{
     routineId: string;
@@ -208,16 +210,16 @@ function browseRoutinesStep(): PathStep {
   };
 }
 
-/** Self-Care Quiz teaser — used when self-care isn't a door pick. */
+/** Self-Care Personality Quiz teaser — used when self-care isn't a door pick. */
 function selfcareQuizStep(): PathStep {
   return {
     id: "quiz_pick:onboarding",
     kind: "quiz_pick", ref: "onboarding",
-    emoji: "🧠", kicker: "Self-care snapshot",
-    title: "Take the 60-sec Self-Care Quiz",
+    emoji: "🧠", kicker: "Self-care personality",
+    title: "Take the Self-Care Personality Quiz",
     meta: "3 min · personalize your path",
     estMinutes: 3, done: false,
-    startHref: "/app/onboarding/selfcare-quiz",
+    startHref: "/app/onboarding/selfcare-personality-quiz",
     tint: "peach", skippable: true,
   };
 }
@@ -435,7 +437,7 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
   const doors = new Set<DoorKey | null>([primary, secondary]);
   const hasSelfcareDoor = doors.has("selfcare");
   const hasProductivityDoor = doors.has("productivity");
-  if (!hasSelfcareDoor && !inputs.hasQuizResult && !steps.some((s) => s.id === "quiz_pick:onboarding")) {
+  if (!hasSelfcareDoor && !inputs.hasPersonalityResult && !steps.some((s) => s.id === "quiz_pick:onboarding")) {
     steps.push(selfcareQuizStep());
   }
   // Planner onboarding teaser is intentionally deferred to Day 2+ so Day 1
@@ -478,11 +480,11 @@ export function buildDayOnePath(inputs: PathInputs): PathStep[] {
     ref: "onboarding",
     emoji: "🧠",
     kicker: "Start here",
-    title: "Take the 60-second Self-Care Quiz",
+    title: "Take the Self-Care Personality Quiz",
     meta: "3 min · personalize your path",
     estMinutes: 3,
     done: false,
-    startHref: "/app/onboarding/selfcare-quiz",
+    startHref: "/app/onboarding/selfcare-personality-quiz",
     tint: "peach",
     skippable: false,
   });
