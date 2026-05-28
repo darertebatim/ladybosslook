@@ -869,6 +869,9 @@ export function useSkipPathStep() {
         step_ref: step.ref,
       });
       if (error && error.code !== "23505") throw error; // ignore unique-violation
+      // Starter pool: a skip on a pool slot retires that slot cross-day.
+      const slot = (step as any).poolSlot ?? getPoolSlotForStepId(step.id);
+      if (slot) markStarterPoolSlotCompleted(slot);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["today-path", user?.id, today] });
