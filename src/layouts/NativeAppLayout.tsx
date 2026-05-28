@@ -188,7 +188,8 @@ const NativeAppLayout = () => {
   const isFullScreenTool = location.pathname.startsWith('/app/journal');
   // Pages that manage their own scroll container (need overflow-hidden on main)
   const isOwnScrollPage =
-    location.pathname === '/app/projects';
+    location.pathname === '/app/projects'
+    || location.pathname === '/app/my-rilo';
 
   const navItems = [
     { path: '/app/home', icon: ClipboardList, label: t('nav.home'), tourClass: 'tour-nav-home' },
