@@ -105,11 +105,11 @@ export function MoodCelebrationSheet({
     haptic.light();
     onOpenChange(false);
     if (hasActivePlayer) {
-      navigate('/app/home');
+      navigate(returnTo, { replace: true });
       routinePlayer!.maximize();
       return;
     }
-    if (onActionClick?.('/app/home')) {
+    if (onActionClick?.(returnTo)) {
       return;
     }
     onDone();
