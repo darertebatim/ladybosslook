@@ -829,6 +829,7 @@ export type Database = {
           is_hidden: boolean
           language: string
           name: string
+          path_role: string | null
           program_slug: string | null
           requires_subscription: boolean
           sort_order: number
@@ -846,6 +847,7 @@ export type Database = {
           is_hidden?: boolean
           language?: string
           name: string
+          path_role?: string | null
           program_slug?: string | null
           requires_subscription?: boolean
           sort_order?: number
@@ -863,6 +865,7 @@ export type Database = {
           is_hidden?: boolean
           language?: string
           name?: string
+          path_role?: string | null
           program_slug?: string | null
           requires_subscription?: boolean
           sort_order?: number
