@@ -223,6 +223,44 @@ function signatureStepForDoor(door: DoorKey, inputs: PathInputs): PathStep | nul
 }
 
 /**
+ * Door-aware "deeper" / booster step — used for Day 2 primary booster and
+ * Day 3 secondary deeper. Always returns something so the spec's
+ * "keeps thread alive" promise holds for every door.
+ */
+function deeperStepForDoor(
+  door: DoorKey,
+  inputs: PathInputs,
+  opts?: { kicker?: string; tint?: PathStep["tint"] }
+): PathStep | null {
+  switch (door) {
+    case "selfcare":
+      // Booster = quiz teaser if not yet done, else a door-flavored Check In.
+      return inputs.hasQuizResult ? buildResetStep(inputs) : selfcareQuizStep();
+    case "productivity":
+      // Booster = planner onboarding if not done, else "pick a routine".
+      return inputs.plannerOnboardingDone ? browseRoutinesStep() : plannerIntroStep();
+    case "immigrant":
+    case "emotion":
+    case "exploring": {
+      // Prefer secondaryAudio (fresh content); fall back to featuredAudio.
+      const a = inputs.secondaryAudio ?? inputs.featuredAudio;
+      if (!a) return null;
+      return audioToStep(
+        { ...a, mode: "default" },
+        {
+          kicker: opts?.kicker ?? (
+            door === "immigrant" ? "More Bilingual Strength" :
+            door === "emotion" ? "More for your emotions" :
+            "More from your door"
+          ),
+          tint: opts?.tint ?? (door === "emotion" ? "pink" : door === "immigrant" ? "lavender" : "mint"),
+        }
+      );
+    }
+  }
+}
+
+/**
  * Door-aware path builder.
  *
  * Day 1 = primary signature + door-flavored reset + browse routines.
