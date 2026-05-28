@@ -163,7 +163,7 @@ export const RoutineEndedCelebration = ({
               </span>
             </div>
             <p className="text-center text-sm text-violet-900/75 leading-snug">
-              Loved this rhythm? Add it to your planner again and keep the momentum going.
+              Loved this rhythm? Add it to your planner again — it'll start fresh tomorrow so today stays clean.
             </p>
           </div>
 
@@ -179,7 +179,7 @@ export const RoutineEndedCelebration = ({
               style={{ boxShadow: '0 4px 24px rgba(139, 92, 246, 0.35), 0 8px 32px rgba(0, 0, 0, 0.1)' }}
             >
               <RotateCw className={cn('w-4 h-4 mr-2', isAddingAgain && 'animate-spin')} />
-              {isAddingAgain ? 'Adding…' : 'Add it again'}
+              {isAddingAgain ? 'Adding…' : 'Add it again — start tomorrow'}
             </Button>
             <Button
               onClick={(e) => { e.stopPropagation(); onClose(); }}
