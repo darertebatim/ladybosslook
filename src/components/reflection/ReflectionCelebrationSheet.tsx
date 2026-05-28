@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
 import { haptic } from '@/lib/haptics';
@@ -34,6 +34,8 @@ export function ReflectionCelebrationSheet({
   onDone,
 }: ReflectionCelebrationSheetProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = (location.state as { from?: string } | null)?.from || '/app/home';
 
   useEffect(() => {
     if (open) {
@@ -61,11 +63,11 @@ export function ReflectionCelebrationSheet({
     haptic.light();
     onOpenChange(false);
     if (hasActivePlayer) {
-      navigate('/app/home', { replace: true });
+      navigate(returnTo, { replace: true });
       routinePlayer!.maximize();
       return;
     }
-    navigate('/app/home', { replace: true });
+    navigate(returnTo, { replace: true });
   };
 
   return (

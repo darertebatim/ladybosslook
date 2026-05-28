@@ -585,14 +585,16 @@ export function buildCandidatePool(inputs: PathInputs): PathStep[] {
     kind: "breath", ref: "box4", emoji: "🟦",
     kicker: "Breathwork", title: "Box breathing · 4-4-4-4",
     meta: "4 min · Focus pattern", estMinutes: 4, done: false,
-    startHref: "/app/breathe", tint: "sky", skippable: true,
+    startHref: "/app/breathe?exercise=4d0790d6-a696-4181-b9cf-8c3760f99533",
+    tint: "sky", skippable: true,
   });
   pool.push({
     id: "breath:478",
     kind: "breath", ref: "478", emoji: "💤",
     kicker: "Breathwork", title: "4-7-8 · Wind-down breath",
     meta: "3 min · Calming", estMinutes: 3, done: false,
-    startHref: "/app/breathe", tint: "lavender", skippable: true,
+    startHref: "/app/breathe?exercise=fad4a7cf-6405-4a18-bf9c-9531c1866879",
+    tint: "lavender", skippable: true,
   });
 
   // Reflection / journaling
