@@ -447,7 +447,7 @@ export default function AppMyRiloPath() {
     <>
       <SEOHead title="My Rilo · Path for Today" description="Your dynamic daily path, hand-picked by Rilo." />
       <div
-        className="min-h-[100dvh] relative overflow-x-hidden w-full max-w-full"
+        className="h-full min-h-0 flex flex-col relative overflow-hidden w-full max-w-full"
         style={{
           background: `linear-gradient(180deg, ${O.bgWarm} 0%, #FFFFFF 50%, ${O.bgWarm} 100%)`,
           color: O.fg,
@@ -464,7 +464,7 @@ export default function AppMyRiloPath() {
 
         {/* Header */}
         <div
-          className="sticky top-0 z-30 px-5 pb-3 grid grid-cols-[auto_1fr_auto] items-center backdrop-blur-xl"
+          className="shrink-0 z-30 px-5 pb-3 grid grid-cols-[auto_1fr_auto] items-center backdrop-blur-xl"
           style={{
             background: "rgba(255,248,243,0.78)",
             boxShadow: "0 1px 0 rgba(245,220,200,0.5)",
@@ -523,115 +523,117 @@ export default function AppMyRiloPath() {
           </div>
         </div>
 
-        {/* Top banners (admin-curated) — under header, above date */}
-        <div className="px-4 pt-2">
-          <PromoBanner location="my_rilo_top" className="py-1" />
-          <HomeBanner location="my_rilo_top" className="py-1" />
-        </div>
-
-        {/* Hero greeting */}
-        <div className="px-5 pt-4 pb-3 relative z-10">
-          <div
-            className="text-[11px] font-bold uppercase tracking-[0.15em]"
-            style={{ color: O.primary }}
-          >
-            {dateLabel}
-          </div>
-          <div
-            className="text-[28px] font-bold leading-[1.05] mt-1.5"
-            style={{ color: O.fg }}
-          >
-            {isDayOne ? "Let's build your path together" : "Your path for today"}
-          </div>
-          <div className="text-[13px] mt-1.5" style={{ color: O.fgMuted }}>
-            {summary.total} small steps · ~{summary.totalMinutes} min
-            {routinesWoven > 0 ? ` · ${routinesWoven} of your routines woven in` : ""}
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
+          {/* Top banners (admin-curated) — under header, above date */}
+          <div className="px-4 pt-2">
+            <PromoBanner location="my_rilo_top" className="py-1" />
+            <HomeBanner location="my_rilo_top" className="py-1" />
           </div>
 
-          {/* Progress segments */}
-          <div className="flex items-center gap-1.5 mt-3">
-            {nonReward.map((s) => (
-              <div
-                key={s.id}
-                className="h-1.5 flex-1 rounded-full"
-                style={{ background: s.done ? O.primary : O.border }}
-              />
-            ))}
-            <span
-              className="text-[11px] font-bold ml-1"
-              style={{ color: O.fgMuted }}
+          {/* Hero greeting */}
+          <div className="px-5 pt-4 pb-3 relative z-10">
+            <div
+              className="text-[11px] font-bold uppercase tracking-[0.15em]"
+              style={{ color: O.primary }}
             >
-              {summary.doneCount}/{summary.total}
-            </span>
+              {dateLabel}
+            </div>
+            <div
+              className="text-[28px] font-bold leading-[1.05] mt-1.5"
+              style={{ color: O.fg }}
+            >
+              {isDayOne ? "Let's build your path together" : "Your path for today"}
+            </div>
+            <div className="text-[13px] mt-1.5" style={{ color: O.fgMuted }}>
+              {summary.total} small steps · ~{summary.totalMinutes} min
+              {routinesWoven > 0 ? ` · ${routinesWoven} of your routines woven in` : ""}
+            </div>
+
+            {/* Progress segments */}
+            <div className="flex items-center gap-1.5 mt-3">
+              {nonReward.map((s) => (
+                <div
+                  key={s.id}
+                  className="h-1.5 flex-1 rounded-full"
+                  style={{ background: s.done ? O.primary : O.border }}
+                />
+              ))}
+              <span
+                className="text-[11px] font-bold ml-1"
+                style={{ color: O.fgMuted }}
+              >
+                {summary.doneCount}/{summary.total}
+              </span>
+            </div>
           </div>
-        </div>
 
-        {/* THE PATH */}
-        <div className="px-4 pt-3 pb-4 relative">
-          {/* Vertical dotted spine */}
-          <div
-            className="absolute left-[34px] top-8 bottom-8 w-px"
-            style={{
-              backgroundImage: `linear-gradient(${O.peachMid} 50%, transparent 50%)`,
-              backgroundSize: "1px 6px",
-            }}
-          />
+          {/* THE PATH */}
+          <div className="px-4 pt-3 pb-4 relative">
+            {/* Vertical dotted spine */}
+            <div
+              className="absolute left-[34px] top-8 bottom-8 w-px"
+              style={{
+                backgroundImage: `linear-gradient(${O.peachMid} 50%, transparent 50%)`,
+                backgroundSize: "1px 6px",
+              }}
+            />
 
-          {/* Done section */}
-          {doneSteps.length > 0 && (
-            <>
-              <SectionDivider label={`☀️ Morning · done`} color={O.fgMuted} />
-              {doneSteps.map((s) => (
-                <InlinePathRow
-                  key={s.id}
-                  step={s}
-                  onStart={() => handleStart(s)}
+            {/* Done section */}
+            {doneSteps.length > 0 && (
+              <>
+                <SectionDivider label={`☀️ Morning · done`} color={O.fgMuted} />
+                {doneSteps.map((s) => (
+                  <InlinePathRow
+                    key={s.id}
+                    step={s}
+                    onStart={() => handleStart(s)}
+                  />
+                ))}
+              </>
+            )}
+
+            {/* Right now */}
+            {activeStep && (
+              <>
+                <div className={doneSteps.length > 0 ? "mt-5" : ""}>
+                  <SectionDivider label="✨ Right now" color={O.primary} />
+                </div>
+                <PathHero
+                  step={activeStep}
+                  onStart={() => handleStart(activeStep)}
+                  onSkip={activeStep.skippable ? () => handleSkip(activeStep) : undefined}
+                  onSwap={activeStep.skippable ? () => setSwapTarget(activeStep) : undefined}
+                  onSnooze={activeStep.skippable ? () => handleSnooze(activeStep) : undefined}
                 />
-              ))}
-            </>
-          )}
+              </>
+            )}
 
-          {/* Right now */}
-          {activeStep && (
-            <>
-              <div className={doneSteps.length > 0 ? "mt-5" : ""}>
-                <SectionDivider label="✨ Right now" color={O.primary} />
-              </div>
-              <PathHero
-                step={activeStep}
-                onStart={() => handleStart(activeStep)}
-                onSkip={activeStep.skippable ? () => handleSkip(activeStep) : undefined}
-                onSwap={activeStep.skippable ? () => setSwapTarget(activeStep) : undefined}
-                onSnooze={activeStep.skippable ? () => handleSnooze(activeStep) : undefined}
-              />
-            </>
-          )}
+            {/* Later */}
+            {laterSteps.length > 0 && (
+              <>
+                <SectionDivider label="🌙 Later today" color={O.fgMuted} />
+                {laterSteps.map((s) => (
+                  <InlinePathRow
+                    key={s.id}
+                    step={s}
+                    onStart={() => handleStart(s)}
+                    onSkip={s.skippable ? () => handleSkip(s) : undefined}
+                  />
+                ))}
+              </>
+            )}
 
-          {/* Later */}
-          {laterSteps.length > 0 && (
-            <>
-              <SectionDivider label="🌙 Later today" color={O.fgMuted} />
-              {laterSteps.map((s) => (
-                <InlinePathRow
-                  key={s.id}
-                  step={s}
-                  onStart={() => handleStart(s)}
-                  onSkip={s.skippable ? () => handleSkip(s) : undefined}
-                />
-              ))}
-            </>
-          )}
+            {reward && <RewardRow step={reward} />}
+          </div>
 
-          {reward && <RewardRow step={reward} />}
+          {/* Bottom banners (admin-curated) — after the path */}
+          <div className="px-4 pb-2">
+            <PromoBanner location="my_rilo_bottom" className="py-2" />
+            <HomeBanner location="my_rilo_bottom" className="py-2" />
+          </div>
+
+          <div className="pb-8" />
         </div>
-
-        {/* Bottom banners (admin-curated) — after the path */}
-        <div className="px-4 pb-2">
-          <PromoBanner location="my_rilo_bottom" className="py-2" />
-          <HomeBanner location="my_rilo_bottom" className="py-2" />
-        </div>
-
-        <div className="pb-8" />
       </div>
 
       <SwapSheet
