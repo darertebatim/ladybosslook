@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   ChartColumn, Check, ArrowLeft,
@@ -40,6 +40,8 @@ const MOODS = [
 export function MoodDashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = (location.state as { from?: string } | null)?.from || '/app/home';
   const { autoCompleteMood } = useAutoCompleteProTask();
   const { data: todayMood } = useTodayMood();
   const createMoodLog = useCreateMoodLog();
@@ -143,8 +145,8 @@ export function MoodDashboard() {
   }, [selectedMood, selectedSubmoods, selectedContexts, contextNote, autoCompleteMood, createMoodLog, t]);
 
   const handleCelebrationDone = useCallback(() => {
-    navigate('/app/home');
-  }, [navigate]);
+    navigate(returnTo, { replace: true });
+  }, [navigate, returnTo]);
 
   // Intercept action clicks from celebration to show routine prompt
   const handleCelebrationAction = useCallback((route: string): boolean => {
@@ -167,19 +169,19 @@ export function MoodDashboard() {
   const handleRoutinePromptSkip = useCallback(() => {
     setShowRoutinePrompt(false);
     if (pendingRoute) {
-      navigate(pendingRoute);
+      navigate(pendingRoute, { state: { from: returnTo } });
       setPendingRoute(null);
     }
-  }, [pendingRoute, navigate]);
+  }, [pendingRoute, navigate, returnTo]);
 
   const handleRoutinePromptNever = useCallback(() => {
     localStorage.setItem('mood_routine_never', 'true');
     setShowRoutinePrompt(false);
     if (pendingRoute) {
-      navigate(pendingRoute);
+      navigate(pendingRoute, { state: { from: returnTo } });
       setPendingRoute(null);
     }
-  }, [pendingRoute, navigate]);
+  }, [pendingRoute, navigate, returnTo]);
 
   const handleRoutineClick = () => {
     haptic.light();
@@ -204,7 +206,7 @@ export function MoodDashboard() {
       setJustAdded(true);
       // Navigate to pending route after adding
       if (pendingRoute) {
-        navigate(pendingRoute);
+        navigate(pendingRoute, { state: { from: returnTo } });
         setPendingRoute(null);
       }
     } catch (error) {
