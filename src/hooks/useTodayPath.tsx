@@ -606,16 +606,20 @@ export function useTodayPath() {
 
       for (const a of actions) {
         const id = `${a.step_kind}:${a.step_ref}`;
+        // Compare in the user's LOCAL timezone — `created_at` is UTC, so a
+        // naive slice(0,10) drops same-day actions for users west of UTC
+        // (e.g. PT user swaps at 8pm → UTC date is already tomorrow).
+        const createdLocalDay = getLocalDateStr(new Date(a.created_at));
         if (a.action === "snooze") {
           // New semantics: snooze = defer to end of list for today.
           // Honor any snooze action created today (ignore stale rows from
           // previous days, regardless of effective_until format).
-          if (a.created_at.slice(0, 10) === today) {
+          if (createdLocalDay === today) {
             deferredToday.add(id);
           }
         } else if (a.action === "swap") {
           // Only honor swaps created today
-          if (a.created_at.slice(0, 10) === today && a.swap_target) {
+          if (createdLocalDay === today && a.swap_target) {
             swapMap.set(id, a.swap_target);
           }
         } else if (a.action === "skip_tomorrow" && a.effective_until) {
