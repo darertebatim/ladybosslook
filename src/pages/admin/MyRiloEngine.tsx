@@ -179,7 +179,7 @@ const dataSources = [
   { table: "emotion_logs", purpose: "Today's mood check-in + valence → mood label for scorer" },
   { table: "selfcare_quiz_results", purpose: "Quiz outcome → routine provisioned via provisionRiloPicks (no separate quiz_pick step)" },
   { table: "user_routines_bank", purpose: "Up to 4 active routines, weaved into path" },
-  { table: "audio_playlists", purpose: "Featured playlist (deterministic: lowest sort_order, available + not hidden)" },
+  { table: "audio_playlists", purpose: "Featured + secondary playlists. Selection priority: door override → playlist tagged path_role='primary' / 'secondary' (filtered by user's preferred language) → educational/intent fallback → sort_order." },
   { table: "breathing_exercises", purpose: "Check In pool — active + not premium; one picked per day by date seed" },
   { table: "reflections", purpose: "Check In pool — active + is_free; one picked per day by date seed" },
   { table: "path_dismissals", purpose: "Per-day skip list, filtered from steps" },
