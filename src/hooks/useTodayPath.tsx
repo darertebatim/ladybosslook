@@ -89,10 +89,10 @@ export function useTodayPath() {
           .order("created_at", { ascending: false })
           .limit(1),
         supabase
-          .from("selfcare_personality_results")
-          .select("id")
+          .from("selfcare_quiz_results")
+          .select("gap_categories")
           .eq("user_id", userId)
-          .order("taken_at", { ascending: false })
+          .order("created_at", { ascending: false })
           .limit(1)
           .maybeSingle(),
         supabase
