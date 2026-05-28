@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useGoBack } from '@/hooks/useGoBack';
 import { useTranslation } from 'react-i18next';
 import { useReflections, Reflection, REFLECTION_CATEGORIES } from '@/hooks/useReflections';
@@ -42,6 +42,7 @@ export default function AppReflections() {
 
 function AppReflectionsInner() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
   const goBack = useGoBack('/app/home');
   const slideCtx = useSlideClose();
@@ -79,6 +80,8 @@ function AppReflectionsInner() {
     const rest = present.filter(c => !priority.includes(c.value));
     return [...pinned, ...rest];
   }, [reflections]);
+
+  const navState = location.state ? { from: (location.state as { from?: string }).from || location.pathname } : { from: location.pathname };
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -120,7 +123,7 @@ function AppReflectionsInner() {
       {/* Free Form */}
       <div className="px-4 mt-2 flex gap-3">
         <button
-          onClick={() => navigate('/app/reflections/free-form')}
+          onClick={() => navigate('/app/reflections/free-form', { state: navState })}
           className="flex-1 rounded-2xl bg-accent/60 p-3 flex items-center gap-2 text-left transition-transform active:scale-[0.97]"
         >
           <span className="text-xl">✍️</span>
@@ -130,7 +133,7 @@ function AppReflectionsInner() {
           </div>
         </button>
         <button
-          onClick={() => navigate('/app/reflections/notes')}
+          onClick={() => navigate('/app/reflections/notes', { state: navState })}
           className="flex-1 rounded-2xl bg-accent/60 p-3 flex items-center gap-2 text-left transition-transform active:scale-[0.97]"
         >
           <FluentEmoji emoji="📓" size={24} />
@@ -149,7 +152,7 @@ function AppReflectionsInner() {
             {featured.map((r) => (
               <button
                 key={r.id}
-                onClick={() => navigate(`/app/reflections/${r.id}`)}
+                onClick={() => navigate(`/app/reflections/${r.id}`, { state: navState })}
                 className="w-full rounded-2xl overflow-hidden text-left transition-transform active:scale-[0.97] relative bg-accent/60 border border-border/40"
               >
                 <div className="flex items-center gap-3 p-3">
@@ -252,6 +255,7 @@ function AppReflectionsInner() {
 
 function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; isSubscribed: boolean }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { data: existingTask } = useExistingProTask('reflection', reflection.id);
   const addRoutinePlan = useAddRoutinePlan();
   const [showSheet, setShowSheet] = useState(false);
@@ -283,7 +287,9 @@ function ReflectionRow({ reflection, isSubscribed }: { reflection: Reflection; i
       setShowPaywall(true);
       return;
     }
-    navigate(`/app/reflections/${reflection.id}`);
+    navigate(`/app/reflections/${reflection.id}`, {
+      state: { from: (location.state as { from?: string } | null)?.from || location.pathname },
+    });
   };
 
   const handleAddToRoutines = () => {
