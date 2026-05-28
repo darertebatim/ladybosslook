@@ -148,5 +148,14 @@ export const whatIsRiloFlow: OnboardingFlow = {
       type: 'rilo-commit',
       title: 'Lastly, commit to get this done!',
     },
+    {
+      id: 'wir-plus-intro',
+      type: 'selfcare-plus-intro',
+      illustrationLabel: 'selfcare-quiz',
+      title: "Rilo is free to use —\nbut we'd love for you to try Rilo Plus for 7 days free too!",
+      subtitle: '',
+      buttonLabel: 'See my free offer →',
+      secondaryButtonLabel: 'Maybe later',
+    },
   ],
 };
