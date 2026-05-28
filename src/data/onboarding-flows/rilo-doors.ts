@@ -66,15 +66,6 @@ export const riloDoorsFlow: OnboardingFlow = {
       type: 'door-immigrant-picker',
       doorBranch: 'immigrant',
     },
-    /* ─── Push permission — reminders before building the path ─── */
-    {
-      id: 'rd-push-permission',
-      type: 'welcome-aboard',
-      title: 'With reminders, routines feel 80% easier.',
-      subtitle: 'Get gentle nudges so your Check Ins stay on track.',
-      buttonLabel: 'Turn on notifications',
-      secondaryButtonLabel: 'Maybe later',
-    },
     /* ─── Final loader: builds the path while teasing what they get ─── */
     {
       id: 'rd-building',
