@@ -211,9 +211,22 @@ function PathHero({
           <div className="flex items-start gap-3 mb-4">
             <div
               className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0"
-              style={{ background: "#fff", boxShadow: "0 6px 14px rgba(0,0,0,0.10)" }}
+              style={{
+                background: "#fff",
+                boxShadow: "0 6px 14px rgba(0,0,0,0.10)",
+                overflow: "hidden",
+              }}
             >
-              <FluentEmoji emoji={step.emoji} size={40} />
+              {step.kind === "playlist" && step.coverImageUrl ? (
+                <img
+                  src={step.coverImageUrl}
+                  alt=""
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <FluentEmoji emoji={step.emoji} size={40} />
+              )}
             </div>
             <div className="flex-1 pt-0.5 min-w-0">
               <div
