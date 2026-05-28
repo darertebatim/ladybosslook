@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   useContentTagsByType,
   useSaveContentTags,
+  useApplyPlaylistTagsToTracks,
   type ContentType,
 } from "@/hooks/useContentTags";
 import { useAllTags } from "@/hooks/useTags";
