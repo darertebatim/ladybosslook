@@ -302,16 +302,31 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
     if (sig) steps.push(sig);
     steps.push(buildResetStep(inputs));
   } else if (day === 1) {
-    // Day 2 — secondary signature + primary booster
+    // Day 2 — secondary signature + primary booster + continue routine + check in
     const sec = secondary ? signatureStepForDoor(secondary, inputs) : null;
     if (sec) steps.push(sec);
-    const primaryBooster = primary && primary !== "selfcare" && primary !== "productivity" && inputs.secondaryAudio
-      ? audioToStep({ ...inputs.secondaryAudio, mode: "default" }, { kicker: "More from your door", tint: "mint" })
+    const primaryBooster = primary
+      ? deeperStepForDoor(primary, inputs, { kicker: "More from your door", tint: "mint" })
       : null;
-    if (primaryBooster) steps.push(primaryBooster);
+    if (primaryBooster && !steps.some((s) => s.id === primaryBooster.id)) {
+      steps.push(primaryBooster);
+    }
     steps.push(buildResetStep(inputs));
+    // Continue the routine the user started on Day 1 (spec slot #6).
+    const day2Routine = inputs.activeRoutines[0];
+    if (day2Routine && !steps.some((s) => s.id === `routine:${day2Routine.routineId}`)) {
+      steps.push({
+        id: `routine:${day2Routine.routineId}`,
+        kind: "routine", ref: day2Routine.routineId,
+        emoji: day2Routine.emoji || "🔥",
+        kicker: "Continue routine", title: day2Routine.title,
+        meta: "Pick up where you left off", estMinutes: 5, done: false,
+        startHref: "/app/home",
+        tint: tintForRoutine(day2Routine.color, 0), skippable: true,
+      });
+    }
   } else {
-    // Day 3 — habit cement: real routine if any, else browse + audio
+    // Day 3 — habit cement: real routine if any, else browse + secondary deeper + audio
     const firstRoutine = inputs.activeRoutines[0];
     if (firstRoutine) {
       steps.push({
@@ -325,6 +340,13 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
       });
     } else {
       steps.push(browseRoutinesStep());
+    }
+    // Secondary door deeper step — keeps the secondary thread alive (spec slot #3).
+    const secondaryDeeper = secondary
+      ? deeperStepForDoor(secondary, inputs, { kicker: "Keep your secondary alive" })
+      : null;
+    if (secondaryDeeper && !steps.some((s) => s.id === secondaryDeeper.id)) {
+      steps.push(secondaryDeeper);
     }
     if (inputs.featuredAudio) steps.push(audioToStep(inputs.featuredAudio));
     steps.push(buildResetStep(inputs));
@@ -342,7 +364,9 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
   if (!hasSelfcareDoor && !inputs.hasQuizResult && !steps.some((s) => s.id === "quiz_pick:onboarding")) {
     steps.push(selfcareQuizStep());
   }
-  if (!hasProductivityDoor && !inputs.plannerOnboardingDone && !steps.some((s) => s.id === "quiz_pick:planner_intro")) {
+  // Planner onboarding teaser is intentionally deferred to Day 2+ so Day 1
+  // isn't overwhelming (matches admin spec: "moved to Day 2").
+  if (day >= 1 && !hasProductivityDoor && !inputs.plannerOnboardingDone && !steps.some((s) => s.id === "quiz_pick:planner_intro")) {
     steps.push(plannerIntroStep());
   }
 
