@@ -16,6 +16,7 @@ import { BreathingCompleteSheet } from './BreathingCompleteSheet';
 interface BreathingExerciseScreenProps {
   exercise: BreathingExercise;
   onClose: () => void;
+  returnTo?: string;
 }
 
 type BreathPhase = 'inhale' | 'inhale_hold' | 'exhale' | 'exhale_hold';
@@ -37,6 +38,7 @@ type LayoutMode = 'classic' | 'immersive';
 export function BreathingExerciseScreen({
   exercise,
   onClose,
+  returnTo,
 }: BreathingExerciseScreenProps) {
   const { t } = useTranslation();
   const CYCLE_OPTIONS = CYCLE_VALUES.map(v => ({ value: v, label: t('breathePage.cyclesShort', { count: v }) }));
@@ -498,6 +500,7 @@ export function BreathingExerciseScreen({
           onOpenChange={setShowCompleteSheet}
           exerciseName={exercise.name}
           durationSeconds={completedDuration}
+          returnTo={returnTo}
         />
       </div>
     );
@@ -669,6 +672,7 @@ export function BreathingExerciseScreen({
         onOpenChange={setShowCompleteSheet}
         exerciseName={exercise.name}
         durationSeconds={completedDuration}
+        returnTo={returnTo}
       />
     </div>
   );
