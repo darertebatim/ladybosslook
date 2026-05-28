@@ -279,8 +279,10 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
   const primary = ctx.primary;
   const secondary = ctx.secondary;
 
-  // ── Daily mood check-in always comes first until logged today ──────
-  steps.push({
+  // ── Mood check-in ──
+  // Spec: Day 1 puts the primary signature first (the "wow"), then mood.
+  // Day 2+ open with mood as the daily anchor.
+  const moodStep: PathStep = {
     id: "mood:today",
     kind: "mood",
     ref: "today",
@@ -293,13 +295,15 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
     startHref: "/app/mood",
     tint: "yellow",
     skippable: !inputs.hasMoodTodayLog,
-  });
+  };
+  if (day !== 0) steps.push(moodStep);
 
   // ── Hero by day ────────────────────────────────────────────────────
   if (day === 0) {
-    // Day 1 — primary signature
+    // Day 1 — primary signature FIRST, then mood (spec: signature is the hero).
     const sig = primary ? signatureStepForDoor(primary, inputs) : null;
     if (sig) steps.push(sig);
+    steps.push(moodStep);
     steps.push(buildResetStep(inputs));
   } else if (day === 1) {
     // Day 2 — secondary signature + primary booster + continue routine + check in

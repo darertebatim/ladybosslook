@@ -52,11 +52,12 @@ const doorSignatures = [
 ];
 
 const day1Flow = [
-  { emoji: "🚪", title: "Primary door signature step", meta: "Hero — door-flavored (see table above)", kind: "door_signature", isNew: true },
-  { emoji: "💛", title: "Mood check-in", meta: "Same as Standard Flow — tags downstream steps", kind: "mood", isNew: true },
+  { emoji: "🚪", title: "Primary door signature step", meta: "Hero — door-flavored (see table above) · FIRST on Day 1", kind: "door_signature", isNew: true },
+  { emoji: "💛", title: "Mood check-in", meta: "Right after the signature — tags downstream steps", kind: "mood", isNew: true },
   { emoji: "🌬️", title: "Check In (door-flavored)", meta: "See Vocabulary card above", kind: "reset", isNew: true },
   { emoji: "✨", title: "Browse routines (pick your first)", meta: "Always shown on Day 1", kind: "routine" },
   { emoji: "🧠", title: "Self-Care Personality Quiz teaser", meta: "Injected if Self-Care isn't a chosen door & quiz not done · skippable", kind: "quiz_pick", isNew: true },
+  { emoji: "🎧", title: "Secondary audio (extra)", meta: "Low-commitment second pick · Day 1 only · skippable", kind: "playlist", isNew: true },
   { emoji: "🏆", title: "+1 day streak & a new affirmation", meta: "Always last", kind: "reward" },
 ];
 
@@ -145,6 +146,8 @@ const emotionTagMap = [
 const standardFlow = [
   { emoji: "💛", title: "Mood check-in", meta: "1 min · pick your mood", kind: "mood" },
   { emoji: "🎧", title: "Today's playlist (ready to play)", meta: "Language match → sort_order", kind: "playlist" },
+  { emoji: "🎧", title: "Secondary audio (extra)", meta: "A second playlist/track when available · skippable", kind: "playlist", isNew: true },
+  { emoji: "🔒", title: "Plus locked teaser", meta: "Shown to non-Plus users when a locked Plus playlist is available · skippable", kind: "playlist", isNew: true },
   { emoji: "🌬️", title: "Check In", meta: "See Vocabulary card above (Day 4+: no door flavor, generic pool)", kind: "reset", isNew: true },
   { emoji: "🔥", title: "Open your Planner (first active routine)", meta: "Quiz outcome already provisioned the routine — navigates to /app/home", kind: "routine" },
   { emoji: "🏆", title: "+1 day streak & a new affirmation", meta: "Reward (always last, never skippable)", kind: "reward" },
