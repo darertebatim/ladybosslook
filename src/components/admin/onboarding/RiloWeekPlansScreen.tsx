@@ -416,7 +416,7 @@ export function RiloWeekPlansScreen({ step, onNext, onAnswer }: Props) {
                 onChange={(e) => setText(e.target.value)}
                 placeholder="Write or speak your plans"
                 rows={4}
-                className="w-full rounded-2xl bg-white/70 backdrop-blur-sm border border-white/60 px-4 py-3.5 pr-14 text-[15px] text-[#1a1f3d] placeholder:text-[#1a1f3d]/40 outline-none focus:bg-white/90 transition-colors resize-none"
+                className="w-full rounded-2xl bg-white/92 border border-white/60 px-4 py-3.5 pr-14 text-[15px] text-[#1a1f3d] placeholder:text-[#1a1f3d]/40 outline-none focus:bg-white/90 transition-colors resize-none"
               />
               <button
                 type="button"
