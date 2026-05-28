@@ -17,7 +17,7 @@ const doorSignatures = [
     door: "selfcare",
     emoji: "🧠",
     label: "Self-Care",
-    signature: "Self-Care Personality Quiz → personalized Check In",
+    signature: "Self-Care Personality Quiz → personalized Check In (audio slot picks playlist tagged Path role = Primary + Self-care subject, language-matched — e.g. Self Care Reset EN/FA)",
     secondarySignature: "Pick Self-Care Goals (/app/tasksbank) → seeds My Rilo Self Care",
     deeper: "Open today's Check In (door-flavored)",
   },
@@ -25,8 +25,8 @@ const doorSignatures = [
     door: "immigrant",
     emoji: "🌍",
     label: "Immigrant / Bilingual",
-    signature: "Open Bilingual Strength playlist + immigrant-tagged sleep story",
-    deeper: "Continue the bilingual series · another immigrant-tagged sleep story",
+    signature: "Playlist tagged Path role = Primary + Immigrant theme (language-matched — e.g. Bilingual Strength EN/FA) + immigrant-tagged sleep story",
+    deeper: "Next playlist in the same Primary + Immigrant pool · another immigrant-tagged sleep story",
   },
   {
     door: "productivity",
@@ -34,7 +34,7 @@ const doorSignatures = [
     label: "Productivity",
     signature: "Open Planner → Rilo Planner Onboarding → pick first routine",
     deeper: "Plan tomorrow · 1 quick routine task",
-    secondaryAudio: "Wellness Planning playlist (offered in the Secondary audio slot)",
+    secondaryAudio: "Playlist tagged Path role = Primary + Productivity (language-matched — e.g. Wellness Planning) — offered in the Secondary audio slot",
   },
   {
     door: "emotion",
@@ -115,9 +115,9 @@ const scenarios = [
   {
     name: "B · Immigrant + Productivity",
     days: [
-      "Day 1: Bilingual Strength playlist → immigrant-tagged sleep story → Browse routines → Planner Onboarding teaser (productivity is secondary, so it still gets seeded)",
+      "Day 1: Primary+Immigrant playlist (language-matched, e.g. Bilingual Strength EN/FA) → immigrant-tagged sleep story → Browse routines → Planner Onboarding teaser (productivity is secondary, so it still gets seeded)",
       "Day 2: Planner Onboarding + pick first routine (secondary signature) → another immigrant-tagged sleep story (primary deeper) → Check In (bilingual if available, else generic)",
-      "Day 3: Routine first → 'Plan tomorrow' (secondary deeper) → bilingual playlist → Check In (bilingual if available, else generic)",
+      "Day 3: Routine first → 'Plan tomorrow' (secondary deeper) → Primary+Immigrant playlist (language-matched) → Check In (bilingual if available, else generic)",
     ],
   },
   {
