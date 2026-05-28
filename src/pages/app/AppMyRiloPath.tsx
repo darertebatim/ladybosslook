@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight, Headset } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import {
@@ -25,6 +25,7 @@ import {
 } from "@/hooks/useMyRiloPathTrophies";
 import { PromoBanner } from "@/components/app/PromoBanner";
 import { HomeBanner } from "@/components/app/HomeBanner";
+import { HomeMenu } from "@/components/app/HomeMenu";
 
 // ── Orange Palette (mirrors /admin/brand/mock) ──
 const O = {
@@ -471,14 +472,20 @@ export default function AppMyRiloPath() {
             paddingTop: "calc(env(safe-area-inset-top, 0px) + 12px)",
           }}
         >
-          <button
-            onClick={goBack}
-            className="p-1.5 -ml-1 active:scale-95"
-            style={{ color: O.fg }}
-            aria-label="Back"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-1 -ml-1" style={{ color: O.fg }}>
+            <HomeMenu />
+            <button
+              onClick={() => {
+                haptic.light();
+                navigate('/app/chat');
+              }}
+              className="p-2 -ml-1 active:scale-95 transition-transform"
+              style={{ color: O.fg }}
+              aria-label="Support"
+            >
+              <Headset className="h-5 w-5" />
+            </button>
+          </div>
           <div className="text-center text-[15px] font-bold tracking-tight" style={{ color: O.fg }}>
             My Rilo
           </div>
