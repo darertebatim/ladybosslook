@@ -241,7 +241,7 @@ export function DoorCardsGlassScreen({
               onClick={() => handlePick(d.key)}
               className={cn(
                 'relative w-full text-left rounded-[22px] p-4 pr-5',
-                'bg-white/55 backdrop-blur-2xl',
+                'bg-white/90',
                 'border border-white/70',
                 'shadow-ios active:scale-[0.985] transition-all'
               )}
@@ -514,7 +514,7 @@ export function DoorSelfcareOffersScreen({
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="rounded-[22px] bg-white/55 backdrop-blur-2xl border border-white/70 shadow-ios p-5"
+          className="rounded-[22px] bg-white/90 border border-white/70 shadow-ios p-5"
         >
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 rounded-2xl bg-emerald-100/80 flex items-center justify-center">
@@ -547,7 +547,7 @@ export function DoorSelfcareOffersScreen({
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="rounded-[22px] bg-white/55 backdrop-blur-2xl border border-white/70 shadow-ios p-5"
+          className="rounded-[22px] bg-white/90 border border-white/70 shadow-ios p-5"
         >
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 rounded-2xl bg-violet-100/80 flex items-center justify-center">
@@ -766,7 +766,7 @@ export function MeetRiloIntroScreen({
                 c.bg,
               )}
             >
-              <div className="w-12 h-12 rounded-2xl bg-white/70 backdrop-blur-xl flex items-center justify-center shadow-ios">
+              <div className="w-12 h-12 rounded-2xl bg-white/92 flex items-center justify-center shadow-ios">
                 <FluentEmoji emoji={c.emoji} size={28} />
               </div>
               <div>
@@ -785,7 +785,7 @@ export function MeetRiloIntroScreen({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.95, duration: 0.4 }}
-            className="absolute left-1/2 -translate-x-1/2 bottom-0 px-4 py-2 rounded-full bg-white/85 backdrop-blur-xl border border-white/80 shadow-ios"
+            className="absolute left-1/2 -translate-x-1/2 bottom-0 px-4 py-2 rounded-full bg-white/95 border border-white/80 shadow-ios"
           >
             <p className="text-[12px] font-semibold text-[#2A1810]">
               <span className="text-[#EB5E33]">+ 200 sessions</span> in your language
@@ -950,7 +950,7 @@ export function DoorNicknameScreen({
         transition={{ delay: 0.15, duration: 0.5 }}
         className="flex-1"
       >
-        <div className="rounded-[22px] bg-white/55 backdrop-blur-2xl border border-white/70 shadow-ios p-4">
+        <div className="rounded-[22px] bg-white/90 border border-white/70 shadow-ios p-4">
           <input
             autoFocus
             type="text"
@@ -1151,7 +1151,7 @@ export function RiloDoorsLoaderScreen({
                     'bg-gradient-to-br', c.bg,
                   )}
                 >
-                  <div className="w-10 h-10 rounded-2xl bg-white/70 backdrop-blur-xl flex items-center justify-center shadow-ios">
+                  <div className="w-10 h-10 rounded-2xl bg-white/92 flex items-center justify-center shadow-ios">
                     <FluentEmoji emoji={c.emoji} size={22} />
                   </div>
                   <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#2A1810]/80 leading-tight">
@@ -1217,10 +1217,10 @@ export function RiloDoorsLoaderScreen({
                   className="flex items-center gap-3 w-[260px]"
                   style={{ transform: `translateX(${i % 2 === 0 ? -20 : 20}px)` }}
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-white/85 backdrop-blur-xl flex items-center justify-center shadow-ios border border-white/80">
+                  <div className="w-12 h-12 rounded-2xl bg-white/95 flex items-center justify-center shadow-ios border border-white/80">
                     <FluentEmoji emoji={s.emoji} size={26} />
                   </div>
-                  <div className="flex-1 px-4 py-2.5 rounded-2xl bg-white/70 backdrop-blur-xl border border-white/70 shadow-ios">
+                  <div className="flex-1 px-4 py-2.5 rounded-2xl bg-white/92 border border-white/70 shadow-ios">
                     <p className="text-[13.5px] font-bold text-[#2A1810]">{s.label}</p>
                   </div>
                 </motion.div>

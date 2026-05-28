@@ -570,7 +570,7 @@ function SuggestVisual() {
         initial={{ opacity: 0, y: 14, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-        className="relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-[0_24px_70px_-20px_rgba(26,31,61,0.3)] p-5 border border-white/80"
+        className="relative bg-white/95 rounded-3xl shadow-[0_24px_70px_-20px_rgba(26,31,61,0.3)] p-5 border border-white/80"
       >
         {/* Card header */}
         <div className="flex items-center justify-between mb-4">
