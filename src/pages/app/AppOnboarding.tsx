@@ -260,6 +260,10 @@ export default function AppOnboarding() {
       } else if (flowId === 'rilo-doors') {
         // Persist preferred language + (optional) UI language switch
         try {
+          // Rilo Doors is the primary onboarding — suppress the legacy
+          // "What is Rilo?" planner intro so visiting /app/home later
+          // doesn't feel like a second onboarding.
+          localStorage.setItem('simora_onboarding_planner_intro_dismissed', 'true');
           const lang = answers['rd-language'];
           const langStr = Array.isArray(lang) ? lang[0] : lang;
           const langIso = langStr ? (LANG_LABEL_TO_ISO[String(langStr)] || String(langStr).toLowerCase()) : '';
@@ -294,6 +298,16 @@ export default function AppOnboarding() {
 
   const handleClose = () => {
     if (flowId) Analytics.onboardingSkipped(flowId, currentStep);
+    // Skipping Rilo Doors should land on My Rilo (the post-onboarding home),
+    // NOT /app/home — which would auto-launch the "What is Rilo?" planner
+    // intro and feel like a second onboarding.
+    if (flowId === 'rilo-doors') {
+      try {
+        localStorage.setItem('simora_onboarding_planner_intro_dismissed', 'true');
+      } catch {}
+      navigate('/app/my-rilo');
+      return;
+    }
     navigate('/app/home');
   };
 
