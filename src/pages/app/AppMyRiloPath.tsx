@@ -424,8 +424,8 @@ export default function AppMyRiloPath() {
 
   const handleSnooze = (step: PathStep) => {
     haptic.light();
-    snooze.mutate({ step, minutes: 15 });
-    toast({ title: "Snoozed 15 min", description: "Rilo will bring this back later." });
+    snooze.mutate({ step });
+    toast({ title: "Snoozed", description: "Moved to the end of today's path." });
   };
 
   const handlePickSwap = (target: PathStep) => {
