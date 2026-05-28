@@ -404,6 +404,9 @@ export default function MyRiloEngine() {
                     <div className="text-xs mt-0.5"><span className="text-muted-foreground">Secondary signature:</span> {(d as any).secondarySignature}</div>
                   )}
                   <div className="text-xs mt-0.5"><span className="text-muted-foreground">Deeper:</span> {d.deeper}</div>
+                  {(d as any).secondaryAudio && (
+                    <div className="text-xs mt-0.5"><span className="text-muted-foreground">Secondary audio:</span> {(d as any).secondaryAudio}</div>
+                  )}
                 </div>
               </div>
             ))}
