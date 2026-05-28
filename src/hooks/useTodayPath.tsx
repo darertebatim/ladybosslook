@@ -131,6 +131,17 @@ export function useTodayPath() {
           .limit(1),
       ]);
 
+      // Personality quiz completion is tracked separately so the path
+      // can mark the "Take the Self-Care Personality Quiz" step as done.
+      const personalityRes = await supabase
+        .from("selfcare_personality_results")
+        .select("id")
+        .eq("user_id", userId)
+        .order("taken_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const hasPersonalityResult = !!personalityRes.data;
+
       // ── Rilo Doors context ─────────────────────────────────────────────
       // Latest answer per step_id (rows are returned newest-first).
       const doorAnswers: Record<string, string[]> = {};
