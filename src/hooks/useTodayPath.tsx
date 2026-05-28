@@ -601,11 +601,18 @@ export function useTodayPath() {
       const snoozedActive = new Set<string>();
       const swapMap = new Map<string, string>(); // original id -> swap_target id
       const skipTomorrowToday = new Set<string>();
+      // Steps deferred today via "Snooze later" — moved to end of list, not hidden.
+      const deferredToday = new Set<string>();
 
       for (const a of actions) {
         const id = `${a.step_kind}:${a.step_ref}`;
-        if (a.action === "snooze" && a.effective_until && a.effective_until > nowIso) {
-          snoozedActive.add(id);
+        if (a.action === "snooze") {
+          // New semantics: snooze = defer to end of list for today.
+          // Honor any snooze action created today (ignore stale rows from
+          // previous days, regardless of effective_until format).
+          if (a.created_at.slice(0, 10) === today) {
+            deferredToday.add(id);
+          }
         } else if (a.action === "swap") {
           // Only honor swaps created today
           if (a.created_at.slice(0, 10) === today && a.swap_target) {
@@ -621,7 +628,6 @@ export function useTodayPath() {
 
       const dismissedIds = new Set<string>([
         ...dismissed,
-        ...snoozedActive,
         ...skipTomorrowToday,
       ]);
 
@@ -666,6 +672,21 @@ export function useTodayPath() {
           }
           return s;
         });
+      }
+
+      // Apply "Snooze later" deferrals: move matched steps to the end of the
+      // list (but keep the reward step pinned as the absolute last item).
+      if (deferredToday.size > 0) {
+        const kept: typeof steps = [];
+        const deferred: typeof steps = [];
+        let reward: (typeof steps)[number] | null = null;
+        for (const s of steps) {
+          if (s.kind === "reward") { reward = s; continue; }
+          if (deferredToday.has(s.id)) deferred.push(s);
+          else kept.push(s);
+        }
+        steps = [...kept, ...deferred];
+        if (reward) steps.push(reward);
       }
 
       // ── Mark path steps as done from activity tables ──────────────────
@@ -828,15 +849,17 @@ export function useSkipPathStep() {
   });
 }
 
-/** Snooze a step for N minutes (default 15). */
+/** "Snooze later": defer a step to the end of today's list (no timer). */
 export function useSnoozePathStep() {
   const { user } = useAuth();
   const today = getLocalDateStr();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ step, minutes = 15 }: { step: PathStep; minutes?: number }) => {
+    mutationFn: async ({ step }: { step: PathStep; minutes?: number }) => {
       if (!user?.id) throw new Error("Not authenticated");
-      const until = new Date(Date.now() + minutes * 60_000).toISOString();
+      // Persist for the rest of today; the path builder filters by created_at
+      // date, so any same-day "snooze" row is treated as "move to end".
+      const until = endOfDay(new Date()).toISOString();
       const { error } = await supabase.from("path_step_actions").insert({
         user_id: user.id,
         action: "snooze",

@@ -285,7 +285,7 @@ function PathHero({
                 className="text-[11.5px] font-semibold active:scale-95"
                 style={{ color: "#6B4D33" }}
               >
-                Snooze 15m
+                Snooze later
               </button>
               <div className="w-px h-3" style={{ background: "rgba(0,0,0,0.10)" }} />
               <button
@@ -424,8 +424,8 @@ export default function AppMyRiloPath() {
 
   const handleSnooze = (step: PathStep) => {
     haptic.light();
-    snooze.mutate({ step, minutes: 15 });
-    toast({ title: "Snoozed 15 min", description: "Rilo will bring this back later." });
+    snooze.mutate({ step });
+    toast({ title: "Snoozed", description: "Moved to the end of today's path." });
   };
 
   const handlePickSwap = (target: PathStep) => {
