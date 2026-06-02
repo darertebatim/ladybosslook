@@ -6130,6 +6130,14 @@ export type Database = {
       claim_dedication: { Args: { t: string }; Returns: Json }
       claim_playlist_gift: { Args: { t: string }; Returns: Json }
       create_playlist_gift: { Args: { p_playlist_id: string }; Returns: Json }
+      find_profile_by_code: {
+        Args: { _code: string }
+        Returns: {
+          friend_code: string
+          full_name: string
+          id: string
+        }[]
+      }
       generate_dedication_token: { Args: never; Returns: string }
       generate_friend_code: { Args: never; Returns: string }
       generate_playlist_gift_token: { Args: never; Returns: string }
@@ -6173,6 +6181,15 @@ export type Database = {
       get_program_events_for_date: {
         Args: { p_date_str: string; p_user_id: string }
         Returns: Json
+      }
+      get_safe_profiles: {
+        Args: { _ids: string[] }
+        Returns: {
+          avatar_url: string
+          friend_code: string
+          full_name: string
+          id: string
+        }[]
       }
       get_scheduled_feed_posts: {
         Args: never
