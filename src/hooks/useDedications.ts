@@ -43,7 +43,7 @@ export function useReceivedDedications() {
       const senderIds = Array.from(new Set(rows.map((r) => r.sender_id)));
       const [{ data: moments }, { data: senders }] = await Promise.all([
         supabase.from("user_moments" as any).select("*").in("id", momentIds),
-        supabase.from("profiles").select("id, full_name, avatar_url, friend_code").in("id", senderIds),
+        supabase.rpc("get_safe_profiles" as any, { _ids: senderIds }),
       ]);
       const mMap = new Map<string, UserMoment>();
       (moments ?? []).forEach((m: any) => mMap.set(m.id, m as UserMoment));
