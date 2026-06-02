@@ -44,9 +44,7 @@ export function useFriendships() {
       ));
       if (otherIds.length === 0) return [];
       const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, full_name, avatar_url, friend_code")
-        .in("id", otherIds);
+        .rpc("get_safe_profiles" as any, { _ids: otherIds });
       const map = new Map<string, FriendProfile>();
       (profiles ?? []).forEach((p: any) => map.set(p.id, p));
       return friendships.map((f) => ({
@@ -86,11 +84,9 @@ export function useSendFriendRequest() {
       const code = rawCode.trim().toUpperCase();
       if (!code) throw new Error("Enter a friend code");
 
-      const { data: target } = await supabase
-        .from("profiles")
-        .select("id, full_name, friend_code")
-        .eq("friend_code", code)
-        .maybeSingle();
+      const { data: matches } = await supabase
+        .rpc("find_profile_by_code" as any, { _code: code });
+      const target = Array.isArray(matches) ? matches[0] : matches;
       if (!target) throw new Error("No one found with that code");
       if ((target as any).id === user.id) throw new Error("That's your own code");
 
