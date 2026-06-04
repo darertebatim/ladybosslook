@@ -544,7 +544,10 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
     skippable: !inputs.hasMoodTodayLog,
   });
 
-  // After mood: a ready-to-play playlist (priority placement).
+  // After mood: the daily Check In (breath or reflection).
+  steps.push(buildResetStep(inputs));
+
+  // Then a ready-to-play playlist.
   if (inputs.featuredAudio) {
     const a = inputs.featuredAudio;
     const isTrack = a.kind === "track";
@@ -582,8 +585,6 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
       coverImageUrl: a.coverImageUrl ?? null,
     });
   }
-
-  steps.push(buildResetStep(inputs));
 
   // Show only the first active routine — it points to the Planner where
   // the user follows their day. Keeps the path short and focused.
