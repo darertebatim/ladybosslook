@@ -326,23 +326,37 @@ function SectionDivider({ label, color }: { label: string; color: string }) {
 }
 
 function RewardRow({ step }: { step: PathStep }) {
+  const done = !!step.done;
   return (
     <div className="relative pl-[60px] mt-4">
       <div
         className="absolute left-[22px] top-3 w-[26px] h-[26px] rounded-full flex items-center justify-center"
-        style={{ background: "#fff", border: `2px dashed ${O.primary}` }}
+        style={
+          done
+            ? { background: "#10b981", border: "2px solid #10b981" }
+            : { background: "#fff", border: `2px dashed ${O.primary}` }
+        }
       >
-        <FluentEmoji emoji="🏆" size={14} />
+        {done ? (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+        ) : (
+          <FluentEmoji emoji="🏆" size={14} />
+        )}
       </div>
       <div
         className="rounded-2xl p-3 flex items-center gap-2.5"
         style={{
           background: O.bg,
-          border: `1px dashed ${O.peachMid}`,
+          border: done ? `1px solid ${O.peachMid}` : `1px dashed ${O.peachMid}`,
+          opacity: done ? 0.75 : 1,
         }}
       >
         <div className="flex-1 text-[12px] leading-snug" style={{ color: O.fg }}>
-          Finish the path → <strong>{step.title}</strong> 🧡
+          {done ? (
+            <>Path complete · <strong>{step.title}</strong> earned 🏆</>
+          ) : (
+            <>Finish the path → <strong>{step.title}</strong> 🧡</>
+          )}
         </div>
       </div>
     </div>
