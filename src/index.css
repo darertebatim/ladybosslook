@@ -65,7 +65,6 @@ html.native-app [data-scroll-container="true"] {
   min-height: 100%;
   width: 100%;
   animation: slide-up-page-enter 320ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
 }
 
 .slide-up-page--closing {
