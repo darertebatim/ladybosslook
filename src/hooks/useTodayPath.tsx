@@ -851,6 +851,11 @@ export function useTodayPath() {
       if (frozenPlan) {
         // Reuse today's locked plan so suggestions stay stable through the day.
         steps = frozenPlan;
+        // Dismissals (skip / skip-tomorrow) are applied AFTER restoring the
+        // snapshot so same-day skips still remove the step from view.
+        if (dismissedIds.size > 0) {
+          steps = steps.filter((s) => !dismissedIds.has(`${s.kind}:${s.ref}`));
+        }
       } else {
         steps =
           remainingPool === 0
