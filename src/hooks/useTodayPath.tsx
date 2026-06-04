@@ -1002,9 +1002,14 @@ export function useTodayPath() {
         return done ? { ...s, done: true } : s;
       });
 
-      // Reward auto-completes when every other step is done.
+      // Reward auto-completes when every REQUIRED non-reward step is done.
+      // Skippable extras (secondary audio, Plus teaser, etc.) don't block the
+      // trophy — otherwise the path feels like "unfinished business" even
+      // after the user finishes the core list.
       const nonReward = steps.filter((s) => s.kind !== "reward");
-      const allDone = nonReward.length > 0 && nonReward.every((s) => s.done);
+      const required = nonReward.filter((s) => !s.skippable);
+      const gating = required.length > 0 ? required : nonReward;
+      const allDone = gating.length > 0 && gating.every((s) => s.done);
       if (allDone) {
         steps = steps.map((s) => (s.kind === "reward" ? { ...s, done: true } : s));
       }
