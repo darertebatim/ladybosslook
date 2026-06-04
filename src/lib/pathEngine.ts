@@ -164,6 +164,20 @@ export interface PathInputs {
     emoji: string | null;
     category?: string | null;
   } | null;
+  /** Real breathing exercises (from DB) usable as Swap alternates. */
+  breathAlternates?: Array<{
+    id: string;
+    title: string;
+    emoji: string | null;
+    category?: string | null;
+  }>;
+  /** Real reflections (from DB) usable as Swap alternates. */
+  reflectionAlternates?: Array<{
+    id: string;
+    title: string;
+    emoji: string | null;
+    category?: string | null;
+  }>;
   /** Rilo Doors onboarding picks. When `primary` is set, the door-aware
    *  builder runs instead of the legacy buildStandardPath. */
   doorContext?: {
