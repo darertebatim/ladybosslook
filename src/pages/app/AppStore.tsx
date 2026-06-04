@@ -495,6 +495,8 @@ const AppStore = () => {
                 </div>
               </section>
             )}
+            {/* Self-Care Quiz Banner - directly under Tools row */}
+            <SelfCareQuizBanner className="mb-2" />
             {/* Playlists — combined audio rail (meditate + soundscape + audiobook + podcast) */}
             {!searchQuery && allListenPlaylists.length > 0 && (
               <section>
@@ -686,9 +688,6 @@ const AppStore = () => {
 
             {/* My Shortcuts — temporarily hidden, will be restored later */}
             {false && !searchQuery && <ToolShortcuts />}
-
-            {/* Self-Care Quiz Banner - Under Tools */}
-            <SelfCareQuizBanner className="mb-2" />
 
             {/* Promo Banner - Under Tools */}
             <PromoBanner location="explore_tools" className="mb-2" />
