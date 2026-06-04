@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight, Headset } from "lucide-react";
+import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight, Headset, Trophy } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import {
@@ -503,45 +503,41 @@ export default function AppMyRiloPath() {
           <div className="text-center text-[15px] font-bold tracking-tight" style={{ color: O.fg }}>
             My Rilo
           </div>
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => {
-                haptic.light();
-                navigate("/app/presence");
-              }}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-full active:scale-95 transition-transform"
-              style={{
-                background: "#FFFFFF",
-                color: O.primary,
-                border: `1px solid ${O.border}`,
-                boxShadow: "0 2px 8px rgba(235,94,51,0.18)",
-              }}
-              aria-label={`Path trophies: ${trophyCount}`}
+          <button
+            type="button"
+            onClick={() => {
+              haptic.light();
+              navigate("/app/presence");
+            }}
+            className="flex items-center p-0.5 rounded-full active:scale-95 transition-transform"
+            style={{
+              background: "#FFFFFF",
+              border: `1px solid ${O.border}`,
+              boxShadow: "0 2px 8px rgba(235,94,51,0.18)",
+            }}
+            aria-label={`Trophies: ${trophyCount} · Streak: ${streak} days · open Presence`}
+          >
+            <span
+              className="flex items-center gap-1 pl-2 pr-2.5 py-0.5"
+              style={{ color: O.primary }}
             >
-              <span className="text-[13px] leading-none">🏆</span>
+              <Trophy className="w-3.5 h-3.5 fill-current" />
               <span className="text-[13px] font-bold" style={{ color: O.fg }}>
                 {trophyCount}
               </span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                haptic.light();
-                navigate("/app/presence");
-              }}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-full active:scale-95 transition-transform"
+            </span>
+            <span
+              className="flex items-center gap-1 pl-2 pr-2.5 py-1 rounded-full"
               style={{
                 background: `linear-gradient(135deg, ${O.primaryL}, ${O.primary})`,
                 color: "#fff",
                 boxShadow: "0 2px 8px rgba(235,94,51,0.35)",
               }}
-              aria-label={`Streak: ${streak} days · open Presence`}
             >
               <Flame className="w-3.5 h-3.5 fill-current" />
               <span className="text-[13px] font-bold">{streak}</span>
-            </button>
-          </div>
+            </span>
+          </button>
         </div>
 
         <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
