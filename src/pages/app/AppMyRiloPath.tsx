@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight, Headset, Trophy } from "lucide-react";
+import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight, Headset, Award } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import {
@@ -521,7 +521,7 @@ export default function AppMyRiloPath() {
               className="flex items-center gap-1 pl-2 pr-2.5 py-0.5"
               style={{ color: O.primary }}
             >
-              <Trophy className="w-3.5 h-3.5 fill-current" />
+              <Award className="w-4 h-4" strokeWidth={2.25} />
               <span className="text-[13px] font-bold" style={{ color: O.fg }}>
                 {trophyCount}
               </span>
