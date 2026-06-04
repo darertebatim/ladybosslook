@@ -60,6 +60,44 @@ export function markStepTapped(stepId: string, day: string = getLocalDateStr()) 
   } catch {}
 }
 
+/**
+ * Daily plan lock. Once today's path is built for the first time, snapshot the
+ * step list (sans `done`) so subsequent loads in the same day reuse the same
+ * suggestions — the user sees a stable "today's list" instead of a hero
+ * playlist that mutates as they listen. Same-day swaps, snoozes, dismissals,
+ * and completion marking are still applied on top.
+ */
+const planStorageKey = (userId: string, day: string) =>
+  `simora_path_plan_${userId}_${day}`;
+
+function readFrozenPlan(userId: string, day: string): PathStep[] | null {
+  try {
+    const raw = localStorage.getItem(planStorageKey(userId, day));
+    if (!raw) return null;
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr) || arr.length === 0) return null;
+    return arr.map((s: any) => ({ ...s, done: false })) as PathStep[];
+  } catch {
+    return null;
+  }
+}
+
+function writeFrozenPlan(userId: string, day: string, steps: PathStep[]) {
+  try {
+    // Strip `done` — completion is recomputed live each load.
+    const stripped = steps.map(({ done, ...rest }: any) => rest);
+    localStorage.setItem(planStorageKey(userId, day), JSON.stringify(stripped));
+    // Purge previous days' plan snapshots to avoid unbounded growth.
+    const prefix = `simora_path_plan_${userId}_`;
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(prefix) && k !== planStorageKey(userId, day)) {
+        localStorage.removeItem(k);
+      }
+    }
+  } catch {}
+}
+
 export function useTodayPath() {
   const { user } = useAuth();
   const preferredLanguage = useUserPreferredLanguage();
@@ -800,12 +838,21 @@ export function useTodayPath() {
       //   • 0 left             → pure Standard Flow
       // Skipped-door users still get the pool (via "exploring" door above).
       const remainingPool = countRemainingPoolSlots(inputs);
-      let steps =
-        remainingPool === 0
-          ? buildStandardPath(inputs)
-          : remainingPool < 4
-            ? buildHybridPath(inputs)
-            : buildStarterPoolPath(inputs);
+      let steps: PathStep[];
+      const frozenPlan = readFrozenPlan(userId, today);
+      if (frozenPlan) {
+        // Reuse today's locked plan so suggestions stay stable through the day.
+        steps = frozenPlan;
+      } else {
+        steps =
+          remainingPool === 0
+            ? buildStandardPath(inputs)
+            : remainingPool < 4
+              ? buildHybridPath(inputs)
+              : buildStarterPoolPath(inputs);
+        // Freeze the freshly-built plan for the rest of today.
+        writeFrozenPlan(userId, today, steps);
+      }
 
       // Apply swaps: replace step with its swap_target from the candidate pool
       if (swapMap.size > 0) {
