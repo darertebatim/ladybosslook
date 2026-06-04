@@ -333,12 +333,12 @@ function RewardRow({ step }: { step: PathStep }) {
         className="absolute left-[22px] top-3 w-[26px] h-[26px] rounded-full flex items-center justify-center"
         style={
           done
-            ? { background: "#10b981", border: "2px solid #10b981" }
+            ? { background: "#DCFCE7", border: `2px solid ${O.success}` }
             : { background: "#fff", border: `2px dashed ${O.primary}` }
         }
       >
         {done ? (
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+          <Check className="w-3 h-3" style={{ color: O.success, strokeWidth: 3 }} />
         ) : (
           <FluentEmoji emoji="🏆" size={14} />
         )}
