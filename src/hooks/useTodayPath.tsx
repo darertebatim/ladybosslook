@@ -838,12 +838,21 @@ export function useTodayPath() {
       //   • 0 left             → pure Standard Flow
       // Skipped-door users still get the pool (via "exploring" door above).
       const remainingPool = countRemainingPoolSlots(inputs);
-      let steps =
-        remainingPool === 0
-          ? buildStandardPath(inputs)
-          : remainingPool < 4
-            ? buildHybridPath(inputs)
-            : buildStarterPoolPath(inputs);
+      let steps: PathStep[];
+      const frozenPlan = readFrozenPlan(userId, today);
+      if (frozenPlan) {
+        // Reuse today's locked plan so suggestions stay stable through the day.
+        steps = frozenPlan;
+      } else {
+        steps =
+          remainingPool === 0
+            ? buildStandardPath(inputs)
+            : remainingPool < 4
+              ? buildHybridPath(inputs)
+              : buildStarterPoolPath(inputs);
+        // Freeze the freshly-built plan for the rest of today.
+        writeFrozenPlan(userId, today, steps);
+      }
 
       // Apply swaps: replace step with its swap_target from the candidate pool
       if (swapMap.size > 0) {
