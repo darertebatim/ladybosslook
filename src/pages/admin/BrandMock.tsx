@@ -210,12 +210,37 @@ export default function BrandMock() {
   const fgMuted = darkMode ? '#BFA08A' : O.fgMuted;
   const border = darkMode ? '#3D2A1A' : O.border;
 
+  const BrandTabs = () => (
+    <div className="flex gap-1 bg-muted rounded-lg p-1 w-fit">
+      <NavLink
+        to="/admin/brand"
+        end
+        className={({ isActive }) =>
+          `px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${isActive ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`
+        }
+      >
+        Design System
+      </NavLink>
+      <NavLink
+        to="/admin/brand/mock"
+        className={({ isActive }) =>
+          `px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${isActive ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`
+        }
+      >
+        Mock
+      </NavLink>
+    </div>
+  );
+
   return (
     <div className="p-6 max-w-5xl space-y-8">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">🍊 Orange Theme Mock</h1>
           <p className="text-muted-foreground text-sm mt-1">Creative home screen concept using the App Orange Palette</p>
+          <div className="mt-4">
+            <BrandTabs />
+          </div>
         </div>
         <button
           onClick={() => setDarkMode(!darkMode)}
