@@ -478,8 +478,16 @@ export function useTodayPath() {
         kind: "breath" | "reflection"; id: string; title: string;
         emoji: string | null; category: string | null;
       } | null = null;
-      const breathPool = flavoredBreaths.length > 0 ? flavoredBreaths : (breaths as any[]);
-      const reflectionPool = flavoredReflections.length > 0 ? flavoredReflections : (reflections as any[]);
+      // Non-emotion-door users get a Check In from the GENERIC pool only —
+      // emotion-based content is reserved for the emotion/immigrant doors.
+      const genericBreaths = (breaths as any[]).filter((b) => b.category !== "emotion-based");
+      const genericReflections = (reflections as any[]).filter((r) => r.category !== "emotion-based");
+      const breathPool = flavoredBreaths.length > 0
+        ? flavoredBreaths
+        : (genericBreaths.length > 0 ? genericBreaths : (breaths as any[]));
+      const reflectionPool = flavoredReflections.length > 0
+        ? flavoredReflections
+        : (genericReflections.length > 0 ? genericReflections : (reflections as any[]));
       if (useBreath && breathPool.length > 0) {
         const b = breathPool[seed % breathPool.length];
         featuredReset = { kind: "breath", id: b.id, title: b.name, emoji: b.emoji, category: b.category };
