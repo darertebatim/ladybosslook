@@ -189,7 +189,9 @@ const NativeAppLayout = () => {
   // Pages that manage their own scroll container (need overflow-hidden on main)
   const isOwnScrollPage =
     location.pathname === '/app/projects'
-    || location.pathname === '/app/my-rilo';
+    || location.pathname === '/app/my-rilo'
+    || location.pathname === '/app/breathe'
+    || location.pathname === '/app/hub';
 
   const navItems = [
     { path: '/app/my-rilo', icon: Route, label: t('nav.myRilo'), tourClass: 'tour-nav-my-rilo' },

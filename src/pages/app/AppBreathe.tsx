@@ -149,7 +149,7 @@ export default function AppBreathe() {
         description="Breathing exercises for relaxation and focus"
       />
 
-      <div className="min-h-0 bg-background">
+      <div className="h-full min-h-0 bg-background flex flex-col overflow-hidden">
         {/* Header */}
         <AppHeader
           title={t("tools.breathe.title")}
@@ -182,69 +182,74 @@ export default function AppBreathe() {
             </div>
           }
         />
-        <AppHeaderSpacer />
+        <div
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain"
+          style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-y" }}
+        >
+          <AppHeaderSpacer />
 
-        {/* Category pills */}
-        <div className="px-4 pt-2 pb-3">
-          <div
-            className="flex gap-2 overflow-x-auto no-scrollbar"
-            style={{
-              WebkitOverflowScrolling: "touch",
-              touchAction: "pan-x",
-            }}
-          >
-            {BREATHING_CATEGORIES.map((cat) => (
-              <button
-                key={cat.value}
-                onClick={() => handleCategoryClick(cat.value)}
-                className={cn(
-                  "px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0",
-                  selectedCategory === cat.value
-                    ? "bg-primary text-primary-foreground shadow-ios"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80",
-                )}
-              >
-                {cat.emoji} {cat.label}
-              </button>
-            ))}
+          {/* Category pills */}
+          <div className="px-4 pt-2 pb-3">
+            <div
+              className="flex gap-2 overflow-x-auto no-scrollbar"
+              style={{
+                WebkitOverflowScrolling: "touch",
+                touchAction: "pan-x",
+              }}
+            >
+              {BREATHING_CATEGORIES.map((cat) => (
+                <button
+                  key={cat.value}
+                  onClick={() => handleCategoryClick(cat.value)}
+                  className={cn(
+                    "px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0",
+                    selectedCategory === cat.value
+                      ? "bg-primary text-primary-foreground shadow-ios"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80",
+                  )}
+                >
+                  {cat.emoji} {cat.label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Exercise list */}
-        <div className="px-4 pb-safe">
-          {isLoading ? (
-            <div className="space-y-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex items-center gap-4">
-                  <Skeleton className="h-20 w-20 rounded-2xl shrink-0" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-3 w-full" />
+          {/* Exercise list */}
+          <div className="px-4 pb-safe">
+            {isLoading ? (
+              <div className="space-y-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <Skeleton className="h-20 w-20 rounded-2xl shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-full" />
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : filteredExercises.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                <Wind className="h-8 w-8 text-muted-foreground" />
+                ))}
               </div>
-              <p className="text-muted-foreground">
-                No exercises available yet
-              </p>
-            </div>
-          ) : (
-            <div className="divide-y divide-border">
-              {filteredExercises.map((exercise, index) => (
-                <BreathingExerciseCard
-                  key={exercise.id}
-                  exercise={exercise}
-                  onClick={() => handleExerciseClick(exercise)}
-                  className={index === 0 ? "tour-exercise-card" : undefined}
-                />
-              ))}
-            </div>
-          )}
+            ) : filteredExercises.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                  <Wind className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <p className="text-muted-foreground">
+                  No exercises available yet
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-border">
+                {filteredExercises.map((exercise, index) => (
+                  <BreathingExerciseCard
+                    key={exercise.id}
+                    exercise={exercise}
+                    onClick={() => handleExerciseClick(exercise)}
+                    className={index === 0 ? "tour-exercise-card" : undefined}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
