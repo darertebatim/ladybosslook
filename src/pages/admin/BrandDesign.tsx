@@ -1,3 +1,4 @@
+import { NavLink } from 'react-router-dom';
 import appIcon from '@/assets/app-icon.png';
 
 const ColorSwatch = ({ label, cssVar, hex, className }: { label: string; cssVar: string; hex: string; className?: string }) => (
