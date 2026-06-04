@@ -25,12 +25,37 @@ const Section = ({ title, description, children }: { title: string; description?
   </div>
 );
 
+const BrandTabs = () => (
+  <div className="flex gap-1 bg-muted rounded-lg p-1 w-fit">
+    <NavLink
+      to="/admin/brand"
+      end
+      className={({ isActive }) =>
+        `px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${isActive ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`
+      }
+    >
+      Design System
+    </NavLink>
+    <NavLink
+      to="/admin/brand/mock"
+      className={({ isActive }) =>
+        `px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${isActive ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`
+      }
+    >
+      Mock
+    </NavLink>
+  </div>
+);
+
 export default function BrandDesign() {
   return (
     <div className="p-6 max-w-5xl space-y-10">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Brand & Design System</h1>
         <p className="text-muted-foreground text-sm mt-1">The definitive source for all Rilo color palettes and design tokens</p>
+        <div className="mt-4">
+          <BrandTabs />
+        </div>
       </div>
 
       {/* Logo */}
