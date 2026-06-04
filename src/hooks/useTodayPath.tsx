@@ -783,6 +783,12 @@ export function useTodayPath() {
         secondaryAudio,
         lockedTeaser,
         featuredReset,
+        breathAlternates: (breaths as any[]).map((b) => ({
+          id: b.id, title: b.name, emoji: b.emoji, category: b.category,
+        })),
+        reflectionAlternates: (reflections as any[]).map((r) => ({
+          id: r.id, title: r.title, emoji: r.emoji, category: r.category,
+        })),
         doorContext: effectiveDoorContext,
         daysSinceSignup,
         plannerOnboardingDone,
