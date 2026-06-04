@@ -840,18 +840,16 @@ export function useTodayPath() {
       const [breatheRes, reflResRes, freeReflRes, taskCompRes] = await Promise.all([
         supabase
           .from("breathing_sessions")
-          .select("id")
+          .select("id, exercise_id")
           .eq("user_id", userId)
           .gte("completed_at", todayStartIso)
-          .lte("completed_at", todayEndIso)
-          .limit(1),
+          .lte("completed_at", todayEndIso),
         supabase
           .from("user_reflection_responses" as any)
-          .select("id")
+          .select("id, reflection_id")
           .eq("user_id", userId)
           .gte("completed_at", todayStartIso)
-          .lte("completed_at", todayEndIso)
-          .limit(1),
+          .lte("completed_at", todayEndIso),
         supabase
           .from("free_form_reflections")
           .select("id")
@@ -865,10 +863,13 @@ export function useTodayPath() {
           .eq("user_id", userId)
           .eq("completed_date", today),
       ]);
-      const breatheDoneToday = (breatheRes.data ?? []).length > 0;
-      const reflectionDoneToday =
-        ((reflResRes.data ?? []) as any[]).length > 0 ||
-        (freeReflRes.data ?? []).length > 0;
+      const completedBreathExerciseIds = new Set<string>(
+        (breatheRes.data ?? []).map((r: any) => r.exercise_id).filter(Boolean),
+      );
+      const completedReflectionIds = new Set<string>(
+        ((reflResRes.data ?? []) as any[]).map((r: any) => r.reflection_id).filter(Boolean),
+      );
+      const freeReflectionDoneToday = (freeReflRes.data ?? []).length > 0;
 
       // Routine completion: resolve completed task_ids → source_routine_id
       const completedRoutineIds = new Set<string>();
@@ -907,12 +908,18 @@ export function useTodayPath() {
         let done = false;
         switch (s.kind) {
           case "breath":
-            done = breatheDoneToday;
+            // Generic built-in breath presets (ref like "box4", "478") aren't
+            // stored in breathing_exercises, so they only complete via tap.
             break;
           case "reset":
             // Step id is `reset:breath:<id>` or `reset:reflection:<id>`
-            if (s.id.startsWith("reset:breath:")) done = breatheDoneToday;
-            else if (s.id.startsWith("reset:reflection:")) done = reflectionDoneToday;
+            if (s.id.startsWith("reset:breath:")) {
+              done = !!s.ref && completedBreathExerciseIds.has(s.ref);
+            } else if (s.id.startsWith("reset:reflection:")) {
+              done =
+                (!!s.ref && completedReflectionIds.has(s.ref)) ||
+                freeReflectionDoneToday;
+            }
             break;
           case "routine":
             if (s.ref && s.ref !== "pick_first") {
