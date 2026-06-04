@@ -167,8 +167,8 @@ const emotionTagMap = [
 
 const standardFlow = [
   { emoji: "💛", title: "Mood check-in", meta: "1 min · pick your mood", kind: "mood" },
-  { emoji: "🎧", title: "Today's playlist (ready to play)", meta: "Picks a playlist tagged Path role = Primary in the user's language; falls back to educational/sort_order", kind: "playlist" },
   { emoji: "🌬️", title: "Check In", meta: "See Vocabulary card above (Day 4+: no door flavor, generic pool)", kind: "reset", isNew: true },
+  { emoji: "🎧", title: "Today's playlist (ready to play)", meta: "Picks a playlist tagged Path role = Primary in the user's language; falls back to educational/sort_order", kind: "playlist" },
   { emoji: "🔥", title: "Open your Planner (first active routine)", meta: "Quiz outcome already provisioned the routine — navigates to /app/home", kind: "routine" },
   { emoji: "🎧", title: "Secondary audio (extra)", meta: "Picks a playlist tagged Path role = Secondary in the user's language; falls back to intent/rotation · skippable", kind: "playlist", isNew: true },
   { emoji: "🔒", title: "Plus locked teaser", meta: "Shown to non-Plus users when a locked Plus playlist is available · skippable", kind: "playlist", isNew: true },
