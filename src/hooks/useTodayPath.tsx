@@ -916,9 +916,7 @@ export function useTodayPath() {
             if (s.id.startsWith("reset:breath:")) {
               done = !!s.ref && completedBreathExerciseIds.has(s.ref);
             } else if (s.id.startsWith("reset:reflection:")) {
-              done =
-                (!!s.ref && completedReflectionIds.has(s.ref)) ||
-                freeReflectionDoneToday;
+              done = !!s.ref && completedReflectionIds.has(s.ref);
             }
             break;
           case "routine":
