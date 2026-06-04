@@ -748,31 +748,44 @@ export function summarizePath(steps: PathStep[]): {
 export function buildCandidatePool(inputs: PathInputs): PathStep[] {
   const pool: PathStep[] = [];
 
-  // Breath alternates
-  pool.push({
-    id: "breath:box4",
-    kind: "breath", ref: "box4", emoji: "🟦",
-    kicker: "Breathwork", title: "Box breathing · 4-4-4-4",
-    meta: "4 min · Focus pattern", estMinutes: 4, done: false,
-    startHref: "/app/breathe?exercise=4d0790d6-a696-4181-b9cf-8c3760f99533",
-    tint: "sky", skippable: true,
-  });
-  pool.push({
-    id: "breath:478",
-    kind: "breath", ref: "478", emoji: "💤",
-    kicker: "Breathwork", title: "4-7-8 · Wind-down breath",
-    meta: "3 min · Calming", estMinutes: 3, done: false,
-    startHref: "/app/breathe?exercise=fad4a7cf-6405-4a18-bf9c-9531c1866879",
-    tint: "lavender", skippable: true,
+  // Breath alternates — real exercises from the DB so completion via
+  // /app/breathe?exercise=<id> properly marks the step done.
+  const featuredId = inputs.featuredReset?.id ?? null;
+  const breathAlts = (inputs.breathAlternates ?? [])
+    .filter((b) =>
+      !(inputs.featuredReset?.kind === "breath" && b.id === featuredId),
+    )
+    .slice(0, 4);
+  breathAlts.forEach((b) => {
+    pool.push({
+      id: `reset:breath:${b.id}`,
+      kind: "reset", ref: b.id,
+      emoji: b.emoji || "🌬️",
+      kicker: b.category ? `Breathwork · ${b.category}` : "Breathwork",
+      title: b.title, meta: "2–3 min · guided breath",
+      estMinutes: 3, done: false,
+      startHref: `/app/breathe?exercise=${b.id}`,
+      tint: "mint", skippable: true,
+    });
   });
 
-  // Reflection / journaling
-  pool.push({
-    id: "quiz_pick:reflect",
-    kind: "quiz_pick", ref: "reflect", emoji: "📓",
-    kicker: "Reflection", title: "60-sec journal",
-    meta: "1 min · One sentence is enough", estMinutes: 1, done: false,
-    startHref: "/app/tools/reflections", tint: "peach", skippable: true,
+  // Reflection alternates — real reflections from the DB.
+  const reflectionAlts = (inputs.reflectionAlternates ?? [])
+    .filter((r) =>
+      !(inputs.featuredReset?.kind === "reflection" && r.id === featuredId),
+    )
+    .slice(0, 4);
+  reflectionAlts.forEach((r) => {
+    pool.push({
+      id: `reset:reflection:${r.id}`,
+      kind: "reset", ref: r.id,
+      emoji: r.emoji || "📓",
+      kicker: r.category ? `Reflection · ${r.category}` : "Reflection",
+      title: r.title, meta: "2 min · journal prompt",
+      estMinutes: 2, done: false,
+      startHref: `/app/reflections/${r.id}`,
+      tint: "lavender", skippable: true,
+    });
   });
 
   // Listen alternates
