@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight, Headset } from "lucide-react";
+import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight, Headset, Trophy } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import {
