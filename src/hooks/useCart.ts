@@ -63,9 +63,8 @@ export const useCart = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart-items'] });
-      toast.success('Added to cart', {
-        action: { label: 'View Cart', onClick: () => navigate('/cart') },
-      });
+      toast.success('Added to cart');
+      navigate('/cart');
     },
     onError: (err: Error) => {
       if (err.message !== 'Sign in required') {
