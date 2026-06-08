@@ -51,12 +51,16 @@ const ProgramCard = ({ program }: { program: Program }) => {
     <Link to={`/${program.slug}`} className="block group">
       <Card className="overflow-hidden border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 h-full flex flex-col">
         <div className="aspect-[16/10] overflow-hidden relative">
-          <img
-            src={program.image}
-            alt={program.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-          />
+          {program.image ? (
+            <img
+              src={program.image}
+              alt={program.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-full bg-muted" />
+          )}
           {program.duration && (
             <div className="absolute bottom-3 left-3 bg-background/90 backdrop-blur-sm text-foreground text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1">
               <Clock size={12} />
