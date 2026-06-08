@@ -1039,6 +1039,7 @@ export type Database = {
           created_at: string
           deposit_price: number | null
           id: string
+          payment_option: string | null
           payment_type: string
           price_amount: number
           program_slug: string
@@ -1050,6 +1051,7 @@ export type Database = {
           created_at?: string
           deposit_price?: number | null
           id?: string
+          payment_option?: string | null
           payment_type: string
           price_amount: number
           program_slug: string
@@ -1061,6 +1063,7 @@ export type Database = {
           created_at?: string
           deposit_price?: number | null
           id?: string
+          payment_option?: string | null
           payment_type?: string
           price_amount?: number
           program_slug?: string
