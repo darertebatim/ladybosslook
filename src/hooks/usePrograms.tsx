@@ -28,7 +28,7 @@ export const usePrograms = () => {
         title: dbProgram.title,
         slug: dbProgram.slug,
         description: dbProgram.description || '',
-        image: dbProgram.cover_image_url || programImages[dbProgram.slug] || programImages['default'],
+        image: dbProgram.cover_image_url || '',
         duration: dbProgram.duration || 'Self-paced',
         participants: '0', // Not stored in DB
         rating: 4.9, // Not stored in DB
