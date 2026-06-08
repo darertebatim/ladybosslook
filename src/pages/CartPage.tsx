@@ -34,7 +34,15 @@ const CartPage = () => {
   const handleCheckout = async () => {
     setCheckingOut(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-cart-checkout');
+      const subscriptionItem = cartItems.find((i) => i.payment_type === 'subscription');
+      const { data, error } = subscriptionItem
+        ? await supabase.functions.invoke('create-payment', {
+            body: {
+              program: subscriptionItem.program_slug,
+              paymentOption: subscriptionItem.payment_option || 'monthly',
+            },
+          })
+        : await supabase.functions.invoke('create-cart-checkout');
       if (error) throw error;
       if (data?.url) {
         window.location.href = data.url;
