@@ -29,6 +29,9 @@ interface ProgramData {
   stripe_payment_link: string | null;
   video_url: string | null;
   cover_image_url: string | null;
+  subscription_interval: string | null;
+  subscription_interval_count: number | null;
+  subscription_full_payment_price: number | null;
 }
 
 const convertToEmbedUrl = (url: string): string => {
@@ -51,6 +54,8 @@ const ProgramPage = () => {
   const [notFound, setNotFound] = useState(false);
   const [isPaymentRedirect, setIsPaymentRedirect] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'full'>('monthly');
+  const [checkingOut, setCheckingOut] = useState(false);
 
   useEffect(() => {
     const fetchProgram = async () => {
@@ -111,8 +116,24 @@ const ProgramPage = () => {
 
   const isDeposit = program.payment_type === 'deposit';
   const isFree = program.payment_type === 'free';
+  const isSubscription = program.payment_type === 'subscription';
+  const hasFullOption = isSubscription && !!program.subscription_full_payment_price && program.subscription_full_payment_price > 0;
   const displayPrice = isDeposit && program.deposit_price ? program.deposit_price : program.price_amount;
   const inCart = isInCart(program.slug);
+
+  const handleDirectCheckout = async (option: 'monthly' | 'full') => {
+    if (!user) { navigate(`/auth?redirect=/${slug}`); return; }
+    setCheckingOut(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: { program: program.slug, paymentOption: option },
+      });
+      if (error || !data?.url) throw new Error('checkout failed');
+      window.location.href = data.url;
+    } catch {
+      setCheckingOut(false);
+    }
+  };
 
   return (
     <>
@@ -201,6 +222,69 @@ const ProgramPage = () => {
                 <div className="lg:sticky lg:top-24">
                   <Card className="p-6 space-y-5 border-2">
                     {/* Price */}
+                    {hasFullOption ? (
+                      <div className="space-y-3">
+                        {program.original_price && program.original_price > 0 && (
+                          <div className="text-muted-foreground line-through text-base">
+                            ${(program.original_price / 100).toFixed(0)}
+                          </div>
+                        )}
+                        <p className="text-sm font-medium text-muted-foreground">Choose your plan</p>
+
+                        {/* Monthly */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPlan('monthly')}
+                          className={`w-full text-left rounded-xl border-2 p-4 transition-all ${
+                            selectedPlan === 'monthly'
+                              ? 'border-primary bg-primary/5'
+                              : 'border-border'
+                          }`}
+                        >
+                          <div className="flex items-baseline justify-between gap-2">
+                            <span className="font-semibold">Monthly</span>
+                            <span className="text-2xl font-bold">
+                              ${(program.price_amount / 100).toFixed(0)}
+                              <span className="text-sm font-medium text-muted-foreground">/mo</span>
+                            </span>
+                          </div>
+                          {program.subscription_interval_count && program.subscription_interval_count > 1 && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Billed for {program.subscription_interval_count} months
+                            </p>
+                          )}
+                        </button>
+
+                        {/* Full payment */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPlan('full')}
+                          className={`relative w-full text-left rounded-xl border-2 p-4 transition-all ${
+                            selectedPlan === 'full'
+                              ? 'border-primary bg-primary/5'
+                              : 'border-border'
+                          }`}
+                        >
+                          {(() => {
+                            const monthlyTotal = program.price_amount * (program.subscription_interval_count || 3);
+                            const savings = monthlyTotal - (program.subscription_full_payment_price || 0);
+                            if (savings <= 0) return null;
+                            return (
+                              <span className="absolute -top-2.5 right-3 bg-green-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                                Save ${(savings / 100).toFixed(0)}
+                              </span>
+                            );
+                          })()}
+                          <div className="flex items-baseline justify-between gap-2">
+                            <span className="font-semibold">One-time</span>
+                            <span className="text-2xl font-bold">
+                              ${((program.subscription_full_payment_price || 0) / 100).toFixed(0)}
+                            </span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">Pay once, full access</p>
+                        </button>
+                      </div>
+                    ) : (
                     <div>
                       {isFree ? (
                         <div className="text-3xl font-bold text-primary">FREE</div>
@@ -228,9 +312,25 @@ const ProgramPage = () => {
                         </div>
                       )}
                     </div>
+                    )}
 
                     {/* Add to Cart / In Cart */}
-                    {inCart ? (
+                    {hasFullOption ? (
+                      <Button
+                        className="w-full gap-2"
+                        size="lg"
+                        onClick={() => handleDirectCheckout(selectedPlan)}
+                        disabled={checkingOut}
+                      >
+                        {checkingOut ? (
+                          <><Loader2 className="w-4 h-4 animate-spin" /> Redirecting…</>
+                        ) : selectedPlan === 'monthly' ? (
+                          <>Start Monthly Plan — ${(program.price_amount / 100).toFixed(0)}/mo</>
+                        ) : (
+                          <>Pay One-time — ${((program.subscription_full_payment_price || 0) / 100).toFixed(0)}</>
+                        )}
+                      </Button>
+                    ) : inCart ? (
                       <Link to="/cart" className="block">
                         <Button variant="secondary" className="w-full gap-2" size="lg">
                           <Check size={18} /> In Your Cart — View Cart
