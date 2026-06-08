@@ -12,6 +12,7 @@ export interface CartItem {
   price_amount: number;
   payment_type: string;
   deposit_price: number | null;
+  payment_option: string | null;
   added_by: string | null;
   created_at: string;
 }
@@ -43,6 +44,7 @@ export const useCart = () => {
       price_amount: number;
       payment_type: string;
       deposit_price?: number | null;
+      payment_option?: string | null;
     }) => {
       if (!user) {
         navigate(`/auth?redirect=${window.location.pathname}`);
@@ -55,6 +57,7 @@ export const useCart = () => {
         price_amount: program.price_amount,
         payment_type: program.payment_type,
         deposit_price: program.deposit_price ?? null,
+        payment_option: program.payment_option ?? null,
       }, { onConflict: 'user_id,program_slug' });
       if (error) throw error;
     },

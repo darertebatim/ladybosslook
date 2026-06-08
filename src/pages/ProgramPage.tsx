@@ -101,6 +101,22 @@ const ProgramPage = () => {
     });
   };
 
+  const handleAddSubscriptionToCart = (option: 'monthly' | 'full') => {
+    if (!program) return;
+    if (!user) { navigate(`/auth?redirect=/${slug}`); return; }
+    const price = option === 'full'
+      ? (program.subscription_full_payment_price || 0)
+      : program.price_amount;
+    addToCart({
+      slug: program.slug,
+      title: program.title,
+      price_amount: price,
+      payment_type: option === 'full' ? 'one-time' : 'subscription',
+      deposit_price: null,
+      payment_option: option,
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -319,15 +335,15 @@ const ProgramPage = () => {
                       <Button
                         className="w-full gap-2"
                         size="lg"
-                        onClick={() => handleDirectCheckout(selectedPlan)}
-                        disabled={checkingOut}
+                        onClick={() => inCart ? navigate('/cart') : handleAddSubscriptionToCart(selectedPlan)}
+                        disabled={isAdding}
                       >
-                        {checkingOut ? (
-                          <><Loader2 className="w-4 h-4 animate-spin" /> Redirecting…</>
+                        {inCart ? (
+                          <><Check size={18} /> In Your Cart — View Cart</>
                         ) : selectedPlan === 'monthly' ? (
-                          <>Start Monthly Plan — ${(program.price_amount / 100).toFixed(0)}/mo</>
+                          <><ShoppingCart size={18} /> Add Monthly — ${(program.price_amount / 100).toFixed(0)}/mo</>
                         ) : (
-                          <>Pay One-time — ${((program.subscription_full_payment_price || 0) / 100).toFixed(0)}</>
+                          <><ShoppingCart size={18} /> Add One-time — ${((program.subscription_full_payment_price || 0) / 100).toFixed(0)}</>
                         )}
                       </Button>
                     ) : inCart ? (
