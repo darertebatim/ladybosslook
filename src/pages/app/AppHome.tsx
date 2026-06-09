@@ -17,6 +17,8 @@ import { cn } from '@/lib/utils';
 import { useTasksForDate, useCompletionsForDate, useCompletedDates, UserTask, TaskTemplate, useAddGoalProgress, useDeleteTask, useSkipsForDate, useSetStreakGoal, useRecoverStreak, useCarryForwardTasks } from '@/hooks/useTaskPlanner';
 import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
 import { useNewHomeData } from '@/hooks/useNewHomeData';
+import { usePrograms } from '@/hooks/usePrograms';
+import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
 import { SortableTaskList } from '@/components/app/SortableTaskList';
 import { MonthCalendar } from '@/components/app/MonthCalendar';
 import { ProgramEventCard } from '@/components/app/ProgramEventCard';
@@ -912,6 +914,14 @@ const AppHome = () => {
     activeRounds = [],
     nextSessionMap = {}
   } = homeData || {};
+  const { programs: allPrograms = [] } = usePrograms();
+  const programImageMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    allPrograms.forEach((p: any) => {
+      if (p?.slug && p?.image) map[p.slug] = p.image;
+    });
+    return map;
+  }, [allPrograms]);
   return (
     <>
       <SEOHead title="Home - LadyBoss" description="Your personal dashboard and planner" />
@@ -1364,6 +1374,13 @@ const AppHome = () => {
                              Rilo Academy
                            </button>
                          </div>
+                          <div className="mt-4">
+                            <ActiveRoundsCarousel
+                              activeRounds={activeRounds}
+                              nextSessionMap={nextSessionMap}
+                              programImageMap={programImageMap}
+                            />
+                          </div>
                        </>
                     </>
                   )}
