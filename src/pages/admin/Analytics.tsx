@@ -179,157 +179,35 @@ export default function Analytics() {
 
   const funnelMax = funnel?.installs || funnel?.onboardingStarts || 1;
 
-  // ===== User breakdown (facets + activation milestones) =====
-  const { data: userBreakdown, isLoading: userBreakdownLoading } = useQuery({
-    queryKey: ['admin-analytics-user-breakdown'],
+  // ===== User breakdown (manual refresh, server-side aggregation) =====
+  // We do NOT fetch automatically — the RPC scans every table, so we let the
+  // admin trigger it explicitly to keep page load fast and numbers fresh.
+  const {
+    data: userBreakdown,
+    isFetching: userBreakdownLoading,
+    refetch: refetchUserBreakdown,
+    dataUpdatedAt: userBreakdownUpdatedAt,
+    error: userBreakdownError,
+  } = useQuery<any>({
+    queryKey: ['admin-analytics-user-breakdown-rpc'],
     queryFn: async () => {
-      const pageSize = 1000;
-
-      // Fetch all rows (selected columns) from a table, paginating.
-      const fetchAll = async <T,>(table: string, columns: string): Promise<T[]> => {
-        const out: T[] = [];
-        let f = 0;
-        while (true) {
-          const { data, error } = await supabase
-            .from(table as any)
-            .select(columns)
-            .range(f, f + pageSize - 1);
-          if (error) throw error;
-          if (!data || data.length === 0) break;
-          out.push(...(data as any));
-          if (data.length < pageSize) break;
-          f += pageSize;
-          if (out.length > 500000) break;
-        }
-        return out;
-      };
-
-      const profiles = await fetchAll<{
-        timezone: string | null;
-        preferred_language: string | null;
-        country: string | null;
-        gender: string | null;
-      }>('profiles', 'timezone, preferred_language, country, gender');
-
-      const tally = (key: 'timezone' | 'preferred_language' | 'country' | 'gender') => {
-        const m = new Map<string, number>();
-        for (const r of profiles) {
-          const v = ((r[key] as string | null) || '— unknown —').toString().trim() || '— unknown —';
-          m.set(v, (m.get(v) || 0) + 1);
-        }
-        return Array.from(m.entries()).sort((a, b) => b[1] - a[1]);
-      };
-
-      const [
-        audioRows, breathRows, focusRows, emoRows, reflectionRows,
-        journalRows, subsRows, ordersRows, onbRows, taskRows, returnRows,
-      ] = await Promise.all([
-        fetchAll<{ user_id: string | null; current_position_seconds: number | null }>(
-          'audio_progress', 'user_id, current_position_seconds'),
-        fetchAll<{ user_id: string | null }>('breathing_sessions', 'user_id'),
-        fetchAll<{ user_id: string | null }>('focus_sessions', 'user_id'),
-        fetchAll<{ user_id: string | null }>('emotion_logs', 'user_id'),
-        fetchAll<{ user_id: string | null }>('free_form_reflections', 'user_id'),
-        fetchAll<{ user_id: string | null }>('journal_entries', 'user_id'),
-        fetchAll<{ user_id: string | null }>('user_subscriptions', 'user_id'),
-        fetchAll<{ user_id: string | null; status: string | null }>(
-          'orders', 'user_id, status'),
-        fetchAll<{ user_id: string | null }>('onboarding_answers', 'user_id'),
-        fetchAll<{ user_id: string | null }>('task_completions', 'user_id'),
-        fetchAll<{ user_id: string | null; created_at: string | null }>(
-          'app_return_events', 'user_id, created_at'),
-      ]);
-
-      const distinct = (rows: Array<{ user_id: string | null }>) => {
-        const s = new Set<string>();
-        for (const r of rows) if (r.user_id) s.add(r.user_id);
-        return s;
-      };
-      const countByUser = (rows: Array<{ user_id: string | null }>) => {
-        const m = new Map<string, number>();
-        for (const r of rows) {
-          if (!r.user_id) continue;
-          m.set(r.user_id, (m.get(r.user_id) || 0) + 1);
-        }
-        return m;
-      };
-      const atLeast = (m: Map<string, number>, n: number) => {
-        let c = 0;
-        for (const v of m.values()) if (v >= n) c++;
-        return c;
-      };
-
-      // Audio seconds per user → minutes thresholds
-      const audioSecs = new Map<string, number>();
-      for (const r of audioRows) {
-        if (!r.user_id) continue;
-        audioSecs.set(r.user_id, (audioSecs.get(r.user_id) || 0) + (r.current_position_seconds || 0));
-      }
-      const audioMinsAtLeast = (mins: number) => {
-        const cutoff = mins * 60;
-        let c = 0;
-        for (const v of audioSecs.values()) if (v >= cutoff) c++;
-        return c;
-      };
-
-      // Active days per user (distinct days from app_return_events)
-      const activeDays = new Map<string, Set<string>>();
-      for (const r of returnRows) {
-        if (!r.user_id || !r.created_at) continue;
-        const day = r.created_at.slice(0, 10);
-        if (!activeDays.has(r.user_id)) activeDays.set(r.user_id, new Set());
-        activeDays.get(r.user_id)!.add(day);
-      }
-      const activeDaysAtLeast = (n: number) => {
-        let c = 0;
-        for (const s of activeDays.values()) if (s.size >= n) c++;
-        return c;
-      };
-
-      // Completed orders only
-      const completedOrderUsers = new Set<string>();
-      for (const r of ordersRows) {
-        if (r.user_id && r.status === 'completed') completedOrderUsers.add(r.user_id);
-      }
-
-      const emoCounts = countByUser(emoRows);
-      const taskCounts = countByUser(taskRows);
-      const journalCounts = countByUser(journalRows);
-      const breathCounts = countByUser(breathRows);
-      const focusCounts = countByUser(focusRows);
-
-      const total = profiles.length;
-
-      return {
-        total,
-        byTimezone: tally('timezone'),
-        byLanguage: tally('preferred_language'),
-        byCountry: tally('country'),
-        byGender: tally('gender'),
-        engagement: [
-          { label: 'Any audio listened', count: distinct(audioRows).size, icon: Headphones },
-          { label: 'Any breathing session', count: distinct(breathRows).size, icon: Wind },
-          { label: 'Any focus session', count: distinct(focusRows).size, icon: Timer },
-          { label: 'Any mood / emotion log', count: distinct(emoRows).size, icon: Heart },
-          { label: 'Any reflection', count: distinct(reflectionRows).size, icon: BookOpen },
-          { label: 'Any journal entry', count: distinct(journalRows).size, icon: BookOpen },
-          { label: 'Answered onboarding', count: distinct(onbRows).size, icon: Brain },
-          { label: 'Has subscription', count: distinct(subsRows).size, icon: Crown },
-          { label: 'Made a purchase', count: completedOrderUsers.size, icon: ShoppingBag },
-        ],
-        milestones: [
-          { label: 'Completed 10+ tasks', count: atLeast(taskCounts, 10), icon: CheckCircle2 },
-          { label: 'Logged mood/emotion 5+ times', count: atLeast(emoCounts, 5), icon: Heart },
-          { label: 'Listened to 30+ min of audio', count: audioMinsAtLeast(30), icon: Headphones },
-          { label: 'Wrote 3+ journal entries', count: atLeast(journalCounts, 3), icon: BookOpen },
-          { label: 'Did 3+ breathing sessions', count: atLeast(breathCounts, 3), icon: Wind },
-          { label: 'Did 3+ focus sessions', count: atLeast(focusCounts, 3), icon: Timer },
-          { label: 'Active 7+ different days', count: activeDaysAtLeast(7), icon: CalendarCheck },
-        ],
-      };
+      const { data, error } = await supabase.rpc('get_admin_user_breakdown' as any);
+      if (error) throw error;
+      return data as any;
     },
-    staleTime: 5 * 60 * 1000,
+    enabled: false,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
+
+  const handleRefreshUserBreakdown = async () => {
+    try {
+      await refetchUserBreakdown({ throwOnError: true });
+      toast.success('Analytics refreshed');
+    } catch (e: any) {
+      toast.error(`Failed: ${e?.message || 'unknown error'}`);
+    }
+  };
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
