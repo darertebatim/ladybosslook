@@ -26,6 +26,10 @@ import {
 import { PromoBanner } from "@/components/app/PromoBanner";
 import { HomeBanner } from "@/components/app/HomeBanner";
 import { HomeMenu } from "@/components/app/HomeMenu";
+import { ActiveRoundsCarousel } from "@/components/dashboard/ActiveRoundsCarousel";
+import { useNewHomeData } from "@/hooks/useNewHomeData";
+import { usePrograms } from "@/hooks/usePrograms";
+import { useMemo } from "react";
 
 // ── Orange Palette (mirrors /admin/brand/mock) ──
 const O = {
