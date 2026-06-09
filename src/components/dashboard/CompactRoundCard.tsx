@@ -1,5 +1,4 @@
-import { Badge } from '@/components/ui/badge';
-import { Sparkles, GraduationCap } from 'lucide-react';
+import { GraduationCap, ChevronRight } from 'lucide-react';
 import { format, isToday } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { CachedImage } from '@/components/ui/CachedImage';
@@ -46,80 +45,68 @@ export function CompactRoundCard({
   }
 
   return (
-    <Link 
-      to={`/app/myprograms/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`}
-      onClick={onView}
-      className="block"
-    >
+    <div className="relative pl-[60px] mb-3">
+      {/* Checkpoint dot (matches InlinePathRow) */}
       <div
-        className={cn(
-          "relative w-[280px] rounded-2xl overflow-hidden shadow-ios transition-transform active:scale-[0.98]",
-          isUnseen && "ring-2 ring-brand ring-offset-2"
-        )}
-        style={{ background: 'linear-gradient(160deg, #FFE6C9 0%, #FFD2A1 100%)' }}
+        className="absolute left-[22px] top-4 w-[26px] h-[26px] rounded-full flex items-center justify-center"
+        style={{ background: '#FFFFFF', border: '2px solid #F5DCC8' }}
       >
-        <div className="flex gap-3 p-2">
-          {/* Square thumbnail */}
-          <div
-            className="relative h-20 w-20 flex-shrink-0 rounded-xl overflow-hidden"
-            style={{ background: '#FFFFFF', boxShadow: '0 6px 14px rgba(0,0,0,0.10)' }}
-          >
-            {thumbnailUrl ? (
-              <CachedImage
-                src={thumbnailUrl}
-                alt={enrollment.course_name}
-                loading="lazy"
-                decoding="async"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center" style={{ background: '#FFF4ED' }}>
-                <GraduationCap className="h-8 w-8" style={{ color: '#8B6E5A' }} />
-              </div>
-            )}
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-            {/* Badges + round name (above title) */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {isUnseen && (
-                <Badge className="bg-primary text-primary-foreground rounded-full text-[10px] px-1.5 py-0 h-4 gap-0.5 border-0">
-                  <Sparkles className="h-2.5 w-2.5" />
-                  New
-                </Badge>
-              )}
-              <span
-                className="text-[10px] font-bold uppercase tracking-[0.15em]"
-                style={{ color: isActive ? '#EB5E33' : '#8B6E5A' }}
-              >
-                {isActive ? 'Active' : round.status}
-              </span>
-            </div>
-
-            {/* Title */}
-            <h3 className="font-bold text-sm line-clamp-2 leading-snug" style={{ color: '#2D1A0E' }}>
-              {enrollment.course_name}
-            </h3>
-
-            {/* Next session */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {displayDate && (
-                <span
-                  className="text-[11px] font-medium truncate"
-                  style={{ color: isSessionToday ? '#EB5E33' : '#6B4D33' }}
-                >
-                  {isSessionToday
-                    ? `Today · ${format(new Date(displayDate), 'h:mm a')}`
-                    : isUpcoming
-                      ? `${format(new Date(displayDate), 'MMM d')}`
-                      : `${format(new Date(displayDate), 'MMM d · h:mm a')}`}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
+        <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#FFD2A1' }} />
       </div>
-    </Link>
+
+      <Link
+        to={`/app/myprograms/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`}
+        onClick={onView}
+        className={cn(
+          'w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-2xl active:scale-[0.99] transition-transform',
+          isUnseen && 'ring-2 ring-brand'
+        )}
+        style={{ background: '#FFFFFF', border: '1px solid #F5DCC8' }}
+      >
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden"
+          style={{ background: '#FFE6C9' }}
+        >
+          {thumbnailUrl ? (
+            <CachedImage
+              src={thumbnailUrl}
+              alt={enrollment.course_name}
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <GraduationCap className="h-5 w-5" style={{ color: '#8B6E5A' }} />
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div
+            className="text-[10px] font-bold uppercase tracking-wider truncate"
+            style={{ color: isActive ? '#EB5E33' : '#8B6E5A' }}
+          >
+            {isActive ? 'Active Program' : round.status}
+          </div>
+          <div
+            className="text-[13.5px] font-semibold leading-tight mt-0.5 truncate"
+            style={{ color: '#2D1A0E' }}
+          >
+            {enrollment.course_name}
+          </div>
+          {displayDate && (
+            <div
+              className="text-[11px] mt-0.5 truncate"
+              style={{ color: isSessionToday ? '#EB5E33' : '#8B6E5A' }}
+            >
+              {isSessionToday
+                ? `Today · ${format(new Date(displayDate), 'h:mm a')}`
+                : isUpcoming
+                  ? format(new Date(displayDate), 'MMM d')
+                  : format(new Date(displayDate), 'MMM d · h:mm a')}
+            </div>
+          )}
+        </div>
+        <ChevronRight className="w-4 h-4 shrink-0" style={{ color: '#8B6E5A' }} />
+      </Link>
+    </div>
   );
 }
