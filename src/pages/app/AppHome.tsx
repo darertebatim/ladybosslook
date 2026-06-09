@@ -314,6 +314,9 @@ const AppHome = () => {
   const btnRoutinesRef = useRef<HTMLButtonElement>(null);
   const btnTasksRef = useRef<HTMLButtonElement>(null);
   const btnOneTimeRef = useRef<HTMLButtonElement>(null);
+  const [showRoutinesTab] = useState<boolean>(() =>
+    typeof window !== 'undefined' && localStorage.getItem('simora_show_routines_tab') === 'true'
+  );
   const spotlightCompleteBaselineRef = useRef<number | null>(null);
 
   const prevTotalCompletions = useRef(totalCompletions);
@@ -1203,8 +1206,8 @@ const AppHome = () => {
                         }}
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                       />
-                      {/* My Routines pill — temporarily hidden */}
-                      {false && (
+                       {/* My Routines pill — temporarily hidden. Admin can re-enable from /admin/system. */}
+                       {showRoutinesTab && (
                         <button
                           ref={btnRoutinesRef}
                           onClick={() => { haptic.selection(); setHomeView('routines'); setTaskFilter('all'); }}
