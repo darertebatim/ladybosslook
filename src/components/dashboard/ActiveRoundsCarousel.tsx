@@ -87,20 +87,17 @@ export function ActiveRoundsCarousel({
         </Link>
       </button>
 
-      {/* Horizontal scroll - collapsible */}
-      <div className={`overflow-hidden transition-all duration-200 ease-out ${isCollapsed ? 'max-h-0 opacity-0' : 'max-h-[140px] opacity-100'}`}>
-        <div
-          className="flex gap-3 overflow-x-auto scrollbar-hide py-2 pl-1 pr-4"
-          style={{ WebkitOverflowScrolling: 'touch' }}
-        >
+      {/* Vertical stack - collapsible (matches path task rows) */}
+      <div className={`overflow-hidden transition-all duration-300 ease-out ${isCollapsed ? 'max-h-0 opacity-0' : 'max-h-[2000px] opacity-100'}`}>
+        <div className="pt-2 -ml-[60px]">
           {activeRounds.map((enrollment, index) => {
             const roundId = enrollment.program_rounds?.id;
             const isEnrollmentUnseen = unseenEnrollments.has(enrollment.id);
             const isRoundUnseen = roundId ? unseenRounds.has(roundId) : false;
             const hasNotification = isEnrollmentUnseen || isRoundUnseen;
             return (
-              <div key={enrollment.id} className="shrink-0">
-                <CompactRoundCard
+              <CompactRoundCard
+                key={enrollment.id}
                   enrollment={enrollment}
                   colorIndex={index}
                   nextSessionDate={roundId ? (nextSessionMap instanceof Map ? nextSessionMap.get(roundId) : nextSessionMap[roundId]) ?? null : null}
@@ -114,8 +111,7 @@ export function ActiveRoundsCarousel({
                       markRoundViewed(roundId);
                     }
                   }}
-                />
-              </div>
+              />
             );
           })}
         </div>
