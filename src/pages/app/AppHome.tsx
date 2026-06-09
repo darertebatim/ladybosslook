@@ -1197,22 +1197,25 @@ const AppHome = () => {
                           width: homeView === 'routines' ? btnRoutinesRef.current?.offsetWidth 
                             : homeView === 'tasks' ? btnTasksRef.current?.offsetWidth
                             : btnOneTimeRef.current?.offsetWidth,
-                          x: homeView === 'routines' ? 0 
-                            : homeView === 'tasks' ? (btnRoutinesRef.current?.offsetWidth ?? 0)
-                            : ((btnRoutinesRef.current?.offsetWidth ?? 0) + (btnTasksRef.current?.offsetWidth ?? 0))
+                          x: homeView === 'tasks' ? 0
+                            : homeView === 'one-time' ? (btnTasksRef.current?.offsetWidth ?? 0)
+                            : 0
                         }}
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                       />
-                      <button
-                        ref={btnRoutinesRef}
-                        onClick={() => { haptic.selection(); setHomeView('routines'); setTaskFilter('all'); }}
-                        className={cn(
-                          "relative z-10 px-3 py-1 rounded-full text-[11px] font-semibold transition-colors whitespace-nowrap",
-                          homeView === 'routines' ? 'text-foreground' : 'text-fg-warm-muted dark:text-white/40'
-                        )}
-                      >
-                        {t('home.myRoutines')}
-                      </button>
+                      {/* My Routines pill — temporarily hidden */}
+                      {false && (
+                        <button
+                          ref={btnRoutinesRef}
+                          onClick={() => { haptic.selection(); setHomeView('routines'); setTaskFilter('all'); }}
+                          className={cn(
+                            "relative z-10 px-3 py-1 rounded-full text-[11px] font-semibold transition-colors whitespace-nowrap",
+                            homeView === 'routines' ? 'text-foreground' : 'text-fg-warm-muted dark:text-white/40'
+                          )}
+                        >
+                          {t('home.myRoutines')}
+                        </button>
+                      )}
                        <button
                          ref={btnTasksRef}
                          onClick={() => { haptic.selection(); setHomeView('tasks'); setTaskFilter('all'); }}
