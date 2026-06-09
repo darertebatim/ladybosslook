@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, GraduationCap, Smartphone } from 'lucide-react';
+import { RefreshCw, GraduationCap, Smartphone, ListChecks } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -22,10 +22,16 @@ interface InstallStats {
   lastInstall: string | null;
 }
 
+interface WaitlistStats {
+  program_name: string;
+  count: number;
+}
+
 export default function Overview() {
   const [courseStats, setCourseStats] = useState<CourseStats[]>([]);
   const [deviceStats, setDeviceStats] = useState<DeviceStats>({ totalDevices: 0, recentDevices: 0, lastRegistration: null });
   const [installStats, setInstallStats] = useState<InstallStats>({ totalInstalls: 0, recentInstalls: 0, lastInstall: null });
+  const [waitlistStats, setWaitlistStats] = useState<WaitlistStats[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -56,6 +62,43 @@ export default function Overview() {
       toast({
         title: "Error",
         description: "Failed to fetch installation statistics",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const fetchWaitlistStats = async () => {
+    try {
+      const { data: waitlist, error } = await supabase
+        .from('program_waitlist')
+        .select('program_slug');
+
+      if (error) throw error;
+
+      const { data: catalogPrograms } = await supabase
+        .from('program_catalog')
+        .select('slug, title');
+
+      const slugToTitle = new Map(
+        catalogPrograms?.map(p => [p.slug, p.title]) || []
+      );
+
+      const counts = new Map<string, number>();
+      waitlist?.forEach(w => {
+        const name = slugToTitle.get(w.program_slug) || w.program_slug;
+        counts.set(name, (counts.get(name) || 0) + 1);
+      });
+
+      const arr: WaitlistStats[] = Array.from(counts.entries()).map(([program_name, count]) => ({
+        program_name,
+        count,
+      }));
+      setWaitlistStats(arr.sort((a, b) => b.count - a.count));
+    } catch (error: any) {
+      console.error('Error fetching waitlist stats:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch waitlist statistics",
         variant: "destructive",
       });
     }
@@ -127,7 +170,7 @@ export default function Overview() {
       }));
 
       setCourseStats(statsArray.sort((a, b) => b.student_count - a.student_count));
-      await Promise.all([fetchDeviceStats(), fetchInstallStats()]);
+      await Promise.all([fetchDeviceStats(), fetchInstallStats(), fetchWaitlistStats()]);
     } catch (error: any) {
       console.error('Error fetching course stats:', error);
       toast({
@@ -167,6 +210,32 @@ export default function Overview() {
           Refresh
         </Button>
       </div>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <ListChecks className="h-5 w-5" />
+            <CardTitle>Program Waitlist</CardTitle>
+          </div>
+          <CardDescription>Users who requested a program</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {waitlistStats.length > 0 ? (
+            <div className="space-y-2">
+              {waitlistStats.map((stat) => (
+                <div key={stat.program_name} className="flex justify-between items-center py-2 border-b last:border-0">
+                  <span className="text-sm">{stat.program_name}</span>
+                  <span className="font-bold">{stat.count}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-4 text-muted-foreground text-sm">
+              No waitlist requests yet
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
