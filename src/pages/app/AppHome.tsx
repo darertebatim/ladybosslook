@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay, subDays } from 'date-fns';
-import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, Headset, ArrowLeft, Heart, Zap, Settings2, Search, Play, Wand2, Compass } from 'lucide-react';
+import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, Headset, ArrowLeft, Heart, Zap, Settings2, Search, Play, Wand2, Compass, GraduationCap } from 'lucide-react';
 
 import AppTaskCreate from '@/pages/app/AppTaskCreate';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -1357,11 +1357,11 @@ const AppHome = () => {
                              Explore Tools
                            </button>
                            <button
-                             onClick={() => navigate('/app/routines')}
+                             onClick={() => navigate('/app/academy')}
                              className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
                            >
-                             <Search className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
-                             Browse Templates
+                             <GraduationCap className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
+                             Rilo Academy
                            </button>
                          </div>
                        </>
