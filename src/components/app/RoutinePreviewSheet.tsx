@@ -141,7 +141,9 @@ export function RoutinePreviewSheet({
   const { t } = useTranslation();
   // Generate synthetic pro-task for multi-task routines
   const displayTasks = useMemo(() => {
-    if (tasks.length > 1 && routineBankId) {
+    // Routine player synthetic task — temporarily hidden (set HIDE_ROUTINE_PLAYER to false to restore)
+    const HIDE_ROUTINE_PLAYER = true;
+    if (!HIDE_ROUTINE_PLAYER && tasks.length > 1 && routineBankId) {
       const proTask: RoutinePlanTask = {
         id: `__pro_task_routine_${routineBankId}`,
         plan_id: routineBankId,
