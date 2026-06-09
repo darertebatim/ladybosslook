@@ -816,6 +816,26 @@ export const ProgramRoundsManager = () => {
                   </p>
                 </div>
 
+                <div className="space-y-2 md:col-span-2">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="auto_create_feed_channel"
+                      checked={formData.auto_create_feed_channel}
+                      onChange={(e) =>
+                        setFormData({ ...formData, auto_create_feed_channel: e.target.checked })
+                      }
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <Label htmlFor="auto_create_feed_channel" className="cursor-pointer">
+                      💬 Auto-create a Chat channel for this round
+                    </Label>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    If unchecked, no public Chats channel will be created for this round. Useful for 1:1 or private cohorts.
+                  </p>
+                </div>
+
                 <div className="space-y-2">
                   <Label>Session Duration (minutes)</Label>
                   <Input
