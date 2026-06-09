@@ -41,6 +41,7 @@ interface ProgramCatalog {
   show_in_app_waitlist?: boolean;
   is_one_on_one?: boolean;
   default_session_count?: number | null;
+  auto_create_feed_channel?: boolean;
 }
 
 export function ProgramsManager() {
@@ -96,6 +97,7 @@ export function ProgramsManager() {
     show_in_app_waitlist: false,
     is_one_on_one: false,
     default_session_count: 0,
+    auto_create_feed_channel: true,
   });
   const [hosts, setHosts] = useState<HostAssignment[]>([]);
 
@@ -175,6 +177,7 @@ export function ProgramsManager() {
       show_in_app_waitlist: false,
       is_one_on_one: false,
       default_session_count: 0,
+      auto_create_feed_channel: true,
     });
     setEditingId(null);
     setShowForm(false);
@@ -266,6 +269,8 @@ export function ProgramsManager() {
       show_in_app_waitlist: (program as any).show_in_app_waitlist || false,
       is_one_on_one: (program as any).is_one_on_one || false,
       default_session_count: (program as any).default_session_count || 0,
+      auto_create_feed_channel:
+        (program as any).auto_create_feed_channel ?? true,
     });
     try {
       setHosts(await loadContentHosts('program', program.slug));
@@ -1150,6 +1155,31 @@ export function ProgramsManager() {
                     </p>
                   </div>
                 )}
+
+                <div className="flex items-center space-x-2 border-t pt-3">
+                  <Checkbox
+                    id="auto_create_feed_channel"
+                    checked={formData.auto_create_feed_channel ?? true}
+                    disabled={formData.is_one_on_one}
+                    onCheckedChange={(checked) =>
+                      setFormData({
+                        ...formData,
+                        auto_create_feed_channel: checked as boolean,
+                      })
+                    }
+                  />
+                  <Label
+                    htmlFor="auto_create_feed_channel"
+                    className="text-sm font-normal cursor-pointer"
+                  >
+                    💬 Auto-create a Chat channel for each new round
+                  </Label>
+                </div>
+                <p className="text-xs text-muted-foreground pl-6 -mt-2">
+                  {formData.is_one_on_one
+                    ? '1:1 rounds never create a chat channel.'
+                    : 'Turn off if this program shouldn\'t produce a per-round channel in the Chats list.'}
+                </p>
                 
                 <div className="flex items-center space-x-2">
                   <Checkbox 
