@@ -677,7 +677,7 @@ export default function AppMyRiloPath() {
             </div>
 
             {/* Your Programs (active rounds) */}
-            <div className="mt-4 pl-[60px]">
+            <div className="mt-4">
               <ActiveRoundsCarousel
                 activeRounds={activeRounds}
                 nextSessionMap={nextSessionMap}
