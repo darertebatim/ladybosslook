@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Users, TrendingUp, MessageSquare, Activity, BookOpen, Wind, Brain, Heart, Timer, Sparkles, Globe, Languages, CheckCircle2, Headphones, CalendarCheck, ShoppingBag, Crown, RefreshCw } from 'lucide-react';
+import { Users, TrendingUp, MessageSquare, Activity, BookOpen, Wind, Brain, Heart, Timer, Sparkles, Globe, Languages, CheckCircle2, Headphones, CalendarCheck, ShoppingBag, Crown, RefreshCw, Smartphone } from 'lucide-react';
 import { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -479,6 +479,7 @@ export default function Analytics() {
                   <FacetCard title="By preferred language" icon={Languages} rows={userBreakdown.by_language || []} total={total} />
                   <FacetCard title="By country" icon={Globe} rows={userBreakdown.by_country || []} total={total} />
                   <FacetCard title="By gender" icon={Users} rows={userBreakdown.by_gender || []} total={total} />
+                  <FacetCard title="By platform (iOS / Android / Web)" icon={Smartphone} rows={userBreakdown.by_platform || []} total={total} />
                 </div>
               </>
             );
