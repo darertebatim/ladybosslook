@@ -492,6 +492,51 @@ export default function AppChat() {
     );
   }
 
+  if (supportBlocked) {
+    return (
+      <>
+        <SEOHead title="Chat | Ladyboss Academy" description="Support chat" />
+        <div className="flex flex-col bg-background h-full">
+          <header
+            className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border/30"
+            style={{ paddingTop: 'env(safe-area-inset-top)' }}
+          >
+            <div className="flex items-center gap-1 pt-3 pb-2 px-4">
+              <Button
+                variant="ghost"
+                onClick={handleBack}
+                className="-ml-2 h-10 px-2 gap-0.5 text-foreground bg-transparent active:opacity-70"
+              >
+                <ChevronLeft className="h-7 w-7" />
+                <span className="text-[17px]">{t("chatPage.back")}</span>
+              </Button>
+              <div className="flex items-center gap-3">
+                <div className="h-11 w-11 rounded-full bg-muted border border-border flex items-center justify-center">
+                  <MessageCircle className="h-5 w-5 text-foreground" />
+                </div>
+                <div>
+                  <h1 className="font-semibold text-[17px]">{t("chatPage.support.title")}</h1>
+                </div>
+              </div>
+            </div>
+          </header>
+          <div style={{ height: 'calc(64px + env(safe-area-inset-top))' }} className="shrink-0" />
+          <div className="flex-1 flex flex-col items-center justify-center px-8 text-center">
+            <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
+              <Headset className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h2 className="text-lg font-semibold text-foreground mb-2">
+              Support chat is unavailable in your region
+            </h2>
+            <p className="text-sm text-muted-foreground max-w-sm">
+              We're unable to offer in-app support chat to users in your region right now. For any questions, please reach out to us by email instead.
+            </p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <SEOHead 
