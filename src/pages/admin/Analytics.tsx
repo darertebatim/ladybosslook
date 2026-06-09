@@ -341,55 +341,148 @@ export default function Analytics() {
 
         {/* === User breakdown === */}
         <TabsContent value="users" className="space-y-4">
-          {userBreakdownLoading ? (
+          <Card className="p-4 flex items-center justify-between gap-3 flex-wrap">
+            <div className="space-y-0.5">
+              <h2 className="font-semibold text-base">User breakdown</h2>
+              <p className="text-xs text-muted-foreground">
+                Server-side aggregation across every table — bulletproof but heavy. Refresh on demand.
+                {userBreakdownUpdatedAt > 0 && (
+                  <> Last refreshed: {new Date(userBreakdownUpdatedAt).toLocaleTimeString()}.</>
+                )}
+              </p>
+            </div>
+            <Button
+              onClick={handleRefreshUserBreakdown}
+              disabled={userBreakdownLoading}
+              size="sm"
+              className="gap-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${userBreakdownLoading ? 'animate-spin' : ''}`} />
+              {userBreakdownLoading ? 'Loading…' : (userBreakdown ? 'Refresh' : 'Load breakdown')}
+            </Button>
+          </Card>
+
+          {userBreakdownError && (
+            <Card className="p-4 border-destructive/40 bg-destructive/5">
+              <p className="text-sm text-destructive">
+                Failed to load: {(userBreakdownError as any)?.message || 'unknown error'}
+              </p>
+            </Card>
+          )}
+
+          {userBreakdownLoading && !userBreakdown && (
             <div className="space-y-3">
               {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-32" />)}
             </div>
-          ) : !userBreakdown ? null : (
-            <>
-              {/* Activation milestones */}
-              <Card className="p-6 space-y-3">
-                <div>
-                  <h2 className="font-semibold text-lg flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5" /> Activation milestones
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    Users who hit each meaningful threshold. Out of {userBreakdown.total.toLocaleString()} total users.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  {userBreakdown.milestones.map((m) => (
-                    <FunnelBar key={m.label} label={m.label} count={m.count} max={userBreakdown.total} />
-                  ))}
-                </div>
-              </Card>
-
-              {/* Lifetime engagement (any usage) */}
-              <Card className="p-6 space-y-3">
-                <div>
-                  <h2 className="font-semibold text-lg flex items-center gap-2">
-                    <Activity className="h-5 w-5" /> Lifetime engagement
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    Distinct users who ever did each action. Note: mood check-in and the Emotions tool share one table, so they're counted together.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  {userBreakdown.engagement.map((e) => (
-                    <FunnelBar key={e.label} label={e.label} count={e.count} max={userBreakdown.total} />
-                  ))}
-                </div>
-              </Card>
-
-              {/* Demographic facets */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <FacetCard title="By timezone" icon={Globe} rows={userBreakdown.byTimezone} total={userBreakdown.total} />
-                <FacetCard title="By preferred language" icon={Languages} rows={userBreakdown.byLanguage} total={userBreakdown.total} />
-                <FacetCard title="By country" icon={Globe} rows={userBreakdown.byCountry} total={userBreakdown.total} />
-                <FacetCard title="By gender" icon={Users} rows={userBreakdown.byGender} total={userBreakdown.total} />
-              </div>
-            </>
           )}
+
+          {userBreakdown && (() => {
+            const total: number = userBreakdown.total ?? 0;
+            const m = userBreakdown.milestones || {};
+            const l = userBreakdown.lifetime || {};
+            const moodSources: Array<{ source: string; logs: number; users: number }> = userBreakdown.mood_sources || [];
+
+            const milestones = [
+              { label: 'Completed 10+ tasks', count: m.tasks_10 ?? 0, icon: CheckCircle2 },
+              { label: 'Logged mood 5+ times', count: m.mood_5 ?? 0, icon: Heart },
+              { label: 'Listened 30+ min (event-based)', count: m.audio_30m ?? 0, icon: Headphones },
+              { label: 'Played 5+ audio sessions', count: m.audio_5plays ?? 0, icon: Headphones },
+              { label: 'Listened 30+ min (legacy progress)', count: m.audio_30m_legacy ?? 0, icon: Headphones },
+              { label: 'Wrote 3+ free-form reflections', count: m.reflection_3 ?? 0, icon: BookOpen },
+              { label: 'Wrote 3+ guided reflections', count: m.guided_reflection_3 ?? 0, icon: BookOpen },
+              { label: 'Wrote 3+ journal entries', count: m.journal_3 ?? 0, icon: BookOpen },
+              { label: 'Did 3+ breathing sessions', count: m.breath_3 ?? 0, icon: Wind },
+              { label: 'Did 3+ focus sessions', count: m.focus_3 ?? 0, icon: Timer },
+              { label: 'Active 7+ different days', count: m.active_7d ?? 0, icon: CalendarCheck },
+            ];
+            const lifetime = [
+              { label: 'Any audio listened (events)', count: l.any_audio_event ?? 0, icon: Headphones },
+              { label: 'Any audio progress (legacy)', count: l.any_audio_legacy ?? 0, icon: Headphones },
+              { label: 'Any breathing session', count: l.any_breath ?? 0, icon: Wind },
+              { label: 'Any focus session', count: l.any_focus ?? 0, icon: Timer },
+              { label: 'Any mood check-in', count: l.any_mood ?? 0, icon: Heart },
+              { label: 'Any emotion log (tool)', count: l.any_emotion ?? 0, icon: Heart },
+              { label: 'Any free-form reflection', count: l.any_reflection ?? 0, icon: BookOpen },
+              { label: 'Any guided reflection', count: l.any_guided_reflection ?? 0, icon: BookOpen },
+              { label: 'Any journal entry', count: l.any_journal ?? 0, icon: BookOpen },
+              { label: 'Answered onboarding', count: l.answered_onboarding ?? 0, icon: Brain },
+              { label: 'Has subscription', count: l.has_subscription ?? 0, icon: Crown },
+              { label: 'Made a purchase', count: l.made_purchase ?? 0, icon: ShoppingBag },
+            ];
+
+            const sourceLabel = (s: string) =>
+              s === 'banner' ? 'Planner top banner (quick check-in)'
+              : s === 'path' ? 'Mood page / My Rilo path'
+              : 'Unknown / older logs';
+
+            return (
+              <>
+                <Card className="p-6 space-y-3">
+                  <div>
+                    <h2 className="font-semibold text-lg flex items-center gap-2">
+                      <CheckCircle2 className="h-5 w-5" /> Activation milestones
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Users who hit each meaningful threshold. Out of {total.toLocaleString()} total users.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    {milestones.map((mi) => (
+                      <FunnelBar key={mi.label} label={mi.label} count={mi.count} max={total} />
+                    ))}
+                  </div>
+                </Card>
+
+                <Card className="p-6 space-y-3">
+                  <div>
+                    <h2 className="font-semibold text-lg flex items-center gap-2">
+                      <Heart className="h-5 w-5" /> Mood check-in sources
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Where users logged their mood. Older check-ins (before this tag was added) show as Unknown.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    {moodSources.length === 0 ? (
+                      <p className="text-sm text-muted-foreground italic">No mood check-ins yet.</p>
+                    ) : (
+                      moodSources.map((s) => (
+                        <div key={s.source} className="flex items-center justify-between text-sm border-b last:border-0 py-2">
+                          <span className="font-medium">{sourceLabel(s.source)}</span>
+                          <span className="tabular-nums text-muted-foreground">
+                            {s.logs.toLocaleString()} logs · {s.users.toLocaleString()} users
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </Card>
+
+                <Card className="p-6 space-y-3">
+                  <div>
+                    <h2 className="font-semibold text-lg flex items-center gap-2">
+                      <Activity className="h-5 w-5" /> Lifetime engagement
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Distinct users who ever did each action.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    {lifetime.map((e) => (
+                      <FunnelBar key={e.label} label={e.label} count={e.count} max={total} />
+                    ))}
+                  </div>
+                </Card>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <FacetCard title="By timezone" icon={Globe} rows={userBreakdown.by_timezone || []} total={total} />
+                  <FacetCard title="By preferred language" icon={Languages} rows={userBreakdown.by_language || []} total={total} />
+                  <FacetCard title="By country" icon={Globe} rows={userBreakdown.by_country || []} total={total} />
+                  <FacetCard title="By gender" icon={Users} rows={userBreakdown.by_gender || []} total={total} />
+                </div>
+              </>
+            );
+          })()}
         </TabsContent>
       </Tabs>
     </div>
