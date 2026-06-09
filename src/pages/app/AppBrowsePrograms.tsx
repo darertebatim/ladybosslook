@@ -432,6 +432,7 @@ const AppBrowsePrograms = () => {
                   <AcademyProgramCard
                     key={program.slug}
                     title={program.title}
+                    slug={program.slug}
                     image={program.image}
                     type={program.type}
                     language={program.language}
@@ -466,6 +467,7 @@ const AppBrowsePrograms = () => {
                   <AcademyProgramCard
                     key={program.slug}
                     title={program.title}
+                    slug={program.slug}
                     image={program.image}
                     type={program.type}
                     language={program.language}
