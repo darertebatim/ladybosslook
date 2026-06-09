@@ -127,6 +127,7 @@ export function MoodDashboard() {
         submoods: selectedSubmoods,
         contexts: selectedContexts,
         note: contextNote.trim() || undefined,
+        source: 'path',
       });
 
       // Auto-complete any mood pro tasks for today

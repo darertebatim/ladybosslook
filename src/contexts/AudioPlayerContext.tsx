@@ -90,6 +90,12 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const currentTrackRef = useRef<TrackInfo | null>(null);
   const useNative = useRef(isNativeAudioAvailable());
   const nativeTimePollerRef = useRef<NodeJS.Timeout | null>(null);
+  // Active audio_listen_events row id for the current play session.
+  // We insert one row each time a new track starts and update its
+  // seconds_listened as the user listens, so admin analytics can
+  // count plays + total time per user reliably.
+  const listenEventIdRef = useRef<string | null>(null);
+  const listenEventTrackIdRef = useRef<string | null>(null);
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -158,6 +164,21 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       }, {
         onConflict: "user_id,audio_id",
       });
+
+      // Finalize listen event with full duration
+      if (listenEventIdRef.current && listenEventTrackIdRef.current === track.id) {
+        try {
+          await supabase
+            .from('audio_listen_events')
+            .update({
+              seconds_listened: Math.floor(duration || 0),
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', listenEventIdRef.current);
+        } catch { /* ignore */ }
+        listenEventIdRef.current = null;
+        listenEventTrackIdRef.current = null;
+      }
       
       if (track.playlistId) {
         try {
@@ -336,6 +357,19 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         onConflict: "user_id,audio_id",
       });
 
+      // Keep the active listen event's seconds_listened in sync.
+      if (listenEventIdRef.current && listenEventTrackIdRef.current === currentTrack.id) {
+        try {
+          await supabase
+            .from('audio_listen_events')
+            .update({
+              seconds_listened: Math.floor(currentTime),
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', listenEventIdRef.current);
+        } catch { /* ignore */ }
+      }
+
       // Fire 5-star review request when user completes ≥80% of an audio track
       if (duration > 0 && currentTime / duration >= 0.8) {
         const { triggerSoftReview } = await import('@/lib/appReview');
@@ -358,6 +392,25 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       import('@/lib/firebaseAnalytics').then(({ Analytics }) => {
         Analytics.audioPlayed(track.id, track.playlistName);
       }).catch(() => {});
+
+      // Open a new audio_listen_events row for this play session.
+      // We update its seconds_listened periodically and on track end.
+      if (user?.id) {
+        const newEventId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random()}`;
+        listenEventIdRef.current = newEventId;
+        listenEventTrackIdRef.current = track.id;
+        try {
+          await supabase.from('audio_listen_events').insert({
+            id: newEventId,
+            user_id: user.id,
+            audio_id: track.id,
+            playlist_id: track.playlistId ?? null,
+            seconds_listened: 0,
+          });
+        } catch { /* ignore */ }
+      }
     }
 
     // ===== NATIVE PATH =====

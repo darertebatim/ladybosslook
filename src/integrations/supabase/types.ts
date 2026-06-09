@@ -741,6 +741,36 @@ export type Database = {
         }
         Relationships: []
       }
+      audio_listen_events: {
+        Row: {
+          audio_id: string
+          created_at: string
+          id: string
+          playlist_id: string | null
+          seconds_listened: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          audio_id: string
+          created_at?: string
+          id?: string
+          playlist_id?: string | null
+          seconds_listened?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          audio_id?: string
+          created_at?: string
+          id?: string
+          playlist_id?: string | null
+          seconds_listened?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       audio_playlist_items: {
         Row: {
           audio_id: string
@@ -6144,6 +6174,7 @@ export type Database = {
       generate_dedication_token: { Args: never; Returns: string }
       generate_friend_code: { Args: never; Returns: string }
       generate_playlist_gift_token: { Args: never; Returns: string }
+      get_admin_user_breakdown: { Args: never; Returns: Json }
       get_current_user_role: { Args: never; Returns: string }
       get_dedication_by_token: {
         Args: { t: string }

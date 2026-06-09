@@ -88,6 +88,7 @@ export function MoodCheckInBanner({ onVisibilityChange }: { onVisibilityChange?:
       await createMoodLog.mutateAsync({
         mood: moodValue,
         content: `Feeling ${moodLabel.toLowerCase()} today.`,
+        source: 'banner',
       });
       haptic.success();
       // Open celebration sheet with 4 follow-up action cards

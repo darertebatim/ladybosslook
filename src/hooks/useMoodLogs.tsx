@@ -34,6 +34,8 @@ export interface CreateMoodLogInput {
   submoods?: string[];
   contexts?: string[];
   note?: string;
+  /** Where the user logged from: 'banner' (planner top banner), 'path' (mood page / My Rilo path), etc. */
+  source?: 'banner' | 'path' | 'dashboard' | 'quick' | string;
 }
 
 const MOOD_VALENCE_MAP: Record<string, string> = {
@@ -57,7 +59,7 @@ export function useCreateMoodLog() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ mood, content, submoods, contexts, note }: CreateMoodLogInput): Promise<MoodLog> => {
+    mutationFn: async ({ mood, content, submoods, contexts, note, source }: CreateMoodLogInput): Promise<MoodLog> => {
       if (!user?.id) throw new Error('Not authenticated');
 
       const clientId = crypto.randomUUID();
@@ -66,13 +68,21 @@ export function useCreateMoodLog() {
 
       const noteText = note?.trim() || content || null;
 
+      // Tag the log with its surface so admin analytics can split mood check-ins
+      // by entry point (banner vs path) without an extra schema change.
+      const baseContexts = contexts ?? [];
+      const sourceTag = source ? `source:${source}` : null;
+      const mergedContexts = sourceTag && !baseContexts.includes(sourceTag)
+        ? [...baseContexts, sourceTag]
+        : baseContexts;
+
       const payload: CreateEmotionLogPayload = {
         clientId,
         userId: user.id,
         category: 'mood_checkin',
         emotion: mood,
         valence,
-        contexts: contexts ?? [],
+        contexts: mergedContexts,
         notes: noteText,
         submoods: submoods ?? [],
       };
@@ -90,7 +100,7 @@ export function useCreateMoodLog() {
               emotion: mood,
               valence,
               notes: noteText,
-              contexts: contexts ?? [],
+              contexts: mergedContexts,
               submoods: submoods ?? [],
             } as any)
             .select('id, emotion, notes, created_at, contexts, submoods')

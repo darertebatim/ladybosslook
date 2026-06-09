@@ -3,9 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Users, TrendingUp, MessageSquare, Activity, BookOpen, Wind, Brain, Heart, Timer, Sparkles, Globe, Languages, CheckCircle2, Headphones, CalendarCheck, ShoppingBag, Crown } from 'lucide-react';
+import { Users, TrendingUp, MessageSquare, Activity, BookOpen, Wind, Brain, Heart, Timer, Sparkles, Globe, Languages, CheckCircle2, Headphones, CalendarCheck, ShoppingBag, Crown, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 type Range = '24h' | '7d' | '30d' | '90d';
 
@@ -177,157 +179,35 @@ export default function Analytics() {
 
   const funnelMax = funnel?.installs || funnel?.onboardingStarts || 1;
 
-  // ===== User breakdown (facets + activation milestones) =====
-  const { data: userBreakdown, isLoading: userBreakdownLoading } = useQuery({
-    queryKey: ['admin-analytics-user-breakdown'],
+  // ===== User breakdown (manual refresh, server-side aggregation) =====
+  // We do NOT fetch automatically — the RPC scans every table, so we let the
+  // admin trigger it explicitly to keep page load fast and numbers fresh.
+  const {
+    data: userBreakdown,
+    isFetching: userBreakdownLoading,
+    refetch: refetchUserBreakdown,
+    dataUpdatedAt: userBreakdownUpdatedAt,
+    error: userBreakdownError,
+  } = useQuery<any>({
+    queryKey: ['admin-analytics-user-breakdown-rpc'],
     queryFn: async () => {
-      const pageSize = 1000;
-
-      // Fetch all rows (selected columns) from a table, paginating.
-      const fetchAll = async <T,>(table: string, columns: string): Promise<T[]> => {
-        const out: T[] = [];
-        let f = 0;
-        while (true) {
-          const { data, error } = await supabase
-            .from(table as any)
-            .select(columns)
-            .range(f, f + pageSize - 1);
-          if (error) throw error;
-          if (!data || data.length === 0) break;
-          out.push(...(data as any));
-          if (data.length < pageSize) break;
-          f += pageSize;
-          if (out.length > 500000) break;
-        }
-        return out;
-      };
-
-      const profiles = await fetchAll<{
-        timezone: string | null;
-        preferred_language: string | null;
-        country: string | null;
-        gender: string | null;
-      }>('profiles', 'timezone, preferred_language, country, gender');
-
-      const tally = (key: 'timezone' | 'preferred_language' | 'country' | 'gender') => {
-        const m = new Map<string, number>();
-        for (const r of profiles) {
-          const v = ((r[key] as string | null) || '— unknown —').toString().trim() || '— unknown —';
-          m.set(v, (m.get(v) || 0) + 1);
-        }
-        return Array.from(m.entries()).sort((a, b) => b[1] - a[1]);
-      };
-
-      const [
-        audioRows, breathRows, focusRows, emoRows, reflectionRows,
-        journalRows, subsRows, ordersRows, onbRows, taskRows, returnRows,
-      ] = await Promise.all([
-        fetchAll<{ user_id: string | null; current_position_seconds: number | null }>(
-          'audio_progress', 'user_id, current_position_seconds'),
-        fetchAll<{ user_id: string | null }>('breathing_sessions', 'user_id'),
-        fetchAll<{ user_id: string | null }>('focus_sessions', 'user_id'),
-        fetchAll<{ user_id: string | null }>('emotion_logs', 'user_id'),
-        fetchAll<{ user_id: string | null }>('free_form_reflections', 'user_id'),
-        fetchAll<{ user_id: string | null }>('journal_entries', 'user_id'),
-        fetchAll<{ user_id: string | null }>('user_subscriptions', 'user_id'),
-        fetchAll<{ user_id: string | null; status: string | null }>(
-          'orders', 'user_id, status'),
-        fetchAll<{ user_id: string | null }>('onboarding_answers', 'user_id'),
-        fetchAll<{ user_id: string | null }>('task_completions', 'user_id'),
-        fetchAll<{ user_id: string | null; created_at: string | null }>(
-          'app_return_events', 'user_id, created_at'),
-      ]);
-
-      const distinct = (rows: Array<{ user_id: string | null }>) => {
-        const s = new Set<string>();
-        for (const r of rows) if (r.user_id) s.add(r.user_id);
-        return s;
-      };
-      const countByUser = (rows: Array<{ user_id: string | null }>) => {
-        const m = new Map<string, number>();
-        for (const r of rows) {
-          if (!r.user_id) continue;
-          m.set(r.user_id, (m.get(r.user_id) || 0) + 1);
-        }
-        return m;
-      };
-      const atLeast = (m: Map<string, number>, n: number) => {
-        let c = 0;
-        for (const v of m.values()) if (v >= n) c++;
-        return c;
-      };
-
-      // Audio seconds per user → minutes thresholds
-      const audioSecs = new Map<string, number>();
-      for (const r of audioRows) {
-        if (!r.user_id) continue;
-        audioSecs.set(r.user_id, (audioSecs.get(r.user_id) || 0) + (r.current_position_seconds || 0));
-      }
-      const audioMinsAtLeast = (mins: number) => {
-        const cutoff = mins * 60;
-        let c = 0;
-        for (const v of audioSecs.values()) if (v >= cutoff) c++;
-        return c;
-      };
-
-      // Active days per user (distinct days from app_return_events)
-      const activeDays = new Map<string, Set<string>>();
-      for (const r of returnRows) {
-        if (!r.user_id || !r.created_at) continue;
-        const day = r.created_at.slice(0, 10);
-        if (!activeDays.has(r.user_id)) activeDays.set(r.user_id, new Set());
-        activeDays.get(r.user_id)!.add(day);
-      }
-      const activeDaysAtLeast = (n: number) => {
-        let c = 0;
-        for (const s of activeDays.values()) if (s.size >= n) c++;
-        return c;
-      };
-
-      // Completed orders only
-      const completedOrderUsers = new Set<string>();
-      for (const r of ordersRows) {
-        if (r.user_id && r.status === 'completed') completedOrderUsers.add(r.user_id);
-      }
-
-      const emoCounts = countByUser(emoRows);
-      const taskCounts = countByUser(taskRows);
-      const journalCounts = countByUser(journalRows);
-      const breathCounts = countByUser(breathRows);
-      const focusCounts = countByUser(focusRows);
-
-      const total = profiles.length;
-
-      return {
-        total,
-        byTimezone: tally('timezone'),
-        byLanguage: tally('preferred_language'),
-        byCountry: tally('country'),
-        byGender: tally('gender'),
-        engagement: [
-          { label: 'Any audio listened', count: distinct(audioRows).size, icon: Headphones },
-          { label: 'Any breathing session', count: distinct(breathRows).size, icon: Wind },
-          { label: 'Any focus session', count: distinct(focusRows).size, icon: Timer },
-          { label: 'Any mood / emotion log', count: distinct(emoRows).size, icon: Heart },
-          { label: 'Any reflection', count: distinct(reflectionRows).size, icon: BookOpen },
-          { label: 'Any journal entry', count: distinct(journalRows).size, icon: BookOpen },
-          { label: 'Answered onboarding', count: distinct(onbRows).size, icon: Brain },
-          { label: 'Has subscription', count: distinct(subsRows).size, icon: Crown },
-          { label: 'Made a purchase', count: completedOrderUsers.size, icon: ShoppingBag },
-        ],
-        milestones: [
-          { label: 'Completed 10+ tasks', count: atLeast(taskCounts, 10), icon: CheckCircle2 },
-          { label: 'Logged mood/emotion 5+ times', count: atLeast(emoCounts, 5), icon: Heart },
-          { label: 'Listened to 30+ min of audio', count: audioMinsAtLeast(30), icon: Headphones },
-          { label: 'Wrote 3+ journal entries', count: atLeast(journalCounts, 3), icon: BookOpen },
-          { label: 'Did 3+ breathing sessions', count: atLeast(breathCounts, 3), icon: Wind },
-          { label: 'Did 3+ focus sessions', count: atLeast(focusCounts, 3), icon: Timer },
-          { label: 'Active 7+ different days', count: activeDaysAtLeast(7), icon: CalendarCheck },
-        ],
-      };
+      const { data, error } = await supabase.rpc('get_admin_user_breakdown' as any);
+      if (error) throw error;
+      return data as any;
     },
-    staleTime: 5 * 60 * 1000,
+    enabled: false,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
+
+  const handleRefreshUserBreakdown = async () => {
+    try {
+      await refetchUserBreakdown({ throwOnError: true });
+      toast.success('Analytics refreshed');
+    } catch (e: any) {
+      toast.error(`Failed: ${e?.message || 'unknown error'}`);
+    }
+  };
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -461,55 +341,148 @@ export default function Analytics() {
 
         {/* === User breakdown === */}
         <TabsContent value="users" className="space-y-4">
-          {userBreakdownLoading ? (
+          <Card className="p-4 flex items-center justify-between gap-3 flex-wrap">
+            <div className="space-y-0.5">
+              <h2 className="font-semibold text-base">User breakdown</h2>
+              <p className="text-xs text-muted-foreground">
+                Server-side aggregation across every table — bulletproof but heavy. Refresh on demand.
+                {userBreakdownUpdatedAt > 0 && (
+                  <> Last refreshed: {new Date(userBreakdownUpdatedAt).toLocaleTimeString()}.</>
+                )}
+              </p>
+            </div>
+            <Button
+              onClick={handleRefreshUserBreakdown}
+              disabled={userBreakdownLoading}
+              size="sm"
+              className="gap-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${userBreakdownLoading ? 'animate-spin' : ''}`} />
+              {userBreakdownLoading ? 'Loading…' : (userBreakdown ? 'Refresh' : 'Load breakdown')}
+            </Button>
+          </Card>
+
+          {userBreakdownError && (
+            <Card className="p-4 border-destructive/40 bg-destructive/5">
+              <p className="text-sm text-destructive">
+                Failed to load: {(userBreakdownError as any)?.message || 'unknown error'}
+              </p>
+            </Card>
+          )}
+
+          {userBreakdownLoading && !userBreakdown && (
             <div className="space-y-3">
               {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-32" />)}
             </div>
-          ) : !userBreakdown ? null : (
-            <>
-              {/* Activation milestones */}
-              <Card className="p-6 space-y-3">
-                <div>
-                  <h2 className="font-semibold text-lg flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5" /> Activation milestones
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    Users who hit each meaningful threshold. Out of {userBreakdown.total.toLocaleString()} total users.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  {userBreakdown.milestones.map((m) => (
-                    <FunnelBar key={m.label} label={m.label} count={m.count} max={userBreakdown.total} />
-                  ))}
-                </div>
-              </Card>
-
-              {/* Lifetime engagement (any usage) */}
-              <Card className="p-6 space-y-3">
-                <div>
-                  <h2 className="font-semibold text-lg flex items-center gap-2">
-                    <Activity className="h-5 w-5" /> Lifetime engagement
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    Distinct users who ever did each action. Note: mood check-in and the Emotions tool share one table, so they're counted together.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  {userBreakdown.engagement.map((e) => (
-                    <FunnelBar key={e.label} label={e.label} count={e.count} max={userBreakdown.total} />
-                  ))}
-                </div>
-              </Card>
-
-              {/* Demographic facets */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <FacetCard title="By timezone" icon={Globe} rows={userBreakdown.byTimezone} total={userBreakdown.total} />
-                <FacetCard title="By preferred language" icon={Languages} rows={userBreakdown.byLanguage} total={userBreakdown.total} />
-                <FacetCard title="By country" icon={Globe} rows={userBreakdown.byCountry} total={userBreakdown.total} />
-                <FacetCard title="By gender" icon={Users} rows={userBreakdown.byGender} total={userBreakdown.total} />
-              </div>
-            </>
           )}
+
+          {userBreakdown && (() => {
+            const total: number = userBreakdown.total ?? 0;
+            const m = userBreakdown.milestones || {};
+            const l = userBreakdown.lifetime || {};
+            const moodSources: Array<{ source: string; logs: number; users: number }> = userBreakdown.mood_sources || [];
+
+            const milestones = [
+              { label: 'Completed 10+ tasks', count: m.tasks_10 ?? 0, icon: CheckCircle2 },
+              { label: 'Logged mood 5+ times', count: m.mood_5 ?? 0, icon: Heart },
+              { label: 'Listened 30+ min (event-based)', count: m.audio_30m ?? 0, icon: Headphones },
+              { label: 'Played 5+ audio sessions', count: m.audio_5plays ?? 0, icon: Headphones },
+              { label: 'Listened 30+ min (legacy progress)', count: m.audio_30m_legacy ?? 0, icon: Headphones },
+              { label: 'Wrote 3+ free-form reflections', count: m.reflection_3 ?? 0, icon: BookOpen },
+              { label: 'Wrote 3+ guided reflections', count: m.guided_reflection_3 ?? 0, icon: BookOpen },
+              { label: 'Wrote 3+ journal entries', count: m.journal_3 ?? 0, icon: BookOpen },
+              { label: 'Did 3+ breathing sessions', count: m.breath_3 ?? 0, icon: Wind },
+              { label: 'Did 3+ focus sessions', count: m.focus_3 ?? 0, icon: Timer },
+              { label: 'Active 7+ different days', count: m.active_7d ?? 0, icon: CalendarCheck },
+            ];
+            const lifetime = [
+              { label: 'Any audio listened (events)', count: l.any_audio_event ?? 0, icon: Headphones },
+              { label: 'Any audio progress (legacy)', count: l.any_audio_legacy ?? 0, icon: Headphones },
+              { label: 'Any breathing session', count: l.any_breath ?? 0, icon: Wind },
+              { label: 'Any focus session', count: l.any_focus ?? 0, icon: Timer },
+              { label: 'Any mood check-in', count: l.any_mood ?? 0, icon: Heart },
+              { label: 'Any emotion log (tool)', count: l.any_emotion ?? 0, icon: Heart },
+              { label: 'Any free-form reflection', count: l.any_reflection ?? 0, icon: BookOpen },
+              { label: 'Any guided reflection', count: l.any_guided_reflection ?? 0, icon: BookOpen },
+              { label: 'Any journal entry', count: l.any_journal ?? 0, icon: BookOpen },
+              { label: 'Answered onboarding', count: l.answered_onboarding ?? 0, icon: Brain },
+              { label: 'Has subscription', count: l.has_subscription ?? 0, icon: Crown },
+              { label: 'Made a purchase', count: l.made_purchase ?? 0, icon: ShoppingBag },
+            ];
+
+            const sourceLabel = (s: string) =>
+              s === 'banner' ? 'Planner top banner (quick check-in)'
+              : s === 'path' ? 'Mood page / My Rilo path'
+              : 'Unknown / older logs';
+
+            return (
+              <>
+                <Card className="p-6 space-y-3">
+                  <div>
+                    <h2 className="font-semibold text-lg flex items-center gap-2">
+                      <CheckCircle2 className="h-5 w-5" /> Activation milestones
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Users who hit each meaningful threshold. Out of {total.toLocaleString()} total users.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    {milestones.map((mi) => (
+                      <FunnelBar key={mi.label} label={mi.label} count={mi.count} max={total} />
+                    ))}
+                  </div>
+                </Card>
+
+                <Card className="p-6 space-y-3">
+                  <div>
+                    <h2 className="font-semibold text-lg flex items-center gap-2">
+                      <Heart className="h-5 w-5" /> Mood check-in sources
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Where users logged their mood. Older check-ins (before this tag was added) show as Unknown.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    {moodSources.length === 0 ? (
+                      <p className="text-sm text-muted-foreground italic">No mood check-ins yet.</p>
+                    ) : (
+                      moodSources.map((s) => (
+                        <div key={s.source} className="flex items-center justify-between text-sm border-b last:border-0 py-2">
+                          <span className="font-medium">{sourceLabel(s.source)}</span>
+                          <span className="tabular-nums text-muted-foreground">
+                            {s.logs.toLocaleString()} logs · {s.users.toLocaleString()} users
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </Card>
+
+                <Card className="p-6 space-y-3">
+                  <div>
+                    <h2 className="font-semibold text-lg flex items-center gap-2">
+                      <Activity className="h-5 w-5" /> Lifetime engagement
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Distinct users who ever did each action.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    {lifetime.map((e) => (
+                      <FunnelBar key={e.label} label={e.label} count={e.count} max={total} />
+                    ))}
+                  </div>
+                </Card>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <FacetCard title="By timezone" icon={Globe} rows={userBreakdown.by_timezone || []} total={total} />
+                  <FacetCard title="By preferred language" icon={Languages} rows={userBreakdown.by_language || []} total={total} />
+                  <FacetCard title="By country" icon={Globe} rows={userBreakdown.by_country || []} total={total} />
+                  <FacetCard title="By gender" icon={Users} rows={userBreakdown.by_gender || []} total={total} />
+                </div>
+              </>
+            );
+          })()}
         </TabsContent>
       </Tabs>
     </div>
