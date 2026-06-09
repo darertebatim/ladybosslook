@@ -68,6 +68,7 @@ export function QuickMoodCheckIn({ open, onOpenChange }: QuickMoodCheckInProps) 
       await createMoodLog.mutateAsync({
         mood: moodValue,
         content: `Feeling ${moodLabel.toLowerCase()} today.`,
+        source: 'quick',
       });
       
       haptic.success();
