@@ -1357,11 +1357,11 @@ const AppHome = () => {
                              Explore Tools
                            </button>
                            <button
-                             onClick={() => navigate('/app/routines')}
+                             onClick={() => navigate('/app/academy')}
                              className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
                            >
-                             <Search className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
-                             Browse Templates
+                             <GraduationCap className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
+                             Rilo Academy
                            </button>
                          </div>
                        </>
