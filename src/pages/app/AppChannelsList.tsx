@@ -25,6 +25,7 @@ import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import feedbackIllustration from '@/assets/feedback-illustration.png';
 import { HubPortalCard } from '@/components/hub/HubPortalCard';
+import { isSupportChatBlockedForRegion } from '@/lib/regionRestrictions';
 
 const SYNTHETIC_CHANNEL_TASK: RoutinePlanTask = {
   id: 'synthetic-channel-task',
@@ -111,6 +112,7 @@ export default function AppChannelsList() {
   };
 
   const isLoading = channelsLoading || summariesLoading;
+  const supportBlocked = isSupportChatBlockedForRegion();
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -136,7 +138,7 @@ export default function AppChannelsList() {
               }}
               iconOnly
             />
-            {canAccessAdminPage('support') && (
+            {canAccessAdminPage('support') && !supportBlocked && (
               <IOSIconButton
                 size="sm"
                 onClick={() => navigate('/app/support', { state: { from: '/app/channels' } })}
