@@ -1342,24 +1342,22 @@ const AppHome = () => {
                     <>
                        <>
                          <SortableTaskList tasks={filteredTasks} date={selectedDate} completedTaskIds={completedTaskIds} completedSubtaskIds={completedSubtaskIds} goalProgressMap={goalProgressMap} onTaskTap={handleTaskTap} onStreakIncrease={handleStreakIncrease} onStepUnlocked={handleStepUnlocked} onOpenGoalInput={handleOpenGoalInput} onOpenTimer={handleOpenTimer} onOpenTaskSheet={handleOpenTaskSheet} hideQuickAdd={taskFilter === 'all-routines' || taskFilter.startsWith('routine:')} defaultRepeatOverride={homeView === 'one-time' ? 'No' : undefined} coachHighlightTaskId={spotlightHighlightTaskId} coachHighlightVariant={spotlightStep === 'complete' ? 'gold' : 'white'} />
-                         {(taskFilter === 'all-routines' || taskFilter.startsWith('routine:')) && (
-                           <div className="flex gap-2 mt-3">
-                             <button
-                               onClick={() => navigate('/app/routineplayer')}
-                               className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
-                             >
-                               <Settings2 className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
-                               Manage Routines
-                             </button>
-                             <button
-                               onClick={() => navigate('/app/routines')}
-                               className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
-                             >
-                               <Search className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
-                               Browse Templates
-                             </button>
-                           </div>
-                         )}
+                         <div className="flex gap-2 mt-3">
+                           <button
+                             onClick={() => navigate('/app/routineplayer')}
+                             className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+                           >
+                             <Settings2 className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
+                             Manage Routines
+                           </button>
+                           <button
+                             onClick={() => navigate('/app/routines')}
+                             className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+                           >
+                             <Search className="w-3.5 h-3.5 text-[hsl(var(--brand-primary))]" />
+                             Browse Templates
+                           </button>
+                         </div>
                        </>
                     </>
                   )}
