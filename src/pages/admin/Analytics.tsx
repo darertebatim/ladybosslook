@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Users, TrendingUp, MessageSquare, Activity, BookOpen, Wind, Brain, Heart, Timer, Sparkles } from 'lucide-react';
+import { Users, TrendingUp, MessageSquare, Activity, BookOpen, Wind, Brain, Heart, Timer, Sparkles, Globe, Languages } from 'lucide-react';
 import { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -218,6 +218,7 @@ export default function Analytics() {
           <TabsTrigger value="funnel">Onboarding funnel</TabsTrigger>
           <TabsTrigger value="tools">Tool usage</TabsTrigger>
           <TabsTrigger value="quiz">Self-care quiz</TabsTrigger>
+          <TabsTrigger value="users">User breakdown</TabsTrigger>
         </TabsList>
 
         {/* === Funnel === */}
