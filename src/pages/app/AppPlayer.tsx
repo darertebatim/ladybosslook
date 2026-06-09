@@ -64,7 +64,8 @@ export default function AppPlayer() {
   >("all");
   const [showPaywall, setShowPaywall] = useState(false);
   const { hasAccessToProgram } = useSubscription();
-  const hasSoundscapeAccess = hasAccessToProgram("simora-plus");
+  // Soundscape is free for all users
+  const hasSoundscapeAccess = true;
   const [preferredLanguage, setPreferredLanguage] = useState("all");
   const { categories: dbCategories } = useMediaCategories("audio");
   // Topic chips on the Player are driven by the "Door" tag dimension (4 Doors)
