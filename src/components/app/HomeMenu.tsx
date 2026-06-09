@@ -258,22 +258,32 @@ export function HomeMenu() {
 
   const renderToolGrid = (items: NavItem[]) => (
     <div className="grid grid-cols-4 gap-2">
-      {items.map((item) => (
-        <button
-          key={item.id}
-          onClick={() => handleNavClick(item.route)}
-          className={cn(
-            "flex flex-col items-center justify-center gap-1.5 py-3 rounded-2xl",
-            "transition-all active:scale-95",
-            item.color,
-          )}
-        >
-          <span className="[&>svg]:h-5 [&>svg]:w-5">{item.icon}</span>
-          <span className="text-[10px] font-semibold leading-tight text-center px-1">
-            {t(`menu.items.${item.nameKey}`)}
-          </span>
-        </button>
-      ))}
+      {items.map((item) => {
+        const isWide = item.id === "academy";
+        return (
+          <button
+            key={item.id}
+            onClick={() => handleNavClick(item.route)}
+            className={cn(
+              "rounded-2xl transition-all active:scale-95",
+              isWide
+                ? "col-span-4 flex flex-row items-center justify-center gap-2 py-3"
+                : "flex flex-col items-center justify-center gap-1.5 py-3",
+              item.color,
+            )}
+          >
+            <span className="[&>svg]:h-5 [&>svg]:w-5">{item.icon}</span>
+            <span
+              className={cn(
+                "font-semibold leading-tight text-center px-1",
+                isWide ? "text-[13px]" : "text-[10px]",
+              )}
+            >
+              {t(`menu.items.${item.nameKey}`)}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 
