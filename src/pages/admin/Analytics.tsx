@@ -175,6 +175,90 @@ export default function Analytics() {
     },
   });
 
+  // ===== User breakdown (facets) =====
+  const { data: userBreakdown, isLoading: userBreakdownLoading } = useQuery({
+    queryKey: ['admin-analytics-user-breakdown'],
+    queryFn: async () => {
+      // Page through profiles to get facet fields
+      const pageSize = 1000;
+      let from = 0;
+      const all: Array<{ id: string; timezone: string | null; preferred_language: string | null; country: string | null; gender: string | null }> = [];
+      while (true) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, timezone, preferred_language, country, gender')
+          .range(from, from + pageSize - 1);
+        if (error) throw error;
+        if (!data || data.length === 0) break;
+        all.push(...(data as any));
+        if (data.length < pageSize) break;
+        from += pageSize;
+      }
+
+      const tally = (key: 'timezone' | 'preferred_language' | 'country' | 'gender') => {
+        const map = new Map<string, number>();
+        for (const r of all) {
+          const v = (r[key] || '— unknown —').toString().trim() || '— unknown —';
+          map.set(v, (map.get(v) || 0) + 1);
+        }
+        return Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
+      };
+
+      // Engagement signals — distinct user_ids per table
+      const fetchDistinctUsers = async (table: string, column = 'user_id') => {
+        const ids = new Set<string>();
+        let f = 0;
+        while (true) {
+          const { data, error } = await supabase
+            .from(table as any)
+            .select(column)
+            .range(f, f + pageSize - 1);
+          if (error) throw error;
+          if (!data || data.length === 0) break;
+          for (const row of data as any[]) if (row[column]) ids.add(row[column]);
+          if (data.length < pageSize) break;
+          f += pageSize;
+          if (f > 100000) break; // safety
+        }
+        return ids;
+      };
+
+      const [audio, breath, focus, emo, journal, fasting, mood, subs, orders, onb] = await Promise.all([
+        fetchDistinctUsers('audio_progress'),
+        fetchDistinctUsers('breathing_sessions'),
+        fetchDistinctUsers('focus_sessions'),
+        fetchDistinctUsers('emotion_logs'),
+        fetchDistinctUsers('free_form_reflections'),
+        fetchDistinctUsers('fasting_sessions'),
+        fetchDistinctUsers('journal_entries'),
+        fetchDistinctUsers('user_subscriptions'),
+        fetchDistinctUsers('orders'),
+        fetchDistinctUsers('onboarding_answers'),
+      ]);
+
+      return {
+        total: all.length,
+        byTimezone: tally('timezone'),
+        byLanguage: tally('preferred_language'),
+        byCountry: tally('country'),
+        byGender: tally('gender'),
+        engagement: [
+          { label: 'Listened to any audio', count: audio.size, icon: Activity },
+          { label: 'Did a breathing session', count: breath.size, icon: Wind },
+          { label: 'Did a focus session', count: focus.size, icon: Timer },
+          { label: 'Logged an emotion', count: emo.size, icon: Heart },
+          { label: 'Wrote a reflection', count: journal.size, icon: BookOpen },
+          { label: 'Wrote a journal entry', count: mood.size, icon: BookOpen },
+          { label: 'Tracked fasting', count: fasting.size, icon: Sparkles },
+          { label: 'Had a subscription', count: subs.size, icon: Sparkles },
+          { label: 'Placed an order', count: orders.size, icon: TrendingUp },
+          { label: 'Answered onboarding', count: onb.size, icon: Brain },
+        ],
+      };
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   const funnelMax = funnel?.installs || funnel?.onboardingStarts || 1;
 
   return (
