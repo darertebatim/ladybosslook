@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Users, TrendingUp, MessageSquare, Activity, BookOpen, Wind, Brain, Heart, Timer, Sparkles, Globe, Languages, CheckCircle2, Headphones, CalendarCheck, ShoppingBag, Crown, RefreshCw, Smartphone } from 'lucide-react';
+import { Users, TrendingUp, MessageSquare, Activity, BookOpen, Wind, Brain, Heart, Timer, Sparkles, Globe, Languages, CheckCircle2, Headphones, CalendarCheck, ShoppingBag, Crown, RefreshCw, Smartphone, LogIn, ListChecks, DoorOpen } from 'lucide-react';
 import { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -480,6 +480,10 @@ export default function Analytics() {
                   <FacetCard title="By country" icon={Globe} rows={userBreakdown.by_country || []} total={total} />
                   <FacetCard title="By gender" icon={Users} rows={userBreakdown.by_gender || []} total={total} />
                   <FacetCard title="By platform (iOS / Android / Web)" icon={Smartphone} rows={userBreakdown.by_platform || []} total={total} />
+                  <FacetCard title="By sign-in provider" icon={LogIn} rows={userBreakdown.by_provider || []} total={total} />
+                  <FacetCard title="By onboarding flow (users who answered)" icon={ListChecks} rows={userBreakdown.by_onboarding_flow || []} total={total} />
+                  <FacetCard title="Rilo Doors — primary door" icon={DoorOpen} rows={userBreakdown.by_rilo_door_primary || []} total={total} />
+                  <FacetCard title="Rilo Doors — secondary door" icon={DoorOpen} rows={userBreakdown.by_rilo_door_secondary || []} total={total} />
                 </div>
               </>
             );
