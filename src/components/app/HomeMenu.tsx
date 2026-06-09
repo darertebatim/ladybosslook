@@ -136,6 +136,13 @@ const toolItems: NavItem[] = [
     route: "/app/tasksbank",
     color: "text-rose-600 bg-rose-100",
   },
+  {
+    id: "academy",
+    nameKey: "riloAcademy",
+    icon: <GraduationCap className="h-4 w-4" />,
+    route: "/app/academy",
+    color: "text-indigo-600 bg-indigo-100",
+  },
 ];
 
 // "Tools hub" entry highlighted at the top of the Tools section
