@@ -1318,6 +1318,7 @@ export type Database = {
           id: string
           program_slug: string | null
           round_id: string | null
+          sessions_purchased: number | null
           status: string | null
           user_id: string
         }
@@ -1327,6 +1328,7 @@ export type Database = {
           id?: string
           program_slug?: string | null
           round_id?: string | null
+          sessions_purchased?: number | null
           status?: string | null
           user_id: string
         }
@@ -1336,6 +1338,7 @@ export type Database = {
           id?: string
           program_slug?: string | null
           round_id?: string | null
+          sessions_purchased?: number | null
           status?: string | null
           user_id?: string
         }
@@ -3228,6 +3231,7 @@ export type Database = {
           balance_monthly_price: number | null
           cover_image_url: string | null
           created_at: string | null
+          default_session_count: number | null
           delivery_method: string | null
           deposit_price: number | null
           description: string | null
@@ -3237,6 +3241,7 @@ export type Database = {
           ios_product_id: string | null
           is_active: boolean | null
           is_free_on_ios: boolean | null
+          is_one_on_one: boolean
           language: string
           mailchimp_program_name: string | null
           mailchimp_tags: Json | null
@@ -3275,6 +3280,7 @@ export type Database = {
           balance_monthly_price?: number | null
           cover_image_url?: string | null
           created_at?: string | null
+          default_session_count?: number | null
           delivery_method?: string | null
           deposit_price?: number | null
           description?: string | null
@@ -3284,6 +3290,7 @@ export type Database = {
           ios_product_id?: string | null
           is_active?: boolean | null
           is_free_on_ios?: boolean | null
+          is_one_on_one?: boolean
           language?: string
           mailchimp_program_name?: string | null
           mailchimp_tags?: Json | null
@@ -3322,6 +3329,7 @@ export type Database = {
           balance_monthly_price?: number | null
           cover_image_url?: string | null
           created_at?: string | null
+          default_session_count?: number | null
           delivery_method?: string | null
           deposit_price?: number | null
           description?: string | null
@@ -3331,6 +3339,7 @@ export type Database = {
           ios_product_id?: string | null
           is_active?: boolean | null
           is_free_on_ios?: boolean | null
+          is_one_on_one?: boolean
           language?: string
           mailchimp_program_name?: string | null
           mailchimp_tags?: Json | null
@@ -3377,9 +3386,12 @@ export type Database = {
           google_meet_link: string | null
           id: string
           important_message: string | null
+          instructor_id: string | null
+          is_one_on_one: boolean
           is_self_paced: boolean
           mailchimp_tags: Json | null
           max_students: number | null
+          owner_user_id: string | null
           program_slug: string
           round_name: string
           round_number: number
@@ -3403,9 +3415,12 @@ export type Database = {
           google_meet_link?: string | null
           id?: string
           important_message?: string | null
+          instructor_id?: string | null
+          is_one_on_one?: boolean
           is_self_paced?: boolean
           mailchimp_tags?: Json | null
           max_students?: number | null
+          owner_user_id?: string | null
           program_slug: string
           round_name: string
           round_number: number
@@ -3429,9 +3444,12 @@ export type Database = {
           google_meet_link?: string | null
           id?: string
           important_message?: string | null
+          instructor_id?: string | null
+          is_one_on_one?: boolean
           is_self_paced?: boolean
           mailchimp_tags?: Json | null
           max_students?: number | null
+          owner_user_id?: string | null
           program_slug?: string
           round_name?: string
           round_number?: number
@@ -3449,6 +3467,13 @@ export type Database = {
             columns: ["audio_playlist_id"]
             isOneToOne: false
             referencedRelation: "audio_playlists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_rounds_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "instructors"
             referencedColumns: ["id"]
           },
         ]
