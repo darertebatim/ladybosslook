@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, GraduationCap, Smartphone, ListChecks } from 'lucide-react';
+import { RefreshCw, GraduationCap, Smartphone, ListChecks, MessageCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -27,11 +28,21 @@ interface WaitlistStats {
   count: number;
 }
 
+interface WaitlistEntry {
+  id: string;
+  user_id: string;
+  program_name: string;
+  created_at: string;
+  user_name: string;
+  user_email: string;
+}
+
 export default function Overview() {
   const [courseStats, setCourseStats] = useState<CourseStats[]>([]);
   const [deviceStats, setDeviceStats] = useState<DeviceStats>({ totalDevices: 0, recentDevices: 0, lastRegistration: null });
   const [installStats, setInstallStats] = useState<InstallStats>({ totalInstalls: 0, recentInstalls: 0, lastInstall: null });
   const [waitlistStats, setWaitlistStats] = useState<WaitlistStats[]>([]);
+  const [waitlistEntries, setWaitlistEntries] = useState<WaitlistEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -71,7 +82,8 @@ export default function Overview() {
     try {
       const { data: waitlist, error } = await supabase
         .from('program_waitlist')
-        .select('program_slug');
+        .select('id, user_id, program_slug, created_at')
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
@@ -94,6 +106,31 @@ export default function Overview() {
         count,
       }));
       setWaitlistStats(arr.sort((a, b) => b.count - a.count));
+
+      const userIds = [...new Set((waitlist || []).map(w => w.user_id))];
+      let profileMap = new Map<string, { full_name: string | null; email: string }>();
+      if (userIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, full_name, email')
+          .in('id', userIds);
+        profileMap = new Map(
+          (profiles || []).map(p => [p.id, { full_name: p.full_name, email: p.email }])
+        );
+      }
+
+      const entries: WaitlistEntry[] = (waitlist || []).map(w => {
+        const profile = profileMap.get(w.user_id);
+        return {
+          id: w.id,
+          user_id: w.user_id,
+          program_name: slugToTitle.get(w.program_slug) || w.program_slug,
+          created_at: w.created_at,
+          user_name: profile?.full_name || 'Unknown User',
+          user_email: profile?.email || '',
+        };
+      });
+      setWaitlistEntries(entries);
     } catch (error: any) {
       console.error('Error fetching waitlist stats:', error);
       toast({
@@ -215,18 +252,33 @@ export default function Overview() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <ListChecks className="h-5 w-5" />
-            <CardTitle>Program Waitlist</CardTitle>
+            <CardTitle>Program Waitlist Requests</CardTitle>
           </div>
-          <CardDescription>Users who requested a program</CardDescription>
+          <CardDescription>Newest requests first — tap to open the user's support chat</CardDescription>
         </CardHeader>
         <CardContent>
-          {waitlistStats.length > 0 ? (
+          {waitlistEntries.length > 0 ? (
             <div className="space-y-2">
-              {waitlistStats.map((stat) => (
-                <div key={stat.program_name} className="flex justify-between items-center py-2 border-b last:border-0">
-                  <span className="text-sm">{stat.program_name}</span>
-                  <span className="font-bold">{stat.count}</span>
-                </div>
+              {waitlistEntries.map((entry) => (
+                <Link
+                  key={entry.id}
+                  to={`/admin/support?userId=${entry.user_id}`}
+                  className="flex items-start justify-between gap-3 py-3 px-3 -mx-3 rounded-md border-b last:border-0 hover:bg-accent transition-colors"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-semibold truncate">{entry.user_name}</span>
+                      <span className="text-xs text-muted-foreground truncate">{entry.user_email}</span>
+                    </div>
+                    <div className="text-sm mt-0.5">
+                      requested <span className="font-medium">{entry.program_name}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {new Date(entry.created_at).toLocaleString()}
+                    </div>
+                  </div>
+                  <MessageCircle className="h-4 w-4 text-muted-foreground shrink-0 mt-1" />
+                </Link>
               ))}
             </div>
           ) : (
