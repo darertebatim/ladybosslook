@@ -223,7 +223,7 @@ export default function Analytics() {
         return ids;
       };
 
-      const [audio, breath, focus, emo, journal, fasting, mood, subs, orders, onb] = await Promise.all([
+      const [audio, breath, focus, emo, reflections, fasting, journal, subs, orders, onb] = await Promise.all([
         fetchDistinctUsers('audio_progress'),
         fetchDistinctUsers('breathing_sessions'),
         fetchDistinctUsers('focus_sessions'),
@@ -247,8 +247,8 @@ export default function Analytics() {
           { label: 'Did a breathing session', count: breath.size, icon: Wind },
           { label: 'Did a focus session', count: focus.size, icon: Timer },
           { label: 'Logged an emotion', count: emo.size, icon: Heart },
-          { label: 'Wrote a reflection', count: journal.size, icon: BookOpen },
-          { label: 'Wrote a journal entry', count: mood.size, icon: BookOpen },
+          { label: 'Wrote a reflection', count: reflections.size, icon: BookOpen },
+          { label: 'Wrote a journal entry', count: journal.size, icon: BookOpen },
           { label: 'Tracked fasting', count: fasting.size, icon: Sparkles },
           { label: 'Had a subscription', count: subs.size, icon: Sparkles },
           { label: 'Placed an order', count: orders.size, icon: TrendingUp },
