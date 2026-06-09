@@ -1292,11 +1292,11 @@ const AppCourseDetail = () => {
                   {/* Program Hero Image (only if no video) */}
                   {program &&
                     !program.video_url &&
-                    programImages[program.slug] && (
+                    (program.cover_image_url || programImages[program.slug]) && (
                       <Card className="overflow-hidden">
                         <div className="relative h-64 overflow-hidden">
                           <img
-                            src={programImages[program.slug]}
+                            src={program.cover_image_url || programImages[program.slug]}
                             alt={program.title}
                             className="w-full h-full object-cover"
                           />
