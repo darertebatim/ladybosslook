@@ -5,9 +5,17 @@
  * (Intl API) — not IP — so a VPN does not bypass or trigger this.
  */
 
-const IRAN_TIMEZONES = new Set<string>([
+/**
+ * Timezones where support chat is blocked. Managed here (hardcoded) — the
+ * Admin → System page surfaces the list for visibility.
+ */
+export const SUPPORT_CHAT_BLOCKED_TIMEZONES: readonly string[] = [
   "Asia/Tehran",
-]);
+  "Asia/Kabul",
+  "Asia/Baghdad",
+] as const;
+
+const BLOCKED_TZ_SET = new Set<string>(SUPPORT_CHAT_BLOCKED_TIMEZONES);
 
 export function getDeviceTimezone(): string {
   try {
@@ -18,10 +26,11 @@ export function getDeviceTimezone(): string {
 }
 
 export function isIranTimezone(): boolean {
-  return IRAN_TIMEZONES.has(getDeviceTimezone());
+  // Kept for backwards-compat: now matches any blocked timezone.
+  return BLOCKED_TZ_SET.has(getDeviceTimezone());
 }
 
 /** Convenience: whether support chat should be blocked for the current device. */
 export function isSupportChatBlockedForRegion(): boolean {
-  return isIranTimezone();
+  return BLOCKED_TZ_SET.has(getDeviceTimezone());
 }
