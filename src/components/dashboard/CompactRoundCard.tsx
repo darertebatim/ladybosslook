@@ -93,7 +93,7 @@ export function CompactRoundCard({
                 className={cn(
                   "rounded-full text-[10px] px-1.5 py-0 h-4 border-0 capitalize",
                   isActive
-                    ? 'bg-emerald-500 text-white hover:bg-emerald-500'
+                    ? 'bg-brand text-white hover:bg-brand'
                     : 'bg-foreground/10 text-foreground/70 hover:bg-foreground/10'
                 )}
               >
@@ -114,7 +114,7 @@ export function CompactRoundCard({
               {displayDate && (
                 <span className={cn(
                   "text-[10px] font-medium truncate",
-                  isSessionToday ? 'text-emerald-700 dark:text-emerald-400' : 'text-foreground/70'
+                  isSessionToday ? 'text-brand' : 'text-foreground/70'
                 )}>
                   {isSessionToday
                     ? `Today · ${format(new Date(displayDate), 'h:mm a')}`
