@@ -36,12 +36,14 @@ import {
   Download,
   Sparkles,
   Eye,
+  Ban,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { BUILD_INFO, getDisplayBuildInfo } from "@/lib/buildInfo";
 import { format } from "date-fns";
+import { SUPPORT_CHAT_BLOCKED_TIMEZONES } from "@/lib/regionRestrictions";
 
 // Toggle hidden UI elements via localStorage flags
 function HiddenFeatureToggles() {
@@ -434,6 +436,10 @@ export default function System() {
 
           {/* Build Info Card */}
           <BuildInfoCard />
+
+          {/* Support Chat Region Restrictions */}
+          <SupportChatRestrictionsCard />
+
           {/* Enroll in All Programs */}
           <Card>
             <CardHeader>
