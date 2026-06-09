@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Users, TrendingUp, MessageSquare, Activity, BookOpen, Wind, Brain, Heart, Timer, Sparkles } from 'lucide-react';
+import { Users, TrendingUp, MessageSquare, Activity, BookOpen, Wind, Brain, Heart, Timer, Sparkles, Globe, Languages, CheckCircle2, Headphones, CalendarCheck, ShoppingBag, Crown } from 'lucide-react';
 import { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -177,6 +177,158 @@ export default function Analytics() {
 
   const funnelMax = funnel?.installs || funnel?.onboardingStarts || 1;
 
+  // ===== User breakdown (facets + activation milestones) =====
+  const { data: userBreakdown, isLoading: userBreakdownLoading } = useQuery({
+    queryKey: ['admin-analytics-user-breakdown'],
+    queryFn: async () => {
+      const pageSize = 1000;
+
+      // Fetch all rows (selected columns) from a table, paginating.
+      const fetchAll = async <T,>(table: string, columns: string): Promise<T[]> => {
+        const out: T[] = [];
+        let f = 0;
+        while (true) {
+          const { data, error } = await supabase
+            .from(table as any)
+            .select(columns)
+            .range(f, f + pageSize - 1);
+          if (error) throw error;
+          if (!data || data.length === 0) break;
+          out.push(...(data as any));
+          if (data.length < pageSize) break;
+          f += pageSize;
+          if (out.length > 500000) break;
+        }
+        return out;
+      };
+
+      const profiles = await fetchAll<{
+        timezone: string | null;
+        preferred_language: string | null;
+        country: string | null;
+        gender: string | null;
+      }>('profiles', 'timezone, preferred_language, country, gender');
+
+      const tally = (key: 'timezone' | 'preferred_language' | 'country' | 'gender') => {
+        const m = new Map<string, number>();
+        for (const r of profiles) {
+          const v = ((r[key] as string | null) || '— unknown —').toString().trim() || '— unknown —';
+          m.set(v, (m.get(v) || 0) + 1);
+        }
+        return Array.from(m.entries()).sort((a, b) => b[1] - a[1]);
+      };
+
+      const [
+        audioRows, breathRows, focusRows, emoRows, reflectionRows,
+        journalRows, subsRows, ordersRows, onbRows, taskRows, returnRows,
+      ] = await Promise.all([
+        fetchAll<{ user_id: string | null; current_position_seconds: number | null }>(
+          'audio_progress', 'user_id, current_position_seconds'),
+        fetchAll<{ user_id: string | null }>('breathing_sessions', 'user_id'),
+        fetchAll<{ user_id: string | null }>('focus_sessions', 'user_id'),
+        fetchAll<{ user_id: string | null }>('emotion_logs', 'user_id'),
+        fetchAll<{ user_id: string | null }>('free_form_reflections', 'user_id'),
+        fetchAll<{ user_id: string | null }>('journal_entries', 'user_id'),
+        fetchAll<{ user_id: string | null }>('user_subscriptions', 'user_id'),
+        fetchAll<{ user_id: string | null; status: string | null }>(
+          'orders', 'user_id, status'),
+        fetchAll<{ user_id: string | null }>('onboarding_answers', 'user_id'),
+        fetchAll<{ user_id: string | null }>('task_completions', 'user_id'),
+        fetchAll<{ user_id: string | null; created_at: string | null }>(
+          'app_return_events', 'user_id, created_at'),
+      ]);
+
+      const distinct = (rows: Array<{ user_id: string | null }>) => {
+        const s = new Set<string>();
+        for (const r of rows) if (r.user_id) s.add(r.user_id);
+        return s;
+      };
+      const countByUser = (rows: Array<{ user_id: string | null }>) => {
+        const m = new Map<string, number>();
+        for (const r of rows) {
+          if (!r.user_id) continue;
+          m.set(r.user_id, (m.get(r.user_id) || 0) + 1);
+        }
+        return m;
+      };
+      const atLeast = (m: Map<string, number>, n: number) => {
+        let c = 0;
+        for (const v of m.values()) if (v >= n) c++;
+        return c;
+      };
+
+      // Audio seconds per user → minutes thresholds
+      const audioSecs = new Map<string, number>();
+      for (const r of audioRows) {
+        if (!r.user_id) continue;
+        audioSecs.set(r.user_id, (audioSecs.get(r.user_id) || 0) + (r.current_position_seconds || 0));
+      }
+      const audioMinsAtLeast = (mins: number) => {
+        const cutoff = mins * 60;
+        let c = 0;
+        for (const v of audioSecs.values()) if (v >= cutoff) c++;
+        return c;
+      };
+
+      // Active days per user (distinct days from app_return_events)
+      const activeDays = new Map<string, Set<string>>();
+      for (const r of returnRows) {
+        if (!r.user_id || !r.created_at) continue;
+        const day = r.created_at.slice(0, 10);
+        if (!activeDays.has(r.user_id)) activeDays.set(r.user_id, new Set());
+        activeDays.get(r.user_id)!.add(day);
+      }
+      const activeDaysAtLeast = (n: number) => {
+        let c = 0;
+        for (const s of activeDays.values()) if (s.size >= n) c++;
+        return c;
+      };
+
+      // Completed orders only
+      const completedOrderUsers = new Set<string>();
+      for (const r of ordersRows) {
+        if (r.user_id && r.status === 'completed') completedOrderUsers.add(r.user_id);
+      }
+
+      const emoCounts = countByUser(emoRows);
+      const taskCounts = countByUser(taskRows);
+      const journalCounts = countByUser(journalRows);
+      const breathCounts = countByUser(breathRows);
+      const focusCounts = countByUser(focusRows);
+
+      const total = profiles.length;
+
+      return {
+        total,
+        byTimezone: tally('timezone'),
+        byLanguage: tally('preferred_language'),
+        byCountry: tally('country'),
+        byGender: tally('gender'),
+        engagement: [
+          { label: 'Any audio listened', count: distinct(audioRows).size, icon: Headphones },
+          { label: 'Any breathing session', count: distinct(breathRows).size, icon: Wind },
+          { label: 'Any focus session', count: distinct(focusRows).size, icon: Timer },
+          { label: 'Any mood / emotion log', count: distinct(emoRows).size, icon: Heart },
+          { label: 'Any reflection', count: distinct(reflectionRows).size, icon: BookOpen },
+          { label: 'Any journal entry', count: distinct(journalRows).size, icon: BookOpen },
+          { label: 'Answered onboarding', count: distinct(onbRows).size, icon: Brain },
+          { label: 'Has subscription', count: distinct(subsRows).size, icon: Crown },
+          { label: 'Made a purchase', count: completedOrderUsers.size, icon: ShoppingBag },
+        ],
+        milestones: [
+          { label: 'Completed 10+ tasks', count: atLeast(taskCounts, 10), icon: CheckCircle2 },
+          { label: 'Logged mood/emotion 5+ times', count: atLeast(emoCounts, 5), icon: Heart },
+          { label: 'Listened to 30+ min of audio', count: audioMinsAtLeast(30), icon: Headphones },
+          { label: 'Wrote 3+ journal entries', count: atLeast(journalCounts, 3), icon: BookOpen },
+          { label: 'Did 3+ breathing sessions', count: atLeast(breathCounts, 3), icon: Wind },
+          { label: 'Did 3+ focus sessions', count: atLeast(focusCounts, 3), icon: Timer },
+          { label: 'Active 7+ different days', count: activeDaysAtLeast(7), icon: CalendarCheck },
+        ],
+      };
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between flex-wrap gap-3">
@@ -218,6 +370,7 @@ export default function Analytics() {
           <TabsTrigger value="funnel">Onboarding funnel</TabsTrigger>
           <TabsTrigger value="tools">Tool usage</TabsTrigger>
           <TabsTrigger value="quiz">Self-care quiz</TabsTrigger>
+          <TabsTrigger value="users">User breakdown</TabsTrigger>
         </TabsList>
 
         {/* === Funnel === */}
@@ -305,7 +458,110 @@ export default function Analytics() {
             )}
           </Card>
         </TabsContent>
+
+        {/* === User breakdown === */}
+        <TabsContent value="users" className="space-y-4">
+          {userBreakdownLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-32" />)}
+            </div>
+          ) : !userBreakdown ? null : (
+            <>
+              {/* Activation milestones */}
+              <Card className="p-6 space-y-3">
+                <div>
+                  <h2 className="font-semibold text-lg flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5" /> Activation milestones
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Users who hit each meaningful threshold. Out of {userBreakdown.total.toLocaleString()} total users.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  {userBreakdown.milestones.map((m) => (
+                    <FunnelBar key={m.label} label={m.label} count={m.count} max={userBreakdown.total} />
+                  ))}
+                </div>
+              </Card>
+
+              {/* Lifetime engagement (any usage) */}
+              <Card className="p-6 space-y-3">
+                <div>
+                  <h2 className="font-semibold text-lg flex items-center gap-2">
+                    <Activity className="h-5 w-5" /> Lifetime engagement
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Distinct users who ever did each action. Note: mood check-in and the Emotions tool share one table, so they're counted together.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  {userBreakdown.engagement.map((e) => (
+                    <FunnelBar key={e.label} label={e.label} count={e.count} max={userBreakdown.total} />
+                  ))}
+                </div>
+              </Card>
+
+              {/* Demographic facets */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <FacetCard title="By timezone" icon={Globe} rows={userBreakdown.byTimezone} total={userBreakdown.total} />
+                <FacetCard title="By preferred language" icon={Languages} rows={userBreakdown.byLanguage} total={userBreakdown.total} />
+                <FacetCard title="By country" icon={Globe} rows={userBreakdown.byCountry} total={userBreakdown.total} />
+                <FacetCard title="By gender" icon={Users} rows={userBreakdown.byGender} total={userBreakdown.total} />
+              </div>
+            </>
+          )}
+        </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+function FacetCard({
+  title,
+  icon: Icon,
+  rows,
+  total,
+  limit = 15,
+}: {
+  title: string;
+  icon: any;
+  rows: Array<[string, number]>;
+  total: number;
+  limit?: number;
+}) {
+  const top = rows.slice(0, limit);
+  const max = top[0]?.[1] ?? 1;
+  return (
+    <Card className="p-5 space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-sm flex items-center gap-2">
+          <Icon className="h-4 w-4" /> {title}
+        </h3>
+        <span className="text-xs text-muted-foreground">{rows.length} groups</span>
+      </div>
+      {top.length === 0 ? (
+        <p className="text-xs text-muted-foreground italic">No data.</p>
+      ) : (
+        <div className="space-y-1.5">
+          {top.map(([label, count]) => {
+            const pct = max > 0 ? (count / max) * 100 : 0;
+            const sharePct = total > 0 ? (count / total) * 100 : 0;
+            return (
+              <div key={label} className="space-y-1">
+                <div className="flex items-center justify-between text-xs gap-2">
+                  <span className="font-medium truncate">{label}</span>
+                  <span className="tabular-nums text-muted-foreground shrink-0">
+                    {count.toLocaleString()} <span className="opacity-70">({sharePct.toFixed(1)}%)</span>
+                  </span>
+                </div>
+                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </Card>
   );
 }
