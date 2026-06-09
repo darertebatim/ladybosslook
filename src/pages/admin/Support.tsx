@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ChatConversationList } from "@/components/admin/ChatConversationList";
 import { ChatPanel } from "@/components/admin/ChatPanel";
@@ -28,6 +29,8 @@ export default function Support() {
   const [loading, setLoading] = useState(true);
   const [mobileMode, setMobileMode] = useState(false);
   const [inboxType, setInboxType] = useState<'support' | 'coach'>('support');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const targetUserId = searchParams.get('userId');
 
   const fetchConversations = async () => {
     try {
@@ -133,6 +136,17 @@ export default function Support() {
     setLoading(true);
     fetchConversations();
   }, [inboxType]);
+
+  // Auto-select conversation when ?userId= is provided
+  useEffect(() => {
+    if (!targetUserId || loading) return;
+    const conv = conversations.find(c => c.user_id === targetUserId);
+    if (conv) {
+      handleSelectConversation(conv);
+      searchParams.delete('userId');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [targetUserId, conversations, loading]);
 
   const handleSelectConversation = (conv: Conversation) => {
     setSelectedConversation(conv);
