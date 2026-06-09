@@ -1374,6 +1374,13 @@ const AppHome = () => {
                              Rilo Academy
                            </button>
                          </div>
+                          <div className="mt-4">
+                            <ActiveRoundsCarousel
+                              activeRounds={activeRounds}
+                              nextSessionMap={nextSessionMap}
+                              programImageMap={programImageMap}
+                            />
+                          </div>
                        </>
                     </>
                   )}
