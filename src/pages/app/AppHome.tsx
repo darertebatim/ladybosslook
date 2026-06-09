@@ -914,6 +914,14 @@ const AppHome = () => {
     activeRounds = [],
     nextSessionMap = {}
   } = homeData || {};
+  const { programs: allPrograms = [] } = usePrograms();
+  const programImageMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    allPrograms.forEach((p: any) => {
+      if (p?.slug && p?.image) map[p.slug] = p.image;
+    });
+    return map;
+  }, [allPrograms]);
   return (
     <>
       <SEOHead title="Home - LadyBoss" description="Your personal dashboard and planner" />
