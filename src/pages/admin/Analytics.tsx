@@ -390,7 +390,100 @@ export default function Analytics() {
             )}
           </Card>
         </TabsContent>
+
+        {/* === User breakdown === */}
+        <TabsContent value="users" className="space-y-4">
+          {userBreakdownLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-32" />)}
+            </div>
+          ) : !userBreakdown ? null : (
+            <>
+              <Card className="p-6 space-y-3">
+                <div>
+                  <h2 className="font-semibold text-lg flex items-center gap-2">
+                    <Activity className="h-5 w-5" /> Engagement
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Distinct users who ever used each feature. Total users: {userBreakdown.total.toLocaleString()}.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  {userBreakdown.engagement.map((e) => (
+                    <FunnelBar
+                      key={e.label}
+                      label={e.label}
+                      count={e.count}
+                      max={userBreakdown.total}
+                    />
+                  ))}
+                </div>
+              </Card>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <FacetCard title="By timezone" icon={Globe} rows={userBreakdown.byTimezone} total={userBreakdown.total} />
+                <FacetCard title="By preferred language" icon={Languages} rows={userBreakdown.byLanguage} total={userBreakdown.total} />
+                <FacetCard title="By country" icon={Globe} rows={userBreakdown.byCountry} total={userBreakdown.total} />
+                <FacetCard title="By gender" icon={Users} rows={userBreakdown.byGender} total={userBreakdown.total} />
+              </div>
+            </>
+          )}
+        </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+function FacetCard({
+  title,
+  icon: Icon,
+  rows,
+  total,
+  limit = 15,
+}: {
+  title: string;
+  icon: any;
+  rows: Array<[string, number]>;
+  total: number;
+  limit?: number;
+}) {
+  const top = rows.slice(0, limit);
+  const max = top[0]?.[1] ?? 1;
+  return (
+    <Card className="p-5 space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-sm flex items-center gap-2">
+          <Icon className="h-4 w-4" /> {title}
+        </h3>
+        <span className="text-xs text-muted-foreground">{rows.length} groups</span>
+      </div>
+      {top.length === 0 ? (
+        <p className="text-xs text-muted-foreground italic">No data.</p>
+      ) : (
+        <div className="space-y-1.5">
+          {top.map(([label, count]) => (
+            <FunnelBarSmall key={label} label={label} count={count} max={max} total={total} />
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function FunnelBarSmall({ label, count, max, total }: { label: string; count: number; max: number; total: number }) {
+  const pct = max > 0 ? (count / max) * 100 : 0;
+  const sharePct = total > 0 ? (count / total) * 100 : 0;
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between text-xs gap-2">
+        <span className="font-medium truncate">{label}</span>
+        <span className="tabular-nums text-muted-foreground shrink-0">
+          {count.toLocaleString()} <span className="opacity-70">({sharePct.toFixed(1)}%)</span>
+        </span>
+      </div>
+      <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+        <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
+      </div>
     </div>
   );
 }
