@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 import { CachedImage } from '@/components/ui/CachedImage';
+import { HostBadges } from '@/components/app/HostBadges';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
@@ -58,6 +59,7 @@ const TYPE_LABEL_KEYS: Record<string, string> = {
 // --- Horizontal Program Card (matches PlaylistCard style) ---
 interface AcademyProgramCardProps {
   title: string;
+  slug: string;
   image?: string;
   type?: string;
   language?: string;
@@ -67,7 +69,7 @@ interface AcademyProgramCardProps {
   onClick?: () => void;
 }
 
-const AcademyProgramCard = ({ title, image, type, language, isFree, isEnrolled, isWaitlist, onClick }: AcademyProgramCardProps) => {
+const AcademyProgramCard = ({ title, slug, image, type, language, isFree, isEnrolled, isWaitlist, onClick }: AcademyProgramCardProps) => {
   const { t } = useTranslation();
   const TypeIcon = (type && TYPE_ICONS[type]) || Sparkles;
   const typeLabel = type && TYPE_LABEL_KEYS[type] ? t(TYPE_LABEL_KEYS[type]) : null;
@@ -123,6 +125,15 @@ const AcademyProgramCard = ({ title, image, type, language, isFree, isEnrolled, 
 
           {/* Title */}
           <h3 className="font-bold text-sm text-white line-clamp-2 leading-snug">{title}</h3>
+
+          {/* Hosts / Instructors */}
+          <HostBadges
+            contentType="program"
+            contentId={slug}
+            size="sm"
+            prefix="with"
+            className="text-white/70"
+          />
 
           {/* Language flag */}
           <div className="flex items-center gap-1.5 mt-0.5">
