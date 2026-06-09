@@ -140,13 +140,38 @@ export default function Support() {
   // Auto-select conversation when ?userId= is provided
   useEffect(() => {
     if (!targetUserId || loading) return;
-    const conv = conversations.find(c => c.user_id === targetUserId);
-    if (conv) {
+    (async () => {
+      let conv = conversations.find(c => c.user_id === targetUserId);
+      if (!conv) {
+        // Look up the conversation directly (may be in a different inbox or outside loaded list)
+        const { data: convData } = await supabase
+          .from('chat_conversations')
+          .select('*')
+          .eq('user_id', targetUserId)
+          .order('last_message_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (!convData) return;
+        if (convData.inbox_type !== inboxType) {
+          setInboxType(convData.inbox_type as 'support' | 'coach');
+          return; // effect will re-run after conversations reload
+        }
+        const [profileRes, lastMsgRes] = await Promise.all([
+          supabase.from('profiles').select('full_name, email').eq('id', convData.user_id).maybeSingle(),
+          supabase.from('chat_messages').select('content').eq('conversation_id', convData.id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
+        ]);
+        conv = {
+          ...convData,
+          profiles: profileRes.data || undefined,
+          last_message: lastMsgRes.data?.content,
+          programs: [],
+        } as Conversation;
+      }
       handleSelectConversation(conv);
       searchParams.delete('userId');
       setSearchParams(searchParams, { replace: true });
-    }
-  }, [targetUserId, conversations, loading]);
+    })();
+  }, [targetUserId, conversations, loading, inboxType]);
 
   const handleSelectConversation = (conv: Conversation) => {
     setSelectedConversation(conv);
