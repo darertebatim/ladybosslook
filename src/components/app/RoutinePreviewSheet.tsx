@@ -141,9 +141,10 @@ export function RoutinePreviewSheet({
   const { t } = useTranslation();
   // Generate synthetic pro-task for multi-task routines
   const displayTasks = useMemo(() => {
-    // Routine player synthetic task — temporarily hidden (set HIDE_ROUTINE_PLAYER to false to restore)
-    const HIDE_ROUTINE_PLAYER = true;
-    if (!HIDE_ROUTINE_PLAYER && tasks.length > 1 && routineBankId) {
+    // Routine player synthetic task — temporarily hidden. Admin can re-enable from /admin/system.
+    const SHOW_ROUTINE_PLAYER = typeof window !== 'undefined'
+      && localStorage.getItem('simora_show_routine_player_task') === 'true';
+    if (SHOW_ROUTINE_PLAYER && tasks.length > 1 && routineBankId) {
       const proTask: RoutinePlanTask = {
         id: `__pro_task_routine_${routineBankId}`,
         plan_id: routineBankId,
