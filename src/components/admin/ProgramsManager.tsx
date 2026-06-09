@@ -97,6 +97,7 @@ export function ProgramsManager() {
     show_in_app_waitlist: false,
     is_one_on_one: false,
     default_session_count: 0,
+    auto_create_feed_channel: true,
   });
   const [hosts, setHosts] = useState<HostAssignment[]>([]);
 
@@ -176,6 +177,7 @@ export function ProgramsManager() {
       show_in_app_waitlist: false,
       is_one_on_one: false,
       default_session_count: 0,
+      auto_create_feed_channel: true,
     });
     setEditingId(null);
     setShowForm(false);
@@ -267,6 +269,8 @@ export function ProgramsManager() {
       show_in_app_waitlist: (program as any).show_in_app_waitlist || false,
       is_one_on_one: (program as any).is_one_on_one || false,
       default_session_count: (program as any).default_session_count || 0,
+      auto_create_feed_channel:
+        (program as any).auto_create_feed_channel ?? true,
     });
     try {
       setHosts(await loadContentHosts('program', program.slug));
