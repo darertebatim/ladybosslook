@@ -1195,9 +1195,11 @@ const AppHome = () => {
                          className="absolute top-0.5 bottom-0.5 rounded-full bg-card shadow-ios"
                         animate={{ 
                           width: homeView === 'routines' ? btnRoutinesRef.current?.offsetWidth 
-                            : btnTasksRef.current?.offsetWidth,
+                            : homeView === 'tasks' ? btnTasksRef.current?.offsetWidth
+                            : btnOneTimeRef.current?.offsetWidth,
                           x: homeView === 'routines' ? 0 
-                            : (btnRoutinesRef.current?.offsetWidth ?? 0)
+                            : homeView === 'tasks' ? (btnRoutinesRef.current?.offsetWidth ?? 0)
+                            : ((btnRoutinesRef.current?.offsetWidth ?? 0) + (btnTasksRef.current?.offsetWidth ?? 0))
                         }}
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                       />
@@ -1220,6 +1222,16 @@ const AppHome = () => {
                          )}
                        >
                         <Zap className="h-2.5 w-2.5 fill-amber-400 text-amber-400 shrink-0" /> {t('home.myTasks')}
+                       </button>
+                       <button
+                         ref={btnOneTimeRef}
+                         onClick={() => { haptic.selection(); setHomeView('one-time'); setTaskFilter('one-time'); }}
+                         className={cn(
+                           "relative z-10 px-3 py-1 rounded-full text-[11px] font-semibold transition-colors whitespace-nowrap",
+                           homeView === 'one-time' ? 'text-foreground' : 'text-fg-warm-muted dark:text-white/40'
+                         )}
+                       >
+                         {t('filter.todos')}
                        </button>
                      </div>
                       <div className="flex items-center gap-2 mr-2">
