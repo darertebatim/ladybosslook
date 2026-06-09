@@ -4,7 +4,6 @@ import { format, isToday } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { CachedImage } from '@/components/ui/CachedImage';
 import { cn } from '@/lib/utils';
-import { pickPeach } from '@/lib/peachPalette';
 
 interface CompactRoundCardProps {
   enrollment: any;
@@ -30,8 +29,6 @@ export function CompactRoundCard({
   const isUpcoming = round.status === 'upcoming';
   const displayDate = nextSessionDate || round.first_session_date;
   const isSessionToday = displayDate && isToday(new Date(displayDate));
-
-  const peachBg = pickPeach(enrollment.program_slug || enrollment.id || String(colorIndex));
 
   // Get video thumbnail
   let thumbnailUrl = programImage || '';
@@ -59,11 +56,14 @@ export function CompactRoundCard({
           "relative w-[280px] rounded-2xl overflow-hidden shadow-ios transition-transform active:scale-[0.98]",
           isUnseen && "ring-2 ring-brand ring-offset-2"
         )}
-        style={{ backgroundColor: peachBg }}
+        style={{ background: 'linear-gradient(160deg, #FFE6C9 0%, #FFD2A1 100%)' }}
       >
         <div className="flex gap-3 p-2">
           {/* Square thumbnail */}
-          <div className="relative h-20 w-20 flex-shrink-0 rounded-xl overflow-hidden bg-background/40">
+          <div
+            className="relative h-20 w-20 flex-shrink-0 rounded-xl overflow-hidden"
+            style={{ background: '#FFFFFF', boxShadow: '0 6px 14px rgba(0,0,0,0.10)' }}
+          >
             {thumbnailUrl ? (
               <CachedImage
                 src={thumbnailUrl}
@@ -73,8 +73,8 @@ export function CompactRoundCard({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-foreground/5">
-                <GraduationCap className="h-8 w-8 text-foreground/40" />
+              <div className="w-full h-full flex items-center justify-center" style={{ background: '#FFF4ED' }}>
+                <GraduationCap className="h-8 w-8" style={{ color: '#8B6E5A' }} />
               </div>
             )}
           </div>
@@ -89,33 +89,26 @@ export function CompactRoundCard({
                   New
                 </Badge>
               )}
-              <Badge
-                className={cn(
-                  "rounded-full text-[10px] px-1.5 py-0 h-4 border-0 capitalize",
-                  isActive
-                    ? 'bg-brand text-white hover:bg-brand'
-                    : 'bg-foreground/10 text-foreground/70 hover:bg-foreground/10'
-                )}
+              <span
+                className="text-[10px] font-bold uppercase tracking-[0.15em]"
+                style={{ color: isActive ? '#EB5E33' : '#8B6E5A' }}
               >
-                {round.status}
-              </Badge>
-              {round.round_name && (
-                <span className="text-[11px] text-foreground/80 truncate">{round.round_name}</span>
-              )}
+                {isActive ? 'Active' : round.status}
+              </span>
             </div>
 
             {/* Title */}
-            <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
+            <h3 className="font-bold text-sm line-clamp-2 leading-snug" style={{ color: '#2D1A0E' }}>
               {enrollment.course_name}
             </h3>
 
             {/* Next session */}
             <div className="flex items-center gap-1.5 flex-wrap">
               {displayDate && (
-                <span className={cn(
-                  "text-[10px] font-medium truncate",
-                  isSessionToday ? 'text-brand' : 'text-foreground/70'
-                )}>
+                <span
+                  className="text-[11px] font-medium truncate"
+                  style={{ color: isSessionToday ? '#EB5E33' : '#6B4D33' }}
+                >
                   {isSessionToday
                     ? `Today · ${format(new Date(displayDate), 'h:mm a')}`
                     : isUpcoming
