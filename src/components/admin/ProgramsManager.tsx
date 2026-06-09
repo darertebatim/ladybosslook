@@ -39,6 +39,8 @@ interface ProgramCatalog {
   android_product_id?: string | null;
   cover_image_url?: string | null;
   show_in_app_waitlist?: boolean;
+  is_one_on_one?: boolean;
+  default_session_count?: number | null;
 }
 
 export function ProgramsManager() {
@@ -92,6 +94,8 @@ export function ProgramsManager() {
     annual_ios_product_id: '',
     annual_android_product_id: '',
     show_in_app_waitlist: false,
+    is_one_on_one: false,
+    default_session_count: 0,
   });
   const [hosts, setHosts] = useState<HostAssignment[]>([]);
 
@@ -169,6 +173,8 @@ export function ProgramsManager() {
       annual_ios_product_id: '',
       annual_android_product_id: '',
       show_in_app_waitlist: false,
+      is_one_on_one: false,
+      default_session_count: 0,
     });
     setEditingId(null);
     setShowForm(false);
@@ -258,6 +264,8 @@ export function ProgramsManager() {
       annual_ios_product_id: (program as any).annual_ios_product_id || '',
       annual_android_product_id: (program as any).annual_android_product_id || '',
       show_in_app_waitlist: (program as any).show_in_app_waitlist || false,
+      is_one_on_one: (program as any).is_one_on_one || false,
+      default_session_count: (program as any).default_session_count || 0,
     });
     try {
       setHosts(await loadContentHosts('program', program.slug));
