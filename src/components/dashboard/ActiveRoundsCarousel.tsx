@@ -69,27 +69,49 @@ export function ActiveRoundsCarousel({
     return null;
   }
   return <div className={`tour-programs-carousel ${isCollapsed ? '' : 'space-y-2'}`}>
-      {/* Header - always visible, acts as expand/collapse toggle */}
-      <button className="w-full flex items-center justify-between rounded-2xl transition-all py-0 px-0 bg-primary-foreground shadow-none" onClick={toggleCollapse} aria-label={isCollapsed ? 'Expand programs' : 'Collapse programs'} aria-expanded={!isCollapsed}>
-        <div className="flex items-center gap-1.5">
-          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}`} />
-          <h2 className="text-sm font-semibold text-foreground">Your Programs</h2>
-          <Badge variant="secondary" className="h-4 px-1 text-[10px]">
-            {activeRounds.length}
-          </Badge>
-          <span className="text-[10px] text-muted-foreground ml-1">
-            {isCollapsed ? 'tap to expand' : 'tap to collapse'}
-          </span>
+      {/* Header - styled like a path row with checkpoint dot */}
+      <div className="relative pl-[60px]">
+        <div
+          className="absolute left-[22px] top-1/2 -translate-y-1/2 w-[26px] h-[26px] rounded-full flex items-center justify-center"
+          style={{ background: '#FFFFFF', border: '2px solid #F5DCC8' }}
+        >
+          <GraduationCap className="w-3 h-3" style={{ color: '#EB5E33' }} />
         </div>
-        <Link to="/app/myprograms" className="text-xs text-primary font-medium flex items-center gap-0.5" onClick={e => e.stopPropagation()}>
-          View All
-          <ChevronRight className="h-3.5 w-3.5" />
-        </Link>
-      </button>
+        <button
+          className="w-full flex items-center justify-between rounded-2xl px-3 py-2.5 active:scale-[0.99] transition-transform"
+          style={{ background: '#FFFFFF', border: '1px solid #F5DCC8' }}
+          onClick={toggleCollapse}
+          aria-label={isCollapsed ? 'Expand programs' : 'Collapse programs'}
+          aria-expanded={!isCollapsed}
+        >
+          <div className="flex items-center gap-1.5 min-w-0">
+            <ChevronDown
+              className={`h-4 w-4 transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}`}
+              style={{ color: '#8B6E5A' }}
+            />
+            <h2 className="text-[13.5px] font-semibold" style={{ color: '#2D1A0E' }}>Your Programs</h2>
+            <Badge variant="secondary" className="h-4 px-1 text-[10px]">
+              {activeRounds.length}
+            </Badge>
+            <span className="text-[10px] ml-1 truncate" style={{ color: '#8B6E5A' }}>
+              {isCollapsed ? 'tap to expand' : 'tap to collapse'}
+            </span>
+          </div>
+          <Link
+            to="/app/myprograms"
+            className="text-[11px] font-semibold flex items-center gap-0.5 shrink-0"
+            style={{ color: '#EB5E33' }}
+            onClick={e => e.stopPropagation()}
+          >
+            View All
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Link>
+        </button>
+      </div>
 
       {/* Vertical stack - collapsible (matches path task rows) */}
       <div className={`overflow-hidden transition-all duration-300 ease-out ${isCollapsed ? 'max-h-0 opacity-0' : 'max-h-[2000px] opacity-100'}`}>
-        <div className="pt-2 -ml-[60px]">
+        <div className="pt-2">
           {activeRounds.map((enrollment, index) => {
             const roundId = enrollment.program_rounds?.id;
             const isEnrollmentUnseen = unseenEnrollments.has(enrollment.id);
