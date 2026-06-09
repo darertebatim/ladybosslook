@@ -1155,6 +1155,31 @@ export function ProgramsManager() {
                     </p>
                   </div>
                 )}
+
+                <div className="flex items-center space-x-2 border-t pt-3">
+                  <Checkbox
+                    id="auto_create_feed_channel"
+                    checked={formData.auto_create_feed_channel ?? true}
+                    disabled={formData.is_one_on_one}
+                    onCheckedChange={(checked) =>
+                      setFormData({
+                        ...formData,
+                        auto_create_feed_channel: checked as boolean,
+                      })
+                    }
+                  />
+                  <Label
+                    htmlFor="auto_create_feed_channel"
+                    className="text-sm font-normal cursor-pointer"
+                  >
+                    💬 Auto-create a Chat channel for each new round
+                  </Label>
+                </div>
+                <p className="text-xs text-muted-foreground pl-6 -mt-2">
+                  {formData.is_one_on_one
+                    ? '1:1 rounds never create a chat channel.'
+                    : 'Turn off if this program shouldn\'t produce a per-round channel in the Chats list.'}
+                </p>
                 
                 <div className="flex items-center space-x-2">
                   <Checkbox 
