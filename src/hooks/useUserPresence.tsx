@@ -190,9 +190,11 @@ export const useTrackAppReturn = (userId: string | undefined) => {
 
       try {
         // Log individual return event for weekly tracking
+        // platform: 'ios' | 'android' | 'web' — feeds the admin platform breakdown
+        const platform = Capacitor.getPlatform();
         await supabase
           .from('app_return_events')
-          .insert({ user_id: userId });
+          .insert({ user_id: userId, platform });
 
         // Also increment the total counter on profiles
         const { data } = await supabase
