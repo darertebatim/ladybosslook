@@ -357,6 +357,19 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         onConflict: "user_id,audio_id",
       });
 
+      // Keep the active listen event's seconds_listened in sync.
+      if (listenEventIdRef.current && listenEventTrackIdRef.current === currentTrack.id) {
+        try {
+          await supabase
+            .from('audio_listen_events')
+            .update({
+              seconds_listened: Math.floor(currentTime),
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', listenEventIdRef.current);
+        } catch { /* ignore */ }
+      }
+
       // Fire 5-star review request when user completes ≥80% of an audio track
       if (duration > 0 && currentTime / duration >= 0.8) {
         const { triggerSoftReview } = await import('@/lib/appReview');
