@@ -129,8 +129,8 @@ const AppPeriod = () => {
     return monthLogs.find((log) => log.date === dateStr) || null;
   }, [selectedDate, monthLogs]);
 
-  // Subscription gate
-  if (!subLoading && !isSubscribed) {
+  // Subscription gate — Period is free for all
+  if (false && !subLoading && !isSubscribed) {
     return (
       <>
         <div className="fixed inset-0 z-10 flex flex-col items-center justify-center bg-gradient-to-b from-pink-200 to-rose-50 px-6 text-center">
