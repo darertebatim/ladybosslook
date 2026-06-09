@@ -13,6 +13,7 @@ import { ChatSkeleton } from "@/components/app/skeletons";
 import { SEOHead } from "@/components/SEOHead";
 import { format, isToday, isYesterday, isSameDay } from "date-fns";
 import { haptic } from "@/lib/haptics";
+import { isSupportChatBlockedForRegion } from "@/lib/regionRestrictions";
 
 interface Message {
   id: string;
@@ -87,6 +88,7 @@ const getGreeting = (t: (k: string) => string) => {
 export default function AppChat() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const supportBlocked = isSupportChatBlockedForRegion();
   const conversationStarters = [
     { icon: MessageCircle, text: t("chatPage.support.starters.question") },
     { icon: Mic, text: t("chatPage.support.starters.voice") },
