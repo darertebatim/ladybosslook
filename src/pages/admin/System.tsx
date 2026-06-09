@@ -36,12 +36,43 @@ import {
   Download,
   Sparkles,
   Eye,
+  Ban,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { BUILD_INFO, getDisplayBuildInfo } from "@/lib/buildInfo";
 import { format } from "date-fns";
+import { SUPPORT_CHAT_BLOCKED_TIMEZONES } from "@/lib/regionRestrictions";
+
+function SupportChatRestrictionsCard() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Ban className="h-5 w-5" />
+          Support Chat Region Restrictions
+        </CardTitle>
+        <CardDescription>
+          Users whose device timezone matches one of these are fully blocked
+          from in-app support chat and shown an email-instead message.
+          Detection is device-only (Intl API), so a VPN does not bypass or
+          trigger this. To change the list, edit{" "}
+          <code className="text-xs">src/lib/regionRestrictions.ts</code>.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-wrap gap-2">
+          {SUPPORT_CHAT_BLOCKED_TIMEZONES.map((tz) => (
+            <Badge key={tz} variant="destructive" className="font-mono text-xs">
+              {tz}
+            </Badge>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 // Toggle hidden UI elements via localStorage flags
 function HiddenFeatureToggles() {
@@ -434,6 +465,10 @@ export default function System() {
 
           {/* Build Info Card */}
           <BuildInfoCard />
+
+          {/* Support Chat Region Restrictions */}
+          <SupportChatRestrictionsCard />
+
           {/* Enroll in All Programs */}
           <Card>
             <CardHeader>
