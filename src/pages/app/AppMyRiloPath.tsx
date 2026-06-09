@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight, Headset, Award } from "lucide-react";
+import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight, Headset, Award, Compass, GraduationCap } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import {
@@ -641,6 +641,24 @@ export default function AppMyRiloPath() {
             )}
 
             {reward && <RewardRow step={reward} />}
+
+            {/* Quick links */}
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={() => navigate('/app/tools')}
+                className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+              >
+                <Compass className="w-3.5 h-3.5" style={{ color: O.primary }} />
+                Explore Tools
+              </button>
+              <button
+                onClick={() => navigate('/app/academy')}
+                className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+              >
+                <GraduationCap className="w-3.5 h-3.5" style={{ color: O.primary }} />
+                Rilo Academy
+              </button>
+            </div>
           </div>
 
           {/* Bottom banners (admin-curated) — after the path */}
