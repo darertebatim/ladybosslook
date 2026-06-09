@@ -295,6 +295,7 @@ export default function AppChannelsList() {
             
 
             {/* Support Chat - Last in the list */}
+            {!supportBlocked && (
             <button
               onClick={handleSupportClick}
               className="w-full flex items-center gap-3 p-3 rounded-2xl bg-card-warm shadow-card-warm text-left transition-transform active:scale-[0.99]"
@@ -331,12 +332,14 @@ export default function AppChannelsList() {
               </div>
               <ChevronRight className="h-4 w-4 text-fg-warm-muted/60 shrink-0" />
             </button>
+            )}
           </div>
           {/* Window into the hub */}
           <div className="px-1 pt-5 flex justify-center">
             <HubPortalCard />
           </div>
           {/* Feedback encouragement in white space */}
+          {!supportBlocked && (
           <button
             onClick={handleSupportClick}
             className="w-full flex flex-col items-center py-8 px-6 active:bg-muted/30 transition-colors"
@@ -356,6 +359,7 @@ export default function AppChannelsList() {
               {t('chats.feedbackHint')}
             </p>
           </button>
+          )}
         </>) : (
           <div className="text-center py-12 px-4">
             <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
