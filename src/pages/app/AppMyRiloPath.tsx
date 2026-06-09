@@ -659,7 +659,7 @@ export default function AppMyRiloPath() {
             {reward && <RewardRow step={reward} />}
 
             {/* Quick links */}
-            <div className="flex gap-2 mt-4">
+            <div className="flex gap-2 mt-4 pl-[60px]">
               <button
                 onClick={() => navigate('/app/tools')}
                 className="flex-1 rounded-3xl py-2.5 px-3 bg-card-warm shadow-card-warm text-[12px] font-semibold text-foreground active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
@@ -677,7 +677,7 @@ export default function AppMyRiloPath() {
             </div>
 
             {/* Your Programs (active rounds) */}
-            <div className="mt-4">
+            <div className="mt-4 pl-[60px]">
               <ActiveRoundsCarousel
                 activeRounds={activeRounds}
                 nextSessionMap={nextSessionMap}
