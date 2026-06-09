@@ -55,6 +55,7 @@ interface ProgramRound {
   video_url: string | null;
   drip_offset_days: number;
   is_self_paced: boolean;
+  auto_create_feed_channel?: boolean;
 }
 
 interface RoundFormData {
@@ -77,6 +78,7 @@ interface RoundFormData {
   audio_playlist_id: string;
   video_url: string;
   is_self_paced: boolean;
+  auto_create_feed_channel: boolean;
 }
 
 export const ProgramRoundsManager = () => {
@@ -114,6 +116,7 @@ export const ProgramRoundsManager = () => {
     audio_playlist_id: "none",
     video_url: "",
     is_self_paced: false,
+    auto_create_feed_channel: true,
   });
 
   // Fetch programs for dropdown
@@ -193,6 +196,7 @@ export const ProgramRoundsManager = () => {
         audio_playlist_id: data.audio_playlist_id === "none" ? null : data.audio_playlist_id || null,
         video_url: data.video_url || null,
         is_self_paced: data.is_self_paced,
+        auto_create_feed_channel: data.auto_create_feed_channel,
       };
 
       if (editingId) {
@@ -210,8 +214,8 @@ export const ProgramRoundsManager = () => {
           .single();
         if (error) throw error;
 
-        // Auto-create a feed channel for this round
-        if (newRound) {
+        // Auto-create a feed channel for this round (respect per-round opt-out)
+        if (newRound && data.auto_create_feed_channel) {
           const programTitle = programs?.find(p => p.slug === data.program_slug)?.title || data.program_slug;
           const channelSlug = `${data.program_slug}-round-${data.round_number}`.toLowerCase().replace(/\s+/g, '-');
           
@@ -342,6 +346,7 @@ export const ProgramRoundsManager = () => {
       audio_playlist_id: "none",
       video_url: "",
       is_self_paced: false,
+      auto_create_feed_channel: true,
     });
     setEditingId(null);
   };
@@ -389,6 +394,7 @@ export const ProgramRoundsManager = () => {
       audio_playlist_id: round.audio_playlist_id || "none",
       video_url: round.video_url || "",
       is_self_paced: round.is_self_paced || false,
+      auto_create_feed_channel: round.auto_create_feed_channel ?? true,
     });
     setEditingId(round.id);
     setIsFormDialogOpen(true);
@@ -419,6 +425,7 @@ export const ProgramRoundsManager = () => {
       audio_playlist_id: round.audio_playlist_id || "none",
       video_url: round.video_url || "",
       is_self_paced: round.is_self_paced || false,
+      auto_create_feed_channel: round.auto_create_feed_channel ?? true,
     });
     setEditingId(null); // This is a new round, not editing
     setIsFormDialogOpen(true);
