@@ -57,12 +57,7 @@ export default function AppFasting() {
   const [editStartOpen, setEditStartOpen] = useState(false);
   const [editGoalOpen, setEditGoalOpen] = useState(false);
 
-  // Show paywall for non-subscribers
-  useEffect(() => {
-    if (!subLoading && !isSubscribed) {
-      setShowPaywall(true);
-    }
-  }, [subLoading, isSubscribed]);
+  // Fasting is free for all — no paywall on entry
 
   // Auto-open weight logging when navigated with ?weight=1
   useEffect(() => {
