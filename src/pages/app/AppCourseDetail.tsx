@@ -1384,27 +1384,6 @@ const AppCourseDetail = () => {
                           {/* Waitlist program - show_in_app_waitlist takes priority */}
                           {(program as any).show_in_app_waitlist ? (
                             <div className="space-y-4">
-                              {/* Price info card */}
-                              {program.price_amount > 0 && (
-                                <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 text-center space-y-1">
-                                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                                    Program Price
-                                  </p>
-                                  <p className="text-2xl font-bold text-foreground">
-                                    {(program as any).currency === "ILS"
-                                      ? "₪"
-                                      : "$"}
-                                    {(program.price_amount / 100).toFixed(0)}
-                                  </p>
-                                  <div className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 mt-1">
-                                    <Clock className="h-3 w-3 text-muted-foreground" />
-                                    <span className="text-xs font-medium text-muted-foreground">
-                                      Registration opening soon
-                                    </span>
-                                  </div>
-                                </div>
-                              )}
-
                               <Button
                                 size="lg"
                                 className="w-full gap-2"
