@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Users, TrendingUp, MessageSquare, Activity, BookOpen, Wind, Brain, Heart, Timer, Sparkles } from 'lucide-react';
+import { Users, TrendingUp, MessageSquare, Activity, BookOpen, Wind, Brain, Heart, Timer, Sparkles, Globe, Languages } from 'lucide-react';
 import { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -177,6 +177,88 @@ export default function Analytics() {
 
   const funnelMax = funnel?.installs || funnel?.onboardingStarts || 1;
 
+  // ===== User breakdown (facets) =====
+  const { data: userBreakdown, isLoading: userBreakdownLoading } = useQuery({
+    queryKey: ['admin-analytics-user-breakdown'],
+    queryFn: async () => {
+      const pageSize = 1000;
+      const all: Array<{ timezone: string | null; preferred_language: string | null; country: string | null; gender: string | null }> = [];
+      let from = 0;
+      while (true) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('timezone, preferred_language, country, gender')
+          .range(from, from + pageSize - 1);
+        if (error) throw error;
+        if (!data || data.length === 0) break;
+        all.push(...(data as any));
+        if (data.length < pageSize) break;
+        from += pageSize;
+      }
+
+      const tally = (key: 'timezone' | 'preferred_language' | 'country' | 'gender') => {
+        const m = new Map<string, number>();
+        for (const r of all) {
+          const v = ((r[key] as string | null) || '— unknown —').toString().trim() || '— unknown —';
+          m.set(v, (m.get(v) || 0) + 1);
+        }
+        return Array.from(m.entries()).sort((a, b) => b[1] - a[1]);
+      };
+
+      const fetchDistinctUsers = async (table: string) => {
+        const ids = new Set<string>();
+        let f = 0;
+        while (true) {
+          const { data, error } = await supabase
+            .from(table as any)
+            .select('user_id')
+            .range(f, f + pageSize - 1);
+          if (error) throw error;
+          if (!data || data.length === 0) break;
+          for (const row of data as any[]) if (row.user_id) ids.add(row.user_id);
+          if (data.length < pageSize) break;
+          f += pageSize;
+          if (f > 200000) break;
+        }
+        return ids;
+      };
+
+      const [audio, breath, focus, emo, reflections, fasting, journal, subs, orders, onb] = await Promise.all([
+        fetchDistinctUsers('audio_progress'),
+        fetchDistinctUsers('breathing_sessions'),
+        fetchDistinctUsers('focus_sessions'),
+        fetchDistinctUsers('emotion_logs'),
+        fetchDistinctUsers('free_form_reflections'),
+        fetchDistinctUsers('fasting_sessions'),
+        fetchDistinctUsers('journal_entries'),
+        fetchDistinctUsers('user_subscriptions'),
+        fetchDistinctUsers('orders'),
+        fetchDistinctUsers('onboarding_answers'),
+      ]);
+
+      return {
+        total: all.length,
+        byTimezone: tally('timezone'),
+        byLanguage: tally('preferred_language'),
+        byCountry: tally('country'),
+        byGender: tally('gender'),
+        engagement: [
+          { label: 'Listened to any audio', count: audio.size, icon: Activity },
+          { label: 'Did a breathing session', count: breath.size, icon: Wind },
+          { label: 'Did a focus session', count: focus.size, icon: Timer },
+          { label: 'Logged mood or emotion', count: emo.size, icon: Heart },
+          { label: 'Wrote a reflection', count: reflections.size, icon: BookOpen },
+          { label: 'Wrote a journal entry', count: journal.size, icon: BookOpen },
+          { label: 'Tracked fasting', count: fasting.size, icon: Sparkles },
+          { label: 'Had a subscription', count: subs.size, icon: Sparkles },
+          { label: 'Placed an order', count: orders.size, icon: TrendingUp },
+          { label: 'Answered onboarding', count: onb.size, icon: Brain },
+        ],
+      };
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between flex-wrap gap-3">
@@ -218,6 +300,7 @@ export default function Analytics() {
           <TabsTrigger value="funnel">Onboarding funnel</TabsTrigger>
           <TabsTrigger value="tools">Tool usage</TabsTrigger>
           <TabsTrigger value="quiz">Self-care quiz</TabsTrigger>
+          <TabsTrigger value="users">User breakdown</TabsTrigger>
         </TabsList>
 
         {/* === Funnel === */}
@@ -305,7 +388,92 @@ export default function Analytics() {
             )}
           </Card>
         </TabsContent>
+
+        {/* === User breakdown === */}
+        <TabsContent value="users" className="space-y-4">
+          {userBreakdownLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-32" />)}
+            </div>
+          ) : !userBreakdown ? null : (
+            <>
+              <Card className="p-6 space-y-3">
+                <div>
+                  <h2 className="font-semibold text-lg flex items-center gap-2">
+                    <Activity className="h-5 w-5" /> Engagement
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Distinct users who ever used each feature. Total users: {userBreakdown.total.toLocaleString()}.
+                    Note: mood check-in and the Emotions tool share one table, so they're counted together.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  {userBreakdown.engagement.map((e) => (
+                    <FunnelBar key={e.label} label={e.label} count={e.count} max={userBreakdown.total} />
+                  ))}
+                </div>
+              </Card>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <FacetCard title="By timezone" icon={Globe} rows={userBreakdown.byTimezone} total={userBreakdown.total} />
+                <FacetCard title="By preferred language" icon={Languages} rows={userBreakdown.byLanguage} total={userBreakdown.total} />
+                <FacetCard title="By country" icon={Globe} rows={userBreakdown.byCountry} total={userBreakdown.total} />
+                <FacetCard title="By gender" icon={Users} rows={userBreakdown.byGender} total={userBreakdown.total} />
+              </div>
+            </>
+          )}
+        </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+function FacetCard({
+  title,
+  icon: Icon,
+  rows,
+  total,
+  limit = 15,
+}: {
+  title: string;
+  icon: any;
+  rows: Array<[string, number]>;
+  total: number;
+  limit?: number;
+}) {
+  const top = rows.slice(0, limit);
+  const max = top[0]?.[1] ?? 1;
+  return (
+    <Card className="p-5 space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-sm flex items-center gap-2">
+          <Icon className="h-4 w-4" /> {title}
+        </h3>
+        <span className="text-xs text-muted-foreground">{rows.length} groups</span>
+      </div>
+      {top.length === 0 ? (
+        <p className="text-xs text-muted-foreground italic">No data.</p>
+      ) : (
+        <div className="space-y-1.5">
+          {top.map(([label, count]) => {
+            const pct = max > 0 ? (count / max) * 100 : 0;
+            const sharePct = total > 0 ? (count / total) * 100 : 0;
+            return (
+              <div key={label} className="space-y-1">
+                <div className="flex items-center justify-between text-xs gap-2">
+                  <span className="font-medium truncate">{label}</span>
+                  <span className="tabular-nums text-muted-foreground shrink-0">
+                    {count.toLocaleString()} <span className="opacity-70">({sharePct.toFixed(1)}%)</span>
+                  </span>
+                </div>
+                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </Card>
   );
 }
