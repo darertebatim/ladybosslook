@@ -26,6 +26,10 @@ import {
 import { PromoBanner } from "@/components/app/PromoBanner";
 import { HomeBanner } from "@/components/app/HomeBanner";
 import { HomeMenu } from "@/components/app/HomeMenu";
+import { ActiveRoundsCarousel } from "@/components/dashboard/ActiveRoundsCarousel";
+import { useNewHomeData } from "@/hooks/useNewHomeData";
+import { usePrograms } from "@/hooks/usePrograms";
+import { useMemo } from "react";
 
 // ── Orange Palette (mirrors /admin/brand/mock) ──
 const O = {
@@ -374,6 +378,18 @@ export default function AppMyRiloPath() {
   const swap = useSwapPathStep();
   const skipTomorrow = useSkipTomorrowPathStep();
 
+  // Active rounds data for "Your Programs" carousel
+  const homeDataQuery = useNewHomeData() as any;
+  const { activeRounds = [], nextSessionMap = {} } = homeDataQuery;
+  const { programs } = usePrograms();
+  const programImageMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    programs.forEach((p) => {
+      if (p.slug && p.image) map[p.slug] = p.image;
+    });
+    return map;
+  }, [programs]);
+
   const [swapTarget, setSwapTarget] = useState<PathStep | null>(null);
   const { data: trophyCount = 0 } = useMyRiloPathTrophies();
 
@@ -658,6 +674,15 @@ export default function AppMyRiloPath() {
                 <GraduationCap className="w-3.5 h-3.5" style={{ color: O.primary }} />
                 Rilo Academy
               </button>
+            </div>
+
+            {/* Your Programs (active rounds) */}
+            <div className="mt-4">
+              <ActiveRoundsCarousel
+                activeRounds={activeRounds}
+                nextSessionMap={nextSessionMap}
+                programImageMap={programImageMap}
+              />
             </div>
           </div>
 
