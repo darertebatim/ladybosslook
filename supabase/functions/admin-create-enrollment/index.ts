@@ -88,10 +88,21 @@ const handler = async (req: Request): Promise<Response> => {
 
     let userId: string = '';
 
-    // Try to find existing user by email
-    // We'll attempt to list users with email filter to be more efficient
-    const { data: { users: authUsers } } = await supabase.auth.admin.listUsers();
-    let existingAuthUser = authUsers.find(u => u.email?.toLowerCase() === email.toLowerCase());
+    // Fast path: look up by profiles.email (avoids paginating auth.users)
+    const { data: profileByEmail } = await supabase
+      .from('profiles')
+      .select('id')
+      .ilike('email', email)
+      .maybeSingle();
+
+    let existingAuthUser: { id: string; email?: string } | undefined = profileByEmail
+      ? { id: profileByEmail.id, email }
+      : undefined;
+
+    if (existingAuthUser) {
+      userId = existingAuthUser.id;
+      console.log(`Found existing user via profiles: ${userId}`);
+    }
 
     // If not found in the limited list, try to create user and handle duplicate error
     if (!existingAuthUser) {
