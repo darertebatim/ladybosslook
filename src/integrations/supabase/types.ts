@@ -3223,6 +3223,7 @@ export type Database = {
           annual_price_amount: number | null
           annual_stripe_price_id: string | null
           audio_playlist_id: string | null
+          auto_create_feed_channel: boolean
           available_on_mobile: boolean | null
           available_on_web: boolean | null
           balance_full_discount: number | null
@@ -3272,6 +3273,7 @@ export type Database = {
           annual_price_amount?: number | null
           annual_stripe_price_id?: string | null
           audio_playlist_id?: string | null
+          auto_create_feed_channel?: boolean
           available_on_mobile?: boolean | null
           available_on_web?: boolean | null
           balance_full_discount?: number | null
@@ -3321,6 +3323,7 @@ export type Database = {
           annual_price_amount?: number | null
           annual_stripe_price_id?: string | null
           audio_playlist_id?: string | null
+          auto_create_feed_channel?: boolean
           available_on_mobile?: boolean | null
           available_on_web?: boolean | null
           balance_full_discount?: number | null
