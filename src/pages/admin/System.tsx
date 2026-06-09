@@ -35,12 +35,95 @@ import {
   RefreshCw,
   Download,
   Sparkles,
+  Eye,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { BUILD_INFO, getDisplayBuildInfo } from "@/lib/buildInfo";
 import { format } from "date-fns";
+
+// Toggle hidden UI elements via localStorage flags
+function HiddenFeatureToggles() {
+  const [showRoutinesTab, setShowRoutinesTab] = useState(
+    () => localStorage.getItem("simora_show_routines_tab") === "true",
+  );
+  const [showRoutinePlayer, setShowRoutinePlayer] = useState(
+    () => localStorage.getItem("simora_show_routine_player_task") === "true",
+  );
+
+  const toggle = (
+    key: string,
+    value: boolean,
+    setter: (v: boolean) => void,
+    label: string,
+  ) => {
+    const next = !value;
+    localStorage.setItem(key, next ? "true" : "false");
+    setter(next);
+    toast.success(`${label} ${next ? "shown" : "hidden"} — reload the app to apply`);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Eye className="h-5 w-5" />
+          Hidden Features
+        </CardTitle>
+        <CardDescription>
+          Re-enable UI elements that are temporarily hidden. Changes apply on next app reload.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex items-center justify-between gap-3 p-3 rounded-lg border">
+          <div className="min-w-0">
+            <p className="text-sm font-medium">My Routines tab</p>
+            <p className="text-xs text-muted-foreground">
+              The "My Routines" pill in the Home switcher.
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant={showRoutinesTab ? "default" : "outline"}
+            onClick={() =>
+              toggle(
+                "simora_show_routines_tab",
+                showRoutinesTab,
+                setShowRoutinesTab,
+                "My Routines tab",
+              )
+            }
+          >
+            {showRoutinesTab ? "Shown" : "Hidden"}
+          </Button>
+        </div>
+        <div className="flex items-center justify-between gap-3 p-3 rounded-lg border">
+          <div className="min-w-0">
+            <p className="text-sm font-medium">Routine Player task</p>
+            <p className="text-xs text-muted-foreground">
+              The synthetic "play full routine" task inside Routine Preview.
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant={showRoutinePlayer ? "default" : "outline"}
+            onClick={() =>
+              toggle(
+                "simora_show_routine_player_task",
+                showRoutinePlayer,
+                setShowRoutinePlayer,
+                "Routine Player task",
+              )
+            }
+          >
+            {showRoutinePlayer ? "Shown" : "Hidden"}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 // Build Info Card Component
 function BuildInfoCard() {
@@ -343,6 +426,9 @@ export default function System() {
         </TabsContent>
 
         <TabsContent value="tools" className="space-y-4">
+          {/* Hidden Feature Toggles */}
+          <HiddenFeatureToggles />
+
           {/* App Update Logs */}
           <AppUpdateLogsCard />
 
