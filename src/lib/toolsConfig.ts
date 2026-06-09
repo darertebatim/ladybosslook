@@ -94,16 +94,17 @@ export const wellnessTools: ToolConfig[] = [
     route: '/app/mood',
     description: 'Daily mood log',
   },
-  {
-    id: 'emotions',
-    name: 'Emotions',
-    icon: 'HeartHandshake',
-    emoji: '💜',
-    bgColor: 'bg-lavender',
-    iconColor: 'text-violet-600',
-    route: '/app/emotion',
-    description: 'Name your feelings',
-  },
+  // Emotions tool temporarily hidden from Tools hub
+  // {
+  //   id: 'emotions',
+  //   name: 'Emotions',
+  //   icon: 'HeartHandshake',
+  //   emoji: '💜',
+  //   bgColor: 'bg-lavender',
+  //   iconColor: 'text-violet-600',
+  //   route: '/app/emotion',
+  //   description: 'Name your feelings',
+  // },
   {
     id: 'videos',
     name: 'Videos',

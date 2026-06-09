@@ -100,13 +100,14 @@ const toolItems: NavItem[] = [
     route: "/app/water",
     color: "text-blue-600 bg-blue-100",
   },
-  {
-    id: "emotions",
-    nameKey: "emotions",
-    icon: <HeartHandshake className="h-4 w-4" />,
-    route: "/app/emotion",
-    color: "text-violet-600 bg-violet-100",
-  },
+  // Emotions temporarily hidden from burger menu
+  // {
+  //   id: "emotions",
+  //   nameKey: "emotions",
+  //   icon: <HeartHandshake className="h-4 w-4" />,
+  //   route: "/app/emotion",
+  //   color: "text-violet-600 bg-violet-100",
+  // },
   {
     id: "period",
     nameKey: "period",
