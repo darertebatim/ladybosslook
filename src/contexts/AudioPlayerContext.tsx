@@ -392,6 +392,25 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       import('@/lib/firebaseAnalytics').then(({ Analytics }) => {
         Analytics.audioPlayed(track.id, track.playlistName);
       }).catch(() => {});
+
+      // Open a new audio_listen_events row for this play session.
+      // We update its seconds_listened periodically and on track end.
+      if (user?.id) {
+        const newEventId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random()}`;
+        listenEventIdRef.current = newEventId;
+        listenEventTrackIdRef.current = track.id;
+        try {
+          await supabase.from('audio_listen_events').insert({
+            id: newEventId,
+            user_id: user.id,
+            audio_id: track.id,
+            playlist_id: track.playlistId ?? null,
+            seconds_listened: 0,
+          });
+        } catch { /* ignore */ }
+      }
     }
 
     // ===== NATIVE PATH =====
