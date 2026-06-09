@@ -41,6 +41,7 @@ interface ProgramCatalog {
   show_in_app_waitlist?: boolean;
   is_one_on_one?: boolean;
   default_session_count?: number | null;
+  auto_create_feed_channel?: boolean;
 }
 
 export function ProgramsManager() {
