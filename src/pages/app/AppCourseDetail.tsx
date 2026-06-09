@@ -1304,6 +1304,38 @@ const AppCourseDetail = () => {
                       </Card>
                     )}
 
+                  {/* Price Card (waitlist programs) - shown above details */}
+                  {program && (program as any).show_in_app_waitlist && program.price_amount > 0 && (
+                    <Card>
+                      <CardContent className="p-5">
+                        <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 text-center space-y-1">
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                            Program Price
+                          </p>
+                          <div className="flex items-baseline justify-center gap-2">
+                            <p className="text-3xl font-bold text-foreground">
+                              {(program as any).currency === "ILS" ? "₪" : "$"}
+                              {(program.price_amount / 100).toFixed(0)}
+                            </p>
+                            {program.original_price &&
+                              program.original_price > program.price_amount && (
+                                <span className="text-lg text-muted-foreground line-through">
+                                  {(program as any).currency === "ILS" ? "₪" : "$"}
+                                  {(program.original_price / 100).toFixed(0)}
+                                </span>
+                              )}
+                          </div>
+                          <div className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 mt-1">
+                            <Clock className="h-3 w-3 text-muted-foreground" />
+                            <span className="text-xs font-medium text-muted-foreground">
+                              Registration opening soon
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
                   {/* Purchase Card */}
                   {program && (
                     <Card>
