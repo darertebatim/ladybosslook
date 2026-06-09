@@ -1311,14 +1311,6 @@ const AppCourseDetail = () => {
                         <CardTitle className="text-2xl">
                           {program.title}
                         </CardTitle>
-                        {program.description && (
-                          <div
-                            className="text-muted-foreground mt-2 whitespace-pre-wrap leading-relaxed"
-                            dangerouslySetInnerHTML={{
-                              __html: DOMPurify.sanitize(program.description),
-                            }}
-                          />
-                        )}
                       </CardHeader>
                       <CardContent className="space-y-6">
                         {/* What's Included */}
@@ -1358,12 +1350,24 @@ const AppCourseDetail = () => {
                                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                                     Program Price
                                   </p>
-                                  <p className="text-2xl font-bold text-foreground">
-                                    {(program as any).currency === "ILS"
-                                      ? "₪"
-                                      : "$"}
-                                    {(program.price_amount / 100).toFixed(0)}
-                                  </p>
+                                  <div className="flex items-baseline justify-center gap-2">
+                                    {program.original_price &&
+                                      program.original_price >
+                                        program.price_amount && (
+                                        <span className="text-lg text-muted-foreground line-through">
+                                          {(program as any).currency === "ILS"
+                                            ? "₪"
+                                            : "$"}
+                                          {(program.original_price / 100).toFixed(0)}
+                                        </span>
+                                      )}
+                                    <p className="text-2xl font-bold text-foreground">
+                                      {(program as any).currency === "ILS"
+                                        ? "₪"
+                                        : "$"}
+                                      {(program.price_amount / 100).toFixed(0)}
+                                    </p>
+                                  </div>
                                   <div className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 mt-1">
                                     <Clock className="h-3 w-3 text-muted-foreground" />
                                     <span className="text-xs font-medium text-muted-foreground">
@@ -1496,6 +1500,16 @@ const AppCourseDetail = () => {
                               </p>
                             )}
                         </div>
+
+                        {/* Program Description */}
+                        {program.description && (
+                          <div
+                            className="text-muted-foreground whitespace-pre-wrap leading-relaxed border-t pt-6"
+                            dangerouslySetInnerHTML={{
+                              __html: DOMPurify.sanitize(program.description),
+                            }}
+                          />
+                        )}
                       </CardContent>
                     </Card>
                   )}
