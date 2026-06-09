@@ -3379,6 +3379,7 @@ export type Database = {
       program_rounds: {
         Row: {
           audio_playlist_id: string | null
+          auto_create_feed_channel: boolean
           created_at: string
           drip_offset_days: number
           end_date: string | null
@@ -3408,6 +3409,7 @@ export type Database = {
         }
         Insert: {
           audio_playlist_id?: string | null
+          auto_create_feed_channel?: boolean
           created_at?: string
           drip_offset_days?: number
           end_date?: string | null
@@ -3437,6 +3439,7 @@ export type Database = {
         }
         Update: {
           audio_playlist_id?: string | null
+          auto_create_feed_channel?: boolean
           created_at?: string
           drip_offset_days?: number
           end_date?: string | null
