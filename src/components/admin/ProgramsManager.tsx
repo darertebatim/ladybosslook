@@ -1113,6 +1113,43 @@ export function ProgramsManager() {
                     📱 Show as Waitlist in App (read-only showcase, no purchase)
                   </Label>
                 </div>
+
+                <div className="flex items-center space-x-2 border-t pt-3">
+                  <Checkbox
+                    id="is_one_on_one"
+                    checked={formData.is_one_on_one}
+                    onCheckedChange={(checked) =>
+                      setFormData({ ...formData, is_one_on_one: checked as boolean })
+                    }
+                  />
+                  <Label htmlFor="is_one_on_one" className="text-sm font-normal cursor-pointer">
+                    👤 1:1 Service (auto-creates a private round per purchase)
+                  </Label>
+                </div>
+                {formData.is_one_on_one && (
+                  <div className="pl-6 space-y-2">
+                    <Label htmlFor="default_session_count" className="text-sm">
+                      Sessions included per purchase
+                    </Label>
+                    <Input
+                      id="default_session_count"
+                      type="number"
+                      min={1}
+                      placeholder="e.g. 4"
+                      value={formData.default_session_count || ''}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          default_session_count: parseInt(e.target.value) || 0,
+                        })
+                      }
+                      className="max-w-[200px]"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Each purchase auto-creates a personal round for the client. Admins schedule sessions and reuse a single recurring Meet link from the 1:1 Clients tab.
+                    </p>
+                  </div>
+                )}
                 
                 <div className="flex items-center space-x-2">
                   <Checkbox 
