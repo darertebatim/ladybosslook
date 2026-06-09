@@ -22,7 +22,7 @@ const iconMap: Record<string, LucideIcon> = {
 };
 
 // Tools that require simora+ subscription
-const LOCKED_TOOLS = ['fasting', 'period', 'ai', 'projects'];
+const LOCKED_TOOLS = ['ai', 'projects'];
 
 interface ToolCardProps {
   tool: ToolConfig;
