@@ -424,6 +424,23 @@ serve(async (req) => {
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         programSlug = subscription.metadata?.program || null;
         productName = subscription.metadata?.product_name || 'Subscription Payment';
+
+        // Extend user_subscriptions.expires_at to the new period end so the
+        // client-side expiry filter keeps treating the sub as active.
+        if (programSlug) {
+          const newExpiresAt = subscription.current_period_end
+            ? new Date(subscription.current_period_end * 1000).toISOString()
+            : null;
+          const { error: extendErr } = await supabase
+            .from('user_subscriptions')
+            .update({ status: 'active', expires_at: newExpiresAt })
+            .eq('stripe_subscription_id', subscription.id);
+          if (extendErr) {
+            console.error('[WEBHOOK] Error extending user_subscription expires_at:', extendErr);
+          } else {
+            console.log('[WEBHOOK] Extended user_subscription expires_at to', newExpiresAt);
+          }
+        }
       }
 
       // Find user by email
