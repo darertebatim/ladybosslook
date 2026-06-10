@@ -75,7 +75,7 @@ serve(async (req) => {
     // Fetch program details from database
     const { data: programData, error: programError } = await supabase
       .from('program_catalog')
-      .select('slug, title, price_amount, description, payment_type, deposit_price, subscription_interval, subscription_interval_count, subscription_full_payment_price, stripe_product_id, stripe_price_id')
+      .select('slug, title, price_amount, description, payment_type, deposit_price, subscription_interval, subscription_interval_count, subscription_full_payment_price, stripe_product_id, stripe_price_id, trial_days')
       .eq('slug', program)
       .eq('is_active', true)
       .single();
