@@ -23,6 +23,7 @@ const TYPE_LABELS: Record<string, { label: string; icon: string }> = {
   'event': { label: 'Live Events', icon: '📅' },
   'webinar': { label: 'Online Webinars', icon: '🎥' },
   'audiobook': { label: 'Audiobooks', icon: '🎧' },
+  'subscription': { label: 'Memberships', icon: '⭐' },
 };
 
 const ProgramCard = ({ program }: { program: Program }) => {
