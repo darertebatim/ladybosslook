@@ -61,12 +61,23 @@ export const useSubscription = () => {
 
   const isLoading = subsLoading || enrollLoading;
 
+  // Any slug belonging to the Plus family (iOS: 'simora-plus', web monthly: 'simora-plus',
+  // web annual: 'simora-plus-annual', future variants: 'simora-plus-*') unlocks Plus access.
+  const isPlusSlug = (s: string | null | undefined): boolean =>
+    !!s && (s === 'simora-plus' || s.startsWith('simora-plus-'));
+
+  const hasAnyPlus =
+    subscriptions.some(sub => isPlusSlug(sub.program_slug)) ||
+    enrolledSlugs.some(isPlusSlug);
+
   // Check if user has ANY active subscription or enrollment in a subscription program
-  const isSubscribed = subscriptions.length > 0 || enrolledSlugs.includes('simora-plus');
+  const isSubscribed = subscriptions.length > 0 || hasAnyPlus;
 
   // Check if user has access to a specific program's subscription content
   const hasAccessToProgram = (programSlug: string): boolean => {
     if (!programSlug) return false;
+    // Plus gating: any Plus-family sub/enrollment grants access
+    if (isPlusSlug(programSlug)) return hasAnyPlus;
     // Check user_subscriptions first
     if (subscriptions.some(sub => sub.program_slug === programSlug)) return true;
     // Fall back to course_enrollments (admin-enrolled users)
@@ -75,6 +86,9 @@ export const useSubscription = () => {
 
   // Get active subscription for a specific program
   const getSubscriptionForProgram = (programSlug: string): UserSubscription | undefined => {
+    if (isPlusSlug(programSlug)) {
+      return subscriptions.find(sub => isPlusSlug(sub.program_slug));
+    }
     return subscriptions.find(sub => sub.program_slug === programSlug);
   };
 

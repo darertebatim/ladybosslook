@@ -75,7 +75,7 @@ serve(async (req) => {
     // Fetch program details from database
     const { data: programData, error: programError } = await supabase
       .from('program_catalog')
-      .select('slug, title, price_amount, description, payment_type, deposit_price, subscription_interval, subscription_interval_count, subscription_full_payment_price, stripe_product_id, stripe_price_id')
+      .select('slug, title, price_amount, description, payment_type, deposit_price, subscription_interval, subscription_interval_count, subscription_full_payment_price, stripe_product_id, stripe_price_id, trial_days')
       .eq('slug', program)
       .eq('is_active', true)
       .single();
@@ -280,6 +280,15 @@ serve(async (req) => {
           auto_cancel_after_months: programData.subscription_interval_count?.toString() || '',
         },
       };
+
+      // Free trial: if admin configured trial_days > 0, defer the first charge.
+      // Stripe collects the card at checkout, creates the sub in `trialing`, and
+      // automatically generates the first real invoice on day `trial_period_days`.
+      const trialDays = (programData as any).trial_days;
+      if (trialDays && Number(trialDays) > 0) {
+        subscriptionData.trial_period_days = Number(trialDays);
+        logStep("Trial configured", { trialDays: Number(trialDays) });
+      }
 
       if (programData.subscription_interval_count) {
         logStep("Subscription configured for auto-cancel", { 
