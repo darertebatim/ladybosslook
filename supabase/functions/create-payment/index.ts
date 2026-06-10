@@ -281,6 +281,15 @@ serve(async (req) => {
         },
       };
 
+      // Free trial: if admin configured trial_days > 0, defer the first charge.
+      // Stripe collects the card at checkout, creates the sub in `trialing`, and
+      // automatically generates the first real invoice on day `trial_period_days`.
+      const trialDays = (programData as any).trial_days;
+      if (trialDays && Number(trialDays) > 0) {
+        subscriptionData.trial_period_days = Number(trialDays);
+        logStep("Trial configured", { trialDays: Number(trialDays) });
+      }
+
       if (programData.subscription_interval_count) {
         logStep("Subscription configured for auto-cancel", { 
           intervalCount: programData.subscription_interval_count,
