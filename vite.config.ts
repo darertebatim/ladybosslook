@@ -10,8 +10,11 @@ const buildId = `B${Date.now().toString(36).toUpperCase()}`;
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // Use relative paths for Capacitor's file:// protocol on iOS/Android
-  base: mode === 'development' ? '/' : './',
+  // Always use absolute paths so deep links like /admin/brand/mock resolve
+  // assets from /assets/... instead of /admin/brand/assets/... (which 404s).
+  // Modern Capacitor (iOS capacitor://, Android https://localhost) handles
+  // absolute paths correctly — relative './' is only needed for raw file://.
+  base: '/',
   define: {
     __BUILD_TIME__: JSON.stringify(buildTime),
     __BUILD_ID__: JSON.stringify(buildId),
