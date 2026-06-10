@@ -22,6 +22,11 @@ export const usePrograms = () => {
         return isNative ? program.available_on_mobile : program.available_on_web;
       }).sort((a: any, b: any) => a.slug.localeCompare(b.slug));
       
+      // Format cents -> "$X" or "$X.XX" preserving non-zero decimals
+      const fmt = (cents: number) => {
+        const v = cents / 100;
+        return Number.isInteger(v) ? `$${v}` : `$${v.toFixed(2)}`;
+      };
       // Map database records to Program type with images
       // Prefer cover_image_url from DB, fallback to static programImages mapping
       return filteredData.map((dbProgram: any) => ({
@@ -33,9 +38,9 @@ export const usePrograms = () => {
         participants: '0', // Not stored in DB
         rating: 4.9, // Not stored in DB
         features: Array.isArray(dbProgram.features) ? dbProgram.features : [],
-        price: `$${(dbProgram.price_amount / 100).toFixed(0)}`,
+        price: fmt(dbProgram.price_amount),
         priceAmount: dbProgram.price_amount / 100,
-        originalPrice: dbProgram.original_price ? `$${(dbProgram.original_price / 100).toFixed(0)}` : undefined,
+        originalPrice: dbProgram.original_price ? fmt(dbProgram.original_price) : undefined,
         limitedSpots: undefined,
         popular: false, // Not stored in DB
         link: `/${dbProgram.slug}`,
