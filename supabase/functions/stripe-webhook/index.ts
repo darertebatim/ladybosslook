@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { sendPurchaseWelcomeMessage } from "../_shared/send-purchase-welcome.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -348,6 +349,11 @@ serve(async (req) => {
       // Apply auto-enrollment if we have a user and program
       if (userId && programSlug) {
         await applyAutoEnrollment(supabase, userId, programSlug, productName);
+        await sendPurchaseWelcomeMessage(supabase, {
+          userId,
+          programSlug,
+          programTitle: productName,
+        });
       } else {
         console.log('[WEBHOOK] Skipping auto-enrollment: userId=', userId, 'programSlug=', programSlug);
       }
@@ -369,6 +375,11 @@ serve(async (req) => {
               .single();
             if (cartProgram) {
               await applyAutoEnrollment(supabase, cartUserId, cartSlug, cartProgram.title);
+              await sendPurchaseWelcomeMessage(supabase, {
+                userId: cartUserId,
+                programSlug: cartSlug,
+                programTitle: cartProgram.title,
+              });
             }
           }
         }
