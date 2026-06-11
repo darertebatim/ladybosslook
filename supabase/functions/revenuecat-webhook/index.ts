@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { sendPurchaseWelcomeMessage } from "../_shared/send-purchase-welcome.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -201,6 +202,11 @@ async function ensureEnrollment(supabase: any, userId: string, programSlug: stri
       console.error("[RC Webhook] Enrollment creation error:", error);
     } else {
       console.log("[RC Webhook] ✓ Created enrollment for:", programSlug);
+      await sendPurchaseWelcomeMessage(supabase, {
+        userId,
+        programSlug,
+        programTitle: courseName,
+      });
     }
   } catch (error: any) {
     console.error("[RC Webhook] Enrollment creation failed:", error);
