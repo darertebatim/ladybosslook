@@ -222,12 +222,12 @@ export default function PaymentSuccess() {
               ✨ Payment confirmed
             </p>
             <h1 className="mt-2 text-[28px] leading-[1.15] font-bold text-[#1a1f3d]">
-              {isPlus ? "Welcome to Rilo Plus" : "Thank you — you're in"}
+              {isPlus ? "Welcome to Rilo Plus" : `Welcome to ${productName}`}
             </h1>
             <p className="mt-3 text-[15px] text-[#1a1f3d]/70 max-w-md mx-auto">
               {isPlus
                 ? 'Every tool, sound, and guided session — unlocked. Open the Rilo app to start.'
-                : 'Your purchase is active. Open the Rilo app to access your content.'}
+                : 'Your lessons and materials are ready. Open the Rilo app to begin.'}
             </p>
           </div>
 
