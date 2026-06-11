@@ -1,12 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, ArrowRight, Download, Calendar, MessageCircle, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import confetti from 'canvas-confetti';
+import { Sparkles, Loader2, Smartphone, Apple, Mail, MessageCircle, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
 import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
+import riloAppIcon from '@/assets/rilo-app-icon.png';
+
+const APP_STORE_URL = 'https://apps.apple.com/app/rilo-self-care-routines/id6755076134';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.ladybosslook.academy';
+const APP_DEEP_LINK = 'https://ladybosslook.com/app/home';
+
+function detectPlatform(): 'ios' | 'android' | 'desktop' {
+  if (typeof navigator === 'undefined') return 'desktop';
+  const ua = navigator.userAgent || '';
+  if (/iPhone|iPad|iPod/i.test(ua)) return 'ios';
+  if (/Android/i.test(ua)) return 'android';
+  return 'desktop';
+}
 
 export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
@@ -18,6 +31,7 @@ export default function PaymentSuccess() {
   const [verificationAttempts, setVerificationAttempts] = useState(0);
   const { toast } = useToast();
   const invalidateAllEnrollmentData = useInvalidateAllEnrollmentData();
+  const platform = useMemo(() => detectPlatform(), []);
 
   useEffect(() => {
     const verifyPayment = async () => {
@@ -95,6 +109,18 @@ export default function PaymentSuccess() {
     verifyPayment();
   }, [sessionId, searchParams, toast, programSlug]);
 
+  // Confetti once verified
+  useEffect(() => {
+    if (!paymentVerified) return;
+    const colors = ['#F08A3E', '#EC4899', '#8A5CF0', '#FFD27A', '#FFFFFF'];
+    const t = setTimeout(() => {
+      confetti({ particleCount: 120, spread: 75, origin: { y: 0.35 }, colors });
+      setTimeout(() => confetti({ particleCount: 60, angle: 60, spread: 60, origin: { x: 0, y: 0.5 }, colors }), 200);
+      setTimeout(() => confetti({ particleCount: 60, angle: 120, spread: 60, origin: { x: 1, y: 0.5 }, colors }), 400);
+    }, 350);
+    return () => clearTimeout(t);
+  }, [paymentVerified]);
+
   const formatPrice = (cents: number) => {
     return (cents / 100).toLocaleString('en-US', {
       style: 'currency',
@@ -102,107 +128,47 @@ export default function PaymentSuccess() {
     });
   };
 
-  const getWorkshopDisplayName = (productName: string) => {
-    if (productName?.toLowerCase().includes('courageous')) {
-      return { english: 'Courageous Character Course', farsi: 'کاراکتر پرجرات' };
-    }
-    if (productName?.toLowerCase().includes('five') || productName?.toLowerCase().includes('language')) {
-      return { english: 'Five Language of Empowered Woman', farsi: '۵ زبان زن توانمند' };
-    }
-    if (productName?.toLowerCase().includes('money') || productName?.toLowerCase().includes('iq')) {
-      return { english: 'IQ Money Workshop', farsi: 'کارگاه هوش مالی' };
-    }
-    return { english: productName || 'Your Course', farsi: 'دوره شما' };
-  };
-
-  const createTelegramMessage = () => {
-    const baseUrl = 'https://t.me/ladybosslook';
-    
-    if (!orderDetails) {
-      const fallbackMessage = encodeURIComponent(
-        `Hello! I just completed my payment and need access to my course.\n\nPlease send me the workshop details and next steps. Thank you!`
-      );
-      return `${baseUrl}?text=${fallbackMessage}`;
-    }
-    
-    const workshop = getWorkshopDisplayName(orderDetails.product_name);
-    const message = encodeURIComponent(
-      `Hello! I just completed my payment for the ${workshop.english} (${workshop.farsi}) workshop.\n\n` +
-      `My details:\n` +
-      `Name: ${orderDetails.name}\n` +
-      `Email: ${orderDetails.email}\n` +
-      `Phone: ${orderDetails.phone || 'Not provided'}\n` +
-      `Amount Paid: ${formatPrice(orderDetails.amount)}\n\n` +
-      `Please send me the workshop details and next steps. Thank you!`
-    );
-    return `${baseUrl}?text=${message}`;
-  };
+  const productName: string = orderDetails?.product_name || 'Rilo Plus';
+  const isPlus = /plus|simora-plus/i.test(productName) || /simora-plus/i.test(orderDetails?.program_slug || '');
+  const isAnnual = /annual|year/i.test(productName) || /annual/i.test(orderDetails?.program_slug || '');
+  const planLabel = isPlus ? (isAnnual ? 'Annual membership' : 'Monthly membership') : 'One-time purchase';
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-lg">Verifying your payment...</p>
-          <p className="text-sm text-muted-foreground mt-2">This may take a few seconds</p>
+          <Loader2 className="h-12 w-12 animate-spin text-[#F08A3E] mx-auto mb-4" />
+          <p className="text-lg text-[#1a1f3d] font-semibold">Confirming your payment…</p>
+          <p className="text-sm text-[#1a1f3d]/60 mt-2">Just a moment</p>
         </div>
       </div>
     );
   }
 
   const isTestMode = searchParams.get('test') === 'true';
-  
-  // Show success page even if order details are incomplete
-  // Payment was confirmed by Stripe, just waiting for our system to process
+
   if (!sessionId && !isTestMode) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center">
-        <Card className="w-full max-w-md mx-auto">
-          <CardHeader className="text-center">
-            <CardTitle className="text-xl text-destructive">Missing Session</CardTitle>
-            <CardDescription>
-              No payment session was found. Please try again or contact support.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <a href={createTelegramMessage()} target="_blank" rel="noopener noreferrer">
-              <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                <MessageCircle className="mr-2 h-5 w-5" />
-                Contact Support on Telegram
-              </Button>
-            </a>
-            <Link to="/">
-              <Button variant="outline" className="w-full">Return Home</Button>
-            </Link>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center px-6 bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]">
+        <div className="max-w-md w-full bg-white/80 backdrop-blur rounded-3xl p-8 text-center shadow-xl">
+          <h1 className="text-xl font-bold text-[#1a1f3d] mb-2">No payment session found</h1>
+          <p className="text-sm text-[#1a1f3d]/70 mb-6">If you just paid, check your email for a receipt and contact support.</p>
+          <Link to="/" className="inline-block px-6 py-3 rounded-2xl bg-[#1a1f3d] text-white font-semibold">Return home</Link>
+        </div>
       </div>
     );
   }
 
-  // If we have a session ID, show success even without complete order details
-  // The webhook will process it, user just needs to contact support
   const showSuccessPage = isTestMode || (sessionId && (paymentVerified || verificationAttempts > 0));
 
   if (!showSuccessPage) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center">
-        <Card className="w-full max-w-md mx-auto">
-          <CardHeader className="text-center">
-            <CardTitle className="text-xl">Processing Your Payment</CardTitle>
-            <CardDescription>
-              Your payment is being processed. Please contact support to get access to your course.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <a href={createTelegramMessage()} target="_blank" rel="noopener noreferrer">
-              <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                <MessageCircle className="mr-2 h-5 w-5" />
-                Contact Support on Telegram
-              </Button>
-            </a>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center px-6 bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]">
+        <div className="max-w-md w-full bg-white/80 backdrop-blur rounded-3xl p-8 text-center shadow-xl">
+          <Loader2 className="h-10 w-10 animate-spin text-[#F08A3E] mx-auto mb-4" />
+          <h1 className="text-xl font-bold text-[#1a1f3d] mb-2">Processing your payment</h1>
+          <p className="text-sm text-[#1a1f3d]/70">This should only take a moment. You can refresh in a few seconds.</p>
+        </div>
       </div>
     );
   }
@@ -210,158 +176,138 @@ export default function PaymentSuccess() {
   return (
     <>
       <SEOHead />
-      
-      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-4 sm:py-12 px-4">
-        <div className="max-w-2xl mx-auto">
-          {/* Success Header */}
-          <div className="text-center mb-2 sm:mb-4">
-            <div className="inline-flex items-center justify-center w-10 h-10 sm:w-16 sm:h-16 bg-green-100 rounded-full mb-2 sm:mb-4">
-              <CheckCircle className="w-5 h-5 sm:w-8 sm:h-8 text-green-600" />
-            </div>
-            <div className="flex items-center justify-center gap-2 sm:gap-4">
-              <ArrowRight className="w-5 h-5 sm:w-7 sm:h-7 text-primary transform rotate-90" />
-              <h1 className="text-xl sm:text-3xl font-bold text-primary">
-                Payment Successful!
-              </h1>
-              <ArrowRight className="w-5 h-5 sm:w-7 sm:h-7 text-primary transform rotate-90" />
-            </div>
+
+      <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]">
+        {/* Ambient glow blobs */}
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[420px] h-[420px] rounded-full blur-3xl opacity-60 pointer-events-none"
+          style={{ background: 'radial-gradient(circle, #FFD6A5 0%, transparent 70%)' }} />
+        <div className="absolute top-1/3 -right-20 w-[260px] h-[260px] rounded-full blur-3xl opacity-50 pointer-events-none"
+          style={{ background: 'radial-gradient(circle, #CDE7FF 0%, transparent 70%)' }} />
+        <div className="absolute bottom-10 -left-16 w-[300px] h-[300px] rounded-full blur-3xl opacity-50 pointer-events-none"
+          style={{ background: 'radial-gradient(circle, #E5D6FF 0%, transparent 70%)' }} />
+
+        <div className="relative z-10 max-w-xl mx-auto px-5 pt-10 pb-12">
+          {/* Hero */}
+          <div className="text-center">
+            <motion.div
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, type: 'spring', stiffness: 200, damping: 16 }}
+              className="mx-auto w-[108px] h-[108px] rounded-[26px] overflow-hidden shadow-[0_24px_60px_-12px_rgba(138,92,240,0.55)]"
+            >
+              <img src={riloAppIcon} alt="Rilo" className="w-full h-full object-cover" draggable={false} />
+            </motion.div>
+
+            <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#B8590E]">
+              ✨ Payment confirmed
+            </p>
+            <h1 className="mt-2 text-[28px] leading-[1.15] font-bold text-[#1a1f3d]">
+              {isPlus ? "Welcome to Rilo Plus" : "Thank you — you're in"}
+            </h1>
+            <p className="mt-3 text-[15px] text-[#1a1f3d]/70 max-w-md mx-auto">
+              {isPlus
+                ? 'Every tool, sound, and guided session — unlocked. Open the Rilo app to start.'
+                : 'Your purchase is active. Open the Rilo app to access your content.'}
+            </p>
           </div>
 
-          {/* Order Details - Only show if we have them */}
-          {orderDetails && orderDetails.product_name && (
-            <Card className="mb-2 sm:mb-4">
-              <CardHeader className="pb-1 sm:pb-3">
-                <CardTitle className="text-base sm:text-lg">Order Confirmation</CardTitle>
-                <CardDescription className="text-xs sm:text-sm">
-                  {orderDetails.created_at ? new Date(orderDetails.created_at).toLocaleDateString() : new Date().toLocaleDateString()}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-1 sm:space-y-2">
-                <div className="flex justify-between items-center py-0.5 sm:py-1 border-b">
-                  <span className="font-medium text-xs sm:text-sm">Program:</span>
-                  <div className="text-right">
-                    <div className="text-xs sm:text-sm">{getWorkshopDisplayName(orderDetails.product_name).english}</div>
-                    <div className="text-xs text-muted-foreground">{getWorkshopDisplayName(orderDetails.product_name).farsi}</div>
-                  </div>
+          {/* Primary CTA — Open the app */}
+          <div className="mt-7 bg-white/75 backdrop-blur rounded-3xl p-5 shadow-[0_20px_50px_-20px_rgba(138,92,240,0.4)] border border-white">
+            <div className="flex items-center gap-2 mb-3">
+              <Smartphone className="h-4 w-4 text-[#F08A3E]" />
+              <h2 className="text-[15px] font-bold text-[#1a1f3d]">Open Rilo to start</h2>
+            </div>
+
+            {platform === 'desktop' ? (
+              <>
+                <p className="text-[13px] text-[#1a1f3d]/70 mb-4">
+                  Download Rilo on your phone — sign in with the same email and your purchase is waiting.
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 h-12 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-[14px] active:opacity-80">
+                    <Apple className="h-4 w-4" /> App Store
+                  </a>
+                  <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 h-12 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-[14px] active:opacity-80">
+                    <Smartphone className="h-4 w-4" /> Google Play
+                  </a>
                 </div>
+                <a href={APP_DEEP_LINK}
+                  className="mt-3 block text-center text-[13px] font-semibold text-[#8A5CF0] active:opacity-70">
+                  Or continue on web →
+                </a>
+              </>
+            ) : (
+              <>
+                <a href={APP_DEEP_LINK}
+                  className="w-full h-[56px] rounded-2xl text-white font-semibold text-[16px] active:opacity-80 transition-opacity bg-gradient-to-r from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] shadow-[0_12px_30px_-8px_rgba(138,92,240,0.55)] flex items-center justify-center gap-2">
+                  <Sparkles className="h-4 w-4" />
+                  Open Rilo
+                </a>
+                <a
+                  href={platform === 'ios' ? APP_STORE_URL : PLAY_STORE_URL}
+                  target="_blank" rel="noopener noreferrer"
+                  className="mt-3 block text-center text-[13px] font-semibold text-[#8A5CF0] active:opacity-70">
+                  Don't have the app? Download it {platform === 'ios' ? 'on the App Store' : 'on Google Play'}
+                </a>
+              </>
+            )}
+
+            {orderDetails?.email && (
+              <div className="mt-4 flex items-start gap-2 text-[12px] text-[#1a1f3d]/65 bg-[#FFF6EC] rounded-xl p-3">
+                <CheckCircle2 className="h-4 w-4 text-[#22A06B] mt-[1px] shrink-0" />
+                <p>
+                  Sign in to Rilo with <span className="font-semibold text-[#1a1f3d]">{orderDetails.email}</span> — your access is already linked.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Order summary */}
+          {orderDetails && (
+            <div className="mt-5 bg-white/75 backdrop-blur rounded-3xl p-5 shadow-sm border border-white">
+              <h2 className="text-[13px] font-bold uppercase tracking-wider text-[#1a1f3d]/60 mb-3">Order summary</h2>
+              <div className="space-y-2.5 text-[14px]">
+                <Row label="Product" value={productName} />
+                <Row label="Plan" value={planLabel} />
                 {orderDetails.amount > 0 && (
-                  <div className="flex justify-between items-center py-0.5 sm:py-1 border-b">
-                    <span className="font-medium text-xs sm:text-sm">Amount:</span>
-                    <span className="text-sm sm:text-base font-semibold text-primary">
-                      {formatPrice(orderDetails.amount)}
-                    </span>
-                  </div>
+                  <Row label="Amount" value={formatPrice(orderDetails.amount)} />
                 )}
-                <div className="flex justify-between items-center py-0.5 sm:py-1">
-                  <span className="font-medium text-xs sm:text-sm">Status:</span>
-                  <span className="text-green-600 font-semibold capitalize text-xs sm:text-sm">
-                    {orderDetails.status || 'Paid'}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+                <Row label="Status" value="Paid" valueClass="text-[#22A06B] font-semibold" />
+                <Row
+                  label="Date"
+                  value={new Date(orderDetails.created_at || Date.now()).toLocaleDateString()}
+                />
+              </div>
+            </div>
           )}
 
-          {/* Next Steps - Telegram Focus */}
-          <Card className="mb-3 sm:mb-6 border-primary bg-primary/5">
-            <CardHeader className="text-center pb-2 pt-3 sm:pt-6">
-              <CardTitle className="text-lg sm:text-2xl font-bold font-farsi" dir="rtl">
-                ⚠️ مهم: مرحله بعدی
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-center space-y-2 sm:space-y-3 py-3 sm:py-4">
-              <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-3 sm:p-4 rounded-lg border-2 border-primary/30">
-                <div className="space-y-2 sm:space-y-3">
-                  <div className="text-base sm:text-xl font-bold text-primary font-farsi leading-tight" dir="rtl">
-                    🚨 همین الان روی دکمه زیر کلیک کنید
-                  </div>
-                  
-                  <p className="text-xs sm:text-sm text-foreground font-farsi font-semibold" dir="rtl">
-                    بدون پیام دادن به تلگرام، دسترسی به دوره ندارید!
-                  </p>
-                  
-                  <div className="flex justify-center py-1">
-                    <div className="animate-bounce">
-                      <ArrowRight className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 transform rotate-90" />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <a 
-                      href={createTelegramMessage()}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="inline-block w-full"
-                    >
-                      <Button 
-                        size="lg" 
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white text-base sm:text-xl py-5 sm:py-7 px-6 sm:px-8 font-farsi font-bold shadow-lg hover:shadow-xl transition-all animate-pulse"
-                      >
-                        <MessageCircle className="ml-2 h-5 w-5 sm:h-6 sm:w-6" />
-                        کلیک کنید - پیام به پشتیبانی
-                      </Button>
-                    </a>
-                    <p className="text-xs sm:text-sm text-primary mt-2 font-farsi font-semibold" dir="rtl">
-                      ✅ پیام شما آماده است، فقط ارسال کنید
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Additional Action Buttons - Desktop Only */}
-          <div className="hidden sm:flex flex-col sm:flex-row gap-4 justify-center mb-6">
-            <Button variant="outline" size="lg">
-              <Download className="mr-2 h-5 w-5" />
-              Access Course Materials
-            </Button>
-            <Button variant="outline" size="lg">
-              <Calendar className="mr-2 h-5 w-5" />
-              Schedule Your First Session
-            </Button>
-          </div>
-
-          {/* Support Info */}
-          <div className="text-center mt-4 sm:mt-8 p-3 sm:p-6 bg-muted/50 rounded-lg">
-            <h3 className="font-semibold mb-1 sm:mb-2 text-sm sm:text-base font-farsi" dir="rtl">راه های دیگه پشتیبانی</h3>
-            <p className="text-muted-foreground mb-2 sm:mb-4 text-xs sm:text-sm font-farsi" dir="rtl">
-              اگه تلگرام نداری، میتونی از طریق ایمیل هم با ما در تماس باشی
-            </p>
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center mb-4">
-              <a 
-                href="mailto:support@ladybosslook.com" 
-                className="text-primary hover:underline text-sm"
-              >
-                support@ladybosslook.com
+          {/* Support — demoted */}
+          <div className="mt-6 text-center">
+            <p className="text-[12px] text-[#1a1f3d]/55 mb-3">Need help with your purchase?</p>
+            <div className="flex items-center justify-center gap-4 text-[13px]">
+              <a href="mailto:support@ladybosslook.com" className="inline-flex items-center gap-1.5 text-[#1a1f3d]/70 active:opacity-70">
+                <Mail className="h-3.5 w-3.5" /> Email support
               </a>
-              <a 
-                href="https://t.me/ladybosslook" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-primary hover:underline text-sm"
-              >
-                Telegram: @ladybosslook
+              <span className="text-[#1a1f3d]/20">·</span>
+              <a href="https://t.me/ladybosslook" target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-[#1a1f3d]/70 active:opacity-70">
+                <MessageCircle className="h-3.5 w-3.5" /> Telegram
               </a>
             </div>
-            
-            <p className="text-muted-foreground text-sm mb-3">
-              اگه تلگرام نداری ایمیل بزن
-            </p>
-            <Button 
-              onClick={() => {
-                const workshop = getWorkshopDisplayName(orderDetails?.product_name || 'My Course');
-                const emailBody = `Hello! I just completed my payment for the ${workshop.english} (${workshop.farsi}) workshop.\n\nMy details:\nName: ${orderDetails?.name || 'Not available'}\nEmail: ${orderDetails?.email || 'Not available'}\nPhone: ${orderDetails?.phone || 'Not provided'}\n${orderDetails?.amount ? `Amount Paid: ${formatPrice(orderDetails.amount)}` : ''}\n\nPlease send me the workshop details and next steps. Thank you!`;
-                window.location.href = `mailto:support@ladybosslook.com?subject=Payment Successful - Workshop Access&body=${encodeURIComponent(emailBody)}`;
-              }}
-              variant="outline"
-              className="w-full sm:w-auto"
-            >
-              📧 ارسال ایمیل به پشتیبانی
-            </Button>
           </div>
         </div>
       </div>
     </>
+  );
+}
+
+function Row({ label, value, valueClass = '' }: { label: string; value: string; valueClass?: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-[#1a1f3d]/60">{label}</span>
+      <span className={`text-[#1a1f3d] text-right ${valueClass}`}>{value}</span>
+    </div>
   );
 }
