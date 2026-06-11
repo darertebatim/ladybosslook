@@ -8,10 +8,26 @@ import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
 import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 import riloAppIcon from '@/assets/rilo-app-icon.png';
+import { ONELINK_BASE_URL } from '@/lib/appsflyer';
 
-const APP_STORE_URL = 'https://apps.apple.com/app/rilo-self-care-routines/id6755076134';
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.ladybosslook.academy';
-const APP_DEEP_LINK = 'https://ladybosslook.com/app/home';
+/**
+ * Smart link: AppsFlyer OneLink opens the Rilo app if installed,
+ * otherwise routes the user to the correct store (App Store / Play Store),
+ * and falls back to /app/home on web via `af_web_dp`.
+ */
+function buildOpenRiloOneLink(sessionId?: string | null, slug?: string | null) {
+  const webFallback = 'https://ladybosslook.com/app/home';
+  const params = new URLSearchParams({
+    af_xp: 'custom',
+    pid: 'web_purchase',
+    c: 'payment_success',
+    deep_link_value: 'home',
+    af_web_dp: webFallback,
+  });
+  if (slug) params.set('af_sub1', slug);
+  if (sessionId) params.set('af_sub2', sessionId.substring(0, 40));
+  return `${ONELINK_BASE_URL}?${params.toString()}`;
+}
 
 function detectPlatform(): 'ios' | 'android' | 'desktop' {
   if (typeof navigator === 'undefined') return 'desktop';
@@ -132,6 +148,10 @@ export default function PaymentSuccess() {
   const isPlus = /plus|simora-plus/i.test(productName) || /simora-plus/i.test(orderDetails?.program_slug || '');
   const isAnnual = /annual|year/i.test(productName) || /annual/i.test(orderDetails?.program_slug || '');
   const planLabel = isPlus ? (isAnnual ? 'Annual membership' : 'Monthly membership') : 'One-time purchase';
+  const openRiloUrl = useMemo(
+    () => buildOpenRiloOneLink(sessionId, orderDetails?.program_slug || programSlug),
+    [sessionId, orderDetails?.program_slug, programSlug]
+  );
 
   if (isLoading) {
     return (
@@ -218,40 +238,27 @@ export default function PaymentSuccess() {
               <h2 className="text-[15px] font-bold text-[#1a1f3d]">Open Rilo to start</h2>
             </div>
 
-            {platform === 'desktop' ? (
-              <>
-                <p className="text-[13px] text-[#1a1f3d]/70 mb-4">
-                  Download Rilo on your phone — sign in with the same email and your purchase is waiting.
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 h-12 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-[14px] active:opacity-80">
-                    <Apple className="h-4 w-4" /> App Store
-                  </a>
-                  <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 h-12 rounded-2xl bg-[#1a1f3d] text-white font-semibold text-[14px] active:opacity-80">
-                    <Smartphone className="h-4 w-4" /> Google Play
-                  </a>
-                </div>
-                <a href={APP_DEEP_LINK}
-                  className="mt-3 block text-center text-[13px] font-semibold text-[#8A5CF0] active:opacity-70">
-                  Or continue on web →
-                </a>
-              </>
-            ) : (
-              <>
-                <a href={APP_DEEP_LINK}
-                  className="w-full h-[56px] rounded-2xl text-white font-semibold text-[16px] active:opacity-80 transition-opacity bg-gradient-to-r from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] shadow-[0_12px_30px_-8px_rgba(138,92,240,0.55)] flex items-center justify-center gap-2">
-                  <Sparkles className="h-4 w-4" />
-                  Open Rilo
-                </a>
-                <a
-                  href={platform === 'ios' ? APP_STORE_URL : PLAY_STORE_URL}
-                  target="_blank" rel="noopener noreferrer"
-                  className="mt-3 block text-center text-[13px] font-semibold text-[#8A5CF0] active:opacity-70">
-                  Don't have the app? Download it {platform === 'ios' ? 'on the App Store' : 'on Google Play'}
-                </a>
-              </>
+            <p className="text-[13px] text-[#1a1f3d]/70 mb-4">
+              {platform === 'desktop'
+                ? 'One tap: if you already have Rilo it opens instantly. If not, you\'ll go to the right store automatically.'
+                : 'Already have Rilo? It\'ll open instantly. If not, you\'ll be sent to the store.'}
+            </p>
+
+            <a
+              href={openRiloUrl}
+              target={platform === 'desktop' ? '_blank' : undefined}
+              rel="noopener noreferrer"
+              className="w-full h-[56px] rounded-2xl text-white font-semibold text-[16px] active:opacity-80 transition-opacity bg-gradient-to-r from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] shadow-[0_12px_30px_-8px_rgba(138,92,240,0.55)] flex items-center justify-center gap-2"
+            >
+              <Sparkles className="h-4 w-4" />
+              Open Rilo
+            </a>
+
+            {platform === 'desktop' && (
+              <p className="mt-3 text-center text-[12px] text-[#1a1f3d]/55">
+                On desktop? Open this page on your phone, or continue on web at{' '}
+                <a href="/app/home" className="font-semibold text-[#8A5CF0] active:opacity-70">/app/home</a>
+              </p>
             )}
 
             {orderDetails?.email && (
