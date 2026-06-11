@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.56.0';
+import { sendPurchaseWelcomeMessage } from "../_shared/send-purchase-welcome.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -294,6 +295,15 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     console.log(`Enrollment created successfully: ${enrollment.id}`);
+
+    // Send welcome support-chat message (idempotent)
+    if (programSlug) {
+      await sendPurchaseWelcomeMessage(supabase, {
+        userId,
+        programSlug,
+        programTitle: courseName,
+      });
+    }
 
     // If this is a subscription program, also create user_subscriptions record
     if (programSlug) {
