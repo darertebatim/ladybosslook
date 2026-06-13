@@ -586,8 +586,17 @@ function MobileMock() {
 // ─────────────────────────────────────────────────────────────
 
 export default function JasperMock() {
+  const [mode, setMode] = useState<'day' | 'night'>('night');
+  const palette = mode === 'night' ? DARK : LIGHT;
+  const pageBg = mode === 'night' ? '#0E0E0E' : '#F6F6F7';
+  const pageText = mode === 'night' ? '#FAFAFA' : '#0A0A0A';
+  const pageSub = mode === 'night' ? '#A1A1A1' : '#555';
+  const pageDim = mode === 'night' ? '#6B6B6B' : '#888';
+  const cardBg = mode === 'night' ? '#141414' : '#fff';
+  const cardBorder = mode === 'night' ? '#262626' : '#E5E5E5';
+  const mobileWell = mode === 'night' ? '#000' : '#1A1A1A';
   return (
-    <div style={{ padding: 24, background: '#F6F6F7', minHeight: '100vh' }}>
+    <div style={{ padding: 24, background: pageBg, minHeight: '100vh', transition: 'background 200ms ease' }}>
       <style>{`
         @keyframes qpPulse {
           0%, 100% { opacity: 0.15; transform: scale(1); }
@@ -596,61 +605,88 @@ export default function JasperMock() {
       `}</style>
 
       <div style={{ maxWidth: 1400, margin: '0 auto' }}>
-        <div style={{ marginBottom: 24 }}>
-          <div style={{ fontFamily: fontMono, fontSize: 11, color: '#888', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-            Visual Direction · v1
+        <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
+          <div>
+            <div style={{ fontFamily: fontMono, fontSize: 11, color: pageDim, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+              Visual Direction · v1
+            </div>
+            <h1 style={{ fontSize: 28, fontWeight: 600, letterSpacing: '-0.02em', margin: '6px 0 4px', color: pageText }}>
+              Quiet Power
+            </h1>
+            <p style={{ color: pageSub, fontSize: 14, margin: 0 }}>
+              Generous whitespace · Inter + JetBrains Mono · Rilo orange as the only accent.
+              Inspired by ElevenLabs operator-first calm.
+            </p>
           </div>
-          <h1 style={{ fontSize: 28, fontWeight: 600, letterSpacing: '-0.02em', margin: '6px 0 4px', color: '#0A0A0A' }}>
-            Quiet Power
-          </h1>
-          <p style={{ color: '#555', fontSize: 14, margin: 0 }}>
-            Dark canvas · generous whitespace · Inter + JetBrains Mono · Rilo orange as the only accent.
-            Inspired by ElevenLabs operator-first calm.
-          </p>
+          {/* Mode toggle */}
+          <div style={{
+            display: 'inline-flex', padding: 4, borderRadius: 999,
+            background: cardBg, border: `1px solid ${cardBorder}`,
+            fontFamily: fontMono, fontSize: 11, letterSpacing: '0.08em',
+          }}>
+            {(['day', 'night'] as const).map(m => {
+              const active = mode === m;
+              return (
+                <button
+                  key={m}
+                  onClick={() => setMode(m)}
+                  style={{
+                    padding: '6px 14px', borderRadius: 999, border: 'none',
+                    cursor: 'pointer', textTransform: 'uppercase',
+                    background: active ? palette.orange : 'transparent',
+                    color: active ? palette.onOrange : pageSub,
+                    fontFamily: fontMono, fontWeight: 600,
+                  }}
+                >
+                  {m}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Desktop */}
         <div style={{ marginBottom: 36 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <div style={{ fontFamily: fontMono, fontSize: 10, color: '#888', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-              01 · Desktop — 1440×900
+            <div style={{ fontFamily: fontMono, fontSize: 10, color: pageDim, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+              01 · Desktop — 1440×900 · {mode}
             </div>
           </div>
-          <DesktopMock />
+          <ThemeCtx.Provider value={palette}><DesktopMock /></ThemeCtx.Provider>
         </div>
 
         {/* Mobile */}
         <div>
-          <div style={{ fontFamily: fontMono, fontSize: 10, color: '#888', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>
-            02 · Mobile — 390×844
+          <div style={{ fontFamily: fontMono, fontSize: 10, color: pageDim, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>
+            02 · Mobile — 390×844 · {mode}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0', background: '#1A1A1A', borderRadius: 12 }}>
-            <MobileMock />
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0', background: mobileWell, borderRadius: 12 }}>
+            <ThemeCtx.Provider value={palette}><MobileMock /></ThemeCtx.Provider>
           </div>
         </div>
 
         {/* Token strip */}
-        <div style={{ marginTop: 36, padding: 20, background: '#fff', border: '1px solid #E5E5E5', borderRadius: 10 }}>
-          <div style={{ fontFamily: fontMono, fontSize: 10, color: '#888', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 14 }}>
-            Design tokens
+        <div style={{ marginTop: 36, padding: 20, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 10 }}>
+          <div style={{ fontFamily: fontMono, fontSize: 10, color: pageDim, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 14 }}>
+            Design tokens · {mode}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
             {[
-              ['BG',        C.bg],
-              ['Surface',   C.surface],
-              ['Hairline',  C.hairline],
-              ['Text',      C.text],
-              ['Text Mid',  C.textMid],
-              ['Text Dim',  C.textDim],
-              ['Orange',    C.orange],
-              ['Success',   C.success],
-              ['Warn',      C.warn],
+              ['BG',        palette.bg],
+              ['Surface',   palette.surface],
+              ['Hairline',  palette.hairline],
+              ['Text',      palette.text],
+              ['Text Mid',  palette.textMid],
+              ['Text Dim',  palette.textDim],
+              ['Orange',    palette.orange],
+              ['Success',   palette.success],
+              ['Warn',      palette.warn],
             ].map(([name, hex]) => (
               <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 6, background: hex, border: '1px solid #E5E5E5' }} />
+                <div style={{ width: 36, height: 36, borderRadius: 6, background: hex, border: `1px solid ${cardBorder}` }} />
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 500, color: '#0A0A0A' }}>{name}</div>
-                  <div style={{ fontFamily: fontMono, fontSize: 10.5, color: '#666' }}>{hex}</div>
+                  <div style={{ fontSize: 12, fontWeight: 500, color: pageText }}>{name}</div>
+                  <div style={{ fontFamily: fontMono, fontSize: 10.5, color: pageSub }}>{hex}</div>
                 </div>
               </div>
             ))}
