@@ -200,6 +200,7 @@ const ChatBubble = ({ role, children, streaming }: any) => {
 // ─────────────────────────────────────────────────────────────
 
 function DesktopMock() {
+  const C = useC();
   return (
     <div
       style={{
@@ -417,6 +418,7 @@ function DesktopMock() {
 // ─────────────────────────────────────────────────────────────
 
 function MobileMock() {
+  const C = useC();
   return (
     <div
       style={{
