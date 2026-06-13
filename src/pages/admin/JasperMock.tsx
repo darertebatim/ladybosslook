@@ -64,11 +64,14 @@ const fontMono = `'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace`;
 // Shared primitives
 // ─────────────────────────────────────────────────────────────
 
-const MonoLabel = ({ children, color = C.textDim }: any) => (
-  <span style={{ fontFamily: fontMono, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color }}>
-    {children}
-  </span>
-);
+const MonoLabel = ({ children, color }: any) => {
+  const C = useC();
+  return (
+    <span style={{ fontFamily: fontMono, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: color ?? C.textDim }}>
+      {children}
+    </span>
+  );
+};
 
 // ─────────────────────────────────────────────────────────────
 // Integrations — connected business infrastructure
@@ -87,7 +90,9 @@ const INTEGRATIONS: Integration[] = [
   { key: 'HS', label: 'HubSpot',    tone: '#FF7A59', status: 'off' },
 ];
 
-const IntegrationDot = ({ i, size = 22 }: { i: Integration; size?: number }) => (
+const IntegrationDot = ({ i, size = 22 }: { i: Integration; size?: number }) => {
+  const C = useC();
+  return (
   <div style={{
     width: size, height: size, borderRadius: 5, flexShrink: 0,
     background: i.status === 'off' ? C.surface2 : i.tone + '22',
@@ -115,9 +120,12 @@ const IntegrationDot = ({ i, size = 22 }: { i: Integration; size?: number }) => 
       }} />
     )}
   </div>
-);
+  );
+};
 
-const PlaybookRow = ({ num, name, category, runs, active }: any) => (
+const PlaybookRow = ({ num, name, category, runs, active }: any) => {
+  const C = useC();
+  return (
   <div
     style={{
       display: 'flex', alignItems: 'center', gap: 14,
@@ -138,9 +146,11 @@ const PlaybookRow = ({ num, name, category, runs, active }: any) => (
     </div>
     {active && <ChevronRight size={14} color={C.orange} />}
   </div>
-);
+  );
+};
 
 const ChatBubble = ({ role, children, streaming }: any) => {
+  const C = useC();
   const isUser = role === 'user';
   return (
     <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: 28 }}>
