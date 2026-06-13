@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import {
   Search, Plus, Send, Sparkles, ChevronRight, Command, Settings, MoreHorizontal,
   MessageSquare, BookOpen, Database, Zap, ArrowUp, Mic, Paperclip, Check,
@@ -8,11 +8,19 @@ import {
 /**
  * Quiet Power — visual mock for the business-AI product
  * Inspired by ElevenLabs aesthetic + Rilo orange accent.
- * Self-contained. No theme tokens — pure inline so it renders identically
- * regardless of the surrounding admin theme.
+ * Self-contained. Day + Night palettes share the same layout.
  */
 
-const C = {
+type Palette = {
+  bg: string; surface: string; surface2: string;
+  hairline: string; hairline2: string;
+  text: string; textMid: string; textDim: string;
+  orange: string; orangeSoft: string; orangeRing: string;
+  onOrange: string;
+  success: string; warn: string;
+};
+
+const DARK: Palette = {
   bg:        '#0A0A0A',
   surface:   '#141414',
   surface2:  '#1C1C1C',
@@ -24,9 +32,30 @@ const C = {
   orange:    '#FF6B1A',
   orangeSoft:'rgba(255,107,26,0.12)',
   orangeRing:'rgba(255,107,26,0.35)',
+  onOrange:  '#0A0A0A',
   success:   '#7BB661',
   warn:      '#D4A24C',
 };
+
+const LIGHT: Palette = {
+  bg:        '#FAFAF7',
+  surface:   '#FFFFFF',
+  surface2:  '#F4F2EE',
+  hairline:  '#E5E2DC',
+  hairline2: '#ECEAE4',
+  text:      '#0F0F0F',
+  textMid:   '#5C5C5C',
+  textDim:   '#9A968E',
+  orange:    '#EB5E33',
+  orangeSoft:'rgba(235,94,51,0.10)',
+  orangeRing:'rgba(235,94,51,0.35)',
+  onOrange:  '#FFFFFF',
+  success:   '#3F8A4C',
+  warn:      '#B8852E',
+};
+
+const ThemeCtx = createContext<Palette>(DARK);
+const useC = () => useContext(ThemeCtx);
 
 const fontSans = `'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif`;
 const fontMono = `'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace`;
@@ -35,11 +64,14 @@ const fontMono = `'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace`;
 // Shared primitives
 // ─────────────────────────────────────────────────────────────
 
-const MonoLabel = ({ children, color = C.textDim }: any) => (
-  <span style={{ fontFamily: fontMono, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color }}>
-    {children}
-  </span>
-);
+const MonoLabel = ({ children, color }: any) => {
+  const C = useC();
+  return (
+    <span style={{ fontFamily: fontMono, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: color ?? C.textDim }}>
+      {children}
+    </span>
+  );
+};
 
 // ─────────────────────────────────────────────────────────────
 // Integrations — connected business infrastructure
@@ -58,7 +90,9 @@ const INTEGRATIONS: Integration[] = [
   { key: 'HS', label: 'HubSpot',    tone: '#FF7A59', status: 'off' },
 ];
 
-const IntegrationDot = ({ i, size = 22 }: { i: Integration; size?: number }) => (
+const IntegrationDot = ({ i, size = 22 }: { i: Integration; size?: number }) => {
+  const C = useC();
+  return (
   <div style={{
     width: size, height: size, borderRadius: 5, flexShrink: 0,
     background: i.status === 'off' ? C.surface2 : i.tone + '22',
@@ -86,9 +120,12 @@ const IntegrationDot = ({ i, size = 22 }: { i: Integration; size?: number }) => 
       }} />
     )}
   </div>
-);
+  );
+};
 
-const PlaybookRow = ({ num, name, category, runs, active }: any) => (
+const PlaybookRow = ({ num, name, category, runs, active }: any) => {
+  const C = useC();
+  return (
   <div
     style={{
       display: 'flex', alignItems: 'center', gap: 14,
@@ -109,9 +146,11 @@ const PlaybookRow = ({ num, name, category, runs, active }: any) => (
     </div>
     {active && <ChevronRight size={14} color={C.orange} />}
   </div>
-);
+  );
+};
 
 const ChatBubble = ({ role, children, streaming }: any) => {
+  const C = useC();
   const isUser = role === 'user';
   return (
     <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: 28 }}>
@@ -161,6 +200,7 @@ const ChatBubble = ({ role, children, streaming }: any) => {
 // ─────────────────────────────────────────────────────────────
 
 function DesktopMock() {
+  const C = useC();
   return (
     <div
       style={{
@@ -319,7 +359,7 @@ function DesktopMock() {
                   </span>
                 </div>
                 <button style={{
-                  border: 'none', background: C.orange, color: '#0A0A0A',
+                  border: 'none', background: C.orange, color: C.onOrange,
                   width: 32, height: 28, borderRadius: 6, display: 'flex',
                   alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
                 }}>
@@ -378,6 +418,7 @@ function DesktopMock() {
 // ─────────────────────────────────────────────────────────────
 
 function MobileMock() {
+  const C = useC();
   return (
     <div
       style={{
@@ -512,7 +553,7 @@ function MobileMock() {
               width: 28, height: 28, borderRadius: '50%', background: C.orange,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <ArrowUp size={14} strokeWidth={2.6} color="#0A0A0A" />
+              <ArrowUp size={14} strokeWidth={2.6} color={C.onOrange} />
             </div>
           </div>
         </div>
@@ -545,8 +586,17 @@ function MobileMock() {
 // ─────────────────────────────────────────────────────────────
 
 export default function JasperMock() {
+  const [mode, setMode] = useState<'day' | 'night'>('night');
+  const palette = mode === 'night' ? DARK : LIGHT;
+  const pageBg = mode === 'night' ? '#0E0E0E' : '#F6F6F7';
+  const pageText = mode === 'night' ? '#FAFAFA' : '#0A0A0A';
+  const pageSub = mode === 'night' ? '#A1A1A1' : '#555';
+  const pageDim = mode === 'night' ? '#6B6B6B' : '#888';
+  const cardBg = mode === 'night' ? '#141414' : '#fff';
+  const cardBorder = mode === 'night' ? '#262626' : '#E5E5E5';
+  const mobileWell = mode === 'night' ? '#000' : '#1A1A1A';
   return (
-    <div style={{ padding: 24, background: '#F6F6F7', minHeight: '100vh' }}>
+    <div style={{ padding: 24, background: pageBg, minHeight: '100vh', transition: 'background 200ms ease' }}>
       <style>{`
         @keyframes qpPulse {
           0%, 100% { opacity: 0.15; transform: scale(1); }
@@ -555,61 +605,88 @@ export default function JasperMock() {
       `}</style>
 
       <div style={{ maxWidth: 1400, margin: '0 auto' }}>
-        <div style={{ marginBottom: 24 }}>
-          <div style={{ fontFamily: fontMono, fontSize: 11, color: '#888', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-            Visual Direction · v1
+        <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
+          <div>
+            <div style={{ fontFamily: fontMono, fontSize: 11, color: pageDim, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+              Visual Direction · v1
+            </div>
+            <h1 style={{ fontSize: 28, fontWeight: 600, letterSpacing: '-0.02em', margin: '6px 0 4px', color: pageText }}>
+              Quiet Power
+            </h1>
+            <p style={{ color: pageSub, fontSize: 14, margin: 0 }}>
+              Generous whitespace · Inter + JetBrains Mono · Rilo orange as the only accent.
+              Inspired by ElevenLabs operator-first calm.
+            </p>
           </div>
-          <h1 style={{ fontSize: 28, fontWeight: 600, letterSpacing: '-0.02em', margin: '6px 0 4px', color: '#0A0A0A' }}>
-            Quiet Power
-          </h1>
-          <p style={{ color: '#555', fontSize: 14, margin: 0 }}>
-            Dark canvas · generous whitespace · Inter + JetBrains Mono · Rilo orange as the only accent.
-            Inspired by ElevenLabs operator-first calm.
-          </p>
+          {/* Mode toggle */}
+          <div style={{
+            display: 'inline-flex', padding: 4, borderRadius: 999,
+            background: cardBg, border: `1px solid ${cardBorder}`,
+            fontFamily: fontMono, fontSize: 11, letterSpacing: '0.08em',
+          }}>
+            {(['day', 'night'] as const).map(m => {
+              const active = mode === m;
+              return (
+                <button
+                  key={m}
+                  onClick={() => setMode(m)}
+                  style={{
+                    padding: '6px 14px', borderRadius: 999, border: 'none',
+                    cursor: 'pointer', textTransform: 'uppercase',
+                    background: active ? palette.orange : 'transparent',
+                    color: active ? palette.onOrange : pageSub,
+                    fontFamily: fontMono, fontWeight: 600,
+                  }}
+                >
+                  {m}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Desktop */}
         <div style={{ marginBottom: 36 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <div style={{ fontFamily: fontMono, fontSize: 10, color: '#888', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-              01 · Desktop — 1440×900
+            <div style={{ fontFamily: fontMono, fontSize: 10, color: pageDim, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+              01 · Desktop — 1440×900 · {mode}
             </div>
           </div>
-          <DesktopMock />
+          <ThemeCtx.Provider value={palette}><DesktopMock /></ThemeCtx.Provider>
         </div>
 
         {/* Mobile */}
         <div>
-          <div style={{ fontFamily: fontMono, fontSize: 10, color: '#888', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>
-            02 · Mobile — 390×844
+          <div style={{ fontFamily: fontMono, fontSize: 10, color: pageDim, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>
+            02 · Mobile — 390×844 · {mode}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0', background: '#1A1A1A', borderRadius: 12 }}>
-            <MobileMock />
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0', background: mobileWell, borderRadius: 12 }}>
+            <ThemeCtx.Provider value={palette}><MobileMock /></ThemeCtx.Provider>
           </div>
         </div>
 
         {/* Token strip */}
-        <div style={{ marginTop: 36, padding: 20, background: '#fff', border: '1px solid #E5E5E5', borderRadius: 10 }}>
-          <div style={{ fontFamily: fontMono, fontSize: 10, color: '#888', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 14 }}>
-            Design tokens
+        <div style={{ marginTop: 36, padding: 20, background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: 10 }}>
+          <div style={{ fontFamily: fontMono, fontSize: 10, color: pageDim, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 14 }}>
+            Design tokens · {mode}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
             {[
-              ['BG',        C.bg],
-              ['Surface',   C.surface],
-              ['Hairline',  C.hairline],
-              ['Text',      C.text],
-              ['Text Mid',  C.textMid],
-              ['Text Dim',  C.textDim],
-              ['Orange',    C.orange],
-              ['Success',   C.success],
-              ['Warn',      C.warn],
+              ['BG',        palette.bg],
+              ['Surface',   palette.surface],
+              ['Hairline',  palette.hairline],
+              ['Text',      palette.text],
+              ['Text Mid',  palette.textMid],
+              ['Text Dim',  palette.textDim],
+              ['Orange',    palette.orange],
+              ['Success',   palette.success],
+              ['Warn',      palette.warn],
             ].map(([name, hex]) => (
               <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 6, background: hex, border: '1px solid #E5E5E5' }} />
+                <div style={{ width: 36, height: 36, borderRadius: 6, background: hex, border: `1px solid ${cardBorder}` }} />
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 500, color: '#0A0A0A' }}>{name}</div>
-                  <div style={{ fontFamily: fontMono, fontSize: 10.5, color: '#666' }}>{hex}</div>
+                  <div style={{ fontSize: 12, fontWeight: 500, color: pageText }}>{name}</div>
+                  <div style={{ fontFamily: fontMono, fontSize: 10.5, color: pageSub }}>{hex}</div>
                 </div>
               </div>
             ))}
