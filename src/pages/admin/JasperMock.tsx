@@ -359,7 +359,7 @@ function DesktopMock() {
                   </span>
                 </div>
                 <button style={{
-                  border: 'none', background: C.orange, color: '#0A0A0A',
+                  border: 'none', background: C.orange, color: C.onOrange,
                   width: 32, height: 28, borderRadius: 6, display: 'flex',
                   alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
                 }}>
