@@ -434,6 +434,25 @@ function MobileMock() {
               <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: v ? C.orange : C.hairline }} />
             ))}
           </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 10 }}>
+            {INTEGRATIONS.filter(i => ['SF','HS','SQ','ST'].includes(i.key)).map(i => (
+              <IntegrationDot key={i.key} i={i} size={18} />
+            ))}
+            <span style={{ fontSize: 10.5, color: C.textDim, fontFamily: fontMono, letterSpacing: '0.04em' }}>
+              LIVE · 2M AGO
+            </span>
+          </div>
+        </div>
+
+        {/* Connected sources strip */}
+        <div style={{ padding: '0 14px 4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <MonoLabel>Connected · 7 of 8</MonoLabel>
+            <span style={{ fontSize: 10.5, color: C.orange, fontFamily: fontMono }}>MANAGE</span>
+          </div>
+          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+            {INTEGRATIONS.map(i => <IntegrationDot key={i.key} i={i} size={32} />)}
+          </div>
         </div>
 
         {/* Chat */}
