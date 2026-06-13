@@ -128,6 +128,7 @@ const PushNotifications = lazy(() => import("@/pages/admin/PushNotifications"));
 const Subscriptions = lazy(() => import("@/pages/admin/Subscriptions"));
 const BrandDesign = lazy(() => import("@/pages/admin/BrandDesign"));
 const BrandMock = lazy(() => import("@/pages/admin/BrandMock"));
+const JasperMock = lazy(() => import("@/pages/admin/JasperMock"));
 const Onboarding = lazy(() => import("@/pages/admin/Onboarding"));
 const Banners = lazy(() => import("@/pages/admin/Banners"));
 const AudienceLibrary = lazy(() => import("@/pages/admin/AudienceLibrary"));
