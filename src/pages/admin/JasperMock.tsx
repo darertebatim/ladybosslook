@@ -223,12 +223,12 @@ function DesktopMock() {
             </div>
           </div>
           <div style={{ flex: 1, overflow: 'hidden' }}>
-            <PlaybookRow num="01" name="Cold outbound email" category="SALES" runs="184" />
-            <PlaybookRow num="02" name="Weekly content calendar" category="MARKETING" runs="92" />
-            <PlaybookRow num="03" name="Customer interview synth" category="RESEARCH" runs="47" active />
-            <PlaybookRow num="04" name="Launch announcement" category="MARKETING" runs="31" />
-            <PlaybookRow num="05" name="SOP from screen rec" category="OPERATIONS" runs="22" />
-            <PlaybookRow num="06" name="Pricing page rewrite" category="MARKETING" runs="18" />
+            <PlaybookRow num="01" name="Weekly revenue digest" category="STRIPE · QUICKBOOKS" runs="184" />
+            <PlaybookRow num="02" name="Instagram content calendar" category="INSTAGRAM · GA4" runs="92" />
+            <PlaybookRow num="03" name="Customer interview synth" category="SALESFORCE · HUBSPOT" runs="47" active />
+            <PlaybookRow num="04" name="Ad spend vs ROI report" category="META · GA4 · STRIPE" runs="31" />
+            <PlaybookRow num="05" name="Reconcile Square ↔ Books" category="SQUARE · QUICKBOOKS" runs="22" />
+            <PlaybookRow num="06" name="Win-back lapsed customers" category="HUBSPOT · STRIPE" runs="18" />
             <PlaybookRow num="07" name="Quarterly OKR draft" category="LEADERSHIP" runs="11" />
           </div>
         </div>
