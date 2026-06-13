@@ -2,7 +2,7 @@ import { useState } from 'react';
 import {
   Search, Plus, Send, Sparkles, ChevronRight, Command, Settings, MoreHorizontal,
   MessageSquare, BookOpen, Database, Zap, ArrowUp, Mic, Paperclip, Check,
-  TrendingUp, FileText, Mail, Megaphone, Target, Layers, ChevronDown, Menu,
+  TrendingUp, FileText, Mail, Megaphone, Target, Layers, ChevronDown, Menu, Plug,
 } from 'lucide-react';
 
 /**
@@ -39,6 +39,53 @@ const MonoLabel = ({ children, color = C.textDim }: any) => (
   <span style={{ fontFamily: fontMono, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color }}>
     {children}
   </span>
+);
+
+// ─────────────────────────────────────────────────────────────
+// Integrations — connected business infrastructure
+// ─────────────────────────────────────────────────────────────
+
+type Integration = { key: string; label: string; tone: string; status: 'live' | 'syncing' | 'off' };
+
+const INTEGRATIONS: Integration[] = [
+  { key: 'IG', label: 'Instagram',  tone: '#E1306C', status: 'live' },
+  { key: 'SQ', label: 'Square',     tone: '#3B6CF6', status: 'live' },
+  { key: 'SF', label: 'Salesforce', tone: '#00A1E0', status: 'live' },
+  { key: 'QB', label: 'QuickBooks', tone: '#2CA01C', status: 'live' },
+  { key: 'ST', label: 'Stripe',     tone: '#635BFF', status: 'syncing' },
+  { key: 'SH', label: 'Shopify',    tone: '#95BF47', status: 'live' },
+  { key: 'GA', label: 'GA4',        tone: '#F9AB00', status: 'live' },
+  { key: 'HS', label: 'HubSpot',    tone: '#FF7A59', status: 'off' },
+];
+
+const IntegrationDot = ({ i, size = 22 }: { i: Integration; size?: number }) => (
+  <div style={{
+    width: size, height: size, borderRadius: 5, flexShrink: 0,
+    background: i.status === 'off' ? C.surface2 : i.tone + '22',
+    border: `1px solid ${i.status === 'off' ? C.hairline : i.tone + '55'}`,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    position: 'relative',
+  }}>
+    <span style={{
+      fontFamily: fontMono, fontSize: size <= 22 ? 9 : 10, fontWeight: 600,
+      color: i.status === 'off' ? C.textDim : i.tone,
+      letterSpacing: '0.02em',
+    }}>{i.key}</span>
+    {i.status === 'live' && (
+      <div style={{
+        position: 'absolute', top: -2, right: -2,
+        width: 6, height: 6, borderRadius: '50%', background: C.success,
+        border: `1.5px solid ${C.bg}`,
+      }} />
+    )}
+    {i.status === 'syncing' && (
+      <div style={{
+        position: 'absolute', top: -2, right: -2,
+        width: 6, height: 6, borderRadius: '50%', background: C.warn,
+        border: `1.5px solid ${C.bg}`,
+      }} />
+    )}
+  </div>
 );
 
 const PlaybookRow = ({ num, name, category, runs, active }: any) => (
@@ -213,6 +260,18 @@ function DesktopMock() {
                 </div>
               ))}
             </div>
+            {/* Data sources used by this playbook */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 14 }}>
+              <MonoLabel>Live data ·</MonoLabel>
+              <div style={{ display: 'flex', gap: 6 }}>
+                {INTEGRATIONS.filter(i => ['SF','HS','SQ','ST'].includes(i.key)).map(i => (
+                  <IntegrationDot key={i.key} i={i} size={20} />
+                ))}
+              </div>
+              <span style={{ fontSize: 11, color: C.textDim }}>
+                Salesforce · HubSpot · Square · Stripe — last sync 2m ago
+              </span>
+            </div>
           </div>
 
           {/* Chat scroll */}
@@ -222,19 +281,20 @@ function DesktopMock() {
             </ChatBubble>
             <ChatBubble role="assistant" streaming>
               <div style={{ marginBottom: 14 }}>
-                Across the 8 interviews, three themes dominate. I weighted by both raw mention count and emotional intensity (verbatim language, qualifiers).
+                Across the 8 interviews and cross-referenced against <span style={{ color: C.text, fontWeight: 500 }}>187 Salesforce support cases</span> and <span style={{ color: C.text, fontWeight: 500 }}>last 30d of HubSpot replies</span>, three themes dominate. Weighted by mention count + revenue at risk (Stripe MRR).
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginTop: 6 }}>
                 {[
-                  { label: 'Onboarding friction', count: '34', tone: C.orange },
-                  { label: 'Pricing opacity', count: '21', tone: C.warn },
-                  { label: 'Slow exports', count: '17', tone: C.textMid },
+                  { label: 'Onboarding friction', count: '34', sub: '$12.4K MRR at risk', tone: C.orange },
+                  { label: 'Pricing opacity',    count: '21', sub: '$7.8K MRR at risk',  tone: C.warn },
+                  { label: 'Slow exports',       count: '17', sub: '$3.1K MRR at risk',  tone: C.textMid },
                 ].map(t => (
                   <div key={t.label} style={{
                     padding: '12px 14px', background: C.surface, border: `1px solid ${C.hairline2}`, borderRadius: 6,
                   }}>
                     <MonoLabel color={t.tone}>{t.count} mentions</MonoLabel>
                     <div style={{ marginTop: 6, fontSize: 13, color: C.text, fontWeight: 500 }}>{t.label}</div>
+                    <div style={{ marginTop: 4, fontSize: 11, color: C.textDim, fontFamily: fontMono }}>{t.sub}</div>
                   </div>
                 ))}
               </div>
@@ -272,13 +332,27 @@ function DesktopMock() {
 
         {/* Right rail — memory */}
         <div style={{ width: 248, borderLeft: `1px solid ${C.hairline2}`, padding: '20px 18px', background: C.bg }}>
+          {/* Connected sources */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <MonoLabel>Connected · 7 of 8</MonoLabel>
+            <Plug size={12} color={C.textMid} />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginTop: 12 }}>
+            {INTEGRATIONS.map(i => <IntegrationDot key={i.key} i={i} size={36} />)}
+          </div>
+          <div style={{ marginTop: 10, fontSize: 11, color: C.textDim, lineHeight: 1.5 }}>
+            Pulling live from Salesforce, Stripe, Shopify, Square, QuickBooks, Instagram, GA4.
+          </div>
+
+          <div style={{ height: 1, background: C.hairline2, margin: '20px 0' }} />
+
           <MonoLabel>Business Memory</MonoLabel>
           <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
             {[
               { k: 'BRAND VOICE', v: 'Direct, no fluff. Sentence case. Avoids "delight", "seamless".' },
+              { k: 'MRR · LIVE',  v: '$48,210 — up 12% MoM · synced from Stripe 2m ago.' },
+              { k: 'TOP SKU',     v: 'Pro plan · 312 active subs · Shopify + Stripe.' },
               { k: 'ICP',         v: 'Solo founders, $0–500K ARR, B2B SaaS.' },
-              { k: 'PRICING',     v: 'Self-serve $49 · Pro $149 · Team $499.' },
-              { k: 'POSITIONING', v: 'Operator-first. Not a chatbot, a workspace.' },
             ].map(m => (
               <div key={m.k} style={{ paddingBottom: 12, borderBottom: `1px solid ${C.hairline2}` }}>
                 <MonoLabel color={C.orange}>{m.k}</MonoLabel>
@@ -290,7 +364,7 @@ function DesktopMock() {
               color: C.textMid, fontSize: 12, padding: '10px', borderRadius: 6, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
             }}>
-              <Plus size={12} /> Add memory
+              <Plus size={12} /> Connect a source
             </button>
           </div>
         </div>
