@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import {
   Search, Plus, Send, Sparkles, ChevronRight, Command, Settings, MoreHorizontal,
   MessageSquare, BookOpen, Database, Zap, ArrowUp, Mic, Paperclip, Check,
@@ -8,11 +8,19 @@ import {
 /**
  * Quiet Power — visual mock for the business-AI product
  * Inspired by ElevenLabs aesthetic + Rilo orange accent.
- * Self-contained. No theme tokens — pure inline so it renders identically
- * regardless of the surrounding admin theme.
+ * Self-contained. Day + Night palettes share the same layout.
  */
 
-const C = {
+type Palette = {
+  bg: string; surface: string; surface2: string;
+  hairline: string; hairline2: string;
+  text: string; textMid: string; textDim: string;
+  orange: string; orangeSoft: string; orangeRing: string;
+  onOrange: string;
+  success: string; warn: string;
+};
+
+const DARK: Palette = {
   bg:        '#0A0A0A',
   surface:   '#141414',
   surface2:  '#1C1C1C',
@@ -24,9 +32,30 @@ const C = {
   orange:    '#FF6B1A',
   orangeSoft:'rgba(255,107,26,0.12)',
   orangeRing:'rgba(255,107,26,0.35)',
+  onOrange:  '#0A0A0A',
   success:   '#7BB661',
   warn:      '#D4A24C',
 };
+
+const LIGHT: Palette = {
+  bg:        '#FAFAF7',
+  surface:   '#FFFFFF',
+  surface2:  '#F4F2EE',
+  hairline:  '#E5E2DC',
+  hairline2: '#ECEAE4',
+  text:      '#0F0F0F',
+  textMid:   '#5C5C5C',
+  textDim:   '#9A968E',
+  orange:    '#EB5E33',
+  orangeSoft:'rgba(235,94,51,0.10)',
+  orangeRing:'rgba(235,94,51,0.35)',
+  onOrange:  '#FFFFFF',
+  success:   '#3F8A4C',
+  warn:      '#B8852E',
+};
+
+const ThemeCtx = createContext<Palette>(DARK);
+const useC = () => useContext(ThemeCtx);
 
 const fontSans = `'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif`;
 const fontMono = `'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace`;
