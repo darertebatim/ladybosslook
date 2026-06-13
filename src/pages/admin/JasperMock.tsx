@@ -553,7 +553,7 @@ function MobileMock() {
               width: 28, height: 28, borderRadius: '50%', background: C.orange,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <ArrowUp size={14} strokeWidth={2.6} color="#0A0A0A" />
+              <ArrowUp size={14} strokeWidth={2.6} color={C.onOrange} />
             </div>
           </div>
         </div>
