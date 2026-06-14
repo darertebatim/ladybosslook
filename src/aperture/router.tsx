@@ -11,6 +11,13 @@ const Memory = lazy(() => import("@/aperture/pages/app/Memory"));
 const Integrations = lazy(() => import("@/aperture/pages/app/Integrations"));
 const Settings = lazy(() => import("@/aperture/pages/app/Settings"));
 
+// Phase 3 — marketing
+const Landing = lazy(() => import("@/aperture/pages/marketing/Landing"));
+const Pricing = lazy(() => import("@/aperture/pages/marketing/Pricing"));
+const PlaybooksPublic = lazy(() => import("@/aperture/pages/marketing/PlaybooksPublic"));
+const IntegrationsPublic = lazy(() => import("@/aperture/pages/marketing/IntegrationsPublic"));
+const Manifesto = lazy(() => import("@/aperture/pages/marketing/Manifesto"));
+
 function ApertureLoader() {
   return (
     <div
@@ -46,7 +53,12 @@ export default function ApertureRouter() {
     <ApertureLayout>
       <Suspense fallback={<ApertureLoader />}>
         <Routes>
-          <Route index element={<Navigate to="app" replace />} />
+          {/* Marketing */}
+          <Route index element={<Landing />} />
+          <Route path="pricing" element={<Pricing />} />
+          <Route path="playbooks" element={<PlaybooksPublic />} />
+          <Route path="integrations" element={<IntegrationsPublic />} />
+          <Route path="manifesto" element={<Manifesto />} />
           <Route path="brand" element={<BrandShowcase />} />
           {/* Phase 2 — product app */}
           <Route path="app" element={<ApertureHome />} />
@@ -56,8 +68,7 @@ export default function ApertureRouter() {
           <Route path="app/memory" element={<Memory />} />
           <Route path="app/integrations" element={<Integrations />} />
           <Route path="app/settings" element={<Settings />} />
-          {/* Phase 3 (marketing) lands here later */}
-          <Route path="*" element={<Navigate to="app" replace />} />
+          <Route path="*" element={<Navigate to="." replace />} />
         </Routes>
       </Suspense>
     </ApertureLayout>
