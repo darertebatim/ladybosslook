@@ -27,11 +27,10 @@ serve(async (req) => {
       user_id: user.id, stale: true,
     });
 
-    const [{ data: answers }, { data: facts }, { data: questions }] = await Promise.all([
-      supabase.from("aperture_memory_answers")
-        .select("bucket_slug,question_key,value").eq("user_id", user.id),
-      supabase.from("aperture_ai_facts")
-        .select("bucket_slug,fact").eq("user_id", user.id).eq("is_active", true),
+    const [{ data: items }, { data: questions }] = await Promise.all([
+      supabase.from("aperture_memory_items")
+        .select("bucket_slug,question_key,source,content")
+        .eq("user_id", user.id).eq("is_active", true),
       supabase.from("aperture_bucket_questions").select("bucket_slug,question_key,prompt"),
     ]);
 
@@ -40,14 +39,18 @@ serve(async (req) => {
       lookup.set(`${q.bucket_slug}:${q.question_key}`, q.prompt));
 
     const grouped: Record<string, string[]> = {};
-    (answers ?? []).forEach((a: any) => {
-      const v = typeof a.value === "string" ? a.value : a.value?.text ?? JSON.stringify(a.value);
-      if (!v || !String(v).trim()) return;
-      const prompt = lookup.get(`${a.bucket_slug}:${a.question_key}`) ?? a.question_key;
-      (grouped[a.bucket_slug] ??= []).push(`- ${prompt} → ${v}`);
-    });
-    (facts ?? []).forEach((f: any) => {
-      (grouped[f.bucket_slug ?? "notes"] ??= []).push(`- (noticed) ${f.fact}`);
+    (items ?? []).forEach((it: any) => {
+      const v = String(it.content ?? "").trim();
+      if (!v) return;
+      const slug = it.bucket_slug ?? "notes";
+      if (it.source === "bucket_answer" && it.question_key) {
+        const prompt = lookup.get(`${it.bucket_slug}:${it.question_key}`) ?? it.question_key;
+        (grouped[slug] ??= []).push(`- ${prompt} → ${v}`);
+      } else if (it.source === "ai_extracted") {
+        (grouped[slug] ??= []).push(`- (noticed) ${v}`);
+      } else {
+        (grouped[slug] ??= []).push(`- ${v}`);
+      }
     });
 
     const raw = Object.entries(grouped)
@@ -78,8 +81,8 @@ serve(async (req) => {
     await supabase.from("aperture_memory_card").upsert({
       user_id: user.id,
       summary,
-      facts_count: facts?.length ?? 0,
-      answers_count: answers?.length ?? 0,
+      facts_count: (items ?? []).filter((i: any) => i.source === "ai_extracted").length,
+      answers_count: (items ?? []).filter((i: any) => i.source === "bucket_answer").length,
       stale: false,
       regenerated_at: new Date().toISOString(),
     });
