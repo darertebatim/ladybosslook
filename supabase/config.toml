@@ -211,3 +211,9 @@ verify_jwt = false
 
 [functions.og-dedication]
 verify_jwt = false
+
+[functions.aperture-chat]
+verify_jwt = false
+
+[functions.aperture-regenerate-memory-card]
+verify_jwt = false
