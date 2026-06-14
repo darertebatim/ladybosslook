@@ -13,6 +13,15 @@ const Library = lazy(() => import("@/aperture/pages/app/Library"));
 const ActionPage = lazy(() => import("@/aperture/pages/app/Action"));
 const Settings = lazy(() => import("@/aperture/pages/app/Settings"));
 
+// Real Supabase-backed product at /aperture/app/*
+const RealHome = lazy(() => import("@/aperture/pages/real/Home"));
+const RealMemory = lazy(() => import("@/aperture/pages/real/Memory"));
+const RealBucket = lazy(() => import("@/aperture/pages/real/Bucket"));
+const RealChats = lazy(() => import("@/aperture/pages/real/Chats"));
+const RealChatThread = lazy(() => import("@/aperture/pages/real/ChatThread"));
+const RealLibrary = lazy(() => import("@/aperture/pages/real/Library"));
+const RealSettings = lazy(() => import("@/aperture/pages/real/Settings"));
+
 function ApertureLoader() {
   return (
     <div
@@ -75,8 +84,14 @@ export default function ApertureRouter() {
           <Route path="brand/mockup/library" element={<Library />} />
           <Route path="brand/mockup/library/:slug" element={<ActionPage />} />
           <Route path="brand/mockup/settings" element={<Settings />} />
-          {/* Legacy /aperture/app/* → mockup */}
-          <Route path="app/*" element={<Navigate to="/aperture/brand/mockup" replace />} />
+          {/* Real product — Supabase-backed, auth-gated */}
+          <Route path="app" element={<ApertureAuthGate><RealHome /></ApertureAuthGate>} />
+          <Route path="app/memory" element={<ApertureAuthGate><RealMemory /></ApertureAuthGate>} />
+          <Route path="app/memory/:slug" element={<ApertureAuthGate><RealBucket /></ApertureAuthGate>} />
+          <Route path="app/chats" element={<ApertureAuthGate><RealChats /></ApertureAuthGate>} />
+          <Route path="app/chats/:id" element={<ApertureAuthGate><RealChatThread /></ApertureAuthGate>} />
+          <Route path="app/library" element={<ApertureAuthGate><RealLibrary /></ApertureAuthGate>} />
+          <Route path="app/settings" element={<ApertureAuthGate><RealSettings /></ApertureAuthGate>} />
           <Route path="*" element={<Navigate to="." replace />} />
         </Routes>
       </Suspense>
