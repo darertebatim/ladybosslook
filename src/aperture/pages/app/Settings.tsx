@@ -2,65 +2,69 @@ import { Helmet } from "react-helmet-async";
 import { AppShell } from "@/aperture/components/AppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
-  ApertureCard, ApertureButton, ApertureMonoLabel, ApertureThemeSwitch, ApertureChip,
+  ApertureButton, ApertureCard, ApertureMonoLabel, ApertureThemeSwitch,
 } from "@/aperture/components/primitives";
+import { useApertureMemory } from "@/aperture/hooks/useApertureMemory";
+import { useApertureChats } from "@/aperture/hooks/useApertureChats";
+import { BUCKETS } from "@/aperture/data/buckets";
 
-function Row({ label, hint, control }: { label: string; hint?: string; control: React.ReactNode }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 18px", borderTop: "1px solid var(--ap-hairline)" }}>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 13.5, color: "var(--ap-ink-1)", fontWeight: 500 }}>{label}</div>
-        {hint && <div style={{ fontSize: 12, color: "var(--ap-ink-3)", marginTop: 2 }}>{hint}</div>}
-      </div>
-      <div>{control}</div>
-    </div>
-  );
-}
+export default function Settings() {
+  const { buckets, completion, clearBucket } = useApertureMemory();
+  const { chats, deleteChat } = useApertureChats();
 
-export default function ApertureSettings() {
+  function resetEverything() {
+    if (!confirm("Wipe all memory + all chats from this browser?")) return;
+    BUCKETS.forEach(b => clearBucket(b.slug));
+    chats.forEach(c => deleteChat(c.id));
+  }
+
   return (
     <>
       <Helmet>
         <title>Settings · Aperture</title>
-        <meta name="description" content="Workspace, theme, billing, and account preferences for Aperture." />
       </Helmet>
       <AppShell>
-        <PageHeader index="05 · SETTINGS" title="Settings" sub="Workspace, theme, and billing." />
+        <PageHeader
+          index="04 · SETTINGS"
+          title="Settings"
+          sub="This is a design demo. All memory and chats live in your browser only."
+        />
 
-        <ApertureCard padding={0}>
-          <div style={{ padding: "16px 18px" }}>
-            <ApertureMonoLabel>Workspace</ApertureMonoLabel>
-          </div>
-          <Row label="Workspace name" hint="Used in headers and exports." control={<span style={{ fontSize: 13.5, color: "var(--ap-ink-2)" }}>Maven & Co.</span>} />
-          <Row label="Domain" control={<span style={{ fontSize: 13, color: "var(--ap-ink-2)", fontFamily: "var(--ap-font-mono)" }}>mavenandco.com</span>} />
-          <Row label="Team" hint="Operator plan · 1 of 3 seats used." control={<ApertureButton variant="default" size="sm">Invite</ApertureButton>} />
-        </ApertureCard>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <ApertureCard padding={18}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+              <div>
+                <ApertureMonoLabel>Appearance</ApertureMonoLabel>
+                <h3 style={{ margin: "6px 0 2px", fontSize: 15, color: "var(--ap-ink-1)", fontWeight: 600 }}>Theme</h3>
+                <p style={{ margin: 0, fontSize: 13, color: "var(--ap-ink-2)" }}>Day or night — Aperture works in both.</p>
+              </div>
+              <ApertureThemeSwitch />
+            </div>
+          </ApertureCard>
 
-        <ApertureCard padding={0} style={{ marginTop: 18 }}>
-          <div style={{ padding: "16px 18px" }}>
-            <ApertureMonoLabel>Appearance</ApertureMonoLabel>
-          </div>
-          <Row label="Theme" hint="Aperture is built for both light and dark." control={<ApertureThemeSwitch />} />
-          <Row label="Density" hint="Compact reduces row height by 4px." control={<ApertureButton variant="default" size="sm">Comfortable</ApertureButton>} />
-        </ApertureCard>
+          <ApertureCard padding={18}>
+            <ApertureMonoLabel>Memory</ApertureMonoLabel>
+            <h3 style={{ margin: "6px 0 2px", fontSize: 15, color: "var(--ap-ink-1)", fontWeight: 600 }}>{completion}% of business profile filled</h3>
+            <p style={{ margin: "0 0 12px", fontSize: 13, color: "var(--ap-ink-2)" }}>
+              {buckets.filter(b => b.status !== "empty").length} of {buckets.length} buckets started.
+            </p>
+          </ApertureCard>
 
-        <ApertureCard padding={0} style={{ marginTop: 18 }}>
-          <div style={{ padding: "16px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <ApertureMonoLabel>Billing</ApertureMonoLabel>
-            <ApertureChip tone="signal">Operator</ApertureChip>
-          </div>
-          <Row label="Plan" hint="Unlimited playbooks, all integrations, 3 seats." control={<ApertureButton variant="ghost" size="sm">Change</ApertureButton>} />
-          <Row label="Next invoice" hint="June 28, 2026" control={<span style={{ fontSize: 13, color: "var(--ap-ink-1)", fontFamily: "var(--ap-font-mono)" }}>$48.00</span>} />
-          <Row label="Payment method" control={<span style={{ fontSize: 13, color: "var(--ap-ink-2)", fontFamily: "var(--ap-font-mono)" }}>•••• 4242</span>} />
-        </ApertureCard>
+          <ApertureCard padding={18}>
+            <ApertureMonoLabel>Chats</ApertureMonoLabel>
+            <h3 style={{ margin: "6px 0 2px", fontSize: 15, color: "var(--ap-ink-1)", fontWeight: 600 }}>{chats.length} conversation{chats.length === 1 ? "" : "s"}</h3>
+            <p style={{ margin: "0 0 12px", fontSize: 13, color: "var(--ap-ink-2)" }}>Stored in this browser. Clearing them does not affect your memory buckets.</p>
+          </ApertureCard>
 
-        <ApertureCard padding={0} style={{ marginTop: 18 }}>
-          <div style={{ padding: "16px 18px" }}>
-            <ApertureMonoLabel>Danger zone</ApertureMonoLabel>
-          </div>
-          <Row label="Disconnect all sources" hint="Aperture stops reading from any integration." control={<ApertureButton variant="default" size="sm">Disconnect</ApertureButton>} />
-          <Row label="Delete workspace" hint="Permanent. Cannot be undone." control={<ApertureButton variant="default" size="sm" style={{ borderColor: "var(--ap-danger)", color: "var(--ap-danger)" }}>Delete</ApertureButton>} />
-        </ApertureCard>
+          <ApertureCard padding={18} style={{ borderColor: "var(--ap-hairline-strong)" }}>
+            <ApertureMonoLabel color="var(--ap-danger)">Danger zone</ApertureMonoLabel>
+            <h3 style={{ margin: "6px 0 2px", fontSize: 15, color: "var(--ap-ink-1)", fontWeight: 600 }}>Reset the demo</h3>
+            <p style={{ margin: "0 0 12px", fontSize: 13, color: "var(--ap-ink-2)" }}>
+              Wipes every memory bucket and every chat from this browser. Useful for trying the empty state again.
+            </p>
+            <ApertureButton onClick={resetEverything}>Wipe memory + chats</ApertureButton>
+          </ApertureCard>
+        </div>
       </AppShell>
     </>
   );

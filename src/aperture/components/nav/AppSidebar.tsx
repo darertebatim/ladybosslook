@@ -43,10 +43,9 @@ function IconGear() {
 
 const NAV: NavItem[] = [
   { to: "/aperture/app",              label: "Home",         icon: <IconHome />, end: true },
-  { to: "/aperture/app/playbooks",    label: "Playbooks",    icon: <IconPlay /> },
-  { to: "/aperture/app/chat",         label: "Chat",         icon: <IconChat /> },
+  { to: "/aperture/app/chats",        label: "Chats",        icon: <IconChat /> },
   { to: "/aperture/app/memory",       label: "Memory",       icon: <IconMemory /> },
-  { to: "/aperture/app/integrations", label: "Integrations", icon: <IconPlug /> },
+  { to: "/aperture/app/library",      label: "Library",      icon: <IconPlay /> },
   { to: "/aperture/app/settings",     label: "Settings",     icon: <IconGear /> },
 ];
 

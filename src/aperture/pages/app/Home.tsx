@@ -1,147 +1,234 @@
 import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AppShell } from "@/aperture/components/AppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
-  ApertureCard, ApertureButton, ApertureChip,
-  ApertureIntegrationDot, ApertureMonoLabel,
+  ApertureCard, ApertureChip, ApertureMonoLabel, ApertureButton,
 } from "@/aperture/components/primitives";
-import { INTEGRATIONS } from "@/aperture/data/integrations";
-import { PLAYBOOKS } from "@/aperture/data/playbooks";
-import { MEMORY_FACTS, BUSINESS_PROFILE } from "@/aperture/data/memory";
+import { BUCKETS } from "@/aperture/data/buckets";
+import { ACTIONS } from "@/aperture/data/playbooks";
+import { useApertureMemory } from "@/aperture/hooks/useApertureMemory";
+import { useApertureChats } from "@/aperture/hooks/useApertureChats";
+import { useState } from "react";
 
-function LivePulse() {
-  return <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--ap-live)", display: "inline-block" }} className="ap-pulse" />;
-}
-
-function TrendArrow({ trend }: { trend?: "up" | "down" | "flat" }) {
-  if (!trend || trend === "flat") return <span style={{ color: "var(--ap-ink-3)" }}>—</span>;
+function BucketTile({
+  slug, index, title, blurb, glyph, status, filled, total, aiSurfaced,
+}: {
+  slug: string; index: string; title: string; blurb: string; glyph: string;
+  status: "empty" | "partial" | "full"; filled: number; total: number;
+  aiSurfaced?: string;
+}) {
+  const isEmpty = status === "empty";
+  const isFull = status === "full";
   return (
-    <span style={{ color: trend === "up" ? "var(--ap-live)" : "var(--ap-danger)", fontSize: 12 }}>
-      {trend === "up" ? "▲" : "▼"}
-    </span>
+    <Link
+      to={`/aperture/app/memory/${slug}`}
+      style={{
+        position: "relative",
+        display: "flex", flexDirection: "column", gap: 12,
+        padding: 18,
+        background: isEmpty ? "transparent" : "var(--ap-surface-1)",
+        border: `1px ${isEmpty ? "dashed" : "solid"} var(--ap-hairline)`,
+        borderRadius: "var(--ap-radius-md)",
+        textDecoration: "none",
+        minHeight: 156,
+        transition: "border-color 120ms ease, background 120ms ease",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <ApertureMonoLabel>{index}</ApertureMonoLabel>
+        <span
+          style={{
+            fontFamily: "var(--ap-font-mono)",
+            fontSize: 28,
+            color: isEmpty ? "var(--ap-ink-3)" : isFull ? "var(--ap-signal)" : "var(--ap-ink-2)",
+            lineHeight: 1,
+            opacity: isEmpty ? 0.4 : 1,
+          }}
+        >{glyph}</span>
+      </div>
+      <div>
+        <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: isEmpty ? "var(--ap-ink-2)" : "var(--ap-ink-1)", letterSpacing: "-0.01em" }}>
+          {title}
+        </h3>
+        <p style={{ margin: "4px 0 0", fontSize: 12.5, color: "var(--ap-ink-3)", lineHeight: 1.5 }}>
+          {blurb}
+        </p>
+      </div>
+      <div style={{ marginTop: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          {/* tiny progress pips */}
+          {Array.from({ length: total }).map((_, i) => (
+            <span key={i} style={{
+              width: 12, height: 3, borderRadius: 2,
+              background: i < filled ? "var(--ap-signal)" : "var(--ap-hairline-strong)",
+            }} />
+          ))}
+        </div>
+        <ApertureMonoLabel color={isFull ? "var(--ap-signal)" : "var(--ap-ink-3)"}>
+          {isEmpty ? "Empty" : isFull ? "Full" : `${filled}/${total}`}
+        </ApertureMonoLabel>
+      </div>
+      {aiSurfaced && status !== "full" && (
+        <span
+          title={aiSurfaced}
+          style={{
+            position: "absolute", top: 12, right: 12,
+            width: 6, height: 6, borderRadius: 999,
+            background: "var(--ap-signal)",
+          }}
+          className="ap-pulse"
+        />
+      )}
+    </Link>
   );
 }
 
 export default function ApertureHome() {
-  const suggested = PLAYBOOKS.filter(p => p.suggested);
-  const recent = PLAYBOOKS.slice(0, 4);
+  const navigate = useNavigate();
+  const { buckets, completion, totalAnswered, totalQuestions } = useApertureMemory();
+  const { createChat } = useApertureChats();
+  const [draft, setDraft] = useState("");
+
+  // Suggestions are personalized: filter by buckets that are at least partial.
+  // Then weight playbooks first, prompts second. Show top 3.
+  const knownBuckets = new Set(buckets.filter(b => b.status !== "empty").map(b => b.slug));
+  const suggested = [...ACTIONS]
+    .sort((a, b) => {
+      const aMatch = a.needs.filter(n => knownBuckets.has(n)).length;
+      const bMatch = b.needs.filter(n => knownBuckets.has(n)).length;
+      if (aMatch !== bMatch) return bMatch - aMatch;
+      if (a.kind !== b.kind) return a.kind === "playbook" ? -1 : 1;
+      return 0;
+    })
+    .slice(0, 3);
+
+  const firstName = (buckets.find(b => b.slug === "basics")?.answers.name ?? "").split(" ")[0];
+  const greeting = firstName ? `Hey ${firstName}.` : "Welcome to Aperture.";
+  const subline =
+    totalAnswered === 0
+      ? "Let's fill your first memory bucket so I can actually help. Start with the basics."
+      : `I know ${totalAnswered} of ${totalQuestions} things about your business. Here's what I think you should work on.`;
+
+  function handleSend(text: string) {
+    const t = text.trim();
+    if (!t) return;
+    const thread = createChat(t);
+    navigate(`/aperture/app/chats/${thread.id}?seed=${encodeURIComponent(t)}`);
+  }
 
   return (
     <>
       <Helmet>
         <title>Today · Aperture</title>
-        <meta name="description" content="Today's business pulse — revenue, integrations, and suggested playbooks to run." />
+        <meta name="description" content="Your AI business advisor. Personalized suggestions based on what it knows about your business." />
       </Helmet>
-      <AppShell
-        rightRail={
-          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-            <div>
-              <ApertureMonoLabel>Business memory</ApertureMonoLabel>
-              <h3 style={{ margin: "10px 0 2px", fontSize: 16, color: "var(--ap-ink-1)", fontWeight: 600 }}>{BUSINESS_PROFILE.name}</h3>
-              <p style={{ margin: 0, fontSize: 12.5, color: "var(--ap-ink-2)" }}>{BUSINESS_PROFILE.tagline}</p>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 0, border: "1px solid var(--ap-hairline)", borderRadius: "var(--ap-radius-sm)", overflow: "hidden" }}>
-              {MEMORY_FACTS.slice(0, 6).map((f, i) => (
-                <div key={f.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 12px", borderTop: i === 0 ? "none" : "1px solid var(--ap-hairline)", background: "var(--ap-surface-1)" }}>
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                    <span style={{ fontSize: 11, color: "var(--ap-ink-3)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{f.label}</span>
-                    <span style={{ fontSize: 13.5, color: "var(--ap-ink-1)", fontFamily: "var(--ap-font-mono)", fontWeight: 500 }}>{f.value}</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <TrendArrow trend={f.trend} />
-                    {f.delta && <span style={{ fontSize: 11, color: "var(--ap-ink-3)" }}>{f.delta}</span>}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Link to="/aperture/app/memory" style={{ fontSize: 12, color: "var(--ap-signal)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
-              Open memory →
-            </Link>
-          </div>
-        }
-      >
+      <AppShell>
         <PageHeader
           index="00 · TODAY"
-          title="Today's pulse"
-          sub={`Monday — ${INTEGRATIONS.filter(i => i.status === "live").length} of ${INTEGRATIONS.length} sources live.`}
+          title={greeting}
+          sub={subline}
           action={
-            <Link to="/aperture/app/playbooks">
-              <ApertureButton variant="ghost">Browse playbooks</ApertureButton>
-            </Link>
+            <ApertureChip tone={completion === 0 ? "neutral" : "signal"}>
+              Memory · {completion}%
+            </ApertureChip>
           }
         />
 
-        {/* Hero suggestion */}
-        {suggested[0] && (
-          <ApertureCard raised padding={24} style={{ marginBottom: 24 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-              <ApertureChip tone="signal">Suggested for today</ApertureChip>
-              <ApertureChip tone="live" icon={<LivePulse />}>Live · 2m ago</ApertureChip>
-            </div>
-            <h2 style={{ margin: "14px 0 6px", fontSize: 22, fontWeight: 600, color: "var(--ap-ink-1)", letterSpacing: "-0.02em" }}>
-              {suggested[0].title}
-            </h2>
-            <p style={{ margin: 0, fontSize: 14, color: "var(--ap-ink-2)", lineHeight: 1.55 }}>{suggested[0].summary}</p>
-            <div style={{ marginTop: 16, padding: 14, background: "var(--ap-surface-2)", borderRadius: "var(--ap-radius-sm)", border: "1px solid var(--ap-hairline)" }}>
-              <ApertureMonoLabel>Preview</ApertureMonoLabel>
-              <p style={{ margin: "8px 0 0", fontSize: 14, color: "var(--ap-ink-1)", lineHeight: 1.5 }}>
-                <strong style={{ color: "var(--ap-signal)" }}>{suggested[0].output.headline}</strong>{" "}
-                <span style={{ color: "var(--ap-ink-2)" }}>{suggested[0].output.body}</span>
-              </p>
-            </div>
-            <div style={{ marginTop: 16, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-              <Link to={`/aperture/app/playbooks/${suggested[0].slug}`}>
-                <ApertureButton variant="accent">Run now</ApertureButton>
-              </Link>
-              <Link to={`/aperture/app/playbooks/${suggested[0].slug}`}>
-                <ApertureButton variant="ghost">See steps</ApertureButton>
-              </Link>
-            </div>
-          </ApertureCard>
-        )}
-
-        {/* Source pulse */}
-        <div style={{ marginBottom: 32 }}>
-          <ApertureMonoLabel>Connected sources</ApertureMonoLabel>
-          <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
-            {INTEGRATIONS.slice(0, 6).map(i => (
-              <div key={i.slug} style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", background: "var(--ap-surface-1)", border: "1px solid var(--ap-hairline)", borderRadius: "var(--ap-radius-sm)" }}>
-                <ApertureIntegrationDot color={i.color} status={i.status === "off" ? "off" : i.status === "syncing" ? "syncing" : "live"} />
-                <div style={{ display: "flex", flexDirection: "column", minWidth: 0, flex: 1 }}>
-                  <span style={{ fontSize: 13, color: "var(--ap-ink-1)", fontWeight: 500 }}>{i.name}</span>
-                  <span style={{ fontSize: 11.5, color: "var(--ap-ink-3)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{i.signal}</span>
-                </div>
-                <ApertureMonoLabel>{i.lastSync}</ApertureMonoLabel>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Recent runs */}
-        <div>
+        {/* Suggested for you */}
+        <section style={{ marginBottom: 36 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-            <ApertureMonoLabel>Recent activity</ApertureMonoLabel>
-            <Link to="/aperture/app/playbooks" style={{ fontSize: 12, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>All →</Link>
+            <ApertureMonoLabel>Suggested for you</ApertureMonoLabel>
+            <Link to="/aperture/app/library" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>Browse all →</Link>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", border: "1px solid var(--ap-hairline)", borderRadius: "var(--ap-radius-sm)", overflow: "hidden" }}>
-            {recent.map((p, i) => (
-              <Link key={p.slug} to={`/aperture/app/playbooks/${p.slug}`} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", borderTop: i === 0 ? "none" : "1px solid var(--ap-hairline)", background: "var(--ap-surface-1)", textDecoration: "none" }}>
-                <ApertureMonoLabel style={{ color: "var(--ap-ink-3)", minWidth: 22 }}>{p.index}</ApertureMonoLabel>
-                <div style={{ display: "flex", flexDirection: "column", minWidth: 0, flex: 1 }}>
-                  <span style={{ fontSize: 14, color: "var(--ap-ink-1)", fontWeight: 500 }}>{p.title}</span>
-                  <span style={{ fontSize: 12, color: "var(--ap-ink-3)" }}>{p.cadence} · last run {p.lastRun ?? "—"}</span>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
+            {suggested.map(a => (
+              <Link
+                key={a.slug}
+                to={`/aperture/app/library/${a.slug}`}
+                style={{
+                  display: "flex", flexDirection: "column", gap: 10,
+                  padding: 18,
+                  background: "var(--ap-surface-1)",
+                  border: "1px solid var(--ap-hairline)",
+                  borderRadius: "var(--ap-radius-md)",
+                  boxShadow: "var(--ap-shadow-card)",
+                  textDecoration: "none",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <ApertureChip tone={a.kind === "playbook" ? "signal" : "neutral"}>
+                    {a.kind === "playbook" ? "Playbook" : "Quick prompt"}
+                  </ApertureChip>
+                  <ApertureMonoLabel>{a.duration}</ApertureMonoLabel>
                 </div>
-                <div style={{ display: "flex", gap: 4 }}>
-                  {p.sources.slice(0, 3).map(s => {
-                    const it = INTEGRATIONS.find(x => x.slug === s);
-                    return it ? <ApertureIntegrationDot key={s} color={it.color} size={7} status="live" /> : null;
-                  })}
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "var(--ap-ink-1)", letterSpacing: "-0.015em", lineHeight: 1.3 }}>
+                  {a.title}
+                </h3>
+                <p style={{ margin: 0, fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
+                  {a.blurb}
+                </p>
+                <div style={{
+                  marginTop: 6, paddingTop: 12,
+                  borderTop: "1px dashed var(--ap-hairline)",
+                  fontSize: 12, color: "var(--ap-ink-3)", fontStyle: "italic", lineHeight: 1.5,
+                }}>
+                  Why this: {a.why}
                 </div>
               </Link>
             ))}
           </div>
-        </div>
+        </section>
+
+        {/* Memory buckets */}
+        <section style={{ marginBottom: 36 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+            <ApertureMonoLabel>Memory buckets</ApertureMonoLabel>
+            <Link to="/aperture/app/memory" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>Open all →</Link>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
+            {buckets.map(b => {
+              const meta = BUCKETS.find(x => x.slug === b.slug)!;
+              return (
+                <BucketTile
+                  key={b.slug}
+                  slug={meta.slug}
+                  index={meta.index}
+                  title={meta.title}
+                  blurb={meta.blurb}
+                  glyph={meta.glyph}
+                  status={b.status}
+                  filled={b.filled}
+                  total={b.total}
+                  aiSurfaced={meta.aiSurfaced}
+                />
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Always-on chat dock */}
+        <ApertureCard padding={6} style={{ position: "sticky", bottom: 16, marginTop: 24 }}>
+          <form
+            onSubmit={e => { e.preventDefault(); handleSend(draft); setDraft(""); }}
+            style={{ display: "flex", alignItems: "center", gap: 8 }}
+          >
+            <ApertureMonoLabel style={{ paddingLeft: 12 }}>Ask</ApertureMonoLabel>
+            <input
+              value={draft}
+              onChange={e => setDraft(e.target.value)}
+              placeholder="Or just tell me what's going on with your business right now…"
+              style={{
+                flex: 1, appearance: "none", border: "none", outline: "none",
+                background: "transparent", color: "var(--ap-ink-1)",
+                padding: "12px 0", fontSize: 14, fontFamily: "var(--ap-font-sans)",
+              }}
+            />
+            <ApertureButton type="submit" variant="accent" disabled={!draft.trim()}>
+              Start chat
+            </ApertureButton>
+          </form>
+        </ApertureCard>
       </AppShell>
     </>
   );

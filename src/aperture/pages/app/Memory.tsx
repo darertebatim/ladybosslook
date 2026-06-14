@@ -1,113 +1,78 @@
 import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
 import { AppShell } from "@/aperture/components/AppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
-import {
-  ApertureCard, ApertureButton, ApertureMonoLabel, ApertureIntegrationDot,
-} from "@/aperture/components/primitives";
-import { MEMORY_FACTS, MEMORY_DOCS, BUSINESS_PROFILE } from "@/aperture/data/memory";
-import { INTEGRATIONS, getIntegration } from "@/aperture/data/integrations";
+import { ApertureChip, ApertureMonoLabel } from "@/aperture/components/primitives";
+import { BUCKETS } from "@/aperture/data/buckets";
+import { useApertureMemory } from "@/aperture/hooks/useApertureMemory";
 
-export default function ApertureMemory() {
+/**
+ * Memory overview — "what the AI knows about my business".
+ * Lists every bucket with completion + a peek at filled facts.
+ */
+export default function MemoryOverview() {
+  const { buckets, completion, totalAnswered, totalQuestions } = useApertureMemory();
+
   return (
     <>
       <Helmet>
         <title>Memory · Aperture</title>
-        <meta name="description" content="Your business memory — connected sources, key facts, and uploaded documents that ground every Aperture answer." />
+        <meta name="description" content="The business memory Aperture uses to personalize every conversation." />
       </Helmet>
       <AppShell>
         <PageHeader
-          index="03 · MEMORY"
-          title="Business memory"
-          sub="Everything Aperture knows about your business. Used as grounding context in every chat and playbook run."
-          action={<ApertureButton variant="default">+ Upload document</ApertureButton>}
+          index="01 · MEMORY"
+          title="What I know about your business"
+          sub={`The buckets I draw from in every chat. The more you fill, the sharper I get. Today: ${totalAnswered} of ${totalQuestions} facts.`}
+          action={<ApertureChip tone={completion === 100 ? "live" : completion === 0 ? "neutral" : "signal"}>{completion}% filled</ApertureChip>}
         />
 
-        <ApertureCard padding={20} style={{ marginBottom: 18, display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-          <div style={{
-            width: 44, height: 44, borderRadius: 12,
-            background: "var(--ap-signal)", color: "var(--ap-on-signal)",
-            display: "inline-flex", alignItems: "center", justifyContent: "center",
-            fontSize: 18, fontWeight: 700,
-          }}>M</div>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{ fontSize: 16, fontWeight: 600, color: "var(--ap-ink-1)" }}>{BUSINESS_PROFILE.name}</div>
-            <div style={{ fontSize: 13, color: "var(--ap-ink-2)" }}>{BUSINESS_PROFILE.tagline}</div>
-          </div>
-          <div style={{ display: "flex", gap: 18 }}>
-            <div><ApertureMonoLabel>Founded</ApertureMonoLabel><div style={{ fontSize: 13.5, color: "var(--ap-ink-1)", marginTop: 2 }}>{BUSINESS_PROFILE.founded}</div></div>
-            <div><ApertureMonoLabel>Team</ApertureMonoLabel><div style={{ fontSize: 13.5, color: "var(--ap-ink-1)", marginTop: 2 }}>{BUSINESS_PROFILE.team}</div></div>
-            <div><ApertureMonoLabel>Stage</ApertureMonoLabel><div style={{ fontSize: 13.5, color: "var(--ap-ink-1)", marginTop: 2 }}>{BUSINESS_PROFILE.stage}</div></div>
-          </div>
-        </ApertureCard>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
-          {/* Connected sources */}
-          <ApertureCard padding={20}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <ApertureMonoLabel>Connected sources</ApertureMonoLabel>
-              <span style={{ fontSize: 11, color: "var(--ap-ink-3)", fontFamily: "var(--ap-font-mono)" }}>
-                {INTEGRATIONS.filter(i => i.status === "live").length} / {INTEGRATIONS.length}
-              </span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {INTEGRATIONS.map(i => (
-                <div key={i.slug} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <ApertureIntegrationDot color={i.color} status={i.status === "off" ? "off" : i.status === "syncing" ? "syncing" : "live"} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, color: "var(--ap-ink-1)", fontWeight: 500 }}>{i.name}</div>
-                    <div style={{ fontSize: 11.5, color: "var(--ap-ink-3)" }}>{i.signal}</div>
+        <div style={{ display: "flex", flexDirection: "column", border: "1px solid var(--ap-hairline)", borderRadius: "var(--ap-radius-md)", overflow: "hidden", background: "var(--ap-surface-1)" }}>
+          {buckets.map((b, i) => {
+            const meta = BUCKETS.find(x => x.slug === b.slug)!;
+            const samples = Object.entries(b.answers).slice(0, 2);
+            return (
+              <Link
+                key={b.slug}
+                to={`/aperture/app/memory/${b.slug}`}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "auto 1fr auto",
+                  alignItems: "center",
+                  gap: 18,
+                  padding: "18px 20px",
+                  borderTop: i === 0 ? "none" : "1px solid var(--ap-hairline)",
+                  textDecoration: "none",
+                }}
+              >
+                <span style={{ fontFamily: "var(--ap-font-mono)", fontSize: 28, color: b.status === "empty" ? "var(--ap-ink-3)" : b.status === "full" ? "var(--ap-signal)" : "var(--ap-ink-2)" }}>{meta.glyph}</span>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+                    <ApertureMonoLabel>{meta.index}</ApertureMonoLabel>
+                    <h3 style={{ margin: 0, fontSize: 15.5, color: "var(--ap-ink-1)", fontWeight: 600 }}>{meta.title}</h3>
                   </div>
-                  <ApertureMonoLabel>{i.lastSync}</ApertureMonoLabel>
+                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
+                    {samples.length > 0
+                      ? samples.map(([qid, v]) => {
+                          const q = meta.questions.find(x => x.id === qid);
+                          return `${q?.label.replace(/\?$/, "")}: ${v}`;
+                        }).join(" · ")
+                      : meta.blurb}
+                  </p>
                 </div>
-              ))}
-            </div>
-          </ApertureCard>
-
-          {/* Key facts */}
-          <ApertureCard padding={20}>
-            <ApertureMonoLabel>Key facts</ApertureMonoLabel>
-            <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0, border: "1px solid var(--ap-hairline)", borderRadius: "var(--ap-radius-sm)", overflow: "hidden" }}>
-              {MEMORY_FACTS.map((f, i) => {
-                const it = getIntegration(f.source);
-                const isRightCol = i % 2 === 1;
-                const isFirstRow = i < 2;
-                return (
-                  <div key={f.label} style={{
-                    padding: "12px 14px",
-                    background: "var(--ap-surface-1)",
-                    borderTop: isFirstRow ? "none" : "1px solid var(--ap-hairline)",
-                    borderLeft: isRightCol ? "1px solid var(--ap-hairline)" : "none",
-                  }}>
-                    <div style={{ fontSize: 10.5, color: "var(--ap-ink-3)", textTransform: "uppercase", letterSpacing: "0.1em", display: "flex", alignItems: "center", gap: 6 }}>
-                      {it && <ApertureIntegrationDot color={it.color} size={5} status="live" />}
-                      {f.label}
-                    </div>
-                    <div style={{ fontSize: 14, color: "var(--ap-ink-1)", fontFamily: "var(--ap-font-mono)", fontWeight: 500, marginTop: 4 }}>{f.value}</div>
-                    {f.delta && <div style={{ fontSize: 10.5, color: f.trend === "down" ? "var(--ap-danger)" : "var(--ap-live)", marginTop: 2 }}>{f.delta}</div>}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
+                  <ApertureMonoLabel color={b.status === "full" ? "var(--ap-signal)" : undefined}>
+                    {b.status === "empty" ? "Empty" : `${b.filled} / ${b.total}`}
+                  </ApertureMonoLabel>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    {Array.from({ length: b.total }).map((_, idx) => (
+                      <span key={idx} style={{ width: 14, height: 3, borderRadius: 2, background: idx < b.filled ? "var(--ap-signal)" : "var(--ap-hairline-strong)" }} />
+                    ))}
                   </div>
-                );
-              })}
-            </div>
-          </ApertureCard>
-        </div>
-
-        {/* Documents */}
-        <div style={{ marginTop: 18 }}>
-          <ApertureCard padding={20}>
-            <ApertureMonoLabel>Documents</ApertureMonoLabel>
-            <div style={{ marginTop: 14, display: "flex", flexDirection: "column", border: "1px solid var(--ap-hairline)", borderRadius: "var(--ap-radius-sm)", overflow: "hidden" }}>
-              {MEMORY_DOCS.map((d, i) => (
-                <div key={d.title} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "var(--ap-surface-1)", borderTop: i === 0 ? "none" : "1px solid var(--ap-hairline)" }}>
-                  <span style={{ fontFamily: "var(--ap-font-mono)", fontSize: 10, padding: "3px 6px", background: "var(--ap-surface-3)", color: "var(--ap-ink-2)", borderRadius: 4, minWidth: 36, textAlign: "center" }}>{d.kind}</span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13.5, color: "var(--ap-ink-1)", fontWeight: 500 }}>{d.title}</div>
-                    <div style={{ fontSize: 11.5, color: "var(--ap-ink-3)" }}>{d.size} · {d.uploaded}</div>
-                  </div>
-                  <ApertureButton variant="ghost" size="sm">Open</ApertureButton>
                 </div>
-              ))}
-            </div>
-          </ApertureCard>
+              </Link>
+            );
+          })}
         </div>
       </AppShell>
     </>
