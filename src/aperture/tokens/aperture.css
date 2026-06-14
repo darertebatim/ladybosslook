@@ -1,0 +1,113 @@
+/* ================================================================
+ * APERTURE design tokens
+ * Scoped under .aperture-root so they never leak into Rilo's theme.
+ * Two modes via data attribute: [data-aperture-theme="dark"|"light"]
+ * ================================================================ */
+
+.aperture-root {
+  /* type */
+  --ap-font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --ap-font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* radii */
+  --ap-radius-xs: 6px;
+  --ap-radius-sm: 10px;
+  --ap-radius-md: 14px;
+  --ap-radius-lg: 18px;
+
+  /* spacing scale */
+  --ap-space-1: 4px;
+  --ap-space-2: 8px;
+  --ap-space-3: 12px;
+  --ap-space-4: 16px;
+  --ap-space-6: 24px;
+  --ap-space-8: 32px;
+  --ap-space-12: 48px;
+  --ap-space-16: 64px;
+
+  /* accent — Aperture Signal (always warm orange, same in both modes) */
+  --ap-signal: #FF6B1A;
+  --ap-signal-pressed: #EB5E33;
+  --ap-signal-glow: #FFB089;
+  --ap-on-signal: #0A0A0A;
+
+  /* semantic — live / success / warn / danger */
+  --ap-live: #7BB661;
+  --ap-warn: #D4A24C;
+  --ap-danger: #D45A4C;
+
+  font-family: var(--ap-font-sans);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  color: var(--ap-ink-1);
+  background: var(--ap-canvas);
+  min-height: 100%;
+}
+
+/* ---- DARK (default) ---- */
+.aperture-root,
+.aperture-root[data-aperture-theme="dark"] {
+  --ap-canvas: #0A0A0A;
+  --ap-surface-1: #141414;
+  --ap-surface-2: #1C1C1C;
+  --ap-surface-3: #242424;
+  --ap-hairline: #262626;
+  --ap-hairline-strong: #3A3A3A;
+
+  --ap-ink-1: #FAFAFA;
+  --ap-ink-2: #A8A8A8;
+  --ap-ink-3: #6B6B6B;
+
+  --ap-signal-soft: rgba(255, 107, 26, 0.12);
+  --ap-live-soft: rgba(123, 182, 97, 0.15);
+
+  --ap-shadow-card: 0 1px 0 rgba(255, 255, 255, 0.04) inset,
+                    0 12px 32px -16px rgba(0, 0, 0, 0.6);
+  --ap-shadow-raised: 0 1px 0 rgba(255, 255, 255, 0.06) inset,
+                      0 24px 60px -24px rgba(0, 0, 0, 0.8);
+}
+
+/* ---- LIGHT ---- */
+.aperture-root[data-aperture-theme="light"] {
+  --ap-canvas: #F6F6F7;
+  --ap-surface-1: #FFFFFF;
+  --ap-surface-2: #FAFAFB;
+  --ap-surface-3: #ECECEE;
+  --ap-hairline: #E5E5E7;
+  --ap-hairline-strong: #D4D4D6;
+
+  --ap-ink-1: #0A0A0A;
+  --ap-ink-2: #3A3A3A;
+  --ap-ink-3: #6B6B6B;
+
+  --ap-signal-soft: rgba(255, 107, 26, 0.10);
+  --ap-live-soft: rgba(63, 138, 76, 0.12);
+
+  --ap-shadow-card: 0 1px 2px rgba(10, 10, 10, 0.04),
+                    0 8px 24px -12px rgba(10, 10, 10, 0.08);
+  --ap-shadow-raised: 0 2px 4px rgba(10, 10, 10, 0.06),
+                      0 16px 40px -16px rgba(10, 10, 10, 0.14);
+}
+
+/* ---- mono utility ---- */
+.aperture-root .ap-mono {
+  font-family: var(--ap-font-mono);
+  font-feature-settings: "tnum", "zero";
+  letter-spacing: 0.02em;
+}
+
+/* ---- selection ---- */
+.aperture-root ::selection {
+  background: var(--ap-signal);
+  color: var(--ap-on-signal);
+}
+
+/* ---- live dot pulse ---- */
+@keyframes ap-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(0.92); }
+}
+.aperture-root .ap-pulse {
+  animation: ap-pulse 2.4s ease-in-out infinite;
+}
