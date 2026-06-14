@@ -439,6 +439,499 @@ export type Database = {
           },
         ]
       }
+      aperture_action_runs: {
+        Row: {
+          action_slug: string
+          chat_id: string | null
+          completed_at: string | null
+          current_step: number
+          id: string
+          started_at: string
+          state: Json
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_slug: string
+          chat_id?: string | null
+          completed_at?: string | null
+          current_step?: number
+          id?: string
+          started_at?: string
+          state?: Json
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_slug?: string
+          chat_id?: string | null
+          completed_at?: string | null
+          current_step?: number
+          id?: string
+          started_at?: string
+          state?: Json
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aperture_action_runs_action_slug_fkey"
+            columns: ["action_slug"]
+            isOneToOne: false
+            referencedRelation: "aperture_actions"
+            referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "aperture_action_runs_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "aperture_chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      aperture_actions: {
+        Row: {
+          blurb: string | null
+          category: string
+          created_at: string
+          duration: string | null
+          is_published: boolean
+          kind: string
+          needs: string[]
+          output: string | null
+          slug: string
+          steps: Json
+          title: string
+          updated_at: string
+          why: string | null
+        }
+        Insert: {
+          blurb?: string | null
+          category: string
+          created_at?: string
+          duration?: string | null
+          is_published?: boolean
+          kind: string
+          needs?: string[]
+          output?: string | null
+          slug: string
+          steps?: Json
+          title: string
+          updated_at?: string
+          why?: string | null
+        }
+        Update: {
+          blurb?: string | null
+          category?: string
+          created_at?: string
+          duration?: string | null
+          is_published?: boolean
+          kind?: string
+          needs?: string[]
+          output?: string | null
+          slug?: string
+          steps?: Json
+          title?: string
+          updated_at?: string
+          why?: string | null
+        }
+        Relationships: []
+      }
+      aperture_ai_facts: {
+        Row: {
+          bucket_slug: string | null
+          confidence: number
+          created_at: string
+          fact: string
+          id: string
+          is_active: boolean
+          source: string | null
+          source_ref: string | null
+          user_id: string
+        }
+        Insert: {
+          bucket_slug?: string | null
+          confidence?: number
+          created_at?: string
+          fact: string
+          id?: string
+          is_active?: boolean
+          source?: string | null
+          source_ref?: string | null
+          user_id: string
+        }
+        Update: {
+          bucket_slug?: string | null
+          confidence?: number
+          created_at?: string
+          fact?: string
+          id?: string
+          is_active?: boolean
+          source?: string | null
+          source_ref?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      aperture_bucket_questions: {
+        Row: {
+          bucket_slug: string
+          choices: Json | null
+          created_at: string
+          hint: string | null
+          id: string
+          input_kind: string
+          prompt: string
+          question_key: string
+          sort_order: number
+        }
+        Insert: {
+          bucket_slug: string
+          choices?: Json | null
+          created_at?: string
+          hint?: string | null
+          id?: string
+          input_kind?: string
+          prompt: string
+          question_key: string
+          sort_order?: number
+        }
+        Update: {
+          bucket_slug?: string
+          choices?: Json | null
+          created_at?: string
+          hint?: string | null
+          id?: string
+          input_kind?: string
+          prompt?: string
+          question_key?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aperture_bucket_questions_bucket_slug_fkey"
+            columns: ["bucket_slug"]
+            isOneToOne: false
+            referencedRelation: "aperture_buckets"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      aperture_buckets: {
+        Row: {
+          blurb: string | null
+          created_at: string
+          glyph: string | null
+          slug: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          blurb?: string | null
+          created_at?: string
+          glyph?: string | null
+          slug: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          blurb?: string | null
+          created_at?: string
+          glyph?: string | null
+          slug?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      aperture_chats: {
+        Row: {
+          archived: boolean
+          created_at: string
+          id: string
+          last_message_at: string
+          origin: string | null
+          origin_ref: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          archived?: boolean
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          origin?: string | null
+          origin_ref?: string | null
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          archived?: boolean
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          origin?: string | null
+          origin_ref?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      aperture_doc_chunks: {
+        Row: {
+          chunk_index: number
+          content: string
+          created_at: string
+          document_id: string
+          embedding: string | null
+          id: string
+          token_count: number | null
+          user_id: string
+        }
+        Insert: {
+          chunk_index: number
+          content: string
+          created_at?: string
+          document_id: string
+          embedding?: string | null
+          id?: string
+          token_count?: number | null
+          user_id: string
+        }
+        Update: {
+          chunk_index?: number
+          content?: string
+          created_at?: string
+          document_id?: string
+          embedding?: string | null
+          id?: string
+          token_count?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aperture_doc_chunks_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "aperture_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      aperture_documents: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          mime_type: string | null
+          size_bytes: number | null
+          source: string | null
+          status: string
+          storage_path: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          mime_type?: string | null
+          size_bytes?: number | null
+          source?: string | null
+          status?: string
+          storage_path?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          mime_type?: string | null
+          size_bytes?: number | null
+          source?: string | null
+          status?: string
+          storage_path?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      aperture_memory_answers: {
+        Row: {
+          bucket_slug: string
+          created_at: string
+          id: string
+          question_key: string
+          updated_at: string
+          user_id: string
+          value: Json | null
+        }
+        Insert: {
+          bucket_slug: string
+          created_at?: string
+          id?: string
+          question_key: string
+          updated_at?: string
+          user_id: string
+          value?: Json | null
+        }
+        Update: {
+          bucket_slug?: string
+          created_at?: string
+          id?: string
+          question_key?: string
+          updated_at?: string
+          user_id?: string
+          value?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aperture_memory_answers_bucket_slug_fkey"
+            columns: ["bucket_slug"]
+            isOneToOne: false
+            referencedRelation: "aperture_buckets"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      aperture_memory_card: {
+        Row: {
+          answers_count: number
+          created_at: string
+          facts_count: number
+          regenerated_at: string | null
+          stale: boolean
+          summary: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers_count?: number
+          created_at?: string
+          facts_count?: number
+          regenerated_at?: string | null
+          stale?: boolean
+          summary?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answers_count?: number
+          created_at?: string
+          facts_count?: number
+          regenerated_at?: string | null
+          stale?: boolean
+          summary?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      aperture_messages: {
+        Row: {
+          chat_id: string
+          content: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          role: string
+          tokens_in: number | null
+          tokens_out: number | null
+          user_id: string
+        }
+        Insert: {
+          chat_id: string
+          content: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          role: string
+          tokens_in?: number | null
+          tokens_out?: number | null
+          user_id: string
+        }
+        Update: {
+          chat_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          role?: string
+          tokens_in?: number | null
+          tokens_out?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aperture_messages_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "aperture_chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      aperture_suggestions: {
+        Row: {
+          acted_on: boolean
+          action_slug: string | null
+          created_at: string
+          dismissed: boolean
+          expires_at: string | null
+          id: string
+          reason: string | null
+          score: number
+          title: string
+          user_id: string
+        }
+        Insert: {
+          acted_on?: boolean
+          action_slug?: string | null
+          created_at?: string
+          dismissed?: boolean
+          expires_at?: string | null
+          id?: string
+          reason?: string | null
+          score?: number
+          title: string
+          user_id: string
+        }
+        Update: {
+          acted_on?: boolean
+          action_slug?: string | null
+          created_at?: string
+          dismissed?: boolean
+          expires_at?: string | null
+          id?: string
+          reason?: string | null
+          score?: number
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aperture_suggestions_action_slug_fkey"
+            columns: ["action_slug"]
+            isOneToOne: false
+            referencedRelation: "aperture_actions"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       app_installations: {
         Row: {
           app_version: string | null
