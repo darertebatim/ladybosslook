@@ -64,17 +64,19 @@ export default function ApertureRouter() {
     <ApertureLayout>
       <Suspense fallback={<ApertureLoader />}>
         <Routes>
-          <Route index element={<Navigate to="app" replace />} />
+          <Route index element={<Navigate to="brand" replace />} />
           <Route path="brand" element={<BrandShowcase />} />
-          {/* Aperture — AI business advisor */}
-          <Route path="app" element={<ApertureAuthGate><Home /></ApertureAuthGate>} />
-          <Route path="app/memory" element={<ApertureAuthGate><Memory /></ApertureAuthGate>} />
-          <Route path="app/memory/:slug" element={<ApertureAuthGate><BucketPage /></ApertureAuthGate>} />
-          <Route path="app/chats" element={<ApertureAuthGate><Chats /></ApertureAuthGate>} />
-          <Route path="app/chats/:id" element={<ApertureAuthGate><ChatThreadPage /></ApertureAuthGate>} />
-          <Route path="app/library" element={<ApertureAuthGate><Library /></ApertureAuthGate>} />
-          <Route path="app/library/:slug" element={<ApertureAuthGate><ActionPage /></ApertureAuthGate>} />
-          <Route path="app/settings" element={<ApertureAuthGate><Settings /></ApertureAuthGate>} />
+          {/* Aperture mockup — design demo, no auth, mock data */}
+          <Route path="brand/mockup" element={<Home />} />
+          <Route path="brand/mockup/memory" element={<Memory />} />
+          <Route path="brand/mockup/memory/:slug" element={<BucketPage />} />
+          <Route path="brand/mockup/chats" element={<Chats />} />
+          <Route path="brand/mockup/chats/:id" element={<ChatThreadPage />} />
+          <Route path="brand/mockup/library" element={<Library />} />
+          <Route path="brand/mockup/library/:slug" element={<ActionPage />} />
+          <Route path="brand/mockup/settings" element={<Settings />} />
+          {/* Legacy /aperture/app/* → mockup */}
+          <Route path="app/*" element={<Navigate to="/aperture/brand/mockup" replace />} />
           <Route path="*" element={<Navigate to="." replace />} />
         </Routes>
       </Suspense>
