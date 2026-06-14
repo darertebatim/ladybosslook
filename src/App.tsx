@@ -190,6 +190,7 @@ const SendTestEmail = lazy(() => import("@/pages/SendTestEmail"));
 const AppSupport = lazy(() => import("@/pages/AppSupport"));
 const CartPage = lazy(() => import("@/pages/CartPage"));
 const Rilo = lazy(() => import("@/pages/Rilo"));
+const ApertureRouter = lazy(() => import("@/aperture/router"));
 
 // Eagerly imported (small, always needed)
 import CalendarRedirect from "@/components/CalendarRedirect";
@@ -431,6 +432,9 @@ const App = () => (
                   <Route path="/cart" element={<CartPage />} />
                   <Route path="/d/:token" element={<PublicDedication />} />
                   <Route path="/g/:token" element={<PublicPlaylistGift />} />
+
+                  {/* Aperture — standalone product surface, isolated tokens */}
+                  <Route path="/aperture/*" element={<ApertureRouter />} />
                   
                   {/* Admin Routes */}
                   {!isNativeApp() && (
