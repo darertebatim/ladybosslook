@@ -3,12 +3,13 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { ApertureLayout } from "@/aperture/components/ApertureLayout";
 
 const BrandShowcase = lazy(() => import("@/aperture/pages/brand/BrandShowcase"));
-const ApertureHome = lazy(() => import("@/aperture/pages/app/Home"));
-const Playbooks = lazy(() => import("@/aperture/pages/app/Playbooks"));
-const PlaybookDetail = lazy(() => import("@/aperture/pages/app/PlaybookDetail"));
-const Chat = lazy(() => import("@/aperture/pages/app/Chat"));
+const Home = lazy(() => import("@/aperture/pages/app/Home"));
 const Memory = lazy(() => import("@/aperture/pages/app/Memory"));
-const Integrations = lazy(() => import("@/aperture/pages/app/Integrations"));
+const BucketPage = lazy(() => import("@/aperture/pages/app/Bucket"));
+const Chats = lazy(() => import("@/aperture/pages/app/Chats"));
+const ChatThreadPage = lazy(() => import("@/aperture/pages/app/ChatThread"));
+const Library = lazy(() => import("@/aperture/pages/app/Library"));
+const ActionPage = lazy(() => import("@/aperture/pages/app/Action"));
 const Settings = lazy(() => import("@/aperture/pages/app/Settings"));
 
 function ApertureLoader() {
@@ -46,15 +47,16 @@ export default function ApertureRouter() {
     <ApertureLayout>
       <Suspense fallback={<ApertureLoader />}>
         <Routes>
-          <Route index element={<Navigate to="brand" replace />} />
+          <Route index element={<Navigate to="app" replace />} />
           <Route path="brand" element={<BrandShowcase />} />
-          {/* Phase 2 — product app */}
-          <Route path="app" element={<ApertureHome />} />
-          <Route path="app/playbooks" element={<Playbooks />} />
-          <Route path="app/playbooks/:slug" element={<PlaybookDetail />} />
-          <Route path="app/chat" element={<Chat />} />
+          {/* Aperture — AI business advisor */}
+          <Route path="app" element={<Home />} />
           <Route path="app/memory" element={<Memory />} />
-          <Route path="app/integrations" element={<Integrations />} />
+          <Route path="app/memory/:slug" element={<BucketPage />} />
+          <Route path="app/chats" element={<Chats />} />
+          <Route path="app/chats/:id" element={<ChatThreadPage />} />
+          <Route path="app/library" element={<Library />} />
+          <Route path="app/library/:slug" element={<ActionPage />} />
           <Route path="app/settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="." replace />} />
         </Routes>
