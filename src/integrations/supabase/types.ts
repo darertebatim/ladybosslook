@@ -501,7 +501,7 @@ export type Database = {
           duration: string | null
           is_published: boolean
           kind: string
-          needs: string[]
+          needs: string[] | null
           output: string | null
           slug: string
           steps: Json
@@ -516,7 +516,7 @@ export type Database = {
           duration?: string | null
           is_published?: boolean
           kind: string
-          needs?: string[]
+          needs?: string[] | null
           output?: string | null
           slug: string
           steps?: Json
@@ -531,7 +531,7 @@ export type Database = {
           duration?: string | null
           is_published?: boolean
           kind?: string
-          needs?: string[]
+          needs?: string[] | null
           output?: string | null
           slug?: string
           steps?: Json
@@ -541,75 +541,45 @@ export type Database = {
         }
         Relationships: []
       }
-      aperture_ai_facts: {
-        Row: {
-          bucket_slug: string | null
-          confidence: number
-          created_at: string
-          fact: string
-          id: string
-          is_active: boolean
-          source: string | null
-          source_ref: string | null
-          user_id: string
-        }
-        Insert: {
-          bucket_slug?: string | null
-          confidence?: number
-          created_at?: string
-          fact: string
-          id?: string
-          is_active?: boolean
-          source?: string | null
-          source_ref?: string | null
-          user_id: string
-        }
-        Update: {
-          bucket_slug?: string | null
-          confidence?: number
-          created_at?: string
-          fact?: string
-          id?: string
-          is_active?: boolean
-          source?: string | null
-          source_ref?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
       aperture_bucket_questions: {
         Row: {
           bucket_slug: string
           choices: Json | null
           created_at: string
+          created_by: string | null
           hint: string | null
           id: string
           input_kind: string
           prompt: string
           question_key: string
           sort_order: number
+          user_id: string | null
         }
         Insert: {
           bucket_slug: string
           choices?: Json | null
           created_at?: string
+          created_by?: string | null
           hint?: string | null
           id?: string
           input_kind?: string
           prompt: string
           question_key: string
           sort_order?: number
+          user_id?: string | null
         }
         Update: {
           bucket_slug?: string
           choices?: Json | null
           created_at?: string
+          created_by?: string | null
           hint?: string | null
           id?: string
           input_kind?: string
           prompt?: string
           question_key?: string
           sort_order?: number
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -625,29 +595,38 @@ export type Database = {
         Row: {
           blurb: string | null
           created_at: string
+          created_by: string | null
           glyph: string | null
           slug: string
           sort_order: number
+          source: string
           title: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           blurb?: string | null
           created_at?: string
+          created_by?: string | null
           glyph?: string | null
           slug: string
           sort_order?: number
+          source?: string
           title: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           blurb?: string | null
           created_at?: string
+          created_by?: string | null
           glyph?: string | null
           slug?: string
           sort_order?: number
+          source?: string
           title?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -770,44 +749,6 @@ export type Database = {
         }
         Relationships: []
       }
-      aperture_memory_answers: {
-        Row: {
-          bucket_slug: string
-          created_at: string
-          id: string
-          question_key: string
-          updated_at: string
-          user_id: string
-          value: Json | null
-        }
-        Insert: {
-          bucket_slug: string
-          created_at?: string
-          id?: string
-          question_key: string
-          updated_at?: string
-          user_id: string
-          value?: Json | null
-        }
-        Update: {
-          bucket_slug?: string
-          created_at?: string
-          id?: string
-          question_key?: string
-          updated_at?: string
-          user_id?: string
-          value?: Json | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "aperture_memory_answers_bucket_slug_fkey"
-            columns: ["bucket_slug"]
-            isOneToOne: false
-            referencedRelation: "aperture_buckets"
-            referencedColumns: ["slug"]
-          },
-        ]
-      }
       aperture_memory_card: {
         Row: {
           answers_count: number
@@ -836,6 +777,48 @@ export type Database = {
           regenerated_at?: string | null
           stale?: boolean
           summary?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      aperture_memory_items: {
+        Row: {
+          bucket_slug: string | null
+          confidence: number | null
+          content: string
+          created_at: string
+          id: string
+          is_active: boolean
+          question_key: string | null
+          source: string
+          source_ref: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bucket_slug?: string | null
+          confidence?: number | null
+          content: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          question_key?: string | null
+          source?: string
+          source_ref?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bucket_slug?: string | null
+          confidence?: number | null
+          content?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          question_key?: string | null
+          source?: string
+          source_ref?: string | null
           updated_at?: string
           user_id?: string
         }
