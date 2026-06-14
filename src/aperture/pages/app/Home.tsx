@@ -22,7 +22,7 @@ function BucketTile({
   const isFull = status === "full";
   return (
     <Link
-      to={`/aperture/app/memory/${slug}`}
+      to={`/aperture/brand/mockup/memory/${slug}`}
       style={{
         position: "relative",
         display: "flex", flexDirection: "column", gap: 12,
@@ -114,7 +114,7 @@ export default function ApertureHome() {
     const t = text.trim();
     if (!t) return;
     const thread = createChat(t);
-    navigate(`/aperture/app/chats/${thread.id}?seed=${encodeURIComponent(t)}`);
+    navigate(`/aperture/brand/mockup/chats/${thread.id}?seed=${encodeURIComponent(t)}`);
   }
 
   return (
@@ -139,13 +139,13 @@ export default function ApertureHome() {
         <section style={{ marginBottom: 36 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
             <ApertureMonoLabel>Suggested for you</ApertureMonoLabel>
-            <Link to="/aperture/app/library" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>Browse all →</Link>
+            <Link to="/aperture/brand/mockup/library" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>Browse all →</Link>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
             {suggested.map(a => (
               <Link
                 key={a.slug}
-                to={`/aperture/app/library/${a.slug}`}
+                to={`/aperture/brand/mockup/library/${a.slug}`}
                 style={{
                   display: "flex", flexDirection: "column", gap: 10,
                   padding: 18,
@@ -184,7 +184,7 @@ export default function ApertureHome() {
         <section style={{ marginBottom: 36 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
             <ApertureMonoLabel>Memory buckets</ApertureMonoLabel>
-            <Link to="/aperture/app/memory" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>Open all →</Link>
+            <Link to="/aperture/brand/mockup/memory" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>Open all →</Link>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
             {buckets.map(b => {

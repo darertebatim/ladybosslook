@@ -6,7 +6,7 @@ import { ApertureWordmark } from "@/aperture/brand/ApertureLogo";
 import { ApertureThemeSwitch } from "./primitives";
 
 /**
- * Shared chrome for /aperture/app/*. Sidebar on desktop, fixed bottom tab
+ * Shared chrome for /aperture/brand/mockup/*. Sidebar on desktop, fixed bottom tab
  * bar on mobile. Main column is constrained to a comfortable reading width
  * and pages handle their own internal layout.
  */

@@ -27,7 +27,7 @@ export default function BucketPage() {
     setDrafts(state.answers);
   }, [bucket?.slug]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!bucket) return <Navigate to="/aperture/app/memory" replace />;
+  if (!bucket) return <Navigate to="/aperture/brand/mockup/memory" replace />;
 
   const state = getState(bucket.slug);
 
@@ -43,7 +43,7 @@ export default function BucketPage() {
       </Helmet>
       <AppShell>
         <div style={{ marginBottom: 8 }}>
-          <Link to="/aperture/app/memory" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
+          <Link to="/aperture/brand/mockup/memory" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
             ← All buckets
           </Link>
         </div>

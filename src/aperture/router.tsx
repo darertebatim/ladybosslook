@@ -40,7 +40,7 @@ function ApertureLoader() {
 
 /**
  * Aperture reuses the main app's /auth flow. Any unauthenticated visit to
- * an /aperture/app/* route is bounced to /auth with a redirect back.
+ * an /aperture/brand/mockup/* route is bounced to /auth with a redirect back.
  * /aperture/brand is public so the design showcase stays browsable.
  */
 function ApertureAuthGate({ children }: { children: React.ReactNode }) {

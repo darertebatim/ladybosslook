@@ -22,7 +22,7 @@ export default function Chats() {
 
   function startNew() {
     const t = createChat();
-    navigate(`/aperture/app/chats/${t.id}`);
+    navigate(`/aperture/brand/mockup/chats/${t.id}`);
   }
 
   return (
@@ -59,7 +59,7 @@ export default function Chats() {
                   borderTop: i === 0 ? "none" : "1px solid var(--ap-hairline)",
                 }}
               >
-                <Link to={`/aperture/app/chats/${c.id}`} style={{ textDecoration: "none", minWidth: 0 }}>
+                <Link to={`/aperture/brand/mockup/chats/${c.id}`} style={{ textDecoration: "none", minWidth: 0 }}>
                   <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
                     <span style={{ fontSize: 14, color: "var(--ap-ink-1)", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.title}</span>
                     <span style={{ fontSize: 12, color: "var(--ap-ink-3)" }}>{c.messages.length} message{c.messages.length === 1 ? "" : "s"} · {relative(c.updatedAt)}</span>

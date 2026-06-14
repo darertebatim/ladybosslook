@@ -79,7 +79,7 @@ export default function Library() {
           {visible.map(a => (
             <Link
               key={a.slug}
-              to={`/aperture/app/library/${a.slug}`}
+              to={`/aperture/brand/mockup/library/${a.slug}`}
               style={{
                 display: "flex", flexDirection: "column", gap: 10,
                 padding: 16,
