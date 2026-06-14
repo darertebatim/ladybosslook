@@ -42,11 +42,11 @@ function IconGear() {
 }
 
 const NAV: NavItem[] = [
-  { to: "/aperture/app",              label: "Home",         icon: <IconHome />, end: true },
-  { to: "/aperture/app/chats",        label: "Chats",        icon: <IconChat /> },
-  { to: "/aperture/app/memory",       label: "Memory",       icon: <IconMemory /> },
-  { to: "/aperture/app/library",      label: "Library",      icon: <IconPlay /> },
-  { to: "/aperture/app/settings",     label: "Settings",     icon: <IconGear /> },
+  { to: "/aperture/brand/mockup",              label: "Home",         icon: <IconHome />, end: true },
+  { to: "/aperture/brand/mockup/chats",        label: "Chats",        icon: <IconChat /> },
+  { to: "/aperture/brand/mockup/memory",       label: "Memory",       icon: <IconMemory /> },
+  { to: "/aperture/brand/mockup/library",      label: "Library",      icon: <IconPlay /> },
+  { to: "/aperture/brand/mockup/settings",     label: "Settings",     icon: <IconGear /> },
 ];
 
 export function AppSidebar() {

@@ -61,7 +61,7 @@ export default function ChatThread() {
     seedHandledRef.current = chat.id;
     handleSend(seed);
     // strip seed from URL
-    navigate(`/aperture/app/chats/${chat.id}`, { replace: true });
+    navigate(`/aperture/brand/mockup/chats/${chat.id}`, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chat?.id, search]);
 
@@ -69,8 +69,8 @@ export default function ChatThread() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [chat?.messages.length, thinking]);
 
-  if (!id) return <Navigate to="/aperture/app/chats" replace />;
-  if (!chat) return <Navigate to="/aperture/app/chats" replace />;
+  if (!id) return <Navigate to="/aperture/brand/mockup/chats" replace />;
+  if (!chat) return <Navigate to="/aperture/brand/mockup/chats" replace />;
 
   function handleSend(text: string) {
     const t = text.trim();
@@ -86,7 +86,7 @@ export default function ChatThread() {
 
   function startNew() {
     const t = createChat();
-    navigate(`/aperture/app/chats/${t.id}`);
+    navigate(`/aperture/brand/mockup/chats/${t.id}`);
   }
 
   return (
@@ -112,7 +112,7 @@ export default function ChatThread() {
                 {chats.slice(0, 8).map(c => (
                   <Link
                     key={c.id}
-                    to={`/aperture/app/chats/${c.id}`}
+                    to={`/aperture/brand/mockup/chats/${c.id}`}
                     style={{
                       padding: "8px 10px", borderRadius: "var(--ap-radius-xs)",
                       fontSize: 13, textDecoration: "none",
@@ -131,7 +131,7 @@ export default function ChatThread() {
                   ? "Nothing yet — your memory buckets are empty."
                   : `${facts.length} fact${facts.length === 1 ? "" : "s"} from your memory.`}
               </p>
-              <Link to="/aperture/app/memory" style={{ fontSize: 11, color: "var(--ap-signal)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
+              <Link to="/aperture/brand/mockup/memory" style={{ fontSize: 11, color: "var(--ap-signal)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
                 Memory · {completion}% →
               </Link>
             </div>

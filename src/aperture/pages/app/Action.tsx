@@ -26,7 +26,7 @@ export default function ActionPage() {
   const [answers, setAnswers] = useState<string[]>([]);
   const [draft, setDraft] = useState("");
 
-  if (!action) return <Navigate to="/aperture/app/library" replace />;
+  if (!action) return <Navigate to="/aperture/brand/mockup/library" replace />;
 
   const missingBuckets = action.needs
     .map(s => ({ slug: s, state: getBucket(s), meta: BUCKETS.find(b => b.slug === s)! }))
@@ -43,7 +43,7 @@ export default function ActionPage() {
           (action.output ?? "Here's a quick take grounded in your memory.") +
           "\n\n— Want me to revise the tone or length? Just say so.",
       });
-      navigate(`/aperture/app/chats/${thread.id}`);
+      navigate(`/aperture/brand/mockup/chats/${thread.id}`);
     }, 400);
   }
 
@@ -62,7 +62,7 @@ export default function ActionPage() {
         `\n\nMy take: based on these answers, the next concrete thing to do this week is to pick the smallest version of the easiest answer above and ship it in 48 hours. Reply here if you want me to draft what that looks like.`;
       setTimeout(() => {
         appendMessage(thread.id, { role: "assistant", text: summary });
-        navigate(`/aperture/app/chats/${thread.id}`);
+        navigate(`/aperture/brand/mockup/chats/${thread.id}`);
       }, 300);
     } else {
       setStepIdx(i => i + 1);
@@ -77,7 +77,7 @@ export default function ActionPage() {
       </Helmet>
       <AppShell>
         <div style={{ marginBottom: 8 }}>
-          <Link to="/aperture/app/library" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
+          <Link to="/aperture/brand/mockup/library" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
             ← Library
           </Link>
         </div>
@@ -108,7 +108,7 @@ export default function ActionPage() {
               return (
                 <Link
                   key={slug}
-                  to={`/aperture/app/memory/${slug}`}
+                  to={`/aperture/brand/mockup/memory/${slug}`}
                   style={{
                     display: "inline-flex", alignItems: "center", gap: 6,
                     padding: "5px 10px", borderRadius: 999,
@@ -134,7 +134,7 @@ export default function ActionPage() {
             </p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {missingBuckets.map(b => (
-                <Link key={b.slug} to={`/aperture/app/memory/${b.slug}`} style={{ textDecoration: "none" }}>
+                <Link key={b.slug} to={`/aperture/brand/mockup/memory/${b.slug}`} style={{ textDecoration: "none" }}>
                   <ApertureButton variant="ghost">Fill {b.meta.title} →</ApertureButton>
                 </Link>
               ))}

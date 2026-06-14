@@ -34,7 +34,7 @@ export default function MemoryOverview() {
             return (
               <Link
                 key={b.slug}
-                to={`/aperture/app/memory/${b.slug}`}
+                to={`/aperture/brand/mockup/memory/${b.slug}`}
                 style={{
                   display: "grid",
                   gridTemplateColumns: "auto 1fr auto",
