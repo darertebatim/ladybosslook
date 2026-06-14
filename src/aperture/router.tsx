@@ -3,6 +3,13 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { ApertureLayout } from "@/aperture/components/ApertureLayout";
 
 const BrandShowcase = lazy(() => import("@/aperture/pages/brand/BrandShowcase"));
+const ApertureHome = lazy(() => import("@/aperture/pages/app/Home"));
+const Playbooks = lazy(() => import("@/aperture/pages/app/Playbooks"));
+const PlaybookDetail = lazy(() => import("@/aperture/pages/app/PlaybookDetail"));
+const Chat = lazy(() => import("@/aperture/pages/app/Chat"));
+const Memory = lazy(() => import("@/aperture/pages/app/Memory"));
+const Integrations = lazy(() => import("@/aperture/pages/app/Integrations"));
+const Settings = lazy(() => import("@/aperture/pages/app/Settings"));
 
 function ApertureLoader() {
   return (
@@ -39,10 +46,18 @@ export default function ApertureRouter() {
     <ApertureLayout>
       <Suspense fallback={<ApertureLoader />}>
         <Routes>
-          <Route index element={<Navigate to="brand" replace />} />
+          <Route index element={<Navigate to="app" replace />} />
           <Route path="brand" element={<BrandShowcase />} />
-          {/* Phase 2 (app) + Phase 3 (marketing) routes land here later */}
-          <Route path="*" element={<Navigate to="brand" replace />} />
+          {/* Phase 2 — product app */}
+          <Route path="app" element={<ApertureHome />} />
+          <Route path="app/playbooks" element={<Playbooks />} />
+          <Route path="app/playbooks/:slug" element={<PlaybookDetail />} />
+          <Route path="app/chat" element={<Chat />} />
+          <Route path="app/memory" element={<Memory />} />
+          <Route path="app/integrations" element={<Integrations />} />
+          <Route path="app/settings" element={<Settings />} />
+          {/* Phase 3 (marketing) lands here later */}
+          <Route path="*" element={<Navigate to="app" replace />} />
         </Routes>
       </Suspense>
     </ApertureLayout>
