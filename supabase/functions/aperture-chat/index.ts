@@ -113,16 +113,24 @@ serve(async (req) => {
     let escapeInstruction = "";
     if (escape && (escape.kind === "skip" || escape.kind === "unknown")) {
       const qText = String(escape.question ?? "").trim().slice(0, 500);
-      const bucket = String(escape.bucket ?? "").trim().toLowerCase() || null;
+      let bucket = String(escape.bucket ?? "").trim().toLowerCase() || null;
+      if (!bucket && qText) {
+        bucket = await classifyBucket(supabase, LOVABLE_API_KEY, qText);
+      }
       if (qText) {
         const content = escape.kind === "skip"
           ? qText
           : `Owner doesn't know: ${qText}`;
+        const nowIso = new Date().toISOString();
+        const metadata = escape.kind === "skip"
+          ? { skipped_at: nowIso, source_view: "chat" }
+          : { logged_at: nowIso, source_view: "chat" };
         await supabase.from("aperture_memory_items").insert({
           user_id: user.id,
           content,
           source: escape.kind === "skip" ? "skipped" : "unknown",
           bucket_slug: bucket,
+          metadata,
           is_active: true,
         });
       }
