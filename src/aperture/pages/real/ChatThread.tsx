@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { ApertureChip, ApertureMonoLabel } from "@/aperture/components/primitives";
@@ -28,22 +28,28 @@ export default function RealChatThread() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages.length, streamingText]);
 
-  async function send(text: string) {
+  async function send(text: string, escape?: { kind: "skip" | "unknown"; question: string }) {
     const t = text.trim();
-    if (!t || !id || streaming) return;
-    const optimistic: MessageRow = {
-      id: `local-${Date.now()}`, chat_id: id, role: "user",
-      content: t, created_at: new Date().toISOString(),
-    };
-    setMessages(prev => [...prev, optimistic]);
+    if (!id || streaming) return;
+    if (!escape && !t) return;
+    let nextHistory = messages;
+    if (!escape) {
+      const optimistic: MessageRow = {
+        id: `local-${Date.now()}`, chat_id: id, role: "user",
+        content: t, created_at: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, optimistic]);
+      nextHistory = [...messages, optimistic];
+    }
     setDraft("");
     setStreaming(true);
     setStreamingText("");
     try {
-      const history = [...messages, optimistic].map(m => ({ role: m.role, content: m.content }));
+      const history = nextHistory.map(m => ({ role: m.role, content: m.content }));
       await streamApertureChat({
         chatId: id, messages: history,
         onDelta: chunk => setStreamingText(prev => prev + chunk),
+        escape: escape ? { kind: escape.kind, question: escape.question, bucket: null } : undefined,
       });
       // Pull authoritative copy from DB (server persisted both messages)
       await refresh();
@@ -133,9 +139,6 @@ export default function RealChatThread() {
           </div>
 
           <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", paddingRight: 4, display: "flex", flexDirection: "column", gap: 18 }}>
-            {messages.length === 0 && !streaming && (
-              <ChatOpener onPick={text => send(text)} />
-            )}
             {messages.map(m => (
               <MessageBubble key={m.id} role={m.role} text={m.content} onPickOption={send} disabled={streaming} />
             ))}
@@ -164,7 +167,7 @@ export default function RealChatThread() {
             <input
               value={draft}
               onChange={e => setDraft(e.target.value)}
-              placeholder="Ask Aperture about your business…"
+              placeholder="Type your answer..."
               disabled={streaming}
               style={{
                 flex: 1, appearance: "none", border: "none", outline: "none",
@@ -187,9 +190,50 @@ export default function RealChatThread() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </button>
           </form>
+          <EscapeLinks
+            messages={messages}
+            streaming={streaming}
+            onEscape={(kind, question) => send("", { kind, question })}
+          />
         </div>
       </RealAppShell>
     </>
+  );
+}
+
+/**
+ * Skip / I don't know — small text links beneath the composer.
+ * Visible only when the latest assistant message is a question
+ * (ends with "?" or contains an [OPTIONS] block).
+ */
+function EscapeLinks({
+  messages, streaming, onEscape,
+}: {
+  messages: MessageRow[];
+  streaming: boolean;
+  onEscape: (kind: "skip" | "unknown", question: string) => void;
+}) {
+  const lastAssistant = [...messages].reverse().find(m => m.role === "assistant" || m.role === "system");
+  if (!lastAssistant) return null;
+  const { body, options } = splitAssistantOptions(lastAssistant.content);
+  const isQuestion = options.length > 0 || /\?\s*$/.test(body.trim());
+  if (!isQuestion) return null;
+  const linkStyle: CSSProperties = {
+    appearance: "none", background: "transparent", border: "none",
+    color: streaming ? "var(--ap-ink-3)" : "var(--ap-ink-2)",
+    fontSize: 12, fontFamily: "var(--ap-font-sans)",
+    cursor: streaming ? "default" : "pointer",
+    padding: "4px 6px", textDecoration: "underline",
+    textUnderlineOffset: 3, opacity: streaming ? 0.5 : 1,
+  };
+  return (
+    <div style={{ marginTop: 8, display: "flex", justifyContent: "center", alignItems: "center", gap: 6 }}>
+      <button type="button" disabled={streaming} style={linkStyle}
+        onClick={() => onEscape("skip", body)}>Skip for now</button>
+      <span style={{ color: "var(--ap-ink-3)", fontSize: 12 }}>·</span>
+      <button type="button" disabled={streaming} style={linkStyle}
+        onClick={() => onEscape("unknown", body)}>I don't know</button>
+    </div>
   );
 }
 
@@ -204,28 +248,7 @@ function MessageBubble({ role, text, onPickOption, disabled }: { role: string; t
             {body}
           </div>
           {options.length > 0 && (
-            <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {options.map((opt, idx) => (
-                <button
-                  key={`${idx}-${opt}`}
-                  type="button"
-                  disabled={disabled || !onPickOption}
-                  onClick={() => onPickOption?.(opt)}
-                  style={{
-                    appearance: "none",
-                    cursor: disabled || !onPickOption ? "default" : "pointer",
-                    padding: "8px 12px", borderRadius: 999,
-                    border: "1px solid var(--ap-hairline)",
-                    background: "var(--ap-surface-2)",
-                    color: "var(--ap-ink-1)",
-                    fontSize: 13, fontWeight: 500, fontFamily: "var(--ap-font-sans)",
-                    opacity: disabled ? 0.5 : 1,
-                  }}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
+            <OptionChips options={options} disabled={!!disabled} onPick={onPickOption} />
           )}
         </div>
       </div>
@@ -265,53 +288,62 @@ function splitAssistantOptions(text: string): { body: string; options: string[] 
   return { body, options };
 }
 
-const OPENER_OPTIONS: { label: string; seed: string }[] = [
-  { label: "My customers and who I'm selling to",
-    seed: "Let's talk about my customers and who I'm selling to." },
-  { label: "What I sell and how I price it",
-    seed: "Let's talk about what I sell and how I price it." },
-  { label: "How I get new customers",
-    seed: "Let's talk about how I get new customers." },
-  { label: "My finances and profit",
-    seed: "Let's talk about my finances and profit." },
-  { label: "My team and how I run the business",
-    seed: "Let's talk about my team and how I run the business." },
-  { label: "Where I want to take this business",
-    seed: "Let's talk about where I want to take this business." },
-];
-
-function ChatOpener({ onPick }: { onPick: (seed: string) => void }) {
+/**
+ * Quick-reply chip rendering. Border-only by default, filled on press,
+ * min 44px height, and a 2-column grid on narrow viewports when there
+ * are 4+ options.
+ */
+function OptionChips({
+  options, disabled, onPick,
+}: {
+  options: string[];
+  disabled: boolean;
+  onPick?: (t: string) => void;
+}) {
+  const [isNarrow, setIsNarrow] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(max-width: 640px)");
+    const update = () => setIsNarrow(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  const useGrid = isNarrow && options.length >= 4;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14, paddingTop: 8 }}>
-      <div>
-        <ApertureMonoLabel>Aperture</ApertureMonoLabel>
-        <h2 style={{ margin: "8px 0 4px", fontSize: 18, fontWeight: 600, color: "var(--ap-ink-1)", letterSpacing: "-0.01em" }}>
-          What would you like to talk about today?
-        </h2>
-        <p style={{ margin: 0, fontSize: 13.5, color: "var(--ap-ink-3)", lineHeight: 1.55 }}>
-          Pick a starting point — or just type whatever's on your mind.
-        </p>
-      </div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        {OPENER_OPTIONS.map(o => (
-          <button
-            key={o.label}
-            type="button"
-            onClick={() => onPick(o.seed)}
-            style={{
-              appearance: "none", cursor: "pointer",
-              padding: "10px 14px", borderRadius: 999,
-              border: "1px solid var(--ap-hairline)",
-              background: "var(--ap-surface-1)",
-              color: "var(--ap-ink-1)",
-              fontSize: 13.5, fontWeight: 500, fontFamily: "var(--ap-font-sans)",
-              textAlign: "left",
-            }}
-          >
-            {o.label}
-          </button>
-        ))}
-      </div>
+    <div
+      style={
+        useGrid
+          ? { marginTop: 10, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }
+          : { marginTop: 10, display: "flex", flexWrap: "wrap", gap: 8 }
+      }
+    >
+      {options.map((opt, idx) => (
+        <button
+          key={`${idx}-${opt}`}
+          type="button"
+          disabled={disabled || !onPick}
+          onClick={() => onPick?.(opt)}
+          className="ap-chip-press"
+          style={{
+            appearance: "none",
+            cursor: disabled || !onPick ? "default" : "pointer",
+            minHeight: 44,
+            padding: "10px 14px",
+            borderRadius: 999,
+            border: "1px solid var(--ap-hairline)",
+            background: "transparent",
+            color: "var(--ap-ink-1)",
+            fontSize: 12.5, fontWeight: 500, fontFamily: "var(--ap-font-sans)",
+            textAlign: "center",
+            lineHeight: 1.2,
+            opacity: disabled ? 0.5 : 1,
+            transition: "background 120ms ease, border-color 120ms ease",
+          }}
+        >
+          {opt}
+        </button>
+      ))}
     </div>
   );
 }
