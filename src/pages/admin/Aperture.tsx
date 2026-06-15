@@ -197,6 +197,7 @@ function BucketsTab() {
           { key: "territory", label: "Territory (user-facing description)", type: "textarea" },
           { key: "brief", label: "AI Brief (internal context)", type: "textarea" },
           { key: "display_order", label: "Display order", type: "number" },
+          { key: "target_count", label: "Target facts (100% threshold)", type: "number" },
           { key: "is_active", label: "Active", type: "switch" },
           { key: "source", label: "Source", type: "select", options: ["default","custom"] },
         ]}
