@@ -73,7 +73,7 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) return json({ error: "AI gateway not configured" }, 500);
 
-    const { chatId, messages, stream = true } = await req.json();
+    const { chatId, messages, stream = true, escape = null } = await req.json();
     if (!chatId || !Array.isArray(messages) || messages.length === 0) {
       return json({ error: "chatId and messages required" }, 400);
     }
@@ -83,9 +83,10 @@ serve(async (req) => {
       .from("aperture_chats").select("id,user_id").eq("id", chatId).maybeSingle();
     if (!chat || chat.user_id !== user.id) return json({ error: "Chat not found" }, 404);
 
-    // Persist the latest user message
+    // Persist the latest user message (only when it's a real user turn — escape
+    // actions don't create a visible user message).
     const lastUser = messages[messages.length - 1];
-    if (lastUser?.role === "user") {
+    if (!escape && lastUser?.role === "user") {
       await supabase.from("aperture_messages").insert({
         chat_id: chatId, user_id: user.id, role: "user", content: lastUser.content,
       });
@@ -106,9 +107,40 @@ serve(async (req) => {
       }
     }
 
+    // Handle Skip / I don't know escape hatches. Log the gap as a memory_item
+    // so the daily-question rotation can defer it, then nudge the AI to
+    // acknowledge briefly and move on to a different territory.
+    let escapeInstruction = "";
+    if (escape && (escape.kind === "skip" || escape.kind === "unknown")) {
+      const qText = String(escape.question ?? "").trim().slice(0, 500);
+      const bucket = String(escape.bucket ?? "").trim().toLowerCase() || null;
+      if (qText) {
+        const content = escape.kind === "skip"
+          ? qText
+          : `Owner doesn't know: ${qText}`;
+        await supabase.from("aperture_memory_items").insert({
+          user_id: user.id,
+          content,
+          source: escape.kind === "skip" ? "skipped" : "unknown",
+          bucket_slug: bucket,
+          is_active: true,
+        });
+      }
+      escapeInstruction = escape.kind === "skip"
+        ? `\n\nESCAPE — the user tapped "Skip for now" on your previous question${qText ? ` ("${qText}")` : ""}. Reply with exactly ONE short, warm sentence acknowledging the skip (e.g. "No problem — we'll come back to that.") and then move to the next most relevant question. CRITICAL: the next question must come from a different topic or a different bucket — never repeat the skipped question or a near-paraphrase in this session. Do not ask why they skipped. Do not show urgency.`
+        : `\n\nESCAPE — the user tapped "I don't know" on your previous question${qText ? ` ("${qText}")` : ""}. Reply with a brief, judgment-free acknowledgement (one short sentence, e.g. "That's okay — most owners haven't tracked this yet."). If — and only if — you genuinely know where they could find this answer in a common tool (QuickBooks, Square, Stripe, Shopify, their CRM, etc.), add ONE short sentence pointing them there. Otherwise skip that part entirely. Then move immediately to the next most relevant question from a different topic. Do not lecture, do not repeat the question, do not ask a follow-up about the gap.`;
+    }
+
     // Load (or build) memory card
     const memoryCard = await getOrBuildMemoryCard(supabase, user.id, LOVABLE_API_KEY);
-    const systemPrompt = `${SYSTEM_PROMPT_BASE}\n\n=== BUSINESS MEMORY CARD ===\n${memoryCard || "(empty — ask the user about their business basics first)"}\n=== END MEMORY CARD ===`;
+    const systemPrompt = `${SYSTEM_PROMPT_BASE}\n\n=== BUSINESS MEMORY CARD ===\n${memoryCard || "(empty — ask the user about their business basics first)"}\n=== END MEMORY CARD ===${escapeInstruction}`;
+
+    // When an escape was sent, the last "messages" entry may still be the
+    // previous assistant turn. The model behaves better if we add a tiny
+    // user-side cue at the end so it knows whose turn it is.
+    const outboundMessages = escape
+      ? [...messages, { role: "user", content: escape.kind === "skip" ? "[skip]" : "[i don't know]" }]
+      : messages;
 
     const upstream = await fetch(AI_GATEWAY, {
       method: "POST",
@@ -119,7 +151,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: DEFAULT_MODEL,
         stream,
-        messages: [{ role: "system", content: systemPrompt }, ...messages],
+        messages: [{ role: "system", content: systemPrompt }, ...outboundMessages],
       }),
     });
 
