@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { ApertureChip, ApertureMonoLabel } from "@/aperture/components/primitives";
@@ -218,7 +218,7 @@ function EscapeLinks({
   const { body, options } = splitAssistantOptions(lastAssistant.content);
   const isQuestion = options.length > 0 || /\?\s*$/.test(body.trim());
   if (!isQuestion) return null;
-  const linkStyle: React.CSSProperties = {
+  const linkStyle: CSSProperties = {
     appearance: "none", background: "transparent", border: "none",
     color: streaming ? "var(--ap-ink-3)" : "var(--ap-ink-2)",
     fontSize: 12, fontFamily: "var(--ap-font-sans)",
