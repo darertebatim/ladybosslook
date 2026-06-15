@@ -92,9 +92,22 @@ export function useApertureMemoryDB() {
     await refresh();
   }, [user, refresh]);
 
+  /** Edit content and/or source of an existing item (owner-scoped). */
+  const updateItem = useCallback(async (
+    id: string,
+    patch: Partial<Pick<MemoryItem, "content" | "source" | "bucket_slug">>,
+  ) => {
+    if (!user) return;
+    await supabase.from("aperture_memory_items")
+      .update(patch as any)
+      .eq("id", id)
+      .eq("user_id", user.id);
+    await refresh();
+  }, [user, refresh]);
+
   return {
     items, loading, refresh,
-    saveBucketAnswer, addFreeformNote, deleteItem,
+    saveBucketAnswer, addFreeformNote, deleteItem, updateItem,
     /** Convenience lookup by bucket+question — empty string if not set. */
     answerFor(bucketSlug: string, questionKey: string): string {
       return items.find(
