@@ -13,6 +13,7 @@ export interface ApertureOnboardingQuestionRow {
   input_kind: string;
   options: any;
   bucket_slugs: string[] | null;
+  bucket_question_keys: string[] | null;
   section: string | null;
   sort_order: number;
   is_active: boolean;
