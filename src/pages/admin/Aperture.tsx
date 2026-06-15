@@ -165,6 +165,7 @@ function BucketsTab() {
           <TableHead>Slug</TableHead>
           <TableHead>Title</TableHead>
           <TableHead>Territory</TableHead>
+          <TableHead>Target</TableHead>
           <TableHead>Active</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow></TableHeader>
@@ -175,6 +176,7 @@ function BucketsTab() {
               <TableCell className="font-mono text-xs">{r.slug}</TableCell>
               <TableCell>{r.title}</TableCell>
               <TableCell className="text-xs text-muted-foreground line-clamp-1">{r.territory}</TableCell>
+              <TableCell className="text-xs">{r.target_count ?? 8}</TableCell>
               <TableCell>{r.is_active ? <Badge>on</Badge> : <Badge variant="outline">off</Badge>}</TableCell>
               <TableCell className="text-right">
                 <Button size="icon" variant="ghost" onClick={() => setEditing(r)}><Pencil className="h-4 w-4" /></Button>
@@ -197,6 +199,7 @@ function BucketsTab() {
           { key: "territory", label: "Territory (user-facing description)", type: "textarea" },
           { key: "brief", label: "AI Brief (internal context)", type: "textarea" },
           { key: "display_order", label: "Display order", type: "number" },
+          { key: "target_count", label: "Target facts (100% threshold)", type: "number" },
           { key: "is_active", label: "Active", type: "switch" },
           { key: "source", label: "Source", type: "select", options: ["default","custom"] },
         ]}

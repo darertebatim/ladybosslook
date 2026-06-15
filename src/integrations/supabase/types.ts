@@ -612,6 +612,7 @@ export type Database = {
           slug: string
           sort_order: number
           source: string
+          target_count: number
           territory: string | null
           title: string
           updated_at: string
@@ -628,6 +629,7 @@ export type Database = {
           slug: string
           sort_order?: number
           source?: string
+          target_count?: number
           territory?: string | null
           title: string
           updated_at?: string
@@ -644,6 +646,7 @@ export type Database = {
           slug?: string
           sort_order?: number
           source?: string
+          target_count?: number
           territory?: string | null
           title?: string
           updated_at?: string

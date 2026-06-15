@@ -61,18 +61,19 @@ export default function OnboardQuick() {
     setBusy(false);
     if (i + 1 >= total) {
       await upsertProfile({ quick_onboarded_at: new Date().toISOString() });
-      // Fire-and-forget research: scrape website/IG and extract facts.
-      try {
-        const website = answers["website"];
-        const instagram = answers["instagram"];
-        const businessName = answers["business_name"];
-        if (website || instagram) {
-          supabase.functions.invoke("aperture-onboarding-research", {
-            body: { website, instagram, businessName },
-          }).catch(() => {});
-        }
-      } catch { /* ignore */ }
-      navigate("/aperture/app", { replace: true });
+      const website = answers["website"];
+      const instagram = answers["instagram"];
+      const businessName = answers["business_name"];
+      if (website || instagram) {
+        // Kick off research and send the user to the confirmation page
+        // (which polls for new ai_extracted items).
+        supabase.functions.invoke("aperture-onboarding-research", {
+          body: { website, instagram, businessName },
+        }).catch(() => {});
+        navigate("/aperture/app/onboard/confirm", { replace: true });
+      } else {
+        navigate("/aperture/app", { replace: true });
+      }
     } else {
       setI(i + 1);
     }
