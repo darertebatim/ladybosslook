@@ -13,6 +13,8 @@ export async function streamApertureChat(opts: {
   messages: ApertureMsg[];
   onDelta: (text: string) => void;
   signal?: AbortSignal;
+  /** Optional escape-hatch action the user just took on the previous AI question. */
+  escape?: { kind: "skip" | "unknown"; question: string; bucket?: string | null };
 }): Promise<string> {
   const { data: { session } } = await supabase.auth.getSession();
   const token = session?.access_token;
@@ -31,6 +33,7 @@ export async function streamApertureChat(opts: {
       chatId: opts.chatId,
       messages: opts.messages,
       stream: true,
+      escape: opts.escape ?? null,
     }),
   });
 
