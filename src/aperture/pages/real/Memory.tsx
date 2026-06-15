@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useMemo } from "react";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
@@ -8,41 +8,38 @@ import {
 } from "@/aperture/components/primitives";
 import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
+import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
+import { useApertureChatsDB } from "@/aperture/hooks/db/useApertureChatsDB";
 
 /**
- * Memory page — single source of truth view of the user's pool.
- * Shows every item regardless of source, grouped by bucket (with a
- * "Notes" group for freeform items not tied to any bucket).
- * A freeform input at the top lets the user add anything to memory.
+ * Memory page — map of what Aperture knows about the user's business.
+ * Shows the 13 territories as tiles with "explored" badges, a single
+ * "Talk to Aperture" CTA, and a "Continue onboarding" card if the
+ * Full questionnaire hasn't been completed yet.
  */
 export default function RealMemory() {
+  const navigate = useNavigate();
   const { buckets, loading: bLoading } = useApertureBucketsDB();
-  const { items, loading, addFreeformNote, deleteItem } = useApertureMemoryDB();
-  const [note, setNote] = useState("");
-  const [busy, setBusy] = useState(false);
+  const { items, loading: mLoading } = useApertureMemoryDB();
+  const { profile } = useApertureUserProfile();
+  const { createChat } = useApertureChatsDB();
 
-  async function handleAdd() {
-    const t = note.trim();
-    if (!t || busy) return;
-    setBusy(true);
-    await addFreeformNote(t);
-    setBusy(false);
-    setNote("");
+  const countsBySlug = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const it of items) {
+      if (!it.bucket_slug) continue;
+      m[it.bucket_slug] = (m[it.bucket_slug] ?? 0) + 1;
+    }
+    return m;
+  }, [items]);
+
+  const exploredCount = buckets.filter(b => (countsBySlug[b.slug] ?? 0) > 0).length;
+  const fullDone = !!profile?.full_onboarded_at;
+
+  async function talkToAperture() {
+    const chat = await createChat("What should we look at first?");
+    if (chat) navigate(`/aperture/app/chats/${chat.id}`);
   }
-
-  // Group items by bucket_slug (null → "notes")
-  const grouped = new Map<string, typeof items>();
-  for (const it of items) {
-    const key = it.bucket_slug ?? "__notes__";
-    if (!grouped.has(key)) grouped.set(key, []);
-    grouped.get(key)!.push(it);
-  }
-
-  // Ensure every known bucket appears, even if empty
-  for (const b of buckets) if (!grouped.has(b.slug)) grouped.set(b.slug, []);
-
-  const bucketTitle = (slug: string) =>
-    slug === "__notes__" ? "Notes" : (buckets.find(b => b.slug === slug)?.title ?? slug);
 
   return (
     <>
@@ -51,91 +48,76 @@ export default function RealMemory() {
         <PageHeader
           index="MEMORY"
           title="What I know about your business"
-          sub="Everything below is one pool. Bucket answers, things I noticed in chats, and your own notes all live here together."
-          action={<ApertureChip tone={items.length > 0 ? "signal" : "neutral"}>{items.length} item{items.length === 1 ? "" : "s"}</ApertureChip>}
+          sub="Thirteen territories. The more I know, the sharper my answers get. Tap any to read or fill in."
+          action={
+            <ApertureChip tone={exploredCount > 0 ? "signal" : "neutral"}>
+              {exploredCount} / {buckets.length} explored
+            </ApertureChip>
+          }
         />
 
-        {/* Freeform add */}
-        <ApertureCard padding={14} style={{ marginBottom: 24 }}>
-          <ApertureMonoLabel>Add to memory</ApertureMonoLabel>
-          <div style={{ display: "flex", gap: 8, alignItems: "flex-start", marginTop: 8 }}>
-            <textarea
-              value={note}
-              onChange={e => setNote(e.target.value)}
-              placeholder="Anything I should know — context, a number, a constraint, a goal…"
-              rows={2}
-              style={{
-                flex: 1, resize: "vertical",
-                appearance: "none", outline: "none",
-                background: "var(--ap-surface-2)",
-                border: "1px solid var(--ap-hairline)",
-                borderRadius: "var(--ap-radius-sm)",
-                padding: "10px 12px",
-                fontSize: 14, color: "var(--ap-ink-1)",
-                fontFamily: "var(--ap-font-sans)", lineHeight: 1.5,
-              }}
-            />
-            <ApertureButton variant="accent" onClick={handleAdd} disabled={!note.trim() || busy}>
-              {busy ? "…" : "Save"}
-            </ApertureButton>
-          </div>
-        </ApertureCard>
-
-        {loading || bLoading ? (
-          <ApertureCard padding={20}><ApertureMonoLabel>Loading…</ApertureMonoLabel></ApertureCard>
-        ) : grouped.size === 0 ? (
-          <ApertureCard padding={32} style={{ textAlign: "center" }}>
-            <h3 style={{ margin: "0 0 6px", fontSize: 16, color: "var(--ap-ink-1)", fontWeight: 600 }}>Nothing in memory yet</h3>
-            <p style={{ margin: 0, fontSize: 13.5, color: "var(--ap-ink-2)", lineHeight: 1.55 }}>
-              Add a note above, or just start a chat. I'll remember the parts that matter.
+        {/* CTA row */}
+        <div style={{ display: "grid", gridTemplateColumns: fullDone ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 20 }}>
+          <ApertureCard padding={16}>
+            <ApertureMonoLabel>Conversation</ApertureMonoLabel>
+            <h3 style={{ margin: "6px 0 4px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
+              Talk to Aperture
+            </h3>
+            <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
+              I'll ask about whatever gap looks most useful right now.
             </p>
+            <ApertureButton variant="accent" onClick={talkToAperture}>Start →</ApertureButton>
           </ApertureCard>
+          {!fullDone && (
+            <ApertureCard padding={16}>
+              <ApertureMonoLabel>Deep dive</ApertureMonoLabel>
+              <h3 style={{ margin: "6px 0 4px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
+                Continue onboarding
+              </h3>
+              <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
+                Run the full business questionnaire. Skip anything that doesn't apply.
+              </p>
+              <Link to="/aperture/app/onboard/full" style={{ textDecoration: "none" }}>
+                <ApertureButton variant="ghost">Open →</ApertureButton>
+              </Link>
+            </ApertureCard>
+          )}
+        </div>
+
+        {bLoading || mLoading ? (
+          <ApertureCard padding={20}><ApertureMonoLabel>Loading…</ApertureMonoLabel></ApertureCard>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-            {[...grouped.entries()].map(([slug, list]) => {
-              const bucket = buckets.find(b => b.slug === slug);
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+            gap: 10,
+          }}>
+            {buckets.map(b => {
+              const count = countsBySlug[b.slug] ?? 0;
+              const explored = count > 0;
               return (
-                <section key={slug}>
-                  <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 8 }}>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-                      <ApertureMonoLabel>{slug === "__notes__" ? "FREEFORM" : "BUCKET"}</ApertureMonoLabel>
-                      <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>{bucketTitle(slug)}</h3>
+                <Link
+                  key={b.slug}
+                  to={`/aperture/app/memory/${b.slug}`}
+                  style={{ textDecoration: "none", display: "block" }}
+                >
+                  <ApertureCard padding={14} style={{ height: "100%" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 8 }}>
+                      <span style={{ fontSize: 20, lineHeight: 1 }}>{b.glyph ?? "·"}</span>
+                      {explored ? (
+                        <ApertureChip tone="signal">Explored</ApertureChip>
+                      ) : (
+                        <ApertureChip tone="neutral">Empty</ApertureChip>
+                      )}
                     </div>
-                    {bucket && (
-                      <Link to={`/aperture/app/memory/${bucket.slug}`} style={{ fontSize: 11, color: "var(--ap-signal)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
-                        Open →
-                      </Link>
-                    )}
-                  </div>
-                  {list.length === 0 ? (
-                    <ApertureCard padding={14}>
-                      <p style={{ margin: 0, fontSize: 12.5, color: "var(--ap-ink-3)" }}>
-                        Nothing in this bucket yet.
-                      </p>
-                    </ApertureCard>
-                  ) : (
-                    <ApertureCard padding={0}>
-                      {list.map((it, idx) => (
-                        <div key={it.id} style={{
-                          display: "grid", gridTemplateColumns: "auto 1fr auto",
-                          gap: 12, alignItems: "flex-start",
-                          padding: "12px 14px",
-                          borderTop: idx === 0 ? "none" : "1px solid var(--ap-hairline)",
-                        }}>
-                          <ApertureMonoLabel color={it.source === "ai_extracted" ? "var(--ap-signal)" : undefined}>
-                            {it.source === "ai_extracted" ? "Noticed" : it.source === "bucket_answer" ? "Answer" : "Note"}
-                          </ApertureMonoLabel>
-                          <span style={{ fontSize: 13.5, color: "var(--ap-ink-1)", lineHeight: 1.5 }}>{it.content}</span>
-                          <button
-                            onClick={() => { if (confirm("Remove from memory?")) deleteItem(it.id); }}
-                            aria-label="Remove"
-                            style={{ appearance: "none", border: "none", background: "transparent", cursor: "pointer", color: "var(--ap-ink-3)", padding: 4 }}
-                          >×</button>
-                        </div>
-                      ))}
-                    </ApertureCard>
-                  )}
-                </section>
+                    <h4 style={{ margin: "0 0 4px", fontSize: 14, color: "var(--ap-ink-1)", fontWeight: 600 }}>
+                      {b.title}
+                    </h4>
+                    <p style={{ margin: 0, fontSize: 12, color: "var(--ap-ink-3)", lineHeight: 1.45 }}>
+                      {b.blurb ?? ""}
+                    </p>
+                  </ApertureCard>
+                </Link>
               );
             })}
           </div>
