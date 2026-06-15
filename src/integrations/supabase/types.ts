@@ -927,6 +927,7 @@ export type Database = {
       }
       aperture_onboarding_questions: {
         Row: {
+          bucket_question_keys: string[]
           bucket_slugs: string[]
           created_at: string
           flow: string
@@ -943,6 +944,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          bucket_question_keys?: string[]
           bucket_slugs?: string[]
           created_at?: string
           flow: string
@@ -959,6 +961,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          bucket_question_keys?: string[]
           bucket_slugs?: string[]
           created_at?: string
           flow?: string
