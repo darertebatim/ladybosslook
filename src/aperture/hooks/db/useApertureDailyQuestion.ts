@@ -66,29 +66,22 @@ export function useApertureDailyQuestion() {
     (gaps ?? []).forEach((g: any) => {
       const ageDays = (now - new Date(g.created_at).getTime()) / DAY;
       const window = g.source === "skipped" ? 21 : 30;
-      // "content" stores the question prompt (skipped) or "Owner doesn't know: <prompt>" (unknown).
       const promptText = String(g.content ?? "")
         .replace(/^Owner doesn't know:\s*/i, "")
         .trim().toLowerCase();
       if (!promptText) return;
-      // Dormant-bucket override: if no activity in this bucket since the gap
-      // was logged, allow the question to resurface immediately.
+      // "Active" = any non-gap memory item written to this bucket after the
+      // gap was logged. Resurfacing rule: only allow back into the pool once
+      // we're past the cool-down window AND the bucket has stayed dormant.
       const bucketActiveSince = (anyItems ?? []).some((it: any) =>
         it.bucket_slug === g.bucket_slug &&
         it.source !== "skipped" && it.source !== "unknown" &&
         new Date(it.created_at).getTime() > new Date(g.created_at).getTime(),
       );
-      if (ageDays >= window || !bucketActiveSince === false) {
-        // either past the window OR the bucket has been active since (skip the defer)
-      }
-      const allowResurface = ageDays >= window || !bucketActiveSince;
+      const allowResurface = ageDays >= window && !bucketActiveSince;
       if (!allowResurface) {
         const key = `${g.bucket_slug}:${promptText}`;
-        // keep the most recent (largest) defer time
-        const until = new Date(g.created_at).getTime() + window * DAY;
-        if (!deferredPrompts.has(key) || (deferredPrompts.get(key) ?? 0) < until) {
-          deferredPrompts.set(key, until);
-        }
+        deferredPrompts.set(key, 1);
       }
     });
 
