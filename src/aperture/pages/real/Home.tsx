@@ -11,6 +11,7 @@ import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { useApertureChatsDB } from "@/aperture/hooks/db/useApertureChatsDB";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 import { useApertureDailyQuestion } from "@/aperture/hooks/db/useApertureDailyQuestion";
+import { useApertureHomeSuggestions } from "@/aperture/hooks/db/useApertureHomeSuggestions";
 import { toast } from "@/hooks/use-toast";
 
 export default function RealHome() {
@@ -20,6 +21,7 @@ export default function RealHome() {
   const { createChat } = useApertureChatsDB();
   const { profile, loading: pLoading } = useApertureUserProfile();
   const { question: dailyQ, refresh: refreshDailyQ, skip: skipDaily } = useApertureDailyQuestion();
+  const { suggestions, loading: sLoading, refresh: refreshSuggestions } = useApertureHomeSuggestions(items.length);
   const [draft, setDraft] = useState("");
   const [starting, setStarting] = useState(false);
   const [dailyAnswer, setDailyAnswer] = useState("");
@@ -44,6 +46,14 @@ export default function RealHome() {
     const chat = await createChat(t.slice(0, 48));
     setStarting(false);
     if (chat) navigate(`/aperture/app/chats/${chat.id}?seed=${encodeURIComponent(t)}`);
+  }
+
+  async function startFromSuggestion(s: { title: string; prompt: string }) {
+    if (starting) return;
+    setStarting(true);
+    const chat = await createChat(s.title.slice(0, 48));
+    setStarting(false);
+    if (chat) navigate(`/aperture/app/chats/${chat.id}?seed=${encodeURIComponent(s.prompt)}`);
   }
 
   async function saveDaily() {
@@ -107,6 +117,66 @@ export default function RealHome() {
                 </ApertureButton>
               </form>
             </ApertureCard>
+          </section>
+        )}
+
+        {/* AI suggestions */}
+        {items.length > 0 && (
+          <section style={{ marginBottom: 28 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <ApertureMonoLabel>Next moves</ApertureMonoLabel>
+              <button
+                type="button"
+                onClick={() => refreshSuggestions()}
+                disabled={sLoading}
+                style={{
+                  appearance: "none", cursor: sLoading ? "default" : "pointer",
+                  border: "none", background: "transparent",
+                  color: "var(--ap-ink-3)", fontSize: 11,
+                  fontFamily: "var(--ap-font-mono)", textTransform: "uppercase",
+                  letterSpacing: "0.12em",
+                }}
+              >
+                {sLoading ? "Thinking…" : "Refresh →"}
+              </button>
+            </div>
+
+            {suggestions.length === 0 ? (
+              <ApertureCard padding={18}>
+                <p style={{ margin: 0, fontSize: 13, color: "var(--ap-ink-3)", lineHeight: 1.55 }}>
+                  {sLoading
+                    ? "Reading your memory and picking your sharpest next moves…"
+                    : "I'll suggest concrete next steps here once I've read enough of your memory."}
+                </p>
+              </ApertureCard>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
+                {suggestions.map((s, idx) => (
+                  <button
+                    key={`${idx}-${s.title}`}
+                    type="button"
+                    onClick={() => startFromSuggestion(s)}
+                    style={{
+                      textAlign: "left", appearance: "none", cursor: "pointer",
+                      padding: 16, background: "var(--ap-surface-1)",
+                      border: "1px solid var(--ap-hairline)",
+                      borderRadius: "var(--ap-radius-md)",
+                      display: "flex", flexDirection: "column", gap: 8,
+                      color: "var(--ap-ink-1)", fontFamily: "var(--ap-font-sans)",
+                    }}
+                  >
+                    <ApertureMonoLabel>Suggestion · {String(idx + 1).padStart(2, "0")}</ApertureMonoLabel>
+                    <h3 style={{ margin: 0, fontSize: 14.5, fontWeight: 600, lineHeight: 1.35 }}>{s.title}</h3>
+                    {s.why && (
+                      <p style={{ margin: 0, fontSize: 12.5, color: "var(--ap-ink-3)", lineHeight: 1.5 }}>{s.why}</p>
+                    )}
+                    <span style={{ marginTop: 4, fontSize: 11, color: "var(--ap-signal)", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
+                      Start chat →
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </section>
         )}
 
