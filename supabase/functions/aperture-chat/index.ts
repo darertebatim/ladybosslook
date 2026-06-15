@@ -113,16 +113,24 @@ serve(async (req) => {
     let escapeInstruction = "";
     if (escape && (escape.kind === "skip" || escape.kind === "unknown")) {
       const qText = String(escape.question ?? "").trim().slice(0, 500);
-      const bucket = String(escape.bucket ?? "").trim().toLowerCase() || null;
+      let bucket = String(escape.bucket ?? "").trim().toLowerCase() || null;
+      if (!bucket && qText) {
+        bucket = await classifyBucket(supabase, LOVABLE_API_KEY, qText);
+      }
       if (qText) {
         const content = escape.kind === "skip"
           ? qText
           : `Owner doesn't know: ${qText}`;
+        const nowIso = new Date().toISOString();
+        const metadata = escape.kind === "skip"
+          ? { skipped_at: nowIso, source_view: "chat" }
+          : { logged_at: nowIso, source_view: "chat" };
         await supabase.from("aperture_memory_items").insert({
           user_id: user.id,
           content,
           source: escape.kind === "skip" ? "skipped" : "unknown",
           bucket_slug: bucket,
+          metadata,
           is_active: true,
         });
       }
@@ -304,6 +312,46 @@ async function summarize(apiKey: string, raw: string): Promise<string> {
   if (!res.ok) return raw.slice(0, 4000);
   const data = await res.json();
   return data?.choices?.[0]?.message?.content ?? raw.slice(0, 4000);
+}
+
+/**
+ * Lightweight bucket classifier for chat-side skip / "I don't know" actions.
+ * Returns one of the active bucket slugs, or null if the model is unsure.
+ * Used so daily-question rotation can defer questions by (bucket, prompt).
+ */
+async function classifyBucket(
+  supabase: any, apiKey: string, questionText: string,
+): Promise<string | null> {
+  try {
+    const { data: buckets } = await supabase
+      .from("aperture_buckets").select("slug,title").eq("is_active", true);
+    const list = (buckets ?? []) as Array<{ slug: string; title: string }>;
+    if (list.length === 0) return null;
+    const allowed = list.map(b => b.slug);
+    const catalog = list.map(b => `- ${b.slug} (${b.title})`).join("\n");
+
+    const res = await fetch(AI_GATEWAY, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: DEFAULT_MODEL,
+        messages: [
+          { role: "system", content:
+            `Classify the following business question into ONE bucket slug. Respond with STRICT JSON only: {"bucket_slug": "<slug>"} or {"bucket_slug": null} if unsure. Allowed slugs:\n${catalog}` },
+          { role: "user", content: questionText.slice(0, 800) },
+        ],
+        response_format: { type: "json_object" },
+      }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const raw = data?.choices?.[0]?.message?.content ?? "{}";
+    const parsed = JSON.parse(raw);
+    const slug = String(parsed?.bucket_slug ?? "").trim().toLowerCase();
+    return slug && allowed.includes(slug) ? slug : null;
+  } catch {
+    return null;
+  }
 }
 
 /**
