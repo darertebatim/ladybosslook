@@ -139,10 +139,10 @@ export default function RealChatThread() {
               </div>
             )}
             {messages.map(m => (
-              <MessageBubble key={m.id} role={m.role} text={m.content} />
+              <MessageBubble key={m.id} role={m.role} text={m.content} onPickOption={send} disabled={streaming} />
             ))}
             {streaming && streamingText && (
-              <MessageBubble role="assistant" text={streamingText} />
+              <MessageBubble role="assistant" text={streamingText} onPickOption={send} disabled />
             )}
             {streaming && !streamingText && (
               <div style={{ display: "flex" }}>
@@ -195,7 +195,7 @@ export default function RealChatThread() {
   );
 }
 
-function MessageBubble({ role, text }: { role: string; text: string }) {
+function MessageBubble({ role, text, onPickOption, disabled }: { role: string; text: string; onPickOption?: (t: string) => void; disabled?: boolean }) {
   if (role === "assistant" || role === "system") {
     const { body, options } = splitAssistantOptions(text);
     return (
@@ -211,14 +211,17 @@ function MessageBubble({ role, text }: { role: string; text: string }) {
                 <button
                   key={`${idx}-${opt}`}
                   type="button"
-                  data-aperture-option={opt}
+                  disabled={disabled || !onPickOption}
+                  onClick={() => onPickOption?.(opt)}
                   style={{
-                    appearance: "none", cursor: "pointer",
+                    appearance: "none",
+                    cursor: disabled || !onPickOption ? "default" : "pointer",
                     padding: "8px 12px", borderRadius: 999,
                     border: "1px solid var(--ap-hairline)",
                     background: "var(--ap-surface-2)",
                     color: "var(--ap-ink-1)",
                     fontSize: 13, fontWeight: 500, fontFamily: "var(--ap-font-sans)",
+                    opacity: disabled ? 0.5 : 1,
                   }}
                 >
                   {opt}
