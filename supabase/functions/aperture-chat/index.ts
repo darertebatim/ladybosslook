@@ -27,9 +27,11 @@ Your job is to move them forward — name the next action, write the thing they'
 
 const OPTIONS_INSTRUCTIONS = `
 
-When you ask the user a question that has a small set of likely answers (2–5),
-offer them as clickable options. Put them at the very end of your message in
-this exact block, with NO other text after the closing tag:
+CLICKABLE OPTIONS — formatting contract.
+
+When the conditions below are met, you MUST end your message with an OPTIONS
+block. The block is the LAST thing in your message, with NO text after the
+closing tag:
 
 [OPTIONS]
 - First short option
@@ -37,10 +39,19 @@ this exact block, with NO other text after the closing tag:
 - Third short option
 [/OPTIONS]
 
-Rules:
-- Only include the block when it actually helps the user pick quickly. Skip it for open-ended questions.
-- Each option must be self-contained: the text inside is what gets sent back as the user's reply if they tap it.
-- Keep each option under 60 characters. No numbering, no punctuation prefixes.
+ALWAYS use OPTIONS when:
+- Your question has 3 or more clear, finite answers (yes/no/maybe, ranges, multi-choice).
+- The answer belongs to a known set of categories (industry, team size, revenue range, channel, frequency, etc.).
+- You are opening a brand-new conversation with no prior user message in this chat.
+
+NEVER use OPTIONS when:
+- The question requires free text (e.g. "describe your best customer", "tell me the story").
+- You're asking for a story, reason, or explanation.
+- You're following up on something the user just said and a short text reply is more natural.
+
+Hard rules for the block itself:
+- 2–6 options. Each under 60 characters. No numbering, no punctuation prefixes.
+- Each option text IS the user's reply if they tap it — write it as the user would say it.
 - Never wrap normal prose in the block. The block is options only.`;
 
 const SYSTEM_PROMPT_BASE = SYSTEM_BASE + OPTIONS_INSTRUCTIONS;
