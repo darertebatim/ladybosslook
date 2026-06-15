@@ -10,6 +10,7 @@ export interface ApertureBucketRow {
   sort_order: number;
   source: string;
   user_id: string | null;
+  target_count: number;
 }
 
 export interface ApertureQuestionRow {
@@ -40,7 +41,7 @@ export function useApertureBucketsDB() {
     setLoading(true);
     const [b, q] = await Promise.all([
       supabase.from("aperture_buckets")
-        .select("slug,title,blurb,glyph,sort_order,source,user_id")
+        .select("slug,title,blurb,glyph,sort_order,source,user_id,target_count")
         .or(`user_id.is.null,user_id.eq.${user.id}`)
         .order("sort_order", { ascending: true }),
       supabase.from("aperture_bucket_questions")
