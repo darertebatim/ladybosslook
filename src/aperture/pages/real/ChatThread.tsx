@@ -197,13 +197,35 @@ export default function RealChatThread() {
 
 function MessageBubble({ role, text }: { role: string; text: string }) {
   if (role === "assistant" || role === "system") {
+    const { body, options } = splitAssistantOptions(text);
     return (
       <div style={{ display: "flex", justifyContent: "flex-start" }}>
         <div style={{ maxWidth: "82%" }}>
           <ApertureMonoLabel style={{ display: "block", marginBottom: 6 }}>Aperture</ApertureMonoLabel>
           <div style={{ color: "var(--ap-ink-1)", fontSize: 14.5, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
-            {text}
+            {body}
           </div>
+          {options.length > 0 && (
+            <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {options.map((opt, idx) => (
+                <button
+                  key={`${idx}-${opt}`}
+                  type="button"
+                  data-aperture-option={opt}
+                  style={{
+                    appearance: "none", cursor: "pointer",
+                    padding: "8px 12px", borderRadius: 999,
+                    border: "1px solid var(--ap-hairline)",
+                    background: "var(--ap-surface-2)",
+                    color: "var(--ap-ink-1)",
+                    fontSize: 13, fontWeight: 500, fontFamily: "var(--ap-font-sans)",
+                  }}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -220,4 +242,24 @@ function MessageBubble({ role, text }: { role: string; text: string }) {
       </div>
     </div>
   );
+}
+
+/**
+ * Splits assistant text into prose + clickable options. The model is
+ * instructed to append a trailing block:
+ *   [OPTIONS]
+ *   - Option A
+ *   - Option B
+ *   [/OPTIONS]
+ */
+function splitAssistantOptions(text: string): { body: string; options: string[] } {
+  const match = text.match(/\[OPTIONS\]([\s\S]*?)\[\/OPTIONS\]/i);
+  if (!match) return { body: text.trim(), options: [] };
+  const body = text.replace(match[0], "").trim();
+  const options = match[1]
+    .split("\n")
+    .map(l => l.replace(/^\s*[-*•]\s*/, "").trim())
+    .filter(Boolean)
+    .slice(0, 6);
+  return { body, options };
 }
