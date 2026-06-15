@@ -25,6 +25,26 @@ How you talk:
 
 Your job is to move them forward — name the next action, write the thing they're stuck on, or pressure-test an idea.`;
 
+const OPTIONS_INSTRUCTIONS = `
+
+When you ask the user a question that has a small set of likely answers (2–5),
+offer them as clickable options. Put them at the very end of your message in
+this exact block, with NO other text after the closing tag:
+
+[OPTIONS]
+- First short option
+- Second short option
+- Third short option
+[/OPTIONS]
+
+Rules:
+- Only include the block when it actually helps the user pick quickly. Skip it for open-ended questions.
+- Each option must be self-contained: the text inside is what gets sent back as the user's reply if they tap it.
+- Keep each option under 60 characters. No numbering, no punctuation prefixes.
+- Never wrap normal prose in the block. The block is options only.`;
+
+const SYSTEM_PROMPT_BASE = SYSTEM_BASE + OPTIONS_INSTRUCTIONS;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -62,7 +82,7 @@ serve(async (req) => {
 
     // Load (or build) memory card
     const memoryCard = await getOrBuildMemoryCard(supabase, user.id, LOVABLE_API_KEY);
-    const systemPrompt = `${SYSTEM_BASE}\n\n=== BUSINESS MEMORY CARD ===\n${memoryCard || "(empty — ask the user about their business basics first)"}\n=== END MEMORY CARD ===`;
+    const systemPrompt = `${SYSTEM_PROMPT_BASE}\n\n=== BUSINESS MEMORY CARD ===\n${memoryCard || "(empty — ask the user about their business basics first)"}\n=== END MEMORY CARD ===`;
 
     const upstream = await fetch(AI_GATEWAY, {
       method: "POST",
