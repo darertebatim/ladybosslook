@@ -165,6 +165,7 @@ function BucketsTab() {
           <TableHead>Slug</TableHead>
           <TableHead>Title</TableHead>
           <TableHead>Territory</TableHead>
+          <TableHead>Target</TableHead>
           <TableHead>Active</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow></TableHeader>
@@ -175,6 +176,7 @@ function BucketsTab() {
               <TableCell className="font-mono text-xs">{r.slug}</TableCell>
               <TableCell>{r.title}</TableCell>
               <TableCell className="text-xs text-muted-foreground line-clamp-1">{r.territory}</TableCell>
+              <TableCell className="text-xs">{r.target_count ?? 8}</TableCell>
               <TableCell>{r.is_active ? <Badge>on</Badge> : <Badge variant="outline">off</Badge>}</TableCell>
               <TableCell className="text-right">
                 <Button size="icon" variant="ghost" onClick={() => setEditing(r)}><Pencil className="h-4 w-4" /></Button>
