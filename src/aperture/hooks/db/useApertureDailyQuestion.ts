@@ -20,6 +20,7 @@ export function useApertureDailyQuestion() {
   const { user } = useAuth();
   const [question, setQuestion] = useState<DailyBucketQuestion | null>(null);
   const [loading, setLoading] = useState(true);
+  const [skipCount, setSkipCount] = useState(0);
 
   const refresh = useCallback(async () => {
     if (!user) { setQuestion(null); setLoading(false); return; }
@@ -51,17 +52,20 @@ export function useApertureDailyQuestion() {
       return;
     }
 
-    // Deterministic daily pick — stable per (user, day).
+    // Deterministic daily pick — stable per (user, day). Bump skipCount
+    // to advance to a different question within the same day.
     const day = Math.floor(Date.now() / 86_400_000);
-    const seed = hashString(`${user.id}:${day}`);
+    const seed = hashString(`${user.id}:${day}:${skipCount}`);
     const idx = seed % pool.length;
     setQuestion(pool[idx] as DailyBucketQuestion);
     setLoading(false);
-  }, [user]);
+  }, [user, skipCount]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
-  return { question, loading, refresh };
+  const skip = useCallback(() => setSkipCount(c => c + 1), []);
+
+  return { question, loading, refresh, skip };
 }
 
 function hashString(s: string): number {
