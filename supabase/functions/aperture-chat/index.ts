@@ -315,6 +315,46 @@ async function summarize(apiKey: string, raw: string): Promise<string> {
 }
 
 /**
+ * Lightweight bucket classifier for chat-side skip / "I don't know" actions.
+ * Returns one of the active bucket slugs, or null if the model is unsure.
+ * Used so daily-question rotation can defer questions by (bucket, prompt).
+ */
+async function classifyBucket(
+  supabase: any, apiKey: string, questionText: string,
+): Promise<string | null> {
+  try {
+    const { data: buckets } = await supabase
+      .from("aperture_buckets").select("slug,title").eq("is_active", true);
+    const list = (buckets ?? []) as Array<{ slug: string; title: string }>;
+    if (list.length === 0) return null;
+    const allowed = list.map(b => b.slug);
+    const catalog = list.map(b => `- ${b.slug} (${b.title})`).join("\n");
+
+    const res = await fetch(AI_GATEWAY, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: DEFAULT_MODEL,
+        messages: [
+          { role: "system", content:
+            `Classify the following business question into ONE bucket slug. Respond with STRICT JSON only: {"bucket_slug": "<slug>"} or {"bucket_slug": null} if unsure. Allowed slugs:\n${catalog}` },
+          { role: "user", content: questionText.slice(0, 800) },
+        ],
+        response_format: { type: "json_object" },
+      }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const raw = data?.choices?.[0]?.message?.content ?? "{}";
+    const parsed = JSON.parse(raw);
+    const slug = String(parsed?.bucket_slug ?? "").trim().toLowerCase();
+    return slug && allowed.includes(slug) ? slug : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Background fact-extraction from a single chat message.
  *
  * Asks the model to return STRICT JSON of new business facts found in the
