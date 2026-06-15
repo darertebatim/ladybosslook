@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import { useState } from "react";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
@@ -9,14 +9,25 @@ import {
 import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { useApertureChatsDB } from "@/aperture/hooks/db/useApertureChatsDB";
+import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 
 export default function RealHome() {
   const navigate = useNavigate();
   const { buckets, loading: bLoading } = useApertureBucketsDB();
   const { items, loading: mLoading } = useApertureMemoryDB();
   const { createChat } = useApertureChatsDB();
+  const { profile, loading: pLoading } = useApertureUserProfile();
   const [draft, setDraft] = useState("");
   const [starting, setStarting] = useState(false);
+
+  // First-time visit → push to Quick Onboarding.
+  if (!pLoading && profile && !profile.quick_onboarded_at) {
+    return <Navigate to="/aperture/app/onboard/quick" replace />;
+  }
+  if (!pLoading && !profile) {
+    // No profile row yet — also send to onboarding (row is created on first upsert).
+    return <Navigate to="/aperture/app/onboard/quick" replace />;
+  }
 
   const knownCount = items.length;
   const hasBuckets = buckets.length > 0;
