@@ -10,15 +10,20 @@ import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { useApertureChatsDB } from "@/aperture/hooks/db/useApertureChatsDB";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
+import { useApertureDailyQuestion } from "@/aperture/hooks/db/useApertureDailyQuestion";
+import { toast } from "@/hooks/use-toast";
 
 export default function RealHome() {
   const navigate = useNavigate();
   const { buckets, loading: bLoading } = useApertureBucketsDB();
-  const { items, loading: mLoading } = useApertureMemoryDB();
+  const { items, loading: mLoading, saveBucketAnswer } = useApertureMemoryDB();
   const { createChat } = useApertureChatsDB();
   const { profile, loading: pLoading } = useApertureUserProfile();
+  const { question: dailyQ, refresh: refreshDailyQ } = useApertureDailyQuestion();
   const [draft, setDraft] = useState("");
   const [starting, setStarting] = useState(false);
+  const [dailyAnswer, setDailyAnswer] = useState("");
+  const [savingDaily, setSavingDaily] = useState(false);
 
   // First-time visit → push to Quick Onboarding.
   if (!pLoading && profile && !profile.quick_onboarded_at) {
@@ -41,6 +46,16 @@ export default function RealHome() {
     if (chat) navigate(`/aperture/app/chats/${chat.id}?seed=${encodeURIComponent(t)}`);
   }
 
+  async function saveDaily() {
+    if (!dailyQ || !dailyAnswer.trim() || savingDaily) return;
+    setSavingDaily(true);
+    await saveBucketAnswer(dailyQ.bucket_slug, dailyQ.question_key, dailyAnswer.trim());
+    setSavingDaily(false);
+    setDailyAnswer("");
+    toast({ title: "Saved to memory", description: "One more thing I know about your business." });
+    await refreshDailyQ();
+  }
+
   return (
     <>
       <Helmet><title>Today · Aperture</title></Helmet>
@@ -55,6 +70,45 @@ export default function RealHome() {
           }
           action={<ApertureChip tone={knownCount > 0 ? "signal" : "neutral"}>Memory · {knownCount}</ApertureChip>}
         />
+
+        {/* Daily question */}
+        {dailyQ && (
+          <section style={{ marginBottom: 28 }}>
+            <ApertureMonoLabel style={{ marginBottom: 12, display: "block" }}>Today's question</ApertureMonoLabel>
+            <ApertureCard padding={18}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 10 }}>
+                <h3 style={{ margin: 0, fontSize: 15.5, fontWeight: 600, color: "var(--ap-ink-1)", lineHeight: 1.4 }}>
+                  {dailyQ.prompt}
+                </h3>
+                <ApertureChip tone="neutral">{dailyQ.bucket_slug}</ApertureChip>
+              </div>
+              <form
+                onSubmit={e => { e.preventDefault(); saveDaily(); }}
+                style={{ display: "flex", gap: 8, alignItems: "stretch" }}
+              >
+                <input
+                  value={dailyAnswer}
+                  onChange={e => setDailyAnswer(e.target.value)}
+                  placeholder="Type your answer…"
+                  style={{
+                    flex: 1, appearance: "none", outline: "none",
+                    background: "var(--ap-surface-2)",
+                    border: "1px solid var(--ap-hairline)",
+                    borderRadius: "var(--ap-radius-sm)",
+                    padding: "10px 12px", fontSize: 14,
+                    color: "var(--ap-ink-1)", fontFamily: "var(--ap-font-sans)",
+                  }}
+                />
+                <ApertureButton type="submit" variant="accent" disabled={!dailyAnswer.trim() || savingDaily}>
+                  {savingDaily ? "…" : "Save"}
+                </ApertureButton>
+                <ApertureButton type="button" variant="ghost" onClick={() => refreshDailyQ()}>
+                  Skip
+                </ApertureButton>
+              </form>
+            </ApertureCard>
+          </section>
+        )}
 
         {/* Memory snapshot */}
         <section style={{ marginBottom: 28 }}>
