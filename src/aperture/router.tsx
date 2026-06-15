@@ -21,6 +21,8 @@ const RealChats = lazy(() => import("@/aperture/pages/real/Chats"));
 const RealChatThread = lazy(() => import("@/aperture/pages/real/ChatThread"));
 const RealLibrary = lazy(() => import("@/aperture/pages/real/Library"));
 const RealSettings = lazy(() => import("@/aperture/pages/real/Settings"));
+const OnboardQuick = lazy(() => import("@/aperture/pages/real/OnboardQuick"));
+const OnboardFull = lazy(() => import("@/aperture/pages/real/OnboardFull"));
 
 function ApertureLoader() {
   return (
@@ -92,6 +94,8 @@ export default function ApertureRouter() {
           <Route path="app/chats/:id" element={<ApertureAuthGate><RealChatThread /></ApertureAuthGate>} />
           <Route path="app/library" element={<ApertureAuthGate><RealLibrary /></ApertureAuthGate>} />
           <Route path="app/settings" element={<ApertureAuthGate><RealSettings /></ApertureAuthGate>} />
+          <Route path="app/onboard/quick" element={<ApertureAuthGate><OnboardQuick /></ApertureAuthGate>} />
+          <Route path="app/onboard/full" element={<ApertureAuthGate><OnboardFull /></ApertureAuthGate>} />
           <Route path="*" element={<Navigate to="." replace />} />
         </Routes>
       </Suspense>
