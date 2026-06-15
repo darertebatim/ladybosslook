@@ -288,6 +288,66 @@ function splitAssistantOptions(text: string): { body: string; options: string[] 
   return { body, options };
 }
 
+/**
+ * Quick-reply chip rendering. Border-only by default, filled on press,
+ * min 44px height, and a 2-column grid on narrow viewports when there
+ * are 4+ options.
+ */
+function OptionChips({
+  options, disabled, onPick,
+}: {
+  options: string[];
+  disabled: boolean;
+  onPick?: (t: string) => void;
+}) {
+  const [isNarrow, setIsNarrow] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(max-width: 640px)");
+    const update = () => setIsNarrow(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  const useGrid = isNarrow && options.length >= 4;
+  return (
+    <div
+      style={
+        useGrid
+          ? { marginTop: 10, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }
+          : { marginTop: 10, display: "flex", flexWrap: "wrap", gap: 8 }
+      }
+    >
+      {options.map((opt, idx) => (
+        <button
+          key={`${idx}-${opt}`}
+          type="button"
+          disabled={disabled || !onPick}
+          onClick={() => onPick?.(opt)}
+          className="ap-chip-press"
+          style={{
+            appearance: "none",
+            cursor: disabled || !onPick ? "default" : "pointer",
+            minHeight: 44,
+            padding: "10px 14px",
+            borderRadius: 999,
+            border: "1px solid var(--ap-hairline)",
+            background: "transparent",
+            color: "var(--ap-ink-1)",
+            fontSize: 12.5, fontWeight: 500, fontFamily: "var(--ap-font-sans)",
+            textAlign: "center",
+            lineHeight: 1.2,
+            opacity: disabled ? 0.5 : 1,
+            transition: "background 120ms ease, border-color 120ms ease",
+          }}
+        >
+          {opt}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 const OPENER_OPTIONS: { label: string; seed: string }[] = [
   { label: "My customers and who I'm selling to",
     seed: "Let's talk about my customers and who I'm selling to." },
