@@ -1,0 +1,183 @@
+import { useEffect, useMemo, useState } from "react";
+import { Helmet } from "react-helmet-async";
+import { useNavigate } from "react-router-dom";
+import { RealAppShell } from "@/aperture/components/RealAppShell";
+import { PageHeader } from "@/aperture/components/PageHeader";
+import {
+  ApertureCard, ApertureMonoLabel, ApertureButton, ApertureChip,
+} from "@/aperture/components/primitives";
+import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
+import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
+
+/**
+ * Phase 3 confirmation — after the website/IG research extraction,
+ * show the owner everything the AI pulled out (grouped by bucket)
+ * and let them keep/edit/remove each fact. Confirmed items get
+ * source='user_confirmed'. Removed items are deleted.
+ */
+export default function OnboardConfirm() {
+  const navigate = useNavigate();
+  const { buckets } = useApertureBucketsDB();
+  const { items, loading, refresh, deleteItem, updateItem } = useApertureMemoryDB();
+  const [saving, setSaving] = useState(false);
+  const [edits, setEdits] = useState<Record<string, string>>({});
+  const [removed, setRemoved] = useState<Record<string, boolean>>({});
+
+  // Poll a couple of times while the edge function is still writing facts.
+  useEffect(() => {
+    let cancelled = false;
+    let tries = 0;
+    const tick = async () => {
+      if (cancelled) return;
+      await refresh();
+      tries += 1;
+      if (tries < 8) setTimeout(tick, 3000); // ~24s total
+    };
+    tick();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const aiItems = useMemo(
+    () => items.filter(i => i.source === "ai_extracted"),
+    [items],
+  );
+
+  const grouped = useMemo(() => {
+    const m: Record<string, typeof aiItems> = {};
+    for (const it of aiItems) {
+      const k = it.bucket_slug ?? "other";
+      (m[k] ||= []).push(it);
+    }
+    return m;
+  }, [aiItems]);
+
+  async function confirmAll() {
+    if (saving) return;
+    setSaving(true);
+    for (const it of aiItems) {
+      if (removed[it.id]) {
+        await deleteItem(it.id);
+        continue;
+      }
+      const nextContent = (edits[it.id] ?? it.content).trim();
+      if (!nextContent) {
+        await deleteItem(it.id);
+        continue;
+      }
+      await updateItem(it.id, {
+        content: nextContent,
+        source: "user_confirmed" as any,
+      });
+    }
+    setSaving(false);
+    navigate("/aperture/app", { replace: true });
+  }
+
+  function skipAll() {
+    navigate("/aperture/app", { replace: true });
+  }
+
+  const bucketTitleMap = useMemo(() => {
+    const m: Record<string, string> = {};
+    for (const b of buckets) m[b.slug] = b.title;
+    return m;
+  }, [buckets]);
+
+  const total = aiItems.length;
+  const kept = aiItems.filter(i => !removed[i.id]).length;
+
+  return (
+    <>
+      <Helmet><title>Review what I found · Aperture</title></Helmet>
+      <RealAppShell>
+        <PageHeader
+          index="REVIEW"
+          title="Here's what I pulled from your links"
+          sub="I scraped your website and Instagram. Confirm what's accurate, fix what's wrong, remove what isn't you. Anything you keep becomes part of my memory."
+          action={total > 0 ? <ApertureChip tone="signal">{kept} kept</ApertureChip> : null}
+        />
+
+        {loading && total === 0 ? (
+          <ApertureCard padding={20}>
+            <ApertureMonoLabel>Working…</ApertureMonoLabel>
+            <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--ap-ink-2)" }}>
+              I'm reading your site and IG. This usually takes 10–20 seconds.
+            </p>
+          </ApertureCard>
+        ) : total === 0 ? (
+          <ApertureCard padding={20}>
+            <ApertureMonoLabel>Nothing yet</ApertureMonoLabel>
+            <p style={{ margin: "8px 0 14px", fontSize: 13, color: "var(--ap-ink-2)" }}>
+              I couldn't extract anything from the links you gave me — they might be private,
+              empty, or blocked. You can skip ahead and fill things in yourself.
+            </p>
+            <ApertureButton variant="accent" onClick={skipAll}>Continue →</ApertureButton>
+          </ApertureCard>
+        ) : (
+          <>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {Object.entries(grouped).map(([slug, list]) => (
+                <ApertureCard key={slug} padding={16}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
+                    <ApertureMonoLabel>{bucketTitleMap[slug] ?? slug}</ApertureMonoLabel>
+                    <ApertureChip tone="neutral">{list.length} facts</ApertureChip>
+                  </div>
+                  <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 8 }}>
+                    {list.map(it => {
+                      const isRemoved = !!removed[it.id];
+                      const value = edits[it.id] ?? it.content;
+                      return (
+                        <li key={it.id} style={{
+                          opacity: isRemoved ? 0.35 : 1,
+                          display: "flex", alignItems: "flex-start", gap: 10,
+                          paddingTop: 8, borderTop: "1px solid var(--ap-hairline)",
+                        }}>
+                          <textarea
+                            value={value}
+                            disabled={isRemoved}
+                            onChange={e => setEdits(s => ({ ...s, [it.id]: e.target.value }))}
+                            rows={Math.min(4, Math.max(1, Math.ceil(value.length / 70)))}
+                            style={{
+                              flex: 1, resize: "vertical",
+                              fontFamily: "var(--ap-font-sans)", fontSize: 13.5,
+                              color: "var(--ap-ink-1)", background: "transparent",
+                              border: "1px solid transparent", borderRadius: 6,
+                              padding: "4px 6px", outline: "none",
+                              textDecoration: isRemoved ? "line-through" : "none",
+                            }}
+                            onFocus={e => { e.currentTarget.style.border = "1px solid var(--ap-hairline)"; }}
+                            onBlur={e => { e.currentTarget.style.border = "1px solid transparent"; }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setRemoved(r => ({ ...r, [it.id]: !r[it.id] }))}
+                            style={{
+                              appearance: "none", cursor: "pointer", flexShrink: 0,
+                              fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase",
+                              padding: "4px 8px", borderRadius: 4,
+                              border: "1px solid var(--ap-hairline)",
+                              background: "transparent",
+                              color: isRemoved ? "var(--ap-ink-1)" : "var(--ap-ink-3)",
+                            }}
+                          >{isRemoved ? "Keep" : "Remove"}</button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </ApertureCard>
+              ))}
+            </div>
+
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 18 }}>
+              <ApertureButton variant="ghost" onClick={skipAll}>Skip</ApertureButton>
+              <ApertureButton variant="accent" onClick={confirmAll} disabled={saving}>
+                {saving ? "Saving…" : `Confirm ${kept} →`}
+              </ApertureButton>
+            </div>
+          </>
+        )}
+      </RealAppShell>
+    </>
+  );
+}
