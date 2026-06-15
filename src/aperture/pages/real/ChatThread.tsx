@@ -248,28 +248,7 @@ function MessageBubble({ role, text, onPickOption, disabled }: { role: string; t
             {body}
           </div>
           {options.length > 0 && (
-            <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {options.map((opt, idx) => (
-                <button
-                  key={`${idx}-${opt}`}
-                  type="button"
-                  disabled={disabled || !onPickOption}
-                  onClick={() => onPickOption?.(opt)}
-                  style={{
-                    appearance: "none",
-                    cursor: disabled || !onPickOption ? "default" : "pointer",
-                    padding: "8px 12px", borderRadius: 999,
-                    border: "1px solid var(--ap-hairline)",
-                    background: "var(--ap-surface-2)",
-                    color: "var(--ap-ink-1)",
-                    fontSize: 13, fontWeight: 500, fontFamily: "var(--ap-font-sans)",
-                    opacity: disabled ? 0.5 : 1,
-                  }}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
+            <OptionChips options={options} disabled={!!disabled} onPick={onPickOption} />
           )}
         </div>
       </div>
