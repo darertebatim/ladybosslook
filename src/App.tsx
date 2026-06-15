@@ -475,6 +475,7 @@ const App = () => (
                       <Route path="my-rilo" element={<ProtectedRoute requiredPage="tools"><MyRiloEngine /></ProtectedRoute>} />
                       <Route path="tags/schema" element={<Navigate to="/admin/tags/content" replace />} />
                       <Route path="tags/content" element={<ProtectedRoute requiredPage="tools"><ContentTaggingPage /></ProtectedRoute>} />
+                      <Route path="aperture" element={<ProtectedRoute requiredPage="system"><ApertureAdmin /></ProtectedRoute>} />
                     </Route>
                   )}
                   
