@@ -89,6 +89,21 @@ serve(async (req) => {
       await supabase.from("aperture_messages").insert({
         chat_id: chatId, user_id: user.id, role: "user", content: lastUser.content,
       });
+
+      // Fire-and-forget: extract any business facts from this user turn
+      // into the memory pool. Done out-of-band so it never blocks the
+      // streaming chat response.
+      const extractPromise = extractFactsFromMessage({
+        supabase,
+        userId: user.id,
+        apiKey: LOVABLE_API_KEY,
+        userMessage: String(lastUser.content ?? ""),
+      }).catch(err => console.error("extractFactsFromMessage failed", err));
+      // @ts-ignore – Deno deploy edge runtime exposes waitUntil for background work.
+      if (typeof EdgeRuntime !== "undefined" && EdgeRuntime?.waitUntil) {
+        // @ts-ignore
+        EdgeRuntime.waitUntil(extractPromise);
+      }
     }
 
     // Load (or build) memory card
