@@ -140,6 +140,7 @@ const InstructorsAdmin = lazy(() => import("@/pages/admin/Instructors"));
 const MyRiloEngine = lazy(() => import("@/pages/admin/MyRiloEngine"));
 const TagSchemaPage = lazy(() => import("@/pages/admin/TagSchema"));
 const ContentTaggingPage = lazy(() => import("@/pages/admin/ContentTagging"));
+const ApertureAdmin = lazy(() => import("@/pages/admin/Aperture"));
 const AppRead = lazy(() => import("@/pages/app/AppRead"));
 const AppReadDetail = lazy(() => import("@/pages/app/AppReadDetail"));
 const AppReadReader = lazy(() => import("@/pages/app/AppReadReader"));
