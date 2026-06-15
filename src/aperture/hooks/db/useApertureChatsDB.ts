@@ -39,6 +39,17 @@ export function useApertureChatsDB() {
 
   useEffect(() => { refresh(); }, [refresh]);
 
+const OPENER_TEXT = `What would you like to work on today?
+
+[OPTIONS]
+- My customers and market
+- What I sell and how I price it
+- Getting new clients
+- My finances and profit
+- My team and how I run things
+- Where I want to take this business
+[/OPTIONS]`;
+
   const createChat = useCallback(async (title = "New chat"): Promise<ChatRow | null> => {
     if (!user) return null;
     const { data, error } = await supabase
@@ -47,6 +58,14 @@ export function useApertureChatsDB() {
       .select("id,title,last_message_at,created_at,archived")
       .single();
     if (error || !data) return null;
+    // Pre-seed the opening assistant message so the opener appears instantly
+    // and stays in thread history when the user scrolls back later.
+    await supabase.from("aperture_messages").insert({
+      chat_id: data.id,
+      user_id: user.id,
+      role: "assistant",
+      content: OPENER_TEXT,
+    });
     await refresh();
     return data as ChatRow;
   }, [user, refresh]);
