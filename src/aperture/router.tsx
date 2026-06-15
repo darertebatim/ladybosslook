@@ -23,6 +23,7 @@ const RealLibrary = lazy(() => import("@/aperture/pages/real/Library"));
 const RealSettings = lazy(() => import("@/aperture/pages/real/Settings"));
 const OnboardQuick = lazy(() => import("@/aperture/pages/real/OnboardQuick"));
 const OnboardFull = lazy(() => import("@/aperture/pages/real/OnboardFull"));
+const OnboardConfirm = lazy(() => import("@/aperture/pages/real/OnboardConfirm"));
 
 function ApertureLoader() {
   return (
@@ -96,6 +97,7 @@ export default function ApertureRouter() {
           <Route path="app/settings" element={<ApertureAuthGate><RealSettings /></ApertureAuthGate>} />
           <Route path="app/onboard/quick" element={<ApertureAuthGate><OnboardQuick /></ApertureAuthGate>} />
           <Route path="app/onboard/full" element={<ApertureAuthGate><OnboardFull /></ApertureAuthGate>} />
+          <Route path="app/onboard/confirm" element={<ApertureAuthGate><OnboardConfirm /></ApertureAuthGate>} />
           <Route path="*" element={<Navigate to="." replace />} />
         </Routes>
       </Suspense>
