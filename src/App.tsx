@@ -140,6 +140,7 @@ const InstructorsAdmin = lazy(() => import("@/pages/admin/Instructors"));
 const MyRiloEngine = lazy(() => import("@/pages/admin/MyRiloEngine"));
 const TagSchemaPage = lazy(() => import("@/pages/admin/TagSchema"));
 const ContentTaggingPage = lazy(() => import("@/pages/admin/ContentTagging"));
+const ApertureAdmin = lazy(() => import("@/pages/admin/Aperture"));
 const AppRead = lazy(() => import("@/pages/app/AppRead"));
 const AppReadDetail = lazy(() => import("@/pages/app/AppReadDetail"));
 const AppReadReader = lazy(() => import("@/pages/app/AppReadReader"));
@@ -474,6 +475,7 @@ const App = () => (
                       <Route path="my-rilo" element={<ProtectedRoute requiredPage="tools"><MyRiloEngine /></ProtectedRoute>} />
                       <Route path="tags/schema" element={<Navigate to="/admin/tags/content" replace />} />
                       <Route path="tags/content" element={<ProtectedRoute requiredPage="tools"><ContentTaggingPage /></ProtectedRoute>} />
+                      <Route path="aperture" element={<ProtectedRoute requiredPage="system"><ApertureAdmin /></ProtectedRoute>} />
                     </Route>
                   )}
                   
