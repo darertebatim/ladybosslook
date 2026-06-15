@@ -847,6 +847,7 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean
+          metadata: Json
           question_key: string | null
           source: string
           source_ref: string | null
@@ -860,6 +861,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          metadata?: Json
           question_key?: string | null
           source?: string
           source_ref?: string | null
@@ -873,6 +875,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          metadata?: Json
           question_key?: string | null
           source?: string
           source_ref?: string | null
