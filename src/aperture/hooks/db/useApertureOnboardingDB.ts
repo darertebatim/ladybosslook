@@ -73,3 +73,35 @@ export function useApertureIndustriesDB(opts: { activeOnly?: boolean } = {}) {
 
   return { industries, loading, refresh };
 }
+
+export interface ApertureToolRow {
+  id: string;
+  slug: string;
+  category: string | null;
+  label: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export function useApertureToolsDB(opts: { activeOnly?: boolean } = {}) {
+  const { activeOnly = true } = opts;
+  const [tools, setTools] = useState<ApertureToolRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    let q = (supabase as any)
+      .from("aperture_tools")
+      .select("*")
+      .order("category", { ascending: true })
+      .order("sort_order", { ascending: true });
+    if (activeOnly) q = q.eq("is_active", true);
+    const { data } = await q;
+    setTools((data ?? []) as ApertureToolRow[]);
+    setLoading(false);
+  }, [activeOnly]);
+
+  useEffect(() => { refresh(); }, [refresh]);
+
+  return { tools, loading, refresh };
+}

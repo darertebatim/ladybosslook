@@ -387,6 +387,58 @@ function IndustriesTab() {
   );
 }
 
+// ---------- Tools ----------
+function ToolsTab() {
+  const t = useTable<Row>("aperture_tools", "sort_order");
+  const [editing, setEditing] = useState<Row | null>(null);
+
+  return (
+    <Section
+      title="Tools"
+      description="The tool stack picker shown in Quick Onboarding ('Which tools do you use?')."
+      onRefresh={t.refresh}
+      onAdd={() => setEditing({ is_active: true, sort_order: t.rows.length + 1 })}
+    >
+      <Table>
+        <TableHeader><TableRow>
+          <TableHead>Category</TableHead>
+          <TableHead>Slug</TableHead>
+          <TableHead>Label</TableHead>
+          <TableHead>Active</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
+        </TableRow></TableHeader>
+        <TableBody>
+          {t.rows.map((r) => (
+            <TableRow key={r.id}>
+              <TableCell className="text-xs">{r.category ?? "—"}</TableCell>
+              <TableCell className="font-mono text-xs">{r.slug}</TableCell>
+              <TableCell>{r.label}</TableCell>
+              <TableCell>{r.is_active ? <Badge>on</Badge> : <Badge variant="outline">off</Badge>}</TableCell>
+              <TableCell className="text-right">
+                <Button size="icon" variant="ghost" onClick={() => setEditing(r)}><Pencil className="h-4 w-4" /></Button>
+                <Button size="icon" variant="ghost" onClick={() => t.remove(r.id)}><Trash2 className="h-4 w-4" /></Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <EditorDialog
+        open={!!editing} onOpenChange={(v) => !v && setEditing(null)}
+        title={editing?.id ? "Edit tool" : "New tool"}
+        initial={editing ?? {}}
+        onSave={(row) => t.upsert(row)}
+        fields={[
+          { key: "slug", label: "Slug", type: "text", required: true },
+          { key: "label", label: "Label", type: "text", required: true },
+          { key: "category", label: "Category", type: "text" },
+          { key: "sort_order", label: "Sort order", type: "number" },
+          { key: "is_active", label: "Active", type: "switch" },
+        ]}
+      />
+    </Section>
+  );
+}
+
 // ---------- Shared Section wrapper ----------
 function Section({ title, description, onRefresh, onAdd, children }: {
   title: string; description: string;
@@ -427,12 +479,14 @@ export default function ApertureAdmin() {
           <TabsTrigger value="quick">Quick Onboarding</TabsTrigger>
           <TabsTrigger value="full">Full Questionnaire</TabsTrigger>
           <TabsTrigger value="industries">Industries</TabsTrigger>
+          <TabsTrigger value="tools">Tools</TabsTrigger>
         </TabsList>
         <TabsContent value="buckets" className="mt-4"><BucketsTab /></TabsContent>
         <TabsContent value="bucket-questions" className="mt-4"><BucketQuestionsTab /></TabsContent>
         <TabsContent value="quick" className="mt-4"><OnboardingTab flow="quick" /></TabsContent>
         <TabsContent value="full" className="mt-4"><OnboardingTab flow="full" /></TabsContent>
         <TabsContent value="industries" className="mt-4"><IndustriesTab /></TabsContent>
+        <TabsContent value="tools" className="mt-4"><ToolsTab /></TabsContent>
       </Tabs>
     </div>
   );
