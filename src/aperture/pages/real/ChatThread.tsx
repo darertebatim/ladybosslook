@@ -134,9 +134,7 @@ export default function RealChatThread() {
 
           <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", paddingRight: 4, display: "flex", flexDirection: "column", gap: 18 }}>
             {messages.length === 0 && !streaming && (
-              <div style={{ margin: "auto 0", textAlign: "center", color: "var(--ap-ink-3)", fontSize: 13.5 }}>
-                Type something — I'll use what I already know about your business.
-              </div>
+              <ChatOpener onPick={text => send(text)} />
             )}
             {messages.map(m => (
               <MessageBubble key={m.id} role={m.role} text={m.content} onPickOption={send} disabled={streaming} />
