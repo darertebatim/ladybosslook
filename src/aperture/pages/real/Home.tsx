@@ -19,7 +19,7 @@ export default function RealHome() {
   const { items, loading: mLoading, saveBucketAnswer } = useApertureMemoryDB();
   const { createChat } = useApertureChatsDB();
   const { profile, loading: pLoading } = useApertureUserProfile();
-  const { question: dailyQ, refresh: refreshDailyQ } = useApertureDailyQuestion();
+  const { question: dailyQ, refresh: refreshDailyQ, skip: skipDaily } = useApertureDailyQuestion();
   const [draft, setDraft] = useState("");
   const [starting, setStarting] = useState(false);
   const [dailyAnswer, setDailyAnswer] = useState("");
@@ -102,7 +102,7 @@ export default function RealHome() {
                 <ApertureButton type="submit" variant="accent" disabled={!dailyAnswer.trim() || savingDaily}>
                   {savingDaily ? "…" : "Save"}
                 </ApertureButton>
-                <ApertureButton type="button" variant="ghost" onClick={() => refreshDailyQ()}>
+                <ApertureButton type="button" variant="ghost" onClick={() => skipDaily()}>
                   Skip
                 </ApertureButton>
               </form>
