@@ -71,7 +71,10 @@ export default function RealChatThread() {
     const seed = search.get("seed");
     if (!seed) return;
     if (seedHandledRef.current === id) return;
-    if (messages.length > 0) { seedHandledRef.current = id; return; }
+    // Pre-seeded opener is assistant-only; treat the chat as "empty" until
+    // there is a real user message, so ?seed=… from Home still fires once.
+    const hasUserMessage = messages.some(m => m.role === "user");
+    if (hasUserMessage) { seedHandledRef.current = id; return; }
     seedHandledRef.current = id;
     navigate(`/aperture/app/chats/${id}`, { replace: true });
     send(seed);
