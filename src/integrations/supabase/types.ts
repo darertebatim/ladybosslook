@@ -543,6 +543,7 @@ export type Database = {
       }
       aperture_bucket_questions: {
         Row: {
+          audience: string
           bucket_slug: string
           choices: Json | null
           created_at: string
@@ -550,12 +551,15 @@ export type Database = {
           hint: string | null
           id: string
           input_kind: string
+          is_active: boolean
+          layer: string | null
           prompt: string
           question_key: string
           sort_order: number
           user_id: string | null
         }
         Insert: {
+          audience?: string
           bucket_slug: string
           choices?: Json | null
           created_at?: string
@@ -563,12 +567,15 @@ export type Database = {
           hint?: string | null
           id?: string
           input_kind?: string
+          is_active?: boolean
+          layer?: string | null
           prompt: string
           question_key: string
           sort_order?: number
           user_id?: string | null
         }
         Update: {
+          audience?: string
           bucket_slug?: string
           choices?: Json | null
           created_at?: string
@@ -576,6 +583,8 @@ export type Database = {
           hint?: string | null
           id?: string
           input_kind?: string
+          is_active?: boolean
+          layer?: string | null
           prompt?: string
           question_key?: string
           sort_order?: number
@@ -594,36 +603,48 @@ export type Database = {
       aperture_buckets: {
         Row: {
           blurb: string | null
+          brief: string | null
           created_at: string
           created_by: string | null
+          display_order: number
           glyph: string | null
+          is_active: boolean
           slug: string
           sort_order: number
           source: string
+          territory: string | null
           title: string
           updated_at: string
           user_id: string | null
         }
         Insert: {
           blurb?: string | null
+          brief?: string | null
           created_at?: string
           created_by?: string | null
+          display_order?: number
           glyph?: string | null
+          is_active?: boolean
           slug: string
           sort_order?: number
           source?: string
+          territory?: string | null
           title: string
           updated_at?: string
           user_id?: string | null
         }
         Update: {
           blurb?: string | null
+          brief?: string | null
           created_at?: string
           created_by?: string | null
+          display_order?: number
           glyph?: string | null
+          is_active?: boolean
           slug?: string
           sort_order?: number
           source?: string
+          territory?: string | null
           title?: string
           updated_at?: string
           user_id?: string | null
@@ -749,6 +770,39 @@ export type Database = {
         }
         Relationships: []
       }
+      aperture_industries: {
+        Row: {
+          created_at: string
+          group_label: string
+          id: string
+          is_active: boolean
+          label: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          group_label: string
+          id?: string
+          is_active?: boolean
+          label: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          group_label?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       aperture_memory_card: {
         Row: {
           answers_count: number
@@ -868,6 +922,57 @@ export type Database = {
           },
         ]
       }
+      aperture_onboarding_questions: {
+        Row: {
+          bucket_slugs: string[]
+          created_at: string
+          flow: string
+          hint: string | null
+          id: string
+          input_kind: string
+          is_active: boolean
+          options: Json
+          prompt: string
+          question_key: string
+          section: string | null
+          sort_order: number
+          step: number
+          updated_at: string
+        }
+        Insert: {
+          bucket_slugs?: string[]
+          created_at?: string
+          flow: string
+          hint?: string | null
+          id?: string
+          input_kind?: string
+          is_active?: boolean
+          options?: Json
+          prompt: string
+          question_key: string
+          section?: string | null
+          sort_order?: number
+          step?: number
+          updated_at?: string
+        }
+        Update: {
+          bucket_slugs?: string[]
+          created_at?: string
+          flow?: string
+          hint?: string | null
+          id?: string
+          input_kind?: string
+          is_active?: boolean
+          options?: Json
+          prompt?: string
+          question_key?: string
+          section?: string | null
+          sort_order?: number
+          step?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       aperture_suggestions: {
         Row: {
           acted_on: boolean
@@ -914,6 +1019,42 @@ export type Database = {
             referencedColumns: ["slug"]
           },
         ]
+      }
+      aperture_user_profile: {
+        Row: {
+          business_name: string | null
+          created_at: string
+          full_onboarded_at: string | null
+          industry_slug: string | null
+          instagram: string | null
+          quick_onboarded_at: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          business_name?: string | null
+          created_at?: string
+          full_onboarded_at?: string | null
+          industry_slug?: string | null
+          instagram?: string | null
+          quick_onboarded_at?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          business_name?: string | null
+          created_at?: string
+          full_onboarded_at?: string | null
+          industry_slug?: string | null
+          instagram?: string | null
+          quick_onboarded_at?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
       }
       app_installations: {
         Row: {
