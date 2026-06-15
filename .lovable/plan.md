@@ -1,131 +1,139 @@
 
-# Aperture — Design & Build Plan
+## Goal
 
-Aperture is a separate product from Rilo, but lives in the same repo for now. It gets its own top-level route, its own theme provider, its own layout chrome, and its own design tokens — fully isolated from Rilo's orange app theme so nothing leaks either direction.
+Wire the finalized Aperture design (13 buckets, Quick Onboarding, Full Questionnaire, AI‑led memory chat) into the app — **and** make every piece of it editable from an Aperture admin dashboard at `/admin/aperture` so nothing is hardcoded going forward.
 
-The plan is sequenced in three phases. We finish each phase, review, and move on.
-
----
-
-## Phase 1 — Brand kit (`/aperture/brand`)
-
-Goal: lock the visual language as a real, reusable system, not inline styles in a mock.
-
-What gets built:
-
-- **Logo & wordmark**
-  - Generate an Aperture mark: a precision-instrument feel (camera aperture blades + signal/lens nod), monoline, works at 16px and at 512px.
-  - Three lockups: mark only, mark + wordmark horizontal, wordmark only.
-  - Light-canvas and dark-canvas variants.
-- **Design tokens** (in a dedicated `aperture.css`, scoped under `.aperture-root`)
-  - Canvas: `#0A0A0A` / `#141414` / `#1C1C1C` / hairline `#262626` (dark); `#F6F6F7` / `#FFFFFF` / `#ECECEE` (light).
-  - Ink: `#FAFAFA` / `#A8A8A8` / `#6B6B6B` (dark); `#0A0A0A` / `#3A3A3A` / `#6B6B6B` (light).
-  - Accent (Aperture Signal): one warm orange derived from Rilo orange but pulled slightly more amber/precise (e.g. `#FF6B1A` primary, `#EB5E33` pressed, `#FFB089` glow). Used sparingly — status, run-state, single CTA per view.
-  - Semantic: success `#7BB661` / `#3F8A4C`, warn `#D4A24C` / `#B8852E`, danger `#D45A4C`, live `#7BB661` pulse.
-  - Type: **Inter** (UI/body, 13/14/16/22/32/48), **JetBrains Mono** (labels, step numbers, data, hash IDs).
-  - Radii: 6 / 10 / 14 / 18. Shadows: hairline border + soft `0 1px 0 rgba(255,255,255,0.04)` inset for raised cards on dark.
-  - Spacing scale 4/8/12/16/24/32/48/64.
-- **Primitives** (new components, namespaced `Aperture*`)
-  - `ApertureLogo`, `ApertureWordmark`
-  - `ApertureLayout` (theme provider + canvas)
-  - `ApertureMonoLabel`, `ApertureBadge`, `ApertureCard`, `ApertureButton` (default/ghost/accent), `ApertureIntegrationDot`, `ApertureChip`, `ApertureSwitch` (day/night)
-- **Brand showcase page** at `/aperture/brand` — single scroll page demonstrating: logo lockups, color tokens, type scale, primitive components, light/dark side-by-side. Replaces the role of the current `JasperMock`.
+Spec sources: `aperture_buckets_spec.md`, `aperture_quick_onboarding.md`, `existing_business_growth_quiz.md`, `aperture_bucket_questions.md`.
 
 ---
 
-## Phase 2 — Product app screens (`/aperture/app/*`)
+## What stays
 
-Goal: real navigable product UI using only the Phase 1 primitives. Static data, no backend yet — every screen reads from a typed mock dataset so we can wire real APIs later without touching presentation.
-
-Routes:
-
-- `/aperture/app` — home: today's pulse (revenue, top integration alerts, suggested playbook to run, last run summary).
-- `/aperture/app/playbooks` — playbook library: cards grouped by data source, search, "Run" affordance, "+ New playbook".
-- `/aperture/app/playbooks/:slug` — playbook detail + run: shows steps, connected sources strip, live-data chip ("LIVE · 2M AGO"), run output (post draft / digest / reconciled list).
-- `/aperture/app/chat` — grounded chat: assistant uses Business Memory as context. Built with AI Elements (`Conversation`, `Message`, `MessageContent`, `MessageResponse`, `PromptInput`).
-- `/aperture/app/memory` — Business Memory: connected sources panel, key facts (MRR, top SKU, lapsed customers count), uploaded docs.
-- `/aperture/app/integrations` — full grid of supported integrations with connect/disconnect (Instagram, Square, Stripe, Salesforce, QuickBooks, Shopify, HubSpot, GA4, Meta Ads).
-- `/aperture/app/settings` — workspace, theme toggle, billing placeholder.
-
-App chrome:
-
-- Desktop: left rail (logo, primary nav, workspace switcher), main column, optional right "Business Memory" rail on home and playbook-run views.
-- Mobile: bottom tab bar (Home · Playbooks · Chat · Memory · More) with pinned composer on Chat.
-
-Quality bar: every screen renders correctly in both day and night modes, at desktop and mobile widths, and uses only Aperture tokens.
+Memory pool (`aperture_memory_items`), Memory Card + regen, chats/messages, fact extraction, playbook runner, auth gate, routing under `/aperture/app/*`, `RealAppShell`.
 
 ---
 
-## Phase 3 — Marketing site (`/aperture` root + `/aperture/pricing`, etc.)
+## Step 1 — Schema: make everything data-driven
 
-Goal: a public landing surface that sells the connected-business-memory positioning.
+One migration that:
 
-Sections:
+1. Wipes the 6 placeholder buckets + their questions (confirmed no `aperture_actions.steps[]` reference them).
+2. Extends `aperture_buckets`: add `brief text` (AI-only context), `territory text` (one-line user-facing), `display_order int`, `is_active bool`.
+3. Extends `aperture_bucket_questions`: already has `prompt/hint/sort_order`; add `layer text` (e.g. "Layer 1 — Current customers"), `is_active bool`, `audience text` (`all` | `immigrant` | `team_owner` | …) so conditional questions are data, not code.
+4. New table `aperture_onboarding_questions` — drives Quick Onboarding + Full Questionnaire from the DB:
+   - `id`, `flow text` (`quick` | `full`), `step int`, `question_key text`, `prompt text`, `hint text`, `input_kind text` (`text` | `textarea` | `single_choice` | `multi_choice`), `options jsonb`, `bucket_slugs text[]` (mapping target buckets), `section text`, `is_active bool`, `sort_order int`.
+5. New table `aperture_industries` — `slug`, `group_label`, `label`, `sort_order`, `is_active` (drives Q11).
+6. New table `aperture_user_profile` — `user_id pk`, `quick_onboarded_at`, `full_onboarded_at`, `industry_slug`, `business_name`, `website`, `instagram`, `created_at`, `updated_at`. RLS: owner-only + service_role.
+7. Seed the 13 buckets, their briefs/territories, all bucket questions from `aperture_bucket_questions.md`, all 11 quick + ~43 full questions, and the industry list — as **seed data**, but loaded the same way runtime/admin additions are loaded. Nothing in the UI hardcodes any of it.
+8. Admin write access: add policies allowing users with the existing `has_role(auth.uid(), 'admin')` security-definer to insert/update/delete on the new tables and on `aperture_buckets` / `aperture_bucket_questions`.
 
-1. **Hero** — wordmark + line: *"Your business has a memory. Aperture is how you use it."* One primary CTA (Join waitlist), one secondary (See a playbook).
-2. **Live demo strip** — animated "Weekly Revenue Digest" running with live source chips (Stripe + QuickBooks).
-3. **How it works** — three steps: Connect your tools → Pick a playbook → Get finished work. Each step uses an `ApertureCard` with a mono step label.
-4. **Playbook gallery** — 6 marquee playbooks with the integrations that power each.
-5. **Integrations grid** — all supported platforms with status (Live / Beta / Coming soon).
-6. **Why Aperture** — three contrast cards (vs generic AI / vs dashboards / vs another tool).
-7. **Pricing** — Starter (free, 1 connection) / Operator ($X, all connections, unlimited playbooks) / Team (multi-seat).
-8. **FAQ + footer** — security/privacy posture, integrations, contact, waitlist form.
+GRANTs included for every new table per the project rule.
 
-Pages: `/aperture` (landing), `/aperture/pricing`, `/aperture/playbooks` (public gallery), `/aperture/integrations` (public list), `/aperture/manifesto` (long-form positioning).
+## Step 2 — Aperture admin dashboard `/admin/aperture`
 
-SEO: title under 60 chars, meta description under 160, single H1 per page, OG image using the Aperture mark on dark canvas.
+Lives inside the existing `AdminLayout` (same gating as other admin pages). Five tabs:
+
+1. **Buckets** — list of all 13 (sortable). Edit title, territory, brief, display_order, is_active. Add new bucket (sets `source='default'` or `'industry'`/`'situational'`).
+2. **Bucket Questions** — pick a bucket, see its questions grouped by `layer`. Reorder, edit prompt/hint/audience, add, deactivate. This is what the AI uses as targets during AI-led conversations.
+3. **Onboarding (Quick)** — table of 11 questions. Edit prompt, options, bucket mapping. Reorder.
+4. **Onboarding (Full)** — table of ~43 questions grouped by `section`. Same edits as above. Bulk import / export JSON for fast iteration.
+5. **Industries** — manage the Q11 industry list (groups + items).
+
+Also a small **Preview** button on each row that opens the user-side question in a sheet so you can see what the owner will actually see.
+
+Pure CRUD, no fancy validation beyond required fields. Uses existing shadcn primitives + the `useApertureAdmin*` hooks I'll add.
+
+## Step 3 — User-side: drive everything from the DB
+
+- `useApertureBucketsDB` already reads from DB ✅ — extend to also return `brief/territory/display_order`.
+- New `useApertureOnboardingDB(flow)` reads `aperture_onboarding_questions` filtered by flow.
+- New `useApertureIndustriesDB`.
+- Delete `src/aperture/data/buckets.ts` and `playbooks.ts` placeholder data files (nothing should reference them after the rewrite).
+
+## Step 4 — Quick Onboarding (`/aperture/app/onboard/quick`)
+
+Renders DB questions for `flow='quick'`. Three phases by `step`:
+- **Phase 1** — steps 1–7, one card at a time, swipe/next.
+- **Phase 2** — steps 8–11 (name, website, IG, industry).
+- **Phase 3** — calls new edge fn `aperture-onboarding-research` (best-effort site/IG scrape via existing AI Gateway), writes extracted notes to memory pool with `source='ai_extracted'`, `bucket_slug='basics'`, then shows the readable summary card for confirm/correct.
+
+All answers stored in `aperture_memory_items` with `source='onboarding'`, `question_key`, `bucket_slug` from the question's `bucket_slugs[0]`. Also stores name/website/industry on `aperture_user_profile`.
+
+Auto-redirect into this flow on first visit to `/aperture/app` when `quick_onboarded_at IS NULL`.
+
+## Step 5 — Full Business Questionnaire (`/aperture/app/onboard/full`)
+
+DB-driven wizard, one section per screen, "Skip" allowed everywhere. Answers fan out to the right buckets via `bucket_slugs[]`. On finish: set `full_onboarded_at`, regenerate Memory Card.
+
+## Step 6 — Memory page rewrite
+
+`pages/real/Memory.tsx`:
+
+- Header: "What Aperture knows about your business."
+- "Continue onboarding" card if Quick or Full unfinished.
+- Big **"Talk to Aperture"** CTA → creates a chat with `mode='memory'`, routes to `/aperture/app/chat/:id`.
+- 13 bucket tiles ordered by `display_order`, each showing title + territory + an **explored badge** (`barely touched / explored / well understood / deeply known`) derived from item count buckets in the pool. **No %, no progress bars.**
+- Tap a bucket → simplified read-only view of memory pool items for that `bucket_slug` (no per-bucket forms — buckets 2–13 are conversation-only by design).
+- Bucket 1 (Basics) opens to Quick + Full answers in read-mode with "Edit" links back to the wizards.
+
+## Step 7 — AI-led conversation
+
+Update `aperture-chat` edge function: when `mode === 'memory'`, system prompt receives:
+- The full memory pool (already wired) ✅
+- All bucket briefs + their question targets, grouped by bucket
+- Instructions: pick the most useful gap to explore now, follow the thread, never march sequentially, never name buckets to the user, tag each extracted fact with the right `bucket_slug`.
+
+No new edge function. One file change.
+
+## Step 8 — Daily question (light)
+
+Home gets one "Aperture's question for you today" card calling `aperture-chat` with `mode='daily_question'` (same prompt structure, asks one question only). Out of scope: scheduling, dedupe. Just a working card.
 
 ---
 
-## Architecture & isolation rules
-
-- All Aperture code lives under `src/aperture/` (pages, components, hooks, tokens). No cross-imports from `src/components/app/*` or Rilo's design tokens.
-- `aperture.css` is imported only by `ApertureLayout`. Tokens are scoped with `.aperture-root { … }` so Rilo's `--primary` etc. are untouched.
-- `App.tsx` mounts a single `/aperture/*` route group that lazy-loads `ApertureLayout` + its child routers.
-- No Capacitor, RevenueCat, or mobile-app code paths in Aperture — it is web-only for now.
-- No Supabase tables or edge functions in Phase 1–3. Mock data lives in `src/aperture/data/*.ts` with typed shapes ready for future API wiring.
-
----
-
-## Technical detail (for the build pass)
+## Files I'll add / change
 
 ```text
-src/aperture/
-  tokens/aperture.css
-  brand/
-    ApertureLogo.tsx
-    ApertureWordmark.tsx
-  components/
-    ApertureLayout.tsx        // theme provider, canvas, day/night
-    ApertureMonoLabel.tsx
-    ApertureCard.tsx
-    ApertureButton.tsx
-    ApertureChip.tsx
-    ApertureIntegrationDot.tsx
-    ApertureSwitch.tsx
-    nav/AppSidebar.tsx
-    nav/MobileTabBar.tsx
-    marketing/MarketingHeader.tsx
-    marketing/MarketingFooter.tsx
-  data/
-    integrations.ts
-    playbooks.ts
-    memory.ts
-  pages/
-    brand/BrandShowcase.tsx
-    app/Home.tsx
-    app/Playbooks.tsx
-    app/PlaybookDetail.tsx
-    app/Chat.tsx               // AI Elements composition
-    app/Memory.tsx
-    app/Integrations.tsx
-    app/Settings.tsx
-    marketing/Landing.tsx
-    marketing/Pricing.tsx
-    marketing/PlaybooksPublic.tsx
-    marketing/IntegrationsPublic.tsx
-    marketing/Manifesto.tsx
-  router.tsx                   // /aperture/* route tree
+supabase/migrations/<ts>_aperture_admin_and_13_buckets.sql
+supabase/functions/aperture-onboarding-research/index.ts        // new
+supabase/functions/aperture-chat/index.ts                        // mode='memory' | 'daily_question'
+
+src/aperture/hooks/db/useApertureBucketsDB.ts                    // extend
+src/aperture/hooks/db/useApertureOnboardingDB.ts                 // new
+src/aperture/hooks/db/useApertureIndustriesDB.ts                 // new
+src/aperture/hooks/db/useApertureUserProfile.ts                  // new
+
+src/aperture/pages/real/OnboardQuick.tsx                         // new
+src/aperture/pages/real/OnboardFull.tsx                          // new
+src/aperture/pages/real/Memory.tsx                               // rewrite
+src/aperture/pages/real/Bucket.tsx                               // simplify to read-only
+src/aperture/pages/real/Home.tsx                                 // CTA + daily card
+src/aperture/router.tsx                                          // routes + first-visit redirect
+
+src/pages/admin/Aperture.tsx                                     // dashboard shell with 5 tabs
+src/components/admin/aperture/BucketsTab.tsx
+src/components/admin/aperture/BucketQuestionsTab.tsx
+src/components/admin/aperture/OnboardingQuickTab.tsx
+src/components/admin/aperture/OnboardingFullTab.tsx
+src/components/admin/aperture/IndustriesTab.tsx
+src/aperture/hooks/admin/useApertureAdmin*.ts                    // CRUD hooks
+
+// deletions
+src/aperture/data/buckets.ts                                     // remove
+src/aperture/data/playbooks.ts                                   // remove (or keep only if admin tab still wants playbooks — out of scope here)
 ```
 
-Phase 1 ships first as an isolated, reviewable visual system. We hold before Phase 2 so you can sign off on tokens and the logo.
+## Out of scope (call out as follow-ups)
+
+- Industry-specific bucket packs (mechanism ready; no packs seeded).
+- Runtime AI-generated / situational bucket creation (schema ready; trigger logic later).
+- Calculated metrics (LTV, CAC, P&L) — added once enough buckets are filled.
+- Daily-question scheduler + dedupe.
+- Memory item change-detection / "significant change" surfacing.
+- Admin tab for Playbooks/Actions (separate concern from buckets; we can do a second pass).
+
+---
+
+## Open question
+
+The Full Questionnaire is ~43 questions. I'll present it as a **section-by-section wizard** (Sales → Marketing → Finance → Hiring → Operations → Strategy → Immigrant Journey → Personal), with "Skip" on every step. That matches Quick Onboarding's feel and is far less intimidating on mobile than one long form. Tell me if you'd rather have one long page.
