@@ -334,8 +334,9 @@ function OnboardingTab({ flow }: { flow: "quick" | "full" }) {
           { key: "input_kind", label: "Input kind", type: "select", options: INPUT_KINDS },
           { key: "options", label: "Options (JSON)", type: "json" },
           { key: "bucket_slugs", label: "Target buckets", type: "multiselect", options: BUCKET_SLUGS },
-          { key: "bucket_question_keys", label: "Bucket question keys ticked off (comma-separated)", type: "json",
-            hint: "Array of bucket_question.question_key values this answer satisfies. The AI will not re-ask these." },
+          { key: "bucket_question_keys",
+            label: "Bucket question keys ticked off (JSON array of strings). The AI won't re-ask these.",
+            type: "json" },
           { key: "sort_order", label: "Sort order", type: "number" },
           { key: "is_active", label: "Active", type: "switch" },
         ]}
