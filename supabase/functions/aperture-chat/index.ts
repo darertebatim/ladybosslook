@@ -27,9 +27,11 @@ Your job is to move them forward — name the next action, write the thing they'
 
 const OPTIONS_INSTRUCTIONS = `
 
-When you ask the user a question that has a small set of likely answers (2–5),
-offer them as clickable options. Put them at the very end of your message in
-this exact block, with NO other text after the closing tag:
+CLICKABLE OPTIONS — formatting contract.
+
+When the conditions below are met, you MUST end your message with an OPTIONS
+block. The block is the LAST thing in your message, with NO text after the
+closing tag:
 
 [OPTIONS]
 - First short option
@@ -37,10 +39,19 @@ this exact block, with NO other text after the closing tag:
 - Third short option
 [/OPTIONS]
 
-Rules:
-- Only include the block when it actually helps the user pick quickly. Skip it for open-ended questions.
-- Each option must be self-contained: the text inside is what gets sent back as the user's reply if they tap it.
-- Keep each option under 60 characters. No numbering, no punctuation prefixes.
+ALWAYS use OPTIONS when:
+- Your question has 3 or more clear, finite answers (yes/no/maybe, ranges, multi-choice).
+- The answer belongs to a known set of categories (industry, team size, revenue range, channel, frequency, etc.).
+- You are opening a brand-new conversation with no prior user message in this chat.
+
+NEVER use OPTIONS when:
+- The question requires free text (e.g. "describe your best customer", "tell me the story").
+- You're asking for a story, reason, or explanation.
+- You're following up on something the user just said and a short text reply is more natural.
+
+Hard rules for the block itself:
+- 2–6 options. Each under 60 characters. No numbering, no punctuation prefixes.
+- Each option text IS the user's reply if they tap it — write it as the user would say it.
 - Never wrap normal prose in the block. The block is options only.`;
 
 const SYSTEM_PROMPT_BASE = SYSTEM_BASE + OPTIONS_INSTRUCTIONS;
@@ -78,6 +89,21 @@ serve(async (req) => {
       await supabase.from("aperture_messages").insert({
         chat_id: chatId, user_id: user.id, role: "user", content: lastUser.content,
       });
+
+      // Fire-and-forget: extract any business facts from this user turn
+      // into the memory pool. Done out-of-band so it never blocks the
+      // streaming chat response.
+      const extractPromise = extractFactsFromMessage({
+        supabase,
+        userId: user.id,
+        apiKey: LOVABLE_API_KEY,
+        userMessage: String(lastUser.content ?? ""),
+      }).catch(err => console.error("extractFactsFromMessage failed", err));
+      // @ts-ignore – Deno deploy edge runtime exposes waitUntil for background work.
+      if (typeof EdgeRuntime !== "undefined" && EdgeRuntime?.waitUntil) {
+        // @ts-ignore
+        EdgeRuntime.waitUntil(extractPromise);
+      }
     }
 
     // Load (or build) memory card
@@ -246,4 +272,108 @@ async function summarize(apiKey: string, raw: string): Promise<string> {
   if (!res.ok) return raw.slice(0, 4000);
   const data = await res.json();
   return data?.choices?.[0]?.message?.content ?? raw.slice(0, 4000);
+}
+
+/**
+ * Background fact-extraction from a single chat message.
+ *
+ * Asks the model to return STRICT JSON of new business facts found in the
+ * user's message and the bucket they belong to. Writes each fact as a
+ * memory_item with source='ai_extracted' and marks the memory card stale.
+ *
+ * Never throws — failures are logged and swallowed.
+ */
+async function extractFactsFromMessage(args: {
+  supabase: any; userId: string; apiKey: string; userMessage: string;
+}): Promise<void> {
+  const { supabase, userId, apiKey, userMessage } = args;
+  const trimmed = (userMessage ?? "").trim();
+  if (trimmed.length < 12) return; // not worth extracting from a tiny ack
+
+  // Allowed bucket slugs for routing the fact.
+  const { data: buckets } = await supabase
+    .from("aperture_buckets").select("slug").eq("is_active", true);
+  const allowed = (buckets ?? []).map((b: any) => b.slug);
+  if (allowed.length === 0) return;
+
+  // Existing facts so the model can avoid restating known things.
+  const { data: existing } = await supabase
+    .from("aperture_memory_items")
+    .select("bucket_slug,content")
+    .eq("user_id", userId).eq("is_active", true)
+    .order("updated_at", { ascending: false }).limit(80);
+  const knownBrief = (existing ?? [])
+    .map((i: any) => `- (${i.bucket_slug ?? "?"}) ${String(i.content).slice(0, 160)}`)
+    .join("\n");
+
+  const system = `You extract NEW business facts from a single user message so an AI advisor can remember them.
+
+Allowed bucket slugs (use EXACTLY one of these per fact): ${allowed.join(", ")}.
+
+Rules:
+- Only extract concrete factual statements about the user's business (numbers, names, products, customers, channels, hires, locations, decisions, plans). Skip opinions, questions, hypotheticals, and small talk.
+- Skip anything already in the "known facts" list below — even if reworded.
+- One fact per item. Keep each fact short (under 220 chars), self-contained, written in third person ("They…", "The business…").
+- If the message has no extractable new facts, return an empty array.
+- Output STRICT JSON only — no prose, no markdown fences.
+
+Schema:
+{ "facts": [ { "bucket_slug": string, "content": string } ] }`;
+
+  const userPayload = `Known facts:
+${knownBrief || "(none)"}
+
+User message:
+${trimmed.slice(0, 4000)}`;
+
+  let parsed: any = {};
+  try {
+    const res = await fetch(AI_GATEWAY, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: DEFAULT_MODEL,
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: userPayload },
+        ],
+        response_format: { type: "json_object" },
+      }),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const raw = data?.choices?.[0]?.message?.content ?? "{}";
+    parsed = JSON.parse(raw);
+  } catch {
+    return;
+  }
+
+  const facts: Array<{ bucket_slug: string; content: string }> = Array.isArray(parsed?.facts)
+    ? parsed.facts : [];
+  const clean = facts
+    .map(f => ({
+      bucket_slug: String(f?.bucket_slug ?? "").trim().toLowerCase(),
+      content: String(f?.content ?? "").trim().slice(0, 240),
+    }))
+    .filter(f => f.content && allowed.includes(f.bucket_slug))
+    .slice(0, 6);
+
+  if (clean.length === 0) return;
+
+  const rows = clean.map(f => ({
+    user_id: userId,
+    content: f.content,
+    source: "ai_extracted",
+    bucket_slug: f.bucket_slug,
+    is_active: true,
+  }));
+  const { error: insertErr } = await supabase.from("aperture_memory_items").insert(rows);
+  if (insertErr) {
+    console.error("ai_extracted insert error", insertErr);
+    return;
+  }
+  // Mark the compressed brief stale so the next chat turn regenerates it.
+  await supabase.from("aperture_memory_card")
+    .update({ stale: true })
+    .eq("user_id", userId);
 }

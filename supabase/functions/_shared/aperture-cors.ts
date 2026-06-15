@@ -6,4 +6,4 @@ export const corsHeaders = {
 };
 
 export const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
-export const DEFAULT_MODEL = "google/gemini-2.5-flash";
+export const DEFAULT_MODEL = "google/gemini-3-flash-preview";

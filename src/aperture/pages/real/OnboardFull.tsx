@@ -41,6 +41,10 @@ export default function OnboardFull() {
       const targets = q.bucket_slugs && q.bucket_slugs.length > 0 ? q.bucket_slugs : ["basics"];
       for (const target of targets) {
         await saveBucketAnswer(target, q.question_key, v);
+        // Tick off mapped bucket questions in the same buckets.
+        for (const bqKey of (q.bucket_question_keys ?? [])) {
+          await saveBucketAnswer(target, bqKey, v);
+        }
       }
     }
   }

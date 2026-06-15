@@ -51,6 +51,18 @@ export default function OnboardQuick() {
     const target = (qq.bucket_slugs && qq.bucket_slugs[0]) ?? "basics";
     if (target === "__notes__") await addFreeformNote(v);
     else await saveBucketAnswer(target, qq.question_key, v);
+
+    // Also tick off any matching aperture_bucket_questions rows so the
+    // AI never re-asks something the user already answered in onboarding.
+    const targetBuckets = (qq.bucket_slugs && qq.bucket_slugs.length > 0)
+      ? qq.bucket_slugs.filter(s => s !== "__notes__")
+      : [];
+    const mappedKeys = (qq.bucket_question_keys ?? []);
+    for (const bucket of targetBuckets) {
+      for (const bqKey of mappedKeys) {
+        await saveBucketAnswer(bucket, bqKey, v);
+      }
+    }
   }
 
   async function next() {
