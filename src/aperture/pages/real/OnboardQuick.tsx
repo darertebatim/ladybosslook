@@ -9,6 +9,7 @@ import {
 import { useApertureOnboardingDB, useApertureIndustriesDB } from "@/aperture/hooks/db/useApertureOnboardingDB";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Quick onboarding — phased, DB-driven. After the last question
@@ -59,6 +60,17 @@ export default function OnboardQuick() {
     setBusy(false);
     if (i + 1 >= total) {
       await upsertProfile({ quick_onboarded_at: new Date().toISOString() });
+      // Fire-and-forget research: scrape website/IG and extract facts.
+      try {
+        const website = answers["website"];
+        const instagram = answers["instagram"];
+        const businessName = answers["business_name"];
+        if (website || instagram) {
+          supabase.functions.invoke("aperture-onboarding-research", {
+            body: { website, instagram, businessName },
+          }).catch(() => {});
+        }
+      } catch { /* ignore */ }
       navigate("/aperture/app", { replace: true });
     } else {
       setI(i + 1);
