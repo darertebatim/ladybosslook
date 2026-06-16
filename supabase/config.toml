@@ -220,6 +220,3 @@ verify_jwt = false
 
 [functions.aperture-onboarding-research]
 verify_jwt = false
-
-[functions.seed-aperture-actions]
-verify_jwt = false
