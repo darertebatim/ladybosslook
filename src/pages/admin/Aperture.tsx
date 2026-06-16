@@ -445,6 +445,103 @@ function ToolsTab() {
   );
 }
 
+// ---------- Actions (Playbooks & Prompts) ----------
+const ACTION_CATEGORIES = [
+  "Marketing","Sales","Pricing","Customers","Operations","Mindset","Product","Finance","Legal","Growth"
+];
+const ACTION_KINDS = ["playbook","prompt"];
+
+function ActionsTab() {
+  const t = useTable<Row>("aperture_actions", "category");
+  const [editing, setEditing] = useState<Row | null>(null);
+  const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [filterKind, setFilterKind] = useState<string>("all");
+
+  const filtered = useMemo(() => {
+    return t.rows.filter((r: Row) => {
+      if (filterCategory !== "all" && r.category !== filterCategory) return false;
+      if (filterKind !== "all" && r.kind !== filterKind) return false;
+      return true;
+    });
+  }, [t.rows, filterCategory, filterKind]);
+
+  return (
+    <Section title="Playbooks & Prompts" description="The Library cards shown to users. Playbooks are multi-step AI walkthroughs; prompts are one-shot outputs."
+      onRefresh={t.refresh} onAdd={() => setEditing({ kind: "playbook", category: "Marketing", is_published: true, steps: [], needs: [] })}>
+      <div className="mb-3 flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2">
+          <Label className="text-xs">Category:</Label>
+          <Select value={filterCategory} onValueChange={setFilterCategory}>
+            <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              {ACTION_CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center gap-2">
+          <Label className="text-xs">Kind:</Label>
+          <Select value={filterKind} onValueChange={setFilterKind}>
+            <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              {ACTION_KINDS.map(k => <SelectItem key={k} value={k}>{k}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <Table>
+        <TableHeader><TableRow>
+          <TableHead>Category</TableHead>
+          <TableHead>Kind</TableHead>
+          <TableHead>Slug</TableHead>
+          <TableHead>Title</TableHead>
+          <TableHead>Duration</TableHead>
+          <TableHead>Needs</TableHead>
+          <TableHead>Published</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
+        </TableRow></TableHeader>
+        <TableBody>
+          {filtered.map((r: Row) => (
+            <TableRow key={r.slug}>
+              <TableCell className="text-xs">{r.category}</TableCell>
+              <TableCell><Badge variant={r.kind === "playbook" ? "default" : "outline"}>{r.kind}</Badge></TableCell>
+              <TableCell className="font-mono text-xs">{r.slug}</TableCell>
+              <TableCell className="max-w-xs truncate">{r.title}</TableCell>
+              <TableCell className="text-xs">{r.duration ?? "—"}</TableCell>
+              <TableCell className="text-xs">{(r.needs ?? []).join(", ")}</TableCell>
+              <TableCell>{r.is_published ? <Badge>on</Badge> : <Badge variant="outline">off</Badge>}</TableCell>
+              <TableCell className="text-right">
+                <Button size="icon" variant="ghost" onClick={() => setEditing(r)}><Pencil className="h-4 w-4" /></Button>
+                <Button size="icon" variant="ghost" onClick={() => t.remove(r.slug)}><Trash2 className="h-4 w-4" /></Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <EditorDialog
+        open={!!editing} onOpenChange={(v) => !v && setEditing(null)}
+        title={editing?.slug ? "Edit action" : "New action"}
+        initial={editing ?? {}}
+        onSave={(row) => t.upsert(row)}
+        fields={[
+          { key: "slug", label: "Slug (unique ID)", type: "text", required: true },
+          { key: "kind", label: "Kind", type: "select", options: ACTION_KINDS, required: true },
+          { key: "category", label: "Category", type: "select", options: ACTION_CATEGORIES, required: true },
+          { key: "title", label: "Title", type: "text", required: true },
+          { key: "blurb", label: "Blurb (one-liner)", type: "textarea" },
+          { key: "why", label: "Why this (personalization hint)", type: "textarea" },
+          { key: "duration", label: "Duration (e.g. '8 min')", type: "text" },
+          { key: "needs", label: "Memory buckets needed", type: "multiselect", options: BUCKET_SLUGS },
+          { key: "steps", label: "Steps (JSON array of {prompt, exampleAnswer?})", type: "json" },
+          { key: "output", label: "Output (for prompts — sample result)", type: "textarea" },
+          { key: "is_published", label: "Published", type: "switch" },
+        ]}
+      />
+    </Section>
+  );
+}
+
 // ---------- Shared Section wrapper ----------
 function Section({ title, description, onRefresh, onAdd, children }: {
   title: string; description: string;
@@ -486,6 +583,7 @@ export default function ApertureAdmin() {
           <TabsTrigger value="full">Full Questionnaire</TabsTrigger>
           <TabsTrigger value="industries">Industries</TabsTrigger>
           <TabsTrigger value="tools">Tools</TabsTrigger>
+          <TabsTrigger value="actions">Playbooks & Prompts</TabsTrigger>
         </TabsList>
         <TabsContent value="buckets" className="mt-4"><BucketsTab /></TabsContent>
         <TabsContent value="bucket-questions" className="mt-4"><BucketQuestionsTab /></TabsContent>
@@ -493,6 +591,7 @@ export default function ApertureAdmin() {
         <TabsContent value="full" className="mt-4"><OnboardingTab flow="full" /></TabsContent>
         <TabsContent value="industries" className="mt-4"><IndustriesTab /></TabsContent>
         <TabsContent value="tools" className="mt-4"><ToolsTab /></TabsContent>
+        <TabsContent value="actions" className="mt-4"><ActionsTab /></TabsContent>
       </Tabs>
     </div>
   );
