@@ -25,6 +25,8 @@ const RealSettings = lazy(() => import("@/aperture/pages/real/Settings"));
 const OnboardQuick = lazy(() => import("@/aperture/pages/real/OnboardQuick"));
 const OnboardFull = lazy(() => import("@/aperture/pages/real/OnboardFull"));
 const OnboardConfirm = lazy(() => import("@/aperture/pages/real/OnboardConfirm"));
+const RealFiles = lazy(() => import("@/aperture/pages/real/Files"));
+const RealTools = lazy(() => import("@/aperture/pages/real/Tools"));
 
 function ApertureLoader() {
   return (
@@ -91,6 +93,8 @@ export default function ApertureRouter() {
           {/* Real product — Supabase-backed, auth-gated */}
           <Route path="app" element={<ApertureAuthGate><RealHome /></ApertureAuthGate>} />
           <Route path="app/memory" element={<ApertureAuthGate><RealMemory /></ApertureAuthGate>} />
+          <Route path="app/memory/files" element={<ApertureAuthGate><RealFiles /></ApertureAuthGate>} />
+          <Route path="app/memory/tools" element={<ApertureAuthGate><RealTools /></ApertureAuthGate>} />
           <Route path="app/memory/:slug" element={<ApertureAuthGate><RealBucket /></ApertureAuthGate>} />
           <Route path="app/chats" element={<ApertureAuthGate><RealChats /></ApertureAuthGate>} />
           <Route path="app/chats/:id" element={<ApertureAuthGate><RealChatThread /></ApertureAuthGate>} />

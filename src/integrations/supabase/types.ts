@@ -809,6 +809,51 @@ export type Database = {
         }
         Relationships: []
       }
+      aperture_files: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          extracted_fact_count: number
+          extracted_text: string | null
+          file_name: string
+          id: string
+          mime_type: string | null
+          size_bytes: number | null
+          status: string
+          storage_path: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          extracted_fact_count?: number
+          extracted_text?: string | null
+          file_name: string
+          id?: string
+          mime_type?: string | null
+          size_bytes?: number | null
+          status?: string
+          storage_path: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          extracted_fact_count?: number
+          extracted_text?: string | null
+          file_name?: string
+          id?: string
+          mime_type?: string | null
+          size_bytes?: number | null
+          status?: string
+          storage_path?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       aperture_generated_items: {
         Row: {
           created_at: string
@@ -946,6 +991,7 @@ export type Database = {
           metadata: Json
           question_key: string | null
           source: string
+          source_file_id: string | null
           source_ref: string | null
           updated_at: string
           user_id: string
@@ -960,6 +1006,7 @@ export type Database = {
           metadata?: Json
           question_key?: string | null
           source?: string
+          source_file_id?: string | null
           source_ref?: string | null
           updated_at?: string
           user_id: string
@@ -974,11 +1021,20 @@ export type Database = {
           metadata?: Json
           question_key?: string | null
           source?: string
+          source_file_id?: string | null
           source_ref?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "aperture_memory_items_source_file_id_fkey"
+            columns: ["source_file_id"]
+            isOneToOne: false
+            referencedRelation: "aperture_files"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       aperture_messages: {
         Row: {
@@ -1144,6 +1200,48 @@ export type Database = {
           updated_at?: string
           user_id?: string
           website?: string | null
+        }
+        Relationships: []
+      }
+      aperture_user_tools: {
+        Row: {
+          category: string | null
+          connected_at: string | null
+          connection_metadata: Json
+          created_at: string
+          custom: boolean
+          id: string
+          is_active: boolean
+          tool_name: string
+          tool_slug: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          connected_at?: string | null
+          connection_metadata?: Json
+          created_at?: string
+          custom?: boolean
+          id?: string
+          is_active?: boolean
+          tool_name: string
+          tool_slug: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          connected_at?: string | null
+          connection_metadata?: Json
+          created_at?: string
+          custom?: boolean
+          id?: string
+          is_active?: boolean
+          tool_name?: string
+          tool_slug?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
