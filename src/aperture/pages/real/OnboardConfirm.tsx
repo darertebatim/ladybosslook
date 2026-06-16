@@ -27,6 +27,7 @@ export default function OnboardConfirm() {
   const [phase, setPhase] = useState<"review" | "closing">("review");
   const [closingAnswer, setClosingAnswer] = useState("");
   const [tailoring, setTailoring] = useState(false);
+  const [prefilling, setPrefilling] = useState(false);
 
   // Poll a couple of times while the edge function is still writing facts.
   useEffect(() => {
@@ -76,10 +77,36 @@ export default function OnboardConfirm() {
       });
     }
     setSaving(false);
+
+    // Pass 1 — pre-fill empty bucket questions with industry-grounded
+    // guesses (source='ai_inferred_pre_onboarding'). Bounded to ~15s so
+    // a slow model never strands the user on the confirm screen.
+    setPrefilling(true);
+    try {
+      await Promise.race([
+        supabase.functions.invoke("aperture-pass1-prefill", {}),
+        new Promise(resolve => setTimeout(resolve, 15_000)),
+      ]);
+    } catch (e) {
+      console.error("pass1 invoke failed", e);
+    }
+    setPrefilling(false);
     setPhase("closing");
   }
 
-  function skipAll() {
+  async function skipAll() {
+    // Even if the owner skips reviewing, still run Pass 1 against
+    // whatever onboarding answers we have so memory isn't empty.
+    setPrefilling(true);
+    try {
+      await Promise.race([
+        supabase.functions.invoke("aperture-pass1-prefill", {}),
+        new Promise(resolve => setTimeout(resolve, 15_000)),
+      ]);
+    } catch (e) {
+      console.error("pass1 invoke failed", e);
+    }
+    setPrefilling(false);
     setPhase("closing");
   }
 
@@ -123,7 +150,21 @@ export default function OnboardConfirm() {
     <>
       <Helmet><title>Review what I found · Aperture</title></Helmet>
       <RealAppShell>
-        {tailoring ? (
+        {prefilling ? (
+          <>
+            <PageHeader
+              index="ONE MOMENT"
+              title="Sketching a first draft of your business…"
+              sub="I'm using your industry and what you just confirmed to pre-fill some guesses. You'll see them clearly marked as guesses — confirm or correct them anytime."
+            />
+            <ApertureCard padding={24}>
+              <ApertureMonoLabel>Working…</ApertureMonoLabel>
+              <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
+                Drafting industry-grounded defaults across your memory buckets.
+              </p>
+            </ApertureCard>
+          </>
+        ) : tailoring ? (
           <>
             <PageHeader
               index="ONE MOMENT"

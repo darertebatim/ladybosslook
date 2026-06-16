@@ -216,8 +216,19 @@ export default function RealHome() {
               <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
                 {items.slice(0, 4).map(i => (
                   <li key={i.id} style={{ fontSize: 13.5, color: "var(--ap-ink-1)", lineHeight: 1.5, display: "flex", gap: 8 }}>
-                    <span style={{ color: "var(--ap-ink-3)", fontFamily: "var(--ap-font-mono)", fontSize: 10, marginTop: 4, textTransform: "uppercase", letterSpacing: "0.1em", minWidth: 70 }}>
-                      {i.source === "ai_extracted" ? "Noticed" : i.source === "bucket_answer" ? "Bucket" : "Note"}
+                    <span style={{
+                      color: i.source === "ai_inferred_pre_onboarding" ? "var(--ap-ink-3)" : "var(--ap-ink-3)",
+                      fontFamily: "var(--ap-font-mono)", fontSize: 10, marginTop: 4,
+                      textTransform: "uppercase", letterSpacing: "0.1em", minWidth: 70,
+                      opacity: i.source === "ai_inferred_pre_onboarding" ? 0.7 : 1,
+                    }}>
+                      {i.source === "ai_extracted"
+                        ? "Noticed"
+                        : i.source === "bucket_answer"
+                          ? "Bucket"
+                          : i.source === "ai_inferred_pre_onboarding"
+                            ? "Guess"
+                            : "Note"}
                     </span>
                     <span style={{ flex: 1 }}>{i.content}</span>
                   </li>

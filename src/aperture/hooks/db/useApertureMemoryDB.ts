@@ -3,7 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { logApertureEvent } from "@/aperture/lib/apertureEvents";
 
-export type MemorySource = "bucket_answer" | "ai_extracted" | "freeform";
+export type MemorySource =
+  | "bucket_answer"
+  | "ai_extracted"
+  | "ai_inferred_pre_onboarding"
+  | "freeform"
+  | "user_confirmed";
 
 export interface MemoryItem {
   id: string;
@@ -125,6 +130,13 @@ export function useApertureMemoryDB() {
     /** All items in a bucket (any source). */
     itemsInBucket(bucketSlug: string | null): MemoryItem[] {
       return items.filter(i => i.bucket_slug === bucketSlug);
+    },
+    /** Source tag for a bucket+question answer (or null). */
+    sourceFor(bucketSlug: string, questionKey: string): MemorySource | null {
+      const m = items.find(
+        i => i.bucket_slug === bucketSlug && i.question_key === questionKey,
+      );
+      return (m?.source as MemorySource | undefined) ?? null;
     },
   };
 }
