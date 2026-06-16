@@ -90,7 +90,7 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) return json({ error: "AI gateway not configured" }, 500);
 
-    const { chatId, messages, stream = true, escape = null } = await req.json();
+    const { chatId, messages, stream = true, escape = null, attachments = [] } = await req.json();
     if (!chatId || !Array.isArray(messages) || messages.length === 0) {
       return json({ error: "chatId and messages required" }, 400);
     }
@@ -106,6 +106,7 @@ serve(async (req) => {
     if (!escape && lastUser?.role === "user") {
       await supabase.from("aperture_messages").insert({
         chat_id: chatId, user_id: user.id, role: "user", content: lastUser.content,
+        attachments: Array.isArray(attachments) ? attachments : [],
       });
       await logApertureEvent(supabase, user.id, "chat_message_user", {
         content: String(lastUser.content ?? ""),
@@ -172,9 +173,37 @@ serve(async (req) => {
     // When an escape was sent, the last "messages" entry may still be the
     // previous assistant turn. The model behaves better if we add a tiny
     // user-side cue at the end so it knows whose turn it is.
-    const outboundMessages = escape
+    let outboundMessages: any[] = escape
       ? [...messages, { role: "user", content: escape.kind === "skip" ? "[skip]" : "[i don't know]" }]
       : messages;
+
+    // If the latest user turn included image attachments, rewrite it as a
+    // multimodal content array so the model can see the screenshots/photos.
+    const imageAtts = Array.isArray(attachments)
+      ? attachments.filter((a: any) => typeof a?.mime === "string" && a.mime.startsWith("image/"))
+      : [];
+    if (!escape && imageAtts.length > 0 && outboundMessages.length > 0) {
+      const lastIdx = outboundMessages.length - 1;
+      const last = outboundMessages[lastIdx];
+      if (last?.role === "user") {
+        const parts: any[] = [];
+        const text = typeof last.content === "string" ? last.content : "";
+        if (text.trim()) parts.push({ type: "text", text });
+        else parts.push({ type: "text", text: "(see attached image)" });
+        for (const a of imageAtts) {
+          const { data: signed } = await supabase.storage
+            .from("aperture-files")
+            .createSignedUrl(a.storage_path, 60 * 10); // 10 min
+          if (signed?.signedUrl) {
+            parts.push({ type: "image_url", image_url: { url: signed.signedUrl } });
+          }
+        }
+        outboundMessages = [
+          ...outboundMessages.slice(0, lastIdx),
+          { role: "user", content: parts },
+        ];
+      }
+    }
 
     const upstream = await fetch(AI_GATEWAY, {
       method: "POST",
