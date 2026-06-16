@@ -15,6 +15,8 @@ export async function streamApertureChat(opts: {
   signal?: AbortSignal;
   /** Optional escape-hatch action the user just took on the previous AI question. */
   escape?: { kind: "skip" | "unknown"; question: string; bucket?: string | null };
+  /** Attachments uploaded for the latest user turn (already in storage). */
+  attachments?: Array<{ file_id: string; storage_path: string; mime: string; name: string; size: number }>;
 }): Promise<string> {
   const { data: { session } } = await supabase.auth.getSession();
   const token = session?.access_token;
@@ -34,6 +36,7 @@ export async function streamApertureChat(opts: {
       messages: opts.messages,
       stream: true,
       escape: opts.escape ?? null,
+      attachments: opts.attachments ?? [],
     }),
   });
 

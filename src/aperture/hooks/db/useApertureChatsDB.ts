@@ -16,6 +16,13 @@ export interface MessageRow {
   role: "user" | "assistant" | "system";
   content: string;
   created_at: string;
+  attachments?: Array<{
+    file_id: string;
+    storage_path: string;
+    mime: string;
+    name: string;
+    size: number;
+  }>;
 }
 
 /** List + create + delete chats for the current user. */
@@ -98,7 +105,7 @@ export function useApertureChatMessages(chatId: string | undefined) {
     setLoading(true);
     const { data } = await supabase
       .from("aperture_messages")
-      .select("id,chat_id,role,content,created_at")
+      .select("id,chat_id,role,content,created_at,attachments")
       .eq("chat_id", chatId)
       .order("created_at", { ascending: true });
     setMessages((data ?? []) as MessageRow[]);

@@ -97,7 +97,7 @@ serve(async (req) => {
     const { data: { user } } = await userClient.auth.getUser();
     if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
-    const { file_id } = await req.json();
+    const { file_id, chat_id = null } = await req.json();
     if (!file_id) return new Response(JSON.stringify({ error: "file_id required" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
     // Ensure bucket exists (idempotent).
@@ -132,6 +132,7 @@ serve(async (req) => {
         source: "file_extracted",
         bucket_slug: f.bucket_slug,
         source_file_id: file_id,
+        chat_id: chat_id ?? null,
       }));
       await admin.from("aperture_memory_items").insert(rows as any);
     }
