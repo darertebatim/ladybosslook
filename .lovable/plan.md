@@ -1,103 +1,67 @@
-# Industry Buckets — Implementation Plan
+## Plan: Files & Tools (Integrations) for Aperture Memory
 
-Address the 5 gaps Claude flagged so the uploaded `aperture_industry_buckets_all.md` becomes a working part of the system, not reference text.
+Add two new pillars to the Memory page so users can feed Aperture context beyond the bucket questionnaire: **Files** (upload docs Aperture reads to extract facts) and **Tools** (which tools the user uses today + future integrations to their live infrastructure).
 
-## 1. Industry → Group mapping (machine-readable)
+### 1. Memory header buttons
 
-`aperture_industries` already has `group_label` for all 32 industries. Add a stable slug column so code can join cleanly:
+In `src/aperture/pages/real/Memory.tsx`, add two compact icon+label buttons to the `PageHeader` `action` slot, sitting alongside the existing `0% MAPPED` chip:
 
-- Migration: `ALTER TABLE aperture_industries ADD COLUMN group_slug text;`
-- Backfill via a data migration mapping the existing `group_label` values to the 11 group slugs below (group 12 "Other" → `NULL` group_slug, no bucket).
+- **Files** → `/aperture/app/memory/files` (paperclip icon)
+- **Tools** → `/aperture/app/memory/tools` (plug/grid icon)
+- Keep the `% MAPPED` chip as well; lay out as a small row.
 
-Group slugs:
-`food-hospitality`, `beauty-wellness`, `retail-ecommerce`, `professional-services`, `coaching-consulting-therapy`, `education-tutoring`, `real-estate`, `general-contracting`, `outdoor-trade-services`, `medical-dental`, `fitness-training`.
+Mobile: the action row wraps under the title (PageHeader already uses `flexWrap`).
 
-Expose a helper `getIndustryGroupSlug(industrySlug)` on the client (reads `aperture_industries`). On the server (edge functions), join `aperture_user_profile.industry_slug → aperture_industries.group_slug`.
+### 2. New page: Files (`/aperture/app/memory/files`)
 
-## 2. Storage / seeding
+File: `src/aperture/pages/real/Files.tsx`. Mirrors Claude Projects' file pane.
 
-Extend the existing tables (no parallel structure):
+Sections:
+- **Header** — "Files Aperture has read" + subcopy ("Upload contracts, price lists, old ads, past tax summaries — I'll read them and turn the useful bits into memory facts.")
+- **Upload zone** — drag/drop + "Choose files" button. Accepts PDF, DOCX, TXT, MD, PNG, JPG up to 20MB each.
+- **File list** — each row: filename, size, uploaded date, status chip (`Reading…` / `Read · N facts extracted` / `Failed`), and a "View extracted facts" link that filters Memory items by `source_file_id`. Delete (trash) action removes file + soft-deletes derived memory items.
 
-- `aperture_buckets`: add `kind text NOT NULL DEFAULT 'default'` (values: `default` | `industry`), and `industry_group_slug text NULL`. Default buckets stay `kind='default'`. The 11 industry buckets are inserted with `kind='industry'` and `industry_group_slug` set.
-- `aperture_bucket_questions` already has `layer` — reuse it (`Layer 1`, `Layer 2`, …). No schema change needed.
+Data layer (new):
+- Storage bucket `aperture-files` (private). Path: `userId/fileId.ext`.
+- Table `public.aperture_files` (id, user_id, file_name, mime_type, size_bytes, storage_path, status, extracted_text, extracted_fact_count, created_at, updated_at). RLS: owner-only; standard GRANTs (`authenticated` + `service_role`).
+- Edge function `aperture-file-extract`: triggered after upload. Reuses logic from existing `extract-document-text` (pandoc/docx/AI Gemini for PDFs/images) to populate `extracted_text`, then calls a fact-extraction pass against Aperture's bucket schema and inserts rows into `aperture_memory_items` with `source = 'file_extracted'` and a new `source_file_id` column.
+- Migration also adds `source_file_id uuid references aperture_files(id) on delete set null` to `aperture_memory_items` and extends the `source` check to include `file_extracted`.
 
-Seed (one migration containing both buckets + questions):
+### 3. New page: Tools (`/aperture/app/memory/tools`)
 
-| Group slug | Bucket slug | Title | Layers → questions |
-|---|---|---|---|
-| food-hospitality | `ind-food-hospitality` | Food & Hospitality | 7 layers, 36 Qs |
-| beauty-wellness | `ind-beauty-wellness` | Beauty & Wellness | ~6 layers |
-| retail-ecommerce | `ind-retail-ecommerce` | Retail & E-Commerce | ~6 layers |
-| professional-services | `ind-professional-services` | Professional Services & Agencies | ~6 layers |
-| coaching-consulting-therapy | `ind-coaching-consulting-therapy` | Coaching, Consulting & Therapy | ~6 layers |
-| education-tutoring | `ind-education-tutoring` | Education & Tutoring | ~5 layers |
-| real-estate | `ind-real-estate` | Real Estate | ~6 layers |
-| general-contracting | `ind-general-contracting` | General Contracting & Renovation | ~6 layers |
-| outdoor-trade-services | `ind-outdoor-trade-services` | Outdoor & Recurring Trade Services | ~5 layers |
-| medical-dental | `ind-medical-dental` | Medical & Dental Practices | ~6 layers |
-| fitness-training | `ind-fitness-training` | Fitness, Training & Movement | ~5 layers |
+File: `src/aperture/pages/real/Tools.tsx`. Two parts:
 
-Each question is one row in `aperture_bucket_questions` with:
-- `bucket_slug` = the industry bucket slug above
-- `question_key` = stable slug like `food-cost-percentage` (derived from question text)
-- `prompt` = exact text from the markdown
-- `layer` = `"Layer N — <title>"` exactly as in the doc
-- `input_kind = 'text'`, `sort_order` = doc order, `is_active = true`
+**a) "Tools you use today"** — curated list of common SMB tools grouped by category (POS, Accounting, Marketing/Social, Booking, E-commerce, Ops). User toggles each on/off; selected tools are saved as memory facts ("Uses Square for POS") into the appropriate bucket (Tools & Systems mostly, some into Marketing/Money/Operations). Free-text "Add a tool" input for anything not in the list.
 
-Calculated metrics from each group are stored as a `metadata` jsonb on the bucket row (new column `metadata jsonb DEFAULT '{}'`), so the chat edge function can inject them into the AI brief.
+**b) "Connect Aperture to your tools" (Integrations)** — preview-only cards for future live integrations: Instagram, Google Business, QuickBooks, Shopify, Square, Stripe, Calendly, Gmail. Each card shows logo, name, one-line "what we'd read", and a `Coming soon` / `Connect` button (disabled, with tooltip explaining roadmap). This sets the surface up; real OAuth comes later.
 
-## 3. Target counts (for progress %)
+Data layer:
+- Table `public.aperture_user_tools` (id, user_id, tool_slug, tool_name, category, custom bool, is_active, connected_at, connection_metadata jsonb, created_at, updated_at). RLS owner-only + GRANTs.
+- Curated tool catalog lives in `src/aperture/data/tools.ts` (static, ~40 entries).
+- Toggling a tool on writes both an `aperture_user_tools` row AND a memory item (so the AI sees it in chat extraction immediately).
+- Integration cards are static for now — no OAuth yet.
 
-Match the default-bucket pattern: `target_count` = total questions in that bucket. Set per-group at seed time (Food & Hospitality = 36, others between ~24 and ~32 depending on actual question count parsed from the markdown). Progress % calculation in `Memory.tsx` already reads `target_count` — no UI math change.
+### 4. Router
 
-## 4. Memory page placement
+Add two routes in `src/aperture/router.tsx`:
+- `app/memory/files` → `RealFiles`
+- `app/memory/tools` → `RealTools`
 
-The industry bucket renders as a **single dynamic 14th card** at the bottom of the memory grid, and only when the user has an `industry_slug` whose group resolves to a non-null `industry_group_slug` (i.e. not "Other"). One card, not 11 — `useApertureMemoryDB` filters `aperture_buckets` where `kind='default' OR (kind='industry' AND industry_group_slug = user's group)`. Card visually marked as industry (small group label under the title, same shape/treatment as default cards so the existing Bucket detail page works unchanged).
+### 5. AI chat awareness
 
-## 5. Trigger logic
+Update `supabase/functions/aperture-chat/index.ts` system prompt builder to:
+- Mention attached files by name + extracted_text snippets (top N most relevant).
+- Mention connected tools in the user's stack.
 
-Activate **immediately after Q11 (industry) is answered in onboarding**:
+### Technical notes
+- File uploads use the existing Supabase storage client; no new SDK.
+- Reuse existing `extract-document-text` extraction primitives (copy or share a helper module under `supabase/functions/_shared/`).
+- Fact extraction prompt mirrors `aperture-chat`'s extractor but runs over file text in one pass, scoped to the user's allowed bucket list (default + industry).
+- Tool toggles use optimistic UI via React Query / local state — same pattern as `useApertureBucketsDB`.
 
-- `OnboardQuick.tsx` already calls `upsertProfile({ industry_slug })` on the industry question. After that call, also invoke the new edge function `aperture-industry-bucket-init` which:
-  - Resolves `group_slug` from the chosen industry.
-  - Does nothing if group is null (Other) or if the user already has memory items in that industry bucket.
-  - Otherwise inserts a single `aperture_events` row (`industry_bucket_activated`) so analytics can confirm timing. No memory items are pre-filled here — Pass 1 already handles industry-grounded guesses for the default buckets; the industry bucket starts empty and fills as the user/chat answers its questions.
-- The chat edge function (`aperture-chat`) is updated so `getOrBuildMemoryCard` also pulls the user's active industry bucket's questions + answers, and `extractFactsFromMessage`'s allowed-bucket list includes the user's industry bucket slug. This lets chat-extracted facts route into the industry bucket the same way they route into defaults today.
+### Out of scope (explicit)
+- Real OAuth to Instagram/QuickBooks/etc. — surface only.
+- Re-extracting files when bucket schema changes.
+- File previews beyond filename (no PDF viewer).
 
-## Technical details
-
-### Schema migration
-```sql
-ALTER TABLE aperture_industries ADD COLUMN group_slug text;
-UPDATE aperture_industries SET group_slug = CASE group_label
-  WHEN 'Food & Hospitality' THEN 'food-hospitality'
-  WHEN 'Beauty & Wellness' THEN 'beauty-wellness'
-  ... -- all 11
-  ELSE NULL END;
-
-ALTER TABLE aperture_buckets
-  ADD COLUMN kind text NOT NULL DEFAULT 'default',
-  ADD COLUMN industry_group_slug text NULL,
-  ADD COLUMN metadata jsonb NOT NULL DEFAULT '{}'::jsonb;
-CREATE INDEX ON aperture_buckets (kind, industry_group_slug);
-```
-
-### Seed migration
-One migration file that:
-1. Inserts 11 rows into `aperture_buckets` (kind='industry', industry_group_slug set, target_count = question count, metadata = `{ "calculated_metrics": [...] }`, sort_order = 100+).
-2. Inserts ~290 rows into `aperture_bucket_questions` (parsed deterministically from the markdown, layer field populated). Migration generated by a one-off Node script that reads the markdown and emits SQL — committed alongside the migration for reproducibility.
-
-### Code changes
-- `useApertureMemoryDB.ts`: include industry-group filter in bucket query; expose `industryBucket` separately if the UI wants a different visual treatment.
-- `Memory.tsx`: render the industry bucket card after the 13 defaults; show group label as a sub-line; same progress bar logic.
-- `Bucket.tsx`: already generic — works as-is. Add a "Layer" group-by in the question list when `layer` is present (industry buckets only).
-- `OnboardQuick.tsx`: after industry upsert, invoke `aperture-industry-bucket-init`.
-- `aperture-chat/index.ts`: load active industry bucket into the memory card source set; extend the allowed-bucket list in fact extraction.
-- New edge function `aperture-industry-bucket-init`: idempotent activation marker + future hook point.
-
-## Out of scope (per the doc's "Deferred")
-- Industry-inferred priors for default buckets (Pass 1 already covers this generically)
-- Pattern detection across stored facts
-- Relevance/rewording map for default-bucket questions
-
-These remain separate design passes.
+Say **"go"** and I'll ship it.
