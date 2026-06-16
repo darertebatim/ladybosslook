@@ -1,5 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import { ApertureCard, ApertureChip, ApertureMonoLabel } from "@/aperture/components/primitives";
@@ -44,7 +45,12 @@ export default function RealLibrary() {
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
             {actions.map(a => (
-              <ApertureCard key={a.slug} padding={18}>
+              <Link
+                key={a.slug}
+                to={`/aperture/app/library/${a.slug}`}
+                style={{ textDecoration: "none", color: "inherit", display: "block" }}
+              >
+                <ApertureCard padding={18} style={{ cursor: "pointer", height: "100%" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                   <ApertureChip tone={a.kind === "playbook" ? "signal" : "neutral"}>
                     {a.kind === "playbook" ? "Playbook" : "Prompt"}
@@ -64,7 +70,8 @@ export default function RealLibrary() {
                     fontSize: 12, color: "var(--ap-ink-3)", fontStyle: "italic", lineHeight: 1.5,
                   }}>Why this: {a.why}</div>
                 )}
-              </ApertureCard>
+                </ApertureCard>
+              </Link>
             ))}
           </div>
         )}
