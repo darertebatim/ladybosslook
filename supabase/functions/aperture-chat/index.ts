@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders, AI_GATEWAY, DEFAULT_MODEL } from "../_shared/aperture-cors.ts";
+import { corsHeaders, AI_GATEWAY, DEFAULT_MODEL, CHAT_MODEL, LITE_MODEL } from "../_shared/aperture-cors.ts";
 
 /**
  * aperture-chat
@@ -157,7 +157,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: DEFAULT_MODEL,
+        model: CHAT_MODEL,
         stream,
         messages: [{ role: "system", content: systemPrompt }, ...outboundMessages],
       }),
@@ -334,7 +334,7 @@ async function classifyBucket(
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: DEFAULT_MODEL,
+        model: LITE_MODEL,
         messages: [
           { role: "system", content:
             `Classify the following business question into ONE bucket slug. Respond with STRICT JSON only: {"bucket_slug": "<slug>"} or {"bucket_slug": null} if unsure. Allowed slugs:\n${catalog}` },
