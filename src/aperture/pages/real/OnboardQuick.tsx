@@ -10,6 +10,7 @@ import { useApertureOnboardingDB, useApertureIndustriesDB } from "@/aperture/hoo
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { supabase } from "@/integrations/supabase/client";
+import { logApertureEvent } from "@/aperture/lib/apertureEvents";
 
 /**
  * Quick onboarding — phased, DB-driven. After the last question
@@ -74,6 +75,9 @@ export default function OnboardQuick() {
     setBusy(true);
     const value = answers[q.question_key] ?? "";
     await persistAnswer(q, value);
+    logApertureEvent("onboarding_answer", {
+      phase: "quick", step: q.step, question_key: q.question_key, answer: value,
+    });
     setBusy(false);
     if (i + 1 >= total) {
       await upsertProfile({ quick_onboarded_at: new Date().toISOString() });
@@ -93,6 +97,12 @@ export default function OnboardQuick() {
   }
 
   async function skip() {
+    if (q) {
+      logApertureEvent("onboarding_answer", {
+        phase: "quick", step: q.step, question_key: q.question_key,
+        answer: null, skipped: true,
+      });
+    }
     if (i + 1 >= total) {
       await upsertProfile({ quick_onboarded_at: new Date().toISOString() });
       navigate("/aperture/app/onboard/confirm", { replace: true });
