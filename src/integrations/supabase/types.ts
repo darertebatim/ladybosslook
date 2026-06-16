@@ -811,6 +811,7 @@ export type Database = {
       }
       aperture_files: {
         Row: {
+          chat_id: string | null
           created_at: string
           error_message: string | null
           extracted_fact_count: number
@@ -819,12 +820,14 @@ export type Database = {
           id: string
           mime_type: string | null
           size_bytes: number | null
+          source: string
           status: string
           storage_path: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          chat_id?: string | null
           created_at?: string
           error_message?: string | null
           extracted_fact_count?: number
@@ -833,12 +836,14 @@ export type Database = {
           id?: string
           mime_type?: string | null
           size_bytes?: number | null
+          source?: string
           status?: string
           storage_path: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          chat_id?: string | null
           created_at?: string
           error_message?: string | null
           extracted_fact_count?: number
@@ -847,6 +852,7 @@ export type Database = {
           id?: string
           mime_type?: string | null
           size_bytes?: number | null
+          source?: string
           status?: string
           storage_path?: string
           updated_at?: string
@@ -983,6 +989,7 @@ export type Database = {
       aperture_memory_items: {
         Row: {
           bucket_slug: string | null
+          chat_id: string | null
           confidence: number | null
           content: string
           created_at: string
@@ -998,6 +1005,7 @@ export type Database = {
         }
         Insert: {
           bucket_slug?: string | null
+          chat_id?: string | null
           confidence?: number | null
           content: string
           created_at?: string
@@ -1013,6 +1021,7 @@ export type Database = {
         }
         Update: {
           bucket_slug?: string | null
+          chat_id?: string | null
           confidence?: number | null
           content?: string
           created_at?: string
@@ -1038,6 +1047,7 @@ export type Database = {
       }
       aperture_messages: {
         Row: {
+          attachments: Json
           chat_id: string
           content: string
           created_at: string
@@ -1049,6 +1059,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          attachments?: Json
           chat_id: string
           content: string
           created_at?: string
@@ -1060,6 +1071,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          attachments?: Json
           chat_id?: string
           content?: string
           created_at?: string
