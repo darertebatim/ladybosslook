@@ -47,6 +47,7 @@ export interface ApertureIndustryRow {
   id: string;
   slug: string;
   group_label: string | null;
+  group_slug: string | null;
   label: string;
   sort_order: number;
   is_active: boolean;
