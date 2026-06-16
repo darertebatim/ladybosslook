@@ -358,11 +358,10 @@ async function summarize(apiKey: string, raw: string): Promise<string> {
  */
 async function classifyBucket(
   supabase: any, apiKey: string, questionText: string,
+  userId?: string,
 ): Promise<string | null> {
   try {
-    const { data: buckets } = await supabase
-      .from("aperture_buckets").select("slug,title").eq("is_active", true);
-    const list = (buckets ?? []) as Array<{ slug: string; title: string }>;
+    const list = await getAllowedBuckets(supabase, userId);
     if (list.length === 0) return null;
     const allowed = list.map(b => b.slug);
     const catalog = list.map(b => `- ${b.slug} (${b.title})`).join("\n");
@@ -408,9 +407,8 @@ async function extractFactsFromMessage(args: {
   if (trimmed.length < 12) return; // not worth extracting from a tiny ack
 
   // Allowed bucket slugs for routing the fact.
-  const { data: buckets } = await supabase
-    .from("aperture_buckets").select("slug").eq("is_active", true);
-  const allowed = (buckets ?? []).map((b: any) => b.slug);
+  const allowedList = await getAllowedBuckets(supabase, userId);
+  const allowed = allowedList.map(b => b.slug);
   if (allowed.length === 0) return;
 
   // Existing facts so the model can avoid restating known things.
