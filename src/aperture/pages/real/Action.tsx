@@ -9,6 +9,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
+import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
+import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 
 interface PlaybookStep {
   prompt: string;
@@ -33,6 +35,8 @@ export default function RealAction() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { buckets } = useApertureBucketsDB();
+  const { items: memoryItems } = useApertureMemoryDB();
 
   const [action, setAction] = useState<ActionRow | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,6 +63,18 @@ export default function RealAction() {
   }, [slug]);
 
   const steps = useMemo(() => action?.steps ?? [], [action]);
+
+  // Map each needed bucket → { slug, title, filled }
+  const needsStatus = useMemo(() => {
+    if (!action?.needs?.length) return [];
+    return action.needs.map(slug => {
+      const b = buckets.find(x => x.slug === slug);
+      const filled = memoryItems.some(i => i.bucket_slug === slug);
+      return { slug, title: b?.title ?? slug, glyph: b?.glyph ?? "◐", filled };
+    });
+  }, [action, buckets, memoryItems]);
+
+  const emptyNeeds = needsStatus.filter(n => !n.filled);
 
   if (notFound) return <Navigate to="/aperture/app/library" replace />;
 
@@ -178,6 +194,46 @@ export default function RealAction() {
               <ApertureCard padding={16} style={{ marginBottom: 18 }}>
                 <ApertureMonoLabel color="var(--ap-signal)">Why this matters</ApertureMonoLabel>
                 <p style={{ margin: "6px 0 0", fontSize: 14, color: "var(--ap-ink-1)", lineHeight: 1.55 }}>{action.why}</p>
+              </ApertureCard>
+            )}
+
+            {needsStatus.length > 0 && (
+              <div style={{ marginBottom: 18 }}>
+                <ApertureMonoLabel>Pulls from memory</ApertureMonoLabel>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
+                  {needsStatus.map(n => (
+                    <Link
+                      key={n.slug}
+                      to={`/aperture/app/memory/${n.slug}`}
+                      style={{ textDecoration: "none" }}
+                    >
+                      <ApertureChip tone={n.filled ? "signal" : "neutral"}>
+                        {n.glyph} {n.title} · {n.filled ? "filled" : "empty"}
+                      </ApertureChip>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {emptyNeeds.length > 0 && (
+              <ApertureCard padding={16} style={{ marginBottom: 18 }}>
+                <ApertureMonoLabel color="var(--ap-signal)">Heads up</ApertureMonoLabel>
+                <p style={{ margin: "6px 0 0", fontSize: 14, color: "var(--ap-ink-1)", lineHeight: 1.55 }}>
+                  This will work better if you fill {emptyNeeds.map(n => n.title).join(" + ")} first — but you can run it anyway.
+                </p>
+                <div style={{ marginTop: 12, display: "flex", gap: 14, flexWrap: "wrap" }}>
+                  {emptyNeeds.map(n => (
+                    <Link
+                      key={n.slug}
+                      to={`/aperture/app/memory/${n.slug}`}
+                      style={{
+                        fontSize: 13, fontWeight: 500,
+                        color: "var(--ap-signal)", textDecoration: "none",
+                      }}
+                    >Fill {n.title} →</Link>
+                  ))}
+                </div>
               </ApertureCard>
             )}
 
