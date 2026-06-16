@@ -468,6 +468,11 @@ ${trimmed.slice(0, 4000)}`;
     console.error("ai_extracted insert error", insertErr);
     return;
   }
+  for (const f of clean) {
+    await logApertureEvent(supabase, userId, "memory_item_written", {
+      bucket_slug: f.bucket_slug, content: f.content, source: "ai_extracted",
+    });
+  }
   // Mark the compressed brief stale so the next chat turn regenerates it.
   await supabase.from("aperture_memory_card")
     .update({ stale: true })
