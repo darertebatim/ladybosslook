@@ -18,10 +18,12 @@ import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 export default function OnboardConfirm() {
   const navigate = useNavigate();
   const { buckets } = useApertureBucketsDB();
-  const { items, loading, refresh, deleteItem, updateItem } = useApertureMemoryDB();
+  const { items, loading, refresh, deleteItem, updateItem, addFreeformNote } = useApertureMemoryDB();
   const [saving, setSaving] = useState(false);
   const [edits, setEdits] = useState<Record<string, string>>({});
   const [removed, setRemoved] = useState<Record<string, boolean>>({});
+  const [phase, setPhase] = useState<"review" | "closing">("review");
+  const [closingAnswer, setClosingAnswer] = useState("");
 
   // Poll a couple of times while the edge function is still writing facts.
   useEffect(() => {
@@ -71,10 +73,19 @@ export default function OnboardConfirm() {
       });
     }
     setSaving(false);
-    navigate("/aperture/app", { replace: true });
+    setPhase("closing");
   }
 
   function skipAll() {
+    setPhase("closing");
+  }
+
+  async function finishClosing() {
+    if (saving) return;
+    setSaving(true);
+    const v = closingAnswer.trim();
+    if (v) await addFreeformNote(v);
+    setSaving(false);
     navigate("/aperture/app", { replace: true });
   }
 
@@ -91,6 +102,40 @@ export default function OnboardConfirm() {
     <>
       <Helmet><title>Review what I found · Aperture</title></Helmet>
       <RealAppShell>
+        {phase === "closing" ? (
+          <>
+            <PageHeader
+              index="ONE LAST THING"
+              title="How can I help you most right now?"
+              sub="If I could take one thing off your plate starting today — what would it be?"
+            />
+            <ApertureCard padding={20}>
+              <textarea
+                rows={5}
+                value={closingAnswer}
+                onChange={e => setClosingAnswer(e.target.value)}
+                placeholder="In your own words…"
+                style={{
+                  width: "100%", resize: "vertical",
+                  background: "var(--ap-surface-2)",
+                  border: "1px solid var(--ap-hairline)",
+                  borderRadius: "var(--ap-radius-sm)",
+                  padding: "12px 14px",
+                  fontSize: 15, color: "var(--ap-ink-1)",
+                  fontFamily: "var(--ap-font-sans)", lineHeight: 1.5,
+                  outline: "none",
+                }}
+              />
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
+                <ApertureButton variant="ghost" onClick={() => navigate("/aperture/app", { replace: true })}>Skip</ApertureButton>
+                <ApertureButton variant="accent" onClick={finishClosing} disabled={saving}>
+                  {saving ? "Saving…" : "Enter Aperture →"}
+                </ApertureButton>
+              </div>
+            </ApertureCard>
+          </>
+        ) : (
+        <>
         <PageHeader
           index="REVIEW"
           title="Here's what I pulled from your links"
@@ -176,6 +221,8 @@ export default function OnboardConfirm() {
               </ApertureButton>
             </div>
           </>
+        )}
+        </>
         )}
       </RealAppShell>
     </>
