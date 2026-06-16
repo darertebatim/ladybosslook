@@ -12,6 +12,7 @@ import { useApertureChatsDB } from "@/aperture/hooks/db/useApertureChatsDB";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 import { useApertureDailyQuestion } from "@/aperture/hooks/db/useApertureDailyQuestion";
 import { useApertureHomeSuggestions } from "@/aperture/hooks/db/useApertureHomeSuggestions";
+import { useApertureStoredSuggestions } from "@/aperture/hooks/db/useApertureStoredSuggestions";
 import { toast } from "@/hooks/use-toast";
 
 export default function RealHome() {
@@ -21,7 +22,17 @@ export default function RealHome() {
   const { createChat } = useApertureChatsDB();
   const { profile, loading: pLoading } = useApertureUserProfile();
   const { question: dailyQ, refresh: refreshDailyQ, skip: skipDaily } = useApertureDailyQuestion();
-  const { suggestions, loading: sLoading, refresh: refreshSuggestions } = useApertureHomeSuggestions(items.length);
+  const { suggestions: storedSuggestions, loading: storedLoading, refresh: refreshStored, markActed } = useApertureStoredSuggestions();
+  const { suggestions: liveSuggestions, loading: liveLoading, refresh: refreshLive } = useApertureHomeSuggestions(items.length);
+  // Prefer stored (Pass 2 / future generators); fall back to live AI generation.
+  const suggestions = storedSuggestions.length > 0
+    ? storedSuggestions.map(s => ({ title: s.title, why: s.why, prompt: s.prompt, _storedId: s.id as string | null }))
+    : liveSuggestions.map(s => ({ title: s.title, why: s.why, prompt: s.prompt, _storedId: null as string | null }));
+  const sLoading = storedSuggestions.length > 0 ? false : liveLoading;
+  const refreshSuggestions = async () => {
+    await refreshStored();
+    if (storedSuggestions.length === 0) await refreshLive();
+  };
   const [draft, setDraft] = useState("");
   const [starting, setStarting] = useState(false);
   const [dailyAnswer, setDailyAnswer] = useState("");
@@ -48,16 +59,17 @@ export default function RealHome() {
     if (chat) navigate(`/aperture/app/chats/${chat.id}?seed=${encodeURIComponent(t)}`);
   }
 
-  async function startFromSuggestion(s: { title: string; prompt: string }) {
+  async function startFromSuggestion(s: { title: string; prompt: string; _storedId?: string | null }) {
     if (starting) return;
     setStarting(true);
     const chat = await createChat(s.title.slice(0, 48));
     setStarting(false);
     void import("@/aperture/lib/apertureEvents").then(m =>
       m.logApertureEvent("suggestion_tapped", {
-        title: s.title, prompt: s.prompt,
+        title: s.title, prompt: s.prompt, stored_id: s._storedId ?? null,
       }, chat?.id ?? null)
     );
+    if (s._storedId) void markActed(s._storedId);
     if (chat) navigate(`/aperture/app/chats/${chat.id}?seed=${encodeURIComponent(s.prompt)}`);
   }
 
