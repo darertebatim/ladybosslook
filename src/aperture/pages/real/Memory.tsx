@@ -10,6 +10,7 @@ import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 import { useApertureChatsDB } from "@/aperture/hooks/db/useApertureChatsDB";
+import { Paperclip, Plug } from "lucide-react";
 
 /**
  * Memory page — map of what Aperture knows about the user's business.
@@ -63,9 +64,21 @@ export default function RealMemory() {
           title="What I know about your business"
           sub={`${buckets.length} territories. The more I know, the sharper my answers get. Tap any to read or fill in.`}
           action={
-            <ApertureChip tone={avgProgress > 0 ? "signal" : "neutral"}>
-              {avgProgress}% mapped
-            </ApertureChip>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <Link to="/aperture/app/memory/files" style={{ textDecoration: "none" }}>
+                <ApertureButton variant="default" size="sm">
+                  <Paperclip size={13} /> Files
+                </ApertureButton>
+              </Link>
+              <Link to="/aperture/app/memory/tools" style={{ textDecoration: "none" }}>
+                <ApertureButton variant="default" size="sm">
+                  <Plug size={13} /> Tools
+                </ApertureButton>
+              </Link>
+              <ApertureChip tone={avgProgress > 0 ? "signal" : "neutral"}>
+                {avgProgress}% mapped
+              </ApertureChip>
+            </div>
           }
         />
 
