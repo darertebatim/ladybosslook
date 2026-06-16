@@ -800,6 +800,63 @@ export type Database = {
         }
         Relationships: []
       }
+      aperture_generated_items: {
+        Row: {
+          created_at: string
+          dedupe_key: string | null
+          expires_at: string | null
+          generator: string | null
+          generator_version: string | null
+          id: string
+          kind: string
+          payload: Json
+          scheduled_for: string | null
+          score: number | null
+          source_bucket_slugs: string[]
+          source_memory_ids: string[]
+          status: string
+          status_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dedupe_key?: string | null
+          expires_at?: string | null
+          generator?: string | null
+          generator_version?: string | null
+          id?: string
+          kind: string
+          payload?: Json
+          scheduled_for?: string | null
+          score?: number | null
+          source_bucket_slugs?: string[]
+          source_memory_ids?: string[]
+          status?: string
+          status_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dedupe_key?: string | null
+          expires_at?: string | null
+          generator?: string | null
+          generator_version?: string | null
+          id?: string
+          kind?: string
+          payload?: Json
+          scheduled_for?: string | null
+          score?: number | null
+          source_bucket_slugs?: string[]
+          source_memory_ids?: string[]
+          status?: string
+          status_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       aperture_industries: {
         Row: {
           created_at: string
@@ -1008,53 +1065,6 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
-      }
-      aperture_suggestions: {
-        Row: {
-          acted_on: boolean
-          action_slug: string | null
-          created_at: string
-          dismissed: boolean
-          expires_at: string | null
-          id: string
-          reason: string | null
-          score: number
-          title: string
-          user_id: string
-        }
-        Insert: {
-          acted_on?: boolean
-          action_slug?: string | null
-          created_at?: string
-          dismissed?: boolean
-          expires_at?: string | null
-          id?: string
-          reason?: string | null
-          score?: number
-          title: string
-          user_id: string
-        }
-        Update: {
-          acted_on?: boolean
-          action_slug?: string | null
-          created_at?: string
-          dismissed?: boolean
-          expires_at?: string | null
-          id?: string
-          reason?: string | null
-          score?: number
-          title?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "aperture_suggestions_action_slug_fkey"
-            columns: ["action_slug"]
-            isOneToOne: false
-            referencedRelation: "aperture_actions"
-            referencedColumns: ["slug"]
-          },
-        ]
       }
       aperture_tools: {
         Row: {
