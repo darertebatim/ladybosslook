@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
@@ -12,10 +12,16 @@ interface ActionRow {
   duration: string | null;
 }
 
+const CATEGORIES = ["All", "Marketing", "Sales", "Pricing", "Customers", "Operations", "Mindset"] as const;
+type CatFilter = typeof CATEGORIES[number];
+type KindFilter = "all" | "playbook" | "prompt";
+
 /** Library of playbooks/prompts pulled from aperture_actions. */
 export default function RealLibrary() {
   const [actions, setActions] = useState<ActionRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<CatFilter>("All");
+  const [kind, setKind] = useState<KindFilter>("all");
 
   useEffect(() => {
     (async () => {
@@ -29,22 +35,67 @@ export default function RealLibrary() {
     })();
   }, []);
 
+  const visible = useMemo(() => actions.filter(a => {
+    if (filter !== "All" && a.category !== filter) return false;
+    if (kind !== "all" && a.kind !== kind) return false;
+    return true;
+  }), [actions, filter, kind]);
+
   return (
     <>
       <Helmet><title>Library · Aperture</title></Helmet>
       <RealAppShell>
         <PageHeader
-          index="LIBRARY"
+          index="03 · LIBRARY"
           title="Playbooks & prompts"
-          sub="Ready-to-run flows for the most common things small businesses get stuck on."
+          sub="The full library. Your home page surfaces the ones that fit your business right now — this is where you browse everything."
         />
+
+        {/* Filters */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {CATEGORIES.map(c => (
+              <button
+                key={c}
+                onClick={() => setFilter(c)}
+                style={{
+                  appearance: "none", cursor: "pointer",
+                  padding: "6px 10px",
+                  fontSize: 11, fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em",
+                  background: filter === c ? "var(--ap-ink-1)" : "var(--ap-surface-1)",
+                  color: filter === c ? "var(--ap-canvas)" : "var(--ap-ink-2)",
+                  border: "1px solid var(--ap-hairline)",
+                  borderRadius: 999,
+                }}
+              >{c}</button>
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: 6 }}>
+            {(["all", "playbook", "prompt"] as const).map(k => (
+              <button
+                key={k}
+                onClick={() => setKind(k)}
+                style={{
+                  appearance: "none", cursor: "pointer",
+                  padding: "5px 10px",
+                  fontSize: 11, fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.1em",
+                  background: kind === k ? "var(--ap-signal-soft)" : "transparent",
+                  color: kind === k ? "var(--ap-signal)" : "var(--ap-ink-3)",
+                  border: "1px solid " + (kind === k ? "var(--ap-signal-soft)" : "var(--ap-hairline)"),
+                  borderRadius: 999,
+                }}
+              >{k === "all" ? "All kinds" : k + "s"}</button>
+            ))}
+          </div>
+        </div>
+
         {loading ? (
           <ApertureMonoLabel>Loading…</ApertureMonoLabel>
-        ) : actions.length === 0 ? (
-          <ApertureCard padding={24}><p style={{ margin: 0, fontSize: 13.5, color: "var(--ap-ink-2)" }}>Library is empty for now.</p></ApertureCard>
+        ) : visible.length === 0 ? (
+          <ApertureCard padding={24}><p style={{ margin: 0, fontSize: 13.5, color: "var(--ap-ink-2)" }}>Nothing matches those filters.</p></ApertureCard>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
-            {actions.map(a => (
+            {visible.map(a => (
               <Link
                 key={a.slug}
                 to={`/aperture/app/library/${a.slug}`}
@@ -53,9 +104,11 @@ export default function RealLibrary() {
                 <ApertureCard padding={18} style={{ cursor: "pointer", height: "100%" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                   <ApertureChip tone={a.kind === "playbook" ? "signal" : "neutral"}>
-                    {a.kind === "playbook" ? "Playbook" : "Prompt"}
+                    {a.kind === "playbook" ? "Playbook" : "Quick prompt"}
                   </ApertureChip>
-                  {a.duration && <ApertureMonoLabel>{a.duration}</ApertureMonoLabel>}
+                  <ApertureMonoLabel>
+                    {[a.category, a.duration].filter(Boolean).join(" · ")}
+                  </ApertureMonoLabel>
                 </div>
                 <h3 style={{ margin: "0 0 6px", fontSize: 15.5, fontWeight: 600, color: "var(--ap-ink-1)", letterSpacing: "-0.015em", lineHeight: 1.3 }}>
                   {a.title}
