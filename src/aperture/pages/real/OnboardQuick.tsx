@@ -162,42 +162,13 @@ function QuestionInput({
   };
 
   if (q.question_key === "industry") {
-    const selected = industries.find(i => i.slug === value);
-    const groups = Array.from(
-      new Set(industries.map(i => i.group_label || "Other"))
-    );
-    const currentGroup = selected?.group_label || "";
-    const inGroup = currentGroup
-      ? industries.filter(i => (i.group_label || "Other") === currentGroup)
-      : [];
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <select
-          style={baseStyle}
-          value={currentGroup}
-          onChange={e => {
-            const g = e.target.value;
-            // reset specific industry when group changes
-            const first = industries.find(i => (i.group_label || "Other") === g);
-            onChange(first && inGroup.length === 0 ? "" : "");
-            // store group choice via a tiny hack: clear value so user must pick industry
-            void g;
-          }}
-        >
-          <option value="">— Pick a category —</option>
-          {groups.map(g => (
-            <option key={g} value={g}>{g}</option>
-          ))}
-        </select>
-        {currentGroup && (
-          <select style={baseStyle} value={value} onChange={e => onChange(e.target.value)}>
-            <option value="">— Pick your industry —</option>
-            {inGroup.map(ind => (
-              <option key={ind.slug} value={ind.slug}>{ind.label}</option>
-            ))}
-          </select>
-        )}
-      </div>
+      <IndustryTwoStep
+        baseStyle={baseStyle}
+        value={value}
+        onChange={onChange}
+        industries={industries}
+      />
     );
   }
 
