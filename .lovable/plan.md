@@ -1,83 +1,103 @@
-## Goal
+# Industry Buckets — Implementation Plan
 
-Bring the live quick onboarding in line with `aperture_quick_onboarding_updated.md`:
+Address the 5 gaps Claude flagged so the uploaded `aperture_industry_buckets_all.md` becomes a working part of the system, not reference text.
 
-1. **Industry groups** — restructure to the 12 groups in the spec.
-2. **Closing question** — add the single "How can I help you most right now?" step *after* Phase-3 confirmation, before landing on `/aperture/app`.
+## 1. Industry → Group mapping (machine-readable)
 
-Both data-driven via existing tables (`aperture_industries`, `aperture_onboarding_questions`) — minimal UI changes.
+`aperture_industries` already has `group_label` for all 32 industries. Add a stable slug column so code can join cleanly:
 
----
+- Migration: `ALTER TABLE aperture_industries ADD COLUMN group_slug text;`
+- Backfill via a data migration mapping the existing `group_label` values to the 11 group slugs below (group 12 "Other" → `NULL` group_slug, no bucket).
 
-## 1. Industries — regroup (data only)
+Group slugs:
+`food-hospitality`, `beauty-wellness`, `retail-ecommerce`, `professional-services`, `coaching-consulting-therapy`, `education-tutoring`, `real-estate`, `general-contracting`, `outdoor-trade-services`, `medical-dental`, `fitness-training`.
 
-Spec groups vs current DB:
+Expose a helper `getIndustryGroupSlug(industrySlug)` on the client (reads `aperture_industries`). On the server (edge functions), join `aperture_user_profile.industry_slug → aperture_industries.group_slug`.
 
-| Spec group | Items | DB change |
-|---|---|---|
-| Food & Hospitality | restaurant, catering, food-retail | rename group label `Food & Hospitality` (unchanged content) |
-| Beauty & Wellness | hair, nail, skincare | remove `fitness-personal-training` |
-| Retail & E-Commerce | clothing, jewelry, home décor, general retail, **ecommerce** | rename `Retail` → `Retail & E-Commerce`; move `ecommerce` here |
-| Professional Services & Agencies | accounting, legal, insurance, financial advising, **digital marketing** | rename `Professional Services` → `… & Agencies`; move `digital-marketing-social` here |
-| Coaching, Consulting & Therapy | coaching-consulting-courses, mental-health-therapy | NEW group; move both rows in |
-| Education & Tutoring | academic, language, test prep | unchanged |
-| Real Estate | agent, property mgmt, investment | unchanged |
-| General Contracting & Renovation | general contractor, renovation | rename `Construction & Trades` partition |
-| Outdoor & Recurring Trade Services | landscaping, cleaning | NEW group; move both rows in |
-| Medical & Dental Practices | dentist, physical-therapy/chiro | rename `Health & Medical` → `Medical & Dental Practices`; **delete `pharmacy` row** |
-| Fitness, Training & Movement | fitness-personal-training | NEW group; move row in |
-| Other | other | unchanged |
+## 2. Storage / seeding
 
-Implementation: single `supabase--insert` running `UPDATE`s for `group_label` per slug, plus `DELETE FROM aperture_industries WHERE slug='pharmacy'`. No schema migration needed — `group_label` is free text.
+Extend the existing tables (no parallel structure):
 
-Optional polish: re-number `sort_order` so groups appear in the spec order in the dropdown (cheap update; will do).
+- `aperture_buckets`: add `kind text NOT NULL DEFAULT 'default'` (values: `default` | `industry`), and `industry_group_slug text NULL`. Default buckets stay `kind='default'`. The 11 industry buckets are inserted with `kind='industry'` and `industry_group_slug` set.
+- `aperture_bucket_questions` already has `layer` — reuse it (`Layer 1`, `Layer 2`, …). No schema change needed.
 
----
+Seed (one migration containing both buckets + questions):
 
-## 2. Onboarding questions
+| Group slug | Bucket slug | Title | Layers → questions |
+|---|---|---|---|
+| food-hospitality | `ind-food-hospitality` | Food & Hospitality | 7 layers, 36 Qs |
+| beauty-wellness | `ind-beauty-wellness` | Beauty & Wellness | ~6 layers |
+| retail-ecommerce | `ind-retail-ecommerce` | Retail & E-Commerce | ~6 layers |
+| professional-services | `ind-professional-services` | Professional Services & Agencies | ~6 layers |
+| coaching-consulting-therapy | `ind-coaching-consulting-therapy` | Coaching, Consulting & Therapy | ~6 layers |
+| education-tutoring | `ind-education-tutoring` | Education & Tutoring | ~5 layers |
+| real-estate | `ind-real-estate` | Real Estate | ~6 layers |
+| general-contracting | `ind-general-contracting` | General Contracting & Renovation | ~6 layers |
+| outdoor-trade-services | `ind-outdoor-trade-services` | Outdoor & Recurring Trade Services | ~5 layers |
+| medical-dental | `ind-medical-dental` | Medical & Dental Practices | ~6 layers |
+| fitness-training | `ind-fitness-training` | Fitness, Training & Movement | ~5 layers |
 
-- **Remove** the `tools_used` row (step 3 / sort 90 / section "Your stack") from `aperture_onboarding_questions` (flow=`quick`). Confirmed by user.
-- **Add** closing question:
-  - `question_key`: `closing_help`
-  - `step`: 12, `sort_order`: 12, `section`: `closing`
-  - `prompt`: "How can I help you most right now?"
-  - `hint`: "If I could take one thing off your plate starting today — what would it be?"
-  - `input_kind`: `textarea`
-  - `bucket_slugs`: `['__notes__']` so the answer lands in the freeform notes pool (matches "Everything collected feeds the memory pool").
+Each question is one row in `aperture_bucket_questions` with:
+- `bucket_slug` = the industry bucket slug above
+- `question_key` = stable slug like `food-cost-percentage` (derived from question text)
+- `prompt` = exact text from the markdown
+- `layer` = `"Layer N — <title>"` exactly as in the doc
+- `input_kind = 'text'`, `sort_order` = doc order, `is_active = true`
 
-Both via `supabase--insert` (data ops, not migration).
+Calculated metrics from each group are stored as a `metadata` jsonb on the bucket row (new column `metadata jsonb DEFAULT '{}'`), so the chat edge function can inject them into the AI brief.
 
----
+## 3. Target counts (for progress %)
 
-## 3. UI changes (`src/aperture/pages/real/`)
+Match the default-bucket pattern: `target_count` = total questions in that bucket. Set per-group at seed time (Food & Hospitality = 36, others between ~24 and ~32 depending on actual question count parsed from the markdown). Progress % calculation in `Memory.tsx` already reads `target_count` — no UI math change.
 
-The current flow ends Phase-2 then jumps to `OnboardConfirm.tsx` (Phase 3). The spec puts the closing question *after* confirmation. Two small edits:
+## 4. Memory page placement
 
-### `OnboardQuick.tsx`
-- Drop the now-unused `tools_used` branch and the `useApertureToolsDB` import / `tools` prop (dead code once the row is gone).
-- Update `phaseLabel` to recognize `step >= 12` → "One last thing" (closing).
-- Skip persisting `closing_help` via the bucket path since `__notes__` already routes to `addFreeformNote`; existing logic handles it.
-- Currently the closing question would be asked *before* Phase-3 confirmation because all questions live in one flow. Fix: when the current question is `closing_help`, hide it from the in-flow loop — i.e. stop the loop at `total - 1` and instead route to `/aperture/app/onboard/confirm` (as today). Pass nothing extra; `OnboardConfirm` will own the closing step.
+The industry bucket renders as a **single dynamic 14th card** at the bottom of the memory grid, and only when the user has an `industry_slug` whose group resolves to a non-null `industry_group_slug` (i.e. not "Other"). One card, not 11 — `useApertureMemoryDB` filters `aperture_buckets` where `kind='default' OR (kind='industry' AND industry_group_slug = user's group)`. Card visually marked as industry (small group label under the title, same shape/treatment as default cards so the existing Bucket detail page works unchanged).
 
-### `OnboardConfirm.tsx`
-- After the user clicks "Confirm N →" (or "Continue" in the empty state), don't navigate straight to `/aperture/app`. Instead show the closing question (single-screen state inside this file: textarea + Continue button), persist the answer via `addFreeformNote` (already imported indirectly through `useApertureMemoryDB`), then navigate to `/aperture/app`.
-- Add a tiny local state machine: `phase: 'review' | 'closing'`. Render the closing card when `phase==='closing'`.
+## 5. Trigger logic
 
-This keeps the spec's order: Phase 1 → 2 → 3 (research + confirm) → Closing → Home.
+Activate **immediately after Q11 (industry) is answered in onboarding**:
 
----
+- `OnboardQuick.tsx` already calls `upsertProfile({ industry_slug })` on the industry question. After that call, also invoke the new edge function `aperture-industry-bucket-init` which:
+  - Resolves `group_slug` from the chosen industry.
+  - Does nothing if group is null (Other) or if the user already has memory items in that industry bucket.
+  - Otherwise inserts a single `aperture_events` row (`industry_bucket_activated`) so analytics can confirm timing. No memory items are pre-filled here — Pass 1 already handles industry-grounded guesses for the default buckets; the industry bucket starts empty and fills as the user/chat answers its questions.
+- The chat edge function (`aperture-chat`) is updated so `getOrBuildMemoryCard` also pulls the user's active industry bucket's questions + answers, and `extractFactsFromMessage`'s allowed-bucket list includes the user's industry bucket slug. This lets chat-extracted facts route into the industry bucket the same way they route into defaults today.
 
-## Technical notes
+## Technical details
 
-- All DB content updates use `supabase--insert` (UPDATE/DELETE/INSERT on existing tables) — no schema migration.
-- No edge function changes; `aperture-onboarding-research` still runs after Phase 2 as today.
-- No new types or hooks; reuse `useApertureMemoryDB.addFreeformNote` for the closing answer.
-- The "Other (open field)" industry option in the spec is satisfied by the existing `other` slug; capturing the free-text variant is out of scope unless you want it.
+### Schema migration
+```sql
+ALTER TABLE aperture_industries ADD COLUMN group_slug text;
+UPDATE aperture_industries SET group_slug = CASE group_label
+  WHEN 'Food & Hospitality' THEN 'food-hospitality'
+  WHEN 'Beauty & Wellness' THEN 'beauty-wellness'
+  ... -- all 11
+  ELSE NULL END;
 
----
+ALTER TABLE aperture_buckets
+  ADD COLUMN kind text NOT NULL DEFAULT 'default',
+  ADD COLUMN industry_group_slug text NULL,
+  ADD COLUMN metadata jsonb NOT NULL DEFAULT '{}'::jsonb;
+CREATE INDEX ON aperture_buckets (kind, industry_group_slug);
+```
 
-## Out of scope
+### Seed migration
+One migration file that:
+1. Inserts 11 rows into `aperture_buckets` (kind='industry', industry_group_slug set, target_count = question count, metadata = `{ "calculated_metrics": [...] }`, sort_order = 100+).
+2. Inserts ~290 rows into `aperture_bucket_questions` (parsed deterministically from the markdown, layer field populated). Migration generated by a one-off Node script that reads the markdown and emits SQL — committed alongside the migration for reproducibility.
 
-- Phase-3 wording / summary-card style (already shipped).
-- Memory bucket question wiring beyond what's already mapped.
-- Translations.
+### Code changes
+- `useApertureMemoryDB.ts`: include industry-group filter in bucket query; expose `industryBucket` separately if the UI wants a different visual treatment.
+- `Memory.tsx`: render the industry bucket card after the 13 defaults; show group label as a sub-line; same progress bar logic.
+- `Bucket.tsx`: already generic — works as-is. Add a "Layer" group-by in the question list when `layer` is present (industry buckets only).
+- `OnboardQuick.tsx`: after industry upsert, invoke `aperture-industry-bucket-init`.
+- `aperture-chat/index.ts`: load active industry bucket into the memory card source set; extend the allowed-bucket list in fact extraction.
+- New edge function `aperture-industry-bucket-init`: idempotent activation marker + future hook point.
+
+## Out of scope (per the doc's "Deferred")
+- Industry-inferred priors for default buckets (Pass 1 already covers this generically)
+- Pattern detection across stored facts
+- Relevance/rewording map for default-bucket questions
+
+These remain separate design passes.
