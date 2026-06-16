@@ -583,6 +583,7 @@ export default function ApertureAdmin() {
           <TabsTrigger value="full">Full Questionnaire</TabsTrigger>
           <TabsTrigger value="industries">Industries</TabsTrigger>
           <TabsTrigger value="tools">Tools</TabsTrigger>
+          <TabsTrigger value="actions">Playbooks & Prompts</TabsTrigger>
         </TabsList>
         <TabsContent value="buckets" className="mt-4"><BucketsTab /></TabsContent>
         <TabsContent value="bucket-questions" className="mt-4"><BucketQuestionsTab /></TabsContent>
@@ -590,6 +591,7 @@ export default function ApertureAdmin() {
         <TabsContent value="full" className="mt-4"><OnboardingTab flow="full" /></TabsContent>
         <TabsContent value="industries" className="mt-4"><IndustriesTab /></TabsContent>
         <TabsContent value="tools" className="mt-4"><ToolsTab /></TabsContent>
+        <TabsContent value="actions" className="mt-4"><ActionsTab /></TabsContent>
       </Tabs>
     </div>
   );
