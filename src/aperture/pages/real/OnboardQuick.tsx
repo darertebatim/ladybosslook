@@ -205,3 +205,44 @@ function QuestionInput({
       value={value} onChange={e => onChange(e.target.value)} />
   );
 }
+
+function IndustryTwoStep({
+  baseStyle, value, onChange, industries,
+}: {
+  baseStyle: React.CSSProperties;
+  value: string;
+  onChange: (v: string) => void;
+  industries: Array<{ slug: string; label: string; group_label: string | null }>;
+}) {
+  const selected = industries.find(i => i.slug === value);
+  const groups = Array.from(new Set(industries.map(i => i.group_label || "Other")));
+  const [group, setGroup] = useState<string>(selected?.group_label || "");
+  const inGroup = group
+    ? industries.filter(i => (i.group_label || "Other") === group)
+    : [];
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <select
+        style={baseStyle}
+        value={group}
+        onChange={e => {
+          setGroup(e.target.value);
+          onChange(""); // reset specific industry when group changes
+        }}
+      >
+        <option value="">— Pick a category —</option>
+        {groups.map(g => (
+          <option key={g} value={g}>{g}</option>
+        ))}
+      </select>
+      {group && (
+        <select style={baseStyle} value={value} onChange={e => onChange(e.target.value)}>
+          <option value="">— Pick your industry —</option>
+          {inGroup.map(ind => (
+            <option key={ind.slug} value={ind.slug}>{ind.label}</option>
+          ))}
+        </select>
+      )}
+    </div>
+  );
+}
