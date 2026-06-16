@@ -114,6 +114,11 @@ ${memoryBrief}`;
       }))
       .filter((s: any) => s.title && s.prompt);
 
+    await logApertureEvent(supabase, user.id, "suggestion_shown", {
+      count: clean.length,
+      titles: clean.map((s: any) => s.title),
+    });
+
     return json({ suggestions: clean });
   } catch (e) {
     console.error("aperture-home-suggestions error", e);
