@@ -9,6 +9,7 @@ import {
 import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { logApertureEvent } from "@/aperture/lib/apertureEvents";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Phase 3 confirmation — after the website/IG research extraction,
@@ -25,6 +26,7 @@ export default function OnboardConfirm() {
   const [removed, setRemoved] = useState<Record<string, boolean>>({});
   const [phase, setPhase] = useState<"review" | "closing">("review");
   const [closingAnswer, setClosingAnswer] = useState("");
+  const [tailoring, setTailoring] = useState(false);
 
   // Poll a couple of times while the edge function is still writing facts.
   useEffect(() => {
@@ -91,6 +93,20 @@ export default function OnboardConfirm() {
     });
     logApertureEvent("onboarding_completed", { flow: "quick" });
     setSaving(false);
+
+    // Pass 2 — generate tailored home suggestions before showing Home.
+    // Bounded so a slow/failed AI call never blocks the user past ~12s.
+    setTailoring(true);
+    try {
+      await Promise.race([
+        supabase.functions.invoke("aperture-pass2-suggestions", {
+          body: { closing_answer: v },
+        }),
+        new Promise(resolve => setTimeout(resolve, 12_000)),
+      ]);
+    } catch (e) {
+      console.error("pass2 invoke failed", e);
+    }
     navigate("/aperture/app", { replace: true });
   }
 
@@ -107,7 +123,21 @@ export default function OnboardConfirm() {
     <>
       <Helmet><title>Review what I found · Aperture</title></Helmet>
       <RealAppShell>
-        {phase === "closing" ? (
+        {tailoring ? (
+          <>
+            <PageHeader
+              index="ONE MOMENT"
+              title="Tailoring your first moves…"
+              sub="I'm using what you just told me to line up the sharpest next steps for your business. This takes a few seconds."
+            />
+            <ApertureCard padding={24}>
+              <ApertureMonoLabel>Working…</ApertureMonoLabel>
+              <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
+                Reading your memory, weighing your answer, drafting concrete next actions.
+              </p>
+            </ApertureCard>
+          </>
+        ) : phase === "closing" ? (
           <>
             <PageHeader
               index="ONE LAST THING"
