@@ -6,7 +6,7 @@ import { PageHeader } from "@/aperture/components/PageHeader";
 import {
   ApertureCard, ApertureMonoLabel, ApertureButton, ApertureChip,
 } from "@/aperture/components/primitives";
-import { useApertureOnboardingDB, useApertureIndustriesDB, useApertureToolsDB } from "@/aperture/hooks/db/useApertureOnboardingDB";
+import { useApertureOnboardingDB, useApertureIndustriesDB } from "@/aperture/hooks/db/useApertureOnboardingDB";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,15 +21,19 @@ export default function OnboardQuick() {
   const navigate = useNavigate();
   const { questions, loading } = useApertureOnboardingDB("quick");
   const { industries } = useApertureIndustriesDB();
-  const { tools } = useApertureToolsDB();
   const { upsert: upsertProfile } = useApertureUserProfile();
   const { saveBucketAnswer, addFreeformNote } = useApertureMemoryDB();
   const [i, setI] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
 
-  const q = questions[i];
-  const total = questions.length;
+  // Closing question is asked AFTER Phase-3 confirmation, not here.
+  const flowQuestions = useMemo(
+    () => questions.filter(q => q.question_key !== "closing_help"),
+    [questions]
+  );
+  const q = flowQuestions[i];
+  const total = flowQuestions.length;
   const done = i >= total;
 
   const phaseLabel = useMemo(() => {
@@ -77,15 +81,12 @@ export default function OnboardQuick() {
       const instagram = answers["instagram"];
       const businessName = answers["business_name"];
       if (website || instagram) {
-        // Kick off research and send the user to the confirmation page
-        // (which polls for new ai_extracted items).
         supabase.functions.invoke("aperture-onboarding-research", {
           body: { website, instagram, businessName },
         }).catch(() => {});
-        navigate("/aperture/app/onboard/confirm", { replace: true });
-      } else {
-        navigate("/aperture/app", { replace: true });
       }
+      // Always go to confirm — it owns the Phase-3 review AND the closing question.
+      navigate("/aperture/app/onboard/confirm", { replace: true });
     } else {
       setI(i + 1);
     }
@@ -94,7 +95,7 @@ export default function OnboardQuick() {
   async function skip() {
     if (i + 1 >= total) {
       await upsertProfile({ quick_onboarded_at: new Date().toISOString() });
-      navigate("/aperture/app", { replace: true });
+      navigate("/aperture/app/onboard/confirm", { replace: true });
     } else setI(i + 1);
   }
 
@@ -129,7 +130,6 @@ export default function OnboardQuick() {
               value={answers[q.question_key] ?? ""}
               onChange={set}
               industries={industries}
-              tools={tools}
             />
 
             <div style={{ display: "flex", gap: 8, marginTop: 18, justifyContent: "flex-end" }}>
@@ -146,11 +146,10 @@ export default function OnboardQuick() {
 }
 
 function QuestionInput({
-  q, value, onChange, industries, tools,
+  q, value, onChange, industries,
 }: {
   q: any; value: string; onChange: (v: string) => void;
   industries: Array<{ slug: string; label: string; group_label: string | null }>;
-  tools: Array<{ slug: string; label: string; category: string | null }>;
 }) {
   const baseStyle: React.CSSProperties = {
     width: "100%", appearance: "none", outline: "none",
@@ -172,44 +171,6 @@ function QuestionInput({
           </option>
         ))}
       </select>
-    );
-  }
-
-  if (q.question_key === "tools_used") {
-    const selected: string[] = value ? value.split(",").map(s => s.trim()).filter(Boolean) : [];
-    const toggle = (slug: string) => {
-      const next = selected.includes(slug) ? selected.filter(s => s !== slug) : [...selected, slug];
-      onChange(next.join(","));
-    };
-    const byCat = tools.reduce<Record<string, typeof tools>>((acc, t) => {
-      const k = t.category ?? "Other";
-      (acc[k] ||= []).push(t);
-      return acc;
-    }, {});
-    return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 14, maxHeight: 360, overflowY: "auto" }}>
-        {Object.entries(byCat).map(([cat, list]) => (
-          <div key={cat}>
-            <div style={{ fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ap-ink-3)", marginBottom: 6 }}>{cat}</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {list.map(t => {
-                const on = selected.includes(t.slug);
-                return (
-                  <button key={t.slug} type="button" onClick={() => toggle(t.slug)}
-                    style={{
-                      appearance: "none", cursor: "pointer",
-                      padding: "8px 12px", borderRadius: "var(--ap-radius-sm)",
-                      border: "1px solid " + (on ? "var(--ap-signal)" : "var(--ap-hairline)"),
-                      background: on ? "var(--ap-signal)" : "var(--ap-surface-2)",
-                      color: on ? "#000" : "var(--ap-ink-1)",
-                      fontSize: 13, fontWeight: 500,
-                    }}>{t.label}</button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
     );
   }
 
