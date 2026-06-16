@@ -68,8 +68,89 @@ export default function RealBucketPage() {
                 </p>
               </ApertureCard>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                {questions.map(q => {
+              <LayeredQuestions
+                questions={questions}
+                bucket={bucket}
+                drafts={drafts}
+                setDrafts={setDrafts}
+                answerFor={answerFor}
+                sourceFor={sourceFor}
+                commit={commit}
+              />
+            )}
+
+            {freeform.length > 0 && (
+              <section style={{ marginTop: 24 }}>
+                <ApertureMonoLabel>Also in this bucket</ApertureMonoLabel>
+                <ApertureCard padding={0} style={{ marginTop: 8 }}>
+                  {freeform.map((it, idx) => (
+                    <div key={it.id} style={{
+                      display: "grid", gridTemplateColumns: "auto 1fr",
+                      gap: 12, padding: "12px 14px",
+                      borderTop: idx === 0 ? "none" : "1px solid var(--ap-hairline)",
+                      opacity: it.source === "ai_inferred_pre_onboarding" ? 0.78 : 1,
+                    }}>
+                      <ApertureMonoLabel color={it.source === "ai_extracted" ? "var(--ap-signal)" : undefined}>
+                        {it.source === "ai_extracted"
+                          ? "Noticed"
+                          : it.source === "ai_inferred_pre_onboarding"
+                            ? "Guess"
+                            : "Note"}
+                      </ApertureMonoLabel>
+                      <span style={{ fontSize: 13.5, color: "var(--ap-ink-1)", lineHeight: 1.5 }}>{it.content}</span>
+                    </div>
+                  ))}
+                </ApertureCard>
+              </section>
+            )}
+
+            {questions.length > 0 && (
+              <p style={{ marginTop: 18, fontSize: 12, color: "var(--ap-ink-3)" }}>
+                {filled} of {questions.length} questions answered.
+              </p>
+            )}
+          </>
+        )}
+      </RealAppShell>
+    </>
+  );
+}
+
+function LayeredQuestions({
+  questions, bucket, drafts, setDrafts, answerFor, sourceFor, commit,
+}: {
+  questions: any[]; bucket: any;
+  drafts: Record<string, string>;
+  setDrafts: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  answerFor: (b: string, k: string) => string;
+  sourceFor: (b: string, k: string) => string | null;
+  commit: (k: string, v: string) => void;
+}) {
+  // Group by `layer` when present (industry buckets). Falls back to a single
+  // flat list when no questions have a layer.
+  const hasLayers = questions.some(q => q.layer);
+  const groups: Array<{ key: string; label: string | null; items: any[] }> = [];
+  if (hasLayers) {
+    const order: string[] = [];
+    const map: Record<string, any[]> = {};
+    for (const q of questions) {
+      const k = q.layer ?? "other";
+      if (!(k in map)) { map[k] = []; order.push(k); }
+      map[k].push(q);
+    }
+    for (const k of order) groups.push({ key: k, label: k, items: map[k] });
+  } else {
+    groups.push({ key: "all", label: null, items: questions });
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+      {groups.map(group => (
+        <div key={group.key} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {group.label && (
+            <ApertureMonoLabel>Layer · {group.label}</ApertureMonoLabel>
+          )}
+          {group.items.map((q: any) => {
                   const value = drafts[q.question_key] ?? "";
                   const saved = answerFor(bucket.slug, q.question_key);
                   const dirty = value !== saved;
@@ -123,43 +204,9 @@ export default function RealBucketPage() {
                       </div>
                     </ApertureCard>
                   );
-                })}
-              </div>
-            )}
-
-            {freeform.length > 0 && (
-              <section style={{ marginTop: 24 }}>
-                <ApertureMonoLabel>Also in this bucket</ApertureMonoLabel>
-                <ApertureCard padding={0} style={{ marginTop: 8 }}>
-                  {freeform.map((it, idx) => (
-                    <div key={it.id} style={{
-                      display: "grid", gridTemplateColumns: "auto 1fr",
-                      gap: 12, padding: "12px 14px",
-                      borderTop: idx === 0 ? "none" : "1px solid var(--ap-hairline)",
-                      opacity: it.source === "ai_inferred_pre_onboarding" ? 0.78 : 1,
-                    }}>
-                      <ApertureMonoLabel color={it.source === "ai_extracted" ? "var(--ap-signal)" : undefined}>
-                        {it.source === "ai_extracted"
-                          ? "Noticed"
-                          : it.source === "ai_inferred_pre_onboarding"
-                            ? "Guess"
-                            : "Note"}
-                      </ApertureMonoLabel>
-                      <span style={{ fontSize: 13.5, color: "var(--ap-ink-1)", lineHeight: 1.5 }}>{it.content}</span>
-                    </div>
-                  ))}
-                </ApertureCard>
-              </section>
-            )}
-
-            {questions.length > 0 && (
-              <p style={{ marginTop: 18, fontSize: 12, color: "var(--ap-ink-3)" }}>
-                {filled} of {questions.length} questions answered.
-              </p>
-            )}
-          </>
-        )}
-      </RealAppShell>
-    </>
+          })}
+        </div>
+      ))}
+    </div>
   );
 }

@@ -61,7 +61,7 @@ export default function RealMemory() {
         <PageHeader
           index="MEMORY"
           title="What I know about your business"
-          sub="Thirteen territories. The more I know, the sharper my answers get. Tap any to read or fill in."
+          sub={`${buckets.length} territories. The more I know, the sharper my answers get. Tap any to read or fill in.`}
           action={
             <ApertureChip tone={avgProgress > 0 ? "signal" : "neutral"}>
               {avgProgress}% mapped

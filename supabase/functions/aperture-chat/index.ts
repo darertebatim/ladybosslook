@@ -135,7 +135,7 @@ serve(async (req) => {
       const qText = String(escape.question ?? "").trim().slice(0, 500);
       let bucket = String(escape.bucket ?? "").trim().toLowerCase() || null;
       if (!bucket && qText) {
-        bucket = await classifyBucket(supabase, LOVABLE_API_KEY, qText);
+        bucket = await classifyBucket(supabase, LOVABLE_API_KEY, qText, user.id);
       }
       if (qText) {
         const content = escape.kind === "skip"
@@ -267,6 +267,46 @@ function json(body: unknown, status = 200) {
 }
 
 /**
+ * Returns the set of bucket slugs this user is allowed to write facts into:
+ * every active default bucket + the single industry bucket matching their
+ * industry group (if their profile has one). Industry buckets that don't
+ * match are excluded so the model never tags a fact into the wrong group.
+ */
+async function getAllowedBuckets(
+  supabase: any, userId?: string,
+): Promise<Array<{ slug: string; title: string }>> {
+  const { data: buckets } = await supabase
+    .from("aperture_buckets")
+    .select("slug,title,kind,industry_group_slug")
+    .eq("is_active", true);
+  const list = (buckets ?? []) as Array<{
+    slug: string; title: string; kind: string; industry_group_slug: string | null;
+  }>;
+
+  let userGroupSlug: string | null = null;
+  if (userId) {
+    const { data: profile } = await supabase
+      .from("aperture_user_profile")
+      .select("industry_slug").eq("user_id", userId).maybeSingle();
+    const industrySlug = (profile as any)?.industry_slug ?? null;
+    if (industrySlug) {
+      const { data: ind } = await supabase
+        .from("aperture_industries")
+        .select("group_slug").eq("slug", industrySlug).maybeSingle();
+      userGroupSlug = (ind as any)?.group_slug ?? null;
+    }
+  }
+
+  return list
+    .filter(b => {
+      if (b.kind !== "industry") return true;
+      if (!userGroupSlug) return false;
+      return b.industry_group_slug === userGroupSlug;
+    })
+    .map(b => ({ slug: b.slug, title: b.title }));
+}
+
+/**
  * Reads the saved memory card. If stale or missing, regenerates it by summarizing
  * the user's bucket answers + AI facts. This is the "compressed brief" injected
  * into every chat so the model never has to re-read the raw buckets.
@@ -358,11 +398,10 @@ async function summarize(apiKey: string, raw: string): Promise<string> {
  */
 async function classifyBucket(
   supabase: any, apiKey: string, questionText: string,
+  userId?: string,
 ): Promise<string | null> {
   try {
-    const { data: buckets } = await supabase
-      .from("aperture_buckets").select("slug,title").eq("is_active", true);
-    const list = (buckets ?? []) as Array<{ slug: string; title: string }>;
+    const list = await getAllowedBuckets(supabase, userId);
     if (list.length === 0) return null;
     const allowed = list.map(b => b.slug);
     const catalog = list.map(b => `- ${b.slug} (${b.title})`).join("\n");
@@ -408,9 +447,8 @@ async function extractFactsFromMessage(args: {
   if (trimmed.length < 12) return; // not worth extracting from a tiny ack
 
   // Allowed bucket slugs for routing the fact.
-  const { data: buckets } = await supabase
-    .from("aperture_buckets").select("slug").eq("is_active", true);
-  const allowed = (buckets ?? []).map((b: any) => b.slug);
+  const allowedList = await getAllowedBuckets(supabase, userId);
+  const allowed = allowedList.map(b => b.slug);
   if (allowed.length === 0) return;
 
   // Existing facts so the model can avoid restating known things.
