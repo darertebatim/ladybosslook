@@ -135,7 +135,7 @@ serve(async (req) => {
       const qText = String(escape.question ?? "").trim().slice(0, 500);
       let bucket = String(escape.bucket ?? "").trim().toLowerCase() || null;
       if (!bucket && qText) {
-        bucket = await classifyBucket(supabase, LOVABLE_API_KEY, qText);
+        bucket = await classifyBucket(supabase, LOVABLE_API_KEY, qText, user.id);
       }
       if (qText) {
         const content = escape.kind === "skip"
