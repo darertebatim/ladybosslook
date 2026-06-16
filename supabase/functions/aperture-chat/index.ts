@@ -57,6 +57,22 @@ Hard rules for the block itself:
 
 const SYSTEM_PROMPT_BASE = SYSTEM_BASE + OPTIONS_INSTRUCTIONS;
 
+const GUESS_INSTRUCTIONS = `
+
+GUESSES vs CONFIRMED FACTS — read carefully.
+
+Some lines in the BUSINESS MEMORY CARD are tagged with "(guess)". Those are
+low-confidence inferences made from the user's industry before they answered
+the question themselves. They are NOT confirmed.
+
+- Never present a (guess) as if the user told you it.
+- Before relying on a (guess) to recommend an action, verify it in one short
+  sentence ("I'm assuming X — true?" / "Quick check: is X right?").
+- If the user corrects a guess, treat the new answer as the truth going forward.
+- Lines without "(guess)" are confirmed by the user — use them directly.`;
+
+const SYSTEM_PROMPT_FINAL = SYSTEM_PROMPT_BASE + GUESS_INSTRUCTIONS;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -151,7 +167,7 @@ serve(async (req) => {
 
     // Load (or build) memory card
     const memoryCard = await getOrBuildMemoryCard(supabase, user.id, LOVABLE_API_KEY);
-    const systemPrompt = `${SYSTEM_PROMPT_BASE}\n\n=== BUSINESS MEMORY CARD ===\n${memoryCard || "(empty — ask the user about their business basics first)"}\n=== END MEMORY CARD ===${escapeInstruction}`;
+    const systemPrompt = `${SYSTEM_PROMPT_FINAL}\n\n=== BUSINESS MEMORY CARD ===\n${memoryCard || "(empty — ask the user about their business basics first)"}\n=== END MEMORY CARD ===${escapeInstruction}`;
 
     // When an escape was sent, the last "messages" entry may still be the
     // previous assistant turn. The model behaves better if we add a tiny
@@ -282,6 +298,11 @@ async function getOrBuildMemoryCard(supabase: any, userId: string, apiKey: strin
       (grouped[slug] ??= []).push(`- ${prompt} → ${v}`);
     } else if (it.source === "ai_extracted") {
       (grouped[slug] ??= []).push(`- (noticed) ${v}`);
+    } else if (it.source === "ai_inferred_pre_onboarding") {
+      const prompt = it.question_key
+        ? (questionLookup.get(`${it.bucket_slug}:${it.question_key}`) ?? it.question_key)
+        : null;
+      (grouped[slug] ??= []).push(prompt ? `- ${prompt} → ${v} (guess)` : `- ${v} (guess)`);
     } else {
       (grouped[slug] ??= []).push(`- ${v}`);
     }
