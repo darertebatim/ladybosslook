@@ -1136,9 +1136,11 @@ export type Database = {
       }
       aperture_tools: {
         Row: {
+          categories: string[]
           category: string | null
           created_at: string
           id: string
+          industries: string[]
           is_active: boolean
           label: string
           slug: string
@@ -1146,9 +1148,11 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          categories?: string[]
           category?: string | null
           created_at?: string
           id?: string
+          industries?: string[]
           is_active?: boolean
           label: string
           slug: string
@@ -1156,9 +1160,11 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          categories?: string[]
           category?: string | null
           created_at?: string
           id?: string
+          industries?: string[]
           is_active?: boolean
           label?: string
           slug?: string

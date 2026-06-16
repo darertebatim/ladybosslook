@@ -1,67 +1,57 @@
-## Plan: Files & Tools (Integrations) for Aperture Memory
+Align the `aperture_tools` table, the admin **Aperture → Tools** tab, and the user-facing **Memory → Tools** page with the v3 list (single row per tool, tagged with multiple categories and optional industries; per-category "Nothing yet" / "Spreadsheet / notes" options).
 
-Add two new pillars to the Memory page so users can feed Aperture context beyond the bucket questionnaire: **Files** (upload docs Aperture reads to extract facts) and **Tools** (which tools the user uses today + future integrations to their live infrastructure).
+## 1. Database migration
 
-### 1. Memory header buttons
+Extend `public.aperture_tools` (keep existing rows, no breaking renames):
 
-In `src/aperture/pages/real/Memory.tsx`, add two compact icon+label buttons to the `PageHeader` `action` slot, sitting alongside the existing `0% MAPPED` chip:
+- Add `categories text[] not null default '{}'` — primary source of truth for grouping.
+- Add `industries text[] not null default '{}'` — industry-bucket signals (empty for general tools).
+- Keep `category text` for back-compat; backfill `categories = ARRAY[category]` for existing rows where `categories = '{}'`.
+- Reseed the full v3 catalog (60+ rows) via `INSERT ... ON CONFLICT (slug) DO UPDATE SET label, categories, industries, sort_order, is_active`. Sort order grouped by primary category in the order shown in v3 (Accounting, AI, Design, E-commerce, Email & CRM, Communication, HR & People, Marketing & Social, Payments, Productivity, Scheduling, Website & Domain, Industry-specific).
 
-- **Files** → `/aperture/app/memory/files` (paperclip icon)
-- **Tools** → `/aperture/app/memory/tools` (plug/grid icon)
-- Keep the `% MAPPED` chip as well; lay out as a small row.
+No new tables. No RLS changes (existing read-all + admin-write policies still apply).
 
-Mobile: the action row wraps under the title (PageHeader already uses `flexWrap`).
+## 2. Admin — `src/pages/admin/Aperture.tsx` → `ToolsTab`
 
-### 2. New page: Files (`/aperture/app/memory/files`)
+Replace the single `category` text field with:
 
-File: `src/aperture/pages/real/Files.tsx`. Mirrors Claude Projects' file pane.
+- **Categories** — multi-select / comma-separated input (chip list). Stored as `categories text[]`. Fixed option set: `Accounting, AI, Design, E-commerce, Email & CRM, Communication, HR & People, Marketing & Social, Payments, Productivity, Scheduling, Website & Domain, Industry-specific`.
+- **Industries** — multi-select / comma-separated input. Fixed option set matches the 11 industry group labels used in v3 (Food & Hospitality, Beauty & Wellness, Fitness/Training/Movement, Retail & E-Commerce, Professional Services & Agencies, Coaching/Consulting/Therapy, Education & Tutoring, Real Estate, General Contracting & Renovation, Outdoor & Recurring Trade Services, Medical & Dental Practices).
+- Table columns become: Categories (chips) · Industries (chips) · Slug · Label · Active · Actions.
+- Drop the legacy single-`category` text field from the editor (still kept in DB for back-compat but hidden in UI).
 
-Sections:
-- **Header** — "Files Aperture has read" + subcopy ("Upload contracts, price lists, old ads, past tax summaries — I'll read them and turn the useful bits into memory facts.")
-- **Upload zone** — drag/drop + "Choose files" button. Accepts PDF, DOCX, TXT, MD, PNG, JPG up to 20MB each.
-- **File list** — each row: filename, size, uploaded date, status chip (`Reading…` / `Read · N facts extracted` / `Failed`), and a "View extracted facts" link that filters Memory items by `source_file_id`. Delete (trash) action removes file + soft-deletes derived memory items.
+Use a small `EditorDialog` field-type extension `chips` (multi-value chip editor) or, if simpler, a comma-separated `text` field that the upsert handler splits/joins into `string[]`.
 
-Data layer (new):
-- Storage bucket `aperture-files` (private). Path: `userId/fileId.ext`.
-- Table `public.aperture_files` (id, user_id, file_name, mime_type, size_bytes, storage_path, status, extracted_text, extracted_fact_count, created_at, updated_at). RLS: owner-only; standard GRANTs (`authenticated` + `service_role`).
-- Edge function `aperture-file-extract`: triggered after upload. Reuses logic from existing `extract-document-text` (pandoc/docx/AI Gemini for PDFs/images) to populate `extracted_text`, then calls a fact-extraction pass against Aperture's bucket schema and inserts rows into `aperture_memory_items` with `source = 'file_extracted'` and a new `source_file_id` column.
-- Migration also adds `source_file_id uuid references aperture_files(id) on delete set null` to `aperture_memory_items` and extends the `source` check to include `file_extracted`.
+## 3. Memory Tools page — `src/aperture/pages/real/Tools.tsx`
 
-### 3. New page: Tools (`/aperture/app/memory/tools`)
+Switch from the static `TOOL_CATALOG` to live `aperture_tools` rows:
 
-File: `src/aperture/pages/real/Tools.tsx`. Two parts:
+- Fetch all active tools once, then group **by every value in `categories`** (a tool tagged `Payments, Scheduling, E-commerce` appears under all three groups but is still one logical row — `aperture_user_tools` is keyed by slug so toggling it in any group flips the same state).
+- Render category groups in fixed display order (same list as admin). For each group:
+  - Tools as togglable chips (same UI we have now).
+  - Append two fixed pseudo-chips at the end: **"Nothing yet"** and **"Spreadsheet / notes / in my head"**. Selecting one writes an `aperture_user_tools` row with `tool_slug = nothing_yet_<category>` / `spreadsheet_or_notes_<category>`, `custom = false`, and a memory fact `"For <category>: nothing yet"` / `"For <category>: spreadsheet / notes / in my head"` into the matching bucket. Selecting any real tool in the same category auto-clears the "nothing yet" selection for that category.
+- Show industry tag(s) as a tiny muted suffix on industry-specific chips (e.g. "Jobber · Trades").
+- Keep the custom "Add anything else" input and the read-only "Integrations" preview section unchanged.
 
-**a) "Tools you use today"** — curated list of common SMB tools grouped by category (POS, Accounting, Marketing/Social, Booking, E-commerce, Ops). User toggles each on/off; selected tools are saved as memory facts ("Uses Square for POS") into the appropriate bucket (Tools & Systems mostly, some into Marketing/Money/Operations). Free-text "Add a tool" input for anything not in the list.
+Bucket mapping (used when writing memory facts) lives in a small helper in `src/aperture/data/tools.ts`:
 
-**b) "Connect Aperture to your tools" (Integrations)** — preview-only cards for future live integrations: Instagram, Google Business, QuickBooks, Shopify, Square, Stripe, Calendly, Gmail. Each card shows logo, name, one-line "what we'd read", and a `Coming soon` / `Connect` button (disabled, with tooltip explaining roadmap). This sets the surface up; real OAuth comes later.
+```text
+Accounting, Payments         -> money-finance
+Marketing & Social           -> marketing-visibility
+Email & CRM                  -> marketing-visibility
+E-commerce                   -> sales-conversion
+Scheduling, Communication,
+Productivity, HR & People,
+AI, Design, Website & Domain,
+Industry-specific            -> tools-systems
+```
 
-Data layer:
-- Table `public.aperture_user_tools` (id, user_id, tool_slug, tool_name, category, custom bool, is_active, connected_at, connection_metadata jsonb, created_at, updated_at). RLS owner-only + GRANTs.
-- Curated tool catalog lives in `src/aperture/data/tools.ts` (static, ~40 entries).
-- Toggling a tool on writes both an `aperture_user_tools` row AND a memory item (so the AI sees it in chat extraction immediately).
-- Integration cards are static for now — no OAuth yet.
+`tools.ts` keeps `INTEGRATIONS` and the bucket-mapping helper; the hard-coded `TOOL_CATALOG` / `TOOL_CATEGORIES` arrays are removed (the page now reads them from the DB).
 
-### 4. Router
+## 4. Out of scope
 
-Add two routes in `src/aperture/router.tsx`:
-- `app/memory/files` → `RealFiles`
-- `app/memory/tools` → `RealTools`
+- No changes to onboarding flow / `useApertureOnboardingDB` (it already reads `aperture_tools`).
+- No real OAuth — integrations stay preview-only.
+- No edits to `aperture_user_tools` schema.
 
-### 5. AI chat awareness
-
-Update `supabase/functions/aperture-chat/index.ts` system prompt builder to:
-- Mention attached files by name + extracted_text snippets (top N most relevant).
-- Mention connected tools in the user's stack.
-
-### Technical notes
-- File uploads use the existing Supabase storage client; no new SDK.
-- Reuse existing `extract-document-text` extraction primitives (copy or share a helper module under `supabase/functions/_shared/`).
-- Fact extraction prompt mirrors `aperture-chat`'s extractor but runs over file text in one pass, scoped to the user's allowed bucket list (default + industry).
-- Tool toggles use optimistic UI via React Query / local state — same pattern as `useApertureBucketsDB`.
-
-### Out of scope (explicit)
-- Real OAuth to Instagram/QuickBooks/etc. — surface only.
-- Re-extracting files when bucket schema changes.
-- File previews beyond filename (no PDF viewer).
-
-Say **"go"** and I'll ship it.
+Say **go** and I'll ship the migration + the two file changes.

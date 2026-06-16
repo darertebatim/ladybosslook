@@ -394,6 +394,19 @@ function IndustriesTab() {
 }
 
 // ---------- Tools ----------
+const TOOL_CATEGORY_OPTIONS = [
+  "Accounting","AI","Design","E-commerce","Email & CRM","Communication",
+  "HR & People","Marketing & Social","Payments","Productivity",
+  "Scheduling","Website & Domain","Industry-specific",
+];
+const TOOL_INDUSTRY_OPTIONS = [
+  "Food & Hospitality","Beauty & Wellness","Fitness, Training & Movement",
+  "Retail & E-Commerce","Professional Services & Agencies",
+  "Coaching, Consulting & Therapy","Education & Tutoring","Real Estate",
+  "General Contracting & Renovation","Outdoor & Recurring Trade Services",
+  "Medical & Dental Practices",
+];
+
 function ToolsTab() {
   const t = useTable<Row>("aperture_tools", "sort_order");
   const [editing, setEditing] = useState<Row | null>(null);
@@ -403,11 +416,12 @@ function ToolsTab() {
       title="Tools"
       description="The tool stack picker shown in Quick Onboarding ('Which tools do you use?')."
       onRefresh={t.refresh}
-      onAdd={() => setEditing({ is_active: true, sort_order: t.rows.length + 1 })}
+      onAdd={() => setEditing({ is_active: true, sort_order: t.rows.length + 1, categories: [], industries: [] })}
     >
       <Table>
         <TableHeader><TableRow>
-          <TableHead>Category</TableHead>
+          <TableHead>Categories</TableHead>
+          <TableHead>Industries</TableHead>
           <TableHead>Slug</TableHead>
           <TableHead>Label</TableHead>
           <TableHead>Active</TableHead>
@@ -416,7 +430,21 @@ function ToolsTab() {
         <TableBody>
           {t.rows.map((r) => (
             <TableRow key={r.id}>
-              <TableCell className="text-xs">{r.category ?? "—"}</TableCell>
+              <TableCell className="text-xs">
+                <div className="flex flex-wrap gap-1">
+                  {(Array.isArray(r.categories) && r.categories.length > 0
+                    ? r.categories
+                    : r.category ? [r.category] : []
+                  ).map((c: string) => <Badge key={c} variant="outline">{c}</Badge>)}
+                </div>
+              </TableCell>
+              <TableCell className="text-xs">
+                <div className="flex flex-wrap gap-1">
+                  {(Array.isArray(r.industries) ? r.industries : []).map((c: string) => (
+                    <Badge key={c}>{c}</Badge>
+                  ))}
+                </div>
+              </TableCell>
               <TableCell className="font-mono text-xs">{r.slug}</TableCell>
               <TableCell>{r.label}</TableCell>
               <TableCell>{r.is_active ? <Badge>on</Badge> : <Badge variant="outline">off</Badge>}</TableCell>
@@ -432,11 +460,16 @@ function ToolsTab() {
         open={!!editing} onOpenChange={(v) => !v && setEditing(null)}
         title={editing?.id ? "Edit tool" : "New tool"}
         initial={editing ?? {}}
-        onSave={(row) => t.upsert(row)}
+        onSave={(row) => {
+          // Keep legacy single `category` in sync with the first selected category.
+          const cats: string[] = Array.isArray(row.categories) ? row.categories : [];
+          return t.upsert({ ...row, category: cats[0] ?? row.category ?? null });
+        }}
         fields={[
           { key: "slug", label: "Slug", type: "text", required: true },
           { key: "label", label: "Label", type: "text", required: true },
-          { key: "category", label: "Category", type: "text" },
+          { key: "categories", label: "Categories", type: "multiselect", options: TOOL_CATEGORY_OPTIONS, required: true },
+          { key: "industries", label: "Industries (industry-specific tools only)", type: "multiselect", options: TOOL_INDUSTRY_OPTIONS },
           { key: "sort_order", label: "Sort order", type: "number" },
           { key: "is_active", label: "Active", type: "switch" },
         ]}
