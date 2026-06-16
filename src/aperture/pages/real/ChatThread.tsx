@@ -7,9 +7,14 @@ import { useApertureChatsDB, useApertureChatMessages, type MessageRow } from "@/
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { streamApertureChat } from "@/aperture/lib/apertureChat";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { ChatComposer } from "@/aperture/components/chat/ChatComposer";
+import { ChatAttachments, AttachmentMemoryChip } from "@/aperture/components/chat/ChatAttachments";
+import type { SentAttachment } from "@/aperture/lib/chatAttachments";
 
 export default function RealChatThread() {
   const { id } = useParams();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [search] = useSearchParams();
   const { chats, createChat, deleteChat } = useApertureChatsDB();
@@ -17,7 +22,6 @@ export default function RealChatThread() {
   const { items } = useApertureMemoryDB();
 
   const [streaming, setStreaming] = useState(false);
-  const [draft, setDraft] = useState("");
   const [streamingText, setStreamingText] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const seedHandledRef = useRef<string | null>(null);
@@ -28,20 +32,24 @@ export default function RealChatThread() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages.length, streamingText]);
 
-  async function send(text: string, escape?: { kind: "skip" | "unknown"; question: string }) {
+  async function send(
+    text: string,
+    escape?: { kind: "skip" | "unknown"; question: string },
+    attachments?: SentAttachment[],
+  ) {
     const t = text.trim();
     if (!id || streaming) return;
-    if (!escape && !t) return;
+    if (!escape && !t && !(attachments && attachments.length > 0)) return;
     let nextHistory = messages;
     if (!escape) {
       const optimistic: MessageRow = {
         id: `local-${Date.now()}`, chat_id: id, role: "user",
         content: t, created_at: new Date().toISOString(),
+        attachments: attachments ?? [],
       };
       setMessages(prev => [...prev, optimistic]);
       nextHistory = [...messages, optimistic];
     }
-    setDraft("");
     setStreaming(true);
     setStreamingText("");
     try {
@@ -50,6 +58,7 @@ export default function RealChatThread() {
         chatId: id, messages: history,
         onDelta: chunk => setStreamingText(prev => prev + chunk),
         escape: escape ? { kind: escape.kind, question: escape.question, bucket: null } : undefined,
+        attachments: attachments ?? [],
       });
       // Pull authoritative copy from DB (server persisted both messages)
       await refresh();
@@ -143,7 +152,7 @@ export default function RealChatThread() {
 
           <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", paddingRight: 4, display: "flex", flexDirection: "column", gap: 18 }}>
             {messages.map(m => (
-              <MessageBubble key={m.id} role={m.role} text={m.content} onPickOption={send} disabled={streaming} />
+              <MessageBubble key={m.id} role={m.role} text={m.content} onPickOption={send} disabled={streaming} attachments={m.attachments} />
             ))}
             {streaming && streamingText && (
               <MessageBubble role="assistant" text={streamingText} onPickOption={send} disabled />
@@ -159,40 +168,14 @@ export default function RealChatThread() {
             )}
           </div>
 
-          <form
-            onSubmit={e => { e.preventDefault(); send(draft); }}
-            style={{
-              marginTop: 14, display: "flex", gap: 8, alignItems: "center",
-              padding: 6, background: "var(--ap-surface-1)",
-              border: "1px solid var(--ap-hairline)", borderRadius: 999,
-            }}
-          >
-            <input
-              value={draft}
-              onChange={e => setDraft(e.target.value)}
-              placeholder="Type your answer..."
+          {id && user && (
+            <ChatComposer
+              chatId={id}
+              userId={user.id}
               disabled={streaming}
-              style={{
-                flex: 1, appearance: "none", border: "none", outline: "none",
-                background: "transparent", color: "var(--ap-ink-1)",
-                padding: "10px 14px", fontSize: 14, fontFamily: "var(--ap-font-sans)",
-              }}
+              onSend={(text, atts) => send(text, undefined, atts)}
             />
-            <button
-              type="submit"
-              disabled={!draft.trim() || streaming}
-              aria-label="Send"
-              style={{
-                appearance: "none", cursor: draft.trim() && !streaming ? "pointer" : "default",
-                border: "none", height: 36, width: 36, borderRadius: 999,
-                background: draft.trim() && !streaming ? "var(--ap-signal)" : "var(--ap-surface-3)",
-                color: draft.trim() && !streaming ? "var(--ap-on-signal)" : "var(--ap-ink-3)",
-                display: "inline-flex", alignItems: "center", justifyContent: "center",
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </button>
-          </form>
+          )}
           <EscapeLinks
             messages={messages}
             streaming={streaming}
@@ -240,7 +223,13 @@ function EscapeLinks({
   );
 }
 
-function MessageBubble({ role, text, onPickOption, disabled }: { role: string; text: string; onPickOption?: (t: string) => void; disabled?: boolean }) {
+function MessageBubble({ role, text, onPickOption, disabled, attachments }: {
+  role: string;
+  text: string;
+  onPickOption?: (t: string) => void;
+  disabled?: boolean;
+  attachments?: Array<{ file_id: string; storage_path: string; mime: string; name: string; size: number }>;
+}) {
   if (role === "assistant" || role === "system") {
     const { body, options } = splitAssistantOptions(text);
     return (
@@ -259,13 +248,21 @@ function MessageBubble({ role, text, onPickOption, disabled }: { role: string; t
   }
   return (
     <div style={{ display: "flex", justifyContent: "flex-end" }}>
-      <div style={{ maxWidth: "78%" }}>
-        <div style={{
-          padding: "10px 14px",
-          borderRadius: "var(--ap-radius-md) var(--ap-radius-md) 4px var(--ap-radius-md)",
-          background: "var(--ap-signal)", color: "var(--ap-on-signal)",
-          fontSize: 14, lineHeight: 1.55, whiteSpace: "pre-wrap",
-        }}>{text}</div>
+      <div style={{ maxWidth: "78%", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
+        {attachments && attachments.length > 0 && (
+          <ChatAttachments attachments={attachments} />
+        )}
+        {text && (
+          <div style={{
+            padding: "10px 14px",
+            borderRadius: "var(--ap-radius-md) var(--ap-radius-md) 4px var(--ap-radius-md)",
+            background: "var(--ap-signal)", color: "var(--ap-on-signal)",
+            fontSize: 14, lineHeight: 1.55, whiteSpace: "pre-wrap",
+          }}>{text}</div>
+        )}
+        {attachments && attachments.length > 0 && attachments.some(a => !!a.file_id) && (
+          <AttachmentMemoryChip fileIds={attachments.map(a => a.file_id).filter(Boolean)} />
+        )}
       </div>
     </div>
   );
