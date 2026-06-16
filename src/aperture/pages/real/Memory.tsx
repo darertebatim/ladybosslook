@@ -25,10 +25,13 @@ export default function RealMemory() {
   const { createChat } = useApertureChatsDB();
 
   const countsBySlug = useMemo(() => {
+    // Weight: confirmed/extracted/freeform = 1.0, ai_inferred_pre_onboarding = 0.5.
+    // Guesses fill the visual space without making a bucket look truly "well understood".
     const m: Record<string, number> = {};
     for (const it of items) {
       if (!it.bucket_slug) continue;
-      m[it.bucket_slug] = (m[it.bucket_slug] ?? 0) + 1;
+      const weight = it.source === "ai_inferred_pre_onboarding" ? 0.5 : 1;
+      m[it.bucket_slug] = (m[it.bucket_slug] ?? 0) + weight;
     }
     return m;
   }, [items]);
