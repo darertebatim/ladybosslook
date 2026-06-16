@@ -163,12 +163,14 @@ function QuestionInput({
 
   if (q.question_key === "industry") {
     return (
-      <IndustryTwoStep
-        baseStyle={baseStyle}
-        value={value}
-        onChange={onChange}
-        industries={industries}
-      />
+      <select style={baseStyle} value={value} onChange={e => onChange(e.target.value)}>
+        <option value="">— Pick one —</option>
+        {industries.map(ind => (
+          <option key={ind.slug} value={ind.slug}>
+            {ind.group_label ? `${ind.group_label} · ${ind.label}` : ind.label}
+          </option>
+        ))}
+      </select>
     );
   }
 
@@ -203,46 +205,5 @@ function QuestionInput({
   return (
     <input style={baseStyle} type={q.input_kind === "url" ? "url" : q.input_kind === "email" ? "email" : "text"}
       value={value} onChange={e => onChange(e.target.value)} />
-  );
-}
-
-function IndustryTwoStep({
-  baseStyle, value, onChange, industries,
-}: {
-  baseStyle: React.CSSProperties;
-  value: string;
-  onChange: (v: string) => void;
-  industries: Array<{ slug: string; label: string; group_label: string | null }>;
-}) {
-  const selected = industries.find(i => i.slug === value);
-  const groups = Array.from(new Set(industries.map(i => i.group_label || "Other")));
-  const [group, setGroup] = useState<string>(selected?.group_label || "");
-  const inGroup = group
-    ? industries.filter(i => (i.group_label || "Other") === group)
-    : [];
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <select
-        style={baseStyle}
-        value={group}
-        onChange={e => {
-          setGroup(e.target.value);
-          onChange(""); // reset specific industry when group changes
-        }}
-      >
-        <option value="">— Pick a category —</option>
-        {groups.map(g => (
-          <option key={g} value={g}>{g}</option>
-        ))}
-      </select>
-      {group && (
-        <select style={baseStyle} value={value} onChange={e => onChange(e.target.value)}>
-          <option value="">— Pick your industry —</option>
-          {inGroup.map(ind => (
-            <option key={ind.slug} value={ind.slug}>{ind.label}</option>
-          ))}
-        </select>
-      )}
-    </div>
   );
 }

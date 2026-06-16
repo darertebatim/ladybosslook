@@ -362,14 +362,9 @@ function IndustriesTab() {
           <TableHead className="text-right">Actions</TableHead>
         </TableRow></TableHeader>
         <TableBody>
-          {t.rows.map((r, idx) => {
-            const prev = idx > 0 ? t.rows[idx - 1] : null;
-            const showGroup = !prev || prev.group_label !== r.group_label;
-            return (
-            <TableRow key={r.id} className={showGroup ? "border-t-2" : ""}>
-              <TableCell className="text-xs font-medium">
-                {showGroup ? (r.group_label ?? "—") : ""}
-              </TableCell>
+          {t.rows.map((r) => (
+            <TableRow key={r.id}>
+              <TableCell className="text-xs">{r.group_label ?? "—"}</TableCell>
               <TableCell className="font-mono text-xs">{r.slug}</TableCell>
               <TableCell>{r.label}</TableCell>
               <TableCell>{r.is_active ? <Badge>on</Badge> : <Badge variant="outline">off</Badge>}</TableCell>
@@ -378,8 +373,7 @@ function IndustriesTab() {
                 <Button size="icon" variant="ghost" onClick={() => t.remove(r.id)}><Trash2 className="h-4 w-4" /></Button>
               </TableCell>
             </TableRow>
-          );
-          })}
+          ))}
         </TableBody>
       </Table>
       <EditorDialog
