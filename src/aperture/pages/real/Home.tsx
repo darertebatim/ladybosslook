@@ -53,6 +53,11 @@ export default function RealHome() {
     setStarting(true);
     const chat = await createChat(s.title.slice(0, 48));
     setStarting(false);
+    void import("@/aperture/lib/apertureEvents").then(m =>
+      m.logApertureEvent("suggestion_tapped", {
+        title: s.title, prompt: s.prompt,
+      }, chat?.id ?? null)
+    );
     if (chat) navigate(`/aperture/app/chats/${chat.id}?seed=${encodeURIComponent(s.prompt)}`);
   }
 

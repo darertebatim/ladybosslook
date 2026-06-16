@@ -8,6 +8,7 @@ import {
 } from "@/aperture/components/primitives";
 import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
+import { logApertureEvent } from "@/aperture/lib/apertureEvents";
 
 /**
  * Phase 3 confirmation — after the website/IG research extraction,
@@ -85,6 +86,10 @@ export default function OnboardConfirm() {
     setSaving(true);
     const v = closingAnswer.trim();
     if (v) await addFreeformNote(v);
+    logApertureEvent("onboarding_answer", {
+      phase: "closing", question_key: "closing_help", answer: v || null,
+    });
+    logApertureEvent("onboarding_completed", { flow: "quick" });
     setSaving(false);
     navigate("/aperture/app", { replace: true });
   }

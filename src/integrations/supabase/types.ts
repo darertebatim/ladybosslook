@@ -773,6 +773,33 @@ export type Database = {
         }
         Relationships: []
       }
+      aperture_events: {
+        Row: {
+          conversation_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          payload: Json
+          user_id: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          payload?: Json
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          payload?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       aperture_industries: {
         Row: {
           created_at: string
@@ -6944,6 +6971,14 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      log_aperture_event: {
+        Args: {
+          p_conversation_id?: string
+          p_event_type: string
+          p_payload?: Json
+        }
+        Returns: string
       }
       log_security_event: {
         Args: { p_action: string; p_details?: Json; p_user_id?: string }

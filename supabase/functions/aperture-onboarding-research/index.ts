@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders, AI_GATEWAY, DEFAULT_MODEL } from "../_shared/aperture-cors.ts";
+import { logApertureEvent } from "../_shared/aperture-events.ts";
 
 /**
  * aperture-onboarding-research
@@ -99,8 +100,21 @@ serve(async (req) => {
         source: "ai_extracted",
         bucket_slug: it.bucket,
       });
-      if (!error) written++;
+      if (!error) {
+        written++;
+        await logApertureEvent(supabase, user.id, "memory_item_written", {
+          bucket_slug: it.bucket,
+          content: it.fact.trim().slice(0, 280),
+          source: "ai_extracted",
+          origin: "onboarding_phase3",
+        });
+      }
     }
+
+    await logApertureEvent(supabase, user.id, "onboarding_phase3_extracted", {
+      written,
+      sources: sources.map(s => ({ label: s.label, url: s.url, len: s.text.length })),
+    });
 
     // Flag memory card as stale so next chat regenerates the brief
     await supabase.from("aperture_memory_card")

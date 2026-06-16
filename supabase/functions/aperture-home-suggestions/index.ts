@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders, AI_GATEWAY, DEFAULT_MODEL } from "../_shared/aperture-cors.ts";
+import { logApertureEvent } from "../_shared/aperture-events.ts";
 
 /**
  * aperture-home-suggestions
@@ -112,6 +113,11 @@ ${memoryBrief}`;
         prompt: String(s?.prompt ?? "").trim().slice(0, 400),
       }))
       .filter((s: any) => s.title && s.prompt);
+
+    await logApertureEvent(supabase, user.id, "suggestion_shown", {
+      count: clean.length,
+      titles: clean.map((s: any) => s.title),
+    });
 
     return json({ suggestions: clean });
   } catch (e) {
