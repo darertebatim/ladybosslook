@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { logApertureEvent } from "@/aperture/lib/apertureEvents";
 
 export type MemorySource = "bucket_answer" | "ai_extracted" | "freeform";
 
@@ -65,6 +66,10 @@ export function useApertureMemoryDB() {
         bucket_slug: bucketSlug,
         question_key: questionKey,
       }, { onConflict: "user_id,bucket_slug,question_key" });
+      logApertureEvent("memory_item_written", {
+        bucket_slug: bucketSlug, question_key: questionKey,
+        content: trimmed, source: "bucket_answer",
+      });
     }
     await refresh();
   }, [user, refresh]);
@@ -81,6 +86,9 @@ export function useApertureMemoryDB() {
       content: trimmed,
       source: "freeform",
       bucket_slug: bucketSlug ?? null,
+    });
+    logApertureEvent("memory_item_written", {
+      bucket_slug: bucketSlug ?? null, content: trimmed, source: "freeform",
     });
     await refresh();
   }, [user, refresh]);
