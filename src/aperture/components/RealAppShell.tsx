@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ApertureWordmark } from "@/aperture/brand/ApertureLogo";
 import { ApertureMonoLabel, ApertureThemeSwitch } from "./primitives";
