@@ -608,7 +608,10 @@ export type Database = {
           created_by: string | null
           display_order: number
           glyph: string | null
+          industry_group_slug: string | null
           is_active: boolean
+          kind: string
+          metadata: Json
           slug: string
           sort_order: number
           source: string
@@ -625,7 +628,10 @@ export type Database = {
           created_by?: string | null
           display_order?: number
           glyph?: string | null
+          industry_group_slug?: string | null
           is_active?: boolean
+          kind?: string
+          metadata?: Json
           slug: string
           sort_order?: number
           source?: string
@@ -642,7 +648,10 @@ export type Database = {
           created_by?: string | null
           display_order?: number
           glyph?: string | null
+          industry_group_slug?: string | null
           is_active?: boolean
+          kind?: string
+          metadata?: Json
           slug?: string
           sort_order?: number
           source?: string
@@ -861,6 +870,7 @@ export type Database = {
         Row: {
           created_at: string
           group_label: string
+          group_slug: string | null
           id: string
           is_active: boolean
           label: string
@@ -871,6 +881,7 @@ export type Database = {
         Insert: {
           created_at?: string
           group_label: string
+          group_slug?: string | null
           id?: string
           is_active?: boolean
           label: string
@@ -881,6 +892,7 @@ export type Database = {
         Update: {
           created_at?: string
           group_label?: string
+          group_slug?: string | null
           id?: string
           is_active?: boolean
           label?: string
