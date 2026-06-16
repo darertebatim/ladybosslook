@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
       why: r.why ?? null,
       duration: r.duration ?? null,
       needs: r.needs ?? [],
-      steps: r.steps ?? null,
+      steps: r.steps ?? [],
       output: r.output ?? null,
       is_published: true,
     }));
