@@ -131,5 +131,12 @@ export function useApertureMemoryDB() {
     itemsInBucket(bucketSlug: string | null): MemoryItem[] {
       return items.filter(i => i.bucket_slug === bucketSlug);
     },
+    /** Source tag for a bucket+question answer (or null). */
+    sourceFor(bucketSlug: string, questionKey: string): MemorySource | null {
+      const m = items.find(
+        i => i.bucket_slug === bucketSlug && i.question_key === questionKey,
+      );
+      return (m?.source as MemorySource | undefined) ?? null;
+    },
   };
 }
