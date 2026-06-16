@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ApertureWordmark } from "@/aperture/brand/ApertureLogo";
 import { ApertureMonoLabel, ApertureThemeSwitch } from "./primitives";
@@ -45,7 +45,12 @@ export function RealAppShell({ children, rightRail }: { children: ReactNode; rig
           borderBottom: "1px solid var(--ap-hairline)",
         }}>
           <ApertureWordmark size={15} />
-          <ApertureThemeSwitch />
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <Link to="/aperture/app/settings" style={{ color: "var(--ap-ink-2)", display: "inline-flex" }}>
+              <Icon name="Settings" />
+            </Link>
+            <ApertureThemeSwitch />
+          </div>
         </header>
         <main style={{ padding: "20px 18px 24px" }}>{children}</main>
         <nav style={{
