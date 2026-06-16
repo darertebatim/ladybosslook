@@ -17,7 +17,7 @@ import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 export default function RealBucketPage() {
   const { slug } = useParams();
   const { buckets, questionsFor, loading: bLoading } = useApertureBucketsDB();
-  const { items, loading, saveBucketAnswer, answerFor } = useApertureMemoryDB();
+  const { items, loading, saveBucketAnswer, answerFor, sourceFor } = useApertureMemoryDB();
 
   const bucket = slug ? buckets.find(b => b.slug === slug) : undefined;
   const questions = slug ? questionsFor(slug) : [];
@@ -73,8 +73,22 @@ export default function RealBucketPage() {
                   const value = drafts[q.question_key] ?? "";
                   const saved = answerFor(bucket.slug, q.question_key);
                   const dirty = value !== saved;
+                  const src = sourceFor(bucket.slug, q.question_key);
+                  const isGuess = src === "ai_inferred_pre_onboarding";
                   return (
                     <ApertureCard key={q.id} padding={16}>
+                      {isGuess && !dirty && (
+                        <div style={{
+                          display: "inline-block", marginBottom: 8,
+                          fontFamily: "var(--ap-font-mono)", fontSize: 10,
+                          letterSpacing: "0.14em", textTransform: "uppercase",
+                          color: "var(--ap-ink-3)",
+                          border: "1px dashed var(--ap-hairline)",
+                          borderRadius: 4, padding: "3px 8px",
+                        }}>
+                          Guess · confirm or edit
+                        </div>
+                      )}
                       <label style={{ display: "block", fontSize: 14, color: "var(--ap-ink-1)", fontWeight: 500, marginBottom: 8 }}>
                         {q.prompt}
                       </label>
@@ -82,13 +96,14 @@ export default function RealBucketPage() {
                       <textarea
                         value={value}
                         onChange={e => setDrafts(d => ({ ...d, [q.question_key]: e.target.value }))}
-                        onBlur={() => dirty && commit(q.question_key, value)}
+                        onBlur={() => { if (dirty) commit(q.question_key, value); }}
                         rows={2}
                         style={{
                           width: "100%", resize: "vertical",
                           appearance: "none", outline: "none",
                           background: "var(--ap-surface-2)",
-                          border: "1px solid var(--ap-hairline)",
+                          border: `1px ${isGuess && !dirty ? "dashed" : "solid"} var(--ap-hairline)`,
+                          opacity: isGuess && !dirty ? 0.78 : 1,
                           borderRadius: "var(--ap-radius-sm)",
                           padding: "10px 12px",
                           fontSize: 14, color: "var(--ap-ink-1)",
@@ -97,7 +112,13 @@ export default function RealBucketPage() {
                       />
                       <div style={{ marginTop: 8 }}>
                         <ApertureMonoLabel>
-                          {saved ? (dirty ? "Edited · tap out to save" : "Saved to memory") : "Empty"}
+                          {saved
+                            ? dirty
+                              ? "Edited · tap out to save"
+                              : isGuess
+                                ? "Pre-filled guess · tap to confirm"
+                                : "Saved to memory"
+                            : "Empty"}
                         </ApertureMonoLabel>
                       </div>
                     </ApertureCard>
@@ -115,9 +136,14 @@ export default function RealBucketPage() {
                       display: "grid", gridTemplateColumns: "auto 1fr",
                       gap: 12, padding: "12px 14px",
                       borderTop: idx === 0 ? "none" : "1px solid var(--ap-hairline)",
+                      opacity: it.source === "ai_inferred_pre_onboarding" ? 0.78 : 1,
                     }}>
                       <ApertureMonoLabel color={it.source === "ai_extracted" ? "var(--ap-signal)" : undefined}>
-                        {it.source === "ai_extracted" ? "Noticed" : "Note"}
+                        {it.source === "ai_extracted"
+                          ? "Noticed"
+                          : it.source === "ai_inferred_pre_onboarding"
+                            ? "Guess"
+                            : "Note"}
                       </ApertureMonoLabel>
                       <span style={{ fontSize: 13.5, color: "var(--ap-ink-1)", lineHeight: 1.5 }}>{it.content}</span>
                     </div>
