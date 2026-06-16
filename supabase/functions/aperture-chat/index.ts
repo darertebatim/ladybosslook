@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders, AI_GATEWAY, DEFAULT_MODEL, CHAT_MODEL, LITE_MODEL } from "../_shared/aperture-cors.ts";
+import { logApertureEvent } from "../_shared/aperture-events.ts";
 
 /**
  * aperture-chat
@@ -90,6 +91,9 @@ serve(async (req) => {
       await supabase.from("aperture_messages").insert({
         chat_id: chatId, user_id: user.id, role: "user", content: lastUser.content,
       });
+      await logApertureEvent(supabase, user.id, "chat_message_user", {
+        content: String(lastUser.content ?? ""),
+      }, chatId);
 
       // Fire-and-forget: extract any business facts from this user turn
       // into the memory pool. Done out-of-band so it never blocks the
@@ -133,6 +137,12 @@ serve(async (req) => {
           metadata,
           is_active: true,
         });
+        await logApertureEvent(
+          supabase, user.id,
+          escape.kind === "skip" ? "daily_question_skipped" : "question_marked_unknown",
+          { question: qText, bucket_slug: bucket },
+          chatId,
+        );
       }
       escapeInstruction = escape.kind === "skip"
         ? `\n\nESCAPE — the user tapped "Skip for now" on your previous question${qText ? ` ("${qText}")` : ""}. Reply with exactly ONE short, warm sentence acknowledging the skip (e.g. "No problem — we'll come back to that.") and then move to the next most relevant question. CRITICAL: the next question must come from a different topic or a different bucket — never repeat the skipped question or a near-paraphrase in this session. Do not ask why they skipped. Do not show urgency.`
@@ -176,6 +186,9 @@ serve(async (req) => {
       await supabase.from("aperture_messages").insert({
         chat_id: chatId, user_id: user.id, role: "assistant", content: text,
       });
+      await logApertureEvent(supabase, user.id, "chat_message_ai", {
+        content: text,
+      }, chatId);
       return json({ content: text });
     }
 
@@ -213,6 +226,9 @@ serve(async (req) => {
             await supabase.from("aperture_messages").insert({
               chat_id: chatId, user_id: user.id, role: "assistant", content: assembled,
             });
+            await logApertureEvent(supabase, user.id, "chat_message_ai", {
+              content: assembled,
+            }, chatId);
           }
         }
       },
