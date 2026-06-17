@@ -56,26 +56,45 @@ export function validateFiles(files: File[]): { ok: File[]; rejected: { file: Fi
   return { ok, rejected };
 }
 
-/** Resize big images to ≤ 2048px before upload to keep latency reasonable. */
+/**
+ * Resize big images to ≤ 2048px and re-encode as JPEG before upload.
+ *
+ * HEIC/HEIF handling: Safari can decode HEIC via createImageBitmap so we
+ * always attempt the conversion — successful decode produces a JPEG the
+ * Gemini vision pipeline can read. On engines that can't decode HEIC
+ * (Chrome/Firefox/Android WebView) the bitmap call throws and we fall
+ * back to uploading the original; the ingest pipeline will then mark
+ * the file as failed instead of silently breaking.
+ */
 export async function compressImage(file: File): Promise<File> {
-  if (!file.type.startsWith("image/") || file.type === "image/heic" || file.type === "image/heif") return file;
+  if (!file.type.startsWith("image/")) return file;
   try {
     const bmp = await createImageBitmap(file);
     const maxDim = 2048;
     const scale = Math.min(1, maxDim / Math.max(bmp.width, bmp.height));
-    if (scale >= 0.999) { bmp.close?.(); return file; }
-    const w = Math.round(bmp.width * scale);
-    const h = Math.round(bmp.height * scale);
+    const w = Math.max(1, Math.round(bmp.width * scale));
+    const h = Math.max(1, Math.round(bmp.height * scale));
     const canvas = document.createElement("canvas");
     canvas.width = w; canvas.height = h;
     const ctx = canvas.getContext("2d");
-    if (!ctx) return file;
+    if (!ctx) { bmp.close?.(); return file; }
     ctx.drawImage(bmp, 0, 0, w, h);
     bmp.close?.();
     const blob: Blob | null = await new Promise(r => canvas.toBlob(r, "image/jpeg", 0.85));
     if (!blob) return file;
-    return new File([blob], file.name.replace(/\.(png|webp|heic|heif|gif)$/i, ".jpg"), { type: "image/jpeg" });
+    const isHeic = /heic|heif/i.test(file.type) || /\.(heic|heif)$/i.test(file.name);
+    // Skip re-encoding only when we'd produce a larger file AND there's
+    // no format conversion benefit (i.e. not HEIC). HEIC must always be
+    // converted because Gemini can't decode it.
+    if (!isHeic && scale >= 0.999 && blob.size >= file.size * 0.95) return file;
+    return new File(
+      [blob],
+      file.name.replace(/\.(png|webp|heic|heif|gif)$/i, ".jpg"),
+      { type: "image/jpeg" },
+    );
   } catch {
+    // Decode failed (likely HEIC on Chrome/Android). Return original;
+    // ingest will mark it failed and the user will see the chip disappear.
     return file;
   }
 }
