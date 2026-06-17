@@ -69,16 +69,24 @@ export function AttachmentMemoryChip({ fileIds }: { fileIds: string[] }) {
   const [state, setState] = useState<{
     done: boolean;
     failed: boolean;
+    timedOut: boolean;
     factCount: number;
     bucket: string | null;
-  }>({ done: false, failed: false, factCount: 0, bucket: null });
+  }>({ done: false, failed: false, timedOut: false, factCount: 0, bucket: null });
 
   useEffect(() => {
     if (fileIds.length === 0) return;
     let alive = true;
     let attempts = 0;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    // Exponential backoff: 2s → 3s → 4.5s → ... capped at 20s.
+    // Total budget ~5 minutes (16 attempts) so slow Gemini OCR still
+    // resolves instead of silently dropping the chip after 75s.
+    const MAX_ATTEMPTS = 16;
+    const nextDelay = (n: number) => Math.min(20000, Math.round(2000 * Math.pow(1.5, n)));
 
     const poll = async () => {
+      if (!alive) return;
       attempts++;
       const { data: files } = await supabase
         .from("aperture_files")
@@ -86,8 +94,12 @@ export function AttachmentMemoryChip({ fileIds }: { fileIds: string[] }) {
         .in("id", fileIds);
       if (!alive || !files) return;
       const allDone = files.every(f => f.status === "read" || f.status === "failed");
-      if (!allDone && attempts < 30) {
-        setTimeout(poll, 2500);
+      if (!allDone && attempts < MAX_ATTEMPTS) {
+        timer = setTimeout(poll, nextDelay(attempts));
+        return;
+      }
+      if (!allDone) {
+        setState(s => ({ ...s, done: true, timedOut: true }));
         return;
       }
       const failed = files.every(f => f.status === "failed");
@@ -106,16 +118,23 @@ export function AttachmentMemoryChip({ fileIds }: { fileIds: string[] }) {
         });
         bucket = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
       }
-      if (alive) setState({ done: true, failed, factCount: totalFacts, bucket });
+      if (alive) setState({ done: true, failed, timedOut: false, factCount: totalFacts, bucket });
     };
-    setTimeout(poll, 2500);
-    return () => { alive = false; };
+    timer = setTimeout(poll, 2000);
+    return () => { alive = false; if (timer) clearTimeout(timer); };
   }, [fileIds.join(",")]);
 
   if (!state.done) {
     return (
       <span style={{ fontSize: 11, color: "var(--ap-ink-3)", fontFamily: "var(--ap-font-mono)" }}>
         Reading attachments…
+      </span>
+    );
+  }
+  if (state.timedOut) {
+    return (
+      <span style={{ fontSize: 11, color: "var(--ap-ink-3)", fontFamily: "var(--ap-font-mono)" }}>
+        Still processing — check back later
       </span>
     );
   }
