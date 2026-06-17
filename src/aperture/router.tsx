@@ -27,6 +27,7 @@ const OnboardFull = lazy(() => import("@/aperture/pages/real/OnboardFull"));
 const OnboardConfirm = lazy(() => import("@/aperture/pages/real/OnboardConfirm"));
 const RealFiles = lazy(() => import("@/aperture/pages/real/Files"));
 const RealTools = lazy(() => import("@/aperture/pages/real/Tools"));
+const ApertureAuth = lazy(() => import("@/aperture/pages/real/Auth"));
 
 function ApertureLoader() {
   return (
@@ -64,7 +65,7 @@ function ApertureAuthGate({ children }: { children: React.ReactNode }) {
   if (loading) return <ApertureLoader />;
   if (!user) {
     const redirect = encodeURIComponent(location.pathname + location.search);
-    return <Navigate to={`/auth?redirect=${redirect}`} replace />;
+    return <Navigate to={`/aperture/auth?redirect=${redirect}`} replace />;
   }
   return <>{children}</>;
 }
@@ -90,6 +91,8 @@ export default function ApertureRouter() {
           <Route path="brand/mockup/library" element={<Library />} />
           <Route path="brand/mockup/library/:slug" element={<ActionPage />} />
           <Route path="brand/mockup/settings" element={<Settings />} />
+          {/* Aperture-branded auth page */}
+          <Route path="auth" element={<ApertureAuth />} />
           {/* Real product — Supabase-backed, auth-gated */}
           <Route path="app" element={<ApertureAuthGate><RealHome /></ApertureAuthGate>} />
           <Route path="app/memory" element={<ApertureAuthGate><RealMemory /></ApertureAuthGate>} />
