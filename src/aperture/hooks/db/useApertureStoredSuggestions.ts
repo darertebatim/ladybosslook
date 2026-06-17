@@ -10,6 +10,18 @@ export interface StoredSuggestion {
 }
 
 /**
+ * Suggestion lifecycle states (text column, no DB enum):
+ *   - active     → currently visible on Home
+ *   - acted_on   → user tapped the suggestion (kept current behaviour)
+ *   - completed  → underlying task done; suggestion no longer relevant
+ *   - dismissed  → user explicitly swiped/closed it
+ *   - expired    → past scheduled_for / expires_at window
+ * Helpers below let callers move a suggestion through any of those.
+ */
+export type SuggestionStatus =
+  | "active" | "acted_on" | "completed" | "dismissed" | "expired";
+
+/**
  * Reads persisted home suggestions from `aperture_generated_items`
  * (kind='home_suggestion', status='active'). These are written by the
  * Pass 2 post-onboarding generator, so Home has tailored cards on the
@@ -50,13 +62,22 @@ export function useApertureStoredSuggestions() {
   /** Mark a suggestion as acted_on (after the user taps it). */
   const markActed = useCallback(async (id: string) => {
     if (!user) return;
+    await setStatus(id, "acted_on");
+  }, [user]);
+
+  /** Generic status setter — drops the card from the local list. */
+  const setStatus = useCallback(async (id: string, status: SuggestionStatus) => {
+    if (!user) return;
     await supabase
       .from("aperture_generated_items")
-      .update({ status: "acted_on", status_at: new Date().toISOString() })
+      .update({ status, status_at: new Date().toISOString() })
       .eq("id", id)
       .eq("user_id", user.id);
     setSuggestions(s => s.filter(x => x.id !== id));
   }, [user]);
 
-  return { suggestions, loading, refresh: fetchNow, markActed };
+  const markDismissed = useCallback((id: string) => setStatus(id, "dismissed"), [setStatus]);
+  const markCompleted = useCallback((id: string) => setStatus(id, "completed"), [setStatus]);
+
+  return { suggestions, loading, refresh: fetchNow, markActed, markDismissed, markCompleted, setStatus };
 }
