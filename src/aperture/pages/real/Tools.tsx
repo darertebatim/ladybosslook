@@ -203,10 +203,15 @@ export default function RealTools() {
               if (tools.length === 0) return null;
               const noneSlug = `nothing_yet__${cat.label}`;
               const sheetSlug = `spreadsheet_or_notes__${cat.label}`;
+              const catKey = cat.label.toLowerCase().replace(/[^a-z0-9]+/g, "_");
               const entries: PickerEntry[] = [
                 ...tools.map((t) => ({
                   kind: "tool" as const,
-                  slug: t.slug,
+                  // Scope the tool slug by category so the same tool tagged
+                  // under multiple categories gets an independent row in
+                  // aperture_user_tools — toggling it off in one category
+                  // no longer wipes the others (unique key is user_id,tool_slug).
+                  slug: `${t.slug}__${catKey}`,
                   name: t.label,
                   industries: t.industries ?? [],
                   category: cat.label,
