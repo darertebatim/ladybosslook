@@ -301,39 +301,8 @@ function json(body: unknown, status = 200) {
  * industry group (if their profile has one). Industry buckets that don't
  * match are excluded so the model never tags a fact into the wrong group.
  */
-async function getAllowedBuckets(
-  supabase: any, userId?: string,
-): Promise<Array<{ slug: string; title: string }>> {
-  const { data: buckets } = await supabase
-    .from("aperture_buckets")
-    .select("slug,title,kind,industry_group_slug")
-    .eq("is_active", true);
-  const list = (buckets ?? []) as Array<{
-    slug: string; title: string; kind: string; industry_group_slug: string | null;
-  }>;
-
-  let userGroupSlug: string | null = null;
-  if (userId) {
-    const { data: profile } = await supabase
-      .from("aperture_user_profile")
-      .select("industry_slug").eq("user_id", userId).maybeSingle();
-    const industrySlug = (profile as any)?.industry_slug ?? null;
-    if (industrySlug) {
-      const { data: ind } = await supabase
-        .from("aperture_industries")
-        .select("group_slug").eq("slug", industrySlug).maybeSingle();
-      userGroupSlug = (ind as any)?.group_slug ?? null;
-    }
-  }
-
-  return list
-    .filter(b => {
-      if (b.kind !== "industry") return true;
-      if (!userGroupSlug) return false;
-      return b.industry_group_slug === userGroupSlug;
-    })
-    .map(b => ({ slug: b.slug, title: b.title }));
-}
+// getAllowedBuckets moved to ../_shared/aperture-buckets.ts so file-ingest
+// and chat share the same industry-aware allow-list.
 
 /**
  * Reads the saved memory card. If stale or missing, regenerates it by summarizing
@@ -442,7 +411,17 @@ async function classifyBucket(
         model: LITE_MODEL,
         messages: [
           { role: "system", content:
-            `Classify the following business question into ONE bucket slug. Respond with STRICT JSON only: {"bucket_slug": "<slug>"} or {"bucket_slug": null} if unsure. Allowed slugs:\n${catalog}` },
+            `Classify the following business question into ONE bucket slug.
+
+Allowed slugs:
+${catalog}
+
+Respond with STRICT JSON only: {"bucket_slug":"<slug>","confidence":"high"|"medium"|"low"}.
+
+Rules:
+- Use "high" ONLY if the slug is an obvious, unambiguous fit.
+- Use "low" (and we will discard your guess) if the question could plausibly belong to two or more buckets, is generic, or doesn't clearly fit any slug.
+- Never invent a slug. Better to be "low" than wrong.` },
           { role: "user", content: questionText.slice(0, 800) },
         ],
         response_format: { type: "json_object" },
@@ -453,7 +432,13 @@ async function classifyBucket(
     const raw = data?.choices?.[0]?.message?.content ?? "{}";
     const parsed = JSON.parse(raw);
     const slug = String(parsed?.bucket_slug ?? "").trim().toLowerCase();
-    return slug && allowed.includes(slug) ? slug : null;
+    const confidence = String(parsed?.confidence ?? "").trim().toLowerCase();
+    if (!slug || !allowed.includes(slug)) return null;
+    // Discard "low" confidence guesses — better to leave bucket null
+    // (the daily-question rotation handles unbucketed gaps fine) than
+    // to defer a skipped question against the wrong bucket for 21–30d.
+    if (confidence === "low") return null;
+    return slug;
   } catch {
     return null;
   }
