@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders, AI_GATEWAY, LITE_MODEL } from "../_shared/aperture-cors.ts";
+import { getAllowedBuckets } from "../_shared/aperture-buckets.ts";
 
 /**
  * aperture-file-ingest
@@ -45,7 +46,14 @@ async function extractText(file: Blob, name: string, mime: string, apiKey: strin
   return json.choices?.[0]?.message?.content ?? null;
 }
 
-async function extractFacts(text: string, apiKey: string): Promise<{ bucket_slug: string; content: string }[]> {
+async function extractFacts(
+  text: string, apiKey: string,
+  allowed: Array<{ slug: string; title: string }>,
+): Promise<{ bucket_slug: string; content: string }[]> {
+  if (allowed.length === 0) return [];
+  const slugList = allowed.map(b => b.slug).join(", ");
+  const allowedSet = new Set(allowed.map(b => b.slug));
+  const catalog = allowed.map(b => `- ${b.slug} (${b.title})`).join("\n");
   const trimmed = text.slice(0, 30000);
   const res = await fetch(AI_GATEWAY, {
     method: "POST",
@@ -55,11 +63,14 @@ async function extractFacts(text: string, apiKey: string): Promise<{ bucket_slug
       messages: [
         { role: "system", content:
 `Extract atomic business facts from the document. Return STRICT JSON:
-{"facts":[{"bucket_slug":"<one of: business-basics, your-story, customers-market, products-services, sales-conversion, marketing-visibility, money-finance, goals-vision, tools-systems, team-people, operations, partners-dependencies, brand-positioning>","content":"<short factual statement, 1 sentence>"}]}
+{"facts":[{"bucket_slug":"<one of the allowed slugs below>","content":"<short factual statement, 1 sentence>"}]}
+Allowed bucket slugs (use EXACTLY one of these — including industry buckets when relevant):
+${catalog}
 Rules:
 - Only extract concrete facts the owner would recognize ("Charges $85 per session", "Open Tue–Sat 10–6", "Sells to brides aged 25–35").
 - No fluff, no inferred opinions, no fabrications.
 - Max 25 facts. Skip anything uncertain.
+- If a fact fits an industry bucket better than a generic one, choose the industry bucket.
 - Output ONLY the JSON object, no markdown.`
         },
         { role: "user", content: trimmed },
@@ -72,7 +83,12 @@ Rules:
   const cleaned = raw.replace(/```json\n?|```/g, "").trim();
   try {
     const parsed = JSON.parse(cleaned);
-    return Array.isArray(parsed.facts) ? parsed.facts.slice(0, 25) : [];
+    const facts = Array.isArray(parsed.facts) ? parsed.facts.slice(0, 25) : [];
+    // Hard-filter to the allow-list — drop anything the model invented.
+    return facts.filter((f: any) =>
+      f && typeof f.bucket_slug === "string" && typeof f.content === "string"
+      && allowedSet.has(f.bucket_slug.toLowerCase().trim())
+    );
   } catch {
     return [];
   }
@@ -124,7 +140,8 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "extraction failed" }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const facts = await extractFacts(text, apiKey);
+    const allowed = await getAllowedBuckets(admin, user.id);
+    const facts = await extractFacts(text, apiKey, allowed);
     if (facts.length > 0) {
       const rows = facts.map(f => ({
         user_id: user.id,
