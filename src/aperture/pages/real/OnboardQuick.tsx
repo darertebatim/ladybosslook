@@ -76,6 +76,18 @@ export default function OnboardQuick() {
     if (qq.question_key === "instagram") {
       const handle = v.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "").replace(/^@/, "").replace(/\/$/, "").trim();
       await upsertProfile({ instagram: handle ? `@${handle}` : null });
+      // Also mark Instagram as an active tool in the user's stack so it
+      // shows up checked on the Tools page (Marketing & Social category).
+      if (handle) {
+        await supabase.from("aperture_user_tools").upsert({
+          user_id: (await supabase.auth.getUser()).data.user?.id,
+          tool_slug: "instagram__marketing_social",
+          tool_name: "Instagram",
+          category: "Marketing & Social",
+          custom: false,
+          is_active: true,
+        } as any, { onConflict: "user_id,tool_slug" });
+      }
     }
     if (qq.question_key === "industry") await upsertProfile({ industry_slug: v });
     // memory write
