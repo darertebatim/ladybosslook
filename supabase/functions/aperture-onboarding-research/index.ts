@@ -43,10 +43,18 @@ serve(async (req) => {
       if (t) sources.push({ label: "website", url: website, text: t });
     }
     if (instagram) {
-      const igUrl = instagram.startsWith("http")
-        ? instagram
-        : `https://www.instagram.com/${String(instagram).replace(/^@/, "")}/`;
-      const t = await fetchAsText(igUrl);
+      const handle = String(instagram)
+        .replace(/^https?:\/\/(www\.)?instagram\.com\//i, "")
+        .replace(/^@/, "")
+        .replace(/\/.*$/, "")
+        .trim();
+      const igUrl = `https://www.instagram.com/${handle}/`;
+      // Try profile page first (mobile UA pulls richer og: meta), then embed as fallback.
+      let t = await fetchInstagramMeta(igUrl);
+      if (!t) {
+        const embedUrl = `https://www.instagram.com/${handle}/embed/`;
+        t = await fetchAsText(embedUrl, true);
+      }
       if (t) sources.push({ label: "instagram", url: igUrl, text: t });
     }
 
@@ -141,11 +149,13 @@ function normalizeUrl(u: string): string {
   return `https://${t}`;
 }
 
-async function fetchAsText(url: string): Promise<string> {
+async function fetchAsText(url: string, mobile = false): Promise<string> {
   try {
     const res = await fetch(url, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; ApertureBot/1.0; +https://aperture.lovable.app)",
+        "User-Agent": mobile
+          ? "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1"
+          : "Mozilla/5.0 (compatible; ApertureBot/1.0; +https://aperture.lovable.app)",
         "Accept": "text/html,application/xhtml+xml",
       },
       redirect: "follow",
@@ -153,6 +163,43 @@ async function fetchAsText(url: string): Promise<string> {
     if (!res.ok) return "";
     const html = await res.text();
     return stripHtml(html);
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Instagram-specific: fetch with mobile UA and extract og:title +
+ * og:description + meta description. These are the only fields a
+ * logged-out client reliably gets from instagram.com.
+ */
+async function fetchInstagramMeta(url: string): Promise<string> {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1",
+        "Accept": "text/html,application/xhtml+xml",
+        "Accept-Language": "en-US,en;q=0.9",
+      },
+      redirect: "follow",
+    });
+    if (!res.ok) return "";
+    const html = await res.text();
+    const parts: string[] = [];
+    const grab = (re: RegExp) => {
+      const m = html.match(re);
+      if (m && m[1]) parts.push(m[1].replace(/&quot;/g, '"').replace(/&amp;/g, "&").trim());
+    };
+    grab(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i);
+    grab(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i);
+    grab(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i);
+    // also pick up the JSON-LD blob if any
+    const ld = html.match(/<script type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/i);
+    if (ld && ld[1]) parts.push(ld[1].slice(0, 2000));
+    const joined = parts.join("\n").trim();
+    // Treat pure "Login • Instagram" boilerplate as empty.
+    if (/^login\b/i.test(joined) || joined.length < 40) return "";
+    return joined;
   } catch {
     return "";
   }
