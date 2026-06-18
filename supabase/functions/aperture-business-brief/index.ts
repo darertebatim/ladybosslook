@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders, AI_GATEWAY, DEFAULT_MODEL } from "../_shared/aperture-cors.ts";
+import { corsHeaders, AI_GATEWAY, CHAT_MODEL } from "../_shared/aperture-cors.ts";
 import { logApertureEvent } from "../_shared/aperture-events.ts";
 
 /**
@@ -49,36 +49,65 @@ serve(async (req) => {
     const grouped: Record<string, string[]> = {};
     for (const it of (items ?? [])) {
       const slug = (it as any).bucket_slug ?? "notes";
-      (grouped[slug] ||= []).push(String((it as any).content ?? "").slice(0, 280));
+      (grouped[slug] ||= []).push(String((it as any).content ?? "").slice(0, 400));
     }
     const memoryBrief = Object.entries(grouped)
-      .map(([slug, lines]) => `## ${slug}\n${lines.slice(0, 10).map(l => `- ${l}`).join("\n")}`)
+      .map(([slug, lines]) => `## ${slug}\n${lines.slice(0, 20).map(l => `- ${l}`).join("\n")}`)
       .join("\n\n") || "(memory pool is still mostly empty)";
 
-    const system = `You are Aperture — a direct, experienced business advisor.
+    // PASS 1 — deep, free-form analysis. Model thinks out loud before structuring.
+    // We deliberately don't constrain it to JSON here so it can reason fully.
+    const analystSystem = `You are a senior operator who has built and advised dozens of small businesses across creator, services, e-commerce, and local categories. You are NOT a generic AI assistant. You think like a partner who is about to invest their own time into this business.
 
-The user just finished ${flow === "full" ? "the deep-dive questionnaire" : "quick onboarding"}. Based on EVERYTHING they shared (profile + memory + closing answer), write a short mini-report that proves you actually read and understood their business.
+You just received a dump of everything a real owner shared during onboarding. Read it the way an experienced operator reads it: looking for what's actually going on underneath the surface, where the money really comes from, what they're avoiding, what they're proud of but shouldn't be, and the ONE bottleneck that — if removed — would change everything in the next 30 days.
 
-Rules:
-- Tone: warm but sharp. Talk TO the owner ("you", "your"). No corporate filler.
-- "summary" = 2-3 sentences. Name what their business actually is and who it's for, in their voice.
-- "bullets" = exactly 4 entries. label is 1-3 words (e.g. "Who you serve", "What you sell", "Your edge", "Biggest gap"). value is one sharp sentence under 140 chars.
-- "next_moves" = exactly 3 imperative actions, under 9 words each. Concrete, weighted toward the closing answer.
-- "risks" = exactly 2 blind spots — things they didn't mention that matter. Each under 120 chars.
-- If memory is thin, say so honestly in summary rather than inventing.
-- Output STRICT JSON only — no prose, no markdown fences.
+Think out loud in plain text. Cover:
+1. What this business REALLY is (in plain language — strip the marketing).
+2. The math: how do they actually make money? What does a typical week of revenue look like based on what they said? Where is it leaking?
+3. The owner's blindspot. What did they NOT say that's screaming at you?
+4. The one bottleneck. If you could only fix one thing in 30 days, what is it and why?
+5. Two or three SPECIFIC moves (named tools, named tactics, real numbers, real channels — never "post more" or "research X" or "explore Y").
+6. What you'd quietly worry about if you were their partner.
+
+Be direct, specific, and evidence-based — every claim must trace back to something they actually said. Reference their exact words when you can. No filler, no hedging, no "consider", no "explore", no "you might want to". If memory is too thin to know something, SAY THAT instead of inventing.`;
+
+    const analystUser = `Business: ${(profile as any)?.business_name ?? "(unknown)"} · Industry: ${(profile as any)?.industry_slug ?? "(unknown)"}
+Website: ${(profile as any)?.website ?? "(none)"} · Instagram: ${(profile as any)?.instagram ?? "(none)"}
+
+THE ONE THING THEY ASKED FOR HELP WITH (weight this heavily):
+${closingAnswer || "(skipped — infer the real ask from memory)"}
+
+Everything they shared, by bucket:
+${memoryBrief}`;
+
+    const analysis = await callGateway(LOVABLE_API_KEY, CHAT_MODEL, [
+      { role: "system", content: analystSystem },
+      { role: "user", content: analystUser },
+    ]);
+    if (analysis.error) return json({ error: analysis.error }, analysis.status);
+    const analysisText = analysis.text;
+
+    // PASS 2 — compress the deep analysis into the strict UI schema, preserving specificity.
+    const formatterSystem = `You convert a senior operator's free-form analysis of a business into a STRICT JSON brief shown to the owner.
+
+Hard rules (a violation = a failed brief):
+- Preserve the analysis's specificity. Keep named tools, real numbers, real channels, the owner's own phrases. Never soften to "consider", "explore", "research", "look into", "think about".
+- Tone: warm, direct, partner-grade. Talk TO the owner ("you", "your"). Zero corporate filler.
+- "summary": 3-4 sentences. Name what the business REALLY is, who it's for, how it makes money today, and the ONE bottleneck — in the owner's own voice where possible.
+- "bullets": exactly 4. label is 1-3 words ("Who you serve", "How money flows", "Your real edge", "The bottleneck" or similar). value is ONE sharp sentence under 160 chars, evidence-based (anchored to something they said).
+- "next_moves": exactly 3 imperative actions. Each must include EITHER a specific number, a named tool/platform, or a named tactic. No vague verbs. Under 14 words each.
+- "risks": exactly 2 blind spots they didn't mention but that matter. Each under 140 chars. Be brave — name the thing they're avoiding.
+- If the analysis itself says memory is thin, reflect that honestly in summary rather than inventing.
+- Output STRICT JSON only. No prose, no markdown fences.
 
 Schema:
 { "summary": string, "bullets": [{"label": string, "value": string}], "next_moves": string[], "risks": string[] }`;
 
-    const userMsg = `Business: ${(profile as any)?.business_name ?? "(unknown)"} · Industry: ${(profile as any)?.industry_slug ?? "(unknown)"}
-Website: ${(profile as any)?.website ?? "(none)"} · Instagram: ${(profile as any)?.instagram ?? "(none)"}
+    const formatterUser = `Senior operator's analysis of this business:
 
-CLOSING ANSWER (what they want help with most right now):
-${closingAnswer || "(skipped)"}
+${analysisText}
 
-Raw memory by bucket:
-${memoryBrief}`;
+Now compress this into the strict JSON brief.`;
 
     const upstream = await fetch(AI_GATEWAY, {
       method: "POST",
@@ -87,10 +116,10 @@ ${memoryBrief}`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: DEFAULT_MODEL,
+        model: CHAT_MODEL,
         messages: [
-          { role: "system", content: system },
-          { role: "user", content: userMsg },
+          { role: "system", content: formatterSystem },
+          { role: "user", content: formatterUser },
         ],
         response_format: { type: "json_object" },
       }),
@@ -130,6 +159,8 @@ ${memoryBrief}`;
       next_moves: brief.next_moves.length,
       risks: brief.risks.length,
       had_closing_answer: closingAnswer.length > 0,
+      analysis_chars: analysisText.length,
+      model: CHAT_MODEL,
     });
 
     return json({ brief });
@@ -138,6 +169,26 @@ ${memoryBrief}`;
     return json({ error: String((e as any)?.message ?? e) }, 500);
   }
 });
+
+async function callGateway(
+  apiKey: string,
+  model: string,
+  messages: { role: string; content: string }[],
+): Promise<{ text: string; error?: string; status?: number }> {
+  const r = await fetch(AI_GATEWAY, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ model, messages }),
+  });
+  if (!r.ok) {
+    const t = await r.text();
+    if (r.status === 429) return { text: "", error: "Rate limited. Try again shortly.", status: 429 };
+    if (r.status === 402) return { text: "", error: "AI credits exhausted.", status: 402 };
+    return { text: "", error: `AI gateway error: ${t.slice(0, 300)}`, status: 500 };
+  }
+  const d = await r.json();
+  return { text: String(d?.choices?.[0]?.message?.content ?? "").trim() };
+}
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
