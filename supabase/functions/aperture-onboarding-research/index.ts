@@ -37,7 +37,7 @@ serve(async (req) => {
       return json({ ok: true, written: 0, skipped: "no urls" });
     }
 
-    const sources: { label: string; url: string; text: string }[] = [];
+    const sources: { label: string; url: string; text: string; meta?: Record<string, unknown> }[] = [];
     if (website) {
       const t = await fetchAsText(normalizeUrl(website));
       if (t) sources.push({ label: "website", url: website, text: t });
@@ -49,13 +49,17 @@ serve(async (req) => {
         .replace(/\/.*$/, "")
         .trim();
       const igUrl = `https://www.instagram.com/${handle}/`;
-      // Try profile page first (mobile UA pulls richer og: meta), then embed as fallback.
+      // Try profile page first (mobile UA pulls richer og: meta), then search snippets,
+      // then embed. Instagram often blocks Supabase IPs and returns only a login shell.
       let t = await fetchInstagramMeta(igUrl);
+      if (!t) {
+        t = await fetchInstagramSearchSnippet(handle);
+      }
       if (!t) {
         const embedUrl = `https://www.instagram.com/${handle}/embed/`;
         t = await fetchAsText(embedUrl, true);
       }
-      if (t) sources.push({ label: "instagram", url: igUrl, text: t });
+      if (t && !isInstagramBoilerplate(t)) sources.push({ label: "instagram", url: igUrl, text: t, meta: { handle } });
     }
 
     if (sources.length === 0) {
@@ -99,6 +103,17 @@ serve(async (req) => {
     const items = (parsed.items ?? []).filter(
       i => i && typeof i.fact === "string" && i.fact.trim() && VALID.has(i.bucket),
     );
+
+    // Deterministic safety net: if Instagram was blocked but search-result snippets
+    // reveal clear public profile facts, keep the user from seeing an empty review.
+    for (const s of sources.filter(s => s.label === "instagram")) {
+      const fallbackFacts = instagramFallbackFacts(s.text, String(s.meta?.handle ?? ""));
+      for (const fact of fallbackFacts) {
+        if (!items.some(i => i.fact.toLowerCase() === fact.toLowerCase())) {
+          items.push({ bucket: "marketing", fact });
+        }
+      }
+    }
 
     let written = 0;
     for (const it of items) {
