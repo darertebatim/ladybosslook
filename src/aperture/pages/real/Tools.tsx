@@ -227,6 +227,14 @@ export default function RealTools() {
           action={<ApertureChip tone={activeSet.size ? "signal" : "neutral"}>{activeSet.size} active</ApertureChip>}
         />
 
+        {industrySlug && (
+          <div style={{ marginBottom: 16 }}>
+            <ApertureMonoLabel>
+              Showing defaults + tools for: {industrySlug.replace(/-/g, " ")}
+            </ApertureMonoLabel>
+          </div>
+        )}
+
         {loading ? (
           <ApertureCard padding={20}><ApertureMonoLabel>Loading…</ApertureMonoLabel></ApertureCard>
         ) : (
@@ -291,6 +299,43 @@ export default function RealTools() {
                       );
                     })}
                   </div>
+                  {/* Per-category Other input */}
+                  <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10 }}>
+                    <input
+                      value={catCustomNames[cat.label] ?? ""}
+                      onChange={(e) => setCatCustomNames((p) => ({ ...p, [cat.label]: e.target.value }))}
+                      onKeyDown={(e) => { if (e.key === "Enter") addCategoryCustom(cat.label); }}
+                      placeholder={`Other ${cat.label.toLowerCase()} tool…`}
+                      style={{
+                        flex: 1, height: 34, padding: "0 12px",
+                        borderRadius: 999,
+                        border: "1px dashed var(--ap-hairline-strong)",
+                        background: "var(--ap-surface-1)", color: "var(--ap-ink-1)",
+                        fontSize: 13, fontFamily: "var(--ap-font-sans)",
+                      }}
+                    />
+                    <ApertureButton variant="ghost" size="sm" onClick={() => addCategoryCustom(cat.label)}>
+                      <Plus size={13} /> Add
+                    </ApertureButton>
+                  </div>
+                  {/* Custom tools previously added under this category */}
+                  {rows.filter((r) => r.custom && r.is_active && r.category === cat.label).length > 0 && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
+                      {rows.filter((r) => r.custom && r.is_active && r.category === cat.label).map((r) => (
+                        <span
+                          key={r.id}
+                          style={{
+                            display: "inline-flex", alignItems: "center", gap: 6,
+                            padding: "6px 10px", borderRadius: 999,
+                            background: "var(--ap-signal-soft)", color: "var(--ap-signal)",
+                            fontSize: 12.5, fontWeight: 500,
+                          }}
+                        >
+                          <Check size={12} /> {r.tool_name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </section>
               );
             })}
