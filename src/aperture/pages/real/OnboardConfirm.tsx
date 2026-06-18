@@ -179,34 +179,6 @@ export default function OnboardConfirm() {
             />
             <LoadingCard label="Reading your memory, weighing your answer, drafting concrete next actions." />
           </>
-        ) : false ? null : prefilling ? (
-          <>
-            <PageHeader
-              index="ONE MOMENT"
-              title="Sketching a first draft of your business…"
-              sub="I'm using your industry and what you just confirmed to pre-fill some guesses. You'll see them clearly marked as guesses — confirm or correct them anytime."
-            />
-            <ApertureCard padding={24}>
-              <ApertureMonoLabel>Working…</ApertureMonoLabel>
-              <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
-                Drafting industry-grounded defaults across your memory buckets.
-              </p>
-            </ApertureCard>
-          </>
-        ) : tailoring ? (
-          <>
-            <PageHeader
-              index="ONE MOMENT"
-              title="Tailoring your first moves…"
-              sub="I'm using what you just told me to line up the sharpest next steps for your business. This takes a few seconds."
-            />
-            <ApertureCard padding={24}>
-              <ApertureMonoLabel>Working…</ApertureMonoLabel>
-              <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
-                Reading your memory, weighing your answer, drafting concrete next actions.
-              </p>
-            </ApertureCard>
-          </>
         ) : phase === "closing" ? (
           <>
             <PageHeader
@@ -248,13 +220,8 @@ export default function OnboardConfirm() {
           action={total > 0 ? <ApertureChip tone="signal">{kept} kept</ApertureChip> : null}
         />
 
-        {loading && total === 0 ? (
-          <ApertureCard padding={20}>
-            <ApertureMonoLabel>Working…</ApertureMonoLabel>
-            <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--ap-ink-2)" }}>
-              I'm reading your site and IG. This usually takes 10–20 seconds.
-            </p>
-          </ApertureCard>
+        {researching && total === 0 ? (
+          <LoadingCard label="Reading your site and Instagram. This usually takes 10–30 seconds." />
         ) : total === 0 ? (
           <ApertureCard padding={20}>
             <ApertureMonoLabel>Nothing yet</ApertureMonoLabel>
