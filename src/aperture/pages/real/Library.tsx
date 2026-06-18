@@ -12,7 +12,7 @@ interface ActionRow {
   duration: string | null;
 }
 
-const CATEGORIES = ["All", "Marketing", "Sales", "Pricing", "Customers", "Operations", "Mindset"] as const;
+const CATEGORIES = ["All", "Strategy", "Sales", "Marketing", "Customers", "Pricing", "Products", "Operations", "Money", "Team"] as const;
 type CatFilter = typeof CATEGORIES[number];
 type KindFilter = "all" | "playbook" | "prompt";
 
