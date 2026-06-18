@@ -1195,6 +1195,7 @@ export type Database = {
           full_onboarded_at: string | null
           industry_slug: string | null
           instagram: string | null
+          owner_name: string | null
           quick_onboarded_at: string | null
           updated_at: string
           user_id: string
@@ -1206,6 +1207,7 @@ export type Database = {
           full_onboarded_at?: string | null
           industry_slug?: string | null
           instagram?: string | null
+          owner_name?: string | null
           quick_onboarded_at?: string | null
           updated_at?: string
           user_id: string
@@ -1217,6 +1219,7 @@ export type Database = {
           full_onboarded_at?: string | null
           industry_slug?: string | null
           instagram?: string | null
+          owner_name?: string | null
           quick_onboarded_at?: string | null
           updated_at?: string
           user_id?: string
