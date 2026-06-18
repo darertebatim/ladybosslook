@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { IndustryPicker } from "@/aperture/components/IndustryPicker";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
@@ -28,6 +28,8 @@ export default function OnboardQuick() {
   const [i, setI] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [showPhaseIntro, setShowPhaseIntro] = useState(false);
+  const lastPhaseRef = useRef<number | null>(null);
 
   // Closing question is asked AFTER Phase-3 confirmation, not here.
   const flowQuestions = useMemo(
@@ -43,6 +45,25 @@ export default function OnboardQuick() {
     const phase = q.step;
     return phase === 1 ? "Your business" : phase === 2 ? "Details" : "One last thing";
   }, [q]);
+
+  // Show a short interstitial when we cross into a new phase.
+  useEffect(() => {
+    if (!q) return;
+    if (lastPhaseRef.current === null) {
+      lastPhaseRef.current = q.step;
+      return;
+    }
+    if (lastPhaseRef.current !== q.step) {
+      lastPhaseRef.current = q.step;
+      setShowPhaseIntro(true);
+    }
+  }, [q?.step]);
+
+  const phaseMeta = (p: number) => p === 1
+    ? { title: "Your business", sub: "The essentials so I know who I'm working with." }
+    : p === 2
+    ? { title: "Your online presence", sub: "Drop your links so I can read up on you." }
+    : { title: "One last thing", sub: "A quick note on how I can help most." };
 
   async function persistAnswer(qq: typeof q, value: string) {
     if (!qq) return;
@@ -132,8 +153,45 @@ export default function OnboardQuick() {
           action={total > 0 ? <ApertureChip tone="neutral">{Math.min(i + 1, total)} / {total}</ApertureChip> : null}
         />
 
+        {q && (
+          <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+            {[1, 2, 3].map(p => {
+              const state = q.step === p ? "active" : q.step > p ? "done" : "todo";
+              return (
+                <div key={p} style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
+                  <div style={{
+                    height: 4, borderRadius: 999,
+                    background: state === "todo" ? "var(--ap-hairline)" : "var(--ap-signal)",
+                    opacity: state === "active" ? 1 : state === "done" ? 0.55 : 1,
+                  }} />
+                  <div style={{
+                    fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase",
+                    color: state === "active" ? "var(--ap-ink-1)" : "var(--ap-ink-2)",
+                    fontWeight: state === "active" ? 600 : 500,
+                  }}>
+                    Phase {p}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
         {loading || !q ? (
           <ApertureCard padding={20}><ApertureMonoLabel>Loading…</ApertureMonoLabel></ApertureCard>
+        ) : showPhaseIntro ? (
+          <ApertureCard padding={24}>
+            <ApertureMonoLabel>Phase {q.step} of 3</ApertureMonoLabel>
+            <h2 style={{ margin: "10px 0 8px", fontSize: 24, color: "var(--ap-ink-1)", fontWeight: 600, letterSpacing: "-0.02em" }}>
+              {phaseMeta(q.step).title}
+            </h2>
+            <p style={{ margin: "0 0 18px", fontSize: 14, color: "var(--ap-ink-2)" }}>
+              {phaseMeta(q.step).sub}
+            </p>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <ApertureButton variant="accent" onClick={() => setShowPhaseIntro(false)}>Continue →</ApertureButton>
+            </div>
+          </ApertureCard>
         ) : (
           <ApertureCard padding={20}>
             <ApertureMonoLabel>{phaseLabel}</ApertureMonoLabel>
