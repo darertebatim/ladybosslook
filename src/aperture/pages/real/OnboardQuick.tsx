@@ -149,9 +149,9 @@ export default function OnboardQuick() {
             />
 
             <div style={{ display: "flex", gap: 8, marginTop: 18, justifyContent: "flex-end" }}>
-              <ApertureButton variant="ghost" onClick={skip}>Skip</ApertureButton>
+              <ApertureButton variant="ghost" onClick={skip} disabled={busy}>Skip</ApertureButton>
               <ApertureButton variant="accent" onClick={next} disabled={busy}>
-                {i + 1 >= total ? "Finish" : "Next →"}
+                {busy ? "Saving…" : i + 1 >= total ? "Finish" : "Next →"}
               </ApertureButton>
             </div>
           </ApertureCard>
