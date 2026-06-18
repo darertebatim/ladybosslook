@@ -115,7 +115,6 @@ export default function ApertureAuth() {
             </ApertureButton>
             <ApertureButton
               type="button"
-              variant="ghost"
               onClick={() => handleOauth("google")}
               disabled={!!oauth || authLoading}
               style={{ width: "100%" }}
