@@ -447,6 +447,11 @@ export default function RealTools() {
           </div>
         )}
       </RealAppShell>
+      <SourceDetailSheet
+        summary={openSource}
+        open={!!openSource}
+        onClose={() => setOpenSource(null)}
+      />
     </>
   );
 }
