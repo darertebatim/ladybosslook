@@ -499,6 +499,7 @@ export type Database = {
           category: string
           created_at: string
           duration: string | null
+          industry_group_slug: string | null
           is_published: boolean
           kind: string
           needs: string[] | null
@@ -514,6 +515,7 @@ export type Database = {
           category: string
           created_at?: string
           duration?: string | null
+          industry_group_slug?: string | null
           is_published?: boolean
           kind: string
           needs?: string[] | null
@@ -529,6 +531,7 @@ export type Database = {
           category?: string
           created_at?: string
           duration?: string | null
+          industry_group_slug?: string | null
           is_published?: boolean
           kind?: string
           needs?: string[] | null
