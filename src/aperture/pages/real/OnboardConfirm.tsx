@@ -10,6 +10,7 @@ import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { logApertureEvent } from "@/aperture/lib/apertureEvents";
 import { supabase } from "@/integrations/supabase/client";
+import { BusinessBriefScreen } from "@/aperture/components/BusinessBriefScreen";
 
 
 /**
@@ -25,7 +26,7 @@ export default function OnboardConfirm() {
   const [saving, setSaving] = useState(false);
   const [edits, setEdits] = useState<Record<string, string>>({});
   const [removed, setRemoved] = useState<Record<string, boolean>>({});
-  const [phase, setPhase] = useState<"review" | "closing">("review");
+  const [phase, setPhase] = useState<"review" | "closing" | "brief">("review");
   const [closingAnswer, setClosingAnswer] = useState("");
   const [tailoring, setTailoring] = useState(false);
   const [prefilling, setPrefilling] = useState(false);
@@ -146,7 +147,8 @@ export default function OnboardConfirm() {
     } catch (e) {
       console.error("pass2 invoke failed", e);
     }
-    navigate("/aperture/app", { replace: true });
+    setTailoring(false);
+    setPhase("brief");
   }
 
   const bucketTitleMap = useMemo(() => {
@@ -180,6 +182,12 @@ export default function OnboardConfirm() {
             />
             <ApertureLoading sublabel="Reading your memory, weighing your answer, drafting concrete next actions." />
           </>
+        ) : phase === "brief" ? (
+          <BusinessBriefScreen
+            closingAnswer={closingAnswer}
+            flow="quick"
+            onDone={() => navigate("/aperture/app", { replace: true })}
+          />
         ) : phase === "closing" ? (
           <>
             <PageHeader

@@ -11,6 +11,7 @@ import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfi
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { logApertureEvent } from "@/aperture/lib/apertureEvents";
 import { supabase } from "@/integrations/supabase/client";
+import { BusinessBriefScreen } from "@/aperture/components/BusinessBriefScreen";
 
 /**
  * Full questionnaire — section-by-section wizard. Each section is
@@ -25,7 +26,7 @@ export default function OnboardFull() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [sectionIdx, setSectionIdx] = useState(0);
   const [busy, setBusy] = useState(false);
-  const [phase, setPhase] = useState<"sections" | "prefilling" | "closing" | "tailoring">("sections");
+  const [phase, setPhase] = useState<"sections" | "prefilling" | "closing" | "tailoring" | "brief">("sections");
   const [closingAnswer, setClosingAnswer] = useState("");
 
   const sections = useMemo(() => {
@@ -96,7 +97,7 @@ export default function OnboardFull() {
     } catch (e) {
       console.error("pass2 invoke failed", e);
     }
-    navigate("/aperture/app", { replace: true });
+    setPhase("brief");
   }
 
   async function next() {
@@ -146,6 +147,12 @@ export default function OnboardFull() {
             />
             <ApertureLoading sublabel="Reading your memory, weighing your answer, drafting concrete next actions." />
           </>
+        ) : phase === "brief" ? (
+          <BusinessBriefScreen
+            closingAnswer={closingAnswer}
+            flow="full"
+            onDone={() => navigate("/aperture/app", { replace: true })}
+          />
         ) : phase === "closing" ? (
           <>
             <PageHeader
