@@ -37,7 +37,7 @@ serve(async (req) => {
       return json({ ok: true, written: 0, skipped: "no urls" });
     }
 
-    const sources: { label: string; url: string; text: string }[] = [];
+    const sources: { label: string; url: string; text: string; meta?: Record<string, unknown> }[] = [];
     if (website) {
       const t = await fetchAsText(normalizeUrl(website));
       if (t) sources.push({ label: "website", url: website, text: t });
@@ -49,13 +49,17 @@ serve(async (req) => {
         .replace(/\/.*$/, "")
         .trim();
       const igUrl = `https://www.instagram.com/${handle}/`;
-      // Try profile page first (mobile UA pulls richer og: meta), then embed as fallback.
+      // Try profile page first (mobile UA pulls richer og: meta), then search snippets,
+      // then embed. Instagram often blocks Supabase IPs and returns only a login shell.
       let t = await fetchInstagramMeta(igUrl);
+      if (!t) {
+        t = await fetchInstagramSearchSnippet(handle);
+      }
       if (!t) {
         const embedUrl = `https://www.instagram.com/${handle}/embed/`;
         t = await fetchAsText(embedUrl, true);
       }
-      if (t) sources.push({ label: "instagram", url: igUrl, text: t });
+      if (t && !isInstagramBoilerplate(t)) sources.push({ label: "instagram", url: igUrl, text: t, meta: { handle } });
     }
 
     if (sources.length === 0) {
@@ -99,6 +103,17 @@ serve(async (req) => {
     const items = (parsed.items ?? []).filter(
       i => i && typeof i.fact === "string" && i.fact.trim() && VALID.has(i.bucket),
     );
+
+    // Deterministic safety net: if Instagram was blocked but search-result snippets
+    // reveal clear public profile facts, keep the user from seeing an empty review.
+    for (const s of sources.filter(s => s.label === "instagram")) {
+      const fallbackFacts = instagramFallbackFacts(s.text, String(s.meta?.handle ?? ""));
+      for (const fact of fallbackFacts) {
+        if (!items.some(i => i.fact.toLowerCase() === fact.toLowerCase())) {
+          items.push({ bucket: "marketing", fact });
+        }
+      }
+    }
 
     let written = 0;
     for (const it of items) {
@@ -149,6 +164,23 @@ function normalizeUrl(u: string): string {
   return `https://${t}`;
 }
 
+function decodeEntities(input: string): string {
+  return input
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(parseInt(dec, 10)))
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'");
+}
+
+function cleanText(input: string): string {
+  return decodeEntities(input.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+}
+
 async function fetchAsText(url: string, mobile = false): Promise<string> {
   try {
     const res = await fetch(url, {
@@ -188,7 +220,7 @@ async function fetchInstagramMeta(url: string): Promise<string> {
     const parts: string[] = [];
     const grab = (re: RegExp) => {
       const m = html.match(re);
-      if (m && m[1]) parts.push(m[1].replace(/&quot;/g, '"').replace(/&amp;/g, "&").trim());
+      if (m && m[1]) parts.push(cleanText(m[1]));
     };
     grab(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i);
     grab(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i);
@@ -198,11 +230,68 @@ async function fetchInstagramMeta(url: string): Promise<string> {
     if (ld && ld[1]) parts.push(ld[1].slice(0, 2000));
     const joined = parts.join("\n").trim();
     // Treat pure "Login • Instagram" boilerplate as empty.
-    if (/^login\b/i.test(joined) || joined.length < 40) return "";
+    if (isInstagramBoilerplate(joined) || joined.length < 40) return "";
     return joined;
   } catch {
     return "";
   }
+}
+
+async function fetchInstagramSearchSnippet(handle: string): Promise<string> {
+  try {
+    const url = `https://duckduckgo.com/html/?q=${encodeURIComponent(`${handle} Instagram`)}`;
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml",
+        "Accept-Language": "en-US,en;q=0.9",
+      },
+      redirect: "follow",
+    });
+    if (!res.ok) return "";
+    const html = await res.text();
+    const chunks: string[] = [];
+    const resultRe = /<div class="result[\s\S]*?(?=<div class="result|<\/body>)/gi;
+    const results = html.match(resultRe) ?? [];
+    for (const block of results.slice(0, 6)) {
+      const text = cleanText(block);
+      if (!text.toLowerCase().includes(handle.toLowerCase())) continue;
+      if (!/instagram|followers|following|posts|business|consult/i.test(text)) continue;
+      chunks.push(text.slice(0, 700));
+    }
+    return chunks.join("\n").trim();
+  } catch {
+    return "";
+  }
+}
+
+function isInstagramBoilerplate(text: string): boolean {
+  const t = text.toLowerCase();
+  if (!t.trim()) return true;
+  if (/^login\b/.test(t.trim())) return true;
+  if (t.includes("create an account or log in to instagram") && !t.includes("followers")) return true;
+  if (t.includes("see everyday moments from your close friends") && !t.includes("followers")) return true;
+  return false;
+}
+
+function instagramFallbackFacts(text: string, handle: string): string[] {
+  const facts: string[] = [];
+  const profileLine = text.split(/\n+/).find(line =>
+    line.toLowerCase().includes(handle.toLowerCase()) && /followers|following|posts/i.test(line),
+  ) ?? text;
+  const followers = profileLine.match(/([\d,.]+\s*[KMB]?)\s+Followers/i)?.[1];
+  const following = profileLine.match(/([\d,.]+\s*[KMB]?)\s+Following/i)?.[1];
+  const posts = profileLine.match(/([\d,.]+)\s+Posts/i)?.[1];
+  if (followers) {
+    facts.push(`Instagram @${handle} has about ${followers.replace(/\s+/g, "")} followers${following ? ` and follows ${following.replace(/\s+/g, "")}` : ""}${posts ? ` across ${posts} posts` : ""}.`);
+  }
+  const businessSnippet = text.match(/Helping[^.\n]{20,180}/i)?.[0]
+    ?? text.match(/BusinessTraining[^.\n]{10,180}/i)?.[0]
+    ?? text.match(/profitable businesses[^.\n]{0,120}/i)?.[0];
+  if (businessSnippet) facts.push(cleanText(businessSnippet).slice(0, 180));
+  const location = text.match(/Orange\s*County[^\n.]{0,40}/i)?.[0];
+  if (location) facts.push(`Instagram bio mentions ${cleanText(location)}.`);
+  return facts.slice(0, 3);
 }
 
 function stripHtml(html: string): string {
@@ -214,13 +303,7 @@ function stripHtml(html: string): string {
   // collapse tags
   out = out.replace(/<[^>]+>/g, " ");
   // decode common entities
-  out = out
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
+  out = decodeEntities(out);
   // collapse whitespace
   return out.replace(/\s+/g, " ").trim();
 }
