@@ -40,7 +40,7 @@ export default function OnboardQuick() {
   const phaseLabel = useMemo(() => {
     if (!q) return "";
     const phase = q.step;
-    return phase === 1 ? "About you" : phase === 2 ? "Your business" : "Online presence";
+    return phase === 1 ? "Your business" : phase === 2 ? "Details" : "One last thing";
   }, [q]);
 
   async function persistAnswer(qq: typeof q, value: string) {
@@ -48,6 +48,7 @@ export default function OnboardQuick() {
     const v = value.trim();
     if (!v) return;
     // profile shortcuts
+    if (qq.question_key === "owner_name") await upsertProfile({ owner_name: v });
     if (qq.question_key === "business_name") await upsertProfile({ business_name: v });
     if (qq.question_key === "website") await upsertProfile({ website: v });
     if (qq.question_key === "instagram") await upsertProfile({ instagram: v });
