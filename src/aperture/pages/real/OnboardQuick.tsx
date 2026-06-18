@@ -188,10 +188,12 @@ function QuestionInput({
   if (q.input_kind === "single_choice" && Array.isArray(q.options)) {
     return (
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        {q.options.map((o: string) => {
-          const on = value === o;
+        {q.options.map((raw: any) => {
+          const label = typeof raw === "string" ? raw : raw?.label ?? String(raw?.value ?? "");
+          const val = typeof raw === "string" ? raw : raw?.value ?? label;
+          const on = value === val;
           return (
-            <button key={o} type="button" onClick={() => onChange(o)}
+            <button key={val} type="button" onClick={() => onChange(val)}
               style={{
                 appearance: "none", cursor: "pointer",
                 padding: "10px 14px", borderRadius: "var(--ap-radius-sm)",
@@ -199,14 +201,14 @@ function QuestionInput({
                 background: on ? "var(--ap-signal)" : "var(--ap-surface-2)",
                 color: on ? "#000" : "var(--ap-ink-1)",
                 fontSize: 14, fontWeight: 500,
-              }}>{o}</button>
+              }}>{label}</button>
           );
         })}
       </div>
     );
   }
 
-  if (q.input_kind === "long_text") {
+  if (q.input_kind === "long_text" || q.input_kind === "textarea") {
     return (
       <textarea rows={4} style={{ ...baseStyle, resize: "vertical" }}
         value={value} onChange={e => onChange(e.target.value)} />
