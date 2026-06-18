@@ -11,7 +11,11 @@ import { logApertureEvent } from "../_shared/aperture-events.ts";
  * crisp facts, and writes them into aperture_memory_items as
  * source='ai_extracted'.
  *
- * Request body: { website?: string, instagram?: string, businessName?: string }
+ * Request body:
+ *   Bulk mode (Quick Onboarding):
+ *     { website?: string, instagram?: string, businessName?: string }
+ *   Targeted mode (single source refetch, used by Tools > Source detail):
+ *     { source: "website"|"instagram", url: string, businessName?: string, userPrompt?: string }
  * Auth: bearer token of the user (writes are scoped to user.id).
  */
 
@@ -32,14 +36,18 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) return json({ error: "AI gateway not configured" }, 500);
 
-    const { website, instagram, businessName } = await req.json();
-    if (!website && !instagram) {
+    const body = await req.json();
+    const { website, instagram, businessName, source, url, userPrompt } = body ?? {};
+    const targeted = source === "website" || source === "instagram";
+    const effWebsite = targeted && source === "website" ? url : website;
+    const effInstagram = targeted && source === "instagram" ? url : instagram;
+    if (!effWebsite && !effInstagram) {
       return json({ ok: true, written: 0, skipped: "no urls" });
     }
 
     const sources: { label: string; url: string; text: string; meta?: Record<string, unknown> }[] = [];
-    if (website) {
-      const baseUrl = normalizeUrl(website);
+    if (effWebsite) {
+      const baseUrl = normalizeUrl(effWebsite);
       // Pull og:meta + visible text from the homepage, then try common
       // marketing pages so SPAs don't come back empty.
       const homepage = await fetchWebsiteRich(baseUrl);
@@ -53,11 +61,11 @@ serve(async (req) => {
       }
       const combined = [homepage, ...extras].filter(Boolean).join("\n\n");
       if (combined.trim().length > 40) {
-        sources.push({ label: "website", url: website, text: combined });
+        sources.push({ label: "website", url: effWebsite, text: combined });
       }
     }
-    if (instagram) {
-      const handle = String(instagram)
+    if (effInstagram) {
+      const handle = String(effInstagram)
         .replace(/^https?:\/\/(www\.)?instagram\.com\//i, "")
         .replace(/^@/, "")
         .replace(/\/.*$/, "")
@@ -80,12 +88,27 @@ serve(async (req) => {
       return json({ ok: true, written: 0, skipped: "fetch failed" });
     }
 
+    // Persist raw snapshot per source for the Source detail sheet.
+    for (const s of sources) {
+      await supabase.from("aperture_source_snapshots").upsert({
+        user_id: user.id,
+        source_kind: s.label,
+        url: s.url,
+        raw_text: s.text.slice(0, 20000),
+        meta: s.meta ?? {},
+        fetched_at: new Date().toISOString(),
+      } as any, { onConflict: "user_id,source_kind" });
+    }
+
     const corpus = sources
       .map(s => `# ${s.label.toUpperCase()} (${s.url})\n${s.text.slice(0, 6000)}`)
       .join("\n\n");
 
     const systemPrompt = `You extract a short list of crisp, factual statements about a small business from raw scraped web/IG text. Each fact must be true based on the source text, brief (<= 24 words), specific, and non-redundant. Skip generic marketing fluff. If the source text is mostly a login wall or empty, return an empty list.`;
-    const userPrompt = `Business name (claimed): ${businessName ?? "(unknown)"}\n\nReturn JSON of the shape:\n{\n  "items": [\n    { "bucket": "<one of: basics|story|customers|products|sales|marketing|money|vision|tools|team|operations|partners|competitors>", "fact": "<concise fact>" }\n  ]\n}\nOnly return valid JSON. Max 12 items.\n\n=== SOURCE ===\n${corpus}\n=== END SOURCE ===`;
+    const focusLine = userPrompt
+      ? `\n\nThe user specifically asked: "${String(userPrompt).slice(0, 240)}". Prefer facts that answer that.`
+      : "";
+    const aiUserPrompt = `Business name (claimed): ${businessName ?? "(unknown)"}${focusLine}\n\nReturn JSON of the shape:\n{\n  "items": [\n    { "bucket": "<one of: basics|story|customers|products|sales|marketing|money|vision|tools|team|operations|partners|competitors>", "fact": "<concise fact>" }\n  ]\n}\nOnly return valid JSON. Max 12 items.\n\n=== SOURCE ===\n${corpus}\n=== END SOURCE ===`;
 
     const aiRes = await fetch(AI_GATEWAY, {
       method: "POST",
@@ -94,7 +117,7 @@ serve(async (req) => {
         model: DEFAULT_MODEL,
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
+          { role: "user", content: aiUserPrompt },
         ],
         response_format: { type: "json_object" },
       }),
@@ -130,12 +153,19 @@ serve(async (req) => {
     }
 
     let written = 0;
+    // Tag each extracted fact with a source-scoped question_key so the
+    // Source detail sheet can filter facts that came from this source.
+    const sourceTag = sources[0]?.label ?? "ai";
+    let seq = 0;
     for (const it of items) {
+      const slugFact = it.fact.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 40);
+      const questionKey = `${sourceTag}__${slugFact || `fact_${++seq}`}`;
       const { error } = await supabase.from("aperture_memory_items").insert({
         user_id: user.id,
         content: it.fact.trim().slice(0, 280),
         source: "ai_extracted",
         bucket_slug: it.bucket,
+        question_key: questionKey,
       });
       if (!error) {
         written++;
@@ -143,7 +173,7 @@ serve(async (req) => {
           bucket_slug: it.bucket,
           content: it.fact.trim().slice(0, 280),
           source: "ai_extracted",
-          origin: "onboarding_phase3",
+          origin: targeted ? "source_refetch" : "onboarding_phase3",
         });
       }
     }

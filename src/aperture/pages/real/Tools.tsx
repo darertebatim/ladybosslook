@@ -11,6 +11,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 import { TOOL_CATEGORY_GROUPS, INTEGRATIONS, bucketForCategory } from "@/aperture/data/tools";
 import { ArrowLeft, Plus, Check } from "lucide-react";
+import { SourceCard } from "@/aperture/components/SourceCard";
+import { SourceDetailSheet } from "@/aperture/components/SourceDetailSheet";
+import { useApertureSources, type SourceSummary } from "@/aperture/hooks/db/useApertureSources";
 
 interface UserToolRow {
   id: string;
@@ -46,6 +49,8 @@ export default function RealTools() {
   const [loading, setLoading] = useState(true);
   const [customName, setCustomName] = useState("");
   const [catCustomNames, setCatCustomNames] = useState<Record<string, string>>({});
+  const { sources, busy: sourceBusy } = useApertureSources();
+  const [openSource, setOpenSource] = useState<SourceSummary | null>(null);
 
   const refresh = useCallback(async () => {
     if (!user) return;
@@ -235,6 +240,33 @@ export default function RealTools() {
           </div>
         )}
 
+        {/* Connected sources (website + instagram) */}
+        {sources.length > 0 && (
+          <section style={{ marginBottom: 24 }}>
+            <div style={{ marginBottom: 10 }}>
+              <ApertureSectionTitle
+                index="YOUR SOURCES"
+                title="What I'm reading from"
+                sub="Tap a card to see what I pulled, refetch, or chat about it."
+              />
+            </div>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+              gap: 10,
+            }}>
+              {sources.map(s => (
+                <SourceCard
+                  key={s.kind}
+                  summary={s}
+                  busy={sourceBusy === s.kind}
+                  onOpen={() => setOpenSource(s)}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
         {loading ? (
           <ApertureLoading label="Loading…" />
         ) : (
@@ -415,6 +447,11 @@ export default function RealTools() {
           </div>
         )}
       </RealAppShell>
+      <SourceDetailSheet
+        summary={openSource}
+        open={!!openSource}
+        onClose={() => setOpenSource(null)}
+      />
     </>
   );
 }

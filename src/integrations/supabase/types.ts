@@ -1149,6 +1149,42 @@ export type Database = {
         }
         Relationships: []
       }
+      aperture_source_snapshots: {
+        Row: {
+          created_at: string
+          fetched_at: string
+          id: string
+          meta: Json
+          raw_text: string | null
+          source_kind: string
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          fetched_at?: string
+          id?: string
+          meta?: Json
+          raw_text?: string | null
+          source_kind: string
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          fetched_at?: string
+          id?: string
+          meta?: Json
+          raw_text?: string | null
+          source_kind?: string
+          updated_at?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       aperture_tools: {
         Row: {
           categories: string[]
