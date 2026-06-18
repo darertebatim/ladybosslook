@@ -28,16 +28,21 @@ export default function OnboardConfirm() {
   const [closingAnswer, setClosingAnswer] = useState("");
   const [tailoring, setTailoring] = useState(false);
   const [prefilling, setPrefilling] = useState(false);
+  // Stay in "researching" until the edge function has had a real chance
+  // to write facts. Prevents the "Nothing yet" flash before results arrive.
+  const [researching, setResearching] = useState(true);
 
   // Poll a couple of times while the edge function is still writing facts.
   useEffect(() => {
     let cancelled = false;
     let tries = 0;
+    const MAX_TRIES = 12; // ~36s total
     const tick = async () => {
       if (cancelled) return;
       await refresh();
       tries += 1;
-      if (tries < 8) setTimeout(tick, 3000); // ~24s total
+      if (tries < MAX_TRIES) setTimeout(tick, 3000);
+      else setResearching(false);
     };
     tick();
     return () => { cancelled = true; };
@@ -48,6 +53,12 @@ export default function OnboardConfirm() {
     () => items.filter(i => i.source === "ai_extracted"),
     [items],
   );
+
+  // As soon as the research function has written anything, stop showing
+  // the loading state — we have real content to review.
+  useEffect(() => {
+    if (aiItems.length > 0 && researching) setResearching(false);
+  }, [aiItems.length, researching]);
 
   const grouped = useMemo(() => {
     const m: Record<string, typeof aiItems> = {};
@@ -151,6 +162,24 @@ export default function OnboardConfirm() {
       <Helmet><title>Review what I found · Aperture</title></Helmet>
       <RealAppShell>
         {prefilling ? (
+          <>
+            <PageHeader
+              index="ONE MOMENT"
+              title="Sketching a first draft of your business…"
+              sub="I'm using your industry and what you just confirmed to pre-fill some guesses. You'll see them clearly marked as guesses — confirm or correct them anytime."
+            />
+            <LoadingCard label="Drafting industry-grounded defaults across your memory buckets." />
+          </>
+        ) : tailoring ? (
+          <>
+            <PageHeader
+              index="ONE MOMENT"
+              title="Tailoring your first moves…"
+              sub="I'm using what you just told me to line up the sharpest next steps for your business. This takes a few seconds."
+            />
+            <LoadingCard label="Reading your memory, weighing your answer, drafting concrete next actions." />
+          </>
+        ) : false ? null : prefilling ? (
           <>
             <PageHeader
               index="ONE MOMENT"
