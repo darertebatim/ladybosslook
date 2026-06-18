@@ -64,33 +64,40 @@ export function useApertureMemoryDB() {
         .eq("bucket_slug", bucketSlug)
         .eq("question_key", questionKey);
     } else {
-      // Manual upsert — avoids partial-unique-index quirks with PostgREST's onConflict
-      const { data: existing } = await supabase
+      // Update-then-insert. Race-safe against parallel writes for the same
+      // (user, bucket, question) tuple: if update affects 0 rows, insert;
+      // if insert hits the unique constraint, fall back to update.
+      const { data: updated, error: updateErr } = await supabase
         .from("aperture_memory_items")
-        .select("id")
+        .update({ content: trimmed, source: "bucket_answer", is_active: true })
         .eq("user_id", user.id)
         .eq("bucket_slug", bucketSlug)
         .eq("question_key", questionKey)
-        .maybeSingle();
-      if (existing?.id) {
-        const { error } = await supabase.from("aperture_memory_items")
-          .update({ content: trimmed, source: "bucket_answer", is_active: true })
-          .eq("id", existing.id);
-        if (error) {
-          console.error("[memory] update failed", error);
-          throw error;
-        }
-      } else {
-        const { error } = await supabase.from("aperture_memory_items").insert({
-          user_id: user.id,
-          content: trimmed,
-          source: "bucket_answer",
-          bucket_slug: bucketSlug,
-          question_key: questionKey,
-        });
-        if (error) {
-          console.error("[memory] insert failed", error);
-          throw error;
+        .select("id");
+      if (updateErr) {
+        console.error("[memory] update failed", updateErr);
+        throw updateErr;
+      }
+      if (!updated || updated.length === 0) {
+        const { error: insertErr } = await supabase
+          .from("aperture_memory_items")
+          .insert({
+            user_id: user.id,
+            content: trimmed,
+            source: "bucket_answer",
+            bucket_slug: bucketSlug,
+            question_key: questionKey,
+          });
+        if (insertErr && insertErr.code === "23505") {
+          // Concurrent writer beat us — retry as update.
+          await supabase.from("aperture_memory_items")
+            .update({ content: trimmed, source: "bucket_answer", is_active: true })
+            .eq("user_id", user.id)
+            .eq("bucket_slug", bucketSlug)
+            .eq("question_key", questionKey);
+        } else if (insertErr) {
+          console.error("[memory] insert failed", insertErr);
+          throw insertErr;
         }
       }
       logApertureEvent("memory_item_written", {

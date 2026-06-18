@@ -35,19 +35,25 @@ export default function OnboardFull() {
   }, [questions]);
 
   async function persistSection(qs: typeof questions) {
-    const writes: Promise<unknown>[] = [];
+    // Dedupe writes by (bucket, question_key) so parallel saves never
+    // race on the same unique row.
+    const planned = new Map<string, { bucket: string; key: string; value: string }>();
     for (const q of qs) {
       const v = (answers[q.question_key] ?? "").trim();
       if (!v) continue;
       const targets = q.bucket_slugs && q.bucket_slugs.length > 0 ? q.bucket_slugs : ["basics"];
       for (const target of targets) {
-        writes.push(saveBucketAnswer(target, q.question_key, v));
-        for (const bqKey of (q.bucket_question_keys ?? [])) {
-          writes.push(saveBucketAnswer(target, bqKey, v));
+        const keys = [q.question_key, ...(q.bucket_question_keys ?? [])];
+        for (const k of keys) {
+          planned.set(`${target}::${k}`, { bucket: target, key: k, value: v });
         }
       }
     }
-    if (writes.length > 0) await Promise.all(writes);
+    // Serialize to avoid concurrent inserts on the same row from other tabs.
+    for (const { bucket, key, value } of planned.values()) {
+      try { await saveBucketAnswer(bucket, key, value); }
+      catch (e) { console.error("[onboard-full] save failed", bucket, key, e); }
+    }
   }
 
   async function next() {
