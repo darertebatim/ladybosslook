@@ -8,6 +8,7 @@ import {
 } from "@/aperture/components/primitives";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 import { TOOL_CATEGORY_GROUPS, INTEGRATIONS, bucketForCategory } from "@/aperture/data/tools";
 import { ArrowLeft, Plus, Check } from "lucide-react";
 
@@ -39,10 +40,12 @@ type PickerEntry =
  */
 export default function RealTools() {
   const { user } = useAuth();
+  const { profile } = useApertureUserProfile();
   const [rows, setRows] = useState<UserToolRow[]>([]);
   const [catalog, setCatalog] = useState<CatalogToolRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [customName, setCustomName] = useState("");
+  const [catCustomNames, setCatCustomNames] = useState<Record<string, string>>({});
 
   const refresh = useCallback(async () => {
     if (!user) return;
@@ -161,11 +164,41 @@ export default function RealTools() {
     await refresh();
   }, [customName, user, refresh, writeMemoryFact]);
 
+  const addCategoryCustom = useCallback(async (categoryLabel: string) => {
+    const name = (catCustomNames[categoryLabel] ?? "").trim();
+    if (!name || !user) return;
+    const catKey = categoryLabel.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+    const slug = `custom_${catKey}_${name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`;
+    await supabase.from("aperture_user_tools").upsert({
+      user_id: user.id,
+      tool_slug: slug,
+      tool_name: name,
+      category: categoryLabel,
+      custom: true,
+      is_active: true,
+    }, { onConflict: "user_id,tool_slug" });
+    await writeMemoryFact({ name, bucket_slug: bucketForCategory(categoryLabel) });
+    setCatCustomNames((prev) => ({ ...prev, [categoryLabel]: "" }));
+    await refresh();
+  }, [catCustomNames, user, refresh, writeMemoryFact]);
+
+  // Filter catalog by user's industry: keep tools tagged to no industry
+  // (defaults) OR explicitly tagged with the user's industry.
+  const industrySlug = profile?.industry_slug ?? null;
+  const filteredCatalog = useMemo(() => {
+    return catalog.filter((t) => {
+      const inds = t.industries ?? [];
+      if (inds.length === 0) return true;
+      if (industrySlug && inds.includes(industrySlug)) return true;
+      return false;
+    });
+  }, [catalog, industrySlug]);
+
   // Bucket tools by every category they're tagged with (a tool with 3
   // categories appears under all 3 groups but the same slug = same state).
   const grouped = useMemo(() => {
     const map = new Map<string, CatalogToolRow[]>();
-    for (const t of catalog) {
+    for (const t of filteredCatalog) {
       for (const c of t.categories ?? []) {
         const arr = map.get(c) ?? [];
         arr.push(t);
@@ -173,7 +206,7 @@ export default function RealTools() {
       }
     }
     return map;
-  }, [catalog]);
+  }, [filteredCatalog]);
 
   return (
     <>
