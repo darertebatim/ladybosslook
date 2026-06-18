@@ -35,18 +35,19 @@ export default function OnboardFull() {
   }, [questions]);
 
   async function persistSection(qs: typeof questions) {
+    const writes: Promise<unknown>[] = [];
     for (const q of qs) {
       const v = (answers[q.question_key] ?? "").trim();
       if (!v) continue;
       const targets = q.bucket_slugs && q.bucket_slugs.length > 0 ? q.bucket_slugs : ["basics"];
       for (const target of targets) {
-        await saveBucketAnswer(target, q.question_key, v);
-        // Tick off mapped bucket questions in the same buckets.
+        writes.push(saveBucketAnswer(target, q.question_key, v));
         for (const bqKey of (q.bucket_question_keys ?? [])) {
-          await saveBucketAnswer(target, bqKey, v);
+          writes.push(saveBucketAnswer(target, bqKey, v));
         }
       }
     }
+    if (writes.length > 0) await Promise.all(writes);
   }
 
   async function next() {
@@ -109,9 +110,9 @@ export default function OnboardFull() {
             </div>
 
             <div style={{ display: "flex", gap: 8, marginTop: 22, justifyContent: "space-between" }}>
-              <ApertureButton variant="ghost" onClick={skipSection}>Skip section</ApertureButton>
+              <ApertureButton variant="ghost" onClick={skipSection} disabled={busy}>Skip section</ApertureButton>
               <ApertureButton variant="accent" onClick={next} disabled={busy}>
-                {sectionIdx + 1 >= sections.length ? "Finish" : "Next section →"}
+                {busy ? "Saving…" : sectionIdx + 1 >= sections.length ? "Finish" : "Next section →"}
               </ApertureButton>
             </div>
           </ApertureCard>

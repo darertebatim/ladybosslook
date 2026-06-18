@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { IndustryPicker } from "@/aperture/components/IndustryPicker";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
@@ -51,7 +52,10 @@ export default function OnboardQuick() {
     if (qq.question_key === "owner_name") await upsertProfile({ owner_name: v });
     if (qq.question_key === "business_name") await upsertProfile({ business_name: v });
     if (qq.question_key === "website") await upsertProfile({ website: v });
-    if (qq.question_key === "instagram") await upsertProfile({ instagram: v });
+    if (qq.question_key === "instagram") {
+      const handle = v.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "").replace(/^@/, "").replace(/\/$/, "").trim();
+      await upsertProfile({ instagram: handle ? `@${handle}` : null });
+    }
     if (qq.question_key === "industry") await upsertProfile({ industry_slug: v });
     // memory write
     const target = (qq.bucket_slugs && qq.bucket_slugs[0]) ?? "basics";
@@ -64,11 +68,13 @@ export default function OnboardQuick() {
       ? qq.bucket_slugs.filter(s => s !== "__notes__")
       : [];
     const mappedKeys = (qq.bucket_question_keys ?? []);
+    const writes: Promise<unknown>[] = [];
     for (const bucket of targetBuckets) {
       for (const bqKey of mappedKeys) {
-        await saveBucketAnswer(bucket, bqKey, v);
+        writes.push(saveBucketAnswer(bucket, bqKey, v));
       }
     }
+    if (writes.length > 0) await Promise.all(writes);
   }
 
   async function next() {
@@ -144,9 +150,9 @@ export default function OnboardQuick() {
             />
 
             <div style={{ display: "flex", gap: 8, marginTop: 18, justifyContent: "flex-end" }}>
-              <ApertureButton variant="ghost" onClick={skip}>Skip</ApertureButton>
+              <ApertureButton variant="ghost" onClick={skip} disabled={busy}>Skip</ApertureButton>
               <ApertureButton variant="accent" onClick={next} disabled={busy}>
-                {i + 1 >= total ? "Finish" : "Next →"}
+                {busy ? "Saving…" : i + 1 >= total ? "Finish" : "Next →"}
               </ApertureButton>
             </div>
           </ApertureCard>
@@ -174,14 +180,7 @@ function QuestionInput({
 
   if (q.question_key === "industry") {
     return (
-      <select style={baseStyle} value={value} onChange={e => onChange(e.target.value)}>
-        <option value="">— Pick one —</option>
-        {industries.map(ind => (
-          <option key={ind.slug} value={ind.slug}>
-            {ind.group_label ? `${ind.group_label} · ${ind.label}` : ind.label}
-          </option>
-        ))}
-      </select>
+      <IndustryPicker industries={industries} value={value} onChange={onChange} />
     );
   }
 

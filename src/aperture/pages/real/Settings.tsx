@@ -11,6 +11,7 @@ import { regenerateMemoryCard } from "@/aperture/lib/apertureChat";
 import { toast } from "@/hooks/use-toast";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 import { useApertureIndustriesDB } from "@/aperture/hooks/db/useApertureOnboardingDB";
+import { IndustryPicker } from "@/aperture/components/IndustryPicker";
 
 export default function RealSettings() {
   const { user } = useAuth();
@@ -98,14 +99,11 @@ export default function RealSettings() {
             </div>
             <div>
               <label style={labelStyle}>Industry</label>
-              <select style={inputStyle} value={form.industry_slug} onChange={e => setForm(f => ({ ...f, industry_slug: e.target.value }))}>
-                <option value="">— Pick one —</option>
-                {industries.map(ind => (
-                  <option key={ind.slug} value={ind.slug}>
-                    {ind.group_label ? `${ind.group_label} · ${ind.label}` : ind.label}
-                  </option>
-                ))}
-              </select>
+              <IndustryPicker
+                industries={industries}
+                value={form.industry_slug}
+                onChange={(slug) => setForm(f => ({ ...f, industry_slug: slug }))}
+              />
             </div>
             <div>
               <label style={labelStyle}>Website</label>

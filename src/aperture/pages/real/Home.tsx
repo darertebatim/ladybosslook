@@ -98,6 +98,28 @@ export default function RealHome() {
           action={<ApertureChip tone={knownCount > 0 ? "signal" : "neutral"}>Memory · {knownCount}</ApertureChip>}
         />
 
+        {/* Finish full onboarding nudge */}
+        {profile?.quick_onboarded_at && !profile?.full_onboarded_at && (
+          <Link to="/aperture/app/onboard/full" style={{ textDecoration: "none", display: "block", marginBottom: 20 }}>
+            <ApertureCard padding={16} style={{ borderColor: "var(--ap-signal)" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                <div style={{ minWidth: 0 }}>
+                  <ApertureMonoLabel style={{ color: "var(--ap-signal)" }}>Next step</ApertureMonoLabel>
+                  <h3 style={{ margin: "6px 0 2px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
+                    Finish the full questionnaire
+                  </h3>
+                  <p style={{ margin: 0, fontSize: 13, color: "var(--ap-ink-3)", lineHeight: 1.45 }}>
+                    A deeper dive so I really get your business — answers go straight into memory.
+                  </p>
+                </div>
+                <span style={{ color: "var(--ap-signal)", fontFamily: "var(--ap-font-mono)", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.12em", flexShrink: 0 }}>
+                  Start →
+                </span>
+              </div>
+            </ApertureCard>
+          </Link>
+        )}
+
         {/* Daily question */}
         {dailyQ && (
           <section style={{ marginBottom: 28 }}>
