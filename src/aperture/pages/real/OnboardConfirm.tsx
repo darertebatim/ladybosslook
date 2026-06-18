@@ -12,6 +12,36 @@ import { logApertureEvent } from "@/aperture/lib/apertureEvents";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
+ * Animated loading card — used while the research / pre-fill / tailor
+ * edge functions are working. Three-dot pulse + descriptive label so
+ * users never see a frozen "Nothing yet" state during async work.
+ */
+function LoadingCard({ label }: { label: string }) {
+  return (
+    <ApertureCard padding={24}>
+      <style>{`
+        @keyframes apDot { 0%,80%,100% { opacity: 0.25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+      `}</style>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+        <div style={{ display: "inline-flex", gap: 4 }}>
+          {[0, 1, 2].map(i => (
+            <span key={i} style={{
+              width: 6, height: 6, borderRadius: 999,
+              background: "var(--ap-signal)",
+              animation: `apDot 1.2s ${i * 0.15}s infinite ease-in-out`,
+            }} />
+          ))}
+        </div>
+        <ApertureMonoLabel>Working…</ApertureMonoLabel>
+      </div>
+      <p style={{ margin: 0, fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
+        {label}
+      </p>
+    </ApertureCard>
+  );
+}
+
+/**
  * Phase 3 confirmation — after the website/IG research extraction,
  * show the owner everything the AI pulled out (grouped by bucket)
  * and let them keep/edit/remove each fact. Confirmed items get
@@ -28,16 +58,21 @@ export default function OnboardConfirm() {
   const [closingAnswer, setClosingAnswer] = useState("");
   const [tailoring, setTailoring] = useState(false);
   const [prefilling, setPrefilling] = useState(false);
+  // Stay in "researching" until the edge function has had a real chance
+  // to write facts. Prevents the "Nothing yet" flash before results arrive.
+  const [researching, setResearching] = useState(true);
 
   // Poll a couple of times while the edge function is still writing facts.
   useEffect(() => {
     let cancelled = false;
     let tries = 0;
+    const MAX_TRIES = 12; // ~36s total
     const tick = async () => {
       if (cancelled) return;
       await refresh();
       tries += 1;
-      if (tries < 8) setTimeout(tick, 3000); // ~24s total
+      if (tries < MAX_TRIES) setTimeout(tick, 3000);
+      else setResearching(false);
     };
     tick();
     return () => { cancelled = true; };
@@ -48,6 +83,12 @@ export default function OnboardConfirm() {
     () => items.filter(i => i.source === "ai_extracted"),
     [items],
   );
+
+  // As soon as the research function has written anything, stop showing
+  // the loading state — we have real content to review.
+  useEffect(() => {
+    if (aiItems.length > 0 && researching) setResearching(false);
+  }, [aiItems.length, researching]);
 
   const grouped = useMemo(() => {
     const m: Record<string, typeof aiItems> = {};
@@ -157,12 +198,7 @@ export default function OnboardConfirm() {
               title="Sketching a first draft of your business…"
               sub="I'm using your industry and what you just confirmed to pre-fill some guesses. You'll see them clearly marked as guesses — confirm or correct them anytime."
             />
-            <ApertureCard padding={24}>
-              <ApertureMonoLabel>Working…</ApertureMonoLabel>
-              <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
-                Drafting industry-grounded defaults across your memory buckets.
-              </p>
-            </ApertureCard>
+            <LoadingCard label="Drafting industry-grounded defaults across your memory buckets." />
           </>
         ) : tailoring ? (
           <>
@@ -171,12 +207,7 @@ export default function OnboardConfirm() {
               title="Tailoring your first moves…"
               sub="I'm using what you just told me to line up the sharpest next steps for your business. This takes a few seconds."
             />
-            <ApertureCard padding={24}>
-              <ApertureMonoLabel>Working…</ApertureMonoLabel>
-              <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
-                Reading your memory, weighing your answer, drafting concrete next actions.
-              </p>
-            </ApertureCard>
+            <LoadingCard label="Reading your memory, weighing your answer, drafting concrete next actions." />
           </>
         ) : phase === "closing" ? (
           <>
@@ -219,13 +250,8 @@ export default function OnboardConfirm() {
           action={total > 0 ? <ApertureChip tone="signal">{kept} kept</ApertureChip> : null}
         />
 
-        {loading && total === 0 ? (
-          <ApertureCard padding={20}>
-            <ApertureMonoLabel>Working…</ApertureMonoLabel>
-            <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--ap-ink-2)" }}>
-              I'm reading your site and IG. This usually takes 10–20 seconds.
-            </p>
-          </ApertureCard>
+        {researching && total === 0 ? (
+          <LoadingCard label="Reading your site and Instagram. This usually takes 10–30 seconds." />
         ) : total === 0 ? (
           <ApertureCard padding={20}>
             <ApertureMonoLabel>Nothing yet</ApertureMonoLabel>
