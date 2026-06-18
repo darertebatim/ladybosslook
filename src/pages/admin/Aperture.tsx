@@ -617,6 +617,7 @@ export default function ApertureAdmin() {
           <TabsTrigger value="industries">Industries</TabsTrigger>
           <TabsTrigger value="tools">Tools</TabsTrigger>
           <TabsTrigger value="actions">Playbooks & Prompts</TabsTrigger>
+          <TabsTrigger value="reset">Reset User</TabsTrigger>
         </TabsList>
         <TabsContent value="buckets" className="mt-4"><BucketsTab /></TabsContent>
         <TabsContent value="bucket-questions" className="mt-4"><BucketQuestionsTab /></TabsContent>
@@ -625,7 +626,56 @@ export default function ApertureAdmin() {
         <TabsContent value="industries" className="mt-4"><IndustriesTab /></TabsContent>
         <TabsContent value="tools" className="mt-4"><ToolsTab /></TabsContent>
         <TabsContent value="actions" className="mt-4"><ActionsTab /></TabsContent>
+        <TabsContent value="reset" className="mt-4"><ResetUserTab /></TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+// ---------- Reset User ----------
+function ResetUserTab() {
+  const { toast } = useToast();
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<any>(null);
+
+  const run = async () => {
+    if (!email.trim()) return;
+    if (!confirm(`Reset ALL Aperture data for ${email}? This deletes memory, chats, profile, generated items, files, documents, and events. The auth account stays.`)) return;
+    setBusy(true); setResult(null);
+    const { data, error } = await supabase.functions.invoke("aperture-reset-user", {
+      body: { email: email.trim() },
+    });
+    setBusy(false);
+    if (error) {
+      toast({ title: "Reset failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    if ((data as any)?.error) {
+      toast({ title: "Reset failed", description: (data as any).error, variant: "destructive" });
+      return;
+    }
+    setResult(data);
+    toast({ title: "User reset", description: `Cleared Aperture data for ${email}` });
+  };
+
+  return (
+    <Section title="Reset Aperture User" description="Wipe a user's Aperture state (memory, chats, profile, generated content, files) so they can run onboarding from scratch. The auth account is preserved.">
+      <div className="flex items-end gap-2 max-w-xl">
+        <div className="flex-1 space-y-1.5">
+          <Label>User email</Label>
+          <Input type="email" placeholder="user@example.com" value={email}
+            onChange={(e) => setEmail(e.target.value)} />
+        </div>
+        <Button onClick={run} disabled={busy || !email.trim()} variant="destructive">
+          {busy ? "Resetting…" : "Reset user"}
+        </Button>
+      </div>
+      {result && (
+        <pre className="mt-4 text-xs bg-muted/40 rounded-md p-3 overflow-auto max-h-80">
+          {JSON.stringify(result, null, 2)}
+        </pre>
+      )}
+    </Section>
   );
 }
