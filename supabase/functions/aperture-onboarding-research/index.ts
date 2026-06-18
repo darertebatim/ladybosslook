@@ -321,3 +321,45 @@ function stripHtml(html: string): string {
   // collapse whitespace
   return out.replace(/\s+/g, " ").trim();
 }
+
+/**
+ * Website-specific: combine og:meta tags (works for SPAs) with the
+ * stripped HTML body. Many small-business sites are React/Wix/Squarespace
+ * shells where the body is empty server-side but the meta tags are rich.
+ */
+async function fetchWebsiteRich(url: string): Promise<string> {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; ApertureBot/1.0; +https://aperture.lovable.app)",
+        "Accept": "text/html,application/xhtml+xml",
+        "Accept-Language": "en-US,en;q=0.9",
+      },
+      redirect: "follow",
+    });
+    if (!res.ok) return "";
+    const html = await res.text();
+    const parts: string[] = [];
+    const grab = (re: RegExp, label: string) => {
+      const m = html.match(re);
+      if (m && m[1]) parts.push(`${label}: ${cleanText(m[1])}`);
+    };
+    grab(/<title[^>]*>([^<]+)<\/title>/i, "Title");
+    grab(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i, "Description");
+    grab(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i, "OG Title");
+    grab(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i, "OG Description");
+    grab(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']+)["']/i, "Site Name");
+    grab(/<meta[^>]+name=["']keywords["'][^>]+content=["']([^"']+)["']/i, "Keywords");
+    // JSON-LD blobs often carry org/business schema for SPAs.
+    const ldMatches = html.match(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi) ?? [];
+    for (const ld of ldMatches.slice(0, 3)) {
+      const inner = ld.replace(/<script[^>]*>/i, "").replace(/<\/script>/i, "");
+      parts.push(`LD-JSON: ${inner.slice(0, 1500)}`);
+    }
+    const body = stripHtml(html);
+    if (body) parts.push(`Body: ${body.slice(0, 4000)}`);
+    return parts.join("\n").trim();
+  } catch {
+    return "";
+  }
+}
