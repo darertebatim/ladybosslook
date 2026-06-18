@@ -99,19 +99,10 @@ export default function OnboardFull() {
                     {q.prompt}
                   </label>
                   {q.hint && <span style={{ fontSize: 12, color: "var(--ap-ink-3)" }}>{q.hint}</span>}
-                  <textarea
-                    rows={q.input_kind === "long_text" ? 3 : 1}
+                  <FullQuestionInput
+                    q={q}
                     value={answers[q.question_key] ?? ""}
-                    onChange={e => setAnswers(a => ({ ...a, [q.question_key]: e.target.value }))}
-                    style={{
-                      appearance: "none", outline: "none", resize: "vertical",
-                      background: "var(--ap-surface-2)",
-                      border: "1px solid var(--ap-hairline)",
-                      borderRadius: "var(--ap-radius-sm)",
-                      padding: "10px 12px",
-                      fontSize: 14, color: "var(--ap-ink-1)",
-                      fontFamily: "var(--ap-font-sans)", lineHeight: 1.5,
-                    }}
+                    onChange={(v) => setAnswers(a => ({ ...a, [q.question_key]: v }))}
                   />
                 </div>
               ))}
@@ -127,5 +118,58 @@ export default function OnboardFull() {
         )}
       </RealAppShell>
     </>
+  );
+}
+
+function FullQuestionInput({
+  q, value, onChange,
+}: { q: any; value: string; onChange: (v: string) => void }) {
+  const baseStyle: React.CSSProperties = {
+    width: "100%", appearance: "none", outline: "none",
+    background: "var(--ap-surface-2)",
+    border: "1px solid var(--ap-hairline)",
+    borderRadius: "var(--ap-radius-sm)",
+    padding: "10px 12px",
+    fontSize: 14, color: "var(--ap-ink-1)",
+    fontFamily: "var(--ap-font-sans)", lineHeight: 1.5,
+  };
+
+  if (q.input_kind === "single_choice" && Array.isArray(q.options)) {
+    return (
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        {q.options.map((raw: any) => {
+          const label = typeof raw === "string" ? raw : raw?.label ?? String(raw?.value ?? "");
+          const val = typeof raw === "string" ? raw : raw?.value ?? label;
+          const on = value === val;
+          return (
+            <button key={val} type="button" onClick={() => onChange(val)}
+              style={{
+                appearance: "none", cursor: "pointer",
+                padding: "8px 12px", borderRadius: "var(--ap-radius-sm)",
+                border: "1px solid " + (on ? "var(--ap-signal)" : "var(--ap-hairline)"),
+                background: on ? "var(--ap-signal)" : "var(--ap-surface-2)",
+                color: on ? "#000" : "var(--ap-ink-1)",
+                fontSize: 13, fontWeight: 500,
+              }}>{label}</button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  if (q.input_kind === "textarea" || q.input_kind === "long_text") {
+    return (
+      <textarea rows={3} style={{ ...baseStyle, resize: "vertical" }}
+        value={value} onChange={e => onChange(e.target.value)} />
+    );
+  }
+
+  return (
+    <input
+      style={baseStyle}
+      type={q.input_kind === "url" ? "url" : q.input_kind === "email" ? "email" : "text"}
+      value={value}
+      onChange={e => onChange(e.target.value)}
+    />
   );
 }
