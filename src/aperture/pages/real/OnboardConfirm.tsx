@@ -12,6 +12,36 @@ import { logApertureEvent } from "@/aperture/lib/apertureEvents";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
+ * Animated loading card — used while the research / pre-fill / tailor
+ * edge functions are working. Three-dot pulse + descriptive label so
+ * users never see a frozen "Nothing yet" state during async work.
+ */
+function LoadingCard({ label }: { label: string }) {
+  return (
+    <ApertureCard padding={24}>
+      <style>{`
+        @keyframes apDot { 0%,80%,100% { opacity: 0.25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+      `}</style>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+        <div style={{ display: "inline-flex", gap: 4 }}>
+          {[0, 1, 2].map(i => (
+            <span key={i} style={{
+              width: 6, height: 6, borderRadius: 999,
+              background: "var(--ap-signal)",
+              animation: `apDot 1.2s ${i * 0.15}s infinite ease-in-out`,
+            }} />
+          ))}
+        </div>
+        <ApertureMonoLabel>Working…</ApertureMonoLabel>
+      </div>
+      <p style={{ margin: 0, fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
+        {label}
+      </p>
+    </ApertureCard>
+  );
+}
+
+/**
  * Phase 3 confirmation — after the website/IG research extraction,
  * show the owner everything the AI pulled out (grouped by bucket)
  * and let them keep/edit/remove each fact. Confirmed items get
