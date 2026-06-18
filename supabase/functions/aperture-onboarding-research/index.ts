@@ -39,8 +39,22 @@ serve(async (req) => {
 
     const sources: { label: string; url: string; text: string; meta?: Record<string, unknown> }[] = [];
     if (website) {
-      const t = await fetchAsText(normalizeUrl(website));
-      if (t) sources.push({ label: "website", url: website, text: t });
+      const baseUrl = normalizeUrl(website);
+      // Pull og:meta + visible text from the homepage, then try common
+      // marketing pages so SPAs don't come back empty.
+      const homepage = await fetchWebsiteRich(baseUrl);
+      const extras: string[] = [];
+      for (const path of ["/about", "/about-us", "/services", "/work-with-me", "/coaching"]) {
+        try {
+          const u = new URL(path, baseUrl).toString();
+          const t = await fetchAsText(u);
+          if (t && t.length > 200) extras.push(`## ${path}\n${t.slice(0, 2000)}`);
+        } catch { /* ignore */ }
+      }
+      const combined = [homepage, ...extras].filter(Boolean).join("\n\n");
+      if (combined.trim().length > 40) {
+        sources.push({ label: "website", url: website, text: combined });
+      }
     }
     if (instagram) {
       const handle = String(instagram)
