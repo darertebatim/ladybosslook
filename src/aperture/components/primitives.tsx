@@ -288,3 +288,58 @@ export function ApertureSectionTitle({
     </div>
   );
 }
+
+/* ============================================================
+ * Loading — animated three-dot pulse with descriptive label.
+ * Use anywhere an async fetch could otherwise flash a stale
+ * "Nothing yet" empty state before data arrives.
+ * ============================================================ */
+export function ApertureLoading({
+  label,
+  sublabel,
+  padding = 24,
+  inline = false,
+}: {
+  label?: string;
+  sublabel?: string;
+  padding?: number;
+  inline?: boolean;
+}) {
+  const dots = (
+    <span style={{ display: "inline-flex", gap: 4 }}>
+      <style>{`
+        @keyframes apLoadDot { 0%,80%,100% { opacity: 0.25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+      `}</style>
+      {[0, 1, 2].map(i => (
+        <span key={i} style={{
+          width: 6, height: 6, borderRadius: 999,
+          background: "var(--ap-signal)",
+          animation: `apLoadDot 1.2s ${i * 0.15}s infinite ease-in-out`,
+        }} />
+      ))}
+    </span>
+  );
+
+  if (inline) {
+    return (
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+        {dots}
+        {label && <ApertureMonoLabel>{label}</ApertureMonoLabel>}
+      </span>
+    );
+  }
+
+  return (
+    <ApertureCard padding={padding}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: sublabel ? 8 : 0 }}>
+        {dots}
+        <ApertureMonoLabel>{label ?? "Working…"}</ApertureMonoLabel>
+      </div>
+      {sublabel && (
+        <p style={{ margin: 0, fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
+          {sublabel}
+        </p>
+      )}
+    </ApertureCard>
+  );
+}

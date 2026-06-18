@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
-  ApertureCard, ApertureMonoLabel,
+  ApertureCard, ApertureMonoLabel, ApertureLoading,
 } from "@/aperture/components/primitives";
 import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
@@ -32,7 +32,7 @@ export default function RealBucketPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug, questions.length, items.length]);
 
-  if (bLoading) return <RealAppShell><ApertureMonoLabel>Loading…</ApertureMonoLabel></RealAppShell>;
+  if (bLoading) return <RealAppShell><ApertureLoading label="Loading bucket…" /></RealAppShell>;
   if (!slug) return <Navigate to="/aperture/app/memory" replace />;
   if (!bucket) return <Navigate to="/aperture/app/memory" replace />;
 
@@ -58,7 +58,7 @@ export default function RealBucketPage() {
         />
 
         {loading ? (
-          <ApertureMonoLabel>Loading…</ApertureMonoLabel>
+          <ApertureLoading label="Loading your answers…" />
         ) : (
           <>
             {questions.length === 0 ? (

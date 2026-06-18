@@ -4,7 +4,7 @@ import { useState } from "react";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
-  ApertureCard, ApertureChip, ApertureMonoLabel, ApertureButton,
+  ApertureCard, ApertureChip, ApertureMonoLabel, ApertureLoading, ApertureButton,
 } from "@/aperture/components/primitives";
 import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
@@ -226,7 +226,7 @@ export default function RealHome() {
             <Link to="/aperture/app/memory" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>Open →</Link>
           </div>
           {mLoading ? (
-            <ApertureCard padding={20}><ApertureMonoLabel>Loading…</ApertureMonoLabel></ApertureCard>
+            <ApertureLoading label="Loading…" />
           ) : items.length === 0 ? (
             <ApertureCard padding={20}>
               <p style={{ margin: 0, fontSize: 13.5, color: "var(--ap-ink-2)", lineHeight: 1.55 }}>

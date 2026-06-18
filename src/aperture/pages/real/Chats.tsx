@@ -4,7 +4,7 @@ import { useState } from "react";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
-  ApertureButton, ApertureCard, ApertureMonoLabel,
+  ApertureButton, ApertureCard, ApertureMonoLabel, ApertureLoading,
 } from "@/aperture/components/primitives";
 import { useApertureChatsDB } from "@/aperture/hooks/db/useApertureChatsDB";
 
@@ -44,7 +44,7 @@ export default function RealChats() {
         />
 
         {loading ? (
-          <ApertureMonoLabel>Loading…</ApertureMonoLabel>
+          <ApertureLoading label="Loading chats…" />
         ) : chats.length === 0 ? (
           <ApertureCard padding={32} style={{ textAlign: "center" }}>
             <ApertureMonoLabel>No conversations yet</ApertureMonoLabel>

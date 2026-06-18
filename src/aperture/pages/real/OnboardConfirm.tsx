@@ -4,42 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
-  ApertureCard, ApertureMonoLabel, ApertureButton, ApertureChip,
+  ApertureCard, ApertureMonoLabel, ApertureButton, ApertureChip, ApertureLoading,
 } from "@/aperture/components/primitives";
 import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { logApertureEvent } from "@/aperture/lib/apertureEvents";
 import { supabase } from "@/integrations/supabase/client";
 
-/**
- * Animated loading card — used while the research / pre-fill / tailor
- * edge functions are working. Three-dot pulse + descriptive label so
- * users never see a frozen "Nothing yet" state during async work.
- */
-function LoadingCard({ label }: { label: string }) {
-  return (
-    <ApertureCard padding={24}>
-      <style>{`
-        @keyframes apDot { 0%,80%,100% { opacity: 0.25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
-      `}</style>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-        <div style={{ display: "inline-flex", gap: 4 }}>
-          {[0, 1, 2].map(i => (
-            <span key={i} style={{
-              width: 6, height: 6, borderRadius: 999,
-              background: "var(--ap-signal)",
-              animation: `apDot 1.2s ${i * 0.15}s infinite ease-in-out`,
-            }} />
-          ))}
-        </div>
-        <ApertureMonoLabel>Working…</ApertureMonoLabel>
-      </div>
-      <p style={{ margin: 0, fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
-        {label}
-      </p>
-    </ApertureCard>
-  );
-}
 
 /**
  * Phase 3 confirmation — after the website/IG research extraction,
@@ -198,7 +169,7 @@ export default function OnboardConfirm() {
               title="Sketching a first draft of your business…"
               sub="I'm using your industry and what you just confirmed to pre-fill some guesses. You'll see them clearly marked as guesses — confirm or correct them anytime."
             />
-            <LoadingCard label="Drafting industry-grounded defaults across your memory buckets." />
+            <ApertureLoading sublabel="Drafting industry-grounded defaults across your memory buckets." />
           </>
         ) : tailoring ? (
           <>
@@ -207,7 +178,7 @@ export default function OnboardConfirm() {
               title="Tailoring your first moves…"
               sub="I'm using what you just told me to line up the sharpest next steps for your business. This takes a few seconds."
             />
-            <LoadingCard label="Reading your memory, weighing your answer, drafting concrete next actions." />
+            <ApertureLoading sublabel="Reading your memory, weighing your answer, drafting concrete next actions." />
           </>
         ) : phase === "closing" ? (
           <>
@@ -251,7 +222,7 @@ export default function OnboardConfirm() {
         />
 
         {researching && total === 0 ? (
-          <LoadingCard label="Reading your site and Instagram. This usually takes 10–30 seconds." />
+          <ApertureLoading sublabel="Reading your site and Instagram. This usually takes 10–30 seconds." />
         ) : total === 0 ? (
           <ApertureCard padding={20}>
             <ApertureMonoLabel>Nothing yet</ApertureMonoLabel>

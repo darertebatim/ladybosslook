@@ -4,7 +4,7 @@ import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
-  ApertureButton, ApertureCard, ApertureChip, ApertureMonoLabel,
+  ApertureButton, ApertureCard, ApertureChip, ApertureMonoLabel, ApertureLoading,
 } from "@/aperture/components/primitives";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -175,7 +175,7 @@ export default function RealAction() {
         </div>
 
         {loading || !action ? (
-          <ApertureMonoLabel>Loading…</ApertureMonoLabel>
+          <ApertureLoading label="Loading action…" />
         ) : (
           <>
             <PageHeader

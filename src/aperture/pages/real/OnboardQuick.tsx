@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
-  ApertureCard, ApertureMonoLabel, ApertureButton, ApertureChip,
+  ApertureCard, ApertureMonoLabel, ApertureLoading, ApertureButton, ApertureChip,
 } from "@/aperture/components/primitives";
 import { useApertureOnboardingDB, useApertureIndustriesDB } from "@/aperture/hooks/db/useApertureOnboardingDB";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
@@ -190,7 +190,7 @@ export default function OnboardQuick() {
         )}
 
         {loading || !q ? (
-          <ApertureCard padding={20}><ApertureMonoLabel>Loading…</ApertureMonoLabel></ApertureCard>
+          <ApertureLoading label="Loading…" />
         ) : showPhaseIntro ? (
           <ApertureCard padding={24}>
             <ApertureMonoLabel>Phase {q.step} of 3</ApertureMonoLabel>
