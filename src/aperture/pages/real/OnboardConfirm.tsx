@@ -169,7 +169,7 @@ export default function OnboardConfirm() {
               title="Sketching a first draft of your business…"
               sub="I'm using your industry and what you just confirmed to pre-fill some guesses. You'll see them clearly marked as guesses — confirm or correct them anytime."
             />
-            <LoadingCard label="Drafting industry-grounded defaults across your memory buckets." />
+            <ApertureLoading sublabel="Drafting industry-grounded defaults across your memory buckets." />
           </>
         ) : tailoring ? (
           <>
@@ -178,7 +178,7 @@ export default function OnboardConfirm() {
               title="Tailoring your first moves…"
               sub="I'm using what you just told me to line up the sharpest next steps for your business. This takes a few seconds."
             />
-            <LoadingCard label="Reading your memory, weighing your answer, drafting concrete next actions." />
+            <ApertureLoading sublabel="Reading your memory, weighing your answer, drafting concrete next actions." />
           </>
         ) : phase === "closing" ? (
           <>
@@ -222,7 +222,7 @@ export default function OnboardConfirm() {
         />
 
         {researching && total === 0 ? (
-          <LoadingCard label="Reading your site and Instagram. This usually takes 10–30 seconds." />
+          <ApertureLoading sublabel="Reading your site and Instagram. This usually takes 10–30 seconds." />
         ) : total === 0 ? (
           <ApertureCard padding={20}>
             <ApertureMonoLabel>Nothing yet</ApertureMonoLabel>
