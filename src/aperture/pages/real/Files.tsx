@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
-  ApertureCard, ApertureChip, ApertureMonoLabel, ApertureButton,
+  ApertureCard, ApertureChip, ApertureMonoLabel, ApertureLoading, ApertureButton,
 } from "@/aperture/components/primitives";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -168,7 +168,7 @@ export default function RealFiles() {
         </ApertureCard>
 
         {loading ? (
-          <ApertureCard padding={20}><ApertureMonoLabel>Loading…</ApertureMonoLabel></ApertureCard>
+          <ApertureLoading label="Loading…" />
         ) : files.length === 0 ? (
           <ApertureCard padding={20}>
             <p style={{ margin: 0, fontSize: 13, color: "var(--ap-ink-2)" }}>

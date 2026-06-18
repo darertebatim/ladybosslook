@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
-  ApertureCard, ApertureChip, ApertureMonoLabel, ApertureButton,
+  ApertureCard, ApertureChip, ApertureMonoLabel, ApertureLoading, ApertureButton,
 } from "@/aperture/components/primitives";
 import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
@@ -111,7 +111,7 @@ export default function RealMemory() {
         </div>
 
         {bLoading || mLoading ? (
-          <ApertureCard padding={20}><ApertureMonoLabel>Loading…</ApertureMonoLabel></ApertureCard>
+          <ApertureLoading label="Loading…" />
         ) : (
           <div style={{
             display: "grid",

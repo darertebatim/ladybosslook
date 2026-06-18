@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
-  ApertureCard, ApertureMonoLabel, ApertureButton, ApertureChip,
+  ApertureCard, ApertureMonoLabel, ApertureLoading, ApertureButton, ApertureChip,
 } from "@/aperture/components/primitives";
 import { useApertureOnboardingDB } from "@/aperture/hooks/db/useApertureOnboardingDB";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
@@ -89,7 +89,7 @@ export default function OnboardFull() {
         />
 
         {loading || !current ? (
-          <ApertureCard padding={20}><ApertureMonoLabel>Loading…</ApertureMonoLabel></ApertureCard>
+          <ApertureLoading label="Loading…" />
         ) : (
           <ApertureCard padding={20}>
             <ApertureMonoLabel>{current[0]}</ApertureMonoLabel>

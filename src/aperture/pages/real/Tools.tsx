@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
-  ApertureCard, ApertureChip, ApertureMonoLabel, ApertureButton, ApertureSectionTitle,
+  ApertureCard, ApertureChip, ApertureMonoLabel, ApertureLoading, ApertureButton, ApertureSectionTitle,
 } from "@/aperture/components/primitives";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -236,7 +236,7 @@ export default function RealTools() {
         )}
 
         {loading ? (
-          <ApertureCard padding={20}><ApertureMonoLabel>Loading…</ApertureMonoLabel></ApertureCard>
+          <ApertureLoading label="Loading…" />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
             {TOOL_CATEGORY_GROUPS.map((cat) => {
