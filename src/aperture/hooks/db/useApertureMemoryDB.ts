@@ -64,13 +64,35 @@ export function useApertureMemoryDB() {
         .eq("bucket_slug", bucketSlug)
         .eq("question_key", questionKey);
     } else {
-      await supabase.from("aperture_memory_items").upsert({
-        user_id: user.id,
-        content: trimmed,
-        source: "bucket_answer",
-        bucket_slug: bucketSlug,
-        question_key: questionKey,
-      }, { onConflict: "user_id,bucket_slug,question_key" });
+      // Manual upsert — avoids partial-unique-index quirks with PostgREST's onConflict
+      const { data: existing } = await supabase
+        .from("aperture_memory_items")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("bucket_slug", bucketSlug)
+        .eq("question_key", questionKey)
+        .maybeSingle();
+      if (existing?.id) {
+        const { error } = await supabase.from("aperture_memory_items")
+          .update({ content: trimmed, source: "bucket_answer", is_active: true })
+          .eq("id", existing.id);
+        if (error) {
+          console.error("[memory] update failed", error);
+          throw error;
+        }
+      } else {
+        const { error } = await supabase.from("aperture_memory_items").insert({
+          user_id: user.id,
+          content: trimmed,
+          source: "bucket_answer",
+          bucket_slug: bucketSlug,
+          question_key: questionKey,
+        });
+        if (error) {
+          console.error("[memory] insert failed", error);
+          throw error;
+        }
+      }
       logApertureEvent("memory_item_written", {
         bucket_slug: bucketSlug, question_key: questionKey,
         content: trimmed, source: "bucket_answer",
