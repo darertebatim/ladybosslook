@@ -13,7 +13,7 @@ import { TOOL_CATEGORY_GROUPS, INTEGRATIONS, bucketForCategory } from "@/apertur
 import { ArrowLeft, Plus, Check } from "lucide-react";
 import { SourceCard } from "@/aperture/components/SourceCard";
 import { SourceDetailSheet } from "@/aperture/components/SourceDetailSheet";
-import { useApertureSources, type SourceKind, type SourceSummary } from "@/aperture/hooks/db/useApertureSources";
+import { useApertureSources, type SourceSummary } from "@/aperture/hooks/db/useApertureSources";
 
 interface UserToolRow {
   id: string;
