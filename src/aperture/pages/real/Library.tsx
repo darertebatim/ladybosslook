@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
-import { ApertureCard, ApertureChip, ApertureMonoLabel } from "@/aperture/components/primitives";
+import { ApertureCard, ApertureChip, ApertureMonoLabel, ApertureLoading } from "@/aperture/components/primitives";
 import { supabase } from "@/integrations/supabase/client";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 
@@ -130,7 +130,7 @@ export default function RealLibrary() {
         </div>
 
         {loading ? (
-          <ApertureMonoLabel>Loading…</ApertureMonoLabel>
+          <ApertureLoading label="Loading library…" />
         ) : visible.length === 0 ? (
           <ApertureCard padding={24}><p style={{ margin: 0, fontSize: 13.5, color: "var(--ap-ink-2)" }}>Nothing matches those filters.</p></ApertureCard>
         ) : (
