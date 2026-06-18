@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { IndustryPicker } from "@/aperture/components/IndustryPicker";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
@@ -179,14 +180,7 @@ function QuestionInput({
 
   if (q.question_key === "industry") {
     return (
-      <select style={baseStyle} value={value} onChange={e => onChange(e.target.value)}>
-        <option value="">— Pick one —</option>
-        {industries.map(ind => (
-          <option key={ind.slug} value={ind.slug}>
-            {ind.group_label ? `${ind.group_label} · ${ind.label}` : ind.label}
-          </option>
-        ))}
-      </select>
+      <IndustryPicker industries={industries} value={value} onChange={onChange} />
     );
   }
 
