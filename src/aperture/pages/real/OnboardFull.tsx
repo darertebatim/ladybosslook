@@ -9,6 +9,8 @@ import {
 import { useApertureOnboardingDB } from "@/aperture/hooks/db/useApertureOnboardingDB";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
+import { logApertureEvent } from "@/aperture/lib/apertureEvents";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Full questionnaire — section-by-section wizard. Each section is
@@ -19,10 +21,12 @@ export default function OnboardFull() {
   const navigate = useNavigate();
   const { questions, loading } = useApertureOnboardingDB("full");
   const { upsert: upsertProfile } = useApertureUserProfile();
-  const { saveBucketAnswer } = useApertureMemoryDB();
+  const { saveBucketAnswer, addFreeformNote } = useApertureMemoryDB();
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [sectionIdx, setSectionIdx] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [phase, setPhase] = useState<"sections" | "prefilling" | "closing" | "tailoring">("sections");
+  const [closingAnswer, setClosingAnswer] = useState("");
 
   const sections = useMemo(() => {
     const map = new Map<string, typeof questions>();
@@ -56,6 +60,45 @@ export default function OnboardFull() {
     }
   }
 
+  async function finishSections() {
+    await upsertProfile({ full_onboarded_at: new Date().toISOString() });
+    // Pass 1 — industry-grounded prefill across buckets
+    setPhase("prefilling");
+    try {
+      await Promise.race([
+        supabase.functions.invoke("aperture-pass1-prefill", {}),
+        new Promise(resolve => setTimeout(resolve, 15_000)),
+      ]);
+    } catch (e) {
+      console.error("pass1 invoke failed", e);
+    }
+    setPhase("closing");
+  }
+
+  async function finishClosing() {
+    if (busy) return;
+    setBusy(true);
+    const v = closingAnswer.trim();
+    if (v) await addFreeformNote(v);
+    logApertureEvent("onboarding_answer", {
+      phase: "closing", question_key: "closing_help", answer: v || null,
+    });
+    logApertureEvent("onboarding_completed", { flow: "full" });
+    setBusy(false);
+    setPhase("tailoring");
+    try {
+      await Promise.race([
+        supabase.functions.invoke("aperture-pass2-suggestions", {
+          body: { closing_answer: v },
+        }),
+        new Promise(resolve => setTimeout(resolve, 12_000)),
+      ]);
+    } catch (e) {
+      console.error("pass2 invoke failed", e);
+    }
+    navigate("/aperture/app", { replace: true });
+  }
+
   async function next() {
     if (busy) return;
     setBusy(true);
@@ -63,18 +106,16 @@ export default function OnboardFull() {
     await persistSection(qs);
     setBusy(false);
     if (sectionIdx + 1 >= sections.length) {
-      await upsertProfile({ full_onboarded_at: new Date().toISOString() });
-      navigate("/aperture/app/memory", { replace: true });
+      await finishSections();
     } else {
       setSectionIdx(sectionIdx + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }
 
-  function skipSection() {
+  async function skipSection() {
     if (sectionIdx + 1 >= sections.length) {
-      upsertProfile({ full_onboarded_at: new Date().toISOString() });
-      navigate("/aperture/app/memory", { replace: true });
+      await finishSections();
     } else {
       setSectionIdx(sectionIdx + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -87,6 +128,58 @@ export default function OnboardFull() {
     <>
       <Helmet><title>Full Questionnaire · Aperture</title></Helmet>
       <RealAppShell>
+        {phase === "prefilling" ? (
+          <>
+            <PageHeader
+              index="ONE MOMENT"
+              title="Sketching a first draft of your business…"
+              sub="I'm using your industry and everything you just shared to pre-fill some guesses. You'll see them clearly marked — confirm or correct them anytime."
+            />
+            <ApertureLoading sublabel="Drafting industry-grounded defaults across your memory buckets." />
+          </>
+        ) : phase === "tailoring" ? (
+          <>
+            <PageHeader
+              index="ONE MOMENT"
+              title="Tailoring your first moves…"
+              sub="I'm using what you just told me to line up the sharpest next steps for your business. This takes a few seconds."
+            />
+            <ApertureLoading sublabel="Reading your memory, weighing your answer, drafting concrete next actions." />
+          </>
+        ) : phase === "closing" ? (
+          <>
+            <PageHeader
+              index="ONE LAST THING"
+              title="How can I help you most right now?"
+              sub="If I could take one thing off your plate starting today — what would it be?"
+            />
+            <ApertureCard padding={20}>
+              <textarea
+                rows={5}
+                value={closingAnswer}
+                onChange={e => setClosingAnswer(e.target.value)}
+                placeholder="In your own words…"
+                style={{
+                  width: "100%", resize: "vertical",
+                  background: "var(--ap-surface-2)",
+                  border: "1px solid var(--ap-hairline)",
+                  borderRadius: "var(--ap-radius-sm)",
+                  padding: "12px 14px",
+                  fontSize: 15, color: "var(--ap-ink-1)",
+                  fontFamily: "var(--ap-font-sans)", lineHeight: 1.5,
+                  outline: "none",
+                }}
+              />
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
+                <ApertureButton variant="ghost" onClick={() => navigate("/aperture/app", { replace: true })}>Skip</ApertureButton>
+                <ApertureButton variant="accent" onClick={finishClosing} disabled={busy}>
+                  {busy ? "Saving…" : "Enter Aperture →"}
+                </ApertureButton>
+              </div>
+            </ApertureCard>
+          </>
+        ) : (
+        <>
         <PageHeader
           index="DEEP DIVE"
           title="Tell me more about your business"
@@ -122,6 +215,8 @@ export default function OnboardFull() {
               </ApertureButton>
             </div>
           </ApertureCard>
+        )}
+        </>
         )}
       </RealAppShell>
     </>
