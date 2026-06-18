@@ -27,6 +27,17 @@ export function IndustryPicker({
   const [group, setGroup] = useState<string | null>(initialGroup);
   useEffect(() => { if (initialGroup) setGroup(initialGroup); }, [initialGroup]);
 
+  // If the saved value is a custom "other:" slug, hydrate the input with the
+  // original text so the user sees what they typed.
+  const isCustomValue = value.startsWith("other__");
+  const [customText, setCustomText] = useState<string>(() => {
+    if (!isCustomValue) return "";
+    // Format: other__<group_slug>__<text_slug>__<original_label>
+    const parts = value.split("__");
+    return parts.length >= 4 ? parts.slice(3).join("__").replace(/_/g, " ") : "";
+  });
+  const [showCustom, setShowCustom] = useState<boolean>(isCustomValue);
+
   const groups = useMemo(() => {
     const seen = new Set<string>();
     const list: string[] = [];
@@ -41,6 +52,15 @@ export function IndustryPicker({
     () => industries.filter(i => (i.group_label ?? "Other") === group),
     [industries, group],
   );
+
+  function commitCustom(text: string) {
+    const t = text.trim();
+    if (!t) { onChange(""); return; }
+    const groupSlug = (group ?? "other").toLowerCase().replace(/[^a-z0-9]+/g, "_");
+    const textSlug = t.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+    // Encode original text in the slug so we can re-hydrate it later.
+    onChange(`other__${groupSlug}__${textSlug}__${textSlug}`);
+  }
 
   const chipBase: React.CSSProperties = {
     appearance: "none", cursor: "pointer",
@@ -73,6 +93,11 @@ export function IndustryPicker({
               {g}
             </button>
           ))}
+          {/* Always allow a fully custom "Other" group too. */}
+          <button type="button" onClick={() => { setGroup("Other"); setShowCustom(true); }}
+            style={{ ...chipBase, borderStyle: "dashed", fontStyle: "italic" }}>
+            ✏️ Other / not listed
+          </button>
         </div>
       </div>
     );
@@ -107,7 +132,38 @@ export function IndustryPicker({
             </button>
           );
         })}
+        {/* Per-group "Other" — opens an open text field below. */}
+        <button type="button"
+          onClick={() => { setShowCustom(true); if (!customText) onChange(""); }}
+          style={{
+            ...(showCustom ? chipOn : chipBase),
+            borderStyle: showCustom ? "solid" : "dashed",
+            fontStyle: "italic",
+          }}>
+          ✏️ Other
+        </button>
       </div>
+
+      {showCustom && (
+        <div style={{ marginTop: 12, display: "flex", gap: 8, alignItems: "center" }}>
+          <input
+            value={customText}
+            onChange={(e) => {
+              setCustomText(e.target.value);
+              commitCustom(e.target.value);
+            }}
+            placeholder={`Type your ${group?.toLowerCase() ?? ""} industry…`}
+            autoFocus
+            style={{
+              flex: 1, height: 38, padding: "0 12px",
+              borderRadius: "var(--ap-radius-sm)",
+              border: "1px solid var(--ap-hairline-strong)",
+              background: "var(--ap-surface-1)", color: "var(--ap-ink-1)",
+              fontSize: 14, fontFamily: "var(--ap-font-sans)",
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
