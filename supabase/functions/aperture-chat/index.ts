@@ -98,8 +98,27 @@ serve(async (req) => {
 
     // Verify chat ownership
     const { data: chat } = await supabase
-      .from("aperture_chats").select("id,user_id").eq("id", chatId).maybeSingle();
+      .from("aperture_chats")
+      .select("id,user_id,entry_point,bucket_slug")
+      .eq("id", chatId)
+      .maybeSingle();
     if (!chat || chat.user_id !== user.id) return json({ error: "Chat not found" }, 404);
+
+    // Bucket-scope hint: when the chat was opened from a specific bucket
+    // (memory_general or bucket_specific), nudge the model to stay
+    // scoped to that territory unless the user pivots.
+    let scopeHint = "";
+    const chatEntryPoint = (chat as any).entry_point as string | null;
+    const chatBucketSlug = (chat as any).bucket_slug as string | null;
+    if (chatBucketSlug && (chatEntryPoint === "bucket_specific" || chatEntryPoint === "memory_general")) {
+      const { data: bRow } = await supabase
+        .from("aperture_buckets")
+        .select("title")
+        .eq("slug", chatBucketSlug)
+        .maybeSingle();
+      const bucketTitle = (bRow as any)?.title ?? chatBucketSlug;
+      scopeHint = `\n\nBUCKET SCOPE — this conversation was opened from the "${bucketTitle}" bucket of the user's memory. Stay in that territory unless the user explicitly pivots. Your questions should deepen this bucket — confirm guesses, fill gaps, surface concrete numbers/names/dates that belong here.`;
+    }
 
     // Persist the latest user message (only when it's a real user turn — escape
     // actions don't create a visible user message).
@@ -169,7 +188,7 @@ serve(async (req) => {
 
     // Load (or build) memory card
     const memoryCard = await getOrBuildMemoryCard(supabase, user.id, LOVABLE_API_KEY);
-    const systemPrompt = `${SYSTEM_PROMPT_FINAL}\n\n=== BUSINESS MEMORY CARD ===\n${memoryCard || "(empty — ask the user about their business basics first)"}\n=== END MEMORY CARD ===${escapeInstruction}`;
+    const systemPrompt = `${SYSTEM_PROMPT_FINAL}\n\n=== BUSINESS MEMORY CARD ===\n${memoryCard || "(empty — ask the user about their business basics first)"}\n=== END MEMORY CARD ===${scopeHint}${escapeInstruction}`;
 
     // When an escape was sent, the last "messages" entry may still be the
     // previous assistant turn. The model behaves better if we add a tiny
