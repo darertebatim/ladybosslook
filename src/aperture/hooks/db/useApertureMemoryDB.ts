@@ -147,9 +147,125 @@ export function useApertureMemoryDB() {
     await refresh();
   }, [user, refresh]);
 
+  /**
+   * Memory is additive — corrections write a NEW timestamped row and
+   * deactivate the old one. Old rows stay in the table (is_active=false)
+   * so the Fact View can show a History expander.
+   */
+  const writeReplacement = useCallback(async (
+    oldId: string,
+    nextContent: string,
+    nextSource: MemorySource,
+  ): Promise<void> => {
+    if (!user) return;
+    const { data: old } = await supabase
+      .from("aperture_memory_items")
+      .select("id,bucket_slug,question_key,content")
+      .eq("id", oldId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (!old) return;
+    const trimmed = nextContent.trim();
+    if (!trimmed) return;
+
+    const { error: insErr } = await supabase
+      .from("aperture_memory_items")
+      .insert({
+        user_id: user.id,
+        content: trimmed,
+        source: nextSource,
+        bucket_slug: (old as any).bucket_slug,
+        question_key: (old as any).question_key,
+        is_active: true,
+      });
+    if (insErr) {
+      // 23505 = unique conflict on (user, bucket, question_key) — fall back
+      // to in-place update so we never end up with two active rows for
+      // the same answer slot.
+      if ((insErr as any).code === "23505") {
+        await supabase.from("aperture_memory_items")
+          .update({ content: trimmed, source: nextSource, is_active: true })
+          .eq("user_id", user.id)
+          .eq("bucket_slug", (old as any).bucket_slug)
+          .eq("question_key", (old as any).question_key);
+      } else {
+        console.error("[memory] replacement insert failed", insErr);
+        throw insErr;
+      }
+    }
+
+    // Deactivate the old row (kept for history).
+    await supabase.from("aperture_memory_items")
+      .update({ is_active: false })
+      .eq("id", oldId)
+      .eq("user_id", user.id);
+
+    logApertureEvent("memory_item_written", {
+      bucket_slug: (old as any).bucket_slug,
+      question_key: (old as any).question_key,
+      content: trimmed,
+      source: nextSource,
+      replaces: oldId,
+    });
+
+    await refresh();
+  }, [user, refresh]);
+
+  /** Flip an `ai_inferred_pre_onboarding` guess to `user_confirmed`. */
+  const confirmGuess = useCallback(async (id: string) => {
+    const target = items.find(i => i.id === id);
+    if (!target) return;
+    await writeReplacement(id, target.content, "user_confirmed");
+  }, [items, writeReplacement]);
+
+  /** Edit a fact's content. Writes a new row, deactivates the old. */
+  const editFact = useCallback(async (id: string, nextContent: string) => {
+    const target = items.find(i => i.id === id);
+    if (!target) return;
+    // Preserve the original source class, except guesses become confirmed
+    // once the user has actively edited them.
+    const nextSource: MemorySource =
+      target.source === "ai_inferred_pre_onboarding"
+        ? "user_confirmed"
+        : target.source;
+    await writeReplacement(id, nextContent, nextSource);
+  }, [items, writeReplacement]);
+
+  /** Soft-delete (kept in history). */
+  const deactivateFact = useCallback(async (id: string) => {
+    if (!user) return;
+    await supabase.from("aperture_memory_items")
+      .update({ is_active: false })
+      .eq("id", id)
+      .eq("user_id", user.id);
+    await refresh();
+  }, [user, refresh]);
+
+  /**
+   * Returns every row (active + inactive) that shares this bucket+question
+   * slot, ordered newest first. Used by the Fact View's History expander.
+   * Falls back to content-match when question_key is null (freeform notes).
+   */
+  const historyFor = useCallback(async (
+    bucketSlug: string,
+    questionKey: string | null,
+  ): Promise<MemoryItem[]> => {
+    if (!user) return [];
+    let q = supabase.from("aperture_memory_items")
+      .select("id,content,source,bucket_slug,question_key,is_active,created_at,updated_at")
+      .eq("user_id", user.id)
+      .eq("bucket_slug", bucketSlug)
+      .order("updated_at", { ascending: false });
+    if (questionKey) q = q.eq("question_key", questionKey);
+    else q = q.is("question_key", null);
+    const { data } = await q;
+    return (data ?? []) as MemoryItem[];
+  }, [user]);
+
   return {
     items, loading, refresh,
     saveBucketAnswer, addFreeformNote, deleteItem, updateItem,
+    confirmGuess, editFact, deactivateFact, historyFor,
     /** Convenience lookup by bucket+question — empty string if not set. */
     answerFor(bucketSlug: string, questionKey: string): string {
       return items.find(

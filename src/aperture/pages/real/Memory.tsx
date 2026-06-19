@@ -11,6 +11,8 @@ import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 import { useApertureChatsDB } from "@/aperture/hooks/db/useApertureChatsDB";
 import { Paperclip, Plug } from "lucide-react";
+import { pickFallbackBucket, topNBuckets } from "@/aperture/lib/pickFallbackBucket";
+import { composeMemoryGeneralOpener } from "@/aperture/lib/composeOpener";
 
 /**
  * Memory page — map of what Aperture knows about the user's business.
@@ -51,7 +53,36 @@ export default function RealMemory() {
   const fullDone = !!profile?.full_onboarded_at;
 
   async function talkToAperture() {
-    const chat = await createChat("What should we look at first?");
+    const chat = await createChat({
+      title: "What should we look at first?",
+      entry_point: "general_chat",
+    });
+    if (chat) navigate(`/aperture/app/chats/${chat.id}`);
+  }
+
+  /**
+   * "Continue filling out your memory" — picks a bucket via the §4
+   * fallback scorer, composes Opener A with chips from the same scorer
+   * (top-N, not raw lowest-progress), starts a memory_general chat.
+   */
+  async function continueFillingMemory() {
+    const scoreable = buckets.map(b => ({
+      slug: b.slug, title: b.title, target_count: b.target_count,
+    }));
+    const memItems = items.map(i => ({ bucket_slug: i.bucket_slug, source: i.source }));
+    const picked = pickFallbackBucket(scoreable, memItems);
+    if (!picked) {
+      await talkToAperture();
+      return;
+    }
+    const topRanked = topNBuckets(scoreable, memItems, 4);
+    const opener = composeMemoryGeneralOpener({ title: picked.title }, topRanked);
+    const chat = await createChat({
+      title: `Memory · ${picked.title}`,
+      entry_point: "memory_general",
+      bucket_slug: picked.slug,
+      opener,
+    });
     if (chat) navigate(`/aperture/app/chats/${chat.id}`);
   }
 
@@ -83,18 +114,18 @@ export default function RealMemory() {
         />
 
         {/* CTA row */}
-        <div style={{ display: "grid", gridTemplateColumns: fullDone ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
           <ApertureCard padding={16}>
             <ApertureMonoLabel>Conversation</ApertureMonoLabel>
             <h3 style={{ margin: "6px 0 4px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
               Talk to Aperture
             </h3>
             <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
-              I'll ask about whatever gap looks most useful right now.
+              Open chat. Bring me anything — a stuck decision, an idea, a quick question.
             </p>
             <ApertureButton variant="accent" onClick={talkToAperture}>Start →</ApertureButton>
           </ApertureCard>
-          {!fullDone && (
+          {!fullDone ? (
             <ApertureCard padding={16}>
               <ApertureMonoLabel>Deep dive</ApertureMonoLabel>
               <h3 style={{ margin: "6px 0 4px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
@@ -106,6 +137,19 @@ export default function RealMemory() {
               <Link to="/aperture/app/onboard/full" style={{ textDecoration: "none" }}>
                 <ApertureButton variant="ghost">Open →</ApertureButton>
               </Link>
+            </ApertureCard>
+          ) : (
+            <ApertureCard padding={16}>
+              <ApertureMonoLabel>Keep building</ApertureMonoLabel>
+              <h3 style={{ margin: "6px 0 4px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
+                Continue filling out your memory
+              </h3>
+              <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
+                I'll pick the territory that looks most useful right now and we'll go from there.
+              </p>
+              <ApertureButton variant="accent" onClick={continueFillingMemory} disabled={bLoading || mLoading}>
+                Start →
+              </ApertureButton>
             </ApertureCard>
           )}
         </div>
