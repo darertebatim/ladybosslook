@@ -669,7 +669,9 @@ export type Database = {
       aperture_chats: {
         Row: {
           archived: boolean
+          bucket_slug: string | null
           created_at: string
+          entry_point: string
           id: string
           last_message_at: string
           origin: string | null
@@ -680,7 +682,9 @@ export type Database = {
         }
         Insert: {
           archived?: boolean
+          bucket_slug?: string | null
           created_at?: string
+          entry_point?: string
           id?: string
           last_message_at?: string
           origin?: string | null
@@ -691,7 +695,9 @@ export type Database = {
         }
         Update: {
           archived?: boolean
+          bucket_slug?: string | null
           created_at?: string
+          entry_point?: string
           id?: string
           last_message_at?: string
           origin?: string | null
@@ -1221,6 +1227,36 @@ export type Database = {
           slug?: string
           sort_order?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      aperture_user_bucket_signals: {
+        Row: {
+          bucket_slug: string
+          created_at: string
+          id: string
+          meta: Json | null
+          signal_type: string
+          user_id: string
+          weight: number
+        }
+        Insert: {
+          bucket_slug: string
+          created_at?: string
+          id?: string
+          meta?: Json | null
+          signal_type: string
+          user_id: string
+          weight?: number
+        }
+        Update: {
+          bucket_slug?: string
+          created_at?: string
+          id?: string
+          meta?: Json | null
+          signal_type?: string
+          user_id?: string
+          weight?: number
         }
         Relationships: []
       }
