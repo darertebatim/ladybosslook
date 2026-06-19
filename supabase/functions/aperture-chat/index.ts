@@ -566,6 +566,18 @@ ${trimmed.slice(0, 4000)}`;
       bucket_slug: f.bucket_slug, content: f.content, source: "ai_extracted",
     });
   }
+  // Bucket signal — feeds the (future) relevance scorer. Fire-and-forget.
+  try {
+    await supabase.from("aperture_user_bucket_signals").insert(
+      clean.map(f => ({
+        user_id: userId,
+        bucket_slug: f.bucket_slug,
+        signal_type: "auto_extracted",
+      })),
+    );
+  } catch (e) {
+    console.error("bucket signal insert failed", e);
+  }
   // Mark the compressed brief stale so the next chat turn regenerates it.
   await supabase.from("aperture_memory_card")
     .update({ stale: true })
