@@ -3,9 +3,18 @@
  *   1. Memory page "Continue filling out your memory" card (single pick).
  *   2. Opener A chip ranking on memory_general chats (top-N).
  *
- * score(bucket) = (1 - progress_pct)
- *               + 0.15 * (has ≥1 onboarding-mapped fact ? 1 : 0)
- * filter:        target_count - count > 0   (skip filled buckets)
+ * score(bucket):
+ *   - has warm context → (1 - progress_pct) + 0.15
+ *   - cold (no warm context, regardless of guesses) → 0.5
+ * filter: target_count - count > 0   (skip filled buckets)
+ *
+ * Why the cold floor: on a fresh post-onboarding profile, every untouched
+ * bucket would otherwise score 1.0 (progress=0, no bonus) and beat any
+ * warm-but-partial bucket the user just answered. That cold-opens
+ * dead-zone buckets like Partners/Competitors right after onboarding.
+ * Pinning cold buckets at 0.5 lets warm-but-unfilled buckets (score
+ * ≥ 0.15 + tiny remainder) win first, and falls back to cold buckets
+ * only once the warm ones are full.
  *
  * Onboarding-mapped facts = anything in the bucket with a source other
  * than `ai_inferred_pre_onboarding` (pure guesses don't count as warm
@@ -51,7 +60,9 @@ function scoreOne(
     }
   }
   const progressPct = Math.min(1, count / target);
-  const score = (1 - progressPct) + (hasWarmContext ? 0.15 : 0);
+  const score = hasWarmContext
+    ? (1 - progressPct) + 0.15
+    : 0.5;
   return {
     slug: bucket.slug,
     title: bucket.title,
