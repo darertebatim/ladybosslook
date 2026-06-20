@@ -16,6 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { MemorySourcePill } from "@/aperture/components/MemorySourcePill";
 import { composeBucketSpecificOpener } from "@/aperture/lib/composeOpener";
+import { BriefCard } from "@/aperture/components/BriefCard";
 import { Check, Pencil, Trash2, Clock, X } from "lucide-react";
 
 /**
@@ -135,21 +136,52 @@ export default function RealBucketPage() {
           sub={bucket.blurb ?? ""}
         />
 
-        {/* Continue chat CTA — the only way to add new facts here now. */}
-        <ApertureCard padding={16} style={{ marginBottom: 18 }}>
-          <ApertureMonoLabel>Conversation</ApertureMonoLabel>
-          <h3 style={{ margin: "6px 0 4px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
-            Continue chat about {bucket.title}
-          </h3>
-          <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
-            {confirmedCount > 0
-              ? "I'll pick up where we left off — what's changed, or what's on your mind here now?"
-              : "Let's open this up. I'll ask the first question and we'll go from there."}
-          </p>
-          <ApertureButton variant="accent" onClick={continueChat} disabled={starting}>
-            {starting ? "Opening…" : "Start →"}
-          </ApertureButton>
-        </ApertureCard>
+        {/* Conversation + Brief CTA row */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+          gap: 12, marginBottom: 18,
+        }}>
+          <ApertureCard padding={16}>
+            <ApertureMonoLabel>Conversation</ApertureMonoLabel>
+            <h3 style={{ margin: "6px 0 4px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
+              Continue chat about {bucket.title}
+            </h3>
+            <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
+              {confirmedCount > 0
+                ? "I'll pick up where we left off — what's changed, or what's on your mind here now?"
+                : "Let's open this up. I'll ask the first question and we'll go from there."}
+            </p>
+            <ApertureButton variant="accent" onClick={continueChat} disabled={starting}>
+              {starting ? "Opening…" : "Start →"}
+            </ApertureButton>
+          </ApertureCard>
+
+          <BriefCard
+            label="Brief"
+            title={`What I know about ${bucket.title}`}
+            teaser="A short read-back of what I've pieced together for this bucket. Reset anytime to refresh."
+            load={async () => {
+              if (!user || !slug) return null;
+              const { data } = await supabase
+                .from("aperture_bucket_briefs")
+                .select("summary,generated_at")
+                .eq("user_id", user.id).eq("bucket_slug", slug)
+                .maybeSingle();
+              return data ? { summary: (data as any).summary, generated_at: (data as any).generated_at } : null;
+            }}
+            regenerate={async () => {
+              if (!slug) throw new Error("Missing bucket");
+              const { data, error } = await supabase.functions.invoke("aperture-bucket-brief", {
+                body: { bucket_slug: slug, force: true },
+              });
+              if (error) throw new Error(error.message);
+              const b = (data as any)?.brief;
+              if (!b) throw new Error("No brief returned");
+              return { summary: b.summary, generated_at: b.generated_at };
+            }}
+          />
+        </div>
 
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 10 }}>
           <ApertureMonoLabel>What I know</ApertureMonoLabel>

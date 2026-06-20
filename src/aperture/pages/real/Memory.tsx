@@ -13,6 +13,9 @@ import { useApertureChatsDB } from "@/aperture/hooks/db/useApertureChatsDB";
 import { Paperclip, Plug } from "lucide-react";
 import { pickFallbackBucket, topNBuckets } from "@/aperture/lib/pickFallbackBucket";
 import { composeMemoryGeneralOpener } from "@/aperture/lib/composeOpener";
+import { BriefCard } from "@/aperture/components/BriefCard";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 /**
  * Memory page — map of what Aperture knows about the user's business.
@@ -26,6 +29,7 @@ export default function RealMemory() {
   const { items, loading: mLoading } = useApertureMemoryDB();
   const { profile } = useApertureUserProfile();
   const { createChat } = useApertureChatsDB();
+  const { user } = useAuth();
 
   const countsBySlug = useMemo(() => {
     // Weight: confirmed/extracted/freeform = 1.0, ai_inferred_pre_onboarding = 0.5.
@@ -157,6 +161,7 @@ export default function RealMemory() {
         {bLoading || mLoading ? (
           <ApertureLoading label="Loading…" />
         ) : (
+          <>
           <div style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
@@ -206,6 +211,35 @@ export default function RealMemory() {
               );
             })}
           </div>
+
+          {/* Full business brief — anchored at the end of the bucket grid. */}
+          <div style={{ marginTop: 20 }}>
+            <BriefCard
+              label="Full brief"
+              title="What I know about your business"
+              teaser="The whole picture, pulled across every bucket. Reset for a fresh read-back anytime."
+              load={async () => {
+                if (!user) return null;
+                const { data } = await supabase
+                  .from("aperture_memory_card")
+                  .select("summary,regenerated_at,stale")
+                  .eq("user_id", user.id).maybeSingle();
+                if (!data || !(data as any).summary) return null;
+                return {
+                  summary: (data as any).summary,
+                  generated_at: (data as any).regenerated_at ?? new Date().toISOString(),
+                };
+              }}
+              regenerate={async () => {
+                const { data, error } = await supabase.functions.invoke("aperture-regenerate-memory-card", {});
+                if (error) throw new Error(error.message);
+                const summary = (data as any)?.summary ?? "";
+                const generated_at = (data as any)?.regenerated_at ?? new Date().toISOString();
+                return { summary, generated_at };
+              }}
+            />
+          </div>
+          </>
         )}
       </RealAppShell>
     </>
