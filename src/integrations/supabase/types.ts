@@ -544,6 +544,39 @@ export type Database = {
         }
         Relationships: []
       }
+      aperture_bucket_briefs: {
+        Row: {
+          bucket_slug: string
+          created_at: string
+          facts_count: number
+          generated_at: string
+          id: string
+          summary: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bucket_slug: string
+          created_at?: string
+          facts_count?: number
+          generated_at?: string
+          id?: string
+          summary?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bucket_slug?: string
+          created_at?: string
+          facts_count?: number
+          generated_at?: string
+          id?: string
+          summary?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       aperture_bucket_questions: {
         Row: {
           audience: string
