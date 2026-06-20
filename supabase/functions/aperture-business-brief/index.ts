@@ -85,7 +85,12 @@ ${memoryBrief}`;
       { role: "user", content: analystUser },
     ]);
     if (analysis.error) return json({ error: analysis.error }, analysis.status);
-    const analysisText = analysis.text;
+    // Pass 1 occasionally returns empty (model refusal, safety filter, or
+    // upstream truncation). When that happens, fall back to feeding the
+    // formatter the raw memory dump directly — better than a blank brief.
+    const analysisText = analysis.text && analysis.text.length > 40
+      ? analysis.text
+      : `(Pass 1 returned empty — work directly from the raw memory dump below.)\n\n${analystUser}`;
 
     // PASS 2 — compress the deep analysis into the strict UI schema, preserving specificity.
     const formatterSystem = `You convert a senior operator's free-form analysis of a business into a STRICT JSON brief shown to the owner.
