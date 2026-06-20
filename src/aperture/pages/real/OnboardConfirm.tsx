@@ -10,9 +10,6 @@ import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { logApertureEvent } from "@/aperture/lib/apertureEvents";
 import { supabase } from "@/integrations/supabase/client";
-import { BusinessBriefScreen } from "@/aperture/components/BusinessBriefScreen";
-
-
 /**
  * Phase 3 confirmation — after the website/IG research extraction,
  * show the owner everything the AI pulled out (grouped by bucket)
@@ -26,7 +23,7 @@ export default function OnboardConfirm() {
   const [saving, setSaving] = useState(false);
   const [edits, setEdits] = useState<Record<string, string>>({});
   const [removed, setRemoved] = useState<Record<string, boolean>>({});
-  const [phase, setPhase] = useState<"review" | "closing" | "brief">("review");
+  const [phase, setPhase] = useState<"review" | "closing">("review");
   const [closingAnswer, setClosingAnswer] = useState("");
   const [tailoring, setTailoring] = useState(false);
   const [prefilling, setPrefilling] = useState(false);
@@ -148,7 +145,8 @@ export default function OnboardConfirm() {
       console.error("pass2 invoke failed", e);
     }
     setTailoring(false);
-    setPhase("brief");
+    // Quick onboarding skips the brief — only the full flow shows one.
+    navigate("/aperture/app", { replace: true });
   }
 
   const bucketTitleMap = useMemo(() => {
@@ -182,12 +180,6 @@ export default function OnboardConfirm() {
             />
             <ApertureLoading sublabel="Reading your memory, weighing your answer, drafting concrete next actions." />
           </>
-        ) : phase === "brief" ? (
-          <BusinessBriefScreen
-            closingAnswer={closingAnswer}
-            flow="quick"
-            onDone={() => navigate("/aperture/app", { replace: true })}
-          />
         ) : phase === "closing" ? (
           <>
             <PageHeader
