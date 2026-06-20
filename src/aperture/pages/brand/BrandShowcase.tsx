@@ -1,3 +1,4 @@
+import { useRef, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { ApertureLogo, ApertureWordmark } from "@/aperture/brand/ApertureLogo";
 import {
@@ -11,23 +12,87 @@ import {
 } from "@/aperture/components/primitives";
 import { useApertureTheme } from "@/aperture/components/ApertureLayout";
 
+/* ---- color helpers ---- */
+function rgbToHex(rgb: string): string {
+  const match = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)$/);
+  if (!match) return rgb;
+  const toHex = (n: number) => n.toString(16).padStart(2, "0").toUpperCase();
+  return `#${toHex(parseInt(match[1]))}${toHex(parseInt(match[2]))}${toHex(parseInt(match[3]))}`;
+}
+
+function useResolvedHex(ref: React.RefObject<HTMLDivElement>): string {
+  const [hex, setHex] = useState("");
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const update = () => {
+      const rgb = getComputedStyle(el).backgroundColor;
+      setHex(rgbToHex(rgb));
+    };
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(el, { attributes: true, attributeFilter: ["style", "class"] });
+    return () => observer.disconnect();
+  }, []);
+  return hex;
+}
+
 /* ---- swatch / token helpers ---- */
 function Swatch({ token, label }: { token: string; label: string }) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  const hex = useResolvedHex(boxRef);
+  const [copied, setCopied] = useState(false);
+
+  const copy = async () => {
+    if (!hex) return;
+    try {
+      await navigator.clipboard.writeText(hex);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch {
+      // ignore
+    }
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       <div
+        ref={boxRef}
         style={{
           height: 64,
           borderRadius: "var(--ap-radius-sm)",
           background: `var(${token})`,
           border: "1px solid var(--ap-hairline)",
+          cursor: "pointer",
+          position: "relative",
         }}
+        onClick={copy}
+        title="Click to copy hex"
       />
       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <span style={{ fontSize: 12.5, color: "var(--ap-ink-1)", fontWeight: 500 }}>
           {label}
         </span>
         <ApertureMonoLabel size={9}>{token}</ApertureMonoLabel>
+        <button
+          onClick={copy}
+          title="Copy hex"
+          style={{
+            background: "none",
+            border: "none",
+            padding: 0,
+            margin: 0,
+            cursor: "pointer",
+            textAlign: "left",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
+          <ApertureMonoLabel size={9} style={{ color: copied ? "var(--ap-live)" : "var(--ap-ink-3)" }}>
+            {copied ? "Copied!" : hex || "..."}
+          </ApertureMonoLabel>
+        </button>
       </div>
     </div>
   );
