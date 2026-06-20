@@ -40,6 +40,32 @@ export default function RealBucketPage() {
   const bucket = slug ? buckets.find(b => b.slug === slug) : undefined;
   const questions = slug ? questionsFor(slug) : [];
 
+  // Question prompts live in TWO tables: `aperture_bucket_questions`
+  // (post-onboarding designed Qs) and `aperture_onboarding_questions`
+  // (the quick + full onboarding questionnaire). Bucket answers carry
+  // `question_key`s that can come from either, so we merge both into a
+  // single lookup to render plain-language labels in the Fact View.
+  const [onbPrompts, setOnbPrompts] = useState<Record<string, string>>({});
+  useEffect(() => {
+    let alive = true;
+    void supabase
+      .from("aperture_onboarding_questions")
+      .select("question_key,prompt")
+      .then(({ data }) => {
+        if (!alive || !data) return;
+        const map: Record<string, string> = {};
+        for (const r of data as any[]) map[r.question_key] = r.prompt;
+        setOnbPrompts(map);
+      });
+    return () => { alive = false; };
+  }, []);
+
+  const promptFor = useMemo(() => {
+    const map: Record<string, string> = { ...onbPrompts };
+    for (const q of questions) map[q.question_key] = q.prompt;
+    return map;
+  }, [questions, onbPrompts]);
+
   // Log a bucket_visit signal on mount — feeds the (future) relevance scorer.
   useEffect(() => {
     if (!user || !slug) return;
@@ -143,7 +169,7 @@ export default function RealBucketPage() {
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {facts.map(f => (
-              <FactRow key={f.id} fact={f} memory={memory} questions={questions} />
+              <FactRow key={f.id} fact={f} memory={memory} promptFor={promptFor} />
             ))}
           </div>
         )}
@@ -155,11 +181,11 @@ export default function RealBucketPage() {
 function FactRow({
   fact,
   memory,
-  questions,
+  promptFor,
 }: {
   fact: MemoryItem;
   memory: ReturnType<typeof useApertureMemoryDB>;
-  questions: ApertureQuestionRow[];
+  promptFor: Record<string, string>;
 }) {
   const isGuess = fact.source === "ai_inferred_pre_onboarding";
   const [mode, setMode] = useState<"view" | "edit">("view");
@@ -202,7 +228,7 @@ function FactRow({
   // Plain-language label for what this fact answers. Without it, raw values
   // like "4155428062" or "Irvine" sit on the page with no context.
   const questionLabel = fact.question_key
-    ? (questions.find(q => q.question_key === fact.question_key)?.prompt ?? null)
+    ? (promptFor[fact.question_key] ?? prettifyKey(fact.question_key))
     : null;
 
   return (
@@ -340,4 +366,16 @@ function relativeTime(iso: string): string {
   const mo = Math.round(d / 30);
   if (mo < 12) return `${mo}mo ago`;
   return `${Math.round(mo / 12)}y ago`;
+}
+
+/** Last-resort label for question_keys we can't find a prompt for —
+ *  strips prefixes like `full_q12_` and turns snake_case into Title Case. */
+function prettifyKey(key: string): string {
+  const stripped = key
+    .replace(/^full_q\d+_/, "")
+    .replace(/^b\d+_q\d+$/i, "")
+    .replace(/_/g, " ")
+    .trim();
+  if (!stripped) return "Detail";
+  return stripped.charAt(0).toUpperCase() + stripped.slice(1);
 }
