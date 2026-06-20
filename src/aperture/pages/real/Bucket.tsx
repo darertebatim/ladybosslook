@@ -7,6 +7,7 @@ import {
   ApertureCard, ApertureMonoLabel, ApertureLoading, ApertureButton,
 } from "@/aperture/components/primitives";
 import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
+import type { ApertureQuestionRow } from "@/aperture/hooks/db/useApertureBucketsDB";
 import {
   useApertureMemoryDB, type MemoryItem,
 } from "@/aperture/hooks/db/useApertureMemoryDB";
@@ -142,7 +143,7 @@ export default function RealBucketPage() {
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {facts.map(f => (
-              <FactRow key={f.id} fact={f} memory={memory} />
+              <FactRow key={f.id} fact={f} memory={memory} questions={questions} />
             ))}
           </div>
         )}
@@ -154,9 +155,11 @@ export default function RealBucketPage() {
 function FactRow({
   fact,
   memory,
+  questions,
 }: {
   fact: MemoryItem;
   memory: ReturnType<typeof useApertureMemoryDB>;
+  questions: ApertureQuestionRow[];
 }) {
   const isGuess = fact.source === "ai_inferred_pre_onboarding";
   const [mode, setMode] = useState<"view" | "edit">("view");
@@ -196,6 +199,11 @@ function FactRow({
   }
 
   const when = relativeTime(fact.updated_at);
+  // Plain-language label for what this fact answers. Without it, raw values
+  // like "4155428062" or "Irvine" sit on the page with no context.
+  const questionLabel = fact.question_key
+    ? (questions.find(q => q.question_key === fact.question_key)?.prompt ?? null)
+    : null;
 
   return (
     <ApertureCard
@@ -232,12 +240,24 @@ function FactRow({
           }}
         />
       ) : (
-        <p style={{
-          margin: 0, fontSize: 14, color: "var(--ap-ink-1)", lineHeight: 1.5,
-          fontStyle: isGuess ? "italic" : "normal",
-        }}>
-          {fact.content}
-        </p>
+        <>
+          {questionLabel && (
+            <div style={{
+              fontSize: 11, color: "var(--ap-ink-3)",
+              fontFamily: "var(--ap-font-mono)",
+              textTransform: "uppercase", letterSpacing: "0.10em",
+              marginBottom: 4, lineHeight: 1.4,
+            }}>
+              {questionLabel.replace(/\?$/, "")}
+            </div>
+          )}
+          <p style={{
+            margin: 0, fontSize: 14, color: "var(--ap-ink-1)", lineHeight: 1.5,
+            fontStyle: isGuess ? "italic" : "normal",
+          }}>
+            {fact.content}
+          </p>
+        </>
       )}
 
       <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
