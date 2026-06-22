@@ -499,15 +499,28 @@ async function extractFactsFromMessage(args: {
 
 Allowed bucket slugs (use EXACTLY one of these per fact): ${allowed.join(", ")}.
 
-Rules:
-- Only extract concrete factual statements about the user's business (numbers, names, products, customers, channels, hires, locations, decisions, plans). Skip opinions, questions, hypotheticals, and small talk.
-- Skip anything already in the "known facts" list below — even if reworded.
-- One fact per item. Keep each fact short (under 220 chars), self-contained, written in third person ("They…", "The business…").
-- If the message has no extractable new facts, return an empty array.
-- Output STRICT JSON only — no prose, no markdown fences.
+A fact worth saving is concrete, specific, and would still be relevant in a future conversation (numbers, names, products, customers, channels, hires, locations, decisions, plans).
+
+Do NOT extract:
+- Questions the user is asking
+- Generic statements ("I want to grow")
+- Feelings or moods ("I'm stressed", "I'm excited")
+- Temporary situations ("I'm busy today", "this week is rough")
+- Things the user is unsure about ("maybe I should…", "I'm thinking about…")
+- Anything phrased as a hypothetical or small talk
+- Anything already in the "known facts" list below — even if reworded
+
+One fact per item. Keep each fact short (under 220 chars), self-contained, written in third person ("They…", "The business…").
+
+For each fact, mark confidence:
+- "high" when the user stated it clearly and directly
+- "medium" when the fact is implied or slightly ambiguous
+
+If the message has no extractable new facts, return an empty array.
+Output STRICT JSON only — no prose, no markdown fences.
 
 Schema:
-{ "facts": [ { "bucket_slug": string, "content": string } ] }`;
+{ "facts": [ { "bucket_slug": string, "content": string, "confidence": "high" | "medium" } ] }`;
 
   const userPayload = `Known facts:
 ${knownBrief || "(none)"}
@@ -543,6 +556,7 @@ ${trimmed.slice(0, 4000)}`;
     .map(f => ({
       bucket_slug: String(f?.bucket_slug ?? "").trim().toLowerCase(),
       content: String(f?.content ?? "").trim().slice(0, 240),
+      confidence: String((f as any)?.confidence ?? "high").toLowerCase() === "medium" ? 0.6 : 0.9,
     }))
     .filter(f => f.content && allowed.includes(f.bucket_slug))
     .slice(0, 6);
@@ -552,18 +566,19 @@ ${trimmed.slice(0, 4000)}`;
   const rows = clean.map(f => ({
     user_id: userId,
     content: f.content,
-    source: "ai_extracted",
+    source: "chat_extracted",
     bucket_slug: f.bucket_slug,
+    confidence: f.confidence,
     is_active: true,
   }));
   const { error: insertErr } = await supabase.from("aperture_memory_items").insert(rows);
   if (insertErr) {
-    console.error("ai_extracted insert error", insertErr);
+    console.error("chat_extracted insert error", insertErr);
     return;
   }
   for (const f of clean) {
     await logApertureEvent(supabase, userId, "memory_item_written", {
-      bucket_slug: f.bucket_slug, content: f.content, source: "ai_extracted",
+      bucket_slug: f.bucket_slug, content: f.content, source: "chat_extracted",
     });
   }
   // Bucket signal — feeds the (future) relevance scorer. Fire-and-forget.

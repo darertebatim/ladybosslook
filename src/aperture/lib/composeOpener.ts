@@ -45,7 +45,7 @@ export function composeMemoryGeneralOpener(
 
 export function composeBucketSpecificOpener(
   bucket: { title: string },
-  /** Most recent active fact with source = user_confirmed | ai_extracted | bucket_answer.
+  /** Most recent active fact with source = user_confirmed | chat_extracted | ai_extracted | bucket_answer.
    *  Guesses (ai_inferred_pre_onboarding) are excluded — we never quote an
    *  unconfirmed guess back as if the user said it. */
   recentConfirmedFact: RecentFact | null,
