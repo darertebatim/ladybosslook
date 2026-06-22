@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { ApertureCard, ApertureMonoLabel, ApertureButton } from "@/aperture/components/primitives";
 import { RotateCw, ChevronDown, ChevronUp } from "lucide-react";
+import { AperturePrompt } from "@/aperture/components/chat/AperturePrompt";
 
 /**
  * Reusable "what I know" brief card. Pure UI — the caller wires the
@@ -110,12 +111,7 @@ export function BriefCard({
           marginTop: 12, paddingTop: 12,
           borderTop: "1px solid var(--ap-hairline)",
         }}>
-          <p style={{
-            margin: 0, fontSize: 13.5, color: "var(--ap-ink-1)",
-            lineHeight: 1.6, whiteSpace: "pre-wrap",
-          }}>
-            {brief.summary}
-          </p>
+          <AperturePrompt text={brief.summary} size={13.5} />
         </div>
       )}
     </ApertureCard>
