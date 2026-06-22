@@ -220,3 +220,6 @@ verify_jwt = false
 
 [functions.aperture-onboarding-research]
 verify_jwt = false
+
+[functions.aperture-name-chat]
+verify_jwt = false

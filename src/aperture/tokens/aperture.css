@@ -111,3 +111,16 @@
 .aperture-root .ap-pulse {
   animation: ap-pulse 2.4s ease-in-out infinite;
 }
+
+/* ---- streaming caret ---- */
+@keyframes ap-cursor {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.aperture-root .ap-cursor {
+  animation: ap-cursor 1s steps(1, end) infinite;
+}
+
+/* ---- chat markdown rhythm ---- */
+.aperture-root .ap-md > *:first-child { margin-top: 0; }
+.aperture-root .ap-md > *:last-child { margin-bottom: 0; }

@@ -14,6 +14,7 @@ import { useApertureDailyQuestion } from "@/aperture/hooks/db/useApertureDailyQu
 import { useApertureHomeSuggestions } from "@/aperture/hooks/db/useApertureHomeSuggestions";
 import { useApertureStoredSuggestions } from "@/aperture/hooks/db/useApertureStoredSuggestions";
 import { toast } from "@/hooks/use-toast";
+import { AperturePrompt } from "@/aperture/components/chat/AperturePrompt";
 
 export default function RealHome() {
   const navigate = useNavigate();
@@ -126,9 +127,13 @@ export default function RealHome() {
             <ApertureMonoLabel style={{ marginBottom: 12, display: "block" }}>Today's question</ApertureMonoLabel>
             <ApertureCard padding={18}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 10 }}>
-                <h3 style={{ margin: 0, fontSize: 15.5, fontWeight: 600, color: "var(--ap-ink-1)", lineHeight: 1.4 }}>
-                  {dailyQ.prompt}
-                </h3>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <AperturePrompt
+                    text={dailyQ.prompt}
+                    size={15.5}
+                    style={{ fontWeight: 600, lineHeight: 1.4 }}
+                  />
+                </div>
                 <ApertureChip tone="neutral">{dailyQ.bucket_slug}</ApertureChip>
               </div>
               <form
@@ -207,7 +212,9 @@ export default function RealHome() {
                     <ApertureMonoLabel>Suggestion · {String(idx + 1).padStart(2, "0")}</ApertureMonoLabel>
                     <h3 style={{ margin: 0, fontSize: 14.5, fontWeight: 600, lineHeight: 1.35 }}>{s.title}</h3>
                     {s.why && (
-                      <p style={{ margin: 0, fontSize: 12.5, color: "var(--ap-ink-3)", lineHeight: 1.5 }}>{s.why}</p>
+                      <div style={{ color: "var(--ap-ink-3)" }}>
+                        <AperturePrompt text={s.why} size={12.5} />
+                      </div>
                     )}
                     <span style={{ marginTop: 4, fontSize: 11, color: "var(--ap-signal)", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
                       Start chat →

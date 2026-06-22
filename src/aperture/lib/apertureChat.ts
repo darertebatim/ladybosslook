@@ -90,3 +90,30 @@ export async function regenerateMemoryCard(): Promise<{ summary: string; length:
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
+
+/**
+ * Asks the server to auto-name a chat from its first exchange. The
+ * server skips when the user already renamed it, so this is safe to
+ * fire-and-forget after every first assistant response.
+ */
+export async function nameApertureChat(chatId: string): Promise<{ title?: string; skipped?: boolean } | null> {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    if (!token) return null;
+    const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/aperture-name-chat`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? "",
+      },
+      body: JSON.stringify({ chatId }),
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
