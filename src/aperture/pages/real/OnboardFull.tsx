@@ -269,16 +269,75 @@ function FullQuestionInput({
   if (q.input_kind === "textarea" || q.input_kind === "long_text") {
     return (
       <textarea rows={3} style={{ ...baseStyle, resize: "vertical" }}
+        placeholder={fullPlaceholderFor(q)}
         value={value} onChange={e => onChange(e.target.value)} />
     );
+  }
+
+  if (q.question_key === "website" || q.question_key === "instagram") {
+    return <FullHasItGate q={q} value={value} onChange={onChange} baseStyle={baseStyle} />;
   }
 
   return (
     <input
       style={baseStyle}
       type={q.input_kind === "url" ? "url" : q.input_kind === "email" ? "email" : "text"}
+      placeholder={fullPlaceholderFor(q)}
       value={value}
       onChange={e => onChange(e.target.value)}
     />
+  );
+}
+
+function fullPlaceholderFor(q: any): string {
+  const map: Record<string, string> = {
+    owner_name: "e.g. Sara",
+    business_name: "e.g. Sara's Bakery",
+    website: "e.g. https://yourbusiness.com",
+    instagram: "e.g. @yourbusiness",
+    find_you: "e.g. Walk-in, Instagram, word of mouth, Google…",
+    channels: "e.g. Instagram, TikTok, Google, none…",
+  };
+  if (map[q.question_key]) return map[q.question_key];
+  if (q.input_kind === "url") return "https://…";
+  if (q.input_kind === "email") return "you@example.com";
+  return q.hint ? `e.g. ${q.hint}` : "Type your answer…";
+}
+
+function FullHasItGate({
+  q, value, onChange, baseStyle,
+}: { q: any; value: string; onChange: (v: string) => void; baseStyle: React.CSSProperties }) {
+  const [mode, setMode] = useState<"yes" | "no" | null>(value ? "yes" : null);
+  const label = q.question_key === "instagram" ? "Instagram" : "website";
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "flex", gap: 8 }}>
+        {(["yes", "no"] as const).map(opt => {
+          const on = mode === opt;
+          return (
+            <button key={opt} type="button"
+              onClick={() => { setMode(opt); if (opt === "no") onChange(""); }}
+              style={{
+                appearance: "none", cursor: "pointer",
+                padding: "8px 12px", borderRadius: "var(--ap-radius-sm)",
+                border: "1px solid " + (on ? "var(--ap-signal)" : "var(--ap-hairline)"),
+                background: on ? "var(--ap-signal)" : "var(--ap-surface-2)",
+                color: on ? "#000" : "var(--ap-ink-1)",
+                fontSize: 13, fontWeight: 500,
+              }}>
+              {opt === "yes" ? `Yes, I have a ${label}` : "No, skip"}
+            </button>
+          );
+        })}
+      </div>
+      {mode === "yes" && (
+        <input style={baseStyle}
+          type={q.question_key === "website" ? "url" : "text"}
+          placeholder={fullPlaceholderFor(q)}
+          autoFocus
+          value={value}
+          onChange={e => onChange(e.target.value)} />
+      )}
+    </div>
   );
 }
