@@ -111,11 +111,62 @@ export function BriefCard({
           marginTop: 12, paddingTop: 12,
           borderTop: "1px solid var(--ap-hairline)",
         }}>
-          <AperturePrompt text={brief.summary} size={13.5} />
+          <BriefBody summary={brief.summary} />
         </div>
       )}
     </ApertureCard>
   );
+}
+
+/**
+ * Splits a two-part brief on the "What I see" label and renders each
+ * section with its own header treatment. Falls back to a single block
+ * for legacy briefs that don't include the labels.
+ */
+function BriefBody({ summary }: { summary: string }) {
+  const parts = splitBrief(summary);
+  if (!parts) return <AperturePrompt text={summary} size={13.5} />;
+  return (
+    <>
+      <SectionLabel color="var(--ap-ink-3)">What we know</SectionLabel>
+      <AperturePrompt text={parts.know} size={13.5} />
+      <hr style={{
+        border: "none",
+        borderTop: "1px solid var(--ap-hairline)",
+        margin: "14px 0",
+      }} />
+      <SectionLabel color="var(--ap-signal)">What I see</SectionLabel>
+      <AperturePrompt text={parts.see} size={13.5} />
+    </>
+  );
+}
+
+function SectionLabel({ children, color }: { children: React.ReactNode; color: string }) {
+  return (
+    <div style={{
+      fontFamily: "var(--ap-font-mono)",
+      fontSize: 10.5,
+      letterSpacing: "0.10em",
+      textTransform: "uppercase",
+      color,
+      marginBottom: 6,
+    }}>{children}</div>
+  );
+}
+
+function splitBrief(text: string): { know: string; see: string } | null {
+  if (!text) return null;
+  // Match "What I see" as a label (case-insensitive), optionally bolded/headed.
+  const re = /(^|\n)\s*[#*_>\-\s]*what\s+i\s+see[\s:*_]*\n?/i;
+  const m = text.match(re);
+  if (!m || m.index === undefined) return null;
+  const before = text.slice(0, m.index);
+  const after = text.slice(m.index + m[0].length);
+  // Strip the "What we know" label from Part 1 if present.
+  const know = before.replace(/^\s*[#*_>\-\s]*what\s+we\s+know[\s:*_]*\n?/i, "").trim();
+  const see = after.trim();
+  if (!know || !see) return null;
+  return { know, see };
 }
 
 function formatStamp(iso: string): string {
