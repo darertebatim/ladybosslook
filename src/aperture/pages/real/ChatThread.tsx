@@ -7,7 +7,6 @@ import { useApertureChatsDB, useApertureChatMessages, type MessageRow } from "@/
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { streamApertureChat, nameApertureChat } from "@/aperture/lib/apertureChat";
 import { useApertureHomeSuggestions } from "@/aperture/hooks/db/useApertureHomeSuggestions";
-import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { ChatComposer } from "@/aperture/components/chat/ChatComposer";
 import { ChatAttachments, AttachmentMemoryChip } from "@/aperture/components/chat/ChatAttachments";
