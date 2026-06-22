@@ -14,6 +14,7 @@ import { useApertureDailyQuestion } from "@/aperture/hooks/db/useApertureDailyQu
 import { useApertureHomeSuggestions } from "@/aperture/hooks/db/useApertureHomeSuggestions";
 import { useApertureStoredSuggestions } from "@/aperture/hooks/db/useApertureStoredSuggestions";
 import { toast } from "@/hooks/use-toast";
+import { AperturePrompt } from "@/aperture/components/chat/AperturePrompt";
 
 export default function RealHome() {
   const navigate = useNavigate();
