@@ -280,12 +280,83 @@ function QuestionInput({
   if (q.input_kind === "long_text" || q.input_kind === "textarea") {
     return (
       <textarea rows={4} style={{ ...baseStyle, resize: "vertical" }}
+        placeholder={placeholderFor(q)}
         value={value} onChange={e => onChange(e.target.value)} />
     );
   }
 
+  if (q.question_key === "website" || q.question_key === "instagram") {
+    return (
+      <HasItGate q={q} value={value} onChange={onChange} baseStyle={baseStyle} />
+    );
+  }
+
   return (
-    <input style={baseStyle} type={q.input_kind === "url" ? "url" : q.input_kind === "email" ? "email" : "text"}
+    <input style={baseStyle}
+      type={q.input_kind === "url" ? "url" : q.input_kind === "email" ? "email" : "text"}
+      placeholder={placeholderFor(q)}
       value={value} onChange={e => onChange(e.target.value)} />
+  );
+}
+
+function placeholderFor(q: any): string {
+  const map: Record<string, string> = {
+    owner_name: "e.g. Sara",
+    business_name: "e.g. Sara's Bakery",
+    website: "e.g. https://yourbusiness.com",
+    instagram: "e.g. @yourbusiness",
+    find_you: "e.g. Walk-in, Instagram, word of mouth, Google…",
+    channels: "e.g. Instagram, TikTok, Google, none…",
+    closing_help: "e.g. Help me get more repeat customers…",
+  };
+  if (map[q.question_key]) return map[q.question_key];
+  if (q.input_kind === "url") return "https://…";
+  if (q.input_kind === "email") return "you@example.com";
+  return q.hint ? `e.g. ${q.hint}` : "Type your answer…";
+}
+
+function HasItGate({
+  q, value, onChange, baseStyle,
+}: {
+  q: any; value: string; onChange: (v: string) => void; baseStyle: React.CSSProperties;
+}) {
+  // If a value already exists, treat as "yes". Otherwise undecided until user picks.
+  const [mode, setMode] = useState<"yes" | "no" | null>(value ? "yes" : null);
+  const label = q.question_key === "instagram" ? "Instagram" : "website";
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ display: "flex", gap: 8 }}>
+        {(["yes", "no"] as const).map(opt => {
+          const on = mode === opt;
+          return (
+            <button key={opt} type="button"
+              onClick={() => {
+                setMode(opt);
+                if (opt === "no") onChange("");
+              }}
+              style={{
+                appearance: "none", cursor: "pointer",
+                padding: "10px 16px", borderRadius: "var(--ap-radius-sm)",
+                border: "1px solid " + (on ? "var(--ap-signal)" : "var(--ap-hairline)"),
+                background: on ? "var(--ap-signal)" : "var(--ap-surface-2)",
+                color: on ? "#000" : "var(--ap-ink-1)",
+                fontSize: 14, fontWeight: 500,
+              }}>
+              {opt === "yes" ? `Yes, I have a ${label}` : "No, skip"}
+            </button>
+          );
+        })}
+      </div>
+      {mode === "yes" && (
+        <input
+          style={baseStyle}
+          type={q.question_key === "website" ? "url" : "text"}
+          placeholder={placeholderFor(q)}
+          autoFocus
+          value={value}
+          onChange={e => onChange(e.target.value)}
+        />
+      )}
+    </div>
   );
 }
