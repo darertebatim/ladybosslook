@@ -168,7 +168,7 @@ function AtAGlance({ items }: { items: GlanceItem[] }) {
       {items.map((it, i) => (
         <GlanceRow key={i} item={it} />
       ))}
-    </>
+    </div>
   );
 }
 
