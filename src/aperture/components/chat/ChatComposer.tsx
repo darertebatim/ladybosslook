@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ClipboardEvent, type DragEvent } from "react";
-import { Plus, Camera, Image as ImageIcon, Paperclip, X, FileText, Loader2 } from "lucide-react";
+import { Plus, Camera, Image as ImageIcon, Paperclip, X, FileText, Loader2, Square } from "lucide-react";
 import {
   MAX_ATTACHMENTS, makePending, uploadPending, validateFiles,
   type PendingAttachment, type SentAttachment,
@@ -10,6 +10,11 @@ interface Props {
   chatId: string;
   userId: string;
   disabled?: boolean;
+  /** True while an AI response is currently streaming. Switches the
+   *  send button into a stop affordance and disables the input. */
+  streaming?: boolean;
+  /** Abort the in-flight stream. */
+  onStop?: () => void;
   onSend: (text: string, attachments: SentAttachment[]) => void | Promise<void>;
 }
 
@@ -19,7 +24,7 @@ interface Props {
  * - Paste image (Cmd/Ctrl+V) to attach.
  * - Drag-and-drop files anywhere onto the composer.
  */
-export function ChatComposer({ chatId, userId, disabled, onSend }: Props) {
+export function ChatComposer({ chatId, userId, disabled, streaming, onStop, onSend }: Props) {
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState<PendingAttachment[]>([]);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -87,7 +92,7 @@ export function ChatComposer({ chatId, userId, disabled, onSend }: Props) {
     if (e.dataTransfer?.files?.length) addFiles(e.dataTransfer.files);
   };
 
-  const canSend = !disabled && (draft.trim().length > 0 || pending.length > 0)
+  const canSend = !disabled && !streaming && (draft.trim().length > 0 || pending.length > 0)
     && !pending.some(p => p.status === "uploading");
 
   const submit = async () => {
@@ -213,8 +218,8 @@ export function ChatComposer({ chatId, userId, disabled, onSend }: Props) {
           value={draft}
           onChange={e => setDraft(e.target.value)}
           onPaste={onPaste}
-          placeholder="Type your answer..."
-          disabled={disabled}
+          placeholder={streaming ? "Aperture is replying…" : "Type your answer..."}
+          disabled={disabled || streaming}
           style={{
             flex: 1, appearance: "none", border: "none", outline: "none",
             background: "transparent", color: "var(--ap-ink-1)",
@@ -222,6 +227,22 @@ export function ChatComposer({ chatId, userId, disabled, onSend }: Props) {
             minWidth: 0,
           }}
         />
+        {streaming ? (
+          <button
+            type="button"
+            onClick={() => onStop?.()}
+            aria-label="Stop generating"
+            style={{
+              appearance: "none", cursor: "pointer",
+              border: "none", height: 36, width: 36, borderRadius: 999,
+              background: "var(--ap-ink-1)", color: "var(--ap-canvas)",
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <Square size={14} fill="currentColor" />
+          </button>
+        ) : (
         <button
           type="submit"
           disabled={!canSend}
@@ -237,6 +258,7 @@ export function ChatComposer({ chatId, userId, disabled, onSend }: Props) {
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </button>
+        )}
       </form>
 
       {/* Hidden file inputs */}
