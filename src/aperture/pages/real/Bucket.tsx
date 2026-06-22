@@ -90,7 +90,7 @@ export default function RealBucketPage() {
     // Opener B: reference the most recent confirmed fact (never a guess).
     // Falls back to the bucket's designed opening question, then to a
     // neutral prompt if neither exists.
-    const confirmedSources = new Set(["user_confirmed", "ai_extracted", "bucket_answer"]);
+    const confirmedSources = new Set(["user_confirmed", "chat_extracted", "ai_extracted", "bucket_answer"]);
     const recent = facts.find(f => confirmedSources.has(f.source as string)) ?? null;
     const designed = [...questions].sort((a, b) => a.sort_order - b.sort_order)[0]?.prompt ?? null;
     const opener = composeBucketSpecificOpener(

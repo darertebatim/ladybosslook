@@ -6,6 +6,7 @@ import { logApertureEvent } from "@/aperture/lib/apertureEvents";
 export type MemorySource =
   | "bucket_answer"
   | "ai_extracted"
+  | "chat_extracted"
   | "ai_inferred_pre_onboarding"
   | "freeform"
   | "user_confirmed";

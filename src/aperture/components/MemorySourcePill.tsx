@@ -63,6 +63,13 @@ function pillSpec(source: string | null) {
         color: "var(--ap-signal)",
         border: "1px solid var(--ap-signal)",
       };
+    case "chat_extracted":
+      return {
+        label: "Said in chat",
+        background: "var(--ap-signal)",
+        color: "#000",
+        border: "1px solid var(--ap-signal)",
+      };
     case "file_extracted":
       return {
         label: "From file",
