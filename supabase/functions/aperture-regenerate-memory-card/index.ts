@@ -74,8 +74,20 @@ The facts you are reading come from different sources:
 
 ---
 
+PART 0 — AT A GLANCE
+Before the prose brief, output a 3-line scannable summary of the whole business. Each line is a single short phrase (max ~14 words), prefixed with one of these exact labels, in this exact order:
+- METRIC: one concrete fact, number, named product, named channel, or named customer segment that defines this business right now
+- WATCH: the single biggest hidden risk across the whole business — the thing quietly costing them
+- MOVE: one specific next action grounded in the facts (name the thing, not a vague verb)
+
+Label this section exactly: "At a glance"
+
+---
+
 PART 1 — WHAT WE KNOW
 Write 5–7 sentences giving an honest picture of this business as it stands today. Cover the most important territories — what the business does, who it serves, how it makes money, what the owner is working toward, and what the current constraints are. Use specific details from the facts: real numbers, real channels, real products, real goals. Do not genericize. If certain areas are thin or mostly guesses, acknowledge it briefly. End Part 1 with one sentence naming the single most important thing that is currently missing from the picture.
+
+Break the section into 2–4 short paragraphs separated by a blank line so it reads in scannable chunks instead of a wall of text. Wrap the single most important sentence in **bold** using markdown — usually the one naming what is most missing.
 
 Label this section exactly: "What we know"
 
@@ -92,14 +104,18 @@ Be specific. Reference actual details. Do not give advice that could apply to an
 
 Do not soften. Do not hedge. Do not use the words: consider, explore, leverage, optimize, ensure, streamline, journey.
 
+Break the section into 2–4 short paragraphs separated by a blank line. Wrap the single sharpest sentence (the pattern, the hidden problem, the opportunity, or the trajectory — whichever lands hardest) in **bold** using markdown.
+
 Label this section exactly: "What I see"
 
 ---
 
 FORMAT RULES:
-- Plain prose paragraphs only — no bullets, no headings beyond the two section labels
+- Plain prose paragraphs only inside Part 1 and Part 2 — no bullets, no headings beyond the three section labels. The At a glance lines ARE the only bullets allowed.
+- Use blank lines between paragraphs so the brief breathes. Aim for 2–4 paragraphs per part.
+- You may wrap exactly one sentence per part in **bold** to mark the key takeaway. Do not bold more than one sentence per part.
 - Address the owner as "you" / "your"
-- Maximum total length: 14 sentences across both parts
+- Length: keep Part 1 and Part 2 at the full 5–7 sentences each. Do NOT shorten the prose. Longer and more specific is better than shorter — the owner wants depth, not brevity.
 - Never end with a question or a call to action
 - The full brief should read like something a trusted advisor wrote after a deep review — not like a form was filled out` },
             { role: "user", content: raw },
