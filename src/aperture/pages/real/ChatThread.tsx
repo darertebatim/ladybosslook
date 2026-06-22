@@ -171,14 +171,14 @@ export default function RealChatThread() {
     if (c) navigate(`/aperture/app/chats/${c.id}`);
   }
 
-  if (!id) return <Navigate to="/aperture/app/chats" replace />;
-
   const filteredChats = useMemo(() => {
     const q = sidebarQuery.trim().toLowerCase();
     if (!q) return chats;
     return chats.filter(c => c.title.toLowerCase().includes(q));
   }, [chats, sidebarQuery]);
   const groupedChats = useMemo(() => groupChatsByDate(filteredChats), [filteredChats]);
+
+  if (!id) return <Navigate to="/aperture/app/chats" replace />;
 
   const hasAnyMessage = messages.length > 0;
   const visibleSuggestions = homeSuggestions.slice(0, 4);
