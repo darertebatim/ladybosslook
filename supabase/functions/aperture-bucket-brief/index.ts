@@ -79,8 +79,20 @@ The facts you are reading come from different sources:
 
 ---
 
+PART 0 — AT A GLANCE
+Before the prose brief, output a 3-line scannable summary. Each line is a single short phrase (max ~12 words), prefixed with one of these exact labels, in this exact order:
+- METRIC: one concrete fact, number, channel, product, or named asset from the data that defines this territory right now
+- WATCH: one thing that is quietly costing the business or about to — the hidden risk in this territory
+- MOVE: one specific next action grounded in the facts (name the thing, not a vague verb)
+
+Label this section exactly: "At a glance"
+
+---
+
 PART 1 — WHAT WE KNOW
 Write 3–5 sentences summarizing the current state of this territory based purely on the facts. Use the owner's own words and specific details where they exist (real numbers, real names, real channels). If the bucket is thin or mostly guesses, say so honestly — do not pad or fabricate. End Part 1 with a single line that names the biggest gap: what is most noticeably missing from this picture.
+
+Break the section into 2–3 short paragraphs separated by a blank line so it reads in scannable chunks instead of a wall of text. Wrap the single most important sentence in **bold** using markdown — usually the one naming the biggest gap.
 
 Label this section exactly: "What we know"
 
@@ -96,14 +108,18 @@ Be specific. Reference actual details from the facts. Do not give generic busine
 
 Do not soften. Do not hedge. Do not use the words: consider, explore, leverage, optimize, ensure, streamline.
 
+Break the section into 2–3 short paragraphs separated by a blank line. Wrap the single sharpest sentence (the pattern, the hidden problem, or the opportunity — whichever lands hardest) in **bold** using markdown.
+
 Label this section exactly: "What I see"
 
 ---
 
 FORMAT RULES:
-- Plain prose paragraphs only — no bullets, no headings beyond the two section labels
+- Plain prose paragraphs only inside Part 1 and Part 2 — no bullets, no headings beyond the three section labels. The At a glance lines ARE the only bullets allowed.
+- Use blank lines between paragraphs so the brief breathes. Aim for 2–3 paragraphs per part.
+- You may wrap exactly one sentence per part in **bold** to mark the key takeaway. Do not bold more than one sentence per part.
 - Address the owner as "you" / "your"
-- Maximum total length: 10 sentences across both parts
+- Length: keep Part 1 and Part 2 at the full 3–5 sentences each. Do NOT shorten the prose. Longer and more specific is better than shorter.
 - Never end with a question or a call to action`;
 
     const usr = `Bucket: ${(bucket as any)?.title ?? bucketSlug}

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { ApertureCard, ApertureMonoLabel, ApertureButton } from "@/aperture/components/primitives";
-import { RotateCw, ChevronDown, ChevronUp } from "lucide-react";
+import { RotateCw, ChevronDown, ChevronUp, BarChart3, AlertTriangle, ArrowRight } from "lucide-react";
 import { AperturePrompt } from "@/aperture/components/chat/AperturePrompt";
 
 /**
@@ -124,22 +124,122 @@ export function BriefCard({
  * for legacy briefs that don't include the labels.
  */
 function BriefBody({ summary }: { summary: string }) {
-  const parts = splitBrief(summary);
-  if (!parts) return <AperturePrompt text={summary} size={13.5} />;
+  const parsed = parseBrief(summary);
+  if (!parsed) return <AperturePrompt text={summary} size={13.5} />;
+  const { glance, know, see } = parsed;
   return (
     <>
-      <SectionLabel color="var(--ap-ink-3)">What we know</SectionLabel>
-      <AperturePrompt text={parts.know} size={13.5} />
-      <hr style={{
-        border: "none",
-        borderTop: "1px solid var(--ap-hairline)",
-        margin: "14px 0",
-      }} />
-      <SectionLabel color="var(--ap-signal)">What I see</SectionLabel>
-      <AperturePrompt text={parts.see} size={13.5} />
+      {glance && <AtAGlance items={glance} />}
+      {know && (
+        <SectionBlock
+          label="What we know"
+          labelColor="var(--ap-ink-3)"
+          accentColor="var(--ap-hairline-strong, var(--ap-ink-3))"
+          text={know}
+        />
+      )}
+      {see && (
+        <SectionBlock
+          label="What I see"
+          labelColor="var(--ap-signal)"
+          accentColor="var(--ap-signal)"
+          text={see}
+          marginTop={glance || know ? 16 : 0}
+        />
+      )}
     </>
   );
 }
+
+function SectionBlock({
+  label, labelColor, accentColor, text, marginTop = 0,
+}: { label: string; labelColor: string; accentColor: string; text: string; marginTop?: number }) {
+  return (
+    <div style={{ marginTop, paddingLeft: 12, borderLeft: `2px solid ${accentColor}` }}>
+      <SectionLabel color={labelColor}>{label}</SectionLabel>
+      <AperturePrompt text={text} size={13.5} />
+    </div>
+  );
+}
+
+function AtAGlance({ items }: { items: GlanceItem[] }) {
+  return (
+    <div style={{ display: "grid", gap: 8, marginBottom: 16 }}>
+      {items.map((it, i) => (
+        <GlanceRow key={i} item={it} />
+      ))}
+    </div>
+  );
+}
+
+function GlanceRow({ item }: { item: GlanceItem }) {
+  const meta = GLANCE_META[item.kind];
+  const Icon = meta.icon;
+  return (
+    <div style={{
+      display: "flex", alignItems: "flex-start", gap: 10,
+      padding: "10px 12px",
+      background: meta.bg,
+      border: `1px solid ${meta.border}`,
+      borderRadius: 10,
+    }}>
+      <div style={{
+        flex: "0 0 auto",
+        width: 26, height: 26, borderRadius: 8,
+        display: "grid", placeItems: "center",
+        background: meta.iconBg, color: meta.iconColor,
+      }}>
+        <Icon size={14} strokeWidth={2.25} />
+      </div>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{
+          fontFamily: "var(--ap-font-mono)",
+          fontSize: 9.5,
+          letterSpacing: "0.12em",
+          textTransform: "uppercase",
+          color: meta.iconColor,
+          marginBottom: 2,
+        }}>{meta.label}</div>
+        <div style={{ fontSize: 13, lineHeight: 1.45, color: "var(--ap-ink-1)" }}>
+          {item.text}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type GlanceKind = "metric" | "watch" | "move";
+type GlanceItem = { kind: GlanceKind; text: string };
+
+const GLANCE_META: Record<GlanceKind, {
+  label: string; icon: typeof BarChart3;
+  bg: string; border: string; iconBg: string; iconColor: string;
+}> = {
+  metric: {
+    label: "Metric",
+    icon: BarChart3,
+    bg: "var(--ap-surface-2)",
+    border: "var(--ap-hairline)",
+    iconBg: "color-mix(in srgb, var(--ap-ink-2) 14%, transparent)",
+    iconColor: "var(--ap-ink-2)",
+  },
+  watch: {
+    label: "Watch",
+    icon: AlertTriangle,
+    bg: "color-mix(in srgb, #c44 6%, var(--ap-surface-2))",
+    border: "color-mix(in srgb, #c44 28%, var(--ap-hairline))",
+    iconBg: "color-mix(in srgb, #c44 16%, transparent)",
+    iconColor: "#c44",
+  },
+  move: {
+    label: "Move",
+    icon: ArrowRight,
+    bg: "color-mix(in srgb, var(--ap-signal) 6%, var(--ap-surface-2))",
+    border: "color-mix(in srgb, var(--ap-signal) 32%, var(--ap-hairline))",
+    iconBg: "color-mix(in srgb, var(--ap-signal) 18%, transparent)",
+    iconColor: "var(--ap-signal)",
+  },
+};
 
 function SectionLabel({ children, color }: { children: React.ReactNode; color: string }) {
   return (
@@ -154,19 +254,59 @@ function SectionLabel({ children, color }: { children: React.ReactNode; color: s
   );
 }
 
-function splitBrief(text: string): { know: string; see: string } | null {
+function parseBrief(text: string): { glance: GlanceItem[] | null; know: string; see: string } | null {
   if (!text) return null;
-  // Match "What I see" as a label (case-insensitive), optionally bolded/headed.
-  const re = /(^|\n)\s*[#*_>\-\s]*what\s+i\s+see[\s:*_]*\n?/i;
-  const m = text.match(re);
-  if (!m || m.index === undefined) return null;
-  const before = text.slice(0, m.index);
-  const after = text.slice(m.index + m[0].length);
-  // Strip the "What we know" label from Part 1 if present.
-  const know = before.replace(/^\s*[#*_>\-\s]*what\s+we\s+know[\s:*_]*\n?/i, "").trim();
-  const see = after.trim();
-  if (!know || !see) return null;
-  return { know, see };
+
+  // Find anchor positions for the three labels.
+  const glanceRe = /(^|\n)\s*[#*_>\-\s]*at\s+a\s+glance[\s:*_]*\n?/i;
+  const knowRe   = /(^|\n)\s*[#*_>\-\s]*what\s+we\s+know[\s:*_]*\n?/i;
+  const seeRe    = /(^|\n)\s*[#*_>\-\s]*what\s+i\s+see[\s:*_]*\n?/i;
+
+  const seeM = text.match(seeRe);
+  if (!seeM || seeM.index === undefined) return null;
+
+  const knowM = text.match(knowRe);
+  const glanceM = text.match(glanceRe);
+
+  let glanceRaw = "";
+  let knowRaw = "";
+  const seeRaw = text.slice(seeM.index + seeM[0].length).trim();
+
+  if (knowM && knowM.index !== undefined && knowM.index < seeM.index) {
+    const knowStart = knowM.index + knowM[0].length;
+    knowRaw = text.slice(knowStart, seeM.index).trim();
+    if (glanceM && glanceM.index !== undefined && glanceM.index < knowM.index) {
+      glanceRaw = text.slice(glanceM.index + glanceM[0].length, knowM.index).trim();
+    } else {
+      glanceRaw = text.slice(0, knowM.index).trim();
+      // Only treat preamble as glance if it actually looks like glance lines
+      if (!/metric\s*:/i.test(glanceRaw) && !/watch\s*:/i.test(glanceRaw) && !/move\s*:/i.test(glanceRaw)) {
+        glanceRaw = "";
+      }
+    }
+  } else {
+    knowRaw = text.slice(0, seeM.index).replace(/^\s*[#*_>\-\s]*what\s+we\s+know[\s:*_]*\n?/i, "").trim();
+  }
+
+  if (!knowRaw || !seeRaw) return null;
+  const glance = parseGlance(glanceRaw);
+  return { glance, know: knowRaw, see: seeRaw };
+}
+
+function parseGlance(raw: string): GlanceItem[] | null {
+  if (!raw) return null;
+  const out: GlanceItem[] = [];
+  const lines = raw.split(/\n+/);
+  for (const line of lines) {
+    const clean = line.replace(/^[\s\-*•>]+/, "").replace(/\*\*/g, "").trim();
+    if (!clean) continue;
+    const m = clean.match(/^(metric|watch|warning|move)\s*[:\-—]\s*(.+)$/i);
+    if (!m) continue;
+    const tag = m[1].toLowerCase();
+    const kind: GlanceKind = tag === "metric" ? "metric" : tag === "move" ? "move" : "watch";
+    out.push({ kind, text: m[2].trim() });
+  }
+  return out.length ? out : null;
 }
 
 function formatStamp(iso: string): string {
