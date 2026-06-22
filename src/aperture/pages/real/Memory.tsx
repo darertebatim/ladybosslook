@@ -162,12 +162,45 @@ export default function RealMemory() {
           <ApertureLoading label="Loading…" />
         ) : (
           <>
+          {/* Full business brief — pinned above the bucket grid. */}
+          <div style={{ marginBottom: 20 }}>
+            <BriefCard
+              label="Full brief"
+              title="What I know about your business"
+              teaser="The whole picture, pulled across every bucket. Reset for a fresh read-back anytime."
+              load={async () => {
+                if (!user) return null;
+                const { data } = await supabase
+                  .from("aperture_memory_card")
+                  .select("summary,regenerated_at,stale")
+                  .eq("user_id", user.id).maybeSingle();
+                if (!data || !(data as any).summary) return null;
+                return {
+                  summary: (data as any).summary,
+                  generated_at: (data as any).regenerated_at ?? new Date().toISOString(),
+                };
+              }}
+              regenerate={async () => {
+                const { data, error } = await supabase.functions.invoke("aperture-regenerate-memory-card", {});
+                if (error) throw new Error(error.message);
+                const summary = (data as any)?.summary ?? "";
+                const generated_at = (data as any)?.regenerated_at ?? new Date().toISOString();
+                return { summary, generated_at };
+              }}
+            />
+          </div>
           <div style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
             gap: 10,
           }}>
-            {buckets.map(b => {
+            {[...buckets].sort((a, b) => {
+              // Industry-specific buckets first, then keep existing order.
+              const ai = (a as any).kind === "industry" ? 0 : 1;
+              const bi = (b as any).kind === "industry" ? 0 : 1;
+              if (ai !== bi) return ai - bi;
+              return 0;
+            }).map(b => {
               const count = countsBySlug[b.slug] ?? 0;
               const target = b.target_count ?? 8;
               const pct = progressFor(b.slug, target);
@@ -210,34 +243,6 @@ export default function RealMemory() {
                 </Link>
               );
             })}
-          </div>
-
-          {/* Full business brief — anchored at the end of the bucket grid. */}
-          <div style={{ marginTop: 20 }}>
-            <BriefCard
-              label="Full brief"
-              title="What I know about your business"
-              teaser="The whole picture, pulled across every bucket. Reset for a fresh read-back anytime."
-              load={async () => {
-                if (!user) return null;
-                const { data } = await supabase
-                  .from("aperture_memory_card")
-                  .select("summary,regenerated_at,stale")
-                  .eq("user_id", user.id).maybeSingle();
-                if (!data || !(data as any).summary) return null;
-                return {
-                  summary: (data as any).summary,
-                  generated_at: (data as any).regenerated_at ?? new Date().toISOString(),
-                };
-              }}
-              regenerate={async () => {
-                const { data, error } = await supabase.functions.invoke("aperture-regenerate-memory-card", {});
-                if (error) throw new Error(error.message);
-                const summary = (data as any)?.summary ?? "";
-                const generated_at = (data as any)?.regenerated_at ?? new Date().toISOString();
-                return { summary, generated_at };
-              }}
-            />
           </div>
           </>
         )}
