@@ -906,7 +906,15 @@ function UserDetailSheet({ user, onClose }: { user: ApertureUserRow | null; onCl
     };
   }, [memory, onboardingMeta]);
 
-  const answerCount = useMemo(() => memory.filter((r) => r.question_key).length, [memory]);
+  const answerCount = useMemo(() => {
+    const seen = new Set<string>();
+    return memory.filter((r) => {
+      if (!r.question_key) return false;
+      if (seen.has(r.question_key)) return false;
+      seen.add(r.question_key);
+      return true;
+    }).length;
+  }, [memory]);
 
   const renderList = (items: any[]) => (
     <ul className="space-y-3">
