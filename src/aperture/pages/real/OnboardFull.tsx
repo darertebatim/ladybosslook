@@ -149,6 +149,7 @@ export default function OnboardFull() {
     <>
       <Helmet><title>Full Questionnaire · Aperture</title></Helmet>
       <RealAppShell>
+        <div ref={topRef} style={{ position: "absolute", top: 0, height: 1, width: 1, pointerEvents: "none" }} />
         {phase === "prefilling" ? (
           <>
             <PageHeader
