@@ -21,6 +21,8 @@ export default function RealSettings() {
   const { industries } = useApertureIndustriesDB();
   const [form, setForm] = useState({ owner_name: "", business_name: "", industry_slug: "", website: "", instagram: "" });
   const [savingProfile, setSavingProfile] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportThin, setExportThin] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -64,6 +66,96 @@ export default function RealSettings() {
       toast({ title: "Failed to rebuild", description: e?.message ?? "Try again.", variant: "destructive" });
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function exportMemory() {
+    if (exporting || !user) return;
+    setExporting(true);
+    setExportThin(false);
+    try {
+      const ALLOWED = ["user_confirmed", "chat_extracted", "ai_extracted", "ai_inferred_pre_onboarding"];
+      const [{ data: items, error: iErr }, { data: buckets, error: bErr }] = await Promise.all([
+        supabase
+          .from("aperture_memory_items")
+          .select("content, source, bucket_slug")
+          .eq("user_id", user.id)
+          .eq("is_active", true)
+          .in("source", ALLOWED),
+        supabase
+          .from("aperture_buckets")
+          .select("slug, title, sort_order")
+          .eq("is_active", true)
+          .order("sort_order", { ascending: true }),
+      ]);
+      if (iErr) throw iErr;
+      if (bErr) throw bErr;
+      const rows = items ?? [];
+      if (rows.length < 5) {
+        setExportThin(true);
+        return;
+      }
+      const byBucket = new Map<string, typeof rows>();
+      for (const r of rows) {
+        const slug = r.bucket_slug ?? "other";
+        if (!byBucket.has(slug)) byBucket.set(slug, [] as any);
+        byBucket.get(slug)!.push(r);
+      }
+      const orderedBuckets = (buckets ?? []).filter(b => byBucket.has(b.slug));
+      // Append any bucket slugs present in items but missing from buckets table (alphabetical).
+      const knownSlugs = new Set(orderedBuckets.map(b => b.slug));
+      const extras = [...byBucket.keys()]
+        .filter(s => !knownSlugs.has(s))
+        .sort()
+        .map(slug => ({ slug, title: slug.replace(/[-_]/g, " ").replace(/\b\w/g, c => c.toUpperCase()), sort_order: 9999 }));
+      const finalBuckets = [...orderedBuckets, ...extras];
+
+      const businessName = (profile?.business_name ?? "").trim() || "my-business";
+      const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
+      let md = `# Business Memory — ${businessName}\n`;
+      md += `*Exported from Aperture on ${today}*\n\n`;
+      md += `This document contains everything Aperture has learned about this business. Paste it at the start of any AI conversation to give the AI full context.\n\n---\n\n`;
+
+      let hasInferred = false;
+      for (const b of finalBuckets) {
+        const facts = byBucket.get(b.slug) ?? [];
+        if (facts.length === 0) continue;
+        md += `## ${b.title}\n`;
+        for (const f of facts) {
+          const content = (f.content ?? "").trim();
+          if (!content) continue;
+          const isInferred = f.source === "ai_inferred_pre_onboarding";
+          if (isInferred) hasInferred = true;
+          md += `- ${content}${isInferred ? " *" : ""}\n`;
+        }
+        md += `\n`;
+      }
+
+      md += `---\n\n`;
+      if (hasInferred) {
+        md += `*Note: Some facts marked with * are AI estimates that have not been confirmed by the owner. Treat these as starting assumptions, not verified information.*\n`;
+      }
+
+      const slug = businessName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "my-business";
+      const filename = `${slug}-aperture-memory.md`;
+
+      const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e: any) {
+      toast({ title: "Export failed", description: e?.message ?? "Try again.", variant: "destructive" });
+    } finally {
+      setExporting(false);
     }
   }
 
@@ -136,6 +228,20 @@ export default function RealSettings() {
           <ApertureButton variant="accent" onClick={rebuild} disabled={busy}>
             {busy ? "Rebuilding…" : "Rebuild memory card"}
           </ApertureButton>
+        </ApertureCard>
+        <ApertureCard padding={18} style={{ marginTop: 14 }}>
+          <ApertureMonoLabel>Export</ApertureMonoLabel>
+          <p style={{ margin: "8px 0 14px", fontSize: 13.5, color: "var(--ap-ink-2)", lineHeight: 1.55 }}>
+            Download everything Aperture knows about your business as a Markdown file. Paste it into Claude, ChatGPT, or any AI tool to give it full context instantly.
+          </p>
+          <ApertureButton variant="accent" onClick={exportMemory} disabled={exporting}>
+            {exporting ? "Preparing…" : "Export my memory"}
+          </ApertureButton>
+          {exportThin && (
+            <p style={{ margin: "12px 0 0", fontSize: 13, color: "var(--ap-ink-3)", lineHeight: 1.5 }}>
+              Your memory is still pretty thin — keep talking to Aperture and come back to export when there's more to work with.
+            </p>
+          )}
         </ApertureCard>
       </RealAppShell>
     </>
