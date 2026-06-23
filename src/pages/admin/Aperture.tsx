@@ -868,22 +868,20 @@ function UserDetailSheet({ user, onClose }: { user: ApertureUserRow | null; onCl
       });
     };
 
-    const answers = memory.filter((r) => r.question_key);
+    // Only show real onboarding answers. Other memory_items (fanned-out
+    // bucket_question prefills, AI-extracted facts, freeform notes) are
+    // internal AI-priming signals — not onboarding Q&A — so they'd look
+    // like nonsense if shown here.
+    const answers = memory.filter(
+      (r) => r.question_key && onboardingMeta[r.question_key],
+    );
     const quick: any[] = [];
     const full: any[] = [];
-    const other: any[] = [];
 
     answers.forEach((r) => {
       const m = onboardingMeta[r.question_key];
-      if (!m) {
-        other.push(r);
-      } else if (m.flow === "quick") {
-        quick.push(r);
-      } else if (m.flow === "full") {
-        full.push(r);
-      } else {
-        other.push(r);
-      }
+      if (m.flow === "quick") quick.push(r);
+      else if (m.flow === "full") full.push(r);
     });
 
     const sortFn = (a: any, b: any) => {
@@ -902,19 +900,19 @@ function UserDetailSheet({ user, onClose }: { user: ApertureUserRow | null; onCl
         { label: "Quick Onboarding", items: dedupeByKey(quick) },
         { label: "Full Onboarding", items: dedupeByKey(full) },
       ].filter((g) => g.items.length > 0),
-      otherAnswers: dedupeByKey(other),
+      otherAnswers: [] as any[],
     };
   }, [memory, onboardingMeta]);
 
   const answerCount = useMemo(() => {
     const seen = new Set<string>();
     return memory.filter((r) => {
-      if (!r.question_key) return false;
+      if (!r.question_key || !onboardingMeta[r.question_key]) return false;
       if (seen.has(r.question_key)) return false;
       seen.add(r.question_key);
       return true;
     }).length;
-  }, [memory]);
+  }, [memory, onboardingMeta]);
 
   const renderList = (items: any[]) => (
     <ul className="space-y-3">
