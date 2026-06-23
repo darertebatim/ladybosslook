@@ -184,11 +184,13 @@ export default function OnboardFull() {
             <ApertureCard padding={20}>
               <textarea
                 rows={5}
+                autoFocus
                 value={closingAnswer}
                 onChange={e => setClosingAnswer(e.target.value)}
-                placeholder="In your own words…"
+                placeholder="e.g. more revenue and customers, business credit or a loan, more Instagram followers, posting consistently…"
                 style={{
                   width: "100%", resize: "vertical",
+                  minHeight: 140,
                   background: "var(--ap-surface-2)",
                   border: "1px solid var(--ap-hairline)",
                   borderRadius: "var(--ap-radius-sm)",
