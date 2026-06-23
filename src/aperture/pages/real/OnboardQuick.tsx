@@ -307,7 +307,7 @@ function placeholderFor(q: any): string {
     instagram: "e.g. @yourbusiness",
     find_you: "e.g. Walk-in, Instagram, word of mouth, Google…",
     channels: "e.g. Instagram, TikTok, Google, none…",
-    closing_help: "e.g. Help me get more repeat customers…",
+    closing_help: "e.g. more revenue and customers, business credit or a loan, more Instagram followers, posting consistently…",
   };
   if (map[q.question_key]) return map[q.question_key];
   if (q.input_kind === "url") return "https://…";
