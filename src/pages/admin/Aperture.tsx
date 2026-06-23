@@ -823,6 +823,7 @@ function UserDetailSheet({ user, onClose }: { user: ApertureUserRow | null; onCl
   const [profile, setProfile] = useState<any>(null);
   const [memory, setMemory] = useState<any[]>([]);
   const [questionMap, setQuestionMap] = useState<Record<string, string>>({});
+  const [onboardingMeta, setOnboardingMeta] = useState<Record<string, { flow: string; step: number; sort_order: number; section?: string }>>({});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -831,33 +832,90 @@ function UserDetailSheet({ user, onClose }: { user: ApertureUserRow | null; onCl
     (async () => {
       const [{ data: prof }, { data: mem }, { data: bq }, { data: oq }] = await Promise.all([
         (supabase as any).from("aperture_user_profile").select("*").eq("user_id", user.user_id).maybeSingle(),
-        (supabase as any).from("aperture_memory_items").select("*").eq("user_id", user.user_id).eq("is_active", true).order("bucket_slug").order("created_at"),
+        (supabase as any).from("aperture_memory_items").select("*").eq("user_id", user.user_id).eq("is_active", true).order("created_at"),
         (supabase as any).from("aperture_bucket_questions").select("question_key,prompt"),
-        (supabase as any).from("aperture_onboarding_questions").select("question_key,prompt"),
+        (supabase as any).from("aperture_onboarding_questions").select("question_key,prompt,flow,step,sort_order,section"),
       ]);
       setProfile(prof);
       setMemory(mem ?? []);
       const map: Record<string, string> = {};
+      const meta: Record<string, { flow: string; step: number; sort_order: number; section?: string }> = {};
       (bq ?? []).forEach((r: any) => { if (r.question_key && r.prompt) map[r.question_key] = r.prompt; });
-      (oq ?? []).forEach((r: any) => { if (r.question_key && r.prompt) map[r.question_key] = r.prompt; });
+      (oq ?? []).forEach((r: any) => {
+        if (r.question_key && r.prompt) map[r.question_key] = r.prompt;
+        if (r.question_key) {
+          meta[r.question_key] = {
+            flow: r.flow ?? "other",
+            step: r.step ?? 0,
+            sort_order: r.sort_order ?? 0,
+            section: r.section,
+          };
+        }
+      });
       setQuestionMap(map);
+      setOnboardingMeta(meta);
       setLoading(false);
     })();
   }, [user]);
 
-  const grouped = useMemo(() => {
-    // only onboarding-style answers (skip free-form notes, chat-derived facts, etc.)
+  const { onboardingGroups, otherAnswers } = useMemo(() => {
     const answers = memory.filter((r) => r.question_key);
-    const m = new Map<string, any[]>();
+    const quick: any[] = [];
+    const full: any[] = [];
+    const other: any[] = [];
+
     answers.forEach((r) => {
-      const k = r.bucket_slug ?? "unsorted";
-      if (!m.has(k)) m.set(k, []);
-      m.get(k)!.push(r);
+      const m = onboardingMeta[r.question_key];
+      if (!m) {
+        other.push(r);
+      } else if (m.flow === "quick") {
+        quick.push(r);
+      } else if (m.flow === "full") {
+        full.push(r);
+      } else {
+        other.push(r);
+      }
     });
-    return Array.from(m.entries()).sort(([a], [b]) => a.localeCompare(b));
-  }, [memory]);
+
+    const sortFn = (a: any, b: any) => {
+      const ma = onboardingMeta[a.question_key];
+      const mb = onboardingMeta[b.question_key];
+      if (!ma || !mb) return 0;
+      if (ma.step !== mb.step) return ma.step - mb.step;
+      return ma.sort_order - mb.sort_order;
+    };
+
+    quick.sort(sortFn);
+    full.sort(sortFn);
+
+    return {
+      onboardingGroups: [
+        { label: "Quick Onboarding", items: quick },
+        { label: "Full Onboarding", items: full },
+      ].filter((g) => g.items.length > 0),
+      otherAnswers: other,
+    };
+  }, [memory, onboardingMeta]);
 
   const answerCount = useMemo(() => memory.filter((r) => r.question_key).length, [memory]);
+
+  const renderList = (items: any[]) => (
+    <ul className="space-y-3">
+      {items.map((it) => (
+        <li key={it.id} className="text-sm border rounded-md p-3 bg-muted/30">
+          <div className="text-xs font-medium text-foreground/80 mb-1.5">
+            Q: {questionMap[it.question_key] ?? it.question_key}
+          </div>
+          <div className="whitespace-pre-wrap break-words text-foreground">
+            <span className="text-muted-foreground">A:</span> {it.content}
+          </div>
+          <div className="mt-2 text-[10px] text-muted-foreground">
+            {new Date(it.created_at).toLocaleDateString()}
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
 
   return (
     <Sheet open={!!user} onOpenChange={(v) => !v && onClose()}>
@@ -899,30 +957,22 @@ function UserDetailSheet({ user, onClose }: { user: ApertureUserRow | null; onCl
                   <h3 className="text-sm font-semibold">Onboarding answers</h3>
                   <span className="text-xs text-muted-foreground">{answerCount} answers</span>
                 </div>
-                {grouped.length === 0 && !loading && (
+                {onboardingGroups.length === 0 && otherAnswers.length === 0 && !loading && (
                   <div className="text-sm text-muted-foreground">No onboarding answers yet.</div>
                 )}
-                <div className="space-y-4">
-                  {grouped.map(([bucket, items]) => (
-                    <div key={bucket}>
-                      <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-semibold">{bucket.replace(/_/g, " ")} · {items.length}</div>
-                      <ul className="space-y-3">
-                        {items.map((it) => (
-                          <li key={it.id} className="text-sm border rounded-md p-3 bg-muted/30">
-                            <div className="text-xs font-medium text-foreground/80 mb-1.5">
-                              Q: {questionMap[it.question_key] ?? it.question_key}
-                            </div>
-                            <div className="whitespace-pre-wrap break-words text-foreground">
-                              <span className="text-muted-foreground">A:</span> {it.content}
-                            </div>
-                            <div className="mt-2 text-[10px] text-muted-foreground">
-                              {new Date(it.created_at).toLocaleDateString()}
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
+                <div className="space-y-5">
+                  {onboardingGroups.map((group) => (
+                    <div key={group.label}>
+                      <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-semibold">{group.label} · {group.items.length}</div>
+                      {renderList(group.items)}
                     </div>
                   ))}
+                  {otherAnswers.length > 0 && (
+                    <div>
+                      <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-semibold">Other answers · {otherAnswers.length}</div>
+                      {renderList(otherAnswers)}
+                    </div>
+                  )}
                 </div>
               </div>
 
