@@ -6,10 +6,12 @@ export const corsHeaders = {
 };
 
 export const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
-export const DEFAULT_MODEL = "google/gemini-3-flash-preview";
 
-/** Premium model for the user-facing chat layer — bigger reasoning, still on gateway. */
-export const CHAT_MODEL = "google/gemini-3.1-pro-preview";
+/** Mid-tier generation: suggestions, briefs, prefill, memory card. */
+export const DEFAULT_MODEL = "openai/gpt-5-mini";
 
-/** Cheapest tier for routing/classification calls (e.g. bucket classifier). */
-export const LITE_MODEL = "google/gemini-3.1-flash-lite-preview";
+/** Premium model for the user-facing chat layer — strongest reasoning. */
+export const CHAT_MODEL = "openai/gpt-5.4";
+
+/** Cheapest tier for routing/classification calls (naming, classification). */
+export const LITE_MODEL = "openai/gpt-5-nano";
