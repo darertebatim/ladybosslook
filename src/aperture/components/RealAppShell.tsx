@@ -1,10 +1,12 @@
 import { ReactNode } from "react";
+import { useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ApertureWordmark } from "@/aperture/brand/ApertureLogo";
 import { ApertureMonoLabel, ApertureThemeSwitch } from "./primitives";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 const NAV = [
   { to: "/aperture/app",          label: "Home",     end: true },
@@ -34,8 +36,93 @@ export function RealAppShell({ children, rightRail }: { children: ReactNode; rig
   const { user } = useAuth();
   const loc = useLocation();
   const initial = (user?.email ?? "U").slice(0, 1).toUpperCase();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  // Claude-style chromeless mode for an open chat thread.
+  const isChatThread = /^\/aperture\/app\/chats\/[^/]+/.test(loc.pathname);
 
   if (isMobile) {
+    if (isChatThread) {
+      return (
+        <div style={{ minHeight: "100vh", background: "var(--ap-canvas)" }}>
+          <header style={{
+            position: "sticky", top: 0, zIndex: 30,
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "12px 14px", background: "transparent",
+          }}>
+            <button
+              onClick={() => setDrawerOpen(true)}
+              aria-label="Open menu"
+              style={{
+                width: 38, height: 38, borderRadius: 999,
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                background: "var(--ap-surface-1)", border: "1px solid var(--ap-hairline)",
+                color: "var(--ap-ink-1)", cursor: "pointer",
+                boxShadow: "var(--ap-shadow-raised)",
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+            </button>
+            <Link
+              to="/aperture/app/chats"
+              aria-label="New chat"
+              style={{
+                width: 38, height: 38, borderRadius: 999,
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                background: "var(--ap-surface-1)", border: "1px solid var(--ap-hairline)",
+                color: "var(--ap-ink-1)",
+                boxShadow: "var(--ap-shadow-raised)",
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            </Link>
+          </header>
+          <main style={{ padding: "4px 18px 16px" }}>{children}</main>
+
+          <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+            <SheetContent side="left" style={{
+              background: "var(--ap-canvas)", padding: 0, width: "82vw", maxWidth: 320,
+              borderRight: "1px solid var(--ap-hairline)",
+            }}>
+              <div style={{ display: "flex", flexDirection: "column", height: "100%", padding: "20px 16px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+                  <ApertureWordmark size={16} />
+                  <ApertureThemeSwitch />
+                </div>
+                <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  {NAV.map(item => {
+                    const active = item.end ? loc.pathname === item.to : loc.pathname.startsWith(item.to);
+                    return (
+                      <NavLink key={item.to} to={item.to} end={item.end}
+                        onClick={() => setDrawerOpen(false)}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 12,
+                          padding: "12px 12px", borderRadius: "var(--ap-radius-xs)",
+                          fontSize: 14.5,
+                          color: active ? "var(--ap-ink-1)" : "var(--ap-ink-2)",
+                          background: active ? "var(--ap-surface-2)" : "transparent",
+                          textDecoration: "none",
+                        }}>
+                        <span style={{ color: active ? "var(--ap-signal)" : "var(--ap-ink-3)", display: "inline-flex" }}><Icon name={item.label} /></span>
+                        {item.label}
+                      </NavLink>
+                    );
+                  })}
+                </nav>
+                <div style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid var(--ap-hairline)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                  <span style={{ fontSize: 12, color: "var(--ap-ink-3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 180 }}>{user?.email ?? "Signed in"}</span>
+                  <button
+                    onClick={() => supabase.auth.signOut()}
+                    style={{ appearance: "none", border: "none", background: "transparent", color: "var(--ap-ink-3)", fontSize: 11, padding: 0, cursor: "pointer", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
+                    Sign out
+                  </button>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+      );
+    }
+
     return (
       <div style={{ minHeight: "100vh", paddingBottom: 92 }}>
         <header style={{
