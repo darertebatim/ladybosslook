@@ -214,21 +214,51 @@ export default function OnboardFull() {
           index="DEEP DIVE"
           title="Tell me more about your business"
           sub="The more you share, the sharper my answers get. Skip anything that doesn't apply."
-          action={sections.length > 0 ? <ApertureChip tone="neutral">Section {sectionIdx + 1} / {sections.length}</ApertureChip> : null}
+          action={sections.length > 0 ? <ApertureChip tone="neutral">Step {sectionIdx + 1} of {sections.length}</ApertureChip> : null}
         />
+
+        {sections.length > 0 && (
+          <div style={{
+            height: 3, width: "100%", borderRadius: 999,
+            background: "var(--ap-hairline)", overflow: "hidden", marginBottom: 18,
+          }}>
+            <div style={{
+              height: "100%", width: `${progressPct}%`,
+              background: "var(--ap-signal)", borderRadius: 999,
+              transition: "width 320ms ease",
+            }} />
+          </div>
+        )}
+
+        {justSaved && (
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            padding: "6px 12px", marginBottom: 14,
+            background: "color-mix(in oklab, var(--ap-signal) 14%, transparent)",
+            color: "var(--ap-signal)",
+            borderRadius: 999, fontSize: 11, fontWeight: 600,
+            fontFamily: "var(--ap-font-mono)", letterSpacing: "0.08em",
+            textTransform: "uppercase",
+          }}>✓ Section saved</div>
+        )}
 
         {loading || !current ? (
           <ApertureLoading label="Loading…" />
         ) : (
           <ApertureCard padding={20}>
             <ApertureMonoLabel>{current[0]}</ApertureMonoLabel>
-            <div style={{ display: "flex", flexDirection: "column", gap: 18, marginTop: 14 }}>
-              {current[1].map(q => (
-                <div key={q.id} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  <label style={{ fontSize: 14, color: "var(--ap-ink-1)", fontWeight: 500 }}>
+            <div style={{ display: "flex", flexDirection: "column", marginTop: 20 }}>
+              {current[1].map((q, i) => (
+                <div key={q.id} style={{
+                  display: "flex", flexDirection: "column", gap: 10,
+                  paddingTop: i === 0 ? 0 : 24,
+                  marginTop: i === 0 ? 0 : 24,
+                  borderTop: i === 0 ? "none" : "1px solid var(--ap-hairline)",
+                }}>
+                  <label style={{ fontSize: 15.5, lineHeight: 1.4, color: "var(--ap-ink-1)", fontWeight: 600 }}>
                     {q.prompt}
                   </label>
-                  {q.hint && <span style={{ fontSize: 12, color: "var(--ap-ink-3)" }}>{q.hint}</span>}
+                  {q.hint && <span style={{ fontSize: 13, color: "var(--ap-ink-3)", marginTop: -4 }}>{q.hint}</span>}
                   <FullQuestionInput
                     q={q}
                     value={answers[q.question_key] ?? ""}
@@ -238,7 +268,14 @@ export default function OnboardFull() {
               ))}
             </div>
 
-            <div style={{ display: "flex", gap: 8, marginTop: 22, justifyContent: "space-between" }}>
+            <div style={{
+              position: "sticky", bottom: 0,
+              display: "flex", gap: 8, justifyContent: "space-between",
+              marginTop: 28, paddingTop: 16,
+              paddingBottom: "max(env(safe-area-inset-bottom, 0px), 4px)",
+              borderTop: "1px solid var(--ap-hairline)",
+              background: "var(--ap-surface-1)",
+            }}>
               <ApertureButton variant="ghost" onClick={skipSection} disabled={busy}>Skip section</ApertureButton>
               <ApertureButton variant="accent" onClick={next} disabled={busy}>
                 {busy ? "Saving…" : sectionIdx + 1 >= sections.length ? "Finish" : "Next section →"}
