@@ -188,8 +188,8 @@ export function McpConnections() {
             Where this key works
           </p>
           <p style={{ margin: "0 0 10px", fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.55 }}>
-            This key works with any AI that lets you set a custom HTTP header — <b>Claude Desktop</b>, <b>ChatGPT</b>, <b>Cursor</b>, <b>Raycast</b>, etc.
-            It does <b>not</b> work in <b>Claude.ai on the web</b> (their custom connector form only supports full OAuth, not bearer keys).
+            This key works with any AI that lets you set a custom HTTP header — <b>Claude Desktop</b>, <b>Cursor</b>, <b>Raycast</b>, etc.
+            It does <b>not</b> work in <b>Claude.ai on the web</b> or <b>ChatGPT</b> (they don't let you add arbitrary custom MCP servers with a bearer key).
           </p>
 
           <p style={{ margin: "10px 0 4px", fontSize: 12, color: "var(--ap-ink-3)", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "var(--ap-font-mono)" }}>
