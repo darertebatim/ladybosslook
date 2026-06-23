@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Pencil, RefreshCw } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 
 type Row = Record<string, any>;
 
@@ -617,6 +618,7 @@ export default function ApertureAdmin() {
           <TabsTrigger value="industries">Industries</TabsTrigger>
           <TabsTrigger value="tools">Tools</TabsTrigger>
           <TabsTrigger value="actions">Playbooks & Prompts</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="reset">Reset User</TabsTrigger>
         </TabsList>
         <TabsContent value="buckets" className="mt-4"><BucketsTab /></TabsContent>
@@ -626,6 +628,7 @@ export default function ApertureAdmin() {
         <TabsContent value="industries" className="mt-4"><IndustriesTab /></TabsContent>
         <TabsContent value="tools" className="mt-4"><ToolsTab /></TabsContent>
         <TabsContent value="actions" className="mt-4"><ActionsTab /></TabsContent>
+        <TabsContent value="users" className="mt-4"><UsersTab /></TabsContent>
         <TabsContent value="reset" className="mt-4"><ResetUserTab /></TabsContent>
       </Tabs>
     </div>
@@ -677,5 +680,247 @@ function ResetUserTab() {
         </pre>
       )}
     </Section>
+  );
+}
+// ---------- Users ----------
+type ApertureUserRow = {
+  user_id: string;
+  email: string | null;
+  full_name: string | null;
+  business_name: string | null;
+  industry_slug: string | null;
+  created_at: string;
+  quick_onboarded_at: string | null;
+  full_onboarded_at: string | null;
+  memory_count: number;
+  message_count: number;
+  tokens_in: number;
+  tokens_out: number;
+};
+
+function UsersTab() {
+  const { toast } = useToast();
+  const [rows, setRows] = useState<ApertureUserRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<ApertureUserRow | null>(null);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const { data: profiles, error: pErr } = await (supabase as any)
+        .from("aperture_user_profile")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (pErr) throw pErr;
+      const ids = (profiles ?? []).map((p: any) => p.user_id);
+      if (ids.length === 0) { setRows([]); setLoading(false); return; }
+
+      const [{ data: users }, { data: mem }, { data: msgs }] = await Promise.all([
+        (supabase as any).from("profiles").select("id,email,full_name").in("id", ids),
+        (supabase as any).from("aperture_memory_items").select("user_id").in("user_id", ids).eq("is_active", true),
+        (supabase as any).from("aperture_messages").select("user_id,role,tokens_in,tokens_out").in("user_id", ids),
+      ]);
+
+      const userMap = new Map<string, any>((users ?? []).map((u: any) => [u.id, u]));
+      const memCount = new Map<string, number>();
+      (mem ?? []).forEach((r: any) => memCount.set(r.user_id, (memCount.get(r.user_id) ?? 0) + 1));
+      const msgCount = new Map<string, number>();
+      const tIn = new Map<string, number>();
+      const tOut = new Map<string, number>();
+      (msgs ?? []).forEach((r: any) => {
+        msgCount.set(r.user_id, (msgCount.get(r.user_id) ?? 0) + 1);
+        tIn.set(r.user_id, (tIn.get(r.user_id) ?? 0) + (r.tokens_in ?? 0));
+        tOut.set(r.user_id, (tOut.get(r.user_id) ?? 0) + (r.tokens_out ?? 0));
+      });
+
+      const merged: ApertureUserRow[] = (profiles ?? []).map((p: any) => ({
+        user_id: p.user_id,
+        email: userMap.get(p.user_id)?.email ?? null,
+        full_name: userMap.get(p.user_id)?.full_name ?? p.owner_name ?? null,
+        business_name: p.business_name,
+        industry_slug: p.industry_slug,
+        created_at: p.created_at,
+        quick_onboarded_at: p.quick_onboarded_at,
+        full_onboarded_at: p.full_onboarded_at,
+        memory_count: memCount.get(p.user_id) ?? 0,
+        message_count: msgCount.get(p.user_id) ?? 0,
+        tokens_in: tIn.get(p.user_id) ?? 0,
+        tokens_out: tOut.get(p.user_id) ?? 0,
+      }));
+      setRows(merged);
+    } catch (e: any) {
+      toast({ title: "Load users failed", description: e.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, []);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter(r =>
+      (r.email ?? "").toLowerCase().includes(q) ||
+      (r.full_name ?? "").toLowerCase().includes(q) ||
+      (r.business_name ?? "").toLowerCase().includes(q)
+    );
+  }, [rows, search]);
+
+  const fmt = (n: number) => n.toLocaleString();
+
+  return (
+    <Section title="Aperture Users" description="Only users who have started Aperture. Tap a row to see their onboarding answers & memory."
+      onRefresh={load}>
+      <div className="mb-3 flex items-center gap-2">
+        <Input placeholder="Search email, name, business…" value={search} onChange={(e) => setSearch(e.target.value)} className="max-w-sm" />
+        <div className="text-xs text-muted-foreground ml-auto">{filtered.length} of {rows.length}</div>
+      </div>
+      <Table>
+        <TableHeader><TableRow>
+          <TableHead>User</TableHead>
+          <TableHead>Business</TableHead>
+          <TableHead>Industry</TableHead>
+          <TableHead className="text-right">Memory</TableHead>
+          <TableHead className="text-right">Messages</TableHead>
+          <TableHead className="text-right">Tokens (in / out)</TableHead>
+          <TableHead>Onboarded</TableHead>
+          <TableHead>Started</TableHead>
+        </TableRow></TableHeader>
+        <TableBody>
+          {loading && <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-6">Loading…</TableCell></TableRow>}
+          {!loading && filtered.length === 0 && <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-6">No users yet.</TableCell></TableRow>}
+          {filtered.map((r) => (
+            <TableRow key={r.user_id} className="cursor-pointer hover:bg-muted/40" onClick={() => setSelected(r)}>
+              <TableCell>
+                <div className="font-medium">{r.full_name ?? "—"}</div>
+                <div className="text-xs text-muted-foreground">{r.email ?? r.user_id.slice(0, 8)}</div>
+              </TableCell>
+              <TableCell>{r.business_name ?? <span className="text-muted-foreground">—</span>}</TableCell>
+              <TableCell className="text-xs">{r.industry_slug ?? "—"}</TableCell>
+              <TableCell className="text-right tabular-nums">{fmt(r.memory_count)}</TableCell>
+              <TableCell className="text-right tabular-nums">{fmt(r.message_count)}</TableCell>
+              <TableCell className="text-right tabular-nums text-xs">
+                {fmt(r.tokens_in)} / {fmt(r.tokens_out)}
+              </TableCell>
+              <TableCell>
+                {r.full_onboarded_at ? <Badge>full</Badge> :
+                  r.quick_onboarded_at ? <Badge variant="outline">quick</Badge> :
+                  <Badge variant="outline">—</Badge>}
+              </TableCell>
+              <TableCell className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <UserDetailSheet user={selected} onClose={() => setSelected(null)} />
+    </Section>
+  );
+}
+
+function UserDetailSheet({ user, onClose }: { user: ApertureUserRow | null; onClose: () => void }) {
+  const [profile, setProfile] = useState<any>(null);
+  const [memory, setMemory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    setLoading(true);
+    (async () => {
+      const [{ data: prof }, { data: mem }] = await Promise.all([
+        (supabase as any).from("aperture_user_profile").select("*").eq("user_id", user.user_id).maybeSingle(),
+        (supabase as any).from("aperture_memory_items").select("*").eq("user_id", user.user_id).eq("is_active", true).order("bucket_slug").order("created_at"),
+      ]);
+      setProfile(prof);
+      setMemory(mem ?? []);
+      setLoading(false);
+    })();
+  }, [user]);
+
+  const grouped = useMemo(() => {
+    const m = new Map<string, any[]>();
+    memory.forEach((r) => {
+      const k = r.bucket_slug ?? "unsorted";
+      if (!m.has(k)) m.set(k, []);
+      m.get(k)!.push(r);
+    });
+    return Array.from(m.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [memory]);
+
+  return (
+    <Sheet open={!!user} onOpenChange={(v) => !v && onClose()}>
+      <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
+        {user && (
+          <>
+            <SheetHeader>
+              <SheetTitle>{user.full_name ?? user.email ?? "User"}</SheetTitle>
+              <SheetDescription>{user.email} · {user.business_name ?? "no business name"}</SheetDescription>
+            </SheetHeader>
+
+            <div className="mt-6 space-y-6 pb-12">
+              {loading && <div className="text-sm text-muted-foreground">Loading…</div>}
+
+              {profile && (
+                <div>
+                  <h3 className="text-sm font-semibold mb-2">Profile</h3>
+                  <dl className="text-sm grid grid-cols-[140px_1fr] gap-y-1.5 gap-x-3">
+                    {[
+                      ["Owner", profile.owner_name],
+                      ["Business", profile.business_name],
+                      ["Industry", profile.industry_slug],
+                      ["Website", profile.website],
+                      ["Instagram", profile.instagram],
+                      ["Quick onboarded", profile.quick_onboarded_at ? new Date(profile.quick_onboarded_at).toLocaleString() : "—"],
+                      ["Full onboarded", profile.full_onboarded_at ? new Date(profile.full_onboarded_at).toLocaleString() : "—"],
+                    ].map(([k, v]) => (
+                      <div key={k} className="contents">
+                        <dt className="text-muted-foreground">{k}</dt>
+                        <dd className="break-words">{v || <span className="text-muted-foreground">—</span>}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
+
+              <div>
+                <div className="flex items-baseline justify-between mb-2">
+                  <h3 className="text-sm font-semibold">Onboarding answers & memory</h3>
+                  <span className="text-xs text-muted-foreground">{memory.length} items</span>
+                </div>
+                {grouped.length === 0 && !loading && (
+                  <div className="text-sm text-muted-foreground">No memory items yet.</div>
+                )}
+                <div className="space-y-4">
+                  {grouped.map(([bucket, items]) => (
+                    <div key={bucket}>
+                      <div className="text-xs font-mono uppercase tracking-wide text-muted-foreground mb-1.5">{bucket} · {items.length}</div>
+                      <ul className="space-y-2">
+                        {items.map((it) => (
+                          <li key={it.id} className="text-sm border rounded-md p-2.5 bg-muted/30">
+                            {it.question_key && <div className="text-xs text-muted-foreground mb-0.5">{it.question_key}</div>}
+                            <div className="whitespace-pre-wrap break-words">{it.content}</div>
+                            <div className="mt-1 flex gap-2 text-[10px] text-muted-foreground">
+                              <span>{it.source}</span>
+                              {it.confidence != null && <span>· conf {it.confidence}</span>}
+                              <span>· {new Date(it.created_at).toLocaleDateString()}</span>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="text-xs text-muted-foreground border-t pt-3">
+                Totals: {user.message_count} messages · {(user.tokens_in + user.tokens_out).toLocaleString()} tokens
+                ({user.tokens_in.toLocaleString()} in / {user.tokens_out.toLocaleString()} out)
+              </div>
+            </div>
+          </>
+        )}
+      </SheetContent>
+    </Sheet>
   );
 }
