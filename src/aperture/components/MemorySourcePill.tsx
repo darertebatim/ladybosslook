@@ -91,6 +91,13 @@ function pillSpec(source: string | null) {
         color: "var(--ap-ink-3)",
         border: "1px dashed var(--ap-hairline)",
       };
+    case "mcp_extracted":
+      return {
+        label: "Via AI tool",
+        background: "transparent",
+        color: "#1f6feb",
+        border: "1px solid #1f6feb",
+      };
     default:
       return {
         label: String(source ?? "item").slice(0, 12),

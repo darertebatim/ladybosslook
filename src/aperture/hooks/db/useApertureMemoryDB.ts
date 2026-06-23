@@ -9,7 +9,8 @@ export type MemorySource =
   | "chat_extracted"
   | "ai_inferred_pre_onboarding"
   | "freeform"
-  | "user_confirmed";
+  | "user_confirmed"
+  | "mcp_extracted";
 
 export interface MemoryItem {
   id: string;

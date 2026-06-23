@@ -995,6 +995,39 @@ export type Database = {
         }
         Relationships: []
       }
+      aperture_mcp_tokens: {
+        Row: {
+          created_at: string
+          id: string
+          last_used_at: string | null
+          name: string
+          revoked: boolean
+          scopes: string[]
+          token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_used_at?: string | null
+          name: string
+          revoked?: boolean
+          scopes?: string[]
+          token: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_used_at?: string | null
+          name?: string
+          revoked?: boolean
+          scopes?: string[]
+          token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       aperture_memory_card: {
         Row: {
           answers_count: number

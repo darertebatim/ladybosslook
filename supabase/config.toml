@@ -32,6 +32,9 @@ enable_confirmations = false
 [functions.create-payment]
 verify_jwt = false
 
+[functions.aperture-mcp]
+verify_jwt = false
+
 [functions.stripe-webhook]
 verify_jwt = false
 
