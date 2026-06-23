@@ -185,43 +185,64 @@ export function McpConnections() {
           </div>
 
           <p style={{ margin: "10px 0 6px", fontSize: 12, color: "var(--ap-ink-3)", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "var(--ap-font-mono)" }}>
-            How to connect in Claude.ai
+            Where this key works
           </p>
-          <ol style={{ margin: "0 0 12px", paddingInlineStart: 20, fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.6 }}>
-            <li>Open Claude.ai → click your profile (bottom left) → <b>Settings</b></li>
-            <li>In the left sidebar choose <b>Connectors</b></li>
-            <li>Top right: <b>Add</b> → <b>Add custom connector</b> (Beta)</li>
-            <li>
-              <b>Name:</b> Rilo (or anything you want)
-            </li>
-            <li>
-              <b>Remote MCP server URL:</b>
-              <div style={{ marginTop: 4 }}>
-                <code style={{ fontSize: 11.5, fontFamily: "var(--ap-font-mono)", color: "var(--ap-ink-1)", wordBreak: "break-all" }}>
-                  {MCP_ENDPOINT}
-                </code>
-              </div>
-            </li>
-            <li>
-              Open <b>Advanced settings</b> and paste your key (the <code style={{ fontFamily: "var(--ap-font-mono)", fontSize: 11.5 }}>apt_…</code> value above) into the
-              <b> OAuth Client ID</b> field. Leave OAuth Client Secret empty.
-            </li>
-            <li>Click <b>Add</b>. Claude will list your Rilo tools — start a new chat and ask "What does my business do?"</li>
-          </ol>
+          <p style={{ margin: "0 0 10px", fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.55 }}>
+            This key works with any AI that lets you set a custom HTTP header — <b>Claude Desktop</b>, <b>ChatGPT</b>, <b>Cursor</b>, <b>Raycast</b>, etc.
+            It does <b>not</b> work in <b>Claude.ai on the web</b> (their custom connector form only supports full OAuth, not bearer keys).
+          </p>
+
           <p style={{ margin: "10px 0 4px", fontSize: 12, color: "var(--ap-ink-3)", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "var(--ap-font-mono)" }}>
-            Using ChatGPT, Cursor or Claude Desktop?
+            Server URL
+          </p>
+          <code style={{
+            display: "block", padding: "8px 10px", background: "var(--ap-bg-0)",
+            border: "1px solid var(--ap-hairline)", borderRadius: 4,
+            fontSize: 11.5, fontFamily: "var(--ap-font-mono)", color: "var(--ap-ink-1)",
+            wordBreak: "break-all", marginBottom: 10,
+          }}>{MCP_ENDPOINT}</code>
+
+          <p style={{ margin: "10px 0 4px", fontSize: 12, color: "var(--ap-ink-3)", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "var(--ap-font-mono)" }}>
+            Claude Desktop (recommended)
+          </p>
+          <ol style={{ margin: "0 0 10px", paddingInlineStart: 20, fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.6 }}>
+            <li>Open <b>Claude Desktop → Settings → Developer → Edit Config</b></li>
+            <li>Add this block under <code style={{ fontFamily: "var(--ap-font-mono)", fontSize: 11.5 }}>mcpServers</code> and save:</li>
+          </ol>
+          <code style={{
+            display: "block", whiteSpace: "pre", padding: "10px 12px", background: "var(--ap-bg-0)",
+            border: "1px solid var(--ap-hairline)", borderRadius: 4,
+            fontSize: 11.5, fontFamily: "var(--ap-font-mono)", color: "var(--ap-ink-1)",
+            overflow: "auto", marginBottom: 10,
+          }}>{`{
+  "mcpServers": {
+    "rilo": {
+      "command": "npx",
+      "args": [
+        "-y", "mcp-remote",
+        "${MCP_ENDPOINT}",
+        "--header", "Authorization:\${RILO_AUTH}"
+      ],
+      "env": { "RILO_AUTH": "Bearer ${revealed}" }
+    }
+  }
+}`}</code>
+          <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--ap-ink-3)", lineHeight: 1.5 }}>
+            Restart Claude Desktop. In a new chat you'll see "rilo" in the tool list — ask "What does my business do?"
+          </p>
+
+          <p style={{ margin: "10px 0 4px", fontSize: 12, color: "var(--ap-ink-3)", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "var(--ap-font-mono)" }}>
+            ChatGPT / Cursor / Raycast
           </p>
           <p style={{ margin: "0 0 6px", fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.55 }}>
-            Add a custom MCP server with this URL and a header:
+            Add a custom MCP server with the URL above and this header:
           </p>
           <code style={{
             display: "block", padding: "8px 10px", background: "var(--ap-bg-0)",
             border: "1px solid var(--ap-hairline)", borderRadius: 4,
             fontSize: 11.5, fontFamily: "var(--ap-font-mono)", color: "var(--ap-ink-1)",
             wordBreak: "break-all", marginBottom: 12,
-          }}>
-            Authorization: Bearer {revealed}
-          </code>
+          }}>Authorization: Bearer {revealed}</code>
           <ApertureButton variant="ghost" onClick={close}>Done</ApertureButton>
         </div>
       )}
