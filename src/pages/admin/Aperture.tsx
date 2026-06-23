@@ -859,6 +859,15 @@ function UserDetailSheet({ user, onClose }: { user: ApertureUserRow | null; onCl
   }, [user]);
 
   const { onboardingGroups, otherAnswers } = useMemo(() => {
+    const dedupeByKey = (arr: any[]) => {
+      const seen = new Set<string>();
+      return arr.filter((r) => {
+        if (seen.has(r.question_key)) return false;
+        seen.add(r.question_key);
+        return true;
+      });
+    };
+
     const answers = memory.filter((r) => r.question_key);
     const quick: any[] = [];
     const full: any[] = [];
@@ -890,14 +899,22 @@ function UserDetailSheet({ user, onClose }: { user: ApertureUserRow | null; onCl
 
     return {
       onboardingGroups: [
-        { label: "Quick Onboarding", items: quick },
-        { label: "Full Onboarding", items: full },
+        { label: "Quick Onboarding", items: dedupeByKey(quick) },
+        { label: "Full Onboarding", items: dedupeByKey(full) },
       ].filter((g) => g.items.length > 0),
-      otherAnswers: other,
+      otherAnswers: dedupeByKey(other),
     };
   }, [memory, onboardingMeta]);
 
-  const answerCount = useMemo(() => memory.filter((r) => r.question_key).length, [memory]);
+  const answerCount = useMemo(() => {
+    const seen = new Set<string>();
+    return memory.filter((r) => {
+      if (!r.question_key) return false;
+      if (seen.has(r.question_key)) return false;
+      seen.add(r.question_key);
+      return true;
+    }).length;
+  }, [memory]);
 
   const renderList = (items: any[]) => (
     <ul className="space-y-3">
