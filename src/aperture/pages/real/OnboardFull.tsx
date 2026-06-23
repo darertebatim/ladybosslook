@@ -128,7 +128,8 @@ export default function OnboardFull() {
       await finishSections();
     } else {
       setSectionIdx(sectionIdx + 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      setJustSaved(true);
+      scrollToTop();
     }
   }
 
@@ -137,11 +138,12 @@ export default function OnboardFull() {
       await finishSections();
     } else {
       setSectionIdx(sectionIdx + 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     }
   }
 
   const current = sections[sectionIdx];
+  const progressPct = sections.length > 0 ? ((sectionIdx + 1) / sections.length) * 100 : 0;
 
   return (
     <>
