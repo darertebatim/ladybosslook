@@ -79,11 +79,20 @@ export function RealAppShell({ children, rightRail }: { children: ReactNode; rig
           <main style={{ padding: "4px 18px 16px" }}>{children}</main>
 
           <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
-            <SheetContent side="left" style={{
-              background: "var(--ap-canvas)", padding: 0, width: "82vw", maxWidth: 320,
-              borderRight: "1px solid var(--ap-hairline)",
-            }}>
-              <div style={{ display: "flex", flexDirection: "column", height: "100%", padding: "20px 16px" }}>
+            <SheetContent
+              side="left"
+              className="aperture-root"
+              data-aperture-theme={document.documentElement.getAttribute("data-aperture-theme") || "light"}
+              style={{
+                background: "var(--ap-canvas)",
+                padding: 0,
+                width: "82vw",
+                maxWidth: 320,
+                borderRight: "1px solid var(--ap-hairline)",
+                opacity: 1,
+              }}
+            >
+              <div style={{ display: "flex", flexDirection: "column", height: "100%", padding: "20px 16px", background: "var(--ap-canvas)" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
                   <ApertureWordmark size={16} />
                   <ApertureThemeSwitch />
