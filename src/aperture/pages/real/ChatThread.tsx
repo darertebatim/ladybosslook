@@ -251,7 +251,7 @@ export default function RealChatThread() {
           </div>
         }
       >
-        <div style={{ display: "flex", flexDirection: "column", height: "calc(100dvh - 180px)", minHeight: 360, maxWidth: "100%", overflowX: "hidden" }}>
+        <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 110px)", minHeight: 360, maxWidth: "100%", overflowX: "hidden" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
             <div style={{ minWidth: 0 }}>
               <ApertureMonoLabel>CONVERSATION</ApertureMonoLabel>
