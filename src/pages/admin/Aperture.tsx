@@ -822,31 +822,42 @@ function UsersTab() {
 function UserDetailSheet({ user, onClose }: { user: ApertureUserRow | null; onClose: () => void }) {
   const [profile, setProfile] = useState<any>(null);
   const [memory, setMemory] = useState<any[]>([]);
+  const [questionMap, setQuestionMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
     setLoading(true);
     (async () => {
-      const [{ data: prof }, { data: mem }] = await Promise.all([
+      const [{ data: prof }, { data: mem }, { data: bq }, { data: oq }] = await Promise.all([
         (supabase as any).from("aperture_user_profile").select("*").eq("user_id", user.user_id).maybeSingle(),
         (supabase as any).from("aperture_memory_items").select("*").eq("user_id", user.user_id).eq("is_active", true).order("bucket_slug").order("created_at"),
+        (supabase as any).from("aperture_bucket_questions").select("question_key,prompt"),
+        (supabase as any).from("aperture_onboarding_questions").select("question_key,prompt"),
       ]);
       setProfile(prof);
       setMemory(mem ?? []);
+      const map: Record<string, string> = {};
+      (bq ?? []).forEach((r: any) => { if (r.question_key && r.prompt) map[r.question_key] = r.prompt; });
+      (oq ?? []).forEach((r: any) => { if (r.question_key && r.prompt) map[r.question_key] = r.prompt; });
+      setQuestionMap(map);
       setLoading(false);
     })();
   }, [user]);
 
   const grouped = useMemo(() => {
+    // only onboarding-style answers (skip free-form notes, chat-derived facts, etc.)
+    const answers = memory.filter((r) => r.question_key);
     const m = new Map<string, any[]>();
-    memory.forEach((r) => {
+    answers.forEach((r) => {
       const k = r.bucket_slug ?? "unsorted";
       if (!m.has(k)) m.set(k, []);
       m.get(k)!.push(r);
     });
     return Array.from(m.entries()).sort(([a], [b]) => a.localeCompare(b));
   }, [memory]);
+
+  const answerCount = useMemo(() => memory.filter((r) => r.question_key).length, [memory]);
 
   return (
     <Sheet open={!!user} onOpenChange={(v) => !v && onClose()}>
@@ -885,25 +896,27 @@ function UserDetailSheet({ user, onClose }: { user: ApertureUserRow | null; onCl
 
               <div>
                 <div className="flex items-baseline justify-between mb-2">
-                  <h3 className="text-sm font-semibold">Onboarding answers & memory</h3>
-                  <span className="text-xs text-muted-foreground">{memory.length} items</span>
+                  <h3 className="text-sm font-semibold">Onboarding answers</h3>
+                  <span className="text-xs text-muted-foreground">{answerCount} answers</span>
                 </div>
                 {grouped.length === 0 && !loading && (
-                  <div className="text-sm text-muted-foreground">No memory items yet.</div>
+                  <div className="text-sm text-muted-foreground">No onboarding answers yet.</div>
                 )}
                 <div className="space-y-4">
                   {grouped.map(([bucket, items]) => (
                     <div key={bucket}>
-                      <div className="text-xs font-mono uppercase tracking-wide text-muted-foreground mb-1.5">{bucket} · {items.length}</div>
-                      <ul className="space-y-2">
+                      <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-semibold">{bucket.replace(/_/g, " ")} · {items.length}</div>
+                      <ul className="space-y-3">
                         {items.map((it) => (
-                          <li key={it.id} className="text-sm border rounded-md p-2.5 bg-muted/30">
-                            {it.question_key && <div className="text-xs text-muted-foreground mb-0.5">{it.question_key}</div>}
-                            <div className="whitespace-pre-wrap break-words">{it.content}</div>
-                            <div className="mt-1 flex gap-2 text-[10px] text-muted-foreground">
-                              <span>{it.source}</span>
-                              {it.confidence != null && <span>· conf {it.confidence}</span>}
-                              <span>· {new Date(it.created_at).toLocaleDateString()}</span>
+                          <li key={it.id} className="text-sm border rounded-md p-3 bg-muted/30">
+                            <div className="text-xs font-medium text-foreground/80 mb-1.5">
+                              Q: {questionMap[it.question_key] ?? it.question_key}
+                            </div>
+                            <div className="whitespace-pre-wrap break-words text-foreground">
+                              <span className="text-muted-foreground">A:</span> {it.content}
+                            </div>
+                            <div className="mt-2 text-[10px] text-muted-foreground">
+                              {new Date(it.created_at).toLocaleDateString()}
                             </div>
                           </li>
                         ))}
