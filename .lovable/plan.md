@@ -1,164 +1,72 @@
+# Polish the Full Onboarding (`/aperture/app/onboard/full`)
 
-# Post-Onboarding Memory Continuation (v2)
+Scope is purely UX/UI on `src/aperture/pages/real/OnboardFull.tsx` (plus a tiny CSS tweak if needed). No schema or business-logic changes.
 
-Implements the brief in `aperture_post_onboarding_memory_continuation.md`. Incorporates Claude's review notes from v1 — chip ranking now reuses the fallback score, guess styling is spec'd explicitly, and the signal logging scope is confirmed.
+## Issues to fix
 
----
+1. **Question vs. answer typography is flat** — prompt and chip options look the same weight/size, so the eye can't find the question.
+2. **Cramped vertical rhythm** — `gap: 18px` between questions is too tight when each has 4–6 chip rows.
+3. **No scroll-to-top on "Next section"** — `window.scrollTo({ top: 0 })` runs on the window, but the actual scroll container is the inner app shell, so on mobile the page stays scrolled to the bottom.
+4. **No progress indicator** — only a tiny "Section 1 / 9" chip. User has no sense of how far through they are.
+5. **No "saving" feedback per section** — the button label flips to "Saving…" but there's no confirmation that the previous section was stored.
+6. **Weak placeholders** — most text inputs fall back to "Type your answer…" or a bare hint. Same complaint as the closing question last turn.
+7. **Mobile**: section chip wraps under the title awkwardly; chip buttons are not min-44px tall; bottom action bar scrolls with content instead of being reachable.
 
-## 1. Memory page — persistent "Continue filling out your memory" card
+## Fixes
 
-`src/aperture/pages/real/Memory.tsx`
+### Typography & spacing
+- Prompt label: bump to `15px / weight 600 / ink-1`. Hint: `13px / ink-3 / mt 2px`.
+- Chip option buttons: keep 13px but increase padding to `10px 14px`, `min-height: 40px`, `border-radius: 999px` (pill) so they read as answers, not labels.
+- Question block gap: `28px` between questions, `10px` between prompt → hint → input.
+- Add a subtle hairline divider between questions (`border-top: 1px solid var(--ap-hairline)` on every question after the first, with `padding-top: 28px`). Gives clear visual separation.
+- Section header (`ApertureMonoLabel`) gets `margin-bottom: 20px`.
 
-- Today the right-hand CTA card is "Continue onboarding" and disappears once `full_onboarded_at` is set, leaving only "Talk to Aperture" (generic chat, not memory-building).
-- After full onboarding, replace it with a permanent **"Continue filling out your memory"** card. Before full onboarding, the existing "Continue onboarding" card stays.
-- Tapping it calls `startMemoryChat()`:
-  1. Runs the **fallback bucket picker** (§4) → returns one bucket slug.
-  2. Calls `createChat({ entry_point: "memory_general", bucket_slug })`.
-  3. Navigates to `/aperture/app/chats/:id`.
-- Copy: "I'll pick the territory that looks most useful right now and we'll go from there."
-- "Talk to Aperture" stays as the third, neutral general-chat entry (`entry_point: "general_chat"`).
+### Progress bar
+- Add a thin 2px progress bar directly under `PageHeader`:
+  - Track: `var(--ap-hairline)`, fill: `var(--ap-signal)`.
+  - Width: `((sectionIdx + 1) / sections.length) * 100%`, animated with `transition: width 300ms ease`.
+- Keep the `Section X / Y` chip in the header `action` slot but restyle as `Step X of Y` for clarity.
 
----
+### Scroll-to-top on next/skip
+- Replace `window.scrollTo` with a ref on the outermost scrollable element inside `RealAppShell` *and* fall back to scrolling `document.scrollingElement`, `document.documentElement`, and `document.body` to 0. Also scroll the page header into view via `headerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })` as the primary mechanism — works regardless of which ancestor is the scroll container.
+- Trigger on both `next()` and `skipSection()` after `setSectionIdx`.
 
-## 2. Bucket page — split into Fact View + Continue chat
+### Saving feedback
+- After a successful `persistSection`, show a small inline toast/pill at the top of the new section: `✓ Section saved` that fades out after 1.5s. Implemented with a local `justSaved` state — no new deps.
 
-Replace `src/aperture/pages/real/Bucket.tsx` (currently a static Q&A form) with:
+### Placeholders with examples
+Extend `fullPlaceholderFor()` to cover the common keys with concrete, comma-separated examples (mirrors the closing-question pattern from last turn). Examples:
+- `revenue_monthly` → `e.g. $3k–$8k, growing slowly, lumpy month to month…`
+- `customer_count` → `e.g. about 40 regulars + 10 new walk-ins a month…`
+- `ideal_customer` → `e.g. busy moms 30–45 who want quick healthy meals…`
+- `marketing_today` → `e.g. Instagram reels 2x/week, word of mouth, some Google ads…`
+- `biggest_obstacle` → `e.g. inconsistent leads, no time for marketing, cash flow tight…`
+- `goals_6mo` → `e.g. double monthly revenue, hire 1 part-time, open 2nd location…`
+- `tools_used` → `e.g. Square POS, QuickBooks, Canva, Meta Ads Manager…`
+- Plus a generic fallback that always prepends `e.g.` to the hint when present, never the bare "Type your answer…".
 
-**Top — Continue chat CTA**
-- Button: "Continue chat about {bucket.title} →"
-- Calls `createChat({ entry_point: "bucket_specific", bucket_slug: slug })`.
+I'll grep `aperture_onboarding_questions` for the actual `question_key` values currently active in `flow='full'` so the map covers what's really shown. (Read-only DB query.)
 
-**Below — Fact View (new)**
-Browsable list of every active `aperture_memory_items` row for this user + bucket, sorted by `updated_at` desc. Each item shows:
-- Content, in plain language.
-- Source pill (see styling spec below).
-- Relative timestamp ("3d ago"), full datetime in tooltip.
-- Inline actions: **Confirm** (only on `ai_inferred_pre_onboarding` → writes new `user_confirmed` row carrying same content/bucket/question_key, deactivates the guess), **Edit** (writes new row with corrected text, deactivates old), **Delete** (sets `is_active=false`, kept in History).
-- "History" expander on items sharing a `question_key` with prior inactive rows — shows older values + dates. Nothing is ever hard-deleted from the user's view of history.
+### Sticky action bar (mobile)
+- Wrap the "Skip section / Next section" buttons in a sticky footer inside the card: `position: sticky; bottom: 0; background: var(--ap-surface-1); padding-top: 16px; margin-top: 24px; border-top: 1px solid var(--ap-hairline)`.
+- On screens `≥ 640px` keep current inline layout (sticky still works fine but unobtrusive).
+- Ensure tap targets are `min-height: 44px`.
 
-### Source pill styling spec (resolves Claude's note 2 — functional, not just verbal, distinction)
+### Header layout on mobile
+- Move the `Section X / Y` chip to a row *below* the title on narrow viewports (use flex-wrap on `PageHeader` action area) so it doesn't squeeze the title.
 
-| Source | Label | Visual |
-|---|---|---|
-| `user_confirmed` | Confirmed | Solid `--ap-signal` background, black text, full opacity |
-| `bucket_answer` | Saved | Solid `--ap-signal` background (same as confirmed — both are owner-stated) |
-| `ai_extracted` | Noticed | Outlined pill, signal-colored border + text, no fill |
-| `file_extracted` | From file | Outlined pill, neutral border + text |
-| `ai_inferred_pre_onboarding` | Guess · tap to confirm | **Dashed** border, muted text, **0.7 opacity on entire row**, italic content text, persistent "Confirm" button visible inline (not hover) |
+### Closing & brief screens
+- Apply the same prompt typography + sticky footer to the closing textarea card for consistency.
+- Closing textarea: `min-height: 140px`, autofocus on mount.
 
-Guesses are also excluded from being referenced as "things you mentioned" in opener B (§3) and de-weighted in progress (already done in `Memory.tsx`).
+## Mobile recheck
+After implementation, verify at 390×697 (current viewport):
+- Section header doesn't overlap chip.
+- Chips wrap cleanly with 8px gap and 40px min-height.
+- Sticky footer sits above the home indicator area (add `padding-bottom: env(safe-area-inset-bottom)`).
+- Scroll-to-top fires when advancing.
 
-**Hook extensions** (`useApertureMemoryDB`, no edge fn):
-- `confirmGuess(itemId)`
-- `editFact(itemId, newContent)`
-- `deactivateFact(itemId)`
-- `historyFor(bucket_slug, question_key)` — returns all rows (active + inactive) ordered desc
+## Files touched
+- `src/aperture/pages/real/OnboardFull.tsx` — all visual changes, scroll fix, progress bar, save toast, placeholder map expansion, sticky footer.
 
-No schema change to `aperture_memory_items` — `source`, `is_active`, `updated_at`, `question_key` already exist.
-
----
-
-## 3. Entry-point-aware opener
-
-Today `createChat` pre-seeds one static `OPENER_TEXT` regardless of origin.
-
-**Migration:**
-```sql
-ALTER TABLE public.aperture_chats
-  ADD COLUMN entry_point text NOT NULL DEFAULT 'general_chat',
-  ADD COLUMN bucket_slug text NULL;
-```
-(Grants already in place.)
-
-**`createChat` signature** → `createChat({ title?, entry_point?, bucket_slug? })`. Default `general_chat` so existing callers keep working.
-
-**Opener selection** (client-side, written into the pre-seed assistant message so it persists in history):
-
-- **`general_chat`** → current static opener (unchanged).
-- **`memory_general` — Opener A**: frames as building the profile. Chip set is the **top 4–6 buckets ranked by the same `score()` from §4**, not raw lowest-progress. This avoids surfacing cold dead-zone buckets (Partners, Competitors at 0% with no context) next to high-value ones. Plus a final "Something else" chip that opens a bucket picker.
-  > "Let's fill in a bit more about your business. What's been on your mind?"
-  > [{Bucket 1}] [{Bucket 2}] [{Bucket 3}] [{Bucket 4}] [Something else]
-- **`bucket_specific` — Opener B**: references the bucket by name.
-  - If the bucket has **≥1 active `user_confirmed` OR `ai_extracted` OR `bucket_answer`** fact → reference the most recent one ("Last time you mentioned {fact_content}. What's changed, or what's on your mind there now?").
-  - If only `ai_inferred_pre_onboarding` guesses exist, or 0 facts → **do not** reference any item; fall back to the bucket's first `aperture_bucket_questions` row by `order_index`. This explicitly prevents the AI from quoting an unconfirmed guess back to the user as if they said it.
-
-Composed client-side from already-loaded data — no extra round trip.
-
-**Edge function** `aperture-chat/index.ts`: read `entry_point` + `bucket_slug` off the chat row at top of handler and add a short system-prompt hint ("This conversation was opened from the {bucket.title} bucket — stay scoped to it unless the user pivots."). Skip-classifier and fact-extraction unchanged.
-
----
-
-## 4. Bucket selection — fallback rule (now) + signals scaffold (later)
-
-**Fallback picker** (`aperture/lib/pickFallbackBucket.ts`) — used by both §1 (single pick) and §3 Opener A (top-N ranking, single source of truth):
-```
-score(bucket) =
-    (1 - progress_pct)                                  // lower-progress = more useful
-  + 0.15 * (has ≥1 onboarding-mapped fact ? 1 : 0)     // tiny warm-context bonus
-filter:   target_count - count > 0                      // ignore filled buckets
-pickOne:  argmax(score)
-topN:     sort desc by score, take N
-```
-Same function, two consumers. Keeps the rule consistent everywhere per Claude's note 1.
-
-**Signals table** (migration):
-```sql
-CREATE TABLE public.aperture_user_bucket_signals (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL,
-  bucket_slug text NOT NULL,
-  signal_type text NOT NULL,
-  -- enum values (full set scaffolded, only 4 wired in this round):
-  --   chat_topic | library_action | daily_q_answered | daily_q_skipped
-  --   | auto_extracted | bucket_visit | home_suggestion_tap | home_suggestion_ignore
-  weight real NOT NULL DEFAULT 1,
-  meta jsonb,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-GRANT SELECT, INSERT ON public.aperture_user_bucket_signals TO authenticated;
-GRANT ALL ON public.aperture_user_bucket_signals TO service_role;
-ALTER TABLE public.aperture_user_bucket_signals ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "own signals read"   ON public.aperture_user_bucket_signals FOR SELECT TO authenticated USING (user_id = auth.uid());
-CREATE POLICY "own signals insert" ON public.aperture_user_bucket_signals FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid());
-```
-
-**Wired in this round (4 of 8, intentional — confirms Claude's note 4):**
-- `bucket_visit` on `/aperture/app/memory/:slug` open.
-- `auto_extracted` server-side in `aperture-chat` alongside existing memory write.
-- `chat_topic` on `createChat` with `memory_general` or `bucket_specific`.
-- `home_suggestion_tap` from existing handler.
-
-**Deferred** (enum present, no wiring yet — wire when daily questions and library action telemetry get their next pass):
-- `daily_q_answered`, `daily_q_skipped` — wire alongside the daily question feature's next touch.
-- `library_action` — wire with the Library tap handler refactor.
-- `home_suggestion_ignore` — needs an impression tracker we don't have yet.
-
-**Not built this round (deferred per brief):**
-- `aperture_user_bucket_relevance` table + daily scorer job.
-- Feeding relevance into daily question / home suggestions / live chat context.
-
----
-
-## 5. Out of scope (called out so we don't over-build)
-
-- Live relevance scorer + scores table.
-- Replacing home or daily-question selection with scores.
-- Conflict-resolution UI beyond per-item History expander.
-
----
-
-## Technical summary
-
-| Change | Where |
-|---|---|
-| Persistent memory card | `pages/real/Memory.tsx` |
-| Bucket page rewrite (fact view + chat CTA, drop form) | `pages/real/Bucket.tsx` |
-| Source pill component w/ styling spec from §2 | new `components/MemorySourcePill.tsx` |
-| `confirmGuess` / `editFact` / `deactivateFact` / `historyFor` | `hooks/db/useApertureMemoryDB.ts` |
-| Shared fallback scorer (single pick + top-N) | new `aperture/lib/pickFallbackBucket.ts` |
-| `createChat({entry_point, bucket_slug})` + opener A/B/C | `hooks/db/useApertureChatsDB.ts` |
-| Read `entry_point` + `bucket_slug`, inject hint | `supabase/functions/aperture-chat/index.ts` |
-| Migration: `aperture_chats` cols + `aperture_user_bucket_signals` table | new migration |
-| Signal logging (4 spots) | bucket page, chat creation, chat edge fn extraction, home suggestion click |
-
-No new edge functions. No onboarding flow changes. `aperture_memory_items` schema unchanged.
+No DB migration, no edge function changes, no new dependencies.

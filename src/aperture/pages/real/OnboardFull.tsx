@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
@@ -28,6 +28,24 @@ export default function OnboardFull() {
   const [busy, setBusy] = useState(false);
   const [phase, setPhase] = useState<"sections" | "prefilling" | "closing" | "tailoring" | "brief">("sections");
   const [closingAnswer, setClosingAnswer] = useState("");
+  const [justSaved, setJustSaved] = useState(false);
+  const topRef = useRef<HTMLDivElement | null>(null);
+
+  function scrollToTop() {
+    requestAnimationFrame(() => {
+      try { topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }); } catch {}
+      try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch {}
+      if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
+  }
+
+  useEffect(() => {
+    if (!justSaved) return;
+    const t = setTimeout(() => setJustSaved(false), 1800);
+    return () => clearTimeout(t);
+  }, [justSaved]);
 
   const sections = useMemo(() => {
     const map = new Map<string, typeof questions>();
@@ -110,7 +128,8 @@ export default function OnboardFull() {
       await finishSections();
     } else {
       setSectionIdx(sectionIdx + 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      setJustSaved(true);
+      scrollToTop();
     }
   }
 
@@ -119,16 +138,18 @@ export default function OnboardFull() {
       await finishSections();
     } else {
       setSectionIdx(sectionIdx + 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     }
   }
 
   const current = sections[sectionIdx];
+  const progressPct = sections.length > 0 ? ((sectionIdx + 1) / sections.length) * 100 : 0;
 
   return (
     <>
       <Helmet><title>Full Questionnaire · Aperture</title></Helmet>
       <RealAppShell>
+        <div ref={topRef} style={{ position: "absolute", top: 0, height: 1, width: 1, pointerEvents: "none" }} />
         {phase === "prefilling" ? (
           <>
             <PageHeader
@@ -163,11 +184,13 @@ export default function OnboardFull() {
             <ApertureCard padding={20}>
               <textarea
                 rows={5}
+                autoFocus
                 value={closingAnswer}
                 onChange={e => setClosingAnswer(e.target.value)}
-                placeholder="In your own words…"
+                placeholder="e.g. more revenue and customers, business credit or a loan, more Instagram followers, posting consistently…"
                 style={{
                   width: "100%", resize: "vertical",
+                  minHeight: 140,
                   background: "var(--ap-surface-2)",
                   border: "1px solid var(--ap-hairline)",
                   borderRadius: "var(--ap-radius-sm)",
@@ -191,21 +214,51 @@ export default function OnboardFull() {
           index="DEEP DIVE"
           title="Tell me more about your business"
           sub="The more you share, the sharper my answers get. Skip anything that doesn't apply."
-          action={sections.length > 0 ? <ApertureChip tone="neutral">Section {sectionIdx + 1} / {sections.length}</ApertureChip> : null}
+          action={sections.length > 0 ? <ApertureChip tone="neutral">Step {sectionIdx + 1} of {sections.length}</ApertureChip> : null}
         />
+
+        {sections.length > 0 && (
+          <div style={{
+            height: 3, width: "100%", borderRadius: 999,
+            background: "var(--ap-hairline)", overflow: "hidden", marginBottom: 18,
+          }}>
+            <div style={{
+              height: "100%", width: `${progressPct}%`,
+              background: "var(--ap-signal)", borderRadius: 999,
+              transition: "width 320ms ease",
+            }} />
+          </div>
+        )}
+
+        {justSaved && (
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            padding: "6px 12px", marginBottom: 14,
+            background: "color-mix(in oklab, var(--ap-signal) 14%, transparent)",
+            color: "var(--ap-signal)",
+            borderRadius: 999, fontSize: 11, fontWeight: 600,
+            fontFamily: "var(--ap-font-mono)", letterSpacing: "0.08em",
+            textTransform: "uppercase",
+          }}>✓ Section saved</div>
+        )}
 
         {loading || !current ? (
           <ApertureLoading label="Loading…" />
         ) : (
           <ApertureCard padding={20}>
             <ApertureMonoLabel>{current[0]}</ApertureMonoLabel>
-            <div style={{ display: "flex", flexDirection: "column", gap: 18, marginTop: 14 }}>
-              {current[1].map(q => (
-                <div key={q.id} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  <label style={{ fontSize: 14, color: "var(--ap-ink-1)", fontWeight: 500 }}>
+            <div style={{ display: "flex", flexDirection: "column", marginTop: 20 }}>
+              {current[1].map((q, i) => (
+                <div key={q.id} style={{
+                  display: "flex", flexDirection: "column", gap: 10,
+                  paddingTop: i === 0 ? 0 : 24,
+                  marginTop: i === 0 ? 0 : 24,
+                  borderTop: i === 0 ? "none" : "1px solid var(--ap-hairline)",
+                }}>
+                  <label style={{ fontSize: 15.5, lineHeight: 1.4, color: "var(--ap-ink-1)", fontWeight: 600 }}>
                     {q.prompt}
                   </label>
-                  {q.hint && <span style={{ fontSize: 12, color: "var(--ap-ink-3)" }}>{q.hint}</span>}
+                  {q.hint && <span style={{ fontSize: 13, color: "var(--ap-ink-3)", marginTop: -4 }}>{q.hint}</span>}
                   <FullQuestionInput
                     q={q}
                     value={answers[q.question_key] ?? ""}
@@ -215,7 +268,14 @@ export default function OnboardFull() {
               ))}
             </div>
 
-            <div style={{ display: "flex", gap: 8, marginTop: 22, justifyContent: "space-between" }}>
+            <div style={{
+              position: "sticky", bottom: 0,
+              display: "flex", gap: 8, justifyContent: "space-between",
+              marginTop: 28, paddingTop: 16,
+              paddingBottom: "max(env(safe-area-inset-bottom, 0px), 4px)",
+              borderTop: "1px solid var(--ap-hairline)",
+              background: "var(--ap-surface-1)",
+            }}>
               <ApertureButton variant="ghost" onClick={skipSection} disabled={busy}>Skip section</ApertureButton>
               <ApertureButton variant="accent" onClick={next} disabled={busy}>
                 {busy ? "Saving…" : sectionIdx + 1 >= sections.length ? "Finish" : "Next section →"}
@@ -245,7 +305,7 @@ function FullQuestionInput({
 
   if (q.input_kind === "single_choice" && Array.isArray(q.options)) {
     return (
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
         {q.options.map((raw: any) => {
           const label = typeof raw === "string" ? raw : raw?.label ?? String(raw?.value ?? "");
           const val = typeof raw === "string" ? raw : raw?.value ?? label;
@@ -254,11 +314,12 @@ function FullQuestionInput({
             <button key={val} type="button" onClick={() => onChange(val)}
               style={{
                 appearance: "none", cursor: "pointer",
-                padding: "8px 12px", borderRadius: "var(--ap-radius-sm)",
+                padding: "10px 14px", minHeight: 42, borderRadius: 999,
                 border: "1px solid " + (on ? "var(--ap-signal)" : "var(--ap-hairline)"),
                 background: on ? "var(--ap-signal)" : "var(--ap-surface-2)",
                 color: on ? "#000" : "var(--ap-ink-1)",
-                fontSize: 13, fontWeight: 500,
+                fontSize: 13.5, fontWeight: on ? 600 : 500,
+                lineHeight: 1.3, textAlign: "left",
               }}>{label}</button>
           );
         })}
@@ -297,11 +358,16 @@ function fullPlaceholderFor(q: any): string {
     instagram: "e.g. @yourbusiness",
     find_you: "e.g. Walk-in, Instagram, word of mouth, Google…",
     channels: "e.g. Instagram, TikTok, Google, none…",
+    full_q7_business: "e.g. I run a small bakery — cakes, breads, weekend pop-ups at the farmers market…",
+    full_q10_bestseller: "e.g. Custom birthday cakes",
+    full_q11_cost: "e.g. $65 each, or $1,200/month retainer",
+    full_q19b_ideal_describe: "e.g. busy moms 30–45 in my city who want healthy meals but have no time to cook…",
+    full_q21_change: "e.g. more consistent revenue, less time on admin, finally posting on Instagram weekly…",
   };
   if (map[q.question_key]) return map[q.question_key];
   if (q.input_kind === "url") return "https://…";
   if (q.input_kind === "email") return "you@example.com";
-  return q.hint ? `e.g. ${q.hint}` : "Type your answer…";
+  return q.hint ? `e.g. ${q.hint}` : "Share a few details — examples, numbers, or what's on your mind…";
 }
 
 function FullHasItGate({
