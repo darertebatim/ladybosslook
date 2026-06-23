@@ -74,19 +74,46 @@ export default function RealSettings() {
     setExporting(true);
     setExportThin(false);
     try {
-      const ALLOWED = ["user_confirmed", "chat_extracted", "ai_extracted", "ai_inferred_pre_onboarding"];
-      const [{ data: items, error: iErr }, { data: buckets, error: bErr }] = await Promise.all([
+      // Pull EVERYTHING — every active memory item across every source
+      // (bucket_answer, user_confirmed, chat_extracted, ai_extracted,
+      // ai_inferred_pre_onboarding, freeform, etc.), plus the bucket
+      // catalog and every known question prompt so we can render
+      // raw onboarding answers (codes like "solo", "<5k") as readable
+      // "Question: Answer" lines.
+      const [
+        { data: items, error: iErr },
+        { data: buckets, error: bErr },
+        { data: onboardingQs },
+        { data: bucketQs },
+        { data: card },
+        { data: briefs },
+      ] = await Promise.all([
         supabase
           .from("aperture_memory_items")
-          .select("content, source, bucket_slug")
+          .select("content, source, bucket_slug, question_key, created_at")
           .eq("user_id", user.id)
           .eq("is_active", true)
-          .in("source", ALLOWED),
+          .order("created_at", { ascending: true }),
         supabase
           .from("aperture_buckets")
           .select("slug, title, sort_order")
           .eq("is_active", true)
           .order("sort_order", { ascending: true }),
+        supabase
+          .from("aperture_onboarding_questions")
+          .select("question_key, prompt, options"),
+        supabase
+          .from("aperture_bucket_questions")
+          .select("question_key, prompt, choices, bucket_slug"),
+        supabase
+          .from("aperture_memory_card")
+          .select("summary")
+          .eq("user_id", user.id)
+          .maybeSingle(),
+        supabase
+          .from("aperture_bucket_briefs")
+          .select("bucket_slug, summary")
+          .eq("user_id", user.id),
       ]);
       if (iErr) throw iErr;
       if (bErr) throw bErr;
@@ -95,14 +122,63 @@ export default function RealSettings() {
         setExportThin(true);
         return;
       }
-      const byBucket = new Map<string, typeof rows>();
+
+      // Build a question lookup: question_key -> { prompt, optionMap }
+      type QInfo = { prompt: string; options: Map<string, string> };
+      const qLookup = new Map<string, QInfo>();
+      function ingest(key: string | null, prompt: string | null, optsRaw: any) {
+        if (!key) return;
+        if (qLookup.has(key)) return;
+        const optionMap = new Map<string, string>();
+        if (Array.isArray(optsRaw)) {
+          for (const o of optsRaw) {
+            if (o && typeof o === "object" && "value" in o) {
+              optionMap.set(String(o.value), String(o.label ?? o.value));
+            } else if (typeof o === "string") {
+              optionMap.set(o, o);
+            }
+          }
+        }
+        qLookup.set(key, { prompt: (prompt ?? key).trim(), options: optionMap });
+      }
+      for (const q of (onboardingQs ?? []) as any[]) ingest(q.question_key, q.prompt, q.options);
+      for (const q of (bucketQs ?? []) as any[]) ingest(q.question_key, q.prompt, q.choices);
+
+      const briefBySlug = new Map<string, string>();
+      for (const b of (briefs ?? []) as any[]) {
+        if (b.bucket_slug && b.summary) briefBySlug.set(b.bucket_slug, String(b.summary).trim());
+      }
+
+      function formatRow(r: any): string | null {
+        const raw = (r.content ?? "").trim();
+        if (!raw) return null;
+        const inferred = r.source === "ai_inferred_pre_onboarding";
+        const star = inferred ? " *" : "";
+        if (r.source === "bucket_answer" && r.question_key) {
+          const q = qLookup.get(r.question_key);
+          if (q) {
+            const labeled = q.options.get(raw) ?? raw;
+            return `- **${q.prompt}** ${labeled}${star}`;
+          }
+          return `- **${r.question_key}** ${raw}${star}`;
+        }
+        return `- ${raw}${star}`;
+      }
+
+      // Group by bucket
+      const byBucket = new Map<string, any[]>();
+      const freeform: any[] = [];
       for (const r of rows) {
-        const slug = r.bucket_slug ?? "other";
-        if (!byBucket.has(slug)) byBucket.set(slug, [] as any);
+        if (r.source === "freeform" || !r.bucket_slug) {
+          freeform.push(r);
+          continue;
+        }
+        const slug = r.bucket_slug;
+        if (!byBucket.has(slug)) byBucket.set(slug, []);
         byBucket.get(slug)!.push(r);
       }
+
       const orderedBuckets = (buckets ?? []).filter(b => byBucket.has(b.slug));
-      // Append any bucket slugs present in items but missing from buckets table (alphabetical).
       const knownSlugs = new Set(orderedBuckets.map(b => b.slug));
       const extras = [...byBucket.keys()]
         .filter(s => !knownSlugs.has(s))
@@ -115,26 +191,55 @@ export default function RealSettings() {
 
       let md = `# Business Memory — ${businessName}\n`;
       md += `*Exported from Aperture on ${today}*\n\n`;
-      md += `This document contains everything Aperture has learned about this business. Paste it at the start of any AI conversation to give the AI full context.\n\n---\n\n`;
+      md += `This document contains everything Aperture has learned about this business. Paste it at the start of any AI conversation to give the AI full context — every onboarding answer, every confirmed fact, every detail extracted from chats, the website, and Instagram.\n\n`;
+
+      // Profile snapshot
+      const profLines: string[] = [];
+      if (profile?.owner_name) profLines.push(`- **Owner:** ${profile.owner_name}`);
+      if (profile?.business_name) profLines.push(`- **Business name:** ${profile.business_name}`);
+      if (profile?.industry_slug) profLines.push(`- **Industry:** ${profile.industry_slug.replace(/-/g, " ")}`);
+      if (profile?.website) profLines.push(`- **Website:** ${profile.website}`);
+      if (profile?.instagram) profLines.push(`- **Instagram:** ${profile.instagram}`);
+      if (profLines.length) {
+        md += `## Profile\n${profLines.join("\n")}\n\n`;
+      }
+
+      // High-level memory card summary, if available
+      const cardSummary = (card as any)?.summary?.toString().trim();
+      if (cardSummary) {
+        md += `## Executive summary\n${cardSummary}\n\n`;
+      }
+
+      md += `---\n\n`;
 
       let hasInferred = false;
       for (const b of finalBuckets) {
         const facts = byBucket.get(b.slug) ?? [];
         if (facts.length === 0) continue;
         md += `## ${b.title}\n`;
+        const brief = briefBySlug.get(b.slug);
+        if (brief) md += `_${brief}_\n\n`;
         for (const f of facts) {
-          const content = (f.content ?? "").trim();
-          if (!content) continue;
-          const isInferred = f.source === "ai_inferred_pre_onboarding";
-          if (isInferred) hasInferred = true;
-          md += `- ${content}${isInferred ? " *" : ""}\n`;
+          const line = formatRow(f);
+          if (!line) continue;
+          if (f.source === "ai_inferred_pre_onboarding") hasInferred = true;
+          md += `${line}\n`;
+        }
+        md += `\n`;
+      }
+
+      if (freeform.length) {
+        md += `## Notes\n`;
+        for (const f of freeform) {
+          const line = formatRow(f);
+          if (line) md += `${line}\n`;
         }
         md += `\n`;
       }
 
       md += `---\n\n`;
       if (hasInferred) {
-        md += `*Note: Some facts marked with * are AI estimates that have not been confirmed by the owner. Treat these as starting assumptions, not verified information.*\n`;
+        md += `*Note: Facts marked with * are AI estimates that have not been confirmed by the owner. Treat these as starting assumptions, not verified information.*\n`;
       }
 
       const slug = businessName
