@@ -58,18 +58,19 @@ export default function OnboardFull() {
   }, [questions]);
 
   async function persistSection(qs: typeof questions) {
-    // Dedupe writes by (bucket, question_key) so parallel saves never
-    // race on the same unique row.
+    // Only write each answer under its OWN question_key. Do NOT fan it
+    // out into `bucket_question_keys` — those are different questions
+    // with different option sets, and copying one short slug (e.g.
+    // "sole", "priority", "registered_informal") into many slots
+    // pollutes the user's memory with answers that don't match the
+    // question they're attached to.
     const planned = new Map<string, { bucket: string; key: string; value: string }>();
     for (const q of qs) {
       const v = (answers[q.question_key] ?? "").trim();
       if (!v) continue;
       const targets = q.bucket_slugs && q.bucket_slugs.length > 0 ? q.bucket_slugs : ["basics"];
       for (const target of targets) {
-        const keys = [q.question_key, ...(q.bucket_question_keys ?? [])];
-        for (const k of keys) {
-          planned.set(`${target}::${k}`, { bucket: target, key: k, value: v });
-        }
+        planned.set(`${target}::${q.question_key}`, { bucket: target, key: q.question_key, value: v });
       }
     }
     // Serialize to avoid concurrent inserts on the same row from other tabs.
