@@ -188,17 +188,40 @@ export function McpConnections() {
             How to connect in Claude.ai
           </p>
           <ol style={{ margin: "0 0 12px", paddingInlineStart: 20, fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.6 }}>
-            <li>Open Claude.ai → Settings → Integrations → Add MCP Server</li>
-            <li>Server URL:
+            <li>Open Claude.ai → click your profile (bottom left) → <b>Settings</b></li>
+            <li>In the left sidebar choose <b>Connectors</b></li>
+            <li>Top right: <b>Add</b> → <b>Add custom connector</b> (Beta)</li>
+            <li>
+              <b>Name:</b> Rilo (or anything you want)
+            </li>
+            <li>
+              <b>Remote MCP server URL:</b>
               <div style={{ marginTop: 4 }}>
                 <code style={{ fontSize: 11.5, fontFamily: "var(--ap-font-mono)", color: "var(--ap-ink-1)", wordBreak: "break-all" }}>
                   {MCP_ENDPOINT}
                 </code>
               </div>
             </li>
-            <li>Authentication: Bearer token — paste your key above</li>
-            <li>Save — Claude will now know your business automatically</li>
+            <li>
+              Open <b>Advanced settings</b> and paste your key (the <code style={{ fontFamily: "var(--ap-font-mono)", fontSize: 11.5 }}>apt_…</code> value above) into the
+              <b> OAuth Client ID</b> field. Leave OAuth Client Secret empty.
+            </li>
+            <li>Click <b>Add</b>. Claude will list your Rilo tools — start a new chat and ask "What does my business do?"</li>
           </ol>
+          <p style={{ margin: "10px 0 4px", fontSize: 12, color: "var(--ap-ink-3)", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "var(--ap-font-mono)" }}>
+            Using ChatGPT, Cursor or Claude Desktop?
+          </p>
+          <p style={{ margin: "0 0 6px", fontSize: 13, color: "var(--ap-ink-2)", lineHeight: 1.55 }}>
+            Add a custom MCP server with this URL and a header:
+          </p>
+          <code style={{
+            display: "block", padding: "8px 10px", background: "var(--ap-bg-0)",
+            border: "1px solid var(--ap-hairline)", borderRadius: 4,
+            fontSize: 11.5, fontFamily: "var(--ap-font-mono)", color: "var(--ap-ink-1)",
+            wordBreak: "break-all", marginBottom: 12,
+          }}>
+            Authorization: Bearer {revealed}
+          </code>
           <ApertureButton variant="ghost" onClick={close}>Done</ApertureButton>
         </div>
       )}
