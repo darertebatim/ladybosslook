@@ -12,7 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 import { useApertureIndustriesDB } from "@/aperture/hooks/db/useApertureOnboardingDB";
 import { IndustryPicker } from "@/aperture/components/IndustryPicker";
-import { McpConnections } from "@/aperture/components/McpConnections";
+
 
 export default function RealSettings() {
   const { user } = useAuth();
@@ -349,9 +349,6 @@ export default function RealSettings() {
             </p>
           )}
         </ApertureCard>
-        <div style={{ marginTop: 14 }}>
-          <McpConnections />
-        </div>
       </RealAppShell>
     </>
   );
