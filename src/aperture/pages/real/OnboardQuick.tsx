@@ -95,19 +95,18 @@ export default function OnboardQuick() {
     if (target === "__notes__") await addFreeformNote(v);
     else await saveBucketAnswer(target, qq.question_key, v);
 
-    // Also tick off any matching aperture_bucket_questions rows so the
-    // AI never re-asks something the user already answered in onboarding.
-    const targetBuckets = (qq.bucket_slugs && qq.bucket_slugs.length > 0)
-      ? qq.bucket_slugs.filter(s => s !== "__notes__")
+    // Also mirror the answer into any additional target buckets under
+    // its OWN question_key. We intentionally do NOT fan out into
+    // `bucket_question_keys` — those are different questions with
+    // different option sets, and copying one short slug into many
+    // unrelated slots pollutes the user's memory with mis-matched
+    // answers (the same bug the export had to filter around).
+    const extraBuckets = (qq.bucket_slugs && qq.bucket_slugs.length > 1)
+      ? qq.bucket_slugs.slice(1).filter(s => s !== "__notes__" && s !== target)
       : [];
-    const mappedKeys = (qq.bucket_question_keys ?? []);
-    const writes: Promise<unknown>[] = [];
-    for (const bucket of targetBuckets) {
-      for (const bqKey of mappedKeys) {
-        writes.push(saveBucketAnswer(bucket, bqKey, v));
-      }
+    if (extraBuckets.length > 0) {
+      await Promise.all(extraBuckets.map(b => saveBucketAnswer(b, qq.question_key, v)));
     }
-    if (writes.length > 0) await Promise.all(writes);
   }
 
   async function next() {
