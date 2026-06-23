@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
@@ -28,6 +28,24 @@ export default function OnboardFull() {
   const [busy, setBusy] = useState(false);
   const [phase, setPhase] = useState<"sections" | "prefilling" | "closing" | "tailoring" | "brief">("sections");
   const [closingAnswer, setClosingAnswer] = useState("");
+  const [justSaved, setJustSaved] = useState(false);
+  const topRef = useRef<HTMLDivElement | null>(null);
+
+  function scrollToTop() {
+    requestAnimationFrame(() => {
+      try { topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }); } catch {}
+      try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch {}
+      if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
+  }
+
+  useEffect(() => {
+    if (!justSaved) return;
+    const t = setTimeout(() => setJustSaved(false), 1800);
+    return () => clearTimeout(t);
+  }, [justSaved]);
 
   const sections = useMemo(() => {
     const map = new Map<string, typeof questions>();
