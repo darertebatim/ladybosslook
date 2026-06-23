@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Pencil, RefreshCw } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 
 type Row = Record<string, any>;
 
@@ -617,6 +618,7 @@ export default function ApertureAdmin() {
           <TabsTrigger value="industries">Industries</TabsTrigger>
           <TabsTrigger value="tools">Tools</TabsTrigger>
           <TabsTrigger value="actions">Playbooks & Prompts</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="reset">Reset User</TabsTrigger>
         </TabsList>
         <TabsContent value="buckets" className="mt-4"><BucketsTab /></TabsContent>
@@ -626,6 +628,7 @@ export default function ApertureAdmin() {
         <TabsContent value="industries" className="mt-4"><IndustriesTab /></TabsContent>
         <TabsContent value="tools" className="mt-4"><ToolsTab /></TabsContent>
         <TabsContent value="actions" className="mt-4"><ActionsTab /></TabsContent>
+        <TabsContent value="users" className="mt-4"><UsersTab /></TabsContent>
         <TabsContent value="reset" className="mt-4"><ResetUserTab /></TabsContent>
       </Tabs>
     </div>
