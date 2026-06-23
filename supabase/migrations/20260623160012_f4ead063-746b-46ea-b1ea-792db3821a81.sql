@@ -1,0 +1,2 @@
+UPDATE aperture_onboarding_questions SET is_active=false WHERE flow='quick' AND question_key='what_business';
+UPDATE aperture_onboarding_questions SET hint='e.g. more revenue and customers, business credit or a loan, growing my social media followers, posting on Instagram consistently…' WHERE flow='quick' AND question_key='closing_help';
