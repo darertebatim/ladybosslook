@@ -305,7 +305,7 @@ function FullQuestionInput({
 
   if (q.input_kind === "single_choice" && Array.isArray(q.options)) {
     return (
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
         {q.options.map((raw: any) => {
           const label = typeof raw === "string" ? raw : raw?.label ?? String(raw?.value ?? "");
           const val = typeof raw === "string" ? raw : raw?.value ?? label;
@@ -314,11 +314,12 @@ function FullQuestionInput({
             <button key={val} type="button" onClick={() => onChange(val)}
               style={{
                 appearance: "none", cursor: "pointer",
-                padding: "8px 12px", borderRadius: "var(--ap-radius-sm)",
+                padding: "10px 14px", minHeight: 42, borderRadius: 999,
                 border: "1px solid " + (on ? "var(--ap-signal)" : "var(--ap-hairline)"),
                 background: on ? "var(--ap-signal)" : "var(--ap-surface-2)",
                 color: on ? "#000" : "var(--ap-ink-1)",
-                fontSize: 13, fontWeight: 500,
+                fontSize: 13.5, fontWeight: on ? 600 : 500,
+                lineHeight: 1.3, textAlign: "left",
               }}>{label}</button>
           );
         })}
@@ -357,11 +358,16 @@ function fullPlaceholderFor(q: any): string {
     instagram: "e.g. @yourbusiness",
     find_you: "e.g. Walk-in, Instagram, word of mouth, Google…",
     channels: "e.g. Instagram, TikTok, Google, none…",
+    full_q7_business: "e.g. I run a small bakery — cakes, breads, weekend pop-ups at the farmers market…",
+    full_q10_bestseller: "e.g. Custom birthday cakes",
+    full_q11_cost: "e.g. $65 each, or $1,200/month retainer",
+    full_q19b_ideal_describe: "e.g. busy moms 30–45 in my city who want healthy meals but have no time to cook…",
+    full_q21_change: "e.g. more consistent revenue, less time on admin, finally posting on Instagram weekly…",
   };
   if (map[q.question_key]) return map[q.question_key];
   if (q.input_kind === "url") return "https://…";
   if (q.input_kind === "email") return "you@example.com";
-  return q.hint ? `e.g. ${q.hint}` : "Type your answer…";
+  return q.hint ? `e.g. ${q.hint}` : "Share a few details — examples, numbers, or what's on your mind…";
 }
 
 function FullHasItGate({
