@@ -158,10 +158,21 @@ export default function RealSettings() {
         if (r.source === "bucket_answer" && r.question_key) {
           const q = qLookup.get(r.question_key);
           if (q) {
-            const labeled = q.options.get(raw) ?? raw;
+            const mapped = q.options.get(raw);
+            // If the question has a defined option list and this answer
+            // isn't one of them, it's a mis-routed fan-out write — skip
+            // instead of printing a raw slug against the wrong prompt.
+            if (q.options.size > 0 && !mapped) {
+              const looksLikeSlug = /^[a-z][a-z0-9_]{0,30}$/.test(raw);
+              if (looksLikeSlug) return null;
+            }
+            const labeled = mapped ?? raw;
             return `- **${q.prompt}** ${labeled}${star}`;
           }
-          return `- **${r.question_key}** ${raw}${star}`;
+          // Unknown question_key: skip slug-shaped values; only keep
+          // human-readable free text.
+          if (/^[a-z][a-z0-9_]{0,30}$/.test(raw)) return null;
+          return `- ${raw}${star}`;
         }
         return `- ${raw}${star}`;
       }
@@ -214,28 +225,49 @@ export default function RealSettings() {
       md += `---\n\n`;
 
       let hasInferred = false;
+      // Dedupe identical (question_key, content) across the whole document
+      // and identical content within a single bucket.
+      const seenGlobal = new Set<string>();
       for (const b of finalBuckets) {
         const facts = byBucket.get(b.slug) ?? [];
         if (facts.length === 0) continue;
+        const seenLocal = new Set<string>();
+        const lines: string[] = [];
+        for (const f of facts) {
+          const raw = (f.content ?? "").trim();
+          if (!raw) continue;
+          const globalKey = `${f.question_key ?? ""}::${raw.toLowerCase()}`;
+          if (seenGlobal.has(globalKey)) continue;
+          const localKey = raw.toLowerCase();
+          if (seenLocal.has(localKey)) continue;
+          const line = formatRow(f);
+          if (!line) continue;
+          seenGlobal.add(globalKey);
+          seenLocal.add(localKey);
+          if (f.source === "ai_inferred_pre_onboarding") hasInferred = true;
+          lines.push(line);
+        }
+        if (lines.length === 0) continue;
         md += `## ${b.title}\n`;
         const brief = briefBySlug.get(b.slug);
         if (brief) md += `_${brief}_\n\n`;
-        for (const f of facts) {
-          const line = formatRow(f);
-          if (!line) continue;
-          if (f.source === "ai_inferred_pre_onboarding") hasInferred = true;
-          md += `${line}\n`;
-        }
-        md += `\n`;
+        md += lines.join("\n") + "\n\n";
       }
 
       if (freeform.length) {
-        md += `## Notes\n`;
+        const seenFree = new Set<string>();
+        const lines: string[] = [];
         for (const f of freeform) {
+          const raw = (f.content ?? "").trim().toLowerCase();
+          if (!raw || seenFree.has(raw)) continue;
           const line = formatRow(f);
-          if (line) md += `${line}\n`;
+          if (!line) continue;
+          seenFree.add(raw);
+          lines.push(line);
         }
-        md += `\n`;
+        if (lines.length) {
+          md += `## Notes\n${lines.join("\n")}\n\n`;
+        }
       }
 
       md += `---\n\n`;
