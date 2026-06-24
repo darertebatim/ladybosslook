@@ -8,12 +8,11 @@ import { ApertureInviteShield } from "./ApertureInviteShield";
  * Everyone else sees the invite shield.
  */
 export function ApertureInviteGate({ children }: { children: React.ReactNode }) {
-  const { user, isAdmin } = useAuth();
+  const { user } = useAuth();
   const [status, setStatus] = useState<"loading" | "approved" | "blocked">("loading");
 
   const check = async () => {
     if (!user) return;
-    if (isAdmin) { setStatus("approved"); return; }
     const { data } = await (supabase as any)
       .from("aperture_approved_users")
       .select("user_id")
@@ -22,7 +21,7 @@ export function ApertureInviteGate({ children }: { children: React.ReactNode }) 
     setStatus(data ? "approved" : "blocked");
   };
 
-  useEffect(() => { check(); /* eslint-disable-next-line */ }, [user?.id, isAdmin]);
+  useEffect(() => { check(); /* eslint-disable-next-line */ }, [user?.id]);
 
   if (status === "loading") {
     return (
