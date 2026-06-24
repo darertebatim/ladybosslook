@@ -30,6 +30,10 @@ import { ActiveRoundsCarousel } from "@/components/dashboard/ActiveRoundsCarouse
 import { useNewHomeData } from "@/hooks/useNewHomeData";
 import { usePrograms } from "@/hooks/usePrograms";
 import { useMemo } from "react";
+import { useProgramEventsForDate } from "@/hooks/usePlannerProgramEvents";
+import { ProgramEventCard } from "@/components/app/ProgramEventCard";
+import { getLocalDateStr } from "@/lib/localDate";
+import { parseISO } from "date-fns";
 
 // ── Orange Palette (mirrors /admin/brand/mock) ──
 const O = {
