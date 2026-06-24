@@ -62,17 +62,9 @@ import { SpotlightCutout } from '@/components/app/home/SpotlightCutout';
 import { PlannerIntroSheet } from '@/components/app/home/PlannerIntroSheet';
 
 
-import coinBronze from '@/assets/coin-bronze.png';
-import coinSilver from '@/assets/coin-silver.png';
-import coinGold from '@/assets/coin-gold.png';
 import checklistEmpty from '@/assets/checklist-empty.png';
 import emptyPlannerImg from '@/assets/empty-planner.png';
-
-const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
-  bronze: coinBronze,
-  silver: coinSilver,
-  gold: coinGold,
-};
+import { usePlannerTrophies, useAwardPlannerTrophyOnComplete } from '@/hooks/usePlannerTrophies';
 
 const AppHome = () => {
   const navigate = useNavigate();
