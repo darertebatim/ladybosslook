@@ -619,6 +619,7 @@ export default function ApertureAdmin() {
           <TabsTrigger value="tools">Tools</TabsTrigger>
           <TabsTrigger value="actions">Playbooks & Prompts</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
+          <TabsTrigger value="invites">Invites</TabsTrigger>
           <TabsTrigger value="reset">Reset User</TabsTrigger>
         </TabsList>
         <TabsContent value="buckets" className="mt-4"><BucketsTab /></TabsContent>
@@ -629,8 +630,186 @@ export default function ApertureAdmin() {
         <TabsContent value="tools" className="mt-4"><ToolsTab /></TabsContent>
         <TabsContent value="actions" className="mt-4"><ActionsTab /></TabsContent>
         <TabsContent value="users" className="mt-4"><UsersTab /></TabsContent>
+        <TabsContent value="invites" className="mt-4"><InvitesTab /></TabsContent>
         <TabsContent value="reset" className="mt-4"><ResetUserTab /></TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+// ---------- Invites ----------
+function InvitesTab() {
+  const codes = useTable<Row>("aperture_invite_codes", "created_at", false);
+  const requests = useTable<Row>("aperture_access_requests", "created_at", false);
+  const { toast } = useToast();
+  const [label, setLabel] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const randCode = () => {
+    const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+    const buf = new Uint32Array(8);
+    crypto.getRandomValues(buf);
+    return Array.from(buf).map(n => alphabet[n % alphabet.length]).join("");
+  };
+
+  const generate = async () => {
+    setBusy(true);
+    try {
+      for (let i = 0; i < 5; i++) {
+        const code = randCode();
+        const { error } = await (supabase as any)
+          .from("aperture_invite_codes")
+          .insert({ code, label: label.trim() || null });
+        if (!error) {
+          toast({ title: "Code generated", description: code });
+          setLabel("");
+          codes.refresh();
+          return;
+        }
+        if (!String(error.message).toLowerCase().includes("duplicate")) {
+          toast({ variant: "destructive", title: "Failed", description: error.message });
+          return;
+        }
+      }
+      toast({ variant: "destructive", title: "Could not generate unique code" });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const revoke = async (id: string) => {
+    const { error } = await (supabase as any)
+      .from("aperture_invite_codes")
+      .update({ revoked_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) toast({ variant: "destructive", title: "Failed", description: error.message });
+    else codes.refresh();
+  };
+
+  const copy = (s: string) => {
+    navigator.clipboard.writeText(s);
+    toast({ title: "Copied", description: s });
+  };
+
+  const approveRequest = async (req: Row) => {
+    setBusy(true);
+    try {
+      let codeRow: any = null;
+      for (let i = 0; i < 5; i++) {
+        const code = randCode();
+        const { data, error } = await (supabase as any)
+          .from("aperture_invite_codes")
+          .insert({ code, label: `Request: ${req.email}` })
+          .select("*").single();
+        if (!error) { codeRow = data; break; }
+        if (!String(error.message).toLowerCase().includes("duplicate")) {
+          toast({ variant: "destructive", title: "Failed", description: error.message });
+          return;
+        }
+      }
+      if (!codeRow) return;
+      await (supabase as any)
+        .from("aperture_access_requests")
+        .update({ status: "approved", resolved_at: new Date().toISOString(), resolved_code_id: codeRow.id })
+        .eq("id", req.id);
+      toast({ title: "Approved", description: `Code ${codeRow.code} — send it to ${req.email}` });
+      codes.refresh(); requests.refresh();
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const dismissRequest = async (id: string) => {
+    const { error } = await (supabase as any)
+      .from("aperture_access_requests")
+      .update({ status: "dismissed", resolved_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) toast({ variant: "destructive", title: "Failed", description: error.message });
+    else requests.refresh();
+  };
+
+  return (
+    <div className="space-y-6">
+      <Section title="Invite codes" description="One-time codes that approve a new RiloBiz user." onRefresh={codes.refresh}>
+        <div className="flex gap-2 mb-4">
+          <Input placeholder="Optional label (who is this for?)" value={label} onChange={(e) => setLabel(e.target.value)} />
+          <Button onClick={generate} disabled={busy}><Plus className="h-4 w-4 mr-1.5" />Generate code</Button>
+        </div>
+        <Table>
+          <TableHeader><TableRow>
+            <TableHead>Code</TableHead>
+            <TableHead>Label</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Created</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow></TableHeader>
+          <TableBody>
+            {codes.rows.map((r) => {
+              const status = r.revoked_at ? "revoked" : r.redeemed_at ? "redeemed" : "unused";
+              return (
+                <TableRow key={r.id}>
+                  <TableCell className="font-mono font-semibold">{r.code}</TableCell>
+                  <TableCell className="text-xs">{r.label ?? "—"}</TableCell>
+                  <TableCell>
+                    {status === "unused" && <Badge>unused</Badge>}
+                    {status === "redeemed" && <Badge variant="outline">redeemed {new Date(r.redeemed_at).toLocaleDateString()}</Badge>}
+                    {status === "revoked" && <Badge variant="destructive">revoked</Badge>}
+                  </TableCell>
+                  <TableCell className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleString()}</TableCell>
+                  <TableCell className="text-right">
+                    <Button size="sm" variant="ghost" onClick={() => copy(r.code)}>Copy</Button>
+                    {status === "unused" && (
+                      <Button size="sm" variant="ghost" onClick={() => revoke(r.id)}>Revoke</Button>
+                    )}
+                    <Button size="icon" variant="ghost" onClick={() => codes.remove(r.id)}><Trash2 className="h-4 w-4" /></Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+            {codes.rows.length === 0 && (
+              <TableRow><TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-6">No codes yet</TableCell></TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </Section>
+
+      <Section title="Access requests" description="Users who asked for an invite from the shield." onRefresh={requests.refresh}>
+        <Table>
+          <TableHeader><TableRow>
+            <TableHead>Email</TableHead>
+            <TableHead>Note</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Requested</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow></TableHeader>
+          <TableBody>
+            {requests.rows.map((r) => (
+              <TableRow key={r.id}>
+                <TableCell className="font-medium">{r.email}</TableCell>
+                <TableCell className="text-xs max-w-md line-clamp-2">{r.note ?? "—"}</TableCell>
+                <TableCell>
+                  {r.status === "pending" && <Badge>pending</Badge>}
+                  {r.status === "approved" && <Badge variant="outline">approved</Badge>}
+                  {r.status === "dismissed" && <Badge variant="destructive">dismissed</Badge>}
+                </TableCell>
+                <TableCell className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleString()}</TableCell>
+                <TableCell className="text-right">
+                  {r.status === "pending" && (
+                    <>
+                      <Button size="sm" onClick={() => approveRequest(r)} disabled={busy}>Approve</Button>
+                      <Button size="sm" variant="ghost" onClick={() => dismissRequest(r.id)}>Dismiss</Button>
+                    </>
+                  )}
+                  <Button size="icon" variant="ghost" onClick={() => requests.remove(r.id)}><Trash2 className="h-4 w-4" /></Button>
+                </TableCell>
+              </TableRow>
+            ))}
+            {requests.rows.length === 0 && (
+              <TableRow><TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-6">No requests yet</TableCell></TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </Section>
     </div>
   );
 }

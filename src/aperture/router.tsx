@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ApertureLayout } from "@/aperture/components/ApertureLayout";
 import { useAuth } from "@/hooks/useAuth";
+import { ApertureInviteGate } from "@/aperture/components/ApertureInviteGate";
 
 const BrandShowcase = lazy(() => import("@/aperture/pages/brand/BrandShowcase"));
 const Home = lazy(() => import("@/aperture/pages/app/Home"));
@@ -71,6 +72,14 @@ function ApertureAuthGate({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function ApertureGate({ children }: { children: React.ReactNode }) {
+  return (
+    <ApertureAuthGate>
+      <ApertureInviteGate>{children}</ApertureInviteGate>
+    </ApertureAuthGate>
+  );
+}
+
 /**
  * Top-level RiloBiz router. Mounted at /aperture/* in App.tsx.
  * All RiloBiz pages live inside <ApertureLayout> so they share
@@ -97,19 +106,19 @@ export default function ApertureRouter() {
           {/* RiloBiz-branded auth page */}
           <Route path="auth" element={<ApertureAuth />} />
           {/* Real product — Supabase-backed, auth-gated */}
-          <Route path="app" element={<ApertureAuthGate><RealHome /></ApertureAuthGate>} />
-          <Route path="app/memory" element={<ApertureAuthGate><RealMemory /></ApertureAuthGate>} />
-          <Route path="app/memory/files" element={<ApertureAuthGate><RealFiles /></ApertureAuthGate>} />
-          <Route path="app/memory/tools" element={<ApertureAuthGate><RealTools /></ApertureAuthGate>} />
-          <Route path="app/memory/:slug" element={<ApertureAuthGate><RealBucket /></ApertureAuthGate>} />
-          <Route path="app/chats" element={<ApertureAuthGate><RealChats /></ApertureAuthGate>} />
-          <Route path="app/chats/:id" element={<ApertureAuthGate><RealChatThread /></ApertureAuthGate>} />
-          <Route path="app/library" element={<ApertureAuthGate><RealLibrary /></ApertureAuthGate>} />
-          <Route path="app/library/:slug" element={<ApertureAuthGate><RealAction /></ApertureAuthGate>} />
-          <Route path="app/settings" element={<ApertureAuthGate><RealSettings /></ApertureAuthGate>} />
-          <Route path="app/onboard/quick" element={<ApertureAuthGate><OnboardQuick /></ApertureAuthGate>} />
-          <Route path="app/onboard/full" element={<ApertureAuthGate><OnboardFull /></ApertureAuthGate>} />
-          <Route path="app/onboard/confirm" element={<ApertureAuthGate><OnboardConfirm /></ApertureAuthGate>} />
+          <Route path="app" element={<ApertureGate><RealHome /></ApertureGate>} />
+          <Route path="app/memory" element={<ApertureGate><RealMemory /></ApertureGate>} />
+          <Route path="app/memory/files" element={<ApertureGate><RealFiles /></ApertureGate>} />
+          <Route path="app/memory/tools" element={<ApertureGate><RealTools /></ApertureGate>} />
+          <Route path="app/memory/:slug" element={<ApertureGate><RealBucket /></ApertureGate>} />
+          <Route path="app/chats" element={<ApertureGate><RealChats /></ApertureGate>} />
+          <Route path="app/chats/:id" element={<ApertureGate><RealChatThread /></ApertureGate>} />
+          <Route path="app/library" element={<ApertureGate><RealLibrary /></ApertureGate>} />
+          <Route path="app/library/:slug" element={<ApertureGate><RealAction /></ApertureGate>} />
+          <Route path="app/settings" element={<ApertureGate><RealSettings /></ApertureGate>} />
+          <Route path="app/onboard/quick" element={<ApertureGate><OnboardQuick /></ApertureGate>} />
+          <Route path="app/onboard/full" element={<ApertureGate><OnboardFull /></ApertureGate>} />
+          <Route path="app/onboard/confirm" element={<ApertureGate><OnboardConfirm /></ApertureGate>} />
           <Route path="*" element={<Navigate to="." replace />} />
         </Routes>
       </Suspense>
