@@ -434,8 +434,10 @@ const App = () => (
                   <Route path="/d/:token" element={<PublicDedication />} />
                   <Route path="/g/:token" element={<PublicPlaylistGift />} />
 
-                  {/* Aperture — standalone product surface, isolated tokens */}
+                  {/* RiloBiz (internal: Aperture) — standalone product surface, isolated tokens */}
                   <Route path="/aperture/*" element={<ApertureRouter />} />
+                  <Route path="/rilobiz/*" element={<ApertureRouter />} />
+                  <Route path="/app/rilobiz/*" element={<ApertureRouter />} />
                   
                   {/* Admin Routes */}
                   {!isNativeApp() && (
