@@ -345,14 +345,16 @@ export function HomeMenu() {
               onClick={() => handleNavClick("/app/rilobiz/app")}
               className={cn(
                 "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl",
-                "bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-primary-dark))]",
                 "text-white text-[13px] font-semibold",
-                "shadow-[0_4px_14px_-4px_hsl(var(--brand-primary)/0.4)]",
                 "active:scale-[0.98] transition-transform",
               )}
+              style={{
+                background: "linear-gradient(135deg, #EB5E33 0%, #A63520 100%)",
+                boxShadow: "0 4px 14px -4px rgba(235,94,51,0.4)",
+              }}
             >
-              <Sparkles className="h-4 w-4" />
-              Go to RiloBiz
+              <ApertureLogo size={18} className="shrink-0" />
+              <span className="font-semibold">RiloBiz</span>
             </button>
           </section>
 
