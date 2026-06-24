@@ -23,8 +23,8 @@ import {
   Flame,
   ChevronRight,
   Target,
-  Sparkles,
 } from "lucide-react";
+import { ApertureLogo } from "@/aperture/brand/ApertureLogo";
 import {
   Sheet,
   SheetContent,
