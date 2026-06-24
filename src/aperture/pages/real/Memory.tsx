@@ -61,7 +61,7 @@ export default function RealMemory() {
       title: "What should we look at first?",
       entry_point: "general_chat",
     });
-    if (chat) navigate(`/aperture/app/chats/${chat.id}`);
+    if (chat) navigate(`/app/rilobiz/app/chats/${chat.id}`);
   }
 
   /**
@@ -87,7 +87,7 @@ export default function RealMemory() {
       bucket_slug: picked.slug,
       opener,
     });
-    if (chat) navigate(`/aperture/app/chats/${chat.id}`);
+    if (chat) navigate(`/app/rilobiz/app/chats/${chat.id}`);
   }
 
   return (
@@ -100,12 +100,12 @@ export default function RealMemory() {
           sub={`${buckets.length} territories. The more I know, the sharper my answers get. Tap any to read or fill in.`}
           action={
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <Link to="/aperture/app/memory/files" style={{ textDecoration: "none" }}>
+              <Link to="/app/rilobiz/app/memory/files" style={{ textDecoration: "none" }}>
                 <ApertureButton variant="default" size="sm">
                   <Paperclip size={13} /> Files
                 </ApertureButton>
               </Link>
-              <Link to="/aperture/app/memory/tools" style={{ textDecoration: "none" }}>
+              <Link to="/app/rilobiz/app/memory/tools" style={{ textDecoration: "none" }}>
                 <ApertureButton variant="default" size="sm">
                   <Plug size={13} /> Tools
                 </ApertureButton>
@@ -138,7 +138,7 @@ export default function RealMemory() {
               <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
                 Run the full business questionnaire. Skip anything that doesn't apply.
               </p>
-              <Link to="/aperture/app/onboard/full" style={{ textDecoration: "none" }}>
+              <Link to="/app/rilobiz/app/onboard/full" style={{ textDecoration: "none" }}>
                 <ApertureButton variant="ghost">Open →</ApertureButton>
               </Link>
             </ApertureCard>
@@ -209,7 +209,7 @@ export default function RealMemory() {
               return (
                 <Link
                   key={b.slug}
-                  to={`/aperture/app/memory/${b.slug}`}
+                  to={`/app/rilobiz/app/memory/${b.slug}`}
                   style={{ textDecoration: "none", display: "block" }}
                 >
                   <ApertureCard padding={14} style={{ height: "100%" }}>

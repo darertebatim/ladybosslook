@@ -33,7 +33,7 @@ export default function RealChats() {
     setBusy(true);
     const c = await createChat();
     setBusy(false);
-    if (c) navigate(`/aperture/app/chats/${c.id}`);
+    if (c) navigate(`/app/rilobiz/app/chats/${c.id}`);
   }
 
   const filtered = useMemo(() => {
@@ -123,7 +123,7 @@ export default function RealChats() {
                           }}
                         />
                       ) : (
-                        <Link to={`/aperture/app/chats/${c.id}`} style={{ textDecoration: "none", minWidth: 0 }}>
+                        <Link to={`/app/rilobiz/app/chats/${c.id}`} style={{ textDecoration: "none", minWidth: 0 }}>
                           <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
                             <span style={{ fontSize: 14, color: "var(--ap-ink-1)", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.title}</span>
                             <span style={{ fontSize: 12, color: "var(--ap-ink-3)" }}>{relative(c.last_message_at)}</span>

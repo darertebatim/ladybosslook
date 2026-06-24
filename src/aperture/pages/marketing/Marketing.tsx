@@ -169,7 +169,7 @@ export default function ApertureMarketing() {
             }}
           >
             <Link
-              to="/aperture/marketing"
+              to="/rilobiz/marketing"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -193,7 +193,7 @@ export default function ApertureMarketing() {
                 How it works
               </a>
               <ApertureThemeSwitch />
-              <Link to="/aperture/auth" style={{ textDecoration: "none" }}>
+              <Link to="/app/rilobiz/auth" style={{ textDecoration: "none" }}>
                 <ApertureButton variant="accent" size="sm">Start free</ApertureButton>
               </Link>
             </nav>
@@ -223,7 +223,7 @@ export default function ApertureMarketing() {
               answer into one tailored to <em>your</em> situation.
             </Lede>
             <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
-              <Link to="/aperture/auth" style={{ textDecoration: "none" }}>
+              <Link to="/app/rilobiz/auth" style={{ textDecoration: "none" }}>
                 <ApertureButton variant="accent">Start free →</ApertureButton>
               </Link>
               <a href="#how" style={{ textDecoration: "none" }}>
@@ -514,7 +514,7 @@ export default function ApertureMarketing() {
               your business — and tells you what it's costing you.
             </Lede>
             <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
-              <Link to="/aperture/auth" style={{ textDecoration: "none" }}>
+              <Link to="/app/rilobiz/auth" style={{ textDecoration: "none" }}>
                 <ApertureButton variant="accent">Start free →</ApertureButton>
               </Link>
               <Link to="/aperture/brand" style={{ textDecoration: "none" }}>

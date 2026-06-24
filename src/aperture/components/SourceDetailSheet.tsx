@@ -43,7 +43,7 @@ export function SourceDetailSheet({
     const chatId = await startChatAboutSource(summary);
     if (chatId) {
       onClose();
-      navigate(`/aperture/app/chats/${chatId}`);
+      navigate(`/app/rilobiz/app/chats/${chatId}`);
     }
   }
 

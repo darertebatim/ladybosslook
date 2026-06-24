@@ -13,7 +13,7 @@ const Library = lazy(() => import("@/aperture/pages/app/Library"));
 const ActionPage = lazy(() => import("@/aperture/pages/app/Action"));
 const Settings = lazy(() => import("@/aperture/pages/app/Settings"));
 
-// Real Supabase-backed product at /aperture/app/*
+// Real Supabase-backed product at /app/rilobiz/app/*
 const RealHome = lazy(() => import("@/aperture/pages/real/Home"));
 const RealMemory = lazy(() => import("@/aperture/pages/real/Memory"));
 const RealBucket = lazy(() => import("@/aperture/pages/real/Bucket"));
@@ -66,7 +66,7 @@ function ApertureAuthGate({ children }: { children: React.ReactNode }) {
   if (loading) return <ApertureLoader />;
   if (!user) {
     const redirect = encodeURIComponent(location.pathname + location.search);
-    return <Navigate to={`/aperture/auth?redirect=${redirect}`} replace />;
+    return <Navigate to={`/app/rilobiz/auth?redirect=${redirect}`} replace />;
   }
   return <>{children}</>;
 }

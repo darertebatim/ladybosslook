@@ -146,7 +146,7 @@ export default function OnboardConfirm() {
     }
     setTailoring(false);
     // Quick onboarding skips the brief — only the full flow shows one.
-    navigate("/aperture/app", { replace: true });
+    navigate("/app/rilobiz/app", { replace: true });
   }
 
   const bucketTitleMap = useMemo(() => {
@@ -205,7 +205,7 @@ export default function OnboardConfirm() {
                 }}
               />
               <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
-                <ApertureButton variant="ghost" onClick={() => navigate("/aperture/app", { replace: true })}>Skip</ApertureButton>
+                <ApertureButton variant="ghost" onClick={() => navigate("/app/rilobiz/app", { replace: true })}>Skip</ApertureButton>
                 <ApertureButton variant="accent" onClick={finishClosing} disabled={saving}>
                   {saving ? "Saving…" : "Enter Aperture →"}
                 </ApertureButton>

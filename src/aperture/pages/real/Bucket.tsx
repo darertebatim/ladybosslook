@@ -105,12 +105,12 @@ export default function RealBucketPage() {
       opener,
     });
     setStarting(false);
-    if (chat) navigate(`/aperture/app/chats/${chat.id}`);
+    if (chat) navigate(`/app/rilobiz/app/chats/${chat.id}`);
   }
 
   if (bLoading) return <RealAppShell><ApertureLoading label="Loading bucket…" /></RealAppShell>;
-  if (!slug) return <Navigate to="/aperture/app/memory" replace />;
-  if (!bucket) return <Navigate to="/aperture/app/memory" replace />;
+  if (!slug) return <Navigate to="/app/rilobiz/app/memory" replace />;
+  if (!bucket) return <Navigate to="/app/rilobiz/app/memory" replace />;
 
   const confirmedCount = facts.filter(
     f => f.source !== "ai_inferred_pre_onboarding",
@@ -122,7 +122,7 @@ export default function RealBucketPage() {
       <Helmet><title>{bucket.title} · Memory · Aperture</title></Helmet>
       <RealAppShell>
         <div style={{ marginBottom: 8 }}>
-          <Link to="/aperture/app/memory" style={{
+          <Link to="/app/rilobiz/app/memory" style={{
             fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none",
             fontFamily: "var(--ap-font-mono)", textTransform: "uppercase",
             letterSpacing: "0.12em",

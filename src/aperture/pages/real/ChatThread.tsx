@@ -160,14 +160,14 @@ export default function RealChatThread() {
     const hasUserMessage = messages.some(m => m.role === "user");
     if (hasUserMessage) { seedHandledRef.current = id; return; }
     seedHandledRef.current = id;
-    navigate(`/aperture/app/chats/${id}`, { replace: true });
+    navigate(`/app/rilobiz/app/chats/${id}`, { replace: true });
     send(seed);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, search, messages.length]);
 
   async function startNew() {
     const c = await createChat();
-    if (c) navigate(`/aperture/app/chats/${c.id}`);
+    if (c) navigate(`/app/rilobiz/app/chats/${c.id}`);
   }
 
   const filteredChats = useMemo(() => {
@@ -177,7 +177,7 @@ export default function RealChatThread() {
   }, [chats, sidebarQuery]);
   const groupedChats = useMemo(() => groupChatsByDate(filteredChats), [filteredChats]);
 
-  if (!id) return <Navigate to="/aperture/app/chats" replace />;
+  if (!id) return <Navigate to="/app/rilobiz/app/chats" replace />;
 
   const hasAnyMessage = messages.length > 0;
   const visibleSuggestions = homeSuggestions.slice(0, 4);
@@ -223,7 +223,7 @@ export default function RealChatThread() {
                       marginBottom: 4,
                     }}>{group.label}</span>
                     {group.items.map(c => (
-                      <Link key={c.id} to={`/aperture/app/chats/${c.id}`} style={{
+                      <Link key={c.id} to={`/app/rilobiz/app/chats/${c.id}`} style={{
                         display: "block",
                         padding: "7px 10px", borderRadius: "var(--ap-radius-xs)",
                         fontSize: 13, textDecoration: "none",
@@ -244,7 +244,7 @@ export default function RealChatThread() {
                   ? "Nothing yet — your memory is empty."
                   : `${items.length} thing${items.length === 1 ? "" : "s"} from your memory.`}
               </p>
-              <Link to="/aperture/app/memory" style={{ fontSize: 11, color: "var(--ap-signal)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
+              <Link to="/app/rilobiz/app/memory" style={{ fontSize: 11, color: "var(--ap-signal)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
                 Open memory →
               </Link>
             </div>
@@ -259,7 +259,7 @@ export default function RealChatThread() {
                 {chat?.title ?? "Chat"}
               </h1>
             </div>
-            <Link to="/aperture/app/memory" style={{ textDecoration: "none" }}>
+            <Link to="/app/rilobiz/app/memory" style={{ textDecoration: "none" }}>
               <ApertureChip tone={items.length > 0 ? "signal" : "neutral"}>
                 Memory · {items.length}
               </ApertureChip>

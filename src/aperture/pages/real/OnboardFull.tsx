@@ -173,7 +173,7 @@ export default function OnboardFull() {
           <BusinessBriefScreen
             closingAnswer={closingAnswer}
             flow="full"
-            onDone={() => navigate("/aperture/app", { replace: true })}
+            onDone={() => navigate("/app/rilobiz/app", { replace: true })}
           />
         ) : phase === "closing" ? (
           <>
@@ -202,7 +202,7 @@ export default function OnboardFull() {
                 }}
               />
               <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
-                <ApertureButton variant="ghost" onClick={() => navigate("/aperture/app", { replace: true })}>Skip</ApertureButton>
+                <ApertureButton variant="ghost" onClick={() => navigate("/app/rilobiz/app", { replace: true })}>Skip</ApertureButton>
                 <ApertureButton variant="accent" onClick={finishClosing} disabled={busy}>
                   {busy ? "Saving…" : "Enter Aperture →"}
                 </ApertureButton>

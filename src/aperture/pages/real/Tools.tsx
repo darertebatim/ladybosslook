@@ -218,7 +218,7 @@ export default function RealTools() {
       <Helmet><title>Tools · Aperture</title></Helmet>
       <RealAppShell>
         <div style={{ marginBottom: 12 }}>
-          <Link to="/aperture/app/memory" style={{ textDecoration: "none" }}>
+          <Link to="/app/rilobiz/app/memory" style={{ textDecoration: "none" }}>
             <ApertureButton variant="ghost" size="sm">
               <ArrowLeft size={13} /> Memory
             </ApertureButton>
