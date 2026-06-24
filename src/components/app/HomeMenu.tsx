@@ -358,6 +358,7 @@ export function HomeMenu() {
                 <div className="shrink-0 bg-white rounded-md p-0.5">
                   <ApertureLogo size={18} className="shrink-0" />
                 </div>
+                <span>Go to RiloBiz</span>
               </button>
             </section>
           )}
