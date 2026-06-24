@@ -52,7 +52,7 @@ export default function RealChats() {
 
   return (
     <>
-      <Helmet><title>Chats · Aperture</title></Helmet>
+      <Helmet><title>Chats · RiloBiz</title></Helmet>
       <RealAppShell>
         <PageHeader
           index="CHATS"

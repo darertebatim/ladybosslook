@@ -164,7 +164,7 @@ export default function RealAction() {
   return (
     <>
       <Helmet>
-        <title>{action?.title ?? "Action"} · Aperture</title>
+        <title>{action?.title ?? "Action"} · RiloBiz</title>
         {action?.blurb && <meta name="description" content={action.blurb} />}
       </Helmet>
       <RealAppShell>
@@ -241,7 +241,7 @@ export default function RealAction() {
               <ApertureCard padding={20}>
                 <ApertureMonoLabel>Preview</ApertureMonoLabel>
                 <p style={{ margin: "10px 0 0", fontSize: 14.5, color: "var(--ap-ink-1)", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
-                  {action.output ?? "Aperture will draft this from your memory when you run it."}
+                  {action.output ?? "RiloBiz will draft this from your memory when you run it."}
                 </p>
                 <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
                   <ApertureButton variant="accent" onClick={runPrompt} disabled={running}>

@@ -91,8 +91,8 @@ export default function ApertureAuth() {
       }}
     >
       <Helmet>
-        <title>Aperture — Sign in</title>
-        <meta name="description" content="Sign in to Aperture." />
+        <title>RiloBiz — Sign in</title>
+        <meta name="description" content="Sign in to RiloBiz." />
       </Helmet>
 
       <div style={{ width: "100%", maxWidth: 380 }}>

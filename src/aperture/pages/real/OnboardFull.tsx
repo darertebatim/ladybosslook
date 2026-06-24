@@ -148,7 +148,7 @@ export default function OnboardFull() {
 
   return (
     <>
-      <Helmet><title>Full Questionnaire · Aperture</title></Helmet>
+      <Helmet><title>Full Questionnaire · RiloBiz</title></Helmet>
       <RealAppShell>
         <div ref={topRef} style={{ position: "absolute", top: 0, height: 1, width: 1, pointerEvents: "none" }} />
         {phase === "prefilling" ? (
@@ -204,7 +204,7 @@ export default function OnboardFull() {
               <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 14 }}>
                 <ApertureButton variant="ghost" onClick={() => navigate("/app/rilobiz/app", { replace: true })}>Skip</ApertureButton>
                 <ApertureButton variant="accent" onClick={finishClosing} disabled={busy}>
-                  {busy ? "Saving…" : "Enter Aperture →"}
+                  {busy ? "Saving…" : "Enter RiloBiz →"}
                 </ApertureButton>
               </div>
             </ApertureCard>

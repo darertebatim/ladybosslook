@@ -86,7 +86,7 @@ export default function RealHome() {
 
   return (
     <>
-      <Helmet><title>Today · Aperture</title></Helmet>
+      <Helmet><title>Today · RiloBiz</title></Helmet>
       <RealAppShell>
         <PageHeader
           index="00 · TODAY"

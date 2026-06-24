@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Fire-and-forget event logger for the Aperture event log
+ * Fire-and-forget event logger for the RiloBiz event log
  * (aperture_events). Writes are append-only and scoped to the
  * signed-in user via RLS. Never throws — losing one event row must
  * never break a UX flow. Use this from any client code that wants

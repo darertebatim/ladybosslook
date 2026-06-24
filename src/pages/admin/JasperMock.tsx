@@ -224,7 +224,7 @@ function DesktopMock() {
           <div style={{ width: 18, height: 18, borderRadius: 4, background: C.orange, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ width: 6, height: 6, background: C.bg, borderRadius: 1 }} />
           </div>
-          <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: '-0.01em' }}>Aperture</span>
+          <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: '-0.01em' }}>RiloBiz</span>
         </div>
         <div style={{ width: 1, height: 18, background: C.hairline }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 10px', borderRadius: 6, background: C.surface }}>

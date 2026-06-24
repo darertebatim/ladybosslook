@@ -155,7 +155,7 @@ export default function OnboardQuick() {
 
   return (
     <>
-      <Helmet><title>Welcome · Aperture</title></Helmet>
+      <Helmet><title>Welcome · RiloBiz</title></Helmet>
       <RealAppShell>
         <PageHeader
           index="QUICK START"

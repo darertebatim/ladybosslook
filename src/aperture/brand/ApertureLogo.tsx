@@ -10,7 +10,7 @@ interface ApertureLogoProps {
 }
 
 /**
- * Aperture mark — six-blade iris drawn as a single monoline SVG.
+ * RiloBiz mark — six-blade iris drawn as a single monoline SVG.
  * Color is taken from `currentColor` by default so it inherits ink color
  * and can be flipped to var(--ap-signal) when used as a brand accent.
  */
@@ -37,7 +37,7 @@ export function ApertureLogo({
 }
 
 /**
- * Wordmark — Aperture set in tight Inter with a leading mark.
+ * Wordmark — RiloBiz set in tight Inter with a leading mark.
  */
 export function ApertureWordmark({
   size = 22,

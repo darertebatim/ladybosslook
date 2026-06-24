@@ -34,7 +34,7 @@ function humanSize(n: number | null) {
 
 /**
  * Files page — users upload documents (contracts, price lists, old ads,
- * past tax summaries). Aperture reads them and turns the useful bits
+ * past tax summaries). RiloBiz reads them and turns the useful bits
  * into memory facts. Same mental model as Claude Projects' file pane.
  */
 export default function RealFiles() {
@@ -117,7 +117,7 @@ export default function RealFiles() {
 
   return (
     <>
-      <Helmet><title>Files · Aperture</title></Helmet>
+      <Helmet><title>Files · RiloBiz</title></Helmet>
       <RealAppShell>
         <div style={{ marginBottom: 12 }}>
           <Link to="/app/rilobiz/app/memory" style={{ textDecoration: "none" }}>
@@ -129,7 +129,7 @@ export default function RealFiles() {
 
         <PageHeader
           index="FILES"
-          title="Files Aperture has read"
+          title="Files RiloBiz has read"
           sub="Upload contracts, price lists, old ads, past tax summaries — I'll read them and turn the useful bits into memory facts."
           action={<ApertureChip tone={files.length ? "signal" : "neutral"}>{files.length} files</ApertureChip>}
         />

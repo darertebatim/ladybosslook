@@ -29,7 +29,7 @@ interface ApertureLayoutProps {
 }
 
 /**
- * Root wrapper for all Aperture pages. Installs the scoped token layer,
+ * Root wrapper for all RiloBiz pages. Installs the scoped token layer,
  * applies the data-aperture-theme attribute, and exposes a theme context.
  *
  * Tokens live in `aperture.css` under `.aperture-root` and never leak

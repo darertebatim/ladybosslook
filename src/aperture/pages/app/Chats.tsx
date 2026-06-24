@@ -28,8 +28,8 @@ export default function Chats() {
   return (
     <>
       <Helmet>
-        <title>Chats · Aperture</title>
-        <meta name="description" content="Your conversations with Aperture — each one already knows your business." />
+        <title>Chats · RiloBiz</title>
+        <meta name="description" content="Your conversations with RiloBiz — each one already knows your business." />
       </Helmet>
       <AppShell>
         <PageHeader
@@ -44,7 +44,7 @@ export default function Chats() {
             <ApertureMonoLabel>No conversations yet</ApertureMonoLabel>
             <h3 style={{ margin: "12px 0 6px", fontSize: 18, color: "var(--ap-ink-1)", fontWeight: 600 }}>Start with what's on your mind</h3>
             <p style={{ margin: "0 auto 18px", fontSize: 13.5, color: "var(--ap-ink-2)", maxWidth: 440, lineHeight: 1.55 }}>
-              Aperture already has whatever you've put in your memory buckets. Just start typing — like you would with a friend who happens to know your business.
+              RiloBiz already has whatever you've put in your memory buckets. Just start typing — like you would with a friend who happens to know your business.
             </p>
             <ApertureButton variant="accent" onClick={startNew}>Open a new chat</ApertureButton>
           </ApertureCard>

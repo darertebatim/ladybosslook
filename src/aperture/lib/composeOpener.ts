@@ -3,7 +3,7 @@ import type { BucketScore } from "./pickFallbackBucket";
 /**
  * Entry-point-aware opener composer. The brief calls for three distinct
  * openers so the user can tell "this builds my profile" from "this is
- * just a chat with Aperture":
+ * just a chat with RiloBiz":
  *
  *   A. memory_general    → frames as profile-building, bucket chips
  *   B. bucket_specific   → references bucket + most recent confirmed

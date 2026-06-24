@@ -18,9 +18,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
 /**
- * Memory page — map of what Aperture knows about the user's business.
+ * Memory page — map of what RiloBiz knows about the user's business.
  * Shows the 13 territories as tiles with "explored" badges, a single
- * "Talk to Aperture" CTA, and a "Continue onboarding" card if the
+ * "Talk to RiloBiz" CTA, and a "Continue onboarding" card if the
  * Full questionnaire hasn't been completed yet.
  */
 export default function RealMemory() {
@@ -92,7 +92,7 @@ export default function RealMemory() {
 
   return (
     <>
-      <Helmet><title>Memory · Aperture</title></Helmet>
+      <Helmet><title>Memory · RiloBiz</title></Helmet>
       <RealAppShell>
         <PageHeader
           index="MEMORY"
@@ -122,7 +122,7 @@ export default function RealMemory() {
           <ApertureCard padding={16}>
             <ApertureMonoLabel>Conversation</ApertureMonoLabel>
             <h3 style={{ margin: "6px 0 4px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
-              Talk to Aperture
+              Talk to RiloBiz
             </h3>
             <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
               Open chat. Bring me anything — a stuck decision, an idea, a quick question.

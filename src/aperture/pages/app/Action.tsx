@@ -72,7 +72,7 @@ export default function ActionPage() {
   return (
     <>
       <Helmet>
-        <title>{action.title} · Aperture</title>
+        <title>{action.title} · RiloBiz</title>
         <meta name="description" content={action.blurb} />
       </Helmet>
       <AppShell>
@@ -94,7 +94,7 @@ export default function ActionPage() {
         />
 
         <ApertureCard padding={16} style={{ marginBottom: 18 }}>
-          <ApertureMonoLabel color="var(--ap-signal)">Why Aperture picked this</ApertureMonoLabel>
+          <ApertureMonoLabel color="var(--ap-signal)">Why RiloBiz picked this</ApertureMonoLabel>
           <p style={{ margin: "6px 0 0", fontSize: 14, color: "var(--ap-ink-1)", lineHeight: 1.55 }}>{action.why}</p>
         </ApertureCard>
 

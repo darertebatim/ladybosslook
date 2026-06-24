@@ -4,7 +4,7 @@ import remarkGfm from "remark-gfm";
 import { Copy, Check } from "lucide-react";
 
 /**
- * Renders AI-generated markdown in a way that matches the Aperture
+ * Renders AI-generated markdown in a way that matches the RiloBiz
  * visual language. Used by:
  *  - assistant chat bubbles
  *  - the Full Brief card on Memory

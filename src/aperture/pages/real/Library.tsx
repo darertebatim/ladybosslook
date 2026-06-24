@@ -66,7 +66,7 @@ export default function RealLibrary() {
 
   return (
     <>
-      <Helmet><title>Library · Aperture</title></Helmet>
+      <Helmet><title>Library · RiloBiz</title></Helmet>
       <RealAppShell>
         <PageHeader
           index="03 · LIBRARY"

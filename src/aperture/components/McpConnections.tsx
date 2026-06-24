@@ -8,7 +8,7 @@ import {
 
 /**
  * MCP connections — lets the user mint API tokens that external AIs
- * (Claude.ai, ChatGPT, etc.) use to read/write their Aperture memory
+ * (Claude.ai, ChatGPT, etc.) use to read/write their RiloBiz memory
  * over the Model Context Protocol. The actual MCP server lives in the
  * `aperture-mcp` edge function.
  *
@@ -125,7 +125,7 @@ export function McpConnections() {
     <ApertureCard padding={18}>
       <ApertureMonoLabel>Connect to AI tools</ApertureMonoLabel>
       <p style={{ margin: "8px 0 14px", fontSize: 13.5, color: "var(--ap-ink-2)", lineHeight: 1.55 }}>
-        Connect Aperture's memory to Claude.ai or any MCP-compatible AI. Once connected, that AI will know your business before you say a word.
+        Connect RiloBiz's memory to Claude.ai or any MCP-compatible AI. Once connected, that AI will know your business before you say a word.
       </p>
 
       {!showCreate && !revealed && (

@@ -184,7 +184,7 @@ export default function RealChatThread() {
 
   return (
     <>
-      <Helmet><title>{chat?.title ?? "Chat"} · Aperture</title></Helmet>
+      <Helmet><title>{chat?.title ?? "Chat"} · RiloBiz</title></Helmet>
       <RealAppShell
         rightRail={
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
@@ -443,7 +443,7 @@ function MessageBubble({ role, text, onPickOption, disabled, attachments, showAI
       <div style={{ display: "flex", justifyContent: "flex-start" }}>
         <div style={{ maxWidth: "82%", minWidth: 0 }}>
           {showAILabel && (
-            <ApertureMonoLabel style={{ display: "block", marginBottom: 6 }}>Aperture</ApertureMonoLabel>
+            <ApertureMonoLabel style={{ display: "block", marginBottom: 6 }}>RiloBiz</ApertureMonoLabel>
           )}
           <div style={{ position: "relative" }}>
             <AperturePrompt text={body} />

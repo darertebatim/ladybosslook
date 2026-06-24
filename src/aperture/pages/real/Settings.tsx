@@ -202,8 +202,8 @@ export default function RealSettings() {
       const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 
       let md = `# Business Memory — ${businessName}\n`;
-      md += `*Exported from Aperture on ${today}*\n\n`;
-      md += `This document contains everything Aperture has learned about this business. Paste it at the start of any AI conversation to give the AI full context — every onboarding answer, every confirmed fact, every detail extracted from chats, the website, and Instagram.\n\n`;
+      md += `*Exported from RiloBiz on ${today}*\n\n`;
+      md += `This document contains everything RiloBiz has learned about this business. Paste it at the start of any AI conversation to give the AI full context — every onboarding answer, every confirmed fact, every detail extracted from chats, the website, and Instagram.\n\n`;
 
       // Profile snapshot
       const profLines: string[] = [];
@@ -310,13 +310,13 @@ export default function RealSettings() {
 
   return (
     <>
-      <Helmet><title>Settings · Aperture</title></Helmet>
+      <Helmet><title>Settings · RiloBiz</title></Helmet>
       <RealAppShell>
         <PageHeader index="SETTINGS" title="Settings" sub="Account and memory tools." />
         <ApertureCard padding={18} style={{ marginBottom: 14 }}>
           <ApertureMonoLabel>Your profile</ApertureMonoLabel>
           <p style={{ margin: "8px 0 14px", fontSize: 13, color: "var(--ap-ink-2)" }}>
-            The basics Aperture uses to ground every answer.
+            The basics RiloBiz uses to ground every answer.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div>
@@ -370,14 +370,14 @@ export default function RealSettings() {
         <ApertureCard padding={18} style={{ marginTop: 14 }}>
           <ApertureMonoLabel>Export</ApertureMonoLabel>
           <p style={{ margin: "8px 0 14px", fontSize: 13.5, color: "var(--ap-ink-2)", lineHeight: 1.55 }}>
-            Download everything Aperture knows about your business as a Markdown file. Paste it into Claude, ChatGPT, or any AI tool to give it full context instantly.
+            Download everything RiloBiz knows about your business as a Markdown file. Paste it into Claude, ChatGPT, or any AI tool to give it full context instantly.
           </p>
           <ApertureButton variant="accent" onClick={exportMemory} disabled={exporting}>
             {exporting ? "Preparing…" : "Export my memory"}
           </ApertureButton>
           {exportThin && (
             <p style={{ margin: "12px 0 0", fontSize: 13, color: "var(--ap-ink-3)", lineHeight: 1.5 }}>
-              Your memory is still pretty thin — keep talking to Aperture and come back to export when there's more to work with.
+              Your memory is still pretty thin — keep talking to RiloBiz and come back to export when there's more to work with.
             </p>
           )}
         </ApertureCard>

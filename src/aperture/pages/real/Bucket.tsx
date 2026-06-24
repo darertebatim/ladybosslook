@@ -20,7 +20,7 @@ import { BriefCard } from "@/aperture/components/BriefCard";
 import { Check, Pencil, Trash2, Clock, X } from "lucide-react";
 
 /**
- * Bucket detail — readable, correctable record of what Aperture knows
+ * Bucket detail — readable, correctable record of what RiloBiz knows
  * about this territory of the user's business. Replaces the old static
  * Q&A form. Two surfaces:
  *
@@ -119,7 +119,7 @@ export default function RealBucketPage() {
 
   return (
     <>
-      <Helmet><title>{bucket.title} · Memory · Aperture</title></Helmet>
+      <Helmet><title>{bucket.title} · Memory · RiloBiz</title></Helmet>
       <RealAppShell>
         <div style={{ marginBottom: 8 }}>
           <Link to="/app/rilobiz/app/memory" style={{

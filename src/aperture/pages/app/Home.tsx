@@ -104,7 +104,7 @@ export default function ApertureHome() {
     .slice(0, 3);
 
   const firstName = (buckets.find(b => b.slug === "basics")?.answers.name ?? "").split(" ")[0];
-  const greeting = firstName ? `Hey ${firstName}.` : "Welcome to Aperture.";
+  const greeting = firstName ? `Hey ${firstName}.` : "Welcome to RiloBiz.";
   const subline =
     totalAnswered === 0
       ? "Let's fill your first memory bucket so I can actually help. Start with the basics."
@@ -120,7 +120,7 @@ export default function ApertureHome() {
   return (
     <>
       <Helmet>
-        <title>Today · Aperture</title>
+        <title>Today · RiloBiz</title>
         <meta name="description" content="Your AI business advisor. Personalized suggestions based on what it knows about your business." />
       </Helmet>
       <AppShell>

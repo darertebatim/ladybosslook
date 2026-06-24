@@ -38,7 +38,7 @@ export default function BucketPage() {
   return (
     <>
       <Helmet>
-        <title>{bucket.title} · Memory · Aperture</title>
+        <title>{bucket.title} · Memory · RiloBiz</title>
         <meta name="description" content={bucket.longBlurb} />
       </Helmet>
       <AppShell>
@@ -62,7 +62,7 @@ export default function BucketPage() {
             <div style={{ display: "flex", gap: 12 }}>
               <span className="ap-pulse" style={{ width: 8, height: 8, borderRadius: 999, background: "var(--ap-signal)", marginTop: 6, flexShrink: 0 }} />
               <div>
-                <ApertureMonoLabel color="var(--ap-signal)">Aperture noticed</ApertureMonoLabel>
+                <ApertureMonoLabel color="var(--ap-signal)">RiloBiz noticed</ApertureMonoLabel>
                 <p style={{ margin: "4px 0 0", fontSize: 14, color: "var(--ap-ink-1)", lineHeight: 1.5 }}>
                   {bucket.aiSurfaced}
                 </p>

@@ -92,7 +92,7 @@ export default function ChatThread() {
   return (
     <>
       <Helmet>
-        <title>{chat.title} · Aperture</title>
+        <title>{chat.title} · RiloBiz</title>
       </Helmet>
       <AppShell
         rightRail={
@@ -161,7 +161,7 @@ export default function ChatThread() {
               <div key={m.id} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
                 {m.role === "assistant" ? (
                   <div style={{ maxWidth: "82%" }}>
-                    <ApertureMonoLabel style={{ display: "block", marginBottom: 6 }}>Aperture</ApertureMonoLabel>
+                    <ApertureMonoLabel style={{ display: "block", marginBottom: 6 }}>RiloBiz</ApertureMonoLabel>
                     <div style={{ color: "var(--ap-ink-1)", fontSize: 14.5, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
                       {m.text}
                     </div>
@@ -204,7 +204,7 @@ export default function ChatThread() {
             <input
               value={draft}
               onChange={e => setDraft(e.target.value)}
-              placeholder="Ask Aperture about your business…"
+              placeholder="Ask RiloBiz about your business…"
               style={{
                 flex: 1, appearance: "none", border: "none", outline: "none",
                 background: "transparent", color: "var(--ap-ink-1)",
