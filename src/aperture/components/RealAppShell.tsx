@@ -117,6 +117,11 @@ export function RealAppShell({ children, rightRail }: { children: ReactNode; rig
                     );
                   })}
                 </nav>
+                {rightRail && (
+                  <div style={{ marginTop: 18, paddingTop: 14, borderTop: "1px solid var(--ap-hairline)" }}>
+                    {rightRail}
+                  </div>
+                )}
                 <div style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid var(--ap-hairline)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                   <span style={{ fontSize: 12, color: "var(--ap-ink-3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 180 }}>{user?.email ?? "Signed in"}</span>
                   <button
@@ -182,9 +187,10 @@ export function RealAppShell({ children, rightRail }: { children: ReactNode; rig
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <aside style={{
         position: "sticky", top: 0, alignSelf: "flex-start",
-        height: "100vh", width: 240, flexShrink: 0,
+        height: "100vh", width: 260, flexShrink: 0,
         background: "var(--ap-surface-1)", borderRight: "1px solid var(--ap-hairline)",
         display: "flex", flexDirection: "column", padding: "20px 16px",
+        overflowY: "auto",
       }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
           <ApertureWordmark size={16} />
@@ -232,6 +238,11 @@ export function RealAppShell({ children, rightRail }: { children: ReactNode; rig
             );
           })}
         </nav>
+        {rightRail && (
+          <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--ap-hairline)" }}>
+            {rightRail}
+          </div>
+        )}
         <div style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid var(--ap-hairline)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
           <ApertureMonoLabel>Theme</ApertureMonoLabel>
           <ApertureThemeSwitch />
@@ -241,17 +252,10 @@ export function RealAppShell({ children, rightRail }: { children: ReactNode; rig
         <main style={{
           flex: 1, minWidth: 0,
           padding: "32px 40px 64px",
-          maxWidth: rightRail ? "none" : 1080,
-          margin: rightRail ? 0 : "0 auto",
+          maxWidth: 1080,
+          margin: "0 auto",
           width: "100%",
         }}>{children}</main>
-        {rightRail && (
-          <aside style={{
-            width: 320, flexShrink: 0,
-            borderLeft: "1px solid var(--ap-hairline)",
-            padding: "32px 24px", background: "var(--ap-surface-1)",
-          }}>{rightRail}</aside>
-        )}
       </div>
     </div>
   );
