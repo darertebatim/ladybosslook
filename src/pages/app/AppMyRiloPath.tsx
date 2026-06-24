@@ -397,6 +397,9 @@ export default function AppMyRiloPath() {
   const [swapTarget, setSwapTarget] = useState<PathStep | null>(null);
   const { data: trophyCount = 0 } = useMyRiloPathTrophies();
 
+  const todayDate = parseISO(getLocalDateStr());
+  const { data: programEvents = [] } = useProgramEventsForDate(todayDate);
+
   const isPathComplete = !!data
     && data.summary.total > 0
     && data.summary.doneCount >= data.summary.total;
