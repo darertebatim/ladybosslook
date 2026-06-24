@@ -117,6 +117,21 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
                     );
                   })}
                 </nav>
+                <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--ap-hairline)", display: "flex", flexDirection: "column", gap: 8 }}>
+                  <Link
+                    to="/app"
+                    onClick={() => setDrawerOpen(false)}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 10,
+                      padding: "10px 10px", borderRadius: "var(--ap-radius-xs)",
+                      fontSize: 14.5, color: "var(--ap-ink-1)", textDecoration: "none",
+                      background: "var(--ap-surface-2)", border: "1px solid var(--ap-hairline)",
+                    }}
+                  >
+                    <img src={riloAppIcon} alt="Rilo" width={22} height={22} style={{ borderRadius: 6, display: "block" }} />
+                    Go to RiloME
+                  </Link>
+                </div>
                 <div style={{ marginTop: 18, paddingTop: 14, borderTop: "1px solid var(--ap-hairline)" }}>
                   <ChatsRail onNavigate={() => setDrawerOpen(false)} />
                 </div>
