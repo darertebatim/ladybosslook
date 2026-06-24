@@ -14,6 +14,9 @@ export const MAX_BYTES = 10 * 1024 * 1024;
 export const ALLOWED_MIME = new Set([
   "image/png", "image/jpeg", "image/jpg", "image/webp", "image/heic", "image/heif",
   "application/pdf", "text/plain", "text/markdown",
+  "text/csv", "application/csv",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 ]);
 
 export interface PendingAttachment {
@@ -43,11 +46,13 @@ export function validateFiles(files: File[]): { ok: File[]; rejected: { file: Fi
   const rejected: { file: File; reason: string }[] = [];
   for (const f of files) {
     const mime = (f.type || "").toLowerCase();
+    const lower = f.name.toLowerCase();
+    const extOk = lower.endsWith(".csv") || lower.endsWith(".xlsx") || lower.endsWith(".xls");
     if (f.size > MAX_BYTES) {
       rejected.push({ file: f, reason: `${f.name} is over 10 MB` });
       continue;
     }
-    if (mime && !ALLOWED_MIME.has(mime)) {
+    if (mime && !ALLOWED_MIME.has(mime) && !extOk) {
       rejected.push({ file: f, reason: `${f.name} is not a supported file type` });
       continue;
     }

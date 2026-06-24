@@ -22,7 +22,7 @@ interface FileRow {
   storage_path: string;
 }
 
-const ACCEPT = ".pdf,.docx,.doc,.txt,.md,.png,.jpg,.jpeg,application/pdf,text/plain,text/markdown,image/png,image/jpeg,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+const ACCEPT = ".pdf,.docx,.doc,.txt,.md,.png,.jpg,.jpeg,.csv,.xlsx,.xls,application/pdf,text/plain,text/markdown,text/csv,image/png,image/jpeg,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 const MAX_BYTES = 20 * 1024 * 1024;
 
 function humanSize(n: number | null) {
@@ -153,7 +153,7 @@ export default function RealFiles() {
               Drop files here or click to upload
             </div>
             <div style={{ fontSize: 12, color: "var(--ap-ink-3)" }}>
-              PDF, DOCX, TXT, MD, PNG, JPG · up to 20 MB
+              PDF, DOCX, XLSX, CSV, TXT, MD, PNG, JPG · up to 20 MB
             </div>
             {uploading && <ApertureMonoLabel>Uploading…</ApertureMonoLabel>}
             <input
