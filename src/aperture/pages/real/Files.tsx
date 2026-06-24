@@ -153,7 +153,7 @@ export default function RealFiles() {
               Drop files here or click to upload
             </div>
             <div style={{ fontSize: 12, color: "var(--ap-ink-3)" }}>
-              PDF, DOCX, TXT, MD, PNG, JPG · up to 20 MB
+              PDF, DOCX, XLSX, CSV, TXT, MD, PNG, JPG · up to 20 MB
             </div>
             {uploading && <ApertureMonoLabel>Uploading…</ApertureMonoLabel>}
             <input
