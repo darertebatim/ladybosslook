@@ -201,6 +201,7 @@ const AppHome = () => {
   const { data: goldDatesThisWeek = [] } = useGoldDatesThisWeek();
   const updateGoldStreak = useUpdateGoldStreak();
   const { data: todayMood } = useTodayMood();
+  const { data: plannerTrophyCount = 0 } = usePlannerTrophies();
   
   // Dismissed individual routine card IDs
   const [dismissedRoutineIds, setDismissedRoutineIds] = useState<Set<string>>(() => {
