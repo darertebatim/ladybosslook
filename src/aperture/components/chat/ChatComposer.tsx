@@ -274,7 +274,7 @@ export function ChatComposer({ chatId, userId, disabled, streaming, onStop, onSe
       />
       <input
         ref={fileRef} type="file"
-        accept="image/*,application/pdf,.txt,.md,text/plain,text/markdown"
+        accept="image/*,application/pdf,.txt,.md,.csv,.xlsx,.xls,text/plain,text/markdown,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         multiple style={{ display: "none" }}
         onChange={(e) => { addFiles(e.target.files); e.target.value = ""; }}
       />
