@@ -691,6 +691,11 @@ const AppHome = () => {
     dateKey: todayDateStr,
   });
 
+  // Award lifetime planner trophy on the day's first gold completion
+  useAwardPlannerTrophyOnComplete(
+    (todayStats?.badgeLevel || 'none') === 'gold' && todayDateStr === format(new Date(), 'yyyy-MM-dd')
+  );
+
   // Challenge day celebration
   const {
     celebrationData: challengeDayCelebration,
