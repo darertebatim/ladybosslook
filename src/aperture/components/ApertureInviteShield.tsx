@@ -2,6 +2,7 @@ import { useState, FormEvent } from "react";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useGoBack } from "@/hooks/useGoBack";
 import { supabase } from "@/integrations/supabase/client";
 import { ApertureButton, ApertureMonoLabel } from "./primitives";
 import { ApertureLogo } from "@/aperture/brand/ApertureLogo";
@@ -9,6 +10,7 @@ import { ApertureLogo } from "@/aperture/brand/ApertureLogo";
 export function ApertureInviteShield({ onApproved }: { onApproved: () => void }) {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
+  const goBack = useGoBack("/app/my-rilo");
   const [code, setCode] = useState("");
   const [email, setEmail] = useState(user?.email ?? "");
   const [note, setNote] = useState("");
@@ -93,11 +95,34 @@ export function ApertureInviteShield({ onApproved }: { onApproved: () => void })
         justifyContent: "center",
         padding: "24px 20px",
         background: "var(--ap-canvas)",
+        position: "relative",
       }}
     >
       <Helmet>
         <title>RiloBiz — Invitation only</title>
       </Helmet>
+
+      <button
+        type="button"
+        onClick={goBack}
+        aria-label="Close"
+        style={{
+          position: "absolute",
+          top: 20,
+          right: 20,
+          background: "none",
+          border: "none",
+          color: "var(--ap-ink-3)",
+          cursor: "pointer",
+          padding: 4,
+          zIndex: 1,
+        }}
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
 
       <div style={{ width: "100%", maxWidth: 420 }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14, marginBottom: 28 }}>
