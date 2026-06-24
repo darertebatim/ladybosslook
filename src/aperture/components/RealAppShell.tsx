@@ -182,7 +182,7 @@ export function RealAppShell({ children, rightRail }: { children: ReactNode; rig
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <aside style={{
         position: "sticky", top: 0, alignSelf: "flex-start",
-        height: "100vh", width: 240, flexShrink: 0,
+        height: "100vh", width: 260, flexShrink: 0,
         background: "var(--ap-surface-1)", borderRight: "1px solid var(--ap-hairline)",
         display: "flex", flexDirection: "column", padding: "20px 16px",
         overflowY: "auto",
