@@ -29,7 +29,6 @@ export default function RealChatThread() {
   const [error, setError] = useState<string | null>(null);
   const [lastSent, setLastSent] = useState<{ text: string; attachments?: SentAttachment[] } | null>(null);
   const [stickToBottom, setStickToBottom] = useState(true);
-  const [sidebarQuery, setSidebarQuery] = useState("");
   const abortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const seedHandledRef = useRef<string | null>(null);
@@ -170,12 +169,6 @@ export default function RealChatThread() {
     if (c) navigate(`/app/rilobiz/app/chats/${c.id}`);
   }
 
-  const filteredChats = useMemo(() => {
-    const q = sidebarQuery.trim().toLowerCase();
-    if (!q) return chats;
-    return chats.filter(c => c.title.toLowerCase().includes(q));
-  }, [chats, sidebarQuery]);
-  const groupedChats = useMemo(() => groupChatsByDate(filteredChats), [filteredChats]);
 
   if (!id) return <Navigate to="/app/rilobiz/app/chats" replace />;
 
