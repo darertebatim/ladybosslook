@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { ApertureLogo, ApertureWordmark } from "@/aperture/brand/ApertureLogo";
@@ -16,8 +17,8 @@ function H1({ children }: { children: React.ReactNode }) {
     <h1
       style={{
         margin: 0,
-        fontSize: "clamp(36px, 6vw, 64px)",
-        lineHeight: 1.02,
+        fontSize: "clamp(28px, 6vw, 64px)",
+        lineHeight: 1.05,
         letterSpacing: "-0.035em",
         fontWeight: 600,
         color: "var(--ap-ink-1)",
@@ -33,7 +34,7 @@ function Lede({ children }: { children: React.ReactNode }) {
     <p
       style={{
         margin: 0,
-        fontSize: "clamp(15px, 1.4vw, 18px)",
+        fontSize: "clamp(14px, 1.4vw, 18px)",
         lineHeight: 1.55,
         color: "var(--ap-ink-2)",
         maxWidth: 620,
@@ -50,7 +51,7 @@ function Stat({ k, v, sub }: { k: string; v: string; sub: string }) {
       <ApertureMonoLabel>{k}</ApertureMonoLabel>
       <div
         style={{
-          fontSize: 30,
+          fontSize: 28,
           fontWeight: 600,
           letterSpacing: "-0.02em",
           color: "var(--ap-ink-1)",
@@ -58,7 +59,7 @@ function Stat({ k, v, sub }: { k: string; v: string; sub: string }) {
       >
         {v}
       </div>
-      <div style={{ fontSize: 12.5, color: "var(--ap-ink-3)" }}>{sub}</div>
+      <div style={{ fontSize: 12, color: "var(--ap-ink-3)" }}>{sub}</div>
     </div>
   );
 }
@@ -73,13 +74,13 @@ function BenefitCard({
   body: string;
 }) {
   return (
-    <ApertureCard padding={22}>
+    <ApertureCard padding={20}>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <ApertureMonoLabel>{idx}</ApertureMonoLabel>
         <h3
           style={{
             margin: 0,
-            fontSize: 17,
+            fontSize: 16,
             fontWeight: 600,
             letterSpacing: "-0.01em",
             color: "var(--ap-ink-1)",
@@ -87,7 +88,7 @@ function BenefitCard({
         >
           {title}
         </h3>
-        <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.55, color: "var(--ap-ink-2)" }}>
+        <p style={{ margin: 0, fontSize: 13, lineHeight: 1.55, color: "var(--ap-ink-2)" }}>
           {body}
         </p>
       </div>
@@ -95,7 +96,7 @@ function BenefitCard({
   );
 }
 
-function LossRow({
+function LossCard({
   label,
   daily,
   monthly,
@@ -109,18 +110,30 @@ function LossRow({
   return (
     <div
       style={{
-        display: "grid",
-        gridTemplateColumns: "1.4fr 1fr 1fr 1fr",
-        gap: 12,
-        padding: "14px 0",
-        borderTop: "1px solid var(--ap-hairline)",
-        alignItems: "baseline",
+        padding: 14,
+        borderRadius: "var(--ap-radius-sm)",
+        background: "var(--ap-surface-2)",
+        border: "1px solid var(--ap-hairline)",
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
       }}
     >
-      <div style={{ fontSize: 13.5, color: "var(--ap-ink-1)" }}>{label}</div>
-      <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-ink-2)" }}>{daily}</div>
-      <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-ink-2)" }}>{monthly}</div>
-      <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-signal)", fontWeight: 600 }}>{yearly}</div>
+      <div style={{ fontSize: 13, fontWeight: 500, color: "var(--ap-ink-1)" }}>{label}</div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+        <div>
+          <ApertureMonoLabel size={9}>Daily</ApertureMonoLabel>
+          <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-ink-2)", marginTop: 4 }}>{daily}</div>
+        </div>
+        <div>
+          <ApertureMonoLabel size={9}>Monthly</ApertureMonoLabel>
+          <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-ink-2)", marginTop: 4 }}>{monthly}</div>
+        </div>
+        <div>
+          <ApertureMonoLabel size={9}>Yearly</ApertureMonoLabel>
+          <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-signal)", fontWeight: 600, marginTop: 4 }}>{yearly}</div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -129,6 +142,16 @@ function LossRow({
  * Marketing landing page for RiloBiz
  * ============================================================ */
 export default function ApertureMarketing() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const onChange = () => setIsMobile(mq.matches);
+    onChange();
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
   return (
     <>
       <Helmet>
@@ -161,11 +184,11 @@ export default function ApertureMarketing() {
             style={{
               maxWidth: 1180,
               margin: "0 auto",
-              padding: "14px 24px",
+              padding: "12px 16px",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              gap: 16,
+              gap: 12,
             }}
           >
             <Link
@@ -176,22 +199,27 @@ export default function ApertureMarketing() {
                 gap: 10,
                 textDecoration: "none",
                 color: "var(--ap-ink-1)",
+                flexShrink: 0,
               }}
             >
               <ApertureLogo size={26} />
               <ApertureWordmark />
             </Link>
 
-            <nav style={{ display: "flex", alignItems: "center", gap: 18 }}>
-              <a href="#benefits" style={{ fontSize: 13, color: "var(--ap-ink-2)", textDecoration: "none" }}>
-                Benefits
-              </a>
-              <a href="#patterns" style={{ fontSize: 13, color: "var(--ap-ink-2)", textDecoration: "none" }}>
-                Patterns
-              </a>
-              <a href="#how" style={{ fontSize: 13, color: "var(--ap-ink-2)", textDecoration: "none" }}>
-                How it works
-              </a>
+            <nav style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+              {!isMobile && (
+                <>
+                  <a href="#benefits" style={{ fontSize: 13, color: "var(--ap-ink-2)", textDecoration: "none" }}>
+                    Benefits
+                  </a>
+                  <a href="#patterns" style={{ fontSize: 13, color: "var(--ap-ink-2)", textDecoration: "none" }}>
+                    Patterns
+                  </a>
+                  <a href="#how" style={{ fontSize: 13, color: "var(--ap-ink-2)", textDecoration: "none" }}>
+                    How it works
+                  </a>
+                </>
+              )}
               <ApertureThemeSwitch />
               <Link to="/app/rilobiz/auth" style={{ textDecoration: "none" }}>
                 <ApertureButton variant="accent" size="sm">Start free</ApertureButton>
@@ -205,14 +233,14 @@ export default function ApertureMarketing() {
           style={{
             maxWidth: 1180,
             margin: "0 auto",
-            padding: "80px 24px 60px",
+            padding: isMobile ? "40px 16px 32px" : "80px 24px 60px",
             display: "grid",
-            gridTemplateColumns: "1.2fr 1fr",
-            gap: 48,
+            gridTemplateColumns: isMobile ? "1fr" : "1.2fr 1fr",
+            gap: isMobile ? 28 : 48,
             alignItems: "center",
           }}
         >
-          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             <ApertureChip tone="signal">For small business owners</ApertureChip>
             <H1>
               The AI advisor that actually <em style={{ fontStyle: "normal", color: "var(--ap-signal)" }}>knows your business.</em>
@@ -222,7 +250,7 @@ export default function ApertureMarketing() {
               business — your customers, pricing, finances, team, goals — and turns every
               answer into one tailored to <em>your</em> situation.
             </Lede>
-            <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
+            <div style={{ display: "flex", gap: 12, marginTop: 4, flexWrap: "wrap" }}>
               <Link to="/app/rilobiz/auth" style={{ textDecoration: "none" }}>
                 <ApertureButton variant="accent">Start free →</ApertureButton>
               </Link>
@@ -230,7 +258,14 @@ export default function ApertureMarketing() {
                 <ApertureButton variant="ghost">See how it works</ApertureButton>
               </a>
             </div>
-            <div style={{ display: "flex", gap: 36, marginTop: 16 }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: isMobile ? "column" : "row",
+                gap: isMobile ? 20 : 36,
+                marginTop: 16,
+              }}
+            >
               <Stat k="Avg. leakage caught" v="$2.1K/mo" sub="across small operators" />
               <Stat k="Decision speed" v="3.4×" sub="vs. generic AI tools" />
               <Stat k="Memory buckets" v="12+" sub="auto-organized" />
@@ -238,7 +273,7 @@ export default function ApertureMarketing() {
           </div>
 
           {/* Right: visual memory mockup */}
-          <ApertureCard padding={20} raised>
+          <ApertureCard padding={isMobile ? 14 : 20} raised>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
               <ApertureMonoLabel>Business memory</ApertureMonoLabel>
               <ApertureChip tone="live">Live</ApertureChip>
@@ -261,7 +296,7 @@ export default function ApertureMarketing() {
                     border: "1px solid var(--ap-hairline)",
                   }}
                 >
-                  <div style={{ fontSize: 13.5, fontWeight: 500, color: "var(--ap-ink-1)" }}>{name}</div>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: "var(--ap-ink-1)" }}>{name}</div>
                   <div className="ap-mono" style={{ fontSize: 10.5, color: "var(--ap-ink-3)", marginTop: 4 }}>
                     {n}
                   </div>
@@ -296,7 +331,7 @@ export default function ApertureMarketing() {
             background: "var(--ap-surface-1)",
           }}
         >
-          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "60px 24px" }}>
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: isMobile ? "40px 16px" : "60px 24px" }}>
             <ApertureSectionTitle
               index="01 / The problem"
               title="Generic AI doesn't know your numbers."
@@ -306,8 +341,8 @@ export default function ApertureMarketing() {
         </section>
 
         {/* ---------------- Benefits ---------------- */}
-        <section id="benefits" style={{ maxWidth: 1180, margin: "0 auto", padding: "72px 24px" }}>
-          <div style={{ maxWidth: 720, marginBottom: 36 }}>
+        <section id="benefits" style={{ maxWidth: 1180, margin: "0 auto", padding: isMobile ? "48px 16px" : "72px 24px" }}>
+          <div style={{ maxWidth: 720, marginBottom: 28 }}>
             <ApertureSectionTitle
               index="02 / What you get"
               title="Not features. Outcomes."
@@ -318,8 +353,8 @@ export default function ApertureMarketing() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-              gap: 14,
+              gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(260px, 1fr))",
+              gap: 12,
             }}
           >
             <BenefitCard
@@ -363,12 +398,12 @@ export default function ApertureMarketing() {
             background: "var(--ap-surface-1)",
           }}
         >
-          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "72px 24px" }}>
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: isMobile ? "48px 16px" : "72px 24px" }}>
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1.2fr",
-                gap: 48,
+                gridTemplateColumns: isMobile ? "1fr" : "1fr 1.2fr",
+                gap: isMobile ? 28 : 48,
                 alignItems: "start",
               }}
             >
@@ -411,26 +446,94 @@ export default function ApertureMarketing() {
                 </ul>
               </div>
 
-              <ApertureCard padding={24}>
+              <ApertureCard padding={isMobile ? 16 : 24}>
                 <ApertureMonoLabel>Loss compounding ledger</ApertureMonoLabel>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1.4fr 1fr 1fr 1fr",
-                    gap: 12,
-                    marginTop: 16,
-                    paddingBottom: 10,
-                  }}
-                >
-                  <ApertureMonoLabel size={9}>Scenario</ApertureMonoLabel>
-                  <ApertureMonoLabel size={9}>Daily</ApertureMonoLabel>
-                  <ApertureMonoLabel size={9}>Monthly</ApertureMonoLabel>
-                  <ApertureMonoLabel size={9}>Yearly</ApertureMonoLabel>
-                </div>
-                <LossRow label="Small daily leak ($10/day)" daily="$10" monthly="$300" yearly="$3,650" />
-                <LossRow label="Delayed $10K/mo launch" daily="—" monthly="$10,000" yearly="$120,000" />
-                <LossRow label="$30K overspend on launch" daily="—" monthly="—" yearly="$30,000" />
-                <LossRow label="Wrong-fit client (3× time)" daily="$120" monthly="$3,600" yearly="$43,200" />
+                {isMobile ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 16 }}>
+                    <LossCard label="Small daily leak ($10/day)" daily="$10" monthly="$300" yearly="$3,650" />
+                    <LossCard label="Delayed $10K/mo launch" daily="—" monthly="$10,000" yearly="$120,000" />
+                    <LossCard label="$30K overspend on launch" daily="—" monthly="—" yearly="$30,000" />
+                    <LossCard label="Wrong-fit client (3× time)" daily="$120" monthly="$3,600" yearly="$43,200" />
+                  </div>
+                ) : (
+                  <>
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1.4fr 1fr 1fr 1fr",
+                        gap: 12,
+                        marginTop: 16,
+                        paddingBottom: 10,
+                      }}
+                    >
+                      <ApertureMonoLabel size={9}>Scenario</ApertureMonoLabel>
+                      <ApertureMonoLabel size={9}>Daily</ApertureMonoLabel>
+                      <ApertureMonoLabel size={9}>Monthly</ApertureMonoLabel>
+                      <ApertureMonoLabel size={9}>Yearly</ApertureMonoLabel>
+                    </div>
+                    {/* Desktop table rows */}
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1.4fr 1fr 1fr 1fr",
+                        gap: 12,
+                        padding: "14px 0",
+                        borderTop: "1px solid var(--ap-hairline)",
+                        alignItems: "baseline",
+                      }}
+                    >
+                      <div style={{ fontSize: 13.5, color: "var(--ap-ink-1)" }}>Small daily leak ($10/day)</div>
+                      <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-ink-2)" }}>$10</div>
+                      <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-ink-2)" }}>$300</div>
+                      <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-signal)", fontWeight: 600 }}>$3,650</div>
+                    </div>
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1.4fr 1fr 1fr 1fr",
+                        gap: 12,
+                        padding: "14px 0",
+                        borderTop: "1px solid var(--ap-hairline)",
+                        alignItems: "baseline",
+                      }}
+                    >
+                      <div style={{ fontSize: 13.5, color: "var(--ap-ink-1)" }}>Delayed $10K/mo launch</div>
+                      <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-ink-2)" }}>—</div>
+                      <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-ink-2)" }}>$10,000</div>
+                      <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-signal)", fontWeight: 600 }}>$120,000</div>
+                    </div>
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1.4fr 1fr 1fr 1fr",
+                        gap: 12,
+                        padding: "14px 0",
+                        borderTop: "1px solid var(--ap-hairline)",
+                        alignItems: "baseline",
+                      }}
+                    >
+                      <div style={{ fontSize: 13.5, color: "var(--ap-ink-1)" }}>$30K overspend on launch</div>
+                      <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-ink-2)" }}>—</div>
+                      <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-ink-2)" }}>—</div>
+                      <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-signal)", fontWeight: 600 }}>$30,000</div>
+                    </div>
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1.4fr 1fr 1fr 1fr",
+                        gap: 12,
+                        padding: "14px 0",
+                        borderTop: "1px solid var(--ap-hairline)",
+                        alignItems: "baseline",
+                      }}
+                    >
+                      <div style={{ fontSize: 13.5, color: "var(--ap-ink-1)" }}>Wrong-fit client (3× time)</div>
+                      <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-ink-2)" }}>$120</div>
+                      <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-ink-2)" }}>$3,600</div>
+                      <div className="ap-mono" style={{ fontSize: 13, color: "var(--ap-signal)", fontWeight: 600 }}>$43,200</div>
+                    </div>
+                  </>
+                )}
                 <div
                   style={{
                     marginTop: 18,
@@ -452,8 +555,8 @@ export default function ApertureMarketing() {
         </section>
 
         {/* ---------------- How it works ---------------- */}
-        <section id="how" style={{ maxWidth: 1180, margin: "0 auto", padding: "72px 24px" }}>
-          <div style={{ maxWidth: 720, marginBottom: 36 }}>
+        <section id="how" style={{ maxWidth: 1180, margin: "0 auto", padding: isMobile ? "48px 16px" : "72px 24px" }}>
+          <div style={{ maxWidth: 720, marginBottom: 28 }}>
             <ApertureSectionTitle
               index="04 / How it works"
               title="Three steps. No spreadsheets."
@@ -462,8 +565,8 @@ export default function ApertureMarketing() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-              gap: 14,
+              gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(260px, 1fr))",
+              gap: 12,
             }}
           >
             {[
@@ -499,12 +602,12 @@ export default function ApertureMarketing() {
             style={{
               maxWidth: 1180,
               margin: "0 auto",
-              padding: "72px 24px",
+              padding: isMobile ? "48px 16px" : "72px 24px",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               textAlign: "center",
-              gap: 18,
+              gap: 16,
             }}
           >
             <ApertureChip tone="signal">Free to start</ApertureChip>
@@ -513,7 +616,7 @@ export default function ApertureMarketing() {
               Stop guessing. Start operating with an advisor that remembers everything about
               your business — and tells you what it's costing you.
             </Lede>
-            <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
+            <div style={{ display: "flex", gap: 12, marginTop: 4, flexWrap: "wrap", justifyContent: "center" }}>
               <Link to="/app/rilobiz/auth" style={{ textDecoration: "none" }}>
                 <ApertureButton variant="accent">Start free →</ApertureButton>
               </Link>
@@ -528,7 +631,7 @@ export default function ApertureMarketing() {
         <footer
           style={{
             borderTop: "1px solid var(--ap-hairline)",
-            padding: "28px 24px",
+            padding: isMobile ? "20px 16px" : "28px 24px",
           }}
         >
           <div
@@ -538,7 +641,7 @@ export default function ApertureMarketing() {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              gap: 16,
+              gap: 12,
               flexWrap: "wrap",
             }}
           >
