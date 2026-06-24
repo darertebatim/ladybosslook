@@ -6,12 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { ApertureButton, ApertureMonoLabel } from "./primitives";
 import { ApertureLogo } from "@/aperture/brand/ApertureLogo";
 
-type Mode = "code" | "request";
-
 export function ApertureInviteShield({ onApproved }: { onApproved: () => void }) {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
-  const [mode, setMode] = useState<Mode>("code");
   const [code, setCode] = useState("");
   const [email, setEmail] = useState(user?.email ?? "");
   const [note, setNote] = useState("");
@@ -28,6 +25,18 @@ export function ApertureInviteShield({ onApproved }: { onApproved: () => void })
     fontFamily: "var(--ap-font-sans)",
     fontSize: 15,
     outline: "none",
+  };
+
+  const dividerStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    margin: "20px 0",
+    color: "var(--ap-ink-3)",
+    fontFamily: "var(--ap-font-mono)",
+    fontSize: 10,
+    letterSpacing: "0.14em",
+    textTransform: "uppercase",
   };
 
   const redeem = async (e: FormEvent) => {
@@ -94,6 +103,9 @@ export function ApertureInviteShield({ onApproved }: { onApproved: () => void })
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14, marginBottom: 28 }}>
           <ApertureLogo size={44} />
           <ApertureMonoLabel size={10}>Invitation only</ApertureMonoLabel>
+          <p style={{ margin: 0, textAlign: "center", color: "var(--ap-ink-3)", fontSize: 14, lineHeight: 1.55 }}>
+            Rilo is your AI-powered business workspace. Capture what matters, automate the routine, and move faster with an assistant that actually knows your context.
+          </p>
           <h1 style={{
             margin: 0, textAlign: "center", color: "var(--ap-ink-1)",
             fontFamily: "var(--ap-font-sans)", fontSize: 22, fontWeight: 600, letterSpacing: "-0.01em",
@@ -105,47 +117,35 @@ export function ApertureInviteShield({ onApproved }: { onApproved: () => void })
           </p>
         </div>
 
-        {/* Mode switch */}
-        <div style={{ display: "flex", gap: 6, padding: 4, background: "var(--ap-surface-2)", border: "1px solid var(--ap-hairline)", borderRadius: "var(--ap-radius-sm)", marginBottom: 18 }}>
-          {(["code", "request"] as Mode[]).map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => { setMode(m); setSubmitted(false); }}
-              style={{
-                flex: 1, padding: "8px 10px", borderRadius: 6, border: 0, cursor: "pointer",
-                background: mode === m ? "var(--ap-surface-1)" : "transparent",
-                color: mode === m ? "var(--ap-ink-1)" : "var(--ap-ink-3)",
-                fontFamily: "var(--ap-font-mono)", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase",
-              }}
-            >
-              {m === "code" ? "Have a code" : "Request access"}
-            </button>
-          ))}
+        {/* Invite code form */}
+        <form onSubmit={redeem} style={{ display: "grid", gap: 12 }}>
+          <div style={{ display: "grid", gap: 6 }}>
+            <ApertureMonoLabel size={9}>Invite code</ApertureMonoLabel>
+            <input
+              type="text"
+              autoFocus
+              required
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              style={{ ...inputStyle, letterSpacing: "0.2em", fontFamily: "var(--ap-font-mono)" }}
+              placeholder="XXXXXXXX"
+              maxLength={32}
+            />
+          </div>
+          <ApertureButton type="submit" variant="accent" disabled={busy} style={{ width: "100%", marginTop: 4 }}>
+            {busy ? "Checking…" : "Redeem code"}
+          </ApertureButton>
+        </form>
+
+        {/* Divider */}
+        <div style={dividerStyle}>
+          <div style={{ flex: 1, height: 1, background: "var(--ap-hairline)" }} />
+          <span>or</span>
+          <div style={{ flex: 1, height: 1, background: "var(--ap-hairline)" }} />
         </div>
 
-        {mode === "code" && (
-          <form onSubmit={redeem} style={{ display: "grid", gap: 12 }}>
-            <div style={{ display: "grid", gap: 6 }}>
-              <ApertureMonoLabel size={9}>Invite code</ApertureMonoLabel>
-              <input
-                type="text"
-                autoFocus
-                required
-                value={code}
-                onChange={(e) => setCode(e.target.value.toUpperCase())}
-                style={{ ...inputStyle, letterSpacing: "0.2em", fontFamily: "var(--ap-font-mono)" }}
-                placeholder="XXXXXXXX"
-                maxLength={32}
-              />
-            </div>
-            <ApertureButton type="submit" variant="accent" disabled={busy} style={{ width: "100%", marginTop: 4 }}>
-              {busy ? "Checking…" : "Redeem code"}
-            </ApertureButton>
-          </form>
-        )}
-
-        {mode === "request" && !submitted && (
+        {/* Request access form */}
+        {!submitted ? (
           <form onSubmit={request} style={{ display: "grid", gap: 12 }}>
             <div style={{ display: "grid", gap: 6 }}>
               <ApertureMonoLabel size={9}>Email</ApertureMonoLabel>
@@ -172,9 +172,7 @@ export function ApertureInviteShield({ onApproved }: { onApproved: () => void })
               {busy ? "Sending…" : "Request access"}
             </ApertureButton>
           </form>
-        )}
-
-        {mode === "request" && submitted && (
+        ) : (
           <div style={{
             padding: 20, borderRadius: "var(--ap-radius-sm)",
             background: "var(--ap-surface-2)", border: "1px solid var(--ap-hairline)",
@@ -184,7 +182,27 @@ export function ApertureInviteShield({ onApproved }: { onApproved: () => void })
           </div>
         )}
 
-        <div style={{ marginTop: 22, textAlign: "center" }}>
+        {/* Bottom actions */}
+        <div style={{ marginTop: 28, display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+          <a
+            href="/app/rilobiz/marketing"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "10px 18px",
+              borderRadius: "var(--ap-radius-sm)",
+              border: "1px solid var(--ap-hairline)",
+              background: "var(--ap-surface-2)",
+              color: "var(--ap-ink-2)",
+              fontFamily: "var(--ap-font-sans)",
+              fontSize: 14,
+              textDecoration: "none",
+              cursor: "pointer",
+            }}
+          >
+            Learn more about RiloBiz
+          </a>
           <button
             type="button"
             onClick={() => signOut()}
