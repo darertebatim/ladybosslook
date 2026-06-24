@@ -1,37 +1,55 @@
-## Answer to your side question
+# RiloBiz Invite-Only Gate
 
-No — we only have one trophy asset, the gold 🏆 (FluentEmoji), the same one used when you complete your Path in My Rilo. There are no bronze/silver trophy variants. So the planner will award **one trophy when the day is fully complete**, just like the Path trophy.
+Lock down `/app/rilobiz/app/*` so only invited users get in. First-time visitors see a "RiloBiz is invitation only" screen where they enter an invite code OR request access with their email. Admin gets a new tab to issue one-time codes and review access requests.
 
-If you want bronze/silver trophies later, I'd need to generate those assets separately.
+## User flow
 
-## Plan: replace planner coins with the 🏆 trophy + add trophy/streak chip to planner
+1. User signs in (or arrives via Rilo burger "Go to RiloBiz") and lands on any `/app/rilobiz/app/*` route.
+2. New `ApertureInviteGate` (wraps `ApertureAuthGate`) checks if the user is already redeemed:
+   - Yes → proceed to app.
+   - No → render the invite shield (full-screen, RiloBiz styled, like onboarding).
+3. Shield has two modes:
+   - **Have a code** → input + Redeem button. Calls edge function; on success marks user as approved and reloads.
+   - **Request access** → prefilled email + optional note + Submit. Inserts into `aperture_access_requests`. Shows "We'll be in touch" confirmation.
+4. Admin can still bypass (skip the gate for `has_role admin`).
 
-### 1. Daily completion badge → trophy (Planner)
-- `src/pages/app/AppHome.tsx`: drop the `BADGE_IMAGES` coin map (bronze/silver/gold). Show a single 🏆 `FluentEmoji` **only when the day is fully complete** (current "gold" tier).
-- `src/components/app/BadgeCelebration.tsx`: swap the coin image for 🏆. Celebration only fires on full completion — silver/bronze celebration variants are removed.
-- `src/components/app/WeeklyPresenceGrid.tsx` and `src/components/app/MonthCalendar.tsx`: per-day coin icons replaced with 🏆 on fully-complete days. Partial days show nothing.
-- `src/components/app/GoldStreakCelebration.tsx`: floating coin swapped for 🏆.
+## Admin UI (Admin → Aperture → new "Invites" tab)
 
-### 2. Trophies counted independently (your "2 trophies in 1 day" rule)
-- Planner trophy and Path trophy stay separate. Completing planner = +1 planner trophy; completing path = +1 path trophy. Same day can yield both.
-- No new DB write needed for the planner trophy; we reuse the existing daily-completion signal (`badgeLevel === 'gold'`) as the trigger.
+- **Invite codes panel**
+  - "Generate code" button → creates a one-time code (random 8-char), shows it with copy button, optional note/label.
+  - Table: code, label, status (unused / redeemed by email + date), created date, revoke button.
+- **Access requests panel**
+  - Table: email, note, requested date, status.
+  - Per row: "Approve" (generates a code, marks request approved, links code) and "Dismiss".
 
-### 3. Trophy + Streak chip on Planner top-right (NEW — matches My Rilo)
-- In My Rilo (`AppMyRiloPath.tsx` ~line 522), the top-right shows a pill with Award icon + `trophyCount`, then a flame gradient pill + `streak`, tapping opens Presence.
-- Add the **same chip** to the Planner header in `src/pages/app/AppHome.tsx`, with the same styling, navigation to `/app/presence`, and same haptic.
-- The trophy number shown there will be the **planner trophy count** (daily completions). The My Rilo chip continues to show the **Path trophy count**. Each page shows the trophy that belongs to it; streak number is the shared daily streak (same value on both).
+## Database (migration)
 
-### What stays the same
-- Recovery shields, streak math, Path trophy logic, presence calendar unchanged.
-- Bronze/silver/gold eligibility memory rule effectively collapses to a single tier in UI: trophy on full completion only.
+Three new public tables, all with GRANTs + RLS:
 
-### Files I'd edit
-- `src/pages/app/AppHome.tsx` (coins → trophy + new top-right chip)
-- `src/components/app/BadgeCelebration.tsx`
-- `src/components/app/WeeklyPresenceGrid.tsx`
-- `src/components/app/MonthCalendar.tsx`
-- `src/components/app/GoldStreakCelebration.tsx`
+- `aperture_invite_codes`
+  - `id uuid pk`, `code text unique`, `label text`, `created_by uuid`, `created_at`, `redeemed_by uuid null`, `redeemed_at null`, `revoked_at null`.
+  - RLS: admins full access; authenticated can SELECT only their own redeemed row (to check status).
+- `aperture_access_requests`
+  - `id uuid pk`, `user_id uuid null`, `email text not null`, `note text`, `status text default 'pending'`, `created_at`, `resolved_at`, `resolved_code_id uuid null`.
+  - RLS: admins full access; authenticated INSERT for self; SELECT own rows.
+- `aperture_approved_users`
+  - `user_id uuid pk`, `code_id uuid`, `approved_at`.
+  - RLS: admins full access; authenticated SELECT own row.
 
-### Confirm before I implement
-- Partial-day behavior: today 2-of-3 shows silver coin; after this it will show **nothing** until the last task is done, then 🏆. Sound right?
-- Planner chip's trophy count should reflect **planner daily completions** (not the Path count), correct?
+Plus a security-definer RPC `redeem_aperture_invite(p_code text)` that atomically: validates the code is unused & not revoked, inserts into `aperture_approved_users` for `auth.uid()`, marks the code redeemed, returns ok/error.
+
+Admins are implicitly approved (no row needed — gate checks `has_role` first).
+
+## Frontend changes
+
+- `src/aperture/router.tsx` — wrap each `/app/rilobiz/app/*` route's `ApertureAuthGate` with new `ApertureInviteGate` (single composed `<ApertureGate>` for cleanliness).
+- New `src/aperture/components/ApertureInviteGate.tsx` — fetches approval status (admin role OR row in `aperture_approved_users`); renders shield otherwise.
+- New `src/aperture/components/ApertureInviteShield.tsx` — two-tab UI (Redeem code / Request access), uses Aperture primitives (`ApertureButton`, `ApertureMonoLabel`), matches existing Auth page styling.
+- `src/pages/admin/Aperture.tsx` — add new "Invites" tab with the two panels described above. Reuse existing `useTable` helper.
+
+## Technical notes
+
+- Code generation: client-side `crypto.getRandomValues` over A-Z2-9 alphabet, 8 chars. Uniqueness enforced by DB unique index; retry on collision.
+- Status check is a single `SELECT` (cached in React Query) so the gate only blocks for ~100ms after login.
+- The shield matches the Aperture look (dark canvas, mono label, soft hairline cards) so it feels like onboarding, not an error.
+- No email sending on access requests in this pass — admin sees them in the dashboard. We can add email later if needed.

@@ -439,6 +439,47 @@ export type Database = {
           },
         ]
       }
+      aperture_access_requests: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          note: string | null
+          resolved_at: string | null
+          resolved_code_id: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          note?: string | null
+          resolved_at?: string | null
+          resolved_code_id?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          note?: string | null
+          resolved_at?: string | null
+          resolved_code_id?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aperture_access_requests_resolved_code_id_fkey"
+            columns: ["resolved_code_id"]
+            isOneToOne: false
+            referencedRelation: "aperture_invite_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       aperture_action_runs: {
         Row: {
           action_slug: string
@@ -543,6 +584,32 @@ export type Database = {
           why?: string | null
         }
         Relationships: []
+      }
+      aperture_approved_users: {
+        Row: {
+          approved_at: string
+          code_id: string | null
+          user_id: string
+        }
+        Insert: {
+          approved_at?: string
+          code_id?: string | null
+          user_id: string
+        }
+        Update: {
+          approved_at?: string
+          code_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aperture_approved_users_code_id_fkey"
+            columns: ["code_id"]
+            isOneToOne: false
+            referencedRelation: "aperture_invite_codes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       aperture_bucket_briefs: {
         Row: {
@@ -992,6 +1059,39 @@ export type Database = {
           slug?: string
           sort_order?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      aperture_invite_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          label: string | null
+          redeemed_at: string | null
+          redeemed_by: string | null
+          revoked_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label?: string | null
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          revoked_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label?: string | null
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          revoked_at?: string | null
         }
         Relationships: []
       }
@@ -7300,6 +7400,7 @@ export type Database = {
         Returns: Json
       }
       publish_due_scheduled_posts: { Args: never; Returns: Json }
+      redeem_aperture_invite: { Args: { p_code: string }; Returns: Json }
       regenerate_my_friend_code: { Args: never; Returns: string }
     }
     Enums: {
