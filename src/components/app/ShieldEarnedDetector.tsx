@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ShieldEarnedSheet } from './ShieldEarnedSheet';
-import { SHIELD_MILESTONES, getEarnedShields } from '@/lib/recoveryShields';
+import { getEarnedShields, getShieldMilestonesUpTo } from '@/lib/recoveryShields';
 
 interface ShieldEarnedDetectorProps {
   longestStreak: number;
@@ -19,8 +19,8 @@ export const ShieldEarnedDetector = ({ longestStreak }: ShieldEarnedDetectorProp
 
   useEffect(() => {
     if (!longestStreak || longestStreak < 7) return;
-    // Skip Day 1 (implicit) — only celebrate Day 7 and Day 30
-    for (const m of SHIELD_MILESTONES) {
+    // Skip Day 1 (implicit) — celebrate Day 7 and every 30-day milestone
+    for (const m of getShieldMilestonesUpTo(longestStreak)) {
       if (m.day < 7) continue;
       if (longestStreak < m.day) continue;
       const key = `simora_shield_earned_seen_${m.day}`;
