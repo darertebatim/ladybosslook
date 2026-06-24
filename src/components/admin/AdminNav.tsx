@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, GraduationCap, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft, Sparkles, Palette, FlaskConical, Smartphone, Image, Video, FileText, BookOpen, Brain, BarChart3, UserPlus, Library, Route as RouteIcon, Tags, TagsIcon, RiloBiz } from 'lucide-react';
+import { LayoutDashboard, Users, GraduationCap, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft, Sparkles, Palette, FlaskConical, Smartphone, Image, Video, FileText, BookOpen, Brain, BarChart3, UserPlus, Library, Route as RouteIcon, Tags, TagsIcon, Aperture } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,7 +36,7 @@ const menuItems = [
   { title: 'Brand', url: '/admin/brand', icon: Palette, pageSlug: 'system' },
   { title: 'App Test', url: '/admin/app', icon: Smartphone, pageSlug: 'system' },
   { title: 'System', url: '/admin/system', icon: Shield, pageSlug: 'system' },
-  { title: 'RiloBiz', url: '/admin/aperture', icon: RiloBiz, pageSlug: 'system' },
+  { title: 'RiloBiz', url: '/admin/aperture', icon: Aperture, pageSlug: 'system' },
 ];
 
 interface AdminNavProps {
