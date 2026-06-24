@@ -126,7 +126,7 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
                 </nav>
                 <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--ap-hairline)", display: "flex", flexDirection: "column", gap: 8 }}>
                   <Link
-                    to="/app"
+                    to="/app/my-rilo"
                     onClick={() => setDrawerOpen(false)}
                     style={{
                       display: "flex", alignItems: "center", gap: 10,
@@ -148,20 +148,25 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
                     }}
                   >
                     <span>Lock on RiloBiz</span>
-                    <span style={{
-                      width: 36, height: 20, borderRadius: 999,
-                      background: lockOnRilobiz ? "var(--ap-signal)" : "var(--ap-surface-3, #d4d4d8)",
-                      position: "relative", transition: "background 180ms ease",
-                      outline: "none", border: "1px solid var(--ap-hairline)",
-                      display: "inline-block", flexShrink: 0,
-                    }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 12, color: "var(--ap-ink-3)", fontWeight: 500 }}>
+                        {lockOnRilobiz ? "Locked" : "Unlocked"}
+                      </span>
                       <span style={{
-                        position: "absolute", top: 2, left: lockOnRilobiz ? 18 : 2,
-                        width: 14, height: 14, borderRadius: 999,
-                        background: "#fff",
-                        transition: "left 180ms ease",
-                        boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
-                      }} />
+                        width: 36, height: 20, borderRadius: 999,
+                        background: lockOnRilobiz ? "var(--ap-signal)" : "var(--ap-surface-3, #d4d4d8)",
+                        position: "relative", transition: "background 180ms ease",
+                        outline: "none", border: "1px solid var(--ap-hairline)",
+                        display: "inline-block", flexShrink: 0,
+                      }}>
+                        <span style={{
+                          position: "absolute", top: 2, left: lockOnRilobiz ? 18 : 2,
+                          width: 14, height: 14, borderRadius: 999,
+                          background: "#fff",
+                          transition: "left 180ms ease",
+                          boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+                        }} />
+                      </span>
                     </span>
                   </label>
                 </div>
@@ -240,7 +245,7 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
         </nav>
         <div style={{ marginTop: 20, paddingTop: 14, borderTop: "1px solid var(--ap-hairline)", display: "flex", flexDirection: "column", gap: 8 }}>
           <Link
-            to="/app"
+            to="/app/my-rilo"
             style={{
               display: "flex", alignItems: "center", gap: 10,
               padding: "9px 10px", borderRadius: "var(--ap-radius-xs)",
@@ -260,20 +265,25 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
             }}
           >
             <span>Lock on RiloBiz</span>
-            <span style={{
-              width: 34, height: 18, borderRadius: 999,
-              background: lockOnRilobiz ? "var(--ap-signal)" : "var(--ap-surface-3, #d4d4d8)",
-              position: "relative", transition: "background 180ms ease",
-              outline: "none", border: "1px solid var(--ap-hairline)",
-              display: "inline-block", flexShrink: 0,
-            }}>
+            <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 11, color: "var(--ap-ink-3)", fontWeight: 500 }}>
+                {lockOnRilobiz ? "Locked" : "Unlocked"}
+              </span>
               <span style={{
-                position: "absolute", top: 2, left: lockOnRilobiz ? 17 : 2,
-                width: 12, height: 12, borderRadius: 999,
-                background: "#fff",
-                transition: "left 180ms ease",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
-              }} />
+                width: 34, height: 18, borderRadius: 999,
+                background: lockOnRilobiz ? "var(--ap-signal)" : "var(--ap-surface-3, #d4d4d8)",
+                position: "relative", transition: "background 180ms ease",
+                outline: "none", border: "1px solid var(--ap-hairline)",
+                display: "inline-block", flexShrink: 0,
+              }}>
+                <span style={{
+                  position: "absolute", top: 2, left: lockOnRilobiz ? 17 : 2,
+                  width: 12, height: 12, borderRadius: 999,
+                  background: "#fff",
+                  transition: "left 180ms ease",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+                }} />
+              </span>
             </span>
           </label>
         </div>
