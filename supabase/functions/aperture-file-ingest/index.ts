@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import * as XLSX from "https://esm.sh/xlsx@0.18.5";
 import { corsHeaders, AI_GATEWAY, LITE_MODEL } from "../_shared/aperture-cors.ts";
 import { getAllowedBuckets } from "../_shared/aperture-buckets.ts";
 
@@ -19,6 +20,30 @@ async function extractText(file: Blob, name: string, mime: string, apiKey: strin
   const lower = name.toLowerCase();
   if (mime === "text/plain" || mime === "text/markdown" || lower.endsWith(".txt") || lower.endsWith(".md")) {
     return await file.text();
+  }
+  // CSV — read as text.
+  if (mime === "text/csv" || mime === "application/csv" || lower.endsWith(".csv")) {
+    return await file.text();
+  }
+  // XLSX/XLS — parse all sheets to CSV text.
+  if (
+    lower.endsWith(".xlsx") || lower.endsWith(".xls") ||
+    mime === "application/vnd.ms-excel" ||
+    mime === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  ) {
+    try {
+      const buf = new Uint8Array(await file.arrayBuffer());
+      const wb = XLSX.read(buf, { type: "array" });
+      const parts: string[] = [];
+      for (const sheetName of wb.SheetNames) {
+        const csv = XLSX.utils.sheet_to_csv(wb.Sheets[sheetName]);
+        parts.push(`# Sheet: ${sheetName}\n${csv}`);
+      }
+      return parts.join("\n\n");
+    } catch (e) {
+      console.error("xlsx parse failed", e);
+      return null;
+    }
   }
   // For PDFs/images/docx — send to Gemini for OCR/extraction.
   const buf = new Uint8Array(await file.arrayBuffer());
