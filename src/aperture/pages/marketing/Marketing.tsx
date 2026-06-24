@@ -409,7 +409,7 @@ export default function ApertureMarketing() {
             >
               <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
                 <ApertureSectionTitle
-                  index="03 / Pattern radar"
+                  index="03 / Pattern radar · Coming soon"
                   title="The losses you never see are the ones that add up."
                   sub="Most owners don't lose money to one big mistake. They lose it to delays that compound, leaks that stack, and windows that close. RiloBiz makes those patterns visible while there's still time to act."
                 />
