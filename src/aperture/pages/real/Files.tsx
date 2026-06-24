@@ -22,7 +22,7 @@ interface FileRow {
   storage_path: string;
 }
 
-const ACCEPT = ".pdf,.docx,.doc,.txt,.md,.png,.jpg,.jpeg,application/pdf,text/plain,text/markdown,image/png,image/jpeg,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+const ACCEPT = ".pdf,.docx,.doc,.txt,.md,.png,.jpg,.jpeg,.csv,.xlsx,.xls,application/pdf,text/plain,text/markdown,text/csv,image/png,image/jpeg,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 const MAX_BYTES = 20 * 1024 * 1024;
 
 function humanSize(n: number | null) {
