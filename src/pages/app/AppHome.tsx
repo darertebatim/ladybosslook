@@ -964,22 +964,41 @@ const AppHome = () => {
               )}
             </div>
 
-            {/* Right: Streak badge */}
+            {/* Right: Trophy + Streak chip (matches My Rilo) */}
             <div className="flex items-center gap-2 justify-end justify-self-end">
-              {/* Mood check-in button – hidden for now, re-enable from admin/app */}
-              
-              {/* Streak badge - navigates to presence page */}
               <button
-                onClick={() => navigate('/app/presence')}
-                className={cn(
-                  "tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full shadow-ios active:scale-95 transition-all",
-                  hasAnyCompletionToday
-                    ? "bg-gradient-to-br from-[hsl(var(--brand-primary-light))] to-[hsl(var(--brand-primary))] text-white"
-                    : "bg-[hsl(var(--tint-peach))] text-[hsl(var(--fg-warm-muted))]"
-                )}
+                type="button"
+                onClick={() => {
+                  haptic.light();
+                  navigate('/app/presence');
+                }}
+                className="tour-streak flex items-center p-0.5 rounded-full active:scale-95 transition-transform bg-white"
+                style={{
+                  border: '1px solid hsl(var(--brand-primary) / 0.25)',
+                  boxShadow: '0 2px 8px rgba(235,94,51,0.18)',
+                }}
+                aria-label={`Trophies: ${plannerTrophyCount} · Streak: ${streak?.current_streak || 0} days · open Presence`}
               >
-                <Flame className="h-3.5 w-3.5 fill-current" />
-                <span className="text-[13px] font-bold">{streak?.current_streak || 0}</span>
+                <span
+                  className="flex items-center gap-1 pl-2 pr-2.5 py-0.5"
+                  style={{ color: 'hsl(var(--brand-primary))' }}
+                >
+                  <Award className="w-4 h-4" strokeWidth={2.25} />
+                  <span className="text-[13px] font-bold text-fg-warm">
+                    {plannerTrophyCount}
+                  </span>
+                </span>
+                <span
+                  className="flex items-center gap-1 pl-2 pr-2.5 py-1 rounded-full text-white"
+                  style={{
+                    background:
+                      'linear-gradient(135deg, hsl(var(--brand-primary-light)), hsl(var(--brand-primary)))',
+                    boxShadow: '0 2px 8px rgba(235,94,51,0.35)',
+                  }}
+                >
+                  <Flame className="w-3.5 h-3.5 fill-current" />
+                  <span className="text-[13px] font-bold">{streak?.current_streak || 0}</span>
+                </span>
               </button>
             </div>
           </div>
