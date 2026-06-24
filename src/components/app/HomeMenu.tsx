@@ -23,6 +23,7 @@ import {
   Flame,
   ChevronRight,
   Target,
+  Sparkles,
 } from "lucide-react";
 import {
   Sheet,
@@ -338,6 +339,23 @@ export function HomeMenu() {
         </button>
 
         <div className="px-4 py-4 space-y-5">
+          {/* Go to RiloBiz */}
+          <section>
+            <button
+              onClick={() => handleNavClick("/app/rilobiz/app")}
+              className={cn(
+                "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl",
+                "bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-primary-dark))]",
+                "text-white text-[13px] font-semibold",
+                "shadow-[0_4px_14px_-4px_hsl(var(--brand-primary)/0.4)]",
+                "active:scale-[0.98] transition-transform",
+              )}
+            >
+              <Sparkles className="h-4 w-4" />
+              Go to RiloBiz
+            </button>
+          </section>
+
           {/* Navigation Pages */}
           <section>
             <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
