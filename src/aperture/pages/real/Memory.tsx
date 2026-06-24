@@ -18,6 +18,36 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
 /**
+ * Memory Level — single climbing number driven by total fact count.
+ * Thresholds: L1 = onboarding complete, L2=40, L3=80, L4=140, L5=220,
+ * L6=320, then every +120 (440, 560, 680…). No max. Cosmetic only.
+ */
+function computeMemoryLevel(facts: number, onboarded: boolean): number {
+  let level = onboarded ? 1 : 0;
+  const table: Array<[number, number]> = [
+    [2, 40], [3, 80], [4, 140], [5, 220], [6, 320],
+  ];
+  for (const [lvl, t] of table) if (facts >= t) level = Math.max(level, lvl);
+  if (facts > 320) {
+    level = Math.max(level, 6 + Math.ceil((facts - 320) / 120));
+  }
+  return level;
+}
+function prevThreshold(level: number): number {
+  if (level <= 0) return 0;
+  if (level === 1) return 1;
+  const t: Record<number, number> = { 2: 40, 3: 80, 4: 140, 5: 220, 6: 320 };
+  if (level in t) return t[level];
+  return 320 + (level - 6) * 120;
+}
+function nextThreshold(level: number): number {
+  if (level === 0) return 1;
+  const t: Record<number, number> = { 1: 40, 2: 80, 3: 140, 4: 220, 5: 320 };
+  if (level in t) return t[level];
+  return 320 + (level - 5) * 120;
+}
+
+/**
  * Memory page — map of what RiloBiz knows about the user's business.
  * Shows the 13 territories as tiles with "explored" badges, a single
  * "Talk to RiloBiz" CTA, and a "Continue onboarding" card if the
