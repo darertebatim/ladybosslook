@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ApertureWordmark } from "@/aperture/brand/ApertureLogo";
@@ -37,6 +37,13 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
   const loc = useLocation();
   const initial = (user?.email ?? "U").slice(0, 1).toUpperCase();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [lockOnRilobiz, setLockOnRilobiz] = useState<boolean>(() =>
+    typeof window !== "undefined" && localStorage.getItem("rilo:lock-on-rilobiz") === "1"
+  );
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("rilo:lock-on-rilobiz", lockOnRilobiz ? "1" : "0");
+  }, [lockOnRilobiz]);
   const isChatThread = /^\/app\/rilobiz\/app\/chats\/[^/]+/.test(loc.pathname);
 
   if (isMobile) {
@@ -131,6 +138,23 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
                     <img src={riloAppIcon} alt="Rilo" width={22} height={22} style={{ borderRadius: 6, display: "block" }} />
                     Go to RiloME
                   </Link>
+                  <label style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
+                    padding: "10px 10px", borderRadius: "var(--ap-radius-xs)",
+                    fontSize: 13.5, color: "var(--ap-ink-2)",
+                    background: "transparent", cursor: "pointer",
+                  }}>
+                    <span>Lock on RiloBiz</span>
+                    <input
+                      type="checkbox"
+                      checked={lockOnRilobiz}
+                      onChange={(e) => setLockOnRilobiz(e.target.checked)}
+                      style={{ width: 36, height: 20, appearance: "none", borderRadius: 999,
+                        background: lockOnRilobiz ? "var(--ap-signal)" : "var(--ap-surface-3, #d4d4d8)",
+                        position: "relative", cursor: "pointer", transition: "background 120ms",
+                        outline: "none", border: "1px solid var(--ap-hairline)" }}
+                    />
+                  </label>
                 </div>
                 <div style={{ marginTop: 18, paddingTop: 14, borderTop: "1px solid var(--ap-hairline)" }}>
                   <ChatsRail onNavigate={() => setDrawerOpen(false)} />
@@ -218,6 +242,22 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
             <img src={riloAppIcon} alt="Rilo" width={22} height={22} style={{ borderRadius: 6, display: "block" }} />
             Go to RiloME
           </Link>
+          <label style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
+            padding: "8px 10px", borderRadius: "var(--ap-radius-xs)",
+            fontSize: 12.5, color: "var(--ap-ink-2)", cursor: "pointer",
+          }}>
+            <span>Lock on RiloBiz</span>
+            <input
+              type="checkbox"
+              checked={lockOnRilobiz}
+              onChange={(e) => setLockOnRilobiz(e.target.checked)}
+              style={{ width: 34, height: 18, appearance: "none", borderRadius: 999,
+                background: lockOnRilobiz ? "var(--ap-signal)" : "var(--ap-surface-3, #d4d4d8)",
+                position: "relative", cursor: "pointer", transition: "background 120ms",
+                outline: "none", border: "1px solid var(--ap-hairline)" }}
+            />
+          </label>
         </div>
         <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--ap-hairline)" }}>
           <ChatsRail />
