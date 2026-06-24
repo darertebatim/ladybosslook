@@ -68,6 +68,10 @@ const AppJournalEntry = lazy(() => import("@/pages/app/AppJournalEntry"));
 // Journal redirect components
 const JournalRedirect = () => { const navigate = useNavigate(); React.useEffect(() => { navigate('/app/reflections', { replace: true }); }, []); return null; };
 const JournalNewRedirect = () => { const navigate = useNavigate(); React.useEffect(() => { navigate('/app/reflections/free-form', { replace: true }); }, []); return null; };
+const AppRootRedirect = () => {
+  const locked = typeof window !== 'undefined' && localStorage.getItem('rilo:lock-on-rilobiz') === '1';
+  return <Navigate to={locked ? '/app/rilobiz/app' : '/app/my-rilo'} replace />;
+};
 const JournalEntryRedirect = () => { const { entryId } = useParams(); const navigate = useNavigate(); React.useEffect(() => { navigate(`/app/reflections/notes/free/${entryId}`, { replace: true }); }, []); return null; };
 const AppTaskCreate = lazy(() => import("@/pages/app/AppTaskCreate"));
 // AppInspire eagerly imported above
