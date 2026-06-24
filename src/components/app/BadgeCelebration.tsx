@@ -6,18 +6,9 @@ import confetti from 'canvas-confetti';
 import { Sparkles, Trophy, Share2 } from 'lucide-react';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
 import { useShareContent } from '@/hooks/useShareContent';
-
-import coinGold from '@/assets/coin-gold.png';
-import coinSilver from '@/assets/coin-silver.png';
-import coinBronze from '@/assets/coin-bronze.png';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 export type BadgeCelebrationLevel = 'silver' | 'gold' | 'almostGold' | 'action';
-
-const BADGE_IMAGES = {
-  bronze: coinBronze,
-  silver: coinSilver,
-  gold: coinGold,
-};
 
 const ACTION_MESSAGES = [
   "You absolutely crushed it! 👍",
@@ -75,7 +66,7 @@ export function BadgeCelebration({
 }: BadgeCelebrationProps) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [flyingBadge, setFlyingBadge] = useState(false);
-  const badgeRef = useRef<HTMLImageElement>(null);
+  const badgeRef = useRef<HTMLDivElement>(null);
 
   const [actionMessage, setActionMessage] = useState('');
 
@@ -213,11 +204,7 @@ export function BadgeCelebration({
           <div className="bg-black/75 backdrop-blur-md rounded-2xl p-4 shadow-2xl flex items-center gap-3 border border-white/10">
             <div className="relative shrink-0">
               <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
-                <img 
-                  src={BADGE_IMAGES.bronze} 
-                  alt="Action complete" 
-                  className="w-[120%] h-[120%] object-cover"
-                />
+                <FluentEmoji emoji="🏆" size={36} />
               </div>
             </div>
             <div className="flex-1 min-w-0">
@@ -241,19 +228,11 @@ export function BadgeCelebration({
           <div className="relative shrink-0">
             {type === 'silver' ? (
               <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
-                <img 
-                  src={BADGE_IMAGES.silver} 
-                  alt="Silver badge" 
-                  className="w-[120%] h-[120%] object-cover"
-                />
+                <FluentEmoji emoji="🏆" size={40} />
               </div>
             ) : (
               <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center overflow-hidden">
-                <img 
-                  src={BADGE_IMAGES.gold} 
-                  alt="Gold badge" 
-                  className="w-[120%] h-[120%] object-cover"
-                />
+                <FluentEmoji emoji="🏆" size={40} />
               </div>
             )}
             {/* Sparkle decorations */}
@@ -329,18 +308,18 @@ export function BadgeCelebration({
             <div className="absolute inset-0 bg-amber-400/30 blur-3xl rounded-full scale-150" />
             
             {/* Badge image */}
-            <img 
+            <div
               ref={badgeRef}
-              src={BADGE_IMAGES.gold} 
-              alt="Gold badge" 
               className={cn(
-                'w-40 h-40 object-contain relative z-10 drop-shadow-2xl transition-all',
+                'relative z-10 flex items-center justify-center w-40 h-40 transition-all',
                 flyingBadge && 'animate-fly-to-header'
               )}
               style={{
                 filter: 'drop-shadow(0 0 30px rgba(255, 215, 0, 0.5))',
               }}
-            />
+            >
+              <FluentEmoji emoji="🏆" size={160} />
+            </div>
           </div>
         </div>
 

@@ -3,16 +3,7 @@ import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSa
 import { cn } from '@/lib/utils';
 import { Star } from 'lucide-react';
 import type { BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
-
-import coinBronze from '@/assets/coin-bronze.png';
-import coinSilver from '@/assets/coin-silver.png';
-import coinGold from '@/assets/coin-gold.png';
-
-const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
-  bronze: coinBronze,
-  silver: coinSilver,
-  gold: coinGold,
-};
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface DayStats {
   badgeLevel: BadgeLevel;
@@ -84,7 +75,7 @@ export const MonthCalendar = ({
             // Get badge level for this day
             const dayStats = badgeData?.[dateStr];
             const badgeLevel = dayStats?.badgeLevel || 'none';
-            const hasBadge = badgeLevel !== 'none';
+            const hasBadge = badgeLevel === 'gold';
 
             return (
               <button
@@ -108,14 +99,12 @@ export const MonthCalendar = ({
                     )} />
                   )}
                   {hasBadge && isCurrentMonth && !isTodayDate && (
-                    <img
-                      src={BADGE_IMAGES[badgeLevel]}
-                      alt={`${badgeLevel} badge`}
-                      className={cn(
-                        "absolute inset-0 w-full h-full object-contain pointer-events-none",
-                        isSelected ? "opacity-100" : "opacity-60"
-                      )}
-                    />
+                    <div className={cn(
+                      "absolute inset-0 flex items-center justify-center pointer-events-none",
+                      isSelected ? "opacity-100" : "opacity-70"
+                    )}>
+                      <FluentEmoji emoji="🏆" size={32} />
+                    </div>
                   )}
                   <span className={cn(
                     'relative z-10 text-[15px] font-bold leading-none',
@@ -125,11 +114,9 @@ export const MonthCalendar = ({
                     {format(dateItem, 'd')}
                   </span>
                   {hasBadge && isCurrentMonth && isTodayDate && (
-                    <img
-                      src={BADGE_IMAGES[badgeLevel]}
-                      alt={`${badgeLevel} badge`}
-                      className="absolute inset-0 w-full h-full object-contain z-20 pointer-events-none drop-shadow-sm"
-                    />
+                    <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                      <FluentEmoji emoji="🏆" size={32} />
+                    </div>
                   )}
                 </div>
               </button>

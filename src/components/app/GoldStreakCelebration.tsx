@@ -7,8 +7,7 @@ import { haptic } from '@/lib/haptics';
 import confetti from 'canvas-confetti';
 import { OverlayPortal } from '@/components/app/OverlayPortal';
 import { useShareContent } from '@/hooks/useShareContent';
-
-import coinGold from '@/assets/coin-gold.png';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface GoldStreakCelebrationProps {
   open: boolean;
@@ -194,14 +193,14 @@ export const GoldStreakCelebration = ({
               background: 'radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, transparent 60%)',
             }}
           />
-          <img 
-            src={coinGold}
-            alt="Gold badge"
-            className="w-32 h-32 object-contain relative z-10"
-            style={{ 
-              filter: 'drop-shadow(0 0 30px rgba(255, 193, 7, 0.5)) drop-shadow(0 8px 20px rgba(0,0,0,0.3))' 
+          <div
+            className="w-32 h-32 flex items-center justify-center relative z-10"
+            style={{
+              filter: 'drop-shadow(0 0 30px rgba(255, 193, 7, 0.5)) drop-shadow(0 8px 20px rgba(0,0,0,0.3))',
             }}
-          />
+          >
+            <FluentEmoji emoji="🏆" size={128} />
+          </div>
         </div>
 
         {/* Title with gold accent */}
@@ -231,12 +230,7 @@ export const GoldStreakCelebration = ({
                   )}
                 >
                   {day.isGold ? (
-                    <img 
-                      src={coinGold}
-                      alt="Gold"
-                      className="w-10 h-10 object-contain"
-                      style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}
-                    />
+                    <FluentEmoji emoji="🏆" size={36} />
                   ) : day.isToday ? (
                     <Sparkles className="w-4 h-4 text-amber-400/70" />
                   ) : null}

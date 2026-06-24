@@ -3836,6 +3836,27 @@ export type Database = {
         }
         Relationships: []
       }
+      planner_trophies: {
+        Row: {
+          created_at: string
+          earned_date: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          earned_date: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          earned_date?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       playlist_gifts: {
         Row: {
           claimed_at: string | null

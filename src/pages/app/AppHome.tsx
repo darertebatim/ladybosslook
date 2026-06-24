@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, isToday, startOfMonth, endOfMonth, addMonths, subMonths, isBefore, startOfDay, subDays } from 'date-fns';
-import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, Headset, ArrowLeft, Heart, Zap, Settings2, Search, Play, Wand2, Compass, GraduationCap } from 'lucide-react';
+import { Plus, Flame, CalendarDays, CalendarPlus, ChevronLeft, ChevronRight, Star, Sparkles, Headset, ArrowLeft, Heart, Zap, Settings2, Search, Play, Wand2, Compass, GraduationCap, Award } from 'lucide-react';
 
 import AppTaskCreate from '@/pages/app/AppTaskCreate';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -62,17 +62,9 @@ import { SpotlightCutout } from '@/components/app/home/SpotlightCutout';
 import { PlannerIntroSheet } from '@/components/app/home/PlannerIntroSheet';
 
 
-import coinBronze from '@/assets/coin-bronze.png';
-import coinSilver from '@/assets/coin-silver.png';
-import coinGold from '@/assets/coin-gold.png';
 import checklistEmpty from '@/assets/checklist-empty.png';
 import emptyPlannerImg from '@/assets/empty-planner.png';
-
-const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
-  bronze: coinBronze,
-  silver: coinSilver,
-  gold: coinGold,
-};
+import { usePlannerTrophies, useAwardPlannerTrophyOnComplete } from '@/hooks/usePlannerTrophies';
 
 const AppHome = () => {
   const navigate = useNavigate();
@@ -209,6 +201,7 @@ const AppHome = () => {
   const { data: goldDatesThisWeek = [] } = useGoldDatesThisWeek();
   const updateGoldStreak = useUpdateGoldStreak();
   const { data: todayMood } = useTodayMood();
+  const { data: plannerTrophyCount = 0 } = usePlannerTrophies();
   
   // Dismissed individual routine card IDs
   const [dismissedRoutineIds, setDismissedRoutineIds] = useState<Set<string>>(() => {
@@ -698,6 +691,11 @@ const AppHome = () => {
     dateKey: todayDateStr,
   });
 
+  // Award lifetime planner trophy on the day's first gold completion
+  useAwardPlannerTrophyOnComplete(
+    (todayStats?.badgeLevel || 'none') === 'gold' && todayDateStr === format(new Date(), 'yyyy-MM-dd')
+  );
+
   // Challenge day celebration
   const {
     celebrationData: challengeDayCelebration,
@@ -966,22 +964,41 @@ const AppHome = () => {
               )}
             </div>
 
-            {/* Right: Streak badge */}
+            {/* Right: Trophy + Streak chip (matches My Rilo) */}
             <div className="flex items-center gap-2 justify-end justify-self-end">
-              {/* Mood check-in button – hidden for now, re-enable from admin/app */}
-              
-              {/* Streak badge - navigates to presence page */}
               <button
-                onClick={() => navigate('/app/presence')}
-                className={cn(
-                  "tour-streak flex items-center gap-1 px-2.5 py-1 rounded-full shadow-ios active:scale-95 transition-all",
-                  hasAnyCompletionToday
-                    ? "bg-gradient-to-br from-[hsl(var(--brand-primary-light))] to-[hsl(var(--brand-primary))] text-white"
-                    : "bg-[hsl(var(--tint-peach))] text-[hsl(var(--fg-warm-muted))]"
-                )}
+                type="button"
+                onClick={() => {
+                  haptic.light();
+                  navigate('/app/presence');
+                }}
+                className="tour-streak flex items-center p-0.5 rounded-full active:scale-95 transition-transform bg-white"
+                style={{
+                  border: '1px solid hsl(var(--brand-primary) / 0.25)',
+                  boxShadow: '0 2px 8px rgba(235,94,51,0.18)',
+                }}
+                aria-label={`Trophies: ${plannerTrophyCount} · Streak: ${streak?.current_streak || 0} days · open Presence`}
               >
-                <Flame className="h-3.5 w-3.5 fill-current" />
-                <span className="text-[13px] font-bold">{streak?.current_streak || 0}</span>
+                <span
+                  className="flex items-center gap-1 pl-2 pr-2.5 py-0.5"
+                  style={{ color: 'hsl(var(--brand-primary))' }}
+                >
+                  <Award className="w-4 h-4" strokeWidth={2.25} />
+                  <span className="text-[13px] font-bold text-fg-warm">
+                    {plannerTrophyCount}
+                  </span>
+                </span>
+                <span
+                  className="flex items-center gap-1 pl-2 pr-2.5 py-1 rounded-full text-white"
+                  style={{
+                    background:
+                      'linear-gradient(135deg, hsl(var(--brand-primary-light)), hsl(var(--brand-primary)))',
+                    boxShadow: '0 2px 8px rgba(235,94,51,0.35)',
+                  }}
+                >
+                  <Flame className="w-3.5 h-3.5 fill-current" />
+                  <span className="text-[13px] font-bold">{streak?.current_streak || 0}</span>
+                </span>
               </button>
             </div>
           </div>
@@ -1054,29 +1071,25 @@ const AppHome = () => {
                             {hasProgramEvents && (
                               <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5 z-20", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />
                             )}
-                            {hasBadge && !isTodayDate && (
-                              <img
-                                src={BADGE_IMAGES[badgeLevel]}
-                                alt={`${badgeLevel} badge`}
-                                className={cn(
-                                  "absolute inset-0 w-full h-full object-contain pointer-events-none rounded-full",
-                                  isSelected ? "opacity-100" : "opacity-60"
-                                )}
-                              />
+                            {badgeLevel === 'gold' && !isTodayDate && (
+                              <div className={cn(
+                                "absolute inset-0 flex items-center justify-center pointer-events-none",
+                                isSelected ? "opacity-100" : "opacity-70"
+                              )}>
+                                <FluentEmoji emoji="🏆" size={28} />
+                              </div>
                             )}
                             <span className={cn(
                               'relative z-10 text-sm font-bold leading-none translate-y-[0.5px]',
                               isSelected ? 'text-white' : 'text-fg-warm',
-                              hasBadge && !isTodayDate && 'drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
+                              badgeLevel === 'gold' && !isTodayDate && 'drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
                             )}>
                               {format(day, 'd')}
                             </span>
-                            {hasBadge && isTodayDate && (
-                              <img
-                                src={BADGE_IMAGES[badgeLevel]}
-                                alt={`${badgeLevel} badge`}
-                                className="absolute inset-0 w-full h-full object-contain z-20 pointer-events-none drop-shadow-sm rounded-full"
-                              />
+                            {badgeLevel === 'gold' && isTodayDate && (
+                              <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                                <FluentEmoji emoji="🏆" size={28} />
+                              </div>
                             )}
                           </div>
                         </div>
