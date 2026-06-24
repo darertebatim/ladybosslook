@@ -335,7 +335,8 @@ const NativeAppLayout = () => {
           </div>
         </LayoutGroup>
 
-        {/* Detached FAB → AI Planner */}
+        {/* Detached FAB → AI Planner (only visible on planner page) */}
+        {location.pathname === '/app/aiplanner' && (
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -362,6 +363,7 @@ const NativeAppLayout = () => {
             </span>
           </Link>
         </motion.div>
+        )}
       </nav>
       )}
 
