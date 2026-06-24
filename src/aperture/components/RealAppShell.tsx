@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ApertureWordmark } from "@/aperture/brand/ApertureLogo";
@@ -37,6 +37,13 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
   const loc = useLocation();
   const initial = (user?.email ?? "U").slice(0, 1).toUpperCase();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [lockOnRilobiz, setLockOnRilobiz] = useState<boolean>(() =>
+    typeof window !== "undefined" && localStorage.getItem("rilo:lock-on-rilobiz") === "1"
+  );
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("rilo:lock-on-rilobiz", lockOnRilobiz ? "1" : "0");
+  }, [lockOnRilobiz]);
   const isChatThread = /^\/app\/rilobiz\/app\/chats\/[^/]+/.test(loc.pathname);
 
   if (isMobile) {
