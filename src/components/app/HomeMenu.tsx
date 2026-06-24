@@ -341,23 +341,25 @@ export function HomeMenu() {
 
         <div className="px-4 py-4 space-y-5">
           {/* Go to RiloBiz */}
-          <section>
-            <button
-              onClick={() => handleNavClick("/app/rilobiz/app")}
-              className={cn(
-                "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl",
-                "text-white text-[13px] font-semibold",
-                "active:scale-[0.98] transition-transform",
-              )}
-              style={{
-                background: "linear-gradient(135deg, #EB5E33 0%, #A63520 100%)",
-                boxShadow: "0 4px 14px -4px rgba(235,94,51,0.4)",
-              }}
-            >
-              <ApertureLogo size={18} className="shrink-0" />
-              <span className="font-semibold">RiloBiz</span>
-            </button>
-          </section>
+          {!isRiloBizHiddenRegion() && (
+            <section>
+              <button
+                onClick={() => handleNavClick("/app/rilobiz/app")}
+                className={cn(
+                  "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl",
+                  "text-white text-[13px] font-semibold",
+                  "active:scale-[0.98] transition-transform",
+                )}
+                style={{
+                  background: "linear-gradient(135deg, #EB5E33 0%, #A63520 100%)",
+                  boxShadow: "0 4px 14px -4px rgba(235,94,51,0.4)",
+                }}
+              >
+                <ApertureLogo size={18} className="shrink-0" />
+                <span className="font-semibold">Go to RiloBiz</span>
+              </button>
+            </section>
+          )}
 
           {/* Navigation Pages */}
           <section>
