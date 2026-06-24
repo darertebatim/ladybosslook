@@ -1,6 +1,6 @@
 import { Shield, Lock, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { SHIELD_MILESTONES, getEarnedShields } from '@/lib/recoveryShields';
+import { getEarnedShields, getNextShieldMilestone } from '@/lib/recoveryShields';
 
 interface RecoveryShieldsProps {
   /** Number of shields already used (0-3) */
@@ -17,16 +17,18 @@ interface RecoveryShieldsProps {
  */
 export const RecoveryShields = ({ recoveryCount, longestStreak, className }: RecoveryShieldsProps) => {
   const earned = getEarnedShields(longestStreak);
-
-  const shields = SHIELD_MILESTONES.map((m, idx) => {
-    const id = idx + 1;
-    const unlocked = id <= earned;
-    const used = recoveryCount >= id;
-    return { id, locked: !unlocked, used, milestoneDay: m.day };
-  });
+  const next = getNextShieldMilestone(longestStreak);
+  // Render one card per earned shield (used vs ready), plus one locked "next milestone" card.
+  const shields: Array<{ id: number; locked: boolean; used: boolean; milestoneDay?: number }> = [];
+  for (let i = 1; i <= earned; i++) {
+    shields.push({ id: i, locked: false, used: recoveryCount >= i });
+  }
+  if (next) {
+    shields.push({ id: earned + 1, locked: true, used: false, milestoneDay: next.day });
+  }
 
   return (
-    <div className={cn('flex gap-2', className)}>
+    <div className={cn('flex flex-wrap gap-2', className)}>
       {shields.map((shield) => (
         <div
           key={shield.id}
