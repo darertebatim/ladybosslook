@@ -355,8 +355,9 @@ export function HomeMenu() {
                   boxShadow: "0 4px 14px -4px rgba(235,94,51,0.4)",
                 }}
               >
-                <ApertureLogo size={18} className="shrink-0" />
-                <span className="font-semibold">Go to RiloBiz</span>
+                <div className="shrink-0 bg-white rounded-md p-0.5">
+                  <ApertureLogo size={18} className="shrink-0" />
+                </div>
               </button>
             </section>
           )}
