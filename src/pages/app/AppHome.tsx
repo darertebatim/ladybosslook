@@ -1046,29 +1046,25 @@ const AppHome = () => {
                             {hasProgramEvents && (
                               <Star className={cn("absolute -top-0.5 -right-0.5 h-2.5 w-2.5 z-20", isSelected ? "text-indigo-400 fill-indigo-400" : "text-indigo-500 fill-indigo-500")} />
                             )}
-                            {hasBadge && !isTodayDate && (
-                              <img
-                                src={BADGE_IMAGES[badgeLevel]}
-                                alt={`${badgeLevel} badge`}
-                                className={cn(
-                                  "absolute inset-0 w-full h-full object-contain pointer-events-none rounded-full",
-                                  isSelected ? "opacity-100" : "opacity-60"
-                                )}
-                              />
+                            {badgeLevel === 'gold' && !isTodayDate && (
+                              <div className={cn(
+                                "absolute inset-0 flex items-center justify-center pointer-events-none",
+                                isSelected ? "opacity-100" : "opacity-70"
+                              )}>
+                                <FluentEmoji emoji="🏆" size={28} />
+                              </div>
                             )}
                             <span className={cn(
                               'relative z-10 text-sm font-bold leading-none translate-y-[0.5px]',
                               isSelected ? 'text-white' : 'text-fg-warm',
-                              hasBadge && !isTodayDate && 'drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
+                              badgeLevel === 'gold' && !isTodayDate && 'drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]'
                             )}>
                               {format(day, 'd')}
                             </span>
-                            {hasBadge && isTodayDate && (
-                              <img
-                                src={BADGE_IMAGES[badgeLevel]}
-                                alt={`${badgeLevel} badge`}
-                                className="absolute inset-0 w-full h-full object-contain z-20 pointer-events-none drop-shadow-sm rounded-full"
-                              />
+                            {badgeLevel === 'gold' && isTodayDate && (
+                              <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                                <FluentEmoji emoji="🏆" size={28} />
+                              </div>
                             )}
                           </div>
                         </div>
