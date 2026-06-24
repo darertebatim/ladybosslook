@@ -360,6 +360,9 @@ export function HomeMenu() {
                 </div>
                 <span>Go to RiloBiz</span>
               </button>
+              <p className="text-[11px] text-white/70 mt-1.5 ml-1">
+                *when you lock app opens on rilobiz
+              </p>
             </section>
           )}
 
