@@ -28,6 +28,7 @@ const OnboardConfirm = lazy(() => import("@/aperture/pages/real/OnboardConfirm")
 const RealFiles = lazy(() => import("@/aperture/pages/real/Files"));
 const RealTools = lazy(() => import("@/aperture/pages/real/Tools"));
 const ApertureAuth = lazy(() => import("@/aperture/pages/real/Auth"));
+const Marketing = lazy(() => import("@/aperture/pages/marketing/Marketing"));
 
 function ApertureLoader() {
   return (
@@ -82,6 +83,8 @@ export default function ApertureRouter() {
         <Routes>
           <Route index element={<Navigate to="brand" replace />} />
           <Route path="brand" element={<BrandShowcase />} />
+          {/* Public marketing landing for Aperture */}
+          <Route path="marketing" element={<Marketing />} />
           {/* Aperture mockup — design demo, no auth, mock data */}
           <Route path="brand/mockup" element={<Home />} />
           <Route path="brand/mockup/memory" element={<Memory />} />
