@@ -38,8 +38,8 @@ export const GoldStreakCelebration = ({
   const [isAnimating, setIsAnimating] = useState(false);
 
   const { handleShare } = useShareContent({
-    title: 'Gold Streak',
-    text: `🥇 ${currentGoldStreak}-day Gold streak on Rilo! Building my self-care routine one day at a time.`,
+    title: 'Trophy Streak',
+    text: `🏆 ${currentGoldStreak}-day trophy streak on Rilo! Building my self-care routine one day at a time.`,
     source: 'gold_streak',
     contentId: `${currentGoldStreak}d`,
   });
@@ -104,7 +104,7 @@ export const GoldStreakCelebration = ({
 
   const nextGoal = currentGoldStreak + 1;
   const message = currentGoldStreak === 1 
-    ? "Amazing start! Come back tomorrow to keep your golden streak!"
+    ? "Amazing start! Come back tomorrow to keep your trophy streak!"
     : `${currentGoldStreak} days strong! Keep your momentum going!`;
 
   return (
