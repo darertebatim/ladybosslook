@@ -16,8 +16,8 @@ export default function MemoryOverview() {
   return (
     <>
       <Helmet>
-        <title>Memory · Aperture</title>
-        <meta name="description" content="The business memory Aperture uses to personalize every conversation." />
+        <title>Memory · RiloBiz</title>
+        <meta name="description" content="The business memory RiloBiz uses to personalize every conversation." />
       </Helmet>
       <AppShell>
         <PageHeader

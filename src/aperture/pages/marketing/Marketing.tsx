@@ -126,16 +126,16 @@ function LossRow({
 }
 
 /* ============================================================
- * Marketing landing page for Aperture
+ * Marketing landing page for RiloBiz
  * ============================================================ */
 export default function ApertureMarketing() {
   return (
     <>
       <Helmet>
-        <title>Aperture — The business advisor that actually knows your business</title>
+        <title>RiloBiz — The business advisor that actually knows your business</title>
         <meta
           name="description"
-          content="Aperture builds a persistent memory of your business and turns it into an AI advisor that protects revenue, cuts losses, and spots growth windows before they close."
+          content="RiloBiz builds a persistent memory of your business and turns it into an AI advisor that protects revenue, cuts losses, and spots growth windows before they close."
         />
       </Helmet>
 
@@ -169,7 +169,7 @@ export default function ApertureMarketing() {
             }}
           >
             <Link
-              to="/aperture/marketing"
+              to="/rilobiz/marketing"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -193,7 +193,7 @@ export default function ApertureMarketing() {
                 How it works
               </a>
               <ApertureThemeSwitch />
-              <Link to="/aperture/auth" style={{ textDecoration: "none" }}>
+              <Link to="/app/rilobiz/auth" style={{ textDecoration: "none" }}>
                 <ApertureButton variant="accent" size="sm">Start free</ApertureButton>
               </Link>
             </nav>
@@ -218,12 +218,12 @@ export default function ApertureMarketing() {
               The AI advisor that actually <em style={{ fontStyle: "normal", color: "var(--ap-signal)" }}>knows your business.</em>
             </H1>
             <Lede>
-              Generic AI gives generic advice. Aperture builds a persistent memory of your
+              Generic AI gives generic advice. RiloBiz builds a persistent memory of your
               business — your customers, pricing, finances, team, goals — and turns every
               answer into one tailored to <em>your</em> situation.
             </Lede>
             <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
-              <Link to="/aperture/auth" style={{ textDecoration: "none" }}>
+              <Link to="/app/rilobiz/auth" style={{ textDecoration: "none" }}>
                 <ApertureButton variant="accent">Start free →</ApertureButton>
               </Link>
               <a href="#how" style={{ textDecoration: "none" }}>
@@ -311,7 +311,7 @@ export default function ApertureMarketing() {
             <ApertureSectionTitle
               index="02 / What you get"
               title="Not features. Outcomes."
-              sub="Aperture is judged by what it changes in your business, not by what it does on a screen."
+              sub="RiloBiz is judged by what it changes in your business, not by what it does on a screen."
             />
           </div>
 
@@ -325,7 +325,7 @@ export default function ApertureMarketing() {
             <BenefitCard
               idx="B.01"
               title="More revenue, less guessing"
-              body="Aperture remembers your pricing, products, and customers, then recommends tactics that fit your real model — not someone else's."
+              body="RiloBiz remembers your pricing, products, and customers, then recommends tactics that fit your real model — not someone else's."
             />
             <BenefitCard
               idx="B.02"
@@ -376,13 +376,13 @@ export default function ApertureMarketing() {
                 <ApertureSectionTitle
                   index="03 / Pattern radar"
                   title="The losses you never see are the ones that add up."
-                  sub="Most owners don't lose money to one big mistake. They lose it to delays that compound, leaks that stack, and windows that close. Aperture makes those patterns visible while there's still time to act."
+                  sub="Most owners don't lose money to one big mistake. They lose it to delays that compound, leaks that stack, and windows that close. RiloBiz makes those patterns visible while there's still time to act."
                 />
                 <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 12 }}>
                   {[
                     "The true cost of delay — pushing a $10K/mo move by 3 months isn't a 3-month delay. It's $30K gone.",
                     "Invisible leakage — $10/day looks harmless. In a year it's $3,650 you didn't budget for.",
-                    "Opportunity windows — Aperture flags the $40K bet that returns $70K when timing is right.",
+                    "Opportunity windows — RiloBiz flags the $40K bet that returns $70K when timing is right.",
                   ].map((t) => (
                     <li
                       key={t}
@@ -443,7 +443,7 @@ export default function ApertureMarketing() {
                     lineHeight: 1.5,
                   }}
                 >
-                  Aperture cross-references your expenses, time logs, and contracts against
+                  RiloBiz cross-references your expenses, time logs, and contracts against
                   benchmarks in memory — and surfaces these patterns as alerts, not reports.
                 </div>
               </ApertureCard>
@@ -470,7 +470,7 @@ export default function ApertureMarketing() {
               {
                 k: "Step 01",
                 t: "Quick onboarding",
-                b: "Answer a few questions — or just chat. Aperture extracts and organizes what matters about your business.",
+                b: "Answer a few questions — or just chat. RiloBiz extracts and organizes what matters about your business.",
               },
               {
                 k: "Step 02",
@@ -480,7 +480,7 @@ export default function ApertureMarketing() {
               {
                 k: "Step 03",
                 t: "Tailored advice & alerts",
-                b: "Ask anything and get answers grounded in your business. Aperture also surfaces patterns you didn't ask about.",
+                b: "Ask anything and get answers grounded in your business. RiloBiz also surfaces patterns you didn't ask about.",
               },
             ].map((s) => (
               <BenefitCard key={s.k} idx={s.k} title={s.t} body={s.b} />
@@ -514,7 +514,7 @@ export default function ApertureMarketing() {
               your business — and tells you what it's costing you.
             </Lede>
             <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
-              <Link to="/aperture/auth" style={{ textDecoration: "none" }}>
+              <Link to="/app/rilobiz/auth" style={{ textDecoration: "none" }}>
                 <ApertureButton variant="accent">Start free →</ApertureButton>
               </Link>
               <Link to="/aperture/brand" style={{ textDecoration: "none" }}>
@@ -544,7 +544,7 @@ export default function ApertureMarketing() {
           >
             <div style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
               <ApertureLogo size={20} />
-              <ApertureMonoLabel>Aperture · Business memory, working for you</ApertureMonoLabel>
+              <ApertureMonoLabel>RiloBiz · Business memory, working for you</ApertureMonoLabel>
             </div>
             <ApertureMonoLabel>© {new Date().getFullYear()}</ApertureMonoLabel>
           </div>

@@ -15,7 +15,7 @@ import { logApertureEvent } from "@/aperture/lib/apertureEvents";
 
 /**
  * Quick onboarding — phased, DB-driven. After the last question
- * we mark profile.quick_onboarded_at and bounce to /aperture/app.
+ * we mark profile.quick_onboarded_at and bounce to /app/rilobiz/app.
  * Each answer is stored as a bucket_answer in memory using the
  * question's first bucket target (defaults to "basics").
  */
@@ -129,7 +129,7 @@ export default function OnboardQuick() {
         }).catch(() => {});
       }
       // Always go to confirm — it owns the Phase-3 review AND the closing question.
-      navigate("/aperture/app/onboard/confirm", { replace: true });
+      navigate("/app/rilobiz/app/onboard/confirm", { replace: true });
     } else {
       setI(i + 1);
     }
@@ -144,7 +144,7 @@ export default function OnboardQuick() {
     }
     if (i + 1 >= total) {
       await upsertProfile({ quick_onboarded_at: new Date().toISOString() });
-      navigate("/aperture/app/onboard/confirm", { replace: true });
+      navigate("/app/rilobiz/app/onboard/confirm", { replace: true });
     } else setI(i + 1);
   }
 
@@ -155,7 +155,7 @@ export default function OnboardQuick() {
 
   return (
     <>
-      <Helmet><title>Welcome · Aperture</title></Helmet>
+      <Helmet><title>Welcome · RiloBiz</title></Helmet>
       <RealAppShell>
         <PageHeader
           index="QUICK START"

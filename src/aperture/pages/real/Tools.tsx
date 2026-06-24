@@ -215,10 +215,10 @@ export default function RealTools() {
 
   return (
     <>
-      <Helmet><title>Tools · Aperture</title></Helmet>
+      <Helmet><title>Tools · RiloBiz</title></Helmet>
       <RealAppShell>
         <div style={{ marginBottom: 12 }}>
-          <Link to="/aperture/app/memory" style={{ textDecoration: "none" }}>
+          <Link to="/app/rilobiz/app/memory" style={{ textDecoration: "none" }}>
             <ApertureButton variant="ghost" size="sm">
               <ArrowLeft size={13} /> Memory
             </ApertureButton>
@@ -417,7 +417,7 @@ export default function RealTools() {
               <div style={{ marginBottom: 10 }}>
                 <ApertureSectionTitle
                   index="INTEGRATIONS"
-                  title="Connect Aperture to your tools"
+                  title="Connect RiloBiz to your tools"
                   sub="Coming soon — instead of asking, I'll read live data straight from these."
                 />
               </div>

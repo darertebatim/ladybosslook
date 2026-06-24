@@ -18,9 +18,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
 /**
- * Memory page — map of what Aperture knows about the user's business.
+ * Memory page — map of what RiloBiz knows about the user's business.
  * Shows the 13 territories as tiles with "explored" badges, a single
- * "Talk to Aperture" CTA, and a "Continue onboarding" card if the
+ * "Talk to RiloBiz" CTA, and a "Continue onboarding" card if the
  * Full questionnaire hasn't been completed yet.
  */
 export default function RealMemory() {
@@ -61,7 +61,7 @@ export default function RealMemory() {
       title: "What should we look at first?",
       entry_point: "general_chat",
     });
-    if (chat) navigate(`/aperture/app/chats/${chat.id}`);
+    if (chat) navigate(`/app/rilobiz/app/chats/${chat.id}`);
   }
 
   /**
@@ -87,12 +87,12 @@ export default function RealMemory() {
       bucket_slug: picked.slug,
       opener,
     });
-    if (chat) navigate(`/aperture/app/chats/${chat.id}`);
+    if (chat) navigate(`/app/rilobiz/app/chats/${chat.id}`);
   }
 
   return (
     <>
-      <Helmet><title>Memory · Aperture</title></Helmet>
+      <Helmet><title>Memory · RiloBiz</title></Helmet>
       <RealAppShell>
         <PageHeader
           index="MEMORY"
@@ -100,12 +100,12 @@ export default function RealMemory() {
           sub={`${buckets.length} territories. The more I know, the sharper my answers get. Tap any to read or fill in.`}
           action={
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <Link to="/aperture/app/memory/files" style={{ textDecoration: "none" }}>
+              <Link to="/app/rilobiz/app/memory/files" style={{ textDecoration: "none" }}>
                 <ApertureButton variant="default" size="sm">
                   <Paperclip size={13} /> Files
                 </ApertureButton>
               </Link>
-              <Link to="/aperture/app/memory/tools" style={{ textDecoration: "none" }}>
+              <Link to="/app/rilobiz/app/memory/tools" style={{ textDecoration: "none" }}>
                 <ApertureButton variant="default" size="sm">
                   <Plug size={13} /> Tools
                 </ApertureButton>
@@ -122,7 +122,7 @@ export default function RealMemory() {
           <ApertureCard padding={16}>
             <ApertureMonoLabel>Conversation</ApertureMonoLabel>
             <h3 style={{ margin: "6px 0 4px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
-              Talk to Aperture
+              Talk to RiloBiz
             </h3>
             <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
               Open chat. Bring me anything — a stuck decision, an idea, a quick question.
@@ -138,7 +138,7 @@ export default function RealMemory() {
               <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
                 Run the full business questionnaire. Skip anything that doesn't apply.
               </p>
-              <Link to="/aperture/app/onboard/full" style={{ textDecoration: "none" }}>
+              <Link to="/app/rilobiz/app/onboard/full" style={{ textDecoration: "none" }}>
                 <ApertureButton variant="ghost">Open →</ApertureButton>
               </Link>
             </ApertureCard>
@@ -209,7 +209,7 @@ export default function RealMemory() {
               return (
                 <Link
                   key={b.slug}
-                  to={`/aperture/app/memory/${b.slug}`}
+                  to={`/app/rilobiz/app/memory/${b.slug}`}
                   style={{ textDecoration: "none", display: "block" }}
                 >
                   <ApertureCard padding={14} style={{ height: "100%" }}>

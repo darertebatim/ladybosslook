@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { BUCKETS, type BucketSlug } from "@/aperture/data/buckets";
 
 /**
- * Aperture memory store — localStorage only (design demo).
+ * RiloBiz memory store — localStorage only (design demo).
  *
  * Shape:
  *   answers: Record<BucketSlug, Record<questionId, string>>

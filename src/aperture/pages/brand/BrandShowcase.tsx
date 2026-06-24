@@ -158,10 +158,10 @@ export default function BrandShowcase() {
   return (
     <div style={{ minHeight: "100vh" }}>
       <Helmet>
-        <title>Aperture — Brand</title>
+        <title>RiloBiz — Brand</title>
         <meta
           name="description"
-          content="Aperture visual system — logo, color tokens, typography, and primitive components."
+          content="RiloBiz visual system — logo, color tokens, typography, and primitive components."
         />
       </Helmet>
 
@@ -222,7 +222,7 @@ export default function BrandShowcase() {
           >
             Your business has a memory.
             <br />
-            <span style={{ color: "var(--ap-signal)" }}>Aperture</span> is how you use it.
+            <span style={{ color: "var(--ap-signal)" }}>RiloBiz</span> is how you use it.
           </h1>
           <p
             style={{
@@ -355,7 +355,7 @@ export default function BrandShowcase() {
           <ApertureSectionTitle
             index="04 · PRIMITIVES"
             title="Components"
-            sub="Reusable building blocks for the product surface. All Aperture pages compose from these."
+            sub="Reusable building blocks for the product surface. All RiloBiz pages compose from these."
           />
 
           <div
@@ -445,7 +445,7 @@ export default function BrandShowcase() {
         {/* ---- footer ---- */}
         <footer style={{ paddingTop: 32, borderTop: "1px solid var(--ap-hairline)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <ApertureWordmark size={14} />
-          <ApertureMonoLabel>© Aperture · {new Date().getFullYear()} · System v0.1</ApertureMonoLabel>
+          <ApertureMonoLabel>© RiloBiz · {new Date().getFullYear()} · System v0.1</ApertureMonoLabel>
         </footer>
       </main>
     </div>

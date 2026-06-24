@@ -27,8 +27,8 @@ export default function Library() {
   return (
     <>
       <Helmet>
-        <title>Library · Aperture</title>
-        <meta name="description" content="Every playbook and quick prompt Aperture can run. The home page suggests the right ones for you." />
+        <title>Library · RiloBiz</title>
+        <meta name="description" content="Every playbook and quick prompt RiloBiz can run. The home page suggests the right ones for you." />
       </Helmet>
       <AppShell>
         <PageHeader

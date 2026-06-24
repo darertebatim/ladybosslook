@@ -154,7 +154,7 @@ export function AttachmentMemoryChip({ fileIds }: { fileIds: string[] }) {
   );
   if (state.bucket) {
     return (
-      <Link to={`/aperture/app/memory/${state.bucket}`} style={{ textDecoration: "none" }}>
+      <Link to={`/app/rilobiz/app/memory/${state.bucket}`} style={{ textDecoration: "none" }}>
         {inner}
       </Link>
     );

@@ -9,11 +9,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 const NAV = [
-  { to: "/aperture/app",          label: "Home",     end: true },
-  { to: "/aperture/app/chats",    label: "Chats" },
-  { to: "/aperture/app/memory",   label: "Memory" },
-  { to: "/aperture/app/library",  label: "Library" },
-  { to: "/aperture/app/settings", label: "Settings" },
+  { to: "/app/rilobiz/app",          label: "Home",     end: true },
+  { to: "/app/rilobiz/app/chats",    label: "Chats" },
+  { to: "/app/rilobiz/app/memory",   label: "Memory" },
+  { to: "/app/rilobiz/app/library",  label: "Library" },
+  { to: "/app/rilobiz/app/settings", label: "Settings" },
 ];
 
 const MOBILE_TABS = NAV.filter(n => n.label !== "Settings");
@@ -30,7 +30,7 @@ function Icon({ name }: { name: string }) {
   }
 }
 
-/** Auth-gated shell for the real /aperture/app/* product. */
+/** Auth-gated shell for the real /app/rilobiz/app/* product. */
 export function RealAppShell({ children, rightRail }: { children: ReactNode; rightRail?: ReactNode }) {
   const isMobile = useIsMobile();
   const { user } = useAuth();
@@ -63,7 +63,7 @@ export function RealAppShell({ children, rightRail }: { children: ReactNode; rig
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
             </button>
             <Link
-              to="/aperture/app/chats"
+              to="/app/rilobiz/app/chats"
               aria-label="New chat"
               style={{
                 width: 38, height: 38, borderRadius: 999,
@@ -142,7 +142,7 @@ export function RealAppShell({ children, rightRail }: { children: ReactNode; rig
         }}>
           <ApertureWordmark size={15} />
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <Link to="/aperture/app/settings" style={{ color: "var(--ap-ink-2)", display: "inline-flex" }}>
+            <Link to="/app/rilobiz/app/settings" style={{ color: "var(--ap-ink-2)", display: "inline-flex" }}>
               <Icon name="Settings" />
             </Link>
             <ApertureThemeSwitch />

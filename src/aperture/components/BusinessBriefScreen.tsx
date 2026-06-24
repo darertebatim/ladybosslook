@@ -14,7 +14,7 @@ type Brief = {
 
 /**
  * Post-onboarding mini-report. Calls aperture-business-brief once,
- * then shows the result with an "Enter Aperture →" CTA. Not persisted —
+ * then shows the result with an "Enter RiloBiz →" CTA. Not persisted —
  * this is a one-time "you've been heard" moment before Home.
  */
 export function BusinessBriefScreen({
@@ -58,7 +58,7 @@ export function BusinessBriefScreen({
           sub="I couldn't draft your brief right now, but everything you shared is saved. We can build on it together."
         />
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}>
-          <ApertureButton variant="accent" onClick={onDone}>Enter Aperture →</ApertureButton>
+          <ApertureButton variant="accent" onClick={onDone}>Enter RiloBiz →</ApertureButton>
         </div>
       </>
     );
@@ -136,7 +136,7 @@ export function BusinessBriefScreen({
       )}
 
       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 18 }}>
-        <ApertureButton variant="accent" onClick={onDone}>Enter Aperture →</ApertureButton>
+        <ApertureButton variant="accent" onClick={onDone}>Enter RiloBiz →</ApertureButton>
       </div>
     </>
   );

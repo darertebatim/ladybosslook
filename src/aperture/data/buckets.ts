@@ -1,5 +1,5 @@
 /**
- * Memory buckets — the core mechanic of Aperture.
+ * Memory buckets — the core mechanic of RiloBiz.
  *
  * Each bucket holds a category of business information that the AI uses to
  * personalize every conversation. Buckets are filled three ways:

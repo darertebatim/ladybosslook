@@ -13,7 +13,7 @@ const Library = lazy(() => import("@/aperture/pages/app/Library"));
 const ActionPage = lazy(() => import("@/aperture/pages/app/Action"));
 const Settings = lazy(() => import("@/aperture/pages/app/Settings"));
 
-// Real Supabase-backed product at /aperture/app/*
+// Real Supabase-backed product at /app/rilobiz/app/*
 const RealHome = lazy(() => import("@/aperture/pages/real/Home"));
 const RealMemory = lazy(() => import("@/aperture/pages/real/Memory"));
 const RealBucket = lazy(() => import("@/aperture/pages/real/Bucket"));
@@ -56,7 +56,7 @@ function ApertureLoader() {
 }
 
 /**
- * Aperture reuses the main app's /auth flow. Any unauthenticated visit to
+ * RiloBiz reuses the main app's /auth flow. Any unauthenticated visit to
  * an /aperture/brand/mockup/* route is bounced to /auth with a redirect back.
  * /aperture/brand is public so the design showcase stays browsable.
  */
@@ -66,14 +66,14 @@ function ApertureAuthGate({ children }: { children: React.ReactNode }) {
   if (loading) return <ApertureLoader />;
   if (!user) {
     const redirect = encodeURIComponent(location.pathname + location.search);
-    return <Navigate to={`/aperture/auth?redirect=${redirect}`} replace />;
+    return <Navigate to={`/app/rilobiz/auth?redirect=${redirect}`} replace />;
   }
   return <>{children}</>;
 }
 
 /**
- * Top-level Aperture router. Mounted at /aperture/* in App.tsx.
- * All Aperture pages live inside <ApertureLayout> so they share
+ * Top-level RiloBiz router. Mounted at /aperture/* in App.tsx.
+ * All RiloBiz pages live inside <ApertureLayout> so they share
  * the scoped token layer and day/night theme.
  */
 export default function ApertureRouter() {
@@ -83,9 +83,9 @@ export default function ApertureRouter() {
         <Routes>
           <Route index element={<Navigate to="brand" replace />} />
           <Route path="brand" element={<BrandShowcase />} />
-          {/* Public marketing landing for Aperture */}
+          {/* Public marketing landing for RiloBiz */}
           <Route path="marketing" element={<Marketing />} />
-          {/* Aperture mockup — design demo, no auth, mock data */}
+          {/* RiloBiz mockup — design demo, no auth, mock data */}
           <Route path="brand/mockup" element={<Home />} />
           <Route path="brand/mockup/memory" element={<Memory />} />
           <Route path="brand/mockup/memory/:slug" element={<BucketPage />} />
@@ -94,7 +94,7 @@ export default function ApertureRouter() {
           <Route path="brand/mockup/library" element={<Library />} />
           <Route path="brand/mockup/library/:slug" element={<ActionPage />} />
           <Route path="brand/mockup/settings" element={<Settings />} />
-          {/* Aperture-branded auth page */}
+          {/* RiloBiz-branded auth page */}
           <Route path="auth" element={<ApertureAuth />} />
           {/* Real product — Supabase-backed, auth-gated */}
           <Route path="app" element={<ApertureAuthGate><RealHome /></ApertureAuthGate>} />

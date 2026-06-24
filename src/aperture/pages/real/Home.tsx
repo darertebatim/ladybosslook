@@ -41,11 +41,11 @@ export default function RealHome() {
 
   // First-time visit → push to Quick Onboarding.
   if (!pLoading && profile && !profile.quick_onboarded_at) {
-    return <Navigate to="/aperture/app/onboard/quick" replace />;
+    return <Navigate to="/app/rilobiz/app/onboard/quick" replace />;
   }
   if (!pLoading && !profile) {
     // No profile row yet — also send to onboarding (row is created on first upsert).
-    return <Navigate to="/aperture/app/onboard/quick" replace />;
+    return <Navigate to="/app/rilobiz/app/onboard/quick" replace />;
   }
 
   const knownCount = items.length;
@@ -57,7 +57,7 @@ export default function RealHome() {
     setStarting(true);
     const chat = await createChat(t.slice(0, 48));
     setStarting(false);
-    if (chat) navigate(`/aperture/app/chats/${chat.id}?seed=${encodeURIComponent(t)}`);
+    if (chat) navigate(`/app/rilobiz/app/chats/${chat.id}?seed=${encodeURIComponent(t)}`);
   }
 
   async function startFromSuggestion(s: { title: string; prompt: string; _storedId?: string | null }) {
@@ -71,7 +71,7 @@ export default function RealHome() {
       }, chat?.id ?? null)
     );
     if (s._storedId) void markActed(s._storedId);
-    if (chat) navigate(`/aperture/app/chats/${chat.id}?seed=${encodeURIComponent(s.prompt)}`);
+    if (chat) navigate(`/app/rilobiz/app/chats/${chat.id}?seed=${encodeURIComponent(s.prompt)}`);
   }
 
   async function saveDaily() {
@@ -86,7 +86,7 @@ export default function RealHome() {
 
   return (
     <>
-      <Helmet><title>Today · Aperture</title></Helmet>
+      <Helmet><title>Today · RiloBiz</title></Helmet>
       <RealAppShell>
         <PageHeader
           index="00 · TODAY"
@@ -101,7 +101,7 @@ export default function RealHome() {
 
         {/* Finish full onboarding nudge */}
         {profile?.quick_onboarded_at && !profile?.full_onboarded_at && (
-          <Link to="/aperture/app/onboard/full" style={{ textDecoration: "none", display: "block", marginBottom: 20 }}>
+          <Link to="/app/rilobiz/app/onboard/full" style={{ textDecoration: "none", display: "block", marginBottom: 20 }}>
             <ApertureCard padding={16} style={{ borderColor: "var(--ap-signal)" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                 <div style={{ minWidth: 0 }}>
@@ -230,7 +230,7 @@ export default function RealHome() {
         <section style={{ marginBottom: 28 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
             <ApertureMonoLabel>Your memory</ApertureMonoLabel>
-            <Link to="/aperture/app/memory" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>Open →</Link>
+            <Link to="/app/rilobiz/app/memory" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>Open →</Link>
           </div>
           {mLoading ? (
             <ApertureLoading label="Loading…" />
@@ -272,7 +272,7 @@ export default function RealHome() {
           <section style={{ marginBottom: 28 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
               <ApertureMonoLabel>Buckets</ApertureMonoLabel>
-              <Link to="/aperture/app/memory" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>All →</Link>
+              <Link to="/app/rilobiz/app/memory" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>All →</Link>
             </div>
             {!hasBuckets ? (
               <ApertureCard padding={24} style={{ textAlign: "center" }}>
@@ -283,7 +283,7 @@ export default function RealHome() {
             ) : (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
                 {buckets.map(b => (
-                  <Link key={b.slug} to={`/aperture/app/memory/${b.slug}`} style={{
+                  <Link key={b.slug} to={`/app/rilobiz/app/memory/${b.slug}`} style={{
                     display: "flex", flexDirection: "column", gap: 8,
                     padding: 16, background: "var(--ap-surface-1)",
                     border: "1px solid var(--ap-hairline)",

@@ -76,7 +76,7 @@ export default function RealAction() {
 
   const emptyNeeds = needsStatus.filter(n => !n.filled);
 
-  if (notFound) return <Navigate to="/aperture/app/library" replace />;
+  if (notFound) return <Navigate to="/app/rilobiz/app/library" replace />;
 
   async function recordRun(chatId: string, status: "completed" | "running", state: unknown) {
     if (!user || !action) return;
@@ -113,7 +113,7 @@ export default function RealAction() {
       ]);
 
       await recordRun(chat.id, "completed", { output: body });
-      navigate(`/aperture/app/chats/${chat.id}`);
+      navigate(`/app/rilobiz/app/chats/${chat.id}`);
     } catch (e: any) {
       toast({ title: "Couldn't run prompt", description: e?.message ?? "Try again.", variant: "destructive" });
       setRunning(false);
@@ -142,7 +142,7 @@ export default function RealAction() {
       ]);
 
       await recordRun(chat.id, "completed", { answers: finalAnswers });
-      navigate(`/aperture/app/chats/${chat.id}`);
+      navigate(`/app/rilobiz/app/chats/${chat.id}`);
     } catch (e: any) {
       toast({ title: "Couldn't finish playbook", description: e?.message ?? "Try again.", variant: "destructive" });
       setRunning(false);
@@ -164,12 +164,12 @@ export default function RealAction() {
   return (
     <>
       <Helmet>
-        <title>{action?.title ?? "Action"} · Aperture</title>
+        <title>{action?.title ?? "Action"} · RiloBiz</title>
         {action?.blurb && <meta name="description" content={action.blurb} />}
       </Helmet>
       <RealAppShell>
         <div style={{ marginBottom: 8 }}>
-          <Link to="/aperture/app/library" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
+          <Link to="/app/rilobiz/app/library" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
             ← Library
           </Link>
         </div>
@@ -204,7 +204,7 @@ export default function RealAction() {
                   {needsStatus.map(n => (
                     <Link
                       key={n.slug}
-                      to={`/aperture/app/memory/${n.slug}`}
+                      to={`/app/rilobiz/app/memory/${n.slug}`}
                       style={{ textDecoration: "none" }}
                     >
                       <ApertureChip tone={n.filled ? "signal" : "neutral"}>
@@ -226,7 +226,7 @@ export default function RealAction() {
                   {emptyNeeds.map(n => (
                     <Link
                       key={n.slug}
-                      to={`/aperture/app/memory/${n.slug}`}
+                      to={`/app/rilobiz/app/memory/${n.slug}`}
                       style={{
                         fontSize: 13, fontWeight: 500,
                         color: "var(--ap-signal)", textDecoration: "none",
@@ -241,7 +241,7 @@ export default function RealAction() {
               <ApertureCard padding={20}>
                 <ApertureMonoLabel>Preview</ApertureMonoLabel>
                 <p style={{ margin: "10px 0 0", fontSize: 14.5, color: "var(--ap-ink-1)", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
-                  {action.output ?? "Aperture will draft this from your memory when you run it."}
+                  {action.output ?? "RiloBiz will draft this from your memory when you run it."}
                 </p>
                 <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
                   <ApertureButton variant="accent" onClick={runPrompt} disabled={running}>

@@ -66,7 +66,7 @@ export default function RealLibrary() {
 
   return (
     <>
-      <Helmet><title>Library · Aperture</title></Helmet>
+      <Helmet><title>Library · RiloBiz</title></Helmet>
       <RealAppShell>
         <PageHeader
           index="03 · LIBRARY"
@@ -138,7 +138,7 @@ export default function RealLibrary() {
             {visible.map(a => (
               <Link
                 key={a.slug}
-                to={`/aperture/app/library/${a.slug}`}
+                to={`/app/rilobiz/app/library/${a.slug}`}
                 style={{ textDecoration: "none", color: "inherit", display: "block" }}
               >
                 <ApertureCard padding={18} style={{ cursor: "pointer", height: "100%" }}>

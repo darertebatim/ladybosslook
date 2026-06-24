@@ -43,7 +43,7 @@ export function SourceDetailSheet({
     const chatId = await startChatAboutSource(summary);
     if (chatId) {
       onClose();
-      navigate(`/aperture/app/chats/${chatId}`);
+      navigate(`/app/rilobiz/app/chats/${chatId}`);
     }
   }
 
@@ -226,7 +226,7 @@ export function SourceDetailSheet({
             <RefreshCw size={13} /> {busyHere ? "Refetching…" : "Refetch"}
           </ApertureButton>
           <ApertureButton variant="accent" size="sm" onClick={handleAskChat}>
-            <MessageSquare size={13} /> Ask Aperture about this
+            <MessageSquare size={13} /> Ask RiloBiz about this
           </ApertureButton>
         </div>
       </div>

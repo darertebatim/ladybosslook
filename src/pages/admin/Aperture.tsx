@@ -158,7 +158,7 @@ function BucketsTab() {
   const [editing, setEditing] = useState<Row | null>(null);
 
   return (
-    <Section title="Buckets" description="The 13 territories Aperture knows about. Briefs feed the AI; titles/blurbs show to users."
+    <Section title="Buckets" description="The 13 territories RiloBiz knows about. Briefs feed the AI; titles/blurbs show to users."
       onRefresh={t.refresh} onAdd={() => setEditing({ source: "default", is_active: true, display_order: t.rows.length + 1 })}>
       <Table>
         <TableHeader><TableRow>
@@ -221,7 +221,7 @@ function BucketQuestionsTab() {
   );
 
   return (
-    <Section title="Bucket Questions" description="Questions Aperture can ask the user, grouped by bucket."
+    <Section title="Bucket Questions" description="Questions RiloBiz can ask the user, grouped by bucket."
       onRefresh={t.refresh} onAdd={() => setEditing({ is_active: true, layer: "core", audience: "all", sort_order: 1, input_kind: "long_text" })}>
       <div className="mb-3 flex items-center gap-2">
         <Label className="text-xs">Bucket:</Label>
@@ -604,7 +604,7 @@ export default function ApertureAdmin() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Aperture</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">RiloBiz</h1>
         <p className="text-sm text-muted-foreground">
           Source of truth for buckets, questions, onboarding, and industries. Changes apply immediately to the live product.
         </p>
@@ -644,7 +644,7 @@ function ResetUserTab() {
 
   const run = async () => {
     if (!email.trim()) return;
-    if (!confirm(`Reset ALL Aperture data for ${email}? This deletes memory, chats, profile, generated items, files, documents, and events. The auth account stays.`)) return;
+    if (!confirm(`Reset ALL RiloBiz data for ${email}? This deletes memory, chats, profile, generated items, files, documents, and events. The auth account stays.`)) return;
     setBusy(true); setResult(null);
     const { data, error } = await supabase.functions.invoke("aperture-reset-user", {
       body: { email: email.trim() },
@@ -659,11 +659,11 @@ function ResetUserTab() {
       return;
     }
     setResult(data);
-    toast({ title: "User reset", description: `Cleared Aperture data for ${email}` });
+    toast({ title: "User reset", description: `Cleared RiloBiz data for ${email}` });
   };
 
   return (
-    <Section title="Reset Aperture User" description="Wipe a user's Aperture state (memory, chats, profile, generated content, files) so they can run onboarding from scratch. The auth account is preserved.">
+    <Section title="Reset RiloBiz User" description="Wipe a user's RiloBiz state (memory, chats, profile, generated content, files) so they can run onboarding from scratch. The auth account is preserved.">
       <div className="flex items-end gap-2 max-w-xl">
         <div className="flex-1 space-y-1.5">
           <Label>User email</Label>
@@ -771,7 +771,7 @@ function UsersTab() {
   const fmt = (n: number) => n.toLocaleString();
 
   return (
-    <Section title="Aperture Users" description="Only users who have started Aperture. Tap a row to see their onboarding answers & memory."
+    <Section title="RiloBiz Users" description="Only users who have started RiloBiz. Tap a row to see their onboarding answers & memory."
       onRefresh={load}>
       <div className="mb-3 flex items-center gap-2">
         <Input placeholder="Search email, name, business…" value={search} onChange={(e) => setSearch(e.target.value)} className="max-w-sm" />

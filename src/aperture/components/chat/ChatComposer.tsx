@@ -218,7 +218,7 @@ export function ChatComposer({ chatId, userId, disabled, streaming, onStop, onSe
           value={draft}
           onChange={e => setDraft(e.target.value)}
           onPaste={onPaste}
-          placeholder={streaming ? "Aperture is replying…" : "Type your answer..."}
+          placeholder={streaming ? "RiloBiz is replying…" : "Type your answer..."}
           disabled={disabled || streaming}
           style={{
             flex: 1, appearance: "none", border: "none", outline: "none",

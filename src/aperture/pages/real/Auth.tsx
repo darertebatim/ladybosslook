@@ -16,7 +16,7 @@ export default function ApertureAuth() {
   const { toast } = useToast();
 
   const search = new URLSearchParams(location.search);
-  const redirectPath = search.get("redirect") || "/aperture/app";
+  const redirectPath = search.get("redirect") || "/app/rilobiz/app";
 
   const [mode, setMode] = useState<Mode>(search.get("mode") === "login" ? "login" : "signup");
   const [email, setEmail] = useState("");
@@ -34,7 +34,7 @@ export default function ApertureAuth() {
     try {
       if (mode === "forgot") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/aperture/auth`,
+          redirectTo: `${window.location.origin}/app/rilobiz/auth`,
         });
         if (error) throw error;
         toast({ title: "Check your email", description: "We've sent you a reset link." });
@@ -91,8 +91,8 @@ export default function ApertureAuth() {
       }}
     >
       <Helmet>
-        <title>Aperture — Sign in</title>
-        <meta name="description" content="Sign in to Aperture." />
+        <title>RiloBiz — Sign in</title>
+        <meta name="description" content="Sign in to RiloBiz." />
       </Helmet>
 
       <div style={{ width: "100%", maxWidth: 380 }}>

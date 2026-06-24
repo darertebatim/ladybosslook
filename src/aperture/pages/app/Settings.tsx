@@ -21,7 +21,7 @@ export default function Settings() {
   return (
     <>
       <Helmet>
-        <title>Settings · Aperture</title>
+        <title>Settings · RiloBiz</title>
       </Helmet>
       <AppShell>
         <PageHeader
@@ -36,7 +36,7 @@ export default function Settings() {
               <div>
                 <ApertureMonoLabel>Appearance</ApertureMonoLabel>
                 <h3 style={{ margin: "6px 0 2px", fontSize: 15, color: "var(--ap-ink-1)", fontWeight: 600 }}>Theme</h3>
-                <p style={{ margin: 0, fontSize: 13, color: "var(--ap-ink-2)" }}>Day or night — Aperture works in both.</p>
+                <p style={{ margin: 0, fontSize: 13, color: "var(--ap-ink-2)" }}>Day or night — RiloBiz works in both.</p>
               </div>
               <ApertureThemeSwitch />
             </div>
