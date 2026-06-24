@@ -9,6 +9,12 @@ const IRAN_TIMEZONES = new Set<string>([
   "Asia/Tehran",
 ]);
 
+const RILOBIZ_HIDDEN_TIMEZONES = new Set<string>([
+  "Asia/Tehran",
+  "Asia/Kabul",
+  "Asia/Baghdad",
+]);
+
 export function getDeviceTimezone(): string {
   try {
     return Intl.DateTimeFormat().resolvedOptions().timeZone || "";
@@ -19,6 +25,11 @@ export function getDeviceTimezone(): string {
 
 export function isIranTimezone(): boolean {
   return IRAN_TIMEZONES.has(getDeviceTimezone());
+}
+
+/** Whether the current device timezone should hide the RiloBiz button. */
+export function isRiloBizHiddenRegion(): boolean {
+  return RILOBIZ_HIDDEN_TIMEZONES.has(getDeviceTimezone());
 }
 
 /** Convenience: whether support chat should be blocked for the current device. */
