@@ -244,24 +244,24 @@ export default function AppTest() {
 
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg">🏅 Badge Celebrations</CardTitle>
+                <CardTitle className="text-lg">🏆 Trophy Celebrations</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button onClick={() => setBadgeCelebrationType('action')} className="w-full justify-start" variant="outline">
                   ✨ Action Completion Toast
                 </Button>
                 <Button onClick={() => setBadgeCelebrationType('silver')} className="w-full justify-start" variant="outline">
-                  🥈 Silver Badge Toast (50%)
+                  🏆 Halfway-to-Trophy Toast (50%)
                 </Button>
                 <Button onClick={() => setBadgeCelebrationType('almostGold')} className="w-full justify-start" variant="outline">
-                  ⭐ Almost Gold Toast
+                  ⭐ Almost-Trophy Toast
                 </Button>
                 <Button onClick={() => setBadgeCelebrationType('gold')} className="w-full justify-start" variant="outline">
-                  🥇 Gold Badge Modal (100%)
+                  🏆 Trophy Earned Modal (100%)
                 </Button>
                 <Button onClick={() => setShowGoldStreakCelebration(true)} className="w-full justify-start" variant="outline">
                   <Flame className="h-4 w-4 mr-2" />
-                  Gold Streak Celebration
+                  Trophy Streak Celebration
                 </Button>
                 <Button onClick={() => { setConfirmedGoal(14); setShowGoalConfirmation(true); }} className="w-full justify-start" variant="outline">
                   <Flame className="h-4 w-4 mr-2" />
@@ -650,10 +650,10 @@ export default function AppTest() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Flame className="h-5 w-5 text-orange-500" />
-            Badge & Streak Celebrations
+            Trophy & Streak Celebrations
           </CardTitle>
           <CardDescription>
-            Test daily badge progress toasts and gold streak celebrations
+            Test daily trophy progress toasts and trophy streak celebrations
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -662,17 +662,17 @@ export default function AppTest() {
               ✨ Action Completion Toast
             </Button>
             <Button onClick={() => setBadgeCelebrationType('silver')} variant="outline">
-              🥈 Silver Badge Toast (50%)
+              🏆 Halfway-to-Trophy Toast (50%)
             </Button>
             <Button onClick={() => setBadgeCelebrationType('almostGold')} variant="outline">
-              ⭐ Almost Gold Toast
+              ⭐ Almost-Trophy Toast
             </Button>
             <Button onClick={() => setBadgeCelebrationType('gold')} variant="outline">
-              🥇 Gold Badge Modal (100%)
+              🏆 Trophy Earned Modal (100%)
             </Button>
             <Button onClick={() => setShowGoldStreakCelebration(true)} variant="outline">
               <Flame className="h-4 w-4 mr-2" />
-              Gold Streak Celebration
+              Trophy Streak Celebration
             </Button>
             <Button onClick={() => setShowStreakGoalSelection(true)} variant="outline">
               <Flame className="h-4 w-4 mr-2" />
