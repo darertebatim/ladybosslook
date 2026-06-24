@@ -1,4 +1,5 @@
 import { CSSProperties } from "react";
+import rilobizLogo from "@/assets/rilobiz-logo.png.asset.json";
 
 interface ApertureLogoProps {
   size?: number;
@@ -18,40 +19,20 @@ export function ApertureLogo({
   color,
   className,
   style,
-  title = "Aperture",
+  title = "RiloBiz",
 }: ApertureLogoProps) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 48 48"
+    <img
+      src={rilobizLogo.url}
       width={size}
       height={size}
+      alt={title}
       role="img"
       aria-label={title}
       className={className}
-      style={{ color, display: "block", ...style }}
-    >
-      <title>{title}</title>
-      <g
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {/* outer ring */}
-        <circle cx="24" cy="24" r="20" />
-        {/* six iris blades — each goes from a point on the outer ring tangent-style
-            to a point on the inner hexagonal aperture */}
-        <path d="M24 4 L33 18 L15 18 Z" opacity="0.95" />
-        <path d="M41.3 14 L30 19 L36 34 Z" opacity="0.95" />
-        <path d="M41.3 34 L30 29 L24 44 Z" opacity="0.95" />
-        <path d="M6.7 34 L18 29 L12 14.5 Z" opacity="0.95" />
-        <path d="M6.7 14 L18 19 L24 4 Z" opacity="0" />
-        {/* inner aperture hexagon */}
-        <path d="M24 16 L31 20 L31 28 L24 32 L17 28 L17 20 Z" />
-      </g>
-    </svg>
+      style={{ display: "block", color, ...style }}
+      draggable={false}
+    />
   );
 }
 
@@ -86,7 +67,7 @@ export function ApertureWordmark({
       }}
     >
       {showMark && <ApertureLogo size={size * 1.15} />}
-      <span>Aperture</span>
+      <span>RiloBiz</span>
     </span>
   );
 }
