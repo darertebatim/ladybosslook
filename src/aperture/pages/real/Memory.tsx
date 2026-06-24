@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "react-router-dom";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
@@ -42,6 +42,63 @@ export default function RealMemory() {
     }
     return m;
   }, [items]);
+
+  // ─── Memory Level ─────────────────────────────────────────────────────────
+  // Total fact count across the memory pool. Excludes rows with source
+  // "skipped" or "unknown" (none of our current sources match, but kept
+  // for future-proofing). Onboarding-complete unlocks Level 1.
+  const factCount = useMemo(
+    () => items.filter(i => !["skipped", "unknown"].includes(String(i.source))).length,
+    [items],
+  );
+  const onboarded = !!profile?.full_onboarded_at || factCount > 0;
+  const computedLevel = useMemo(() => computeMemoryLevel(factCount, onboarded), [factCount, onboarded]);
+
+  // Levels never decrease — even if facts are soft-deleted/superseded.
+  const LEVEL_FLOOR_KEY = "rilobiz.memoryLevel.floor";
+  const LEVEL_SEEN_KEY = "rilobiz.memoryLevel.lastSeen";
+  const [level, setLevel] = useState<number>(() => {
+    if (typeof window === "undefined") return computedLevel;
+    const floor = Number(window.localStorage.getItem(LEVEL_FLOOR_KEY) ?? 0);
+    return Math.max(floor, computedLevel);
+  });
+  useEffect(() => {
+    const next = Math.max(level, computedLevel);
+    if (next !== level) setLevel(next);
+    try { window.localStorage.setItem(LEVEL_FLOOR_KEY, String(next)); } catch {}
+  }, [computedLevel, level]);
+
+  // Level-up moment — one-line message for a few seconds. No modal.
+  const [leveledUp, setLeveledUp] = useState(false);
+  const initRef = useRef(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const lastSeen = Number(window.localStorage.getItem(LEVEL_SEEN_KEY) ?? 0);
+    if (!initRef.current) {
+      initRef.current = true;
+      // Don't celebrate on first mount unless we've actually crossed.
+      if (level > lastSeen && lastSeen > 0) {
+        setLeveledUp(true);
+        const t = setTimeout(() => setLeveledUp(false), 4000);
+        try { window.localStorage.setItem(LEVEL_SEEN_KEY, String(level)); } catch {}
+        return () => clearTimeout(t);
+      }
+      try { window.localStorage.setItem(LEVEL_SEEN_KEY, String(level)); } catch {}
+      return;
+    }
+    if (level > lastSeen) {
+      setLeveledUp(true);
+      try { window.localStorage.setItem(LEVEL_SEEN_KEY, String(level)); } catch {}
+      const t = setTimeout(() => setLeveledUp(false), 4000);
+      return () => clearTimeout(t);
+    }
+  }, [level]);
+
+  const prevT = prevThreshold(level);
+  const nextT = nextThreshold(level);
+  const span = Math.max(1, nextT - prevT);
+  const intoLevel = Math.max(0, factCount - prevT);
+  const levelPct = Math.min(100, Math.round((intoLevel / span) * 100));
 
   const progressFor = (slug: string, target: number) => {
     const t = Math.max(1, target ?? 8);
@@ -162,6 +219,52 @@ export default function RealMemory() {
           <ApertureLoading label="Loading…" />
         ) : (
           <>
+          {/* Memory Level — single number, progress to next. Cosmetic only. */}
+          <div style={{ marginBottom: 16 }}>
+            <div style={{
+              display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12,
+              marginBottom: 8,
+            }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+                <ApertureMonoLabel>Level</ApertureMonoLabel>
+                <span
+                  key={level}
+                  style={{
+                    fontSize: 28, fontWeight: 700, color: "var(--ap-ink-1)",
+                    fontVariantNumeric: "tabular-nums",
+                    animation: leveledUp ? "rilobizLevelPulse 700ms ease-out" : undefined,
+                  }}
+                >
+                  {level}
+                </span>
+              </div>
+              <ApertureMonoLabel>
+                {level >= 1 ? `${factCount} / ${nextT} facts` : `${factCount} facts`}
+              </ApertureMonoLabel>
+            </div>
+            <div style={{
+              height: 4, borderRadius: 2, background: "var(--ap-hairline)", overflow: "hidden",
+            }}>
+              <div style={{
+                width: `${levelPct}%`, height: "100%",
+                background: "var(--ap-signal)",
+                transition: "width 400ms ease",
+              }} />
+            </div>
+            <div style={{
+              minHeight: 18, marginTop: 6, fontSize: 12, color: "var(--ap-signal)",
+              opacity: leveledUp ? 1 : 0, transition: "opacity 240ms ease",
+            }}>
+              {leveledUp ? `You reached Level ${level}.` : ""}
+            </div>
+            <style>{`
+              @keyframes rilobizLevelPulse {
+                0% { transform: scale(1); }
+                40% { transform: scale(1.18); }
+                100% { transform: scale(1); }
+              }
+            `}</style>
+          </div>
           {/* Full business brief — pinned above the bucket grid. */}
           <div style={{ marginBottom: 20 }}>
             <BriefCard
