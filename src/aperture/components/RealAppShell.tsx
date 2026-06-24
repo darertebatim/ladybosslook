@@ -6,6 +6,7 @@ import { ApertureWordmark } from "@/aperture/brand/ApertureLogo";
 import { ApertureMonoLabel, ApertureThemeSwitch } from "./primitives";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import riloAppIcon from "@/assets/rilo-app-icon.png";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { ChatsRail } from "./ChatsRail";
 
