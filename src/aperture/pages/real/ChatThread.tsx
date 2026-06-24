@@ -185,72 +185,7 @@ export default function RealChatThread() {
   return (
     <>
       <Helmet><title>{chat?.title ?? "Chat"} · RiloBiz</title></Helmet>
-      <RealAppShell
-        rightRail={
-          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-            <button onClick={startNew} style={{
-              appearance: "none", cursor: "pointer",
-              padding: "10px 12px", borderRadius: "var(--ap-radius-sm)",
-              background: "var(--ap-signal)", color: "var(--ap-on-signal)",
-              border: "none", fontFamily: "var(--ap-font-sans)", fontWeight: 500, fontSize: 13,
-            }}>+ New chat</button>
-            <div>
-              <ApertureMonoLabel>Conversations</ApertureMonoLabel>
-              <input
-                value={sidebarQuery}
-                onChange={e => setSidebarQuery(e.target.value)}
-                placeholder="Search chats…"
-                style={{
-                  marginTop: 8, width: "100%", boxSizing: "border-box",
-                  appearance: "none", outline: "none",
-                  background: "var(--ap-surface-2)",
-                  border: "1px solid var(--ap-hairline)",
-                  borderRadius: "var(--ap-radius-xs)",
-                  padding: "8px 10px", fontSize: 12.5,
-                  color: "var(--ap-ink-1)", fontFamily: "var(--ap-font-sans)",
-                }}
-              />
-              <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 14, maxHeight: "55vh", overflowY: "auto" }}>
-                {filteredChats.length === 0 && (
-                  <span style={{ fontSize: 12, color: "var(--ap-ink-3)" }}>No conversations found.</span>
-                )}
-                {groupedChats.map(group => (
-                  <div key={group.label}>
-                    <span style={{
-                      display: "block", fontFamily: "var(--ap-font-mono)",
-                      fontSize: 10, color: "var(--ap-ink-3)",
-                      textTransform: "uppercase", letterSpacing: "0.12em",
-                      marginBottom: 4,
-                    }}>{group.label}</span>
-                    {group.items.map(c => (
-                      <Link key={c.id} to={`/app/rilobiz/app/chats/${c.id}`} style={{
-                        display: "block",
-                        padding: "7px 10px", borderRadius: "var(--ap-radius-xs)",
-                        fontSize: 13, textDecoration: "none",
-                        background: c.id === id ? "var(--ap-surface-2)" : "transparent",
-                        color: c.id === id ? "var(--ap-ink-1)" : "var(--ap-ink-2)",
-                        overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                        fontWeight: c.id === id ? 600 : 400,
-                      }}>{c.title}</Link>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div style={{ paddingTop: 14, borderTop: "1px solid var(--ap-hairline)" }}>
-              <ApertureMonoLabel>Grounded in</ApertureMonoLabel>
-              <p style={{ margin: "8px 0 10px", fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
-                {items.length === 0
-                  ? "Nothing yet — your memory is empty."
-                  : `${items.length} thing${items.length === 1 ? "" : "s"} from your memory.`}
-              </p>
-              <Link to="/app/rilobiz/app/memory" style={{ fontSize: 11, color: "var(--ap-signal)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
-                Open memory →
-              </Link>
-            </div>
-          </div>
-        }
-      >
+      <RealAppShell>
         <div style={{ display: "flex", flexDirection: "column", height: "calc(100dvh - 80px)", minHeight: 360, maxWidth: "100%", overflowX: "hidden" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
             <div style={{ minWidth: 0 }}>
