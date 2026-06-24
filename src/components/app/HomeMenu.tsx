@@ -23,6 +23,7 @@ import {
   Flame,
   ChevronRight,
   Target,
+  Sparkles,
 } from "lucide-react";
 import {
   Sheet,
