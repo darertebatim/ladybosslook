@@ -1,22 +1,13 @@
 import { format, addDays, startOfWeek, isSameDay, isBefore, startOfDay } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useWeeklyTaskCompletion, BadgeLevel } from '@/hooks/useWeeklyTaskCompletion';
-
-import coinBronze from '@/assets/coin-bronze.png';
-import coinSilver from '@/assets/coin-silver.png';
-import coinGold from '@/assets/coin-gold.png';
+import { FluentEmoji } from '@/components/ui/FluentEmoji';
 
 interface WeeklyPresenceGridProps {
   lastActiveDate?: Date | null;
   showedUpToday?: boolean;
   variant?: 'light' | 'dark';
 }
-
-const BADGE_IMAGES: Record<Exclude<BadgeLevel, 'none'>, string> = {
-  bronze: coinBronze,
-  silver: coinSilver,
-  gold: coinGold,
-};
 
 export function WeeklyPresenceGrid({ 
   lastActiveDate, 
@@ -37,8 +28,8 @@ export function WeeklyPresenceGrid({
     const dayStats = weeklyCompletion?.[dateStr];
     const badgeLevel = dayStats?.badgeLevel || 'none';
     
-    // Day is active if it has a badge (completed at least 1 task)
-    const isActive = badgeLevel !== 'none';
+    // Only a fully-complete (gold) day shows a trophy
+    const isActive = badgeLevel === 'gold';
     
     return {
       date: day,
@@ -77,12 +68,8 @@ export function WeeklyPresenceGrid({
               !day.isActive && !isDark && 'bg-orange-100 text-orange-400'
             )}
           >
-          {day.isActive && day.badgeLevel !== 'none' ? (
-              <img 
-                src={BADGE_IMAGES[day.badgeLevel]} 
-                alt={`${day.badgeLevel} badge`}
-                className="w-[140%] h-[140%] object-cover"
-              />
+          {day.isActive ? (
+              <FluentEmoji emoji="🏆" size={32} />
             ) : (
               <span>{format(day.date, 'd')}</span>
             )}
