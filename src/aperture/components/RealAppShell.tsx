@@ -138,22 +138,31 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
                     <img src={riloAppIcon} alt="Rilo" width={22} height={22} style={{ borderRadius: 6, display: "block" }} />
                     Go to RiloME
                   </Link>
-                  <label style={{
-                    display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
-                    padding: "10px 10px", borderRadius: "var(--ap-radius-xs)",
-                    fontSize: 13.5, color: "var(--ap-ink-2)",
-                    background: "transparent", cursor: "pointer",
-                  }}>
+                  <label
+                    onClick={() => setLockOnRilobiz(v => !v)}
+                    style={{
+                      display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
+                      padding: "10px 10px", borderRadius: "var(--ap-radius-xs)",
+                      fontSize: 13.5, color: "var(--ap-ink-2)",
+                      background: "transparent", cursor: "pointer",
+                    }}
+                  >
                     <span>Lock on RiloBiz</span>
-                    <input
-                      type="checkbox"
-                      checked={lockOnRilobiz}
-                      onChange={(e) => setLockOnRilobiz(e.target.checked)}
-                      style={{ width: 36, height: 20, appearance: "none", borderRadius: 999,
-                        background: lockOnRilobiz ? "var(--ap-signal)" : "var(--ap-surface-3, #d4d4d8)",
-                        position: "relative", cursor: "pointer", transition: "background 120ms",
-                        outline: "none", border: "1px solid var(--ap-hairline)" }}
-                    />
+                    <span style={{
+                      width: 36, height: 20, borderRadius: 999,
+                      background: lockOnRilobiz ? "var(--ap-signal)" : "var(--ap-surface-3, #d4d4d8)",
+                      position: "relative", transition: "background 180ms ease",
+                      outline: "none", border: "1px solid var(--ap-hairline)",
+                      display: "inline-block", flexShrink: 0,
+                    }}>
+                      <span style={{
+                        position: "absolute", top: 2, left: lockOnRilobiz ? 18 : 2,
+                        width: 14, height: 14, borderRadius: 999,
+                        background: "#fff",
+                        transition: "left 180ms ease",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+                      }} />
+                    </span>
                   </label>
                 </div>
                 <div style={{ marginTop: 18, paddingTop: 14, borderTop: "1px solid var(--ap-hairline)" }}>
