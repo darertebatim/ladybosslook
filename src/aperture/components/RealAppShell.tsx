@@ -7,6 +7,7 @@ import { ApertureMonoLabel, ApertureThemeSwitch } from "./primitives";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { ChatsRail } from "./ChatsRail";
 
 const NAV = [
   { to: "/app/rilobiz/app",          label: "Home",     end: true },
@@ -15,8 +16,6 @@ const NAV = [
   { to: "/app/rilobiz/app/library",  label: "Library" },
   { to: "/app/rilobiz/app/settings", label: "Settings" },
 ];
-
-const MOBILE_TABS = NAV.filter(n => n.label !== "Settings");
 
 function Icon({ name }: { name: string }) {
   const props = { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.75, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
@@ -31,23 +30,22 @@ function Icon({ name }: { name: string }) {
 }
 
 /** Auth-gated shell for the real /app/rilobiz/app/* product. */
-export function RealAppShell({ children, rightRail }: { children: ReactNode; rightRail?: ReactNode }) {
+export function RealAppShell({ children }: { children: ReactNode; rightRail?: ReactNode }) {
   const isMobile = useIsMobile();
   const { user } = useAuth();
   const loc = useLocation();
   const initial = (user?.email ?? "U").slice(0, 1).toUpperCase();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  // Claude-style chromeless mode for an open chat thread.
-  const isChatThread = /^\/aperture\/app\/chats\/[^/]+/.test(loc.pathname);
+  const isChatThread = /^\/app\/rilobiz\/app\/chats\/[^/]+/.test(loc.pathname);
 
   if (isMobile) {
-    if (isChatThread) {
-      return (
-        <div style={{ minHeight: "100vh", background: "var(--ap-canvas)" }}>
+    return (
+      <div style={{ minHeight: "100vh", background: "var(--ap-canvas)" }}>
           <header style={{
             position: "sticky", top: 0, zIndex: 30,
             display: "flex", alignItems: "center", justifyContent: "space-between",
-            padding: "12px 14px", background: "transparent",
+            padding: "12px 14px", background: "var(--ap-canvas)",
+            borderBottom: isChatThread ? "none" : "1px solid var(--ap-hairline)",
           }}>
             <button
               onClick={() => setDrawerOpen(true)}
@@ -62,6 +60,7 @@ export function RealAppShell({ children, rightRail }: { children: ReactNode; rig
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
             </button>
+            <ApertureWordmark size={14} />
             <Link
               to="/app/rilobiz/app/chats"
               aria-label="New chat"
@@ -92,7 +91,7 @@ export function RealAppShell({ children, rightRail }: { children: ReactNode; rig
                 opacity: 1,
               }}
             >
-              <div style={{ display: "flex", flexDirection: "column", height: "100%", padding: "20px 16px", background: "var(--ap-canvas)" }}>
+              <div style={{ display: "flex", flexDirection: "column", height: "100%", padding: "20px 16px", background: "var(--ap-canvas)", overflowY: "auto" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
                   <ApertureWordmark size={16} />
                   <ApertureThemeSwitch />
@@ -117,11 +116,9 @@ export function RealAppShell({ children, rightRail }: { children: ReactNode; rig
                     );
                   })}
                 </nav>
-                {rightRail && (
-                  <div style={{ marginTop: 18, paddingTop: 14, borderTop: "1px solid var(--ap-hairline)" }}>
-                    {rightRail}
-                  </div>
-                )}
+                <div style={{ marginTop: 18, paddingTop: 14, borderTop: "1px solid var(--ap-hairline)" }}>
+                  <ChatsRail onNavigate={() => setDrawerOpen(false)} />
+                </div>
                 <div style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid var(--ap-hairline)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                   <span style={{ fontSize: 12, color: "var(--ap-ink-3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 180 }}>{user?.email ?? "Signed in"}</span>
                   <button
@@ -134,52 +131,6 @@ export function RealAppShell({ children, rightRail }: { children: ReactNode; rig
             </SheetContent>
           </Sheet>
         </div>
-      );
-    }
-
-    return (
-      <div style={{ minHeight: "100vh", paddingBottom: 92 }}>
-        <header style={{
-          position: "sticky", top: 0, zIndex: 30,
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "14px 18px", background: "var(--ap-canvas)",
-          borderBottom: "1px solid var(--ap-hairline)",
-        }}>
-          <ApertureWordmark size={15} />
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <Link to="/app/rilobiz/app/settings" style={{ color: "var(--ap-ink-2)", display: "inline-flex" }}>
-              <Icon name="Settings" />
-            </Link>
-            <ApertureThemeSwitch />
-          </div>
-        </header>
-        <main style={{ padding: "20px 18px 24px" }}>{children}</main>
-        <nav style={{
-          position: "fixed", left: 12, right: 12, bottom: 12, zIndex: 50,
-          padding: 6, display: "grid",
-          gridTemplateColumns: `repeat(${MOBILE_TABS.length}, 1fr)`, gap: 2,
-          background: "var(--ap-surface-1)", border: "1px solid var(--ap-hairline)",
-          borderRadius: 999, backdropFilter: "blur(14px)",
-          boxShadow: "var(--ap-shadow-raised)",
-        }}>
-          {MOBILE_TABS.map(t => {
-            const active = t.end ? loc.pathname === t.to : loc.pathname.startsWith(t.to);
-            return (
-              <NavLink key={t.to} to={t.to} end={t.end} style={{
-                display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
-                padding: "8px 0", borderRadius: 999, fontSize: 10,
-                fontFamily: "var(--ap-font-mono)", letterSpacing: "0.12em", textTransform: "uppercase",
-                textDecoration: "none",
-                color: active ? "var(--ap-ink-1)" : "var(--ap-ink-3)",
-                background: active ? "var(--ap-surface-3)" : "transparent",
-              }}>
-                <span style={{ color: active ? "var(--ap-signal)" : "currentColor" }}><Icon name={t.label} /></span>
-                {t.label}
-              </NavLink>
-            );
-          })}
-        </nav>
-      </div>
     );
   }
 
@@ -238,11 +189,9 @@ export function RealAppShell({ children, rightRail }: { children: ReactNode; rig
             );
           })}
         </nav>
-        {rightRail && (
-          <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--ap-hairline)" }}>
-            {rightRail}
-          </div>
-        )}
+        <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--ap-hairline)" }}>
+          <ChatsRail />
+        </div>
         <div style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid var(--ap-hairline)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
           <ApertureMonoLabel>Theme</ApertureMonoLabel>
           <ApertureThemeSwitch />
