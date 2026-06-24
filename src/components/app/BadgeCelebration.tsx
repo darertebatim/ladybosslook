@@ -71,8 +71,8 @@ export function BadgeCelebration({
   const [actionMessage, setActionMessage] = useState('');
 
   const { handleShare } = useShareContent({
-    title: 'Gold Day on Rilo',
-    text: `🥇 Just earned my Gold badge on Rilo — every task done today!`,
+    title: 'Trophy Day on Rilo',
+    text: `🏆 Just earned a trophy on Rilo — every task done today!`,
     source: 'badge_gold',
   });
 
@@ -244,12 +244,12 @@ export function BadgeCelebration({
           <div className="flex-1 min-w-0">
             <p className="text-white font-semibold text-base">
               {type === 'silver' 
-                ? '2 tasks done — Silver Badge!' 
-                : 'Almost there! One more for Gold!'
+                ? 'Halfway to your trophy!' 
+                : 'Almost there! One more for your trophy!'
               }
             </p>
             {type === 'silver' ? (
-              <p className="text-white/70 text-sm">Silver Badge collected!</p>
+              <p className="text-white/70 text-sm">Keep going — finish today to earn 🏆</p>
             ) : (
               <div className="mt-1.5">
                 <div className="h-2 bg-white/20 rounded-full overflow-hidden">
@@ -326,7 +326,7 @@ export function BadgeCelebration({
         {/* Text content */}
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-white mb-2">
-            Legendary day!
+            Trophy earned!
           </h2>
           <p className="text-white/80 text-sm leading-relaxed">
             Every task completed today is a{'\n'}testament to your dedication.
@@ -338,7 +338,7 @@ export function BadgeCelebration({
           onClick={handleCollectGold}
           className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-4 rounded-xl text-base h-auto"
         >
-          Collect my Gold Badge
+          Collect my trophy
         </Button>
 
         {/* Share button */}
