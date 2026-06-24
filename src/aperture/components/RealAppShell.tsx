@@ -117,6 +117,11 @@ export function RealAppShell({ children, rightRail }: { children: ReactNode; rig
                     );
                   })}
                 </nav>
+                {rightRail && (
+                  <div style={{ marginTop: 18, paddingTop: 14, borderTop: "1px solid var(--ap-hairline)" }}>
+                    {rightRail}
+                  </div>
+                )}
                 <div style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid var(--ap-hairline)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                   <span style={{ fontSize: 12, color: "var(--ap-ink-3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 180 }}>{user?.email ?? "Signed in"}</span>
                   <button
