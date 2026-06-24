@@ -30,6 +30,10 @@ import { ActiveRoundsCarousel } from "@/components/dashboard/ActiveRoundsCarouse
 import { useNewHomeData } from "@/hooks/useNewHomeData";
 import { usePrograms } from "@/hooks/usePrograms";
 import { useMemo } from "react";
+import { useProgramEventsForDate } from "@/hooks/usePlannerProgramEvents";
+import { ProgramEventCard } from "@/components/app/ProgramEventCard";
+import { getLocalDateStr } from "@/lib/localDate";
+import { parseISO } from "date-fns";
 
 // ── Orange Palette (mirrors /admin/brand/mock) ──
 const O = {
@@ -393,6 +397,9 @@ export default function AppMyRiloPath() {
   const [swapTarget, setSwapTarget] = useState<PathStep | null>(null);
   const { data: trophyCount = 0 } = useMyRiloPathTrophies();
 
+  const todayDate = parseISO(getLocalDateStr());
+  const { data: programEvents = [] } = useProgramEventsForDate(todayDate);
+
   const isPathComplete = !!data
     && data.summary.total > 0
     && data.summary.doneCount >= data.summary.total;
@@ -599,6 +606,33 @@ export default function AppMyRiloPath() {
               </span>
             </div>
           </div>
+
+          {/* Today's Program Events */}
+          {programEvents.length > 0 && (
+            <div className="px-4 pt-2 pb-3">
+              <div className="flex items-center gap-2 mb-3 pl-1">
+                <div
+                  className="text-[10px] font-bold uppercase tracking-[0.18em]"
+                  style={{ color: O.primary }}
+                >
+                  Today's events
+                </div>
+                <div
+                  className="flex-1 h-px"
+                  style={{ background: `linear-gradient(90deg, ${O.primary}55, transparent)` }}
+                />
+              </div>
+              <div className="space-y-3">
+                {programEvents.map((event) => (
+                  <ProgramEventCard
+                    key={`${event.type}-${event.id}`}
+                    event={event}
+                    date={todayDate}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* THE PATH */}
           <div className="px-4 pt-3 pb-4 relative">
