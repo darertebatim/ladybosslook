@@ -192,6 +192,8 @@ const AppSupport = lazy(() => import("@/pages/AppSupport"));
 const CartPage = lazy(() => import("@/pages/CartPage"));
 const Rilo = lazy(() => import("@/pages/Rilo"));
 const ApertureRouter = lazy(() => import("@/aperture/router"));
+const RiloBizMarketing = lazy(() => import("@/aperture/pages/marketing/Marketing"));
+const ApertureLayoutLazy = lazy(() => import("@/aperture/components/ApertureLayout").then(m => ({ default: m.ApertureLayout })));
 
 // Eagerly imported (small, always needed)
 import CalendarRedirect from "@/components/CalendarRedirect";
