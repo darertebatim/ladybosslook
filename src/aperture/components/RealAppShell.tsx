@@ -72,7 +72,9 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
           <header style={{
             position: "sticky", top: 0, zIndex: 30,
             display: "flex", alignItems: "center", justifyContent: "space-between",
-            padding: "12px 14px", background: "var(--ap-canvas)",
+            padding: "12px 14px",
+            paddingTop: "calc(12px + env(safe-area-inset-top, 0px))",
+            background: "var(--ap-canvas)",
             borderBottom: isChatThread ? "none" : "1px solid var(--ap-hairline)",
           }}>
             <button
