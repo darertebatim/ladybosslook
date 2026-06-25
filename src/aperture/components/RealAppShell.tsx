@@ -48,6 +48,16 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
   useEffect(() => {
     if (typeof window === "undefined") return;
     localStorage.setItem("rilo:lock-on-rilobiz", userLock ? "1" : "0");
+    // Persist to DB so the lock survives app restarts / reinstalls / new devices.
+    (async () => {
+      try {
+        const { data: { user: u } } = await supabase.auth.getUser();
+        if (!u) return;
+        await (supabase as any)
+          .from("aperture_user_profile")
+          .upsert({ user_id: u.id, user_locked: userLock }, { onConflict: "user_id" });
+      } catch {}
+    })();
   }, [userLock]);
   // Poll the admin-lock localStorage value so the sync hook's write
   // (it runs asynchronously) gets reflected in the toggle UI.
