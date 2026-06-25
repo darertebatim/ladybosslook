@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import riloAppIcon from "@/assets/rilo-app-icon.png";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { ChatsRail } from "./ChatsRail";
+import { useApertureAdminLockSync } from "@/aperture/hooks/useApertureAdminLockSync";
 
 const NAV = [
   { to: "/app/rilobiz/app",          label: "Home",     end: true },
@@ -37,13 +38,32 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
   const loc = useLocation();
   const initial = (user?.email ?? "U").slice(0, 1).toUpperCase();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [lockOnRilobiz, setLockOnRilobiz] = useState<boolean>(() =>
+  useApertureAdminLockSync();
+  const [adminLocked, setAdminLocked] = useState<boolean>(() =>
+    typeof window !== "undefined" && localStorage.getItem("rilo:admin-lock-on-rilobiz") === "1"
+  );
+  const [userLock, setUserLock] = useState<boolean>(() =>
     typeof window !== "undefined" && localStorage.getItem("rilo:lock-on-rilobiz") === "1"
   );
   useEffect(() => {
     if (typeof window === "undefined") return;
-    localStorage.setItem("rilo:lock-on-rilobiz", lockOnRilobiz ? "1" : "0");
-  }, [lockOnRilobiz]);
+    localStorage.setItem("rilo:lock-on-rilobiz", userLock ? "1" : "0");
+  }, [userLock]);
+  // Poll the admin-lock localStorage value so the sync hook's write
+  // (it runs asynchronously) gets reflected in the toggle UI.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const tick = () => {
+      const v = localStorage.getItem("rilo:admin-lock-on-rilobiz") === "1";
+      setAdminLocked(prev => prev === v ? prev : v);
+    };
+    const id = window.setInterval(tick, 1500);
+    window.addEventListener("storage", tick);
+    return () => { window.clearInterval(id); window.removeEventListener("storage", tick); };
+  }, []);
+  const lockOnRilobiz = adminLocked || userLock;
+  const toggleLock = () => { if (!adminLocked) setUserLock(v => !v); };
+  const lockLabel = adminLocked ? "Locked by admin" : (lockOnRilobiz ? "Locked" : "Unlocked");
   const isChatThread = /^\/app\/rilobiz\/app\/chats\/[^/]+/.test(loc.pathname);
 
   if (isMobile) {
