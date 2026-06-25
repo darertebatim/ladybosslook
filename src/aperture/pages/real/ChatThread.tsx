@@ -8,6 +8,7 @@ import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { streamApertureChat, nameApertureChat } from "@/aperture/lib/apertureChat";
 import { useApertureHomeSuggestions } from "@/aperture/hooks/db/useApertureHomeSuggestions";
 import { useAuth } from "@/hooks/useAuth";
+import { haptic } from "@/lib/haptics";
 import { ChatComposer } from "@/aperture/components/chat/ChatComposer";
 import { ChatAttachments, AttachmentMemoryChip } from "@/aperture/components/chat/ChatAttachments";
 import { AperturePrompt } from "@/aperture/components/chat/AperturePrompt";
@@ -80,6 +81,7 @@ export default function RealChatThread() {
     const t = text.trim();
     if (!id || streaming) return;
     if (!escape && !t && !(attachments && attachments.length > 0)) return;
+    haptic.light();
     setError(null);
     if (!escape) setLastSent({ text: t, attachments });
     let nextHistory = messages;

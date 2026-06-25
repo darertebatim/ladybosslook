@@ -10,6 +10,7 @@ import riloAppIcon from "@/assets/rilo-app-icon.png";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { ChatsRail } from "./ChatsRail";
 import { useApertureAdminLockSync } from "@/aperture/hooks/useApertureAdminLockSync";
+import { haptic } from "@/lib/haptics";
 
 const NAV = [
   { to: "/app/rilobiz/app",          label: "Home",     end: true },
@@ -72,7 +73,11 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
     return () => { window.clearInterval(id); window.removeEventListener("storage", tick); };
   }, []);
   const lockOnRilobiz = adminLocked || userLock;
-  const toggleLock = () => { if (!adminLocked) setUserLock(v => !v); };
+  const toggleLock = () => {
+    if (adminLocked) { haptic.warning(); return; }
+    haptic.medium();
+    setUserLock(v => !v);
+  };
   const lockLabel = adminLocked ? "Locked by admin" : (lockOnRilobiz ? "Locked" : "Unlocked");
   const isChatThread = /^\/app\/rilobiz\/app\/chats\/[^/]+/.test(loc.pathname);
 
@@ -88,7 +93,7 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
             borderBottom: isChatThread ? "none" : "1px solid var(--ap-hairline)",
           }}>
             <button
-              onClick={() => setDrawerOpen(true)}
+              onClick={() => { haptic.light(); setDrawerOpen(true); }}
               aria-label="Open menu"
               style={{
                 width: 38, height: 38, borderRadius: 999,
@@ -157,7 +162,7 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
                     const active = item.end ? loc.pathname === item.to : loc.pathname.startsWith(item.to);
                     return (
                       <NavLink key={item.to} to={item.to} end={item.end}
-                        onClick={() => setDrawerOpen(false)}
+                        onClick={() => { haptic.light(); setDrawerOpen(false); }}
                         style={{
                           display: "flex", alignItems: "center", gap: 12,
                           padding: "12px 12px", borderRadius: "var(--ap-radius-xs)",
@@ -175,7 +180,7 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
                 <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--ap-hairline)", display: "flex", flexDirection: "column", gap: 8 }}>
                   <Link
                     to="/app/my-rilo"
-                    onClick={() => setDrawerOpen(false)}
+                    onClick={() => { haptic.medium(); setDrawerOpen(false); }}
                     style={{
                       display: "flex", alignItems: "center", gap: 10,
                       padding: "10px 10px", borderRadius: "var(--ap-radius-xs)",
@@ -225,7 +230,7 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
                 <div style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid var(--ap-hairline)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                   <span style={{ fontSize: 12, color: "var(--ap-ink-3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 180 }}>{user?.email ?? "Signed in"}</span>
                   <button
-                    onClick={() => supabase.auth.signOut()}
+                    onClick={() => { haptic.warning(); supabase.auth.signOut(); }}
                     style={{ appearance: "none", border: "none", background: "transparent", color: "var(--ap-ink-3)", fontSize: 11, padding: 0, cursor: "pointer", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
                     Sign out
                   </button>
@@ -267,7 +272,7 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
               {user?.email ?? "Signed in"}
             </span>
             <button
-              onClick={() => supabase.auth.signOut()}
+              onClick={() => { haptic.warning(); supabase.auth.signOut(); }}
               style={{ appearance: "none", border: "none", background: "transparent", color: "var(--ap-ink-3)", fontSize: 11, padding: 0, textAlign: "left", cursor: "pointer", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
               Sign out
             </button>
@@ -278,6 +283,7 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
             const active = item.end ? loc.pathname === item.to : loc.pathname.startsWith(item.to);
             return (
               <NavLink key={item.to} to={item.to} end={item.end}
+                onClick={() => haptic.light()}
                 style={{
                   display: "flex", alignItems: "center", gap: 10,
                   padding: "9px 10px", borderRadius: "var(--ap-radius-xs)",
@@ -295,6 +301,7 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
         <div style={{ marginTop: 20, paddingTop: 14, borderTop: "1px solid var(--ap-hairline)", display: "flex", flexDirection: "column", gap: 8 }}>
           <Link
             to="/app/my-rilo"
+            onClick={() => haptic.medium()}
             style={{
               display: "flex", alignItems: "center", gap: 10,
               padding: "9px 10px", borderRadius: "var(--ap-radius-xs)",
