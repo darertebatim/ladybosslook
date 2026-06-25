@@ -875,6 +875,7 @@ type ApertureUserRow = {
   message_count: number;
   tokens_in: number;
   tokens_out: number;
+  admin_locked: boolean;
 };
 
 function UsersTab() {
@@ -926,6 +927,7 @@ function UsersTab() {
         message_count: msgCount.get(p.user_id) ?? 0,
         tokens_in: tIn.get(p.user_id) ?? 0,
         tokens_out: tOut.get(p.user_id) ?? 0,
+        admin_locked: !!p.admin_locked,
       }));
       setRows(merged);
     } catch (e: any) {
@@ -949,6 +951,21 @@ function UsersTab() {
 
   const fmt = (n: number) => n.toLocaleString();
 
+  const toggleLock = async (row: ApertureUserRow, next: boolean) => {
+    // Optimistic update
+    setRows(prev => prev.map(r => r.user_id === row.user_id ? { ...r, admin_locked: next } : r));
+    const { error } = await (supabase as any)
+      .from("aperture_user_profile")
+      .update({ admin_locked: next })
+      .eq("user_id", row.user_id);
+    if (error) {
+      setRows(prev => prev.map(r => r.user_id === row.user_id ? { ...r, admin_locked: !next } : r));
+      toast({ title: "Lock update failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: next ? "Locked on RiloBiz" : "Unlocked", description: row.email ?? row.user_id.slice(0, 8) });
+  };
+
   return (
     <Section title="RiloBiz Users" description="Only users who have started RiloBiz. Tap a row to see their onboarding answers & memory."
       onRefresh={load}>
@@ -966,10 +983,11 @@ function UsersTab() {
           <TableHead className="text-right">Tokens (in / out)</TableHead>
           <TableHead>Onboarded</TableHead>
           <TableHead>Started</TableHead>
+          <TableHead>Lock</TableHead>
         </TableRow></TableHeader>
         <TableBody>
-          {loading && <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-6">Loading…</TableCell></TableRow>}
-          {!loading && filtered.length === 0 && <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-6">No users yet.</TableCell></TableRow>}
+          {loading && <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-6">Loading…</TableCell></TableRow>}
+          {!loading && filtered.length === 0 && <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-6">No users yet.</TableCell></TableRow>}
           {filtered.map((r) => (
             <TableRow key={r.user_id} className="cursor-pointer hover:bg-muted/40" onClick={() => setSelected(r)}>
               <TableCell>
@@ -989,6 +1007,19 @@ function UsersTab() {
                   <Badge variant="outline">—</Badge>}
               </TableCell>
               <TableCell className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</TableCell>
+              <TableCell onClick={(e) => e.stopPropagation()}>
+                <label className="inline-flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={r.admin_locked}
+                    onChange={(e) => toggleLock(r, e.target.checked)}
+                    className="h-4 w-4 accent-primary cursor-pointer"
+                  />
+                  <span className="text-xs text-muted-foreground">
+                    {r.admin_locked ? "Locked" : "Unlocked"}
+                  </span>
+                </label>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
