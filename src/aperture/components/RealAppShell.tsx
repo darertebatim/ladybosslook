@@ -159,18 +159,19 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
                     Go to RiloME
                   </Link>
                   <label
-                    onClick={() => setLockOnRilobiz(v => !v)}
+                    onClick={toggleLock}
                     style={{
                       display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
                       padding: "10px 10px", borderRadius: "var(--ap-radius-xs)",
                       fontSize: 13.5, color: "var(--ap-ink-2)",
-                      background: "transparent", cursor: "pointer",
+                      background: "transparent", cursor: adminLocked ? "not-allowed" : "pointer",
+                      opacity: adminLocked ? 0.85 : 1,
                     }}
                   >
                     <span>Lock on RiloBiz</span>
                     <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span style={{ fontSize: 12, color: "var(--ap-ink-3)", fontWeight: 500 }}>
-                        {lockOnRilobiz ? "Locked" : "Unlocked"}
+                        {lockLabel}
                       </span>
                       <span style={{
                         width: 36, height: 20, borderRadius: 999,
@@ -277,17 +278,19 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
             Go to RiloME
           </Link>
           <label
-            onClick={() => setLockOnRilobiz(v => !v)}
+            onClick={toggleLock}
             style={{
               display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
               padding: "8px 10px", borderRadius: "var(--ap-radius-xs)",
-              fontSize: 12.5, color: "var(--ap-ink-2)", cursor: "pointer",
+              fontSize: 12.5, color: "var(--ap-ink-2)",
+              cursor: adminLocked ? "not-allowed" : "pointer",
+              opacity: adminLocked ? 0.85 : 1,
             }}
           >
             <span>Lock on RiloBiz</span>
             <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: 11, color: "var(--ap-ink-3)", fontWeight: 500 }}>
-                {lockOnRilobiz ? "Locked" : "Unlocked"}
+                {lockLabel}
               </span>
               <span style={{
                 width: 34, height: 18, borderRadius: 999,
