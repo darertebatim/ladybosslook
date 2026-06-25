@@ -69,11 +69,45 @@ const AppJournalEntry = lazy(() => import("@/pages/app/AppJournalEntry"));
 const JournalRedirect = () => { const navigate = useNavigate(); React.useEffect(() => { navigate('/app/reflections', { replace: true }); }, []); return null; };
 const JournalNewRedirect = () => { const navigate = useNavigate(); React.useEffect(() => { navigate('/app/reflections/free-form', { replace: true }); }, []); return null; };
 const AppRootRedirect = () => {
-  const locked = typeof window !== 'undefined' && (
-    localStorage.getItem('rilo:lock-on-rilobiz') === '1' ||
-    localStorage.getItem('rilo:admin-lock-on-rilobiz') === '1'
-  );
-  return <Navigate to={locked ? '/app/rilobiz/app' : '/app/my-rilo'} replace />;
+  const [target, setTarget] = React.useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const cached =
+      localStorage.getItem('rilo:lock-on-rilobiz') === '1' ||
+      localStorage.getItem('rilo:admin-lock-on-rilobiz') === '1';
+    // If we already know we're locked, redirect immediately.
+    return cached ? '/app/rilobiz/app' : null;
+  });
+
+  React.useEffect(() => {
+    if (target) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          if (!cancelled) setTarget('/app/my-rilo');
+          return;
+        }
+        const { data } = await (supabase as any)
+          .from('aperture_user_profile')
+          .select('admin_locked')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        const locked = !!data?.admin_locked;
+        try {
+          if (locked) localStorage.setItem('rilo:admin-lock-on-rilobiz', '1');
+          else localStorage.removeItem('rilo:admin-lock-on-rilobiz');
+        } catch {}
+        if (!cancelled) setTarget(locked ? '/app/rilobiz/app' : '/app/my-rilo');
+      } catch {
+        if (!cancelled) setTarget('/app/my-rilo');
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [target]);
+
+  if (!target) return <PageLoader />;
+  return <Navigate to={target} replace />;
 };
 const JournalEntryRedirect = () => { const { entryId } = useParams(); const navigate = useNavigate(); React.useEffect(() => { navigate(`/app/reflections/notes/free/${entryId}`, { replace: true }); }, []); return null; };
 const AppTaskCreate = lazy(() => import("@/pages/app/AppTaskCreate"));
