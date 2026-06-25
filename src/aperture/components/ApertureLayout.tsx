@@ -37,7 +37,7 @@ interface ApertureLayoutProps {
  */
 export function ApertureLayout({
   children,
-  defaultTheme = "dark",
+  defaultTheme = "light",
   className,
 }: ApertureLayoutProps) {
   const [theme, setTheme] = useState<ApertureTheme>(() => {
