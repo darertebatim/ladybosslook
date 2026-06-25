@@ -81,6 +81,7 @@ export default function RealChatThread() {
     const t = text.trim();
     if (!id || streaming) return;
     if (!escape && !t && !(attachments && attachments.length > 0)) return;
+    haptic.light();
     setError(null);
     if (!escape) setLastSent({ text: t, attachments });
     let nextHistory = messages;
