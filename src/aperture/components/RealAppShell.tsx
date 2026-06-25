@@ -10,6 +10,7 @@ import riloAppIcon from "@/assets/rilo-app-icon.png";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { ChatsRail } from "./ChatsRail";
 import { useApertureAdminLockSync } from "@/aperture/hooks/useApertureAdminLockSync";
+import { haptic } from "@/lib/haptics";
 
 const NAV = [
   { to: "/app/rilobiz/app",          label: "Home",     end: true },
