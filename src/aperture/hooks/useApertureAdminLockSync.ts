@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
 const ADMIN_KEY = "rilo:admin-lock-on-rilobiz";
+const USER_KEY = "rilo:lock-on-rilobiz";
 
 /**
  * Mirrors the server-side `aperture_user_profile.admin_locked` flag into
@@ -20,14 +21,17 @@ export function useApertureAdminLockSync() {
     (async () => {
       const { data } = await (supabase as any)
         .from("aperture_user_profile")
-        .select("admin_locked")
+        .select("admin_locked, user_locked")
         .eq("user_id", user.id)
         .maybeSingle();
       if (cancelled) return;
       const locked = !!data?.admin_locked;
+      const userLocked = !!data?.user_locked;
       try {
         if (locked) localStorage.setItem(ADMIN_KEY, "1");
         else localStorage.removeItem(ADMIN_KEY);
+        if (userLocked) localStorage.setItem(USER_KEY, "1");
+        else localStorage.removeItem(USER_KEY);
       } catch {}
     })();
     return () => { cancelled = true; };

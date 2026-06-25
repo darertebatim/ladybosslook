@@ -90,13 +90,15 @@ const AppRootRedirect = () => {
         }
         const { data } = await (supabase as any)
           .from('aperture_user_profile')
-          .select('admin_locked')
+          .select('admin_locked, user_locked')
           .eq('user_id', user.id)
           .maybeSingle();
-        const locked = !!data?.admin_locked;
+        const locked = !!data?.admin_locked || !!data?.user_locked;
         try {
-          if (locked) localStorage.setItem('rilo:admin-lock-on-rilobiz', '1');
+          if (data?.admin_locked) localStorage.setItem('rilo:admin-lock-on-rilobiz', '1');
           else localStorage.removeItem('rilo:admin-lock-on-rilobiz');
+          if (data?.user_locked) localStorage.setItem('rilo:lock-on-rilobiz', '1');
+          else localStorage.removeItem('rilo:lock-on-rilobiz');
         } catch {}
         if (!cancelled) setTarget(locked ? '/app/rilobiz/app' : '/app/my-rilo');
       } catch {
