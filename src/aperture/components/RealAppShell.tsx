@@ -162,7 +162,7 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
                     const active = item.end ? loc.pathname === item.to : loc.pathname.startsWith(item.to);
                     return (
                       <NavLink key={item.to} to={item.to} end={item.end}
-                        onClick={() => setDrawerOpen(false)}
+                        onClick={() => { haptic.light(); setDrawerOpen(false); }}
                         style={{
                           display: "flex", alignItems: "center", gap: 12,
                           padding: "12px 12px", borderRadius: "var(--ap-radius-xs)",
