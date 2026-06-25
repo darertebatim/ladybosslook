@@ -1438,6 +1438,7 @@ export type Database = {
           quick_onboarded_at: string | null
           updated_at: string
           user_id: string
+          user_locked: boolean
           website: string | null
         }
         Insert: {
@@ -1451,6 +1452,7 @@ export type Database = {
           quick_onboarded_at?: string | null
           updated_at?: string
           user_id: string
+          user_locked?: boolean
           website?: string | null
         }
         Update: {
@@ -1464,6 +1466,7 @@ export type Database = {
           quick_onboarded_at?: string | null
           updated_at?: string
           user_id?: string
+          user_locked?: boolean
           website?: string | null
         }
         Relationships: []

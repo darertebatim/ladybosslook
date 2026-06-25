@@ -1,0 +1,1 @@
+ALTER TABLE public.aperture_user_profile ADD COLUMN IF NOT EXISTS user_locked boolean NOT NULL DEFAULT false;
