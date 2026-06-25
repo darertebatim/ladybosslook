@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import riloAppIcon from "@/assets/rilo-app-icon.png";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { ChatsRail } from "./ChatsRail";
+import { useApertureAdminLockSync } from "@/aperture/hooks/useApertureAdminLockSync";
 
 const NAV = [
   { to: "/app/rilobiz/app",          label: "Home",     end: true },
@@ -37,13 +38,32 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
   const loc = useLocation();
   const initial = (user?.email ?? "U").slice(0, 1).toUpperCase();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [lockOnRilobiz, setLockOnRilobiz] = useState<boolean>(() =>
+  useApertureAdminLockSync();
+  const [adminLocked, setAdminLocked] = useState<boolean>(() =>
+    typeof window !== "undefined" && localStorage.getItem("rilo:admin-lock-on-rilobiz") === "1"
+  );
+  const [userLock, setUserLock] = useState<boolean>(() =>
     typeof window !== "undefined" && localStorage.getItem("rilo:lock-on-rilobiz") === "1"
   );
   useEffect(() => {
     if (typeof window === "undefined") return;
-    localStorage.setItem("rilo:lock-on-rilobiz", lockOnRilobiz ? "1" : "0");
-  }, [lockOnRilobiz]);
+    localStorage.setItem("rilo:lock-on-rilobiz", userLock ? "1" : "0");
+  }, [userLock]);
+  // Poll the admin-lock localStorage value so the sync hook's write
+  // (it runs asynchronously) gets reflected in the toggle UI.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const tick = () => {
+      const v = localStorage.getItem("rilo:admin-lock-on-rilobiz") === "1";
+      setAdminLocked(prev => prev === v ? prev : v);
+    };
+    const id = window.setInterval(tick, 1500);
+    window.addEventListener("storage", tick);
+    return () => { window.clearInterval(id); window.removeEventListener("storage", tick); };
+  }, []);
+  const lockOnRilobiz = adminLocked || userLock;
+  const toggleLock = () => { if (!adminLocked) setUserLock(v => !v); };
+  const lockLabel = adminLocked ? "Locked by admin" : (lockOnRilobiz ? "Locked" : "Unlocked");
   const isChatThread = /^\/app\/rilobiz\/app\/chats\/[^/]+/.test(loc.pathname);
 
   if (isMobile) {
@@ -139,18 +159,19 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
                     Go to RiloME
                   </Link>
                   <label
-                    onClick={() => setLockOnRilobiz(v => !v)}
+                    onClick={toggleLock}
                     style={{
                       display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
                       padding: "10px 10px", borderRadius: "var(--ap-radius-xs)",
                       fontSize: 13.5, color: "var(--ap-ink-2)",
-                      background: "transparent", cursor: "pointer",
+                      background: "transparent", cursor: adminLocked ? "not-allowed" : "pointer",
+                      opacity: adminLocked ? 0.85 : 1,
                     }}
                   >
                     <span>Lock on RiloBiz</span>
                     <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span style={{ fontSize: 12, color: "var(--ap-ink-3)", fontWeight: 500 }}>
-                        {lockOnRilobiz ? "Locked" : "Unlocked"}
+                        {lockLabel}
                       </span>
                       <span style={{
                         width: 36, height: 20, borderRadius: 999,
@@ -257,17 +278,19 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
             Go to RiloME
           </Link>
           <label
-            onClick={() => setLockOnRilobiz(v => !v)}
+            onClick={toggleLock}
             style={{
               display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
               padding: "8px 10px", borderRadius: "var(--ap-radius-xs)",
-              fontSize: 12.5, color: "var(--ap-ink-2)", cursor: "pointer",
+              fontSize: 12.5, color: "var(--ap-ink-2)",
+              cursor: adminLocked ? "not-allowed" : "pointer",
+              opacity: adminLocked ? 0.85 : 1,
             }}
           >
             <span>Lock on RiloBiz</span>
             <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: 11, color: "var(--ap-ink-3)", fontWeight: 500 }}>
-                {lockOnRilobiz ? "Locked" : "Unlocked"}
+                {lockLabel}
               </span>
               <span style={{
                 width: 34, height: 18, borderRadius: 999,

@@ -1428,6 +1428,7 @@ export type Database = {
       }
       aperture_user_profile: {
         Row: {
+          admin_locked: boolean
           business_name: string | null
           created_at: string
           full_onboarded_at: string | null
@@ -1440,6 +1441,7 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          admin_locked?: boolean
           business_name?: string | null
           created_at?: string
           full_onboarded_at?: string | null
@@ -1452,6 +1454,7 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          admin_locked?: boolean
           business_name?: string | null
           created_at?: string
           full_onboarded_at?: string | null
