@@ -180,7 +180,7 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
                 <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--ap-hairline)", display: "flex", flexDirection: "column", gap: 8 }}>
                   <Link
                     to="/app/my-rilo"
-                    onClick={() => setDrawerOpen(false)}
+                    onClick={() => { haptic.medium(); setDrawerOpen(false); }}
                     style={{
                       display: "flex", alignItems: "center", gap: 10,
                       padding: "10px 10px", borderRadius: "var(--ap-radius-xs)",
@@ -230,7 +230,7 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
                 <div style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid var(--ap-hairline)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                   <span style={{ fontSize: 12, color: "var(--ap-ink-3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 180 }}>{user?.email ?? "Signed in"}</span>
                   <button
-                    onClick={() => supabase.auth.signOut()}
+                    onClick={() => { haptic.warning(); supabase.auth.signOut(); }}
                     style={{ appearance: "none", border: "none", background: "transparent", color: "var(--ap-ink-3)", fontSize: 11, padding: 0, cursor: "pointer", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
                     Sign out
                   </button>
