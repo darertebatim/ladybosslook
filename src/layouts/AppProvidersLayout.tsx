@@ -4,10 +4,12 @@ import { RoutinePlayerProvider } from '@/components/app/RoutinePlayerProvider';
 import { useClaimPendingDedication } from '@/hooks/useClaimPendingDedication';
 import { useClaimPendingPlaylistGift } from '@/hooks/useClaimPendingPlaylistGift';
 import { GlobalCelebrationHost } from '@/components/app/GlobalCelebrationHost';
+import { useApertureAdminLockSync } from '@/aperture/hooks/useApertureAdminLockSync';
 
 function DedicationClaimer() {
   useClaimPendingDedication();
   useClaimPendingPlaylistGift();
+  useApertureAdminLockSync();
   return null;
 }
 
