@@ -228,7 +228,7 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
   }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div style={{ display: "flex", height: "100%", minHeight: "100vh" }}>
       <aside style={{
         position: "sticky", top: 0, alignSelf: "flex-start",
         height: "100vh", width: 260, flexShrink: 0,
@@ -337,8 +337,9 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
         </div>
       </aside>
       <div style={{ flex: 1, display: "flex", minWidth: 0 }}>
-        <main style={{
+        <main data-scroll-container="true" style={{
           flex: 1, minWidth: 0,
+          height: "100vh", overflowY: "auto", WebkitOverflowScrolling: "touch",
           padding: "32px 40px 64px",
           maxWidth: 1080,
           margin: "0 auto",
