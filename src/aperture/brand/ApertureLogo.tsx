@@ -1,5 +1,5 @@
 import { CSSProperties } from "react";
-import rilobizLogo from "@/assets/rilobiz-logo.png.asset.json";
+import rilobizLogo from "@/assets/rilobiz-logo.png";
 
 interface ApertureLogoProps {
   size?: number;
@@ -23,7 +23,7 @@ export function ApertureLogo({
 }: ApertureLogoProps) {
   return (
     <img
-      src={rilobizLogo.url}
+      src={rilobizLogo}
       width={size}
       height={size}
       alt={title}
