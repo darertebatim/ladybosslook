@@ -18,6 +18,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        // Fix: prevent black background from showing behind WKWebView when the
+        // iOS keyboard resizes the view (Keyboard.resize: 'native').
+        self.window?.backgroundColor = .white
         return true
     }
 
