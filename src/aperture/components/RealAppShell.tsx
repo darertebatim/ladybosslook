@@ -68,9 +68,9 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
 
   if (isMobile) {
     return (
-      <div style={{ minHeight: "100vh", background: "var(--ap-canvas)" }}>
+      <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "var(--ap-canvas)" }}>
           <header style={{
-            position: "sticky", top: 0, zIndex: 30,
+            flexShrink: 0, zIndex: 30,
             display: "flex", alignItems: "center", justifyContent: "space-between",
             padding: "12px 14px",
             paddingTop: "calc(12px + env(safe-area-inset-top, 0px))",
@@ -105,7 +105,16 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
             </Link>
           </header>
-          <main style={{ padding: "4px 18px 16px" }}>{children}</main>
+          <main
+            data-scroll-container="true"
+            style={{
+              flex: 1,
+              minHeight: 0,
+              overflowY: "auto",
+              WebkitOverflowScrolling: "touch",
+              padding: "4px 18px calc(16px + env(safe-area-inset-bottom, 0px))",
+            }}
+          >{children}</main>
 
           <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
             <SheetContent
@@ -121,7 +130,14 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
                 opacity: 1,
               }}
             >
-              <div style={{ display: "flex", flexDirection: "column", height: "100%", padding: "20px 16px", background: "var(--ap-canvas)", overflowY: "auto" }}>
+              <div style={{
+                display: "flex", flexDirection: "column", height: "100%",
+                padding: "20px 16px",
+                paddingTop: "calc(20px + env(safe-area-inset-top, 0px))",
+                paddingBottom: "calc(20px + env(safe-area-inset-bottom, 0px))",
+                background: "var(--ap-canvas)", overflowY: "auto",
+                WebkitOverflowScrolling: "touch",
+              }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
                   <ApertureWordmark size={16} />
                   <ApertureThemeSwitch />
