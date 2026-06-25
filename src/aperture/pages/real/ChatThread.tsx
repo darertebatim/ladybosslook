@@ -8,6 +8,7 @@ import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { streamApertureChat, nameApertureChat } from "@/aperture/lib/apertureChat";
 import { useApertureHomeSuggestions } from "@/aperture/hooks/db/useApertureHomeSuggestions";
 import { useAuth } from "@/hooks/useAuth";
+import { haptic } from "@/lib/haptics";
 import { ChatComposer } from "@/aperture/components/chat/ChatComposer";
 import { ChatAttachments, AttachmentMemoryChip } from "@/aperture/components/chat/ChatAttachments";
 import { AperturePrompt } from "@/aperture/components/chat/AperturePrompt";
