@@ -1,5 +1,6 @@
 import { ButtonHTMLAttributes, CSSProperties, HTMLAttributes, ReactNode } from "react";
 import { useApertureTheme } from "./ApertureLayout";
+import { haptic } from "@/lib/haptics";
 
 /* ============================================================
  * MonoLabel — tiny uppercase JetBrains Mono label
