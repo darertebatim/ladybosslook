@@ -73,7 +73,11 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
     return () => { window.clearInterval(id); window.removeEventListener("storage", tick); };
   }, []);
   const lockOnRilobiz = adminLocked || userLock;
-  const toggleLock = () => { if (!adminLocked) setUserLock(v => !v); };
+  const toggleLock = () => {
+    if (adminLocked) { haptic.warning(); return; }
+    haptic.medium();
+    setUserLock(v => !v);
+  };
   const lockLabel = adminLocked ? "Locked by admin" : (lockOnRilobiz ? "Locked" : "Unlocked");
   const isChatThread = /^\/app\/rilobiz\/app\/chats\/[^/]+/.test(loc.pathname);
 
@@ -89,7 +93,7 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
             borderBottom: isChatThread ? "none" : "1px solid var(--ap-hairline)",
           }}>
             <button
-              onClick={() => setDrawerOpen(true)}
+              onClick={() => { haptic.light(); setDrawerOpen(true); }}
               aria-label="Open menu"
               style={{
                 width: 38, height: 38, borderRadius: 999,
