@@ -74,6 +74,7 @@ export function ApertureButton({
   variant = "default",
   size = "md",
   style,
+  onClick,
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size }) {
   const isAccent = variant === "accent";
@@ -112,6 +113,10 @@ export function ApertureButton({
         color: isAccent ? "var(--ap-on-signal)" : "var(--ap-ink-1)",
         transition: "background 120ms ease, border-color 120ms ease, transform 80ms ease",
         ...style,
+      }}
+      onClick={(e) => {
+        if (isAccent) haptic.medium(); else haptic.light();
+        onClick?.(e);
       }}
       {...rest}
     >
@@ -208,7 +213,7 @@ export function ApertureThemeSwitch() {
   const { theme, toggle } = useApertureTheme();
   return (
     <button
-      onClick={toggle}
+      onClick={() => { haptic.selection(); toggle(); }}
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
       className="ap-mono"
       style={{
