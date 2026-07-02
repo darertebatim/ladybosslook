@@ -53,6 +53,8 @@ export default function WaveRunner() {
   const [payload, setPayload] = useState<WavePayload | null>(null);
   const [i, setI] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [details, setDetails] = useState<Record<string, string>>({});
+  const [detailOpen, setDetailOpen] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
   const [alreadyComplete, setAlreadyComplete] = useState(false);
 
@@ -107,12 +109,14 @@ export default function WaveRunner() {
   async function persist(qq: WaveQuestion, value: string) {
     if (!user) return;
     const v = value.trim();
-    if (!v) return;
+    const extra = (details[qq.id] ?? "").trim();
+    if (!v && !extra) return;
+    const combined = v && extra ? `${v} — ${extra}` : (v || extra);
     const slug = qq.bucket_slug || slugForBucket(qq.bucket) || "__notes__";
     if (slug === "__notes__") {
-      await addFreeformNote(`${qq.question_text} — ${v}`);
+      await addFreeformNote(`${qq.question_text} — ${combined}`);
     } else {
-      await saveBucketAnswer(slug, qq.id, v);
+      await saveBucketAnswer(slug, qq.id, combined);
     }
     // Tag the row(s) we just wrote as ai_extracted + wave_number for auditability.
     try {
