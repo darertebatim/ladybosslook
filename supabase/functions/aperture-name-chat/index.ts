@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders, AI_GATEWAY, LITE_MODEL } from "../_shared/aperture-cors.ts";
+import { corsHeaders, AI_GATEWAY, LITE_MODEL, logAiUsage } from "../_shared/aperture-cors.ts";
 
 /**
  * aperture-name-chat
@@ -75,6 +75,7 @@ serve(async (req) => {
       return json({ error: `AI gateway: ${t.slice(0, 200)}` }, 500);
     }
     const data = await res.json();
+    await logAiUsage(supabase, { userId: user.id, fn: "aperture-name-chat", model: LITE_MODEL, usage: data?.usage });
     let title = String(data?.choices?.[0]?.message?.content ?? "").trim();
     title = title.replace(/^["'`]+|["'`]+$/g, "").replace(/[.!?]+$/g, "").trim();
     if (!title) title = "Untitled chat";
