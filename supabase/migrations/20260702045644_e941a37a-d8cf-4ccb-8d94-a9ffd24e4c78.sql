@@ -1,0 +1,2 @@
+CREATE POLICY "aperture_memory_items_admin_read" ON public.aperture_memory_items FOR SELECT USING (has_role(auth.uid(), 'admin'::app_role));
+CREATE POLICY "aperture_messages_admin_read" ON public.aperture_messages FOR SELECT USING (has_role(auth.uid(), 'admin'::app_role));
