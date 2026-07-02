@@ -202,7 +202,7 @@ export default function WaveRunner() {
 
   return (
     <>
-      <Helmet><title>Wave {waveNum} · RiloBiz</title></Helmet>
+      <Helmet><title>{`Wave ${waveNum} · RiloBiz`}</title></Helmet>
       <RealAppShell>
         <PageHeader
           index={`WAVE ${waveNum}`}
