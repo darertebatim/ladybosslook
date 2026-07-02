@@ -242,15 +242,19 @@ export default function RealMemory() {
           </ApertureCard>
           {(profile?.essential_onboarded_at || profile?.quick_onboarded_at) ? (
             <ApertureCard padding={16} style={{ borderColor: "var(--ap-signal)" }}>
-              <ApertureMonoLabel style={{ color: "var(--ap-signal)" }}>Wave 2 ready</ApertureMonoLabel>
+              <ApertureMonoLabel style={{ color: "var(--ap-signal)" }}>
+                {waveInProgress ? `Wave ${waveInProgress} in progress` : `Wave ${nextWave} ready`}
+              </ApertureMonoLabel>
               <h3 style={{ margin: "6px 0 4px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
                 A short round of focused questions
               </h3>
               <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
                 10–15 questions I've picked for your business. Skip anything.
               </p>
-              <Link to="/app/rilobiz/app/waves/2" style={{ textDecoration: "none" }}>
-                <ApertureButton variant="accent">Start Wave 2 →</ApertureButton>
+              <Link to={`/app/rilobiz/app/waves/${waveInProgress ?? nextWave}`} style={{ textDecoration: "none" }}>
+                <ApertureButton variant="accent">
+                  {waveInProgress ? `Resume Wave ${waveInProgress} →` : `Start Wave ${nextWave} →`}
+                </ApertureButton>
               </Link>
             </ApertureCard>
           ) : (
