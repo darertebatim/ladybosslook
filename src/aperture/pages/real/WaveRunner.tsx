@@ -53,6 +53,8 @@ export default function WaveRunner() {
   const [payload, setPayload] = useState<WavePayload | null>(null);
   const [i, setI] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [details, setDetails] = useState<Record<string, string>>({});
+  const [detailOpen, setDetailOpen] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
   const [alreadyComplete, setAlreadyComplete] = useState(false);
 
@@ -107,12 +109,14 @@ export default function WaveRunner() {
   async function persist(qq: WaveQuestion, value: string) {
     if (!user) return;
     const v = value.trim();
-    if (!v) return;
+    const extra = (details[qq.id] ?? "").trim();
+    if (!v && !extra) return;
+    const combined = v && extra ? `${v} — ${extra}` : (v || extra);
     const slug = qq.bucket_slug || slugForBucket(qq.bucket) || "__notes__";
     if (slug === "__notes__") {
-      await addFreeformNote(`${qq.question_text} — ${v}`);
+      await addFreeformNote(`${qq.question_text} — ${combined}`);
     } else {
-      await saveBucketAnswer(slug, qq.id, v);
+      await saveBucketAnswer(slug, qq.id, combined);
     }
     // Tag the row(s) we just wrote as ai_extracted + wave_number for auditability.
     try {
@@ -274,6 +278,43 @@ export default function WaveRunner() {
                       }}>{opt}</button>
                   );
                 })}
+              </div>
+            )}
+
+            {q.options && q.options.length > 0 && !q.open_field && (
+              <div style={{ marginTop: 12 }}>
+                {!detailOpen[q.id] ? (
+                  <button
+                    type="button"
+                    onClick={() => setDetailOpen(d => ({ ...d, [q.id]: true }))}
+                    style={{
+                      appearance: "none", background: "transparent", border: "none",
+                      padding: "4px 0", cursor: "pointer",
+                      fontSize: 13, color: "var(--ap-ink-2)",
+                      fontFamily: "var(--ap-font-sans)", textDecoration: "underline",
+                      textDecorationStyle: "dotted",
+                    }}
+                  >
+                    + Add more detail (optional)
+                  </button>
+                ) : (
+                  <textarea
+                    rows={2}
+                    autoFocus
+                    style={{
+                      width: "100%", appearance: "none", outline: "none",
+                      background: "var(--ap-surface-2)",
+                      border: "1px solid var(--ap-hairline)",
+                      borderRadius: "var(--ap-radius-sm)",
+                      padding: "10px 12px",
+                      fontSize: 14, color: "var(--ap-ink-1)",
+                      fontFamily: "var(--ap-font-sans)", lineHeight: 1.5, resize: "vertical",
+                    }}
+                    placeholder="Add context, nuance, or an exception…"
+                    value={details[q.id] ?? ""}
+                    onChange={e => setDetails(d => ({ ...d, [q.id]: e.target.value }))}
+                  />
+                )}
               </div>
             )}
 
