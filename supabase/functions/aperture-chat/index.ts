@@ -396,7 +396,7 @@ async function getOrBuildMemoryCard(supabase: any, userId: string, apiKey: strin
   }
 
   // Compress into a tight brief via the model
-  const summarized = await summarize(apiKey, rawBrief);
+  const summarized = await summarize(supabase, userId, apiKey, rawBrief);
 
   await supabase.from("aperture_memory_card").upsert({
     user_id: userId,
@@ -409,7 +409,7 @@ async function getOrBuildMemoryCard(supabase: any, userId: string, apiKey: strin
   return summarized;
 }
 
-async function summarize(apiKey: string, raw: string): Promise<string> {
+async function summarize(supabase: any, userId: string, apiKey: string, raw: string): Promise<string> {
   const res = await fetch(AI_GATEWAY, {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
@@ -424,6 +424,7 @@ async function summarize(apiKey: string, raw: string): Promise<string> {
   });
   if (!res.ok) return raw.slice(0, 4000);
   const data = await res.json();
+  await logAiUsage(supabase, { userId, fn: "aperture-chat:summarize", model: DEFAULT_MODEL, usage: data?.usage });
   return data?.choices?.[0]?.message?.content ?? raw.slice(0, 4000);
 }
 
@@ -467,6 +468,7 @@ Rules:
     });
     if (!res.ok) return null;
     const data = await res.json();
+    if (userId) await logAiUsage(supabase, { userId, fn: "aperture-chat:classifyBucket", model: LITE_MODEL, usage: data?.usage });
     const raw = data?.choices?.[0]?.message?.content ?? "{}";
     const parsed = JSON.parse(raw);
     const slug = String(parsed?.bucket_slug ?? "").trim().toLowerCase();
@@ -562,6 +564,7 @@ ${trimmed.slice(0, 4000)}`;
     });
     if (!res.ok) return;
     const data = await res.json();
+    await logAiUsage(supabase, { userId, fn: "aperture-chat:extractFacts", model: DEFAULT_MODEL, usage: data?.usage });
     const raw = data?.choices?.[0]?.message?.content ?? "{}";
     parsed = JSON.parse(raw);
   } catch {
