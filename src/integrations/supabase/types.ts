@@ -585,6 +585,39 @@ export type Database = {
         }
         Relationships: []
       }
+      aperture_ai_usage: {
+        Row: {
+          completion_tokens: number
+          created_at: string
+          fn: string
+          id: string
+          model: string
+          prompt_tokens: number
+          usd_cost: number
+          user_id: string
+        }
+        Insert: {
+          completion_tokens?: number
+          created_at?: string
+          fn: string
+          id?: string
+          model: string
+          prompt_tokens?: number
+          usd_cost?: number
+          user_id: string
+        }
+        Update: {
+          completion_tokens?: number
+          created_at?: string
+          fn?: string
+          id?: string
+          model?: string
+          prompt_tokens?: number
+          usd_cost?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       aperture_approved_users: {
         Row: {
           approved_at: string
@@ -1228,9 +1261,11 @@ export type Database = {
           created_at: string
           id: string
           metadata: Json | null
+          model: string | null
           role: string
           tokens_in: number | null
           tokens_out: number | null
+          usd_cost: number
           user_id: string
         }
         Insert: {
@@ -1240,9 +1275,11 @@ export type Database = {
           created_at?: string
           id?: string
           metadata?: Json | null
+          model?: string | null
           role: string
           tokens_in?: number | null
           tokens_out?: number | null
+          usd_cost?: number
           user_id: string
         }
         Update: {
@@ -1252,9 +1289,11 @@ export type Database = {
           created_at?: string
           id?: string
           metadata?: Json | null
+          model?: string | null
           role?: string
           tokens_in?: number | null
           tokens_out?: number | null
+          usd_cost?: number
           user_id?: string
         }
         Relationships: [
