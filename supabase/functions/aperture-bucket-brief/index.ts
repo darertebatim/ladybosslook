@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders, AI_GATEWAY, CHAT_MODEL } from "../_shared/aperture-cors.ts";
+import { corsHeaders, AI_GATEWAY, CHAT_MODEL, logAiUsage } from "../_shared/aperture-cors.ts";
 
 /**
  * Per-bucket brief — short, user-facing summary of what Aperture currently
@@ -143,6 +143,7 @@ ${corpus}`;
       });
       if (r.ok) {
         const d = await r.json();
+        await logAiUsage(supabase, { userId: user.id, fn: "aperture-bucket-brief", model: CHAT_MODEL, usage: d?.usage });
         summary = String(d?.choices?.[0]?.message?.content ?? "").trim();
       } else {
         const t = await r.text();

@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders, AI_GATEWAY, DEFAULT_MODEL, CHAT_MODEL, LITE_MODEL } from "../_shared/aperture-cors.ts";
+import { corsHeaders, AI_GATEWAY, DEFAULT_MODEL, CHAT_MODEL, LITE_MODEL, logAiUsage, computeUsdCost } from "../_shared/aperture-cors.ts";
 import { logApertureEvent } from "../_shared/aperture-events.ts";
 import { getAllowedBuckets } from "../_shared/aperture-buckets.ts";
 
@@ -235,6 +235,7 @@ serve(async (req) => {
         model: CHAT_MODEL,
         stream,
         messages: [{ role: "system", content: systemPrompt }, ...outboundMessages],
+        ...(stream ? { stream_options: { include_usage: true } } : {}),
       }),
     });
 
@@ -248,8 +249,16 @@ serve(async (req) => {
     if (!stream) {
       const data = await upstream.json();
       const text = data?.choices?.[0]?.message?.content ?? "";
+      const usage = data?.usage ?? null;
+      const promptTok = usage?.prompt_tokens ?? 0;
+      const completionTok = usage?.completion_tokens ?? 0;
+      const usd = computeUsdCost(CHAT_MODEL, promptTok, completionTok);
       await supabase.from("aperture_messages").insert({
         chat_id: chatId, user_id: user.id, role: "assistant", content: text,
+        model: CHAT_MODEL,
+        tokens_in: promptTok,
+        tokens_out: completionTok,
+        usd_cost: usd,
       });
       await logApertureEvent(supabase, user.id, "chat_message_ai", {
         content: text,
@@ -259,6 +268,7 @@ serve(async (req) => {
 
     // Stream SSE through, and capture assembled text to persist at the end.
     let assembled = "";
+    let streamUsage: { prompt_tokens?: number; completion_tokens?: number } | null = null;
     const stream2 = new ReadableStream({
       async start(controller) {
         const reader = upstream.body!.getReader();
@@ -281,6 +291,7 @@ serve(async (req) => {
                 const obj = JSON.parse(payload);
                 const delta = obj?.choices?.[0]?.delta?.content;
                 if (typeof delta === "string") assembled += delta;
+                if (obj?.usage) streamUsage = obj.usage;
               } catch { /* ignore parse errors */ }
             }
             controller.enqueue(value);
@@ -288,8 +299,15 @@ serve(async (req) => {
         } finally {
           controller.close();
           if (assembled.trim()) {
+            const promptTok = streamUsage?.prompt_tokens ?? 0;
+            const completionTok = streamUsage?.completion_tokens ?? 0;
+            const usd = computeUsdCost(CHAT_MODEL, promptTok, completionTok);
             await supabase.from("aperture_messages").insert({
               chat_id: chatId, user_id: user.id, role: "assistant", content: assembled,
+              model: CHAT_MODEL,
+              tokens_in: promptTok,
+              tokens_out: completionTok,
+              usd_cost: usd,
             });
             await logApertureEvent(supabase, user.id, "chat_message_ai", {
               content: assembled,
@@ -378,7 +396,7 @@ async function getOrBuildMemoryCard(supabase: any, userId: string, apiKey: strin
   }
 
   // Compress into a tight brief via the model
-  const summarized = await summarize(apiKey, rawBrief);
+  const summarized = await summarize(supabase, userId, apiKey, rawBrief);
 
   await supabase.from("aperture_memory_card").upsert({
     user_id: userId,
@@ -391,7 +409,7 @@ async function getOrBuildMemoryCard(supabase: any, userId: string, apiKey: strin
   return summarized;
 }
 
-async function summarize(apiKey: string, raw: string): Promise<string> {
+async function summarize(supabase: any, userId: string, apiKey: string, raw: string): Promise<string> {
   const res = await fetch(AI_GATEWAY, {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
@@ -406,6 +424,7 @@ async function summarize(apiKey: string, raw: string): Promise<string> {
   });
   if (!res.ok) return raw.slice(0, 4000);
   const data = await res.json();
+  await logAiUsage(supabase, { userId, fn: "aperture-chat:summarize", model: DEFAULT_MODEL, usage: data?.usage });
   return data?.choices?.[0]?.message?.content ?? raw.slice(0, 4000);
 }
 
@@ -449,6 +468,7 @@ Rules:
     });
     if (!res.ok) return null;
     const data = await res.json();
+    if (userId) await logAiUsage(supabase, { userId, fn: "aperture-chat:classifyBucket", model: LITE_MODEL, usage: data?.usage });
     const raw = data?.choices?.[0]?.message?.content ?? "{}";
     const parsed = JSON.parse(raw);
     const slug = String(parsed?.bucket_slug ?? "").trim().toLowerCase();
@@ -544,6 +564,7 @@ ${trimmed.slice(0, 4000)}`;
     });
     if (!res.ok) return;
     const data = await res.json();
+    await logAiUsage(supabase, { userId, fn: "aperture-chat:extractFacts", model: DEFAULT_MODEL, usage: data?.usage });
     const raw = data?.choices?.[0]?.message?.content ?? "{}";
     parsed = JSON.parse(raw);
   } catch {

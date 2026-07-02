@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders, AI_GATEWAY, CHAT_MODEL } from "../_shared/aperture-cors.ts";
+import { corsHeaders, AI_GATEWAY, CHAT_MODEL, logAiUsage } from "../_shared/aperture-cors.ts";
 import { logApertureEvent } from "../_shared/aperture-events.ts";
 
 /**
@@ -84,6 +84,9 @@ ${memoryBrief}`;
       { role: "system", content: analystSystem },
       { role: "user", content: analystUser },
     ]);
+    if (analysis.usage) {
+      await logAiUsage(supabase, { userId: user.id, fn: "aperture-business-brief:pass1", model: CHAT_MODEL, usage: analysis.usage });
+    }
     if (analysis.error) return json({ error: analysis.error }, analysis.status);
     // Pass 1 occasionally returns empty (model refusal, safety filter, or
     // upstream truncation). When that happens, fall back to feeding the
@@ -138,6 +141,7 @@ Now compress this into the strict JSON brief.`;
     }
 
     const data = await upstream.json();
+    await logAiUsage(supabase, { userId: user.id, fn: "aperture-business-brief:pass2", model: CHAT_MODEL, usage: data?.usage });
     const raw = data?.choices?.[0]?.message?.content ?? "{}";
     let parsed: any = {};
     try { parsed = JSON.parse(raw); } catch { parsed = {}; }
@@ -179,7 +183,7 @@ async function callGateway(
   apiKey: string,
   model: string,
   messages: { role: string; content: string }[],
-): Promise<{ text: string; error?: string; status?: number }> {
+): Promise<{ text: string; usage?: any; error?: string; status?: number }> {
   const r = await fetch(AI_GATEWAY, {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
@@ -192,7 +196,7 @@ async function callGateway(
     return { text: "", error: `AI gateway error: ${t.slice(0, 300)}`, status: 500 };
   }
   const d = await r.json();
-  return { text: String(d?.choices?.[0]?.message?.content ?? "").trim() };
+  return { text: String(d?.choices?.[0]?.message?.content ?? "").trim(), usage: d?.usage };
 }
 
 function json(body: unknown, status = 200) {

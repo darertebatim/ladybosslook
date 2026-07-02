@@ -875,6 +875,8 @@ type ApertureUserRow = {
   message_count: number;
   tokens_in: number;
   tokens_out: number;
+  chat_usd: number;
+  bg_usd: number;
   admin_locked: boolean;
 };
 
@@ -896,10 +898,11 @@ function UsersTab() {
       const ids = (profiles ?? []).map((p: any) => p.user_id);
       if (ids.length === 0) { setRows([]); setLoading(false); return; }
 
-      const [{ data: users }, { data: mem }, { data: msgs }] = await Promise.all([
+      const [{ data: users }, { data: mem }, { data: msgs }, { data: bg }] = await Promise.all([
         (supabase as any).from("profiles").select("id,email,full_name").in("id", ids),
         (supabase as any).from("aperture_memory_items").select("user_id").in("user_id", ids).eq("is_active", true),
-        (supabase as any).from("aperture_messages").select("user_id,role,tokens_in,tokens_out").in("user_id", ids),
+        (supabase as any).from("aperture_messages").select("user_id,role,tokens_in,tokens_out,usd_cost").in("user_id", ids),
+        (supabase as any).from("aperture_ai_usage").select("user_id,usd_cost").in("user_id", ids),
       ]);
 
       const userMap = new Map<string, any>((users ?? []).map((u: any) => [u.id, u]));
@@ -908,10 +911,16 @@ function UsersTab() {
       const msgCount = new Map<string, number>();
       const tIn = new Map<string, number>();
       const tOut = new Map<string, number>();
+      const chatUsd = new Map<string, number>();
+      const bgUsd = new Map<string, number>();
       (msgs ?? []).forEach((r: any) => {
         msgCount.set(r.user_id, (msgCount.get(r.user_id) ?? 0) + 1);
         tIn.set(r.user_id, (tIn.get(r.user_id) ?? 0) + (r.tokens_in ?? 0));
         tOut.set(r.user_id, (tOut.get(r.user_id) ?? 0) + (r.tokens_out ?? 0));
+        chatUsd.set(r.user_id, (chatUsd.get(r.user_id) ?? 0) + Number(r.usd_cost ?? 0));
+      });
+      (bg ?? []).forEach((r: any) => {
+        bgUsd.set(r.user_id, (bgUsd.get(r.user_id) ?? 0) + Number(r.usd_cost ?? 0));
       });
 
       const merged: ApertureUserRow[] = (profiles ?? []).map((p: any) => ({
@@ -927,6 +936,8 @@ function UsersTab() {
         message_count: msgCount.get(p.user_id) ?? 0,
         tokens_in: tIn.get(p.user_id) ?? 0,
         tokens_out: tOut.get(p.user_id) ?? 0,
+        chat_usd: chatUsd.get(p.user_id) ?? 0,
+        bg_usd: bgUsd.get(p.user_id) ?? 0,
         admin_locked: !!p.admin_locked,
       }));
       setRows(merged);
@@ -980,7 +991,7 @@ function UsersTab() {
           <TableHead>Industry</TableHead>
           <TableHead className="text-right">Memory</TableHead>
           <TableHead className="text-right">Messages</TableHead>
-          <TableHead className="text-right">Tokens (in / out)</TableHead>
+          <TableHead className="text-right">AI credit spend</TableHead>
           <TableHead>Onboarded</TableHead>
           <TableHead>Started</TableHead>
           <TableHead>Lock</TableHead>
@@ -999,7 +1010,10 @@ function UsersTab() {
               <TableCell className="text-right tabular-nums">{fmt(r.memory_count)}</TableCell>
               <TableCell className="text-right tabular-nums">{fmt(r.message_count)}</TableCell>
               <TableCell className="text-right tabular-nums text-xs">
-                {fmt(r.tokens_in)} / {fmt(r.tokens_out)}
+                <div className="font-medium">${(r.chat_usd + r.bg_usd).toFixed(4)}</div>
+                <div className="text-[10px] text-muted-foreground">
+                  chat ${r.chat_usd.toFixed(4)} · bg ${r.bg_usd.toFixed(4)}
+                </div>
               </TableCell>
               <TableCell>
                 {r.full_onboarded_at ? <Badge>full</Badge> :
@@ -1201,9 +1215,15 @@ function UserDetailSheet({ user, onClose }: { user: ApertureUserRow | null; onCl
                 </div>
               </div>
 
-              <div className="text-xs text-muted-foreground border-t pt-3">
-                Totals: {user.message_count} messages · {(user.tokens_in + user.tokens_out).toLocaleString()} tokens
-                ({user.tokens_in.toLocaleString()} in / {user.tokens_out.toLocaleString()} out)
+              <div className="text-xs text-muted-foreground border-t pt-3 space-y-1">
+                <div>
+                  <span className="font-medium text-foreground">AI credit spend: ${(user.chat_usd + user.bg_usd).toFixed(4)}</span>
+                  {"  "}(chat ${user.chat_usd.toFixed(4)} · background ${user.bg_usd.toFixed(4)})
+                </div>
+                <div>
+                  {user.message_count} messages · {(user.tokens_in + user.tokens_out).toLocaleString()} tokens
+                  ({user.tokens_in.toLocaleString()} in / {user.tokens_out.toLocaleString()} out)
+                </div>
               </div>
             </div>
           </>

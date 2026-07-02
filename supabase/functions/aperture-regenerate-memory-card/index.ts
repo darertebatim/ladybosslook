@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders, AI_GATEWAY, DEFAULT_MODEL } from "../_shared/aperture-cors.ts";
+import { corsHeaders, AI_GATEWAY, DEFAULT_MODEL, logAiUsage } from "../_shared/aperture-cors.ts";
 
 /**
  * Forces a rebuild of the user's business memory card from their bucket answers
@@ -124,6 +124,7 @@ FORMAT RULES:
       });
       if (res.ok) {
         const data = await res.json();
+        await logAiUsage(supabase, { userId: user.id, fn: "aperture-regenerate-memory-card", model: DEFAULT_MODEL, usage: data?.usage });
         summary = data?.choices?.[0]?.message?.content ?? raw.slice(0, 4000);
       } else {
         summary = raw.slice(0, 4000);
