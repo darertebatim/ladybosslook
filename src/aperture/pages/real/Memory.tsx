@@ -61,6 +61,30 @@ export default function RealMemory() {
   const { createChat } = useApertureChatsDB();
   const { user } = useAuth();
 
+  // ─── Wave progression ─────────────────────────────────────────────────
+  // Next wave number = (max completed wave) + 1. Defaults to 2 for a user
+  // who's just finished Essential onboarding and hasn't run any wave yet.
+  const [nextWave, setNextWave] = useState<number>(2);
+  const [waveInProgress, setWaveInProgress] = useState<number | null>(null);
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("aperture_waves")
+        .select("wave_number,status")
+        .eq("user_id", user.id);
+      if (cancelled || !data) return;
+      const inProg = data.find((r: any) => r.status !== "complete");
+      if (inProg) setWaveInProgress(inProg.wave_number as number);
+      const maxComplete = data
+        .filter((r: any) => r.status === "complete")
+        .reduce((m: number, r: any) => Math.max(m, r.wave_number as number), 1);
+      setNextWave(Math.max(2, maxComplete + 1));
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
   const countsBySlug = useMemo(() => {
     // Weight: confirmed/extracted/freeform = 1.0, ai_inferred_pre_onboarding = 0.5.
     // Guesses fill the visual space without making a bucket look truly "well understood".
@@ -218,15 +242,19 @@ export default function RealMemory() {
           </ApertureCard>
           {(profile?.essential_onboarded_at || profile?.quick_onboarded_at) ? (
             <ApertureCard padding={16} style={{ borderColor: "var(--ap-signal)" }}>
-              <ApertureMonoLabel style={{ color: "var(--ap-signal)" }}>Wave 2 ready</ApertureMonoLabel>
+              <ApertureMonoLabel style={{ color: "var(--ap-signal)" }}>
+                {waveInProgress ? `Wave ${waveInProgress} in progress` : `Wave ${nextWave} ready`}
+              </ApertureMonoLabel>
               <h3 style={{ margin: "6px 0 4px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
                 A short round of focused questions
               </h3>
               <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
                 10–15 questions I've picked for your business. Skip anything.
               </p>
-              <Link to="/app/rilobiz/app/waves/2" style={{ textDecoration: "none" }}>
-                <ApertureButton variant="accent">Start Wave 2 →</ApertureButton>
+              <Link to={`/app/rilobiz/app/waves/${waveInProgress ?? nextWave}`} style={{ textDecoration: "none" }}>
+                <ApertureButton variant="accent">
+                  {waveInProgress ? `Resume Wave ${waveInProgress} →` : `Start Wave ${nextWave} →`}
+                </ApertureButton>
               </Link>
             </ApertureCard>
           ) : (
