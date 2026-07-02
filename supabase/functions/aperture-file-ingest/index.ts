@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import * as XLSX from "https://esm.sh/xlsx@0.18.5";
-import { corsHeaders, AI_GATEWAY, LITE_MODEL } from "../_shared/aperture-cors.ts";
+import { corsHeaders, AI_GATEWAY, LITE_MODEL, logAiUsage } from "../_shared/aperture-cors.ts";
 import { getAllowedBuckets } from "../_shared/aperture-buckets.ts";
 
 /**
@@ -16,7 +16,10 @@ import { getAllowedBuckets } from "../_shared/aperture-buckets.ts";
  *    into aperture_memory_items as source = 'file_extracted'.
  */
 
-async function extractText(file: Blob, name: string, mime: string, apiKey: string): Promise<string | null> {
+async function extractText(
+  file: Blob, name: string, mime: string, apiKey: string,
+  usageCtx?: { supabase: any; userId: string },
+): Promise<string | null> {
   const lower = name.toLowerCase();
   if (mime === "text/plain" || mime === "text/markdown" || lower.endsWith(".txt") || lower.endsWith(".md")) {
     return await file.text();
@@ -68,12 +71,14 @@ async function extractText(file: Blob, name: string, mime: string, apiKey: strin
   });
   if (!res.ok) return null;
   const json = await res.json();
+  if (usageCtx) await logAiUsage(usageCtx.supabase, { userId: usageCtx.userId, fn: "aperture-file-ingest:ocr", model: "google/gemini-2.5-flash", usage: json?.usage });
   return json.choices?.[0]?.message?.content ?? null;
 }
 
 async function extractFacts(
   text: string, apiKey: string,
   allowed: Array<{ slug: string; title: string }>,
+  usageCtx?: { supabase: any; userId: string },
 ): Promise<{ bucket_slug: string; content: string }[]> {
   if (allowed.length === 0) return [];
   const slugList = allowed.map(b => b.slug).join(", ");
@@ -104,6 +109,7 @@ Rules:
   });
   if (!res.ok) return [];
   const json = await res.json();
+  if (usageCtx) await logAiUsage(usageCtx.supabase, { userId: usageCtx.userId, fn: "aperture-file-ingest:facts", model: LITE_MODEL, usage: json?.usage });
   const raw = json.choices?.[0]?.message?.content ?? "{}";
   const cleaned = raw.replace(/```json\n?|```/g, "").trim();
   try {
@@ -159,14 +165,15 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "download failed" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const text = await extractText(blob, file.file_name, file.mime_type ?? "", apiKey);
+    const usageCtx = { supabase: admin, userId: user.id };
+    const text = await extractText(blob, file.file_name, file.mime_type ?? "", apiKey, usageCtx);
     if (!text) {
       await admin.from("aperture_files").update({ status: "failed", error_message: "could not read file" }).eq("id", file_id);
       return new Response(JSON.stringify({ error: "extraction failed" }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const allowed = await getAllowedBuckets(admin, user.id);
-    const facts = await extractFacts(text, apiKey, allowed);
+    const facts = await extractFacts(text, apiKey, allowed, usageCtx);
     if (facts.length > 0) {
       const rows = facts.map(f => ({
         user_id: user.id,
