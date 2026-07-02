@@ -61,6 +61,30 @@ export default function RealMemory() {
   const { createChat } = useApertureChatsDB();
   const { user } = useAuth();
 
+  // ─── Wave progression ─────────────────────────────────────────────────
+  // Next wave number = (max completed wave) + 1. Defaults to 2 for a user
+  // who's just finished Essential onboarding and hasn't run any wave yet.
+  const [nextWave, setNextWave] = useState<number>(2);
+  const [waveInProgress, setWaveInProgress] = useState<number | null>(null);
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("aperture_waves")
+        .select("wave_number,status")
+        .eq("user_id", user.id);
+      if (cancelled || !data) return;
+      const inProg = data.find((r: any) => r.status !== "complete");
+      if (inProg) setWaveInProgress(inProg.wave_number as number);
+      const maxComplete = data
+        .filter((r: any) => r.status === "complete")
+        .reduce((m: number, r: any) => Math.max(m, r.wave_number as number), 1);
+      setNextWave(Math.max(2, maxComplete + 1));
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
   const countsBySlug = useMemo(() => {
     // Weight: confirmed/extracted/freeform = 1.0, ai_inferred_pre_onboarding = 0.5.
     // Guesses fill the visual space without making a bucket look truly "well understood".
