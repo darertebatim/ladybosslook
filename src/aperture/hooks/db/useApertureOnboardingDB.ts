@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export type ApertureOnboardingFlow = "quick" | "full";
+export type ApertureOnboardingFlow = "quick" | "full" | "essential";
 
 export interface ApertureOnboardingQuestionRow {
   id: string;
@@ -17,6 +17,7 @@ export interface ApertureOnboardingQuestionRow {
   section: string | null;
   sort_order: number;
   is_active: boolean;
+  signal_key?: string | null;
 }
 
 export function useApertureOnboardingDB(flow: ApertureOnboardingFlow, opts: { activeOnly?: boolean } = {}) {
