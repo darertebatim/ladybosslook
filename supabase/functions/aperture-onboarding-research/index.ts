@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders, AI_GATEWAY, DEFAULT_MODEL } from "../_shared/aperture-cors.ts";
+import { corsHeaders, AI_GATEWAY, DEFAULT_MODEL, logAiUsage } from "../_shared/aperture-cors.ts";
 import { logApertureEvent } from "../_shared/aperture-events.ts";
 
 /**
@@ -130,6 +130,7 @@ serve(async (req) => {
       return json({ error: `AI gateway error: ${t.slice(0, 300)}` }, 500);
     }
     const aiJson = await aiRes.json();
+    await logAiUsage(supabase, { userId: user.id, fn: "aperture-onboarding-research", model: DEFAULT_MODEL, usage: aiJson?.usage });
     const raw = aiJson?.choices?.[0]?.message?.content ?? "{}";
     let parsed: { items?: { bucket: string; fact: string }[] } = {};
     try { parsed = JSON.parse(raw); } catch { parsed = {}; }
