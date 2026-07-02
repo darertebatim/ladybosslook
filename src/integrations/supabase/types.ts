@@ -1196,6 +1196,7 @@ export type Database = {
       }
       aperture_memory_items: {
         Row: {
+          bucket_half: string | null
           bucket_slug: string | null
           chat_id: string | null
           confidence: number | null
@@ -1203,6 +1204,7 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean
+          layer: string | null
           metadata: Json
           question_key: string | null
           source: string
@@ -1210,8 +1212,10 @@ export type Database = {
           source_ref: string | null
           updated_at: string
           user_id: string
+          wave_number: number | null
         }
         Insert: {
+          bucket_half?: string | null
           bucket_slug?: string | null
           chat_id?: string | null
           confidence?: number | null
@@ -1219,6 +1223,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          layer?: string | null
           metadata?: Json
           question_key?: string | null
           source?: string
@@ -1226,8 +1231,10 @@ export type Database = {
           source_ref?: string | null
           updated_at?: string
           user_id: string
+          wave_number?: number | null
         }
         Update: {
+          bucket_half?: string | null
           bucket_slug?: string | null
           chat_id?: string | null
           confidence?: number | null
@@ -1235,6 +1242,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          layer?: string | null
           metadata?: Json
           question_key?: string | null
           source?: string
@@ -1242,6 +1250,7 @@ export type Database = {
           source_ref?: string | null
           updated_at?: string
           user_id?: string
+          wave_number?: number | null
         }
         Relationships: [
           {
@@ -1320,6 +1329,7 @@ export type Database = {
           prompt: string
           question_key: string
           section: string | null
+          signal_key: string | null
           sort_order: number
           step: number
           updated_at: string
@@ -1337,6 +1347,7 @@ export type Database = {
           prompt: string
           question_key: string
           section?: string | null
+          signal_key?: string | null
           sort_order?: number
           step?: number
           updated_at?: string
@@ -1354,6 +1365,7 @@ export type Database = {
           prompt?: string
           question_key?: string
           section?: string | null
+          signal_key?: string | null
           sort_order?: number
           step?: number
           updated_at?: string
@@ -1470,6 +1482,7 @@ export type Database = {
           admin_locked: boolean
           business_name: string | null
           created_at: string
+          essential_onboarded_at: string | null
           full_onboarded_at: string | null
           industry_slug: string | null
           instagram: string | null
@@ -1484,6 +1497,7 @@ export type Database = {
           admin_locked?: boolean
           business_name?: string | null
           created_at?: string
+          essential_onboarded_at?: string | null
           full_onboarded_at?: string | null
           industry_slug?: string | null
           instagram?: string | null
@@ -1498,6 +1512,7 @@ export type Database = {
           admin_locked?: boolean
           business_name?: string | null
           created_at?: string
+          essential_onboarded_at?: string | null
           full_onboarded_at?: string | null
           industry_slug?: string | null
           instagram?: string | null
@@ -1549,6 +1564,51 @@ export type Database = {
           tool_slug?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      aperture_waves: {
+        Row: {
+          active_layers: string[] | null
+          answered_count: number
+          completed_at: string | null
+          created_at: string
+          id: string
+          question_payload: Json | null
+          reasoning_summary: string | null
+          selected_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          wave_number: number
+        }
+        Insert: {
+          active_layers?: string[] | null
+          answered_count?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          question_payload?: Json | null
+          reasoning_summary?: string | null
+          selected_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          wave_number: number
+        }
+        Update: {
+          active_layers?: string[] | null
+          answered_count?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          question_payload?: Json | null
+          reasoning_summary?: string | null
+          selected_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          wave_number?: number
         }
         Relationships: []
       }
@@ -7324,6 +7384,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      aperture_bucket_half_valid: {
+        Args: { _bucket: string; _half: string }
+        Returns: boolean
+      }
       can_access_admin_page: {
         Args: { _page_slug: string; _user_id: string }
         Returns: boolean

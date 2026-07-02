@@ -1,55 +1,79 @@
-# RiloBiz Invite-Only Gate
+# RiloBiz — Essential Onboarding + Waves + Chat Cleanup
 
-Lock down `/app/rilobiz/app/*` so only invited users get in. First-time visitors see a "RiloBiz is invitation only" screen where they enter an invite code OR request access with their email. Admin gets a new tab to issue one-time codes and review access requests.
+Implements Claude's 6-step brief on top of the current codebase.
 
-## User flow
+## Step 1 — Replace onboarding with Essential Onboarding (28 screens)
 
-1. User signs in (or arrives via Rilo burger "Go to RiloBiz") and lands on any `/app/rilobiz/app/*` route.
-2. New `ApertureInviteGate` (wraps `ApertureAuthGate`) checks if the user is already redeemed:
-   - Yes → proceed to app.
-   - No → render the invite shield (full-screen, RiloBiz styled, like onboarding).
-3. Shield has two modes:
-   - **Have a code** → input + Redeem button. Calls edge function; on success marks user as approved and reloads.
-   - **Request access** → prefilled email + optional note + Submit. Inserts into `aperture_access_requests`. Shows "We'll be in touch" confirmation.
-4. Admin can still bypass (skip the gate for `has_role admin`).
+**DB (migration)**
+- Keep `aperture_onboarding_questions` but repopulate for a single flow. Introduce `flow = 'essential'` and 5 sections: `phase1_identifiers`, `phase2_core`, `phase3_research`, `phase4_contact`, `phase5_closing`.
+- Add `signal_key` (text, nullable) so each Phase 2 question has a stable ID (`Q1`…`Q21`) usable by the Wave 2 signal-table lookup.
+- Deactivate every existing `flow IN ('quick','full')` row (`is_active=false`), don't delete — preserved as deferred bank per essential_onboarding.md §Deferred.
+- Insert the 28 new rows from `docs/rilobiz/wave2/essential_onboarding.md` (Phase 1×2, Phase 2×21, Phase 3×2, Phase 4×3, Phase 5×1) with `bucket_slugs` populated so answers still route into memory.
+- On `aperture_user_profile`: add `essential_onboarded_at timestamptz`, keep the legacy `quick_onboarded_at` / `full_onboarded_at` for back-compat but stop reading them.
 
-## Admin UI (Admin → Aperture → new "Invites" tab)
+**Frontend**
+- Delete `OnboardQuick.tsx` + `OnboardFull.tsx` from the user path. Router: `/aperture/onboarding` → single new `OnboardEssential.tsx` that walks the 28 screens one-per-screen (reuses existing chip / open-field renderer).
+- After Phase 3 (IG + website), call `aperture-onboarding-research` for the confirmation card (already exists, updated in Step 6). Keep `OnboardConfirm.tsx`.
+- On completion → write `essential_onboarded_at`, hand off to Home.
 
-- **Invite codes panel**
-  - "Generate code" button → creates a one-time code (random 8-char), shows it with copy button, optional note/label.
-  - Table: code, label, status (unused / redeemed by email + date), created date, revoke button.
-- **Access requests panel**
-  - Table: email, note, requested date, status.
-  - Per row: "Approve" (generates a code, marks request approved, links code) and "Dismiss".
+## Step 2 — Layer + half tagging on memory
 
-## Database (migration)
+**DB (migration)** — no new buckets, only tags on `aperture_memory_items`:
+- `layer text` — one of `revenue_engine | owner_capacity | financial_health | direction` (nullable; not every fact needs it).
+- `bucket_half text` — for the split buckets only:
+  - customers → `icp` | `existing`
+  - money → `revenue` | `cost`
+  - products → `front` | `back`
+  - partners → `referrals` | `suppliers` | `delivery`
+- CHECK constraints per bucket_slug so bad combos are rejected. Backfill: leave existing rows NULL (safe).
+- Same two columns on `aperture_bucket_questions` so the bank knows which half/layer each question serves — Wave 2 selector reads this.
 
-Three new public tables, all with GRANTs + RLS:
+## Step 3 — Waves surface on Memory page
 
-- `aperture_invite_codes`
-  - `id uuid pk`, `code text unique`, `label text`, `created_by uuid`, `created_at`, `redeemed_by uuid null`, `redeemed_at null`, `revoked_at null`.
-  - RLS: admins full access; authenticated can SELECT only their own redeemed row (to check status).
-- `aperture_access_requests`
-  - `id uuid pk`, `user_id uuid null`, `email text not null`, `note text`, `status text default 'pending'`, `created_at`, `resolved_at`, `resolved_code_id uuid null`.
-  - RLS: admins full access; authenticated INSERT for self; SELECT own rows.
-- `aperture_approved_users`
-  - `user_id uuid pk`, `code_id uuid`, `approved_at`.
-  - RLS: admins full access; authenticated SELECT own row.
+**DB**
+- New table `aperture_waves`: `id, user_id, wave_number int, status ('ready'|'in_progress'|'complete'|'skipped'), selected_at, completed_at, question_payload jsonb` (the selector's JSON), `active_layers text[]`, `reasoning_summary text`.
+- Answers already fit `aperture_memory_items` — add `wave_number int` + set `source = 'wave_answer'`.
 
-Plus a security-definer RPC `redeem_aperture_invite(p_code text)` that atomically: validates the code is unused & not revoked, inserts into `aperture_approved_users` for `auth.uid()`, marks the code redeemed, returns ok/error.
+**Frontend (`Memory.tsx`)**
+- Add "Wave 2 ready" card above the existing memory grid. Tap → calls `aperture-wave-selector` edge function (loading state "Preparing your next wave…") → routes to a new `WaveRunner.tsx` form flow.
+- `WaveRunner.tsx`: one question per screen (same shell as OnboardEssential), Skip / I-don't-know footer links per question, progress dots, completion screen. Uses `[OPTIONS]` chips already in codebase.
+- On finish → mark wave `complete`, write answers as memory items tagged with `wave_number`, `layer`, `bucket_half` (from selector payload).
 
-Admins are implicitly approved (no row needed — gate checks `has_role` first).
+## Step 4 — `aperture-wave-selector` edge function (GPT)
 
-## Frontend changes
+- New function `supabase/functions/aperture-wave-selector/index.ts`.
+- Input: `{ wave_number: 2 }` (Wave 3+ deferred).
+- Assembles: system prompt (from `wave_2_selector_prompt.md` §System Prompt), + full text of `bucket_relationship_map.md` + `essential_onboarding_signal_table.md` (bundled as string constants in the function so no runtime fetch), + user's essential onboarding answers, + memory pool state per bucket (`fill_count`, `already_answered_question_ids`, `pass_1_inferred_items`), + filtered bucket question bank (14 defaults + user's industry bucket).
+- Model: `openai/gpt-5.4` via Lovable AI Gateway (chat completions). Logs cost via existing `logAiUsage` helper.
+- Returns strict JSON per the spec. Server-side guardrails (all six in the doc): dedupe vs answered, ≤11/bucket retry-once, Revenue Engine sanity flag, question-ID validation, options 3–6, sequence sort (opening first).
+- Persists the returned payload to `aperture_waves.question_payload`.
 
-- `src/aperture/router.tsx` — wrap each `/app/rilobiz/app/*` route's `ApertureAuthGate` with new `ApertureInviteGate` (single composed `<ApertureGate>` for cleanliness).
-- New `src/aperture/components/ApertureInviteGate.tsx` — fetches approval status (admin role OR row in `aperture_approved_users`); renders shield otherwise.
-- New `src/aperture/components/ApertureInviteShield.tsx` — two-tab UI (Redeem code / Request access), uses Aperture primitives (`ApertureButton`, `ApertureMonoLabel`), matches existing Auth page styling.
-- `src/pages/admin/Aperture.tsx` — add new "Invites" tab with the two panels described above. Reuse existing `useTable` helper.
+## Step 5 — Chat separation from memory-filling
 
-## Technical notes
+- `aperture-chat/index.ts` system prompt rewrite: explicit "You answer the user's question. You do NOT drive a question flow. If the user asks nothing, don't push. Background fact-extraction happens elsewhere — do not narrate it."
+- Remove any current logic that appends "next question" prompts (audit `apertureChat.ts` / `composeOpener.ts`).
+- Keep the existing background fact-extraction path (chat → `aperture_memory_items` with `source='chat_extracted'`) untouched.
 
-- Code generation: client-side `crypto.getRandomValues` over A-Z2-9 alphabet, 8 chars. Uniqueness enforced by DB unique index; retry on collision.
-- Status check is a single `SELECT` (cached in React Query) so the gate only blocks for ~100ms after login.
-- The shield matches the Aperture look (dark canvas, mono label, soft hairline cards) so it feels like onboarding, not an error.
-- No email sending on access requests in this pass — admin sees them in the dashboard. We can add email later if needed.
+## Step 6 — Pass 1 map-aware upgrade
+
+- `aperture-onboarding-research` + `aperture-pass1-prefill`: prompt updates only.
+  - Load `bucket_relationship_map.md` + `essential_onboarding_signal_table.md` as system context.
+  - Instruct the model to identify active layers from the user's essential answers first, then bias pre-fill guesses into those layers' buckets (still writes across all 14, just weights inference effort).
+  - Every inferred item gets `layer` + `bucket_half` set on write.
+  - Model swap Gemini → `openai/gpt-5-mini` (matches "not Gemini" directive; keeps cost reasonable for pre-fill).
+
+## Sequencing (matches Claude's brief)
+
+Parallel: Step 1, Step 2, Step 5.
+Then: Step 3 (needs 1).
+Then: Step 4 (needs 2 + 3).
+Anytime: Step 6.
+
+## Explicitly NOT in this plan
+Wave 3+ selector, chat-steer override into next wave, home-page fix, relevance scoring, learned weights.
+
+## Open decisions before I build
+
+1. **Old onboarding rows** — deactivate (recommended, keeps deferred bank) vs hard-delete. I'll deactivate unless you say otherwise.
+2. **Users mid-onboarding on the old quick/full flow** — force them into the new essential flow on next open? (Recommended: yes; old flow disappears.)
+3. **`layer` / `bucket_half` for existing memory items** — leave NULL and let waves/Pass 1 tag new writes only, or run a one-shot AI backfill on existing user_confirmed items? (Recommended: leave NULL for launch; add backfill later if needed.)

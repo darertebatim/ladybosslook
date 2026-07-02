@@ -6,6 +6,7 @@ export interface ApertureUserProfileRow {
   user_id: string;
   quick_onboarded_at: string | null;
   full_onboarded_at: string | null;
+  essential_onboarded_at: string | null;
   industry_slug: string | null;
   owner_name: string | null;
   business_name: string | null;
