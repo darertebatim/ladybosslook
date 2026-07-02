@@ -39,13 +39,13 @@ export default function RealHome() {
   const [dailyAnswer, setDailyAnswer] = useState("");
   const [savingDaily, setSavingDaily] = useState(false);
 
-  // First-time visit → push to Quick Onboarding.
-  if (!pLoading && profile && !profile.quick_onboarded_at) {
-    return <Navigate to="/app/rilobiz/app/onboard/quick" replace />;
+  // First-time visit → push to Essential Onboarding.
+  // Legacy users who completed the old "quick" flow are treated as onboarded.
+  if (!pLoading && profile && !profile.essential_onboarded_at && !profile.quick_onboarded_at) {
+    return <Navigate to="/app/rilobiz/app/onboard/essential" replace />;
   }
   if (!pLoading && !profile) {
-    // No profile row yet — also send to onboarding (row is created on first upsert).
-    return <Navigate to="/app/rilobiz/app/onboard/quick" replace />;
+    return <Navigate to="/app/rilobiz/app/onboard/essential" replace />;
   }
 
   const knownCount = items.length;
@@ -99,18 +99,18 @@ export default function RealHome() {
           action={<ApertureChip tone={knownCount > 0 ? "signal" : "neutral"}>Memory · {knownCount}</ApertureChip>}
         />
 
-        {/* Finish full onboarding nudge */}
-        {profile?.quick_onboarded_at && !profile?.full_onboarded_at && (
-          <Link to="/app/rilobiz/app/onboard/full" style={{ textDecoration: "none", display: "block", marginBottom: 20 }}>
+        {/* Wave 2 ready — surfaced once essential onboarding is complete. */}
+        {(profile?.essential_onboarded_at || profile?.quick_onboarded_at) && (
+          <Link to="/app/rilobiz/app/waves/2" style={{ textDecoration: "none", display: "block", marginBottom: 20 }}>
             <ApertureCard padding={16} style={{ borderColor: "var(--ap-signal)" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                 <div style={{ minWidth: 0 }}>
-                  <ApertureMonoLabel style={{ color: "var(--ap-signal)" }}>Next step</ApertureMonoLabel>
+                  <ApertureMonoLabel style={{ color: "var(--ap-signal)" }}>Wave 2 ready</ApertureMonoLabel>
                   <h3 style={{ margin: "6px 0 2px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
-                    Finish the full questionnaire
+                    A short round of focused questions
                   </h3>
                   <p style={{ margin: 0, fontSize: 13, color: "var(--ap-ink-3)", lineHeight: 1.45 }}>
-                    A deeper dive so I really get your business — answers go straight into memory.
+                    10–15 questions picked for your business. Skip anything — answers land in your memory.
                   </p>
                 </div>
                 <span style={{ color: "var(--ap-signal)", fontFamily: "var(--ap-font-mono)", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.12em", flexShrink: 0 }}>
