@@ -54,6 +54,7 @@ export default function WaveRunner() {
   const [i, setI] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [alreadyComplete, setAlreadyComplete] = useState(false);
 
   const questions = payload?.questions ?? [];
   const q = questions[i];
@@ -76,7 +77,10 @@ export default function WaveRunner() {
       if (cancelled) return;
       if (existing && existing.question_payload) {
         setPayload(existing.question_payload as unknown as WavePayload);
-        setI(Math.min((existing.answered_count as number) ?? 0, ((existing.question_payload as any)?.questions?.length ?? 0)));
+        const total = (existing.question_payload as any)?.questions?.length ?? 0;
+        const answered = (existing.answered_count as number) ?? 0;
+        setI(Math.min(answered, total));
+        if (existing.status === "complete" || answered >= total) setAlreadyComplete(true);
         setLoading(false);
         return;
       }
@@ -218,6 +222,17 @@ export default function WaveRunner() {
             <ApertureMonoLabel style={{ color: "var(--ap-danger, #d33)" }}>Couldn't build the wave</ApertureMonoLabel>
             <p style={{ margin: "8px 0 14px", fontSize: 14, color: "var(--ap-ink-2)" }}>{error}</p>
             <ApertureButton variant="ghost" onClick={() => navigate("/app/rilobiz/app/memory")}>Back to memory</ApertureButton>
+          </ApertureCard>
+        ) : alreadyComplete ? (
+          <ApertureCard padding={20}>
+            <ApertureMonoLabel style={{ color: "var(--ap-signal)" }}>Wave {waveNum} complete</ApertureMonoLabel>
+            <h2 style={{ margin: "8px 0 10px", fontSize: 20, color: "var(--ap-ink-1)", fontWeight: 600, letterSpacing: "-0.015em", lineHeight: 1.35 }}>
+              You already finished this wave.
+            </h2>
+            <p style={{ margin: "0 0 16px", fontSize: 14, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
+              Your answers are saved in memory. The next wave will show up on the memory page when it's ready.
+            </p>
+            <ApertureButton variant="accent" onClick={() => navigate("/app/rilobiz/app/memory")}>Back to memory</ApertureButton>
           </ApertureCard>
         ) : !q ? (
           <ApertureCard padding={20}>
