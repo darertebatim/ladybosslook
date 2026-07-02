@@ -184,11 +184,10 @@ serve(async (req) => {
       const usage = upstreamJson?.usage ?? null;
       if (usage) {
         await logAiUsage(supabase, {
-          user_id: user.id,
-          feature: "wave_selector",
+          userId: user.id,
+          fn: "aperture-wave-selector",
           model: CHAT_MODEL,
-          prompt_tokens: usage.prompt_tokens ?? 0,
-          completion_tokens: usage.completion_tokens ?? 0,
+          usage: { prompt_tokens: usage.prompt_tokens ?? 0, completion_tokens: usage.completion_tokens ?? 0 },
         });
       }
     } catch { /* ignore */ }
