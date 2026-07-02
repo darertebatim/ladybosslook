@@ -216,17 +216,17 @@ export default function RealMemory() {
             </p>
             <ApertureButton variant="accent" onClick={talkToAperture}>Start →</ApertureButton>
           </ApertureCard>
-          {!fullDone ? (
-            <ApertureCard padding={16}>
-              <ApertureMonoLabel>Deep dive</ApertureMonoLabel>
+          {(profile?.essential_onboarded_at || profile?.quick_onboarded_at) ? (
+            <ApertureCard padding={16} style={{ borderColor: "var(--ap-signal)" }}>
+              <ApertureMonoLabel style={{ color: "var(--ap-signal)" }}>Wave 2 ready</ApertureMonoLabel>
               <h3 style={{ margin: "6px 0 4px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
-                Continue onboarding
+                A short round of focused questions
               </h3>
               <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
-                Run the full business questionnaire. Skip anything that doesn't apply.
+                10–15 questions I've picked for your business. Skip anything.
               </p>
-              <Link to="/app/rilobiz/app/onboard/full" style={{ textDecoration: "none" }}>
-                <ApertureButton variant="ghost">Open →</ApertureButton>
+              <Link to="/app/rilobiz/app/waves/2" style={{ textDecoration: "none" }}>
+                <ApertureButton variant="accent">Start Wave 2 →</ApertureButton>
               </Link>
             </ApertureCard>
           ) : (
