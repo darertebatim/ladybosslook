@@ -104,11 +104,21 @@ serve(async (req) => {
       .map(s => `# ${s.label.toUpperCase()} (${s.url})\n${s.text.slice(0, 6000)}`)
       .join("\n\n");
 
-    const systemPrompt = `You extract a short list of crisp, factual statements about a small business from raw scraped web/IG text. Each fact must be true based on the source text, brief (<= 24 words), specific, and non-redundant. Skip generic marketing fluff. If the source text is mostly a login wall or empty, return an empty list.`;
+    const systemPrompt = `You extract a short list of crisp, factual statements about a small business from raw scraped web/IG text.
+
+Each fact must be true based on the source text, brief (<= 24 words), specific, and non-redundant. Skip generic marketing fluff. If the source text is mostly a login wall or empty, return an empty list.
+
+You also tag each fact with the reasoning LAYER it belongs to (not just a bucket). The four layers:
+- "Revenue Engine" — how the business makes money: ICP/target audience, offer, pricing, marketing channels, sales/conversion, referrals. This is the DEFAULT for most facts about a small business.
+- "Owner Capacity" — team, delivery/fulfillment, owner-as-bottleneck signals.
+- "Financial Health" — revenue level, margins, cost structure, debt, unit economics.
+- "Direction" — vision, story, time horizon, life/family constraints, why-they-started.
+
+Prefer Revenue Engine unless the fact is clearly about team/ops (Owner Capacity), money/costs (Financial Health), or vision/story (Direction).`;
     const focusLine = userPrompt
       ? `\n\nThe user specifically asked: "${String(userPrompt).slice(0, 240)}". Prefer facts that answer that.`
       : "";
-    const aiUserPrompt = `Business name (claimed): ${businessName ?? "(unknown)"}${focusLine}\n\nReturn JSON of the shape:\n{\n  "items": [\n    { "bucket": "<one of: basics|story|customers|products|sales|marketing|money|vision|tools|team|operations|partners|competitors>", "fact": "<concise fact>" }\n  ]\n}\nOnly return valid JSON. Max 12 items.\n\n=== SOURCE ===\n${corpus}\n=== END SOURCE ===`;
+    const aiUserPrompt = `Business name (claimed): ${businessName ?? "(unknown)"}${focusLine}\n\nReturn JSON of the shape:\n{\n  "items": [\n    {\n      "bucket": "<one of: basics|story|customers|products|sales|marketing|money|vision|tools|team|operations|partners|competitors>",\n      "layer": "<Revenue Engine|Owner Capacity|Financial Health|Direction>",\n      "fact": "<concise fact>"\n    }\n  ]\n}\nOnly return valid JSON. Max 12 items.\n\n=== SOURCE ===\n${corpus}\n=== END SOURCE ===`;
 
     const aiRes = await fetch(AI_GATEWAY, {
       method: "POST",
@@ -138,9 +148,28 @@ serve(async (req) => {
       "basics","story","customers","products","sales","marketing","money",
       "vision","tools","team","operations","partners","competitors",
     ]);
+    const VALID_LAYERS = new Set(["Revenue Engine", "Owner Capacity", "Financial Health", "Direction"]);
+    const DEFAULT_LAYER_BY_BUCKET: Record<string, string> = {
+      basics: "Direction",
+      story: "Direction",
+      vision: "Direction",
+      customers: "Revenue Engine",
+      products: "Revenue Engine",
+      sales: "Revenue Engine",
+      marketing: "Revenue Engine",
+      money: "Financial Health",
+      team: "Owner Capacity",
+      operations: "Owner Capacity",
+      partners: "Revenue Engine",
+      competitors: "Revenue Engine",
+      tools: "Revenue Engine",
+    };
     const items = (parsed.items ?? []).filter(
       i => i && typeof i.fact === "string" && i.fact.trim() && VALID.has(i.bucket),
-    );
+    ).map((i: any) => ({
+      ...i,
+      layer: VALID_LAYERS.has(i.layer) ? i.layer : DEFAULT_LAYER_BY_BUCKET[i.bucket] ?? "Revenue Engine",
+    }));
 
     // Deterministic safety net: if Instagram was blocked but search-result snippets
     // reveal clear public profile facts, keep the user from seeing an empty review.
@@ -148,7 +177,7 @@ serve(async (req) => {
       const fallbackFacts = instagramFallbackFacts(s.text, String(s.meta?.handle ?? ""));
       for (const fact of fallbackFacts) {
         if (!items.some(i => i.fact.toLowerCase() === fact.toLowerCase())) {
-          items.push({ bucket: "marketing", fact });
+          items.push({ bucket: "marketing", fact, layer: "Revenue Engine" } as any);
         }
       }
     }
@@ -167,6 +196,8 @@ serve(async (req) => {
         source: "ai_extracted",
         bucket_slug: it.bucket,
         question_key: questionKey,
+        layer: (it as any).layer ?? DEFAULT_LAYER_BY_BUCKET[it.bucket] ?? "Revenue Engine",
+        wave_number: 1,
       });
       if (!error) {
         written++;
