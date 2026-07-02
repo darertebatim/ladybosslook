@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders, AI_GATEWAY, DEFAULT_MODEL } from "../_shared/aperture-cors.ts";
+import { corsHeaders, AI_GATEWAY, DEFAULT_MODEL, logAiUsage } from "../_shared/aperture-cors.ts";
 import { logApertureEvent } from "../_shared/aperture-events.ts";
 
 /**
@@ -155,6 +155,7 @@ ${JSON.stringify(targetList, null, 2)}`;
     }
 
     const data = await upstream.json();
+    await logAiUsage(supabase, { userId: user.id, fn: "aperture-pass1-prefill", model: DEFAULT_MODEL, usage: data?.usage });
     const raw = data?.choices?.[0]?.message?.content ?? "{}";
     let parsed: any = {};
     try { parsed = JSON.parse(raw); } catch { parsed = {}; }
