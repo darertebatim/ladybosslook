@@ -106,6 +106,7 @@ ${memoryBrief}`;
     }
 
     const data = await upstream.json();
+    await logAiUsage(supabase, { userId: user.id, fn: "aperture-pass2-suggestions", model: DEFAULT_MODEL, usage: data?.usage });
     const raw = data?.choices?.[0]?.message?.content ?? "{}";
     let parsed: any = {};
     try { parsed = JSON.parse(raw); } catch { parsed = {}; }
