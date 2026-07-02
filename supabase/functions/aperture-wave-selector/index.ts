@@ -201,6 +201,67 @@ serve(async (req) => {
       payload.selected_question_count = payload.questions.length;
     }
 
+    // ── Forced Wave 2 questions ─────────────────────────────────────────
+    // These 3 fire for every user on Wave 2, regardless of signals.
+    // Appended after selector output, not counted against 10-15 budget,
+    // skipped only if the user has already answered them.
+    if (waveNumber === 2) {
+      const FORCED_WAVE2: any[] = [
+        {
+          id: "products_L1_bestseller",
+          bucket: "Products & Services",
+          bucket_slug: "products",
+          layer: "Revenue Engine",
+          role_in_sequence: "opening",
+          question_text: "What's your best-selling product or service?",
+          options: [],
+          open_field: true,
+          forced: true,
+          reason: "Foundational operational fact — every user needs this asked",
+        },
+        {
+          id: "products_L1_bestseller_price",
+          bucket: "Products & Services",
+          bucket_slug: "products",
+          layer: "Revenue Engine",
+          role_in_sequence: "opening",
+          question_text: "What does it cost?",
+          options: [],
+          open_field: true,
+          forced: true,
+          reason: "Pairs with best-seller — always needed for specific advice",
+        },
+        {
+          id: "customers_L2_ideal_customer",
+          bucket: "Customers & Market",
+          bucket_slug: "customers",
+          layer: "Revenue Engine",
+          role_in_sequence: "opening",
+          question_text: "Who is your ideal customer — describe them specifically?",
+          options: [],
+          open_field: true,
+          forced: true,
+          reason: "Foundational Customer bucket fact — needed for specificity",
+        },
+      ];
+
+      if (!Array.isArray(payload.questions)) payload.questions = [];
+
+      // Drop any AI-selected question that collides with a forced id, so
+      // the forced version wins and we don't double-ask.
+      const forcedIds = new Set(FORCED_WAVE2.map(f => f.id));
+      payload.questions = payload.questions.filter((q: any) => !forcedIds.has(q?.id));
+
+      // Skip forced questions the user already answered.
+      const toPrepend = FORCED_WAVE2.filter(
+        f => !alreadyAnswered.has(`${f.bucket_slug}::${f.id}`),
+      );
+
+      // Put forced ones at the front (they're openers).
+      payload.questions = [...toPrepend, ...payload.questions];
+      payload.selected_question_count = payload.questions.length;
+    }
+
     // Persist the wave.
     await supabase.from("aperture_waves").upsert({
       user_id: user.id,
