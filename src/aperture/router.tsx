@@ -26,6 +26,8 @@ const RealSettings = lazy(() => import("@/aperture/pages/real/Settings"));
 const OnboardQuick = lazy(() => import("@/aperture/pages/real/OnboardQuick"));
 const OnboardFull = lazy(() => import("@/aperture/pages/real/OnboardFull"));
 const OnboardConfirm = lazy(() => import("@/aperture/pages/real/OnboardConfirm"));
+const OnboardEssential = lazy(() => import("@/aperture/pages/real/OnboardEssential"));
+const WaveRunner = lazy(() => import("@/aperture/pages/real/WaveRunner"));
 const RealFiles = lazy(() => import("@/aperture/pages/real/Files"));
 const RealTools = lazy(() => import("@/aperture/pages/real/Tools"));
 const ApertureAuth = lazy(() => import("@/aperture/pages/real/Auth"));
@@ -119,6 +121,8 @@ export default function ApertureRouter() {
           <Route path="app/onboard/quick" element={<ApertureGate><OnboardQuick /></ApertureGate>} />
           <Route path="app/onboard/full" element={<ApertureGate><OnboardFull /></ApertureGate>} />
           <Route path="app/onboard/confirm" element={<ApertureGate><OnboardConfirm /></ApertureGate>} />
+          <Route path="app/onboard/essential" element={<ApertureGate><OnboardEssential /></ApertureGate>} />
+          <Route path="app/waves/:waveNumber" element={<ApertureGate><WaveRunner /></ApertureGate>} />
           <Route path="*" element={<Navigate to="." replace />} />
         </Routes>
       </Suspense>
