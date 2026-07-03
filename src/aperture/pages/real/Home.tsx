@@ -10,7 +10,7 @@ import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { useApertureChatsDB } from "@/aperture/hooks/db/useApertureChatsDB";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 import { useApertureDailyQuestion } from "@/aperture/hooks/db/useApertureDailyQuestion";
-import { useApertureHomeSuggestions } from "@/aperture/hooks/db/useApertureHomeSuggestions";
+import { useApertureHomeSuggestions, computeMemorySignature } from "@/aperture/hooks/db/useApertureHomeSuggestions";
 import { useApertureStoredSuggestions } from "@/aperture/hooks/db/useApertureStoredSuggestions";
 import { toast } from "@/hooks/use-toast";
 import { AperturePrompt } from "@/aperture/components/chat/AperturePrompt";
@@ -56,7 +56,8 @@ export default function RealHome() {
   const { user } = useAuth();
   const { question: dailyQ, refresh: refreshDailyQ, skip: skipDaily } = useApertureDailyQuestion();
   const { suggestions: storedSuggestions, refresh: refreshStored, markActed } = useApertureStoredSuggestions();
-  const { suggestions: liveSuggestions, loading: liveLoading, refresh: refreshLive } = useApertureHomeSuggestions(items.length);
+  const memorySig = useMemo(() => computeMemorySignature(items as any), [items]);
+  const { suggestions: liveSuggestions, loading: liveLoading, refresh: refreshLive } = useApertureHomeSuggestions(memorySig);
   // Prefer stored (Pass 2 / future generators); fall back to live AI generation.
   const suggestions = storedSuggestions.length > 0
     ? storedSuggestions.map(s => ({ title: s.title, why: s.why, prompt: s.prompt, _storedId: s.id as string | null }))
