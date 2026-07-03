@@ -6,6 +6,7 @@ import { PageHeader } from "@/aperture/components/PageHeader";
 import {
   ApertureCard, ApertureMonoLabel, ApertureLoading, ApertureButton, ApertureChip,
 } from "@/aperture/components/primitives";
+import { ApertureProgressOverlay, ApertureProgressStatus } from "@/aperture/components/ApertureProgressOverlay";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
