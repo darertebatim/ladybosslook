@@ -23,6 +23,19 @@ export function SourceDetailSheet({
 
   const facts = useMemo(() => summary ? factsFor(summary.kind) : [], [summary, factsFor]);
 
+  // Group facts by bucket so users see structure ("Products (3), Basics (2)…")
+  // instead of a flat list. Sort by count desc.
+  const factsByBucket = useMemo(() => {
+    const map = new Map<string, typeof facts>();
+    for (const f of facts) {
+      const k = f.bucket_slug ?? "other";
+      const arr = map.get(k) ?? [];
+      arr.push(f);
+      map.set(k, arr);
+    }
+    return Array.from(map.entries()).sort((a, b) => b[1].length - a[1].length);
+  }, [facts]);
+
   if (!open || !summary) return null;
 
   const busyHere = busy === summary.kind || working;
@@ -104,14 +117,18 @@ export function SourceDetailSheet({
         {/* Body */}
         <div style={{ flex: 1, overflowY: "auto", padding: 18, display: "flex", flexDirection: "column", gap: 16 }}>
           {/* Status row */}
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <ApertureChip tone={summary.snapshot ? "signal" : "neutral"}>
-              {summary.snapshot ? "Synced" : "Not fetched yet"}
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <ApertureChip tone={summary.fetchStatus === "ok" ? "signal" : "neutral"}>
+              {summary.fetchStatus === "ok"
+                ? "Synced"
+                : summary.fetchStatus === "failed"
+                  ? "Couldn't read this site"
+                  : "Not fetched yet"}
             </ApertureChip>
             <ApertureChip tone="neutral">{facts.length} facts</ApertureChip>
             {summary.snapshot?.fetched_at && (
               <span style={{ fontSize: 11, color: "var(--ap-ink-3)" }}>
-                Last fetched {new Date(summary.snapshot.fetched_at).toLocaleString()}
+                Last checked {new Date(summary.snapshot.fetched_at).toLocaleString()}
               </span>
             )}
           </div>
@@ -124,25 +141,33 @@ export function SourceDetailSheet({
             {facts.length === 0 ? (
               <ApertureCard padding={14}>
                 <p style={{ margin: 0, fontSize: 13, color: "var(--ap-ink-3)" }}>
-                  Nothing extracted yet. Tap "Refetch" below and I'll pull what I can from this {summary.kind}.
+                  {summary.fetchStatus === "failed"
+                    ? `I couldn't read this ${summary.kind} — the site may be blocking scrapers or hiding content behind login. Try answering in chat instead.`
+                    : `Nothing extracted yet. Tap "Refetch" below and I'll pull what I can from this ${summary.kind}.`}
                 </p>
               </ApertureCard>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {facts.map(f => (
-                  <div key={f.id} style={{
-                    padding: "10px 12px",
-                    borderRadius: "var(--ap-radius-sm)",
-                    background: "var(--ap-surface-2)",
-                    border: "1px solid var(--ap-hairline)",
-                    fontSize: 13.5, color: "var(--ap-ink-1)", lineHeight: 1.5,
-                  }}>
-                    {f.content}
-                    {f.bucket_slug && (
-                      <div style={{ marginTop: 4 }}>
-                        <ApertureMonoLabel size={9}>{f.bucket_slug}</ApertureMonoLabel>
-                      </div>
-                    )}
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {factsByBucket.map(([bucket, list]) => (
+                  <div key={bucket}>
+                    <div style={{ marginBottom: 6 }}>
+                      <ApertureMonoLabel>
+                        {prettyBucket(bucket)} ({list.length})
+                      </ApertureMonoLabel>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      {list.map(f => (
+                        <div key={f.id} style={{
+                          padding: "10px 12px",
+                          borderRadius: "var(--ap-radius-sm)",
+                          background: "var(--ap-surface-2)",
+                          border: "1px solid var(--ap-hairline)",
+                          fontSize: 13.5, color: "var(--ap-ink-1)", lineHeight: 1.5,
+                        }}>
+                          {f.content}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
