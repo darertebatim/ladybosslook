@@ -1,12 +1,11 @@
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate, Navigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
-  ApertureCard, ApertureChip, ApertureMonoLabel, ApertureLoading, ApertureButton,
+  ApertureCard, ApertureChip, ApertureMonoLabel, ApertureButton,
 } from "@/aperture/components/primitives";
-import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { useApertureChatsDB } from "@/aperture/hooks/db/useApertureChatsDB";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
@@ -15,15 +14,17 @@ import { useApertureHomeSuggestions } from "@/aperture/hooks/db/useApertureHomeS
 import { useApertureStoredSuggestions } from "@/aperture/hooks/db/useApertureStoredSuggestions";
 import { toast } from "@/hooks/use-toast";
 import { AperturePrompt } from "@/aperture/components/chat/AperturePrompt";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function RealHome() {
   const navigate = useNavigate();
-  const { buckets, loading: bLoading } = useApertureBucketsDB();
-  const { items, loading: mLoading, saveBucketAnswer } = useApertureMemoryDB();
+  const { items, saveBucketAnswer } = useApertureMemoryDB();
   const { createChat } = useApertureChatsDB();
   const { profile, loading: pLoading } = useApertureUserProfile();
+  const { user } = useAuth();
   const { question: dailyQ, refresh: refreshDailyQ, skip: skipDaily } = useApertureDailyQuestion();
-  const { suggestions: storedSuggestions, loading: storedLoading, refresh: refreshStored, markActed } = useApertureStoredSuggestions();
+  const { suggestions: storedSuggestions, refresh: refreshStored, markActed } = useApertureStoredSuggestions();
   const { suggestions: liveSuggestions, loading: liveLoading, refresh: refreshLive } = useApertureHomeSuggestions(items.length);
   // Prefer stored (Pass 2 / future generators); fall back to live AI generation.
   const suggestions = storedSuggestions.length > 0
@@ -39,6 +40,25 @@ export default function RealHome() {
   const [dailyAnswer, setDailyAnswer] = useState("");
   const [savingDaily, setSavingDaily] = useState(false);
 
+  // Next wave number (same logic as Memory page)
+  const [nextWave, setNextWave] = useState<number>(2);
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("aperture_waves")
+        .select("wave_number,status")
+        .eq("user_id", user.id);
+      if (cancelled || !data) return;
+      const maxComplete = data
+        .filter((r: any) => r.status === "complete")
+        .reduce((m: number, r: any) => Math.max(m, r.wave_number as number), 1);
+      setNextWave(Math.max(2, maxComplete + 1));
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
   // First-time visit → push to Essential Onboarding.
   // Legacy users who completed the old "quick" flow are treated as onboarded.
   if (!pLoading && profile && !profile.essential_onboarded_at && !profile.quick_onboarded_at) {
@@ -49,7 +69,6 @@ export default function RealHome() {
   }
 
   const knownCount = items.length;
-  const hasBuckets = buckets.length > 0;
 
   async function handleSend(text: string) {
     const t = text.trim();
@@ -99,13 +118,13 @@ export default function RealHome() {
           action={<ApertureChip tone={knownCount > 0 ? "signal" : "neutral"}>Memory · {knownCount}</ApertureChip>}
         />
 
-        {/* Wave 2 ready — surfaced once essential onboarding is complete. */}
+        {/* Next wave ready — surfaced once essential onboarding is complete. */}
         {(profile?.essential_onboarded_at || profile?.quick_onboarded_at) && (
-          <Link to="/app/rilobiz/app/waves/2" style={{ textDecoration: "none", display: "block", marginBottom: 20 }}>
+          <Link to={`/app/rilobiz/app/waves/${nextWave}`} style={{ textDecoration: "none", display: "block", marginBottom: 20 }}>
             <ApertureCard padding={16} style={{ borderColor: "var(--ap-signal)" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                 <div style={{ minWidth: 0 }}>
-                  <ApertureMonoLabel style={{ color: "var(--ap-signal)" }}>Wave 2 ready</ApertureMonoLabel>
+                  <ApertureMonoLabel style={{ color: "var(--ap-signal)" }}>Wave {nextWave} ready</ApertureMonoLabel>
                   <h3 style={{ margin: "6px 0 2px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
                     A short round of focused questions
                   </h3>
@@ -119,49 +138,6 @@ export default function RealHome() {
               </div>
             </ApertureCard>
           </Link>
-        )}
-
-        {/* Daily question */}
-        {dailyQ && (
-          <section style={{ marginBottom: 28 }}>
-            <ApertureMonoLabel style={{ marginBottom: 12, display: "block" }}>Today's question</ApertureMonoLabel>
-            <ApertureCard padding={18}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 10 }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <AperturePrompt
-                    text={dailyQ.prompt}
-                    size={15.5}
-                    style={{ fontWeight: 600, lineHeight: 1.4 }}
-                  />
-                </div>
-                <ApertureChip tone="neutral">{dailyQ.bucket_slug}</ApertureChip>
-              </div>
-              <form
-                onSubmit={e => { e.preventDefault(); saveDaily(); }}
-                style={{ display: "flex", gap: 8, alignItems: "stretch" }}
-              >
-                <input
-                  value={dailyAnswer}
-                  onChange={e => setDailyAnswer(e.target.value)}
-                  placeholder="Type your answer…"
-                  style={{
-                    flex: 1, appearance: "none", outline: "none",
-                    background: "var(--ap-surface-2)",
-                    border: "1px solid var(--ap-hairline)",
-                    borderRadius: "var(--ap-radius-sm)",
-                    padding: "10px 12px", fontSize: 14,
-                    color: "var(--ap-ink-1)", fontFamily: "var(--ap-font-sans)",
-                  }}
-                />
-                <ApertureButton type="submit" variant="accent" disabled={!dailyAnswer.trim() || savingDaily}>
-                  {savingDaily ? "…" : "Save"}
-                </ApertureButton>
-                <ApertureButton type="button" variant="ghost" onClick={() => skipDaily()}>
-                  Skip
-                </ApertureButton>
-              </form>
-            </ApertureCard>
-          </section>
         )}
 
         {/* AI suggestions */}
@@ -226,79 +202,46 @@ export default function RealHome() {
           </section>
         )}
 
-        {/* Memory snapshot */}
-        <section style={{ marginBottom: 28 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-            <ApertureMonoLabel>Your memory</ApertureMonoLabel>
-            <Link to="/app/rilobiz/app/memory" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>Open →</Link>
-          </div>
-          {mLoading ? (
-            <ApertureLoading label="Loading…" />
-          ) : items.length === 0 ? (
-            <ApertureCard padding={20}>
-              <p style={{ margin: 0, fontSize: 13.5, color: "var(--ap-ink-2)", lineHeight: 1.55 }}>
-                Nothing in your memory yet. Just start typing below — I'll listen and remember the parts that matter.
-              </p>
-            </ApertureCard>
-          ) : (
-            <ApertureCard padding={18}>
-              <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
-                {items.slice(0, 4).map(i => (
-                  <li key={i.id} style={{ fontSize: 13.5, color: "var(--ap-ink-1)", lineHeight: 1.5, display: "flex", gap: 8 }}>
-                    <span style={{
-                      color: i.source === "ai_inferred_pre_onboarding" ? "var(--ap-ink-3)" : "var(--ap-ink-3)",
-                      fontFamily: "var(--ap-font-mono)", fontSize: 10, marginTop: 4,
-                      textTransform: "uppercase", letterSpacing: "0.1em", minWidth: 70,
-                      opacity: i.source === "ai_inferred_pre_onboarding" ? 0.7 : 1,
-                    }}>
-                      {i.source === "ai_extracted"
-                        ? "Noticed"
-                        : i.source === "bucket_answer"
-                          ? "Bucket"
-                          : i.source === "ai_inferred_pre_onboarding"
-                            ? "Guess"
-                            : "Note"}
-                    </span>
-                    <span style={{ flex: 1 }}>{i.content}</span>
-                  </li>
-                ))}
-              </ul>
-            </ApertureCard>
-          )}
-        </section>
-
-        {/* Buckets */}
-        {!bLoading && (
+        {/* Daily question */}
+        {dailyQ && (
           <section style={{ marginBottom: 28 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <ApertureMonoLabel>Buckets</ApertureMonoLabel>
-              <Link to="/app/rilobiz/app/memory" style={{ fontSize: 11, color: "var(--ap-ink-3)", textDecoration: "none", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>All →</Link>
-            </div>
-            {!hasBuckets ? (
-              <ApertureCard padding={24} style={{ textAlign: "center" }}>
-                <p style={{ margin: 0, fontSize: 13.5, color: "var(--ap-ink-2)", lineHeight: 1.55 }}>
-                  No buckets yet. They'll appear as we talk — and as your business changes.
-                </p>
-              </ApertureCard>
-            ) : (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
-                {buckets.map(b => (
-                  <Link key={b.slug} to={`/app/rilobiz/app/memory/${b.slug}`} style={{
-                    display: "flex", flexDirection: "column", gap: 8,
-                    padding: 16, background: "var(--ap-surface-1)",
-                    border: "1px solid var(--ap-hairline)",
-                    borderRadius: "var(--ap-radius-md)", textDecoration: "none",
-                  }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                      <ApertureMonoLabel>{b.source}</ApertureMonoLabel>
-                      {b.glyph && <span style={{ fontFamily: "var(--ap-font-mono)", fontSize: 22, color: "var(--ap-ink-2)" }}>{b.glyph}</span>}
-                    </div>
-                    <h3 style={{ margin: 0, fontSize: 14.5, fontWeight: 600, color: "var(--ap-ink-1)" }}>{b.title}</h3>
-                    {b.blurb && <p style={{ margin: 0, fontSize: 12.5, color: "var(--ap-ink-3)", lineHeight: 1.5 }}>{b.blurb}</p>}
-                  </Link>
-                ))}
+            <ApertureMonoLabel style={{ marginBottom: 12, display: "block" }}>Today's question</ApertureMonoLabel>
+            <ApertureCard padding={18}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 10 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <AperturePrompt
+                    text={dailyQ.prompt}
+                    size={15.5}
+                    style={{ fontWeight: 600, lineHeight: 1.4 }}
+                  />
+                </div>
+                <ApertureChip tone="neutral">{dailyQ.bucket_slug}</ApertureChip>
               </div>
-            )}
+              <form
+                onSubmit={e => { e.preventDefault(); saveDaily(); }}
+                style={{ display: "flex", gap: 8, alignItems: "stretch" }}
+              >
+                <input
+                  value={dailyAnswer}
+                  onChange={e => setDailyAnswer(e.target.value)}
+                  placeholder="Type your answer…"
+                  style={{
+                    flex: 1, appearance: "none", outline: "none",
+                    background: "var(--ap-surface-2)",
+                    border: "1px solid var(--ap-hairline)",
+                    borderRadius: "var(--ap-radius-sm)",
+                    padding: "10px 12px", fontSize: 14,
+                    color: "var(--ap-ink-1)", fontFamily: "var(--ap-font-sans)",
+                  }}
+                />
+                <ApertureButton type="submit" variant="accent" disabled={!dailyAnswer.trim() || savingDaily}>
+                  {savingDaily ? "…" : "Save"}
+                </ApertureButton>
+                <ApertureButton type="button" variant="ghost" onClick={() => skipDaily()}>
+                  Skip
+                </ApertureButton>
+              </form>
+            </ApertureCard>
           </section>
         )}
 
