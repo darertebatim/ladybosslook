@@ -7,6 +7,7 @@ import { PageHeader } from "@/aperture/components/PageHeader";
 import {
   ApertureCard, ApertureMonoLabel, ApertureLoading, ApertureButton, ApertureChip,
 } from "@/aperture/components/primitives";
+import { ApertureProgressOverlay, ApertureProgressStatus } from "@/aperture/components/ApertureProgressOverlay";
 import { useApertureOnboardingDB, useApertureIndustriesDB } from "@/aperture/hooks/db/useApertureOnboardingDB";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
@@ -39,8 +40,8 @@ export default function OnboardEssential() {
   const [showPhaseIntro, setShowPhaseIntro] = useState(false);
   const lastPhaseRef = useRef<number | null>(null);
   const [finishing, setFinishing] = useState(false);
-  const [finishProgress, setFinishProgress] = useState(0);
-  const [finishLabel, setFinishLabel] = useState("Saving your answers…");
+  const [finishStatus, setFinishStatus] = useState<ApertureProgressStatus>("running");
+  const [finishError, setFinishError] = useState<string | null>(null);
 
   // Skip contact questions we already know from the signed-in account.
   const knownEmail = user?.email ?? null;
@@ -181,46 +182,35 @@ export default function OnboardEssential() {
 
   async function finish() {
     setFinishing(true);
-    setFinishProgress(5);
-    setFinishLabel("Saving your answers…");
-
-    // Smooth progress ticker up to 92% so it feels like real work happening.
-    const started = Date.now();
-    const ticker = setInterval(() => {
-      setFinishProgress(prev => {
-        const elapsed = (Date.now() - started) / 1000;
-        // Ease toward 92 over ~12s.
-        const target = Math.min(92, 5 + Math.round((1 - Math.exp(-elapsed / 4)) * 87));
-        return Math.max(prev, target);
+    setFinishStatus("running");
+    setFinishError(null);
+    try {
+      const now = new Date().toISOString();
+      await upsertProfile({
+        essential_onboarded_at: now,
+        quick_onboarded_at: now,
       });
-    }, 250);
 
-    const now = new Date().toISOString();
-    await upsertProfile({
-      essential_onboarded_at: now,
-      quick_onboarded_at: now,
-    });
+      const website = answers["website"];
+      const instagram = answers["instagram"];
+      const businessName = answers["business_name"];
+      if (website || instagram) {
+        supabase.functions.invoke("aperture-onboarding-research", {
+          body: { website, instagram, businessName },
+        }).catch(() => {});
+      }
+      try { window.localStorage.setItem("rilobiz.showBriefOnHome", "essential"); } catch {}
 
-    setFinishLabel("Reading up on your business…");
-    const website = answers["website"];
-    const instagram = answers["instagram"];
-    const businessName = answers["business_name"];
-    if (website || instagram) {
-      supabase.functions.invoke("aperture-onboarding-research", {
-        body: { website, instagram, businessName },
-      }).catch(() => {});
+      const { error } = await supabase.functions.invoke("aperture-regenerate-memory-card", {});
+      if (error) throw error;
+
+      setFinishStatus("done");
+      await new Promise(r => setTimeout(r, 1100));
+      navigate("/app/rilobiz/app", { replace: true });
+    } catch (e: any) {
+      setFinishError(e?.message ?? "We couldn't finish building your home. Please try again.");
+      setFinishStatus("error");
     }
-    try { window.localStorage.setItem("rilobiz.showBriefOnHome", "essential"); } catch {}
-
-    setFinishLabel("Building your customized home…");
-    try { await supabase.functions.invoke("aperture-regenerate-memory-card", {}); } catch {}
-
-    clearInterval(ticker);
-    setFinishProgress(100);
-    setFinishLabel("Ready — welcome to RiloBiz");
-    // Brief pause so the 100% + welcome message actually reads.
-    await new Promise(r => setTimeout(r, 900));
-    navigate("/app/rilobiz/app", { replace: true });
   }
 
   function set(value: string) {
@@ -267,31 +257,26 @@ export default function OnboardEssential() {
         )}
 
         {finishing ? (
-          <ApertureCard padding={28}>
-            <ApertureMonoLabel>All done</ApertureMonoLabel>
-            <h2 style={{ margin: "10px 0 8px", fontSize: 24, color: "var(--ap-ink-1)", fontWeight: 600, letterSpacing: "-0.02em" }}>
-              Building your customized home
-            </h2>
-            <p style={{ margin: "0 0 20px", fontSize: 14, color: "var(--ap-ink-2)" }}>
-              I'm saving your memory and pulling together what I know so your home page is ready when you land. This takes a few seconds.
-            </p>
-            <div style={{
-              width: "100%", height: 8, borderRadius: 999,
-              background: "var(--ap-hairline)", overflow: "hidden", marginBottom: 10,
-            }}>
-              <div style={{
-                width: `${finishProgress}%`, height: "100%",
-                background: "var(--ap-signal)",
-                transition: "width 0.35s ease",
-              }} />
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--ap-ink-2)" }}>
-              <span>{finishLabel}</span>
-              <span style={{ fontVariantNumeric: "tabular-nums", fontWeight: 600, color: "var(--ap-ink-1)" }}>
-                {finishProgress}%
-              </span>
-            </div>
-          </ApertureCard>
+          <ApertureProgressOverlay
+            open
+            status={finishStatus}
+            title="Building your customized home"
+            description="I'm saving your memory and pulling together what I know so your home page is ready when you land."
+            estimateMs={12000}
+            hardTimeoutMs={30000}
+            steps={[
+              { at: 5, label: "Saving your answers…" },
+              { at: 35, label: "Reading up on your business…" },
+              { at: 70, label: "Building your customized home…" },
+            ]}
+            errorMessage={finishError ?? undefined}
+            onRetry={() => { setFinishError(null); finish(); }}
+            onDismiss={() => { setFinishing(false); }}
+            onHardTimeout={() => {
+              setFinishError("This is taking longer than expected. Please try again.");
+              setFinishStatus("error");
+            }}
+          />
         ) : loading || !q ? (
           <ApertureLoading label="Loading…" />
         ) : showPhaseIntro ? (

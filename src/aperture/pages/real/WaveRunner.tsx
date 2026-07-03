@@ -6,6 +6,7 @@ import { PageHeader } from "@/aperture/components/PageHeader";
 import {
   ApertureCard, ApertureMonoLabel, ApertureLoading, ApertureButton, ApertureChip,
 } from "@/aperture/components/primitives";
+import { ApertureProgressOverlay, ApertureProgressStatus } from "@/aperture/components/ApertureProgressOverlay";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
@@ -198,10 +199,25 @@ export default function WaveRunner() {
     setI(nextIdx);
   }
 
+  const [finishing, setFinishing] = useState(false);
+  const [finishStatus, setFinishStatus] = useState<ApertureProgressStatus>("running");
+  const [finishError, setFinishError] = useState<string | null>(null);
+
   async function finishWaveAndGoHome() {
     try { window.localStorage.setItem("rilobiz.showBriefOnHome", `wave-${waveNum}`); } catch {}
-    try { await supabase.functions.invoke("aperture-regenerate-memory-card", {}); } catch {}
-    navigate("/app/rilobiz/app", { replace: true });
+    setFinishing(true);
+    setFinishStatus("running");
+    setFinishError(null);
+    try {
+      const { error } = await supabase.functions.invoke("aperture-regenerate-memory-card", {});
+      if (error) throw error;
+      setFinishStatus("done");
+      await new Promise(r => setTimeout(r, 900));
+      navigate("/app/rilobiz/app", { replace: true });
+    } catch (e: any) {
+      setFinishError(e?.message ?? "We couldn't wrap up this wave. Please try again.");
+      setFinishStatus("error");
+    }
   }
 
   function set(v: string) {
@@ -225,7 +241,28 @@ export default function WaveRunner() {
           action={total > 0 ? <ApertureChip tone="signal">{Math.min(i + 1, total)} / {total}</ApertureChip> : null}
         />
 
-        {loading ? (
+        {finishing ? (
+          <ApertureProgressOverlay
+            open
+            status={finishStatus}
+            title={`Wrapping up wave ${waveNum}`}
+            description="I'm updating your home and pulling together what changed."
+            estimateMs={8000}
+            hardTimeoutMs={22000}
+            steps={[
+              { at: 5, label: "Saving your answers…" },
+              { at: 45, label: "Refreshing your home card…" },
+              { at: 80, label: "Almost ready…" },
+            ]}
+            errorMessage={finishError ?? undefined}
+            onRetry={() => { setFinishError(null); finishWaveAndGoHome(); }}
+            onDismiss={() => { navigate("/app/rilobiz/app", { replace: true }); }}
+            onHardTimeout={() => {
+              setFinishError("This is taking longer than expected. You can retry or head home.");
+              setFinishStatus("error");
+            }}
+          />
+        ) : loading ? (
           <ApertureLoading label="Preparing your wave…" />
         ) : error ? (
           <ApertureCard padding={20}>
