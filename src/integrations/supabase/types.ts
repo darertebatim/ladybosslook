@@ -1271,10 +1271,12 @@ export type Database = {
       aperture_messages: {
         Row: {
           attachments: Json
+          bucket_slug: string | null
           chat_id: string
           content: string
           created_at: string
           id: string
+          is_memory_question: boolean
           metadata: Json | null
           model: string | null
           role: string
@@ -1285,10 +1287,12 @@ export type Database = {
         }
         Insert: {
           attachments?: Json
+          bucket_slug?: string | null
           chat_id: string
           content: string
           created_at?: string
           id?: string
+          is_memory_question?: boolean
           metadata?: Json | null
           model?: string | null
           role: string
@@ -1299,10 +1303,12 @@ export type Database = {
         }
         Update: {
           attachments?: Json
+          bucket_slug?: string | null
           chat_id?: string
           content?: string
           created_at?: string
           id?: string
+          is_memory_question?: boolean
           metadata?: Json | null
           model?: string | null
           role?: string

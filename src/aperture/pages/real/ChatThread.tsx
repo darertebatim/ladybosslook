@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { ApertureChip, ApertureMonoLabel } from "@/aperture/components/primitives";
@@ -76,7 +76,7 @@ export default function RealChatThread() {
 
   async function send(
     text: string,
-    escape?: { kind: "skip" | "unknown"; question: string },
+    escape?: { kind: "skip" | "unknown"; question: string; bucket?: string | null },
     attachments?: SentAttachment[],
   ) {
     const t = text.trim();
@@ -105,7 +105,7 @@ export default function RealChatThread() {
       await streamApertureChat({
         chatId: id, messages: history,
         onDelta: chunk => setStreamingText(prev => prev + chunk),
-        escape: escape ? { kind: escape.kind, question: escape.question, bucket: null } : undefined,
+        escape: escape ? { kind: escape.kind, question: escape.question, bucket: escape.bucket ?? null } : undefined,
         attachments: attachments ?? [],
         signal: ctrl.signal,
       });
@@ -178,6 +178,22 @@ export default function RealChatThread() {
   const hasAnyMessage = messages.length > 0;
   const visibleSuggestions = homeSuggestions.slice(0, 4);
 
+  // Identify the trailing assistant message that is a real memory-extraction
+  // question. Only that specific message gets Skip / I don't know chips
+  // appended to its options row.
+  const lastAssistantIdx = (() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const m = messages[i];
+      if (m.role === "assistant" || m.role === "system") return i;
+    }
+    return -1;
+  })();
+  const lastMemoryQuestionId = (() => {
+    if (lastAssistantIdx < 0 || streaming) return null;
+    const m = messages[lastAssistantIdx];
+    return m?.is_memory_question ? m.id : null;
+  })();
+
   return (
     <>
       <Helmet><title>{chat?.title ?? "Chat"} · RiloBiz</title></Helmet>
@@ -208,6 +224,7 @@ export default function RealChatThread() {
               const prev = messages[i - 1];
               const showAILabel = (m.role === "assistant" || m.role === "system") &&
                 (!prev || prev.role === "user");
+              const showEscape = m.id === lastMemoryQuestionId;
               return (
                 <MessageBubble
                   key={m.id}
@@ -217,6 +234,8 @@ export default function RealChatThread() {
                   onPickOption={(t) => send(t)}
                   disabled={streaming}
                   attachments={m.attachments}
+                  showEscape={showEscape}
+                  onEscape={(kind, question) => send("", { kind, question, bucket: m.bucket_slug ?? null })}
                 />
               );
             })}
@@ -310,54 +329,13 @@ export default function RealChatThread() {
               />
             </div>
           )}
-          <EscapeLinks
-            messages={messages}
-            streaming={streaming}
-            onEscape={(kind, question) => send("", { kind, question })}
-          />
         </div>
       </RealAppShell>
     </>
   );
 }
 
-/**
- * Skip / I don't know — small text links beneath the composer.
- * Visible only when the latest assistant message is a question
- * (ends with "?" or contains an [OPTIONS] block).
- */
-function EscapeLinks({
-  messages, streaming, onEscape,
-}: {
-  messages: MessageRow[];
-  streaming: boolean;
-  onEscape: (kind: "skip" | "unknown", question: string) => void;
-}) {
-  const lastAssistant = [...messages].reverse().find(m => m.role === "assistant" || m.role === "system");
-  if (!lastAssistant) return null;
-  const { body, options } = splitAssistantOptions(lastAssistant.content);
-  const isQuestion = options.length > 0 || /\?\s*$/.test(body.trim());
-  if (!isQuestion) return null;
-  const linkStyle: CSSProperties = {
-    appearance: "none", background: "transparent", border: "none",
-    color: streaming ? "var(--ap-ink-3)" : "var(--ap-ink-2)",
-    fontSize: 12, fontFamily: "var(--ap-font-sans)",
-    cursor: streaming ? "default" : "pointer",
-    padding: "4px 6px", textDecoration: "underline",
-    textUnderlineOffset: 3, opacity: streaming ? 0.5 : 1,
-  };
-  return (
-    <div style={{ marginTop: 8, display: "flex", justifyContent: "center", alignItems: "center", gap: 6 }}>
-      <button type="button" disabled={streaming} style={linkStyle}
-        onClick={() => onEscape("skip", body)}>Skip for now</button>
-      <span style={{ color: "var(--ap-ink-3)", fontSize: 12 }}>·</span>
-      <button type="button" disabled={streaming} style={linkStyle}
-        onClick={() => onEscape("unknown", body)}>I don't know</button>
-    </div>
-  );
-}
-
-function MessageBubble({ role, text, onPickOption, disabled, attachments, showAILabel = true, streaming = false }: {
+function MessageBubble({ role, text, onPickOption, disabled, attachments, showAILabel = true, streaming = false, showEscape = false, onEscape }: {
   role: string;
   text: string;
   onPickOption?: (t: string) => void;
@@ -365,11 +343,13 @@ function MessageBubble({ role, text, onPickOption, disabled, attachments, showAI
   attachments?: Array<{ file_id: string; storage_path: string; mime: string; name: string; size: number }>;
   showAILabel?: boolean;
   streaming?: boolean;
+  showEscape?: boolean;
+  onEscape?: (kind: "skip" | "unknown", question: string) => void;
 }) {
   if (role === "assistant" || role === "system") {
     const { body, options } = splitAssistantOptions(text);
     // Chips/options only appear after streaming completes — never mid-stream.
-    const showOptions = !streaming && options.length > 0;
+    const showOptions = !streaming && (options.length > 0 || showEscape);
     return (
       <div style={{ display: "flex", justifyContent: "flex-start" }}>
         <div style={{ maxWidth: "82%", minWidth: 0 }}>
@@ -387,7 +367,15 @@ function MessageBubble({ role, text, onPickOption, disabled, attachments, showAI
             )}
           </div>
           {showOptions && (
-            <OptionChips options={options} disabled={!!disabled} onPick={onPickOption} />
+            <OptionChips
+              options={options}
+              disabled={!!disabled}
+              onPick={onPickOption}
+              escapeChips={showEscape && onEscape ? [
+                { label: "Skip for now", onClick: () => onEscape("skip", body) },
+                { label: "I don't know", onClick: () => onEscape("unknown", body) },
+              ] : undefined}
+            />
           )}
         </div>
       </div>
@@ -441,11 +429,12 @@ function splitAssistantOptions(text: string): { body: string; options: string[] 
  * are 4+ options.
  */
 function OptionChips({
-  options, disabled, onPick,
+  options, disabled, onPick, escapeChips,
 }: {
   options: string[];
   disabled: boolean;
   onPick?: (t: string) => void;
+  escapeChips?: Array<{ label: string; onClick: () => void }>;
 }) {
   const [isNarrow, setIsNarrow] = useState(false);
   useEffect(() => {
@@ -489,6 +478,33 @@ function OptionChips({
           }}
         >
           {opt}
+        </button>
+      ))}
+      {escapeChips?.map((chip, idx) => (
+        <button
+          key={`escape-${idx}-${chip.label}`}
+          type="button"
+          disabled={disabled}
+          onClick={chip.onClick}
+          className="ap-chip-press"
+          style={{
+            appearance: "none",
+            cursor: disabled ? "default" : "pointer",
+            minHeight: 44,
+            padding: "10px 14px",
+            borderRadius: 999,
+            border: "1px dashed var(--ap-hairline)",
+            background: "transparent",
+            color: "var(--ap-ink-3)",
+            fontSize: 12, fontWeight: 500, fontFamily: "var(--ap-font-sans)",
+            fontStyle: "italic",
+            textAlign: "center",
+            lineHeight: 1.2,
+            opacity: disabled ? 0.5 : 1,
+            transition: "background 120ms ease, border-color 120ms ease",
+          }}
+        >
+          {chip.label}
         </button>
       ))}
     </div>
