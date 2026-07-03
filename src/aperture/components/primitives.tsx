@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, CSSProperties, HTMLAttributes, ReactNode } from "react";
+import { ButtonHTMLAttributes, CSSProperties, HTMLAttributes, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { useApertureTheme } from "./ApertureLayout";
 import { haptic } from "@/lib/haptics";
 
@@ -76,8 +76,10 @@ export function ApertureButton({
   size = "md",
   style,
   onClick,
+  loading = false,
+  disabled,
   ...rest
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size; loading?: boolean }) {
   const isAccent = variant === "accent";
   const isGhost = variant === "ghost";
 
@@ -85,11 +87,32 @@ export function ApertureButton({
   const fontSizes: Record<Size, number> = { sm: 12.5, md: 13.5 };
   const paddings: Record<Size, string> = { sm: "0 12px", md: "0 16px" };
 
+  const [pressed, setPressed] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const lockRef = useRef(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const apply = () => setReduceMotion(mq.matches);
+    apply();
+    mq.addEventListener?.("change", apply);
+    return () => mq.removeEventListener?.("change", apply);
+  }, []);
+
+  const inactive = loading || !!disabled;
+  const pressActive = pressed && !inactive;
+  const scale = pressActive && !reduceMotion ? "scale(0.97)" : "scale(1)";
+  const brightness = pressActive ? "brightness(0.92)" : "brightness(1)";
+
   return (
     <button
+      disabled={disabled}
+      aria-busy={loading || undefined}
       style={{
         appearance: "none",
-        cursor: "pointer",
+        cursor: inactive ? (loading ? "progress" : "not-allowed") : "pointer",
+        pointerEvents: inactive ? "none" : "auto",
+        opacity: disabled && !loading ? 0.55 : 1,
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
@@ -112,15 +135,47 @@ export function ApertureButton({
           ? "transparent"
           : "var(--ap-surface-2)",
         color: isAccent ? "var(--ap-on-signal)" : "var(--ap-ink-1)",
-        transition: "background 120ms ease, border-color 120ms ease, transform 80ms ease",
+        transform: scale,
+        filter: brightness,
+        transition: "background 120ms ease, border-color 120ms ease, transform 80ms ease, filter 80ms ease, opacity 120ms ease",
         ...style,
       }}
+      onPointerDown={() => { if (!inactive) setPressed(true); }}
+      onPointerUp={() => setPressed(false)}
+      onPointerLeave={() => setPressed(false)}
+      onPointerCancel={() => setPressed(false)}
       onClick={(e) => {
+        if (inactive) return;
+        // Synchronous double-tap guard: React state is one render behind,
+        // so a fast second tap can slip through before `loading` re-renders.
+        if (lockRef.current) return;
+        lockRef.current = true;
         if (isAccent) haptic.medium(); else haptic.light();
-        onClick?.(e);
+        try {
+          onClick?.(e);
+        } finally {
+          // Release on the next tick — enough to block a synchronous double-tap
+          // but not so long it stops a legitimate second interaction.
+          setTimeout(() => { lockRef.current = false; }, 350);
+        }
       }}
       {...rest}
     >
+      {loading && (
+        <span
+          aria-hidden
+          style={{
+            width: 12, height: 12, borderRadius: 999,
+            border: `1.5px solid ${isAccent ? "var(--ap-on-signal)" : "var(--ap-ink-2)"}`,
+            borderTopColor: "transparent",
+            display: "inline-block",
+            animation: "apBtnSpin 0.7s linear infinite",
+          }}
+        />
+      )}
+      {loading && (
+        <style>{`@keyframes apBtnSpin { to { transform: rotate(360deg); } }`}</style>
+      )}
       {children}
     </button>
   );
