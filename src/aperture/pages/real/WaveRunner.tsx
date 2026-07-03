@@ -154,7 +154,7 @@ export default function WaveRunner() {
     setBusy(false);
     if (nextIdx >= total) {
       await refreshMem();
-      navigate("/app/rilobiz/app/memory", { replace: true });
+      await finishWaveAndGoHome();
       return;
     }
     setI(nextIdx);
@@ -167,7 +167,7 @@ export default function WaveRunner() {
     await persistWaveRow(nextIdx, nextIdx >= total);
     if (nextIdx >= total) {
       await refreshMem();
-      navigate("/app/rilobiz/app/memory", { replace: true });
+      await finishWaveAndGoHome();
       return;
     }
     setI(nextIdx);
@@ -192,10 +192,16 @@ export default function WaveRunner() {
     await persistWaveRow(nextIdx, nextIdx >= total);
     if (nextIdx >= total) {
       await refreshMem();
-      navigate("/app/rilobiz/app/memory", { replace: true });
+      await finishWaveAndGoHome();
       return;
     }
     setI(nextIdx);
+  }
+
+  async function finishWaveAndGoHome() {
+    try { window.localStorage.setItem("rilobiz.showBriefOnHome", `wave-${waveNum}`); } catch {}
+    try { await supabase.functions.invoke("aperture-regenerate-memory-card", {}); } catch {}
+    navigate("/app/rilobiz/app", { replace: true });
   }
 
   function set(v: string) {

@@ -19,6 +19,7 @@ export function BriefCard({
   teaser,
   load,
   regenerate,
+  defaultOpen = false,
 }: {
   label: string;
   title: string;
@@ -27,8 +28,10 @@ export function BriefCard({
   load: () => Promise<{ summary: string; generated_at: string } | null>;
   /** Forces regeneration and returns the fresh brief. */
   regenerate: () => Promise<{ summary: string; generated_at: string }>;
+  /** Render already expanded on mount (with brief auto-loaded). */
+  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [brief, setBrief] = useState<{ summary: string; generated_at: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +40,7 @@ export function BriefCard({
   useEffect(() => {
     let alive = true;
     void load().then(b => { if (alive && b) setBrief(b); });
+    if (defaultOpen) { void ensureBrief(); }
     return () => { alive = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
