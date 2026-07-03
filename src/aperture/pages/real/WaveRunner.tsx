@@ -241,7 +241,28 @@ export default function WaveRunner() {
           action={total > 0 ? <ApertureChip tone="signal">{Math.min(i + 1, total)} / {total}</ApertureChip> : null}
         />
 
-        {loading ? (
+        {finishing ? (
+          <ApertureProgressOverlay
+            open
+            status={finishStatus}
+            title={`Wrapping up wave ${waveNum}`}
+            description="I'm updating your home and pulling together what changed."
+            estimateMs={8000}
+            hardTimeoutMs={22000}
+            steps={[
+              { at: 5, label: "Saving your answers…" },
+              { at: 45, label: "Refreshing your home card…" },
+              { at: 80, label: "Almost ready…" },
+            ]}
+            errorMessage={finishError ?? undefined}
+            onRetry={() => { setFinishError(null); finishWaveAndGoHome(); }}
+            onDismiss={() => { navigate("/app/rilobiz/app", { replace: true }); }}
+            onHardTimeout={() => {
+              setFinishError("This is taking longer than expected. You can retry or head home.");
+              setFinishStatus("error");
+            }}
+          />
+        ) : loading ? (
           <ApertureLoading label="Preparing your wave…" />
         ) : error ? (
           <ApertureCard padding={20}>
