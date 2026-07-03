@@ -42,7 +42,7 @@ export default function RealBucketPage() {
   const memory = useApertureMemoryDB();
   const { createChat } = useApertureChatsDB();
   const [starting, setStarting] = useState(false);
-  const [showAllFacts, setShowAllFacts] = useState(false);
+  const [showAllFacts, setShowAllFacts] = useState(true);
   const [cachedBriefSummary, setCachedBriefSummary] = useState<string | null>(null);
 
   const bucket = slug ? buckets.find(b => b.slug === slug) : undefined;
