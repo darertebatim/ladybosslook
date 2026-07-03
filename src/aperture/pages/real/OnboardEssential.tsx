@@ -7,6 +7,7 @@ import { PageHeader } from "@/aperture/components/PageHeader";
 import {
   ApertureCard, ApertureMonoLabel, ApertureLoading, ApertureButton, ApertureChip,
 } from "@/aperture/components/primitives";
+import { ApertureProgressOverlay, ApertureProgressStatus } from "@/aperture/components/ApertureProgressOverlay";
 import { useApertureOnboardingDB, useApertureIndustriesDB } from "@/aperture/hooks/db/useApertureOnboardingDB";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
@@ -39,8 +40,8 @@ export default function OnboardEssential() {
   const [showPhaseIntro, setShowPhaseIntro] = useState(false);
   const lastPhaseRef = useRef<number | null>(null);
   const [finishing, setFinishing] = useState(false);
-  const [finishProgress, setFinishProgress] = useState(0);
-  const [finishLabel, setFinishLabel] = useState("Saving your answers…");
+  const [finishStatus, setFinishStatus] = useState<ApertureProgressStatus>("running");
+  const [finishError, setFinishError] = useState<string | null>(null);
 
   // Skip contact questions we already know from the signed-in account.
   const knownEmail = user?.email ?? null;
