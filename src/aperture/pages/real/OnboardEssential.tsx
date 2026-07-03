@@ -164,6 +164,8 @@ export default function OnboardEssential() {
         body: { website, instagram, businessName },
       }).catch(() => {});
     }
+    try { window.localStorage.setItem("rilobiz.showBriefOnHome", "essential"); } catch {}
+    try { await supabase.functions.invoke("aperture-regenerate-memory-card", {}); } catch {}
     navigate("/app/rilobiz/app", { replace: true });
   }
 
