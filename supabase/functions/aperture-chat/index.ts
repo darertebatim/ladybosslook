@@ -80,6 +80,21 @@ the question themselves. They are NOT confirmed.
 
 const SYSTEM_PROMPT_FINAL = SYSTEM_PROMPT_BASE + GUESS_INSTRUCTIONS;
 
+/**
+ * A message counts as a memory-extraction question only when the chat was
+ * opened as a memory-building entry point (bucket_specific / memory_general)
+ * AND the assistant text is shaped like a question (ends with "?" or emits
+ * an [OPTIONS] block). This is what gates the Skip / I don't know chips in
+ * the client — never rendered inside a plain general_chat.
+ */
+function isMemoryQuestion(text: string, entryPoint: string | null): boolean {
+  if (entryPoint !== "bucket_specific" && entryPoint !== "memory_general") return false;
+  const t = String(text ?? "");
+  if (/\[OPTIONS\][\s\S]*?\[\/OPTIONS\]/i.test(t)) return true;
+  const stripped = t.replace(/\[OPTIONS\][\s\S]*?\[\/OPTIONS\]/i, "").trim();
+  return /\?\s*$/.test(stripped);
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
