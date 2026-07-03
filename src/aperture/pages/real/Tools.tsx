@@ -162,7 +162,10 @@ export default function RealTools() {
     if (!user) return;
     const bucket = bucketForCategory(entry.category);
     if (on) {
-      // For "nothing yet" / "spreadsheet" in a category, clear the opposite one first.
+      // MUTUAL EXCLUSIVITY (redesign plan §8):
+      //  - picking a marker ("Nothing yet" / "Spreadsheet") clears the OTHER marker
+      //    AND every real-tool row in this category.
+      //  - picking a real tool clears BOTH markers in this category.
       if (entry.kind === "nothing_yet" || entry.kind === "spreadsheet_or_notes") {
         const opposite = entry.kind === "nothing_yet"
           ? `spreadsheet_or_notes__${entry.category}`
@@ -171,6 +174,18 @@ export default function RealTools() {
           .update({ is_active: false })
           .eq("user_id", user.id)
           .eq("tool_slug", opposite);
+        await supabase.from("aperture_user_tools")
+          .update({ is_active: false })
+          .eq("user_id", user.id)
+          .eq("category", entry.category)
+          .eq("custom", false)
+          .not("tool_slug", "like", "nothing_yet__%")
+          .not("tool_slug", "like", "spreadsheet_or_notes__%");
+      } else if (entry.kind === "tool") {
+        await supabase.from("aperture_user_tools")
+          .update({ is_active: false })
+          .eq("user_id", user.id)
+          .in("tool_slug", [`nothing_yet__${entry.category}`, `spreadsheet_or_notes__${entry.category}`]);
       }
       await supabase.from("aperture_user_tools").upsert({
         user_id: user.id,
