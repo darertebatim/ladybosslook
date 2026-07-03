@@ -398,6 +398,18 @@ export default function RealTools() {
             label="Brief"
             title="What I know about your stack"
             teaser="A short read-back of the tools you use and what I've pulled from your sources."
+            onTalk={async ({ move }) => {
+              const opener = move
+                ? `From your stack brief, here's the move I'd zero in on:\n\n"${move}"\n\nWant to break this down together — first step, what's blocking it, or how you'd know it's working?`
+                : `Let's dig into your stack brief. Where do you want to start?`;
+              const chat = await createChat({
+                title: "My stack · brief",
+                entry_point: "bucket_specific",
+                bucket_slug: "tools-systems",
+                opener,
+              });
+              if (chat) navigate(`/app/rilobiz/app/chats/${chat.id}`);
+            }}
             load={async () => {
               if (!user) return null;
               const { data } = await supabase
