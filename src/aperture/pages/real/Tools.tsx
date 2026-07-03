@@ -219,6 +219,31 @@ export default function RealTools() {
     return map;
   }, [filteredCatalog]);
 
+  const activeToolNames = useMemo(
+    () => rows.filter(r => r.is_active).map(r => r.tool_name).filter(Boolean),
+    [rows],
+  );
+
+  async function continueStackChat() {
+    if (startingStackChat) return;
+    setStartingStackChat(true);
+    const toolLine = activeToolNames.length > 0
+      ? `You're using ${activeToolNames.slice(0, 6).join(", ")}${activeToolNames.length > 6 ? ", and more" : ""}.`
+      : `You haven't picked any tools yet — want to walk through what you actually use?`;
+    const sourceLine = sources.length > 0
+      ? ` I've also read your ${sources.map(s => s.display).join(" and ")}.`
+      : "";
+    const opener = `${toolLine}${sourceLine}\n\nWhat do you want to dig into — what's missing, what's overlapping, or how these connect?`;
+    const chat = await createChat({
+      title: "My stack",
+      entry_point: "bucket_specific",
+      bucket_slug: "tools-systems",
+      opener,
+    });
+    setStartingStackChat(false);
+    if (chat) navigate(`/app/rilobiz/app/chats/${chat.id}`);
+  }
+
   return (
     <>
       <Helmet><title>Tools · RiloBiz</title></Helmet>
