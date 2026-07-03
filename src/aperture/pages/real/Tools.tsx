@@ -358,7 +358,23 @@ export default function RealTools() {
           action={<ApertureChip tone={activeSet.size ? "signal" : "neutral"}>{activeSet.size} active</ApertureChip>}
         />
 
-        {/* Continue chat + Brief pair — same pattern as bucket pages */}
+        {firstVisit && (
+          <ApertureCard padding={16} style={{ marginBottom: 16, background: "var(--ap-signal-soft)", border: "1px solid var(--ap-signal)" }}>
+            <ApertureMonoLabel>First time here</ApertureMonoLabel>
+            <h3 style={{ margin: "6px 0 4px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
+              Tap what you use, category by category
+            </h3>
+            <p style={{ margin: 0, fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
+              Just pick tools you actually use — no depth yet. If a category doesn't apply, mark
+              "Nothing yet" or "Spreadsheet / notes". When you're done, tap <strong>Continue</strong>
+              and I'll unlock the living Tools page for you.
+            </p>
+          </ApertureCard>
+        )}
+
+        {/* Continue chat + Brief pair — same pattern as bucket pages.
+            Hidden during the first-visit onboarding pass to keep it focused. */}
+        {!firstVisit && (
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
@@ -401,6 +417,7 @@ export default function RealTools() {
             }}
           />
         </div>
+        )}
 
         {industrySlug && (
           <div style={{ marginBottom: 16 }}>
@@ -410,8 +427,8 @@ export default function RealTools() {
           </div>
         )}
 
-        {/* Connected sources (website + instagram) */}
-        {sources.length > 0 && (
+        {/* Connected sources (website + instagram) — hidden during onboarding */}
+        {!firstVisit && sources.length > 0 && (
           <section style={{ marginBottom: 24 }}>
             <div style={{ marginBottom: 10 }}>
               <ApertureSectionTitle
