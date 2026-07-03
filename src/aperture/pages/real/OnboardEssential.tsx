@@ -182,46 +182,35 @@ export default function OnboardEssential() {
 
   async function finish() {
     setFinishing(true);
-    setFinishProgress(5);
-    setFinishLabel("Saving your answers…");
-
-    // Smooth progress ticker up to 92% so it feels like real work happening.
-    const started = Date.now();
-    const ticker = setInterval(() => {
-      setFinishProgress(prev => {
-        const elapsed = (Date.now() - started) / 1000;
-        // Ease toward 92 over ~12s.
-        const target = Math.min(92, 5 + Math.round((1 - Math.exp(-elapsed / 4)) * 87));
-        return Math.max(prev, target);
+    setFinishStatus("running");
+    setFinishError(null);
+    try {
+      const now = new Date().toISOString();
+      await upsertProfile({
+        essential_onboarded_at: now,
+        quick_onboarded_at: now,
       });
-    }, 250);
 
-    const now = new Date().toISOString();
-    await upsertProfile({
-      essential_onboarded_at: now,
-      quick_onboarded_at: now,
-    });
+      const website = answers["website"];
+      const instagram = answers["instagram"];
+      const businessName = answers["business_name"];
+      if (website || instagram) {
+        supabase.functions.invoke("aperture-onboarding-research", {
+          body: { website, instagram, businessName },
+        }).catch(() => {});
+      }
+      try { window.localStorage.setItem("rilobiz.showBriefOnHome", "essential"); } catch {}
 
-    setFinishLabel("Reading up on your business…");
-    const website = answers["website"];
-    const instagram = answers["instagram"];
-    const businessName = answers["business_name"];
-    if (website || instagram) {
-      supabase.functions.invoke("aperture-onboarding-research", {
-        body: { website, instagram, businessName },
-      }).catch(() => {});
+      const { error } = await supabase.functions.invoke("aperture-regenerate-memory-card", {});
+      if (error) throw error;
+
+      setFinishStatus("done");
+      await new Promise(r => setTimeout(r, 1100));
+      navigate("/app/rilobiz/app", { replace: true });
+    } catch (e: any) {
+      setFinishError(e?.message ?? "We couldn't finish building your home. Please try again.");
+      setFinishStatus("error");
     }
-    try { window.localStorage.setItem("rilobiz.showBriefOnHome", "essential"); } catch {}
-
-    setFinishLabel("Building your customized home…");
-    try { await supabase.functions.invoke("aperture-regenerate-memory-card", {}); } catch {}
-
-    clearInterval(ticker);
-    setFinishProgress(100);
-    setFinishLabel("Ready — welcome to RiloBiz");
-    // Brief pause so the 100% + welcome message actually reads.
-    await new Promise(r => setTimeout(r, 900));
-    navigate("/app/rilobiz/app", { replace: true });
   }
 
   function set(value: string) {
