@@ -1,12 +1,11 @@
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate, Navigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
   ApertureCard, ApertureChip, ApertureMonoLabel, ApertureLoading, ApertureButton,
 } from "@/aperture/components/primitives";
-import { useApertureBucketsDB } from "@/aperture/hooks/db/useApertureBucketsDB";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { useApertureChatsDB } from "@/aperture/hooks/db/useApertureChatsDB";
 import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfile";
@@ -15,6 +14,8 @@ import { useApertureHomeSuggestions } from "@/aperture/hooks/db/useApertureHomeS
 import { useApertureStoredSuggestions } from "@/aperture/hooks/db/useApertureStoredSuggestions";
 import { toast } from "@/hooks/use-toast";
 import { AperturePrompt } from "@/aperture/components/chat/AperturePrompt";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function RealHome() {
   const navigate = useNavigate();
