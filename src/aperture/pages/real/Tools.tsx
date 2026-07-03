@@ -14,6 +14,9 @@ import { ArrowLeft, Plus, Check } from "lucide-react";
 import { SourceCard } from "@/aperture/components/SourceCard";
 import { SourceDetailSheet } from "@/aperture/components/SourceDetailSheet";
 import { useApertureSources, type SourceSummary } from "@/aperture/hooks/db/useApertureSources";
+import { BriefCard } from "@/aperture/components/BriefCard";
+import { useApertureChatsDB } from "@/aperture/hooks/db/useApertureChatsDB";
+import { useNavigate } from "react-router-dom";
 
 interface UserToolRow {
   id: string;
@@ -44,6 +47,9 @@ type PickerEntry =
 export default function RealTools() {
   const { user } = useAuth();
   const { profile } = useApertureUserProfile();
+  const navigate = useNavigate();
+  const { createChat } = useApertureChatsDB();
+  const [startingStackChat, setStartingStackChat] = useState(false);
   const [rows, setRows] = useState<UserToolRow[]>([]);
   const [catalog, setCatalog] = useState<CatalogToolRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -213,6 +219,31 @@ export default function RealTools() {
     return map;
   }, [filteredCatalog]);
 
+  const activeToolNames = useMemo(
+    () => rows.filter(r => r.is_active).map(r => r.tool_name).filter(Boolean),
+    [rows],
+  );
+
+  async function continueStackChat() {
+    if (startingStackChat) return;
+    setStartingStackChat(true);
+    const toolLine = activeToolNames.length > 0
+      ? `You're using ${activeToolNames.slice(0, 6).join(", ")}${activeToolNames.length > 6 ? ", and more" : ""}.`
+      : `You haven't picked any tools yet — want to walk through what you actually use?`;
+    const sourceLine = sources.length > 0
+      ? ` I've also read your ${sources.map(s => s.display).join(" and ")}.`
+      : "";
+    const opener = `${toolLine}${sourceLine}\n\nWhat do you want to dig into — what's missing, what's overlapping, or how these connect?`;
+    const chat = await createChat({
+      title: "My stack",
+      entry_point: "bucket_specific",
+      bucket_slug: "tools-systems",
+      opener,
+    });
+    setStartingStackChat(false);
+    if (chat) navigate(`/app/rilobiz/app/chats/${chat.id}`);
+  }
+
   return (
     <>
       <Helmet><title>Tools · RiloBiz</title></Helmet>
@@ -231,6 +262,50 @@ export default function RealTools() {
           sub="Tell me what you use to run the business. I'll remember it and skip asking about it later."
           action={<ApertureChip tone={activeSet.size ? "signal" : "neutral"}>{activeSet.size} active</ApertureChip>}
         />
+
+        {/* Continue chat + Brief pair — same pattern as bucket pages */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+          gap: 12, marginBottom: 18,
+        }}>
+          <ApertureCard padding={16}>
+            <ApertureMonoLabel>Conversation</ApertureMonoLabel>
+            <h3 style={{ margin: "6px 0 4px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
+              Continue chat about my stack
+            </h3>
+            <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
+              Talk through what's missing, what overlaps, and how your tools and sources connect.
+            </p>
+            <ApertureButton variant="accent" onClick={continueStackChat} disabled={startingStackChat}>
+              {startingStackChat ? "Opening…" : "Start →"}
+            </ApertureButton>
+          </ApertureCard>
+
+          <BriefCard
+            label="Brief"
+            title="What I know about your stack"
+            teaser="A short read-back of the tools you use and what I've pulled from your sources."
+            load={async () => {
+              if (!user) return null;
+              const { data } = await supabase
+                .from("aperture_bucket_briefs")
+                .select("summary,generated_at")
+                .eq("user_id", user.id).eq("bucket_slug", "tools-systems")
+                .maybeSingle();
+              return data ? { summary: (data as any).summary, generated_at: (data as any).generated_at } : null;
+            }}
+            regenerate={async () => {
+              const { data, error } = await supabase.functions.invoke("aperture-bucket-brief", {
+                body: { bucket_slug: "tools-systems", force: true },
+              });
+              if (error) throw new Error(error.message);
+              const b = (data as any)?.brief;
+              if (!b) throw new Error("No brief returned");
+              return { summary: b.summary, generated_at: b.generated_at };
+            }}
+          />
+        </div>
 
         {industrySlug && (
           <div style={{ marginBottom: 16 }}>

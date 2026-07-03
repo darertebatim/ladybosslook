@@ -66,7 +66,12 @@ serve(async (req) => {
           text: combinedText,
           meta: {
             fetch_status: "ok",
-            pages: crawl.pages.map((p) => ({ url: p.url, page_type: p.page_type, len: p.text.length })),
+          pages: crawl.pages.map((p) => ({
+            url: p.url,
+            page_type: p.page_type,
+            len: p.text.length,
+            text: p.text.slice(0, 6000),
+          })),
           },
         });
       } else {
