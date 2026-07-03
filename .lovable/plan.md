@@ -1,50 +1,108 @@
+## Goal
+Give every RiloBiz button clear tap feedback that actually works on iOS WKWebView, and add robust loading / progress UI (with real error + timeout handling) for AI-backed actions.
 
-This is a big one — sequencing exactly the way the plan doc's section 11 suggests, batched into two shippable waves so you can test between them.
+Feedback from Claude has been folded in — items marked **[iOS-critical]** are on-device correctness, not polish.
 
-## Wave A — plumbing (ship first, verifiable end-to-end)
+---
 
-1. **Nav item.** Add `Tools` to `RealAppShell` sidebar + mobile bar (icon = plug). Route already exists at `/app/rilobiz/app/tools`.
-2. **Mutual exclusivity fix.** In `togglePick`, when a real tool is turned on, deactivate `nothing_yet__<cat>` and `spreadsheet_or_notes__<cat>` for that category. When a marker is turned on, deactivate all real tools in that category. (Markers already exclude each other — extend to real tools.)
-3. **Tool Onboarding pass (first-visit).** Detect "user has zero `aperture_user_tools` rows" → render a slimmed picker-only mode ("Tap what you use, category by category, then continue"). On tap **Continue**, mark a `tool_onboarding_done_at` field on `aperture_user_profile` and redirect to the living Tools page. Existing users with any picks are treated as done.
-4. **Static category order (section 6).** Replace current order in `TOOL_CATEGORY_GROUPS` iteration with: Marketing & Social → Communication → Email & CRM → Payments → Scheduling → E-commerce → Website & Domain → everything else. Categories with no picks/gaps are skipped in the living view (still shown during onboarding).
-5. **Data model.**
-   - New table `aperture_tool_card_questions` (`user_id, card_key, question_text, answer_text, generated_at, answered_at, is_active`). `card_key` = `tool:<slug>` | `gap:<category>` | `multi:<category>`.
-   - Answers additionally insert into `aperture_memory_items` (tag `source='tool_card'`, `question_key='tool_card__<card_key>__<hash>'`, bucket routed via `bucketForCategory` or AI).
-   - GRANTs + RLS scoped to `auth.uid()`.
+## Part 1 — Universal tap feedback (all buttons)
 
-## Wave B — living cards (the actual redesign)
+**File:** `src/aperture/components/primitives.tsx` → `ApertureButton`
 
-6. **Card model (sections 4, 4b, 5).** New `ToolCard` component:
-   - Renders collapsed by default (title + tool/gap name + state chip).
-   - On tap: if no cached questions → call edge fn `aperture-tool-card-generate` → cache 3 questions in `aperture_tool_card_questions` → render. If answered → also render the 3 suggestions.
-   - Wave-runner style open textareas per question. Submit → writes answer to card_questions + memory_items → fetches suggestions (same edge fn, mode=`suggestions`).
-   - "Ask me something new" button once all 3 are answered → deletes/marks-inactive old row set, generates a fresh 3.
-   - **Multi-tool card** auto-appears when a category has ≥2 real tools (card_key `multi:<category>`).
-   - Top 1-2 cards per category expanded by default; rest collapsed.
+- **[iOS-critical] Do not rely on CSS `:active`.** WKWebView won't fire it reliably. Drive the pressed state from JS: `onPointerDown` sets a `pressed` state, `onPointerUp` / `onPointerCancel` / `onPointerLeave` clears it. Apply `transform: scale(0.97)` + `filter: brightness(0.92)` while `pressed` is true.
+- As a belt-and-suspenders fallback, add a no-op `ontouchstart={() => {}}` on the app shell root (`RealAppShell`) so any lingering `:active`-based styles elsewhere start firing on iOS too.
+- **Respect `prefers-reduced-motion`**: when the media query matches, drop the scale transform and keep only the brightness change (still gives feedback, no motion).
+- `disabled`: 55% opacity, `pointer-events: none`, `cursor: not-allowed`.
+- New `loading?: boolean` prop:
+  - Renders inline spinner in the left icon slot; label stays visible; width doesn't jump.
+  - **[iOS-critical] While loading, `pointer-events: none` and no haptic.** The spinner is the single signal; do not fake-confirm repeat taps.
+- **[iOS-critical] Synchronous double-tap guard inside the wrapped handler:** a `useRef<boolean>` lock set/cleared around the async call, checked before state updates (React state is a render behind and won't block a fast second tap).
 
-7. **Edge function `aperture-tool-card-generate`.**
-   - Input: `{ card_key, mode: 'questions' | 'suggestions' }`.
-   - Loads: user memory for the bucket + full stack (`aperture_user_tools`) + bucket relationship map + already-asked questions for this card_key.
-   - `questions` mode → returns 3 questions (Q1 = satisfaction/priority check per plan section 4). Persists them.
-   - `suggestions` mode → returns 3 suggestions ordered per plan (RiloBiz-native first).
+Same treatment applied to:
+- `IOSIconButton` (`src/components/app/ui/IOSIconButton.tsx`) — replace `active:scale-95` with the JS pressed state + `loading` prop.
+- Raw shadcn `<Button>` usages inside aperture pages — leave as-is unless they're on an AI path; those get migrated to `ApertureButton`.
 
-8. **Batch quick-pass card (section 7).**
-   - Passive: on Tools page load, count rows in `aperture_tool_card_questions` where `answer_text IS NULL AND is_active`.
-   - If count ≥ 7, render a single card above the category list: "You've got N quick questions waiting — answer them in one pass?" → opens a modal listing all pending questions (reuses same submit path).
+---
 
-Chat/Brief pair (section 10) — already exists on the page, kept as-is.
+## Part 2 — Short async actions (<3s expected)
 
-## Technical notes
+Wrap handlers so the button flips to `loading` for the duration of the promise. On success → `haptic.success`. On failure → `haptic.error` + toast. Every wrapped handler uses the ref-lock from Part 1.
 
-- Reuse Wave 2 answer input component from `WaveRunner.tsx` (open textarea, submit) for card questions — no new input primitive.
-- `SourceCard` block ("Your sources") stays exactly where it is (plan §1b).
-- No changes to `INTEGRATIONS` block; the "Coming soon" section stays for now.
-- `aperture_user_profile.tool_onboarding_done_at TIMESTAMPTZ NULL` — nullable so existing users default to null = "treat as done if they already picked tools".
+**Explicit exception — optimistic toggles do NOT get a spinner:**
+- Favorite / save / pin / any boolean toggle: flip UI instantly, mutate in background, roll back + toast on failure. Spinner-per-tap on toggles feels broken.
 
-## What I'll skip until you confirm
+Call sites to update (handlers only):
+- `BriefCard` "Talk about this"
+- `Bucket.tsx` wave next-question tap
+- `Memory.tsx` brief generate button
+- `Tools.tsx` action tap
+- `Files.tsx` upload confirm
+- `OnboardEssential.tsx` per-question Next
 
-- Splitting migrations for approval — I'll bundle all schema in one migration.
-- Building an admin surface for tool cards.
-- Analytics / instrumentation beyond `aperture_ai_usage` (already logs edge fn spend).
+Scope note: this is real per-call-site work (~7 files), not a free side-effect of the primitive change.
 
-Want me to ship **Wave A first** and let you test, then follow with Wave B? Or do the whole thing in one go?
+---
+
+## Part 3 — Long AI actions (progress overlay with %)
+
+**New file:** `src/aperture/components/ApertureProgressOverlay.tsx`
+
+Reusable overlay driven by an eased fake-progress curve, but with real safety rails.
+
+Props:
+```
+{
+  open: boolean;
+  status: 'running' | 'done' | 'error';
+  errorMessage?: string;
+  onRetry?: () => void;
+  onDismiss?: () => void;
+  title: string;
+  steps: { at: number; label: string }[];
+  estimateMs: number;
+  minDisplayMs?: number;  // default 700
+  hardTimeoutMs?: number; // default 25000
+}
+```
+
+Behavior:
+- Eases 5 → 92% over `estimateMs` with a decelerating curve.
+- Label switches based on current % vs `steps[].at`.
+- **[iOS-critical] Minimum display floor (default 700ms).** If the promise resolves in 200ms, the bar still animates to 100 over ≥`minDisplayMs` so it never looks like it skipped.
+- On `status='done'`: snap 92→100, hold ~250ms, close.
+- **[iOS-critical] On `status='error'`:** bar turns danger red at its current fill, label becomes `errorMessage`, buttons show `Retry` (if `onRetry`) and `Dismiss`. No silent hang, no toast-behind-overlay.
+- **[iOS-critical] Stall + hard timeout:**
+  - Past `estimateMs * 1.5` → label switches to "Almost there…", bar holds at 92%.
+  - Past `hardTimeoutMs` (default 25s) → auto-flip to `status='error'` with "This is taking longer than expected" + Retry / Go back. No indefinite dead-bar.
+- Not cancelable during `running` (AI calls shouldn't be aborted mid-flight); error state gives the escape hatch.
+
+Rewrite `OnboardEssential.tsx` finish flow to consume this component so behavior stays identical to what already ships.
+
+**Wire into these AI call sites** (each provides its own `steps`, `estimateMs`, and error/retry wiring):
+
+1. All onboarding finishes — `OnboardEssential`, `OnboardQuick`, `OnboardFull`, `OnboardConfirm` (~12s).
+2. Wave completion — `WaveRunner.tsx` (~8s). Retry re-runs the wave finalize call.
+3. Brief generation — `Memory.tsx`, `BusinessBriefScreen.tsx` (~10s). Retry re-invokes the brief edge function.
+4. Home suggestion-card tap that spawns an AI chat — `Home.tsx`, `LivingToolCards.tsx` (~5s).
+5. BriefCard "Talk about this" seeded chat — `useApertureChatsDB` (~5s).
+6. Source upload + extract — `Files.tsx`. Use real upload progress where the storage API exposes it; fall back to the eased curve for the extract phase.
+
+---
+
+## Part 4 — Verification
+
+- Type-check the changed files.
+- Playwright (localhost, signed in as test account):
+  - **Onboarding finish** — overlay appears, % advances, snaps to 100, closes.
+  - **Wave completion** — same, plus verify error state by mocking a rejection.
+  - **Home suggestion card** — spawns chat, overlay closes into thread.
+- **[iOS-critical] Throttled network run:** Chrome devtools "Slow 3G" throttle on the same three flows to confirm stall label + hard timeout error path both fire, no infinite hang.
+- Spot-check `ApertureButton` press state on Home, Bucket, Memory (screenshot) and confirm the JS-driven pressed style renders (since `:active` won't).
+
+---
+
+## Not in scope
+- Redesigning any button layout or copy.
+- Changing edge function implementations or their real latency.
+- Tap feedback on non-aperture (`/app/*` legacy) pages.
+- Canceling in-flight AI requests.
