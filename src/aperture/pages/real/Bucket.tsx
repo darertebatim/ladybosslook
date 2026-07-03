@@ -399,6 +399,7 @@ function FactRow({
   promptFor: Record<string, string>;
 }) {
   const isGuess = fact.source === "ai_inferred_pre_onboarding";
+  const isNoticed = NOTICED_SOURCES.has(fact.source as string);
   const [mode, setMode] = useState<"view" | "edit">("view");
   const [draft, setDraft] = useState(fact.content);
   const [busy, setBusy] = useState(false);
@@ -537,6 +538,19 @@ function FactRow({
               <ApertureButton variant="accent" size="sm" onClick={onConfirm} disabled={busy}>
                 <Check size={12} /> Confirm
               </ApertureButton>
+            )}
+            {isNoticed && (
+              <>
+                <span style={{
+                  fontSize: 11, color: "var(--ap-ink-3)",
+                  fontStyle: "italic", marginRight: 2,
+                }}>
+                  Does this look right?
+                </span>
+                <ApertureButton variant="accent" size="sm" onClick={onConfirm} disabled={busy}>
+                  <Check size={12} /> Confirm
+                </ApertureButton>
+              </>
             )}
             <ApertureButton variant="default" size="sm" onClick={() => setMode("edit")} disabled={busy}>
               <Pencil size={12} /> Edit
