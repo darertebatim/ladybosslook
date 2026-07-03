@@ -288,7 +288,7 @@ export function LivingToolCards({ userToolRows }: Props) {
                       variant="accent"
                       size="sm"
                       onClick={() => generate(card, "questions")}
-                      disabled={busy === card.key + ":questions"}
+                      loading={busy === card.key + ":questions"}
                     >
                       <Sparkles size={13} /> {busy === card.key + ":questions" ? "Thinking…" : "Generate 3 questions"}
                     </ApertureButton>
@@ -327,9 +327,10 @@ export function LivingToolCards({ userToolRows }: Props) {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => saveAnswer(card, q)}
-                                disabled={busy === q.id || !(drafts[q.id] ?? "").trim()}
+                                loading={busy === q.id}
+                                disabled={!(drafts[q.id] ?? "").trim()}
                               >
-                                {busy === q.id ? "…" : "Save"}
+                                Save
                               </ApertureButton>
                             </div>
                           )}
@@ -345,7 +346,7 @@ export function LivingToolCards({ userToolRows }: Props) {
                                 variant="accent"
                                 size="sm"
                                 onClick={() => generate(card, "suggestions")}
-                                disabled={busy === card.key + ":suggestions"}
+                                loading={busy === card.key + ":suggestions"}
                               >
                                 <Sparkles size={13} /> {busy === card.key + ":suggestions" ? "Thinking…" : "Show 3 suggestions"}
                               </ApertureButton>
@@ -370,7 +371,7 @@ export function LivingToolCards({ userToolRows }: Props) {
                               variant="ghost"
                               size="sm"
                               onClick={() => generate(card, "more_questions")}
-                              disabled={busy === card.key + ":more_questions"}
+                              loading={busy === card.key + ":more_questions"}
                             >
                               <Sparkles size={13} /> {busy === card.key + ":more_questions" ? "Thinking…" : "Ask me something new"}
                             </ApertureButton>
