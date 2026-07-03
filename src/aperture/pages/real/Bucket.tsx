@@ -61,11 +61,41 @@ export default function RealBucketPage() {
     return () => { alive = false; };
   }, []);
 
+  // Wave questions (Wave 2+) are generated per-user by the selector and stored
+  // as `question_payload` on `aperture_waves`. They don't live in either of the
+  // static prompt tables, so we merge in the actual `question_text` for every
+  // wave question this user has seen — that way the label above a fact is the
+  // real question the AI asked, not a title-cased key.
+  const [wavePrompts, setWavePrompts] = useState<Record<string, string>>({});
+  useEffect(() => {
+    if (!user) return;
+    let alive = true;
+    void supabase
+      .from("aperture_waves")
+      .select("question_payload")
+      .eq("user_id", user.id)
+      .then(({ data }) => {
+        if (!alive || !data) return;
+        const map: Record<string, string> = {};
+        for (const row of data as any[]) {
+          const qs = row?.question_payload?.questions;
+          if (!Array.isArray(qs)) continue;
+          for (const q of qs) {
+            if (q?.id && typeof q.question_text === "string") {
+              map[q.id] = q.question_text;
+            }
+          }
+        }
+        setWavePrompts(map);
+      });
+    return () => { alive = false; };
+  }, [user]);
+
   const promptFor = useMemo(() => {
-    const map: Record<string, string> = { ...onbPrompts };
+    const map: Record<string, string> = { ...onbPrompts, ...wavePrompts };
     for (const q of questions) map[q.question_key] = q.prompt;
     return map;
-  }, [questions, onbPrompts]);
+  }, [questions, onbPrompts, wavePrompts]);
 
   // Log a bucket_visit signal on mount — feeds the (future) relevance scorer.
   useEffect(() => {
@@ -112,10 +142,22 @@ export default function RealBucketPage() {
   if (!slug) return <Navigate to="/app/rilobiz/app/memory" replace />;
   if (!bucket) return <Navigate to="/app/rilobiz/app/memory" replace />;
 
-  const confirmedCount = facts.filter(
-    f => f.source !== "ai_inferred_pre_onboarding",
-  ).length;
+  // Split the "What I know" counter into three trust tiers, matching the
+  // MemorySourcePill styling. Direct = the user said it. Noticed = the AI
+  // pulled it from a chat/file/site. Guess = pre-onboarding inference.
+  const DIRECT_SOURCES = new Set(["user_confirmed", "bucket_answer", "chat_extracted"]);
+  const NOTICED_SOURCES = new Set(["ai_extracted", "file_extracted", "mcp_extracted", "freeform"]);
+  const directCount = facts.filter(f => DIRECT_SOURCES.has(f.source as string)).length;
+  const noticedCount = facts.filter(f => NOTICED_SOURCES.has(f.source as string)).length;
   const guessCount = facts.filter(f => f.source === "ai_inferred_pre_onboarding").length;
+  const counterSegments = [
+    directCount > 0 ? `${directCount} confirmed` : null,
+    noticedCount > 0 ? `${noticedCount} noticed` : null,
+    guessCount > 0 ? `${guessCount} guess${guessCount === 1 ? "" : "es"}` : null,
+  ].filter(Boolean);
+  const counterLabel = counterSegments.length > 0 ? counterSegments.join(" · ") : "0 confirmed";
+  // Keep an aggregate for the chat CTA copy ("pick up where we left off").
+  const confirmedCount = directCount + noticedCount;
 
   return (
     <>
@@ -186,7 +228,7 @@ export default function RealBucketPage() {
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 10 }}>
           <ApertureMonoLabel>What I know</ApertureMonoLabel>
           <span style={{ fontSize: 11, color: "var(--ap-ink-3)" }}>
-            {confirmedCount} confirmed · {guessCount} guess{guessCount === 1 ? "" : "es"}
+            {counterLabel}
           </span>
         </div>
 
@@ -259,8 +301,12 @@ function FactRow({
   const when = relativeTime(fact.updated_at);
   // Plain-language label for what this fact answers. Without it, raw values
   // like "4155428062" or "Irvine" sit on the page with no context.
+  // Only show a question label when we have the real prompt text. If the
+  // lookup misses (unknown key, new question surface not wired up yet), omit
+  // the label rather than leaking a title-cased internal key like
+  // "W2 Q9 AD STATUS" — a missing label is invisible; a mangled one is not.
   const questionLabel = fact.question_key
-    ? (promptFor[fact.question_key] ?? prettifyKey(fact.question_key))
+    ? (promptFor[fact.question_key] ?? null)
     : null;
 
   return (
@@ -418,16 +464,4 @@ function relativeTime(iso: string): string {
   const mo = Math.round(d / 30);
   if (mo < 12) return `${mo}mo ago`;
   return `${Math.round(mo / 12)}y ago`;
-}
-
-/** Last-resort label for question_keys we can't find a prompt for —
- *  strips prefixes like `full_q12_` and turns snake_case into Title Case. */
-function prettifyKey(key: string): string {
-  const stripped = key
-    .replace(/^full_q\d+_/, "")
-    .replace(/^b\d+_q\d+$/i, "")
-    .replace(/_/g, " ")
-    .trim();
-  if (!stripped) return "Detail";
-  return stripped.charAt(0).toUpperCase() + stripped.slice(1);
 }
