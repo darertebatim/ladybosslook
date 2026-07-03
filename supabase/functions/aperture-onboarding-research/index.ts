@@ -136,11 +136,26 @@ You also tag each fact with the reasoning LAYER it belongs to (not just a bucket
 - "Financial Health" — revenue level, margins, cost structure, debt, unit economics.
 - "Direction" — vision, story, time horizon, life/family constraints, why-they-started.
 
-Prefer Revenue Engine unless the fact is clearly about team/ops (Owner Capacity), money/costs (Financial Health), or vision/story (Direction).`;
+Prefer Revenue Engine unless the fact is clearly about team/ops (Owner Capacity), money/costs (Financial Health), or vision/story (Direction).
+
+Bucket routing (use these rules; the model judges phrasing, no hard mapping):
+- products — offers, services, features. When a PRICE appears, ALSO emit a second parallel item into "money" (revenue half) using the same fact — pricing is both an offer detail and a revenue signal.
+- customers — target/ICP language (aspirational), and testimonials/reviews framed as proof of who buys.
+- sales — CTA structure and conversion mechanism (book now, DM, shop now, add-to-cart) especially when adjacent to pricing.
+- basics — hours, phone, email, address, service area, booking mechanism.
+- story — mission, origin, founder narrative.
+- marketing — press mentions, "as seen in", awards, PR.
+- content-media — blog posts, podcasts, videos hosted on-site.
+- team — bios, photos, roles.
+- partners — vendor/partner logos framed as an ongoing relationship (not a review).
+- competitors — explicit comparison language, only if present.
+- tools — third-party tools/platforms the business runs on (Shopify, Squarespace, Stripe) if surfaced in the copy.
+
+Each item must also carry its own \`source\` (which INPUT source the fact came from — "website" or "instagram") and an optional \`page_type\` (e.g. "products", "pricing", "about", "contact", "homepage") when the fact came from a page whose \`## PAGE_TYPE:\` marker made that clear.`;
     const focusLine = userPrompt
       ? `\n\nThe user specifically asked: "${String(userPrompt).slice(0, 240)}". Prefer facts that answer that.`
       : "";
-    const aiUserPrompt = `Business name (claimed): ${businessName ?? "(unknown)"}${focusLine}\n\nReturn JSON of the shape:\n{\n  "items": [\n    {\n      "bucket": "<one of: basics|story|customers|products|sales|marketing|money|vision|tools|team|operations|partners|competitors>",\n      "layer": "<Revenue Engine|Owner Capacity|Financial Health|Direction>",\n      "fact": "<concise fact>"\n    }\n  ]\n}\nOnly return valid JSON. Max 12 items.\n\n=== SOURCE ===\n${corpus}\n=== END SOURCE ===`;
+    const aiUserPrompt = `Business name (claimed): ${businessName ?? "(unknown)"}${focusLine}\n\nReturn JSON of the shape:\n{\n  "items": [\n    {\n      "bucket": "<one of: basics|story|customers|products|sales|marketing|money|vision|tools|team|operations|partners|competitors>",\n      "layer": "<Revenue Engine|Owner Capacity|Financial Health|Direction>",\n      "source": "<website|instagram>",\n      "page_type": "<optional, e.g. products|pricing|about|contact|homepage>",\n      "fact": "<concise fact>"\n    }\n  ]\n}\nOnly return valid JSON. Max 16 items.\n\n=== SOURCE ===\n${corpus}\n=== END SOURCE ===`;
 
     const aiRes = await fetch(AI_GATEWAY, {
       method: "POST",
