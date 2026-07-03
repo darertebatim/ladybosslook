@@ -12,6 +12,7 @@ import { useApertureUserProfile } from "@/aperture/hooks/db/useApertureUserProfi
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { supabase } from "@/integrations/supabase/client";
 import { logApertureEvent } from "@/aperture/lib/apertureEvents";
+import { useAuth } from "@/hooks/useAuth";
 
 /**
  * Essential Onboarding — 5-phase, single-flow. Replaces quick + full.
@@ -27,15 +28,44 @@ import { logApertureEvent } from "@/aperture/lib/apertureEvents";
  */
 export default function OnboardEssential() {
   const navigate = useNavigate();
-  const { questions, loading } = useApertureOnboardingDB("essential");
+  const { user } = useAuth();
+  const { questions: rawQuestions, loading } = useApertureOnboardingDB("essential");
   const { industries } = useApertureIndustriesDB();
-  const { upsert: upsertProfile } = useApertureUserProfile();
+  const { profile, upsert: upsertProfile } = useApertureUserProfile();
   const { saveBucketAnswer, addFreeformNote } = useApertureMemoryDB();
   const [i, setI] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [showPhaseIntro, setShowPhaseIntro] = useState(false);
   const lastPhaseRef = useRef<number | null>(null);
+  const [finishing, setFinishing] = useState(false);
+  const [finishProgress, setFinishProgress] = useState(0);
+  const [finishLabel, setFinishLabel] = useState("Saving your answers…");
+
+  // Skip contact questions we already know from the signed-in account.
+  const knownEmail = user?.email ?? null;
+  const knownPhone = (user as any)?.phone ?? profile?.["phone" as keyof typeof profile] ?? null;
+  const questions = useMemo(() => {
+    return rawQuestions.filter(q => {
+      if (q.question_key === "email" && knownEmail) return false;
+      if (q.question_key === "phone" && knownPhone) return false;
+      return true;
+    });
+  }, [rawQuestions, knownEmail, knownPhone]);
+
+  // Auto-persist known email/phone so memory has them even though we skip the questions.
+  useEffect(() => {
+    if (loading || !user) return;
+    (async () => {
+      if (knownEmail) {
+        try { await saveBucketAnswer("basics", "email", knownEmail); } catch {}
+      }
+      if (knownPhone) {
+        try { await saveBucketAnswer("basics", "phone", String(knownPhone)); } catch {}
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, user?.id, knownEmail, knownPhone]);
 
   const q = questions[i];
   const total = questions.length;
@@ -150,12 +180,28 @@ export default function OnboardEssential() {
   }
 
   async function finish() {
+    setFinishing(true);
+    setFinishProgress(5);
+    setFinishLabel("Saving your answers…");
+
+    // Smooth progress ticker up to 92% so it feels like real work happening.
+    const started = Date.now();
+    const ticker = setInterval(() => {
+      setFinishProgress(prev => {
+        const elapsed = (Date.now() - started) / 1000;
+        // Ease toward 92 over ~12s.
+        const target = Math.min(92, 5 + Math.round((1 - Math.exp(-elapsed / 4)) * 87));
+        return Math.max(prev, target);
+      });
+    }, 250);
+
     const now = new Date().toISOString();
     await upsertProfile({
       essential_onboarded_at: now,
-      // Keep legacy flag set so any code still keyed off it treats user as onboarded.
       quick_onboarded_at: now,
     });
+
+    setFinishLabel("Reading up on your business…");
     const website = answers["website"];
     const instagram = answers["instagram"];
     const businessName = answers["business_name"];
@@ -165,7 +211,15 @@ export default function OnboardEssential() {
       }).catch(() => {});
     }
     try { window.localStorage.setItem("rilobiz.showBriefOnHome", "essential"); } catch {}
+
+    setFinishLabel("Building your customized home…");
     try { await supabase.functions.invoke("aperture-regenerate-memory-card", {}); } catch {}
+
+    clearInterval(ticker);
+    setFinishProgress(100);
+    setFinishLabel("Ready — welcome to RiloBiz");
+    // Brief pause so the 100% + welcome message actually reads.
+    await new Promise(r => setTimeout(r, 900));
     navigate("/app/rilobiz/app", { replace: true });
   }
 
@@ -188,7 +242,7 @@ export default function OnboardEssential() {
           action={total > 0 ? <ApertureChip tone="neutral">{Math.min(i + 1, total)} / {total}</ApertureChip> : null}
         />
 
-        {q && (
+        {q && !finishing && (
           <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
             {phases.map(p => {
               const state = currentPhase === p ? "active" : currentPhase > p ? "done" : "todo";
@@ -212,7 +266,33 @@ export default function OnboardEssential() {
           </div>
         )}
 
-        {loading || !q ? (
+        {finishing ? (
+          <ApertureCard padding={28}>
+            <ApertureMonoLabel>All done</ApertureMonoLabel>
+            <h2 style={{ margin: "10px 0 8px", fontSize: 24, color: "var(--ap-ink-1)", fontWeight: 600, letterSpacing: "-0.02em" }}>
+              Building your customized home
+            </h2>
+            <p style={{ margin: "0 0 20px", fontSize: 14, color: "var(--ap-ink-2)" }}>
+              I'm saving your memory and pulling together what I know so your home page is ready when you land. This takes a few seconds.
+            </p>
+            <div style={{
+              width: "100%", height: 8, borderRadius: 999,
+              background: "var(--ap-hairline)", overflow: "hidden", marginBottom: 10,
+            }}>
+              <div style={{
+                width: `${finishProgress}%`, height: "100%",
+                background: "var(--ap-signal)",
+                transition: "width 0.35s ease",
+              }} />
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--ap-ink-2)" }}>
+              <span>{finishLabel}</span>
+              <span style={{ fontVariantNumeric: "tabular-nums", fontWeight: 600, color: "var(--ap-ink-1)" }}>
+                {finishProgress}%
+              </span>
+            </div>
+          </ApertureCard>
+        ) : loading || !q ? (
           <ApertureLoading label="Loading…" />
         ) : showPhaseIntro ? (
           <ApertureCard padding={24}>
@@ -232,6 +312,11 @@ export default function OnboardEssential() {
             <ApertureMonoLabel>{phaseLabel}</ApertureMonoLabel>
             <h2 style={{ margin: "8px 0 4px", fontSize: 20, color: "var(--ap-ink-1)", fontWeight: 600, letterSpacing: "-0.015em" }}>
               {q.prompt}
+              {q.hint && /^optional/i.test(q.hint) && (
+                <span style={{ marginLeft: 8, fontSize: 12, fontWeight: 500, color: "var(--ap-ink-2)", letterSpacing: 0 }}>
+                  (optional)
+                </span>
+              )}
             </h2>
             {q.hint && <p style={{ margin: "0 0 14px", fontSize: 13, color: "var(--ap-ink-2)" }}>{q.hint}</p>}
 
@@ -306,10 +391,19 @@ function QuestionInput({
     );
   }
 
+  // Per-question placeholder overrides — concrete examples beat repeating the hint.
+  const placeholderOverride: Record<string, string> = {
+    instagram: "alilotfivip",
+    website: "ladybosslook.com",
+  };
+  const placeholder =
+    placeholderOverride[q.question_key] ??
+    (q.hint ? `e.g. ${q.hint}` : q.input_kind === "url" ? "https://…" : q.input_kind === "email" ? "you@example.com" : "Type your answer…");
+
   return (
     <input style={baseStyle}
       type={q.input_kind === "url" ? "url" : q.input_kind === "email" ? "email" : "text"}
-      placeholder={q.hint ? `e.g. ${q.hint}` : q.input_kind === "url" ? "https://…" : q.input_kind === "email" ? "you@example.com" : "Type your answer…"}
+      placeholder={placeholder}
       value={value} onChange={e => onChange(e.target.value)} />
   );
 }
