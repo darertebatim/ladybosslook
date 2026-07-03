@@ -429,11 +429,12 @@ function splitAssistantOptions(text: string): { body: string; options: string[] 
  * are 4+ options.
  */
 function OptionChips({
-  options, disabled, onPick,
+  options, disabled, onPick, escapeChips,
 }: {
   options: string[];
   disabled: boolean;
   onPick?: (t: string) => void;
+  escapeChips?: Array<{ label: string; onClick: () => void }>;
 }) {
   const [isNarrow, setIsNarrow] = useState(false);
   useEffect(() => {
@@ -477,6 +478,33 @@ function OptionChips({
           }}
         >
           {opt}
+        </button>
+      ))}
+      {escapeChips?.map((chip, idx) => (
+        <button
+          key={`escape-${idx}-${chip.label}`}
+          type="button"
+          disabled={disabled}
+          onClick={chip.onClick}
+          className="ap-chip-press"
+          style={{
+            appearance: "none",
+            cursor: disabled ? "default" : "pointer",
+            minHeight: 44,
+            padding: "10px 14px",
+            borderRadius: 999,
+            border: "1px dashed var(--ap-hairline)",
+            background: "transparent",
+            color: "var(--ap-ink-3)",
+            fontSize: 12, fontWeight: 500, fontFamily: "var(--ap-font-sans)",
+            fontStyle: "italic",
+            textAlign: "center",
+            lineHeight: 1.2,
+            opacity: disabled ? 0.5 : 1,
+            transition: "background 120ms ease, border-color 120ms ease",
+          }}
+        >
+          {chip.label}
         </button>
       ))}
     </div>
