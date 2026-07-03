@@ -243,33 +243,91 @@ export function SourceDetailSheet({
 
           {/* Raw snapshot accordion */}
           <section>
-            <button
-              onClick={() => setSnapOpen(s => !s)}
-              style={{
-                appearance: "none", cursor: "pointer", background: "transparent",
-                border: "1px solid var(--ap-hairline)",
-                borderRadius: "var(--ap-radius-sm)",
-                padding: "10px 12px", width: "100%",
-                display: "flex", alignItems: "center", justifyContent: "space-between",
-                color: "var(--ap-ink-1)", fontSize: 13, fontWeight: 500,
-              }}
-            >
-              <span>Raw snapshot</span>
-              {snapOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-            </button>
-            {snapOpen && (
-              <pre style={{
-                marginTop: 8, padding: 12,
-                background: "var(--ap-surface-2)",
-                border: "1px solid var(--ap-hairline)",
-                borderRadius: "var(--ap-radius-sm)",
-                fontSize: 11.5, color: "var(--ap-ink-2)",
-                fontFamily: "var(--ap-font-mono, ui-monospace, monospace)",
-                whiteSpace: "pre-wrap", wordBreak: "break-word",
-                maxHeight: 320, overflow: "auto", margin: 0,
-              }}>
-                {summary.snapshot?.raw_text?.slice(0, 6000) || "(no snapshot stored)"}
-              </pre>
+            <div style={{ marginBottom: 8 }}>
+              <ApertureMonoLabel>
+                Raw snapshot{pages.length > 0 ? ` · ${pages.length} page${pages.length === 1 ? "" : "s"}` : ""}
+              </ApertureMonoLabel>
+            </div>
+            {pages.length > 0 ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {pages.map((p, i) => {
+                  const isOpen = !!openPages[i];
+                  return (
+                    <div key={`${p.url}-${i}`}>
+                      <button
+                        onClick={() => setOpenPages(m => ({ ...m, [i]: !isOpen }))}
+                        style={{
+                          appearance: "none", cursor: "pointer", background: "transparent",
+                          border: "1px solid var(--ap-hairline)",
+                          borderRadius: "var(--ap-radius-sm)",
+                          padding: "10px 12px", width: "100%",
+                          display: "flex", alignItems: "center", justifyContent: "space-between",
+                          color: "var(--ap-ink-1)", fontSize: 13, fontWeight: 500,
+                          gap: 8,
+                        }}
+                      >
+                        <span style={{
+                          display: "flex", alignItems: "center", gap: 8, minWidth: 0,
+                        }}>
+                          <ApertureChip tone="neutral">{p.page_type}</ApertureChip>
+                          <span style={{
+                            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                            color: "var(--ap-ink-3)", fontSize: 12, fontWeight: 400,
+                          }}>
+                            {p.url}
+                          </span>
+                        </span>
+                        {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                      </button>
+                      {isOpen && (
+                        <pre style={{
+                          marginTop: 6, padding: 12,
+                          background: "var(--ap-surface-2)",
+                          border: "1px solid var(--ap-hairline)",
+                          borderRadius: "var(--ap-radius-sm)",
+                          fontSize: 11.5, color: "var(--ap-ink-2)",
+                          fontFamily: "var(--ap-font-mono, ui-monospace, monospace)",
+                          whiteSpace: "pre-wrap", wordBreak: "break-word",
+                          maxHeight: 320, overflow: "auto",
+                        }}>
+                          {p.text?.slice(0, 6000) || "(no text captured for this page)"}
+                        </pre>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <>
+                <button
+                  onClick={() => setSnapOpen(s => !s)}
+                  style={{
+                    appearance: "none", cursor: "pointer", background: "transparent",
+                    border: "1px solid var(--ap-hairline)",
+                    borderRadius: "var(--ap-radius-sm)",
+                    padding: "10px 12px", width: "100%",
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    color: "var(--ap-ink-1)", fontSize: 13, fontWeight: 500,
+                  }}
+                >
+                  <span>Snapshot</span>
+                  {snapOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                </button>
+                {snapOpen && (
+                  <pre style={{
+                    marginTop: 8, padding: 12,
+                    background: "var(--ap-surface-2)",
+                    border: "1px solid var(--ap-hairline)",
+                    borderRadius: "var(--ap-radius-sm)",
+                    fontSize: 11.5, color: "var(--ap-ink-2)",
+                    fontFamily: "var(--ap-font-mono, ui-monospace, monospace)",
+                    whiteSpace: "pre-wrap", wordBreak: "break-word",
+                    maxHeight: 320, overflow: "auto", margin: 0,
+                  }}>
+                    {summary.snapshot?.raw_text?.slice(0, 6000) || "(no snapshot stored)"}
+                  </pre>
+                )}
+              </>
             )}
           </section>
         </div>
