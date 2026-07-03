@@ -199,10 +199,25 @@ export default function WaveRunner() {
     setI(nextIdx);
   }
 
+  const [finishing, setFinishing] = useState(false);
+  const [finishStatus, setFinishStatus] = useState<ApertureProgressStatus>("running");
+  const [finishError, setFinishError] = useState<string | null>(null);
+
   async function finishWaveAndGoHome() {
     try { window.localStorage.setItem("rilobiz.showBriefOnHome", `wave-${waveNum}`); } catch {}
-    try { await supabase.functions.invoke("aperture-regenerate-memory-card", {}); } catch {}
-    navigate("/app/rilobiz/app", { replace: true });
+    setFinishing(true);
+    setFinishStatus("running");
+    setFinishError(null);
+    try {
+      const { error } = await supabase.functions.invoke("aperture-regenerate-memory-card", {});
+      if (error) throw error;
+      setFinishStatus("done");
+      await new Promise(r => setTimeout(r, 900));
+      navigate("/app/rilobiz/app", { replace: true });
+    } catch (e: any) {
+      setFinishError(e?.message ?? "We couldn't wrap up this wave. Please try again.");
+      setFinishStatus("error");
+    }
   }
 
   function set(v: string) {
