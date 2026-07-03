@@ -263,6 +263,50 @@ export default function RealTools() {
           action={<ApertureChip tone={activeSet.size ? "signal" : "neutral"}>{activeSet.size} active</ApertureChip>}
         />
 
+        {/* Continue chat + Brief pair — same pattern as bucket pages */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+          gap: 12, marginBottom: 18,
+        }}>
+          <ApertureCard padding={16}>
+            <ApertureMonoLabel>Conversation</ApertureMonoLabel>
+            <h3 style={{ margin: "6px 0 4px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
+              Continue chat about my stack
+            </h3>
+            <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
+              Talk through what's missing, what overlaps, and how your tools and sources connect.
+            </p>
+            <ApertureButton variant="accent" onClick={continueStackChat} disabled={startingStackChat}>
+              {startingStackChat ? "Opening…" : "Start →"}
+            </ApertureButton>
+          </ApertureCard>
+
+          <BriefCard
+            label="Brief"
+            title="What I know about your stack"
+            teaser="A short read-back of the tools you use and what I've pulled from your sources."
+            load={async () => {
+              if (!user) return null;
+              const { data } = await supabase
+                .from("aperture_bucket_briefs")
+                .select("summary,generated_at")
+                .eq("user_id", user.id).eq("bucket_slug", "tools-systems")
+                .maybeSingle();
+              return data ? { summary: (data as any).summary, generated_at: (data as any).generated_at } : null;
+            }}
+            regenerate={async () => {
+              const { data, error } = await supabase.functions.invoke("aperture-bucket-brief", {
+                body: { bucket_slug: "tools-systems", force: true },
+              });
+              if (error) throw new Error(error.message);
+              const b = (data as any)?.brief;
+              if (!b) throw new Error("No brief returned");
+              return { summary: b.summary, generated_at: b.generated_at };
+            }}
+          />
+        </div>
+
         {industrySlug && (
           <div style={{ marginBottom: 16 }}>
             <ApertureMonoLabel>
