@@ -46,7 +46,7 @@ type PickerEntry =
  */
 export default function RealTools() {
   const { user } = useAuth();
-  const { profile } = useApertureUserProfile();
+  const { profile, upsert: upsertProfile, refresh: refreshProfile } = useApertureUserProfile();
   const navigate = useNavigate();
   const { createChat } = useApertureChatsDB();
   const [startingStackChat, setStartingStackChat] = useState(false);
@@ -93,6 +93,33 @@ export default function RealTools() {
     () => new Set(rows.filter((r) => r.is_active).map((r) => r.tool_slug)),
     [rows],
   );
+
+  // First-visit onboarding pass (plan §3): if user has never stamped
+  // tool_onboarding_done_at, show a simplified picker-only view with a
+  // sticky Continue button. Existing users who already picked tools before
+  // this shipped are silently backfilled below.
+  const hasAnyPick = rows.some((r) => r.is_active);
+  const onboardingDone = !!(profile as any)?.tool_onboarding_done_at;
+  const firstVisit = !loading && !onboardingDone;
+  const [savingContinue, setSavingContinue] = useState(false);
+  const finishOnboarding = useCallback(async () => {
+    if (!user || savingContinue) return;
+    setSavingContinue(true);
+    try {
+      await upsertProfile({ tool_onboarding_done_at: new Date().toISOString() } as any);
+      await refreshProfile();
+    } finally {
+      setSavingContinue(false);
+    }
+  }, [user, savingContinue, upsertProfile, refreshProfile]);
+
+  // Backfill: existing users with picks but no stamp → mark them as done so
+  // they don't get bounced into onboarding on next load.
+  useEffect(() => {
+    if (!loading && !onboardingDone && hasAnyPick) {
+      void finishOnboarding();
+    }
+  }, [loading, onboardingDone, hasAnyPick, finishOnboarding]);
 
   const writeMemoryFact = useCallback(async (tool: { name: string; bucket_slug: string; question_key?: string }) => {
     if (!user) return;
@@ -162,7 +189,10 @@ export default function RealTools() {
     if (!user) return;
     const bucket = bucketForCategory(entry.category);
     if (on) {
-      // For "nothing yet" / "spreadsheet" in a category, clear the opposite one first.
+      // MUTUAL EXCLUSIVITY (redesign plan §8):
+      //  - picking a marker ("Nothing yet" / "Spreadsheet") clears the OTHER marker
+      //    AND every real-tool row in this category.
+      //  - picking a real tool clears BOTH markers in this category.
       if (entry.kind === "nothing_yet" || entry.kind === "spreadsheet_or_notes") {
         const opposite = entry.kind === "nothing_yet"
           ? `spreadsheet_or_notes__${entry.category}`
@@ -171,6 +201,18 @@ export default function RealTools() {
           .update({ is_active: false })
           .eq("user_id", user.id)
           .eq("tool_slug", opposite);
+        await supabase.from("aperture_user_tools")
+          .update({ is_active: false })
+          .eq("user_id", user.id)
+          .eq("category", entry.category)
+          .eq("custom", false)
+          .not("tool_slug", "like", "nothing_yet__%")
+          .not("tool_slug", "like", "spreadsheet_or_notes__%");
+      } else if (entry.kind === "tool") {
+        await supabase.from("aperture_user_tools")
+          .update({ is_active: false })
+          .eq("user_id", user.id)
+          .in("tool_slug", [`nothing_yet__${entry.category}`, `spreadsheet_or_notes__${entry.category}`]);
       }
       await supabase.from("aperture_user_tools").upsert({
         user_id: user.id,
@@ -316,7 +358,23 @@ export default function RealTools() {
           action={<ApertureChip tone={activeSet.size ? "signal" : "neutral"}>{activeSet.size} active</ApertureChip>}
         />
 
-        {/* Continue chat + Brief pair — same pattern as bucket pages */}
+        {firstVisit && (
+          <ApertureCard padding={16} style={{ marginBottom: 16, background: "var(--ap-signal-soft)", border: "1px solid var(--ap-signal)" }}>
+            <ApertureMonoLabel>First time here</ApertureMonoLabel>
+            <h3 style={{ margin: "6px 0 4px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
+              Tap what you use, category by category
+            </h3>
+            <p style={{ margin: 0, fontSize: 12.5, color: "var(--ap-ink-2)", lineHeight: 1.5 }}>
+              Just pick tools you actually use — no depth yet. If a category doesn't apply, mark
+              "Nothing yet" or "Spreadsheet / notes". When you're done, tap <strong>Continue</strong>
+              and I'll unlock the living Tools page for you.
+            </p>
+          </ApertureCard>
+        )}
+
+        {/* Continue chat + Brief pair — same pattern as bucket pages.
+            Hidden during the first-visit onboarding pass to keep it focused. */}
+        {!firstVisit && (
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
@@ -359,6 +417,7 @@ export default function RealTools() {
             }}
           />
         </div>
+        )}
 
         {industrySlug && (
           <div style={{ marginBottom: 16 }}>
@@ -368,8 +427,8 @@ export default function RealTools() {
           </div>
         )}
 
-        {/* Connected sources (website + instagram) */}
-        {sources.length > 0 && (
+        {/* Connected sources (website + instagram) — hidden during onboarding */}
+        {!firstVisit && sources.length > 0 && (
           <section style={{ marginBottom: 24 }}>
             <div style={{ marginBottom: 10 }}>
               <ApertureSectionTitle
@@ -575,6 +634,26 @@ export default function RealTools() {
           </div>
         )}
       </RealAppShell>
+      {firstVisit && (
+        <div
+          style={{
+            position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 20,
+            padding: "12px 16px calc(12px + env(safe-area-inset-bottom))",
+            background: "var(--ap-surface-1)",
+            borderTop: "1px solid var(--ap-hairline)",
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+          }}
+        >
+          <span style={{ fontSize: 12.5, color: "var(--ap-ink-2)" }}>
+            {activeSet.size === 0
+              ? "Pick anything you use — you can always change it later."
+              : `${activeSet.size} picked. You can keep going or continue now.`}
+          </span>
+          <ApertureButton variant="accent" onClick={finishOnboarding} disabled={savingContinue}>
+            {savingContinue ? "Saving…" : "Continue →"}
+          </ApertureButton>
+        </div>
+      )}
       <SourceDetailSheet
         summary={openSource}
         open={!!openSource}

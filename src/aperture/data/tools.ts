@@ -10,18 +10,20 @@ export interface ApertureToolCategoryGroup {
 }
 
 export const TOOL_CATEGORY_GROUPS: ApertureToolCategoryGroup[] = [
-  { label: "Accounting",          sub: "Books, invoices, payroll",                    bucket_slug: "money-finance" },
-  { label: "Payments",            sub: "How customers pay you",                       bucket_slug: "money-finance" },
-  { label: "E-commerce",          sub: "Selling online",                              bucket_slug: "sales-conversion" },
+  // Revenue-engine first ordering (per Tools redesign plan §6):
+  // leads / visibility / money-in before back-office.
   { label: "Marketing & Social",  sub: "Where you post, send, advertise",             bucket_slug: "marketing-visibility" },
-  { label: "Email & CRM",         sub: "Lists, sequences, customer data",             bucket_slug: "marketing-visibility" },
-  { label: "Scheduling",          sub: "Appointments, reservations",                  bucket_slug: "tools-systems" },
   { label: "Communication",       sub: "How you talk to customers and team",          bucket_slug: "tools-systems" },
+  { label: "Email & CRM",         sub: "Lists, sequences, customer data",             bucket_slug: "marketing-visibility" },
+  { label: "Payments",            sub: "How customers pay you",                       bucket_slug: "money-finance" },
+  { label: "Scheduling",          sub: "Appointments, reservations",                  bucket_slug: "tools-systems" },
+  { label: "E-commerce",          sub: "Selling online",                              bucket_slug: "sales-conversion" },
+  { label: "Website & Domain",    sub: "Where your site lives",                       bucket_slug: "tools-systems" },
+  { label: "Accounting",          sub: "Books, invoices, payroll",                    bucket_slug: "money-finance" },
   { label: "Productivity",        sub: "Docs, files, projects, meetings",             bucket_slug: "tools-systems" },
   { label: "HR & People",         sub: "Payroll, hiring, team",                       bucket_slug: "tools-systems" },
   { label: "AI",                  sub: "Tools using AI in your workflow",             bucket_slug: "tools-systems" },
   { label: "Design",              sub: "Visuals, branding, video",                    bucket_slug: "tools-systems" },
-  { label: "Website & Domain",    sub: "Where your site lives",                       bucket_slug: "tools-systems" },
   { label: "Industry-specific",   sub: "Specialty tools for your line of work",       bucket_slug: "tools-systems" },
 ];
 
