@@ -259,12 +259,15 @@ serve(async (req) => {
       const promptTok = usage?.prompt_tokens ?? 0;
       const completionTok = usage?.completion_tokens ?? 0;
       const usd = computeUsdCost(CHAT_MODEL, promptTok, completionTok);
+      const isMemoryQ = isMemoryQuestion(text, chatEntryPoint);
       await supabase.from("aperture_messages").insert({
         chat_id: chatId, user_id: user.id, role: "assistant", content: text,
         model: CHAT_MODEL,
         tokens_in: promptTok,
         tokens_out: completionTok,
         usd_cost: usd,
+        is_memory_question: isMemoryQ,
+        bucket_slug: isMemoryQ ? chatBucketSlug : null,
       });
       await logApertureEvent(supabase, user.id, "chat_message_ai", {
         content: text,
@@ -308,12 +311,15 @@ serve(async (req) => {
             const promptTok = streamUsage?.prompt_tokens ?? 0;
             const completionTok = streamUsage?.completion_tokens ?? 0;
             const usd = computeUsdCost(CHAT_MODEL, promptTok, completionTok);
+            const isMemoryQ = isMemoryQuestion(assembled, chatEntryPoint);
             await supabase.from("aperture_messages").insert({
               chat_id: chatId, user_id: user.id, role: "assistant", content: assembled,
               model: CHAT_MODEL,
               tokens_in: promptTok,
               tokens_out: completionTok,
               usd_cost: usd,
+              is_memory_question: isMemoryQ,
+              bucket_slug: isMemoryQ ? chatBucketSlug : null,
             });
             await logApertureEvent(supabase, user.id, "chat_message_ai", {
               content: assembled,
