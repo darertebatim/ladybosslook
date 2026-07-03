@@ -17,7 +17,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { MemorySourcePill } from "@/aperture/components/MemorySourcePill";
 import { composeBucketSpecificOpener } from "@/aperture/lib/composeOpener";
 import { BriefCard } from "@/aperture/components/BriefCard";
-import { Check, Pencil, Trash2, Clock, X } from "lucide-react";
+import { Check, Pencil, Trash2, Clock, X, ChevronDown, ChevronUp } from "lucide-react";
+
+// Source-tier classification, reused for the counter, list grouping, and
+// the per-row Confirm affordance. Keep in sync with MemorySourcePill.
+const DIRECT_SOURCES = new Set(["user_confirmed", "bucket_answer", "chat_extracted"]);
+const NOTICED_SOURCES = new Set(["ai_extracted", "file_extracted", "mcp_extracted", "freeform"]);
 
 /**
  * Bucket detail — readable, correctable record of what RiloBiz knows
@@ -37,6 +42,8 @@ export default function RealBucketPage() {
   const memory = useApertureMemoryDB();
   const { createChat } = useApertureChatsDB();
   const [starting, setStarting] = useState(false);
+  const [showAllFacts, setShowAllFacts] = useState(false);
+  const [cachedBriefSummary, setCachedBriefSummary] = useState<string | null>(null);
 
   const bucket = slug ? buckets.find(b => b.slug === slug) : undefined;
   const questions = slug ? questionsFor(slug) : [];
@@ -145,11 +152,13 @@ export default function RealBucketPage() {
   // Split the "What I know" counter into three trust tiers, matching the
   // MemorySourcePill styling. Direct = the user said it. Noticed = the AI
   // pulled it from a chat/file/site. Guess = pre-onboarding inference.
-  const DIRECT_SOURCES = new Set(["user_confirmed", "bucket_answer", "chat_extracted"]);
-  const NOTICED_SOURCES = new Set(["ai_extracted", "file_extracted", "mcp_extracted", "freeform"]);
-  const directCount = facts.filter(f => DIRECT_SOURCES.has(f.source as string)).length;
-  const noticedCount = facts.filter(f => NOTICED_SOURCES.has(f.source as string)).length;
-  const guessCount = facts.filter(f => f.source === "ai_inferred_pre_onboarding").length;
+  const directFacts = facts.filter(f => DIRECT_SOURCES.has(f.source as string));
+  const noticedFacts = facts.filter(f => NOTICED_SOURCES.has(f.source as string));
+  const guessFacts = facts.filter(f => f.source === "ai_inferred_pre_onboarding");
+  const directCount = directFacts.length;
+  const noticedCount = noticedFacts.length;
+  const guessCount = guessFacts.length;
+  const totalCount = directCount + noticedCount + guessCount;
   const counterSegments = [
     directCount > 0 ? `${directCount} confirmed` : null,
     noticedCount > 0 ? `${noticedCount} noticed` : null,
@@ -158,6 +167,25 @@ export default function RealBucketPage() {
   const counterLabel = counterSegments.length > 0 ? counterSegments.join(" · ") : "0 confirmed";
   // Keep an aggregate for the chat CTA copy ("pick up where we left off").
   const confirmedCount = directCount + noticedCount;
+
+  // Dynamic subtitle: once the user has directly confirmed enough for this
+  // bucket, replace the static blurb with the first sentence of the cached
+  // brief (whichever section leads with prose). Falls back to the static
+  // blurb when we don't have enough signal or the brief hasn't generated.
+  const dynamicSubtitle =
+    directCount >= 3 && cachedBriefSummary
+      ? firstBriefSentence(cachedBriefSummary)
+      : null;
+  const headerSubtitle = dynamicSubtitle || (bucket.blurb ?? "");
+
+  // Forward-pointing hint: pick the first designed bucket question this
+  // user hasn't answered yet, so the Continue Chat card can name what
+  // we'd want to explore next. Silent when no clean signal exists.
+  const answeredKeys = new Set(facts.map(f => f.question_key).filter(Boolean) as string[]);
+  const nextQuestion = [...questions]
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .find(q => !answeredKeys.has(q.question_key));
+  const nextHint = nextQuestion ? shortenNextHint(nextQuestion.prompt) : null;
 
   return (
     <>
@@ -175,7 +203,7 @@ export default function RealBucketPage() {
         <PageHeader
           index={`BUCKET · ${bucket.source.toUpperCase()}`}
           title={bucket.title}
-          sub={bucket.blurb ?? ""}
+          sub={headerSubtitle}
         />
 
         {/* Conversation + Brief CTA row */}
@@ -194,6 +222,14 @@ export default function RealBucketPage() {
                 ? "I'll pick up where we left off — what's changed, or what's on your mind here now?"
                 : "Let's open this up. I'll ask the first question and we'll go from there."}
             </p>
+            {nextHint && (
+              <p style={{
+                margin: "0 0 12px", fontSize: 12, color: "var(--ap-ink-3)",
+                lineHeight: 1.5, fontStyle: "italic",
+              }}>
+                Next time we talk, I'd want to know more about {nextHint}.
+              </p>
+            )}
             <ApertureButton variant="accent" onClick={continueChat} disabled={starting}>
               {starting ? "Opening…" : "Start →"}
             </ApertureButton>
@@ -203,6 +239,7 @@ export default function RealBucketPage() {
             label="Brief"
             title={`What I know about ${bucket.title}`}
             teaser="A short read-back of what I've pieced together for this bucket. Reset anytime to refresh."
+            autoExpandIfCached
             load={async () => {
               if (!user || !slug) return null;
               const { data } = await supabase
@@ -210,7 +247,10 @@ export default function RealBucketPage() {
                 .select("summary,generated_at")
                 .eq("user_id", user.id).eq("bucket_slug", slug)
                 .maybeSingle();
-              return data ? { summary: (data as any).summary, generated_at: (data as any).generated_at } : null;
+              if (!data) return null;
+              const summary = (data as any).summary as string;
+              setCachedBriefSummary(summary);
+              return { summary, generated_at: (data as any).generated_at };
             }}
             regenerate={async () => {
               if (!slug) throw new Error("Missing bucket");
@@ -220,36 +260,133 @@ export default function RealBucketPage() {
               if (error) throw new Error(error.message);
               const b = (data as any)?.brief;
               if (!b) throw new Error("No brief returned");
+              setCachedBriefSummary(b.summary);
               return { summary: b.summary, generated_at: b.generated_at };
             }}
           />
         </div>
 
-        <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 10 }}>
-          <ApertureMonoLabel>What I know</ApertureMonoLabel>
-          <span style={{ fontSize: 11, color: "var(--ap-ink-3)" }}>
-            {counterLabel}
-          </span>
-        </div>
-
         {memory.loading ? (
           <ApertureLoading label="Loading what I know…" />
         ) : facts.length === 0 ? (
-          <ApertureCard padding={20}>
-            <p style={{ margin: 0, fontSize: 13.5, color: "var(--ap-ink-2)", lineHeight: 1.55 }}>
-              Nothing here yet. Start a chat above — anything you share will show up here.
-            </p>
-          </ApertureCard>
+          <>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 10 }}>
+              <ApertureMonoLabel>What I know</ApertureMonoLabel>
+              <span style={{ fontSize: 11, color: "var(--ap-ink-3)" }}>{counterLabel}</span>
+            </div>
+            <ApertureCard padding={20}>
+              <p style={{ margin: 0, fontSize: 13.5, color: "var(--ap-ink-2)", lineHeight: 1.55 }}>
+                Nothing here yet. Start a chat above — anything you share will show up here.
+              </p>
+            </ApertureCard>
+          </>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {facts.map(f => (
-              <FactRow key={f.id} fact={f} memory={memory} promptFor={promptFor} />
-            ))}
-          </div>
+          <>
+            <button
+              type="button"
+              onClick={() => setShowAllFacts(s => !s)}
+              style={{
+                appearance: "none", background: "none", border: "none",
+                cursor: "pointer", padding: "8px 0", marginBottom: showAllFacts ? 10 : 0,
+                display: "flex", alignItems: "center", gap: 8,
+                color: "var(--ap-ink-2)", width: "100%", textAlign: "left",
+              }}
+            >
+              <span style={{
+                fontFamily: "var(--ap-font-mono)", fontSize: 11,
+                letterSpacing: "0.12em", textTransform: "uppercase",
+                color: "var(--ap-ink-3)",
+              }}>
+                See everything I know
+              </span>
+              <span style={{ fontSize: 11, color: "var(--ap-ink-3)" }}>
+                ({totalCount} item{totalCount === 1 ? "" : "s"} · {counterLabel})
+              </span>
+              <span style={{ marginLeft: "auto", color: "var(--ap-ink-3)", display: "inline-flex" }}>
+                {showAllFacts ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </span>
+            </button>
+            {showAllFacts && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                <FactGroup
+                  label="Directly answered"
+                  facts={directFacts}
+                  memory={memory}
+                  promptFor={promptFor}
+                />
+                <FactGroup
+                  label="Noticed"
+                  facts={noticedFacts}
+                  memory={memory}
+                  promptFor={promptFor}
+                />
+                <FactGroup
+                  label="Guesses"
+                  facts={guessFacts}
+                  memory={memory}
+                  promptFor={promptFor}
+                />
+              </div>
+            )}
+          </>
         )}
       </RealAppShell>
     </>
   );
+}
+
+function FactGroup({
+  label,
+  facts,
+  memory,
+  promptFor,
+}: {
+  label: string;
+  facts: MemoryItem[];
+  memory: ReturnType<typeof useApertureMemoryDB>;
+  promptFor: Record<string, string>;
+}) {
+  if (facts.length === 0) return null;
+  return (
+    <section>
+      <div style={{ marginBottom: 8 }}>
+        <ApertureMonoLabel>{label} · {facts.length}</ApertureMonoLabel>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {facts.map(f => (
+          <FactRow key={f.id} fact={f} memory={memory} promptFor={promptFor} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function firstBriefSentence(summary: string): string | null {
+  if (!summary) return null;
+  // Strip common section labels and markdown before hunting for prose.
+  const stripped = summary
+    .replace(/^\s*[#*_>\-\s]*(at\s+a\s+glance|what\s+we\s+know|what\s+i\s+see)[\s:*_]*\n?/gim, "\n")
+    .replace(/^\s*(metric|watch|warning|move)\s*[:\-—].*$/gim, "")
+    .replace(/\*\*/g, "")
+    .replace(/^[\s\-*•>]+/gm, "")
+    .trim();
+  const firstProseLine = stripped
+    .split(/\n+/)
+    .map(l => l.trim())
+    .find(l => l.length > 0 && !/^(metric|watch|warning|move)\b/i.test(l));
+  if (!firstProseLine) return null;
+  const sentence = firstProseLine.split(/(?<=[.!?])\s+/)[0].trim();
+  if (!sentence) return null;
+  return sentence.length > 160 ? sentence.slice(0, 157).trimEnd() + "…" : sentence;
+}
+
+function shortenNextHint(prompt: string): string {
+  const clean = prompt.replace(/\?$/, "").trim();
+  // Try to lift the topic after "your ", "about ", or "the " for a natural read.
+  const m = clean.match(/(?:your|about|the)\s+([a-z0-9][a-z0-9 \-]{2,50})/i);
+  if (m) return m[1].trim();
+  const short = clean.length > 60 ? clean.slice(0, 57).trimEnd() + "…" : clean;
+  return short.toLowerCase();
 }
 
 function FactRow({
