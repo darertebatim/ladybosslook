@@ -85,7 +85,12 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
 
   if (isMobile) {
     return (
-      <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "var(--ap-canvas)" }}>
+      <div
+        // No-op touch handler forces iOS WKWebView to fire :active pseudo-class
+        // reliably across descendants. Long-standing WebKit quirk.
+        onTouchStart={() => {}}
+        style={{ height: "100%", display: "flex", flexDirection: "column", background: "var(--ap-canvas)" }}
+      >
           <header style={{
             flexShrink: 0, zIndex: 30,
             display: "flex", alignItems: "center", justifyContent: "space-between",
