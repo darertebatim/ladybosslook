@@ -465,15 +465,3 @@ function relativeTime(iso: string): string {
   if (mo < 12) return `${mo}mo ago`;
   return `${Math.round(mo / 12)}y ago`;
 }
-
-/** Last-resort label for question_keys we can't find a prompt for —
- *  strips prefixes like `full_q12_` and turns snake_case into Title Case. */
-function prettifyKey(key: string): string {
-  const stripped = key
-    .replace(/^full_q\d+_/, "")
-    .replace(/^b\d+_q\d+$/i, "")
-    .replace(/_/g, " ")
-    .trim();
-  if (!stripped) return "Detail";
-  return stripped.charAt(0).toUpperCase() + stripped.slice(1);
-}
