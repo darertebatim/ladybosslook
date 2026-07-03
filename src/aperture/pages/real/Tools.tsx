@@ -103,7 +103,60 @@ export default function RealTools() {
       bucket_slug: tool.bucket_slug,
       question_key: tool.question_key ?? `uses_${tool.name.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`,
     } as any);
+    // Mirror EVERY tool pick into the canonical `tools-systems` bucket so the
+    // Tools page brief ("What I know about your stack") sees the full stack,
+    // regardless of which category-specific bucket the tool primarily maps to.
+    if (tool.bucket_slug !== "tools-systems") {
+      const nameKey = tool.name.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+      await supabase.from("aperture_memory_items").upsert({
+        user_id: user.id,
+        content: `Uses ${tool.name}`,
+        source: "user_confirmed",
+        bucket_slug: "tools-systems",
+        question_key: `tool_mirror__${nameKey}`,
+        is_active: true,
+      } as any, { onConflict: "user_id,bucket_slug,question_key" });
+    }
   }, [user]);
+
+  // Backfill: any active aperture_user_tools row without a matching
+  // tools-systems memory fact gets one inserted. Runs once per rows change so
+  // existing users (who picked tools before mirroring existed) light up the
+  // Tools brief the moment they open this page.
+  useEffect(() => {
+    if (!user || rows.length === 0) return;
+    const activeTools = rows.filter(r => r.is_active && r.tool_name && !r.tool_slug.startsWith("nothing_yet__") && !r.tool_slug.startsWith("spreadsheet_or_notes__"));
+    if (activeTools.length === 0) return;
+    (async () => {
+      const { data: existing } = await supabase
+        .from("aperture_memory_items")
+        .select("question_key")
+        .eq("user_id", user.id)
+        .eq("bucket_slug", "tools-systems")
+        .eq("is_active", true);
+      const have = new Set(((existing ?? []) as any[]).map(r => r.question_key).filter(Boolean));
+      const toInsert = activeTools
+        .map(r => {
+          const nameKey = r.tool_name.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+          const qk = `tool_mirror__${nameKey}`;
+          return { qk, r };
+        })
+        .filter(x => !have.has(x.qk))
+        // Dedup by question_key (same tool in multiple categories).
+        .filter((x, i, arr) => arr.findIndex(y => y.qk === x.qk) === i);
+      if (toInsert.length === 0) return;
+      await supabase.from("aperture_memory_items").insert(
+        toInsert.map(({ qk, r }) => ({
+          user_id: user.id,
+          content: `Uses ${r.tool_name}`,
+          source: "user_confirmed",
+          bucket_slug: "tools-systems",
+          question_key: qk,
+          is_active: true,
+        })) as any,
+      );
+    })();
+  }, [user, rows]);
 
   const togglePick = useCallback(async (entry: PickerEntry, on: boolean) => {
     if (!user) return;
