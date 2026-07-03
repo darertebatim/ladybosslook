@@ -189,6 +189,17 @@ export default function RealHome() {
               title="Here's what I now know about your business"
               teaser="Your latest answers folded into the full picture."
               defaultOpen
+              onTalk={async ({ move }) => {
+                const opener = move
+                  ? `From your fresh brief, here's the move I'd zero in on:\n\n"${move}"\n\nWant to work on this together? Where do you want to start — the first concrete step, what's blocking it, or how you'd know it's working?`
+                  : `Let's talk through your brief. Where do you want to start?`;
+                const chat = await createChat({
+                  title: "Talk about my brief",
+                  entry_point: "general_chat",
+                  opener,
+                });
+                if (chat) navigate(`/app/rilobiz/app/chats/${chat.id}`);
+              }}
               load={async () => {
                 const { data } = await supabase
                   .from("aperture_memory_card")
