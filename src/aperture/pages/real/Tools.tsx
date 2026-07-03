@@ -14,6 +14,9 @@ import { ArrowLeft, Plus, Check } from "lucide-react";
 import { SourceCard } from "@/aperture/components/SourceCard";
 import { SourceDetailSheet } from "@/aperture/components/SourceDetailSheet";
 import { useApertureSources, type SourceSummary } from "@/aperture/hooks/db/useApertureSources";
+import { BriefCard } from "@/aperture/components/BriefCard";
+import { useApertureChatsDB } from "@/aperture/hooks/db/useApertureChatsDB";
+import { useNavigate } from "react-router-dom";
 
 interface UserToolRow {
   id: string;
@@ -44,6 +47,9 @@ type PickerEntry =
 export default function RealTools() {
   const { user } = useAuth();
   const { profile } = useApertureUserProfile();
+  const navigate = useNavigate();
+  const { createChat } = useApertureChatsDB();
+  const [startingStackChat, setStartingStackChat] = useState(false);
   const [rows, setRows] = useState<UserToolRow[]>([]);
   const [catalog, setCatalog] = useState<CatalogToolRow[]>([]);
   const [loading, setLoading] = useState(true);
