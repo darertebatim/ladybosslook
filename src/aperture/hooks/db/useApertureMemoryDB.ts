@@ -21,6 +21,8 @@ export interface MemoryItem {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  source_kind?: string | null;
+  locked_from_refetch?: boolean | null;
 }
 
 /**
@@ -39,7 +41,7 @@ export function useApertureMemoryDB() {
     setLoading(true);
     const { data } = await supabase
       .from("aperture_memory_items")
-      .select("id,content,source,bucket_slug,question_key,is_active,created_at,updated_at")
+      .select("id,content,source,bucket_slug,question_key,is_active,created_at,updated_at,source_kind,locked_from_refetch")
       .eq("user_id", user.id)
       .eq("is_active", true)
       .order("updated_at", { ascending: false });
@@ -162,7 +164,7 @@ export function useApertureMemoryDB() {
     if (!user) return;
     const { data: old } = await supabase
       .from("aperture_memory_items")
-      .select("id,bucket_slug,question_key,content")
+      .select("id,bucket_slug,question_key,content,source_kind")
       .eq("id", oldId)
       .eq("user_id", user.id)
       .maybeSingle();
@@ -179,6 +181,12 @@ export function useApertureMemoryDB() {
         bucket_slug: (old as any).bucket_slug,
         question_key: (old as any).question_key,
         is_active: true,
+        // Carry the origin (website/instagram/manual) forward so provenance
+        // tags survive edits.
+        source_kind: (old as any).source_kind ?? null,
+        // A user edit locks the fact against being overwritten by future
+        // refetches of the same source.
+        locked_from_refetch: true,
       });
     if (insErr) {
       // 23505 = unique conflict on (user, bucket, question_key) — fall back
@@ -186,7 +194,7 @@ export function useApertureMemoryDB() {
       // the same answer slot.
       if ((insErr as any).code === "23505") {
         await supabase.from("aperture_memory_items")
-          .update({ content: trimmed, source: nextSource, is_active: true })
+          .update({ content: trimmed, source: nextSource, is_active: true, locked_from_refetch: true })
           .eq("user_id", user.id)
           .eq("bucket_slug", (old as any).bucket_slug)
           .eq("question_key", (old as any).question_key);
@@ -254,7 +262,7 @@ export function useApertureMemoryDB() {
   ): Promise<MemoryItem[]> => {
     if (!user) return [];
     let q = supabase.from("aperture_memory_items")
-      .select("id,content,source,bucket_slug,question_key,is_active,created_at,updated_at")
+      .select("id,content,source,bucket_slug,question_key,is_active,created_at,updated_at,source_kind,locked_from_refetch")
       .eq("user_id", user.id)
       .eq("bucket_slug", bucketSlug)
       .order("updated_at", { ascending: false });
