@@ -48,20 +48,42 @@ serve(async (req) => {
     const sources: { label: string; url: string; text: string; meta?: Record<string, unknown> }[] = [];
     if (effWebsite) {
       const baseUrl = normalizeUrl(effWebsite);
-      // Pull og:meta + visible text from the homepage, then try common
-      // marketing pages so SPAs don't come back empty.
-      const homepage = await fetchWebsiteRich(baseUrl);
-      const extras: string[] = [];
-      for (const path of ["/about", "/about-us", "/services", "/work-with-me", "/coaching"]) {
-        try {
-          const u = new URL(path, baseUrl).toString();
-          const t = await fetchAsText(u);
-          if (t && t.length > 200) extras.push(`## ${path}\n${t.slice(0, 2000)}`);
-        } catch { /* ignore */ }
-      }
-      const combined = [homepage, ...extras].filter(Boolean).join("\n\n");
-      if (combined.trim().length > 40) {
-        sources.push({ label: "website", url: effWebsite, text: combined });
+      // Two-tier crawl:
+      //   Tier A: headless-render fetch of homepage + auto-discovered
+      //           interior pages (products/pricing/about/contact).
+      //   Tier B: if the caller supplied a focus prompt (Source detail
+      //           "Pull more specific info"), attempt to discover and
+      //           fetch any page type implied by the prompt that Tier A
+      //           missed, then run extraction over the combined set.
+      const crawl = await crawlWebsite(baseUrl, userPrompt);
+      const combinedText = crawl.pages
+        .map((p) => `## PAGE_TYPE: ${p.page_type} — ${p.url}\n${p.text.slice(0, 3500)}`)
+        .join("\n\n");
+      if (crawl.pages.length > 0 && combinedText.trim().length > 200) {
+        sources.push({
+          label: "website",
+          url: effWebsite,
+          text: combinedText,
+          meta: {
+            fetch_status: "ok",
+            pages: crawl.pages.map((p) => ({ url: p.url, page_type: p.page_type, len: p.text.length })),
+          },
+        });
+      } else {
+        // Honest failure: persist a snapshot flagged failed so the UI
+        // can say "Couldn't read this site" instead of silently "Synced".
+        await supabase.from("aperture_source_snapshots").upsert({
+          user_id: user.id,
+          source_kind: "website",
+          url: effWebsite,
+          raw_text: combinedText.slice(0, 20000),
+          meta: {
+            fetch_status: "failed",
+            reason: crawl.reason ?? "empty",
+            pages: crawl.pages.map((p) => ({ url: p.url, page_type: p.page_type, len: p.text.length })),
+          },
+          fetched_at: new Date().toISOString(),
+        } as any, { onConflict: "user_id,source_kind" });
       }
     }
     if (effInstagram) {
