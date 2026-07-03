@@ -4,6 +4,26 @@ import { X, RefreshCw, MessageSquare, ExternalLink, Sparkles, ChevronDown, Chevr
 import { ApertureButton, ApertureCard, ApertureChip, ApertureMonoLabel } from "./primitives";
 import { useApertureSources, type SourceSummary } from "@/aperture/hooks/db/useApertureSources";
 
+const BUCKET_LABELS: Record<string, string> = {
+  basics: "Basics",
+  story: "Story",
+  customers: "Customers",
+  products: "Products & Services",
+  sales: "Sales",
+  marketing: "Marketing & Visibility",
+  money: "Money",
+  vision: "Vision",
+  tools: "Tools",
+  team: "Team",
+  operations: "Operations",
+  partners: "Partners",
+  competitors: "Competitors",
+  "content-media": "Content & Media",
+};
+function prettyBucket(slug: string): string {
+  return BUCKET_LABELS[slug] ?? slug.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export function SourceDetailSheet({
   summary, open, onClose,
 }: {
