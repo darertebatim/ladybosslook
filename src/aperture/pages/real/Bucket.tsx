@@ -272,7 +272,27 @@ function FactRow({
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, marginBottom: 8 }}>
-        <MemorySourcePill source={fact.source} />
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+          <MemorySourcePill source={fact.source} />
+          {fact.source_kind === "website" && (
+            <span style={{
+              fontSize: 10, color: "var(--ap-ink-3)",
+              fontFamily: "var(--ap-font-mono)",
+              textTransform: "uppercase", letterSpacing: "0.08em",
+              padding: "2px 6px", borderRadius: 4,
+              background: "var(--ap-surface-2)", border: "1px solid var(--ap-hairline)",
+            }}>🌐 website</span>
+          )}
+          {fact.source_kind === "instagram" && (
+            <span style={{
+              fontSize: 10, color: "var(--ap-ink-3)",
+              fontFamily: "var(--ap-font-mono)",
+              textTransform: "uppercase", letterSpacing: "0.08em",
+              padding: "2px 6px", borderRadius: 4,
+              background: "var(--ap-surface-2)", border: "1px solid var(--ap-hairline)",
+            }}>📷 instagram</span>
+          )}
+        </div>
         <span
           title={new Date(fact.updated_at).toLocaleString()}
           style={{ fontSize: 11, color: "var(--ap-ink-3)", fontFamily: "var(--ap-font-mono)" }}
