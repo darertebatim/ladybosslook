@@ -6,7 +6,7 @@ import { ApertureChip, ApertureMonoLabel } from "@/aperture/components/primitive
 import { useApertureChatsDB, useApertureChatMessages, type MessageRow } from "@/aperture/hooks/db/useApertureChatsDB";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { streamApertureChat, nameApertureChat } from "@/aperture/lib/apertureChat";
-import { useApertureHomeSuggestions } from "@/aperture/hooks/db/useApertureHomeSuggestions";
+import { useApertureHomeSuggestions, computeMemorySignature } from "@/aperture/hooks/db/useApertureHomeSuggestions";
 import { useAuth } from "@/hooks/useAuth";
 import { haptic } from "@/lib/haptics";
 import { ChatComposer } from "@/aperture/components/chat/ChatComposer";
@@ -23,7 +23,8 @@ export default function RealChatThread() {
   const { chats, createChat, refresh: refreshChats } = useApertureChatsDB();
   const { messages, setMessages, refresh } = useApertureChatMessages(id);
   const { items } = useApertureMemoryDB();
-  const { suggestions: homeSuggestions } = useApertureHomeSuggestions(items.length);
+  const memorySig = useMemo(() => computeMemorySignature(items as any), [items]);
+  const { suggestions: homeSuggestions } = useApertureHomeSuggestions(memorySig);
 
   const [streaming, setStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState("");

@@ -8,18 +8,38 @@ export interface HomeSuggestion {
   prompt: string;
 }
 
+/**
+ * Build a stable signature over the user's memory that only rotates when
+ * *meaningful* facts change. We deliberately ignore `ai_extracted` (which
+ * churns from every chat turn), `skipped`, and `unknown` — those would
+ * otherwise bust the daily cache constantly.
+ *
+ * Signature = count of user-authored active facts. Stable across a day
+ * as long as the user doesn't confirm/add/edit new facts themselves.
+ */
+export function computeMemorySignature(
+  items: ReadonlyArray<{ source?: string | null; is_active?: boolean | null }>,
+): string {
+  const MEANINGFUL = new Set(["bucket_answer", "freeform", "user_confirmed"]);
+  const n = items.filter(i => (i.is_active ?? true) && MEANINGFUL.has(String(i.source ?? ""))).length;
+  return n === 0 ? "empty" : `v1:${n}`;
+}
+
 interface CachedPayload {
   day: number;
-  memorySig: number;
+  memorySig: string;
   suggestions: HomeSuggestion[];
 }
 
 /**
  * AI-personalized next-actions for Home. Cached per (user, day, memory
- * size) in localStorage so we don't burn credits on every Home visit.
+ * signature) in localStorage so we don't burn credits on every Home
+ * visit. `memorySig` is a stable string hash of meaningful user-authored
+ * facts — NOT a raw item count — so noisy background writes (e.g.
+ * ai_extracted facts from chat) don't bust the daily cache.
  * Pass `refresh()` to force a fresh generation.
  */
-export function useApertureHomeSuggestions(memoryCount: number) {
+export function useApertureHomeSuggestions(memorySig: string) {
   const { user } = useAuth();
   const [suggestions, setSuggestions] = useState<HomeSuggestion[]>([]);
   const [loading, setLoading] = useState(false);
@@ -35,21 +55,21 @@ export function useApertureHomeSuggestions(memoryCount: number) {
       const raw = localStorage.getItem(cacheKey);
       if (!raw) return;
       const cached = JSON.parse(raw) as CachedPayload;
-      if (cached.day === today && cached.memorySig === memoryCount) {
+      if (cached.day === today && cached.memorySig === memorySig) {
         setSuggestions(cached.suggestions ?? []);
       }
     } catch { /* ignore */ }
-  }, [cacheKey, today, memoryCount]);
+  }, [cacheKey, today, memorySig]);
 
   const fetchNow = useCallback(async (force = false) => {
     if (!user || !cacheKey) return;
-    if (memoryCount === 0) { setSuggestions([]); return; }
+    if (!memorySig || memorySig === "empty") { setSuggestions([]); return; }
     if (!force) {
       try {
         const raw = localStorage.getItem(cacheKey);
         if (raw) {
           const cached = JSON.parse(raw) as CachedPayload;
-          if (cached.day === today && cached.memorySig === memoryCount && cached.suggestions?.length) {
+          if (cached.day === today && cached.memorySig === memorySig && cached.suggestions?.length) {
             setSuggestions(cached.suggestions);
             return;
           }
@@ -64,20 +84,20 @@ export function useApertureHomeSuggestions(memoryCount: number) {
       const list = Array.isArray((data as any)?.suggestions) ? (data as any).suggestions : [];
       setSuggestions(list);
       localStorage.setItem(cacheKey, JSON.stringify({
-        day: today, memorySig: memoryCount, suggestions: list,
+        day: today, memorySig, suggestions: list,
       } satisfies CachedPayload));
     } catch (e: any) {
       setError(e?.message ?? "Failed to load suggestions.");
     } finally {
       setLoading(false);
     }
-  }, [user, cacheKey, today, memoryCount]);
+  }, [user, cacheKey, today, memorySig]);
 
   // Auto-fetch once per day per memory snapshot.
   useEffect(() => {
-    if (!user || memoryCount === 0) return;
+    if (!user || !memorySig || memorySig === "empty") return;
     fetchNow(false);
-  }, [user, memoryCount, fetchNow]);
+  }, [user, memorySig, fetchNow]);
 
   return { suggestions, loading, error, refresh: () => fetchNow(true) };
 }
