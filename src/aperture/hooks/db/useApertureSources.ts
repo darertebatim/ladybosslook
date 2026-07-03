@@ -28,6 +28,7 @@ export interface SourceSummary {
   url: string;          // outbound URL
   snapshot: SourceSnapshot | null;
   factsCount: number;
+  fetchStatus: "ok" | "failed" | "unfetched";
 }
 
 function domainOf(raw: string): string {
@@ -61,23 +62,23 @@ export function useApertureSources() {
         .from("aperture_source_snapshots")
         .select("id,source_kind,url,raw_text,meta,fetched_at")
         .eq("user_id", user.id),
-      supabase
+      (supabase as any)
         .from("aperture_memory_items")
-        .select("id,content,bucket_slug,question_key,created_at")
+        .select("id,content,bucket_slug,question_key,source_kind,created_at")
         .eq("user_id", user.id)
         .eq("source", "ai_extracted")
-        .eq("is_active", true),
+        .eq("is_active", true)
+        .not("source_kind", "is", null),
     ]);
     setSnapshots(((snapRes.data ?? []) as any[]) as SourceSnapshot[]);
-    setFacts(((factRes.data ?? []) as any[]) as SourceFact[]);
+    setFacts(((factRes.data ?? []) as any[]) as (SourceFact & { source_kind: SourceKind })[]);
     setLoading(false);
   }, [user]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
   const factsFor = useCallback((kind: SourceKind): SourceFact[] => {
-    const tag = `${kind}__`;
-    return facts.filter(f => (f.question_key ?? "").startsWith(tag));
+    return facts.filter((f: any) => f.source_kind === kind);
   }, [facts]);
 
   const sources = useMemo<SourceSummary[]>(() => {
@@ -85,24 +86,28 @@ export function useApertureSources() {
     const websiteRaw = profile?.website?.trim();
     if (websiteRaw) {
       const snap = snapshots.find(s => s.source_kind === "website") ?? null;
+      const st = (snap?.meta as any)?.fetch_status;
       out.push({
         kind: "website",
         display: domainOf(websiteRaw),
         url: /^https?:\/\//i.test(websiteRaw) ? websiteRaw : `https://${websiteRaw}`,
         snapshot: snap,
         factsCount: factsFor("website").length,
+        fetchStatus: !snap ? "unfetched" : st === "failed" ? "failed" : "ok",
       });
     }
     const igRaw = profile?.instagram?.trim();
     if (igRaw) {
       const handle = igRaw.replace(/^@/, "");
       const snap = snapshots.find(s => s.source_kind === "instagram") ?? null;
+      const st = (snap?.meta as any)?.fetch_status;
       out.push({
         kind: "instagram",
         display: `@${handle}`,
         url: instagramUrlOf(igRaw),
         snapshot: snap,
         factsCount: factsFor("instagram").length,
+        fetchStatus: !snap ? "unfetched" : st === "failed" ? "failed" : "ok",
       });
     }
     return out;

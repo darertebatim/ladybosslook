@@ -48,20 +48,42 @@ serve(async (req) => {
     const sources: { label: string; url: string; text: string; meta?: Record<string, unknown> }[] = [];
     if (effWebsite) {
       const baseUrl = normalizeUrl(effWebsite);
-      // Pull og:meta + visible text from the homepage, then try common
-      // marketing pages so SPAs don't come back empty.
-      const homepage = await fetchWebsiteRich(baseUrl);
-      const extras: string[] = [];
-      for (const path of ["/about", "/about-us", "/services", "/work-with-me", "/coaching"]) {
-        try {
-          const u = new URL(path, baseUrl).toString();
-          const t = await fetchAsText(u);
-          if (t && t.length > 200) extras.push(`## ${path}\n${t.slice(0, 2000)}`);
-        } catch { /* ignore */ }
-      }
-      const combined = [homepage, ...extras].filter(Boolean).join("\n\n");
-      if (combined.trim().length > 40) {
-        sources.push({ label: "website", url: effWebsite, text: combined });
+      // Two-tier crawl:
+      //   Tier A: headless-render fetch of homepage + auto-discovered
+      //           interior pages (products/pricing/about/contact).
+      //   Tier B: if the caller supplied a focus prompt (Source detail
+      //           "Pull more specific info"), attempt to discover and
+      //           fetch any page type implied by the prompt that Tier A
+      //           missed, then run extraction over the combined set.
+      const crawl = await crawlWebsite(baseUrl, userPrompt);
+      const combinedText = crawl.pages
+        .map((p) => `## PAGE_TYPE: ${p.page_type} — ${p.url}\n${p.text.slice(0, 3500)}`)
+        .join("\n\n");
+      if (crawl.pages.length > 0 && combinedText.trim().length > 200) {
+        sources.push({
+          label: "website",
+          url: effWebsite,
+          text: combinedText,
+          meta: {
+            fetch_status: "ok",
+            pages: crawl.pages.map((p) => ({ url: p.url, page_type: p.page_type, len: p.text.length })),
+          },
+        });
+      } else {
+        // Honest failure: persist a snapshot flagged failed so the UI
+        // can say "Couldn't read this site" instead of silently "Synced".
+        await supabase.from("aperture_source_snapshots").upsert({
+          user_id: user.id,
+          source_kind: "website",
+          url: effWebsite,
+          raw_text: combinedText.slice(0, 20000),
+          meta: {
+            fetch_status: "failed",
+            reason: crawl.reason ?? "empty",
+            pages: crawl.pages.map((p) => ({ url: p.url, page_type: p.page_type, len: p.text.length })),
+          },
+          fetched_at: new Date().toISOString(),
+        } as any, { onConflict: "user_id,source_kind" });
       }
     }
     if (effInstagram) {
@@ -114,11 +136,26 @@ You also tag each fact with the reasoning LAYER it belongs to (not just a bucket
 - "Financial Health" — revenue level, margins, cost structure, debt, unit economics.
 - "Direction" — vision, story, time horizon, life/family constraints, why-they-started.
 
-Prefer Revenue Engine unless the fact is clearly about team/ops (Owner Capacity), money/costs (Financial Health), or vision/story (Direction).`;
+Prefer Revenue Engine unless the fact is clearly about team/ops (Owner Capacity), money/costs (Financial Health), or vision/story (Direction).
+
+Bucket routing (use these rules; the model judges phrasing, no hard mapping):
+- products — offers, services, features. When a PRICE appears, ALSO emit a second parallel item into "money" (revenue half) using the same fact — pricing is both an offer detail and a revenue signal.
+- customers — target/ICP language (aspirational), and testimonials/reviews framed as proof of who buys.
+- sales — CTA structure and conversion mechanism (book now, DM, shop now, add-to-cart) especially when adjacent to pricing.
+- basics — hours, phone, email, address, service area, booking mechanism.
+- story — mission, origin, founder narrative.
+- marketing — press mentions, "as seen in", awards, PR.
+- content-media — blog posts, podcasts, videos hosted on-site.
+- team — bios, photos, roles.
+- partners — vendor/partner logos framed as an ongoing relationship (not a review).
+- competitors — explicit comparison language, only if present.
+- tools — third-party tools/platforms the business runs on (Shopify, Squarespace, Stripe) if surfaced in the copy.
+
+Each item must also carry its own \`source\` (which INPUT source the fact came from — "website" or "instagram") and an optional \`page_type\` (e.g. "products", "pricing", "about", "contact", "homepage") when the fact came from a page whose \`## PAGE_TYPE:\` marker made that clear.`;
     const focusLine = userPrompt
       ? `\n\nThe user specifically asked: "${String(userPrompt).slice(0, 240)}". Prefer facts that answer that.`
       : "";
-    const aiUserPrompt = `Business name (claimed): ${businessName ?? "(unknown)"}${focusLine}\n\nReturn JSON of the shape:\n{\n  "items": [\n    {\n      "bucket": "<one of: basics|story|customers|products|sales|marketing|money|vision|tools|team|operations|partners|competitors>",\n      "layer": "<Revenue Engine|Owner Capacity|Financial Health|Direction>",\n      "fact": "<concise fact>"\n    }\n  ]\n}\nOnly return valid JSON. Max 12 items.\n\n=== SOURCE ===\n${corpus}\n=== END SOURCE ===`;
+    const aiUserPrompt = `Business name (claimed): ${businessName ?? "(unknown)"}${focusLine}\n\nReturn JSON of the shape:\n{\n  "items": [\n    {\n      "bucket": "<one of: basics|story|customers|products|sales|marketing|money|vision|tools|team|operations|partners|competitors>",\n      "layer": "<Revenue Engine|Owner Capacity|Financial Health|Direction>",\n      "source": "<website|instagram>",\n      "page_type": "<optional, e.g. products|pricing|about|contact|homepage>",\n      "fact": "<concise fact>"\n    }\n  ]\n}\nOnly return valid JSON. Max 16 items.\n\n=== SOURCE ===\n${corpus}\n=== END SOURCE ===`;
 
     const aiRes = await fetch(AI_GATEWAY, {
       method: "POST",
@@ -183,21 +220,37 @@ Prefer Revenue Engine unless the fact is clearly about team/ops (Owner Capacity)
     }
 
     let written = 0;
-    // Tag each extracted fact with a source-scoped question_key so the
-    // Source detail sheet can filter facts that came from this source.
-    const sourceTag = sources[0]?.label ?? "ai";
+    // On refetch, sweep out prior AI-extracted facts for THIS source so a
+    // successful re-run doesn't just pile duplicates on top. Locked
+    // (user-edited) facts are preserved via locked_from_refetch.
+    if (targeted && source) {
+      await supabase
+        .from("aperture_memory_items")
+        .update({ is_active: false })
+        .eq("user_id", user.id)
+        .eq("source_kind", source)
+        .eq("source", "ai_extracted")
+        .eq("locked_from_refetch", false);
+    }
+    const VALID_SOURCE_KINDS = new Set(["website", "instagram"]);
     let seq = 0;
     for (const it of items) {
+      const factSource: string = VALID_SOURCE_KINDS.has((it as any).source)
+        ? (it as any).source
+        : (sources.length === 1 ? sources[0].label : "website");
       const slugFact = it.fact.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 40);
-      const questionKey = `${sourceTag}__${slugFact || `fact_${++seq}`}`;
+      const questionKey = `${factSource}__${slugFact || `fact_${++seq}`}`;
+      const pageType = (it as any).page_type ?? null;
       const { error } = await supabase.from("aperture_memory_items").insert({
         user_id: user.id,
         content: it.fact.trim().slice(0, 280),
         source: "ai_extracted",
+        source_kind: factSource,
         bucket_slug: it.bucket,
         question_key: questionKey,
         layer: (it as any).layer ?? DEFAULT_LAYER_BY_BUCKET[it.bucket] ?? "Revenue Engine",
         wave_number: 1,
+        metadata: pageType ? { page_type: pageType } : {},
       });
       if (!error) {
         written++;
@@ -205,6 +258,7 @@ Prefer Revenue Engine unless the fact is clearly about team/ops (Owner Capacity)
           bucket_slug: it.bucket,
           content: it.fact.trim().slice(0, 280),
           source: "ai_extracted",
+          source_kind: factSource,
           origin: targeted ? "source_refetch" : "onboarding_phase3",
         });
       }
@@ -424,4 +478,130 @@ async function fetchWebsiteRich(url: string): Promise<string> {
   } catch {
     return "";
   }
+}
+
+/**
+ * Page-type classifier — matches nav link text and URL path against known
+ * patterns. Returns null if nothing recognizable.
+ */
+function classifyPageType(hrefPath: string, anchorText: string): PageType | null {
+  const s = `${anchorText} ${hrefPath}`.toLowerCase();
+  if (/\b(products?|shop|store|services?|menu|book(ing)?|offer(ings?)?)\b/.test(s)) return "products";
+  if (/\b(pricing|packages?|plans?|rates?|fees?)\b/.test(s)) return "pricing";
+  if (/\b(about|our[- ]story|who[- ]we[- ]are|team)\b/.test(s)) return "about";
+  if (/\b(contact|location|hours|find[- ]us|visit)\b/.test(s)) return "contact";
+  return null;
+}
+
+type PageType = "homepage" | "products" | "pricing" | "about" | "contact";
+
+interface CrawledPage { url: string; page_type: PageType; text: string; }
+interface CrawlResult { pages: CrawledPage[]; reason: string | null; }
+
+/**
+ * Fetch a URL through the Jina Reader (r.jina.ai) headless-render proxy.
+ * This returns rendered markdown so JS-heavy SPAs (Squarespace, Wix,
+ * Shopify themes, React/Vue) come back with actual page content instead
+ * of an empty shell. No API key required for the free tier.
+ *
+ * Falls back to raw fetch + stripHtml on network failure.
+ */
+async function fetchRendered(url: string): Promise<string> {
+  const readerUrl = `https://r.jina.ai/${url}`;
+  try {
+    const res = await fetch(readerUrl, {
+      headers: {
+        "Accept": "text/plain",
+        "User-Agent": "Mozilla/5.0 (compatible; ApertureBot/1.0)",
+        "X-Return-Format": "markdown",
+      },
+      redirect: "follow",
+    });
+    if (res.ok) {
+      const txt = (await res.text()).trim();
+      if (txt.length > 200) return txt;
+    }
+  } catch { /* fall through */ }
+  // Fallback: direct fetch, strip HTML.
+  const meta = await fetchWebsiteRich(url);
+  return meta;
+}
+
+/**
+ * Discover candidate interior pages by scanning the homepage HTML for
+ * anchor tags whose text or path matches a known page-type pattern.
+ * Returns at most one URL per page type.
+ */
+async function discoverInteriorPages(baseUrl: string): Promise<Partial<Record<PageType, string>>> {
+  const found: Partial<Record<PageType, string>> = {};
+  try {
+    const res = await fetch(baseUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; ApertureBot/1.0; +https://aperture.lovable.app)",
+        "Accept": "text/html,application/xhtml+xml",
+      },
+      redirect: "follow",
+    });
+    if (!res.ok) return found;
+    const html = await res.text();
+    const base = new URL(baseUrl);
+    const anchorRe = /<a\s+[^>]*href=["']([^"'#]+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+    let m: RegExpExecArray | null;
+    while ((m = anchorRe.exec(html)) !== null) {
+      const rawHref = m[1];
+      const text = cleanText(m[2]);
+      let abs: URL;
+      try { abs = new URL(rawHref, base); } catch { continue; }
+      if (abs.hostname !== base.hostname) continue;
+      if (/\.(pdf|png|jpe?g|gif|svg|webp|mp4|zip|css|js)$/i.test(abs.pathname)) continue;
+      const kind = classifyPageType(abs.pathname, text);
+      if (!kind) continue;
+      if (!found[kind]) found[kind] = abs.toString();
+      if (found.products && found.pricing && found.about && found.contact) break;
+    }
+  } catch { /* ignore */ }
+  return found;
+}
+
+/**
+ * Two-tier crawl. Tier A fetches homepage (rendered) + up to 4 discovered
+ * interior pages. Tier B: if userPrompt hints at a page type not yet
+ * crawled, attempt to discover and fetch that too.
+ */
+async function crawlWebsite(baseUrl: string, userPrompt?: string): Promise<CrawlResult> {
+  const pages: CrawledPage[] = [];
+
+  // Homepage (rendered).
+  const home = await fetchRendered(baseUrl);
+  if (home && home.length > 200) {
+    pages.push({ url: baseUrl, page_type: "homepage", text: home });
+  }
+
+  const discovered = await discoverInteriorPages(baseUrl);
+
+  // Tier B: prompt-hinted page type not already in the discovery set.
+  if (userPrompt) {
+    const hinted = classifyPageType("", userPrompt);
+    if (hinted && !discovered[hinted]) {
+      const guess = new URL(`/${hinted}`, baseUrl).toString();
+      // We tentatively add it; fetchRendered will short-circuit if it 404s.
+      discovered[hinted] = guess;
+    }
+  }
+
+  const order: PageType[] = ["products", "pricing", "about", "contact"];
+  for (const kind of order) {
+    const url = discovered[kind];
+    if (!url) continue;
+    const txt = await fetchRendered(url);
+    if (txt && txt.length > 200) {
+      pages.push({ url, page_type: kind, text: txt });
+    }
+  }
+
+  let reason: string | null = null;
+  if (pages.length === 0) reason = "no_content";
+  else if (pages.reduce((n, p) => n + p.text.length, 0) < 500) reason = "too_thin";
+
+  return { pages, reason };
 }

@@ -1205,10 +1205,12 @@ export type Database = {
           id: string
           is_active: boolean
           layer: string | null
+          locked_from_refetch: boolean
           metadata: Json
           question_key: string | null
           source: string
           source_file_id: string | null
+          source_kind: string | null
           source_ref: string | null
           updated_at: string
           user_id: string
@@ -1224,10 +1226,12 @@ export type Database = {
           id?: string
           is_active?: boolean
           layer?: string | null
+          locked_from_refetch?: boolean
           metadata?: Json
           question_key?: string | null
           source?: string
           source_file_id?: string | null
+          source_kind?: string | null
           source_ref?: string | null
           updated_at?: string
           user_id: string
@@ -1243,10 +1247,12 @@ export type Database = {
           id?: string
           is_active?: boolean
           layer?: string | null
+          locked_from_refetch?: boolean
           metadata?: Json
           question_key?: string | null
           source?: string
           source_file_id?: string | null
+          source_kind?: string | null
           source_ref?: string | null
           updated_at?: string
           user_id?: string
