@@ -329,6 +329,17 @@ export default function RealMemory() {
               label="Full brief"
               title="What I know about your business"
               teaser="The whole picture, pulled across every bucket. Reset for a fresh read-back anytime."
+              onTalk={async ({ move }) => {
+                const opener = move
+                  ? `From your full brief, here's the move I'd zero in on:\n\n"${move}"\n\nWant to work on this together? Where do you want to start — the first concrete step, what's blocking it, or how you'd know it's working?`
+                  : `Let's talk through your brief. Where do you want to start?`;
+                const chat = await createChat({
+                  title: "Talk about my brief",
+                  entry_point: "general_chat",
+                  opener,
+                });
+                if (chat) navigate(`/app/rilobiz/app/chats/${chat.id}`);
+              }}
               load={async () => {
                 if (!user) return null;
                 const { data } = await supabase
