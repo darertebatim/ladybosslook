@@ -257,31 +257,26 @@ export default function OnboardEssential() {
         )}
 
         {finishing ? (
-          <ApertureCard padding={28}>
-            <ApertureMonoLabel>All done</ApertureMonoLabel>
-            <h2 style={{ margin: "10px 0 8px", fontSize: 24, color: "var(--ap-ink-1)", fontWeight: 600, letterSpacing: "-0.02em" }}>
-              Building your customized home
-            </h2>
-            <p style={{ margin: "0 0 20px", fontSize: 14, color: "var(--ap-ink-2)" }}>
-              I'm saving your memory and pulling together what I know so your home page is ready when you land. This takes a few seconds.
-            </p>
-            <div style={{
-              width: "100%", height: 8, borderRadius: 999,
-              background: "var(--ap-hairline)", overflow: "hidden", marginBottom: 10,
-            }}>
-              <div style={{
-                width: `${finishProgress}%`, height: "100%",
-                background: "var(--ap-signal)",
-                transition: "width 0.35s ease",
-              }} />
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--ap-ink-2)" }}>
-              <span>{finishLabel}</span>
-              <span style={{ fontVariantNumeric: "tabular-nums", fontWeight: 600, color: "var(--ap-ink-1)" }}>
-                {finishProgress}%
-              </span>
-            </div>
-          </ApertureCard>
+          <ApertureProgressOverlay
+            open
+            status={finishStatus}
+            title="Building your customized home"
+            description="I'm saving your memory and pulling together what I know so your home page is ready when you land."
+            estimateMs={12000}
+            hardTimeoutMs={30000}
+            steps={[
+              { at: 5, label: "Saving your answers…" },
+              { at: 35, label: "Reading up on your business…" },
+              { at: 70, label: "Building your customized home…" },
+            ]}
+            errorMessage={finishError ?? undefined}
+            onRetry={() => { setFinishError(null); finish(); }}
+            onDismiss={() => { setFinishing(false); }}
+            onHardTimeout={() => {
+              setFinishError("This is taking longer than expected. Please try again.");
+              setFinishStatus("error");
+            }}
+          />
         ) : loading || !q ? (
           <ApertureLoading label="Loading…" />
         ) : showPhaseIntro ? (
