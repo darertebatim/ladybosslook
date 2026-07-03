@@ -26,9 +26,11 @@ export function SourceCard({
   const fetched = summary.snapshot?.fetched_at ?? null;
   const status = busy
     ? { tone: "neutral" as const, label: "Fetching…" }
-    : fetched
-      ? { tone: "signal" as const, label: "Synced" }
-      : { tone: "neutral" as const, label: "Not fetched" };
+    : summary.fetchStatus === "failed"
+      ? { tone: "neutral" as const, label: "Couldn't read this site" }
+      : summary.fetchStatus === "ok"
+        ? { tone: "signal" as const, label: "Synced" }
+        : { tone: "neutral" as const, label: "Not fetched" };
 
   return (
     <ApertureCard
