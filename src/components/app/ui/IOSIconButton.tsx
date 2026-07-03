@@ -22,7 +22,7 @@ const sizeMap = {
 };
 
 export const IOSIconButton = forwardRef<HTMLButtonElement, IOSIconButtonProps>(
-  ({ className, variant = "light", size = "md", children, loading = false, disabled, onClick, onPointerDown, onPointerUp, onPointerLeave, onPointerCancel, ...rest }, ref) => {
+  ({ className, variant = "light", size = "md", children, loading = false, disabled, onClick, onPointerDown, onPointerUp, onPointerLeave, onPointerCancel, style: styleProp, ...rest }, ref) => {
     const base =
       "inline-flex items-center justify-center rounded-full shadow-ios transition-all";
     const variants = {
@@ -55,7 +55,7 @@ export const IOSIconButton = forwardRef<HTMLButtonElement, IOSIconButtonProps>(
           pointerEvents: inactive ? "none" : undefined,
           opacity: disabled && !loading ? 0.55 : undefined,
           cursor: inactive ? (loading ? "progress" : "not-allowed") : undefined,
-          ...(rest as any).style,
+          ...styleProp,
         }}
         onPointerDown={(e) => { if (!inactive) setPressed(true); onPointerDown?.(e); }}
         onPointerUp={(e) => { setPressed(false); onPointerUp?.(e); }}
