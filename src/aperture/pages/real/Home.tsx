@@ -169,6 +169,24 @@ export default function RealHome() {
           action={<ApertureChip tone={knownCount > 0 ? "signal" : "neutral"}>Memory · {knownCount}</ApertureChip>}
         />
 
+        {/* Memory Level */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, marginBottom: 8 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+              <ApertureMonoLabel>Level</ApertureMonoLabel>
+              <span style={{ fontSize: 28, fontWeight: 700, color: "var(--ap-ink-1)", fontVariantNumeric: "tabular-nums" }}>
+                {level}
+              </span>
+            </div>
+            <ApertureMonoLabel>
+              {level >= 1 ? `${factCount} / ${nextT} facts` : `${factCount} facts`}
+            </ApertureMonoLabel>
+          </div>
+          <div style={{ height: 4, borderRadius: 2, background: "var(--ap-hairline)", overflow: "hidden" }}>
+            <div style={{ width: `${levelPct}%`, height: "100%", background: "var(--ap-signal)", transition: "width 400ms ease" }} />
+          </div>
+        </div>
+
         {/* Next wave ready — surfaced once essential onboarding is complete. */}
         {(profile?.essential_onboarded_at || profile?.quick_onboarded_at) && (
           <Link to={`/app/rilobiz/app/waves/${nextWave}`} style={{ textDecoration: "none", display: "block", marginBottom: 20 }}>
