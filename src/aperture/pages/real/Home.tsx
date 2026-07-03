@@ -16,6 +16,7 @@ import { toast } from "@/hooks/use-toast";
 import { AperturePrompt } from "@/aperture/components/chat/AperturePrompt";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { BriefCard } from "@/aperture/components/BriefCard";
 
 /**
  * Memory Level — single climbing number driven by total fact count.
@@ -69,6 +70,16 @@ export default function RealHome() {
   const [starting, setStarting] = useState(false);
   const [dailyAnswer, setDailyAnswer] = useState("");
   const [savingDaily, setSavingDaily] = useState(false);
+
+  // One-shot expanded brief right after essential onboarding / wave completion.
+  const [showBriefOnce, setShowBriefOnce] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    const v = window.localStorage.getItem("rilobiz.showBriefOnHome");
+    if (v) {
+      try { window.localStorage.removeItem("rilobiz.showBriefOnHome"); } catch {}
+    }
+    return v;
+  });
 
   // Next wave number (same logic as Memory page)
   const [nextWave, setNextWave] = useState<number>(2);
@@ -168,6 +179,37 @@ export default function RealHome() {
           }
           action={<ApertureChip tone={knownCount > 0 ? "signal" : "neutral"}>Memory · {knownCount}</ApertureChip>}
         />
+
+        {/* First-view brief (one-shot after onboarding / wave completion) */}
+        {showBriefOnce && user && (
+          <div style={{ marginBottom: 20 }}>
+            <BriefCard
+              label={showBriefOnce === "essential" ? "Fresh from onboarding" : `Fresh from ${showBriefOnce.replace("wave-", "Wave ")}`}
+              title="Here's what I now know about your business"
+              teaser="Your latest answers folded into the full picture."
+              defaultOpen
+              load={async () => {
+                const { data } = await supabase
+                  .from("aperture_memory_card")
+                  .select("summary,regenerated_at")
+                  .eq("user_id", user.id).maybeSingle();
+                if (!data || !(data as any).summary) return null;
+                return {
+                  summary: (data as any).summary,
+                  generated_at: (data as any).regenerated_at ?? new Date().toISOString(),
+                };
+              }}
+              regenerate={async () => {
+                const { data, error } = await supabase.functions.invoke("aperture-regenerate-memory-card", {});
+                if (error) throw new Error(error.message);
+                return {
+                  summary: (data as any)?.summary ?? "",
+                  generated_at: (data as any)?.regenerated_at ?? new Date().toISOString(),
+                };
+              }}
+            />
+          </div>
+        )}
 
         {/* Memory Level */}
         <div style={{ marginBottom: 20 }}>
