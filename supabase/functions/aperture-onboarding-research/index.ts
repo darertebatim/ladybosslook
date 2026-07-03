@@ -479,3 +479,129 @@ async function fetchWebsiteRich(url: string): Promise<string> {
     return "";
   }
 }
+
+/**
+ * Page-type classifier — matches nav link text and URL path against known
+ * patterns. Returns null if nothing recognizable.
+ */
+function classifyPageType(hrefPath: string, anchorText: string): PageType | null {
+  const s = `${anchorText} ${hrefPath}`.toLowerCase();
+  if (/\b(products?|shop|store|services?|menu|book(ing)?|offer(ings?)?)\b/.test(s)) return "products";
+  if (/\b(pricing|packages?|plans?|rates?|fees?)\b/.test(s)) return "pricing";
+  if (/\b(about|our[- ]story|who[- ]we[- ]are|team)\b/.test(s)) return "about";
+  if (/\b(contact|location|hours|find[- ]us|visit)\b/.test(s)) return "contact";
+  return null;
+}
+
+type PageType = "homepage" | "products" | "pricing" | "about" | "contact";
+
+interface CrawledPage { url: string; page_type: PageType; text: string; }
+interface CrawlResult { pages: CrawledPage[]; reason: string | null; }
+
+/**
+ * Fetch a URL through the Jina Reader (r.jina.ai) headless-render proxy.
+ * This returns rendered markdown so JS-heavy SPAs (Squarespace, Wix,
+ * Shopify themes, React/Vue) come back with actual page content instead
+ * of an empty shell. No API key required for the free tier.
+ *
+ * Falls back to raw fetch + stripHtml on network failure.
+ */
+async function fetchRendered(url: string): Promise<string> {
+  const readerUrl = `https://r.jina.ai/${url}`;
+  try {
+    const res = await fetch(readerUrl, {
+      headers: {
+        "Accept": "text/plain",
+        "User-Agent": "Mozilla/5.0 (compatible; ApertureBot/1.0)",
+        "X-Return-Format": "markdown",
+      },
+      redirect: "follow",
+    });
+    if (res.ok) {
+      const txt = (await res.text()).trim();
+      if (txt.length > 200) return txt;
+    }
+  } catch { /* fall through */ }
+  // Fallback: direct fetch, strip HTML.
+  const meta = await fetchWebsiteRich(url);
+  return meta;
+}
+
+/**
+ * Discover candidate interior pages by scanning the homepage HTML for
+ * anchor tags whose text or path matches a known page-type pattern.
+ * Returns at most one URL per page type.
+ */
+async function discoverInteriorPages(baseUrl: string): Promise<Partial<Record<PageType, string>>> {
+  const found: Partial<Record<PageType, string>> = {};
+  try {
+    const res = await fetch(baseUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; ApertureBot/1.0; +https://aperture.lovable.app)",
+        "Accept": "text/html,application/xhtml+xml",
+      },
+      redirect: "follow",
+    });
+    if (!res.ok) return found;
+    const html = await res.text();
+    const base = new URL(baseUrl);
+    const anchorRe = /<a\s+[^>]*href=["']([^"'#]+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+    let m: RegExpExecArray | null;
+    while ((m = anchorRe.exec(html)) !== null) {
+      const rawHref = m[1];
+      const text = cleanText(m[2]);
+      let abs: URL;
+      try { abs = new URL(rawHref, base); } catch { continue; }
+      if (abs.hostname !== base.hostname) continue;
+      if (/\.(pdf|png|jpe?g|gif|svg|webp|mp4|zip|css|js)$/i.test(abs.pathname)) continue;
+      const kind = classifyPageType(abs.pathname, text);
+      if (!kind) continue;
+      if (!found[kind]) found[kind] = abs.toString();
+      if (found.products && found.pricing && found.about && found.contact) break;
+    }
+  } catch { /* ignore */ }
+  return found;
+}
+
+/**
+ * Two-tier crawl. Tier A fetches homepage (rendered) + up to 4 discovered
+ * interior pages. Tier B: if userPrompt hints at a page type not yet
+ * crawled, attempt to discover and fetch that too.
+ */
+async function crawlWebsite(baseUrl: string, userPrompt?: string): Promise<CrawlResult> {
+  const pages: CrawledPage[] = [];
+
+  // Homepage (rendered).
+  const home = await fetchRendered(baseUrl);
+  if (home && home.length > 200) {
+    pages.push({ url: baseUrl, page_type: "homepage", text: home });
+  }
+
+  const discovered = await discoverInteriorPages(baseUrl);
+
+  // Tier B: prompt-hinted page type not already in the discovery set.
+  if (userPrompt) {
+    const hinted = classifyPageType("", userPrompt);
+    if (hinted && !discovered[hinted]) {
+      const guess = new URL(`/${hinted}`, baseUrl).toString();
+      // We tentatively add it; fetchRendered will short-circuit if it 404s.
+      discovered[hinted] = guess;
+    }
+  }
+
+  const order: PageType[] = ["products", "pricing", "about", "contact"];
+  for (const kind of order) {
+    const url = discovered[kind];
+    if (!url) continue;
+    const txt = await fetchRendered(url);
+    if (txt && txt.length > 200) {
+      pages.push({ url, page_type: kind, text: txt });
+    }
+  }
+
+  let reason: string | null = null;
+  if (pages.length === 0) reason = "no_content";
+  else if (pages.reduce((n, p) => n + p.text.length, 0) < 500) reason = "too_thin";
+
+  return { pages, reason };
+}
