@@ -46,7 +46,7 @@ type PickerEntry =
  */
 export default function RealTools() {
   const { user } = useAuth();
-  const { profile } = useApertureUserProfile();
+  const { profile, upsert: upsertProfile, refresh: refreshProfile } = useApertureUserProfile();
   const navigate = useNavigate();
   const { createChat } = useApertureChatsDB();
   const [startingStackChat, setStartingStackChat] = useState(false);
@@ -93,6 +93,23 @@ export default function RealTools() {
     () => new Set(rows.filter((r) => r.is_active).map((r) => r.tool_slug)),
     [rows],
   );
+
+  // First-visit onboarding pass (plan §3): if user has never touched Tools,
+  // show a simplified picker-only view with a sticky Continue button that
+  // stamps `tool_onboarding_done_at` and reveals the living Tools page.
+  const hasAnyPick = rows.some((r) => r.is_active);
+  const firstVisit = !loading && !hasAnyPick && !(profile as any)?.tool_onboarding_done_at;
+  const [savingContinue, setSavingContinue] = useState(false);
+  const finishOnboarding = useCallback(async () => {
+    if (!user || savingContinue) return;
+    setSavingContinue(true);
+    try {
+      await upsertProfile({ tool_onboarding_done_at: new Date().toISOString() } as any);
+      await refreshProfile();
+    } finally {
+      setSavingContinue(false);
+    }
+  }, [user, savingContinue, upsertProfile, refreshProfile]);
 
   const writeMemoryFact = useCallback(async (tool: { name: string; bucket_slug: string; question_key?: string }) => {
     if (!user) return;
