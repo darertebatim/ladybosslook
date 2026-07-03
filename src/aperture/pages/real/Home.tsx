@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
-  ApertureCard, ApertureChip, ApertureMonoLabel, ApertureLoading, ApertureButton,
+  ApertureCard, ApertureChip, ApertureMonoLabel, ApertureButton,
 } from "@/aperture/components/primitives";
 import { useApertureMemoryDB } from "@/aperture/hooks/db/useApertureMemoryDB";
 import { useApertureChatsDB } from "@/aperture/hooks/db/useApertureChatsDB";
@@ -24,7 +24,7 @@ export default function RealHome() {
   const { profile, loading: pLoading } = useApertureUserProfile();
   const { user } = useAuth();
   const { question: dailyQ, refresh: refreshDailyQ, skip: skipDaily } = useApertureDailyQuestion();
-  const { suggestions: storedSuggestions, loading: storedLoading, refresh: refreshStored, markActed } = useApertureStoredSuggestions();
+  const { suggestions: storedSuggestions, refresh: refreshStored, markActed } = useApertureStoredSuggestions();
   const { suggestions: liveSuggestions, loading: liveLoading, refresh: refreshLive } = useApertureHomeSuggestions(items.length);
   // Prefer stored (Pass 2 / future generators); fall back to live AI generation.
   const suggestions = storedSuggestions.length > 0
@@ -118,13 +118,13 @@ export default function RealHome() {
           action={<ApertureChip tone={knownCount > 0 ? "signal" : "neutral"}>Memory · {knownCount}</ApertureChip>}
         />
 
-        {/* Wave 2 ready — surfaced once essential onboarding is complete. */}
+        {/* Next wave ready — surfaced once essential onboarding is complete. */}
         {(profile?.essential_onboarded_at || profile?.quick_onboarded_at) && (
-          <Link to="/app/rilobiz/app/waves/2" style={{ textDecoration: "none", display: "block", marginBottom: 20 }}>
+          <Link to={`/app/rilobiz/app/waves/${nextWave}`} style={{ textDecoration: "none", display: "block", marginBottom: 20 }}>
             <ApertureCard padding={16} style={{ borderColor: "var(--ap-signal)" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                 <div style={{ minWidth: 0 }}>
-                  <ApertureMonoLabel style={{ color: "var(--ap-signal)" }}>Wave 2 ready</ApertureMonoLabel>
+                  <ApertureMonoLabel style={{ color: "var(--ap-signal)" }}>Wave {nextWave} ready</ApertureMonoLabel>
                   <h3 style={{ margin: "6px 0 2px", fontSize: 15, fontWeight: 600, color: "var(--ap-ink-1)" }}>
                     A short round of focused questions
                   </h3>
@@ -138,111 +138,6 @@ export default function RealHome() {
               </div>
             </ApertureCard>
           </Link>
-        )}
-
-        {/* Daily question */}
-        {dailyQ && (
-          <section style={{ marginBottom: 28 }}>
-            <ApertureMonoLabel style={{ marginBottom: 12, display: "block" }}>Today's question</ApertureMonoLabel>
-            <ApertureCard padding={18}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 10 }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <AperturePrompt
-                    text={dailyQ.prompt}
-                    size={15.5}
-                    style={{ fontWeight: 600, lineHeight: 1.4 }}
-                  />
-                </div>
-                <ApertureChip tone="neutral">{dailyQ.bucket_slug}</ApertureChip>
-              </div>
-              <form
-                onSubmit={e => { e.preventDefault(); saveDaily(); }}
-                style={{ display: "flex", gap: 8, alignItems: "stretch" }}
-              >
-                <input
-                  value={dailyAnswer}
-                  onChange={e => setDailyAnswer(e.target.value)}
-                  placeholder="Type your answer…"
-                  style={{
-                    flex: 1, appearance: "none", outline: "none",
-                    background: "var(--ap-surface-2)",
-                    border: "1px solid var(--ap-hairline)",
-                    borderRadius: "var(--ap-radius-sm)",
-                    padding: "10px 12px", fontSize: 14,
-                    color: "var(--ap-ink-1)", fontFamily: "var(--ap-font-sans)",
-                  }}
-                />
-                <ApertureButton type="submit" variant="accent" disabled={!dailyAnswer.trim() || savingDaily}>
-                  {savingDaily ? "…" : "Save"}
-                </ApertureButton>
-                <ApertureButton type="button" variant="ghost" onClick={() => skipDaily()}>
-                  Skip
-                </ApertureButton>
-              </form>
-            </ApertureCard>
-          </section>
-        )}
-
-        {/* AI suggestions */}
-        {items.length > 0 && (
-          <section style={{ marginBottom: 28 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <ApertureMonoLabel>Next moves</ApertureMonoLabel>
-              <button
-                type="button"
-                onClick={() => refreshSuggestions()}
-                disabled={sLoading}
-                style={{
-                  appearance: "none", cursor: sLoading ? "default" : "pointer",
-                  border: "none", background: "transparent",
-                  color: "var(--ap-ink-3)", fontSize: 11,
-                  fontFamily: "var(--ap-font-mono)", textTransform: "uppercase",
-                  letterSpacing: "0.12em",
-                }}
-              >
-                {sLoading ? "Thinking…" : "Refresh →"}
-              </button>
-            </div>
-
-            {suggestions.length === 0 ? (
-              <ApertureCard padding={18}>
-                <p style={{ margin: 0, fontSize: 13, color: "var(--ap-ink-3)", lineHeight: 1.55 }}>
-                  {sLoading
-                    ? "Reading your memory and picking your sharpest next moves…"
-                    : "I'll suggest concrete next steps here once I've read enough of your memory."}
-                </p>
-              </ApertureCard>
-            ) : (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
-                {suggestions.map((s, idx) => (
-                  <button
-                    key={`${idx}-${s.title}`}
-                    type="button"
-                    onClick={() => startFromSuggestion(s)}
-                    style={{
-                      textAlign: "left", appearance: "none", cursor: "pointer",
-                      padding: 16, background: "var(--ap-surface-1)",
-                      border: "1px solid var(--ap-hairline)",
-                      borderRadius: "var(--ap-radius-md)",
-                      display: "flex", flexDirection: "column", gap: 8,
-                      color: "var(--ap-ink-1)", fontFamily: "var(--ap-font-sans)",
-                    }}
-                  >
-                    <ApertureMonoLabel>Suggestion · {String(idx + 1).padStart(2, "0")}</ApertureMonoLabel>
-                    <h3 style={{ margin: 0, fontSize: 14.5, fontWeight: 600, lineHeight: 1.35 }}>{s.title}</h3>
-                    {s.why && (
-                      <div style={{ color: "var(--ap-ink-3)" }}>
-                        <AperturePrompt text={s.why} size={12.5} />
-                      </div>
-                    )}
-                    <span style={{ marginTop: 4, fontSize: 11, color: "var(--ap-signal)", fontFamily: "var(--ap-font-mono)", textTransform: "uppercase", letterSpacing: "0.12em" }}>
-                      Start chat →
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </section>
         )}
 
         {/* AI suggestions */}
