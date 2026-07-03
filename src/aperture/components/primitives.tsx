@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, CSSProperties, HTMLAttributes, ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { ButtonHTMLAttributes, CSSProperties, HTMLAttributes, ReactNode, useEffect, useRef, useState } from "react";
 import { useApertureTheme } from "./ApertureLayout";
 import { haptic } from "@/lib/haptics";
 
