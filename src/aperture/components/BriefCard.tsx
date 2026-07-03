@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { ApertureCard, ApertureMonoLabel, ApertureButton } from "@/aperture/components/primitives";
-import { RotateCw, ChevronDown, ChevronUp, BarChart3, AlertTriangle, ArrowRight } from "lucide-react";
+import { RotateCw, ChevronDown, ChevronUp, BarChart3, AlertTriangle, ArrowRight, MessageSquare } from "lucide-react";
 import { AperturePrompt } from "@/aperture/components/chat/AperturePrompt";
 
 /**
@@ -21,6 +21,8 @@ export function BriefCard({
   regenerate,
   defaultOpen = false,
   autoExpandIfCached = false,
+  onTalk,
+  talkLabel = "Talk about this",
 }: {
   label: string;
   title: string;
@@ -35,11 +37,17 @@ export function BriefCard({
    *  when nothing is cached, so brand-new buckets stay in the "Show brief"
    *  teaser state instead of force-generating from thin data. */
   autoExpandIfCached?: boolean;
+  /** When set, renders a "Talk about this" CTA after the brief body. Handler
+   *  receives the raw summary + parsed MOVE (if any) so the caller can seed
+   *  a chat opener anchored on the recommended next move. */
+  onTalk?: (args: { summary: string; move: string | null }) => void | Promise<void>;
+  talkLabel?: string;
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const [brief, setBrief] = useState<{ summary: string; generated_at: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [talking, setTalking] = useState(false);
 
   // Prefetch the cached row once so we can show "last updated" without expanding.
   useEffect(() => {
@@ -84,6 +92,15 @@ export function BriefCard({
     if (next) await ensureBrief();
   }
 
+  async function onTalkClick() {
+    if (!onTalk || !brief || talking) return;
+    setTalking(true);
+    try {
+      const move = extractBriefMove(brief.summary);
+      await onTalk({ summary: brief.summary, move });
+    } finally { setTalking(false); }
+  }
+
   return (
     <ApertureCard padding={16}>
       <ApertureMonoLabel>{label}</ApertureMonoLabel>
@@ -125,10 +142,28 @@ export function BriefCard({
           borderTop: "1px solid var(--ap-hairline)",
         }}>
           <BriefBody summary={brief.summary} />
+          {onTalk && (
+            <div style={{
+              marginTop: 16, paddingTop: 12,
+              borderTop: "1px solid var(--ap-hairline)",
+              display: "flex", justifyContent: "flex-start",
+            }}>
+              <ApertureButton variant="accent" onClick={onTalkClick} disabled={talking}>
+                <MessageSquare size={12} /> {talking ? "Opening…" : talkLabel}
+              </ApertureButton>
+            </div>
+          )}
         </div>
       )}
     </ApertureCard>
   );
+}
+
+/** Pulls the first "Move" line out of a parsed brief, if present. */
+export function extractBriefMove(summary: string): string | null {
+  const parsed = parseBrief(summary);
+  const moveItem = parsed?.glance?.find(g => g.kind === "move");
+  return moveItem?.text?.trim() ?? null;
 }
 
 /**
