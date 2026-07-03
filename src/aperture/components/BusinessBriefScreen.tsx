@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/aperture/components/PageHeader";
 import {
-  ApertureCard, ApertureMonoLabel, ApertureButton, ApertureLoading, ApertureChip,
+  ApertureCard, ApertureMonoLabel, ApertureButton, ApertureChip,
 } from "@/aperture/components/primitives";
+import { ApertureProgressOverlay, ApertureProgressStatus } from "@/aperture/components/ApertureProgressOverlay";
 
 type Brief = {
   summary: string;
@@ -27,44 +28,29 @@ export function BusinessBriefScreen({
   onDone: () => void;
 }) {
   const [brief, setBrief] = useState<Brief | null>(null);
-  const [errored, setErrored] = useState(false);
+  const [status, setStatus] = useState<ApertureProgressStatus>("running");
+  const [errMsg, setErrMsg] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const { data, error } = await supabase.functions.invoke("aperture-business-brief", {
-          body: { closing_answer: closingAnswer, flow },
-        });
-        if (cancelled) return;
-        if (error || !data?.brief) {
-          setErrored(true);
-          return;
-        }
-        setBrief(data.brief as Brief);
-      } catch {
-        if (!cancelled) setErrored(true);
-      }
-    })();
-    return () => { cancelled = true; };
+  const run = useCallback(async () => {
+    setStatus("running");
+    setErrMsg(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("aperture-business-brief", {
+        body: { closing_answer: closingAnswer, flow },
+      });
+      if (error) throw error;
+      if (!data?.brief) throw new Error("Empty brief response.");
+      setBrief(data.brief as Brief);
+      setStatus("done");
+    } catch (e: any) {
+      setErrMsg(e?.message ?? "Couldn't build your brief right now.");
+      setStatus("error");
+    }
   }, [closingAnswer, flow]);
 
-  if (errored) {
-    return (
-      <>
-        <PageHeader
-          index="ALL SET"
-          title="You're ready to go."
-          sub="I couldn't draft your brief right now, but everything you shared is saved. We can build on it together."
-        />
-        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}>
-          <ApertureButton variant="accent" onClick={onDone}>Enter RiloBiz →</ApertureButton>
-        </div>
-      </>
-    );
-  }
+  useEffect(() => { run(); }, [run]);
 
-  if (!brief) {
+  if (!brief && status !== "done") {
     return (
       <>
         <PageHeader
@@ -72,7 +58,26 @@ export function BusinessBriefScreen({
           title="Reading everything you shared…"
           sub="I'm pulling your answers together into a short snapshot of your business so we're on the same page before we begin."
         />
-        <ApertureLoading sublabel="Synthesizing memory, closing answer, and source notes into a mini-report." />
+        <ApertureProgressOverlay
+          open
+          status={status}
+          title="Reading your answers"
+          description="Synthesizing memory, closing answer, and source notes into a short mini-report."
+          estimateMs={10000}
+          hardTimeoutMs={25000}
+          steps={[
+            { at: 5, label: "Pulling in your answers…" },
+            { at: 45, label: "Reading source notes…" },
+            { at: 80, label: "Drafting your brief…" },
+          ]}
+          errorMessage={errMsg ?? undefined}
+          onRetry={run}
+          onDismiss={onDone}
+          onHardTimeout={() => {
+            setErrMsg("This is taking longer than expected. You can retry or continue without a brief.");
+            setStatus("error");
+          }}
+        />
       </>
     );
   }

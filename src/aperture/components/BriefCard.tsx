@@ -111,12 +111,12 @@ export function BriefCard({
         {teaser}
       </p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-        <ApertureButton variant="accent" size="sm" onClick={onToggle} disabled={busy}>
+        <ApertureButton variant="accent" size="sm" onClick={onToggle} loading={busy && !brief}>
           {open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
           {busy && !brief ? "Reading…" : open ? "Hide" : "Show brief"}
         </ApertureButton>
         {brief && (
-          <ApertureButton variant="ghost" size="sm" onClick={onReset} disabled={busy}>
+          <ApertureButton variant="ghost" size="sm" onClick={onReset} loading={busy}>
             <RotateCw size={12} /> {busy ? "Refreshing…" : "Reset"}
           </ApertureButton>
         )}
@@ -148,7 +148,7 @@ export function BriefCard({
               borderTop: "1px solid var(--ap-hairline)",
               display: "flex", justifyContent: "flex-start",
             }}>
-              <ApertureButton variant="accent" onClick={onTalkClick} disabled={talking}>
+              <ApertureButton variant="accent" onClick={onTalkClick} loading={talking}>
                 <MessageSquare size={12} /> {talking ? "Opening…" : talkLabel}
               </ApertureButton>
             </div>
