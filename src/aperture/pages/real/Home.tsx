@@ -19,10 +19,10 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function RealHome() {
   const navigate = useNavigate();
-  const { buckets, loading: bLoading } = useApertureBucketsDB();
-  const { items, loading: mLoading, saveBucketAnswer } = useApertureMemoryDB();
+  const { items, saveBucketAnswer } = useApertureMemoryDB();
   const { createChat } = useApertureChatsDB();
   const { profile, loading: pLoading } = useApertureUserProfile();
+  const { user } = useAuth();
   const { question: dailyQ, refresh: refreshDailyQ, skip: skipDaily } = useApertureDailyQuestion();
   const { suggestions: storedSuggestions, loading: storedLoading, refresh: refreshStored, markActed } = useApertureStoredSuggestions();
   const { suggestions: liveSuggestions, loading: liveLoading, refresh: refreshLive } = useApertureHomeSuggestions(items.length);
@@ -40,6 +40,25 @@ export default function RealHome() {
   const [dailyAnswer, setDailyAnswer] = useState("");
   const [savingDaily, setSavingDaily] = useState(false);
 
+  // Next wave number (same logic as Memory page)
+  const [nextWave, setNextWave] = useState<number>(2);
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("aperture_waves")
+        .select("wave_number,status")
+        .eq("user_id", user.id);
+      if (cancelled || !data) return;
+      const maxComplete = data
+        .filter((r: any) => r.status === "complete")
+        .reduce((m: number, r: any) => Math.max(m, r.wave_number as number), 1);
+      setNextWave(Math.max(2, maxComplete + 1));
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
   // First-time visit → push to Essential Onboarding.
   // Legacy users who completed the old "quick" flow are treated as onboarded.
   if (!pLoading && profile && !profile.essential_onboarded_at && !profile.quick_onboarded_at) {
@@ -50,7 +69,6 @@ export default function RealHome() {
   }
 
   const knownCount = items.length;
-  const hasBuckets = buckets.length > 0;
 
   async function handleSend(text: string) {
     const t = text.trim();
