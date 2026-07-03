@@ -43,6 +43,19 @@ export function SourceDetailSheet({
 
   const facts = useMemo(() => summary ? factsFor(summary.kind) : [], [summary, factsFor]);
 
+  const pages = useMemo(() => {
+    const raw = (summary?.snapshot?.meta as any)?.pages;
+    return Array.isArray(raw) ? raw as Array<{ url: string; page_type: string; len: number; text?: string }> : [];
+  }, [summary]);
+
+  const stale = useMemo(() => {
+    const iso = summary?.snapshot?.fetched_at;
+    if (!iso) return false;
+    return Date.now() - new Date(iso).getTime() > 7 * 24 * 60 * 60 * 1000;
+  }, [summary]);
+
+  const [openPages, setOpenPages] = useState<Record<number, boolean>>({});
+
   // Group facts by bucket so users see structure ("Products (3), Basics (2)…")
   // instead of a flat list. Sort by count desc.
   const factsByBucket = useMemo(() => {
@@ -147,8 +160,9 @@ export function SourceDetailSheet({
             </ApertureChip>
             <ApertureChip tone="neutral">{facts.length} facts</ApertureChip>
             {summary.snapshot?.fetched_at && (
-              <span style={{ fontSize: 11, color: "var(--ap-ink-3)" }}>
+              <span style={{ fontSize: 11, color: stale ? "var(--ap-signal)" : "var(--ap-ink-3)" }}>
                 Last checked {new Date(summary.snapshot.fetched_at).toLocaleString()}
+                {stale && " — refresh?"}
               </span>
             )}
           </div>
