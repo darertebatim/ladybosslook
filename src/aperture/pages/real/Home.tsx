@@ -100,6 +100,27 @@ export default function RealHome() {
 
   const knownCount = items.length;
 
+  // ─── Memory Level ─────────────────────────────────────────────────────────
+  const factCount = items.filter(i => !["skipped", "unknown"].includes(String(i.source))).length;
+  const onboarded = !!profile?.full_onboarded_at || factCount > 0;
+  const computedLevel = computeMemoryLevel(factCount, onboarded);
+  const LEVEL_FLOOR_KEY = "rilobiz.memoryLevel.floor";
+  const [level, setLevel] = useState<number>(() => {
+    if (typeof window === "undefined") return computedLevel;
+    const floor = Number(window.localStorage.getItem(LEVEL_FLOOR_KEY) ?? 0);
+    return Math.max(floor, computedLevel);
+  });
+  useEffect(() => {
+    const next = Math.max(level, computedLevel);
+    if (next !== level) setLevel(next);
+    try { window.localStorage.setItem(LEVEL_FLOOR_KEY, String(next)); } catch {}
+  }, [computedLevel, level]);
+  const prevT = prevThreshold(level);
+  const nextT = nextThreshold(level);
+  const span = Math.max(1, nextT - prevT);
+  const intoLevel = Math.max(0, factCount - prevT);
+  const levelPct = Math.min(100, Math.round((intoLevel / span) * 100));
+
   async function handleSend(text: string) {
     const t = text.trim();
     if (!t || starting) return;
