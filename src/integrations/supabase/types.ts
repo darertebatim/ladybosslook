@@ -1420,6 +1420,51 @@ export type Database = {
         }
         Relationships: []
       }
+      aperture_tool_card_questions: {
+        Row: {
+          answer_text: string | null
+          answered_at: string | null
+          bucket_slug: string
+          card_key: string
+          created_at: string
+          generated_at: string
+          id: string
+          is_active: boolean
+          question_index: number
+          question_text: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answer_text?: string | null
+          answered_at?: string | null
+          bucket_slug: string
+          card_key: string
+          created_at?: string
+          generated_at?: string
+          id?: string
+          is_active?: boolean
+          question_index?: number
+          question_text: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answer_text?: string | null
+          answered_at?: string | null
+          bucket_slug?: string
+          card_key?: string
+          created_at?: string
+          generated_at?: string
+          id?: string
+          is_active?: boolean
+          question_index?: number
+          question_text?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       aperture_tools: {
         Row: {
           categories: string[]
@@ -1500,6 +1545,7 @@ export type Database = {
           instagram: string | null
           owner_name: string | null
           quick_onboarded_at: string | null
+          tool_onboarding_done_at: string | null
           updated_at: string
           user_id: string
           user_locked: boolean
@@ -1515,6 +1561,7 @@ export type Database = {
           instagram?: string | null
           owner_name?: string | null
           quick_onboarded_at?: string | null
+          tool_onboarding_done_at?: string | null
           updated_at?: string
           user_id: string
           user_locked?: boolean
@@ -1530,6 +1577,7 @@ export type Database = {
           instagram?: string | null
           owner_name?: string | null
           quick_onboarded_at?: string | null
+          tool_onboarding_done_at?: string | null
           updated_at?: string
           user_id?: string
           user_locked?: boolean

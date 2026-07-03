@@ -1,79 +1,50 @@
-# RiloBiz — Essential Onboarding + Waves + Chat Cleanup
 
-Implements Claude's 6-step brief on top of the current codebase.
+This is a big one — sequencing exactly the way the plan doc's section 11 suggests, batched into two shippable waves so you can test between them.
 
-## Step 1 — Replace onboarding with Essential Onboarding (28 screens)
+## Wave A — plumbing (ship first, verifiable end-to-end)
 
-**DB (migration)**
-- Keep `aperture_onboarding_questions` but repopulate for a single flow. Introduce `flow = 'essential'` and 5 sections: `phase1_identifiers`, `phase2_core`, `phase3_research`, `phase4_contact`, `phase5_closing`.
-- Add `signal_key` (text, nullable) so each Phase 2 question has a stable ID (`Q1`…`Q21`) usable by the Wave 2 signal-table lookup.
-- Deactivate every existing `flow IN ('quick','full')` row (`is_active=false`), don't delete — preserved as deferred bank per essential_onboarding.md §Deferred.
-- Insert the 28 new rows from `docs/rilobiz/wave2/essential_onboarding.md` (Phase 1×2, Phase 2×21, Phase 3×2, Phase 4×3, Phase 5×1) with `bucket_slugs` populated so answers still route into memory.
-- On `aperture_user_profile`: add `essential_onboarded_at timestamptz`, keep the legacy `quick_onboarded_at` / `full_onboarded_at` for back-compat but stop reading them.
+1. **Nav item.** Add `Tools` to `RealAppShell` sidebar + mobile bar (icon = plug). Route already exists at `/app/rilobiz/app/tools`.
+2. **Mutual exclusivity fix.** In `togglePick`, when a real tool is turned on, deactivate `nothing_yet__<cat>` and `spreadsheet_or_notes__<cat>` for that category. When a marker is turned on, deactivate all real tools in that category. (Markers already exclude each other — extend to real tools.)
+3. **Tool Onboarding pass (first-visit).** Detect "user has zero `aperture_user_tools` rows" → render a slimmed picker-only mode ("Tap what you use, category by category, then continue"). On tap **Continue**, mark a `tool_onboarding_done_at` field on `aperture_user_profile` and redirect to the living Tools page. Existing users with any picks are treated as done.
+4. **Static category order (section 6).** Replace current order in `TOOL_CATEGORY_GROUPS` iteration with: Marketing & Social → Communication → Email & CRM → Payments → Scheduling → E-commerce → Website & Domain → everything else. Categories with no picks/gaps are skipped in the living view (still shown during onboarding).
+5. **Data model.**
+   - New table `aperture_tool_card_questions` (`user_id, card_key, question_text, answer_text, generated_at, answered_at, is_active`). `card_key` = `tool:<slug>` | `gap:<category>` | `multi:<category>`.
+   - Answers additionally insert into `aperture_memory_items` (tag `source='tool_card'`, `question_key='tool_card__<card_key>__<hash>'`, bucket routed via `bucketForCategory` or AI).
+   - GRANTs + RLS scoped to `auth.uid()`.
 
-**Frontend**
-- Delete `OnboardQuick.tsx` + `OnboardFull.tsx` from the user path. Router: `/aperture/onboarding` → single new `OnboardEssential.tsx` that walks the 28 screens one-per-screen (reuses existing chip / open-field renderer).
-- After Phase 3 (IG + website), call `aperture-onboarding-research` for the confirmation card (already exists, updated in Step 6). Keep `OnboardConfirm.tsx`.
-- On completion → write `essential_onboarded_at`, hand off to Home.
+## Wave B — living cards (the actual redesign)
 
-## Step 2 — Layer + half tagging on memory
+6. **Card model (sections 4, 4b, 5).** New `ToolCard` component:
+   - Renders collapsed by default (title + tool/gap name + state chip).
+   - On tap: if no cached questions → call edge fn `aperture-tool-card-generate` → cache 3 questions in `aperture_tool_card_questions` → render. If answered → also render the 3 suggestions.
+   - Wave-runner style open textareas per question. Submit → writes answer to card_questions + memory_items → fetches suggestions (same edge fn, mode=`suggestions`).
+   - "Ask me something new" button once all 3 are answered → deletes/marks-inactive old row set, generates a fresh 3.
+   - **Multi-tool card** auto-appears when a category has ≥2 real tools (card_key `multi:<category>`).
+   - Top 1-2 cards per category expanded by default; rest collapsed.
 
-**DB (migration)** — no new buckets, only tags on `aperture_memory_items`:
-- `layer text` — one of `revenue_engine | owner_capacity | financial_health | direction` (nullable; not every fact needs it).
-- `bucket_half text` — for the split buckets only:
-  - customers → `icp` | `existing`
-  - money → `revenue` | `cost`
-  - products → `front` | `back`
-  - partners → `referrals` | `suppliers` | `delivery`
-- CHECK constraints per bucket_slug so bad combos are rejected. Backfill: leave existing rows NULL (safe).
-- Same two columns on `aperture_bucket_questions` so the bank knows which half/layer each question serves — Wave 2 selector reads this.
+7. **Edge function `aperture-tool-card-generate`.**
+   - Input: `{ card_key, mode: 'questions' | 'suggestions' }`.
+   - Loads: user memory for the bucket + full stack (`aperture_user_tools`) + bucket relationship map + already-asked questions for this card_key.
+   - `questions` mode → returns 3 questions (Q1 = satisfaction/priority check per plan section 4). Persists them.
+   - `suggestions` mode → returns 3 suggestions ordered per plan (RiloBiz-native first).
 
-## Step 3 — Waves surface on Memory page
+8. **Batch quick-pass card (section 7).**
+   - Passive: on Tools page load, count rows in `aperture_tool_card_questions` where `answer_text IS NULL AND is_active`.
+   - If count ≥ 7, render a single card above the category list: "You've got N quick questions waiting — answer them in one pass?" → opens a modal listing all pending questions (reuses same submit path).
 
-**DB**
-- New table `aperture_waves`: `id, user_id, wave_number int, status ('ready'|'in_progress'|'complete'|'skipped'), selected_at, completed_at, question_payload jsonb` (the selector's JSON), `active_layers text[]`, `reasoning_summary text`.
-- Answers already fit `aperture_memory_items` — add `wave_number int` + set `source = 'wave_answer'`.
+Chat/Brief pair (section 10) — already exists on the page, kept as-is.
 
-**Frontend (`Memory.tsx`)**
-- Add "Wave 2 ready" card above the existing memory grid. Tap → calls `aperture-wave-selector` edge function (loading state "Preparing your next wave…") → routes to a new `WaveRunner.tsx` form flow.
-- `WaveRunner.tsx`: one question per screen (same shell as OnboardEssential), Skip / I-don't-know footer links per question, progress dots, completion screen. Uses `[OPTIONS]` chips already in codebase.
-- On finish → mark wave `complete`, write answers as memory items tagged with `wave_number`, `layer`, `bucket_half` (from selector payload).
+## Technical notes
 
-## Step 4 — `aperture-wave-selector` edge function (GPT)
+- Reuse Wave 2 answer input component from `WaveRunner.tsx` (open textarea, submit) for card questions — no new input primitive.
+- `SourceCard` block ("Your sources") stays exactly where it is (plan §1b).
+- No changes to `INTEGRATIONS` block; the "Coming soon" section stays for now.
+- `aperture_user_profile.tool_onboarding_done_at TIMESTAMPTZ NULL` — nullable so existing users default to null = "treat as done if they already picked tools".
 
-- New function `supabase/functions/aperture-wave-selector/index.ts`.
-- Input: `{ wave_number: 2 }` (Wave 3+ deferred).
-- Assembles: system prompt (from `wave_2_selector_prompt.md` §System Prompt), + full text of `bucket_relationship_map.md` + `essential_onboarding_signal_table.md` (bundled as string constants in the function so no runtime fetch), + user's essential onboarding answers, + memory pool state per bucket (`fill_count`, `already_answered_question_ids`, `pass_1_inferred_items`), + filtered bucket question bank (14 defaults + user's industry bucket).
-- Model: `openai/gpt-5.4` via Lovable AI Gateway (chat completions). Logs cost via existing `logAiUsage` helper.
-- Returns strict JSON per the spec. Server-side guardrails (all six in the doc): dedupe vs answered, ≤11/bucket retry-once, Revenue Engine sanity flag, question-ID validation, options 3–6, sequence sort (opening first).
-- Persists the returned payload to `aperture_waves.question_payload`.
+## What I'll skip until you confirm
 
-## Step 5 — Chat separation from memory-filling
+- Splitting migrations for approval — I'll bundle all schema in one migration.
+- Building an admin surface for tool cards.
+- Analytics / instrumentation beyond `aperture_ai_usage` (already logs edge fn spend).
 
-- `aperture-chat/index.ts` system prompt rewrite: explicit "You answer the user's question. You do NOT drive a question flow. If the user asks nothing, don't push. Background fact-extraction happens elsewhere — do not narrate it."
-- Remove any current logic that appends "next question" prompts (audit `apertureChat.ts` / `composeOpener.ts`).
-- Keep the existing background fact-extraction path (chat → `aperture_memory_items` with `source='chat_extracted'`) untouched.
-
-## Step 6 — Pass 1 map-aware upgrade
-
-- `aperture-onboarding-research` + `aperture-pass1-prefill`: prompt updates only.
-  - Load `bucket_relationship_map.md` + `essential_onboarding_signal_table.md` as system context.
-  - Instruct the model to identify active layers from the user's essential answers first, then bias pre-fill guesses into those layers' buckets (still writes across all 14, just weights inference effort).
-  - Every inferred item gets `layer` + `bucket_half` set on write.
-  - Model swap Gemini → `openai/gpt-5-mini` (matches "not Gemini" directive; keeps cost reasonable for pre-fill).
-
-## Sequencing (matches Claude's brief)
-
-Parallel: Step 1, Step 2, Step 5.
-Then: Step 3 (needs 1).
-Then: Step 4 (needs 2 + 3).
-Anytime: Step 6.
-
-## Explicitly NOT in this plan
-Wave 3+ selector, chat-steer override into next wave, home-page fix, relevance scoring, learned weights.
-
-## Open decisions before I build
-
-1. **Old onboarding rows** — deactivate (recommended, keeps deferred bank) vs hard-delete. I'll deactivate unless you say otherwise.
-2. **Users mid-onboarding on the old quick/full flow** — force them into the new essential flow on next open? (Recommended: yes; old flow disappears.)
-3. **`layer` / `bucket_half` for existing memory items** — leave NULL and let waves/Pass 1 tag new writes only, or run a one-shot AI backfill on existing user_confirmed items? (Recommended: leave NULL for launch; add backfill later if needed.)
+Want me to ship **Wave A first** and let you test, then follow with Wave B? Or do the whole thing in one go?
