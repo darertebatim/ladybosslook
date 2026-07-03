@@ -20,6 +20,7 @@ export function BriefCard({
   load,
   regenerate,
   defaultOpen = false,
+  autoExpandIfCached = false,
 }: {
   label: string;
   title: string;
@@ -30,6 +31,10 @@ export function BriefCard({
   regenerate: () => Promise<{ summary: string; generated_at: string }>;
   /** Render already expanded on mount (with brief auto-loaded). */
   defaultOpen?: boolean;
+  /** Auto-expand once the initial prefetch finds a cached brief. Skips expansion
+   *  when nothing is cached, so brand-new buckets stay in the "Show brief"
+   *  teaser state instead of force-generating from thin data. */
+  autoExpandIfCached?: boolean;
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const [brief, setBrief] = useState<{ summary: string; generated_at: string } | null>(null);
@@ -39,7 +44,11 @@ export function BriefCard({
   // Prefetch the cached row once so we can show "last updated" without expanding.
   useEffect(() => {
     let alive = true;
-    void load().then(b => { if (alive && b) setBrief(b); });
+    void load().then(b => {
+      if (!alive || !b) return;
+      setBrief(b);
+      if (autoExpandIfCached) setOpen(true);
+    });
     if (defaultOpen) { void ensureBrief(); }
     return () => { alive = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
