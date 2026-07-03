@@ -101,15 +101,6 @@ export default function RealHome() {
     return () => { cancelled = true; };
   }, [user]);
 
-  // First-time visit → push to Essential Onboarding.
-  // Legacy users who completed the old "quick" flow are treated as onboarded.
-  if (!pLoading && profile && !profile.essential_onboarded_at && !profile.quick_onboarded_at) {
-    return <Navigate to="/app/rilobiz/app/onboard/essential" replace />;
-  }
-  if (!pLoading && !profile) {
-    return <Navigate to="/app/rilobiz/app/onboard/essential" replace />;
-  }
-
   const knownCount = items.length;
 
   // ─── Memory Level ─────────────────────────────────────────────────────────
@@ -127,6 +118,16 @@ export default function RealHome() {
     if (next !== level) setLevel(next);
     try { window.localStorage.setItem(LEVEL_FLOOR_KEY, String(next)); } catch {}
   }, [computedLevel, level]);
+
+  // First-time visit → push to Essential Onboarding.
+  // Legacy users who completed the old "quick" flow are treated as onboarded.
+  if (!pLoading && profile && !profile.essential_onboarded_at && !profile.quick_onboarded_at) {
+    return <Navigate to="/app/rilobiz/app/onboard/essential" replace />;
+  }
+  if (!pLoading && !profile) {
+    return <Navigate to="/app/rilobiz/app/onboard/essential" replace />;
+  }
+
   const prevT = prevThreshold(level);
   const nextT = nextThreshold(level);
   const span = Math.max(1, nextT - prevT);
