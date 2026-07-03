@@ -102,6 +102,7 @@ export default function OnboardEssential() {
             .in("question_key", ["specific_industry", "industry_group"]);
         }
       } catch { /* non-critical */ }
+      return; // industry handled fully above; skip generic slug save.
     }
 
     // Memory write — tag with wave_number=1 and signal_key so selector can find it.
