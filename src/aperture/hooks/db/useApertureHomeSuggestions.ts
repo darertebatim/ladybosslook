@@ -8,6 +8,23 @@ export interface HomeSuggestion {
   prompt: string;
 }
 
+/**
+ * Build a stable signature over the user's memory that only rotates when
+ * *meaningful* facts change. We deliberately ignore `ai_extracted` (which
+ * churns from every chat turn), `skipped`, and `unknown` — those would
+ * otherwise bust the daily cache constantly.
+ *
+ * Signature = count of user-authored active facts. Stable across a day
+ * as long as the user doesn't confirm/add/edit new facts themselves.
+ */
+export function computeMemorySignature(
+  items: ReadonlyArray<{ source?: string | null; is_active?: boolean | null }>,
+): string {
+  const MEANINGFUL = new Set(["bucket_answer", "freeform", "user_confirmed"]);
+  const n = items.filter(i => (i.is_active ?? true) && MEANINGFUL.has(String(i.source ?? ""))).length;
+  return n === 0 ? "empty" : `v1:${n}`;
+}
+
 interface CachedPayload {
   day: number;
   memorySig: string;
