@@ -82,7 +82,27 @@ export default function OnboardEssential() {
         } as any, { onConflict: "user_id,tool_slug" });
       }
     }
-    if (qq.question_key === "industry") await upsertProfile({ industry_slug: v });
+    if (qq.question_key === "industry") {
+      await upsertProfile({ industry_slug: v });
+      // Also save human-readable industry label + group as memory facts, so
+      // GPT sees e.g. "Café" + "Food & Hospitality" instead of raw slugs.
+      const ind = industries.find(i => i.slug === v);
+      const specificLabel = ind?.label ?? v;
+      const groupLabel = ind?.group_label ?? "";
+      try {
+        await saveBucketAnswer("basics", "specific_industry", specificLabel);
+        if (groupLabel) await saveBucketAnswer("basics", "industry_group", groupLabel);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase
+            .from("aperture_memory_items")
+            .update({ wave_number: 1 } as any)
+            .eq("user_id", user.id)
+            .eq("bucket_slug", "basics")
+            .in("question_key", ["specific_industry", "industry_group"]);
+        }
+      } catch { /* non-critical */ }
+    }
 
     // Memory write — tag with wave_number=1 and signal_key so selector can find it.
     const target = (qq.bucket_slugs && qq.bucket_slugs[0]) ?? "basics";
