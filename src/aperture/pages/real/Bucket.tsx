@@ -240,6 +240,19 @@ export default function RealBucketPage() {
             title={`What I know about ${bucket.title}`}
             teaser="A short read-back of what I've pieced together for this bucket. Reset anytime to refresh."
             autoExpandIfCached
+            onTalk={async ({ move }) => {
+              if (!bucket) return;
+              const opener = move
+                ? `From your ${bucket.title} brief, here's the move I'd zero in on:\n\n"${move}"\n\nWant to break this down together? Where do you want to start — the first concrete step, what's blocking it, or how you'd know it's working?`
+                : `Let's dig into your ${bucket.title} brief. Where do you want to start?`;
+              const chat = await createChat({
+                title: `${bucket.title} · brief`,
+                entry_point: "bucket_specific",
+                bucket_slug: bucket.slug,
+                opener,
+              });
+              if (chat) navigate(`/app/rilobiz/app/chats/${chat.id}`);
+            }}
             load={async () => {
               if (!user || !slug) return null;
               const { data } = await supabase

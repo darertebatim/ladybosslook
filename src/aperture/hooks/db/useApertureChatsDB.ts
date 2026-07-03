@@ -102,12 +102,18 @@ const DEFAULT_OPENER = `What would you like to work on today?
     const providedOpener = opts.opener?.trim();
     let opener: string | null = null;
     if (entry_point === "general_chat") {
-      const { count } = await supabase
-        .from("aperture_memory_items")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .eq("is_active", true);
-      if (!count || count === 0) opener = providedOpener || DEFAULT_OPENER;
+      if (providedOpener) {
+        // Caller supplied a grounded opener (e.g. "Talk about this brief")
+        // — always seed it, regardless of whether memory exists.
+        opener = providedOpener;
+      } else {
+        const { count } = await supabase
+          .from("aperture_memory_items")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("is_active", true);
+        if (!count || count === 0) opener = DEFAULT_OPENER;
+      }
     } else {
       opener = providedOpener || DEFAULT_OPENER;
     }
