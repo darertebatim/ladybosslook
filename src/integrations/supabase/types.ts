@@ -1426,12 +1426,17 @@ export type Database = {
           answered_at: string | null
           bucket_slug: string
           card_key: string
+          card_kind: string | null
+          card_label: string | null
+          category: string | null
           created_at: string
           generated_at: string
+          generation_batch: number
           id: string
           is_active: boolean
           question_index: number
           question_text: string
+          row_kind: string
           updated_at: string
           user_id: string
         }
@@ -1440,12 +1445,17 @@ export type Database = {
           answered_at?: string | null
           bucket_slug: string
           card_key: string
+          card_kind?: string | null
+          card_label?: string | null
+          category?: string | null
           created_at?: string
           generated_at?: string
+          generation_batch?: number
           id?: string
           is_active?: boolean
           question_index?: number
           question_text: string
+          row_kind?: string
           updated_at?: string
           user_id: string
         }
@@ -1454,12 +1464,17 @@ export type Database = {
           answered_at?: string | null
           bucket_slug?: string
           card_key?: string
+          card_kind?: string | null
+          card_label?: string | null
+          category?: string | null
           created_at?: string
           generated_at?: string
+          generation_batch?: number
           id?: string
           is_active?: boolean
           question_index?: number
           question_text?: string
+          row_kind?: string
           updated_at?: string
           user_id?: string
         }

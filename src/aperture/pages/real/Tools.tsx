@@ -17,6 +17,7 @@ import { useApertureSources, type SourceSummary } from "@/aperture/hooks/db/useA
 import { BriefCard } from "@/aperture/components/BriefCard";
 import { useApertureChatsDB } from "@/aperture/hooks/db/useApertureChatsDB";
 import { useNavigate } from "react-router-dom";
+import { LivingToolCards } from "@/aperture/components/LivingToolCards";
 
 interface UserToolRow {
   id: string;
@@ -458,6 +459,9 @@ export default function RealTools() {
           <ApertureLoading label="Loading…" />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+            {!firstVisit && (
+              <LivingToolCards userToolRows={rows} />
+            )}
             {TOOL_CATEGORY_GROUPS.map((cat) => {
               const tools = grouped.get(cat.label) ?? [];
               if (tools.length === 0) return null;
