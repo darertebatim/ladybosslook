@@ -118,7 +118,7 @@
   "overrides": {
     "minimatch": "^9.0.5",
     "tar": "^7.4.3",
-    "@xmldom/xmldom": "^0.9.11",
+    "@xmldom/xmldom": "^0.8.11",
     "@isaacs/brace-expansion": "^5.0.0",
     "brace-expansion": "^4.0.1",
     "glob": "^10.4.5",
