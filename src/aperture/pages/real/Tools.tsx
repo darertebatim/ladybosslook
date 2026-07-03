@@ -634,6 +634,26 @@ export default function RealTools() {
           </div>
         )}
       </RealAppShell>
+      {firstVisit && (
+        <div
+          style={{
+            position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 20,
+            padding: "12px 16px calc(12px + env(safe-area-inset-bottom))",
+            background: "var(--ap-surface-1)",
+            borderTop: "1px solid var(--ap-hairline)",
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+          }}
+        >
+          <span style={{ fontSize: 12.5, color: "var(--ap-ink-2)" }}>
+            {activeSet.size === 0
+              ? "Pick anything you use — you can always change it later."
+              : `${activeSet.size} picked. You can keep going or continue now.`}
+          </span>
+          <ApertureButton variant="accent" onClick={finishOnboarding} disabled={savingContinue}>
+            {savingContinue ? "Saving…" : "Continue →"}
+          </ApertureButton>
+        </div>
+      )}
       <SourceDetailSheet
         summary={openSource}
         open={!!openSource}
