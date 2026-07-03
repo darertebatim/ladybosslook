@@ -165,7 +165,7 @@ export function useApertureChatMessages(chatId: string | undefined) {
     setLoading(true);
     const { data } = await supabase
       .from("aperture_messages")
-      .select("id,chat_id,role,content,created_at,attachments")
+      .select("id,chat_id,role,content,created_at,attachments,is_memory_question,bucket_slug")
       .eq("chat_id", chatId)
       .order("created_at", { ascending: true });
     setMessages((data ?? []) as MessageRow[]);
