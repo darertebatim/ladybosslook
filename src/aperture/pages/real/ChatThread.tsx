@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { RealAppShell } from "@/aperture/components/RealAppShell";
 import { ApertureChip, ApertureMonoLabel } from "@/aperture/components/primitives";
