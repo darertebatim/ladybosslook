@@ -220,21 +220,37 @@ Each item must also carry its own \`source\` (which INPUT source the fact came f
     }
 
     let written = 0;
-    // Tag each extracted fact with a source-scoped question_key so the
-    // Source detail sheet can filter facts that came from this source.
-    const sourceTag = sources[0]?.label ?? "ai";
+    // On refetch, sweep out prior AI-extracted facts for THIS source so a
+    // successful re-run doesn't just pile duplicates on top. Locked
+    // (user-edited) facts are preserved via locked_from_refetch.
+    if (targeted && source) {
+      await supabase
+        .from("aperture_memory_items")
+        .update({ is_active: false })
+        .eq("user_id", user.id)
+        .eq("source_kind", source)
+        .eq("source", "ai_extracted")
+        .eq("locked_from_refetch", false);
+    }
+    const VALID_SOURCE_KINDS = new Set(["website", "instagram"]);
     let seq = 0;
     for (const it of items) {
+      const factSource: string = VALID_SOURCE_KINDS.has((it as any).source)
+        ? (it as any).source
+        : (sources.length === 1 ? sources[0].label : "website");
       const slugFact = it.fact.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 40);
-      const questionKey = `${sourceTag}__${slugFact || `fact_${++seq}`}`;
+      const questionKey = `${factSource}__${slugFact || `fact_${++seq}`}`;
+      const pageType = (it as any).page_type ?? null;
       const { error } = await supabase.from("aperture_memory_items").insert({
         user_id: user.id,
         content: it.fact.trim().slice(0, 280),
         source: "ai_extracted",
+        source_kind: factSource,
         bucket_slug: it.bucket,
         question_key: questionKey,
         layer: (it as any).layer ?? DEFAULT_LAYER_BY_BUCKET[it.bucket] ?? "Revenue Engine",
         wave_number: 1,
+        metadata: pageType ? { page_type: pageType } : {},
       });
       if (!error) {
         written++;
@@ -242,6 +258,7 @@ Each item must also carry its own \`source\` (which INPUT source the fact came f
           bucket_slug: it.bucket,
           content: it.fact.trim().slice(0, 280),
           source: "ai_extracted",
+          source_kind: factSource,
           origin: targeted ? "source_refetch" : "onboarding_phase3",
         });
       }
