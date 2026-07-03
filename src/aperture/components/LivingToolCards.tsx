@@ -52,6 +52,10 @@ export function LivingToolCards({ userToolRows }: Props) {
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, string>>({}); // key = row id
+  // Batch "quick pass" mode: when true, saving an answer auto-advances to the
+  // next card that still has an unanswered question, so the user can burn
+  // through the queue in one pass without leaving Tools.
+  const [batchMode, setBatchMode] = useState(false);
 
   const refresh = useCallback(async () => {
     if (!user) return;
@@ -192,6 +196,17 @@ export function LivingToolCards({ userToolRows }: Props) {
       if (allAnswered && !hasSugs) {
         await generate(card, "suggestions");
       }
+      // Batch mode: hop to the next unanswered question across all cards.
+      if (batchMode) {
+        const remaining = rows.filter(
+          (r) => r.row_kind === "question" && !r.answer_text && r.id !== row.id,
+        );
+        if (remaining.length > 0) {
+          setOpenKey(remaining[0].card_key);
+        } else {
+          setBatchMode(false);
+        }
+      }
     } finally {
       setBusy(null);
     }
@@ -221,10 +236,13 @@ export function LivingToolCards({ userToolRows }: Props) {
             size="sm"
             onClick={() => {
               const first = unansweredQs[0];
-              if (first) setOpenKey(first.card_key);
+              if (first) {
+                setBatchMode(true);
+                setOpenKey(first.card_key);
+              }
             }}
           >
-            Jump to first →
+            {batchMode ? "In quick pass — keep going →" : "Start quick pass →"}
           </ApertureButton>
         </ApertureCard>
       )}
