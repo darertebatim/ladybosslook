@@ -1434,6 +1434,8 @@ export type Database = {
           generation_batch: number
           id: string
           is_active: boolean
+          open_field: boolean
+          options: Json
           question_index: number
           question_text: string
           row_kind: string
@@ -1453,6 +1455,8 @@ export type Database = {
           generation_batch?: number
           id?: string
           is_active?: boolean
+          open_field?: boolean
+          options?: Json
           question_index?: number
           question_text: string
           row_kind?: string
@@ -1472,6 +1476,8 @@ export type Database = {
           generation_batch?: number
           id?: string
           is_active?: boolean
+          open_field?: boolean
+          options?: Json
           question_index?: number
           question_text?: string
           row_kind?: string
