@@ -327,29 +327,61 @@ export function LivingToolCards({ userToolRows }: Props) {
                               <span>{q.answer_text}</span>
                             </div>
                           ) : (
-                            <div style={{ display: "flex", gap: 6 }}>
-                              <textarea
-                                value={drafts[q.id] ?? ""}
-                                onChange={(e) => setDrafts((d) => ({ ...d, [q.id]: e.target.value }))}
-                                placeholder="Your answer…"
-                                rows={2}
-                                style={{
-                                  flex: 1, padding: "8px 10px",
-                                  borderRadius: 8,
-                                  border: "1px solid var(--ap-hairline-strong)",
-                                  background: "var(--ap-surface-1)", color: "var(--ap-ink-1)",
-                                  fontSize: 13, fontFamily: "var(--ap-font-sans)", resize: "vertical",
-                                }}
-                              />
-                              <ApertureButton
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => saveAnswer(card, q)}
-                                loading={busy === q.id}
-                                disabled={!(drafts[q.id] ?? "").trim()}
-                              >
-                                Save
-                              </ApertureButton>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                              {Array.isArray(q.question_options) && q.question_options.length > 0 && (
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                                  {q.question_options.map((opt) => (
+                                    <button
+                                      key={opt}
+                                      type="button"
+                                      disabled={busy === q.id}
+                                      onClick={() => saveAnswer(card, q, opt)}
+                                      style={{
+                                        appearance: "none",
+                                        padding: "6px 12px",
+                                        borderRadius: 999,
+                                        border: "1px solid var(--ap-hairline-strong)",
+                                        background: "var(--ap-surface-1)",
+                                        color: "var(--ap-ink-1)",
+                                        fontSize: 12.5,
+                                        fontFamily: "var(--ap-font-sans)",
+                                        cursor: busy === q.id ? "wait" : "pointer",
+                                        textAlign: "left",
+                                      }}
+                                    >
+                                      {opt}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                              <div style={{ display: "flex", gap: 6 }}>
+                                <textarea
+                                  value={drafts[q.id] ?? ""}
+                                  onChange={(e) => setDrafts((d) => ({ ...d, [q.id]: e.target.value }))}
+                                  placeholder={
+                                    Array.isArray(q.question_options) && q.question_options.length > 0
+                                      ? "Or type your own…"
+                                      : "Your answer…"
+                                  }
+                                  rows={2}
+                                  style={{
+                                    flex: 1, padding: "8px 10px",
+                                    borderRadius: 8,
+                                    border: "1px solid var(--ap-hairline-strong)",
+                                    background: "var(--ap-surface-1)", color: "var(--ap-ink-1)",
+                                    fontSize: 13, fontFamily: "var(--ap-font-sans)", resize: "vertical",
+                                  }}
+                                />
+                                <ApertureButton
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => saveAnswer(card, q)}
+                                  loading={busy === q.id}
+                                  disabled={!(drafts[q.id] ?? "").trim()}
+                                >
+                                  Save
+                                </ApertureButton>
+                              </div>
                             </div>
                           )}
                         </div>
