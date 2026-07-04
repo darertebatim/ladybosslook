@@ -172,9 +172,9 @@ export function LivingToolCards({ userToolRows }: Props) {
     }
   }
 
-  async function saveAnswer(card: CardDef, row: QRow) {
+  async function saveAnswer(card: CardDef, row: QRow, overrideVal?: string) {
     if (!user) return;
-    const val = (drafts[row.id] ?? "").trim();
+    const val = (overrideVal ?? drafts[row.id] ?? "").trim();
     if (!val) return;
     setBusy(row.id);
     try {
