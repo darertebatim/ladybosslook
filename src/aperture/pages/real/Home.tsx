@@ -79,11 +79,28 @@ export default function RealHome() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const v = window.localStorage.getItem("rilobiz.showBriefOnHome");
-    if (v) {
-      try { window.localStorage.removeItem("rilobiz.showBriefOnHome"); } catch {}
-      setShowBriefOnce(v);
+    if (!v || !user) return;
+    // Validate wave-N flags against actual completed waves — after a full
+    // account reset, a stale "wave-4" from a previous session must not show.
+    const m = /^wave-(\d+)$/.exec(v);
+    if (m) {
+      const n = Number(m[1]);
+      (async () => {
+        const { data } = await supabase
+          .from("aperture_waves")
+          .select("wave_number,status")
+          .eq("user_id", user.id)
+          .eq("wave_number", n)
+          .eq("status", "complete")
+          .maybeSingle();
+        try { window.localStorage.removeItem("rilobiz.showBriefOnHome"); } catch {}
+        if (data) setShowBriefOnce(v);
+      })();
+      return;
     }
-  }, []);
+    try { window.localStorage.removeItem("rilobiz.showBriefOnHome"); } catch {}
+    setShowBriefOnce(v);
+  }, [user]);
 
   // Next wave number (same logic as Memory page)
   const [nextWave, setNextWave] = useState<number>(2);
