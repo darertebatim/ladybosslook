@@ -59,9 +59,9 @@ export default function RealTools() {
   const { sources, busy: sourceBusy } = useApertureSources();
   const [openSource, setOpenSource] = useState<SourceSummary | null>(null);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (opts?: { silent?: boolean }) => {
     if (!user) return;
-    setLoading(true);
+    if (!opts?.silent) setLoading(true);
     const [{ data: userRows }, { data: catRows }] = await Promise.all([
       supabase
         .from("aperture_user_tools")
@@ -85,7 +85,7 @@ export default function RealTools() {
         sort_order: r.sort_order ?? 0,
       })),
     );
-    setLoading(false);
+    if (!opts?.silent) setLoading(false);
   }, [user]);
 
   useEffect(() => { refresh(); }, [refresh]);
@@ -241,7 +241,7 @@ export default function RealTools() {
         .eq("user_id", user.id)
         .eq("tool_slug", entry.slug);
     }
-    await refresh();
+    await refresh({ silent: true });
   }, [user, refresh, writeMemoryFact]);
 
   const addCustom = useCallback(async () => {
@@ -258,7 +258,7 @@ export default function RealTools() {
     }, { onConflict: "user_id,tool_slug" });
     await writeMemoryFact({ name, bucket_slug: "tools-systems" });
     setCustomName("");
-    await refresh();
+    await refresh({ silent: true });
   }, [customName, user, refresh, writeMemoryFact]);
 
   const addCategoryCustom = useCallback(async (categoryLabel: string) => {
@@ -276,7 +276,7 @@ export default function RealTools() {
     }, { onConflict: "user_id,tool_slug" });
     await writeMemoryFact({ name, bucket_slug: bucketForCategory(categoryLabel) });
     setCatCustomNames((prev) => ({ ...prev, [categoryLabel]: "" }));
-    await refresh();
+    await refresh({ silent: true });
   }, [catCustomNames, user, refresh, writeMemoryFact]);
 
   // Filter catalog by user's industry: keep tools tagged to no industry
