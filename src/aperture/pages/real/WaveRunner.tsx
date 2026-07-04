@@ -326,24 +326,8 @@ export default function WaveRunner() {
 
             {q.options && q.options.length > 0 && !q.open_field && (
               <div style={{ marginTop: 12 }}>
-                {!detailOpen[q.id] ? (
-                  <button
-                    type="button"
-                    onClick={() => setDetailOpen(d => ({ ...d, [q.id]: true }))}
-                    style={{
-                      appearance: "none", background: "transparent", border: "none",
-                      padding: "4px 0", cursor: "pointer",
-                      fontSize: 13, color: "var(--ap-ink-2)",
-                      fontFamily: "var(--ap-font-sans)", textDecoration: "underline",
-                      textDecorationStyle: "dotted",
-                    }}
-                  >
-                    + Add more detail (optional)
-                  </button>
-                ) : (
-                  <textarea
+                <textarea
                     rows={2}
-                    autoFocus
                     style={{
                       width: "100%", appearance: "none", outline: "none",
                       background: "var(--ap-surface-2)",
@@ -353,11 +337,10 @@ export default function WaveRunner() {
                       fontSize: 14, color: "var(--ap-ink-1)",
                       fontFamily: "var(--ap-font-sans)", lineHeight: 1.5, resize: "vertical",
                     }}
-                    placeholder="Add context, nuance, or an exception…"
+                    placeholder="Add more detail (optional) — context, nuance, or an exception…"
                     value={details[q.id] ?? ""}
                     onChange={e => setDetails(d => ({ ...d, [q.id]: e.target.value }))}
                   />
-                )}
               </div>
             )}
 
