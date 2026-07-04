@@ -334,30 +334,76 @@ export function LivingToolCards({ userToolRows }: Props) {
                               <span>{q.answer_text}</span>
                             </div>
                           ) : (
-                            <div style={{ display: "flex", gap: 6 }}>
-                              <textarea
-                                value={drafts[q.id] ?? ""}
-                                onChange={(e) => setDrafts((d) => ({ ...d, [q.id]: e.target.value }))}
-                                placeholder="Your answer…"
-                                rows={2}
-                                style={{
-                                  flex: 1, padding: "8px 10px",
-                                  borderRadius: 8,
-                                  border: "1px solid var(--ap-hairline-strong)",
-                                  background: "var(--ap-surface-1)", color: "var(--ap-ink-1)",
-                                  fontSize: 13, fontFamily: "var(--ap-font-sans)", resize: "vertical",
-                                }}
-                              />
-                              <ApertureButton
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => saveAnswer(card, q)}
-                                loading={busy === q.id}
-                                disabled={!(drafts[q.id] ?? "").trim()}
-                              >
-                                Save
-                              </ApertureButton>
-                            </div>
+                            (() => {
+                              const selected = picks[q.id] ?? [];
+                              const typed = drafts[q.id] ?? "";
+                              const canSave = selected.length > 0 || typed.trim().length > 0;
+                              const showOptions = (q.options ?? []).length > 0;
+                              const showOpen = q.open_field !== false || !showOptions;
+                              return (
+                                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                                  {showOptions && (
+                                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                                      {q.options.map((opt) => {
+                                        const on = selected.includes(opt);
+                                        return (
+                                          <button
+                                            key={opt}
+                                            type="button"
+                                            onClick={() => setPicks((p) => {
+                                              const cur = p[q.id] ?? [];
+                                              const next = cur.includes(opt)
+                                                ? cur.filter((v) => v !== opt)
+                                                : [...cur, opt];
+                                              return { ...p, [q.id]: next };
+                                            })}
+                                            style={{
+                                              appearance: "none", cursor: "pointer",
+                                              padding: "6px 10px", borderRadius: 999,
+                                              fontSize: 12.5, fontFamily: "var(--ap-font-sans)",
+                                              border: on
+                                                ? "1px solid var(--ap-signal)"
+                                                : "1px solid var(--ap-hairline-strong)",
+                                              background: on ? "var(--ap-signal-soft)" : "var(--ap-surface-1)",
+                                              color: on ? "var(--ap-signal)" : "var(--ap-ink-1)",
+                                              fontWeight: on ? 600 : 500,
+                                            }}
+                                          >
+                                            {on ? "✓ " : ""}{opt}
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
+                                  <div style={{ display: "flex", gap: 6 }}>
+                                    {showOpen && (
+                                      <textarea
+                                        value={typed}
+                                        onChange={(e) => setDrafts((d) => ({ ...d, [q.id]: e.target.value }))}
+                                        placeholder={showOptions ? "Add your own…" : "Your answer…"}
+                                        rows={showOptions ? 1 : 2}
+                                        style={{
+                                          flex: 1, padding: "8px 10px",
+                                          borderRadius: 8,
+                                          border: "1px solid var(--ap-hairline-strong)",
+                                          background: "var(--ap-surface-1)", color: "var(--ap-ink-1)",
+                                          fontSize: 13, fontFamily: "var(--ap-font-sans)", resize: "vertical",
+                                        }}
+                                      />
+                                    )}
+                                    <ApertureButton
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => saveAnswer(card, q)}
+                                      loading={busy === q.id}
+                                      disabled={!canSave}
+                                    >
+                                      Save
+                                    </ApertureButton>
+                                  </div>
+                                </div>
+                              );
+                            })()
                           )}
                         </div>
                       ))}
