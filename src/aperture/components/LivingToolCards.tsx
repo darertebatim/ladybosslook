@@ -28,6 +28,8 @@ interface QRow {
   answer_text: string | null;
   generation_batch: number;
   is_active: boolean;
+  options: string[];
+  open_field: boolean;
 }
 
 interface Props {
@@ -52,6 +54,7 @@ export function LivingToolCards({ userToolRows }: Props) {
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, string>>({}); // key = row id
+  const [picks, setPicks] = useState<Record<string, string[]>>({}); // key = row id -> selected option labels
   // Batch "quick pass" mode: when true, saving an answer auto-advances to the
   // next card that still has an unanswered question, so the user can burn
   // through the queue in one pass without leaving Tools.
@@ -62,12 +65,16 @@ export function LivingToolCards({ userToolRows }: Props) {
     setLoading(true);
     const { data } = await supabase
       .from("aperture_tool_card_questions")
-      .select("id,card_key,row_kind,question_index,question_text,answer_text,generation_batch,is_active")
+      .select("id,card_key,row_kind,question_index,question_text,answer_text,generation_batch,is_active,options,open_field")
       .eq("user_id", user.id)
       .eq("is_active", true)
       .order("generation_batch", { ascending: true })
       .order("question_index", { ascending: true });
-    setRows(((data ?? []) as any[]) as QRow[]);
+    setRows(((data ?? []) as any[]).map((r) => ({
+      ...r,
+      options: Array.isArray(r.options) ? r.options : [],
+      open_field: r.open_field !== false,
+    })) as QRow[]);
     setLoading(false);
   }, [user]);
 
@@ -169,7 +176,11 @@ export function LivingToolCards({ userToolRows }: Props) {
 
   async function saveAnswer(card: CardDef, row: QRow) {
     if (!user) return;
-    const val = (drafts[row.id] ?? "").trim();
+    const selected = picks[row.id] ?? [];
+    const typed = (drafts[row.id] ?? "").trim();
+    const parts = [...selected];
+    if (typed) parts.push(typed);
+    const val = parts.join(", ").trim();
     if (!val) return;
     setBusy(row.id);
     try {
@@ -186,6 +197,7 @@ export function LivingToolCards({ userToolRows }: Props) {
         question_key: `tool_card__${card.key}__b${row.generation_batch}__i${row.question_index}`,
       } as any);
       setDrafts((d) => ({ ...d, [row.id]: "" }));
+      setPicks((p) => ({ ...p, [row.id]: [] }));
       await refresh();
       // Auto-generate suggestions when all 3 in latest batch answered and none exist yet
       const cardRows = [...(rowsByCard.get(card.key) ?? []).filter((r) => r.id !== row.id), { ...row, answer_text: val }];
@@ -322,30 +334,76 @@ export function LivingToolCards({ userToolRows }: Props) {
                               <span>{q.answer_text}</span>
                             </div>
                           ) : (
-                            <div style={{ display: "flex", gap: 6 }}>
-                              <textarea
-                                value={drafts[q.id] ?? ""}
-                                onChange={(e) => setDrafts((d) => ({ ...d, [q.id]: e.target.value }))}
-                                placeholder="Your answer…"
-                                rows={2}
-                                style={{
-                                  flex: 1, padding: "8px 10px",
-                                  borderRadius: 8,
-                                  border: "1px solid var(--ap-hairline-strong)",
-                                  background: "var(--ap-surface-1)", color: "var(--ap-ink-1)",
-                                  fontSize: 13, fontFamily: "var(--ap-font-sans)", resize: "vertical",
-                                }}
-                              />
-                              <ApertureButton
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => saveAnswer(card, q)}
-                                loading={busy === q.id}
-                                disabled={!(drafts[q.id] ?? "").trim()}
-                              >
-                                Save
-                              </ApertureButton>
-                            </div>
+                            (() => {
+                              const selected = picks[q.id] ?? [];
+                              const typed = drafts[q.id] ?? "";
+                              const canSave = selected.length > 0 || typed.trim().length > 0;
+                              const showOptions = (q.options ?? []).length > 0;
+                              const showOpen = q.open_field !== false || !showOptions;
+                              return (
+                                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                                  {showOptions && (
+                                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                                      {q.options.map((opt) => {
+                                        const on = selected.includes(opt);
+                                        return (
+                                          <button
+                                            key={opt}
+                                            type="button"
+                                            onClick={() => setPicks((p) => {
+                                              const cur = p[q.id] ?? [];
+                                              const next = cur.includes(opt)
+                                                ? cur.filter((v) => v !== opt)
+                                                : [...cur, opt];
+                                              return { ...p, [q.id]: next };
+                                            })}
+                                            style={{
+                                              appearance: "none", cursor: "pointer",
+                                              padding: "6px 10px", borderRadius: 999,
+                                              fontSize: 12.5, fontFamily: "var(--ap-font-sans)",
+                                              border: on
+                                                ? "1px solid var(--ap-signal)"
+                                                : "1px solid var(--ap-hairline-strong)",
+                                              background: on ? "var(--ap-signal-soft)" : "var(--ap-surface-1)",
+                                              color: on ? "var(--ap-signal)" : "var(--ap-ink-1)",
+                                              fontWeight: on ? 600 : 500,
+                                            }}
+                                          >
+                                            {on ? "✓ " : ""}{opt}
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
+                                  <div style={{ display: "flex", gap: 6 }}>
+                                    {showOpen && (
+                                      <textarea
+                                        value={typed}
+                                        onChange={(e) => setDrafts((d) => ({ ...d, [q.id]: e.target.value }))}
+                                        placeholder={showOptions ? "Add your own…" : "Your answer…"}
+                                        rows={showOptions ? 1 : 2}
+                                        style={{
+                                          flex: 1, padding: "8px 10px",
+                                          borderRadius: 8,
+                                          border: "1px solid var(--ap-hairline-strong)",
+                                          background: "var(--ap-surface-1)", color: "var(--ap-ink-1)",
+                                          fontSize: 13, fontFamily: "var(--ap-font-sans)", resize: "vertical",
+                                        }}
+                                      />
+                                    )}
+                                    <ApertureButton
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => saveAnswer(card, q)}
+                                      loading={busy === q.id}
+                                      disabled={!canSave}
+                                    >
+                                      Save
+                                    </ApertureButton>
+                                  </div>
+                                </div>
+                              );
+                            })()
                           )}
                         </div>
                       ))}
