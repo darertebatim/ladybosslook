@@ -28,6 +28,8 @@ interface QRow {
   answer_text: string | null;
   generation_batch: number;
   is_active: boolean;
+  question_options?: string[] | null;
+  open_field?: boolean | null;
 }
 
 interface Props {
@@ -62,12 +64,15 @@ export function LivingToolCards({ userToolRows }: Props) {
     setLoading(true);
     const { data } = await supabase
       .from("aperture_tool_card_questions")
-      .select("id,card_key,row_kind,question_index,question_text,answer_text,generation_batch,is_active")
+      .select("id,card_key,row_kind,question_index,question_text,answer_text,generation_batch,is_active,question_options,open_field")
       .eq("user_id", user.id)
       .eq("is_active", true)
       .order("generation_batch", { ascending: true })
       .order("question_index", { ascending: true });
-    setRows(((data ?? []) as any[]) as QRow[]);
+    setRows(((data ?? []) as any[]).map((r) => ({
+      ...r,
+      question_options: Array.isArray(r.question_options) ? r.question_options : [],
+    })) as QRow[]);
     setLoading(false);
   }, [user]);
 
