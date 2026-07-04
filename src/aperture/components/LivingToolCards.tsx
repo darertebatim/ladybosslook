@@ -239,6 +239,19 @@ export function LivingToolCards({ userToolRows }: Props) {
               if (first) {
                 setBatchMode(true);
                 setOpenKey(first.card_key);
+                // Scroll target card into view + focus its first empty answer.
+                requestAnimationFrame(() => {
+                  setTimeout(() => {
+                    const el = document.querySelector<HTMLElement>(
+                      `[data-card-key="${CSS.escape(first.card_key)}"]`,
+                    );
+                    if (el) {
+                      el.scrollIntoView({ behavior: "smooth", block: "start" });
+                      const ta = el.querySelector<HTMLTextAreaElement>("textarea");
+                      if (ta) ta.focus({ preventScroll: true });
+                    }
+                  }, 60);
+                });
               }
             }}
           >
@@ -262,7 +275,7 @@ export function LivingToolCards({ userToolRows }: Props) {
             card.kind === "gap_manual" ? "MANUAL" : "MULTI";
 
           return (
-            <ApertureCard key={card.key} padding={14}>
+            <ApertureCard key={card.key} padding={14} data-card-key={card.key}>
               <button
                 type="button"
                 onClick={() => setOpenKey(isOpen ? null : card.key)}
