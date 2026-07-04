@@ -96,10 +96,8 @@ export default function RealTools() {
   );
 
   // First-visit onboarding pass (plan §3): if user has never stamped
-  // tool_onboarding_done_at, show a simplified picker-only view with a
-  // sticky Continue button. Existing users who already picked tools before
-  // this shipped are silently backfilled below.
-  const hasAnyPick = rows.some((r) => r.is_active);
+  // tool_onboarding_done_at, always show a simplified picker-only view with a
+  // sticky Continue button — even when tool picks already exist.
   const onboardingDone = !!(profile as any)?.tool_onboarding_done_at;
   const firstVisit = !loading && !onboardingDone;
   const [savingContinue, setSavingContinue] = useState(false);
@@ -113,14 +111,6 @@ export default function RealTools() {
       setSavingContinue(false);
     }
   }, [user, savingContinue, upsertProfile, refreshProfile]);
-
-  // Backfill: existing users with picks but no stamp → mark them as done so
-  // they don't get bounced into onboarding on next load.
-  useEffect(() => {
-    if (!loading && !onboardingDone && hasAnyPick) {
-      void finishOnboarding();
-    }
-  }, [loading, onboardingDone, hasAnyPick, finishOnboarding]);
 
   const writeMemoryFact = useCallback(async (tool: { name: string; bucket_slug: string; question_key?: string }) => {
     if (!user) return;
