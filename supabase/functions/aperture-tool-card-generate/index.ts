@@ -169,6 +169,7 @@ serve(async (req) => {
       usage: aiData?.usage,
     });
     const content = aiData?.choices?.[0]?.message?.content ?? "{}";
+    console.log("[tool-card-generate] raw AI content:", content);
     let parsed: any = {};
     try { parsed = JSON.parse(content); } catch { parsed = {}; }
 
