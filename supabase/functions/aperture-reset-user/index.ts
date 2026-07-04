@@ -37,39 +37,13 @@ serve(async (req) => {
     }
     if (!userId) throw new Error("User not found");
 
-    // Delete chat messages first (FK to chats)
-    const { data: chats } = await admin
-      .from("aperture_chats").select("id").eq("user_id", userId);
-    const chatIds = (chats ?? []).map((c: any) => c.id);
-    if (chatIds.length) {
-      await admin.from("aperture_messages").delete().in("chat_id", chatIds);
-    }
-
-    // Delete doc chunks before documents (FK)
-    const { data: docs } = await admin
-      .from("aperture_documents").select("id").eq("user_id", userId);
-    const docIds = (docs ?? []).map((d: any) => d.id);
-    if (docIds.length) {
-      await admin.from("aperture_doc_chunks").delete().in("document_id", docIds);
-    }
-
-    const tables = [
-      "aperture_memory_items",
-      "aperture_memory_card",
-      "aperture_chats",
-      "aperture_generated_items",
-      "aperture_action_runs",
-      "aperture_user_tools",
-      "aperture_files",
-      "aperture_documents",
-      "aperture_events",
-      "aperture_user_profile",
-    ];
-    const results: Record<string, string> = {};
-    for (const t of tables) {
-      const { error } = await admin.from(t).delete().eq("user_id", userId);
-      results[t] = error ? `error: ${error.message}` : "ok";
-    }
+    // Single RPC wipes every aperture_* table with a user_id column,
+    // so newly added aperture tables are covered automatically.
+    const { data: results, error: rpcErr } = await admin.rpc(
+      "aperture_full_reset",
+      { p_user_id: userId },
+    );
+    if (rpcErr) throw rpcErr;
 
     return new Response(
       JSON.stringify({ ok: true, userId, email, results }),

@@ -7463,6 +7463,7 @@ export type Database = {
         Args: { _bucket: string; _half: string }
         Returns: boolean
       }
+      aperture_full_reset: { Args: { p_user_id: string }; Returns: Json }
       can_access_admin_page: {
         Args: { _page_slug: string; _user_id: string }
         Returns: boolean
