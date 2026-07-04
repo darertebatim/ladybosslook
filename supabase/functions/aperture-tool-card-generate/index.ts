@@ -43,13 +43,6 @@ RULES for QUESTIONS:
     multi -> intentional split vs redundancy, what each tool specifically handles
 - Each question is one sentence, plain language, answerable in a short text box.
 
-QUESTION SHAPE — same rule as the Wave 2 selector:
-- For each question decide if it's operational/diagnostic (the tool does X vs Y, using feature A or B, tracking metric C or D) or reflective/personal (are you happy with…, would you change something).
-- Operational/diagnostic → provide 4–6 short tappable options in the user's own likely phrasing, plus open_field: true so they can add their own. Options must be short (≤ 6 words), concrete, mutually distinct, in the user's voice — not a rephrasing of the question.
-- Reflective/personal → set open_field: true and options: [] (open field only).
-- Question 1 (the satisfaction/priority check) is ALWAYS reflective → options: [], open_field: true.
-- Do not include Skip / I-don't-know / Other — the UI adds those.
-
 RULES for SUGGESTIONS:
 - Return exactly 3 suggestions.
 - Suggestion 1 ALWAYS leads with what RiloBiz itself can do for this user right now (hold numbers, organize spreadsheet, cross-tool leverage).
@@ -58,10 +51,9 @@ RULES for SUGGESTIONS:
 
 RULES for MORE_QUESTIONS:
 - Return 3 NEW questions that go deeper than what's already in prior_qa. Do not repeat prior topics.
-- Apply the same QUESTION SHAPE rule (options + open_field per question).
 
 OUTPUT — JSON only, no prose, no code fences:
-{ "questions": [{"text":"...","options":["...","..."],"open_field":true}, ...] }
+{ "questions": [{"text":"..."},{"text":"..."},{"text":"..."}] }
 or
 { "suggestions": [{"text":"..."},{"text":"..."},{"text":"..."}] }`;
 
@@ -205,13 +197,6 @@ serve(async (req) => {
       row_kind: "question",
       question_index: i,
       question_text: String(q?.text ?? "").slice(0, 500),
-      options: Array.isArray(q?.options)
-        ? q.options
-            .map((o: any) => String(o ?? "").trim())
-            .filter((s: string) => s.length > 0)
-            .slice(0, 6)
-        : [],
-      open_field: q?.open_field === false ? false : true,
       generation_batch: nextBatch,
       is_active: true,
     }));
