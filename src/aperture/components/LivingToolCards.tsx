@@ -28,6 +28,8 @@ interface QRow {
   answer_text: string | null;
   generation_batch: number;
   is_active: boolean;
+  question_options?: string[] | null;
+  open_field?: boolean | null;
 }
 
 interface Props {
@@ -62,12 +64,15 @@ export function LivingToolCards({ userToolRows }: Props) {
     setLoading(true);
     const { data } = await supabase
       .from("aperture_tool_card_questions")
-      .select("id,card_key,row_kind,question_index,question_text,answer_text,generation_batch,is_active")
+      .select("id,card_key,row_kind,question_index,question_text,answer_text,generation_batch,is_active,question_options,open_field")
       .eq("user_id", user.id)
       .eq("is_active", true)
       .order("generation_batch", { ascending: true })
       .order("question_index", { ascending: true });
-    setRows(((data ?? []) as any[]) as QRow[]);
+    setRows(((data ?? []) as any[]).map((r) => ({
+      ...r,
+      question_options: Array.isArray(r.question_options) ? r.question_options : [],
+    })) as QRow[]);
     setLoading(false);
   }, [user]);
 
@@ -167,9 +172,9 @@ export function LivingToolCards({ userToolRows }: Props) {
     }
   }
 
-  async function saveAnswer(card: CardDef, row: QRow) {
+  async function saveAnswer(card: CardDef, row: QRow, overrideVal?: string) {
     if (!user) return;
-    const val = (drafts[row.id] ?? "").trim();
+    const val = (overrideVal ?? drafts[row.id] ?? "").trim();
     if (!val) return;
     setBusy(row.id);
     try {
@@ -322,29 +327,61 @@ export function LivingToolCards({ userToolRows }: Props) {
                               <span>{q.answer_text}</span>
                             </div>
                           ) : (
-                            <div style={{ display: "flex", gap: 6 }}>
-                              <textarea
-                                value={drafts[q.id] ?? ""}
-                                onChange={(e) => setDrafts((d) => ({ ...d, [q.id]: e.target.value }))}
-                                placeholder="Your answer…"
-                                rows={2}
-                                style={{
-                                  flex: 1, padding: "8px 10px",
-                                  borderRadius: 8,
-                                  border: "1px solid var(--ap-hairline-strong)",
-                                  background: "var(--ap-surface-1)", color: "var(--ap-ink-1)",
-                                  fontSize: 13, fontFamily: "var(--ap-font-sans)", resize: "vertical",
-                                }}
-                              />
-                              <ApertureButton
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => saveAnswer(card, q)}
-                                loading={busy === q.id}
-                                disabled={!(drafts[q.id] ?? "").trim()}
-                              >
-                                Save
-                              </ApertureButton>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                              {Array.isArray(q.question_options) && q.question_options.length > 0 && (
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                                  {q.question_options.map((opt) => (
+                                    <button
+                                      key={opt}
+                                      type="button"
+                                      disabled={busy === q.id}
+                                      onClick={() => saveAnswer(card, q, opt)}
+                                      style={{
+                                        appearance: "none",
+                                        padding: "6px 12px",
+                                        borderRadius: 999,
+                                        border: "1px solid var(--ap-hairline-strong)",
+                                        background: "var(--ap-surface-1)",
+                                        color: "var(--ap-ink-1)",
+                                        fontSize: 12.5,
+                                        fontFamily: "var(--ap-font-sans)",
+                                        cursor: busy === q.id ? "wait" : "pointer",
+                                        textAlign: "left",
+                                      }}
+                                    >
+                                      {opt}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                              <div style={{ display: "flex", gap: 6 }}>
+                                <textarea
+                                  value={drafts[q.id] ?? ""}
+                                  onChange={(e) => setDrafts((d) => ({ ...d, [q.id]: e.target.value }))}
+                                  placeholder={
+                                    Array.isArray(q.question_options) && q.question_options.length > 0
+                                      ? "Or type your own…"
+                                      : "Your answer…"
+                                  }
+                                  rows={2}
+                                  style={{
+                                    flex: 1, padding: "8px 10px",
+                                    borderRadius: 8,
+                                    border: "1px solid var(--ap-hairline-strong)",
+                                    background: "var(--ap-surface-1)", color: "var(--ap-ink-1)",
+                                    fontSize: 13, fontFamily: "var(--ap-font-sans)", resize: "vertical",
+                                  }}
+                                />
+                                <ApertureButton
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => saveAnswer(card, q)}
+                                  loading={busy === q.id}
+                                  disabled={!(drafts[q.id] ?? "").trim()}
+                                >
+                                  Save
+                                </ApertureButton>
+                              </div>
                             </div>
                           )}
                         </div>

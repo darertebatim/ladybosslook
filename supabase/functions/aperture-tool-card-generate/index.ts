@@ -43,6 +43,14 @@ RULES for QUESTIONS:
     multi -> intentional split vs redundancy, what each tool specifically handles
 - Each question is one sentence, plain language, answerable in a short text box.
 
+QUESTION FORMAT RULE (per question — MUST decide for each):
+- Question 1 (satisfaction/priority check) is ALWAYS open_field: true, options: []. Never force options on Q1.
+- For every OTHER question (Q2, Q3, and any more_questions follow-ups), apply this test:
+    • If it's OPERATIONAL or DIAGNOSTIC (asking what the user is doing, using, or measuring — e.g. "are you using the pixel, custom audiences, and A/B tests, or mainly just boosting posts?"), generate 4–6 short tappable "options" in the user's own voice — direct, specific, spoken-language phrases they might actually say. Also set open_field: false. The UI adds "Skip" and an open-text fallback itself; do NOT include them.
+    • If it's PERSONAL or REFLECTIVE ("in your own words", opinion, story, "how do you feel about X"), set open_field: true and options: [] — no options.
+- Never rewrite a question that already implies a fixed set of answers into freeform text.
+- Multi-tool card questions follow the same test — "different jobs or is one redundant?" is diagnostic → options + open_field:false; any personal follow-up stays open_field:true.
+
 RULES for SUGGESTIONS:
 - Return exactly 3 suggestions.
 - Suggestion 1 ALWAYS leads with what RiloBiz itself can do for this user right now (hold numbers, organize spreadsheet, cross-tool leverage).
@@ -51,9 +59,10 @@ RULES for SUGGESTIONS:
 
 RULES for MORE_QUESTIONS:
 - Return 3 NEW questions that go deeper than what's already in prior_qa. Do not repeat prior topics.
+- Apply the same QUESTION FORMAT RULE. Since these are follow-ups (not the opening satisfaction check), most will be operational/diagnostic → options + open_field:false.
 
 OUTPUT — JSON only, no prose, no code fences:
-{ "questions": [{"text":"..."},{"text":"..."},{"text":"..."}] }
+{ "questions": [{"text":"...", "options": ["...","..."], "open_field": false}, ...] }
 or
 { "suggestions": [{"text":"..."},{"text":"..."},{"text":"..."}] }`;
 
@@ -187,19 +196,32 @@ serve(async (req) => {
     const nextBatch = mode === "more_questions"
       ? (Math.max(0, ...(existing ?? []).map((r: any) => r.generation_batch ?? 1)) + 1)
       : 1;
-    const inserts = questions.map((q: any, i: number) => ({
-      user_id: user.id,
-      card_key,
-      card_kind,
-      card_label,
-      category,
-      bucket_slug,
-      row_kind: "question",
-      question_index: i,
-      question_text: String(q?.text ?? "").slice(0, 500),
-      generation_batch: nextBatch,
-      is_active: true,
-    }));
+    const inserts = questions.map((q: any, i: number) => {
+      // Q1 in a fresh "questions" batch is the satisfaction check → always open field.
+      const isQ1Satisfaction = mode === "questions" && i === 0;
+      const rawOpts = Array.isArray(q?.options)
+        ? q.options.filter((o: any) => typeof o === "string" && o.trim().length > 0).slice(0, 6)
+        : [];
+      const opts = isQ1Satisfaction ? [] : rawOpts;
+      const openField = isQ1Satisfaction
+        ? true
+        : (q?.open_field === false ? false : opts.length === 0);
+      return {
+        user_id: user.id,
+        card_key,
+        card_kind,
+        card_label,
+        category,
+        bucket_slug,
+        row_kind: "question",
+        question_index: i,
+        question_text: String(q?.text ?? "").slice(0, 500),
+        question_options: opts,
+        open_field: openField,
+        generation_batch: nextBatch,
+        is_active: true,
+      };
+    });
     await supabase.from("aperture_tool_card_questions").insert(inserts as any);
     return json({ questions, batch: nextBatch });
   } catch (e) {
