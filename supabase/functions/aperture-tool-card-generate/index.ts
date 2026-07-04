@@ -62,8 +62,18 @@ RULES for MORE_QUESTIONS:
 - Apply the same QUESTION FORMAT RULE. Since these are follow-ups (not the opening satisfaction check), most will be operational/diagnostic → options + open_field:false.
 
 OUTPUT — JSON only, no prose, no code fences:
-{ "questions": [{"text":"...", "options": ["...","..."], "open_field": false}, ...] }
-or
+Every question object MUST include ALL THREE fields: "text", "options", "open_field". Do not omit "options" or "open_field" — even if options is [] it must be present.
+
+EXAMPLE (tool card — Meta Ads Manager):
+{
+  "questions": [
+    { "text": "Are you happy with how Meta Ads Manager is performing, or is this something you'd change?", "options": [], "open_field": true },
+    { "text": "Are you using the pixel, custom audiences, and A/B tests, or mainly just boosting posts?", "options": ["Mainly boosting posts", "Pixel + retargeting", "Custom audiences + lookalikes", "Full setup: pixel, audiences, A/B tests", "Someone else runs it"], "open_field": false },
+    { "text": "Which metrics do you actually check?", "options": ["Cost per lead", "ROAS", "CTR", "Conversions / purchases", "I mostly just look at reach"], "open_field": false }
+  ]
+}
+
+For suggestions:
 { "suggestions": [{"text":"..."},{"text":"..."},{"text":"..."}] }`;
 
 serve(async (req) => {
@@ -159,6 +169,7 @@ serve(async (req) => {
       usage: aiData?.usage,
     });
     const content = aiData?.choices?.[0]?.message?.content ?? "{}";
+    console.log("[tool-card-generate] raw AI content:", content);
     let parsed: any = {};
     try { parsed = JSON.parse(content); } catch { parsed = {}; }
 
