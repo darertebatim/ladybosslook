@@ -196,23 +196,32 @@ serve(async (req) => {
     const nextBatch = mode === "more_questions"
       ? (Math.max(0, ...(existing ?? []).map((r: any) => r.generation_batch ?? 1)) + 1)
       : 1;
-    const inserts = questions.map((q: any, i: number) => ({
-      user_id: user.id,
-      card_key,
-      card_kind,
-      card_label,
-      category,
-      bucket_slug,
-      row_kind: "question",
-      question_index: i,
-      question_text: String(q?.text ?? "").slice(0, 500),
-      question_options: Array.isArray(q?.options)
+    const inserts = questions.map((q: any, i: number) => {
+      // Q1 in a fresh "questions" batch is the satisfaction check → always open field.
+      const isQ1Satisfaction = mode === "questions" && i === 0;
+      const rawOpts = Array.isArray(q?.options)
         ? q.options.filter((o: any) => typeof o === "string" && o.trim().length > 0).slice(0, 6)
-        : [],
-      open_field: q?.open_field === false ? false : (Array.isArray(q?.options) && q.options.length > 0 ? false : true),
-      generation_batch: nextBatch,
-      is_active: true,
-    }));
+        : [];
+      const opts = isQ1Satisfaction ? [] : rawOpts;
+      const openField = isQ1Satisfaction
+        ? true
+        : (q?.open_field === false ? false : opts.length === 0);
+      return {
+        user_id: user.id,
+        card_key,
+        card_kind,
+        card_label,
+        category,
+        bucket_slug,
+        row_kind: "question",
+        question_index: i,
+        question_text: String(q?.text ?? "").slice(0, 500),
+        question_options: opts,
+        open_field: openField,
+        generation_batch: nextBatch,
+        is_active: true,
+      };
+    });
     await supabase.from("aperture_tool_card_questions").insert(inserts as any);
     return json({ questions, batch: nextBatch });
   } catch (e) {
