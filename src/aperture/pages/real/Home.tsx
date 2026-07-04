@@ -73,14 +73,17 @@ export default function RealHome() {
   const [savingDaily, setSavingDaily] = useState(false);
 
   // One-shot expanded brief right after essential onboarding / wave completion.
-  const [showBriefOnce, setShowBriefOnce] = useState<string | null>(() => {
-    if (typeof window === "undefined") return null;
+  // Read + clear in an effect (not a useState initializer) so React StrictMode's
+  // double-invocation in dev doesn't swallow the flag on the second call.
+  const [showBriefOnce, setShowBriefOnce] = useState<string | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
     const v = window.localStorage.getItem("rilobiz.showBriefOnHome");
     if (v) {
       try { window.localStorage.removeItem("rilobiz.showBriefOnHome"); } catch {}
+      setShowBriefOnce(v);
     }
-    return v;
-  });
+  }, []);
 
   // Next wave number (same logic as Memory page)
   const [nextWave, setNextWave] = useState<number>(2);
