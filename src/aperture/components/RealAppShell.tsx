@@ -16,7 +16,7 @@ const NAV = [
   { to: "/app/rilobiz/app",          label: "Home",     end: true },
   { to: "/app/rilobiz/app/chats",    label: "Chats" },
   { to: "/app/rilobiz/app/memory",   label: "Memory" },
-  { to: "/app/rilobiz/app/tools",    label: "Tools" },
+  { to: "/app/rilobiz/app/memory/tools",    label: "Tools" },
   { to: "/app/rilobiz/app/library",  label: "Library" },
   { to: "/app/rilobiz/app/settings", label: "Settings" },
 ];
