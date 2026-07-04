@@ -54,6 +54,7 @@ export function LivingToolCards({ userToolRows }: Props) {
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, string>>({}); // key = row id
+  const [picks, setPicks] = useState<Record<string, string[]>>({}); // key = row id -> selected option labels
   // Batch "quick pass" mode: when true, saving an answer auto-advances to the
   // next card that still has an unanswered question, so the user can burn
   // through the queue in one pass without leaving Tools.
@@ -175,7 +176,11 @@ export function LivingToolCards({ userToolRows }: Props) {
 
   async function saveAnswer(card: CardDef, row: QRow) {
     if (!user) return;
-    const val = (drafts[row.id] ?? "").trim();
+    const selected = picks[row.id] ?? [];
+    const typed = (drafts[row.id] ?? "").trim();
+    const parts = [...selected];
+    if (typed) parts.push(typed);
+    const val = parts.join(", ").trim();
     if (!val) return;
     setBusy(row.id);
     try {
@@ -192,6 +197,7 @@ export function LivingToolCards({ userToolRows }: Props) {
         question_key: `tool_card__${card.key}__b${row.generation_batch}__i${row.question_index}`,
       } as any);
       setDrafts((d) => ({ ...d, [row.id]: "" }));
+      setPicks((p) => ({ ...p, [row.id]: [] }));
       await refresh();
       // Auto-generate suggestions when all 3 in latest batch answered and none exist yet
       const cardRows = [...(rowsByCard.get(card.key) ?? []).filter((r) => r.id !== row.id), { ...row, answer_text: val }];
