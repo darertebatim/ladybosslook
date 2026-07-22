@@ -126,22 +126,27 @@ export default function ThankYouSixTraps() {
 
           {/* Calendar buttons */}
           {event && (
-            <section className="mt-4 grid grid-cols-2 gap-3">
-              <a
-                href={buildGoogleCalendarUrl(event)}
-                target="_blank"
-                rel="noreferrer"
-                className="flex min-h-[52px] items-center justify-center rounded-xl bg-neutral-900 px-3 text-sm font-semibold text-white shadow-sm transition active:scale-[0.98]"
-              >
-                افزودن به Google Calendar
-              </a>
-              <button
-                type="button"
-                onClick={() => downloadIcs(event, "sixtraps.ics")}
-                className="flex min-h-[52px] items-center justify-center rounded-xl border border-neutral-300 bg-white px-3 text-sm font-semibold text-neutral-900 shadow-sm transition active:scale-[0.98]"
-              >
-                افزودن به Apple Calendar
-              </button>
+            <section className="mt-6">
+              <p className="mb-3 text-center text-sm font-semibold text-neutral-800">
+                الآن به تقویم‌تان اضافه کنید تا یادتان نرود:
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <a
+                  href={buildGoogleCalendarUrl(event)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex min-h-[52px] items-center justify-center rounded-xl bg-neutral-900 px-3 text-sm font-semibold text-white shadow-sm transition active:scale-[0.98]"
+                >
+                  افزودن به Google Calendar
+                </a>
+                <button
+                  type="button"
+                  onClick={() => downloadIcs(event, "sixtraps.ics")}
+                  className="flex min-h-[52px] items-center justify-center rounded-xl border border-neutral-300 bg-white px-3 text-sm font-semibold text-neutral-900 shadow-sm transition active:scale-[0.98]"
+                >
+                  افزودن به Apple Calendar
+                </button>
+              </div>
             </section>
           )}
 
