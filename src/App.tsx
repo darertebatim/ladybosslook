@@ -228,6 +228,8 @@ const RefundPolicy = lazy(() => import("@/pages/RefundPolicy"));
 const SMSTerms = lazy(() => import("@/pages/SMSTerms"));
 const ThankFreeLive = lazy(() => import("@/pages/ThankFreeLive"));
 const ThankOne = lazy(() => import("@/pages/ThankOne"));
+const SixTrapsLanding = lazy(() => import("@/pages/SixTrapsLanding"));
+const ThankYouSixTraps = lazy(() => import("@/pages/ThankYouSixTraps"));
 const Video = lazy(() => import("@/pages/Video"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const SendTestEmail = lazy(() => import("@/pages/SendTestEmail"));
@@ -553,6 +555,8 @@ const App = () => (
                   {!isNativeApp() && <Route path="/floew" element={<Floew />} />}
                   {!isNativeApp() && <Route path="/thankfreelive" element={<ThankFreeLive />} />}
                   {!isNativeApp() && <Route path="/thankone" element={<ThankOne />} />}
+                  {!isNativeApp() && <Route path="/sixtraps" element={<SixTrapsLanding />} />}
+                  {!isNativeApp() && <Route path="/thankyousixtraps" element={<ThankYouSixTraps />} />}
                   {!isNativeApp() && <Route path="/iqmoney" element={<IQMoneyWorkshop />} />}
                   <Route path="/rathus" element={<RathusAssessment />} />
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
