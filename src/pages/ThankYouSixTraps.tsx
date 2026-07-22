@@ -112,7 +112,7 @@ export default function ThankYouSixTraps() {
               <div className="mt-3 space-y-2 text-sm text-neutral-800">
                 <div dir="ltr" className="text-left">📅 {laDate}</div>
                 {localDate && (
-                  <div dir="ltr" className="text-left text-xs text-neutral-600">
+                  <div dir="ltr" className="text-left text-base font-bold text-neutral-900">
                     🕒 Your time: {localDate}
                   </div>
                 )}
@@ -120,6 +120,9 @@ export default function ThankYouSixTraps() {
               </div>
               <p className="mt-3 text-xs text-neutral-500">
                 لینک ورود در ایمیل شما ارسال شده است.
+              </p>
+              <p className="mt-1 text-xs text-neutral-500" dir="ltr">
+                Sender: <strong>onboarding@resend.dev</strong> (Ali Lotfi - Ladyboss Academy). Please check your spam folder.
               </p>
             </section>
           )}
