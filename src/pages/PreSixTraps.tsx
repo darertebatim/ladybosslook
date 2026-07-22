@@ -156,12 +156,15 @@ export default function PreSixTraps() {
               <div className="mt-3 space-y-2 text-sm text-neutral-800">
                 <div dir="ltr" className="text-left">📅 {laDate}</div>
                 {localDate && (
-                  <div dir="ltr" className="text-left text-xs text-neutral-600">
+                  <div dir="ltr" className="text-left text-base font-bold text-neutral-900">
                     🕒 Your time: {localDate}
                   </div>
                 )}
                 <div>⏱ مدت: {webinar.durationMinutes} دقیقه</div>
               </div>
+              <p className="mt-3 text-xs text-neutral-500" dir="ltr">
+                Sender: <strong>onboarding@resend.dev</strong> (Ali Lotfi - Ladyboss Academy). Please check your spam folder.
+              </p>
             </section>
           )}
 

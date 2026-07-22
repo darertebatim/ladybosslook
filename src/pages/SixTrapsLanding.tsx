@@ -150,7 +150,7 @@ export default function SixTrapsLanding() {
                   📅 {laLabel}
                 </div>
                 {localLabel && (
-                  <div dir="ltr" className="inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white px-4 py-2 text-xs font-medium text-neutral-700">
+                  <div dir="ltr" className="inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white px-4 py-2.5 text-base font-bold text-neutral-900">
                     🕒 Your time: {localLabel}
                   </div>
                 )}
@@ -231,6 +231,9 @@ export default function SixTrapsLanding() {
 
             <p className="text-center text-[11px] leading-5 text-neutral-500">
               By registering, the webinar link and reminders will be sent to your email.
+            </p>
+            <p className="text-center text-[11px] leading-5 text-neutral-500" dir="ltr">
+              Sender: <strong>onboarding@resend.dev</strong> (Ali Lotfi - Ladyboss Academy). Please check your spam folder.
             </p>
           </form>
         </main>
