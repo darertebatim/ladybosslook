@@ -75,27 +75,31 @@ export function downloadIcs(evt: WebinarEvent, filename = "sixtraps.ics") {
 }
 
 /**
- * Format a UTC date in Tehran time (Asia/Tehran) as Persian date + 24h time.
+ * Format a UTC date in Los Angeles time with American (Gregorian) calendar.
  */
-export function formatTehranDateTime(d: Date): string {
+export function formatLADateTime(d: Date): string {
   try {
-    const fmt = new Intl.DateTimeFormat("fa-IR", {
-      timeZone: "Asia/Tehran",
+    return new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Los_Angeles",
       dateStyle: "full",
       timeStyle: "short",
-    });
-    return fmt.format(d);
+    }).format(d) + " (PT)";
   } catch {
     return d.toISOString();
   }
 }
 
+/**
+ * Format a UTC date in the user's local browser timezone (American calendar).
+ */
 export function formatLocalDateTime(d: Date): string {
   try {
-    return new Intl.DateTimeFormat("fa-IR", {
-      dateStyle: "long",
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+    const formatted = new Intl.DateTimeFormat("en-US", {
+      dateStyle: "full",
       timeStyle: "short",
     }).format(d);
+    return tz ? `${formatted} (${tz})` : formatted;
   } catch {
     return d.toString();
   }
