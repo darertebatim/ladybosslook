@@ -172,7 +172,7 @@ serve(async (req) => {
   </body>
 </html>`;
 
-    const { error } = await resend.emails.send({
+    const { data: sendData, error } = await resend.emails.send({
       from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>",
       to: [email],
       subject: `تایید ثبت‌نام: ${title}`,
@@ -181,11 +181,22 @@ serve(async (req) => {
 
     if (error) {
       console.error("resend error", error);
+      await supabase.from("email_logs").insert({
+        recipient_email: email,
+        status: "failed",
+        error_message: String(error),
+      });
       return new Response(JSON.stringify({ error: String(error) }), {
         status: 502,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    await supabase.from("email_logs").insert({
+      recipient_email: email,
+      resend_id: (sendData as any)?.id ?? null,
+      status: "success",
+    });
 
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
