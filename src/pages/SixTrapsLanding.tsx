@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
 import heroAsset from "@/assets/sixtraps-hero.png.asset.json";
-import { formatTehranDateTime } from "@/lib/sixtrapsCalendar";
+import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
 
 const PROGRAM_SLUG = "instagram6traps";
 
@@ -56,8 +56,12 @@ export default function SixTrapsLanding() {
     })();
   }, []);
 
-  const dateLabel = useMemo(
-    () => (webinar ? formatTehranDateTime(webinar.startUtc) : ""),
+  const laLabel = useMemo(
+    () => (webinar ? formatLADateTime(webinar.startUtc) : ""),
+    [webinar],
+  );
+  const localLabel = useMemo(
+    () => (webinar ? formatLocalDateTime(webinar.startUtc) : ""),
     [webinar],
   );
 
@@ -132,14 +136,24 @@ export default function SixTrapsLanding() {
             <h1 className="text-2xl font-bold leading-tight text-neutral-900">
               وبینار رایگان: ۶ تله بزرگ اینستاگرام
             </h1>
+            <p className="text-xs font-semibold text-rose-600">
+              این وبینار مخصوص صاحبان کسب‌وکار در آمریکا و کانادا است
+            </p>
             <p className="text-sm leading-6 text-neutral-700">
               اگر کسب‌وکار داری و از اینستاگرام نتیجه دلخواه نمی‌گیری، این وبینار
-              برای توست. رازی لیدی‌باس ۶ اشتباهی که مانع رشد فروش می‌شود را
+              برای توست. علی لطفی ۶ اشتباهی که مانع رشد فروش می‌شود را
               مرحله‌به‌مرحله بررسی می‌کند.
             </p>
-            {dateLabel && (
-              <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 text-sm font-medium text-white">
-                📅 {dateLabel}
+            {laLabel && (
+              <div className="mx-auto flex flex-col items-center gap-2">
+                <div dir="ltr" className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 text-sm font-medium text-white">
+                  📅 {laLabel}
+                </div>
+                {localLabel && (
+                  <div dir="ltr" className="inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white px-4 py-2 text-xs font-medium text-neutral-700">
+                    🕒 Your time: {localLabel}
+                  </div>
+                )}
               </div>
             )}
           </section>

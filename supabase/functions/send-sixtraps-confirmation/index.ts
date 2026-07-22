@@ -103,12 +103,12 @@ serve(async (req) => {
       ? new Date(round.first_session_date)
       : null;
 
-    const tehranDate = startUtc
-      ? new Intl.DateTimeFormat("fa-IR", {
-          timeZone: "Asia/Tehran",
+    const laDate = startUtc
+      ? new Intl.DateTimeFormat("en-US", {
+          timeZone: "America/Los_Angeles",
           dateStyle: "full",
           timeStyle: "short",
-        }).format(startUtc)
+        }).format(startUtc) + " (PT)"
       : "";
 
     const gcalUrl =
@@ -130,12 +130,15 @@ serve(async (req) => {
       <h1 style="margin:0 0 12px;font-size:22px;line-height:1.4;">
         سلام ${name} عزیز 👋
       </h1>
+      <p style="margin:0 0 12px;font-size:13px;color:#e11d48;font-weight:bold;">
+        این وبینار مخصوص صاحبان کسب‌وکار در آمریکا و کانادا است
+      </p>
       <p style="margin:0 0 16px;font-size:15px;line-height:1.8;">
         ثبت‌نام شما در وبینار رایگان <strong>${title}</strong> با موفقیت انجام شد.
       </p>
 
       <div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:16px;margin:16px 0;">
-        <p style="margin:0 0 8px;font-size:14px;"><strong>📅 زمان (تهران):</strong><br>${tehranDate}</p>
+        <p style="margin:0 0 8px;font-size:14px;" dir="ltr"><strong>📅 Date & Time (Los Angeles / PT):</strong><br>${laDate}</p>
         <p style="margin:8px 0;font-size:14px;"><strong>⏱ مدت:</strong> ${durationMinutes} دقیقه</p>
         ${
           meetUrl
@@ -163,14 +166,14 @@ serve(async (req) => {
 
       <p style="margin:24px 0 0;font-size:13px;color:#6b7280;line-height:1.8;">
         منتظر دیدنت هستیم!<br>
-        رازی لیدی‌باس
+        علی لطفی
       </p>
     </div>
   </body>
 </html>`;
 
     const { error } = await resend.emails.send({
-      from: "Razie - Ladyboss Academy <onboarding@resend.dev>",
+      from: "Ali Lotfi - Ladyboss Academy <onboarding@resend.dev>",
       to: [email],
       subject: `تایید ثبت‌نام: ${title}`,
       html,

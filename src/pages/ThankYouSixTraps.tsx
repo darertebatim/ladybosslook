@@ -4,7 +4,8 @@ import { SEOHead } from "@/components/SEOHead";
 import {
   buildGoogleCalendarUrl,
   downloadIcs,
-  formatTehranDateTime,
+  formatLADateTime,
+  formatLocalDateTime,
   type WebinarEvent,
 } from "@/lib/sixtrapsCalendar";
 
@@ -58,7 +59,8 @@ export default function ThankYouSixTraps() {
     };
   }, [webinar]);
 
-  const tehranDate = webinar ? formatTehranDateTime(webinar.startUtc) : "";
+  const laDate = webinar ? formatLADateTime(webinar.startUtc) : "";
+  const localDate = webinar ? formatLocalDateTime(webinar.startUtc) : "";
 
   return (
     <>
@@ -80,9 +82,12 @@ export default function ThankYouSixTraps() {
             <h1 className="text-2xl font-bold text-neutral-900">
               ثبت‌نام شما با موفقیت انجام شد
             </h1>
+            <p className="mt-2 text-xs font-semibold text-rose-600">
+              این وبینار مخصوص صاحبان کسب‌وکار در آمریکا و کانادا است
+            </p>
             <p className="mt-2 text-sm leading-6 text-neutral-700">
               لینک ورود به وبینار و جزئیات کامل به ایمیل شما ارسال شد. تا وبینار،
-              این ویدیوی کوتاه از رازی را ببینید.
+              این ویدیوی کوتاه از علی لطفی را ببینید.
             </p>
           </div>
 
@@ -91,7 +96,7 @@ export default function ThankYouSixTraps() {
             <iframe
               className="h-full w-full"
               src={`https://www.youtube.com/embed/${YOUTUBE_ID}`}
-              title="پیام رازی لیدی‌باس"
+              title="پیام علی لطفی"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             />
@@ -104,8 +109,13 @@ export default function ThankYouSixTraps() {
                 جزئیات وبینار
               </h2>
               <p className="mt-1 text-sm text-neutral-700">{webinar.title}</p>
-              <div className="mt-3 space-y-1 text-sm text-neutral-800">
-                <div>📅 {tehranDate}</div>
+              <div className="mt-3 space-y-2 text-sm text-neutral-800">
+                <div dir="ltr" className="text-left">📅 {laDate}</div>
+                {localDate && (
+                  <div dir="ltr" className="text-left text-xs text-neutral-600">
+                    🕒 Your time: {localDate}
+                  </div>
+                )}
                 <div>⏱ مدت: {webinar.durationMinutes} دقیقه</div>
               </div>
               <p className="mt-3 text-xs text-neutral-500">
