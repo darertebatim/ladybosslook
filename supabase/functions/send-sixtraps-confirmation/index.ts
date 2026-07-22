@@ -173,7 +173,7 @@ serve(async (req) => {
 </html>`;
 
     const { error } = await resend.emails.send({
-      from: "Ali Lotfi - Ladyboss Academy <onboarding@resend.dev>",
+      from: "Ali Lotfi - Ladyboss Academy <hello@ladybosslook.com>",
       to: [email],
       subject: `تایید ثبت‌نام: ${title}`,
       html,
