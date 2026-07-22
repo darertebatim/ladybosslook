@@ -228,6 +228,8 @@ const RefundPolicy = lazy(() => import("@/pages/RefundPolicy"));
 const SMSTerms = lazy(() => import("@/pages/SMSTerms"));
 const ThankFreeLive = lazy(() => import("@/pages/ThankFreeLive"));
 const ThankOne = lazy(() => import("@/pages/ThankOne"));
+const SixTrapsLanding = lazy(() => import("@/pages/SixTrapsLanding"));
+const ThankYouSixTraps = lazy(() => import("@/pages/ThankYouSixTraps"));
 const Video = lazy(() => import("@/pages/Video"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const SendTestEmail = lazy(() => import("@/pages/SendTestEmail"));
