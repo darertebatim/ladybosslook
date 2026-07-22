@@ -66,10 +66,10 @@ serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const name = String(body?.name || "").trim().slice(0, 100);
+    const name = String(body?.name || "دوست عزیز").trim().slice(0, 100);
     const email = String(body?.email || "").trim().toLowerCase().slice(0, 255);
 
-    if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return new Response(JSON.stringify({ error: "invalid_input" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
