@@ -160,15 +160,16 @@ export default function SixTrapsLanding() {
 
           <form
             onSubmit={handleSubmit}
-            className="mt-8 space-y-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm"
+            dir="ltr"
+            className="mt-8 space-y-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm text-left"
           >
             <h2 className="text-center text-lg font-semibold text-neutral-900">
-              ثبت‌نام رایگان
+              Free Registration
             </h2>
 
             <div>
               <label className="mb-1 block text-sm font-medium text-neutral-800">
-                نام و نام خانوادگی
+                Full Name
               </label>
               <input
                 type="text"
@@ -176,8 +177,8 @@ export default function SixTrapsLanding() {
                 onChange={(e) => setName(e.target.value)}
                 maxLength={100}
                 className="min-h-[48px] w-full rounded-xl border border-neutral-300 bg-white px-4 text-base text-neutral-900 outline-none focus:border-rose-500"
-                placeholder="مثلا: رعنا احمدی"
-                dir="rtl"
+                placeholder="e.g. Sara Ahmadi"
+                dir="ltr"
               />
               {errors.name && (
                 <p className="mt-1 text-xs text-rose-600">{errors.name}</p>
@@ -186,7 +187,7 @@ export default function SixTrapsLanding() {
 
             <div>
               <label className="mb-1 block text-sm font-medium text-neutral-800">
-                شهر
+                City
               </label>
               <input
                 type="text"
@@ -194,8 +195,8 @@ export default function SixTrapsLanding() {
                 onChange={(e) => setCity(e.target.value)}
                 maxLength={100}
                 className="min-h-[48px] w-full rounded-xl border border-neutral-300 bg-white px-4 text-base text-neutral-900 outline-none focus:border-rose-500"
-                placeholder="مثلا: تهران"
-                dir="rtl"
+                placeholder="e.g. Los Angeles"
+                dir="ltr"
               />
               {errors.city && (
                 <p className="mt-1 text-xs text-rose-600">{errors.city}</p>
@@ -204,7 +205,7 @@ export default function SixTrapsLanding() {
 
             <div>
               <label className="mb-1 block text-sm font-medium text-neutral-800">
-                ایمیل
+                Email
               </label>
               <input
                 type="email"
@@ -225,11 +226,11 @@ export default function SixTrapsLanding() {
               disabled={submitting}
               className="min-h-[52px] w-full rounded-xl bg-gradient-to-l from-rose-500 to-amber-500 text-base font-bold text-white shadow-md transition active:scale-[0.98] disabled:opacity-60"
             >
-              {submitting ? "در حال ثبت‌نام..." : "ثبت‌نام رایگان"}
+              {submitting ? "Registering..." : "Register Free"}
             </button>
 
             <p className="text-center text-[11px] leading-5 text-neutral-500">
-              با ثبت‌نام، لینک ورود و یادآوری‌های وبینار به ایمیل شما ارسال می‌شود.
+              By registering, the webinar link and reminders will be sent to your email.
             </p>
           </form>
         </main>
