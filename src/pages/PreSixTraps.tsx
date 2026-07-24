@@ -162,9 +162,6 @@ export default function PreSixTraps() {
                 )}
                 <div>⏱ مدت: {webinar.durationMinutes} دقیقه</div>
               </div>
-              <p className="mt-3 text-xs text-neutral-500" dir="ltr">
-                Sender: <strong>hi@ladybosslook.com</strong> (Ali Lotfi - Ladyboss Academy). Please check your spam folder.
-              </p>
             </section>
           )}
 
