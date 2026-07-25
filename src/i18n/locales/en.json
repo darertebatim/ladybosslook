@@ -833,7 +833,7 @@
     }
   },
   "player": {
-    "title": "Listen",
+    "title": "Player",
     "searchPlaceholder": "Search audio...",
     "searchAria": "Search",
     "closeSearchAria": "Close search",
@@ -893,7 +893,7 @@
     "addToRoutinesFailed": "Failed to add to routines"
   },
   "toolsPage": {
-    "title": "Self-Care Tools",
+    "title": "Rilo Tools",
     "searchPlaceholder": "Search tools & programs...",
     "searchAria": "Search",
     "closeSearchAria": "Close search",
