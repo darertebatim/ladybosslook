@@ -1944,9 +1944,13 @@ const AppCourseDetail = () => {
                               )
                             }
                           >
-                            <Music className="h-5 w-5 mr-2" />
+                          <Music className="h-5 w-5 mr-2" />
                             Round Playlist
                           </Button>
+                        )}
+                        {false && (
+                          <></>
+                        )}
                         )}
 
                         {/* 3. Join Google Meet - Time-sensitive */}
