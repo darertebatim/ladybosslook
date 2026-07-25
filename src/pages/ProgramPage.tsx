@@ -367,12 +367,12 @@ const ProgramPage = () => {
               {/* Right: Sticky pricing card — shown first on mobile so Enroll is visible */}
               <div className="lg:col-span-1 order-first lg:order-last">
                 <div className="lg:sticky lg:top-24">
-                  <Card className="p-6 space-y-5 border-2">
+                  <Card className="p-4 lg:p-6 space-y-4 lg:space-y-5 border-2">
                     {/* Price */}
                     {hasFullOption ? (
-                      <div className="space-y-3">
+                      <div className="space-y-2">
                         {program.original_price && program.original_price > 0 && (
-                          <div className="text-muted-foreground line-through text-base">
+                          <div className="text-muted-foreground line-through text-sm">
                             ${(program.original_price / 100).toFixed(0)}
                           </div>
                         )}
@@ -382,15 +382,15 @@ const ProgramPage = () => {
                         <button
                           type="button"
                           onClick={() => setSelectedPlan('monthly')}
-                          className={`w-full text-left rounded-xl border-2 p-4 transition-all ${
+                          className={`w-full text-left rounded-xl border-2 p-3 transition-all ${
                             selectedPlan === 'monthly'
                               ? 'border-primary bg-primary/5'
                               : 'border-border'
                           }`}
                         >
                           <div className="flex items-baseline justify-between gap-2">
-                            <span className="font-semibold">Monthly</span>
-                            <span className="text-2xl font-bold">
+                            <span className="font-semibold text-sm">Monthly</span>
+                            <span className="text-xl font-bold">
                               ${(program.price_amount / 100).toFixed(0)}
                               <span className="text-sm font-medium text-muted-foreground">/mo</span>
                             </span>
@@ -406,7 +406,7 @@ const ProgramPage = () => {
                         <button
                           type="button"
                           onClick={() => setSelectedPlan('full')}
-                          className={`relative w-full text-left rounded-xl border-2 p-4 transition-all ${
+                          className={`relative w-full text-left rounded-xl border-2 p-3 transition-all ${
                             selectedPlan === 'full'
                               ? 'border-primary bg-primary/5'
                               : 'border-border'
@@ -417,14 +417,14 @@ const ProgramPage = () => {
                             const savings = monthlyTotal - (program.subscription_full_payment_price || 0);
                             if (savings <= 0) return null;
                             return (
-                              <span className="absolute -top-2.5 right-3 bg-green-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                              <span className="absolute -top-2 right-2 bg-green-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
                                 Save ${(savings / 100).toFixed(0)}
                               </span>
                             );
                           })()}
                           <div className="flex items-baseline justify-between gap-2">
-                            <span className="font-semibold">One-time</span>
-                            <span className="text-2xl font-bold">
+                            <span className="font-semibold text-sm">One-time</span>
+                            <span className="text-xl font-bold">
                               ${((program.subscription_full_payment_price || 0) / 100).toFixed(0)}
                             </span>
                           </div>
@@ -434,17 +434,17 @@ const ProgramPage = () => {
                     ) : (
                     <div>
                       {isFree ? (
-                        <div className="text-3xl font-bold text-primary">FREE</div>
+                        <div className="text-2xl lg:text-3xl font-bold text-primary">FREE</div>
                       ) : (
-                        <div className="space-y-1">
+                        <div className="space-y-0.5">
                           {program.original_price && program.original_price > 0 && program.original_price > program.price_amount && (
-                            <div className="text-muted-foreground line-through text-lg">
+                            <div className="text-muted-foreground line-through text-sm">
                               ${(program.original_price / 100).toFixed(0)}
                             </div>
                           )}
                           {isDeposit ? (
                             <>
-                              <div className="text-3xl font-bold text-foreground">
+                              <div className="text-2xl lg:text-3xl font-bold text-foreground">
                                 ${(displayPrice / 100).toFixed(0)} <span className="text-sm font-medium text-muted-foreground">deposit</span>
                               </div>
                               <p className="text-xs text-muted-foreground">
@@ -452,7 +452,7 @@ const ProgramPage = () => {
                               </p>
                             </>
                           ) : (
-                            <div className="text-3xl font-bold text-foreground">
+                            <div className="text-2xl lg:text-3xl font-bold text-foreground">
                               ${(displayPrice / 100).toFixed(0)}
                             </div>
                           )}
@@ -499,7 +499,7 @@ const ProgramPage = () => {
                       </Button>
                     )}
 
-                    <div className="pt-2 space-y-3 text-center">
+                    <div className="space-y-1.5 text-center">
                       <a
                         href="https://t.me/ladybosslook"
                         target="_blank"
