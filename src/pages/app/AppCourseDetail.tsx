@@ -28,6 +28,26 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
+import { HostBadges } from "@/components/app/HostBadges";
+import { PersianFlag } from "@/components/ui/PersianFlag";
+
+const LANG_FLAGS: Record<string, string> = {
+  all: "🌐",
+  american: "🇺🇸",
+  english: "🇺🇸",
+  turkish: "🇹🇷",
+  spanish: "🇪🇸",
+};
+
+const LANGUAGE_LABELS: Record<string, string> = {
+  all: "All languages",
+  american: "English",
+  english: "English",
+  persian: "Persian",
+  farsi: "Persian",
+  turkish: "Turkish",
+  spanish: "Spanish",
+};
 import { BackButton } from "@/components/app/BackButton";
 import { downloadICSFile, generateICSFile } from "@/utils/calendar";
 import {
@@ -1344,159 +1364,219 @@ const AppCourseDetail = () => {
                           {program.title}
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-6">
-                        {/* What's Included */}
-                        {program.features &&
-                          Array.isArray(program.features) &&
-                          program.features.length > 0 && (
-                            <div>
-                              <h3 className="font-semibold text-lg mb-4">
-                                What's Included
-                              </h3>
-                              <div className="space-y-3">
-                                {program.features.map(
-                                  (feature: string, idx: number) => (
-                                    <div
-                                      key={idx}
-                                      className="flex items-start gap-3"
-                                    >
-                                      <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                                      <span className="text-muted-foreground">
-                                        {feature}
-                                      </span>
-                                    </div>
-                                  ),
-                                )}
+                        <CardContent className="space-y-6">
+                          {/* Host + Language */}
+                          <div className="space-y-2">
+                            <HostBadges
+                              contentType="program"
+                              contentId={program.slug}
+                              size="md"
+                              prefix="with"
+                              className="text-muted-foreground"
+                            />
+                            {program.language && program.language !== "all" && (
+                              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                                {program.language === "persian" || program.language === "farsi" ? (
+                                  <PersianFlag size={14} />
+                                ) : LANG_FLAGS[program.language] ? (
+                                  <span className="text-sm leading-none">
+                                    {LANG_FLAGS[program.language]}
+                                  </span>
+                                ) : null}
+                                <span className="capitalize">
+                                  {LANGUAGE_LABELS[program.language] || program.language}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Program Description */}
+                          {program.description && (
+                            <div
+                              className="text-muted-foreground whitespace-pre-wrap leading-relaxed"
+                              dangerouslySetInnerHTML={{
+                                __html: DOMPurify.sanitize(program.description),
+                              }}
+                            />
+                          )}
+
+                          {/* Active Round Details — shown for programs with auto-enrollment */}
+                          {autoEnrollRound && (
+                            <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 space-y-3">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4 text-primary" />
+                                <p className="text-sm font-semibold">
+                                  {autoEnrollRound.round_name || "Upcoming Round"}
+                                </p>
+                              </div>
+                              <div className="space-y-1">
+                                {(() => {
+                                  const sessionDateStr =
+                                    autoEnrollRound.first_session_date ||
+                                    autoEnrollRound.start_date;
+                                  if (!sessionDateStr) return null;
+                                  const sessionDate = sessionDateStr.includes("T")
+                                    ? new Date(sessionDateStr)
+                                    : new Date(sessionDateStr + "T00:00:00");
+                                  if (isNaN(sessionDate.getTime())) return null;
+                                  return (
+                                    <>
+                                      <p className="text-sm text-muted-foreground">
+                                        Starts{" "}
+                                        <span className="font-medium text-foreground">
+                                          {format(sessionDate, "EEEE, MMMM d, yyyy")}
+                                        </span>
+                                      </p>
+                                      {sessionDateStr.includes("T") &&
+                                        format(sessionDate, "h:mm a") !== "12:00 AM" && (
+                                          <p className="text-sm text-muted-foreground">
+                                            Time{" "}
+                                            <span className="font-medium text-foreground">
+                                              {format(sessionDate, "h:mm a")}
+                                            </span>
+                                          </p>
+                                        )}
+                                    </>
+                                  );
+                                })()}
+                                {autoEnrollRound.first_session_duration ? (
+                                  <p className="text-sm text-muted-foreground">
+                                    Duration{" "}
+                                    <span className="font-medium text-foreground">
+                                      {autoEnrollRound.first_session_duration} min
+                                    </span>
+                                  </p>
+                                ) : null}
                               </div>
                             </div>
                           )}
 
-                        {/* Active Round Details — shown for programs with auto-enrollment */}
-                        {autoEnrollRound && (
-                          <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 space-y-3">
-                            <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4 text-primary" />
-                              <p className="text-sm font-semibold">
-                                {autoEnrollRound.round_name || "Upcoming Round"}
-                              </p>
-                            </div>
-                            <div className="space-y-1">
-                              {(() => {
-                                const sessionDateStr =
-                                  autoEnrollRound.first_session_date ||
-                                  autoEnrollRound.start_date;
-                                if (!sessionDateStr) return null;
-                                const sessionDate = sessionDateStr.includes("T")
-                                  ? new Date(sessionDateStr)
-                                  : new Date(sessionDateStr + "T00:00:00");
-                                if (isNaN(sessionDate.getTime())) return null;
-                                return (
-                                  <>
-                                    <p className="text-sm text-muted-foreground">
-                                      Starts{" "}
-                                      <span className="font-medium text-foreground">
-                                        {format(sessionDate, "EEEE, MMMM d, yyyy")}
-                                      </span>
+                          {/* Purchase / Enrollment Section */}
+                          <div>
+                            {/* Waitlist program - show_in_app_waitlist takes priority */}
+                            {(program as any).show_in_app_waitlist ? (
+                              <div className="space-y-4">
+                                {/* Price info card */}
+                                {program.price_amount > 0 && (
+                                  <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 text-center space-y-1">
+                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                      Program Price
                                     </p>
-                                    {sessionDateStr.includes("T") &&
-                                      format(sessionDate, "h:mm a") !== "12:00 AM" && (
-                                        <p className="text-sm text-muted-foreground">
-                                          Time{" "}
-                                          <span className="font-medium text-foreground">
-                                            {format(sessionDate, "h:mm a")}
+                                    <div className="flex items-baseline justify-center gap-2">
+                                      {program.original_price &&
+                                        program.original_price >
+                                          program.price_amount && (
+                                          <span className="text-lg text-muted-foreground line-through">
+                                            {(program as any).currency === "ILS"
+                                              ? "₪"
+                                              : "$"}
+                                            {(program.original_price / 100).toFixed(0)}
                                           </span>
-                                        </p>
-                                      )}
-                                  </>
-                                );
-                              })()}
-                              {autoEnrollRound.first_session_duration ? (
-                                <p className="text-sm text-muted-foreground">
-                                  Duration{" "}
-                                  <span className="font-medium text-foreground">
-                                    {autoEnrollRound.first_session_duration} min
-                                  </span>
-                                </p>
-                              ) : null}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Purchase / Enrollment Section */}
-                        <div className="border-t pt-6">
-                          {/* Waitlist program - show_in_app_waitlist takes priority */}
-                          {(program as any).show_in_app_waitlist ? (
-                            <div className="space-y-4">
-                              {/* Price info card */}
-                              {program.price_amount > 0 && (
-                                <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 text-center space-y-1">
-                                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                                    Program Price
-                                  </p>
-                                  <div className="flex items-baseline justify-center gap-2">
-                                    {program.original_price &&
-                                      program.original_price >
-                                        program.price_amount && (
-                                        <span className="text-lg text-muted-foreground line-through">
-                                          {(program as any).currency === "ILS"
-                                            ? "₪"
-                                            : "$"}
-                                          {(program.original_price / 100).toFixed(0)}
-                                        </span>
-                                      )}
-                                    <p className="text-2xl font-bold text-foreground">
-                                      {(program as any).currency === "ILS"
-                                        ? "₪"
-                                        : "$"}
-                                      {(program.price_amount / 100).toFixed(0)}
-                                    </p>
+                                        )}
+                                      <p className="text-2xl font-bold text-foreground">
+                                        {(program as any).currency === "ILS"
+                                          ? "₪"
+                                          : "$"}
+                                        {(program.price_amount / 100).toFixed(0)}
+                                      </p>
+                                    </div>
+                                    <div className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 mt-1">
+                                      <Clock className="h-3 w-3 text-muted-foreground" />
+                                      <span className="text-xs font-medium text-muted-foreground">
+                                        Registration opening soon
+                                      </span>
+                                    </div>
                                   </div>
-                                  <div className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 mt-1">
-                                    <Clock className="h-3 w-3 text-muted-foreground" />
-                                    <span className="text-xs font-medium text-muted-foreground">
-                                      Registration opening soon
-                                    </span>
-                                  </div>
-                                </div>
-                              )}
-
-                              <Button
-                                size="lg"
-                                className="w-full gap-2"
-                                variant={isOnWaitlist ? "secondary" : "default"}
-                                onClick={handleToggleWaitlist}
-                                disabled={joiningWaitlist}
-                              >
-                                {joiningWaitlist ? (
-                                  <>
-                                    <Loader2 className="h-4 w-4 animate-spin" />{" "}
-                                    Processing...
-                                  </>
-                                ) : isOnWaitlist ? (
-                                  <>
-                                    <CheckCircle2 className="h-5 w-5" /> On
-                                    Waitlist
-                                  </>
-                                ) : (
-                                  <>
-                                    <BellRing className="h-5 w-5" /> Notify Me
-                                    When Available
-                                  </>
                                 )}
-                              </Button>
-                              <p className="text-xs text-center text-muted-foreground">
-                                {isOnWaitlist
-                                  ? "You're on the list! We'll notify you when registration opens."
-                                  : "Be the first to know when this program opens for enrollment."}
-                              </p>
-                            </div>
-                          ) : program.ios_product_id ? (
-                            /* IAP Subscription Plan Picker - shown on both native and web */
-                            <IAPPlanPicker program={program} />
-                          ) : program.stripe_price_id &&
-                            program.price_amount > 0 ? (
-                            /* Paid program via Stripe - show payment button */
-                            enrollment ? (
+
+                                <Button
+                                  size="lg"
+                                  className="w-full gap-2"
+                                  variant={isOnWaitlist ? "secondary" : "default"}
+                                  onClick={handleToggleWaitlist}
+                                  disabled={joiningWaitlist}
+                                >
+                                  {joiningWaitlist ? (
+                                    <>
+                                      <Loader2 className="h-4 w-4 animate-spin" />{" "}
+                                      Processing...
+                                    </>
+                                  ) : isOnWaitlist ? (
+                                    <>
+                                      <CheckCircle2 className="h-5 w-5" /> On
+                                      Waitlist
+                                    </>
+                                  ) : (
+                                    <>
+                                      <BellRing className="h-5 w-5" /> Notify Me
+                                      When Available
+                                    </>
+                                  )}
+                                </Button>
+                                <p className="text-xs text-center text-muted-foreground">
+                                  {isOnWaitlist
+                                    ? "You're on the list! We'll notify you when registration opens."
+                                    : "Be the first to know when this program opens for enrollment."}
+                                </p>
+                              </div>
+                            ) : program.ios_product_id ? (
+                              /* IAP Subscription Plan Picker - shown on both native and web */
+                              <IAPPlanPicker program={program} />
+                            ) : program.stripe_price_id &&
+                              program.price_amount > 0 ? (
+                              /* Paid program via Stripe - show payment button */
+                              enrollment ? (
+                                <Button
+                                  size="lg"
+                                  className="w-full"
+                                  variant="secondary"
+                                  disabled
+                                >
+                                  <CheckCircle2 className="mr-2 h-5 w-5" />
+                                  Enrolled
+                                </Button>
+                              ) : (
+                                <>
+                                  <Button
+                                    size="lg"
+                                    className="w-full"
+                                    onClick={async () => {
+                                      try {
+                                        const { data, error } =
+                                          await supabase.functions.invoke(
+                                            "create-payment",
+                                            {
+                                              body: { program: program.slug },
+                                            },
+                                          );
+                                        if (error) throw error;
+                                        if (data?.url) {
+                                          window.location.href = data.url;
+                                        } else {
+                                          throw new Error(
+                                            "No checkout URL received",
+                                          );
+                                        }
+                                      } catch (err) {
+                                        console.error("Payment error:", err);
+                                        toast.error(
+                                          "Payment failed. Please try again.",
+                                        );
+                                      }
+                                    }}
+                                  >
+                                    {`Enroll · $${(program.price_amount / 100).toFixed(0)}`}
+                                  </Button>
+                                  {program.original_price &&
+                                    program.original_price >
+                                      program.price_amount && (
+                                    <p className="text-xs text-center text-muted-foreground mt-2 line-through">
+                                      {`$${(program.original_price / 100).toFixed(0)}`}
+                                    </p>
+                                  )}
+                                </>
+                              )
+                            ) : enrollment ? (
                               <Button
                                 size="lg"
                                 className="w-full"
@@ -1507,93 +1587,58 @@ const AppCourseDetail = () => {
                                 Enrolled
                               </Button>
                             ) : (
-                              <>
-                                <Button
-                                  size="lg"
-                                  className="w-full"
-                                  onClick={async () => {
-                                    try {
-                                      const { data, error } =
-                                        await supabase.functions.invoke(
-                                          "create-payment",
-                                          {
-                                            body: { program: program.slug },
-                                          },
-                                        );
-                                      if (error) throw error;
-                                      if (data?.url) {
-                                        window.location.href = data.url;
-                                      } else {
-                                        throw new Error(
-                                          "No checkout URL received",
-                                        );
-                                      }
-                                    } catch (err) {
-                                      console.error("Payment error:", err);
-                                      toast.error(
-                                        "Payment failed. Please try again.",
-                                      );
-                                    }
-                                  }}
-                                >
-                                  {`Enroll · $${(program.price_amount / 100).toFixed(0)}`}
-                                </Button>
-                                {program.original_price &&
-                                  program.original_price >
-                                    program.price_amount && (
-                                    <p className="text-xs text-center text-muted-foreground mt-2 line-through">
-                                      {`$${(program.original_price / 100).toFixed(0)}`}
-                                    </p>
-                                  )}
-                              </>
-                            )
-                          ) : enrollment ? (
-                            <Button
-                              size="lg"
-                              className="w-full"
-                              variant="secondary"
-                              disabled
-                            >
-                              <CheckCircle2 className="mr-2 h-5 w-5" />
-                              Enrolled
-                            </Button>
-                          ) : (
-                            <Button
-                              size="lg"
-                              className="w-full"
-                              onClick={() => enrollMutation.mutate()}
-                              disabled={enrollMutation.isPending}
-                            >
-                              {enrollMutation.isPending ? (
-                                <>
-                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                  Enrolling...
-                                </>
-                              ) : (
-                                "Enroll Free"
-                              )}
-                            </Button>
-                          )}
-
-                          {!program.ios_product_id &&
-                            !program.stripe_price_id &&
-                            !(program as any).show_in_app_waitlist && (
-                              <p className="text-xs text-center text-muted-foreground mt-4">
-                                Free enrollment • Instant access
-                              </p>
+                              <Button
+                                size="lg"
+                                className="w-full"
+                                onClick={() => enrollMutation.mutate()}
+                                disabled={enrollMutation.isPending}
+                              >
+                                {enrollMutation.isPending ? (
+                                  <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Enrolling...
+                                  </>
+                                ) : (
+                                  "Enroll Free"
+                                )}
+                              </Button>
                             )}
-                        </div>
 
-                        {/* Program Description */}
-                        {program.description && (
-                          <div
-                            className="text-muted-foreground whitespace-pre-wrap leading-relaxed border-t pt-6"
-                            dangerouslySetInnerHTML={{
-                              __html: DOMPurify.sanitize(program.description),
-                            }}
-                          />
-                        )}
-                      </CardContent>
+                            {!program.ios_product_id &&
+                              !program.stripe_price_id &&
+                              !(program as any).show_in_app_waitlist && (
+                                <p className="text-xs text-center text-muted-foreground mt-4">
+                                  Free enrollment • Instant access
+                                </p>
+                              )}
+                          </div>
+
+                          {/* What's Included */}
+                          {program.features &&
+                            Array.isArray(program.features) &&
+                            program.features.length > 0 && (
+                              <div className="border-t pt-6">
+                                <h3 className="font-semibold text-lg mb-4">
+                                  What's Included
+                                </h3>
+                                <div className="space-y-3">
+                                  {program.features.map(
+                                    (feature: string, idx: number) => (
+                                      <div
+                                        key={idx}
+                                        className="flex items-start gap-3"
+                                      >
+                                        <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                                        <span className="text-muted-foreground">
+                                          {feature}
+                                        </span>
+                                      </div>
+                                    ),
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                        </CardContent>
                     </Card>
                   )}
 
