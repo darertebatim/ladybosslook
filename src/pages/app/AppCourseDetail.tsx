@@ -1937,14 +1937,19 @@ const AppCourseDetail = () => {
                           <Button
                             size="lg"
                             className="w-full tour-playlist-btn bg-fg-warm text-white shadow-ios rounded-full border-0"
-                            onClick={() =>
-                              navigate(
-                                `/app/player/playlist/${round.audio_playlist_id}`,
-                                { state: { from: location.pathname } }
-                              )
-                            }
+                            onClick={() => {
+                              const el = document.getElementById("playlist-schedule-section");
+                              if (el) {
+                                el.scrollIntoView({ behavior: "smooth", block: "start" });
+                              } else {
+                                navigate(
+                                  `/app/player/playlist/${round.audio_playlist_id}`,
+                                  { state: { from: location.pathname } }
+                                );
+                              }
+                            }}
                           >
-                            <Music className="h-5 w-5 mr-2" />
+                          <Music className="h-5 w-5 mr-2" />
                             Round Playlist
                           </Button>
                         )}
@@ -2080,7 +2085,7 @@ const AppCourseDetail = () => {
                       <CardHeader className="tour-sessions-header">
                         <CardTitle className="tour-sessions-title flex items-center gap-2 text-fg-warm">
                           <Clock className="h-5 w-5" />
-                          Sessions
+                          Live Sessions
                           <Badge className="ml-auto bg-white text-fg-warm border-0">
                             {dbSessions.length}
                           </Badge>
@@ -2193,8 +2198,8 @@ const AppCourseDetail = () => {
                   )}
 
                   {/* Content Schedule Card - shows drip unlock timeline for modules or audio tracks */}
-                  {showContentSchedule && (
-                    <Card className="tour-content-schedule rounded-2xl border-0 shadow-ios bg-card-warm">
+                   {showContentSchedule && (
+                     <Card id="playlist-schedule-section" className="tour-content-schedule rounded-2xl border-0 shadow-ios bg-card-warm scroll-mt-20">
                       <CardHeader className="tour-content-schedule-header">
                         <CardTitle className="tour-content-schedule-title flex items-center gap-2 text-fg-warm">
                           <BookOpen className="h-5 w-5 text-[hsl(var(--brand-primary))]" />
