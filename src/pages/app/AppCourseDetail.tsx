@@ -2347,16 +2347,22 @@ const AppCourseDetail = () => {
                                 unlockDate && isDateToday(unlockDate);
                               const trackTitle =
                                 track.audio_content?.title || "Untitled Track";
+                              const audioId = track.audio_content?.id;
 
                               return (
                                 <div
                                   key={track.id}
+                                  onClick={() => {
+                                    if (isAvailable && audioId) {
+                                      navigate(`/app/player/${audioId}`);
+                                    }
+                                  }}
                                   className={`flex items-center gap-3 p-3 rounded-2xl shadow-ios ${
                                     !isAvailable
                                       ? "bg-white/60 opacity-70"
                                       : isToday
                                         ? "bg-[hsl(var(--tint-peach))]"
-                                        : "bg-white"
+                                        : "bg-white cursor-pointer active:scale-[0.99] transition-transform"
                                   }`}
                                 >
                                   {/* Date Column (or "Now" for drip_delay_days=0) */}
