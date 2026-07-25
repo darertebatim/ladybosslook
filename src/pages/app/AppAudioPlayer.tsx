@@ -549,7 +549,12 @@ export default function AppAudioPlayer() {
               <button
                 onClick={() => {
                   const navPlaylistId = isModuleMode ? contextPlaylistId : playlistInfo?.playlist_id;
-                  if (navPlaylistId) navigate(`/app/player/playlist/${navPlaylistId}`);
+                  if (navPlaylistId) {
+                    navigate(
+                      `/app/player/playlist/${navPlaylistId}`,
+                      cameFromProgram ? { state: { from } } : undefined
+                    );
+                  }
                 }}
                 className="text-sm font-medium text-fg-warm hover:text-fg-warm transition-colors truncate"
               >
