@@ -460,6 +460,22 @@ const AppCourseDetail = () => {
     enabled: !!round?.audio_playlist_id,
   });
 
+  // Fetch playlist metadata (name, description, cover) for the schedule header
+  const { data: schedulePlaylistInfo } = useQuery({
+    queryKey: ["course-schedule-playlist-info", round?.audio_playlist_id],
+    queryFn: async () => {
+      if (!round?.audio_playlist_id) return null;
+      const { data, error } = await supabase
+        .from("audio_playlists")
+        .select("id, name, description, cover_image_url, category")
+        .eq("id", round.audio_playlist_id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!round?.audio_playlist_id,
+  });
+
   // Fetch unread post count for the round's channel
   const { data: channelUnreadCount } = useQuery({
     queryKey: ["channel-unread-count", roundChannel?.id, user?.id],
@@ -2052,6 +2068,39 @@ const AppCourseDetail = () => {
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
+                        {/* Playlist details */}
+                        {schedulePlaylistInfo && (
+                          <button
+                            onClick={() =>
+                              navigate(
+                                `/app/player/playlist/${round?.audio_playlist_id}`,
+                              )
+                            }
+                            className="w-full flex items-center gap-3 p-3 mb-4 rounded-2xl bg-white shadow-ios text-left active:scale-[0.99] transition-transform"
+                          >
+                            {schedulePlaylistInfo.cover_image_url ? (
+                              <img
+                                src={schedulePlaylistInfo.cover_image_url}
+                                alt={schedulePlaylistInfo.name}
+                                className="h-14 w-14 rounded-xl object-cover shrink-0"
+                              />
+                            ) : (
+                              <div className="h-14 w-14 rounded-xl bg-[hsl(var(--tint-peach))] flex items-center justify-center shrink-0">
+                                <Music className="h-6 w-6 text-[hsl(var(--brand-primary))]" />
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-fg-warm truncate">
+                                {schedulePlaylistInfo.name}
+                              </p>
+                              {schedulePlaylistInfo.description && (
+                                <p className="text-xs text-fg-warm/70 line-clamp-2">
+                                  {schedulePlaylistInfo.description}
+                                </p>
+                              )}
+                            </div>
+                          </button>
+                        )}
                         {/* Reminder Settings Button */}
                         <Button
                           className="w-full mb-4 tour-session-reminder-btn bg-white text-fg-warm shadow-ios rounded-full border-0"
@@ -2298,16 +2347,22 @@ const AppCourseDetail = () => {
                                 unlockDate && isDateToday(unlockDate);
                               const trackTitle =
                                 track.audio_content?.title || "Untitled Track";
+                              const audioId = track.audio_content?.id;
 
                               return (
                                 <div
                                   key={track.id}
+                                  onClick={() => {
+                                    if (isAvailable && audioId) {
+                                      navigate(`/app/player/${audioId}`);
+                                    }
+                                  }}
                                   className={`flex items-center gap-3 p-3 rounded-2xl shadow-ios ${
                                     !isAvailable
                                       ? "bg-white/60 opacity-70"
                                       : isToday
                                         ? "bg-[hsl(var(--tint-peach))]"
-                                        : "bg-white"
+                                        : "bg-white cursor-pointer active:scale-[0.99] transition-transform"
                                   }`}
                                 >
                                   {/* Date Column (or "Now" for drip_delay_days=0) */}
@@ -2362,9 +2417,10 @@ const AppCourseDetail = () => {
                                         hasContentReminder(track.id) &&
                                           "text-primary",
                                       )}
-                                      onClick={() =>
-                                        handleContentReminder(track, unlockDate)
-                                      }
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleContentReminder(track, unlockDate);
+                                      }}
                                     >
                                       {hasContentReminder(track.id) ? (
                                         <BellRing className="h-4 w-4" />
