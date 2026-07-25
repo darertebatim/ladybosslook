@@ -1151,6 +1151,7 @@ const AppCourseDetail = () => {
         course_name: program.title,
         program_slug: program.slug,
         status: "active",
+        round_id: autoEnrollRound?.id || null,
       });
 
       if (error) throw error;
