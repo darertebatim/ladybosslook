@@ -2187,17 +2187,15 @@ const AppCourseDetail = () => {
 
                   {/* Content Schedule Card - shows drip unlock timeline for modules or audio tracks */}
                   {showContentSchedule && (
-                    <Card className="tour-content-schedule">
+                    <Card className="tour-content-schedule rounded-2xl border-0 shadow-ios bg-card-warm">
                       <CardHeader className="tour-content-schedule-header">
-                        <CardTitle className="tour-content-schedule-title flex items-center gap-2">
-                          <BookOpen className="h-5 w-5" />
-                          {hasDripTracks
-                            ? "Audiobook Schedule"
-                            : "Content Schedule"}
-                          <Badge variant="secondary" className="ml-auto">
+                        <CardTitle className="tour-content-schedule-title flex items-center gap-2 text-fg-warm">
+                          <BookOpen className="h-5 w-5 text-[hsl(var(--brand-primary))]" />
+                          {hasDripModules ? "Content Schedule" : "Playlist Schedule"}
+                          <Badge className="ml-auto bg-white text-fg-warm border-0">
                             {hasDripModules
                               ? `${playlistModules?.length || 0} modules`
-                              : `${playlistTracks?.length || 0} chapters`}
+                              : `${playlistTracks?.length || 0} tracks`}
                           </Badge>
                         </CardTitle>
                       </CardHeader>
@@ -2205,7 +2203,7 @@ const AppCourseDetail = () => {
                         {/* Reminder Settings Button */}
                         <Button
                           variant="outline"
-                          className="w-full mb-4 bg-[#F4ECFE] border-[#F4ECFE] tour-content-reminder-btn"
+                          className="w-full mb-4 rounded-full border-0 bg-[hsl(var(--tint-peach))] text-fg-warm shadow-ios tour-content-reminder-btn"
                           onClick={() => setShowContentReminderSheet(true)}
                         >
                           <Bell className="h-4 w-4 mr-2" />
@@ -2408,7 +2406,7 @@ const AppCourseDetail = () => {
                             })}
                         </div>
                         <Button
-                          className="w-full mt-4"
+                          className="w-full mt-4 rounded-full bg-[hsl(var(--brand-primary))] text-white shadow-ios hover:bg-[hsl(var(--brand-primary))]"
                           onClick={() =>
                             navigate(
                               `/app/player/playlist/${round?.audio_playlist_id}`,
@@ -2416,9 +2414,7 @@ const AppCourseDetail = () => {
                           }
                         >
                           <Music className="h-5 w-5 mr-2" />
-                          {hasDripTracks
-                            ? "Open Audiobook"
-                            : "Open Course Modules"}
+                          {hasDripModules ? "Open Course Modules" : "Open Playlist"}
                         </Button>
                       </CardContent>
                     </Card>
