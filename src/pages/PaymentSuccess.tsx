@@ -59,12 +59,14 @@ export default function PaymentSuccess() {
 
       // Free enrollment (no Stripe): mark verified immediately
       if (isFreeEnrollment) {
+        const firstFreeSlug = programsParam ? programsParam.split(',')[0]?.trim() : (programSlug || null);
         setPaymentVerified(true);
         setOrderDetails({
           product_name: 'Your free program',
           amount: 0,
           status: 'paid',
           created_at: new Date().toISOString(),
+          program_slug: firstFreeSlug,
         });
         invalidateAllEnrollmentData();
         setIsLoading(false);
