@@ -181,9 +181,9 @@ const NativeAppLayout = () => {
     { path: '/app/my-rilo', icon: Route, label: t('nav.myRilo'), tourClass: 'tour-nav-my-rilo' },
     { path: '/app/home', icon: ClipboardList, label: t('nav.home'), tourClass: 'tour-nav-home' },
     { path: '/app/tools', icon: Compass, label: t('nav.tools'), tourClass: 'tour-nav-explore' },
-    { path: '/app/player', icon: Headphones, label: t('nav.listen'), tourClass: 'tour-nav-listen' },
-    { path: '/app/channels', icon: Users, label: t('nav.chats'), showBadge: chatsBadgeCount > 0, badgeCount: chatsBadgeCount, tourClass: 'tour-nav-channels' },
+    { path: '/app/player', icon: Headphones, label: t('nav.player'), tourClass: 'tour-nav-listen' },
   ];
+
 
   // Tab bar actual height: grid content (~48px for compact) + safe area inset
   const TAB_BAR_CONTENT_HEIGHT = 48;
