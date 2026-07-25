@@ -1371,6 +1371,57 @@ const AppCourseDetail = () => {
                             </div>
                           )}
 
+                        {/* Active Round Details — shown for programs with auto-enrollment */}
+                        {autoEnrollRound && (
+                          <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 space-y-3">
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-primary" />
+                              <p className="text-sm font-semibold">
+                                {autoEnrollRound.round_name || "Upcoming Round"}
+                              </p>
+                            </div>
+                            <div className="space-y-1">
+                              {(() => {
+                                const sessionDateStr =
+                                  autoEnrollRound.first_session_date ||
+                                  autoEnrollRound.start_date;
+                                if (!sessionDateStr) return null;
+                                const sessionDate = sessionDateStr.includes("T")
+                                  ? new Date(sessionDateStr)
+                                  : new Date(sessionDateStr + "T00:00:00");
+                                if (isNaN(sessionDate.getTime())) return null;
+                                return (
+                                  <>
+                                    <p className="text-sm text-muted-foreground">
+                                      Starts{" "}
+                                      <span className="font-medium text-foreground">
+                                        {format(sessionDate, "EEEE, MMMM d, yyyy")}
+                                      </span>
+                                    </p>
+                                    {sessionDateStr.includes("T") &&
+                                      format(sessionDate, "h:mm a") !== "12:00 AM" && (
+                                        <p className="text-sm text-muted-foreground">
+                                          Time{" "}
+                                          <span className="font-medium text-foreground">
+                                            {format(sessionDate, "h:mm a")}
+                                          </span>
+                                        </p>
+                                      )}
+                                  </>
+                                );
+                              })()}
+                              {autoEnrollRound.first_session_duration ? (
+                                <p className="text-sm text-muted-foreground">
+                                  Duration{" "}
+                                  <span className="font-medium text-foreground">
+                                    {autoEnrollRound.first_session_duration} min
+                                  </span>
+                                </p>
+                              ) : null}
+                            </div>
+                          </div>
+                        )}
+
                         {/* Purchase / Enrollment Section */}
                         <div className="border-t pt-6">
                           {/* Waitlist program - show_in_app_waitlist takes priority */}
