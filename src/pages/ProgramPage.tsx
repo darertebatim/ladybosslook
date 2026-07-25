@@ -258,7 +258,7 @@ const ProgramPage = () => {
               <div className="lg:col-span-2 space-y-4 lg:space-y-6">
                 {/* Cover image */}
                 {program.cover_image_url && (
-                  <div className="aspect-video rounded-2xl overflow-hidden">
+                  <div className="aspect-[16/10] lg:aspect-video rounded-xl lg:rounded-2xl overflow-hidden">
                     <img src={program.cover_image_url} alt={program.title} className="w-full h-full object-cover" />
                   </div>
                 )}
@@ -267,12 +267,12 @@ const ProgramPage = () => {
                 <div>
                   <h1
                     dir="auto"
-                    className={`font-display text-3xl md:text-4xl font-bold ${isFarsi ? 'font-farsi' : ''}`}
+                    className={`font-display text-2xl md:text-3xl lg:text-4xl font-bold ${isFarsi ? 'font-farsi' : ''}`}
                   >
                     {program.title}
                   </h1>
-                  <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-                    <HostBadges contentType="program" contentId={program.slug} size="md" />
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                    <HostBadges contentType="program" contentId={program.slug} size="sm" />
                     {program.language && program.language !== 'all' && (
                       <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
                         {isFarsi ? (
