@@ -72,6 +72,8 @@ export default function AppPlayer() {
   // Soundscape is free for all users
   const hasSoundscapeAccess = true;
   const [preferredLanguage, setPreferredLanguage] = useState("all");
+  const todayDate = useMemo(() => parseISO(getLocalDateStr()), []);
+  const { data: programEvents = [] } = useProgramEventsForDate(todayDate);
   const { categories: dbCategories } = useMediaCategories("audio");
   // Topic chips on the Player are driven by the "Door" tag dimension (4 Doors)
   // from the unified tag schema, applied to playlists via content_tags.
