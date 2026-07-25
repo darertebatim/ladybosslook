@@ -460,6 +460,22 @@ const AppCourseDetail = () => {
     enabled: !!round?.audio_playlist_id,
   });
 
+  // Fetch playlist metadata (name, description, cover) for the schedule header
+  const { data: schedulePlaylistInfo } = useQuery({
+    queryKey: ["course-schedule-playlist-info", round?.audio_playlist_id],
+    queryFn: async () => {
+      if (!round?.audio_playlist_id) return null;
+      const { data, error } = await supabase
+        .from("audio_playlists")
+        .select("id, name, description, cover_image_url, category")
+        .eq("id", round.audio_playlist_id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!round?.audio_playlist_id,
+  });
+
   // Fetch unread post count for the round's channel
   const { data: channelUnreadCount } = useQuery({
     queryKey: ["channel-unread-count", roundChannel?.id, user?.id],
