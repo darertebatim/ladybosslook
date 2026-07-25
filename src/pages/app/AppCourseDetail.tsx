@@ -1837,7 +1837,7 @@ const AppCourseDetail = () => {
                                 {nextSession.title}
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                {format(nextDate, "EEE, MMM d • ") + formatSessionTime(nextDate)} •{" "}
+                                {formatSessionTime(nextDate)} •{" "}
                                 {nextSession.duration_minutes || 90} min
                               </p>
                             </div>
