@@ -48,7 +48,7 @@ const ProgramPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { addToCart, isInCart, isAdding } = useCart();
+  const { addToCart, isInCart, isAdding, enrollFree, isEnrollingFree } = useCart();
   const [program, setProgram] = useState<ProgramData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -92,6 +92,10 @@ const ProgramPage = () => {
   const handleAddToCart = () => {
     if (!user) { navigate(`/auth?redirect=/${slug}`); return; }
     if (!program) return;
+    if (program.payment_type === 'free' || program.price_amount === 0) {
+      enrollFree(program.slug);
+      return;
+    }
     addToCart({
       slug: program.slug,
       title: program.title,
@@ -131,7 +135,7 @@ const ProgramPage = () => {
   if (paymentError || notFound || !program) return <Navigate to="/404" replace />;
 
   const isDeposit = program.payment_type === 'deposit';
-  const isFree = program.payment_type === 'free';
+  const isFree = program.payment_type === 'free' || program.price_amount === 0;
   const isSubscription = program.payment_type === 'subscription';
   const hasFullOption = isSubscription && !!program.subscription_full_payment_price && program.subscription_full_payment_price > 0;
   const displayPrice = isDeposit && program.deposit_price ? program.deposit_price : program.price_amount;
@@ -353,9 +357,12 @@ const ProgramPage = () => {
                         </Button>
                       </Link>
                     ) : (
-                      <Button className="w-full gap-2" size="lg" onClick={handleAddToCart} disabled={isAdding || isFree}>
-                        <ShoppingCart size={18} />
-                        {isFree ? 'Sign In to Enroll' : isDeposit ? `Add to Cart — $${(displayPrice / 100).toFixed(0)} Deposit` : 'Add to Cart'}
+                      <Button className="w-full gap-2" size="lg" onClick={handleAddToCart} disabled={isAdding || isEnrollingFree}>
+                        {isFree ? (
+                          <><Check size={18} /> {isEnrollingFree ? 'Enrolling…' : (user ? 'Enroll for Free' : 'Sign In to Enroll')}</>
+                        ) : (
+                          <><ShoppingCart size={18} /> {isDeposit ? `Add to Cart — $${(displayPrice / 100).toFixed(0)} Deposit` : 'Add to Cart'}</>
+                        )}
                       </Button>
                     )}
 
