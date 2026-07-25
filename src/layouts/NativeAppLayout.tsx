@@ -150,19 +150,6 @@ const NativeAppLayout = () => {
     // Provider not available, ignore
   }
 
-  // Get unread feed count for Channels badge
-  const { data: unreadFeedCount = 0 } = useUnreadFeedCount();
-
-  // Friend Hub unread: pending friend requests + unseen dedications
-  const { data: friendships = [] } = useFriendships();
-  const { data: receivedDedications = [] } = useReceivedDedications();
-  const friendHubCount =
-    friendships.filter(
-      (f) => f.friendship.status === 'pending' && f.friendship.addressee_id === user?.id,
-    ).length +
-    receivedDedications.filter((d) => !d.dedication.seen_at).length;
-
-  const chatsBadgeCount = unreadFeedCount + friendHubCount;
 
   // Get streak count for Presence nav badge
   const { data: streakCount = 0 } = useQuery({
