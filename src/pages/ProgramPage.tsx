@@ -131,6 +131,29 @@ const ProgramPage = () => {
     fetchProgram();
   }, [slug]);
 
+  const { data: autoEnrollRound } = useQuery({
+    queryKey: ['program-page-auto-round', slug],
+    enabled: !!slug,
+    queryFn: async () => {
+      if (!slug) return null;
+      const { data: autoEnroll } = await (supabase as any)
+        .from('program_auto_enrollment')
+        .select('round_id, program_rounds(*)')
+        .eq('program_slug', slug)
+        .maybeSingle();
+      if (autoEnroll?.program_rounds) return autoEnroll.program_rounds as any;
+      const { data: activeRound } = await (supabase as any)
+        .from('program_rounds')
+        .select('*')
+        .eq('program_slug', slug)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return activeRound || null;
+    },
+  });
+
   const handleAddToCart = () => {
     if (!user) { navigate(`/auth?redirect=/${slug}`); return; }
     if (!program) return;
@@ -183,6 +206,7 @@ const ProgramPage = () => {
   const displayPrice = isDeposit && program.deposit_price ? program.deposit_price : program.price_amount;
   const inCart = isInCart(program.slug);
   const enrolled = isEnrolled(program.slug);
+  const isFarsi = program.language === 'persian' || program.language === 'farsi';
 
   const handleDirectCheckout = async (option: 'monthly' | 'full') => {
     if (!user) { navigate(`/auth?redirect=/${slug}`); return; }
@@ -208,11 +232,23 @@ const ProgramPage = () => {
         <Navigation />
 
         <main className="flex-grow pt-20">
-          {/* Back link */}
+          {/* Back link + badges row */}
           <div className="container mx-auto px-4 py-4">
-            <Link to="/programs" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors">
-              <ArrowLeft size={16} className="mr-1" /> All Programs
-            </Link>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <Link to="/programs" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <ArrowLeft size={16} className="mr-1" /> All Programs
+              </Link>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="bg-primary/10 text-primary text-xs font-medium px-3 py-1 rounded-full capitalize">
+                  {program.type.replace('-', ' ')}
+                </span>
+                {program.duration && (
+                  <span className="text-xs text-muted-foreground inline-flex items-center gap-1 bg-muted/60 px-3 py-1 rounded-full">
+                    <Clock size={12} /> {program.duration}
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Two-column layout */}
@@ -229,18 +265,27 @@ const ProgramPage = () => {
 
                 {/* Title & meta */}
                 <div>
-                  <div className="flex flex-wrap items-center gap-2 mb-3">
-                    <span className="bg-primary/10 text-primary text-xs font-medium px-3 py-1 rounded-full capitalize">
-                      {program.type.replace('-', ' ')}
-                    </span>
-                    {program.duration && (
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Clock size={12} /> {program.duration}
+                  <h1
+                    dir={isFarsi ? 'rtl' : 'auto'}
+                    className={`font-display text-3xl md:text-4xl font-bold ${isFarsi ? 'font-farsi' : ''}`}
+                  >
+                    {program.title}
+                  </h1>
+                  <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+                    <HostBadges contentType="program" contentId={program.slug} size="md" />
+                    {program.language && program.language !== 'all' && (
+                      <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                        {isFarsi ? (
+                          <PersianFlag className="h-4 w-4" />
+                        ) : LANG_FLAGS[program.language] ? (
+                          <span className="text-base leading-none">{LANG_FLAGS[program.language]}</span>
+                        ) : null}
+                        <span className="font-medium text-foreground">
+                          {LANGUAGE_LABELS[program.language] || program.language}
+                        </span>
                       </span>
                     )}
                   </div>
-                  <h1 className="font-display text-3xl md:text-4xl font-bold">{program.title}</h1>
-                  <HostBadges contentType="program" contentId={program.slug} size="md" className="mt-3" />
                 </div>
 
                 {/* Video */}
@@ -259,9 +304,57 @@ const ProgramPage = () => {
                 {/* Description */}
                 {program.description && (
                   <div
-                    className="prose prose-lg prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground max-w-none"
-                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(program.description) }}
+                    dir={isFarsi ? 'rtl' : 'auto'}
+                    className={`prose prose-lg prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground max-w-none ${isFarsi ? 'font-farsi text-right' : ''}`}
+                    dangerouslySetInnerHTML={{ __html: sanitizeDescription(program.description) }}
                   />
+                )}
+
+                {/* Active Round Details */}
+                {autoEnrollRound && (
+                  <div className="rounded-2xl bg-[hsl(var(--tint-peach,25_100%_96%))] border border-primary/10 shadow-sm p-5 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-primary" />
+                      <p className="text-sm font-semibold">
+                        {autoEnrollRound.round_name || 'Upcoming Round'}
+                      </p>
+                    </div>
+                    <div className="space-y-1 text-sm">
+                      {(() => {
+                        const sessionDateStr = autoEnrollRound.first_session_date || autoEnrollRound.start_date;
+                        if (!sessionDateStr) return null;
+                        const sessionDate = sessionDateStr.includes('T')
+                          ? new Date(sessionDateStr)
+                          : new Date(sessionDateStr + 'T00:00:00');
+                        if (isNaN(sessionDate.getTime())) return null;
+                        return (
+                          <>
+                            <p className="text-muted-foreground">
+                              Starts <span className="font-medium text-foreground">{format(sessionDate, 'EEEE, MMMM d, yyyy')}</span>
+                            </p>
+                            {sessionDateStr.includes('T') && format(sessionDate, 'h:mm a') !== '12:00 AM' && (
+                              <p className="text-muted-foreground">
+                                Time <span className="font-medium text-foreground">{formatSessionTime(sessionDate)}</span>
+                              </p>
+                            )}
+                          </>
+                        );
+                      })()}
+                      {autoEnrollRound.first_session_duration ? (
+                        <p className="text-muted-foreground">
+                          Duration <span className="font-medium text-foreground">{autoEnrollRound.first_session_duration} min</span>
+                        </p>
+                      ) : null}
+                      {autoEnrollRound.google_meet_link ? (
+                        <p className="text-muted-foreground">
+                          Meeting on{' '}
+                          <span className="inline-flex items-center gap-1 font-medium text-foreground">
+                            <Video className="h-3.5 w-3.5" /> Google Meet
+                          </span>
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
                 )}
 
                 {/* Features */}
