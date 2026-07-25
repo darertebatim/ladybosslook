@@ -1393,6 +1393,7 @@ const AppCourseDetail = () => {
                           {/* Program Description */}
                           {program.description && (
                             <div
+                              dir="auto"
                               className="text-muted-foreground whitespace-pre-wrap leading-relaxed [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-foreground [&_h2]:mt-4 [&_h2]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-foreground [&_h3]:mt-3 [&_h3]:mb-1 [&_strong]:text-foreground"
                               dangerouslySetInnerHTML={{
                                 __html: DOMPurify.sanitize(program.description),
