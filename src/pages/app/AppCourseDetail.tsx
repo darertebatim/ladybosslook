@@ -1447,6 +1447,20 @@ const AppCourseDetail = () => {
                                     </span>
                                   </p>
                                 ) : null}
+                                {autoEnrollRound.google_meet_link ? (
+                                  <p className="text-sm text-muted-foreground">
+                                    Meeting on{" "}
+                                    <a
+                                      href={autoEnrollRound.google_meet_link}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="inline-flex items-center gap-1 font-medium text-foreground underline"
+                                    >
+                                      <Video className="h-3.5 w-3.5" />
+                                      Google Meet
+                                    </a>
+                                  </p>
+                                ) : null}
                               </div>
                             </div>
                           )}
