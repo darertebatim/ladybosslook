@@ -832,7 +832,7 @@
     }
   },
   "player": {
-    "title": "شنیدن",
+    "title": "پلیر",
     "searchPlaceholder": "جستجوی صوت…",
     "searchAria": "جستجو",
     "closeSearchAria": "بستن جستجو",
@@ -892,7 +892,7 @@
     "addToRoutinesFailed": "افزودن به روتین‌ها ناموفق بود"
   },
   "toolsPage": {
-    "title": "ابزارهای خودمراقبتی",
+    "title": "ابزارهای ریلو",
     "searchPlaceholder": "جستجوی ابزارها و برنامه‌ها…",
     "searchAria": "جستجو",
     "closeSearchAria": "بستن جستجو",
