@@ -528,6 +528,10 @@ export default function AppAudioPlayer() {
         <div className="pt-1 pb-2 px-4 flex items-center gap-1">
           <button
             onClick={() => {
+              if (cameFromProgram) {
+                navigate(from);
+                return;
+              }
               const backPlaylistId = isModuleMode ? contextPlaylistId : playlistInfo?.playlist_id;
               if (backPlaylistId) {
                 navigate(`/app/player/playlist/${backPlaylistId}`);
