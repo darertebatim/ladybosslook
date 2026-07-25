@@ -2227,12 +2227,12 @@ const AppCourseDetail = () => {
                               return (
                                 <div
                                   key={module.id}
-                                  className={`flex items-center gap-3 p-3 rounded-lg border ${
+                                  className={`flex items-center gap-3 p-3 rounded-2xl shadow-ios ${
                                     !isAvailable
-                                      ? "bg-muted/50 opacity-60"
+                                      ? "bg-white/60 opacity-70"
                                       : isToday
-                                        ? "border-primary bg-primary/5"
-                                        : "bg-card"
+                                        ? "bg-[hsl(var(--tint-peach))]"
+                                        : "bg-white"
                                   }`}
                                 >
                                   {/* Date Column (or "Now" for drip_delay_days=0) */}
@@ -2330,12 +2330,12 @@ const AppCourseDetail = () => {
                               return (
                                 <div
                                   key={track.id}
-                                  className={`flex items-center gap-3 p-3 rounded-lg border ${
+                                  className={`flex items-center gap-3 p-3 rounded-2xl shadow-ios ${
                                     !isAvailable
-                                      ? "bg-muted/50 opacity-60"
+                                      ? "bg-white/60 opacity-70"
                                       : isToday
-                                        ? "border-primary bg-primary/5"
-                                        : "bg-card"
+                                        ? "bg-[hsl(var(--tint-peach))]"
+                                        : "bg-white"
                                   }`}
                                 >
                                   {/* Date Column (or "Now" for drip_delay_days=0) */}
