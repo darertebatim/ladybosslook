@@ -497,6 +497,23 @@ const ProgramPage = () => {
                   </Card>
                 </div>
               </div>
+
+              {/* Features */}
+              <div className="lg:col-span-2 space-y-4 lg:space-y-6">
+                {program.features?.length > 0 && (
+                  <div>
+                    <h2 className="font-display text-xl lg:text-2xl font-bold mb-3">What's Included</h2>
+                    <div className="grid sm:grid-cols-2 gap-2">
+                      {program.features.map((feature, i) => (
+                        <div key={i} className="flex items-start gap-2.5 bg-muted/50 rounded-lg p-3">
+                          <Check className="w-4 h-4 lg:w-5 lg:h-5 text-primary flex-shrink-0 mt-0.5" />
+                          <span className="text-sm">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </section>
 
