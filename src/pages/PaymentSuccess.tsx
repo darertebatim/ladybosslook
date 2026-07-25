@@ -41,6 +41,7 @@ export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const programSlug = searchParams.get('program');
+  const isFreeEnrollment = searchParams.get('free') === '1';
   const [paymentVerified, setPaymentVerified] = useState(false);
   const [orderDetails, setOrderDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -52,6 +53,24 @@ export default function PaymentSuccess() {
   useEffect(() => {
     const verifyPayment = async () => {
       const isTestMode = searchParams.get('test') === 'true';
+
+      // Free enrollment (no Stripe): mark verified immediately
+      if (isFreeEnrollment) {
+        setPaymentVerified(true);
+        setOrderDetails({
+          product_name: 'Your free program',
+          amount: 0,
+          status: 'paid',
+          created_at: new Date().toISOString(),
+        });
+        invalidateAllEnrollmentData();
+        setIsLoading(false);
+        toast({
+          title: "You're enrolled!",
+          description: "Your free program is unlocked.",
+        });
+        return;
+      }
       
       if (isTestMode) {
         const testProgramData: Record<string, { title: string; amount: number }> = {
