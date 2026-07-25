@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { Sparkles, Loader2, Smartphone, Mail, MessageCircle, CheckCircle2 } from 'lucide-react';
+import { Sparkles, Loader2, Smartphone, Mail, MessageCircle, CheckCircle2, Calendar, Video } from 'lucide-react';
+import { format } from 'date-fns';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
@@ -41,6 +43,7 @@ export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const programSlug = searchParams.get('program');
+  const programsParam = searchParams.get('programs');
   const isFreeEnrollment = searchParams.get('free') === '1';
   const [paymentVerified, setPaymentVerified] = useState(false);
   const [orderDetails, setOrderDetails] = useState<any>(null);
@@ -172,6 +175,37 @@ export default function PaymentSuccess() {
     [sessionId, orderDetails?.program_slug, programSlug]
   );
 
+  // Resolve slug(s) to look up round details
+  const roundSlug = useMemo(() => {
+    if (orderDetails?.program_slug) return orderDetails.program_slug as string;
+    if (programSlug) return programSlug;
+    if (programsParam) return programsParam.split(',')[0]?.trim() || null;
+    return null;
+  }, [orderDetails?.program_slug, programSlug, programsParam]);
+
+  const { data: roundInfo } = useQuery({
+    queryKey: ['payment-success-round', roundSlug],
+    enabled: !!roundSlug,
+    queryFn: async () => {
+      const slug = roundSlug!;
+      const { data: autoEnroll } = await (supabase as any)
+        .from('program_auto_enrollment')
+        .select('round_id, program_rounds(*)')
+        .eq('program_slug', slug)
+        .maybeSingle();
+      if (autoEnroll?.program_rounds) return autoEnroll.program_rounds as any;
+      const { data: activeRound } = await (supabase as any)
+        .from('program_rounds')
+        .select('*')
+        .eq('program_slug', slug)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return activeRound || null;
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]">
@@ -289,6 +323,53 @@ export default function PaymentSuccess() {
               </div>
             )}
           </div>
+
+          {/* Round details */}
+          {roundInfo && (() => {
+            const sessionDateStr = roundInfo.first_session_date || roundInfo.start_date;
+            const sessionDate = sessionDateStr
+              ? (sessionDateStr.includes('T') ? new Date(sessionDateStr) : new Date(sessionDateStr + 'T00:00:00'))
+              : null;
+            const validDate = sessionDate && !isNaN(sessionDate.getTime()) ? sessionDate : null;
+            const hasTime = !!sessionDateStr && sessionDateStr.includes('T') && validDate && format(validDate, 'h:mm a') !== '12:00 AM';
+            const tzAbbr = (() => {
+              try {
+                return new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' })
+                  .formatToParts(new Date()).find(p => p.type === 'timeZoneName')?.value || '';
+              } catch { return ''; }
+            })();
+            return (
+              <div className="mt-5 bg-[#FFF6EC] rounded-3xl p-5 border border-[#F08A3E]/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <Calendar className="h-4 w-4 text-[#F08A3E]" />
+                  <h2 className="text-[15px] font-bold text-[#1a1f3d]">
+                    {roundInfo.round_name || 'Upcoming Round'}
+                  </h2>
+                </div>
+                <div className="space-y-1.5 text-[14px]">
+                  {validDate && (
+                    <p className="text-[#1a1f3d]/70">
+                      Starts <span className="font-semibold text-[#1a1f3d]">{format(validDate, 'EEEE, MMMM d, yyyy')}</span>
+                    </p>
+                  )}
+                  {hasTime && validDate && (
+                    <p className="text-[#1a1f3d]/70">
+                      Time <span className="font-semibold text-[#1a1f3d]">{format(validDate, 'h:mm a')}{tzAbbr ? ` ${tzAbbr}` : ''}</span>
+                    </p>
+                  )}
+                  {roundInfo.first_session_duration && (
+                    <p className="text-[#1a1f3d]/70">
+                      Duration <span className="font-semibold text-[#1a1f3d]">{roundInfo.first_session_duration} min</span>
+                    </p>
+                  )}
+                  <p className="text-[#1a1f3d]/70 inline-flex items-center gap-1.5">
+                    <Video className="h-3.5 w-3.5 text-[#F08A3E]" />
+                    <span className="font-semibold text-[#1a1f3d]">Google Meet</span>
+                  </p>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Order summary */}
           {orderDetails && (
