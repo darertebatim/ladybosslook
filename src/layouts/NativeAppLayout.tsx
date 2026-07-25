@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { haptic } from '@/lib/haptics';
-import { Home, MessageCircle, Compass, Music, Users, Flame, CalendarPlus, Play, Sparkles, Route, ClipboardList, Headphones } from 'lucide-react';
+import { Home, MessageCircle, Compass, Music, Flame, CalendarPlus, Play, Sparkles, Route, ClipboardList, Headphones } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, LayoutGroup } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
@@ -14,11 +14,8 @@ import { RoutineMiniPlayer } from '@/components/app/RoutineMiniPlayer';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
-import { useUnreadChat } from '@/hooks/useUnreadChat';
 import { useChatNotifications } from '@/hooks/useChatNotifications';
-import { useUnreadFeedCount } from '@/hooks/useFeed';
-import { useFriendships } from '@/hooks/useFriends';
-import { useReceivedDedications } from '@/hooks/useDedications';
+
 import { cn } from '@/lib/utils';
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
 import { usePushNotificationFlow } from '@/hooks/usePushNotificationFlow';
@@ -86,8 +83,8 @@ const NativeAppLayout = () => {
   }, []);
   
   // Custom hooks after useState declarations
-  const { unreadCount } = useUnreadChat();
   const { showUnreadPopup, unreadMessageCount, dismissPopup, goToChat } = useChatNotifications();
+
   const invalidateAllEnrollmentData = useInvalidateAllEnrollmentData();
   const { isKeyboardOpen } = useKeyboard();
 
@@ -150,19 +147,6 @@ const NativeAppLayout = () => {
     // Provider not available, ignore
   }
 
-  // Get unread feed count for Channels badge
-  const { data: unreadFeedCount = 0 } = useUnreadFeedCount();
-
-  // Friend Hub unread: pending friend requests + unseen dedications
-  const { data: friendships = [] } = useFriendships();
-  const { data: receivedDedications = [] } = useReceivedDedications();
-  const friendHubCount =
-    friendships.filter(
-      (f) => f.friendship.status === 'pending' && f.friendship.addressee_id === user?.id,
-    ).length +
-    receivedDedications.filter((d) => !d.dedication.seen_at).length;
-
-  const chatsBadgeCount = unreadFeedCount + friendHubCount;
 
   // Get streak count for Presence nav badge
   const { data: streakCount = 0 } = useQuery({
@@ -197,9 +181,9 @@ const NativeAppLayout = () => {
     { path: '/app/my-rilo', icon: Route, label: t('nav.myRilo'), tourClass: 'tour-nav-my-rilo' },
     { path: '/app/home', icon: ClipboardList, label: t('nav.home'), tourClass: 'tour-nav-home' },
     { path: '/app/tools', icon: Compass, label: t('nav.tools'), tourClass: 'tour-nav-explore' },
-    { path: '/app/player', icon: Headphones, label: t('nav.listen'), tourClass: 'tour-nav-listen' },
-    { path: '/app/channels', icon: Users, label: t('nav.chats'), showBadge: chatsBadgeCount > 0, badgeCount: chatsBadgeCount, tourClass: 'tour-nav-channels' },
+    { path: '/app/player', icon: Headphones, label: t('nav.player'), tourClass: 'tour-nav-listen' },
   ];
+
 
   // Tab bar actual height: grid content (~48px for compact) + safe area inset
   const TAB_BAR_CONTENT_HEIGHT = 48;
@@ -252,12 +236,12 @@ const NativeAppLayout = () => {
                 : 'bg-gradient-to-b from-white/65 to-bg-warm/75 border-white/65 dark:from-[#3C2819]/55 dark:to-[#28190F]/65 dark:border-[hsl(var(--brand-primary)/0.18)]',
             )}
           >
-            <div className="grid grid-cols-5 items-center">
+            <div className="grid grid-cols-4 items-center">
+
               {navItems.map((item) => {
-                const isActive = location.pathname === item.path ||
-                  (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
+                const isActive = location.pathname === item.path;
                 const Icon = item.icon;
-                const showChatBadge = item.path === '/app/chat' && unreadCount > 0;
+
                 const isOverlayContext = location.pathname.startsWith('/app/watch');
 
                 return (
@@ -303,19 +287,7 @@ const NativeAppLayout = () => {
                       />
 
                       {/* Badges */}
-                      {showChatBadge && (
-                        <span className="absolute -top-0.5 -right-0.5 z-20 bg-brand-rose text-white text-[9px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 shadow-[0_1px_4px_hsl(var(--brand-accent-rose)/0.4)]">
-                          {unreadCount > 99 ? '99+' : unreadCount}
-                        </span>
-                      )}
-                      {item.showBadge && !showChatBadge && item.badgeCount && (
-                        <span className="absolute -top-0.5 -right-0.5 z-20 bg-brand-rose text-white text-[9px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 shadow-[0_1px_4px_hsl(var(--brand-accent-rose)/0.4)]">
-                          {item.badgeCount > 9 ? '9+' : item.badgeCount}
-                        </span>
-                      )}
-                      {item.showBadge && !showChatBadge && !item.badgeCount && (
-                        <span className="absolute top-0 right-0 z-20 bg-brand-rose w-2 h-2 rounded-full" />
-                      )}
+
                     </div>
 
                     <span
