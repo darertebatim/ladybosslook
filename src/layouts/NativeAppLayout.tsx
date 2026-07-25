@@ -236,7 +236,8 @@ const NativeAppLayout = () => {
                 : 'bg-gradient-to-b from-white/65 to-bg-warm/75 border-white/65 dark:from-[#3C2819]/55 dark:to-[#28190F]/65 dark:border-[hsl(var(--brand-primary)/0.18)]',
             )}
           >
-            <div className="grid grid-cols-5 items-center">
+            <div className="grid grid-cols-4 items-center">
+
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path ||
                   (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
