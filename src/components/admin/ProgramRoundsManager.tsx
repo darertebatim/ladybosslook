@@ -118,6 +118,7 @@ export const ProgramRoundsManager = () => {
     video_url: "",
     is_self_paced: false,
     auto_create_feed_channel: true,
+      in_app_support_enabled: false,
   });
 
   // Fetch programs for dropdown
@@ -349,6 +350,7 @@ export const ProgramRoundsManager = () => {
       video_url: "",
       is_self_paced: false,
       auto_create_feed_channel: true,
+      in_app_support_enabled: false,
     });
     setEditingId(null);
   };
@@ -397,6 +399,7 @@ export const ProgramRoundsManager = () => {
       video_url: round.video_url || "",
       is_self_paced: round.is_self_paced || false,
       auto_create_feed_channel: round.auto_create_feed_channel ?? true,
+      in_app_support_enabled: (round as any).in_app_support_enabled ?? false,
     });
     setEditingId(round.id);
     setIsFormDialogOpen(true);
@@ -428,6 +431,7 @@ export const ProgramRoundsManager = () => {
       video_url: round.video_url || "",
       is_self_paced: round.is_self_paced || false,
       auto_create_feed_channel: round.auto_create_feed_channel ?? true,
+      in_app_support_enabled: (round as any).in_app_support_enabled ?? false,
     });
     setEditingId(null); // This is a new round, not editing
     setIsFormDialogOpen(true);
