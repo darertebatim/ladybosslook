@@ -1937,20 +1937,21 @@ const AppCourseDetail = () => {
                           <Button
                             size="lg"
                             className="w-full tour-playlist-btn bg-fg-warm text-white shadow-ios rounded-full border-0"
-                            onClick={() =>
-                              navigate(
-                                `/app/player/playlist/${round.audio_playlist_id}`,
-                                { state: { from: location.pathname } }
-                              )
-                            }
+                            onClick={() => {
+                              const el = document.getElementById("playlist-schedule-section");
+                              if (el) {
+                                el.scrollIntoView({ behavior: "smooth", block: "start" });
+                              } else {
+                                navigate(
+                                  `/app/player/playlist/${round.audio_playlist_id}`,
+                                  { state: { from: location.pathname } }
+                                );
+                              }
+                            }}
                           >
                           <Music className="h-5 w-5 mr-2" />
                             Round Playlist
                           </Button>
-                        )}
-                        {false && (
-                          <></>
-                        )}
                         )}
 
                         {/* 3. Join Google Meet - Time-sensitive */}
