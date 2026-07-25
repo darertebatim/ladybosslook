@@ -37,6 +37,33 @@ export const useCart = () => {
     enabled: !!user,
   });
 
+  // Enroll a free program directly (no cart / no Stripe)
+  const enrollFreeMutation = useMutation({
+    mutationFn: async (slug: string) => {
+      if (!user) {
+        navigate(`/auth?redirect=${window.location.pathname}`);
+        throw new Error('Sign in required');
+      }
+      const { data, error } = await supabase.functions.invoke('enroll-free-programs', {
+        body: { slugs: [slug] },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cart-items'] });
+      queryClient.invalidateQueries({ queryKey: ['course-enrollments'] });
+      queryClient.invalidateQueries({ queryKey: ['active-enrollments'] });
+      toast.success("You're enrolled!");
+      navigate('/payment-success?free=1');
+    },
+    onError: (err: Error) => {
+      if (err.message !== 'Sign in required') {
+        toast.error('Could not enroll. Please try again.');
+      }
+    },
+  });
+
   const addToCartMutation = useMutation({
     mutationFn: async (program: {
       slug: string;
@@ -100,5 +127,7 @@ export const useCart = () => {
     removeFromCart: removeFromCartMutation.mutate,
     isInCart,
     isAdding: addToCartMutation.isPending,
+    enrollFree: enrollFreeMutation.mutate,
+    isEnrollingFree: enrollFreeMutation.isPending,
   };
 };

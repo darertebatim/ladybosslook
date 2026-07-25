@@ -178,6 +178,27 @@ serve(async (req) => {
       }
     };
 
+    // Safety net: clear cart items for this checkout in case the webhook was late/missed
+    try {
+      const cartUserId = session.metadata?.user_id;
+      const cartSlugsRaw = session.metadata?.program_slugs || session.metadata?.program_slug || '';
+      const cartSlugs = cartSlugsRaw.split(',').map(s => s.trim()).filter(Boolean);
+      if (cartUserId && cartSlugs.length > 0) {
+        const { error: cartErr } = await supabase
+          .from('cart_items')
+          .delete()
+          .eq('user_id', cartUserId)
+          .in('program_slug', cartSlugs);
+        if (cartErr) {
+          logStep('Cart cleanup warning', { error: cartErr.message });
+        } else {
+          logStep('Cart cleaned', { userId: cartUserId, slugs: cartSlugs });
+        }
+      }
+    } catch (e: any) {
+      logStep('Cart cleanup failed', { error: e?.message });
+    }
+
     logStep('Returning success response', { hasOrder: !!orderDetails });
     return new Response(JSON.stringify(response), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

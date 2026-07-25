@@ -118,7 +118,7 @@ const CartPage = () => {
               <div className="border-t pt-6 mt-6 space-y-4">
                 <div className="flex justify-between items-center text-lg">
                   <span className="font-semibold">Total</span>
-                  <span className="font-bold text-2xl">{formatPrice(totalCents)}</span>
+                  <span className="font-bold text-2xl">{totalCents === 0 ? 'Free' : formatPrice(totalCents)}</span>
                 </div>
                 <Button
                   className="w-full"
@@ -128,13 +128,17 @@ const CartPage = () => {
                 >
                   {checkingOut ? (
                     <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
+                  ) : totalCents === 0 ? (
+                    <>Enroll for Free <ArrowRight className="ml-2 w-4 h-4" /></>
                   ) : (
                     <>Proceed to Checkout <ArrowRight className="ml-2 w-4 h-4" /></>
                   )}
                 </Button>
-                <p className="text-xs text-center text-muted-foreground">
-                  Secure payment powered by Stripe
-                </p>
+                {totalCents > 0 && (
+                  <p className="text-xs text-center text-muted-foreground">
+                    Secure payment powered by Stripe
+                  </p>
+                )}
               </div>
             </div>
           )}
