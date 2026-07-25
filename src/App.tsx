@@ -212,6 +212,7 @@ const FreeLive = lazy(() => import("@/pages/FreeLive"));
 const One = lazy(() => import("@/pages/One"));
 const Five = lazy(() => import("@/pages/Five"));
 const Floew = lazy(() => import("@/pages/Floew"));
+const ElcLanding = lazy(() => import("@/pages/ElcLanding"));
 const Giveaway = lazy(() => import("@/pages/Giveaway"));
 const IQMoneyWorkshop = lazy(() => import("@/pages/IQMoneyWorkshop"));
 const LadybossAnnouncements = lazy(() => import("@/pages/LadybossAnnouncements"));
