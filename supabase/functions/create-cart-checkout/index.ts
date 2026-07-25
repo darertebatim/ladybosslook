@@ -124,8 +124,9 @@ serve(async (req) => {
     // If only free items — skip Stripe entirely
     if (lineItems.length === 0) {
       const origin = req.headers.get('origin') || 'https://ladybosslook.com';
+      const freeSlugsParam = freePrograms.map(p => p.slug).join(',');
       return new Response(JSON.stringify({
-        url: `${origin}/payment-success?free=1`,
+        url: `${origin}/payment-success?free=1${freeSlugsParam ? `&programs=${encodeURIComponent(freeSlugsParam)}` : ''}`,
         freeOnly: true,
         enrolled: freePrograms.map(p => p.slug),
       }), {
