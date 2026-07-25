@@ -28,6 +28,26 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
+import { HostBadges } from "@/components/app/HostBadges";
+import { PersianFlag } from "@/components/ui/PersianFlag";
+
+const LANG_FLAGS: Record<string, string> = {
+  all: "🌐",
+  american: "🇺🇸",
+  english: "🇺🇸",
+  turkish: "🇹🇷",
+  spanish: "🇪🇸",
+};
+
+const LANGUAGE_LABELS: Record<string, string> = {
+  all: "All languages",
+  american: "English",
+  english: "English",
+  persian: "Persian",
+  farsi: "Persian",
+  turkish: "Turkish",
+  spanish: "Spanish",
+};
 import { BackButton } from "@/components/app/BackButton";
 import { downloadICSFile, generateICSFile } from "@/utils/calendar";
 import {
