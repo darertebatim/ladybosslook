@@ -239,10 +239,9 @@ const NativeAppLayout = () => {
             <div className="grid grid-cols-4 items-center">
 
               {navItems.map((item) => {
-                const isActive = location.pathname === item.path ||
-                  (item.path === '/app/channels' && location.pathname.startsWith('/app/channels'));
+                const isActive = location.pathname === item.path;
                 const Icon = item.icon;
-                const showChatBadge = item.path === '/app/chat' && unreadCount > 0;
+
                 const isOverlayContext = location.pathname.startsWith('/app/watch');
 
                 return (
