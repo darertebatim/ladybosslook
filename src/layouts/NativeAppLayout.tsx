@@ -182,6 +182,7 @@ const NativeAppLayout = () => {
     { path: '/app/home', icon: ClipboardList, label: t('nav.home'), tourClass: 'tour-nav-home' },
     { path: '/app/player', icon: Headphones, label: t('nav.player'), tourClass: 'tour-nav-listen' },
     { path: '/app/tools', icon: Compass, label: t('nav.tools'), tourClass: 'tour-nav-explore' },
+    { path: '/app/aiplanner', icon: Sparkles, label: t('nav.aiPlanner'), tourClass: 'tour-nav-ai-planner' },
   ];
 
 
@@ -236,7 +237,7 @@ const NativeAppLayout = () => {
                 : 'bg-gradient-to-b from-white/65 to-bg-warm/75 border-white/65 dark:from-[#3C2819]/55 dark:to-[#28190F]/65 dark:border-[hsl(var(--brand-primary)/0.18)]',
             )}
           >
-            <div className="grid grid-cols-4 items-center">
+            <div className="grid grid-cols-5 items-center">
 
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path;
@@ -307,35 +308,6 @@ const NativeAppLayout = () => {
           </div>
         </LayoutGroup>
 
-        {/* Detached FAB → AI Planner (only on planner/home page) */}
-        {location.pathname === '/app/home' && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
-          className="shrink-0"
-        >
-          <Link
-            to="/app/aiplanner"
-            onClick={() => haptic.medium()}
-            aria-label={t('nav.aiPlanner')}
-            className={cn(
-              'block w-[60px] h-[60px] rounded-full relative',
-              'bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-primary-dark))]',
-              'border-[0.5px] border-white/70 dark:border-[hsl(var(--brand-primary)/0.25)]',
-              'shadow-[0_8px_24px_-4px_hsl(var(--brand-primary)/0.5),0_3px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.28)]',
-              'active:scale-95 transition-transform',
-              'flex items-center justify-center',
-            )}
-          >
-            <Sparkles className="w-6 h-6 text-white relative z-10" strokeWidth={2.2} />
-            {/* Glass shine */}
-            <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
-              <span className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full bg-gradient-to-b from-white/35 to-transparent" />
-            </span>
-          </Link>
-        </motion.div>
-        )}
       </nav>
       )}
 
