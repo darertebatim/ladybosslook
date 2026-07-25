@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Headphones, List, Lock, CheckCircle, Play, CalendarPlus, Check, Download, CheckCircle2, Share2 } from "lucide-react";
@@ -38,14 +38,17 @@ export default function AppAudioPlayer() {
   const { t } = useTranslation();
   const { audioId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const [showCelebration, setShowCelebration] = useState(false);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   
-  // Check if we're in module mode (navigated from modules list)
+  // Check if we're in module mode (navigated from modules list) or came from a program/round page
   const isModuleMode = searchParams.get('moduleMode') === 'true';
   const contextPlaylistId = searchParams.get('playlistId');
   const moduleIndex = parseInt(searchParams.get('moduleIndex') || '0', 10);
+  const from = (location.state as any)?.from;
+  const cameFromProgram = typeof from === "string" && from.startsWith("/app/myprograms");
   
   // Use global audio player context
   const {
