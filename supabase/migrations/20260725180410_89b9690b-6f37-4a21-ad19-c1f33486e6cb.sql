@@ -1,0 +1,1 @@
+ALTER TABLE public.program_rounds ADD COLUMN IF NOT EXISTS in_app_support_enabled boolean NOT NULL DEFAULT false;
