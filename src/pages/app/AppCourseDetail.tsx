@@ -1369,9 +1369,9 @@ const AppCourseDetail = () => {
 
                   {/* Purchase Card */}
                   {program && (
-                    <Card>
+                    <Card className="rounded-2xl border-0 shadow-ios bg-card-warm">
                       <CardHeader>
-                        <CardTitle className="text-2xl">
+                        <CardTitle className="text-2xl text-fg-warm">
                           {program.title}
                         </CardTitle>
                       </CardHeader>
@@ -1413,10 +1413,10 @@ const AppCourseDetail = () => {
 
                           {/* Active Round Details — shown for programs with auto-enrollment */}
                           {autoEnrollRound && (
-                            <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 space-y-3">
+                            <div className="rounded-2xl bg-[hsl(var(--tint-peach))] shadow-ios p-4 space-y-3">
                               <div className="flex items-center gap-2">
-                                <Calendar className="h-4 w-4 text-primary" />
-                                <p className="text-sm font-semibold">
+                                <Calendar className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
+                                <p className="text-sm font-semibold text-fg-warm">
                                   {autoEnrollRound.round_name || "Upcoming Round"}
                                 </p>
                               </div>
@@ -1432,17 +1432,17 @@ const AppCourseDetail = () => {
                                   if (isNaN(sessionDate.getTime())) return null;
                                   return (
                                     <>
-                                      <p className="text-sm text-muted-foreground">
+                                      <p className="text-sm text-fg-warm-muted">
                                         Starts{" "}
-                                        <span className="font-medium text-foreground">
+                                        <span className="font-medium text-fg-warm">
                                           {format(sessionDate, "EEEE, MMMM d, yyyy")}
                                         </span>
                                       </p>
                                       {sessionDateStr.includes("T") &&
                                         format(sessionDate, "h:mm a") !== "12:00 AM" && (
-                                          <p className="text-sm text-muted-foreground">
+                                          <p className="text-sm text-fg-warm-muted">
                                             Time{" "}
-                                            <span className="font-medium text-foreground">
+                                            <span className="font-medium text-fg-warm">
                                               {format(sessionDate, "h:mm a")}
                                             </span>
                                           </p>
@@ -1451,17 +1451,17 @@ const AppCourseDetail = () => {
                                   );
                                 })()}
                                 {autoEnrollRound.first_session_duration ? (
-                                  <p className="text-sm text-muted-foreground">
+                                  <p className="text-sm text-fg-warm-muted">
                                     Duration{" "}
-                                    <span className="font-medium text-foreground">
+                                    <span className="font-medium text-fg-warm">
                                       {autoEnrollRound.first_session_duration} min
                                     </span>
                                   </p>
                                 ) : null}
                                 {autoEnrollRound.google_meet_link ? (
-                                  <p className="text-sm text-muted-foreground">
+                                  <p className="text-sm text-fg-warm-muted">
                                     Meeting on{" "}
-                                    <span className="inline-flex items-center gap-1 font-medium text-foreground">
+                                    <span className="inline-flex items-center gap-1 font-medium text-fg-warm">
                                       <Video className="h-3.5 w-3.5" />
                                       Google Meet
                                     </span>
@@ -1609,7 +1609,7 @@ const AppCourseDetail = () => {
                             ) : (
                               <Button
                                 size="lg"
-                                className="w-full"
+                                className="w-full rounded-full bg-[hsl(var(--brand-primary))] hover:bg-[hsl(var(--brand-primary))]/90 text-white shadow-ios"
                                 onClick={() => enrollMutation.mutate()}
                                 disabled={enrollMutation.isPending}
                               >
@@ -1664,25 +1664,25 @@ const AppCourseDetail = () => {
 
                   {/* Additional Info */}
                   {program && (
-                    <Card>
+                    <Card className="rounded-2xl border-0 shadow-ios bg-card-warm">
                       <CardHeader>
-                        <CardTitle>{t('courseDetailPage.programDetails')}</CardTitle>
+                        <CardTitle className="text-fg-warm">{t('courseDetailPage.programDetails')}</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-fg-warm-muted">
                               Duration
                             </p>
-                            <p className="font-semibold">
+                            <p className="font-semibold text-fg-warm">
                               {program.duration || "Self-paced"}
                             </p>
                           </div>
                           <div>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-fg-warm-muted">
                               Format
                             </p>
-                            <p className="font-semibold capitalize">
+                            <p className="font-semibold capitalize text-fg-warm">
                               {program.delivery_method || "Online"}
                             </p>
                           </div>
