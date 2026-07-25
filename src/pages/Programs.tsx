@@ -7,6 +7,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { usePrograms } from '@/hooks/usePrograms';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
+import { useMyEnrollments } from '@/hooks/useMyEnrollments';
 import { Link, useNavigate } from 'react-router-dom';
 import type { Program } from '@/data/programs';
 import DOMPurify from 'dompurify';
@@ -29,8 +30,10 @@ const TYPE_LABELS: Record<string, { label: string; icon: string }> = {
 const ProgramCard = ({ program }: { program: Program }) => {
   const { addToCart, isInCart, isAdding, enrollFree, isEnrollingFree } = useCart();
   const { user } = useAuth();
+  const { isEnrolled } = useMyEnrollments();
   const navigate = useNavigate();
   const inCart = isInCart(program.slug);
+  const enrolled = isEnrolled(program.slug);
   const cleanDesc = stripHtml(program.description).slice(0, 120);
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -94,7 +97,11 @@ const ProgramCard = ({ program }: { program: Program }) => {
               </span>
             </div>
 
-            {inCart ? (
+            {enrolled ? (
+              <Button size="sm" variant="secondary" className="gap-1.5" disabled>
+                <Check size={14} /> Enrolled
+              </Button>
+            ) : inCart ? (
               <Link to="/cart" onClick={(e) => e.stopPropagation()}>
                 <Button size="sm" variant="secondary" className="gap-1.5">
                   <Check size={14} /> In Cart
