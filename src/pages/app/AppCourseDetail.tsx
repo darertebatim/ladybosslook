@@ -101,6 +101,17 @@ import DOMPurify from "dompurify";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
+// Sanitize program description and add dir="auto" to each block element so
+// mixed English/Farsi paragraphs pick their own direction instead of the
+// whole description being forced one way.
+function sanitizeDescription(html: string): string {
+  const sanitized = DOMPurify.sanitize(html);
+  return sanitized.replace(
+    /<(p|div|h[1-6]|li|blockquote|pre)(?![^>]*?\sdir=)([^>]*)>/gi,
+    '<$1 dir="auto"$2>'
+  );
+}
+
 const AppCourseDetail = () => {
   const { t } = useTranslation();
   const { slug, roundId } = useParams();
