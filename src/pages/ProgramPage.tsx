@@ -231,19 +231,19 @@ const ProgramPage = () => {
       <div className="min-h-screen flex flex-col bg-background">
         <Navigation />
 
-        <main className="flex-grow pt-20">
+        <main className="flex-grow pt-14 lg:pt-20">
           {/* Back link + badges row */}
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="container mx-auto px-4 py-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <Link to="/programs" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors">
                 <ArrowLeft size={16} className="mr-1" /> All Programs
               </Link>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="bg-primary/10 text-primary text-xs font-medium px-3 py-1 rounded-full capitalize">
+                <span className="bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 rounded-full capitalize">
                   {program.type.replace('-', ' ')}
                 </span>
                 {program.duration && (
-                  <span className="text-xs text-muted-foreground inline-flex items-center gap-1 bg-muted/60 px-3 py-1 rounded-full">
+                  <span className="text-xs text-muted-foreground inline-flex items-center gap-1 bg-muted/60 px-2.5 py-0.5 rounded-full">
                     <Clock size={12} /> {program.duration}
                   </span>
                 )}
@@ -252,13 +252,13 @@ const ProgramPage = () => {
           </div>
 
           {/* Two-column layout */}
-          <section className="container mx-auto px-4 pb-16">
-            <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+          <section className="container mx-auto px-4 pb-8 lg:pb-16">
+            <div className="grid lg:grid-cols-3 gap-4 lg:gap-8">
               {/* Left: Details */}
-              <div className="lg:col-span-2 space-y-8">
+              <div className="lg:col-span-2 space-y-4 lg:space-y-6">
                 {/* Cover image */}
                 {program.cover_image_url && (
-                  <div className="aspect-video rounded-2xl overflow-hidden">
+                  <div className="aspect-[16/10] lg:aspect-video rounded-xl lg:rounded-2xl overflow-hidden">
                     <img src={program.cover_image_url} alt={program.title} className="w-full h-full object-cover" />
                   </div>
                 )}
@@ -267,12 +267,12 @@ const ProgramPage = () => {
                 <div>
                   <h1
                     dir="auto"
-                    className={`font-display text-3xl md:text-4xl font-bold ${isFarsi ? 'font-farsi' : ''}`}
+                    className={`font-display text-2xl md:text-3xl lg:text-4xl font-bold ${isFarsi ? 'font-farsi' : ''}`}
                   >
                     {program.title}
                   </h1>
-                  <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-                    <HostBadges contentType="program" contentId={program.slug} size="md" />
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                    <HostBadges contentType="program" contentId={program.slug} size="sm" />
                     {program.language && program.language !== 'all' && (
                       <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
                         {isFarsi ? (
@@ -290,7 +290,7 @@ const ProgramPage = () => {
 
                 {/* Video */}
                 {program.video_url && (
-                  <div className="aspect-video rounded-2xl overflow-hidden bg-muted">
+                  <div className="aspect-[16/10] lg:aspect-video rounded-xl lg:rounded-2xl overflow-hidden bg-muted">
                     {program.video_url.includes('youtube') || program.video_url.includes('youtu.be') ? (
                       <iframe src={convertToEmbedUrl(program.video_url)} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title={program.title} />
                     ) : program.video_url.includes('vimeo') ? (
@@ -303,14 +303,14 @@ const ProgramPage = () => {
 
                 {/* Active Round Details */}
                 {autoEnrollRound && (
-                  <div className="rounded-2xl bg-[hsl(var(--tint-peach,25_100%_96%))] border border-primary/10 shadow-sm p-5 space-y-3">
+                  <div className="rounded-xl bg-[hsl(var(--tint-peach,25_100%_96%))] border border-primary/10 shadow-sm p-4 space-y-2">
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-primary" />
                       <p className="text-sm font-semibold">
                         {autoEnrollRound.round_name || 'Upcoming Round'}
                       </p>
                     </div>
-                    <div className="space-y-1 text-sm">
+                    <div className="space-y-0.5 text-sm">
                       {(() => {
                         const sessionDateStr = autoEnrollRound.first_session_date || autoEnrollRound.start_date;
                         if (!sessionDateStr) return null;
@@ -351,11 +351,11 @@ const ProgramPage = () => {
                 {/* Features */}
                 {program.features?.length > 0 && (
                   <div>
-                    <h2 className="font-display text-2xl font-bold mb-4">What's Included</h2>
-                    <div className="grid sm:grid-cols-2 gap-3">
+                    <h2 className="font-display text-xl lg:text-2xl font-bold mb-3">What's Included</h2>
+                    <div className="grid sm:grid-cols-2 gap-2">
                       {program.features.map((feature, i) => (
-                        <div key={i} className="flex items-start gap-3 bg-muted/50 rounded-lg p-4">
-                          <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <div key={i} className="flex items-start gap-2.5 bg-muted/50 rounded-lg p-3">
+                          <Check className="w-4 h-4 lg:w-5 lg:h-5 text-primary flex-shrink-0 mt-0.5" />
                           <span className="text-sm">{feature}</span>
                         </div>
                       ))}
@@ -364,15 +364,15 @@ const ProgramPage = () => {
                 )}
               </div>
 
-              {/* Right: Sticky pricing card */}
-              <div className="lg:col-span-1">
+              {/* Right: Sticky pricing card — shown first on mobile so Enroll is visible */}
+              <div className="lg:col-span-1 order-first lg:order-last">
                 <div className="lg:sticky lg:top-24">
-                  <Card className="p-6 space-y-5 border-2">
+                  <Card className="p-4 lg:p-6 space-y-4 lg:space-y-5 border-2">
                     {/* Price */}
                     {hasFullOption ? (
-                      <div className="space-y-3">
+                      <div className="space-y-2">
                         {program.original_price && program.original_price > 0 && (
-                          <div className="text-muted-foreground line-through text-base">
+                          <div className="text-muted-foreground line-through text-sm">
                             ${(program.original_price / 100).toFixed(0)}
                           </div>
                         )}
@@ -382,15 +382,15 @@ const ProgramPage = () => {
                         <button
                           type="button"
                           onClick={() => setSelectedPlan('monthly')}
-                          className={`w-full text-left rounded-xl border-2 p-4 transition-all ${
+                          className={`w-full text-left rounded-xl border-2 p-3 transition-all ${
                             selectedPlan === 'monthly'
                               ? 'border-primary bg-primary/5'
                               : 'border-border'
                           }`}
                         >
                           <div className="flex items-baseline justify-between gap-2">
-                            <span className="font-semibold">Monthly</span>
-                            <span className="text-2xl font-bold">
+                            <span className="font-semibold text-sm">Monthly</span>
+                            <span className="text-xl font-bold">
                               ${(program.price_amount / 100).toFixed(0)}
                               <span className="text-sm font-medium text-muted-foreground">/mo</span>
                             </span>
@@ -406,7 +406,7 @@ const ProgramPage = () => {
                         <button
                           type="button"
                           onClick={() => setSelectedPlan('full')}
-                          className={`relative w-full text-left rounded-xl border-2 p-4 transition-all ${
+                          className={`relative w-full text-left rounded-xl border-2 p-3 transition-all ${
                             selectedPlan === 'full'
                               ? 'border-primary bg-primary/5'
                               : 'border-border'
@@ -417,14 +417,14 @@ const ProgramPage = () => {
                             const savings = monthlyTotal - (program.subscription_full_payment_price || 0);
                             if (savings <= 0) return null;
                             return (
-                              <span className="absolute -top-2.5 right-3 bg-green-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                              <span className="absolute -top-2 right-2 bg-green-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
                                 Save ${(savings / 100).toFixed(0)}
                               </span>
                             );
                           })()}
                           <div className="flex items-baseline justify-between gap-2">
-                            <span className="font-semibold">One-time</span>
-                            <span className="text-2xl font-bold">
+                            <span className="font-semibold text-sm">One-time</span>
+                            <span className="text-xl font-bold">
                               ${((program.subscription_full_payment_price || 0) / 100).toFixed(0)}
                             </span>
                           </div>
@@ -434,17 +434,17 @@ const ProgramPage = () => {
                     ) : (
                     <div>
                       {isFree ? (
-                        <div className="text-3xl font-bold text-primary">FREE</div>
+                        <div className="text-2xl lg:text-3xl font-bold text-primary">FREE</div>
                       ) : (
-                        <div className="space-y-1">
+                        <div className="space-y-0.5">
                           {program.original_price && program.original_price > 0 && program.original_price > program.price_amount && (
-                            <div className="text-muted-foreground line-through text-lg">
+                            <div className="text-muted-foreground line-through text-sm">
                               ${(program.original_price / 100).toFixed(0)}
                             </div>
                           )}
                           {isDeposit ? (
                             <>
-                              <div className="text-3xl font-bold text-foreground">
+                              <div className="text-2xl lg:text-3xl font-bold text-foreground">
                                 ${(displayPrice / 100).toFixed(0)} <span className="text-sm font-medium text-muted-foreground">deposit</span>
                               </div>
                               <p className="text-xs text-muted-foreground">
@@ -452,7 +452,7 @@ const ProgramPage = () => {
                               </p>
                             </>
                           ) : (
-                            <div className="text-3xl font-bold text-foreground">
+                            <div className="text-2xl lg:text-3xl font-bold text-foreground">
                               ${(displayPrice / 100).toFixed(0)}
                             </div>
                           )}
@@ -499,7 +499,7 @@ const ProgramPage = () => {
                       </Button>
                     )}
 
-                    <div className="pt-2 space-y-3 text-center">
+                    <div className="space-y-1.5 text-center">
                       <a
                         href="https://t.me/ladybosslook"
                         target="_blank"
@@ -518,23 +518,23 @@ const ProgramPage = () => {
 
           {/* Description — below enroll section */}
           {program.description && (
-            <section className="container mx-auto px-4 pb-16">
+            <section className="container mx-auto px-4 pb-8 lg:pb-16">
               <div
                 dir="auto"
-                className={`prose prose-lg prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground max-w-none ${isFarsi ? 'font-farsi' : ''}`}
+                className={`prose prose-base lg:prose-lg prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground max-w-none ${isFarsi ? 'font-farsi' : ''}`}
                 dangerouslySetInnerHTML={{ __html: sanitizeDescription(program.description) }}
               />
             </section>
           )}
         </main>
 
-        <footer className="bg-card border-t border-border mt-8">
-          <div className="container mx-auto px-6 py-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <p className="text-sm text-muted-foreground text-center md:text-left">
+        <footer className="bg-card border-t border-border mt-4 lg:mt-8">
+          <div className="container mx-auto px-4 py-4 lg:px-6 lg:py-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-3">
+              <p className="text-xs lg:text-sm text-muted-foreground text-center md:text-left">
                 © 2024 LadyBoss Academy. All rights reserved. Empowering women worldwide.
               </p>
-              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
+              <div className="flex flex-wrap justify-center gap-x-4 lg:gap-x-6 gap-y-1.5 text-xs lg:text-sm">
                 <RLink to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</RLink>
                 <RLink to="/refund-policy" className="text-muted-foreground hover:text-primary transition-colors">Refund Policy</RLink>
                 <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</a>
