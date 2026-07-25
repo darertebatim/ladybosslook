@@ -351,11 +351,11 @@ const ProgramPage = () => {
                 {/* Features */}
                 {program.features?.length > 0 && (
                   <div>
-                    <h2 className="font-display text-2xl font-bold mb-4">What's Included</h2>
-                    <div className="grid sm:grid-cols-2 gap-3">
+                    <h2 className="font-display text-xl lg:text-2xl font-bold mb-3">What's Included</h2>
+                    <div className="grid sm:grid-cols-2 gap-2">
                       {program.features.map((feature, i) => (
-                        <div key={i} className="flex items-start gap-3 bg-muted/50 rounded-lg p-4">
-                          <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <div key={i} className="flex items-start gap-2.5 bg-muted/50 rounded-lg p-3">
+                          <Check className="w-4 h-4 lg:w-5 lg:h-5 text-primary flex-shrink-0 mt-0.5" />
                           <span className="text-sm">{feature}</span>
                         </div>
                       ))}
@@ -364,8 +364,8 @@ const ProgramPage = () => {
                 )}
               </div>
 
-              {/* Right: Sticky pricing card */}
-              <div className="lg:col-span-1">
+              {/* Right: Sticky pricing card — shown first on mobile so Enroll is visible */}
+              <div className="lg:col-span-1 order-first lg:order-last">
                 <div className="lg:sticky lg:top-24">
                   <Card className="p-6 space-y-5 border-2">
                     {/* Price */}
