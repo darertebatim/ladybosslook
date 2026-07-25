@@ -526,7 +526,21 @@ const ProgramPage = () => {
           </section>
         </main>
 
-        <Footer />
+        <footer className="bg-card border-t border-border mt-8">
+          <div className="container mx-auto px-6 py-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <p className="text-sm text-muted-foreground text-center md:text-left">
+                © 2024 LadyBoss Academy. All rights reserved. Empowering women worldwide.
+              </p>
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
+                <RLink to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</RLink>
+                <RLink to="/refund-policy" className="text-muted-foreground hover:text-primary transition-colors">Refund Policy</RLink>
+                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</a>
+                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Cookie Policy</a>
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
     </>
   );
