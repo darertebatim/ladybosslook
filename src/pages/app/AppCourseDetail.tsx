@@ -2392,6 +2392,35 @@ const AppCourseDetail = () => {
                     </Card>
                   )}
 
+                  {/* Program Playlist Card */}
+                  {(program as any)?.audio_playlist_id && enrollment && (
+                    <Card className="rounded-2xl border-0 shadow-ios bg-card-warm">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-fg-warm">
+                          <Music className="h-5 w-5" />
+                          Program Playlist
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-fg-warm/75 mb-4">
+                          Content for this program
+                        </p>
+                        <Button
+                          className="w-full bg-brand text-white shadow-ios rounded-full border-0"
+                          size="lg"
+                          onClick={() =>
+                            navigate(
+                              `/app/player/playlist/${(program as any).audio_playlist_id}`,
+                            )
+                          }
+                        >
+                          <Music className="h-5 w-5 mr-2" />
+                          Open Playlist
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+
                   <Card className="tour-program-info rounded-2xl border-0 shadow-ios bg-card-warm">
                     <CardHeader>
                       <div className="flex items-center justify-between">
