@@ -1,17 +1,56 @@
 import { useEffect, useState } from 'react';
 import { useParams, Navigate, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Check, MessageCircle, ShoppingCart, Clock, ArrowLeft } from 'lucide-react';
+import { Loader2, Check, MessageCircle, ShoppingCart, Clock, ArrowLeft, Calendar, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Navigation from '@/components/ui/navigation';
-import Footer from '@/components/sections/Footer';
 import { SEOHead } from '@/components/SEOHead';
 import { useCart } from '@/hooks/useCart';
 import { HostBadges } from '@/components/app/HostBadges';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyEnrollments } from '@/hooks/useMyEnrollments';
 import DOMPurify from 'dompurify';
+import { useQuery } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { PersianFlag } from '@/components/ui/PersianFlag';
+import { Link as RLink } from 'react-router-dom';
+
+const LANG_FLAGS: Record<string, string> = {
+  all: '🌐',
+  american: '🇺🇸',
+  english: '🇺🇸',
+  turkish: '🇹🇷',
+  spanish: '🇪🇸',
+};
+const LANGUAGE_LABELS: Record<string, string> = {
+  all: 'All languages',
+  american: 'English',
+  english: 'English',
+  persian: 'Persian',
+  farsi: 'Persian',
+  turkish: 'Turkish',
+  spanish: 'Spanish',
+};
+
+function sanitizeDescription(html: string): string {
+  const sanitized = DOMPurify.sanitize(html);
+  return sanitized.replace(
+    /<(p|div|h[1-6]|li|blockquote|pre)(?![^>]*?\sdir=)([^>]*)>/gi,
+    '<$1 dir="auto"$2>'
+  );
+}
+
+function formatSessionTime(date: Date): string {
+  const time = format(date, 'h:mm a');
+  try {
+    const parts = Intl.DateTimeFormat('en-US', { timeZoneName: 'short' }).formatToParts(date);
+    const zone = parts.find((p) => p.type === 'timeZoneName')?.value || '';
+    return zone ? `${time} ${zone}` : time;
+  } catch {
+    return time;
+  }
+}
 
 interface ProgramData {
   id: string;
@@ -33,6 +72,7 @@ interface ProgramData {
   subscription_interval: string | null;
   subscription_interval_count: number | null;
   subscription_full_payment_price: number | null;
+  language?: string | null;
 }
 
 const convertToEmbedUrl = (url: string): string => {
