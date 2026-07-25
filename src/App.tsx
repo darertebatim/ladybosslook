@@ -212,6 +212,7 @@ const FreeLive = lazy(() => import("@/pages/FreeLive"));
 const One = lazy(() => import("@/pages/One"));
 const Five = lazy(() => import("@/pages/Five"));
 const Floew = lazy(() => import("@/pages/Floew"));
+const ElcLanding = lazy(() => import("@/pages/ElcLanding"));
 const Giveaway = lazy(() => import("@/pages/Giveaway"));
 const IQMoneyWorkshop = lazy(() => import("@/pages/IQMoneyWorkshop"));
 const LadybossAnnouncements = lazy(() => import("@/pages/LadybossAnnouncements"));
@@ -554,6 +555,7 @@ const App = () => (
                   {!isNativeApp() && <Route path="/one" element={<One />} />}
                   {!isNativeApp() && <Route path="/five" element={<Five />} />}
                   {!isNativeApp() && <Route path="/floew" element={<Floew />} />}
+                  {!isNativeApp() && <Route path="/elclanding" element={<ElcLanding />} />}
                   {!isNativeApp() && <Route path="/thankfreelive" element={<ThankFreeLive />} />}
                   {!isNativeApp() && <Route path="/thankone" element={<ThankOne />} />}
                   {!isNativeApp() && <Route path="/sixtraps" element={<SixTrapsLanding />} />}
