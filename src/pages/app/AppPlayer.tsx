@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
-import { Search, X, Clock, Globe, Crown, ChevronRight } from "lucide-react";
+import { Search, X, Clock, Globe, Crown, ChevronRight, Headset } from "lucide-react";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import { PlaylistCard } from "@/components/audio/PlaylistCard";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -35,6 +35,7 @@ import {
   shouldShowLanguageSettingsHint,
 } from "@/components/app/LanguageSettingsHintPopup";
 import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
+import { HomeMenu } from "@/components/app/HomeMenu";
 import { useMediaCategories } from "@/hooks/useMediaCategories";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";

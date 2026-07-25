@@ -9,6 +9,7 @@ import {
   Crown,
   Sparkles,
   CheckCircle2,
+  Headset,
 } from "lucide-react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,6 +26,7 @@ import { ToolCard } from "@/components/app/ToolCard";
 import { pickPeach, useIsDarkMode } from "@/lib/peachPalette";
 import { Input } from "@/components/ui/input";
 import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
+import { HomeMenu } from "@/components/app/HomeMenu";
 import {
   wellnessTools,
   audioTools,
