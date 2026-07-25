@@ -43,6 +43,10 @@ import { CachedImage } from "@/components/ui/CachedImage";
 import { useAllTags } from "@/hooks/useTags";
 import { useTagDimensions } from "@/hooks/useTagDimensions";
 import { useContentTagsByType } from "@/hooks/useContentTags";
+import { useProgramEventsForDate } from "@/hooks/usePlannerProgramEvents";
+import { ProgramEventCard } from "@/components/app/ProgramEventCard";
+import { getLocalDateStr } from "@/lib/localDate";
+import { parseISO } from "date-fns";
 
 const LANGUAGE_OPTIONS = [
   { value: "all", labelKey: "player.languages.all", flag: "🌐" },
@@ -68,6 +72,8 @@ export default function AppPlayer() {
   // Soundscape is free for all users
   const hasSoundscapeAccess = true;
   const [preferredLanguage, setPreferredLanguage] = useState("all");
+  const todayDate = useMemo(() => parseISO(getLocalDateStr()), []);
+  const { data: programEvents = [] } = useProgramEventsForDate(todayDate);
   const { categories: dbCategories } = useMediaCategories("audio");
   // Topic chips on the Player are driven by the "Door" tag dimension (4 Doors)
   // from the unified tag schema, applied to playlists via content_tags.
@@ -638,6 +644,32 @@ export default function AppPlayer() {
             )}
 
           {/* Hot Tracks — individually featured audios */}
+          {progressFilter === "all" &&
+            selectedCategory === "all" &&
+            !searchQuery &&
+            programEvents.length > 0 && (
+              <div className="px-4 pt-4 pb-1">
+                <div className="flex items-center gap-2 mb-3 pl-1">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand">
+                    Today's events
+                  </div>
+                  <div
+                    className="flex-1 h-px"
+                    style={{ background: "linear-gradient(90deg, hsl(var(--brand) / 0.33), transparent)" }}
+                  />
+                </div>
+                <div className="space-y-3">
+                  {programEvents.map((event) => (
+                    <ProgramEventCard
+                      key={`${event.type}-${event.id}`}
+                      event={event}
+                      date={todayDate}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
           {progressFilter === "all" &&
             selectedCategory === "all" &&
             !searchQuery &&
