@@ -254,7 +254,7 @@ const ProgramPage = () => {
           {/* Two-column layout */}
           <section className="container mx-auto px-4 pb-8 lg:pb-16">
             <div className="grid lg:grid-cols-3 gap-4 lg:gap-8">
-              {/* Left: Details */}
+              {/* Left: Top details */}
               <div className="lg:col-span-2 space-y-4 lg:space-y-6">
                 {/* Cover image */}
                 {program.cover_image_url && (
@@ -347,27 +347,11 @@ const ProgramPage = () => {
                     </div>
                   </div>
                 )}
-
-                {/* Features */}
-                {program.features?.length > 0 && (
-                  <div>
-                    <h2 className="font-display text-xl lg:text-2xl font-bold mb-3">What's Included</h2>
-                    <div className="grid sm:grid-cols-2 gap-2">
-                      {program.features.map((feature, i) => (
-                        <div key={i} className="flex items-start gap-2.5 bg-muted/50 rounded-lg p-3">
-                          <Check className="w-4 h-4 lg:w-5 lg:h-5 text-primary flex-shrink-0 mt-0.5" />
-                          <span className="text-sm">{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
 
-              {/* Right: Sticky pricing card — shown first on mobile so Enroll is visible */}
-              <div className="lg:col-span-1 order-first lg:order-last">
-                <div className="lg:sticky lg:top-24">
-                  <Card className="p-4 lg:p-6 space-y-4 lg:space-y-5 border-2">
+              {/* Right: Sticky pricing card — placed after round details on mobile, sticky on desktop */}
+              <div className="lg:col-span-1 lg:sticky lg:top-24 lg:self-start">
+                <Card className="p-4 lg:p-6 space-y-4 lg:space-y-5 border-2">
                     {/* Price */}
                     {hasFullOption ? (
                       <div className="space-y-2">
@@ -512,6 +496,22 @@ const ProgramPage = () => {
                     </div>
                   </Card>
                 </div>
+
+              {/* Features */}
+              <div className="lg:col-span-2 space-y-4 lg:space-y-6">
+                {program.features?.length > 0 && (
+                  <div>
+                    <h2 className="font-display text-xl lg:text-2xl font-bold mb-3">What's Included</h2>
+                    <div className="grid sm:grid-cols-2 gap-2">
+                      {program.features.map((feature, i) => (
+                        <div key={i} className="flex items-start gap-2.5 bg-muted/50 rounded-lg p-3">
+                          <Check className="w-4 h-4 lg:w-5 lg:h-5 text-primary flex-shrink-0 mt-0.5" />
+                          <span className="text-sm">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </section>
