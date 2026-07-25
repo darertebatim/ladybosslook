@@ -2417,9 +2417,10 @@ const AppCourseDetail = () => {
                                         hasContentReminder(track.id) &&
                                           "text-primary",
                                       )}
-                                      onClick={() =>
-                                        handleContentReminder(track, unlockDate)
-                                      }
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleContentReminder(track, unlockDate);
+                                      }}
                                     >
                                       {hasContentReminder(track.id) ? (
                                         <BellRing className="h-4 w-4" />
