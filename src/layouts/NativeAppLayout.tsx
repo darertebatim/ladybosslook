@@ -83,8 +83,8 @@ const NativeAppLayout = () => {
   }, []);
   
   // Custom hooks after useState declarations
-  const { unreadCount } = useUnreadChat();
   const { showUnreadPopup, unreadMessageCount, dismissPopup, goToChat } = useChatNotifications();
+
   const invalidateAllEnrollmentData = useInvalidateAllEnrollmentData();
   const { isKeyboardOpen } = useKeyboard();
 
