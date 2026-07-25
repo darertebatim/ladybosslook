@@ -58,12 +58,13 @@ serve(async (req) => {
     // Build line items from cart
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
     const programSlugs: string[] = [];
+    const freePrograms: { slug: string; title: string }[] = [];
 
     for (const item of cartItems) {
       // Fetch current price from catalog
       const { data: program } = await supabase
         .from('program_catalog')
-        .select('title, price_amount, deposit_price, payment_type, stripe_product_id')
+        .select('title, price_amount, deposit_price, payment_type, stripe_product_id, is_active')
         .eq('slug', item.program_slug)
         .eq('is_active', true)
         .single();
@@ -75,6 +76,13 @@ serve(async (req) => {
 
       const isDeposit = program.payment_type === 'deposit';
       const chargeAmount = isDeposit && program.deposit_price ? program.deposit_price : program.price_amount;
+      const isFree = program.payment_type === 'free' || chargeAmount === 0;
+
+      if (isFree) {
+        freePrograms.push({ slug: item.program_slug, title: program.title });
+        continue;
+      }
+
       const productName = isDeposit ? `${program.title} (Deposit)` : program.title;
 
       if (program.stripe_product_id) {
@@ -100,9 +108,28 @@ serve(async (req) => {
       programSlugs.push(item.program_slug);
     }
 
+    // Enroll free programs directly (no Stripe needed)
+    if (freePrograms.length > 0) {
+      console.log('[CART-CHECKOUT] Enrolling free programs:', freePrograms.map(p => p.slug));
+      try {
+        await supabase.functions.invoke('enroll-free-programs', {
+          body: { slugs: freePrograms.map(p => p.slug) },
+          headers: { Authorization: authHeader },
+        });
+      } catch (e: any) {
+        console.error('[CART-CHECKOUT] Free enrollment invoke error:', e?.message);
+      }
+    }
+
+    // If only free items — skip Stripe entirely
     if (lineItems.length === 0) {
-      return new Response(JSON.stringify({ error: 'No valid programs in cart' }), {
-        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      const origin = req.headers.get('origin') || 'https://ladybosslook.com';
+      return new Response(JSON.stringify({
+        url: `${origin}/payment-success?free=1`,
+        freeOnly: true,
+        enrolled: freePrograms.map(p => p.slug),
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
