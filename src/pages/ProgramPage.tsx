@@ -496,7 +496,6 @@ const ProgramPage = () => {
                     </div>
                   </Card>
                 </div>
-              </div>
 
               {/* Features */}
               <div className="lg:col-span-2 space-y-4 lg:space-y-6">
