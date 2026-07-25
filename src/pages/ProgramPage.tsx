@@ -290,7 +290,7 @@ const ProgramPage = () => {
 
                 {/* Video */}
                 {program.video_url && (
-                  <div className="aspect-video rounded-2xl overflow-hidden bg-muted">
+                  <div className="aspect-[16/10] lg:aspect-video rounded-xl lg:rounded-2xl overflow-hidden bg-muted">
                     {program.video_url.includes('youtube') || program.video_url.includes('youtu.be') ? (
                       <iframe src={convertToEmbedUrl(program.video_url)} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title={program.title} />
                     ) : program.video_url.includes('vimeo') ? (
@@ -303,14 +303,14 @@ const ProgramPage = () => {
 
                 {/* Active Round Details */}
                 {autoEnrollRound && (
-                  <div className="rounded-2xl bg-[hsl(var(--tint-peach,25_100%_96%))] border border-primary/10 shadow-sm p-5 space-y-3">
+                  <div className="rounded-xl bg-[hsl(var(--tint-peach,25_100%_96%))] border border-primary/10 shadow-sm p-4 space-y-2">
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-primary" />
                       <p className="text-sm font-semibold">
                         {autoEnrollRound.round_name || 'Upcoming Round'}
                       </p>
                     </div>
-                    <div className="space-y-1 text-sm">
+                    <div className="space-y-0.5 text-sm">
                       {(() => {
                         const sessionDateStr = autoEnrollRound.first_session_date || autoEnrollRound.start_date;
                         if (!sessionDateStr) return null;
