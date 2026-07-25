@@ -518,23 +518,23 @@ const ProgramPage = () => {
 
           {/* Description — below enroll section */}
           {program.description && (
-            <section className="container mx-auto px-4 pb-16">
+            <section className="container mx-auto px-4 pb-8 lg:pb-16">
               <div
                 dir="auto"
-                className={`prose prose-lg prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground max-w-none ${isFarsi ? 'font-farsi' : ''}`}
+                className={`prose prose-base lg:prose-lg prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground max-w-none ${isFarsi ? 'font-farsi' : ''}`}
                 dangerouslySetInnerHTML={{ __html: sanitizeDescription(program.description) }}
               />
             </section>
           )}
         </main>
 
-        <footer className="bg-card border-t border-border mt-8">
-          <div className="container mx-auto px-6 py-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <p className="text-sm text-muted-foreground text-center md:text-left">
+        <footer className="bg-card border-t border-border mt-4 lg:mt-8">
+          <div className="container mx-auto px-4 py-4 lg:px-6 lg:py-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-3">
+              <p className="text-xs lg:text-sm text-muted-foreground text-center md:text-left">
                 © 2024 LadyBoss Academy. All rights reserved. Empowering women worldwide.
               </p>
-              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
+              <div className="flex flex-wrap justify-center gap-x-4 lg:gap-x-6 gap-y-1.5 text-xs lg:text-sm">
                 <RLink to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</RLink>
                 <RLink to="/refund-policy" className="text-muted-foreground hover:text-primary transition-colors">Refund Policy</RLink>
                 <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</a>
