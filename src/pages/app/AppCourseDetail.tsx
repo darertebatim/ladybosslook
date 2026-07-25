@@ -1761,6 +1761,77 @@ const AppCourseDetail = () => {
                     </Alert>
                   )}
 
+                  {/* Next Session Card - shown at the top for quick visibility */}
+                  {(() => {
+                    const nextSession = dbSessions?.find(
+                      (s) => !isSessionPast(s.session_date),
+                    );
+                    if (!nextSession) return null;
+                    const nextDate = new Date(nextSession.session_date);
+                    const isTodayNext = isSessionToday(nextSession.session_date);
+                    return (
+                      <Card className="rounded-2xl border-0 shadow-ios bg-card-warm">
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2 mb-3 text-fg-warm">
+                            <Clock className="h-4 w-4" />
+                            <span className="text-sm font-semibold">
+                              Next session
+                            </span>
+                            {isTodayNext && (
+                              <Badge className="ml-auto bg-brand text-white border-0 shadow-ios">
+                                Today
+                              </Badge>
+                            )}
+                          </div>
+                          <div
+                            className={`flex items-center gap-3 p-3 rounded-2xl shadow-ios ${
+                              isTodayNext
+                                ? "bg-[hsl(var(--tint-peach))] text-fg-warm"
+                                : "bg-white"
+                            }`}
+                          >
+                            <div className="flex flex-col items-center justify-center w-12 shrink-0">
+                              <span className="text-xs text-muted-foreground uppercase">
+                                {format(nextDate, "MMM")}
+                              </span>
+                              <span className="text-xl font-bold leading-none">
+                                {format(nextDate, "d")}
+                              </span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium truncate">
+                                {nextSession.title}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {format(nextDate, "EEE, MMM d • h:mm a")} •{" "}
+                                {nextSession.duration_minutes || 90} min
+                              </p>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className={cn(
+                                "shrink-0",
+                                isSessionSynced(nextSession.id) &&
+                                  "text-green-600 dark:text-green-400",
+                              )}
+                              onClick={() => handleAddSingleSession(nextSession)}
+                              disabled={addingSessionId === nextSession.id}
+                            >
+                              {addingSessionId === nextSession.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : isSessionSynced(nextSession.id) ? (
+                                <CheckCircle2 className="h-4 w-4" />
+                              ) : (
+                                <CalendarPlus className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })()}
+
                   {/* New Sessions Available Banner */}
                   {hasNewSessions && round && (
                     <Alert className="border-0 bg-card-warm shadow-ios rounded-2xl tour-sync-banner">
