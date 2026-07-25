@@ -2057,7 +2057,7 @@ const AppCourseDetail = () => {
                           <Button
                             size="lg"
                             className="w-full bg-white text-fg-warm shadow-ios rounded-full border-0"
-                            onClick={() => navigate("/app/support")}
+                            onClick={() => navigate("/app/chat")}
                           >
                             <HelpCircle className="h-5 w-5 mr-2" />
                             In-App Support Chat
