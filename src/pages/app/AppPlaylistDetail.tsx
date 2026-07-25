@@ -392,8 +392,10 @@ export default function AppPlaylistDetail() {
     enabled: !!playlistId && !playlist?.is_free,
   });
 
-  // Check if user came from planner (Pro Task navigation)
-  const cameFromPlanner = (location.state as any)?.from === "planner";
+  // Check if user came from planner or a program/round page
+  const from = (location.state as any)?.from;
+  const cameFromPlanner = from === "planner";
+  const cameFromProgram = typeof from === "string" && from.startsWith("/app/myprograms");
 
   const { hasAccessToProgram } = useSubscription();
 
@@ -801,8 +803,8 @@ export default function AppPlaylistDetail() {
         >
           <div className="pt-1 pb-2 px-4 flex items-center justify-between">
             <BackButton
-              to={cameFromPlanner ? "/app/home" : "/app/player"}
-              label={cameFromPlanner ? "Home" : "Library"}
+              to={cameFromPlanner ? "/app/home" : cameFromProgram ? from : "/app/player"}
+              label={cameFromPlanner ? "Home" : cameFromProgram ? "Program" : "Library"}
               className="text-fg-warm"
             />
             <div className="flex items-center gap-1">
