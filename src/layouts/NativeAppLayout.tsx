@@ -288,19 +288,7 @@ const NativeAppLayout = () => {
                       />
 
                       {/* Badges */}
-                      {showChatBadge && (
-                        <span className="absolute -top-0.5 -right-0.5 z-20 bg-brand-rose text-white text-[9px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 shadow-[0_1px_4px_hsl(var(--brand-accent-rose)/0.4)]">
-                          {unreadCount > 99 ? '99+' : unreadCount}
-                        </span>
-                      )}
-                      {item.showBadge && !showChatBadge && item.badgeCount && (
-                        <span className="absolute -top-0.5 -right-0.5 z-20 bg-brand-rose text-white text-[9px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 shadow-[0_1px_4px_hsl(var(--brand-accent-rose)/0.4)]">
-                          {item.badgeCount > 9 ? '9+' : item.badgeCount}
-                        </span>
-                      )}
-                      {item.showBadge && !showChatBadge && !item.badgeCount && (
-                        <span className="absolute top-0 right-0 z-20 bg-brand-rose w-2 h-2 rounded-full" />
-                      )}
+
                     </div>
 
                     <span
