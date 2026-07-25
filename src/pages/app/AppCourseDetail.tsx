@@ -291,7 +291,38 @@ const AppCourseDetail = () => {
     },
   });
 
-  const round = enrollment?.program_rounds;
+  // Fetch the active/auto-enrollment round for this program so non-enrolled users
+  // can see upcoming round details (date/time) before they enroll.
+  const { data: autoEnrollRound } = useQuery({
+    queryKey: ["program-auto-enroll-round", slug],
+    queryFn: async () => {
+      if (!slug) return null;
+      const { data: autoEnroll } = await supabase
+        .from("program_auto_enrollment")
+        .select("round_id, program_rounds(*)")
+        .eq("program_slug", slug)
+        .maybeSingle();
+
+      if (autoEnroll?.program_rounds) {
+        return autoEnroll.program_rounds as any;
+      }
+
+      // Fallback: any active round for this program
+      const { data: activeRound } = await (supabase
+        .from("program_rounds")
+        .select("*")
+        .eq("program_slug", slug)
+        .eq("is_active", true)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle() as any);
+
+      return activeRound || null;
+    },
+    enabled: !!slug,
+  });
+
+  const round = enrollment?.program_rounds || autoEnrollRound;
 
   // Calendar sync tracking hook - tracks which sessions have been synced to calendar
   const {
