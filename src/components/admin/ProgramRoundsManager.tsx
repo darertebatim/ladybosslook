@@ -79,6 +79,7 @@ interface RoundFormData {
   video_url: string;
   is_self_paced: boolean;
   auto_create_feed_channel: boolean;
+  in_app_support_enabled: boolean;
 }
 
 export const ProgramRoundsManager = () => {
@@ -197,6 +198,7 @@ export const ProgramRoundsManager = () => {
         video_url: data.video_url || null,
         is_self_paced: data.is_self_paced,
         auto_create_feed_channel: data.auto_create_feed_channel,
+        in_app_support_enabled: data.in_app_support_enabled,
       };
 
       if (editingId) {
