@@ -231,19 +231,19 @@ const ProgramPage = () => {
       <div className="min-h-screen flex flex-col bg-background">
         <Navigation />
 
-        <main className="flex-grow pt-20">
+        <main className="flex-grow pt-14 lg:pt-20">
           {/* Back link + badges row */}
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="container mx-auto px-4 py-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <Link to="/programs" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors">
                 <ArrowLeft size={16} className="mr-1" /> All Programs
               </Link>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="bg-primary/10 text-primary text-xs font-medium px-3 py-1 rounded-full capitalize">
+                <span className="bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 rounded-full capitalize">
                   {program.type.replace('-', ' ')}
                 </span>
                 {program.duration && (
-                  <span className="text-xs text-muted-foreground inline-flex items-center gap-1 bg-muted/60 px-3 py-1 rounded-full">
+                  <span className="text-xs text-muted-foreground inline-flex items-center gap-1 bg-muted/60 px-2.5 py-0.5 rounded-full">
                     <Clock size={12} /> {program.duration}
                   </span>
                 )}
@@ -252,10 +252,10 @@ const ProgramPage = () => {
           </div>
 
           {/* Two-column layout */}
-          <section className="container mx-auto px-4 pb-16">
-            <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+          <section className="container mx-auto px-4 pb-8 lg:pb-16">
+            <div className="grid lg:grid-cols-3 gap-4 lg:gap-8">
               {/* Left: Details */}
-              <div className="lg:col-span-2 space-y-8">
+              <div className="lg:col-span-2 space-y-4 lg:space-y-6">
                 {/* Cover image */}
                 {program.cover_image_url && (
                   <div className="aspect-video rounded-2xl overflow-hidden">
