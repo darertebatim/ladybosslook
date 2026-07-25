@@ -9,6 +9,7 @@ import {
   Crown,
   Sparkles,
   CheckCircle2,
+  Headset,
 } from "lucide-react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -16,6 +17,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { haptic } from "@/lib/haptics";
 import {
   useEnrollments,
   useInvalidateAllEnrollmentData,
@@ -25,6 +27,7 @@ import { ToolCard } from "@/components/app/ToolCard";
 import { pickPeach, useIsDarkMode } from "@/lib/peachPalette";
 import { Input } from "@/components/ui/input";
 import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
+import { HomeMenu } from "@/components/app/HomeMenu";
 import {
   wellnessTools,
   audioTools,
@@ -402,9 +405,9 @@ const AppStore = () => {
         className="shrink-0 z-40 bg-white/35 dark:bg-black/20 backdrop-blur-xl rounded-b-2xl shadow-[0_2px_10px_rgba(0,0,0,0.06)]"
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
-        <div className="flex items-center justify-between px-4 pt-3 pb-3 min-h-[52px]">
+        <div className="grid grid-cols-[auto_1fr_auto] items-center px-4 pt-3 pb-3 min-h-[52px]">
           {showSearch ? (
-            <div className="flex-1 flex items-center gap-2">
+            <div className="flex-1 flex items-center gap-2 col-span-3">
               <Input
                 type="text"
                 placeholder={t("toolsPage.searchPlaceholder")}
@@ -426,10 +429,23 @@ const AppStore = () => {
             </div>
           ) : (
             <>
-              <h1 className="text-2xl font-bold text-fg-warm">
+              <div className="flex items-center gap-1 -ml-1">
+                <HomeMenu />
+                <button
+                  onClick={() => {
+                    haptic.light();
+                    navigate('/app/chat');
+                  }}
+                  className="p-2 -ml-1 active:scale-95 transition-transform"
+                  aria-label="Support"
+                >
+                  <Headset className="h-5 w-5 text-fg-warm" />
+                </button>
+              </div>
+              <h1 className="text-center text-2xl font-bold text-fg-warm">
                 {t("toolsPage.title")}
               </h1>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-end gap-2">
                 <IOSIconButton
                   size="sm"
                   onClick={() => setShowSearch(true)}
