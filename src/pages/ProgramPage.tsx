@@ -10,6 +10,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { useCart } from '@/hooks/useCart';
 import { HostBadges } from '@/components/app/HostBadges';
 import { useAuth } from '@/hooks/useAuth';
+import { useMyEnrollments } from '@/hooks/useMyEnrollments';
 import DOMPurify from 'dompurify';
 
 interface ProgramData {
@@ -49,6 +50,7 @@ const ProgramPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { addToCart, isInCart, isAdding, enrollFree, isEnrollingFree } = useCart();
+  const { isEnrolled } = useMyEnrollments();
   const [program, setProgram] = useState<ProgramData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -140,6 +142,7 @@ const ProgramPage = () => {
   const hasFullOption = isSubscription && !!program.subscription_full_payment_price && program.subscription_full_payment_price > 0;
   const displayPrice = isDeposit && program.deposit_price ? program.deposit_price : program.price_amount;
   const inCart = isInCart(program.slug);
+  const enrolled = isEnrolled(program.slug);
 
   const handleDirectCheckout = async (option: 'monthly' | 'full') => {
     if (!user) { navigate(`/auth?redirect=/${slug}`); return; }
@@ -334,8 +337,14 @@ const ProgramPage = () => {
                     </div>
                     )}
 
-                    {/* Add to Cart / In Cart */}
-                    {hasFullOption ? (
+                    {/* Add to Cart / In Cart / Enrolled */}
+                    {enrolled ? (
+                      <Link to="/app/home" className="block">
+                        <Button variant="secondary" className="w-full gap-2" size="lg">
+                          <Check size={18} /> You're Enrolled — Open in App
+                        </Button>
+                      </Link>
+                    ) : hasFullOption ? (
                       <Button
                         className="w-full gap-2"
                         size="lg"
