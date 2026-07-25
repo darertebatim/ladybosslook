@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Headphones, List, Lock, CheckCircle, Play, CalendarPlus, Check, Download, CheckCircle2, Share2 } from "lucide-react";
@@ -38,14 +38,17 @@ export default function AppAudioPlayer() {
   const { t } = useTranslation();
   const { audioId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const [showCelebration, setShowCelebration] = useState(false);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   
-  // Check if we're in module mode (navigated from modules list)
+  // Check if we're in module mode (navigated from modules list) or came from a program/round page
   const isModuleMode = searchParams.get('moduleMode') === 'true';
   const contextPlaylistId = searchParams.get('playlistId');
   const moduleIndex = parseInt(searchParams.get('moduleIndex') || '0', 10);
+  const from = (location.state as any)?.from;
+  const cameFromProgram = typeof from === "string" && from.startsWith("/app/myprograms");
   
   // Use global audio player context
   const {
@@ -473,7 +476,7 @@ export default function AppAudioPlayer() {
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="pt-1 pb-2 px-4">
-            <BackButton to="/app/player" label="Library" className="text-fg-warm" />
+            <BackButton to={cameFromProgram ? from : "/app/player"} label={cameFromProgram ? "Program" : "Library"} className="text-fg-warm" />
           </div>
         </div>
         <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
@@ -525,6 +528,10 @@ export default function AppAudioPlayer() {
         <div className="pt-1 pb-2 px-4 flex items-center gap-1">
           <button
             onClick={() => {
+              if (cameFromProgram) {
+                navigate(from);
+                return;
+              }
               const backPlaylistId = isModuleMode ? contextPlaylistId : playlistInfo?.playlist_id;
               if (backPlaylistId) {
                 navigate(`/app/player/playlist/${backPlaylistId}`);
@@ -542,7 +549,12 @@ export default function AppAudioPlayer() {
               <button
                 onClick={() => {
                   const navPlaylistId = isModuleMode ? contextPlaylistId : playlistInfo?.playlist_id;
-                  if (navPlaylistId) navigate(`/app/player/playlist/${navPlaylistId}`);
+                  if (navPlaylistId) {
+                    navigate(
+                      `/app/player/playlist/${navPlaylistId}`,
+                      cameFromProgram ? { state: { from } } : undefined
+                    );
+                  }
                 }}
                 className="text-sm font-medium text-fg-warm hover:text-fg-warm transition-colors truncate"
               >

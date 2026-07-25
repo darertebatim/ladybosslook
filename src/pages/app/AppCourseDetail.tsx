@@ -2357,7 +2357,9 @@ const AppCourseDetail = () => {
                                   key={track.id}
                                   onClick={() => {
                                     if (isAvailable && audioId) {
-                                      navigate(`/app/player/${audioId}`);
+                                      navigate(`/app/player/${audioId}`, {
+                                        state: { from: location.pathname },
+                                      });
                                     }
                                   }}
                                   className={`flex items-center gap-3 p-3 rounded-2xl shadow-ios ${
