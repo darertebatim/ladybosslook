@@ -186,7 +186,7 @@ export default function PaymentSuccess() {
 
   const isTestMode = searchParams.get('test') === 'true';
 
-  if (!sessionId && !isTestMode) {
+  if (!sessionId && !isTestMode && !isFreeEnrollment) {
     return (
       <div className="min-h-screen flex items-center justify-center px-6 bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]">
         <div className="max-w-md w-full bg-white/80 backdrop-blur rounded-3xl p-8 text-center shadow-xl">
@@ -198,7 +198,7 @@ export default function PaymentSuccess() {
     );
   }
 
-  const showSuccessPage = isTestMode || (sessionId && (paymentVerified || verificationAttempts > 0));
+  const showSuccessPage = isTestMode || isFreeEnrollment || (sessionId && (paymentVerified || verificationAttempts > 0));
 
   if (!showSuccessPage) {
     return (
