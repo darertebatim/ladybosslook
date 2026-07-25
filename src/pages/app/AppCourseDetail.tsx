@@ -322,7 +322,7 @@ const AppCourseDetail = () => {
     enabled: !!slug,
   });
 
-  const round = enrollment?.program_rounds || autoEnrollRound;
+  const round = enrollment?.program_rounds;
 
   // Calendar sync tracking hook - tracks which sessions have been synced to calendar
   const {
