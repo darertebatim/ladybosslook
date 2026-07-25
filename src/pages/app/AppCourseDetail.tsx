@@ -1923,6 +1923,7 @@ const AppCourseDetail = () => {
                             onClick={() =>
                               navigate(
                                 `/app/player/playlist/${round.audio_playlist_id}`,
+                                { state: { from: location.pathname } }
                               )
                             }
                           >
@@ -2195,6 +2196,7 @@ const AppCourseDetail = () => {
                             onClick={() =>
                               navigate(
                                 `/app/player/playlist/${round?.audio_playlist_id}`,
+                                { state: { from: location.pathname } }
                               )
                             }
                             className="w-full flex items-center gap-3 p-3 mb-4 rounded-2xl bg-white shadow-ios text-left active:scale-[0.99] transition-transform"
@@ -2439,6 +2441,7 @@ const AppCourseDetail = () => {
                           onClick={() =>
                             navigate(
                               `/app/player/playlist/${round?.audio_playlist_id}`,
+                              { state: { from: location.pathname } }
                             )
                           }
                         >
@@ -2468,6 +2471,7 @@ const AppCourseDetail = () => {
                           onClick={() =>
                             navigate(
                               `/app/player/playlist/${(program as any).audio_playlist_id}`,
+                              { state: { from: location.pathname } }
                             )
                           }
                         >
