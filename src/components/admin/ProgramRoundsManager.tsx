@@ -907,6 +907,19 @@ export const ProgramRoundsManager = () => {
               <p className="text-xs text-muted-foreground">The text shown on the support button</p>
             </div>
 
+            <div className="flex items-center gap-3 rounded-md border p-3">
+              <input
+                id="in_app_support_enabled"
+                type="checkbox"
+                className="h-4 w-4"
+                checked={formData.in_app_support_enabled}
+                onChange={(e) => setFormData({ ...formData, in_app_support_enabled: e.target.checked })}
+              />
+              <Label htmlFor="in_app_support_enabled" className="cursor-pointer">
+                Enable in-app Support Chat button in Quick Actions
+              </Label>
+            </div>
+
             <div className="space-y-2 mt-4">
               <Label htmlFor="audio_playlist">Audio Playlist (Optional)</Label>
               <Select
