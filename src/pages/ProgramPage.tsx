@@ -515,6 +515,17 @@ const ProgramPage = () => {
               </div>
             </div>
           </section>
+
+          {/* Description — below enroll section */}
+          {program.description && (
+            <section className="container mx-auto px-4 pb-16">
+              <div
+                dir="auto"
+                className={`prose prose-lg prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground max-w-none ${isFarsi ? 'font-farsi' : ''}`}
+                dangerouslySetInnerHTML={{ __html: sanitizeDescription(program.description) }}
+              />
+            </section>
+          )}
         </main>
 
         <footer className="bg-card border-t border-border mt-8">
