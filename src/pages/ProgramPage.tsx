@@ -301,15 +301,6 @@ const ProgramPage = () => {
                   </div>
                 )}
 
-                {/* Description */}
-                {program.description && (
-                  <div
-                    dir="auto"
-                    className={`prose prose-lg prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground max-w-none ${isFarsi ? 'font-farsi' : ''}`}
-                    dangerouslySetInnerHTML={{ __html: sanitizeDescription(program.description) }}
-                  />
-                )}
-
                 {/* Active Round Details */}
                 {autoEnrollRound && (
                   <div className="rounded-2xl bg-[hsl(var(--tint-peach,25_100%_96%))] border border-primary/10 shadow-sm p-5 space-y-3">
