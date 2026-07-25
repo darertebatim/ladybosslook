@@ -798,8 +798,7 @@
     "home": "Planner",
     "myRilo": "My Rilo",
     "tools": "Tools",
-    "listen": "Listen",
-    "chats": "Chats",
+    "player": "Player",
     "aiPlanner": "Open AI Planner"
   },
   "presence": {
