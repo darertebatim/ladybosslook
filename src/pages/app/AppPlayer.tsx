@@ -399,9 +399,9 @@ export default function AppPlayer() {
             className="sticky z-20 px-4 pt-3 pb-2 bg-background"
             style={{ top: "env(safe-area-inset-top)" }}
           >
-            <div className="min-h-[44px] flex items-center justify-between">
+            <div className="min-h-[44px] grid grid-cols-[auto_1fr_auto] items-center">
               {showSearch ? (
-                <div className="flex-1 flex items-center gap-2">
+                <div className="flex-1 flex items-center gap-2 col-span-3">
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-fg-warm-muted" />
                     <Input
@@ -425,10 +425,23 @@ export default function AppPlayer() {
                 </div>
               ) : (
                 <>
-                  <h1 className="text-2xl font-bold text-fg-warm tracking-tight">
+                  <div className="flex items-center gap-1 -ml-1">
+                    <HomeMenu />
+                    <button
+                      onClick={() => {
+                        haptic.light();
+                        navigate('/app/chat');
+                      }}
+                      className="p-2 -ml-1 active:scale-95 transition-transform"
+                      aria-label="Support"
+                    >
+                      <Headset className="h-5 w-5 text-fg-warm" />
+                    </button>
+                  </div>
+                  <h1 className="text-center text-2xl font-bold text-fg-warm tracking-tight">
                     {t("player.title")}
                   </h1>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-end gap-2">
                     <IOSIconButton
                       size="sm"
                       onClick={() => setShowSearch(true)}
