@@ -266,7 +266,7 @@ const ProgramPage = () => {
                 {/* Title & meta */}
                 <div>
                   <h1
-                    dir={isFarsi ? 'rtl' : 'auto'}
+                    dir="auto"
                     className={`font-display text-3xl md:text-4xl font-bold ${isFarsi ? 'font-farsi' : ''}`}
                   >
                     {program.title}
@@ -304,8 +304,8 @@ const ProgramPage = () => {
                 {/* Description */}
                 {program.description && (
                   <div
-                    dir={isFarsi ? 'rtl' : 'auto'}
-                    className={`prose prose-lg prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground max-w-none ${isFarsi ? 'font-farsi text-right' : ''}`}
+                    dir="auto"
+                    className={`prose prose-lg prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground max-w-none ${isFarsi ? 'font-farsi' : ''}`}
                     dangerouslySetInnerHTML={{ __html: sanitizeDescription(program.description) }}
                   />
                 )}
