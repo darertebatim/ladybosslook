@@ -301,53 +301,6 @@ const ProgramPage = () => {
                   </div>
                 )}
 
-                {/* Active Round Details */}
-                {autoEnrollRound && (
-                  <div className="rounded-2xl bg-[hsl(var(--tint-peach,25_100%_96%))] border border-primary/10 shadow-sm p-5 space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-primary" />
-                      <p className="text-sm font-semibold">
-                        {autoEnrollRound.round_name || 'Upcoming Round'}
-                      </p>
-                    </div>
-                    <div className="space-y-1 text-sm">
-                      {(() => {
-                        const sessionDateStr = autoEnrollRound.first_session_date || autoEnrollRound.start_date;
-                        if (!sessionDateStr) return null;
-                        const sessionDate = sessionDateStr.includes('T')
-                          ? new Date(sessionDateStr)
-                          : new Date(sessionDateStr + 'T00:00:00');
-                        if (isNaN(sessionDate.getTime())) return null;
-                        return (
-                          <>
-                            <p className="text-muted-foreground">
-                              Starts <span className="font-medium text-foreground">{format(sessionDate, 'EEEE, MMMM d, yyyy')}</span>
-                            </p>
-                            {sessionDateStr.includes('T') && format(sessionDate, 'h:mm a') !== '12:00 AM' && (
-                              <p className="text-muted-foreground">
-                                Time <span className="font-medium text-foreground">{formatSessionTime(sessionDate)}</span>
-                              </p>
-                            )}
-                          </>
-                        );
-                      })()}
-                      {autoEnrollRound.first_session_duration ? (
-                        <p className="text-muted-foreground">
-                          Duration <span className="font-medium text-foreground">{autoEnrollRound.first_session_duration} min</span>
-                        </p>
-                      ) : null}
-                      {autoEnrollRound.google_meet_link ? (
-                        <p className="text-muted-foreground">
-                          Meeting on{' '}
-                          <span className="inline-flex items-center gap-1 font-medium text-foreground">
-                            <Video className="h-3.5 w-3.5" /> Google Meet
-                          </span>
-                        </p>
-                      ) : null}
-                    </div>
-                  </div>
-                )}
-
                 {/* Features */}
                 {program.features?.length > 0 && (
                   <div>
