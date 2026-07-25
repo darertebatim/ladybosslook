@@ -27,7 +27,7 @@ const TYPE_LABELS: Record<string, { label: string; icon: string }> = {
 };
 
 const ProgramCard = ({ program }: { program: Program }) => {
-  const { addToCart, isInCart, isAdding } = useCart();
+  const { addToCart, isInCart, isAdding, enrollFree, isEnrollingFree } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
   const inCart = isInCart(program.slug);
@@ -38,6 +38,10 @@ const ProgramCard = ({ program }: { program: Program }) => {
     e.stopPropagation();
     if (!user) {
       navigate(`/auth?redirect=/programs`);
+      return;
+    }
+    if (program.isFree || program.priceAmount === 0) {
+      enrollFree(program.slug);
       return;
     }
     addToCart({
@@ -100,10 +104,14 @@ const ProgramCard = ({ program }: { program: Program }) => {
               <Button
                 size="sm"
                 onClick={handleAddToCart}
-                disabled={isAdding || program.isFree}
+                disabled={isAdding || isEnrollingFree}
                 className="gap-1.5"
               >
-                <ShoppingCart size={14} /> Add to Cart
+                {program.isFree || program.priceAmount === 0 ? (
+                  <><Check size={14} /> Enroll Free</>
+                ) : (
+                  <><ShoppingCart size={14} /> Add to Cart</>
+                )}
               </Button>
             )}
           </div>
