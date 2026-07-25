@@ -112,6 +112,23 @@ function sanitizeDescription(html: string): string {
   );
 }
 
+function getTimeZoneAbbr(date: Date): string {
+  try {
+    const parts = Intl.DateTimeFormat("en-US", {
+      timeZoneName: "short",
+    }).formatToParts(date);
+    return parts.find((p) => p.type === "timeZoneName")?.value || "";
+  } catch {
+    return "";
+  }
+}
+
+function formatSessionTime(date: Date): string {
+  const time = format(date, "h:mm a");
+  const zone = getTimeZoneAbbr(date);
+  return zone ? `${time} ${zone}` : time;
+}
+
 const AppCourseDetail = () => {
   const { t } = useTranslation();
   const { slug, roundId } = useParams();
@@ -1460,7 +1477,7 @@ const AppCourseDetail = () => {
                                           <p className="text-sm text-fg-warm-muted">
                                             Time{" "}
                                             <span className="font-medium text-fg-warm">
-                                              {format(sessionDate, "h:mm a")}
+                                              {formatSessionTime(sessionDate)}
                                             </span>
                                           </p>
                                         )}
@@ -1820,7 +1837,7 @@ const AppCourseDetail = () => {
                                 {nextSession.title}
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                {format(nextDate, "EEE, MMM d • h:mm a")} •{" "}
+                                {format(nextDate, "EEE, MMM d • ") + formatSessionTime(nextDate)} •{" "}
                                 {nextSession.duration_minutes || 90} min
                               </p>
                             </div>
@@ -2133,7 +2150,7 @@ const AppCourseDetail = () => {
                                     )}
                                   </div>
                                   <p className="text-sm text-muted-foreground">
-                                    {format(sessionDate, "h:mm a")} •{" "}
+                                    {formatSessionTime(sessionDate)} •{" "}
                                     {session.duration_minutes || 90} min
                                   </p>
                                 </div>
