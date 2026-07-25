@@ -647,6 +647,32 @@ export default function AppPlayer() {
           {progressFilter === "all" &&
             selectedCategory === "all" &&
             !searchQuery &&
+            programEvents.length > 0 && (
+              <div className="px-4 pt-4 pb-1">
+                <div className="flex items-center gap-2 mb-3 pl-1">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand">
+                    Today's events
+                  </div>
+                  <div
+                    className="flex-1 h-px"
+                    style={{ background: "linear-gradient(90deg, hsl(var(--brand) / 0.33), transparent)" }}
+                  />
+                </div>
+                <div className="space-y-3">
+                  {programEvents.map((event) => (
+                    <ProgramEventCard
+                      key={`${event.type}-${event.id}`}
+                      event={event}
+                      date={todayDate}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+          {progressFilter === "all" &&
+            selectedCategory === "all" &&
+            !searchQuery &&
             hotTracks.length > 0 && (
               <div className="px-4 pt-4 space-y-2">
                 <div className="flex items-center gap-2">
