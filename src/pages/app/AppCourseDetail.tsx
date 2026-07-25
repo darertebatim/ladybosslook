@@ -2051,6 +2051,18 @@ const AppCourseDetail = () => {
                               "Contact Support"}
                           </Button>
                         )}
+
+                        {/* 8. In-App Support Chat - optional per round */}
+                        {(round as any).in_app_support_enabled && (
+                          <Button
+                            size="lg"
+                            className="w-full bg-white text-fg-warm shadow-ios rounded-full border-0"
+                            onClick={() => navigate("/app/support")}
+                          >
+                            <HelpCircle className="h-5 w-5 mr-2" />
+                            In-App Support Chat
+                          </Button>
+                        )}
                       </CardContent>
                     </Card>
                   )}

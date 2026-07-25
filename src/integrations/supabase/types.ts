@@ -4668,6 +4668,7 @@ export type Database = {
           google_meet_link: string | null
           id: string
           important_message: string | null
+          in_app_support_enabled: boolean
           instructor_id: string | null
           is_one_on_one: boolean
           is_self_paced: boolean
@@ -4698,6 +4699,7 @@ export type Database = {
           google_meet_link?: string | null
           id?: string
           important_message?: string | null
+          in_app_support_enabled?: boolean
           instructor_id?: string | null
           is_one_on_one?: boolean
           is_self_paced?: boolean
@@ -4728,6 +4730,7 @@ export type Database = {
           google_meet_link?: string | null
           id?: string
           important_message?: string | null
+          in_app_support_enabled?: boolean
           instructor_id?: string | null
           is_one_on_one?: boolean
           is_self_paced?: boolean

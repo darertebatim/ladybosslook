@@ -79,6 +79,7 @@ interface RoundFormData {
   video_url: string;
   is_self_paced: boolean;
   auto_create_feed_channel: boolean;
+  in_app_support_enabled: boolean;
 }
 
 export const ProgramRoundsManager = () => {
@@ -117,6 +118,7 @@ export const ProgramRoundsManager = () => {
     video_url: "",
     is_self_paced: false,
     auto_create_feed_channel: true,
+      in_app_support_enabled: false,
   });
 
   // Fetch programs for dropdown
@@ -197,6 +199,7 @@ export const ProgramRoundsManager = () => {
         video_url: data.video_url || null,
         is_self_paced: data.is_self_paced,
         auto_create_feed_channel: data.auto_create_feed_channel,
+        in_app_support_enabled: data.in_app_support_enabled,
       };
 
       if (editingId) {
@@ -347,6 +350,7 @@ export const ProgramRoundsManager = () => {
       video_url: "",
       is_self_paced: false,
       auto_create_feed_channel: true,
+      in_app_support_enabled: false,
     });
     setEditingId(null);
   };
@@ -395,6 +399,7 @@ export const ProgramRoundsManager = () => {
       video_url: round.video_url || "",
       is_self_paced: round.is_self_paced || false,
       auto_create_feed_channel: round.auto_create_feed_channel ?? true,
+      in_app_support_enabled: (round as any).in_app_support_enabled ?? false,
     });
     setEditingId(round.id);
     setIsFormDialogOpen(true);
@@ -426,6 +431,7 @@ export const ProgramRoundsManager = () => {
       video_url: round.video_url || "",
       is_self_paced: round.is_self_paced || false,
       auto_create_feed_channel: round.auto_create_feed_channel ?? true,
+      in_app_support_enabled: (round as any).in_app_support_enabled ?? false,
     });
     setEditingId(null); // This is a new round, not editing
     setIsFormDialogOpen(true);
@@ -899,6 +905,19 @@ export const ProgramRoundsManager = () => {
                 placeholder="e.g., Contact Telegram Support"
               />
               <p className="text-xs text-muted-foreground">The text shown on the support button</p>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-md border p-3">
+              <input
+                id="in_app_support_enabled"
+                type="checkbox"
+                className="h-4 w-4"
+                checked={formData.in_app_support_enabled}
+                onChange={(e) => setFormData({ ...formData, in_app_support_enabled: e.target.checked })}
+              />
+              <Label htmlFor="in_app_support_enabled" className="cursor-pointer">
+                Enable in-app Support Chat button in Quick Actions
+              </Label>
             </div>
 
             <div className="space-y-2 mt-4">
