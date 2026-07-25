@@ -286,6 +286,38 @@ export default function AppPlaylistDetail() {
   const { data: enrollments } = useEnrollments();
   const { categories: audioCategories } = useMediaCategories("audio");
 
+  // Check if this playlist is attached to a program the user is enrolled in
+  // (either at the program level via program_catalog.audio_playlist_id, or
+  // at a round level via program_rounds.audio_playlist_id). This lets
+  // program-attached playlists unlock without requiring playlist.program_slug.
+  const { data: enrolledViaProgram } = useQuery({
+    queryKey: ["playlist-program-enrollment", playlistId, user?.id],
+    queryFn: async () => {
+      if (!user || !playlistId) return false;
+      const [{ data: progs }, { data: rounds }] = await Promise.all([
+        supabase
+          .from("program_catalog")
+          .select("slug")
+          .eq("audio_playlist_id", playlistId),
+        supabase
+          .from("program_rounds")
+          .select("program_slug")
+          .eq("audio_playlist_id", playlistId),
+      ]);
+      const slugs = new Set<string>([
+        ...((progs || []).map((p: any) => p.slug).filter(Boolean)),
+        ...((rounds || []).map((r: any) => r.program_slug).filter(Boolean)),
+      ]);
+      const { data: enr } = await supabase
+        .from("course_enrollments")
+        .select("program_slug, status")
+        .eq("user_id", user.id)
+        .eq("status", "active");
+      return (enr || []).some((e: any) => slugs.has(e.program_slug));
+    },
+    enabled: !!playlistId && !!user?.id,
+  });
+
   // Check if user has activated this free playlist
   const { data: playlistSave, isLoading: saveLoading } = useQuery({
     queryKey: ["playlist-save", playlistId, user?.id],
@@ -375,7 +407,7 @@ export default function AppPlaylistDetail() {
     ? !!playlistSave
     : playlist?.requires_subscription
       ? hasAccessToProgram("simora-plus") && !!playlistSave
-      : enrollments?.includes(playlist?.program_slug);
+      : enrollments?.includes(playlist?.program_slug) || !!enrolledViaProgram;
 
   const getTrackProgress = (audioId: string) => {
     const progress = progressData?.find((p) => p.audio_id === audioId);
