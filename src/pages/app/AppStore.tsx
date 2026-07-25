@@ -17,6 +17,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { haptic } from "@/lib/haptics";
 import {
   useEnrollments,
   useInvalidateAllEnrollmentData,
