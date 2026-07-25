@@ -101,6 +101,17 @@ import DOMPurify from "dompurify";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
+// Sanitize program description and add dir="auto" to each block element so
+// mixed English/Farsi paragraphs pick their own direction instead of the
+// whole description being forced one way.
+function sanitizeDescription(html: string): string {
+  const sanitized = DOMPurify.sanitize(html);
+  return sanitized.replace(
+    /<(p|div|h[1-6]|li|blockquote|pre)(?![^>]*?\sdir=)([^>]*)>/gi,
+    '<$1 dir="auto"$2>'
+  );
+}
+
 const AppCourseDetail = () => {
   const { t } = useTranslation();
   const { slug, roundId } = useParams();
@@ -1393,13 +1404,9 @@ const AppCourseDetail = () => {
                           {/* Program Description */}
                           {program.description && (
                             <div
-                              dir={program.language === "persian" || program.language === "farsi" ? "rtl" : "auto"}
-                              className={cn(
-                                "text-muted-foreground whitespace-pre-wrap leading-relaxed [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-foreground [&_h2]:mt-4 [&_h2]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-foreground [&_h3]:mt-3 [&_h3]:mb-1 [&_strong]:text-foreground",
-                                (program.language === "persian" || program.language === "farsi") && "text-right"
-                              )}
+                              className="text-muted-foreground whitespace-pre-wrap leading-relaxed [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-foreground [&_h2]:mt-4 [&_h2]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-foreground [&_h3]:mt-3 [&_h3]:mb-1 [&_strong]:text-foreground"
                               dangerouslySetInnerHTML={{
-                                __html: DOMPurify.sanitize(program.description),
+                                __html: sanitizeDescription(program.description),
                               }}
                             />
                           )}
@@ -2349,13 +2356,9 @@ const AppCourseDetail = () => {
                     <CardContent className="space-y-4">
                       {program?.description && (
                         <div
-                          dir={program.language === "persian" || program.language === "farsi" ? "rtl" : "auto"}
-                          className={cn(
-                            "text-fg-warm/80 whitespace-pre-wrap leading-relaxed [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-fg-warm [&_h2]:mt-4 [&_h2]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-fg-warm [&_h3]:mt-3 [&_h3]:mb-1 [&_strong]:text-fg-warm",
-                            (program.language === "persian" || program.language === "farsi") && "text-right"
-                          )}
+                          className="text-fg-warm/80 whitespace-pre-wrap leading-relaxed [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-fg-warm [&_h2]:mt-4 [&_h2]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-fg-warm [&_h3]:mt-3 [&_h3]:mb-1 [&_strong]:text-fg-warm"
                           dangerouslySetInnerHTML={{
-                            __html: DOMPurify.sanitize(program.description),
+                            __html: sanitizeDescription(program.description),
                           }}
                         />
                       )}
