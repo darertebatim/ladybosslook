@@ -555,6 +555,7 @@ const App = () => (
                   {!isNativeApp() && <Route path="/one" element={<One />} />}
                   {!isNativeApp() && <Route path="/five" element={<Five />} />}
                   {!isNativeApp() && <Route path="/floew" element={<Floew />} />}
+                  {!isNativeApp() && <Route path="/elclanding" element={<ElcLanding />} />}
                   {!isNativeApp() && <Route path="/thankfreelive" element={<ThankFreeLive />} />}
                   {!isNativeApp() && <Route path="/thankone" element={<ThankOne />} />}
                   {!isNativeApp() && <Route path="/sixtraps" element={<SixTrapsLanding />} />}
