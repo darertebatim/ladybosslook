@@ -40,8 +40,9 @@ const ElcLanding = () => {
           </a>
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
-            <p className="text-base text-blue-800 font-medium">
-              👇 عزیزان مهاجر خارج از ایران (ساکنین امریکا، کانادا، اروپا و ...) وارد لینک پایین شوید 👇
+            <p className="text-base text-blue-800 font-medium whitespace-pre-line">
+              👇 عزیزان خارج از ایران (ساکنین امریکا، کانادا،
+&nbsp;🇺🇸 🇨🇦 اروپا و ...) وارد لینک پایین شوید 👇
             </p>
           </div>
 
