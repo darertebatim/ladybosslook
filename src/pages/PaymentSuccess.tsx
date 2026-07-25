@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { Sparkles, Loader2, Smartphone, Mail, MessageCircle, CheckCircle2 } from 'lucide-react';
+import { Sparkles, Loader2, Smartphone, Mail, MessageCircle, CheckCircle2, Calendar, Video } from 'lucide-react';
+import { format } from 'date-fns';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
@@ -41,6 +43,7 @@ export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const programSlug = searchParams.get('program');
+  const programsParam = searchParams.get('programs');
   const isFreeEnrollment = searchParams.get('free') === '1';
   const [paymentVerified, setPaymentVerified] = useState(false);
   const [orderDetails, setOrderDetails] = useState<any>(null);
@@ -171,6 +174,37 @@ export default function PaymentSuccess() {
     () => buildOpenRiloOneLink(sessionId, orderDetails?.program_slug || programSlug),
     [sessionId, orderDetails?.program_slug, programSlug]
   );
+
+  // Resolve slug(s) to look up round details
+  const roundSlug = useMemo(() => {
+    if (orderDetails?.program_slug) return orderDetails.program_slug as string;
+    if (programSlug) return programSlug;
+    if (programsParam) return programsParam.split(',')[0]?.trim() || null;
+    return null;
+  }, [orderDetails?.program_slug, programSlug, programsParam]);
+
+  const { data: roundInfo } = useQuery({
+    queryKey: ['payment-success-round', roundSlug],
+    enabled: !!roundSlug,
+    queryFn: async () => {
+      const slug = roundSlug!;
+      const { data: autoEnroll } = await (supabase as any)
+        .from('program_auto_enrollment')
+        .select('round_id, program_rounds(*)')
+        .eq('program_slug', slug)
+        .maybeSingle();
+      if (autoEnroll?.program_rounds) return autoEnroll.program_rounds as any;
+      const { data: activeRound } = await (supabase as any)
+        .from('program_rounds')
+        .select('*')
+        .eq('program_slug', slug)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return activeRound || null;
+    },
+  });
 
   if (isLoading) {
     return (
