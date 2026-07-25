@@ -291,6 +291,37 @@ const AppCourseDetail = () => {
     },
   });
 
+  // Fetch the active/auto-enrollment round for this program so non-enrolled users
+  // can see upcoming round details (date/time) before they enroll.
+  const { data: autoEnrollRound } = useQuery({
+    queryKey: ["program-auto-enroll-round", slug],
+    queryFn: async () => {
+      if (!slug) return null;
+      const { data: autoEnroll } = await (supabase as any)
+        .from("program_auto_enrollment")
+        .select("round_id, program_rounds(*)")
+        .eq("program_slug", slug)
+        .maybeSingle();
+
+      if (autoEnroll?.program_rounds) {
+        return autoEnroll.program_rounds as any;
+      }
+
+      // Fallback: any active round for this program
+      const { data: activeRound } = await (supabase as any)
+        .from("program_rounds")
+        .select("*")
+        .eq("program_slug", slug)
+        .eq("is_active", true)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      return activeRound || null;
+    },
+    enabled: !!slug,
+  });
+
   const round = enrollment?.program_rounds;
 
   // Calendar sync tracking hook - tracks which sessions have been synced to calendar
@@ -1120,6 +1151,7 @@ const AppCourseDetail = () => {
         course_name: program.title,
         program_slug: program.slug,
         status: "active",
+        round_id: autoEnrollRound?.id || null,
       });
 
       if (error) throw error;
@@ -1338,6 +1370,57 @@ const AppCourseDetail = () => {
                               </div>
                             </div>
                           )}
+
+                        {/* Active Round Details — shown for programs with auto-enrollment */}
+                        {autoEnrollRound && (
+                          <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 space-y-3">
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-primary" />
+                              <p className="text-sm font-semibold">
+                                {autoEnrollRound.round_name || "Upcoming Round"}
+                              </p>
+                            </div>
+                            <div className="space-y-1">
+                              {(() => {
+                                const sessionDateStr =
+                                  autoEnrollRound.first_session_date ||
+                                  autoEnrollRound.start_date;
+                                if (!sessionDateStr) return null;
+                                const sessionDate = sessionDateStr.includes("T")
+                                  ? new Date(sessionDateStr)
+                                  : new Date(sessionDateStr + "T00:00:00");
+                                if (isNaN(sessionDate.getTime())) return null;
+                                return (
+                                  <>
+                                    <p className="text-sm text-muted-foreground">
+                                      Starts{" "}
+                                      <span className="font-medium text-foreground">
+                                        {format(sessionDate, "EEEE, MMMM d, yyyy")}
+                                      </span>
+                                    </p>
+                                    {sessionDateStr.includes("T") &&
+                                      format(sessionDate, "h:mm a") !== "12:00 AM" && (
+                                        <p className="text-sm text-muted-foreground">
+                                          Time{" "}
+                                          <span className="font-medium text-foreground">
+                                            {format(sessionDate, "h:mm a")}
+                                          </span>
+                                        </p>
+                                      )}
+                                  </>
+                                );
+                              })()}
+                              {autoEnrollRound.first_session_duration ? (
+                                <p className="text-sm text-muted-foreground">
+                                  Duration{" "}
+                                  <span className="font-medium text-foreground">
+                                    {autoEnrollRound.first_session_duration} min
+                                  </span>
+                                </p>
+                              ) : null}
+                            </div>
+                          </div>
+                        )}
 
                         {/* Purchase / Enrollment Section */}
                         <div className="border-t pt-6">
