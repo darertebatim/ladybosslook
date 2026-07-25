@@ -407,7 +407,7 @@ export default function AppPlaylistDetail() {
     ? !!playlistSave
     : playlist?.requires_subscription
       ? hasAccessToProgram("simora-plus") && !!playlistSave
-      : enrollments?.includes(playlist?.program_slug);
+      : enrollments?.includes(playlist?.program_slug) || !!enrolledViaProgram;
 
   const getTrackProgress = (audioId: string) => {
     const progress = progressData?.find((p) => p.audio_id === audioId);
