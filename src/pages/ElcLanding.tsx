@@ -35,7 +35,7 @@ const ElcLanding = () => {
               size="lg"
               className="w-full text-xl py-8 bg-green-600 hover:bg-green-700 text-white font-bold shadow-lg"
             >
-              🇮🇷 پرداخت ۹۹.۰۰۰ تومان (داخل ایران)
+              🇮🇷 ورود به چالش از داخل ایران
             </Button>
           </a>
 
@@ -55,7 +55,7 @@ const ElcLanding = () => {
               size="lg"
               className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 text-white"
             >
-              🇺🇸 💵 پرداخت (خارج ایران)
+              🇺🇸  ورود از امریکا / کانادا / اروپا (خارج ایران)
             </Button>
           </a>
         </div>
