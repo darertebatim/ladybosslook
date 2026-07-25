@@ -1366,7 +1366,7 @@ const AppCourseDetail = () => {
                       </CardHeader>
                         <CardContent className="space-y-6">
                           {/* Host + Language */}
-                          <div className="space-y-2">
+                          <div className="flex flex-wrap items-center gap-3">
                             <HostBadges
                               contentType="program"
                               contentId={program.slug}
@@ -1393,7 +1393,7 @@ const AppCourseDetail = () => {
                           {/* Program Description */}
                           {program.description && (
                             <div
-                              className="text-muted-foreground whitespace-pre-wrap leading-relaxed"
+                              className="text-muted-foreground whitespace-pre-wrap leading-relaxed [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-foreground [&_h2]:mt-4 [&_h2]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-foreground [&_h3]:mt-3 [&_h3]:mb-1 [&_strong]:text-foreground"
                               dangerouslySetInnerHTML={{
                                 __html: DOMPurify.sanitize(program.description),
                               }}
@@ -1445,6 +1445,20 @@ const AppCourseDetail = () => {
                                     <span className="font-medium text-foreground">
                                       {autoEnrollRound.first_session_duration} min
                                     </span>
+                                  </p>
+                                ) : null}
+                                {autoEnrollRound.google_meet_link ? (
+                                  <p className="text-sm text-muted-foreground">
+                                    Meeting on{" "}
+                                    <a
+                                      href={autoEnrollRound.google_meet_link}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="inline-flex items-center gap-1 font-medium text-foreground underline"
+                                    >
+                                      <Video className="h-3.5 w-3.5" />
+                                      Google Meet
+                                    </a>
                                   </p>
                                 ) : null}
                               </div>
