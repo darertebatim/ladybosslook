@@ -14,8 +14,8 @@ import { RoutineMiniPlayer } from '@/components/app/RoutineMiniPlayer';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
-import { useUnreadChat } from '@/hooks/useUnreadChat';
 import { useChatNotifications } from '@/hooks/useChatNotifications';
+
 import { cn } from '@/lib/utils';
 import { PushNotificationOnboarding } from '@/components/app/PushNotificationOnboarding';
 import { usePushNotificationFlow } from '@/hooks/usePushNotificationFlow';
