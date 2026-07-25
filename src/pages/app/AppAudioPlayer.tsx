@@ -476,7 +476,7 @@ export default function AppAudioPlayer() {
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
           <div className="pt-1 pb-2 px-4">
-            <BackButton to="/app/player" label="Library" className="text-fg-warm" />
+            <BackButton to={cameFromProgram ? from : "/app/player"} label={cameFromProgram ? "Program" : "Library"} className="text-fg-warm" />
           </div>
         </div>
         <div style={{ height: 'calc(48px + env(safe-area-inset-top, 0px))' }} className="shrink-0" />
