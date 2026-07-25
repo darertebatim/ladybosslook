@@ -297,7 +297,7 @@ const AppCourseDetail = () => {
     queryKey: ["program-auto-enroll-round", slug],
     queryFn: async () => {
       if (!slug) return null;
-      const { data: autoEnroll } = await supabase
+      const { data: autoEnroll } = await (supabase as any)
         .from("program_auto_enrollment")
         .select("round_id, program_rounds(*)")
         .eq("program_slug", slug)
@@ -308,14 +308,14 @@ const AppCourseDetail = () => {
       }
 
       // Fallback: any active round for this program
-      const { data: activeRound } = await (supabase
+      const { data: activeRound } = await (supabase as any)
         .from("program_rounds")
         .select("*")
         .eq("program_slug", slug)
         .eq("is_active", true)
         .order("created_at", { ascending: false })
         .limit(1)
-        .maybeSingle() as any);
+        .maybeSingle();
 
       return activeRound || null;
     },
