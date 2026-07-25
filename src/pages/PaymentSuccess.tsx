@@ -324,6 +324,53 @@ export default function PaymentSuccess() {
             )}
           </div>
 
+          {/* Round details */}
+          {roundInfo && (() => {
+            const sessionDateStr = roundInfo.first_session_date || roundInfo.start_date;
+            const sessionDate = sessionDateStr
+              ? (sessionDateStr.includes('T') ? new Date(sessionDateStr) : new Date(sessionDateStr + 'T00:00:00'))
+              : null;
+            const validDate = sessionDate && !isNaN(sessionDate.getTime()) ? sessionDate : null;
+            const hasTime = !!sessionDateStr && sessionDateStr.includes('T') && validDate && format(validDate, 'h:mm a') !== '12:00 AM';
+            const tzAbbr = (() => {
+              try {
+                return new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' })
+                  .formatToParts(new Date()).find(p => p.type === 'timeZoneName')?.value || '';
+              } catch { return ''; }
+            })();
+            return (
+              <div className="mt-5 bg-[#FFF6EC] rounded-3xl p-5 border border-[#F08A3E]/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <Calendar className="h-4 w-4 text-[#F08A3E]" />
+                  <h2 className="text-[15px] font-bold text-[#1a1f3d]">
+                    {roundInfo.round_name || 'Upcoming Round'}
+                  </h2>
+                </div>
+                <div className="space-y-1.5 text-[14px]">
+                  {validDate && (
+                    <p className="text-[#1a1f3d]/70">
+                      Starts <span className="font-semibold text-[#1a1f3d]">{format(validDate, 'EEEE, MMMM d, yyyy')}</span>
+                    </p>
+                  )}
+                  {hasTime && validDate && (
+                    <p className="text-[#1a1f3d]/70">
+                      Time <span className="font-semibold text-[#1a1f3d]">{format(validDate, 'h:mm a')}{tzAbbr ? ` ${tzAbbr}` : ''}</span>
+                    </p>
+                  )}
+                  {roundInfo.first_session_duration && (
+                    <p className="text-[#1a1f3d]/70">
+                      Duration <span className="font-semibold text-[#1a1f3d]">{roundInfo.first_session_duration} min</span>
+                    </p>
+                  )}
+                  <p className="text-[#1a1f3d]/70 inline-flex items-center gap-1.5">
+                    <Video className="h-3.5 w-3.5 text-[#F08A3E]" />
+                    <span className="font-semibold text-[#1a1f3d]">Google Meet</span>
+                  </p>
+                </div>
+              </div>
+            );
+          })()}
+
           {/* Order summary */}
           {orderDetails && (
             <div className="mt-5 bg-white/75 backdrop-blur rounded-3xl p-5 shadow-sm border border-white">
