@@ -1,53 +1,22 @@
 // Shared region-restriction helper for enrollment edge functions.
-// Returns the ISO country code (uppercase) the caller appears to be in based
-// on their profile.country and phone prefix — VPN-proof for phone/country
-// fields but not for device timezone (timezone is not checked here).
+// Detects the caller's region from their stored device timezone
+// (profiles.timezone, synced by useTimezoneSync on app open).
+// We deliberately do NOT use phone/country — those are not collected.
 
-// Map profile.country values (as stored) to ISO codes.
-const COUNTRY_TO_ISO: Record<string, string> = {
-  iran: 'IR',
-  'islamic republic of iran': 'IR',
-  ir: 'IR',
-  afghanistan: 'AF',
-  af: 'AF',
-  iraq: 'IQ',
-  iq: 'IQ',
+// Map IANA timezone -> ISO country code.
+const TIMEZONE_TO_ISO: Record<string, string> = {
+  'Asia/Tehran': 'IR',
+  'Asia/Kabul': 'AF',
+  'Asia/Baghdad': 'IQ',
 };
 
-// Map phone prefix -> ISO code. Longest-prefix match wins.
-const PHONE_PREFIX_TO_ISO: Array<[string, string]> = [
-  ['+98', 'IR'],
-  ['+93', 'AF'],
-  ['+964', 'IQ'],
-];
-
 export function detectUserRegions(profile: {
-  country?: string | null;
-  phone?: string | null;
+  timezone?: string | null;
 } | null | undefined): string[] {
-  const regions = new Set<string>();
   if (!profile) return [];
-
-  const country = (profile.country || '').trim().toLowerCase();
-  if (country && COUNTRY_TO_ISO[country]) {
-    regions.add(COUNTRY_TO_ISO[country]);
-  } else if (country.length === 2) {
-    regions.add(country.toUpperCase());
-  }
-
-  const phone = (profile.phone || '').replace(/\s|-|\(|\)/g, '');
-  if (phone) {
-    // longest prefix wins
-    const sorted = [...PHONE_PREFIX_TO_ISO].sort((a, b) => b[0].length - a[0].length);
-    for (const [prefix, iso] of sorted) {
-      if (phone.startsWith(prefix)) {
-        regions.add(iso);
-        break;
-      }
-    }
-  }
-
-  return [...regions];
+  const tz = (profile.timezone || '').trim();
+  const iso = TIMEZONE_TO_ISO[tz];
+  return iso ? [iso] : [];
 }
 
 export function isRegionBlocked(
@@ -76,7 +45,7 @@ export async function checkProgramRegionBlocks(
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('country, phone')
+    .select('timezone')
     .eq('id', userId)
     .maybeSingle();
 
