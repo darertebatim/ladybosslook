@@ -1262,7 +1262,7 @@ export function ProgramsManager() {
               <div className="space-y-2 p-3 border rounded-lg bg-muted/30">
                 <Label className="text-sm font-semibold">Region Restrictions</Label>
                 <p className="text-xs text-muted-foreground">
-                  Block enrollment for users in these regions (checked server-side via profile country + phone prefix). Applies to both free and paid checkout.
+                  Block enrollment for users in these regions (checked server-side via device timezone synced to the user's profile). Applies to both free and paid checkout.
                 </p>
                 <div className="flex flex-wrap gap-3 pt-1">
                   {[
