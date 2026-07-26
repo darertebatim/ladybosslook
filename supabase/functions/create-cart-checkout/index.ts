@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { checkProgramRegionBlocks } from "../_shared/region-restriction.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -52,6 +53,21 @@ serve(async (req) => {
     }
 
     console.log('[CART-CHECKOUT] Cart items:', cartItems.length);
+
+    // Region check — reject before touching Stripe
+    const cartSlugs = cartItems.map((i: any) => i.program_slug);
+    const regionBlocks = await checkProgramRegionBlocks(supabase, user.id, cartSlugs);
+    if (Object.keys(regionBlocks).length > 0) {
+      console.log('[CART-CHECKOUT] Region blocked:', regionBlocks);
+      return new Response(
+        JSON.stringify({
+          error: 'One or more programs in your cart are not available in your region.',
+          code: 'region_restricted',
+          blocked: regionBlocks,
+        }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
 
     const stripe = new Stripe(stripeKey, { apiVersion: '2023-10-16' });
 

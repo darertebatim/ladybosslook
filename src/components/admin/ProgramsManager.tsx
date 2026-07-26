@@ -98,6 +98,7 @@ export function ProgramsManager() {
     is_one_on_one: false,
     default_session_count: 0,
     auto_create_feed_channel: true,
+    restricted_regions: [] as string[],
   });
   const [hosts, setHosts] = useState<HostAssignment[]>([]);
 
@@ -178,6 +179,7 @@ export function ProgramsManager() {
       is_one_on_one: false,
       default_session_count: 0,
       auto_create_feed_channel: true,
+      restricted_regions: [],
     });
     setEditingId(null);
     setShowForm(false);
@@ -271,6 +273,9 @@ export function ProgramsManager() {
       default_session_count: (program as any).default_session_count || 0,
       auto_create_feed_channel:
         (program as any).auto_create_feed_channel ?? true,
+      restricted_regions: Array.isArray((program as any).restricted_regions)
+        ? (program as any).restricted_regions
+        : [],
     });
     try {
       setHosts(await loadContentHosts('program', program.slug));
@@ -1252,6 +1257,39 @@ export function ProgramsManager() {
                     </div>
                   </div>
                 )}
+              </div>
+
+              <div className="space-y-2 p-3 border rounded-lg bg-muted/30">
+                <Label className="text-sm font-semibold">Region Restrictions</Label>
+                <p className="text-xs text-muted-foreground">
+                  Block enrollment for users in these regions (checked server-side via profile country + phone prefix). Applies to both free and paid checkout.
+                </p>
+                <div className="flex flex-wrap gap-3 pt-1">
+                  {[
+                    { code: 'IR', label: '🇮🇷 Iran' },
+                    { code: 'AF', label: '🇦🇫 Afghanistan' },
+                    { code: 'IQ', label: '🇮🇶 Iraq' },
+                  ].map((r) => {
+                    const checked = formData.restricted_regions.includes(r.code);
+                    return (
+                      <div key={r.code} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`region_${r.code}`}
+                          checked={checked}
+                          onCheckedChange={(v) => {
+                            const next = v
+                              ? [...formData.restricted_regions, r.code]
+                              : formData.restricted_regions.filter((x) => x !== r.code);
+                            setFormData({ ...formData, restricted_regions: next });
+                          }}
+                        />
+                        <Label htmlFor={`region_${r.code}`} className="text-sm font-normal cursor-pointer">
+                          {r.label}
+                        </Label>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               <div className="flex gap-2">
