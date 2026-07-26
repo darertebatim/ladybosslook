@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { sendPurchaseWelcomeMessage } from "../_shared/send-purchase-welcome.ts";
+import { sendEnrollmentEmail } from "../_shared/send-enrollment-email.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -206,6 +207,10 @@ async function ensureEnrollment(supabase: any, userId: string, programSlug: stri
         userId,
         programSlug,
         programTitle: courseName,
+      });
+      await sendEnrollmentEmail(supabase, {
+        userId,
+        programSlug,
       });
     }
   } catch (error: any) {
