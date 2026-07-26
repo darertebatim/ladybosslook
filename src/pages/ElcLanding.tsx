@@ -35,7 +35,7 @@ const ElcLanding = () => {
               size="lg"
               className="w-full text-xl py-8 bg-green-600 hover:bg-green-700 text-white font-bold shadow-lg"
             >
-              🇮🇷 ورود به چالش از داخل ایران
+              🇮🇷 ورود از داخل ایران (به وقت تهران)
             </Button>
           </a>
 
