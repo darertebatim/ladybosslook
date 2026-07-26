@@ -98,6 +98,7 @@ export function ProgramsManager() {
     is_one_on_one: false,
     default_session_count: 0,
     auto_create_feed_channel: true,
+    restricted_regions: [] as string[],
   });
   const [hosts, setHosts] = useState<HostAssignment[]>([]);
 
@@ -178,6 +179,7 @@ export function ProgramsManager() {
       is_one_on_one: false,
       default_session_count: 0,
       auto_create_feed_channel: true,
+      restricted_regions: [],
     });
     setEditingId(null);
     setShowForm(false);
@@ -271,6 +273,9 @@ export function ProgramsManager() {
       default_session_count: (program as any).default_session_count || 0,
       auto_create_feed_channel:
         (program as any).auto_create_feed_channel ?? true,
+      restricted_regions: Array.isArray((program as any).restricted_regions)
+        ? (program as any).restricted_regions
+        : [],
     });
     try {
       setHosts(await loadContentHosts('program', program.slug));
