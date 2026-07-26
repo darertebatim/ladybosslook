@@ -495,42 +495,7 @@ const ProgramPage = () => {
                     )}
 
                     {/* Add to Cart / In Cart / Enrolled */}
-                    {enrolled ? (
-                      <Link to="/app/home" className="block">
-                        <Button variant="secondary" className="w-full gap-2" size="lg">
-                          <Check size={18} /> You're Enrolled — Open in App
-                        </Button>
-                      </Link>
-                    ) : hasFullOption ? (
-                      <Button
-                        className="w-full gap-2"
-                        size="lg"
-                        onClick={() => inCart ? navigate('/cart') : handleAddSubscriptionToCart(selectedPlan)}
-                        disabled={isAdding}
-                      >
-                        {inCart ? (
-                          <><Check size={18} /> In Your Cart — View Cart</>
-                        ) : selectedPlan === 'monthly' ? (
-                          <><ShoppingCart size={18} /> Add Monthly — ${(program.price_amount / 100).toFixed(0)}/mo</>
-                        ) : (
-                          <><ShoppingCart size={18} /> Add One-time — ${((program.subscription_full_payment_price || 0) / 100).toFixed(0)}</>
-                        )}
-                      </Button>
-                    ) : inCart ? (
-                      <Link to="/cart" className="block">
-                        <Button variant="secondary" className="w-full gap-2" size="lg">
-                          <Check size={18} /> In Your Cart — View Cart
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Button className="w-full gap-2" size="lg" onClick={handleAddToCart} disabled={isAdding || isEnrollingFree}>
-                        {isFree ? (
-                          <><Check size={18} /> {isEnrollingFree ? 'Enrolling…' : (user ? 'Enroll for Free' : 'Sign In to Enroll')}</>
-                        ) : (
-                          <><ShoppingCart size={18} /> {isDeposit ? `Add to Cart — $${(displayPrice / 100).toFixed(0)} Deposit` : 'Add to Cart'}</>
-                        )}
-                      </Button>
-                    )}
+                    <EnrollButton />
 
                     <div className="space-y-1.5 text-center">
                       <a
