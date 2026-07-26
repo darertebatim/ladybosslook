@@ -467,7 +467,14 @@ const ProgramPage = () => {
                     ) : (
                     <div>
                       {isFree ? (
-                        <div className="text-2xl lg:text-3xl font-bold text-primary">FREE</div>
+                        <div className="flex items-baseline gap-2">
+                          {program.original_price && program.original_price > 0 && (
+                            <span className="text-muted-foreground line-through text-base">
+                              ${(program.original_price / 100).toFixed(0)}
+                            </span>
+                          )}
+                          <span className="text-2xl lg:text-3xl font-bold text-primary">FREE</span>
+                        </div>
                       ) : (
                         <div className="space-y-0.5">
                           {program.original_price && program.original_price > 0 && program.original_price > program.price_amount && (
