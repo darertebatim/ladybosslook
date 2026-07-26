@@ -466,6 +466,7 @@ const App = () => (
           <Toaster />
           <BrowserRouter>
             <NativeAppRedirect />
+            <MetaPixelTracker />
             <ChunkLoadErrorBoundary>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
