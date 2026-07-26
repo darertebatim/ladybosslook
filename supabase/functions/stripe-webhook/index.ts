@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { sendPurchaseWelcomeMessage } from "../_shared/send-purchase-welcome.ts";
+import { sendEnrollmentEmail } from "../_shared/send-enrollment-email.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -354,6 +355,10 @@ serve(async (req) => {
           programSlug,
           programTitle: productName,
         });
+        await sendEnrollmentEmail(supabase, {
+          userId,
+          programSlug,
+        });
       } else {
         console.log('[WEBHOOK] Skipping auto-enrollment: userId=', userId, 'programSlug=', programSlug);
       }
@@ -379,6 +384,10 @@ serve(async (req) => {
                 userId: cartUserId,
                 programSlug: cartSlug,
                 programTitle: cartProgram.title,
+              });
+              await sendEnrollmentEmail(supabase, {
+                userId: cartUserId,
+                programSlug: cartSlug,
               });
             }
           }

@@ -1,62 +1,62 @@
+# Program Enrollment Email
 
-## Webinar data (pulled from `program_catalog` + `program_rounds`)
+Send a branded confirmation email whenever a user enrolls in a program — free, Stripe paid, RevenueCat, or admin-created. If the program has an auto-enroll round, include the round details. Include an onelink to download the app and a universal link to open the program inside the app.
 
-- **Program**: `Instagram for Business: Avoid the 6 Biggest Mistakes` (slug `instagram6traps`, language: persian, type: webinar)
-- **Round #1**: `2026-08-01 18:00 UTC`, 90 minutes
-- **Google Meet**: `https://meet.google.com/nqc-gztw-imp`
-- **WhatsApp support**: `https://wa.me/16265028535`
-- Cover image: the uploaded PNG (added to `src/assets/`)
+## What the email contains
 
-All webinar info on both pages is pulled **live from the DB** (`program_rounds` + `program_catalog` for slug `instagram6traps`), so future edits in admin/programs automatically flow through.
+- Subject: `You're enrolled in {program title} 🎉` (Farsi variant when program language is `fa`)
+- Header with Rilo/Ladybosslook branding + orange theme
+- Greeting with user's name
+- Program block: cover image, title, host, language, short description
+- **Round details block** (only if an auto-enroll round or specific round is attached):
+  - Round name / number
+  - Start date + first session date (formatted in user's timezone if available; else PT with `PT` label)
+  - End date / duration
+  - Google Meet link (button)
+  - Google Drive link (if any)
+  - WhatsApp support number (if any)
+  - Important message (if any)
+- **Access buttons**:
+  - "Open in app" → universal link `https://ladybosslook.com/app/programs/{slug}` (AASA already covers `/app/*`)
+  - "Download the app" → AppsFlyer OneLink (new secret `APPSFLYER_ONELINK_URL`, fallback to App Store + Play Store buttons if not set)
+  - "View on web" → `https://ladybosslook.com/programs/{slug}`
+- Order summary line (amount, currency, payment type) — omitted for $0/free
+- Support footer: `hi@ladybosslook.com`, unsubscribe/legal links, copyright
 
----
+Bilingual: English by default; Farsi (RTL) template variant used when `program_catalog.language = 'fa'`. Layout mirrors the existing `/sixtraps` confirmation styling for consistency.
 
-## Page 1 — `/sixtraps` (Farsi, mobile-first)
+## Where it gets sent from
 
-Structure (single column, RTL, Farsi copy):
-1. Cover image (uploaded webinar hero).
-2. Farsi headline + short subtitle from the program description.
-3. Registration card:
-   - Full name (متن)
-   - City (شهر)
-   - Email (ایمیل)
-   - Submit button: «ثبت‌نام رایگان»
-4. On submit:
-   - Validate with zod (name/city 1–100, valid email).
-   - Insert into `form_submissions` (existing public table) with `form_type='sixtraps_registration'` and payload `{name, city, email, program_slug, round_id}`.
-   - Call new edge function `send-sixtraps-confirmation` with `{name, email, roundId}` — it fetches round + program from DB and sends a Farsi confirmation email via Resend containing: webinar title, date/time (both UTC and Tehran time), Google Meet link, WhatsApp support link, add-to-calendar links.
-   - Navigate to `/thankyousixtraps`.
-5. No auth required (public page). Any submit failure still redirects to thank-you but toasts a soft warning — email will be retried by the edge function log path.
+New edge function `send-enrollment-confirmation` that:
+1. Accepts `{ user_id, program_slug, round_id? , order_id? }`
+2. Loads user email/name from `auth.users` + `profiles`
+3. Loads `program_catalog` row
+4. Resolves round: use passed `round_id`, else look up `program_auto_enrollment.round_id` for the slug, else the next upcoming `program_rounds` row
+5. Renders HTML (inline template, no React Email dependency — keep it self-contained like `send-sixtraps-confirmation`)
+6. Sends via Resend using existing `RESEND_API_KEY` from `hi@ladybosslook.com`
+7. Logs to `email_logs` (already exists) with type `program_enrollment` for idempotency — skip if a row with same `user_id + program_slug + type` exists
 
----
+## Wiring into existing flows
 
-## Page 2 — `/thankyousixtraps` (Farsi, mobile-first)
+Call the new function (fire-and-forget, non-blocking) from:
+- `supabase/functions/enroll-free-programs/index.ts` — after `enrollFreeProgram`
+- `supabase/functions/stripe-webhook/index.ts` — right after `sendPurchaseWelcomeMessage` for each enrolled slug
+- `supabase/functions/revenuecat-webhook/index.ts` — same spot
+- `supabase/functions/admin-create-enrollment/index.ts` — same spot
 
-1. Farsi thank-you headline.
-2. Responsive YouTube embed: `https://youtu.be/nccqY4M6GZ4`.
-3. Webinar details card (from round): title, date/time (Tehran + local), duration, «لینک ورود در ایمیل شما ارسال شد».
-4. Two calendar buttons:
-   - **Google Calendar** — opens `https://calendar.google.com/calendar/render?action=TEMPLATE&...` prefilled from round data.
-   - **Apple Calendar** — downloads a generated `.ics` file (client-side blob) with the same event details.
-5. Below: single button «ارسال جزئیات به واتس‌اپ من» → opens the round's `support_link_url` (`https://wa.me/16265028535`) with a prefilled Farsi message asking support to resend the webinar details.
+Reuse the same `sendPurchaseWelcomeMessage` pattern (try/catch, log-and-continue) so email failures never break enrollment.
 
----
+Skip sending for the `simora-plus` / `simora-plus-annual` subscription slugs (those already get the Plus welcome chat message and aren't program enrollments).
 
-## Backend
+## Technical notes
 
-- **New edge function**: `supabase/functions/send-sixtraps-confirmation/index.ts` — public (no JWT), CORS, Resend-based, Farsi HTML email. Requires `RESEND_API_KEY` secret (already used elsewhere; if missing I'll prompt to add).
-- No schema changes; reuses `form_submissions` and reads `program_rounds` / `program_catalog`.
+- New file: `supabase/functions/send-enrollment-confirmation/index.ts` (JWT-verified for direct calls; internal calls use service role via `supabase.functions.invoke`)
+- New shared helper: `supabase/functions/_shared/send-enrollment-email.ts` — thin wrapper the four enrollment functions call, mirroring `send-purchase-welcome.ts`
+- Uses existing `RESEND_API_KEY`; will request `APPSFLYER_ONELINK_URL` secret via `add_secret` if you want the download CTA to use OneLink (otherwise falls back to direct App Store / Play Store URLs already in the codebase)
+- Idempotency via `email_logs` insert with unique-ish check on `(recipient_email, type, metadata->>program_slug)`
+- Timezone: format round times in `America/Los_Angeles` with `PT` abbrev (matches current session-card convention); no per-user TZ resolution in the email
+- No schema changes required
 
-## Frontend files
+## Open question
 
-- New: `src/pages/SixTrapsLanding.tsx`, `src/pages/ThankYouSixTraps.tsx`, `src/lib/sixtrapsCalendar.ts` (Google URL + ICS blob helpers).
-- New asset: `src/assets/sixtraps-hero.png` (from upload).
-- Update: `src/App.tsx` — lazy-register `/sixtraps` and `/thankyousixtraps` (web only, same guard pattern as `/thankfreelive`).
-
-## Out of scope
-
-- Admin UI to edit round content (already exists).
-- Payment flow (webinar is free).
-- Farsi copy is drafted by me; you can tweak inline after preview.
-
-Confirm and I'll build it.
+Do you want a separate download CTA using AppsFlyer OneLink (needs the OneLink URL as a secret), or is a plain App Store + Google Play button pair fine?
