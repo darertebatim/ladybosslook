@@ -25,24 +25,10 @@ const ElcLanding = () => {
 
         {/* Buttons */}
         <div className="space-y-4">
-          <a
-            href="https://ladybossnew.com/5chiran"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full"
-          >
-            <Button
-              size="lg"
-              className="w-full text-xl py-8 bg-green-600 hover:bg-green-700 text-white font-bold shadow-lg"
-            >
-              🇮🇷 ورود از داخل ایران (به وقت تهران)
-            </Button>
-          </a>
-
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
             <p className="text-base text-blue-800 font-medium whitespace-pre-line">
               👇 عزیزان خارج از ایران (ساکنین امریکا، کانادا،
-&nbsp;🇺🇸 🇨🇦 اروپا و ...) وارد لینک پایین شوید 👇
+              &nbsp;🇺🇸 🇨🇦 اروپا و ...) وارد لینک پایین شوید 👇
             </p>
           </div>
 
@@ -56,7 +42,21 @@ const ElcLanding = () => {
               size="lg"
               className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 text-white"
             >
-              🇺🇸  ورود از امریکا / کانادا / اروپا (خارج ایران)
+              🇺🇸  ورود از امریکا / کانادا / اروپا (خارج ایران)
+            </Button>
+          </a>
+
+          <a
+            href="https://ladybossnew.com/5chiran"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full"
+          >
+            <Button
+              size="lg"
+              className="w-full text-xl py-8 bg-green-600 hover:bg-green-700 text-white font-bold shadow-lg"
+            >
+              🇮🇷 ورود از داخل ایران (به وقت تهران)
             </Button>
           </a>
         </div>
