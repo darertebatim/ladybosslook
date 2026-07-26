@@ -147,7 +147,7 @@ const ProgramPage = () => {
         .from('program_rounds')
         .select('*')
         .eq('program_slug', slug)
-        .eq('is_active', true)
+        .in('status', ['upcoming', 'active'])
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
