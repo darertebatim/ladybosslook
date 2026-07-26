@@ -476,24 +476,33 @@ const ProgramPage = () => {
                           <span className="text-2xl lg:text-3xl font-bold text-primary">FREE</span>
                         </div>
                       ) : (
-                        <div className="space-y-0.5">
-                          {program.original_price && program.original_price > 0 && program.original_price > program.price_amount && (
-                            <div className="text-muted-foreground line-through text-sm">
-                              ${(program.original_price / 100).toFixed(0)}
-                            </div>
-                          )}
+                      <div className="space-y-0.5">
                           {isDeposit ? (
                             <>
-                              <div className="text-2xl lg:text-3xl font-bold text-foreground">
-                                ${(displayPrice / 100).toFixed(0)} <span className="text-sm font-medium text-muted-foreground">deposit</span>
+                              <div className="flex items-baseline gap-2">
+                                {program.original_price && program.original_price > 0 && program.original_price > program.price_amount && (
+                                  <span className="text-muted-foreground line-through text-base">
+                                    ${(program.original_price / 100).toFixed(0)}
+                                  </span>
+                                )}
+                                <span className="text-2xl lg:text-3xl font-bold text-foreground">
+                                  ${(displayPrice / 100).toFixed(0)} <span className="text-sm font-medium text-muted-foreground">deposit</span>
+                                </span>
                               </div>
                               <p className="text-xs text-muted-foreground">
                                 Full price: ${(program.price_amount / 100).toFixed(0)} • Remaining: ${((program.price_amount - displayPrice) / 100).toFixed(0)}
                               </p>
                             </>
                           ) : (
-                            <div className="text-2xl lg:text-3xl font-bold text-foreground">
-                              ${(displayPrice / 100).toFixed(0)}
+                            <div className="flex items-baseline gap-2">
+                              {program.original_price && program.original_price > 0 && program.original_price > program.price_amount && (
+                                <span className="text-muted-foreground line-through text-base">
+                                  ${(program.original_price / 100).toFixed(0)}
+                                </span>
+                              )}
+                              <span className="text-2xl lg:text-3xl font-bold text-foreground">
+                                ${(displayPrice / 100).toFixed(0)}
+                              </span>
                             </div>
                           )}
                         </div>
