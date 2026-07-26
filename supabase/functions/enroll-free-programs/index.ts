@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { sendEnrollmentEmail } from "../_shared/send-enrollment-email.ts";
+import { checkProgramRegionBlocks } from "../_shared/region-restriction.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -116,6 +117,27 @@ serve(async (req) => {
       .in('slug', targetSlugs);
 
     if (progErr) throw progErr;
+
+    // Region check — block enrollment for restricted regions
+    const regionBlocks = await checkProgramRegionBlocks(
+      supabase,
+      user.id,
+      (programs || []).map((p: any) => p.slug),
+    );
+    if (Object.keys(regionBlocks).length > 0) {
+      log('region blocked', regionBlocks);
+      return new Response(
+        JSON.stringify({
+          error: 'This program is not available in your region.',
+          code: 'region_restricted',
+          blocked: regionBlocks,
+        }),
+        {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
+      );
+    }
 
     const { data: profile } = await supabase
       .from('profiles')
