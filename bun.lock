@@ -6,31 +6,31 @@
       "name": "vite_react_shadcn_ts",
       "dependencies": {
         "@capacitor-community/in-app-review": "^8.0.0",
-        "@capacitor/action-sheet": "^8.0.0",
-        "@capacitor/android": "^8.0.1",
-        "@capacitor/app": "^8.0.0",
-        "@capacitor/browser": "^8.0.0",
-        "@capacitor/camera": "^8.0.0",
-        "@capacitor/cli": "^8.0.1",
-        "@capacitor/core": "^8.0.1",
-        "@capacitor/device": "^8.0.0",
-        "@capacitor/filesystem": "^8.0.0",
-        "@capacitor/haptics": "^8.0.0",
-        "@capacitor/ios": "^8.0.1",
-        "@capacitor/keyboard": "^8.0.0",
-        "@capacitor/local-notifications": "^8.0.0",
+        "@capacitor/action-sheet": "^8.1.1",
+        "@capacitor/android": "^8.4.2",
+        "@capacitor/app": "^8.1.1",
+        "@capacitor/browser": "^8.0.4",
+        "@capacitor/camera": "^8.2.1",
+        "@capacitor/cli": "^8.4.2",
+        "@capacitor/core": "^8.4.2",
+        "@capacitor/device": "^8.0.3",
+        "@capacitor/filesystem": "^8.1.2",
+        "@capacitor/haptics": "^8.0.2",
+        "@capacitor/ios": "^8.4.2",
+        "@capacitor/keyboard": "^8.0.5",
+        "@capacitor/local-notifications": "^8.2.1",
         "@capacitor/network": "^8.0.1",
-        "@capacitor/push-notifications": "^8.0.0",
-        "@capacitor/share": "^8.0.0",
-        "@capacitor/splash-screen": "^8.0.0",
-        "@capacitor/status-bar": "^8.0.0",
-        "@capawesome/capacitor-file-picker": "^8.0.0",
+        "@capacitor/push-notifications": "^8.1.2",
+        "@capacitor/share": "^8.0.1",
+        "@capacitor/splash-screen": "^8.0.2",
+        "@capacitor/status-bar": "^8.0.3",
+        "@capawesome/capacitor-file-picker": "^8.0.3",
         "@capgo/capacitor-social-login": "^8.2.16",
         "@dnd-kit/core": "^6.3.1",
         "@dnd-kit/modifiers": "^9.0.0",
         "@dnd-kit/sortable": "^10.0.0",
         "@dnd-kit/utilities": "^3.2.2",
-        "@ebarooni/capacitor-calendar": "^8.0.0",
+        "@ebarooni/capacitor-calendar": "^8.2.0",
         "@hookform/resolvers": "^3.10.0",
         "@mediagrid/capacitor-native-audio": "^3.0.0",
         "@radix-ui/react-accordion": "^1.2.11",
@@ -157,45 +157,45 @@
 
     "@capacitor-community/in-app-review": ["@capacitor-community/in-app-review@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-AYpEkIjdv27WGS3hnlc7xAQ1BhaBvD2svgQBfHF4P2Olw1N6a7MSCOQC6O4SuxmdBdJ2fM6uFeo1jyNjKLtIPw=="],
 
-    "@capacitor/action-sheet": ["@capacitor/action-sheet@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-6NYSv9EeaPiInu+/4AfuvSlJEaH+F7J6UmAejVdPW8YHF+Qinc/DKYkMvqMx+8MXVKIptCA0Zwz8JnabuNCl2Q=="],
+    "@capacitor/action-sheet": ["@capacitor/action-sheet@8.1.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/action-sheet/-/action-sheet-8.1.1.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-yHuGSR/FS2dDr9oBmy+Ql+y7/i5XsUAlENx5oRND5NtzsNLLiFxpNPGLWV27aU9uf9ICjI92VzH93Zh0g2FL1A=="],
 
-    "@capacitor/android": ["@capacitor/android@8.0.1", "", { "peerDependencies": { "@capacitor/core": "^8.0.0" } }, "sha512-Mrk2MFKSg9YA4BPLKm03wwFnGKcvzNBERUTcxjW1NkLrF6YhJwygAT69f/YGopFvOhhqdnDPsuZuASUfmpkSpw=="],
+    "@capacitor/android": ["@capacitor/android@8.4.2", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/android/-/android-8.4.2.tgz", { "peerDependencies": { "@capacitor/core": "^8.4.0" } }, "sha512-bzf8XZ9C+ePgOQ+e+T0fnhHGH4aCNY494vvSQIF5w4AY07RwEmkFqZs1678DDSMH0hLSQpxEwXGFNUVcXO6bBA=="],
 
-    "@capacitor/app": ["@capacitor/app@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-OwzIkUs4w433Bu9WWAEbEYngXEfJXZ9Wmdb8eoaqzYBgB0W9/3Ed/mh6sAYPNBAZlpyarmewgP7Nb+d3Vrh+xA=="],
+    "@capacitor/app": ["@capacitor/app@8.1.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/app/-/app-8.1.1.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-xM2ZTX5jK60tFtmjsmJv+Cdj1Qsb6NcavkqmdEnCPQBeya9oKhamZJxYOnQNj1ZvcJM7sWfG6BEtSLx42pisbA=="],
 
-    "@capacitor/browser": ["@capacitor/browser@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-xey7maszGABKuStvXDV4vXN+EzIyz0o7zlyzw4JKG6o/1GzqeqHqVuE+8Ux+Hks3DZji4LoriWZVgVF6mR6RGg=="],
+    "@capacitor/browser": ["@capacitor/browser@8.0.4", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/browser/-/browser-8.0.4.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-ORZ4u/y+7aMuu6yVuk6SP529fUZyqcbnuHB1q5McpA3o2SYfVoi28iB8rsQjI2ad1qlKJd29ZUuGtspXLBDlWg=="],
 
-    "@capacitor/camera": ["@capacitor/camera@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-Iu8j2oxoIhY2mLuoEckbL7PFgw1XFm1nqmeWdIkILpcT3H9A+BrSDUDlzWqM/EeaDKo6JnhR59tYHwUhOdXaUg=="],
+    "@capacitor/camera": ["@capacitor/camera@8.2.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/camera/-/camera-8.2.1.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-yq4TbVcv9Z91JLr7C5407s3rrXr/Dmk+Pr9FAVRn65s3Jg4iYabjwG4fVKUYlQL5TiUdBbZA3LiNAbUxJNcUkw=="],
 
-    "@capacitor/cli": ["@capacitor/cli@8.0.1", "", { "dependencies": { "@ionic/cli-framework-output": "^2.2.8", "@ionic/utils-subprocess": "^3.0.1", "@ionic/utils-terminal": "^2.3.5", "commander": "^12.1.0", "debug": "^4.4.0", "env-paths": "^2.2.0", "fs-extra": "^11.2.0", "kleur": "^4.1.5", "native-run": "^2.0.3", "open": "^8.4.0", "plist": "^3.1.0", "prompts": "^2.4.2", "rimraf": "^6.0.1", "semver": "^7.6.3", "tar": "^6.1.11", "tslib": "^2.8.1", "xml2js": "^0.6.2" }, "bin": { "cap": "bin/capacitor", "capacitor": "bin/capacitor" } }, "sha512-okCNTsL8FNYrtPNeHWFjWb1S+PwBMhx5wFLhDC0MZOIrOLm+2ynMBtKu3BnR0Nv1hozoHcOCi6SuTF1TrRpb3w=="],
+    "@capacitor/cli": ["@capacitor/cli@8.4.2", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/cli/-/cli-8.4.2.tgz", { "dependencies": { "@ionic/cli-framework-output": "^2.2.8", "@ionic/utils-subprocess": "^3.0.1", "@ionic/utils-terminal": "^2.3.5", "commander": "^12.1.0", "debug": "^4.4.0", "env-paths": "^2.2.0", "fs-extra": "^11.2.0", "kleur": "^4.1.5", "native-run": "^2.0.3", "open": "^8.4.0", "plist": "^3.1.0", "prompts": "^2.4.2", "rimraf": "^6.0.1", "semver": "^7.6.3", "tar": "^7.5.3", "tslib": "^2.8.1", "xml2js": "^0.6.2" }, "bin": { "cap": "bin/capacitor", "capacitor": "bin/capacitor" } }, "sha512-hE4HmpMdr5T8eQ++kGa1BKkdG2JLEvo1y1cj1kmFK78VB9dBp538oe1EZvzwupNGOl0ZueALotzL5wcXRD9w1Q=="],
 
-    "@capacitor/core": ["@capacitor/core@8.0.1", "", { "dependencies": { "tslib": "^2.1.0" } }, "sha512-5UqSWxGMp/B8KhYu7rAijqNtYslhcLh+TrbfU48PfdMDsPfaU/VY48sMNzC22xL8BmoFoql/3SKyP+pavTOvOA=="],
+    "@capacitor/core": ["@capacitor/core@8.4.2", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/core/-/core-8.4.2.tgz", { "dependencies": { "tslib": "^2.1.0" } }, "sha512-fQPRb3JXRaU2pnufDUvqOjhsrYxDQeFRZyaj/sHydIUxD2NxOGHKMpmKUdI+U4OOmKuGZyvRpi7TSJU+7Bjbmg=="],
 
-    "@capacitor/device": ["@capacitor/device@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-qFmlTDnAvUwIg93YUF3u3ovqpDFqUl2RFkf2dVIF8Py7vTA+GjQIHQWITcBKfeUENoVXPNn04t5nxg5mAkjNEA=="],
+    "@capacitor/device": ["@capacitor/device@8.0.3", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/device/-/device-8.0.3.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-rliPCCZwxtjU6200jJNDAsQhioyozV3fGgiP+NgRqtDOI7i+Jdz+DYNwEup+3MGZZ4NEmkuFaBeWLM3T01vJRg=="],
 
-    "@capacitor/filesystem": ["@capacitor/filesystem@8.0.0", "", { "dependencies": { "@capacitor/synapse": "^1.0.4" }, "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-RRGNLW9xEqvVVHGyGlfS4Oy0R3Na+bEefwZElKbex22S9eZr5cg8wc750BPPVwbcv5lf5fJymkY8x8y6UwKPyg=="],
+    "@capacitor/filesystem": ["@capacitor/filesystem@8.1.2", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/filesystem/-/filesystem-8.1.2.tgz", { "dependencies": { "@capacitor/synapse": "^1.0.4" }, "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-doaaMfGoFR2hWU6aV6u83I+5ZsGyJVq+Gz4r9lMpJzUKMm1eMu0hLnFdV1aXZlU9FlK/RndFrVD8oRZfNOqWgQ=="],
 
-    "@capacitor/haptics": ["@capacitor/haptics@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-DY1IUOjke1T4ITl7mFHQIKCaJJyHYAYRYHG9bVApU7PDOZiMVGMp48Yjzdqjya+wv/AHS5mDabSTUmhJ5uDvBA=="],
+    "@capacitor/haptics": ["@capacitor/haptics@8.0.2", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/haptics/-/haptics-8.0.2.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-c2hZzRR5Fk1tbTvhG1jhh2XBAf3EhnIerMIb2sl7Mt41Gxx1fhBJFDa0/BI1IbY4loVepyyuqNC9820/GZuoWQ=="],
 
-    "@capacitor/ios": ["@capacitor/ios@8.0.1", "", { "peerDependencies": { "@capacitor/core": "^8.0.0" } }, "sha512-pDxwQtx3n07DBhRKFGvYh4g00ruIsT7HxPm6IIT+tJD8VuTNgwgWYmEOZzfHkG6mZuCe03KqCsuD+aVmg5Rctg=="],
+    "@capacitor/ios": ["@capacitor/ios@8.4.2", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/ios/-/ios-8.4.2.tgz", { "peerDependencies": { "@capacitor/core": "^8.4.0" } }, "sha512-ClVzIjK++yRjsRPOpdEzhsZfbHfoEc0f4M6vD0v7sWh0qcoF6NkxNAeHpWTn4OPJpJfpGGoYsq+IfEHrYyBiWA=="],
 
-    "@capacitor/keyboard": ["@capacitor/keyboard@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-ycPW6iQyFwzDK95jihesj5EGiyyGSfbBqNek11iNp9tBOB7zDeYkUA2S/vPpOETt3dhP6pWr7a9gNVGuEfj11g=="],
+    "@capacitor/keyboard": ["@capacitor/keyboard@8.0.5", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/keyboard/-/keyboard-8.0.5.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-oFXygC4eKYA5l2MdpTR06L2M/4x6e2SLD5yS1T9+UBDKTkzyvhWKEhbYLUaTIBPpLKqlfGudJw1X73S1H9eUzQ=="],
 
-    "@capacitor/local-notifications": ["@capacitor/local-notifications@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-Jn2IJs13vhRyOUtYni7PIPdMDYMILb4uI/rRAi7PmGg2lnaKbM5aWBmHZWt0laTYyVApYIbCWmdgBqWx/IH4dQ=="],
+    "@capacitor/local-notifications": ["@capacitor/local-notifications@8.2.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/local-notifications/-/local-notifications-8.2.1.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-Bkim+MGl7UrDTjDferV4ECq0aWciTsa0k15+MX2jnx2PeWgEPvlBy5yrqzBlwEZPrtHFUvPVxPi5V66MPGHkAw=="],
 
     "@capacitor/network": ["@capacitor/network@8.0.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/network/-/network-8.0.1.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-9xK/FHFmzKGanB6BdoSZOzXk8vF0OFVQSQ4PAsIrzAzLuXHryO317qy8dcHVpgxYeuZq2noI0My9z1DvVDi/9w=="],
 
-    "@capacitor/push-notifications": ["@capacitor/push-notifications@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-xJWQLqAfC8b2ETqAPmwDnkKB4t/lVrbYc2D8VpA2fSu10JFSL/R722Vk0Lfl9Lo9WusmyIiQbVfILNQ3iFNGKw=="],
+    "@capacitor/push-notifications": ["@capacitor/push-notifications@8.1.2", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/push-notifications/-/push-notifications-8.1.2.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-TQl4XxqJfNF+KbSYBFMXYYT5WXUaleVKXlByhh/8+KySMVNjp+l5OqAUoGe/sY1IAnGXEuUeCjA/WLZEVvGwrA=="],
 
-    "@capacitor/share": ["@capacitor/share@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-VU+xT4LFwr4keIC0UKDqGQVAiNlAHwoTMQg8wVVSxtn/k32VOvvtqFfu63qnXr40WKytZWrxJfVESvRjd761yg=="],
+    "@capacitor/share": ["@capacitor/share@8.0.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/share/-/share-8.0.1.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-3cSBKBCJVon54rKDROP2rqGyeGks4pBh9TbaEk9S375Kbek/ZHe72N50zIa0Vn9Eac/SuhwgehO/mmA4CsUOiw=="],
 
-    "@capacitor/splash-screen": ["@capacitor/splash-screen@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-zkFdUSd6C6gd3s3bIEgtO3DVjfwpaX5mmWU9er8xYTg47zr2toEkGtfyE6CPhhErG09fl4rCqrK5DfnGrXLh9w=="],
+    "@capacitor/splash-screen": ["@capacitor/splash-screen@8.0.2", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/splash-screen/-/splash-screen-8.0.2.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-0C6rYScr13WfAE9nPl4ScOQynmjFv9NT3Th+RZkD4ezYHmER6mcl1/lDYsv7jg3Rj3FOvLrlTlmNkUrr83kZzQ=="],
 
-    "@capacitor/status-bar": ["@capacitor/status-bar@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-aIj3bc7z8lfPgOen8HlrBrkfnxpFnh21OCx6jCUx4Mvv+B6eEkUQ49b32DOddgVfr+igRHLX2SYi7duqIsNDXg=="],
+    "@capacitor/status-bar": ["@capacitor/status-bar@8.0.3", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capacitor/status-bar/-/status-bar-8.0.3.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-csSpfNeN49Hx9JaQBSJEIiEbOLtXg3kcc2IpScq2fu5L520h3AWEvsxoH8Srk1jxfRKepaJ4S4sqSC3foI4AgA=="],
 
     "@capacitor/synapse": ["@capacitor/synapse@1.0.4", "", {}, "sha512-/C1FUo8/OkKuAT4nCIu/34ny9siNHr9qtFezu4kxm6GY1wNFxrCFWjfYx5C1tUhVGz3fxBABegupkpjXvjCHrw=="],
 
-    "@capawesome/capacitor-file-picker": ["@capawesome/capacitor-file-picker@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-eA39o8phSRcA78tnmQT6T2h73pljt5g+TcxI3xdR1hlWG7nlGLM2fDfiAaQ/2IASI4TA+s+NGBW1TdOXbwQiOw=="],
+    "@capawesome/capacitor-file-picker": ["@capawesome/capacitor-file-picker@8.0.3", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@capawesome/capacitor-file-picker/-/capacitor-file-picker-8.0.3.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-/PdujysNnbY82LXXM1XthRdgNr5wodgLNgbo2pgarJskiQYvy/+QPKsuzFPUZd/4pi3dLxXjZMZVVyYy2Wm05A=="],
 
     "@capgo/capacitor-social-login": ["@capgo/capacitor-social-login@8.2.16", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-6u69dR+oqeG5kRvrw2KRtfHEQ3k+T4eF1nJ2djW5fixUy0t+ONgItCW9DVV31aVprUUqqrXU+L9PpeGoChaqag=="],
 
@@ -209,7 +209,7 @@
 
     "@dnd-kit/utilities": ["@dnd-kit/utilities@3.2.2", "", { "dependencies": { "tslib": "^2.0.0" }, "peerDependencies": { "react": ">=16.8.0" } }, "sha512-+MKAJEOfaBe5SmV6t34p80MMKhjvUz0vRrvVJbPT0WElzaOJ/1xs+D+KDv+tD/NE5ujfrChEcshd4fLn0wpiqg=="],
 
-    "@ebarooni/capacitor-calendar": ["@ebarooni/capacitor-calendar@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-UW0Q3itAgha0MarMOlejJs9phaz6h/MXnslyrDpgKifmuf+PjjIH/ugAzC0zWfAw6kJDXOsWCA/SauR1FM7Xog=="],
+    "@ebarooni/capacitor-calendar": ["@ebarooni/capacitor-calendar@8.2.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@ebarooni/capacitor-calendar/-/capacitor-calendar-8.2.0.tgz", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-li4UGGJEtVNugoST7Uw7Io3JHuB0YqKBg637cr1LKBYofd4lI5EDRCFwAL+qNI6chrECYKhdh3i22ihNRtsKdA=="],
 
     "@emnapi/runtime": ["@emnapi/runtime@1.8.1", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-mehfKSMWjjNol8659Z8KxEMrdSJDDot5SXMq00dM8BN4o+CLNXQ0xH2V7EchNHV4RmbZLmmPdEaXZc5H2FXmDg=="],
 
