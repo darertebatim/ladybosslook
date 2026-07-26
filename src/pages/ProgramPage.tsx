@@ -15,6 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 import { Link as RLink } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
