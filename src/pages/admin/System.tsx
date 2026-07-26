@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DeviceManagementPanel } from "@/components/admin/DeviceManagementPanel";
 import SecurityAuditLog from "@/components/SecurityAuditLog";
 import { StaffPermissionsManager } from "@/components/admin/StaffPermissionsManager";
+import RegionRestrictionsPanel from "@/components/admin/RegionRestrictionsPanel";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -406,10 +407,11 @@ export default function System() {
       </div>
 
       <Tabs defaultValue="devices">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="devices">Devices</TabsTrigger>
           <TabsTrigger value="permissions">Permissions</TabsTrigger>
           <TabsTrigger value="security">Audit Log</TabsTrigger>
+          <TabsTrigger value="regions">Regions</TabsTrigger>
           <TabsTrigger value="tools">Tools</TabsTrigger>
         </TabsList>
 
@@ -423,6 +425,10 @@ export default function System() {
 
         <TabsContent value="security">
           <SecurityAuditLog />
+        </TabsContent>
+
+        <TabsContent value="regions">
+          <RegionRestrictionsPanel />
         </TabsContent>
 
         <TabsContent value="tools" className="space-y-4">
