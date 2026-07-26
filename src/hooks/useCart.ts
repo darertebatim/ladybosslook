@@ -48,14 +48,15 @@ export const useCart = () => {
         body: { slugs: [slug] },
       });
       if (error) throw error;
-      return data;
+      return { data, slug };
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['cart-items'] });
       queryClient.invalidateQueries({ queryKey: ['course-enrollments'] });
       queryClient.invalidateQueries({ queryKey: ['active-enrollments'] });
       toast.success("You're enrolled!");
-      navigate('/payment-success?free=1');
+      const slug = (result as any)?.slug;
+      navigate(`/payment-success?free=1${slug ? `&programs=${encodeURIComponent(slug)}` : ''}`);
     },
     onError: (err: Error) => {
       if (err.message !== 'Sign in required') {
