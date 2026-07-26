@@ -47,7 +47,7 @@ const ElcLanding = () => {
 
           <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
             <p className="text-base text-green-800 font-medium whitespace-pre-line">
-              👇 از داخل ایران (شهرهای تهران، تبریز، بندرعباسو ...) وارد لینک پایین شوید 👇
+              👇 از داخل ایران (شهرهای تهران، تبریز، شیرازو ...) وارد لینک پایین شوید 👇
             </p>
           </div>
 
