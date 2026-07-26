@@ -223,6 +223,54 @@ const ProgramPage = () => {
     }
   };
 
+  const EnrollButton = ({ className, size = 'lg' }: { className?: string; size?: 'default' | 'lg' }) => {
+    if (enrolled) {
+      return (
+        <Link to="/app/home" className="block">
+          <Button variant="secondary" className={cn('w-full gap-2', className)} size={size}>
+            <Check size={18} /> You're Enrolled — Open in App
+          </Button>
+        </Link>
+      );
+    }
+    if (hasFullOption) {
+      return (
+        <Button
+          className={cn('w-full gap-2', className)}
+          size={size}
+          onClick={() => (inCart ? navigate('/cart') : handleAddSubscriptionToCart(selectedPlan))}
+          disabled={isAdding}
+        >
+          {inCart ? (
+            <><Check size={18} /> In Your Cart — View Cart</>
+          ) : selectedPlan === 'monthly' ? (
+            <><ShoppingCart size={18} /> Add Monthly — ${(program.price_amount / 100).toFixed(0)}/mo</>
+          ) : (
+            <><ShoppingCart size={18} /> Add One-time — ${((program.subscription_full_payment_price || 0) / 100).toFixed(0)}</>
+          )}
+        </Button>
+      );
+    }
+    if (inCart) {
+      return (
+        <Link to="/cart" className="block">
+          <Button variant="secondary" className={cn('w-full gap-2', className)} size={size}>
+            <Check size={18} /> In Your Cart — View Cart
+          </Button>
+        </Link>
+      );
+    }
+    return (
+      <Button className={cn('w-full gap-2', className)} size={size} onClick={handleAddToCart} disabled={isAdding || isEnrollingFree}>
+        {isFree ? (
+          <><Check size={18} /> {isEnrollingFree ? 'Enrolling…' : (user ? 'Enroll for Free' : 'Sign In to Enroll')}</>
+        ) : (
+          <><ShoppingCart size={18} /> {isDeposit ? `Add to Cart — $${(displayPrice / 100).toFixed(0)} Deposit` : 'Add to Cart'}</>
+        )}
+      </Button>
+    );
+  };
+
   return (
     <>
       <SEOHead
