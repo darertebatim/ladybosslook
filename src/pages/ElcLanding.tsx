@@ -42,7 +42,7 @@ const ElcLanding = () => {
               size="lg"
               className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 text-white"
             >
-              🇺🇸 ورود از امریکا  کانادا و ... (خارج ایران)
+              🇺🇸 ورود از امریکا،  کانادا و ... (خارج ایران)
             </Button>
           </a>
 
