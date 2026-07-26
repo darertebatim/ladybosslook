@@ -357,7 +357,7 @@ serve(async (req) => {
     // Load program
     const { data: program } = await supabase
       .from("program_catalog")
-      .select("slug, title, description, cover_image_url, language, host_name")
+      .select("slug, title, description, cover_image_url, language")
       .eq("slug", programSlug)
       .maybeSingle();
     if (!program) {
@@ -459,7 +459,7 @@ serve(async (req) => {
         description: program.description,
         cover_image_url: (program as any).cover_image_url ?? null,
       },
-      host: (program as any).host_name ?? null,
+      host: null,
       languageLabel,
       round,
       order,
