@@ -545,7 +545,7 @@ const ProgramPage = () => {
         {/* Sticky mobile enroll bar */}
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-border p-2 lg:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
           <div className="container mx-auto max-w-3xl">
-            <EnrollButton size="sm" className="text-sm py-2" />
+            <EnrollButton size="default" className="text-sm py-2" />
           </div>
         </div>
 
