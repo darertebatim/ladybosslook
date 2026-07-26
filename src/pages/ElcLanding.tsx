@@ -27,8 +27,7 @@ const ElcLanding = () => {
         <div className="space-y-4">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
             <p className="text-base text-blue-800 font-medium whitespace-pre-line">
-              👇 عزیزان خارج از ایران (ساکنین امریکا، کانادا،
-              &nbsp;🇺🇸 🇨🇦 اروپا و ...) وارد لینک پایین شوید 👇
+              👇 خانم‌رییس‌های خارج از ایران (ساکن امریکا، کانادا,&nbsp; &nbsp;اروپا، دبی و ...) وارد لینک پایین شوید 👇🇺🇸 🇨🇦
             </p>
           </div>
 
@@ -42,7 +41,7 @@ const ElcLanding = () => {
               size="lg"
               className="w-full text-2xl py-10 bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg"
             >
-              🇺🇸 ورود از امریکا، کانادا و ... (خارج ایران)
+              🇺🇸 ورود از امریکا و...(خارج ایران)
             </Button>
           </a>
 
