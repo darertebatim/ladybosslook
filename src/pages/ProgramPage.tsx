@@ -15,6 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 import { Link as RLink } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
@@ -220,6 +221,54 @@ const ProgramPage = () => {
     } catch {
       setCheckingOut(false);
     }
+  };
+
+  const EnrollButton = ({ className, size = 'lg' }: { className?: string; size?: 'default' | 'lg' }) => {
+    if (enrolled) {
+      return (
+        <Link to="/app/home" className="block">
+          <Button variant="secondary" className={cn('w-full gap-2', className)} size={size}>
+            <Check size={18} /> You're Enrolled — Open in App
+          </Button>
+        </Link>
+      );
+    }
+    if (hasFullOption) {
+      return (
+        <Button
+          className={cn('w-full gap-2', className)}
+          size={size}
+          onClick={() => (inCart ? navigate('/cart') : handleAddSubscriptionToCart(selectedPlan))}
+          disabled={isAdding}
+        >
+          {inCart ? (
+            <><Check size={18} /> In Your Cart — View Cart</>
+          ) : selectedPlan === 'monthly' ? (
+            <><ShoppingCart size={18} /> Add Monthly — ${(program.price_amount / 100).toFixed(0)}/mo</>
+          ) : (
+            <><ShoppingCart size={18} /> Add One-time — ${((program.subscription_full_payment_price || 0) / 100).toFixed(0)}</>
+          )}
+        </Button>
+      );
+    }
+    if (inCart) {
+      return (
+        <Link to="/cart" className="block">
+          <Button variant="secondary" className={cn('w-full gap-2', className)} size={size}>
+            <Check size={18} /> In Your Cart — View Cart
+          </Button>
+        </Link>
+      );
+    }
+    return (
+      <Button className={cn('w-full gap-2', className)} size={size} onClick={handleAddToCart} disabled={isAdding || isEnrollingFree}>
+        {isFree ? (
+          <><Check size={18} /> {isEnrollingFree ? 'Enrolling…' : (user ? 'Enroll for Free' : 'Sign In to Enroll')}</>
+        ) : (
+          <><ShoppingCart size={18} /> {isDeposit ? `Add to Cart — $${(displayPrice / 100).toFixed(0)} Deposit` : 'Add to Cart'}</>
+        )}
+      </Button>
+    );
   };
 
   return (
@@ -446,42 +495,7 @@ const ProgramPage = () => {
                     )}
 
                     {/* Add to Cart / In Cart / Enrolled */}
-                    {enrolled ? (
-                      <Link to="/app/home" className="block">
-                        <Button variant="secondary" className="w-full gap-2" size="lg">
-                          <Check size={18} /> You're Enrolled — Open in App
-                        </Button>
-                      </Link>
-                    ) : hasFullOption ? (
-                      <Button
-                        className="w-full gap-2"
-                        size="lg"
-                        onClick={() => inCart ? navigate('/cart') : handleAddSubscriptionToCart(selectedPlan)}
-                        disabled={isAdding}
-                      >
-                        {inCart ? (
-                          <><Check size={18} /> In Your Cart — View Cart</>
-                        ) : selectedPlan === 'monthly' ? (
-                          <><ShoppingCart size={18} /> Add Monthly — ${(program.price_amount / 100).toFixed(0)}/mo</>
-                        ) : (
-                          <><ShoppingCart size={18} /> Add One-time — ${((program.subscription_full_payment_price || 0) / 100).toFixed(0)}</>
-                        )}
-                      </Button>
-                    ) : inCart ? (
-                      <Link to="/cart" className="block">
-                        <Button variant="secondary" className="w-full gap-2" size="lg">
-                          <Check size={18} /> In Your Cart — View Cart
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Button className="w-full gap-2" size="lg" onClick={handleAddToCart} disabled={isAdding || isEnrollingFree}>
-                        {isFree ? (
-                          <><Check size={18} /> {isEnrollingFree ? 'Enrolling…' : (user ? 'Enroll for Free' : 'Sign In to Enroll')}</>
-                        ) : (
-                          <><ShoppingCart size={18} /> {isDeposit ? `Add to Cart — $${(displayPrice / 100).toFixed(0)} Deposit` : 'Add to Cart'}</>
-                        )}
-                      </Button>
-                    )}
+                    <EnrollButton />
 
                     <div className="space-y-1.5 text-center">
                       <a
@@ -527,6 +541,16 @@ const ProgramPage = () => {
             </section>
           )}
         </main>
+
+        {/* Sticky mobile enroll bar */}
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-border p-3 lg:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+          <div className="container mx-auto max-w-3xl">
+            <EnrollButton size="lg" className="text-base" />
+          </div>
+        </div>
+
+        {/* Spacer for mobile sticky bar */}
+        <div className="h-20 lg:hidden" />
 
         <footer className="bg-card border-t border-border mt-4 lg:mt-8">
           <div className="container mx-auto px-4 py-4 lg:px-6 lg:py-6">
