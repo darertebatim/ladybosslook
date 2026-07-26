@@ -5,8 +5,10 @@
  * (Intl API) — not IP — so a VPN does not bypass or trigger this.
  */
 
-const IRAN_TIMEZONES = new Set<string>([
+const SUPPORT_CHAT_BLOCKED_TIMEZONES = new Set<string>([
   "Asia/Tehran",
+  "Asia/Kabul",
+  "Asia/Baghdad",
 ]);
 
 const RILOBIZ_HIDDEN_TIMEZONES = new Set<string>([
@@ -24,7 +26,7 @@ export function getDeviceTimezone(): string {
 }
 
 export function isIranTimezone(): boolean {
-  return IRAN_TIMEZONES.has(getDeviceTimezone());
+  return getDeviceTimezone() === "Asia/Tehran";
 }
 
 /** Whether the current device timezone should hide the RiloBiz button. */
@@ -34,5 +36,5 @@ export function isRiloBizHiddenRegion(): boolean {
 
 /** Convenience: whether support chat should be blocked for the current device. */
 export function isSupportChatBlockedForRegion(): boolean {
-  return isIranTimezone();
+  return SUPPORT_CHAT_BLOCKED_TIMEZONES.has(getDeviceTimezone());
 }
