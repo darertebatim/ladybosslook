@@ -4528,6 +4528,7 @@ export type Database = {
           payment_type: string
           price_amount: number
           requires_subscription: boolean
+          restricted_regions: string[]
           show_in_app_waitlist: boolean
           slug: string
           stripe_payment_link: string | null
@@ -4578,6 +4579,7 @@ export type Database = {
           payment_type: string
           price_amount?: number
           requires_subscription?: boolean
+          restricted_regions?: string[]
           show_in_app_waitlist?: boolean
           slug: string
           stripe_payment_link?: string | null
@@ -4628,6 +4630,7 @@ export type Database = {
           payment_type?: string
           price_amount?: number
           requires_subscription?: boolean
+          restricted_regions?: string[]
           show_in_app_waitlist?: boolean
           slug?: string
           stripe_payment_link?: string | null
