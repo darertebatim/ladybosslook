@@ -543,14 +543,14 @@ const ProgramPage = () => {
         </main>
 
         {/* Sticky mobile enroll bar */}
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-border p-3 lg:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-border p-2 lg:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
           <div className="container mx-auto max-w-3xl">
-            <EnrollButton size="lg" className="text-base" />
+            <EnrollButton size="sm" className="text-sm py-2" />
           </div>
         </div>
 
         {/* Spacer for mobile sticky bar */}
-        <div className="h-20 lg:hidden" />
+        <div className="h-16 lg:hidden" />
 
         <footer className="bg-card border-t border-border mt-4 lg:mt-8">
           <div className="container mx-auto px-4 py-4 lg:px-6 lg:py-6">
