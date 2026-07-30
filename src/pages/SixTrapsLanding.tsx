@@ -80,13 +80,14 @@ export default function SixTrapsLanding() {
     setErrors({});
     setSubmitting(true);
     try {
-      await (supabase as any).from("form_submissions").insert({
+      const { error } = await (supabase as any).from("form_submissions").insert({
         name: parsed.data.name,
         email: parsed.data.email.toLowerCase(),
         city: parsed.data.city,
         phone: "",
         source: "sixtraps_registration",
       });
+      if (error) throw error;
 
       // Fire-and-log confirmation email (non-blocking failure)
       supabase.functions
