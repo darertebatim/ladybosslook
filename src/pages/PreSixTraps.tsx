@@ -82,13 +82,14 @@ export default function PreSixTraps() {
     setEmailError("");
     setSubmitting(true);
     try {
-      await (supabase as any).from("form_submissions").insert({
+      const { error } = await (supabase as any).from("form_submissions").insert({
         name: "",
         email: parsed.data.email.toLowerCase(),
         city: "",
         phone: "",
         source: "presixtraps_interest",
       });
+      if (error) throw error;
 
       supabase.functions
         .invoke("send-sixtraps-confirmation", {
