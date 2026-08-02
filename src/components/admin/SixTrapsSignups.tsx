@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Download, RefreshCw } from 'lucide-react';
+import { Download, RefreshCw, Send, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const SOURCES = ['sixtraps_registration', 'presixtraps_interest'];
 
@@ -20,6 +21,8 @@ interface Row {
 
 export function SixTrapsSignups() {
   const [search, setSearch] = useState('');
+  const [testEmail, setTestEmail] = useState('');
+  const [sending, setSending] = useState<'test' | 'all' | null>(null);
 
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['sixtraps-signups'],
@@ -68,6 +71,31 @@ export function SixTrapsSignups() {
     URL.revokeObjectURL(url);
   }
 
+  async function sendReminder(mode: 'test' | 'all') {
+    if (mode === 'test' && !testEmail.trim()) {
+      toast.error('Enter a test email first');
+      return;
+    }
+    if (
+      mode === 'all' &&
+      !window.confirm(`Send the reminder email to all ${rows.length} signups?`)
+    ) {
+      return;
+    }
+    setSending(mode);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-sixtraps-reminder', {
+        body: mode === 'test' ? { testEmail: testEmail.trim() } : {},
+      });
+      if (error) throw error;
+      toast.success(`Sent ${(data as any)?.sent ?? 0} · failed ${(data as any)?.failed ?? 0}`);
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to send');
+    } finally {
+      setSending(null);
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-3">
@@ -90,6 +118,47 @@ export function SixTrapsSignups() {
           <CardContent className="text-2xl font-bold">{preInterest}</CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Reminder email (prerequisite video + calendar)</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Sends the Farsi reminder with the prerequisite video link, an add-to-calendar button, and
+            session times for Los Angeles/Vancouver, New York/Toronto, Chicago/Texas and Sydney.
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <Input
+              value={testEmail}
+              onChange={(e) => setTestEmail(e.target.value)}
+              placeholder="test@email.com"
+              className="w-64"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => sendReminder('test')}
+              disabled={sending !== null}
+            >
+              {sending === 'test' ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-1 h-4 w-4" />
+              )}
+              Send test
+            </Button>
+            <Button size="sm" onClick={() => sendReminder('all')} disabled={sending !== null}>
+              {sending === 'all' ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-1 h-4 w-4" />
+              )}
+              Send to all ({rows.length})
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
