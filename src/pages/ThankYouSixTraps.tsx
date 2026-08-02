@@ -42,7 +42,7 @@ export default function ThankYouSixTraps() {
           startUtc: new Date(round.first_session_date),
           durationMinutes: round.first_session_duration || 90,
           meetUrl: round.google_meet_link || "",
-          supportUrl: round.support_link_url || "https://wa.me/16265028535",
+          supportUrl: round.support_link_url || "https://wa.me/16265028538",
         });
       }
     })();
