@@ -47,6 +47,9 @@ verify_jwt = false
 [functions.send-sixtraps-confirmation]
 verify_jwt = false
 
+[functions.send-sixtraps-reminder]
+verify_jwt = true
+
 [functions.send-enrollment-confirmation]
 verify_jwt = false
 
