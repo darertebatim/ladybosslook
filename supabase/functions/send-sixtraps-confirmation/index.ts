@@ -15,6 +15,29 @@ const corsHeaders = {
 };
 
 const PROGRAM_SLUG = "instagram6traps";
+const PREREQ_VIDEO_URL = "https://ladybosslook.com/presixtraps";
+
+const CITY_ZONES: { label: string; tz: string }[] = [
+  { label: "Los Angeles / Vancouver", tz: "America/Los_Angeles" },
+  { label: "New York / Toronto", tz: "America/New_York" },
+  { label: "Chicago / Texas", tz: "America/Chicago" },
+  { label: "Sydney", tz: "Australia/Sydney" },
+];
+
+function fmtZone(d: Date, tz: string): string {
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      timeZone: tz,
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(d);
+  } catch {
+    return d.toISOString();
+  }
+}
 
 function pad(n: number) {
   return String(n).padStart(2, "0");
@@ -112,15 +135,25 @@ serve(async (req) => {
       : "";
 
     const gcalUrl =
-      startUtc && meetUrl
+      startUtc
         ? buildGoogleCalendarUrl(
             title,
             startUtc,
             durationMinutes,
-            `لینک ورود: ${meetUrl}\nپشتیبانی: ${supportUrl}`,
-            meetUrl,
+            `ویدیوی پیش‌نیاز: ${PREREQ_VIDEO_URL}\n${meetUrl ? `لینک ورود: ${meetUrl}\n` : ""}پشتیبانی: ${supportUrl}`,
+            meetUrl || PREREQ_VIDEO_URL,
           )
         : "";
+
+    const zoneRows = startUtc
+      ? CITY_ZONES.map(
+          (z) => `
+        <tr>
+          <td style="padding:6px 10px;font-size:13px;border-bottom:1px solid #fde68a;">${z.label}</td>
+          <td style="padding:6px 10px;font-size:13px;border-bottom:1px solid #fde68a;" dir="ltr"><strong>${fmtZone(startUtc, z.tz)}</strong></td>
+        </tr>`,
+        ).join("")
+      : "";
 
     const html = `
 <!doctype html>
@@ -146,6 +179,27 @@ serve(async (req) => {
                  <a href="${meetUrl}" style="color:#e11d48;word-break:break-all;">${meetUrl}</a></p>`
             : ""
         }
+      </div>
+
+      ${
+        zoneRows
+          ? `<div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:12px;margin:16px 0;">
+               <p style="margin:0 0 8px;font-size:14px;font-weight:bold;">⏰ ساعت جلسه در شهرهای مختلف</p>
+               <table style="width:100%;border-collapse:collapse;">${zoneRows}</table>
+             </div>`
+          : ""
+      }
+
+      <div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:16px;margin:16px 0;">
+        <p style="margin:0 0 8px;font-size:15px;line-height:1.9;font-weight:bold;">🎬 ویدیوی ۵ دقیقه‌ای پیش‌نیاز</p>
+        <p style="margin:0 0 12px;font-size:14px;line-height:1.9;">
+          قبل از وبینار حتماً این ویدیوی کوتاه رو ببینید تا بیشترین نتیجه رو از جلسه بگیرید.
+        </p>
+        <p style="text-align:center;margin:0;">
+          <a href="${PREREQ_VIDEO_URL}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
+            تماشای ویدیوی پیش‌نیاز
+          </a>
+        </p>
       </div>
 
       ${
