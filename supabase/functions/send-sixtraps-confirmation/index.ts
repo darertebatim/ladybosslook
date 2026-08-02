@@ -97,7 +97,7 @@ serve(async (req) => {
 
     const title = prog?.title || "وبینار ۶ تله اینستاگرام";
     const meetUrl = round?.google_meet_link || "";
-    const supportUrl = round?.support_link_url || "https://wa.me/16265028535";
+    const supportUrl = round?.support_link_url || "https://wa.me/16265028538";
     const durationMinutes = round?.first_session_duration || 90;
     const startUtc = round?.first_session_date
       ? new Date(round.first_session_date)
