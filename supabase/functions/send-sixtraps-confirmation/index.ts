@@ -91,6 +91,11 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const name = String(body?.name || "دوست عزیز").trim().slice(0, 100);
     const email = String(body?.email || "").trim().toLowerCase().slice(0, 255);
+    const requestedRoundId =
+      typeof body?.roundId === "string" &&
+      /^[0-9a-f-]{36}$/i.test(body.roundId)
+        ? body.roundId
+        : null;
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return new Response(JSON.stringify({ error: "invalid_input" }), {
@@ -101,12 +106,14 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Prefer the auto-enrollment round, fall back to the earliest active round
-    const { data: autoRule } = await supabase
-      .from("program_auto_enrollment")
-      .select("round_id")
-      .eq("program_slug", PROGRAM_SLUG)
-      .maybeSingle();
+    // Explicit roundId wins, then the auto-enrollment round, then earliest active
+    const { data: autoRule } = requestedRoundId
+      ? { data: { round_id: requestedRoundId } }
+      : await supabase
+          .from("program_auto_enrollment")
+          .select("round_id")
+          .eq("program_slug", PROGRAM_SLUG)
+          .maybeSingle();
 
     const roundCols =
       "id, first_session_date, first_session_duration, google_meet_link, support_link_url";
