@@ -97,6 +97,7 @@ export default function PreSixTraps() {
           body: {
             name: "دوست عزیز",
             email: parsed.data.email.toLowerCase(),
+            roundId: PINNED_ROUND_ID,
           },
         })
         .catch((err) => console.error("confirmation email error", err));
