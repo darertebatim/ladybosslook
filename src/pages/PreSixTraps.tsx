@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { trackLead } from "@/lib/metaPixel";
 import { SEOHead } from "@/components/SEOHead";
 import {
   buildGoogleCalendarUrl,
@@ -91,6 +92,11 @@ export default function PreSixTraps() {
         source: "presixtraps_interest",
       });
       if (error) throw error;
+
+      trackLead({
+        content_name: "6 Traps Pre-Webinar Interest",
+        content_category: "webinar",
+      });
 
       supabase.functions
         .invoke("send-sixtraps-confirmation", {
