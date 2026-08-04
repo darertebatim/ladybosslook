@@ -32,14 +32,25 @@ export default function SixTrapsLanding() {
 
   useEffect(() => {
     (async () => {
-      const { data: round } = await (supabase as any)
-        .from("program_rounds")
-        .select("first_session_date, first_session_duration, google_meet_link")
+      // Prefer the round configured for auto-enrollment; fall back to earliest active round
+      const { data: autoRule } = await (supabase as any)
+        .from("program_auto_enrollment")
+        .select("round_id")
         .eq("program_slug", PROGRAM_SLUG)
-        .eq("status", "active")
-        .order("first_session_date", { ascending: true })
-        .limit(1)
         .maybeSingle();
+
+      const roundQuery = (supabase as any)
+        .from("program_rounds")
+        .select("first_session_date, first_session_duration, google_meet_link");
+
+      const { data: round } = autoRule?.round_id
+        ? await roundQuery.eq("id", autoRule.round_id).maybeSingle()
+        : await roundQuery
+            .eq("program_slug", PROGRAM_SLUG)
+            .eq("status", "active")
+            .order("first_session_date", { ascending: true })
+            .limit(1)
+            .maybeSingle();
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
         .select("title")
