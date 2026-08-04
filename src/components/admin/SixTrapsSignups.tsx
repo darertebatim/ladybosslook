@@ -5,10 +5,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Download, RefreshCw, Send, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const SOURCES = ['sixtraps_registration', 'presixtraps_interest'];
+const PROGRAM_SLUG = 'instagram6traps';
 
 interface Row {
   id: string;
@@ -17,28 +25,88 @@ interface Row {
   city: string | null;
   source: string | null;
   submitted_at: string;
+  round_id: string | null;
+  reminder_sent_at: string | null;
+  reminder_round_id: string | null;
+}
+
+interface RoundRow {
+  id: string;
+  round_name: string | null;
+  first_session_date: string | null;
+  status: string | null;
 }
 
 export function SixTrapsSignups() {
   const [search, setSearch] = useState('');
   const [testEmail, setTestEmail] = useState('');
   const [sending, setSending] = useState<'test' | 'all' | null>(null);
+  const [roundChoice, setRoundChoice] = useState<string>('auto');
+  const [onlyUnsent, setOnlyUnsent] = useState(true);
+
+  const { data: rounds } = useQuery({
+    queryKey: ['sixtraps-rounds'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('program_rounds')
+        .select('id, round_name, first_session_date, status')
+        .eq('program_slug', PROGRAM_SLUG)
+        .order('first_session_date', { ascending: true });
+      if (error) throw error;
+      return (data || []) as RoundRow[];
+    },
+  });
+
+  const { data: autoRoundId } = useQuery({
+    queryKey: ['sixtraps-auto-round'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('program_auto_enrollment')
+        .select('round_id')
+        .eq('program_slug', PROGRAM_SLUG)
+        .maybeSingle();
+      return (data as any)?.round_id ?? null;
+    },
+  });
 
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['sixtraps-signups'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('form_submissions')
-        .select('id, email, name, city, source, submitted_at')
+        .select(
+          'id, email, name, city, source, submitted_at, round_id, reminder_sent_at, reminder_round_id',
+        )
         .in('source', SOURCES)
         .order('submitted_at', { ascending: false })
         .limit(2000);
       if (error) throw error;
-      return (data || []) as Row[];
+      return (data || []) as unknown as Row[];
     },
   });
 
   const rows = data || [];
+  const effectiveRoundId = roundChoice === 'auto' ? autoRoundId : roundChoice;
+
+  const roundLabel = (id: string | null) => {
+    if (!id) return '—';
+    const r = rounds?.find((x) => x.id === id);
+    if (!r) return 'Unknown';
+    const d = r.first_session_date
+      ? new Date(r.first_session_date).toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric',
+        })
+      : '';
+    return `${r.round_name || 'Round'}${d ? ` · ${d}` : ''}`;
+  };
+
+  const targetCount = rows.filter(
+    (r) =>
+      (!effectiveRoundId || r.round_id === effectiveRoundId) &&
+      (!onlyUnsent || !r.reminder_sent_at),
+  ).length;
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return rows;
@@ -54,10 +122,18 @@ export function SixTrapsSignups() {
   const preInterest = rows.filter((r) => r.source === 'presixtraps_interest').length;
 
   function exportCsv() {
-    const header = 'email,name,city,source,submitted_at';
+    const header = 'email,name,city,source,round,reminder_sent_at,submitted_at';
     const body = filtered
       .map((r) =>
-        [r.email, r.name || '', r.city || '', r.source || '', r.submitted_at]
+        [
+          r.email,
+          r.name || '',
+          r.city || '',
+          r.source || '',
+          roundLabel(r.round_id),
+          r.reminder_sent_at || '',
+          r.submitted_at,
+        ]
           .map((v) => `"${String(v).replace(/"/g, '""')}"`)
           .join(','),
       )
@@ -78,17 +154,26 @@ export function SixTrapsSignups() {
     }
     if (
       mode === 'all' &&
-      !window.confirm(`Send the reminder email to all ${rows.length} signups?`)
+      !window.confirm(
+        `Send the reminder email to ${targetCount} signup(s) for ${roundLabel(effectiveRoundId)}${onlyUnsent ? ' (not yet reminded)' : ''}?`,
+      )
     ) {
       return;
     }
     setSending(mode);
     try {
       const { data, error } = await supabase.functions.invoke('send-sixtraps-reminder', {
-        body: mode === 'test' ? { testEmail: testEmail.trim() } : {},
+        body:
+          mode === 'test'
+            ? { testEmail: testEmail.trim(), roundId: roundChoice === 'auto' ? undefined : roundChoice }
+            : {
+                roundId: roundChoice === 'auto' ? undefined : roundChoice,
+                onlyUnsent,
+              },
       });
       if (error) throw error;
       toast.success(`Sent ${(data as any)?.sent ?? 0} · failed ${(data as any)?.failed ?? 0}`);
+      refetch();
     } catch (e: any) {
       toast.error(e?.message || 'Failed to send');
     } finally {
@@ -128,6 +213,31 @@ export function SixTrapsSignups() {
             Sends the Farsi reminder with the prerequisite video link, an add-to-calendar button, and
             session times for Los Angeles/Vancouver, New York/Toronto, Chicago/Texas and Sydney.
           </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <Select value={roundChoice} onValueChange={setRoundChoice}>
+              <SelectTrigger className="w-72">
+                <SelectValue placeholder="Select round" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="auto">
+                  Auto (enrollment round){autoRoundId ? ` · ${roundLabel(autoRoundId)}` : ''}
+                </SelectItem>
+                {(rounds || []).map((r) => (
+                  <SelectItem key={r.id} value={r.id}>
+                    {roundLabel(r.id)} {r.status !== 'active' ? `(${r.status})` : ''}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={onlyUnsent}
+                onChange={(e) => setOnlyUnsent(e.target.checked)}
+              />
+              Only those who haven't received it
+            </label>
+          </div>
           <div className="flex flex-wrap items-center gap-2">
             <Input
               value={testEmail}
@@ -154,7 +264,7 @@ export function SixTrapsSignups() {
               ) : (
                 <Send className="mr-1 h-4 w-4" />
               )}
-              Send to all ({rows.length})
+              Send to {targetCount}
             </Button>
           </div>
         </CardContent>
@@ -192,6 +302,8 @@ export function SixTrapsSignups() {
                     <th className="p-2 font-medium">Name</th>
                     <th className="p-2 font-medium">City</th>
                     <th className="p-2 font-medium">Source</th>
+                    <th className="p-2 font-medium">Round</th>
+                    <th className="p-2 font-medium">Reminder</th>
                     <th className="p-2 font-medium">Date</th>
                   </tr>
                 </thead>
@@ -205,6 +317,18 @@ export function SixTrapsSignups() {
                         <Badge variant="secondary">
                           {r.source === 'sixtraps_registration' ? 'Registration' : 'Pre-webinar'}
                         </Badge>
+                      </td>
+                      <td className="p-2 whitespace-nowrap">
+                        <Badge variant="outline">{roundLabel(r.round_id)}</Badge>
+                      </td>
+                      <td className="p-2 whitespace-nowrap">
+                        {r.reminder_sent_at ? (
+                          <Badge>
+                            Sent · {roundLabel(r.reminder_round_id)}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">Not sent</span>
+                        )}
                       </td>
                       <td className="p-2 whitespace-nowrap">
                         {new Date(r.submitted_at).toLocaleString()}

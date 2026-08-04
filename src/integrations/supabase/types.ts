@@ -3269,6 +3269,9 @@ export type Database = {
           mailchimp_success: boolean | null
           name: string
           phone: string
+          reminder_round_id: string | null
+          reminder_sent_at: string | null
+          round_id: string | null
           source: string | null
           submitted_at: string
           user_agent: string | null
@@ -3282,6 +3285,9 @@ export type Database = {
           mailchimp_success?: boolean | null
           name: string
           phone: string
+          reminder_round_id?: string | null
+          reminder_sent_at?: string | null
+          round_id?: string | null
           source?: string | null
           submitted_at?: string
           user_agent?: string | null
@@ -3295,6 +3301,9 @@ export type Database = {
           mailchimp_success?: boolean | null
           name?: string
           phone?: string
+          reminder_round_id?: string | null
+          reminder_sent_at?: string | null
+          round_id?: string | null
           source?: string | null
           submitted_at?: string
           user_agent?: string | null
