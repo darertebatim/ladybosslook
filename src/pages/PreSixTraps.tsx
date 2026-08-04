@@ -12,6 +12,10 @@ import {
 
 const PROGRAM_SLUG = "instagram6traps";
 const YOUTUBE_ID = "nccqY4M6GZ4";
+// This page is intentionally PINNED to a specific round (used for previous-round
+// signups). It does NOT auto-update when a new round is added.
+// To point it at a new round, change this id.
+const PINNED_ROUND_ID = "f267cca0-e749-4287-a05d-c81a03dff8e2";
 
 const emailSchema = z.object({
   email: z.string().trim().email("ایمیل معتبر نیست").max(255),
@@ -35,10 +39,7 @@ export default function PreSixTraps() {
       const { data: round } = await (supabase as any)
         .from("program_rounds")
         .select("first_session_date, first_session_duration, google_meet_link, support_link_url")
-        .eq("program_slug", PROGRAM_SLUG)
-        .eq("status", "active")
-        .order("first_session_date", { ascending: true })
-        .limit(1)
+        .eq("id", PINNED_ROUND_ID)
         .maybeSingle();
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
