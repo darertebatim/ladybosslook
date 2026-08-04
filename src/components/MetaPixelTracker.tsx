@@ -3,12 +3,7 @@ import { useLocation, useParams, matchPath } from "react-router-dom";
 
 declare global {
   interface Window {
-    fbq?: (
-      command: string,
-      event: string,
-      parameters?: Record<string, any>,
-      options?: Record<string, any>,
-    ) => void;
+    fbq?: (command: string, event: string, parameters?: Record<string, any>) => void;
   }
 }
 
