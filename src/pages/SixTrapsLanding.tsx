@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
 import heroAsset from "@/assets/sixtraps-hero.png.asset.json";
 import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
+import { trackCompleteRegistration, trackLead } from "@/lib/metaPixel";
 
 const PROGRAM_SLUG = "instagram6traps";
 
@@ -99,6 +100,19 @@ export default function SixTrapsLanding() {
         source: "sixtraps_registration",
       });
       if (error) throw error;
+
+      // Meta Pixel conversion events (used for Custom Audiences / optimization)
+      trackCompleteRegistration({
+        content_name: "6 Traps Webinar Registration",
+        content_category: "webinar",
+        status: true,
+        value: 0,
+        currency: "USD",
+      });
+      trackLead({
+        content_name: "6 Traps Webinar Registration",
+        content_category: "webinar",
+      });
 
       // Fire-and-log confirmation email (non-blocking failure)
       supabase.functions
