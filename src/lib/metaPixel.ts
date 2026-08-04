@@ -6,7 +6,9 @@ type PixelParams = Record<string, any>;
 function fire(event: string, params?: PixelParams, eventID?: string) {
   if (typeof window === "undefined" || !window.fbq) return;
   try {
-    window.fbq("track", event, params, eventID ? ({ eventID } as any) : undefined);
+    const fbq = window.fbq as (...args: any[]) => void;
+    if (eventID) fbq("track", event, params, { eventID });
+    else fbq("track", event, params);
   } catch {
     // no-op
   }
