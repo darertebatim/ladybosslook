@@ -190,17 +190,39 @@ serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const testEmail = String(body?.testEmail || "").trim().toLowerCase();
+    const requestedRoundId = String(body?.roundId || "").trim();
+    const onlyUnsent = body?.onlyUnsent !== false;
 
-    const { data: round } = await supabase
-      .from("program_rounds")
-      .select(
-        "first_session_date, first_session_duration, google_meet_link, support_link_url",
-      )
-      .eq("program_slug", PROGRAM_SLUG)
-      .eq("status", "active")
-      .order("first_session_date", { ascending: true })
-      .limit(1)
-      .maybeSingle();
+    // Round resolution: explicit -> auto-enrollment round -> earliest active
+    const roundCols =
+      "id, first_session_date, first_session_duration, google_meet_link, support_link_url";
+
+    let roundId = requestedRoundId;
+    if (!roundId) {
+      const { data: autoRule } = await supabase
+        .from("program_auto_enrollment")
+        .select("round_id")
+        .eq("program_slug", PROGRAM_SLUG)
+        .maybeSingle();
+      roundId = autoRule?.round_id || "";
+    }
+
+    const { data: round } = roundId
+      ? await supabase
+          .from("program_rounds")
+          .select(roundCols)
+          .eq("id", roundId)
+          .maybeSingle()
+      : await supabase
+          .from("program_rounds")
+          .select(roundCols)
+          .eq("program_slug", PROGRAM_SLUG)
+          .eq("status", "active")
+          .order("first_session_date", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+
+    const targetRoundId = round?.id || roundId || null;
 
     const { data: prog } = await supabase
       .from("program_catalog")
@@ -237,11 +259,14 @@ serve(async (req) => {
       }
       recipients = [{ email: testEmail, name: "دوست عزیز" }];
     } else {
-      const { data: rows, error } = await supabase
+      let query = supabase
         .from("form_submissions")
         .select("email, name")
         .in("source", SOURCES)
         .limit(5000);
+      if (targetRoundId) query = query.eq("round_id", targetRoundId);
+      if (onlyUnsent) query = query.is("reminder_sent_at", null);
+      const { data: rows, error } = await query;
       if (error) throw error;
       const seen = new Set<string>();
       for (const r of rows || []) {
@@ -279,6 +304,16 @@ serve(async (req) => {
           resend_id: (sendData as any)?.id ?? null,
           status: "success",
         });
+        if (!testEmail) {
+          await supabase
+            .from("form_submissions")
+            .update({
+              reminder_sent_at: new Date().toISOString(),
+              reminder_round_id: targetRoundId,
+            })
+            .eq("email", r.email)
+            .in("source", SOURCES);
+        }
       }
       // gentle pacing for Resend rate limits
       await new Promise((res) => setTimeout(res, 120));
