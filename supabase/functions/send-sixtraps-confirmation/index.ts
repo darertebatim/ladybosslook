@@ -109,7 +109,7 @@ serve(async (req) => {
       .maybeSingle();
 
     const roundCols =
-      "first_session_date, first_session_duration, google_meet_link, support_link_url";
+      "id, first_session_date, first_session_duration, google_meet_link, support_link_url";
     const { data: round } = autoRule?.round_id
       ? await supabase
           .from("program_rounds")
@@ -130,6 +130,16 @@ serve(async (req) => {
       .select("title, description")
       .eq("slug", PROGRAM_SLUG)
       .maybeSingle();
+
+    // Stamp the signup with the round they registered for
+    if (round?.id) {
+      await supabase
+        .from("form_submissions")
+        .update({ round_id: round.id })
+        .eq("email", email)
+        .is("round_id", null)
+        .in("source", ["sixtraps_registration", "presixtraps_interest"]);
+    }
 
     const title = prog?.title || "وبینار ۶ تله اینستاگرام";
     const meetUrl = round?.google_meet_link || "";
