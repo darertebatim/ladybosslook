@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SEOHead } from "@/components/SEOHead";
+import { trackCompleteRegistration } from "@/lib/metaPixel";
 import {
   buildGoogleCalendarUrl,
   downloadIcs,
@@ -13,6 +15,7 @@ const PROGRAM_SLUG = "instagram6traps";
 const YOUTUBE_ID = "nccqY4M6GZ4";
 
 export default function ThankYouSixTraps() {
+  const location = useLocation();
   const [webinar, setWebinar] = useState<{
     title: string;
     startUtc: Date;
@@ -20,6 +23,24 @@ export default function ThankYouSixTraps() {
     meetUrl: string;
     supportUrl: string;
   } | null>(null);
+
+  useEffect(() => {
+    if (!location.state?.sixTrapsRegistrationCompleted) return;
+
+    // Dispatch from the confirmed destination so navigation cannot interrupt Meta.
+    const timer = window.setTimeout(() => {
+      trackCompleteRegistration({
+        content_name: "6 Traps Webinar Registration",
+        content_category: "webinar",
+        status: true,
+        value: 0,
+        currency: "USD",
+      });
+      window.history.replaceState({}, document.title, window.location.href);
+    }, 500);
+
+    return () => window.clearTimeout(timer);
+  }, [location.state]);
 
   useEffect(() => {
     (async () => {
