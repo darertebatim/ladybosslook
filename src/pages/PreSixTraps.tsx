@@ -165,8 +165,8 @@ export default function PreSixTraps() {
               <div className="mt-3 space-y-2 text-sm text-neutral-800">
                 <div dir="ltr" className="text-left">📅 {laDate}</div>
                 {localDate && (
-                  <div dir="ltr" className="text-left text-base font-bold text-neutral-900">
-                    🕒 Your time: {localDate}
+                  <div dir="ltr" className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-2 text-left text-base font-bold text-emerald-900 border border-emerald-300">
+                    🕒 Your Local time: {localDate}
                   </div>
                 )}
                 <div>⏱ مدت: {webinar.durationMinutes} دقیقه</div>
