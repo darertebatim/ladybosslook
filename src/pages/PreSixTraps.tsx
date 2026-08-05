@@ -197,6 +197,9 @@ export default function PreSixTraps() {
                   افزودن به Apple Calendar
                 </button>
               </div>
+              <p className="mt-4 text-center text-sm font-bold text-rose-600">
+                لینک ورود به وبینار در ایمیل شما ارسال شده است
+              </p>
             </section>
           )}
 
