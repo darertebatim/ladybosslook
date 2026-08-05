@@ -28,6 +28,8 @@ interface Row {
   round_id: string | null;
   reminder_sent_at: string | null;
   reminder_round_id: string | null;
+  join_now_sent_at: string | null;
+  join_now_round_id: string | null;
 }
 
 interface RoundRow {
@@ -77,7 +79,7 @@ export function SixTrapsSignups() {
       const { data, error } = await supabase
         .from('form_submissions')
         .select(
-          'id, email, name, city, source, submitted_at, round_id, reminder_sent_at, reminder_round_id',
+          'id, email, name, city, source, submitted_at, round_id, reminder_sent_at, reminder_round_id, join_now_sent_at, join_now_round_id',
         )
         .in('source', SOURCES)
         .order('submitted_at', { ascending: false })
@@ -109,6 +111,12 @@ export function SixTrapsSignups() {
       (!onlyUnsent || !r.reminder_sent_at),
   ).length;
 
+  const joinNowTargetCount = rows.filter(
+    (r) =>
+      (!effectiveRoundId || r.round_id === effectiveRoundId) &&
+      (!onlyUnsent || !r.join_now_sent_at),
+  ).length;
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return rows;
@@ -124,7 +132,7 @@ export function SixTrapsSignups() {
   const preInterest = rows.filter((r) => r.source === 'presixtraps_interest').length;
 
   function exportCsv() {
-    const header = 'email,name,city,source,round,reminder_sent_at,submitted_at';
+    const header = 'email,name,city,source,round,reminder_sent_at,join_now_sent_at,submitted_at';
     const body = filtered
       .map((r) =>
         [
@@ -134,6 +142,7 @@ export function SixTrapsSignups() {
           r.source || '',
           roundLabel(r.round_id),
           r.reminder_sent_at || '',
+          r.join_now_sent_at || '',
           r.submitted_at,
         ]
           .map((v) => `"${String(v).replace(/"/g, '""')}"`)
@@ -162,7 +171,7 @@ export function SixTrapsSignups() {
     if (
       mode === 'all' &&
       !window.confirm(
-        `Send the ${joinNow ? '"starting now"' : 'reminder'} email to ${targetCount} signup(s) for ${roundLabel(effectiveRoundId)}${onlyUnsent ? ' (not yet reminded)' : ''}?`,
+        `Send the ${joinNow ? '"starting now"' : 'reminder'} email to ${joinNow ? joinNowTargetCount : targetCount} signup(s) for ${roundLabel(effectiveRoundId)}${onlyUnsent ? (joinNow ? ' (no "starting now" yet)' : ' (not yet reminded)') : ''}?`,
       )
     ) {
       return;
