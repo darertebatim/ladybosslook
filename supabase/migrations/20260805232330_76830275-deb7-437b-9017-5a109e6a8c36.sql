@@ -1,0 +1,1 @@
+ALTER TABLE public.form_submissions ADD COLUMN IF NOT EXISTS join_now_sent_at timestamptz, ADD COLUMN IF NOT EXISTS join_now_round_id uuid;
