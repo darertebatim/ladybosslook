@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
+import { ArrowDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
@@ -175,6 +176,10 @@ export default function SixTrapsLanding() {
                     🕒 Your Local time: {localLabel}
                   </div>
                 )}
+                <div className="flex flex-col items-center gap-1 pt-1 text-sm font-semibold text-emerald-700">
+                  <span>برای دریافت لینک وبینار، فرم زیر را پر کنید</span>
+                  <ArrowDown className="h-5 w-5 animate-bounce" />
+                </div>
               </div>
             )}
           </section>
