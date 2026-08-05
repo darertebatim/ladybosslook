@@ -151,6 +151,44 @@ function buildHtml(
 </html>`;
 }
 
+function buildJoinNowHtml(
+  name: string,
+  meetUrl: string,
+  supportUrl: string,
+): string {
+  return `
+<!doctype html>
+<html dir="rtl" lang="fa">
+  <body style="margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
+    <div style="max-width:560px;margin:0 auto;padding:24px 20px;text-align:center;">
+      <h1 style="margin:0 0 14px;font-size:22px;line-height:1.6;">
+        سلام ${name} 🌷 وبینار در حال شروع است
+      </h1>
+      <p style="margin:0 0 18px;font-size:16px;line-height:1.9;">
+        همین حالا وارد شوید 👇
+      </p>
+      ${
+        meetUrl
+          ? `<p style="margin:18px 0;">
+               <a href="${meetUrl}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:16px 32px;border-radius:12px;font-size:18px;font-weight:bold;">
+                 ورود به وبینار
+               </a>
+             </p>
+             <p style="margin:8px 0 0;font-size:13px;">
+               <a href="${meetUrl}" style="color:#e11d48;word-break:break-all;">${meetUrl}</a>
+             </p>`
+          : ""
+      }
+      <p style="margin:22px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
+        مشکلی داشتی؟ واتس‌اپ پشتیبانی:
+        <a href="${supportUrl}" style="color:#059669;">${supportUrl}</a>
+        <br><br>علی لطفی
+      </p>
+    </div>
+  </body>
+</html>`;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -192,6 +230,7 @@ serve(async (req) => {
     const testEmail = String(body?.testEmail || "").trim().toLowerCase();
     const requestedRoundId = String(body?.roundId || "").trim();
     const onlyUnsent = body?.onlyUnsent !== false;
+    const joinNow = body?.joinNow === true;
 
     // Round resolution: explicit -> auto-enrollment round -> earliest active
     const roundCols =
@@ -281,11 +320,15 @@ serve(async (req) => {
     let failed = 0;
 
     for (const r of recipients) {
-      const html = buildHtml(r.name, startUtc, meetUrl, gcalUrl, supportUrl);
+      const html = joinNow
+        ? buildJoinNowHtml(r.name, meetUrl, supportUrl)
+        : buildHtml(r.name, startUtc, meetUrl, gcalUrl, supportUrl);
       const { data: sendData, error } = await resend.emails.send({
         from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>",
         to: [r.email],
-        subject: "یادآوری: وبینار ۵ آگست + ویدیوی پیش‌نیاز 🌷",
+        subject: joinNow
+          ? "وبینار در حال شروع است — همین حالا وارد شوید 🚀"
+          : "یادآوری: وبینار ۵ آگست + ویدیوی پیش‌نیاز 🌷",
         html,
       });
 
@@ -304,7 +347,7 @@ serve(async (req) => {
           resend_id: (sendData as any)?.id ?? null,
           status: "success",
         });
-        if (!testEmail) {
+        if (!testEmail && !joinNow) {
           await supabase
             .from("form_submissions")
             .update({

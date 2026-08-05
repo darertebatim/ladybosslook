@@ -40,7 +40,9 @@ interface RoundRow {
 export function SixTrapsSignups() {
   const [search, setSearch] = useState('');
   const [testEmail, setTestEmail] = useState('');
-  const [sending, setSending] = useState<'test' | 'all' | null>(null);
+  const [sending, setSending] = useState<
+    'test' | 'all' | 'join-test' | 'join-all' | null
+  >(null);
   const [roundChoice, setRoundChoice] = useState<string>('auto');
   const [onlyUnsent, setOnlyUnsent] = useState(true);
 
@@ -147,7 +149,12 @@ export function SixTrapsSignups() {
     URL.revokeObjectURL(url);
   }
 
-  async function sendReminder(mode: 'test' | 'all') {
+  async function sendReminder(mode: 'test' | 'all', joinNow = false) {
+    const key = (joinNow ? `join-${mode}` : mode) as
+      | 'test'
+      | 'all'
+      | 'join-test'
+      | 'join-all';
     if (mode === 'test' && !testEmail.trim()) {
       toast.error('Enter a test email first');
       return;
@@ -155,20 +162,25 @@ export function SixTrapsSignups() {
     if (
       mode === 'all' &&
       !window.confirm(
-        `Send the reminder email to ${targetCount} signup(s) for ${roundLabel(effectiveRoundId)}${onlyUnsent ? ' (not yet reminded)' : ''}?`,
+        `Send the ${joinNow ? '"starting now"' : 'reminder'} email to ${targetCount} signup(s) for ${roundLabel(effectiveRoundId)}${onlyUnsent ? ' (not yet reminded)' : ''}?`,
       )
     ) {
       return;
     }
-    setSending(mode);
+    setSending(key);
     try {
       const { data, error } = await supabase.functions.invoke('send-sixtraps-reminder', {
         body:
           mode === 'test'
-            ? { testEmail: testEmail.trim(), roundId: roundChoice === 'auto' ? undefined : roundChoice }
+            ? {
+                testEmail: testEmail.trim(),
+                roundId: roundChoice === 'auto' ? undefined : roundChoice,
+                joinNow,
+              }
             : {
                 roundId: roundChoice === 'auto' ? undefined : roundChoice,
                 onlyUnsent,
+                joinNow,
               },
       });
       if (error) throw error;
@@ -265,6 +277,42 @@ export function SixTrapsSignups() {
                 <Send className="mr-1 h-4 w-4" />
               )}
               Send to {targetCount}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">“Starting now” email (join link)</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Short Farsi email: “وبینار در حال شروع است” with a big join button to the round’s Google
+            Meet link. Uses the round and the “only those who haven’t received it” filter above, and
+            does not mark anyone as reminded.
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => sendReminder('test', true)}
+              disabled={sending !== null}
+            >
+              {sending === 'join-test' ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-1 h-4 w-4" />
+              )}
+              Send test
+            </Button>
+            <Button size="sm" onClick={() => sendReminder('all', true)} disabled={sending !== null}>
+              {sending === 'join-all' ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-1 h-4 w-4" />
+              )}
+              Send “starting now” to {targetCount}
             </Button>
           </div>
         </CardContent>
