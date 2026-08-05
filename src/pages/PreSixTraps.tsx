@@ -169,7 +169,11 @@ export default function PreSixTraps() {
                     🕒 Your Local time: {localDate}
                   </div>
                 )}
-                <div>⏱ مدت: {webinar.durationMinutes} دقیقه</div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span>⏱ مدت: {webinar.durationMinutes} دقیقه</span>
+                  <span className="text-neutral-400">|</span>
+                  <span>🔴 Live in Google Meet</span>
+                </div>
               </div>
             </section>
           )}

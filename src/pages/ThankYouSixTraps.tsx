@@ -145,7 +145,11 @@ export default function ThankYouSixTraps() {
                     🕒 Your Local time: {localDate}
                   </div>
                 )}
-                <div>⏱ مدت: {webinar.durationMinutes} دقیقه</div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span>⏱ مدت: {webinar.durationMinutes} دقیقه</span>
+                  <span className="text-neutral-400">|</span>
+                  <span>🔴 Live in Google Meet</span>
+                </div>
               </div>
               <p className="mt-3 text-xs text-neutral-500">
                 لینک ورود در ایمیل شما ارسال شده است.
