@@ -3265,6 +3265,8 @@ export type Database = {
           email: string
           id: string
           ip_address: unknown
+          join_now_round_id: string | null
+          join_now_sent_at: string | null
           mailchimp_error: string | null
           mailchimp_success: boolean | null
           name: string
@@ -3281,6 +3283,8 @@ export type Database = {
           email: string
           id?: string
           ip_address?: unknown
+          join_now_round_id?: string | null
+          join_now_sent_at?: string | null
           mailchimp_error?: string | null
           mailchimp_success?: boolean | null
           name: string
@@ -3297,6 +3301,8 @@ export type Database = {
           email?: string
           id?: string
           ip_address?: unknown
+          join_now_round_id?: string | null
+          join_now_sent_at?: string | null
           mailchimp_error?: string | null
           mailchimp_success?: boolean | null
           name?: string

@@ -28,6 +28,8 @@ interface Row {
   round_id: string | null;
   reminder_sent_at: string | null;
   reminder_round_id: string | null;
+  join_now_sent_at: string | null;
+  join_now_round_id: string | null;
 }
 
 interface RoundRow {
@@ -77,7 +79,7 @@ export function SixTrapsSignups() {
       const { data, error } = await supabase
         .from('form_submissions')
         .select(
-          'id, email, name, city, source, submitted_at, round_id, reminder_sent_at, reminder_round_id',
+          'id, email, name, city, source, submitted_at, round_id, reminder_sent_at, reminder_round_id, join_now_sent_at, join_now_round_id',
         )
         .in('source', SOURCES)
         .order('submitted_at', { ascending: false })
@@ -109,6 +111,12 @@ export function SixTrapsSignups() {
       (!onlyUnsent || !r.reminder_sent_at),
   ).length;
 
+  const joinNowTargetCount = rows.filter(
+    (r) =>
+      (!effectiveRoundId || r.round_id === effectiveRoundId) &&
+      (!onlyUnsent || !r.join_now_sent_at),
+  ).length;
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return rows;
@@ -124,7 +132,7 @@ export function SixTrapsSignups() {
   const preInterest = rows.filter((r) => r.source === 'presixtraps_interest').length;
 
   function exportCsv() {
-    const header = 'email,name,city,source,round,reminder_sent_at,submitted_at';
+    const header = 'email,name,city,source,round,reminder_sent_at,join_now_sent_at,submitted_at';
     const body = filtered
       .map((r) =>
         [
@@ -134,6 +142,7 @@ export function SixTrapsSignups() {
           r.source || '',
           roundLabel(r.round_id),
           r.reminder_sent_at || '',
+          r.join_now_sent_at || '',
           r.submitted_at,
         ]
           .map((v) => `"${String(v).replace(/"/g, '""')}"`)
@@ -162,7 +171,7 @@ export function SixTrapsSignups() {
     if (
       mode === 'all' &&
       !window.confirm(
-        `Send the ${joinNow ? '"starting now"' : 'reminder'} email to ${targetCount} signup(s) for ${roundLabel(effectiveRoundId)}${onlyUnsent ? ' (not yet reminded)' : ''}?`,
+        `Send the ${joinNow ? '"starting now"' : 'reminder'} email to ${joinNow ? joinNowTargetCount : targetCount} signup(s) for ${roundLabel(effectiveRoundId)}${onlyUnsent ? (joinNow ? ' (no "starting now" yet)' : ' (not yet reminded)') : ''}?`,
       )
     ) {
       return;
@@ -289,8 +298,9 @@ export function SixTrapsSignups() {
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">
             Short Farsi email: “وبینار در حال شروع است” with a big join button to the round’s Google
-            Meet link. Uses the round and the “only those who haven’t received it” filter above, and
-            does not mark anyone as reminded.
+            Meet link. Tracked separately from the reminder email — with the filter above on, it only
+            goes to people who haven’t received a “starting now” email yet (even if they already got
+            the reminder).
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <Button
@@ -312,7 +322,7 @@ export function SixTrapsSignups() {
               ) : (
                 <Send className="mr-1 h-4 w-4" />
               )}
-              Send “starting now” to {targetCount}
+              Send “starting now” to {joinNowTargetCount}
             </Button>
           </div>
         </CardContent>
@@ -352,6 +362,7 @@ export function SixTrapsSignups() {
                     <th className="p-2 font-medium">Source</th>
                     <th className="p-2 font-medium">Round</th>
                     <th className="p-2 font-medium">Reminder</th>
+                    <th className="p-2 font-medium">Starting now</th>
                     <th className="p-2 font-medium">Date</th>
                   </tr>
                 </thead>
@@ -374,6 +385,13 @@ export function SixTrapsSignups() {
                           <Badge>
                             Sent · {roundLabel(r.reminder_round_id)}
                           </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">Not sent</span>
+                        )}
+                      </td>
+                      <td className="p-2 whitespace-nowrap">
+                        {r.join_now_sent_at ? (
+                          <Badge>Sent · {roundLabel(r.join_now_round_id)}</Badge>
                         ) : (
                           <span className="text-muted-foreground">Not sent</span>
                         )}

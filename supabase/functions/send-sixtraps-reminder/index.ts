@@ -304,7 +304,11 @@ serve(async (req) => {
         .in("source", SOURCES)
         .limit(5000);
       if (targetRoundId) query = query.eq("round_id", targetRoundId);
-      if (onlyUnsent) query = query.is("reminder_sent_at", null);
+      if (onlyUnsent) {
+        query = joinNow
+          ? query.is("join_now_sent_at", null)
+          : query.is("reminder_sent_at", null);
+      }
       const { data: rows, error } = await query;
       if (error) throw error;
       const seen = new Set<string>();
@@ -347,7 +351,16 @@ serve(async (req) => {
           resend_id: (sendData as any)?.id ?? null,
           status: "success",
         });
-        if (!testEmail && !joinNow) {
+        if (!testEmail && joinNow) {
+          await supabase
+            .from("form_submissions")
+            .update({
+              join_now_sent_at: new Date().toISOString(),
+              join_now_round_id: targetRoundId,
+            })
+            .eq("email", r.email)
+            .in("source", SOURCES);
+        } else if (!testEmail) {
           await supabase
             .from("form_submissions")
             .update({
