@@ -40,7 +40,9 @@ interface RoundRow {
 export function SixTrapsSignups() {
   const [search, setSearch] = useState('');
   const [testEmail, setTestEmail] = useState('');
-  const [sending, setSending] = useState<'test' | 'all' | null>(null);
+  const [sending, setSending] = useState<
+    'test' | 'all' | 'join-test' | 'join-all' | null
+  >(null);
   const [roundChoice, setRoundChoice] = useState<string>('auto');
   const [onlyUnsent, setOnlyUnsent] = useState(true);
 
