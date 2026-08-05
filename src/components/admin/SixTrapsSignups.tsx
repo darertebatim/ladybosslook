@@ -362,6 +362,7 @@ export function SixTrapsSignups() {
                     <th className="p-2 font-medium">Source</th>
                     <th className="p-2 font-medium">Round</th>
                     <th className="p-2 font-medium">Reminder</th>
+                    <th className="p-2 font-medium">Starting now</th>
                     <th className="p-2 font-medium">Date</th>
                   </tr>
                 </thead>
@@ -384,6 +385,13 @@ export function SixTrapsSignups() {
                           <Badge>
                             Sent · {roundLabel(r.reminder_round_id)}
                           </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">Not sent</span>
+                        )}
+                      </td>
+                      <td className="p-2 whitespace-nowrap">
+                        {r.join_now_sent_at ? (
+                          <Badge>Sent · {roundLabel(r.join_now_round_id)}</Badge>
                         ) : (
                           <span className="text-muted-foreground">Not sent</span>
                         )}
