@@ -298,8 +298,9 @@ export function SixTrapsSignups() {
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">
             Short Farsi email: “وبینار در حال شروع است” with a big join button to the round’s Google
-            Meet link. Uses the round and the “only those who haven’t received it” filter above, and
-            does not mark anyone as reminded.
+            Meet link. Tracked separately from the reminder email — with the filter above on, it only
+            goes to people who haven’t received a “starting now” email yet (even if they already got
+            the reminder).
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <Button
@@ -321,7 +322,7 @@ export function SixTrapsSignups() {
               ) : (
                 <Send className="mr-1 h-4 w-4" />
               )}
-              Send “starting now” to {targetCount}
+              Send “starting now” to {joinNowTargetCount}
             </Button>
           </div>
         </CardContent>
