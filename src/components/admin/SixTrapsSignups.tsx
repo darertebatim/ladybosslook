@@ -147,7 +147,8 @@ export function SixTrapsSignups() {
     URL.revokeObjectURL(url);
   }
 
-  async function sendReminder(mode: 'test' | 'all') {
+  async function sendReminder(mode: 'test' | 'all', joinNow = false) {
+    const key = joinNow ? `join-${mode}` : mode;
     if (mode === 'test' && !testEmail.trim()) {
       toast.error('Enter a test email first');
       return;
@@ -155,20 +156,25 @@ export function SixTrapsSignups() {
     if (
       mode === 'all' &&
       !window.confirm(
-        `Send the reminder email to ${targetCount} signup(s) for ${roundLabel(effectiveRoundId)}${onlyUnsent ? ' (not yet reminded)' : ''}?`,
+        `Send the ${joinNow ? '"starting now"' : 'reminder'} email to ${targetCount} signup(s) for ${roundLabel(effectiveRoundId)}${onlyUnsent ? ' (not yet reminded)' : ''}?`,
       )
     ) {
       return;
     }
-    setSending(mode);
+    setSending(key);
     try {
       const { data, error } = await supabase.functions.invoke('send-sixtraps-reminder', {
         body:
           mode === 'test'
-            ? { testEmail: testEmail.trim(), roundId: roundChoice === 'auto' ? undefined : roundChoice }
+            ? {
+                testEmail: testEmail.trim(),
+                roundId: roundChoice === 'auto' ? undefined : roundChoice,
+                joinNow,
+              }
             : {
                 roundId: roundChoice === 'auto' ? undefined : roundChoice,
                 onlyUnsent,
+                joinNow,
               },
       });
       if (error) throw error;
