@@ -283,6 +283,42 @@ export function SixTrapsSignups() {
       </Card>
 
       <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">“Starting now” email (join link)</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Short Farsi email: “وبینار در حال شروع است” with a big join button to the round’s Google
+            Meet link. Uses the round and the “only those who haven’t received it” filter above, and
+            does not mark anyone as reminded.
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => sendReminder('test', true)}
+              disabled={sending !== null}
+            >
+              {sending === 'join-test' ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-1 h-4 w-4" />
+              )}
+              Send test
+            </Button>
+            <Button size="sm" onClick={() => sendReminder('all', true)} disabled={sending !== null}>
+              {sending === 'join-all' ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-1 h-4 w-4" />
+              )}
+              Send “starting now” to {targetCount}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
           <CardTitle>6 Traps Webinar Signups</CardTitle>
           <div className="flex items-center gap-2">
