@@ -150,7 +150,11 @@ export function SixTrapsSignups() {
   }
 
   async function sendReminder(mode: 'test' | 'all', joinNow = false) {
-    const key = joinNow ? `join-${mode}` : mode;
+    const key = (joinNow ? `join-${mode}` : mode) as
+      | 'test'
+      | 'all'
+      | 'join-test'
+      | 'join-all';
     if (mode === 'test' && !testEmail.trim()) {
       toast.error('Enter a test email first');
       return;
