@@ -95,10 +95,18 @@ export function formatLADateTime(d: Date): string {
 export function formatLocalDateTime(d: Date): string {
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-    const formatted = new Intl.DateTimeFormat("en-US", {
-      dateStyle: "full",
-      timeStyle: "short",
+    const time = new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
     }).format(d);
+    const date = new Intl.DateTimeFormat("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).format(d);
+    const formatted = `${time}, ${date}`;
     return tz ? `${formatted} (${tz})` : formatted;
   } catch {
     return d.toString();
