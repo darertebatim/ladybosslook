@@ -172,7 +172,15 @@ export function SixTrapsSignups() {
     if (
       mode === 'all' &&
       !window.confirm(
-        `Send the ${joinNow ? '"starting now"' : 'reminder'} email to ${joinNow ? joinNowTargetCount : targetCount} signup(s) for ${roundLabel(effectiveRoundId)}${onlyUnsent ? (joinNow ? ' (no "starting now" yet)' : ' (not yet reminded)') : ''}?`,
+        `Send the ${joinNow ? '"starting now"' : 'reminder'} email to ${joinNow ? joinNowTargetCount : targetCount} signup(s) for ${roundLabel(effectiveRoundId)}${
+          joinNow
+            ? onlyUnsentJoinNow
+              ? ' (no "starting now" yet)'
+              : ''
+            : onlyUnsent
+              ? ' (not yet reminded)'
+              : ''
+        }?`,
       )
     ) {
       return;
@@ -189,7 +197,7 @@ export function SixTrapsSignups() {
               }
             : {
                 roundId: roundChoice === 'auto' ? undefined : roundChoice,
-                onlyUnsent,
+                onlyUnsent: joinNow ? onlyUnsentJoinNow : onlyUnsent,
                 joinNow,
               },
       });
