@@ -307,10 +307,17 @@ export function SixTrapsSignups() {
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">
             Short Farsi email: “وبینار در حال شروع است” with a big join button to the round’s Google
-            Meet link. Tracked separately from the reminder email — with the filter above on, it only
-            goes to people who haven’t received a “starting now” email yet (even if they already got
-            the reminder).
+            Meet link. Tracked separately from the reminder email — people who already got the
+            reminder still get this one.
           </p>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={onlyUnsentJoinNow}
+              onChange={(e) => setOnlyUnsentJoinNow(e.target.checked)}
+            />
+            Only those who haven't received it
+          </label>
           <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="outline"
