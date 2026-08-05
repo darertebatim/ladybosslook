@@ -171,8 +171,8 @@ export default function SixTrapsLanding() {
                   📅 {laLabel}
                 </div>
                 {localLabel && (
-                  <div dir="ltr" className="inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white px-4 py-2.5 text-base font-bold text-neutral-900">
-                    🕒 Your time: {localLabel}
+                  <div dir="ltr" className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-base font-bold text-white shadow-sm">
+                    🕒 Your Local time: {localLabel}
                   </div>
                 )}
               </div>
