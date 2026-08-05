@@ -47,6 +47,7 @@ export function SixTrapsSignups() {
   >(null);
   const [roundChoice, setRoundChoice] = useState<string>('auto');
   const [onlyUnsent, setOnlyUnsent] = useState(true);
+  const [onlyUnsentJoinNow, setOnlyUnsentJoinNow] = useState(true);
 
   const { data: rounds } = useQuery({
     queryKey: ['sixtraps-rounds'],
@@ -114,7 +115,7 @@ export function SixTrapsSignups() {
   const joinNowTargetCount = rows.filter(
     (r) =>
       (!effectiveRoundId || r.round_id === effectiveRoundId) &&
-      (!onlyUnsent || !r.join_now_sent_at),
+      (!onlyUnsentJoinNow || !r.join_now_sent_at),
   ).length;
 
   const filtered = useMemo(() => {
