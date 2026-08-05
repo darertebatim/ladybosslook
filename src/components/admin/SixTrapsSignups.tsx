@@ -47,6 +47,7 @@ export function SixTrapsSignups() {
   >(null);
   const [roundChoice, setRoundChoice] = useState<string>('auto');
   const [onlyUnsent, setOnlyUnsent] = useState(true);
+  const [onlyUnsentJoinNow, setOnlyUnsentJoinNow] = useState(true);
 
   const { data: rounds } = useQuery({
     queryKey: ['sixtraps-rounds'],
@@ -114,7 +115,7 @@ export function SixTrapsSignups() {
   const joinNowTargetCount = rows.filter(
     (r) =>
       (!effectiveRoundId || r.round_id === effectiveRoundId) &&
-      (!onlyUnsent || !r.join_now_sent_at),
+      (!onlyUnsentJoinNow || !r.join_now_sent_at),
   ).length;
 
   const filtered = useMemo(() => {
@@ -171,7 +172,15 @@ export function SixTrapsSignups() {
     if (
       mode === 'all' &&
       !window.confirm(
-        `Send the ${joinNow ? '"starting now"' : 'reminder'} email to ${joinNow ? joinNowTargetCount : targetCount} signup(s) for ${roundLabel(effectiveRoundId)}${onlyUnsent ? (joinNow ? ' (no "starting now" yet)' : ' (not yet reminded)') : ''}?`,
+        `Send the ${joinNow ? '"starting now"' : 'reminder'} email to ${joinNow ? joinNowTargetCount : targetCount} signup(s) for ${roundLabel(effectiveRoundId)}${
+          joinNow
+            ? onlyUnsentJoinNow
+              ? ' (no "starting now" yet)'
+              : ''
+            : onlyUnsent
+              ? ' (not yet reminded)'
+              : ''
+        }?`,
       )
     ) {
       return;
@@ -188,7 +197,7 @@ export function SixTrapsSignups() {
               }
             : {
                 roundId: roundChoice === 'auto' ? undefined : roundChoice,
-                onlyUnsent,
+                onlyUnsent: joinNow ? onlyUnsentJoinNow : onlyUnsent,
                 joinNow,
               },
       });
@@ -298,10 +307,17 @@ export function SixTrapsSignups() {
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">
             Short Farsi email: “وبینار در حال شروع است” with a big join button to the round’s Google
-            Meet link. Tracked separately from the reminder email — with the filter above on, it only
-            goes to people who haven’t received a “starting now” email yet (even if they already got
-            the reminder).
+            Meet link. Tracked separately from the reminder email — people who already got the
+            reminder still get this one.
           </p>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={onlyUnsentJoinNow}
+              onChange={(e) => setOnlyUnsentJoinNow(e.target.checked)}
+            />
+            Only those who haven't received it
+          </label>
           <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="outline"
