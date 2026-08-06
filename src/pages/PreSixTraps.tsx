@@ -13,10 +13,6 @@ import {
 
 const PROGRAM_SLUG = "instagram6traps";
 const YOUTUBE_ID = "nccqY4M6GZ4";
-// This page is intentionally PINNED to a specific round (used for previous-round
-// signups). It does NOT auto-update when a new round is added.
-// To point it at a new round, change this id.
-const PINNED_ROUND_ID = "f267cca0-e749-4287-a05d-c81a03dff8e2";
 
 const emailSchema = z.object({
   email: z.string().trim().email("ایمیل معتبر نیست").max(255),
@@ -34,20 +30,36 @@ export default function PreSixTraps() {
   const [emailError, setEmailError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [roundId, setRoundId] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const { data: round } = await (supabase as any)
-        .from("program_rounds")
-        .select("first_session_date, first_session_duration, google_meet_link, support_link_url")
-        .eq("id", PINNED_ROUND_ID)
+      // Follow the round configured for auto-enrollment; fall back to earliest active round
+      const { data: autoRule } = await (supabase as any)
+        .from("program_auto_enrollment")
+        .select("round_id")
+        .eq("program_slug", PROGRAM_SLUG)
         .maybeSingle();
+
+      const roundQuery = (supabase as any)
+        .from("program_rounds")
+        .select("id, first_session_date, first_session_duration, google_meet_link, support_link_url");
+
+      const { data: round } = autoRule?.round_id
+        ? await roundQuery.eq("id", autoRule.round_id).maybeSingle()
+        : await roundQuery
+            .eq("program_slug", PROGRAM_SLUG)
+            .eq("status", "active")
+            .order("first_session_date", { ascending: true })
+            .limit(1)
+            .maybeSingle();
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
         .select("title")
         .eq("slug", PROGRAM_SLUG)
         .maybeSingle();
       if (round?.first_session_date) {
+        setRoundId(round.id ?? autoRule?.round_id ?? null);
         setWebinar({
           title: prog?.title || "وبینار ۶ تله اینستاگرام",
           startUtc: new Date(round.first_session_date),
@@ -103,7 +115,7 @@ export default function PreSixTraps() {
           body: {
             name: "دوست عزیز",
             email: parsed.data.email.toLowerCase(),
-            roundId: PINNED_ROUND_ID,
+            ...(roundId ? { roundId } : {}),
           },
         })
         .catch((err) => console.error("confirmation email error", err));
