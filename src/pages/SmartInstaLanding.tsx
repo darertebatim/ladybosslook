@@ -5,7 +5,6 @@ import { ArrowDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
-import heroAsset from "@/assets/smartinsta-hero.jpg.asset.json";
 import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
 import { trackLead } from "@/lib/metaPixel";
 
@@ -30,6 +29,7 @@ export default function SmartInstaLanding() {
     startUtc: Date;
     durationMinutes: number;
     meetUrl: string;
+    coverUrl: string;
   } | null>(null);
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function SmartInstaLanding() {
 
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
-        .select("title")
+        .select("title, cover_image_url")
         .eq("slug", PROGRAM_SLUG)
         .maybeSingle();
 
@@ -65,6 +65,7 @@ export default function SmartInstaLanding() {
           startUtc: new Date(round.first_session_date),
           durationMinutes: round.first_session_duration || 90,
           meetUrl: round.google_meet_link || "",
+          coverUrl: prog?.cover_image_url || "",
         });
       }
     })();
@@ -145,15 +146,15 @@ export default function SmartInstaLanding() {
         className="min-h-screen bg-gradient-to-b from-violet-50 via-white to-amber-50 font-farsi"
       >
         <main className="mx-auto w-full max-w-md px-4 pb-16 pt-6">
-          <div className="overflow-hidden rounded-3xl shadow-lg">
-            <img
-              src={heroAsset.url}
-              alt="وبینار فریم‌ورک اینستاگرام هوشمند"
-              width={1024}
-              height={768}
-              className="h-auto w-full object-cover"
-            />
-          </div>
+          {webinar?.coverUrl && (
+            <div className="overflow-hidden rounded-3xl shadow-lg">
+              <img
+                src={webinar.coverUrl}
+                alt="وبینار فریم‌ورک اینستاگرام هوشمند"
+                className="h-auto w-full object-cover"
+              />
+            </div>
+          )}
 
           <section className="mt-6 space-y-3 text-center">
             <h1 className="text-2xl font-bold leading-tight text-neutral-900">
@@ -163,7 +164,7 @@ export default function SmartInstaLanding() {
               این وبینار مخصوص صاحبان کسب‌وکار در آمریکا و کانادا است
             </p>
             <p className="text-sm leading-6 text-neutral-700">
-              اگر کسب‌وکار داری و از اینستاگرام نتیجه دلخواه نمی‌گیری، در این وبینار رایگان یک فریم‌ورک ساده و مرحله‌به‌مرحله می‌گیری تا محتوایت به فروش تبدیل شود.
+              هدیه به حاضرین وبینار ۶ تله
             </p>
             {laLabel && (
               <div className="mx-auto flex flex-col items-center gap-2">
