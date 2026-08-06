@@ -8,6 +8,7 @@ import { EmailGenerator } from '@/components/admin/EmailGenerator';
 import { UpdateNotificationSender } from '@/components/admin/UpdateNotificationSender';
 import { AppReviewKPIPanel } from '@/components/admin/AppReviewKPIPanel';
 import { SixTrapsSignups } from '@/components/admin/SixTrapsSignups';
+import { SmartInstaSignups } from '@/components/admin/SmartInstaSignups';
 
 export default function Communications() {
   return (
@@ -18,7 +19,7 @@ export default function Communications() {
       </div>
 
       <Tabs defaultValue="updates">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="updates">Updates</TabsTrigger>
           <TabsTrigger value="broadcasts">Broadcasts</TabsTrigger>
           <TabsTrigger value="push">Push Only</TabsTrigger>
@@ -26,6 +27,7 @@ export default function Communications() {
           <TabsTrigger value="email-gen">Email Gen</TabsTrigger>
           <TabsTrigger value="mailchimp">Mailchimp</TabsTrigger>
           <TabsTrigger value="sixtraps">6 Traps</TabsTrigger>
+          <TabsTrigger value="smartinsta">Smart IG</TabsTrigger>
         </TabsList>
 
         <TabsContent value="updates" className="space-y-6">
@@ -56,6 +58,10 @@ export default function Communications() {
 
         <TabsContent value="sixtraps" className="space-y-6">
           <SixTrapsSignups />
+        </TabsContent>
+
+        <TabsContent value="smartinsta" className="space-y-6">
+          <SmartInstaSignups />
         </TabsContent>
       </Tabs>
     </div>
