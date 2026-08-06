@@ -50,6 +50,12 @@ verify_jwt = false
 [functions.send-sixtraps-reminder]
 verify_jwt = true
 
+[functions.send-smartinsta-confirmation]
+verify_jwt = false
+
+[functions.send-smartinsta-reminder]
+verify_jwt = true
+
 [functions.send-enrollment-confirmation]
 verify_jwt = false
 
