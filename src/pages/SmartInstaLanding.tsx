@@ -190,7 +190,6 @@ export default function SmartInstaLanding() {
               Free Registration
             </h2>
 
-
             <div>
               <label className="mb-1 block text-sm font-medium text-neutral-800">Email</label>
               <input
