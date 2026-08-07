@@ -398,6 +398,27 @@ export function SixTrapsSignups() {
             </Button>
           </div>
         </CardHeader>
+        <CardContent />
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
+          <CardTitle>placeholder</CardTitle>
+          <div className="flex items-center gap-2">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search email, name, city"
+              className="w-56"
+            />
+            <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
+              <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+            </Button>
+            <Button variant="outline" size="sm" onClick={exportCsv}>
+              <Download className="mr-1 h-4 w-4" /> CSV
+            </Button>
+          </div>
+        </CardHeader>
         <CardContent>
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Loading…</p>
