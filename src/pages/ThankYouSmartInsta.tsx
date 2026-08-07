@@ -4,7 +4,7 @@ import { Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SEOHead } from "@/components/SEOHead";
 import { trackCompleteRegistration } from "@/lib/metaPixel";
-import workbookAsset from "@/assets/instagram-content-workbook.pdf.asset.json";
+import workbookAsset from "@/assets/build-trustworthy-instagram-profile-workbook.pdf.asset.json";
 import {
   buildGoogleCalendarUrl,
   downloadIcs,
