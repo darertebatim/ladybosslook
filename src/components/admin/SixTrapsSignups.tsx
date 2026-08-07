@@ -30,6 +30,8 @@ interface Row {
   reminder_round_id: string | null;
   join_now_sent_at: string | null;
   join_now_round_id: string | null;
+  next_session_sent_at: string | null;
+  next_session_round_id: string | null;
 }
 
 interface RoundRow {
@@ -43,11 +45,13 @@ export function SixTrapsSignups() {
   const [search, setSearch] = useState('');
   const [testEmail, setTestEmail] = useState('');
   const [sending, setSending] = useState<
-    'test' | 'all' | 'join-test' | 'join-all' | null
+    'test' | 'all' | 'join-test' | 'join-all' | 'next-test' | 'next-all' | null
   >(null);
   const [roundChoice, setRoundChoice] = useState<string>('auto');
   const [onlyUnsent, setOnlyUnsent] = useState(true);
   const [onlyUnsentJoinNow, setOnlyUnsentJoinNow] = useState(true);
+  const [nextAudienceRound, setNextAudienceRound] = useState<string>('all');
+  const [onlyUnsentNext, setOnlyUnsentNext] = useState(true);
 
   const { data: rounds } = useQuery({
     queryKey: ['sixtraps-rounds'],
@@ -80,7 +84,7 @@ export function SixTrapsSignups() {
       const { data, error } = await supabase
         .from('form_submissions')
         .select(
-          'id, email, name, city, source, submitted_at, round_id, reminder_sent_at, reminder_round_id, join_now_sent_at, join_now_round_id',
+          'id, email, name, city, source, submitted_at, round_id, reminder_sent_at, reminder_round_id, join_now_sent_at, join_now_round_id, next_session_sent_at, next_session_round_id',
         )
         .in('source', SOURCES)
         .order('submitted_at', { ascending: false })
@@ -116,6 +120,12 @@ export function SixTrapsSignups() {
     (r) =>
       (!effectiveRoundId || r.round_id === effectiveRoundId) &&
       (!onlyUnsentJoinNow || !r.join_now_sent_at),
+  ).length;
+
+  const nextSessionTargetCount = rows.filter(
+    (r) =>
+      (nextAudienceRound === 'all' || r.round_id === nextAudienceRound) &&
+      (!onlyUnsentNext || !r.next_session_sent_at),
   ).length;
 
   const filtered = useMemo(() => {
@@ -159,18 +169,23 @@ export function SixTrapsSignups() {
     URL.revokeObjectURL(url);
   }
 
-  async function sendReminder(mode: 'test' | 'all', joinNow = false) {
-    const key = (joinNow ? `join-${mode}` : mode) as
-      | 'test'
-      | 'all'
-      | 'join-test'
-      | 'join-all';
+  async function sendReminder(
+    mode: 'test' | 'all',
+    joinNow = false,
+    nextSession = false,
+  ) {
+    const key = (nextSession
+      ? `next-${mode}`
+      : joinNow
+        ? `join-${mode}`
+        : mode) as typeof sending;
     if (mode === 'test' && !testEmail.trim()) {
       toast.error('Enter a test email first');
       return;
     }
     if (
       mode === 'all' &&
+      !nextSession &&
       !window.confirm(
         `Send the ${joinNow ? '"starting now"' : 'reminder'} email to ${joinNow ? joinNowTargetCount : targetCount} signup(s) for ${roundLabel(effectiveRoundId)}${
           joinNow
@@ -185,6 +200,15 @@ export function SixTrapsSignups() {
     ) {
       return;
     }
+    if (
+      mode === 'all' &&
+      nextSession &&
+      !window.confirm(
+        `Send the "next session" invite to ${nextSessionTargetCount} signup(s)?`,
+      )
+    ) {
+      return;
+    }
     setSending(key);
     try {
       const { data, error } = await supabase.functions.invoke('send-sixtraps-reminder', {
@@ -192,10 +216,22 @@ export function SixTrapsSignups() {
           mode === 'test'
             ? {
                 testEmail: testEmail.trim(),
-                roundId: roundChoice === 'auto' ? undefined : roundChoice,
+                roundId: nextSession
+                  ? undefined
+                  : roundChoice === 'auto'
+                    ? undefined
+                    : roundChoice,
                 joinNow,
+                nextSession,
               }
-            : {
+            : nextSession
+              ? {
+                  nextSession: true,
+                  audienceRoundId:
+                    nextAudienceRound === 'all' ? undefined : nextAudienceRound,
+                  onlyUnsent: onlyUnsentNext,
+                }
+              : {
                 roundId: roundChoice === 'auto' ? undefined : roundChoice,
                 onlyUnsent: joinNow ? onlyUnsentJoinNow : onlyUnsent,
                 joinNow,
