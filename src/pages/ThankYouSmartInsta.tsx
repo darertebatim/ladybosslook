@@ -122,8 +122,10 @@ export default function ThankYouSmartInsta() {
               این وبینار مخصوص صاحبان کسب‌وکار در آمریکا و کانادا است
             </p>
             <p className="mt-2 text-sm leading-6 text-neutral-700">
-              لینک ورود به وبینار و جزئیات کامل به ایمیل شما ارسال شد. تا وبینار،
-              این ویدیوی کوتاه از علی لطفی را ببینید.
+              لینک ورود به وبینار و جزئیات کامل به ایمیل شما ارسال شد.
+            </p>
+            <p className="mt-3 text-xl font-bold leading-7 text-violet-700">
+              ویدیوی خیلی مهم را همین الان ببین
             </p>
           </div>
 
