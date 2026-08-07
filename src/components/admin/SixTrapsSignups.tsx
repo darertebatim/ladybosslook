@@ -382,28 +382,70 @@ export function SixTrapsSignups() {
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
-          <CardTitle>6 Traps Webinar Signups</CardTitle>
-          <div className="flex items-center gap-2">
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search email, name, city"
-              className="w-56"
-            />
-            <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
-              <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+          <CardTitle className="text-base">“Missed it? Next session” invite</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Farsi email for people who missed the live class: announces the next session (auto-uses
+            the next upcoming round and its times per city) with a big button to{' '}
+            <span dir="ltr">/sixtraps</span> to sign up.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <Select value={nextAudienceRound} onValueChange={setNextAudienceRound}>
+              <SelectTrigger className="w-72">
+                <SelectValue placeholder="Audience round" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All signups (any round)</SelectItem>
+                {(rounds || []).map((r) => (
+                  <SelectItem key={r.id} value={r.id}>
+                    Signed up for {roundLabel(r.id)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={onlyUnsentNext}
+                onChange={(e) => setOnlyUnsentNext(e.target.checked)}
+              />
+              Only those who haven't received it
+            </label>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => sendReminder('test', false, true)}
+              disabled={sending !== null}
+            >
+              {sending === 'next-test' ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-1 h-4 w-4" />
+              )}
+              Send test
             </Button>
-            <Button variant="outline" size="sm" onClick={exportCsv}>
-              <Download className="mr-1 h-4 w-4" /> CSV
+            <Button
+              size="sm"
+              onClick={() => sendReminder('all', false, true)}
+              disabled={sending !== null}
+            >
+              {sending === 'next-all' ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-1 h-4 w-4" />
+              )}
+              Send invite to {nextSessionTargetCount}
             </Button>
           </div>
-        </CardHeader>
-        <CardContent />
+        </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
-          <CardTitle>placeholder</CardTitle>
+          <CardTitle>6 Traps Webinar Signups</CardTitle>
           <div className="flex items-center gap-2">
             <Input
               value={search}
