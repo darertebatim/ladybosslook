@@ -14,7 +14,13 @@ import {
 } from "@/lib/sixtrapsCalendar";
 
 const PROGRAM_SLUG = "smartinstagramframework";
-const YOUTUBE_ID = "nccqY4M6GZ4";
+const FALLBACK_YOUTUBE_ID = "G_qM6-Y00wE";
+
+function extractYouTubeId(url?: string | null): string {
+  if (!url) return FALLBACK_YOUTUBE_ID;
+  const m = url.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{6,})/);
+  return m?.[1] || FALLBACK_YOUTUBE_ID;
+}
 
 export default function ThankYouSmartInsta() {
   const location = useLocation();
@@ -25,6 +31,7 @@ export default function ThankYouSmartInsta() {
     meetUrl: string;
     supportUrl: string;
   } | null>(null);
+  const [youtubeId, setYoutubeId] = useState<string>(FALLBACK_YOUTUBE_ID);
 
   useEffect(() => {
     if (!location.state?.smartInstaRegistrationCompleted) return;
@@ -61,9 +68,10 @@ export default function ThankYouSmartInsta() {
             .maybeSingle();
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
-        .select("title")
+        .select("title, video_url")
         .eq("slug", PROGRAM_SLUG)
         .maybeSingle();
+      setYoutubeId(extractYouTubeId(prog?.video_url));
       if (round?.first_session_date) {
         setWebinar({
           title: prog?.title || "وبینار فریم‌ورک اینستاگرام هوشمند",
@@ -123,7 +131,7 @@ export default function ThankYouSmartInsta() {
           <div className="mt-6 aspect-video overflow-hidden rounded-2xl shadow-md">
             <iframe
               className="h-full w-full"
-              src={`https://www.youtube.com/embed/${YOUTUBE_ID}`}
+              src={`https://www.youtube.com/embed/${youtubeId}`}
               title="پیام علی لطفی"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
