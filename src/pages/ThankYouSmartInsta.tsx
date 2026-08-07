@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Download } from "lucide-react";
+import { Download, ArrowDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SEOHead } from "@/components/SEOHead";
 import { trackCompleteRegistration } from "@/lib/metaPixel";
@@ -124,8 +124,10 @@ export default function ThankYouSmartInsta() {
             <p className="mt-2 text-sm leading-6 text-neutral-700">
               لینک ورود به وبینار و جزئیات کامل به ایمیل شما ارسال شد.
             </p>
-            <p className="mt-3 text-xl font-bold leading-7 text-violet-700">
+            <p className="mt-3 flex items-center justify-center gap-2 text-xl font-bold leading-7 text-violet-700">
+              <ArrowDown className="h-5 w-5 animate-bounce" />
               ویدیوی خیلی مهم را همین الان ببین
+              <ArrowDown className="h-5 w-5 animate-bounce" />
             </p>
           </div>
 
