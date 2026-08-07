@@ -146,7 +146,7 @@ export default function ThankYouSmartInsta() {
             </p>
             <a
               href={workbookAsset.url}
-              download="Instagram_Introduction_Content_Workbook.pdf"
+              download="Build_a_Trustworthy_Instagram_Profile_Workbook.pdf"
               target="_blank"
               rel="noreferrer"
               className="mt-4 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-l from-violet-600 to-fuchsia-500 px-4 text-base font-bold text-white shadow-md transition active:scale-[0.98]"
