@@ -3270,6 +3270,8 @@ export type Database = {
           mailchimp_error: string | null
           mailchimp_success: boolean | null
           name: string
+          next_session_round_id: string | null
+          next_session_sent_at: string | null
           phone: string
           reminder_round_id: string | null
           reminder_sent_at: string | null
@@ -3288,6 +3290,8 @@ export type Database = {
           mailchimp_error?: string | null
           mailchimp_success?: boolean | null
           name: string
+          next_session_round_id?: string | null
+          next_session_sent_at?: string | null
           phone: string
           reminder_round_id?: string | null
           reminder_sent_at?: string | null
@@ -3306,6 +3310,8 @@ export type Database = {
           mailchimp_error?: string | null
           mailchimp_success?: boolean | null
           name?: string
+          next_session_round_id?: string | null
+          next_session_sent_at?: string | null
           phone?: string
           reminder_round_id?: string | null
           reminder_sent_at?: string | null

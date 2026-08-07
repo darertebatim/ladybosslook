@@ -30,6 +30,8 @@ interface Row {
   reminder_round_id: string | null;
   join_now_sent_at: string | null;
   join_now_round_id: string | null;
+  next_session_sent_at: string | null;
+  next_session_round_id: string | null;
 }
 
 interface RoundRow {
@@ -43,11 +45,13 @@ export function SixTrapsSignups() {
   const [search, setSearch] = useState('');
   const [testEmail, setTestEmail] = useState('');
   const [sending, setSending] = useState<
-    'test' | 'all' | 'join-test' | 'join-all' | null
+    'test' | 'all' | 'join-test' | 'join-all' | 'next-test' | 'next-all' | null
   >(null);
   const [roundChoice, setRoundChoice] = useState<string>('auto');
   const [onlyUnsent, setOnlyUnsent] = useState(true);
   const [onlyUnsentJoinNow, setOnlyUnsentJoinNow] = useState(true);
+  const [nextAudienceRound, setNextAudienceRound] = useState<string>('all');
+  const [onlyUnsentNext, setOnlyUnsentNext] = useState(true);
 
   const { data: rounds } = useQuery({
     queryKey: ['sixtraps-rounds'],
@@ -80,7 +84,7 @@ export function SixTrapsSignups() {
       const { data, error } = await supabase
         .from('form_submissions')
         .select(
-          'id, email, name, city, source, submitted_at, round_id, reminder_sent_at, reminder_round_id, join_now_sent_at, join_now_round_id',
+          'id, email, name, city, source, submitted_at, round_id, reminder_sent_at, reminder_round_id, join_now_sent_at, join_now_round_id, next_session_sent_at, next_session_round_id',
         )
         .in('source', SOURCES)
         .order('submitted_at', { ascending: false })
@@ -116,6 +120,12 @@ export function SixTrapsSignups() {
     (r) =>
       (!effectiveRoundId || r.round_id === effectiveRoundId) &&
       (!onlyUnsentJoinNow || !r.join_now_sent_at),
+  ).length;
+
+  const nextSessionTargetCount = rows.filter(
+    (r) =>
+      (nextAudienceRound === 'all' || r.round_id === nextAudienceRound) &&
+      (!onlyUnsentNext || !r.next_session_sent_at),
   ).length;
 
   const filtered = useMemo(() => {
@@ -159,18 +169,23 @@ export function SixTrapsSignups() {
     URL.revokeObjectURL(url);
   }
 
-  async function sendReminder(mode: 'test' | 'all', joinNow = false) {
-    const key = (joinNow ? `join-${mode}` : mode) as
-      | 'test'
-      | 'all'
-      | 'join-test'
-      | 'join-all';
+  async function sendReminder(
+    mode: 'test' | 'all',
+    joinNow = false,
+    nextSession = false,
+  ) {
+    const key = (nextSession
+      ? `next-${mode}`
+      : joinNow
+        ? `join-${mode}`
+        : mode) as typeof sending;
     if (mode === 'test' && !testEmail.trim()) {
       toast.error('Enter a test email first');
       return;
     }
     if (
       mode === 'all' &&
+      !nextSession &&
       !window.confirm(
         `Send the ${joinNow ? '"starting now"' : 'reminder'} email to ${joinNow ? joinNowTargetCount : targetCount} signup(s) for ${roundLabel(effectiveRoundId)}${
           joinNow
@@ -185,6 +200,15 @@ export function SixTrapsSignups() {
     ) {
       return;
     }
+    if (
+      mode === 'all' &&
+      nextSession &&
+      !window.confirm(
+        `Send the "next session" invite to ${nextSessionTargetCount} signup(s)?`,
+      )
+    ) {
+      return;
+    }
     setSending(key);
     try {
       const { data, error } = await supabase.functions.invoke('send-sixtraps-reminder', {
@@ -192,10 +216,22 @@ export function SixTrapsSignups() {
           mode === 'test'
             ? {
                 testEmail: testEmail.trim(),
-                roundId: roundChoice === 'auto' ? undefined : roundChoice,
+                roundId: nextSession
+                  ? undefined
+                  : roundChoice === 'auto'
+                    ? undefined
+                    : roundChoice,
                 joinNow,
+                nextSession,
               }
-            : {
+            : nextSession
+              ? {
+                  nextSession: true,
+                  audienceRoundId:
+                    nextAudienceRound === 'all' ? undefined : nextAudienceRound,
+                  onlyUnsent: onlyUnsentNext,
+                }
+              : {
                 roundId: roundChoice === 'auto' ? undefined : roundChoice,
                 onlyUnsent: joinNow ? onlyUnsentJoinNow : onlyUnsent,
                 joinNow,
@@ -346,6 +382,69 @@ export function SixTrapsSignups() {
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
+          <CardTitle className="text-base">“Missed it? Next session” invite</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Farsi email for people who missed the live class: announces the next session (auto-uses
+            the next upcoming round and its times per city) with a big button to{' '}
+            <span dir="ltr">/sixtraps</span> to sign up.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <Select value={nextAudienceRound} onValueChange={setNextAudienceRound}>
+              <SelectTrigger className="w-72">
+                <SelectValue placeholder="Audience round" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All signups (any round)</SelectItem>
+                {(rounds || []).map((r) => (
+                  <SelectItem key={r.id} value={r.id}>
+                    Signed up for {roundLabel(r.id)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={onlyUnsentNext}
+                onChange={(e) => setOnlyUnsentNext(e.target.checked)}
+              />
+              Only those who haven't received it
+            </label>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => sendReminder('test', false, true)}
+              disabled={sending !== null}
+            >
+              {sending === 'next-test' ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-1 h-4 w-4" />
+              )}
+              Send test
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => sendReminder('all', false, true)}
+              disabled={sending !== null}
+            >
+              {sending === 'next-all' ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-1 h-4 w-4" />
+              )}
+              Send invite to {nextSessionTargetCount}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
           <CardTitle>6 Traps Webinar Signups</CardTitle>
           <div className="flex items-center gap-2">
             <Input
@@ -379,6 +478,7 @@ export function SixTrapsSignups() {
                     <th className="p-2 font-medium">Round</th>
                     <th className="p-2 font-medium">Reminder</th>
                     <th className="p-2 font-medium">Starting now</th>
+                    <th className="p-2 font-medium">Next session</th>
                     <th className="p-2 font-medium">Date</th>
                   </tr>
                 </thead>
@@ -408,6 +508,13 @@ export function SixTrapsSignups() {
                       <td className="p-2 whitespace-nowrap">
                         {r.join_now_sent_at ? (
                           <Badge>Sent · {roundLabel(r.join_now_round_id)}</Badge>
+                        ) : (
+                          <span className="text-muted-foreground">Not sent</span>
+                        )}
+                      </td>
+                      <td className="p-2 whitespace-nowrap">
+                        {r.next_session_sent_at ? (
+                          <Badge>Sent · {roundLabel(r.next_session_round_id)}</Badge>
                         ) : (
                           <span className="text-muted-foreground">Not sent</span>
                         )}
