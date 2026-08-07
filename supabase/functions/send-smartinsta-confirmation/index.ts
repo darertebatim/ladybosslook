@@ -15,8 +15,7 @@ const corsHeaders = {
 };
 
 const PROGRAM_SLUG = "smartinstagramframework";
-const GIFT_PDF_URL =
-  "https://ladybosslook.com/__l5e/assets-v1/62f2be11-799c-4f61-bcc3-f5caa7c53523/Instagram_Introduction_Content_Workbook.pdf";
+const PRE_VIDEO_URL = "https://ladybosslook.com/thankyousmartinstaframework";
 
 const CITY_ZONES: { label: string; tz: string }[] = [
   { label: "Los Angeles / Vancouver", tz: "America/Los_Angeles" },
@@ -171,8 +170,8 @@ serve(async (req) => {
             title,
             startUtc,
             durationMinutes,
-            `ورک‌بوک هدیه: ${GIFT_PDF_URL}\n${meetUrl ? `لینک ورود: ${meetUrl}\n` : ""}پشتیبانی: ${supportUrl}`,
-            meetUrl || GIFT_PDF_URL,
+            `ویدیو پیش‌نیاز: ${PRE_VIDEO_URL}\n${meetUrl ? `لینک ورود: ${meetUrl}\n` : ""}پشتیبانی: ${supportUrl}`,
+            meetUrl || PRE_VIDEO_URL,
           )
         : "";
 
@@ -222,13 +221,13 @@ serve(async (req) => {
       }
 
       <div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:16px;margin:16px 0;">
-        <p style="margin:0 0 8px;font-size:15px;line-height:1.9;font-weight:bold;">🎁 هدیه شما: ورک‌بوک محتوای اینستاگرام</p>
+        <p style="margin:0 0 8px;font-size:15px;line-height:1.9;font-weight:bold;">🎬 ویدیو پیش‌نیاز وبینار</p>
         <p style="margin:0 0 12px;font-size:14px;line-height:1.9;">
-          این ورک‌بوک رو دانلود کنید و قبل از وبینار یک نگاه بهش بندازید.
+          قبل از وبینار حتماً این ویدیو کوتاه رو ببینید.
         </p>
         <p style="text-align:center;margin:0;">
-          <a href="${GIFT_PDF_URL}" style="display:inline-block;background:#7c3aed;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
-            دانلود ورک‌بوک هدیه (PDF)
+          <a href="${PRE_VIDEO_URL}" style="display:inline-block;background:#7c3aed;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
+            تماشای ویدیو پیش‌نیاز
           </a>
         </p>
       </div>

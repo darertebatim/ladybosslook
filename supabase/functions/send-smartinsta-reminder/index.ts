@@ -16,8 +16,7 @@ const corsHeaders = {
 
 const PROGRAM_SLUG = "smartinstagramframework";
 const SOURCES = ["smartinsta_registration"];
-const GIFT_PDF_URL =
-  "https://ladybosslook.com/__l5e/assets-v1/62f2be11-799c-4f61-bcc3-f5caa7c53523/Instagram_Introduction_Content_Workbook.pdf";
+const PRE_VIDEO_URL = "https://ladybosslook.com/thankyousmartinstaframework";
 
 function pad(n: number) {
   return String(n).padStart(2, "0");
@@ -101,11 +100,11 @@ function buildHtml(
       </h1>
 
       <p style="margin:0 0 10px;font-size:15px;line-height:1.9;">
-        ورک‌بوک هدیه‌ی محتوای اینستاگرام رو دانلود کردین؟
+        ویدیو پیش‌نیاز وبینار رو دیدین؟
       </p>
       <p style="text-align:center;margin:16px 0;">
-        <a href="${GIFT_PDF_URL}" style="display:inline-block;background:#7c3aed;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
-          دانلود ورک‌بوک هدیه (PDF)
+        <a href="${PRE_VIDEO_URL}" style="display:inline-block;background:#7c3aed;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
+          تماشای ویدیو پیش‌نیاز
         </a>
       </p>
 
@@ -283,8 +282,8 @@ serve(async (req) => {
           title,
           startUtc,
           durationMinutes,
-          `ورک‌بوک هدیه: ${GIFT_PDF_URL}\n${meetUrl ? `لینک ورود: ${meetUrl}\n` : ""}پشتیبانی: ${supportUrl}`,
-          meetUrl || GIFT_PDF_URL,
+          `ویدیو پیش‌نیاز: ${PRE_VIDEO_URL}\n${meetUrl ? `لینک ورود: ${meetUrl}\n` : ""}پشتیبانی: ${supportUrl}`,
+          meetUrl || PRE_VIDEO_URL,
         )
       : "";
 
@@ -333,7 +332,7 @@ serve(async (req) => {
         to: [r.email],
         subject: joinNow
           ? "وبینار در حال شروع است — همین حالا وارد شوید 🚀"
-          : "یادآوری: وبینار فریم‌ورک اینستاگرام هوشمند + ورک‌بوک هدیه 🎁",
+          : "یادآوری: وبینار فریم‌ورک اینستاگرام هوشمند + ویدیو پیش‌نیاز 🎬",
         html,
       });
 
