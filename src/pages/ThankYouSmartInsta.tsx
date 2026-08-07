@@ -138,23 +138,6 @@ export default function ThankYouSmartInsta() {
             />
           </div>
 
-          {/* Gift PDF */}
-          <section className="mt-6 rounded-2xl border border-violet-200 bg-white p-5 shadow-sm text-center">
-            <p className="text-base font-bold text-neutral-900">🎁 هدیه شما</p>
-            <p className="mt-1 text-sm leading-6 text-neutral-700">
-              ورک‌بوک «پروفایل اینستاگرام قابل اعتماد» را همین حالا دانلود کنید.
-            </p>
-            <a
-              href={workbookAsset.url}
-              download="Build_a_Trustworthy_Instagram_Profile_Workbook.pdf"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-4 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-l from-violet-600 to-fuchsia-500 px-4 text-base font-bold text-white shadow-md transition active:scale-[0.98]"
-            >
-              <Download className="h-5 w-5" />
-              دانلود ورک‌بوک هدیه (PDF)
-            </a>
-          </section>
 
           {/* Webinar details */}
           {webinar && (
@@ -211,6 +194,24 @@ export default function ThankYouSmartInsta() {
               </p>
             </section>
           )}
+
+          {/* Gift PDF */}
+          <section className="mt-6 rounded-2xl border border-violet-200 bg-white p-5 shadow-sm text-center">
+            <p className="text-base font-bold text-neutral-900">🎁 هدیه شما</p>
+            <p className="mt-1 text-sm leading-6 text-neutral-700">
+              ورک‌بوک «پروفایل اینستاگرام قابل اعتماد» را همین حالا دانلود کنید.
+            </p>
+            <a
+              href={workbookAsset.url}
+              download="Build_a_Trustworthy_Instagram_Profile_Workbook.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-l from-violet-600 to-fuchsia-500 px-4 text-base font-bold text-white shadow-md transition active:scale-[0.98]"
+            >
+              <Download className="h-5 w-5" />
+              دانلود ورک‌بوک هدیه (PDF)
+            </a>
+          </section>
         </main>
       </div>
     </>
