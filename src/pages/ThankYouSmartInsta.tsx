@@ -14,6 +14,7 @@ import {
 } from "@/lib/sixtrapsCalendar";
 
 const PROGRAM_SLUG = "smartinstagramframework";
+const YOUTUBE_ID = "nccqY4M6GZ4";
 
 export default function ThankYouSmartInsta() {
   const location = useLocation();
@@ -113,8 +114,20 @@ export default function ThankYouSmartInsta() {
               این وبینار مخصوص صاحبان کسب‌وکار در آمریکا و کانادا است
             </p>
             <p className="mt-2 text-sm leading-6 text-neutral-700">
-              لینک ورود به وبینار و جزئیات کامل به ایمیل شما ارسال شد.
+              لینک ورود به وبینار و جزئیات کامل به ایمیل شما ارسال شد. تا وبینار،
+              این ویدیوی کوتاه از علی لطفی را ببینید.
             </p>
+          </div>
+
+          {/* YouTube embed */}
+          <div className="mt-6 aspect-video overflow-hidden rounded-2xl shadow-md">
+            <iframe
+              className="h-full w-full"
+              src={`https://www.youtube.com/embed/${YOUTUBE_ID}`}
+              title="پیام علی لطفی"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
           </div>
 
           {/* Gift PDF */}
