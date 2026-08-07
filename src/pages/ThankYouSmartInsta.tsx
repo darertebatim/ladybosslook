@@ -142,7 +142,7 @@ export default function ThankYouSmartInsta() {
           <section className="mt-6 rounded-2xl border border-violet-200 bg-white p-5 shadow-sm text-center">
             <p className="text-base font-bold text-neutral-900">🎁 هدیه شما</p>
             <p className="mt-1 text-sm leading-6 text-neutral-700">
-              ورک‌بوک محتوای اینستاگرام را همین حالا دانلود کنید.
+              ورک‌بوک «پروفایل اینستاگرام قابل اعتماد» را همین حالا دانلود کنید.
             </p>
             <a
               href={workbookAsset.url}
