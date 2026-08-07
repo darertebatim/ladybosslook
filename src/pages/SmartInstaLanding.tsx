@@ -11,16 +11,12 @@ import { trackLead } from "@/lib/metaPixel";
 const PROGRAM_SLUG = "smartinstagramframework";
 
 const schema = z.object({
-  name: z.string().trim().min(2, "نام را کامل وارد کنید").max(100),
-  city: z.string().trim().min(2, "شهر را وارد کنید").max(100),
   email: z.string().trim().email("ایمیل معتبر نیست").max(255),
 });
 
 export default function SmartInstaLanding() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [name, setName] = useState("");
-  const [city, setCity] = useState("");
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -83,7 +79,7 @@ export default function SmartInstaLanding() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (submitting) return;
-    const parsed = schema.safeParse({ name, city, email });
+    const parsed = schema.safeParse({ email });
     if (!parsed.success) {
       const errs: Record<string, string> = {};
       parsed.error.errors.forEach((er) => {
@@ -96,9 +92,9 @@ export default function SmartInstaLanding() {
     setSubmitting(true);
     try {
       const { error } = await (supabase as any).from("form_submissions").insert({
-        name: parsed.data.name,
+        name: "",
         email: parsed.data.email.toLowerCase(),
-        city: parsed.data.city,
+        city: "",
         phone: "",
         source: "smartinsta_registration",
       });
@@ -112,7 +108,7 @@ export default function SmartInstaLanding() {
       supabase.functions
         .invoke("send-smartinsta-confirmation", {
           body: {
-            name: parsed.data.name,
+            name: "",
             email: parsed.data.email.toLowerCase(),
           },
         })
@@ -193,34 +189,6 @@ export default function SmartInstaLanding() {
             <h2 className="text-center text-lg font-semibold text-neutral-900">
               Free Registration
             </h2>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-neutral-800">Full Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                maxLength={100}
-                className="min-h-[48px] w-full rounded-xl border border-neutral-300 bg-white px-4 text-base text-neutral-900 outline-none focus:border-violet-500"
-                placeholder="e.g. Sara Ahmadi"
-                dir="ltr"
-              />
-              {errors.name && <p className="mt-1 text-xs text-rose-600">{errors.name}</p>}
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-neutral-800">City</label>
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                maxLength={100}
-                className="min-h-[48px] w-full rounded-xl border border-neutral-300 bg-white px-4 text-base text-neutral-900 outline-none focus:border-violet-500"
-                placeholder="e.g. Los Angeles"
-                dir="ltr"
-              />
-              {errors.city && <p className="mt-1 text-xs text-rose-600">{errors.city}</p>}
-            </div>
 
             <div>
               <label className="mb-1 block text-sm font-medium text-neutral-800">Email</label>
