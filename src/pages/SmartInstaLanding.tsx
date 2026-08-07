@@ -11,8 +11,6 @@ import { trackLead } from "@/lib/metaPixel";
 const PROGRAM_SLUG = "smartinstagramframework";
 
 const schema = z.object({
-  name: z.string().trim().min(2, "نام را کامل وارد کنید").max(100),
-  city: z.string().trim().min(2, "شهر را وارد کنید").max(100),
   email: z.string().trim().email("ایمیل معتبر نیست").max(255),
 });
 
