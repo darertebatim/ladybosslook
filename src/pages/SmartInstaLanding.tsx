@@ -190,8 +190,10 @@ export default function SmartInstaLanding() {
               Free Registration
             </h2>
 
-            <div>
-              <label className="mb-1 block text-sm font-medium text-neutral-800">Email</label>
+            <div className="flex items-center gap-3">
+              <label className="shrink-0 text-sm font-medium text-neutral-800">
+                Email
+              </label>
               <input
                 type="email"
                 value={email}
@@ -201,8 +203,8 @@ export default function SmartInstaLanding() {
                 placeholder="you@example.com"
                 dir="ltr"
               />
-              {errors.email && <p className="mt-1 text-xs text-rose-600">{errors.email}</p>}
             </div>
+            {errors.email && <p className="-mt-2 text-xs text-rose-600">{errors.email}</p>}
 
             <button
               type="submit"
