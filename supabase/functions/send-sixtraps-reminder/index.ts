@@ -212,8 +212,13 @@ function buildNextSessionHtml(
   <body style="margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
     <div style="max-width:560px;margin:0 auto;padding:24px 20px;">
       <h1 style="margin:0 0 14px;font-size:20px;line-height:1.6;">
-        سلام ${name} 🌷 اگر وبینار زنده رو از دست دادین…
+        سلام ${name} 🌷
       </h1>
+
+      <p style="margin:0 0 12px;font-size:15px;line-height:1.9;">
+        وبینار با حضور بیش از ۲۰۰ نفر از ایرانیان، با بالاترین رضایت برگزار شد.
+        اما اگر جلسه زنده را از دست دادید، آخرین فرصت برای تبدیل اینستاگرامتان به یک منبع درآمد باقی مانده است…
+      </p>
 
       <p style="margin:0 0 12px;font-size:15px;line-height:1.9;">
         خبر خوب: هفته آینده یک جلسه دیگه از وبینار «۶ تله اینستاگرام» برگزار می‌شه.
