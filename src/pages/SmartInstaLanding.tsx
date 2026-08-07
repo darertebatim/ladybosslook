@@ -17,8 +17,6 @@ const schema = z.object({
 export default function SmartInstaLanding() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [name, setName] = useState("");
-  const [city, setCity] = useState("");
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -81,7 +79,7 @@ export default function SmartInstaLanding() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (submitting) return;
-    const parsed = schema.safeParse({ name, city, email });
+    const parsed = schema.safeParse({ email });
     if (!parsed.success) {
       const errs: Record<string, string> = {};
       parsed.error.errors.forEach((er) => {
@@ -94,9 +92,9 @@ export default function SmartInstaLanding() {
     setSubmitting(true);
     try {
       const { error } = await (supabase as any).from("form_submissions").insert({
-        name: parsed.data.name,
+        name: "",
         email: parsed.data.email.toLowerCase(),
-        city: parsed.data.city,
+        city: "",
         phone: "",
         source: "smartinsta_registration",
       });
@@ -110,7 +108,7 @@ export default function SmartInstaLanding() {
       supabase.functions
         .invoke("send-smartinsta-confirmation", {
           body: {
-            name: parsed.data.name,
+            name: "",
             email: parsed.data.email.toLowerCase(),
           },
         })
