@@ -4,7 +4,7 @@ import { Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SEOHead } from "@/components/SEOHead";
 import { trackCompleteRegistration } from "@/lib/metaPixel";
-import workbookAsset from "@/assets/instagram-content-workbook.pdf.asset.json";
+import workbookAsset from "@/assets/build-trustworthy-instagram-profile-workbook.pdf.asset.json";
 import {
   buildGoogleCalendarUrl,
   downloadIcs,
@@ -142,11 +142,11 @@ export default function ThankYouSmartInsta() {
           <section className="mt-6 rounded-2xl border border-violet-200 bg-white p-5 shadow-sm text-center">
             <p className="text-base font-bold text-neutral-900">🎁 هدیه شما</p>
             <p className="mt-1 text-sm leading-6 text-neutral-700">
-              ورک‌بوک محتوای اینستاگرام را همین حالا دانلود کنید.
+              ورک‌بوک «پروفایل اینستاگرام قابل اعتماد» را همین حالا دانلود کنید.
             </p>
             <a
               href={workbookAsset.url}
-              download="Instagram_Introduction_Content_Workbook.pdf"
+              download="Build_a_Trustworthy_Instagram_Profile_Workbook.pdf"
               target="_blank"
               rel="noreferrer"
               className="mt-4 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-l from-violet-600 to-fuchsia-500 px-4 text-base font-bold text-white shadow-md transition active:scale-[0.98]"
