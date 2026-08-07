@@ -190,33 +190,6 @@ export default function SmartInstaLanding() {
               Free Registration
             </h2>
 
-            <div>
-              <label className="mb-1 block text-sm font-medium text-neutral-800">Full Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                maxLength={100}
-                className="min-h-[48px] w-full rounded-xl border border-neutral-300 bg-white px-4 text-base text-neutral-900 outline-none focus:border-violet-500"
-                placeholder="e.g. Sara Ahmadi"
-                dir="ltr"
-              />
-              {errors.name && <p className="mt-1 text-xs text-rose-600">{errors.name}</p>}
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-neutral-800">City</label>
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                maxLength={100}
-                className="min-h-[48px] w-full rounded-xl border border-neutral-300 bg-white px-4 text-base text-neutral-900 outline-none focus:border-violet-500"
-                placeholder="e.g. Los Angeles"
-                dir="ltr"
-              />
-              {errors.city && <p className="mt-1 text-xs text-rose-600">{errors.city}</p>}
-            </div>
 
             <div>
               <label className="mb-1 block text-sm font-medium text-neutral-800">Email</label>
