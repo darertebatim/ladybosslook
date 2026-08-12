@@ -189,6 +189,67 @@ function buildJoinNowHtml(
 </html>`;
 }
 
+const SIGNUP_URL = "https://ladybosslook.com/smartinstaframework";
+
+function buildNextSessionHtml(
+  name: string,
+  startUtc: Date | null,
+  supportUrl: string,
+): string {
+  const rows = startUtc
+    ? CITY_ZONES.map(
+        (z) => `
+        <tr>
+          <td style="padding:6px 10px;font-size:13px;border-bottom:1px solid #fde68a;">${z.label}</td>
+          <td style="padding:6px 10px;font-size:13px;border-bottom:1px solid #fde68a;" dir="ltr"><strong>${fmtZone(startUtc, z.tz)}</strong></td>
+        </tr>`,
+      ).join("")
+    : "";
+
+  return `
+<!doctype html>
+<html dir="rtl" lang="fa">
+  <body style="margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
+    <div style="max-width:560px;margin:0 auto;padding:24px 20px;">
+      <h1 style="margin:0 0 14px;font-size:20px;line-height:1.6;">
+        سلام ${name} 🌷
+      </h1>
+
+      <p style="margin:0 0 12px;font-size:15px;line-height:1.9;">
+        وبینار «فریم‌ورک اینستاگرام هوشمند» با حضور جمع زیادی از ایرانیان و با بالاترین رضایت برگزار شد.
+        اما اگر جلسه زنده را از دست دادید، آخرین فرصت برای تبدیل اینستاگرامتان به یک منبع درآمد باقی مانده است…
+      </p>
+
+      <p style="margin:0 0 12px;font-size:15px;line-height:1.9;">
+        خبر خوب: یک جلسه دیگر از این وبینار برگزار می‌شود.
+        کافیست روی دکمه زیر بزنید و برای جلسه جدید ثبت‌نام کنید.
+      </p>
+
+      <p style="text-align:center;margin:22px 0;">
+        <a href="${SIGNUP_URL}" style="display:inline-block;background:#7c3aed;color:#fff;text-decoration:none;padding:16px 32px;border-radius:12px;font-size:17px;font-weight:bold;">
+          ثبت‌نام در جلسه جدید
+        </a>
+      </p>
+
+      ${
+        rows
+          ? `<div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:12px;margin:20px 0;">
+               <p style="margin:0 0 8px;font-size:14px;font-weight:bold;">⏰ ساعت جلسه جدید در شهرهای مختلف</p>
+               <table style="width:100%;border-collapse:collapse;">${rows}</table>
+             </div>`
+          : ""
+      }
+
+      <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
+        سوالی داشتی؟ واتس‌اپ پشتیبانی:
+        <a href="${supportUrl}" style="color:#059669;">${supportUrl}</a>
+        <br><br>علی لطفی
+      </p>
+    </div>
+  </body>
+</html>`;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -231,6 +292,12 @@ serve(async (req) => {
     const requestedRoundId = String(body?.roundId || "").trim();
     const onlyUnsent = body?.onlyUnsent !== false;
     const joinNow = body?.joinNow === true;
+    const nextSession = body?.nextSession === true;
+    // For the "next session" email, roundId selects the AUDIENCE (people who
+    // signed up for that past round); the content uses the upcoming round.
+    const audienceRoundId = nextSession
+      ? String(body?.audienceRoundId || "").trim()
+      : "";
 
     // Round resolution: explicit -> auto-enrollment round -> earliest active
     const roundCols =
@@ -244,6 +311,19 @@ serve(async (req) => {
         .eq("program_slug", PROGRAM_SLUG)
         .maybeSingle();
       roundId = autoRule?.round_id || "";
+    }
+
+    // Next-session email: always resolve the next upcoming round for content
+    if (nextSession) {
+      const { data: upcoming } = await supabase
+        .from("program_rounds")
+        .select(roundCols)
+        .eq("program_slug", PROGRAM_SLUG)
+        .gt("first_session_date", new Date().toISOString())
+        .order("first_session_date", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (upcoming?.id) roundId = upcoming.id;
     }
 
     const { data: round } = roundId
@@ -303,11 +383,16 @@ serve(async (req) => {
         .select("email, name")
         .in("source", SOURCES)
         .limit(5000);
-      if (targetRoundId) query = query.eq("round_id", targetRoundId);
-      if (onlyUnsent) {
-        query = joinNow
-          ? query.is("join_now_sent_at", null)
-          : query.is("reminder_sent_at", null);
+      if (nextSession) {
+        if (audienceRoundId) query = query.eq("round_id", audienceRoundId);
+        if (onlyUnsent) query = query.is("next_session_sent_at", null);
+      } else {
+        if (targetRoundId) query = query.eq("round_id", targetRoundId);
+        if (onlyUnsent) {
+          query = joinNow
+            ? query.is("join_now_sent_at", null)
+            : query.is("reminder_sent_at", null);
+        }
       }
       const { data: rows, error } = await query;
       if (error) throw error;
@@ -324,15 +409,19 @@ serve(async (req) => {
     let failed = 0;
 
     for (const r of recipients) {
-      const html = joinNow
-        ? buildJoinNowHtml(r.name, meetUrl, supportUrl)
-        : buildHtml(r.name, startUtc, meetUrl, gcalUrl, supportUrl);
+      const html = nextSession
+        ? buildNextSessionHtml(r.name, startUtc, supportUrl)
+        : joinNow
+          ? buildJoinNowHtml(r.name, meetUrl, supportUrl)
+          : buildHtml(r.name, startUtc, meetUrl, gcalUrl, supportUrl);
       const { data: sendData, error } = await resend.emails.send({
         from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>",
         to: [r.email],
-        subject: joinNow
-          ? "وبینار در حال شروع است — همین حالا وارد شوید 🚀"
-          : "یادآوری: وبینار فریم‌ورک اینستاگرام هوشمند + ویدیو پیش‌نیاز 🎬",
+        subject: nextSession
+          ? "جلسه را از دست دادید؟ آخرین فرصت — ثبت‌نام در جلسه جدید 🎯"
+          : joinNow
+            ? "وبینار در حال شروع است — همین حالا وارد شوید 🚀"
+            : "یادآوری: وبینار فریم‌ورک اینستاگرام هوشمند + ویدیو پیش‌نیاز 🎬",
         html,
       });
 
@@ -351,7 +440,16 @@ serve(async (req) => {
           resend_id: (sendData as any)?.id ?? null,
           status: "success",
         });
-        if (!testEmail && joinNow) {
+        if (!testEmail && nextSession) {
+          await supabase
+            .from("form_submissions")
+            .update({
+              next_session_sent_at: new Date().toISOString(),
+              next_session_round_id: targetRoundId,
+            })
+            .eq("email", r.email)
+            .in("source", SOURCES);
+        } else if (!testEmail && joinNow) {
           await supabase
             .from("form_submissions")
             .update({
