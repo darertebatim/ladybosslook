@@ -235,6 +235,7 @@ const ThankYouSixTraps = lazy(() => import("@/pages/ThankYouSixTraps"));
 const PreSixTraps = lazy(() => import("@/pages/PreSixTraps"));
 const SmartInstaLanding = lazy(() => import("@/pages/SmartInstaLanding"));
 const ThankYouSmartInsta = lazy(() => import("@/pages/ThankYouSmartInsta"));
+const GiftsAliLotfiVip = lazy(() => import("@/pages/GiftsAliLotfiVip"));
 const Video = lazy(() => import("@/pages/Video"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const SendTestEmail = lazy(() => import("@/pages/SendTestEmail"));
@@ -567,6 +568,7 @@ const App = () => (
                   {!isNativeApp() && <Route path="/presixtraps" element={<PreSixTraps />} />}
                   {!isNativeApp() && <Route path="/smartinstaframework" element={<SmartInstaLanding />} />}
                   {!isNativeApp() && <Route path="/thankyousmartinstaframework" element={<ThankYouSmartInsta />} />}
+                  {!isNativeApp() && <Route path="/giftsalilotfivip" element={<GiftsAliLotfiVip />} />}
                   {!isNativeApp() && <Route path="/iqmoney" element={<IQMoneyWorkshop />} />}
                   <Route path="/rathus" element={<RathusAssessment />} />
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
