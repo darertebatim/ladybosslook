@@ -568,6 +568,7 @@ const App = () => (
                   {!isNativeApp() && <Route path="/presixtraps" element={<PreSixTraps />} />}
                   {!isNativeApp() && <Route path="/smartinstaframework" element={<SmartInstaLanding />} />}
                   {!isNativeApp() && <Route path="/thankyousmartinstaframework" element={<ThankYouSmartInsta />} />}
+                  {!isNativeApp() && <Route path="/giftsalilotfivip" element={<GiftsAliLotfiVip />} />}
                   {!isNativeApp() && <Route path="/iqmoney" element={<IQMoneyWorkshop />} />}
                   <Route path="/rathus" element={<RathusAssessment />} />
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
