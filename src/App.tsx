@@ -235,6 +235,7 @@ const ThankYouSixTraps = lazy(() => import("@/pages/ThankYouSixTraps"));
 const PreSixTraps = lazy(() => import("@/pages/PreSixTraps"));
 const SmartInstaLanding = lazy(() => import("@/pages/SmartInstaLanding"));
 const ThankYouSmartInsta = lazy(() => import("@/pages/ThankYouSmartInsta"));
+const GiftsAliLotfiVip = lazy(() => import("@/pages/GiftsAliLotfiVip"));
 const Video = lazy(() => import("@/pages/Video"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const SendTestEmail = lazy(() => import("@/pages/SendTestEmail"));
