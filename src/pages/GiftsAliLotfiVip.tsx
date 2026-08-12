@@ -70,7 +70,7 @@ export default function GiftsAliLotfiVip() {
       />
       <main
         dir="rtl"
-        className="min-h-screen bg-gradient-to-b from-orange-50 to-white dark:from-neutral-950 dark:to-neutral-900"
+        className="min-h-screen bg-gradient-to-b from-orange-50 to-white font-farsi dark:from-neutral-950 dark:to-neutral-900"
       >
         {/* Header */}
         <div className="relative overflow-hidden bg-gradient-to-br from-orange-500 to-orange-600 px-5 pt-12 pb-10 text-white">
