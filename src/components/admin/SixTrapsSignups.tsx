@@ -110,23 +110,33 @@ export function SixTrapsSignups() {
     return `${r.round_name || 'Round'}${d ? ` · ${d}` : ''}`;
   };
 
-  const targetCount = rows.filter(
-    (r) =>
-      (!effectiveRoundId || r.round_id === effectiveRoundId) &&
-      (!onlyUnsent || !r.reminder_sent_at),
-  ).length;
+  // Emails are deduplicated when sending, so counts reflect unique emails
+  const uniqueEmails = (list: Row[]) =>
+    new Set(list.map((r) => String(r.email || '').trim().toLowerCase()).filter(Boolean)).size;
 
-  const joinNowTargetCount = rows.filter(
-    (r) =>
-      (!effectiveRoundId || r.round_id === effectiveRoundId) &&
-      (!onlyUnsentJoinNow || !r.join_now_sent_at),
-  ).length;
+  const targetCount = uniqueEmails(
+    rows.filter(
+      (r) =>
+        (!effectiveRoundId || r.round_id === effectiveRoundId) &&
+        (!onlyUnsent || !r.reminder_sent_at),
+    ),
+  );
 
-  const nextSessionTargetCount = rows.filter(
-    (r) =>
-      (nextAudienceRound === 'all' || r.round_id === nextAudienceRound) &&
-      (!onlyUnsentNext || !r.next_session_sent_at),
-  ).length;
+  const joinNowTargetCount = uniqueEmails(
+    rows.filter(
+      (r) =>
+        (!effectiveRoundId || r.round_id === effectiveRoundId) &&
+        (!onlyUnsentJoinNow || !r.join_now_sent_at),
+    ),
+  );
+
+  const nextSessionTargetCount = uniqueEmails(
+    rows.filter(
+      (r) =>
+        (nextAudienceRound === 'all' || r.round_id === nextAudienceRound) &&
+        (!onlyUnsentNext || !r.next_session_sent_at),
+    ),
+  );
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -139,8 +149,9 @@ export function SixTrapsSignups() {
     );
   }, [rows, search]);
 
-  const registrations = rows.filter((r) => r.source === 'sixtraps_registration').length;
-  const preInterest = rows.filter((r) => r.source === 'presixtraps_interest').length;
+  const totalUnique = uniqueEmails(rows);
+  const registrations = uniqueEmails(rows.filter((r) => r.source === 'sixtraps_registration'));
+  const preInterest = uniqueEmails(rows.filter((r) => r.source === 'presixtraps_interest'));
 
   function exportCsv() {
     const header = 'email,name,city,source,round,reminder_sent_at,join_now_sent_at,submitted_at';
@@ -252,9 +263,14 @@ export function SixTrapsSignups() {
       <div className="grid grid-cols-3 gap-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Total signups</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">Unique emails</CardTitle>
           </CardHeader>
-          <CardContent className="text-2xl font-bold">{rows.length}</CardContent>
+          <CardContent className="text-2xl font-bold">
+            {totalUnique}
+            <span className="ml-2 text-xs font-normal text-muted-foreground">
+              {rows.length} submissions
+            </span>
+          </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
