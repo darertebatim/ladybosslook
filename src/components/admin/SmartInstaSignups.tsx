@@ -261,13 +261,13 @@ export function SmartInstaSignups() {
       <div className="grid grid-cols-2 gap-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Total signups</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">Total submissions</CardTitle>
           </CardHeader>
           <CardContent className="text-2xl font-bold">{rows.length}</CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Full registration</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">Unique emails</CardTitle>
           </CardHeader>
           <CardContent className="text-2xl font-bold">{registrations}</CardContent>
         </Card>
