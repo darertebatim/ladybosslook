@@ -110,23 +110,33 @@ export function SmartInstaSignups() {
     return `${r.round_name || 'Round'}${d ? ` · ${d}` : ''}`;
   };
 
-  const targetCount = rows.filter(
-    (r) =>
-      (!effectiveRoundId || r.round_id === effectiveRoundId) &&
-      (!onlyUnsent || !r.reminder_sent_at),
-  ).length;
+  // Emails are deduplicated when sending, so counts reflect unique emails
+  const uniqueEmails = (list: Row[]) =>
+    new Set(list.map((r) => String(r.email || '').trim().toLowerCase()).filter(Boolean)).size;
 
-  const joinNowTargetCount = rows.filter(
-    (r) =>
-      (!effectiveRoundId || r.round_id === effectiveRoundId) &&
-      (!onlyUnsentJoinNow || !r.join_now_sent_at),
-  ).length;
+  const targetCount = uniqueEmails(
+    rows.filter(
+      (r) =>
+        (!effectiveRoundId || r.round_id === effectiveRoundId) &&
+        (!onlyUnsent || !r.reminder_sent_at),
+    ),
+  );
 
-  const nextSessionTargetCount = rows.filter(
-    (r) =>
-      (nextAudienceRound === 'all' || r.round_id === nextAudienceRound) &&
-      (!onlyUnsentNext || !r.next_session_sent_at),
-  ).length;
+  const joinNowTargetCount = uniqueEmails(
+    rows.filter(
+      (r) =>
+        (!effectiveRoundId || r.round_id === effectiveRoundId) &&
+        (!onlyUnsentJoinNow || !r.join_now_sent_at),
+    ),
+  );
+
+  const nextSessionTargetCount = uniqueEmails(
+    rows.filter(
+      (r) =>
+        (nextAudienceRound === 'all' || r.round_id === nextAudienceRound) &&
+        (!onlyUnsentNext || !r.next_session_sent_at),
+    ),
+  );
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -139,7 +149,7 @@ export function SmartInstaSignups() {
     );
   }, [rows, search]);
 
-  const registrations = rows.length;
+  const registrations = uniqueEmails(rows);
 
   function exportCsv() {
     const header = 'email,name,city,source,round,reminder_sent_at,join_now_sent_at,submitted_at';
@@ -251,13 +261,13 @@ export function SmartInstaSignups() {
       <div className="grid grid-cols-2 gap-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Total signups</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">Total submissions</CardTitle>
           </CardHeader>
           <CardContent className="text-2xl font-bold">{rows.length}</CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Full registration</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">Unique emails</CardTitle>
           </CardHeader>
           <CardContent className="text-2xl font-bold">{registrations}</CardContent>
         </Card>
