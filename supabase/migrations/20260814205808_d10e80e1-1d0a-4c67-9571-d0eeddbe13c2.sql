@@ -1,0 +1,2 @@
+ALTER TABLE public.content_tags DROP CONSTRAINT content_tags_content_type_check;
+ALTER TABLE public.content_tags ADD CONSTRAINT content_tags_content_type_check CHECK (content_type = ANY (ARRAY['audio'::text, 'playlist'::text, 'reflection'::text, 'breathing'::text, 'program'::text]));
