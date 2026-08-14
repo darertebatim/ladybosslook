@@ -41,6 +41,7 @@ interface ContentRow {
 
 const TYPE_TABS: { value: ContentType; label: string }[] = [
   { value: "playlist", label: "Playlists" },
+  { value: "program", label: "Programs" },
   { value: "reflection", label: "Reflections" },
   { value: "breathing", label: "Breathes" },
 ];
@@ -390,6 +391,20 @@ function useContentList(contentType: ContentType) {
         if (error) throw error;
         return (data || []).map((r: any) => ({ id: r.id, title: r.title, subtitle: r.subtitle }));
       }
+      if (contentType === "program") {
+        const { data, error } = await supabase
+          .from("program_catalog")
+          .select("id, title, description, is_active")
+          .order("title", { ascending: true })
+          .limit(1000);
+        if (error) throw error;
+        return (data || []).map((r: any) => ({
+          id: r.id,
+          title: r.title,
+          subtitle: r.description,
+          groupName: r.is_active ? "Active" : "Inactive",
+        }));
+      }
       // breathing
       const { data, error } = await supabase
         .from("breathing_exercises")
@@ -715,6 +730,7 @@ const TYPE_BADGE: Record<ContentType, { label: string; cls: string }> = {
   audio: { label: "Audio", cls: "bg-purple-500/15 text-purple-700 dark:text-purple-300" },
   reflection: { label: "Reflection", cls: "bg-pink-500/15 text-pink-700 dark:text-pink-300" },
   breathing: { label: "Breathe", cls: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" },
+  program: { label: "Program", cls: "bg-orange-500/15 text-orange-700 dark:text-orange-300" },
 };
 
 function PendingReview() {
