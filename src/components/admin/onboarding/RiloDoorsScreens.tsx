@@ -704,6 +704,8 @@ const BUSINESS_TAGS = [
   { key: 'getting_started', emoji: '🚀', label: 'Getting started' },
   { key: 'find_clients', emoji: '🎯', label: 'Finding clients' },
   { key: 'content_marketing', emoji: '📱', label: 'Content & marketing' },
+  { key: 'instagram', emoji: '📸', label: 'Instagram' },
+  { key: 'advertising', emoji: '📢', label: 'Advertising' },
   { key: 'pricing_sales', emoji: '🏷️', label: 'Pricing & sales' },
   { key: 'systems_time', emoji: '⏳', label: 'Systems & time' },
   { key: 'founder_burnout', emoji: '🔥', label: 'Founder burnout' },
