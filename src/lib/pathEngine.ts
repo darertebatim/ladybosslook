@@ -185,6 +185,8 @@ export interface PathInputs {
     secondary: DoorKey | null;
     emotionKeys: string[]; // raw picker keys (e.g. "lonely", "anxious")
     immigrantKeys: string[];
+    financialKeys?: string[];
+    businessKeys?: string[];
   } | null;
   /** 0-based days since signup, capped at 3 (Day 1 = 0). */
   daysSinceSignup?: number;
@@ -192,7 +194,7 @@ export interface PathInputs {
   plannerOnboardingDone?: boolean;
 }
 
-export type DoorKey = "emotion" | "selfcare" | "immigrant" | "productivity" | "exploring";
+export type DoorKey = "emotion" | "selfcare" | "immigrant" | "productivity" | "financial" | "business" | "exploring";
 
 const TINT_BY_COLOR: Record<string, PathStep["tint"]> = {
   yellow: "yellow",
@@ -291,6 +293,8 @@ function signatureStepForDoor(door: DoorKey, inputs: PathInputs): PathStep | nul
         : plannerIntroStep();
     case "immigrant":
     case "emotion":
+    case "financial":
+    case "business":
     case "exploring":
       // These doors rely on the door-flavored featuredAudio computed upstream.
       return inputs.featuredAudio
@@ -298,6 +302,8 @@ function signatureStepForDoor(door: DoorKey, inputs: PathInputs): PathStep | nul
             kicker:
               door === "immigrant" ? "Bilingual Strength" :
               door === "emotion" ? "For your emotions" :
+              door === "financial" ? "Money calm" :
+              door === "business" ? "Business focus" :
               "Today's pick",
             tint: door === "emotion" ? "pink" : door === "immigrant" ? "lavender" : "sky",
           })
@@ -324,6 +330,8 @@ function deeperStepForDoor(
       return inputs.plannerOnboardingDone ? browseRoutinesStep() : plannerIntroStep();
     case "immigrant":
     case "emotion":
+    case "financial":
+    case "business":
     case "exploring": {
       // Prefer secondaryAudio (fresh content); fall back to featuredAudio.
       const a = inputs.secondaryAudio ?? inputs.featuredAudio;
@@ -334,6 +342,8 @@ function deeperStepForDoor(
           kicker: opts?.kicker ?? (
             door === "immigrant" ? "More Bilingual Strength" :
             door === "emotion" ? "More for your emotions" :
+            door === "financial" ? "More money calm" :
+            door === "business" ? "More business focus" :
             "More from your door"
           ),
           tint: opts?.tint ?? (door === "emotion" ? "pink" : door === "immigrant" ? "lavender" : "mint"),

@@ -15,7 +15,7 @@ export const LANG_LABEL_TO_ISO: Record<string, string> = {
 
 /* ─── Door catalog ─────────────────────────────────────────────── */
 
-type DoorKey = 'emotion' | 'selfcare' | 'immigrant' | 'productivity' | 'exploring';
+type DoorKey = 'emotion' | 'selfcare' | 'immigrant' | 'productivity' | 'financial' | 'business' | 'exploring';
 
 const DOORS: {
   key: DoorKey;
@@ -61,6 +61,24 @@ const DOORS: {
     tint: 'rgba(253,224,71,0.55)',
     ring: 'from-yellow-300 via-amber-300 to-orange-300',
     bubble: 'bg-yellow-100/80',
+  },
+  {
+    key: 'financial',
+    emoji: '💰',
+    label: 'I want calm with money',
+    blurb: 'Money stress, budgets, saving — build a steady money rhythm.',
+    tint: 'rgba(52,211,153,0.55)',
+    ring: 'from-green-300 via-emerald-300 to-lime-300',
+    bubble: 'bg-green-100/80',
+  },
+  {
+    key: 'business',
+    emoji: '💼',
+    label: 'I’m building my business',
+    blurb: 'Clients, content, pricing — grow without burning out.',
+    tint: 'rgba(96,165,250,0.55)',
+    ring: 'from-sky-300 via-blue-300 to-indigo-300',
+    bubble: 'bg-sky-100/80',
   },
   {
     key: 'exploring',
@@ -667,7 +685,132 @@ export function DoorImmigrantPickerScreen({
   );
 }
 
+/* ─── 4b. Financial picker ─────────────────────────────────────── */
+
+const FINANCIAL_TAGS = [
+  { key: 'money_anxiety', emoji: '😰', label: 'Money anxiety' },
+  { key: 'budgeting', emoji: '🧾', label: 'Budgeting' },
+  { key: 'debt', emoji: '💳', label: 'Debt' },
+  { key: 'saving', emoji: '🏦', label: 'Saving' },
+  { key: 'overspending', emoji: '🛍️', label: 'Overspending' },
+  { key: 'income_growth', emoji: '📈', label: 'Grow my income' },
+  { key: 'investing', emoji: '🌱', label: 'Investing basics' },
+  { key: 'independence', emoji: '🕊️', label: 'Financial freedom' },
+];
+
+/* ─── 4c. Business picker ──────────────────────────────────────── */
+
+const BUSINESS_TAGS = [
+  { key: 'getting_started', emoji: '🚀', label: 'Getting started' },
+  { key: 'find_clients', emoji: '🎯', label: 'Finding clients' },
+  { key: 'content_marketing', emoji: '📱', label: 'Content & marketing' },
+  { key: 'pricing_sales', emoji: '🏷️', label: 'Pricing & sales' },
+  { key: 'systems_time', emoji: '⏳', label: 'Systems & time' },
+  { key: 'founder_burnout', emoji: '🔥', label: 'Founder burnout' },
+  { key: 'confidence', emoji: '💪', label: 'Confidence & visibility' },
+  { key: 'scaling', emoji: '📊', label: 'Scaling & team' },
+];
+
+function DoorTagPickerScreen({
+  step,
+  onNext,
+  onAnswer,
+  tags,
+  heading,
+  sub,
+}: {
+  step: OnboardingStep;
+  onNext: () => void;
+  onAnswer?: (id: string, val: string | string[]) => void;
+  tags: { key: string; emoji: string; label: string }[];
+  heading: string;
+  sub: string;
+}) {
+  const [picked, setPicked] = useState<string[]>([]);
+
+  const toggle = (k: string) => {
+    haptic.selection();
+    setPicked((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]));
+  };
+
+  return (
+    <GlassShell>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-5"
+      >
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#EB5E33]">
+          Tune your door
+        </p>
+        <h1 className="mt-2 text-[26px] leading-[1.15] font-bold text-[#2A1810]">
+          {step.title || heading}
+        </h1>
+        <p className="mt-2 text-[14px] text-[#6b5a4a] leading-snug">
+          {step.subtitle || sub}
+        </p>
+      </motion.div>
+
+      <div className="flex flex-wrap gap-2.5 content-start mb-5">
+        {tags.map((t, i) => (
+          <EmotionTile
+            key={t.key}
+            emoji={t.emoji}
+            label={t.label}
+            picked={picked.includes(t.key)}
+            onClick={() => toggle(t.key)}
+            delay={i * 0.04}
+          />
+        ))}
+      </div>
+
+      <div className="pt-5">
+        <GlassCTA
+          onClick={() => {
+            onAnswer?.(step.id, picked.length ? picked : ['unknown']);
+            onNext();
+          }}
+        >
+          Continue
+        </GlassCTA>
+      </div>
+    </GlassShell>
+  );
+}
+
+export function DoorFinancialPickerScreen(props: {
+  step: OnboardingStep;
+  onNext: () => void;
+  onAnswer?: (id: string, val: string | string[]) => void;
+}) {
+  return (
+    <DoorTagPickerScreen
+      {...props}
+      tags={FINANCIAL_TAGS}
+      heading="Where does money feel heaviest?"
+      sub="Pick anything that fits. Rilo builds calm money habits around it."
+    />
+  );
+}
+
+export function DoorBusinessPickerScreen(props: {
+  step: OnboardingStep;
+  onNext: () => void;
+  onAnswer?: (id: string, val: string | string[]) => void;
+}) {
+  return (
+    <DoorTagPickerScreen
+      {...props}
+      tags={BUSINESS_TAGS}
+      heading="What's your business focus?"
+      sub="Pick anything that fits. Rilo lines up steps that move the needle."
+    />
+  );
+}
+
 /* ─── 5. Meet My Rilo intro ────────────────────────────────────── */
+
 
 export function MeetRiloIntroScreen({
   step,

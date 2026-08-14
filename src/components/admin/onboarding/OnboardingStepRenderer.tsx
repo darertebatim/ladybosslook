@@ -42,6 +42,8 @@ import {
   DoorEmotionPickerScreen,
   DoorSelfcareOffersScreen,
   DoorImmigrantPickerScreen,
+  DoorFinancialPickerScreen,
+  DoorBusinessPickerScreen,
   MeetRiloIntroScreen,
   OpenTheDoorScreen,
   DoorNicknameScreen,
@@ -111,6 +113,10 @@ export function OnboardingStepRenderer({ step, onNext, onMilestone, onAnswer, an
       return <DoorSelfcareOffersScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
     case 'door-immigrant-picker':
       return <DoorImmigrantPickerScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'door-financial-picker':
+      return <DoorFinancialPickerScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
+    case 'door-business-picker':
+      return <DoorBusinessPickerScreen step={step} onNext={onNext} onAnswer={onAnswer} />;
     case 'meet-rilo-intro':
       return <MeetRiloIntroScreen step={step} onNext={onNext} />;
     case 'open-the-door':

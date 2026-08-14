@@ -66,6 +66,16 @@ export const riloDoorsFlow: OnboardingFlow = {
       type: 'door-immigrant-picker',
       doorBranch: 'immigrant',
     },
+    {
+      id: 'rd-sharp-financial',
+      type: 'door-financial-picker',
+      doorBranch: 'financial',
+    },
+    {
+      id: 'rd-sharp-business',
+      type: 'door-business-picker',
+      doorBranch: 'business',
+    },
     /* ─── Final loader: builds the path while teasing what they get ─── */
     {
       id: 'rd-building',
