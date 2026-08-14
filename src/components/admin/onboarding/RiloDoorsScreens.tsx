@@ -15,7 +15,7 @@ export const LANG_LABEL_TO_ISO: Record<string, string> = {
 
 /* ─── Door catalog ─────────────────────────────────────────────── */
 
-type DoorKey = 'emotion' | 'selfcare' | 'immigrant' | 'productivity' | 'exploring';
+type DoorKey = 'emotion' | 'selfcare' | 'immigrant' | 'productivity' | 'financial' | 'business' | 'exploring';
 
 const DOORS: {
   key: DoorKey;
@@ -61,6 +61,24 @@ const DOORS: {
     tint: 'rgba(253,224,71,0.55)',
     ring: 'from-yellow-300 via-amber-300 to-orange-300',
     bubble: 'bg-yellow-100/80',
+  },
+  {
+    key: 'financial',
+    emoji: '💰',
+    label: 'I want calm with money',
+    blurb: 'Money stress, budgets, saving — build a steady money rhythm.',
+    tint: 'rgba(52,211,153,0.55)',
+    ring: 'from-green-300 via-emerald-300 to-lime-300',
+    bubble: 'bg-green-100/80',
+  },
+  {
+    key: 'business',
+    emoji: '💼',
+    label: 'I’m building my business',
+    blurb: 'Clients, content, pricing — grow without burning out.',
+    tint: 'rgba(96,165,250,0.55)',
+    ring: 'from-sky-300 via-blue-300 to-indigo-300',
+    bubble: 'bg-sky-100/80',
   },
   {
     key: 'exploring',
