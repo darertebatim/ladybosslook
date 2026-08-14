@@ -65,6 +65,8 @@ export type OnboardingStepType =
   | 'door-emotion-picker'
   | 'door-selfcare-offers'
   | 'door-immigrant-picker'
+  | 'door-financial-picker'
+  | 'door-business-picker'
   | 'meet-rilo-intro'
   | 'open-the-door'
   | 'rilo-doors-loader'
@@ -136,7 +138,7 @@ export interface OnboardingStep {
   /** For door-cards-glass-secondary: hides whichever door was picked as primary */
   excludePrimary?: boolean;
   /** Which door this sharpener step belongs to — used by AppOnboarding to skip non-matching steps */
-  doorBranch?: 'emotion' | 'selfcare' | 'immigrant' | 'productivity' | 'exploring';
+  doorBranch?: 'emotion' | 'selfcare' | 'immigrant' | 'productivity' | 'financial' | 'business' | 'exploring';
 }
 
 export type OnboardingAnswers = Record<string, string | string[]>;

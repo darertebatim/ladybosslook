@@ -192,6 +192,8 @@ export function useTodayPath() {
       const doorSecondary = (doorAnswers["rd-door-secondary"]?.[0] ?? null) as DoorKey | null;
       const emotionKeys = (doorAnswers["rd-sharp-emotion"] ?? []).filter((k) => k && k !== "unknown");
       const immigrantKeys = (doorAnswers["rd-sharp-immigrant"] ?? []).filter((k) => k && k !== "unknown");
+      const financialKeys = (doorAnswers["rd-sharp-financial"] ?? []).filter((k) => k && k !== "unknown");
+      const businessKeys = (doorAnswers["rd-sharp-business"] ?? []).filter((k) => k && k !== "unknown");
       const hasDoorContext = !!doorPrimary;
       const plannerOnboardingDone =
         ((plannerOnbRes.data ?? []) as any[]).length > 0 ||
@@ -809,12 +811,16 @@ export function useTodayPath() {
             secondary: doorSecondary,
             emotionKeys,
             immigrantKeys,
+            financialKeys,
+            businessKeys,
           }
         : {
             primary: "exploring" as const,
             secondary: null,
             emotionKeys: [] as string[],
             immigrantKeys: [] as string[],
+            financialKeys: [] as string[],
+            businessKeys: [] as string[],
           };
 
       const inputs = {
