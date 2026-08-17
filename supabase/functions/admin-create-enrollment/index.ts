@@ -277,8 +277,18 @@ const handler = async (req: Request): Promise<Response> => {
       enrollmentData.program_slug = programSlug;
     }
 
-    if (roundId) {
-      enrollmentData.round_id = roundId;
+    let finalRoundId = roundId;
+    if (!finalRoundId && programSlug) {
+      const { data: autoRound } = await supabase
+        .from('program_auto_enrollment')
+        .select('round_id')
+        .eq('program_slug', programSlug)
+        .maybeSingle();
+      finalRoundId = autoRound?.round_id ?? undefined;
+    }
+
+    if (finalRoundId) {
+      enrollmentData.round_id = finalRoundId;
     }
 
     const { data: enrollment, error: enrollmentError } = await supabase

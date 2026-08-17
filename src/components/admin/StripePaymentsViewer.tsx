@@ -138,6 +138,14 @@ export const StripePaymentsViewer = () => {
 
       if (programError) throw programError;
 
+      // Find the current auto-enrollment round for this program (if any)
+      const { data: autoRound } = await supabase
+        .from('program_auto_enrollment')
+        .select('round_id')
+        .eq('program_slug', programSlug)
+        .maybeSingle();
+      const roundId = autoRound?.round_id ?? null;
+
       // Look up user by email if user_id is missing
       let finalUserId = userId;
       if (!finalUserId) {
@@ -157,7 +165,8 @@ export const StripePaymentsViewer = () => {
               body: {
                 email: userEmail,
                 courseName: program.title,
-                programSlug: programSlug
+                programSlug: programSlug,
+                ...(roundId ? { roundId } : {})
               }
             }
           );
@@ -191,17 +200,35 @@ export const StripePaymentsViewer = () => {
 
       // If user_id exists, enroll them in the course
       if (finalUserId) {
-        const { error: enrollError } = await supabase
+        const { data: existing } = await supabase
           .from('course_enrollments')
-          .insert({
-            user_id: finalUserId,
-            course_name: program.title,
-            program_slug: programSlug,
-            status: 'active'
-          });
+          .select('id, round_id')
+          .eq('user_id', finalUserId)
+          .eq('program_slug', programSlug)
+          .maybeSingle();
 
-        if (enrollError && !enrollError.message.includes('duplicate')) {
-          throw enrollError;
+        if (existing) {
+          if (roundId && !existing.round_id) {
+            const { error: updErr } = await supabase
+              .from('course_enrollments')
+              .update({ round_id: roundId, status: 'active' })
+              .eq('id', existing.id);
+            if (updErr) throw updErr;
+          }
+        } else {
+          const { error: enrollError } = await supabase
+            .from('course_enrollments')
+            .insert({
+              user_id: finalUserId,
+              course_name: program.title,
+              program_slug: programSlug,
+              status: 'active',
+              ...(roundId ? { round_id: roundId } : {})
+            });
+
+          if (enrollError && !enrollError.message.includes('duplicate')) {
+            throw enrollError;
+          }
         }
       }
 
