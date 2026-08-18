@@ -288,6 +288,24 @@ export const StripePaymentsViewer = () => {
   const completedPayments = filteredOrders.filter(o => !o.refunded).length;
   const refundedPayments = filteredOrders.filter(o => o.refunded).length;
 
+  // Per-currency breakdown (never sum different currencies together)
+  const byCurrency = useMemo(() => {
+    const map: Record<string, { revenue: number; refunded: number; count: number }> = {};
+    filteredOrders.forEach(order => {
+      const cur = (order.currency || 'usd').toLowerCase();
+      if (!map[cur]) map[cur] = { revenue: 0, refunded: 0, count: 0 };
+      map[cur].revenue += order.amount;
+      map[cur].refunded += order.refund_amount || 0;
+      map[cur].count += 1;
+    });
+    return Object.entries(map)
+      .map(([currency, v]) => ({ currency, ...v }))
+      .sort((a, b) => b.revenue - a.revenue);
+  }, [filteredOrders]);
+
+  const fmtMoney = (cents: number, currency: string) =>
+    `${(cents / 100).toFixed(2)} ${currency.toUpperCase()}`;
+
   // Generate chart data - group by month
   const chartData = useMemo(() => {
     const monthlyData: Record<string, { revenue: number; count: number }> = {};
@@ -445,8 +463,21 @@ export const StripePaymentsViewer = () => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${(totalRevenue / 100).toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">From {filteredOrders.length} payments</p>
+            {byCurrency.length === 0 ? (
+              <div className="text-2xl font-bold">0.00</div>
+            ) : (
+              <div className="space-y-1">
+                {byCurrency.map(c => (
+                  <div key={c.currency} className="flex items-baseline gap-2">
+                    <span className="text-2xl font-bold">{fmtMoney(c.revenue, c.currency)}</span>
+                    <span className="text-xs text-muted-foreground">{c.count} payments</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground mt-1">
+              From {filteredOrders.length} payments{byCurrency.length > 1 ? ' • shown per currency (not converted)' : ''}
+            </p>
           </CardContent>
         </Card>
 
@@ -458,9 +489,11 @@ export const StripePaymentsViewer = () => {
           <CardContent>
             <div className="text-2xl font-bold">{completedPayments}</div>
             <p className="text-xs text-muted-foreground">Completed • {refundedPayments} Refunded</p>
-            {totalRefunded > 0 && (
-              <p className="text-xs text-destructive mt-1">-${(totalRefunded / 100).toFixed(2)} refunded</p>
-            )}
+            {totalRefunded > 0 && byCurrency.filter(c => c.refunded > 0).map(c => (
+              <p key={c.currency} className="text-xs text-destructive mt-1">
+                -{fmtMoney(c.refunded, c.currency)} refunded
+              </p>
+            ))}
           </CardContent>
         </Card>
 
@@ -470,9 +503,17 @@ export const StripePaymentsViewer = () => {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              ${filteredOrders.length > 0 ? ((totalRevenue / filteredOrders.length) / 100).toFixed(2) : '0.00'}
-            </div>
+            {byCurrency.length === 0 ? (
+              <div className="text-2xl font-bold">0.00</div>
+            ) : (
+              <div className="space-y-1">
+                {byCurrency.map(c => (
+                  <div key={c.currency} className="text-2xl font-bold">
+                    {fmtMoney(c.revenue / c.count, c.currency)}
+                  </div>
+                ))}
+              </div>
+            )}
             <p className="text-xs text-muted-foreground">Per transaction</p>
           </CardContent>
         </Card>
