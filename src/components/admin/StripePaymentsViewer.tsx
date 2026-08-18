@@ -288,6 +288,24 @@ export const StripePaymentsViewer = () => {
   const completedPayments = filteredOrders.filter(o => !o.refunded).length;
   const refundedPayments = filteredOrders.filter(o => o.refunded).length;
 
+  // Per-currency breakdown (never sum different currencies together)
+  const byCurrency = useMemo(() => {
+    const map: Record<string, { revenue: number; refunded: number; count: number }> = {};
+    filteredOrders.forEach(order => {
+      const cur = (order.currency || 'usd').toLowerCase();
+      if (!map[cur]) map[cur] = { revenue: 0, refunded: 0, count: 0 };
+      map[cur].revenue += order.amount;
+      map[cur].refunded += order.refund_amount || 0;
+      map[cur].count += 1;
+    });
+    return Object.entries(map)
+      .map(([currency, v]) => ({ currency, ...v }))
+      .sort((a, b) => b.revenue - a.revenue);
+  }, [filteredOrders]);
+
+  const fmtMoney = (cents: number, currency: string) =>
+    `${(cents / 100).toFixed(2)} ${currency.toUpperCase()}`;
+
   // Generate chart data - group by month
   const chartData = useMemo(() => {
     const monthlyData: Record<string, { revenue: number; count: number }> = {};
