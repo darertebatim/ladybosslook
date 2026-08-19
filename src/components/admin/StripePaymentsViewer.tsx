@@ -30,6 +30,8 @@ interface Order {
   refunded_at: string | null;
   refund_amount: number | null;
   user_id: string | null;
+  usd_amount: number | null;
+  usd_exchange_rate: number | null;
 }
 
 export const StripePaymentsViewer = () => {
@@ -306,6 +308,48 @@ export const StripePaymentsViewer = () => {
   const fmtMoney = (cents: number, currency: string) =>
     `${(cents / 100).toFixed(2)} ${currency.toUpperCase()}`;
 
+  // USD-normalized totals (uses Stripe settlement amounts stored on each order)
+  const usdStats = useMemo(() => {
+    let revenue = 0;
+    let refunded = 0;
+    let missing = 0;
+    filteredOrders.forEach(order => {
+      const cur = (order.currency || 'usd').toLowerCase();
+      if (order.usd_amount != null) {
+        revenue += order.usd_amount;
+        const rate = order.usd_exchange_rate ?? (order.usd_amount / (order.amount || 1));
+        refunded += Math.round((order.refund_amount || 0) * rate);
+      } else if (cur === 'usd') {
+        revenue += order.amount;
+        refunded += order.refund_amount || 0;
+      } else {
+        missing += 1;
+      }
+    });
+    return { revenue, refunded, missing };
+  }, [filteredOrders]);
+
+  const usdAmountOf = (order: Order) => {
+    if (order.usd_amount != null) return order.usd_amount;
+    if ((order.currency || 'usd').toLowerCase() === 'usd') return order.amount;
+    return null;
+  };
+
+  const [converting, setConverting] = useState(false);
+  const convertToUsd = async () => {
+    setConverting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('backfill-usd-amounts');
+      if (error) throw error;
+      toast.success(`Converted ${data?.converted ?? 0} payments to USD`);
+      fetchOrders();
+    } catch (e: any) {
+      toast.error(e.message || 'Conversion failed');
+    } finally {
+      setConverting(false);
+    }
+  };
+
   // Generate chart data - group by month
   const chartData = useMemo(() => {
     const monthlyData: Record<string, { revenue: number; count: number }> = {};
@@ -315,7 +359,8 @@ export const StripePaymentsViewer = () => {
       if (!monthlyData[monthKey]) {
         monthlyData[monthKey] = { revenue: 0, count: 0 };
       }
-      monthlyData[monthKey].revenue += order.amount / 100;
+      const usd = usdAmountOf(order);
+      monthlyData[monthKey].revenue += (usd ?? 0) / 100;
       monthlyData[monthKey].count += 1;
     });
 
@@ -436,7 +481,20 @@ export const StripePaymentsViewer = () => {
 
           {chartData.length > 0 && (
             <div className="mt-6">
-              <h3 className="text-sm font-medium mb-4">Revenue by Month</h3>
+              <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+                <div>
+                  <h3 className="text-sm font-medium">Revenue by Month (USD)</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Non-USD payments use the actual Stripe settlement amount
+                    {usdStats.missing > 0 ? ` • ${usdStats.missing} payment(s) not converted yet` : ''}
+                  </p>
+                </div>
+                {usdStats.missing > 0 && (
+                  <Button variant="outline" size="sm" onClick={convertToUsd} disabled={converting}>
+                    {converting ? 'Converting…' : 'Convert with Stripe rates'}
+                  </Button>
+                )}
+              </div>
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -447,7 +505,7 @@ export const StripePaymentsViewer = () => {
                     contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
                   />
                   <Legend />
-                  <Bar dataKey="revenue" fill="hsl(var(--primary))" name="Revenue ($)" />
+                  <Bar dataKey="revenue" fill="hsl(var(--primary))" name="Revenue (USD)" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -463,21 +521,19 @@ export const StripePaymentsViewer = () => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {byCurrency.length === 0 ? (
-              <div className="text-2xl font-bold">0.00</div>
-            ) : (
-              <div className="space-y-1">
+            <div className="text-2xl font-bold">{fmtMoney(usdStats.revenue, 'usd')}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              From {filteredOrders.length} payments • converted at Stripe settlement rates
+            </p>
+            {byCurrency.length > 1 && (
+              <div className="mt-2 space-y-0.5">
                 {byCurrency.map(c => (
-                  <div key={c.currency} className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold">{fmtMoney(c.revenue, c.currency)}</span>
-                    <span className="text-xs text-muted-foreground">{c.count} payments</span>
+                  <div key={c.currency} className="text-xs text-muted-foreground">
+                    {fmtMoney(c.revenue, c.currency)} • {c.count} payments
                   </div>
                 ))}
               </div>
             )}
-            <p className="text-xs text-muted-foreground mt-1">
-              From {filteredOrders.length} payments{byCurrency.length > 1 ? ' • shown per currency (not converted)' : ''}
-            </p>
           </CardContent>
         </Card>
 
@@ -489,11 +545,9 @@ export const StripePaymentsViewer = () => {
           <CardContent>
             <div className="text-2xl font-bold">{completedPayments}</div>
             <p className="text-xs text-muted-foreground">Completed • {refundedPayments} Refunded</p>
-            {totalRefunded > 0 && byCurrency.filter(c => c.refunded > 0).map(c => (
-              <p key={c.currency} className="text-xs text-destructive mt-1">
-                -{fmtMoney(c.refunded, c.currency)} refunded
-              </p>
-            ))}
+            {usdStats.refunded > 0 && (
+              <p className="text-xs text-destructive mt-1">-{fmtMoney(usdStats.refunded, 'usd')} refunded</p>
+            )}
           </CardContent>
         </Card>
 
@@ -503,17 +557,9 @@ export const StripePaymentsViewer = () => {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {byCurrency.length === 0 ? (
-              <div className="text-2xl font-bold">0.00</div>
-            ) : (
-              <div className="space-y-1">
-                {byCurrency.map(c => (
-                  <div key={c.currency} className="text-2xl font-bold">
-                    {fmtMoney(c.revenue / c.count, c.currency)}
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="text-2xl font-bold">
+              {fmtMoney(filteredOrders.length ? usdStats.revenue / filteredOrders.length : 0, 'usd')}
+            </div>
             <p className="text-xs text-muted-foreground">Per transaction</p>
           </CardContent>
         </Card>
