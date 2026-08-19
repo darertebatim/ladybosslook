@@ -241,3 +241,6 @@ verify_jwt = false
 
 [functions.aperture-name-chat]
 verify_jwt = false
+
+[functions.backfill-usd-amounts]
+verify_jwt = true

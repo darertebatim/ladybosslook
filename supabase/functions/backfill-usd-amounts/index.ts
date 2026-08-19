@@ -36,9 +36,6 @@ serve(async (req) => {
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', { apiVersion: '2023-10-16' });
 
-    // USD orders: usd_amount == amount
-    await supabase.from('orders').update({ usd_amount: null }).eq('id', '00000000-0000-0000-0000-000000000000'); // no-op guard
-
     const { data: pending, error } = await supabase
       .from('orders')
       .select('id, amount, currency, stripe_session_id, usd_amount')
