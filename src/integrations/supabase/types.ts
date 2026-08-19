@@ -3933,6 +3933,8 @@ export type Database = {
           status: string | null
           stripe_session_id: string | null
           updated_at: string
+          usd_amount: number | null
+          usd_exchange_rate: number | null
           user_id: string | null
         }
         Insert: {
@@ -3955,6 +3957,8 @@ export type Database = {
           status?: string | null
           stripe_session_id?: string | null
           updated_at?: string
+          usd_amount?: number | null
+          usd_exchange_rate?: number | null
           user_id?: string | null
         }
         Update: {
@@ -3977,6 +3981,8 @@ export type Database = {
           status?: string | null
           stripe_session_id?: string | null
           updated_at?: string
+          usd_amount?: number | null
+          usd_exchange_rate?: number | null
           user_id?: string | null
         }
         Relationships: []

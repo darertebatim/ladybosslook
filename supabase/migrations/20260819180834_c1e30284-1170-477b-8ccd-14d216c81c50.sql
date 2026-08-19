@@ -1,0 +1,2 @@
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS usd_amount integer, ADD COLUMN IF NOT EXISTS usd_exchange_rate numeric;
+UPDATE public.orders SET usd_amount = amount WHERE usd_amount IS NULL AND lower(coalesce(currency,'usd')) = 'usd';
