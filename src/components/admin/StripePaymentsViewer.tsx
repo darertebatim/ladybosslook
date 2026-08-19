@@ -308,6 +308,31 @@ export const StripePaymentsViewer = () => {
   const fmtMoney = (cents: number, currency: string) =>
     `${(cents / 100).toFixed(2)} ${currency.toUpperCase()}`;
 
+  // Average exchange rate per currency, learned from orders already converted by Stripe
+  const rateByCurrency = useMemo(() => {
+    const acc: Record<string, { sum: number; n: number }> = {};
+    filteredOrders.forEach(order => {
+      const cur = (order.currency || 'usd').toLowerCase();
+      if (cur === 'usd' || order.usd_amount == null || !order.amount) return;
+      const rate = order.usd_exchange_rate ?? order.usd_amount / order.amount;
+      if (!acc[cur]) acc[cur] = { sum: 0, n: 0 };
+      acc[cur].sum += rate;
+      acc[cur].n += 1;
+    });
+    const out: Record<string, number> = {};
+    Object.entries(acc).forEach(([cur, v]) => { out[cur] = v.sum / v.n; });
+    return out;
+  }, [filteredOrders]);
+
+  const usdAmountOf = (order: Order) => {
+    if (order.usd_amount != null) return order.usd_amount;
+    const cur = (order.currency || 'usd').toLowerCase();
+    if (cur === 'usd') return order.amount;
+    const rate = rateByCurrency[cur];
+    if (rate) return Math.round(order.amount * rate);
+    return order.amount; // last-resort: never drop revenue from the chart
+  };
+
   // USD-normalized totals (uses Stripe settlement amounts stored on each order)
   const usdStats = useMemo(() => {
     let revenue = 0;
@@ -315,25 +340,14 @@ export const StripePaymentsViewer = () => {
     let missing = 0;
     filteredOrders.forEach(order => {
       const cur = (order.currency || 'usd').toLowerCase();
-      if (order.usd_amount != null) {
-        revenue += order.usd_amount;
-        const rate = order.usd_exchange_rate ?? (order.usd_amount / (order.amount || 1));
-        refunded += Math.round((order.refund_amount || 0) * rate);
-      } else if (cur === 'usd') {
-        revenue += order.amount;
-        refunded += order.refund_amount || 0;
-      } else {
-        missing += 1;
-      }
+      const usd = usdAmountOf(order) ?? 0;
+      const rate = order.amount ? usd / order.amount : 1;
+      revenue += usd;
+      refunded += Math.round((order.refund_amount || 0) * rate);
+      if (cur !== 'usd' && order.usd_amount == null) missing += 1;
     });
     return { revenue, refunded, missing };
-  }, [filteredOrders]);
-
-  const usdAmountOf = (order: Order) => {
-    if (order.usd_amount != null) return order.usd_amount;
-    if ((order.currency || 'usd').toLowerCase() === 'usd') return order.amount;
-    return null;
-  };
+  }, [filteredOrders, rateByCurrency]);
 
   const [converting, setConverting] = useState(false);
   const convertToUsd = async () => {
