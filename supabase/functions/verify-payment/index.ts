@@ -120,6 +120,22 @@ serve(async (req) => {
         }
       }
 
+      // Fetch the real USD settlement amount from Stripe
+      let usdAmount: number | null = null;
+      let usdExchangeRate: number | null = null;
+      try {
+        const sessionWithSettlement = await stripe.checkout.sessions.retrieve(sanitizedSessionId, {
+          expand: ['payment_intent.latest_charge.balance_transaction'],
+        });
+        const bt = (sessionWithSettlement as any).payment_intent?.latest_charge?.balance_transaction;
+        if (bt && (bt.currency || '').toLowerCase() === 'usd') {
+          usdAmount = bt.amount;
+          usdExchangeRate = bt.exchange_rate ?? null;
+        }
+      } catch (e: any) {
+        logStep('Could not fetch USD settlement', { error: e.message });
+      }
+
       // Create the order since webhook hasn't done it yet
       const { data: newOrder, error: insertError } = await supabase
         .from('orders')
@@ -136,7 +152,9 @@ serve(async (req) => {
           status: 'paid',
           product_name: productName,
           program_slug: programSlug,
-          payment_type: session.mode || 'payment'
+          payment_type: session.mode || 'payment',
+          usd_amount: usdAmount,
+          usd_exchange_rate: usdExchangeRate,
         })
         .select()
         .single();

@@ -180,6 +180,39 @@ async function triggerMailchimpSubscription(supabase: any, orderData: any, progr
   }
 }
 
+// Fetch the actual USD settlement amount and exchange rate from Stripe's balance transaction.
+// This is the exact amount Stripe paid out in USD and the rate they used, not a market estimate.
+async function getUsdSettlement(
+  stripe: Stripe,
+  source: Stripe.Checkout.Session | Stripe.Invoice,
+): Promise<{ usd_amount: number | null; usd_exchange_rate: number | null }> {
+  try {
+    let balanceTransaction: any = null;
+
+    if (source.object === 'checkout.session') {
+      const session = await stripe.checkout.sessions.retrieve(source.id, {
+        expand: ['payment_intent.latest_charge.balance_transaction'],
+      });
+      balanceTransaction = (session as any).payment_intent?.latest_charge?.balance_transaction;
+    } else if (source.object === 'invoice') {
+      const invoice = await stripe.invoices.retrieve(source.id, {
+        expand: ['charge.balance_transaction'],
+      });
+      balanceTransaction = (invoice as any).charge?.balance_transaction;
+    }
+
+    if (balanceTransaction && (balanceTransaction.currency || '').toLowerCase() === 'usd') {
+      return {
+        usd_amount: balanceTransaction.amount,
+        usd_exchange_rate: balanceTransaction.exchange_rate ?? null,
+      };
+    }
+  } catch (e: any) {
+    console.error('[WEBHOOK] Error fetching USD settlement:', e.message);
+  }
+  return { usd_amount: null, usd_exchange_rate: null };
+}
+
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -318,6 +351,9 @@ serve(async (req) => {
         }
       }
 
+      // Fetch the real USD settlement amount from Stripe (only writes if available)
+      const { usd_amount, usd_exchange_rate } = await getUsdSettlement(stripe, session);
+
       // Create order record with user_id
       const orderData = {
         stripe_session_id: session.id,
@@ -334,6 +370,8 @@ serve(async (req) => {
         program_slug: programSlug,
         payment_type: paymentType,
         user_id: userId,
+        usd_amount,
+        usd_exchange_rate,
       };
 
       const { error: orderError } = await supabase
@@ -469,6 +507,9 @@ serve(async (req) => {
         userId = await findOrCreateUser(supabase, customerEmail, customerName);
       }
 
+      // Fetch the real USD settlement amount for this recurring invoice
+      const { usd_amount, usd_exchange_rate } = await getUsdSettlement(stripe, invoice);
+
       // Create order record for recurring payment
       const { error: orderError } = await supabase
         .from('orders')
@@ -483,6 +524,8 @@ serve(async (req) => {
           program_slug: programSlug,
           payment_type: 'subscription_recurring',
           user_id: userId,
+          usd_amount,
+          usd_exchange_rate,
         });
 
       if (orderError) {
