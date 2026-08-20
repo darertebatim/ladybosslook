@@ -38,7 +38,8 @@ export const StripePaymentsViewer = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  
+  const [converting, setConverting] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -83,6 +84,24 @@ export const StripePaymentsViewer = () => {
       setPrograms(data || []);
     } catch (error) {
       console.error('Error fetching programs:', error);
+    }
+  };
+
+  const backfillLegacyUsd = async () => {
+    setConverting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('backfill-usd-amounts', {
+        method: 'POST',
+      });
+      if (error) throw error;
+      toast.success(`Converted ${data?.converted ?? 0} payment(s) to USD`);
+      await fetchOrders();
+    } catch (err) {
+      console.error('Backfill error:', err);
+      const message = err instanceof Error ? err.message : 'Failed to backfill USD amounts';
+      toast.error(message);
+    } finally {
+      setConverting(false);
     }
   };
 
@@ -308,7 +327,8 @@ export const StripePaymentsViewer = () => {
   const fmtMoney = (cents: number, currency: string) =>
     `${(cents / 100).toFixed(2)} ${currency.toUpperCase()}`;
 
-  // Average exchange rate per currency, learned from orders already converted by Stripe
+  // Average exchange rate per currency, learned from orders already converted by Stripe.
+  // Used only as a fallback for legacy non-USD rows created before automatic conversion.
   const rateByCurrency = useMemo(() => {
     const acc: Record<string, { sum: number; n: number }> = {};
     filteredOrders.forEach(order => {
@@ -348,21 +368,6 @@ export const StripePaymentsViewer = () => {
     });
     return { revenue, refunded, missing };
   }, [filteredOrders, rateByCurrency]);
-
-  const [converting, setConverting] = useState(false);
-  const convertToUsd = async () => {
-    setConverting(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('backfill-usd-amounts');
-      if (error) throw error;
-      toast.success(`Converted ${data?.converted ?? 0} payments to USD`);
-      fetchOrders();
-    } catch (e: any) {
-      toast.error(e.message || 'Conversion failed');
-    } finally {
-      setConverting(false);
-    }
-  };
 
   // Generate chart data - group by month
   const chartData = useMemo(() => {
@@ -499,13 +504,18 @@ export const StripePaymentsViewer = () => {
                 <div>
                   <h3 className="text-sm font-medium">Revenue by Month (USD)</h3>
                   <p className="text-xs text-muted-foreground">
-                    Non-USD payments use the actual Stripe settlement amount
-                    {usdStats.missing > 0 ? ` • ${usdStats.missing} payment(s) not converted yet` : ''}
+                    Non-USD payments use the actual USD settlement amount from Stripe
+                    {usdStats.missing > 0 ? ` • ${usdStats.missing} legacy payment(s) estimated from already-converted rates` : ''}
                   </p>
                 </div>
                 {usdStats.missing > 0 && (
-                  <Button variant="outline" size="sm" onClick={convertToUsd} disabled={converting}>
-                    {converting ? 'Converting…' : 'Convert with Stripe rates'}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={backfillLegacyUsd}
+                    disabled={converting}
+                  >
+                    {converting ? 'Converting…' : `Convert ${usdStats.missing} legacy payment(s)`}
                   </Button>
                 )}
               </div>
