@@ -107,6 +107,7 @@ export function LeadsManager() {
   const [isMerging, setIsMerging] = useState(false);
   const [isMergeDialogOpen, setIsMergeDialogOpen] = useState(false);
   const [mergeEmail, setMergeEmail] = useState('');
+  const [mergedEmails, setMergedEmails] = useState<string[]>([]);
   const [sendingTestTo, setSendingTestTo] = useState<string | null>(null);
   const [deletingSubscription, setDeletingSubscription] = useState<string | null>(null);
   const [coachAccessLoading, setCoachAccessLoading] = useState(false);
