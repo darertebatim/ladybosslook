@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ToolShortcuts } from "@/components/app/ToolShortcuts";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight, Headset, Award, Compass, GraduationCap } from "lucide-react";
