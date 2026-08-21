@@ -217,6 +217,7 @@ serve(async (req) => {
         message: `Successfully merged data from ${normalizedEmail}`,
         mergedOrders,
         mergedEnrollments,
+        mergedSubscriptions,
         primaryEmail: primaryProfile.email,
         secondaryEmail: normalizedEmail
       }),
