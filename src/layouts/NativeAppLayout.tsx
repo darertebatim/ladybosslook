@@ -11,6 +11,7 @@ import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { useTrackAppReturn } from '@/hooks/useUserPresence';
 import { MiniPlayer } from '@/components/audio/MiniPlayer';
 import { RoutineMiniPlayer } from '@/components/app/RoutineMiniPlayer';
+import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
@@ -133,6 +134,15 @@ const NativeAppLayout = () => {
     // AudioPlayerContext not available yet
   }
 
+  // Routine mini player visibility
+  let routineMiniVisible = false;
+  try {
+    const rp = useRoutinePlayerContext();
+    routineMiniVisible = rp.isActive && rp.isMinimized;
+  } catch {
+    // RoutinePlayerContext not available yet
+  }
+
   // Reset viewport zoom on navigation to fix iOS zoom bug
   useEffect(() => {
     resetViewportZoom();
@@ -187,6 +197,13 @@ const NativeAppLayout = () => {
 
   // Tab bar actual height: grid content (~48px for compact) + safe area inset
   const TAB_BAR_CONTENT_HEIGHT = 48;
+
+  // AI Planner FAB vertical offset: sits above nav; rises when mini players appear
+  const showAudioMini = !!currentTrack && !isOnPlayerPage && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen;
+  const showRoutineMini = routineMiniVisible && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen;
+  let aiFabBottomOffset = 54; // px above safe-area inset
+  if (showRoutineMini) aiFabBottomOffset += 98;
+  if (showAudioMini) aiFabBottomOffset += 60;
 
   return (
     <div className="flex flex-col h-[100dvh] bg-background app-theme font-farsi">
@@ -307,20 +324,26 @@ const NativeAppLayout = () => {
           </div>
         </LayoutGroup>
 
-        {/* Detached FAB → AI Planner (only on planner/home page) */}
-        {location.pathname === '/app/home' && (
+      </nav>
+      )}
+
+      {/* AI Planner FAB - bottom left, floats above nav / mini players */}
+      {location.pathname === '/app/home' && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen && (
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
-          className="shrink-0"
+          className="fixed left-4 z-[55] flex flex-col items-center"
+          style={{
+            bottom: `calc(${aiFabBottomOffset}px + env(safe-area-inset-bottom))`,
+          }}
         >
           <Link
             to="/app/aiplanner"
             onClick={() => haptic.medium()}
             aria-label={t('nav.aiPlanner')}
             className={cn(
-              'block w-[60px] h-[60px] rounded-full relative',
+              'block w-[56px] h-[56px] rounded-full relative',
               'bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-primary-dark))]',
               'border-[0.5px] border-white/70 dark:border-[hsl(var(--brand-primary)/0.25)]',
               'shadow-[0_8px_24px_-4px_hsl(var(--brand-primary)/0.5),0_3px_8px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.28)]',
@@ -328,15 +351,13 @@ const NativeAppLayout = () => {
               'flex items-center justify-center',
             )}
           >
-            <Sparkles className="w-6 h-6 text-white relative z-10" strokeWidth={2.2} />
+            <Sparkles className="w-5 h-5 text-white relative z-10" strokeWidth={2.2} />
             {/* Glass shine */}
             <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
               <span className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full bg-gradient-to-b from-white/35 to-transparent" />
             </span>
           </Link>
         </motion.div>
-        )}
-      </nav>
       )}
 
       {/* Full-screen Push Notification Onboarding */}
