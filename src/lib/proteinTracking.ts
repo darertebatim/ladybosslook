@@ -1,6 +1,6 @@
 import { UserTask } from '@/hooks/useTaskPlanner';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
-import { Egg, Drumstick, Milk, Beef, Fish, Cookie, Bean } from 'lucide-react';
+import { Egg, Drumstick, Milk, Beef, Fish, Cookie, Bean, Ham, Utensils } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 
 export const PROTEIN_UNITS = ['g'] as const;
@@ -10,18 +10,41 @@ export interface ProteinPreset {
   label: string;
   value: number;
   icon: LucideIcon;
+  /** Explicit portion so the grams are never ambiguous */
+  portion?: string;
+  iconKey?: string;
 }
 
-// Common protein sources (grams of protein per serving), arranged in 2 rows of 4
+// Icon registry so user-customised presets can persist an icon by key
+export const PRESET_ICONS: Record<string, LucideIcon> = {
+  egg: Egg,
+  milk: Milk,
+  whey: Beef,
+  chicken: Drumstick,
+  thigh: Ham,
+  wing: Drumstick,
+  fish: Fish,
+  bar: Cookie,
+  bean: Bean,
+  other: Utensils,
+};
+
+export function getPresetIcon(key?: string | null): LucideIcon {
+  return (key && PRESET_ICONS[key]) || Utensils;
+}
+
+// Common protein sources with explicit portions
 export const PROTEIN_PRESETS: ProteinPreset[] = [
-  { label: 'Egg 6g', value: 6, icon: Egg },
-  { label: 'Yogurt 17g', value: 17, icon: Milk },
-  { label: 'Whey 25g', value: 25, icon: Beef },
-  { label: '½ Chicken 27g', value: 27, icon: Drumstick },
-  { label: 'Tuna 30g', value: 30, icon: Fish },
-  { label: 'Cottage 14g', value: 14, icon: Milk },
-  { label: 'Protein bar 20g', value: 20, icon: Cookie },
-  { label: 'Tofu 10g', value: 10, icon: Bean },
+  { label: 'Egg', value: 6, icon: Egg, iconKey: 'egg', portion: '1 large egg' },
+  { label: 'Greek yogurt', value: 17, icon: Milk, iconKey: 'milk', portion: '1 cup (170g)' },
+  { label: 'Whey', value: 25, icon: Beef, iconKey: 'whey', portion: '1 scoop' },
+  { label: 'Chicken breast', value: 27, icon: Drumstick, iconKey: 'chicken', portion: '½ breast (~85g)' },
+  { label: 'Chicken thigh', value: 21, icon: Ham, iconKey: 'thigh', portion: '1 thigh (~85g)' },
+  { label: 'Chicken wings', value: 12, icon: Drumstick, iconKey: 'wing', portion: '2 wings' },
+  { label: 'Tuna', value: 30, icon: Fish, iconKey: 'fish', portion: '1 can drained (142g)' },
+  { label: 'Cottage cheese', value: 14, icon: Milk, iconKey: 'milk', portion: '½ cup' },
+  { label: 'Protein bar', value: 20, icon: Cookie, iconKey: 'bar', portion: '1 bar' },
+  { label: 'Tofu', value: 10, icon: Bean, iconKey: 'bean', portion: '½ cup firm' },
 ];
 
 export function isProteinTask(task: UserTask): boolean {

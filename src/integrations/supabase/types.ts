@@ -6855,6 +6855,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_quick_presets: {
+        Row: {
+          amount: number
+          created_at: string
+          icon: string | null
+          id: string
+          label: string
+          sort_order: number
+          tool: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          icon?: string | null
+          id?: string
+          label: string
+          sort_order?: number
+          tool: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          icon?: string | null
+          id?: string
+          label?: string
+          sort_order?: number
+          tool?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_reflection_responses: {
         Row: {
           completed_at: string | null
