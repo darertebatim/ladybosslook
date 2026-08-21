@@ -10,7 +10,8 @@ import { UnseenContentProvider, useUnseenContentContext } from '@/contexts/Unsee
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { useTrackAppReturn } from '@/hooks/useUserPresence';
 import { MiniPlayer } from '@/components/audio/MiniPlayer';
-import { RoutineMiniPlayer, useRoutinePlayerContext } from '@/components/app/RoutineMiniPlayer';
+import { RoutineMiniPlayer } from '@/components/app/RoutineMiniPlayer';
+import { useRoutinePlayerContext } from '@/components/app/RoutinePlayerProvider';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
