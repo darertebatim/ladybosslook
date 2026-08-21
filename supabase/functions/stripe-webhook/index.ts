@@ -308,9 +308,43 @@ serve(async (req) => {
 
       // Find or create user
       let userId: string | null = null;
-      if (customerEmail) {
+      // If the buyer was signed in when starting checkout, the order belongs to THAT account
+      // even if they paid with a different email — record the payment email as an alias.
+      const authUserId = session.metadata?.auth_user_id || session.metadata?.user_id || null;
+      if (authUserId) {
+        const { data: authProfile } = await supabase
+          .from('profiles')
+          .select('id, email')
+          .eq('id', authUserId)
+          .maybeSingle();
+
+        if (authProfile) {
+          userId = authProfile.id;
+          const payEmail = (customerEmail || '').toLowerCase().trim();
+          const accountEmail = (authProfile.email || '').toLowerCase().trim();
+          if (payEmail && payEmail !== accountEmail) {
+            const { error: aliasError } = await supabase
+              .from('account_email_aliases')
+              .upsert(
+                { primary_user_id: authProfile.id, email: payEmail },
+                { onConflict: 'email' }
+              );
+            if (aliasError) {
+              console.error('[WEBHOOK] Error recording payment email alias:', aliasError);
+            } else {
+              console.log('[WEBHOOK] Payment email merged as alias:', payEmail, '->', accountEmail);
+            }
+          }
+        }
+      }
+
+      if (!userId && customerEmail) {
         userId = await findOrCreateUser(supabase, customerEmail, customerName);
         console.log('[WEBHOOK] User ID for order:', userId);
+      }
+
+      if (userId) {
+
 
         // Sync location data to profile (only update null fields)
         if (userId) {
