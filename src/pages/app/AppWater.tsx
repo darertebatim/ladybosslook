@@ -16,8 +16,6 @@ import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useSubscription } from '@/hooks/useSubscription';
-import { PaywallSheet } from '@/components/app/PaywallSheet';
 
 // Default water goal when no task exists
 const DEFAULT_WATER_GOAL = 64;
@@ -44,8 +42,6 @@ const AppWater = () => {
   const createTask = useCreateTask();
   const queryClient = useQueryClient();
   const [isSavingRoutine, setIsSavingRoutine] = useState(false);
-  const { isSubscribed, isLoading: subLoading } = useSubscription();
-  const [showPaywall, setShowPaywall] = useState(false);
 
   // Find water task for today
   const waterTask = useMemo(() => {
@@ -219,26 +215,6 @@ const AppWater = () => {
   };
 
 
-  // Subscription gate
-  if (!subLoading && !isSubscribed) {
-    return (
-      <>
-        <div className="fixed inset-0 z-10 flex flex-col items-center justify-center bg-gradient-to-b from-sky-200 to-sky-50 px-6 text-center">
-          <BackButtonCircle />
-          <Droplets className="h-16 w-16 text-sky-400 mb-4" />
-          <h2 className="text-xl font-bold mb-2">{t('tier1.water.plusFeatureTitle')}</h2>
-          <p className="text-muted-foreground mb-6">{t('tier1.water.plusFeatureDesc')}</p>
-          <button
-            onClick={() => { haptic.light(); setShowPaywall(true); }}
-            className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-semibold"
-          >
-            {t('tier1.common.unlockWithPlus')}
-          </button>
-        </div>
-        <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
-      </>
-    );
-  }
 
   // Loading state
   if (tasksLoading) {

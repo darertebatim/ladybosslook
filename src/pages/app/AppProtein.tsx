@@ -14,8 +14,6 @@ import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 import { useQueryClient } from '@tanstack/react-query';
-import { useSubscription } from '@/hooks/useSubscription';
-import { PaywallSheet } from '@/components/app/PaywallSheet';
 
 const DEFAULT_PROTEIN_GOAL = 100;
 const DEFAULT_PROTEIN_UNIT = 'g';
@@ -40,8 +38,6 @@ const AppProtein = () => {
   const createTask = useCreateTask();
   const queryClient = useQueryClient();
   const [isSavingRoutine, setIsSavingRoutine] = useState(false);
-  const { isSubscribed, isLoading: subLoading } = useSubscription();
-  const [showPaywall, setShowPaywall] = useState(false);
 
   const proteinTask = useMemo(() => tasks.find((task) => isProteinTask(task)), [tasks]);
 
@@ -190,25 +186,6 @@ const AppProtein = () => {
     return format(selectedDate, 'EEE, MMM d');
   };
 
-  if (!subLoading && !isSubscribed) {
-    return (
-      <>
-        <div className="fixed inset-0 z-10 flex flex-col items-center justify-center bg-gradient-to-b from-orange-200 to-orange-50 px-6 text-center">
-          <BackButtonCircle />
-          <Beef className="h-16 w-16 text-orange-400 mb-4" />
-          <h2 className="text-xl font-bold mb-2">{t('tier1.protein.plusFeatureTitle')}</h2>
-          <p className="text-muted-foreground mb-6">{t('tier1.protein.plusFeatureDesc')}</p>
-          <button
-            onClick={() => { haptic.light(); setShowPaywall(true); }}
-            className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-semibold"
-          >
-            {t('tier1.common.unlockWithPlus')}
-          </button>
-        </div>
-        <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
-      </>
-    );
-  }
 
   if (tasksLoading) {
     return (
