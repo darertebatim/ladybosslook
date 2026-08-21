@@ -198,6 +198,13 @@ const NativeAppLayout = () => {
   // Tab bar actual height: grid content (~48px for compact) + safe area inset
   const TAB_BAR_CONTENT_HEIGHT = 48;
 
+  // AI Planner FAB vertical offset: sits above nav; rises when mini players appear
+  const showAudioMini = !!currentTrack && !isOnPlayerPage && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen;
+  const showRoutineMini = routineMiniVisible && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen;
+  let aiFabBottomOffset = 54; // px above safe-area inset
+  if (showRoutineMini) aiFabBottomOffset += 98;
+  if (showAudioMini) aiFabBottomOffset += 60;
+
   return (
     <div className="flex flex-col h-[100dvh] bg-background app-theme font-farsi">
       {/* Offline / sync status pill */}
