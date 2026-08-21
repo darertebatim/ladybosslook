@@ -23,7 +23,8 @@ interface ShortcutData {
   emoji: string;
 }
 
-const STORAGE_KEY = 'tool-shortcuts-v5';
+const STORAGE_KEY = 'tool-shortcuts-v6';
+const LEGACY_KEYS = ['tool-shortcuts', 'tool-shortcuts-v2', 'tool-shortcuts-v3', 'tool-shortcuts-v4', 'tool-shortcuts-v5'];
 const MAX_SHORTCUTS = 4;
 const DEFAULT_SHORTCUTS: (ShortcutData | null)[] = [
   { type: 'myprograms', value: null, label: 'My Programs', emoji: '🎓' },
