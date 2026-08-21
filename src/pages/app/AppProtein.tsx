@@ -190,25 +190,6 @@ const AppProtein = () => {
     return format(selectedDate, 'EEE, MMM d');
   };
 
-  if (!subLoading && !isSubscribed) {
-    return (
-      <>
-        <div className="fixed inset-0 z-10 flex flex-col items-center justify-center bg-gradient-to-b from-orange-200 to-orange-50 px-6 text-center">
-          <BackButtonCircle />
-          <Beef className="h-16 w-16 text-orange-400 mb-4" />
-          <h2 className="text-xl font-bold mb-2">{t('tier1.protein.plusFeatureTitle')}</h2>
-          <p className="text-muted-foreground mb-6">{t('tier1.protein.plusFeatureDesc')}</p>
-          <button
-            onClick={() => { haptic.light(); setShowPaywall(true); }}
-            className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-semibold"
-          >
-            {t('tier1.common.unlockWithPlus')}
-          </button>
-        </div>
-        <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
-      </>
-    );
-  }
 
   if (tasksLoading) {
     return (
