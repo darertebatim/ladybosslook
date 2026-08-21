@@ -234,20 +234,20 @@ export function DoorCardsGlassScreen({
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="mb-6"
+        className="mb-4"
       >
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#EB5E33]">
           {slot === 'primary' ? 'Step 1 of 2' : 'Step 2 of 2'}
         </p>
-        <h1 className="mt-2 text-[28px] leading-[1.15] font-bold text-[#2A1810]">
+        <h1 className="mt-2 text-[26px] leading-[1.15] font-bold text-[#2A1810]">
           {step.title || (slot === 'primary' ? 'Which door is yours\nright now?' : 'And a second one?')}
         </h1>
         {step.subtitle && (
-          <p className="mt-2 text-[15px] text-[#5a4a3a] leading-snug">{step.subtitle}</p>
+          <p className="mt-1.5 text-[15px] text-[#5a4a3a] leading-snug">{step.subtitle}</p>
         )}
       </motion.div>
 
-      <div className="flex-1 space-y-3">
+      <div className="flex-1 space-y-2">
         {doors.map((d, i) => {
           const isPicked = picked === d.key;
           return (
@@ -258,14 +258,14 @@ export function DoorCardsGlassScreen({
               transition={{ duration: 0.35, delay: 0.08 + i * 0.05 }}
               onClick={() => handlePick(d.key)}
               className={cn(
-                'relative w-full text-left rounded-[22px] p-4 pr-5',
+                'relative w-full text-left rounded-[18px] p-3 pr-4',
                 'bg-white/90',
                 'border border-white/70',
                 'shadow-ios active:scale-[0.985] transition-all'
               )}
               style={{
                 boxShadow: isPicked
-                  ? `0 12px 36px -8px ${d.tint}, 0 4px 12px rgba(0,0,0,0.06)`
+                  ? `0 10px 30px -7px ${d.tint}, 0 3px 10px rgba(0,0,0,0.05)`
                   : undefined,
               }}
             >
@@ -277,7 +277,7 @@ export function DoorCardsGlassScreen({
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0 }}
                     className={cn(
-                      'absolute inset-0 rounded-[22px] pointer-events-none',
+                      'absolute inset-0 rounded-[18px] pointer-events-none',
                       'bg-gradient-to-r p-[1.5px]',
                       d.ring
                     )}
@@ -286,17 +286,17 @@ export function DoorCardsGlassScreen({
                 )}
               </AnimatePresence>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3.5">
                 <div
                   className={cn(
-                    'shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center',
+                    'shrink-0 w-12 h-12 rounded-[14px] flex items-center justify-center',
                     d.bubble
                   )}
                 >
-                  <FluentEmoji emoji={d.emoji} size={36} />
+                  <FluentEmoji emoji={d.emoji} size={30} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[17px] font-bold text-[#2A1810] leading-tight">
+                  <p className="text-[16px] font-bold text-[#2A1810] leading-tight">
                     {d.label}
                   </p>
                 </div>
