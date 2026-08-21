@@ -19,6 +19,7 @@ export type NotificationType =
   | 'action_nudge'
   | 'proaction_nudge'
   | 'water_reminder'
+  | 'protein_reminder'
   | 'period_reminder'
   | 'fasting_reminder';
 
