@@ -103,7 +103,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
     );
   }
 
-  // Compact size for horizontal scroll icon cards
+  // Compact size for grid icon cards (5 columns, no horizontal scroll)
   if (size === 'compact') {
     return (
       <>
@@ -111,7 +111,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
           onClick={handleClick}
           disabled={tool.comingSoon}
           className={cn(
-            'relative flex flex-col items-center gap-1.5 shrink-0',
+            'relative flex flex-col items-center gap-1.5 w-full',
             'transition-transform active:scale-95',
             tool.comingSoon && 'opacity-60',
             className
@@ -127,7 +127,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
             </div>
           ) : null}
           <div
-            className="w-[68px] h-[68px] rounded-[26px] flex items-center justify-center relative"
+            className="w-full aspect-square max-w-[68px] rounded-[26px] flex items-center justify-center relative"
             style={{ backgroundColor: peachBg }}
           >
             {tool.emoji ? (
@@ -150,7 +150,7 @@ export function ToolCard({ tool, size = 'default', className }: ToolCardProps) {
               )
             )}
           </div>
-          <span className="text-[12px] font-medium text-foreground max-w-[76px] text-center leading-tight line-clamp-2">
+          <span className="text-[12px] font-medium text-foreground w-full text-center leading-tight line-clamp-2">
             {tool.name}
           </span>
         </button>
