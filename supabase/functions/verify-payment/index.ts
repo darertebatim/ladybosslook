@@ -136,6 +136,29 @@ serve(async (req) => {
         logStep('Could not fetch USD settlement', { error: e.message });
       }
 
+      // Link to the signed-in buyer's account (and merge the payment email as an alias)
+      let linkedUserId: string | null = null;
+      const authUserId = session.metadata?.auth_user_id || session.metadata?.user_id || null;
+      if (authUserId) {
+        const { data: authProfile } = await supabase
+          .from('profiles')
+          .select('id, email')
+          .eq('id', authUserId)
+          .maybeSingle();
+        if (authProfile) {
+          linkedUserId = authProfile.id;
+          const payEmail = (customerEmail || '').toLowerCase().trim();
+          const accountEmail = (authProfile.email || '').toLowerCase().trim();
+          if (payEmail && payEmail !== accountEmail && payEmail !== 'unknown@example.com') {
+            const { error: aliasError } = await supabase
+              .from('account_email_aliases')
+              .upsert({ primary_user_id: authProfile.id, email: payEmail }, { onConflict: 'email' });
+            if (aliasError) logStep('Alias upsert failed', { error: aliasError.message });
+            else logStep('Payment email merged as alias', { payEmail, accountEmail });
+          }
+        }
+      }
+
       // Create the order since webhook hasn't done it yet
       const { data: newOrder, error: insertError } = await supabase
         .from('orders')
@@ -153,6 +176,7 @@ serve(async (req) => {
           product_name: productName,
           program_slug: programSlug,
           payment_type: session.mode || 'payment',
+          user_id: linkedUserId,
           usd_amount: usdAmount,
           usd_exchange_rate: usdExchangeRate,
         })
