@@ -495,9 +495,13 @@ const AppStore = () => {
                     {filteredWellnessTools
                       .filter(
                         (t) =>
-                          !["water", "protein", "period", "fasting"].includes(
-                            t.id,
-                          ),
+                          ![
+                            "water",
+                            "protein",
+                            "period",
+                            "fasting",
+                            "focus-timer",
+                          ].includes(t.id),
                       )
                       .map((tool) => (
                         <ToolCard
