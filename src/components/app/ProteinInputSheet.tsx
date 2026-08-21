@@ -90,18 +90,18 @@ export const ProteinInputSheet = ({
           <span className="text-3xl font-bold text-orange-500/70">{unit}</span>
         </div>
 
-        {/* Common protein sources */}
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2 -mx-4 px-4">
+        {/* Common protein sources — 2 rows of 4 */}
+        <div className="grid grid-cols-4 gap-2 mb-4">
           {presets.map((preset) => {
             const PresetIcon = preset.icon;
             return (
               <button
                 key={preset.label}
                 onClick={() => handlePresetClick(preset)}
-                className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all shrink-0 min-w-[68px] bg-orange-100 text-orange-700 active:scale-95"
+                className="flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-xl transition-all bg-orange-100 text-orange-700 active:scale-95"
               >
                 <PresetIcon className="h-5 w-5" />
-                <span className="text-xs font-semibold whitespace-nowrap">{preset.label}</span>
+                <span className="text-xs font-semibold text-center leading-tight">{preset.label}</span>
               </button>
             );
           })}

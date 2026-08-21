@@ -1,6 +1,6 @@
 import { UserTask } from '@/hooks/useTaskPlanner';
 import { RoutinePlanTask } from '@/hooks/useRoutinePlans';
-import { Egg, Drumstick, Milk, Beef, Fish } from 'lucide-react';
+import { Egg, Drumstick, Milk, Beef, Fish, Cookie, Bean } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 
 export const PROTEIN_UNITS = ['g'] as const;
@@ -12,13 +12,16 @@ export interface ProteinPreset {
   icon: LucideIcon;
 }
 
-// 5 most common protein sources (grams of protein per serving)
+// Common protein sources (grams of protein per serving), arranged in 2 rows of 4
 export const PROTEIN_PRESETS: ProteinPreset[] = [
   { label: 'Egg 6g', value: 6, icon: Egg },
   { label: 'Yogurt 17g', value: 17, icon: Milk },
   { label: 'Whey 25g', value: 25, icon: Beef },
   { label: '½ Chicken 27g', value: 27, icon: Drumstick },
-  { label: 'Tuna can 30g', value: 30, icon: Fish },
+  { label: 'Tuna 30g', value: 30, icon: Fish },
+  { label: 'Cottage 14g', value: 14, icon: Milk },
+  { label: 'Protein bar 20g', value: 20, icon: Cookie },
+  { label: 'Tofu 10g', value: 10, icon: Bean },
 ];
 
 export function isProteinTask(task: UserTask): boolean {
