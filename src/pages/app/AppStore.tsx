@@ -489,7 +489,7 @@ const AppStore = () => {
                   {t("toolsPage.allTools")}
                 </h2>
 
-                {/* First row: wellness tools except trackers */}
+                {/* First row: wellness tools except trackers (5 static buttons) */}
                 {!searchQuery && (
                   <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
                     {filteredWellnessTools
@@ -511,22 +511,10 @@ const AppStore = () => {
                           className={`tour-tool-${tool.id}`}
                         />
                       ))}
-                    {filteredAudioTools
-                      .filter(
-                        (t) => t.id === "meditate" || t.id === "soundscape",
-                      )
-                      .map((tool) => (
-                        <ToolCard
-                          key={tool.id}
-                          tool={tool}
-                          size="compact"
-                          className={`tour-tool-${tool.id}`}
-                        />
-                      ))}
                   </div>
                 )}
 
-                {/* Search results: all matching tools in one row */}
+                {/* Search results: all matching wellness tools only */}
                 {searchQuery && (
                   <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
                     {filteredWellnessTools.map((tool) => (
@@ -537,18 +525,6 @@ const AppStore = () => {
                         className={`tour-tool-${tool.id}`}
                       />
                     ))}
-                    {filteredAudioTools
-                      .filter(
-                        (t) => t.id === "meditate" || t.id === "soundscape",
-                      )
-                      .map((tool) => (
-                        <ToolCard
-                          key={tool.id}
-                          tool={tool}
-                          size="compact"
-                          className={`tour-tool-${tool.id}`}
-                        />
-                      ))}
                   </div>
                 )}
 
