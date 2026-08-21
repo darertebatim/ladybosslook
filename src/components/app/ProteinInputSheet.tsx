@@ -120,9 +120,9 @@ export const ProteinInputSheet = ({
           </p>
         )}
 
-        {/* Quick-add shortcuts */}
+        {/* Quick-add shortcuts — max 8 */}
         <div className="grid grid-cols-4 gap-2 mb-4">
-          {presets.map((preset) => {
+          {presets.slice(0, 8).map((preset) => {
             const PresetIcon = getPresetIcon(preset.iconKey);
             return (
               <button
@@ -144,7 +144,7 @@ export const ProteinInputSheet = ({
             );
           })}
 
-          {editMode && (
+          {editMode && presets.length < 8 && (
             <button
               onClick={() => { haptic.light(); setEditingPreset(null); setShowPresetSheet(true); }}
               className="flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-xl border-2 border-dashed border-orange-300 text-orange-600 active:scale-95"
