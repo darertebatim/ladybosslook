@@ -58,9 +58,25 @@ serve(async (req) => {
       apiVersion: "2023-10-16",
     });
 
+    // Identify the signed-in user (if any) so we can link/merge the payment email later
+    let authUserId: string | null = null;
+    try {
+      const authHeader = req.headers.get('Authorization');
+      if (authHeader?.startsWith('Bearer ')) {
+        const { data: { user } } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+        if (user) {
+          authUserId = user.id;
+          logStep('Authenticated buyer detected', { userId: authUserId });
+        }
+      }
+    } catch (e: any) {
+      logStep('Could not resolve auth user', { error: e?.message });
+    }
+
     // Parse and validate request data
     const requestBody = await req.json();
     const { program, paymentOption, name, email, phone, idempotencyKey } = requestBody;
+
     
     // Validate required program field
     if (!program || typeof program !== 'string') {
