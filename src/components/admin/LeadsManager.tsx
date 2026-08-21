@@ -167,18 +167,52 @@ export function LeadsManager() {
       const email = searchQuery.toLowerCase().trim();
       
       // Search for user profile
-      const { data: profile } = await supabase
+      let { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .or(`email.ilike.%${email}%,full_name.ilike.%${searchQuery}%`)
         .maybeSingle();
 
-      // Search orders
+      // If the searched email was merged into another account, resolve to that account
+      const { data: aliasHit } = await supabase
+        .from('account_email_aliases')
+        .select('primary_user_id')
+        .ilike('email', email)
+        .maybeSingle();
+
+      if (aliasHit?.primary_user_id && profile?.id !== aliasHit.primary_user_id) {
+        const { data: primaryProfile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', aliasHit.primary_user_id)
+          .maybeSingle();
+        if (primaryProfile) profile = primaryProfile;
+      }
+
+      // Collect all emails belonging to this account (primary + merged aliases)
+      let aliasEmails: string[] = [];
+      if (profile?.id) {
+        const { data: aliasRows } = await supabase
+          .from('account_email_aliases')
+          .select('email')
+          .eq('primary_user_id', profile.id);
+        aliasEmails = (aliasRows || []).map((r: { email: string }) => r.email);
+      }
+      setMergedEmails(aliasEmails);
+
+      const accountEmails = [profile?.email, ...aliasEmails, email].filter(Boolean) as string[];
+      const uniqueEmails = [...new Set(accountEmails.map(e => e.toLowerCase()))];
+
+      // Search orders across every email on the account
       const { data: orders } = await supabase
         .from('orders')
         .select('*')
-        .or(`email.ilike.%${email}%,name.ilike.%${searchQuery}%`)
+        .or([
+          ...uniqueEmails.map(e => `email.ilike.%${e}%`),
+          `name.ilike.%${searchQuery}%`,
+        ].join(','))
         .order('created_at', { ascending: false });
+
 
       // Get payment info (city/country) from the most recent paid order
       let paymentInfo: { city: string | null; country: string | null } | null = null;
