@@ -26,7 +26,7 @@ interface ShortcutData {
 const STORAGE_KEY = 'tool-shortcuts-v5';
 const MAX_SHORTCUTS = 4;
 const DEFAULT_SHORTCUTS: (ShortcutData | null)[] = [
-  { type: 'breathe', value: null, label: 'Breathe Exercise', emoji: '🌬️' },
+  { type: 'myprograms', value: null, label: 'My Programs', emoji: '🎓' },
   { type: 'reflection', value: null, label: 'Reflection Journal', emoji: '✏️' },
   { type: 'protein', value: null, label: 'Protein Counter', emoji: '🍗' },
   null,
