@@ -405,22 +405,22 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
   return (
     <section>
       {!hideLabels && (
-        <div className="flex items-center justify-between mb-2 px-1">
+        <div className="flex items-center justify-between mb-1.5 px-1">
           <h2 className="text-sm font-semibold text-foreground">My Shortcuts</h2>
           {hasAny && <p className="text-[10px] text-muted-foreground">Long press to remove</p>}
         </div>
       )}
 
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-4 gap-2">
         {shortcuts.map((shortcut, i) => {
           if (shortcut) {
             return (
               <ShortcutSlot key={i} onTap={() => handleSlotTap(i)} onLongPress={() => handleLongPress(i)}>
-                <div className={cn("relative w-full rounded-2xl flex flex-col items-center justify-center bg-accent/60 px-1", hideLabels ? "aspect-square" : "aspect-[3/4]")}>
+                <div className={cn("relative w-full rounded-2xl flex flex-col items-center justify-center bg-accent/60 px-1", hideLabels ? "aspect-square" : "aspect-square")}>
                   {!hideLabels && shortcut.emoji && (
-                    <FluentEmoji emoji={shortcut.emoji} size={24} className="mb-1" />
+                    <FluentEmoji emoji={shortcut.emoji} size={22} className="mb-0.5" />
                   )}
-                  <span className="text-[11px] font-bold text-foreground leading-tight text-center line-clamp-3 w-full px-1">
+                  <span className="text-[10px] font-bold text-foreground leading-tight text-center line-clamp-3 w-full px-1">
                     {shortcut.value ? shortcut.label : (PRO_LINK_CONFIGS[shortcut.type]?.label || shortcut.label)}
                   </span>
                   {(() => {
@@ -428,11 +428,11 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
                       ? !!todayMood
                       : isShortcutCompletedToday(proLinkCompletions, shortcut.type, shortcut.value);
                     return isDone ? (
-                        <div className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center shadow-sm bg-emerald-500">
-                          <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                        <div className="absolute top-1 right-1 w-4 h-4 rounded-full flex items-center justify-center shadow-sm bg-emerald-500">
+                          <Check className="h-2.5 w-2.5 text-white" strokeWidth={3} />
                         </div>
                       ) : (
-                        <span className="absolute top-1 right-1 text-[14px] leading-none">⭕️</span>
+                        <span className="absolute top-1 right-1 text-[12px] leading-none">⭕️</span>
                       );
                   })()}
                 </div>
@@ -442,9 +442,9 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
 
           return (
             <ShortcutSlot key={i} onTap={() => handleSlotTap(i)}>
-              <div className={cn("w-full rounded-2xl bg-muted/60 border-2 border-dashed border-border/50 flex flex-col items-center justify-center gap-1", hideLabels ? "aspect-square" : "aspect-[3/4]")}>
-                <Plus className="h-5 w-5 text-muted-foreground/60" />
-                <span className="text-[10px] text-muted-foreground/50">Add</span>
+              <div className={cn("w-full rounded-2xl bg-muted/60 border-2 border-dashed border-border/50 flex flex-col items-center justify-center gap-0.5", hideLabels ? "aspect-square" : "aspect-square")}>
+                <Plus className="h-4 w-4 text-muted-foreground/60" />
+                <span className="text-[9px] text-muted-foreground/50">Add</span>
               </div>
             </ShortcutSlot>
           );
