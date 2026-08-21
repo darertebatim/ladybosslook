@@ -700,14 +700,6 @@ export default function AppMyRiloPath() {
               </button>
             </div>
 
-            {/* Your Programs (active rounds) */}
-            <div className="mt-4">
-              <ActiveRoundsCarousel
-                activeRounds={activeRounds}
-                nextSessionMap={nextSessionMap}
-                programImageMap={programImageMap}
-              />
-            </div>
           </div>
 
           {/* Bottom banners (admin-curated) — after the path */}
