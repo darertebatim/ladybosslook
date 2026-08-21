@@ -18,7 +18,7 @@ import { useTasksForDate, useCompletionsForDate, useCompletedDates, UserTask, Ta
 import { useProgramEventsForDate, useProgramEventDates } from '@/hooks/usePlannerProgramEvents';
 import { useNewHomeData } from '@/hooks/useNewHomeData';
 import { usePrograms } from '@/hooks/usePrograms';
-import { ActiveRoundsCarousel } from '@/components/dashboard/ActiveRoundsCarousel';
+
 import { SortableTaskList } from '@/components/app/SortableTaskList';
 import { MonthCalendar } from '@/components/app/MonthCalendar';
 import { ProgramEventCard } from '@/components/app/ProgramEventCard';
