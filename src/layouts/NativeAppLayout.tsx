@@ -201,7 +201,7 @@ const NativeAppLayout = () => {
   // AI Planner FAB vertical offset: sits above nav; rises when mini players appear
   const showAudioMini = !!currentTrack && !isOnPlayerPage && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen;
   const showRoutineMini = routineMiniVisible && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen;
-  let aiFabBottomOffset = 54; // px above safe-area inset
+  let aiFabBottomOffset = 76; // px above safe-area inset (clears the nav pill)
   if (showRoutineMini) aiFabBottomOffset += 98;
   if (showAudioMini) aiFabBottomOffset += 60;
 
