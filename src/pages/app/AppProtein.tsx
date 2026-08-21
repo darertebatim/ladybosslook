@@ -103,14 +103,44 @@ const AppProtein = () => {
   }, [proteinTask, selectedDate, addGoalProgress, goalUnit, goalTarget, t]);
 
   const handleOpenSettings = useCallback(() => {
-    if (proteinTask) {
-      haptic.light();
-      setShowGoalSheet(true);
-    } else {
-      haptic.light();
-      setShowRoutineSheet(true);
-    }
-  }, [proteinTask, navigate]);
+    haptic.light();
+    setShowGoalSheet(true);
+  }, []);
+
+  const handleCreateWithGoal = useCallback((target: number) => {
+    setIsSavingRoutine(true);
+    createTask.mutate(
+      {
+        title: 'Hit Protein Goal 🍗',
+        emoji: '🍗',
+        color: 'peach',
+        repeat_pattern: 'daily',
+        scheduled_time: null,
+        tag: 'pro',
+        reminder_enabled: false,
+        pro_link_type: 'protein',
+        pro_link_value: null,
+        goal_enabled: true,
+        goal_type: 'count',
+        goal_target: target,
+        goal_unit: DEFAULT_PROTEIN_UNIT,
+      },
+      {
+        onSuccess: () => {
+          haptic.success();
+          toast.success(`Daily goal set to ${target}${DEFAULT_PROTEIN_UNIT}`);
+          setShowGoalSheet(false);
+          setIsSavingRoutine(false);
+          queryClient.invalidateQueries({ queryKey: ['planner-tasks-for-date'] });
+        },
+        onError: () => {
+          toast.error(t('tier1.protein.addFailed'));
+          setIsSavingRoutine(false);
+        },
+      }
+    );
+  }, [createTask, queryClient, t]);
+
 
   const handleSaveRoutine = useCallback((_selectedTaskIds: string[], editedTasks: EditedTask[]) => {
     const editedProtein = editedTasks.find((task) => task.id === 'protein-routine-template');
