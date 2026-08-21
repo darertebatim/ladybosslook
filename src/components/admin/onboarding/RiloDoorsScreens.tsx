@@ -65,7 +65,7 @@ const DOORS: {
   {
     key: 'financial',
     emoji: '💰',
-    label: 'I want calm with money',
+    label: 'I want to understand money better',
     blurb: 'Money stress, budgets, saving — build a steady money rhythm.',
     tint: 'rgba(52,211,153,0.55)',
     ring: 'from-green-300 via-emerald-300 to-lime-300',
