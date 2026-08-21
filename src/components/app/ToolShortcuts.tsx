@@ -404,13 +404,6 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
 
   return (
     <section>
-      {!hideLabels && (
-        <div className="flex items-center justify-between mb-1.5 px-1">
-          <h2 className="text-sm font-semibold text-foreground">My Shortcuts</h2>
-          {hasAny && <p className="text-[10px] text-muted-foreground">Long press to remove</p>}
-        </div>
-      )}
-
       <div className="grid grid-cols-4 gap-2">
         {shortcuts.map((shortcut, i) => {
           if (shortcut) {
