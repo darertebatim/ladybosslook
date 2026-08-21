@@ -134,6 +134,15 @@ const NativeAppLayout = () => {
     // AudioPlayerContext not available yet
   }
 
+  // Routine mini player visibility
+  let routineMiniVisible = false;
+  try {
+    const rp = useRoutinePlayerContext();
+    routineMiniVisible = rp.isActive && rp.isMinimized;
+  } catch {
+    // RoutinePlayerContext not available yet
+  }
+
   // Reset viewport zoom on navigation to fix iOS zoom bug
   useEffect(() => {
     resetViewportZoom();
