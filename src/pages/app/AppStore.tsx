@@ -488,19 +488,44 @@ const AppStore = () => {
                 <h2 className="text-base font-bold text-fg-warm mb-2 px-1">
                   {t("toolsPage.allTools")}
                 </h2>
-                {/* All tools in single scrollable row */}
-                <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
-                  {filteredWellnessTools.map((tool) => (
-                    <ToolCard
-                      key={tool.id}
-                      tool={tool}
-                      size="compact"
-                      className={`tour-tool-${tool.id}`}
-                    />
-                  ))}
-                  {filteredAudioTools
-                    .filter((t) => t.id === "meditate" || t.id === "soundscape")
-                    .map((tool) => (
+
+                {/* First row: wellness tools except trackers */}
+                {!searchQuery && (
+                  <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
+                    {filteredWellnessTools
+                      .filter(
+                        (t) =>
+                          !["water", "protein", "period", "fasting"].includes(
+                            t.id,
+                          ),
+                      )
+                      .map((tool) => (
+                        <ToolCard
+                          key={tool.id}
+                          tool={tool}
+                          size="compact"
+                          className={`tour-tool-${tool.id}`}
+                        />
+                      ))}
+                    {filteredAudioTools
+                      .filter(
+                        (t) => t.id === "meditate" || t.id === "soundscape",
+                      )
+                      .map((tool) => (
+                        <ToolCard
+                          key={tool.id}
+                          tool={tool}
+                          size="compact"
+                          className={`tour-tool-${tool.id}`}
+                        />
+                      ))}
+                  </div>
+                )}
+
+                {/* Search results: all matching tools in one row */}
+                {searchQuery && (
+                  <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
+                    {filteredWellnessTools.map((tool) => (
                       <ToolCard
                         key={tool.id}
                         tool={tool}
@@ -508,7 +533,40 @@ const AppStore = () => {
                         className={`tour-tool-${tool.id}`}
                       />
                     ))}
-                </div>
+                    {filteredAudioTools
+                      .filter(
+                        (t) => t.id === "meditate" || t.id === "soundscape",
+                      )
+                      .map((tool) => (
+                        <ToolCard
+                          key={tool.id}
+                          tool={tool}
+                          size="compact"
+                          className={`tour-tool-${tool.id}`}
+                        />
+                      ))}
+                  </div>
+                )}
+
+                {/* Second row: trackers */}
+                {!searchQuery && (
+                  <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pt-1 pb-2 scrollbar-hide">
+                    {filteredWellnessTools
+                      .filter((t) =>
+                        ["water", "protein", "period", "fasting"].includes(
+                          t.id,
+                        ),
+                      )
+                      .map((tool) => (
+                        <ToolCard
+                          key={tool.id}
+                          tool={tool}
+                          size="compact"
+                          className={`tour-tool-${tool.id}`}
+                        />
+                      ))}
+                  </div>
+                )}
               </section>
             )}
             {/* Self-Care Quiz Banner - directly under Tools row */}
