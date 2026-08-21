@@ -470,9 +470,7 @@ const AppStore = () => {
             />
 
             {/* Tools Section */}
-            {(!searchQuery ||
-              filteredWellnessTools.length > 0 ||
-              filteredAudioTools.length > 0) && (
+            {(!searchQuery || filteredWellnessTools.length > 0) && (
               <section className="tour-tools-section">
                 <h2 className="text-base font-bold text-fg-warm mb-2 px-1">
                   {t("toolsPage.allTools")}
