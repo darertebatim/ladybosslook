@@ -33,7 +33,7 @@ export function getPresetIcon(key?: string | null): LucideIcon {
   return (key && PRESET_ICONS[key]) || Utensils;
 }
 
-// Common protein sources with explicit portions
+// Common protein sources with explicit portions (max 8 shortcuts)
 export const PROTEIN_PRESETS: ProteinPreset[] = [
   { label: 'Egg', value: 6, icon: Egg, iconKey: 'egg', portion: '1 large egg' },
   { label: 'Greek yogurt', value: 17, icon: Milk, iconKey: 'milk', portion: '1 cup (170g)' },
@@ -42,9 +42,7 @@ export const PROTEIN_PRESETS: ProteinPreset[] = [
   { label: 'Chicken thigh', value: 21, icon: Ham, iconKey: 'thigh', portion: '1 thigh (~85g)' },
   { label: 'Chicken wings', value: 12, icon: Drumstick, iconKey: 'wing', portion: '2 wings' },
   { label: 'Tuna', value: 30, icon: Fish, iconKey: 'fish', portion: '1 can drained (142g)' },
-  { label: 'Cottage cheese', value: 14, icon: Milk, iconKey: 'milk', portion: '½ cup' },
   { label: 'Protein bar', value: 20, icon: Cookie, iconKey: 'bar', portion: '1 bar' },
-  { label: 'Tofu', value: 10, icon: Bean, iconKey: 'bean', portion: '½ cup firm' },
 ];
 
 export function isProteinTask(task: UserTask): boolean {

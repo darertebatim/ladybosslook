@@ -98,9 +98,9 @@ export const WaterInputSheet = ({
           </span>
         </div>
 
-        {/* Cup size presets */}
+        {/* Cup size presets — max 8 */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2 -mx-4 px-4">
-          {presets.map((preset) => {
+          {presets.slice(0, 8).map((preset) => {
             const PresetIcon = preset.icon;
             const isSelected = value === preset.value.toString();
             return (
