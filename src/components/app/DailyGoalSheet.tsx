@@ -11,10 +11,14 @@ import { useNavigate } from 'react-router-dom';
 interface DailyGoalSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  task: UserTask;
+  task?: UserTask | null;
   title: string;
   unit: string;
   presets: number[];
+  defaultTarget?: number;
+  /** Called when there is no task yet — should create the task with this goal */
+  onCreate?: (target: number) => void;
+  isCreating?: boolean;
 }
 
 export const DailyGoalSheet = ({
@@ -24,14 +28,17 @@ export const DailyGoalSheet = ({
   title,
   unit,
   presets,
+  defaultTarget,
+  onCreate,
+  isCreating,
 }: DailyGoalSheetProps) => {
   const navigate = useNavigate();
   const updateTask = useUpdateTask();
-  const [value, setValue] = useState<string>(String(task.goal_target ?? ''));
+  const [value, setValue] = useState<string>(String(task?.goal_target ?? defaultTarget ?? ''));
 
   useEffect(() => {
-    if (open) setValue(String(task.goal_target ?? ''));
-  }, [open, task.goal_target]);
+    if (open) setValue(String(task?.goal_target ?? defaultTarget ?? ''));
+  }, [open, task?.goal_target, defaultTarget]);
 
   const numeric = Number(value);
   const valid = Number.isFinite(numeric) && numeric > 0;
@@ -39,6 +46,12 @@ export const DailyGoalSheet = ({
   const handleSave = () => {
     if (!valid) return;
     haptic.light();
+
+    if (!task) {
+      onCreate?.(numeric);
+      return;
+    }
+
     updateTask.mutate(
       { id: task.id, goal_enabled: true, goal_type: 'count', goal_target: numeric, goal_unit: unit },
       {
@@ -51,6 +64,7 @@ export const DailyGoalSheet = ({
       }
     );
   };
+
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
