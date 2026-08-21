@@ -332,6 +332,7 @@ serve(async (req) => {
           program: program,
           payment_type: programData.payment_type,
           product_name: productName,
+          ...(authUserId ? { auth_user_id: authUserId } : {}),
         },
       };
 
@@ -400,6 +401,7 @@ serve(async (req) => {
           program_slug: program,
           payment_type: programData.payment_type,
           product_name: productName,
+          ...(authUserId ? { auth_user_id: authUserId } : {}),
         },
       };
 
