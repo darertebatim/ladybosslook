@@ -571,6 +571,11 @@ export default function AppMyRiloPath() {
             <HomeBanner location="my_rilo_top" className="py-1" />
           </div>
 
+          {/* Quick shortcuts — under header, above date */}
+          <div className="px-4 pt-2 pb-1">
+            <ToolShortcuts hideWhenEmpty />
+          </div>
+
           {/* Hero greeting */}
           <div className="px-5 pt-4 pb-3 relative z-10">
             <div
