@@ -320,16 +320,6 @@ const AppStore = () => {
     );
   }, [searchQuery]);
 
-  const filteredAudioTools = useMemo(() => {
-    if (!searchQuery.trim()) return audioTools;
-    const query = searchQuery.toLowerCase();
-    return audioTools.filter(
-      (t) =>
-        t.name.toLowerCase().includes(query) ||
-        t.description.toLowerCase().includes(query),
-    );
-  }, [searchQuery]);
-
   // Filter programs by search only (no category filter anymore)
   const filteredPrograms = useMemo(() => {
     let result = allBrowsePrograms;
