@@ -1184,6 +1184,23 @@
       "focus": "تمرکز",
       "popular": "محبوب",
       "routines": "روتین‌ها"
+    },
+    "protein": {
+      "title": "پروتئین",
+      "intakeGoal": "پروتئین دریافتی و هدف تو",
+      "goalReached": "به هدف رسیدی!",
+      "addToTrack": "به روتین اضافه کن تا روزانه ثبت شود",
+      "addProtein": "افزودن پروتئین",
+      "addedGoToPlanner": "اضافه شد — رفتن به برنامه‌ریز",
+      "addAgain": "دوباره اضافه کن",
+      "plusFeatureTitle": "ردیاب پروتئین یک قابلیت Plus است",
+      "plusFeatureDesc": "برای ثبت پروتئین با هدف روزانه و یادآور، به Rilo Plus ارتقا بده.",
+      "addedToRoutines": "ردیابی پروتئین به روتین‌هایت اضافه شد!",
+      "addFailed": "افزودن ردیابی پروتئین ناموفق بود",
+      "addToRoutineDesc": "ردیابی پروتئین را به روتینت اضافه کن تا پیشرفتت ذخیره شود!",
+      "addRoutine": "افزودن روتین",
+      "progressFormat": "پیشرفت: {{current}}/{{target}}",
+      "routineTitle": "ردیابی پروتئین"
     }
   },
   "routinePlayer": {
