@@ -93,6 +93,9 @@ export function ProLinkPicker({
             <p className="text-xs text-foreground font-medium">
               Link this task to an app feature for one-tap access.
             </p>
+            <p className="text-[11px] font-medium text-destructive">
+              Long press to remove
+            </p>
 
             {proLinkType && (
               <motion.button
