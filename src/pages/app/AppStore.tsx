@@ -30,7 +30,6 @@ import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
 import { HomeMenu } from "@/components/app/HomeMenu";
 import {
   wellnessTools,
-  audioTools,
   getVisibleComingSoon,
 } from "@/lib/toolsConfig";
 import { PromoBanner } from "@/components/app/PromoBanner";
