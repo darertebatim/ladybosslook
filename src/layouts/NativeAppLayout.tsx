@@ -333,7 +333,7 @@ const NativeAppLayout = () => {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
-          className="fixed left-4 z-[55] flex flex-col items-center"
+          className="fixed right-4 z-[55] flex flex-col items-center"
           style={{
             bottom: `calc(${aiFabBottomOffset}px + env(safe-area-inset-bottom))`,
           }}
