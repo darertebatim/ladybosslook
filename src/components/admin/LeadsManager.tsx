@@ -1219,7 +1219,19 @@ export function LeadsManager() {
                         Joined: {new Date(searchResults.profile.created_at).toLocaleDateString()}
                       </span>
                     </div>
+                    {mergedEmails.length > 0 && (
+                      <div className="flex items-start gap-2 md:col-span-2">
+                        <GitMerge className="h-4 w-4 text-muted-foreground mt-0.5" />
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm text-muted-foreground">Merged emails:</span>
+                          {mergedEmails.map((m) => (
+                            <Badge key={m} variant="secondary" className="text-xs">{m}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
+
                   
                   {/* Push Notifications Section */}
                   <div className="mt-4 pt-4 border-t">
