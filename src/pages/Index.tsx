@@ -19,7 +19,7 @@ const Index = () => {
   useEffect(() => {
     if (isNativeApp()) {
       if (user) {
-        navigate('/app/my-rilo', { replace: true });
+        navigate('/app/path', { replace: true });
       } else {
         navigate('/auth', { replace: true });
       }

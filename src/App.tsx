@@ -86,7 +86,7 @@ const AppRootRedirect = () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
-          if (!cancelled) setTarget('/app/my-rilo');
+          if (!cancelled) setTarget('/app/path');
           return;
         }
         const { data } = await (supabase as any)
@@ -101,9 +101,9 @@ const AppRootRedirect = () => {
           if (data?.user_locked) localStorage.setItem('rilo:lock-on-rilobiz', '1');
           else localStorage.removeItem('rilo:lock-on-rilobiz');
         } catch {}
-        if (!cancelled) setTarget(locked ? '/app/rilobiz/app' : '/app/my-rilo');
+        if (!cancelled) setTarget(locked ? '/app/rilobiz/app' : '/app/path');
       } catch {
-        if (!cancelled) setTarget('/app/my-rilo');
+        if (!cancelled) setTarget('/app/path');
       }
     })();
     return () => { cancelled = true; };
@@ -620,7 +620,8 @@ const App = () => (
                     <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                       <Route index element={<AppRootRedirect />} />
                       <Route path="home" element={<AppHome />} />
-                      <Route path="my-rilo" element={<AppMyRiloPath />} />
+                      <Route path="path" element={<AppMyRiloPath />} />
+                      <Route path="my-rilo" element={<Navigate to="/app/path" replace />} />
                       <Route path="myprograms" element={<AppPrograms />} />
                       <Route path="programs" element={<Navigate to="/app/myprograms" replace />} />
                       <Route path="tools" element={<AppStore />} />

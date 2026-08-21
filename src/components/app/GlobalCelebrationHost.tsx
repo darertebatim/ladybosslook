@@ -18,7 +18,7 @@ import { useAuth } from '@/hooks/useAuth';
  *
  * Detects celebration-worthy events (first action, badge level-ups, gold streak,
  * challenge day) from anywhere in the app and shows the corresponding modal
- * only when the user is on /app/home or /app/my-rilo. If a trigger fires
+ * only when the user is on /app/home or /app/path. If a trigger fires
  * elsewhere, it remains pending (via localStorage flags) and pops the next
  * time the user lands on either of those pages.
  *
@@ -55,7 +55,7 @@ export function GlobalCelebrationHost() {
   const { user } = useAuth();
   const { pathname } = useLocation();
   const allowedRoute =
-    pathname.startsWith('/app/home') || pathname.startsWith('/app/my-rilo');
+    pathname.startsWith('/app/home') || pathname.startsWith('/app/path');
 
   const todayStr = getLocalDateStr();
   const today = useMemo(() => new Date(), []);

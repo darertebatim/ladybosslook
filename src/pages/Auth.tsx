@@ -51,7 +51,7 @@ export default function Auth() {
 
   // Read redirect param from URL (e.g. /auth?redirect=/cart)
   const searchParams = new URLSearchParams(window.location.search);
-  const redirectPath = searchParams.get('redirect') || '/app/my-rilo';
+  const redirectPath = searchParams.get('redirect') || '/app/path';
   const hasCustomRedirect = searchParams.has('redirect');
 
   // Redirect if already authenticated, or to onboarding if not seen yet

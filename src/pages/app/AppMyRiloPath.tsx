@@ -420,7 +420,7 @@ export default function AppMyRiloPath() {
     // user's tap IS the completion intent.
     markStepTapped(step.id);
     qc.invalidateQueries({ queryKey: ["today-path"] });
-    navigate(step.startHref, { state: { from: "/app/my-rilo" } });
+    navigate(step.startHref, { state: { from: "/app/path" } });
   };
   const handleSkip = (step: PathStep) => {
     if (step.kind === "reward") return;
