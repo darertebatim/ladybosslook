@@ -108,20 +108,23 @@ export const DailyGoalSheet = ({
 
           <Button
             onClick={handleSave}
-            disabled={!valid || updateTask.isPending}
+            disabled={!valid || updateTask.isPending || !!isCreating}
             className="w-full h-12 rounded-2xl"
           >
             <Check className="h-4 w-4 mr-2" />
-            Save goal
+            {task ? 'Save goal' : 'Save goal & start tracking'}
           </Button>
 
-          <button
-            onClick={() => { onOpenChange(false); navigate(`/app/home/edit/${task.id}`); }}
-            className="w-full h-11 rounded-2xl text-sm text-muted-foreground flex items-center justify-center gap-2 active:bg-muted"
-          >
-            <Pencil className="h-4 w-4" />
-            Edit task (reminders, schedule)
-          </button>
+          {task && (
+            <button
+              onClick={() => { onOpenChange(false); navigate(`/app/home/edit/${task.id}`); }}
+              className="w-full h-11 rounded-2xl text-sm text-muted-foreground flex items-center justify-center gap-2 active:bg-muted"
+            >
+              <Pencil className="h-4 w-4" />
+              Edit task (reminders, schedule)
+            </button>
+          )}
+
         </div>
       </SheetContent>
     </Sheet>
