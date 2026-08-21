@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import { useTasksForDate, useCompletionsForDate, useAddGoalProgress, useCreateTask, UserTask } from '@/hooks/useTaskPlanner';
 import { isWaterTask, createWaterRoutineTask } from '@/lib/waterTracking';
 import { WaterInputSheet } from '@/components/app/WaterInputSheet';
+import { DailyGoalSheet } from '@/components/app/DailyGoalSheet';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { haptic } from '@/lib/haptics';
@@ -27,6 +28,7 @@ const AppWater = () => {
   const navigate = useNavigate();
   const [selectedDate] = useState(new Date());
   const [showInputSheet, setShowInputSheet] = useState(false);
+  const [showGoalSheet, setShowGoalSheet] = useState(false);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [localProgress, setLocalProgress] = useState(0);
@@ -116,7 +118,8 @@ const AppWater = () => {
   // Handle opening settings (edit task)
   const handleOpenSettings = useCallback(() => {
     if (waterTask) {
-      navigate(`/app/home/edit/${waterTask.id}`);
+      haptic.light();
+      setShowGoalSheet(true);
     } else {
       // No task - open routine sheet instead
       haptic.light();
@@ -434,6 +437,17 @@ const AppWater = () => {
       </div>
 
       {/* Water input sheet */}
+      {waterTask && (
+        <DailyGoalSheet
+          open={showGoalSheet}
+          onOpenChange={setShowGoalSheet}
+          task={waterTask}
+          title="Water Goal"
+          unit={goalUnit}
+          presets={[48, 64, 80, 96, 100, 120, 128, 160]}
+        />
+      )}
+
       <WaterInputSheet
         open={showInputSheet}
         onOpenChange={setShowInputSheet}

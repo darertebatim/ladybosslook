@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { useTasksForDate, useCompletionsForDate, useAddGoalProgress, useCreateTask } from '@/hooks/useTaskPlanner';
 import { isProteinTask, createProteinRoutineTask } from '@/lib/proteinTracking';
 import { ProteinInputSheet } from '@/components/app/ProteinInputSheet';
+import { DailyGoalSheet } from '@/components/app/DailyGoalSheet';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { StreakCelebration } from '@/components/app/StreakCelebration';
 import { haptic } from '@/lib/haptics';
@@ -24,6 +25,7 @@ const AppProtein = () => {
   const navigate = useNavigate();
   const [selectedDate] = useState(new Date());
   const [showInputSheet, setShowInputSheet] = useState(false);
+  const [showGoalSheet, setShowGoalSheet] = useState(false);
   const [showRoutineSheet, setShowRoutineSheet] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [localProgress, setLocalProgress] = useState(0);
@@ -102,7 +104,8 @@ const AppProtein = () => {
 
   const handleOpenSettings = useCallback(() => {
     if (proteinTask) {
-      navigate(`/app/home/edit/${proteinTask.id}`);
+      haptic.light();
+      setShowGoalSheet(true);
     } else {
       haptic.light();
       setShowRoutineSheet(true);
@@ -343,6 +346,17 @@ const AppProtein = () => {
           .animate-float-delayed { animation: float-delayed 4s ease-in-out infinite; }
         `}</style>
       </div>
+
+      {proteinTask && (
+        <DailyGoalSheet
+          open={showGoalSheet}
+          onOpenChange={setShowGoalSheet}
+          task={proteinTask}
+          title="Protein Goal"
+          unit={goalUnit}
+          presets={[60, 80, 100, 120, 140, 160, 180, 200]}
+        />
+      )}
 
       <ProteinInputSheet
         open={showInputSheet}
