@@ -26,7 +26,7 @@ const CATEGORIES: CategoryGroup[] = [
   {
     id: 'wellness',
     label: 'Wellness Tools',
-    links: ['journal', 'breathe', 'mood', 'emotion', 'reflection', 'presence', 'water', 'period', 'fasting', 'weight', 'focus_timer'],
+    links: ['journal', 'breathe', 'mood', 'emotion', 'reflection', 'presence', 'water', 'protein', 'period', 'fasting', 'weight', 'focus_timer'],
   },
   {
     id: 'media',
@@ -133,6 +133,7 @@ export function ProLinkPicker({
                       '/app/mood': 'mood',
                       '/app/emotion': 'emotion',
                       '/app/water': 'water',
+                      '/app/protein': 'protein',
                       '/app/fasting': 'fasting',
                       '/app/period': 'period',
                       '/app/presence': 'presence',

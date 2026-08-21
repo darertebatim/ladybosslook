@@ -28,6 +28,7 @@ const TOOL_PATHS: Record<string, string> = {
   emotion: 'Emotions',
   fasting: 'Fasting',
   water: 'Water',
+  protein: 'Protein',
   period: 'Period',
   reflections: 'Reflections',
   timer: 'Focus Timer',

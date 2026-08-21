@@ -122,6 +122,7 @@ const AppRoutinePlayerPage = lazy(() => import("@/pages/app/AppRoutinePlayer"));
 const AppBreathe = lazy(() => import("@/pages/app/AppBreathe"));
 const AppBreatheStats = lazy(() => import("@/pages/app/AppBreatheStats"));
 const AppWater = lazy(() => import("@/pages/app/AppWater"));
+const AppProtein = lazy(() => import("@/pages/app/AppProtein"));
 const AppPeriod = lazy(() => import("@/pages/app/AppPeriod"));
 const AppEmotion = lazy(() => import("@/pages/app/AppEmotion"));
 const AppEmotionHistory = lazy(() => import("@/pages/app/AppEmotionHistory"));
@@ -584,6 +585,7 @@ const App = () => (
                     <Route path="/app/breathe" element={<ProtectedRoute><AppBreathe /></ProtectedRoute>} />
                     <Route path="/app/breathe/stats" element={<ProtectedRoute><AppBreatheStats /></ProtectedRoute>} />
                     <Route path="/app/water" element={<ProtectedRoute><AppWater /></ProtectedRoute>} />
+                    <Route path="/app/protein" element={<ProtectedRoute><AppProtein /></ProtectedRoute>} />
                     <Route path="/app/period" element={<ProtectedRoute><AppPeriod /></ProtectedRoute>} />
                     <Route path="/app/emotion" element={<ProtectedRoute><AppEmotion /></ProtectedRoute>} />
                     <Route path="/app/emotion/history" element={<ProtectedRoute><AppEmotionHistory /></ProtectedRoute>} />
