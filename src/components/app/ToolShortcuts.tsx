@@ -423,18 +423,7 @@ export function ToolShortcuts({ hideWhenEmpty = false, hideLabels = false }: { h
                   <span className="text-[10px] font-bold text-foreground leading-tight text-center line-clamp-3 w-full px-1">
                     {shortcut.value ? shortcut.label : (PRO_LINK_CONFIGS[shortcut.type]?.label || shortcut.label)}
                   </span>
-                  {(() => {
-                    const isDone = shortcut.type === 'mood'
-                      ? !!todayMood
-                      : isShortcutCompletedToday(proLinkCompletions, shortcut.type, shortcut.value);
-                    return isDone ? (
-                        <div className="absolute top-1 right-1 w-4 h-4 rounded-full flex items-center justify-center shadow-sm bg-emerald-500">
-                          <Check className="h-2.5 w-2.5 text-white" strokeWidth={3} />
-                        </div>
-                      ) : (
-                        <span className="absolute top-1 right-1 text-[12px] leading-none">⭕️</span>
-                      );
-                  })()}
+                  {/* Completion indicator hidden temporarily */}
                 </div>
               </ShortcutSlot>
             );
