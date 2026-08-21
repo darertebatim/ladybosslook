@@ -495,9 +495,13 @@ const AppStore = () => {
                     {filteredWellnessTools
                       .filter(
                         (t) =>
-                          !["water", "protein", "period", "fasting"].includes(
-                            t.id,
-                          ),
+                          ![
+                            "water",
+                            "protein",
+                            "period",
+                            "fasting",
+                            "focus-timer",
+                          ].includes(t.id),
                       )
                       .map((tool) => (
                         <ToolCard
@@ -553,9 +557,13 @@ const AppStore = () => {
                   <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pt-1 pb-2 scrollbar-hide">
                     {filteredWellnessTools
                       .filter((t) =>
-                        ["water", "protein", "period", "fasting"].includes(
-                          t.id,
-                        ),
+                        [
+                          "water",
+                          "protein",
+                          "period",
+                          "fasting",
+                          "focus-timer",
+                        ].includes(t.id),
                       )
                       .map((tool) => (
                         <ToolCard
