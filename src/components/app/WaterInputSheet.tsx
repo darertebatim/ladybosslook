@@ -65,6 +65,7 @@ export const WaterInputSheet = ({
     <Sheet open={open} onOpenChange={handleClose}>
       <SheetContent 
         side="bottom" 
+        hideCloseButton
         className="rounded-t-3xl px-4 pt-6 pb-8 bg-gradient-to-b from-white to-sky-50"
         style={{ paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}
       >

@@ -79,6 +79,7 @@ export const ProteinInputSheet = ({
     <Sheet open={open} onOpenChange={handleClose}>
       <SheetContent
         side="bottom"
+        hideCloseButton
         className="rounded-t-3xl px-4 pt-6 pb-8 bg-gradient-to-b from-white to-orange-50 max-h-[92vh] overflow-y-auto"
         style={{ paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}
       >
