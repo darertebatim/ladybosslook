@@ -337,8 +337,7 @@ const AppStore = () => {
   }, [allBrowsePrograms, searchQuery]);
 
   // Check if any tools match search
-  const hasToolMatches =
-    filteredWellnessTools.length > 0 || filteredAudioTools.length > 0;
+  const hasToolMatches = filteredWellnessTools.length > 0;
   const hasProgramMatches = filteredPrograms.length > 0;
 
   const handleEnroll = async (program: (typeof freePrograms)[0]) => {
