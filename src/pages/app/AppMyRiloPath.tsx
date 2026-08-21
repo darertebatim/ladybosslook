@@ -379,18 +379,6 @@ export default function AppMyRiloPath() {
   const swap = useSwapPathStep();
   const skipTomorrow = useSkipTomorrowPathStep();
 
-  // Active rounds data for "Your Programs" carousel
-  const homeDataQuery = useNewHomeData() as any;
-  const { activeRounds = [], nextSessionMap = {} } = homeDataQuery;
-  const { programs } = usePrograms();
-  const programImageMap = useMemo(() => {
-    const map: Record<string, string> = {};
-    programs.forEach((p) => {
-      if (p.slug && p.image) map[p.slug] = p.image;
-    });
-    return map;
-  }, [programs]);
-
   const [swapTarget, setSwapTarget] = useState<PathStep | null>(null);
   const { data: trophyCount = 0 } = useMyRiloPathTrophies();
 
