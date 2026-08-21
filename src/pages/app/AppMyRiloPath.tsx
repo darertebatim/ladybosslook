@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ToolShortcuts } from "@/components/app/ToolShortcuts";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight, Headset, Award, Compass, GraduationCap } from "lucide-react";
@@ -568,6 +569,11 @@ export default function AppMyRiloPath() {
           <div className="px-4 pt-2">
             <PromoBanner location="my_rilo_top" className="py-1" />
             <HomeBanner location="my_rilo_top" className="py-1" />
+          </div>
+
+          {/* Quick shortcuts — under header, above date */}
+          <div className="px-4 pt-2 pb-1">
+            <ToolShortcuts hideWhenEmpty />
           </div>
 
           {/* Hero greeting */}
