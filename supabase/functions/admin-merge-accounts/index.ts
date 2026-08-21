@@ -153,6 +153,60 @@ serve(async (req) => {
       }
     }
 
+    let mergedSubscriptions = 0
+
+    if (secondaryProfile) {
+      // Transfer subscriptions that the primary doesn't already have
+      const { data: subs } = await supabaseAdmin
+        .from('user_subscriptions')
+        .select('id')
+        .eq('user_id', secondaryProfile.id)
+
+      if (subs && subs.length > 0) {
+        const { data: primarySubs } = await supabaseAdmin
+          .from('user_subscriptions')
+          .select('id')
+          .eq('user_id', primaryUserId)
+
+        if (!primarySubs || primarySubs.length === 0) {
+          const { error: subErr } = await supabaseAdmin
+            .from('user_subscriptions')
+            .update({ user_id: primaryUserId })
+            .eq('user_id', secondaryProfile.id)
+          if (!subErr) mergedSubscriptions = subs.length
+        }
+      }
+
+      // Transfer any cart items
+      await supabaseAdmin
+        .from('cart_items')
+        .update({ user_id: primaryUserId })
+        .eq('user_id', secondaryProfile.id)
+
+      // Re-point any aliases that pointed at the secondary account
+      await supabaseAdmin
+        .from('account_email_aliases')
+        .update({ primary_user_id: primaryUserId })
+        .eq('primary_user_id', secondaryProfile.id)
+    }
+
+    // Record the secondary email as an alias of the primary account,
+    // so searching either email resolves to the same single account.
+    if (normalizedEmail !== (primaryProfile.email || '').toLowerCase()) {
+      const { error: aliasError } = await supabaseAdmin
+        .from('account_email_aliases')
+        .upsert({
+          primary_user_id: primaryUserId,
+          email: normalizedEmail,
+          merged_from_user_id: secondaryProfile?.id ?? null,
+          merged_by: user.id,
+        }, { onConflict: 'email' })
+
+      if (aliasError) {
+        console.error('Error recording email alias:', aliasError)
+      }
+    }
+
     // Log the merge action
     console.log(`Account merge completed: ${normalizedEmail} -> ${primaryProfile.email}`)
     console.log(`Orders: ${mergedOrders}, Enrollments: ${mergedEnrollments}`)
