@@ -14,8 +14,6 @@ import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 import { useQueryClient } from '@tanstack/react-query';
-import { useSubscription } from '@/hooks/useSubscription';
-import { PaywallSheet } from '@/components/app/PaywallSheet';
 
 const DEFAULT_PROTEIN_GOAL = 100;
 const DEFAULT_PROTEIN_UNIT = 'g';
@@ -40,8 +38,6 @@ const AppProtein = () => {
   const createTask = useCreateTask();
   const queryClient = useQueryClient();
   const [isSavingRoutine, setIsSavingRoutine] = useState(false);
-  const { isSubscribed, isLoading: subLoading } = useSubscription();
-  const [showPaywall, setShowPaywall] = useState(false);
 
   const proteinTask = useMemo(() => tasks.find((task) => isProteinTask(task)), [tasks]);
 
