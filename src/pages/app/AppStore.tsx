@@ -30,7 +30,6 @@ import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
 import { HomeMenu } from "@/components/app/HomeMenu";
 import {
   wellnessTools,
-  audioTools,
   getVisibleComingSoon,
 } from "@/lib/toolsConfig";
 import { PromoBanner } from "@/components/app/PromoBanner";
@@ -320,16 +319,6 @@ const AppStore = () => {
     );
   }, [searchQuery]);
 
-  const filteredAudioTools = useMemo(() => {
-    if (!searchQuery.trim()) return audioTools;
-    const query = searchQuery.toLowerCase();
-    return audioTools.filter(
-      (t) =>
-        t.name.toLowerCase().includes(query) ||
-        t.description.toLowerCase().includes(query),
-    );
-  }, [searchQuery]);
-
   // Filter programs by search only (no category filter anymore)
   const filteredPrograms = useMemo(() => {
     let result = allBrowsePrograms;
@@ -347,8 +336,7 @@ const AppStore = () => {
   }, [allBrowsePrograms, searchQuery]);
 
   // Check if any tools match search
-  const hasToolMatches =
-    filteredWellnessTools.length > 0 || filteredAudioTools.length > 0;
+  const hasToolMatches = filteredWellnessTools.length > 0;
   const hasProgramMatches = filteredPrograms.length > 0;
 
   const handleEnroll = async (program: (typeof freePrograms)[0]) => {
@@ -481,15 +469,13 @@ const AppStore = () => {
             />
 
             {/* Tools Section */}
-            {(!searchQuery ||
-              filteredWellnessTools.length > 0 ||
-              filteredAudioTools.length > 0) && (
+            {(!searchQuery || filteredWellnessTools.length > 0) && (
               <section className="tour-tools-section">
                 <h2 className="text-base font-bold text-fg-warm mb-2 px-1">
                   {t("toolsPage.allTools")}
                 </h2>
 
-                {/* First row: wellness tools except trackers */}
+                {/* First row: wellness tools except trackers (5 static buttons) */}
                 {!searchQuery && (
                   <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
                     {filteredWellnessTools
@@ -511,22 +497,10 @@ const AppStore = () => {
                           className={`tour-tool-${tool.id}`}
                         />
                       ))}
-                    {filteredAudioTools
-                      .filter(
-                        (t) => t.id === "meditate" || t.id === "soundscape",
-                      )
-                      .map((tool) => (
-                        <ToolCard
-                          key={tool.id}
-                          tool={tool}
-                          size="compact"
-                          className={`tour-tool-${tool.id}`}
-                        />
-                      ))}
                   </div>
                 )}
 
-                {/* Search results: all matching tools in one row */}
+                {/* Search results: all matching wellness tools only */}
                 {searchQuery && (
                   <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
                     {filteredWellnessTools.map((tool) => (
@@ -537,18 +511,6 @@ const AppStore = () => {
                         className={`tour-tool-${tool.id}`}
                       />
                     ))}
-                    {filteredAudioTools
-                      .filter(
-                        (t) => t.id === "meditate" || t.id === "soundscape",
-                      )
-                      .map((tool) => (
-                        <ToolCard
-                          key={tool.id}
-                          tool={tool}
-                          size="compact"
-                          className={`tour-tool-${tool.id}`}
-                        />
-                      ))}
                   </div>
                 )}
 
