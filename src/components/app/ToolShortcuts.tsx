@@ -35,6 +35,7 @@ const DEFAULT_SHORTCUTS: (ShortcutData | null)[] = [
 
 function loadShortcuts(): (ShortcutData | null)[] {
   try {
+    LEGACY_KEYS.forEach((k) => localStorage.removeItem(k));
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
