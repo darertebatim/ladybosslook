@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_email_aliases: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          merged_by: string | null
+          merged_from_user_id: string | null
+          primary_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          merged_by?: string | null
+          merged_from_user_id?: string | null
+          primary_user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          merged_by?: string | null
+          merged_from_user_id?: string | null
+          primary_user_id?: string
+        }
+        Relationships: []
+      }
       admin_ai_chat_messages: {
         Row: {
           content: string

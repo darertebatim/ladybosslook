@@ -107,6 +107,7 @@ export function LeadsManager() {
   const [isMerging, setIsMerging] = useState(false);
   const [isMergeDialogOpen, setIsMergeDialogOpen] = useState(false);
   const [mergeEmail, setMergeEmail] = useState('');
+  const [mergedEmails, setMergedEmails] = useState<string[]>([]);
   const [sendingTestTo, setSendingTestTo] = useState<string | null>(null);
   const [deletingSubscription, setDeletingSubscription] = useState<string | null>(null);
   const [coachAccessLoading, setCoachAccessLoading] = useState(false);
@@ -167,18 +168,52 @@ export function LeadsManager() {
       const email = searchQuery.toLowerCase().trim();
       
       // Search for user profile
-      const { data: profile } = await supabase
+      let { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .or(`email.ilike.%${email}%,full_name.ilike.%${searchQuery}%`)
         .maybeSingle();
 
-      // Search orders
+      // If the searched email was merged into another account, resolve to that account
+      const { data: aliasHit } = await supabase
+        .from('account_email_aliases')
+        .select('primary_user_id')
+        .ilike('email', email)
+        .maybeSingle();
+
+      if (aliasHit?.primary_user_id && profile?.id !== aliasHit.primary_user_id) {
+        const { data: primaryProfile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', aliasHit.primary_user_id)
+          .maybeSingle();
+        if (primaryProfile) profile = primaryProfile;
+      }
+
+      // Collect all emails belonging to this account (primary + merged aliases)
+      let aliasEmails: string[] = [];
+      if (profile?.id) {
+        const { data: aliasRows } = await supabase
+          .from('account_email_aliases')
+          .select('email')
+          .eq('primary_user_id', profile.id);
+        aliasEmails = (aliasRows || []).map((r: { email: string }) => r.email);
+      }
+      setMergedEmails(aliasEmails);
+
+      const accountEmails = [profile?.email, ...aliasEmails, email].filter(Boolean) as string[];
+      const uniqueEmails = [...new Set(accountEmails.map(e => e.toLowerCase()))];
+
+      // Search orders across every email on the account
       const { data: orders } = await supabase
         .from('orders')
         .select('*')
-        .or(`email.ilike.%${email}%,name.ilike.%${searchQuery}%`)
+        .or([
+          ...uniqueEmails.map(e => `email.ilike.%${e}%`),
+          `name.ilike.%${searchQuery}%`,
+        ].join(','))
         .order('created_at', { ascending: false });
+
 
       // Get payment info (city/country) from the most recent paid order
       let paymentInfo: { city: string | null; country: string | null } | null = null;
@@ -1184,7 +1219,19 @@ export function LeadsManager() {
                         Joined: {new Date(searchResults.profile.created_at).toLocaleDateString()}
                       </span>
                     </div>
+                    {mergedEmails.length > 0 && (
+                      <div className="flex items-start gap-2 md:col-span-2">
+                        <GitMerge className="h-4 w-4 text-muted-foreground mt-0.5" />
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm text-muted-foreground">Merged emails:</span>
+                          {mergedEmails.map((m) => (
+                            <Badge key={m} variant="secondary" className="text-xs">{m}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
+
                   
                   {/* Push Notifications Section */}
                   <div className="mt-4 pt-4 border-t">
