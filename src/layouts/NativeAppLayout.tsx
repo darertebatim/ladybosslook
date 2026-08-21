@@ -203,7 +203,7 @@ const NativeAppLayout = () => {
   const showRoutineMini = routineMiniVisible && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen;
   let aiFabBottomOffset = 76; // px above safe-area inset (clears the nav pill)
   if (showRoutineMini) aiFabBottomOffset += 98;
-  if (showAudioMini) aiFabBottomOffset += 60;
+  if (showAudioMini) aiFabBottomOffset += 84; // clears the audio mini-player
 
   return (
     <div className="flex flex-col h-[100dvh] bg-background app-theme font-farsi">
