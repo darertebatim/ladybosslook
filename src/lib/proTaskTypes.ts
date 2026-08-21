@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 
 // Pro Task link types and their configuration
-export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | 'video' | 'video_playlist' | 'focus_timer' | 'routine' | 'myprograms' | 'myprofile' | 'presence' | 'tasksbank' | 'listen' | 'watch' | 'myroutines' | 'projects' | 'reading' | 'reading_item';
+export type ProLinkType = 'playlist' | 'journal' | 'channel' | 'program' | 'planner' | 'inspire' | 'route' | 'breathe' | 'water' | 'protein' | 'period' | 'emotion' | 'audio' | 'mood' | 'fasting' | 'weight' | 'reflection' | 'video' | 'video_playlist' | 'focus_timer' | 'routine' | 'myprograms' | 'myprofile' | 'presence' | 'tasksbank' | 'listen' | 'watch' | 'myroutines' | 'projects' | 'reading' | 'reading_item';
 
 export interface ProLinkConfig {
   value: ProLinkType;
@@ -161,6 +161,19 @@ export const PRO_LINK_CONFIGS: Record<ProLinkType, ProLinkConfig> = {
     badgeColorClass: 'bg-sky-500/20 text-sky-700 dark:text-sky-300',
     buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
     description: 'Open the water tracking tool',
+    requiresValue: false,
+  },
+  protein: {
+    value: 'protein',
+    label: 'Protein Tracking',
+    icon: Droplets,
+    badgeText: 'Log',
+    color: 'orange',
+    gradientClass: 'bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/40 dark:to-amber-900/40',
+    iconColorClass: 'text-orange-600 dark:text-orange-400',
+    badgeColorClass: 'bg-orange-500/20 text-orange-700 dark:text-orange-300',
+    buttonClass: 'bg-white hover:bg-white/90 text-foreground border border-border/50 shadow-sm',
+    description: 'Open the protein tracking tool',
     requiresValue: false,
   },
   period: {
@@ -457,6 +470,8 @@ export function getProTaskNavigationPath(linkType: ProLinkType, linkValue: strin
       return linkValue ? `/app/breathe?exercise=${linkValue}` : '/app/breathe';
     case 'water':
       return '/app/water';
+    case 'protein':
+      return '/app/protein';
     case 'period':
       return '/app/period';
     case 'emotion':

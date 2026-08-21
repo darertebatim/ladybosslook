@@ -10,6 +10,7 @@ export const PRO_LINK_EMOJIS: Record<ProLinkType, string> = {
   route: '🔗',
   breathe: '🌬️',
   water: '💧',
+  protein: '🍗',
   period: '🩸',
   emotion: '💜',
   audio: '🎧',

@@ -1185,6 +1185,23 @@
       "focus": "Focus",
       "popular": "Popular",
       "routines": "Routines"
+    },
+    "protein": {
+      "title": "Protein",
+      "intakeGoal": "Protein intake & your goal",
+      "goalReached": "Goal Reached!",
+      "addToTrack": "Add to routine to track daily",
+      "addProtein": "Add Protein",
+      "addedGoToPlanner": "Added — Go to Planner",
+      "addAgain": "Add again",
+      "plusFeatureTitle": "Protein Tracker is a Plus feature",
+      "plusFeatureDesc": "Upgrade to Rilo Plus to track your protein with daily goals and reminders.",
+      "addedToRoutines": "Protein tracking added to your routines!",
+      "addFailed": "Failed to add protein tracking",
+      "addToRoutineDesc": "Add protein tracking to your routine to save progress!",
+      "addRoutine": "Add Routine",
+      "progressFormat": "Progress: {{current}}/{{target}}",
+      "routineTitle": "Protein Tracking"
     }
   },
   "routinePlayer": {

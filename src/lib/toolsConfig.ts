@@ -127,6 +127,16 @@ export const wellnessTools: ToolConfig[] = [
     description: 'Hydration tracker',
   },
   {
+    id: 'protein',
+    name: 'Protein',
+    icon: 'Beef',
+    emoji: '🍗',
+    bgColor: 'bg-peach',
+    iconColor: 'text-orange-600',
+    route: '/app/protein',
+    description: 'Protein tracker',
+  },
+  {
     id: 'period',
     name: 'Period',
     icon: 'Heart',

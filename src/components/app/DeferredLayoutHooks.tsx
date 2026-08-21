@@ -7,6 +7,7 @@ import { useProgramEventNotificationScheduler } from '@/hooks/useProgramEventNot
 import { useSmartActionNudges } from '@/hooks/useSmartActionNudges';
 import { usePeriodNotifications } from '@/hooks/usePeriodNotifications';
 import { useWaterNotifications } from '@/hooks/useWaterNotifications';
+import { useProteinNotifications } from '@/hooks/useProteinNotifications';
 import { useFastingNotifications } from '@/hooks/useFastingNotifications';
 import { useFirebaseUserSync } from '@/hooks/useFirebaseUserSync';
 import { useOfflinePrefetch } from '@/hooks/useOfflinePrefetch';
@@ -71,6 +72,7 @@ export const DeferredLayoutHooks = ({ userId }: { userId: string | undefined }) 
   useSmartActionNudges(userId);
   usePeriodNotifications(userId);
   useWaterNotifications(userId);
+  useProteinNotifications(userId);
   useFastingNotifications(userId);
   useProgramEventNotificationScheduler();
 
