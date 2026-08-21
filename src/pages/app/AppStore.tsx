@@ -477,7 +477,7 @@ const AppStore = () => {
 
                 {/* First row: wellness tools except trackers (5 static buttons) */}
                 {!searchQuery && (
-                  <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
+                  <div className="grid grid-cols-5 gap-2 -mx-4 px-4 pt-3 pb-2">
                     {filteredWellnessTools
                       .filter(
                         (t) =>
@@ -494,7 +494,7 @@ const AppStore = () => {
                           key={tool.id}
                           tool={tool}
                           size="compact"
-                          className={`tour-tool-${tool.id}`}
+                          className={`tour-tool-${tool.id} w-full`}
                         />
                       ))}
                   </div>
@@ -502,13 +502,13 @@ const AppStore = () => {
 
                 {/* Search results: all matching wellness tools only */}
                 {searchQuery && (
-                  <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pt-3 pb-2 scrollbar-hide">
+                  <div className="grid grid-cols-5 gap-2 -mx-4 px-4 pt-3 pb-2">
                     {filteredWellnessTools.map((tool) => (
                       <ToolCard
                         key={tool.id}
                         tool={tool}
                         size="compact"
-                        className={`tour-tool-${tool.id}`}
+                        className={`tour-tool-${tool.id} w-full`}
                       />
                     ))}
                   </div>
@@ -516,7 +516,7 @@ const AppStore = () => {
 
                 {/* Second row: trackers */}
                 {!searchQuery && (
-                  <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pt-1 pb-2 scrollbar-hide">
+                  <div className="grid grid-cols-5 gap-2 -mx-4 px-4 pt-1 pb-2">
                     {filteredWellnessTools
                       .filter((t) =>
                         [
@@ -532,7 +532,7 @@ const AppStore = () => {
                           key={tool.id}
                           tool={tool}
                           size="compact"
-                          className={`tour-tool-${tool.id}`}
+                          className={`tour-tool-${tool.id} w-full`}
                         />
                       ))}
                   </div>
