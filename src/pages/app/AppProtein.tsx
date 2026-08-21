@@ -377,16 +377,17 @@ const AppProtein = () => {
         `}</style>
       </div>
 
-      {proteinTask && (
-        <DailyGoalSheet
-          open={showGoalSheet}
-          onOpenChange={setShowGoalSheet}
-          task={proteinTask}
-          title="Protein Goal"
-          unit={goalUnit}
-          presets={[60, 80, 100, 120, 140, 160, 180, 200]}
-        />
-      )}
+      <DailyGoalSheet
+        open={showGoalSheet}
+        onOpenChange={setShowGoalSheet}
+        task={proteinTask}
+        title="Protein Goal"
+        unit={goalUnit}
+        presets={[60, 80, 100, 120, 140, 160, 180, 200]}
+        defaultTarget={DEFAULT_PROTEIN_GOAL}
+        onCreate={handleCreateWithGoal}
+        isCreating={isSavingRoutine}
+      />
 
       <ProteinInputSheet
         open={showInputSheet}

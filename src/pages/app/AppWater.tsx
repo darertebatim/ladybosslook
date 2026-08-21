@@ -117,15 +117,43 @@ const AppWater = () => {
 
   // Handle opening settings (edit task)
   const handleOpenSettings = useCallback(() => {
-    if (waterTask) {
-      haptic.light();
-      setShowGoalSheet(true);
-    } else {
-      // No task - open routine sheet instead
-      haptic.light();
-      setShowRoutineSheet(true);
-    }
-  }, [waterTask, navigate]);
+    haptic.light();
+    setShowGoalSheet(true);
+  }, []);
+
+  const handleCreateWithGoal = useCallback((target: number) => {
+    setIsSavingRoutine(true);
+    createTask.mutate(
+      {
+        title: 'Drink Water 💧',
+        emoji: '💧',
+        color: 'sky',
+        repeat_pattern: 'daily',
+        scheduled_time: null,
+        tag: 'pro',
+        reminder_enabled: false,
+        pro_link_type: 'water',
+        pro_link_value: null,
+        goal_enabled: true,
+        goal_type: 'count',
+        goal_target: target,
+        goal_unit: DEFAULT_WATER_UNIT,
+      },
+      {
+        onSuccess: () => {
+          haptic.success();
+          toast.success(`Daily goal set to ${target}${DEFAULT_WATER_UNIT}`);
+          setShowGoalSheet(false);
+          setIsSavingRoutine(false);
+          queryClient.invalidateQueries({ queryKey: ['planner-tasks-for-date'] });
+        },
+        onError: () => {
+          toast.error(t('tier1.water.addFailed'));
+          setIsSavingRoutine(false);
+        },
+      }
+    );
+  }, [createTask, queryClient, t]);
 
   // Handle adding to routine
   const handleOpenRoutineSheet = useCallback(() => {
@@ -437,16 +465,17 @@ const AppWater = () => {
       </div>
 
       {/* Water input sheet */}
-      {waterTask && (
-        <DailyGoalSheet
-          open={showGoalSheet}
-          onOpenChange={setShowGoalSheet}
-          task={waterTask}
-          title="Water Goal"
-          unit={goalUnit}
-          presets={[48, 64, 80, 96, 100, 120, 128, 160]}
-        />
-      )}
+      <DailyGoalSheet
+        open={showGoalSheet}
+        onOpenChange={setShowGoalSheet}
+        task={waterTask}
+        title="Water Goal"
+        unit={goalUnit}
+        presets={[48, 64, 80, 96, 100, 120, 128, 160]}
+        defaultTarget={DEFAULT_WATER_GOAL}
+        onCreate={handleCreateWithGoal}
+        isCreating={isSavingRoutine}
+      />
 
       <WaterInputSheet
         open={showInputSheet}
