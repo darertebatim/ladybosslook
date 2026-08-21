@@ -560,6 +560,33 @@ export default function AppMyRiloPath() {
             <ToolShortcuts hideWhenEmpty />
           </div>
 
+          {/* Today's Program Events — above the date greeting */}
+          {programEvents.length > 0 && (
+            <div className="px-4 pt-2 pb-3">
+              <div className="flex items-center gap-2 mb-3 pl-1">
+                <div
+                  className="text-[10px] font-bold uppercase tracking-[0.18em]"
+                  style={{ color: O.primary }}
+                >
+                  Today's events
+                </div>
+                <div
+                  className="flex-1 h-px"
+                  style={{ background: `linear-gradient(90deg, ${O.primary}55, transparent)` }}
+                />
+              </div>
+              <div className="space-y-3">
+                {programEvents.map((event) => (
+                  <ProgramEventCard
+                    key={`${event.type}-${event.id}`}
+                    event={event}
+                    date={todayDate}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Hero greeting */}
           <div className="px-5 pt-4 pb-3 relative z-10">
             <div
@@ -596,33 +623,6 @@ export default function AppMyRiloPath() {
               </span>
             </div>
           </div>
-
-          {/* Today's Program Events */}
-          {programEvents.length > 0 && (
-            <div className="px-4 pt-2 pb-3">
-              <div className="flex items-center gap-2 mb-3 pl-1">
-                <div
-                  className="text-[10px] font-bold uppercase tracking-[0.18em]"
-                  style={{ color: O.primary }}
-                >
-                  Today's events
-                </div>
-                <div
-                  className="flex-1 h-px"
-                  style={{ background: `linear-gradient(90deg, ${O.primary}55, transparent)` }}
-                />
-              </div>
-              <div className="space-y-3">
-                {programEvents.map((event) => (
-                  <ProgramEventCard
-                    key={`${event.type}-${event.id}`}
-                    event={event}
-                    date={todayDate}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* THE PATH */}
           <div className="px-4 pt-3 pb-4 relative">
