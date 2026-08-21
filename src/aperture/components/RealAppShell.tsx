@@ -186,7 +186,7 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
                 </nav>
                 <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--ap-hairline)", display: "flex", flexDirection: "column", gap: 8 }}>
                   <Link
-                    to="/app/my-rilo"
+                    to="/app/path"
                     onClick={() => { haptic.medium(); setDrawerOpen(false); }}
                     style={{
                       display: "flex", alignItems: "center", gap: 10,
@@ -307,7 +307,7 @@ export function RealAppShell({ children }: { children: ReactNode; rightRail?: Re
         </nav>
         <div style={{ marginTop: 20, paddingTop: 14, borderTop: "1px solid var(--ap-hairline)", display: "flex", flexDirection: "column", gap: 8 }}>
           <Link
-            to="/app/my-rilo"
+            to="/app/path"
             onClick={() => haptic.medium()}
             style={{
               display: "flex", alignItems: "center", gap: 10,

@@ -10,7 +10,7 @@ import { ApertureLogo } from "@/aperture/brand/ApertureLogo";
 export function ApertureInviteShield({ onApproved }: { onApproved: () => void }) {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
-  const goBack = useGoBack("/app/my-rilo");
+  const goBack = useGoBack("/app/path");
   const [code, setCode] = useState("");
   const [email, setEmail] = useState(user?.email ?? "");
   const [note, setNote] = useState("");

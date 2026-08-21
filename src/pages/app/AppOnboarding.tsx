@@ -280,7 +280,7 @@ export default function AppOnboarding() {
             localStorage.setItem('simora_onboarding_nickname', typeof nickname === 'string' ? nickname : nickname[0] || '');
           }
         } catch {}
-        navigate('/app/my-rilo');
+        navigate('/app/path');
       } else {
         navigate('/auth?mode=signup');
       }
@@ -305,7 +305,7 @@ export default function AppOnboarding() {
       try {
         localStorage.setItem('simora_onboarding_planner_intro_dismissed', 'true');
       } catch {}
-      navigate('/app/my-rilo');
+      navigate('/app/path');
       return;
     }
     navigate('/app/home');
