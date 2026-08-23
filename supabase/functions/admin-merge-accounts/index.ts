@@ -231,14 +231,14 @@ serve(async (req) => {
         .eq('primary_user_id', secondaryProfile.id)
     }
 
-    // Record the secondary email as an alias of the primary account,
+    // Record the merged email as an alias of the primary account,
     // so searching either email resolves to the same single account.
-    if (normalizedEmail !== (primaryProfile.email || '').toLowerCase()) {
+    if (mergedEmail && mergedEmail !== (primaryProfile.email || '').toLowerCase()) {
       const { error: aliasError } = await supabaseAdmin
         .from('account_email_aliases')
         .upsert({
           primary_user_id: primaryUserId,
-          email: normalizedEmail,
+          email: mergedEmail,
           merged_from_user_id: secondaryProfile?.id ?? null,
           merged_by: user.id,
         }, { onConflict: 'email' })
@@ -248,20 +248,28 @@ serve(async (req) => {
       }
     }
 
+    // Make sure the primary's own email is never left as an alias of another account
+    await supabaseAdmin
+      .from('account_email_aliases')
+      .delete()
+      .eq('email', (primaryProfile.email || '').toLowerCase())
+
     // Log the merge action
-    console.log(`Account merge completed: ${normalizedEmail} -> ${primaryProfile.email}`)
+    console.log(`Account merge completed: ${mergedEmail} -> ${primaryProfile.email}`)
     console.log(`Orders: ${mergedOrders}, Enrollments: ${mergedEnrollments}`)
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: `Successfully merged data from ${normalizedEmail}`,
+        message: `Successfully merged data from ${mergedEmail}`,
         mergedOrders,
         mergedEnrollments,
         mergedSubscriptions,
+        swapped,
         primaryEmail: primaryProfile.email,
-        secondaryEmail: normalizedEmail
+        secondaryEmail: mergedEmail
       }),
+
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error: any) {
