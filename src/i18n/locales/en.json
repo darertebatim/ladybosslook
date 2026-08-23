@@ -366,6 +366,7 @@
     "recentTransactions": "Recent Transactions",
     "enrolled": "Enrolled {{date}}",
     "refunded": "Refunded",
+    "partiallyRefunded": "Partially refunded",
     "completed": "Completed",
     "sections": {
       "journal": "Journal Stats",
