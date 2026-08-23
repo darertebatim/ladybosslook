@@ -613,9 +613,12 @@ export function LeadsManager() {
       if (error) throw error;
 
       toast({
-        title: 'Merge Complete!',
-        description: `Transferred ${data.mergedOrders} orders and ${data.mergedEnrollments} enrollments from ${mergeEmail}`,
+        title: data?.swapped ? 'Merge Complete (direction auto-corrected)' : 'Merge Complete!',
+        description: data?.swapped
+          ? `${data.primaryEmail} is the account that actually signs in, so it was kept as the primary. Transferred ${data.mergedOrders} orders and ${data.mergedEnrollments} enrollments.`
+          : `Transferred ${data.mergedOrders} orders and ${data.mergedEnrollments} enrollments from ${mergeEmail}`,
       });
+
 
       setIsMergeDialogOpen(false);
       setMergeEmail('');
@@ -1133,6 +1136,10 @@ export function LeadsManager() {
                               <p className="text-xs text-muted-foreground">
                                 All orders and enrollments from this email will be transferred to the current user.
                               </p>
+                              <p className="text-xs text-amber-600 font-medium">
+                                The primary account must be the one the user actually signs into. If this account has never signed in and the other one has, the direction is corrected automatically.
+                              </p>
+
                             </div>
                           </div>
                           <DialogFooter>

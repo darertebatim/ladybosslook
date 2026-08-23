@@ -45,13 +45,39 @@ serve(async (req) => {
       throw new Error('Admin access required')
     }
 
-    const { primaryUserId, secondaryEmail } = await req.json()
+    const { primaryUserId: requestedPrimaryId, secondaryEmail, forceDirection } = await req.json()
 
-    if (!primaryUserId || !secondaryEmail) {
+    if (!requestedPrimaryId || !secondaryEmail) {
       throw new Error('primaryUserId and secondaryEmail are required')
     }
 
     const normalizedEmail = secondaryEmail.toLowerCase().trim()
+
+    // Find secondary user profile (if exists)
+    const { data: requestedSecondaryProfile } = await supabaseAdmin
+      .from('profiles')
+      .select('id, email')
+      .eq('email', normalizedEmail)
+      .single()
+
+    // --- Auto-direction: the primary MUST be the account the user actually signs into ---
+    let primaryUserId = requestedPrimaryId
+    let swapped = false
+
+    if (requestedSecondaryProfile && !forceDirection) {
+      const { data: reqPrimaryUser } = await supabaseAdmin.auth.admin.getUserById(requestedPrimaryId)
+      const { data: reqSecondaryUser } = await supabaseAdmin.auth.admin.getUserById(requestedSecondaryProfile.id)
+
+      const primarySignedIn = !!reqPrimaryUser?.user?.last_sign_in_at
+      const secondarySignedIn = !!reqSecondaryUser?.user?.last_sign_in_at
+
+      if (!primarySignedIn && secondarySignedIn) {
+        // Flip: keep the login-capable account as the primary
+        primaryUserId = requestedSecondaryProfile.id
+        swapped = true
+        console.log(`Auto-swapped merge direction: primary is now ${normalizedEmail}`)
+      }
+    }
 
     // Get primary user info
     const { data: primaryProfile, error: primaryError } = await supabaseAdmin
@@ -64,21 +90,27 @@ serve(async (req) => {
       throw new Error('Primary user not found')
     }
 
-    // Find secondary user profile (if exists)
-    const { data: secondaryProfile } = await supabaseAdmin
+    // Resolve which profile/email is being merged INTO the primary
+    const { data: originalPrimaryProfile } = await supabaseAdmin
       .from('profiles')
       .select('id, email')
-      .eq('email', normalizedEmail)
+      .eq('id', requestedPrimaryId)
       .single()
+
+    const secondaryProfile = swapped ? originalPrimaryProfile : requestedSecondaryProfile
+    const mergedEmail = swapped
+      ? (originalPrimaryProfile?.email || '').toLowerCase()
+      : normalizedEmail
 
     let mergedOrders = 0
     let mergedEnrollments = 0
 
-    // Transfer orders from secondary email to primary user
+
+    // Transfer orders from the merged email (and merged account) to the primary user
     const { data: ordersToTransfer, error: ordersError } = await supabaseAdmin
       .from('orders')
       .select('id, product_name')
-      .ilike('email', normalizedEmail)
+      .ilike('email', mergedEmail)
 
     if (ordersError) {
       console.error('Error fetching orders:', ordersError)
@@ -92,7 +124,7 @@ serve(async (req) => {
           user_id: primaryUserId,
           email: primaryProfile.email // Update email to primary
         })
-        .ilike('email', normalizedEmail)
+        .ilike('email', mergedEmail)
 
       if (updateOrdersError) {
         console.error('Error updating orders:', updateOrdersError)
@@ -100,8 +132,17 @@ serve(async (req) => {
       }
 
       mergedOrders = ordersToTransfer.length
-      console.log(`Transferred ${mergedOrders} orders from ${normalizedEmail} to ${primaryProfile.email}`)
+      console.log(`Transferred ${mergedOrders} orders from ${mergedEmail} to ${primaryProfile.email}`)
     }
+
+    // Also move any remaining orders still attached to the merged account id
+    if (secondaryProfile?.id) {
+      await supabaseAdmin
+        .from('orders')
+        .update({ user_id: primaryUserId })
+        .eq('user_id', secondaryProfile.id)
+    }
+
 
     // Transfer enrollments from secondary user to primary user
     if (secondaryProfile) {
@@ -190,14 +231,14 @@ serve(async (req) => {
         .eq('primary_user_id', secondaryProfile.id)
     }
 
-    // Record the secondary email as an alias of the primary account,
+    // Record the merged email as an alias of the primary account,
     // so searching either email resolves to the same single account.
-    if (normalizedEmail !== (primaryProfile.email || '').toLowerCase()) {
+    if (mergedEmail && mergedEmail !== (primaryProfile.email || '').toLowerCase()) {
       const { error: aliasError } = await supabaseAdmin
         .from('account_email_aliases')
         .upsert({
           primary_user_id: primaryUserId,
-          email: normalizedEmail,
+          email: mergedEmail,
           merged_from_user_id: secondaryProfile?.id ?? null,
           merged_by: user.id,
         }, { onConflict: 'email' })
@@ -207,20 +248,28 @@ serve(async (req) => {
       }
     }
 
+    // Make sure the primary's own email is never left as an alias of another account
+    await supabaseAdmin
+      .from('account_email_aliases')
+      .delete()
+      .eq('email', (primaryProfile.email || '').toLowerCase())
+
     // Log the merge action
-    console.log(`Account merge completed: ${normalizedEmail} -> ${primaryProfile.email}`)
+    console.log(`Account merge completed: ${mergedEmail} -> ${primaryProfile.email}`)
     console.log(`Orders: ${mergedOrders}, Enrollments: ${mergedEnrollments}`)
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: `Successfully merged data from ${normalizedEmail}`,
+        message: `Successfully merged data from ${mergedEmail}`,
         mergedOrders,
         mergedEnrollments,
         mergedSubscriptions,
+        swapped,
         primaryEmail: primaryProfile.email,
-        secondaryEmail: normalizedEmail
+        secondaryEmail: mergedEmail
       }),
+
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error: any) {
