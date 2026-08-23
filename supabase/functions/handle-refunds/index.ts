@@ -61,18 +61,28 @@ serve(async (req) => {
           
           console.log(`[HANDLE-REFUNDS] Checking order ${order.id}, PI status: ${paymentIntent.status}, amount_refunded: ${paymentIntent.amount_received || 0}`);
           
-          // Check if payment was refunded - check amount_refunded or refunded flag
-          const isRefunded = paymentIntent.amount_refunded > 0 || 
-                           (paymentIntent.charges?.data?.[0]?.refunded === true);
-          
-          if (isRefunded) {
+          // Only treat as refunded when the FULL amount was refunded.
+          const amountRefunded = paymentIntent.amount_refunded ?? 0;
+          const amountTotal = paymentIntent.amount ?? 0;
+          const isFullRefund = amountRefunded > 0 && amountRefunded >= amountTotal;
+          const isPartialRefund = amountRefunded > 0 && !isFullRefund;
+
+          if (isPartialRefund) {
+            console.log(`[HANDLE-REFUNDS] Partial refund (${amountRefunded}/${amountTotal}) for order ${order.id} — keeping enrollment`);
+            await supabase
+              .from('orders')
+              .update({ status: 'partially_refunded', refund_amount: amountRefunded })
+              .eq('id', order.id);
+          }
+
+          if (isFullRefund) {
             console.log(`[HANDLE-REFUNDS] Found refunded order: ${order.id}, email: ${order.email}`);
             refundedOrders.push(order);
 
             // Update order status
             await supabase
               .from('orders')
-              .update({ status: 'refunded' })
+              .update({ status: 'refunded', refunded: true, refund_amount: amountRefunded })
               .eq('id', order.id);
 
             // Remove enrollment
@@ -83,6 +93,7 @@ serve(async (req) => {
                 .eq('user_id', order.user_id)
                 .eq('course_name', order.product_name);
             }
+
 
             // Remove Mailchimp tag
             try {
