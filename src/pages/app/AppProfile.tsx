@@ -763,7 +763,12 @@ const AppProfile = () => {
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <span className="text-sm font-medium text-[hsl(var(--fg-warm))]">{formatCurrency(order.amount, order.currency || 'usd')}</span>
                           <Badge variant={getStatusBadgeVariant(order.status || 'completed')}>
-                            {order.refunded ? t('profile.refunded') : (order.status || t('profile.completed'))}
+                            {order.refunded
+                              ? t('profile.refunded')
+                              : order.status === 'partially_refunded'
+                                ? t('profile.partiallyRefunded', 'Partially refunded')
+                                : (order.status || t('profile.completed'))}
+
                           </Badge>
                         </div>
                       </div>
