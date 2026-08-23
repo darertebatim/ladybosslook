@@ -43,18 +43,20 @@ serve(async (req) => {
 
 
     // Check if user is admin
-    const { data: roleData, error: roleError } = await supabaseAdmin
+    const { data: roleRows } = await supabaseAdmin
       .from('user_roles')
       .select('role')
-      .eq('user_id', user.id)
-      .single();
+      .eq('user_id', user.id);
 
-    if (roleError || roleData?.role !== 'admin') {
+    const isAdmin = (roleRows ?? []).some((r: { role: string }) => r.role === 'admin');
+
+    if (!isAdmin) {
       return new Response(
         JSON.stringify({ error: 'Admin access required' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
 
     // Get request body
     const { userId, newPassword } = await req.json();
