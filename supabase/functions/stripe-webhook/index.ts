@@ -736,14 +736,20 @@ serve(async (req) => {
         });
       }
 
-      // Update order as refunded
+      // Determine if this is a FULL refund or only a partial one
+      const isFullRefund = charge.amount_refunded >= charge.amount;
+      console.log(
+        `[WEBHOOK] Refund ${charge.amount_refunded}/${charge.amount} → ${isFullRefund ? 'FULL' : 'PARTIAL'}`
+      );
+
+      // Update order
       const { error: updateError } = await supabase
         .from('orders')
         .update({
-          refunded: true,
+          refunded: isFullRefund,
           refunded_at: new Date().toISOString(),
           refund_amount: charge.amount_refunded,
-          status: 'refunded',
+          status: isFullRefund ? 'refunded' : 'partially_refunded',
         })
         .eq('id', order.id);
 
@@ -752,8 +758,8 @@ serve(async (req) => {
         throw updateError;
       }
 
-      // Remove course enrollments if user_id and program_slug exist
-      if (order.user_id && order.program_slug) {
+      // Only revoke access on a FULL refund — partial refunds keep the enrollment
+      if (isFullRefund && order.user_id && order.program_slug) {
         const { error: enrollmentError } = await supabase
           .from('course_enrollments')
           .delete()
@@ -765,7 +771,10 @@ serve(async (req) => {
         } else {
           console.log('[WEBHOOK] Enrollment removed for user:', order.user_id);
         }
+      } else if (!isFullRefund) {
+        console.log('[WEBHOOK] Partial refund — enrollment kept for user:', order.user_id);
       }
+
 
       console.log('[WEBHOOK] Refund processed successfully for order:', order.id);
     }
