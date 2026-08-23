@@ -1136,6 +1136,10 @@ export function LeadsManager() {
                               <p className="text-xs text-muted-foreground">
                                 All orders and enrollments from this email will be transferred to the current user.
                               </p>
+                              <p className="text-xs text-amber-600 font-medium">
+                                The primary account must be the one the user actually signs into. If this account has never signed in and the other one has, the direction is corrected automatically.
+                              </p>
+
                             </div>
                           </div>
                           <DialogFooter>
