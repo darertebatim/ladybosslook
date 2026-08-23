@@ -704,12 +704,22 @@ export const StripePaymentsViewer = () => {
                                 </div>
                               )}
                             </div>
+                          ) : order.status === 'partially_refunded' || ((order.refund_amount || 0) > 0 && (order.refund_amount || 0) < order.amount) ? (
+                            <div className="space-y-1">
+                              <Badge variant="outline" className="border-amber-500 text-amber-600">
+                                Partially refunded
+                              </Badge>
+                              <div className="text-xs text-muted-foreground">
+                                -${((order.refund_amount || 0) / 100).toFixed(2)} {order.refunded_at ? `· ${format(new Date(order.refunded_at), 'MMM dd, yyyy')}` : ''}
+                              </div>
+                            </div>
                           ) : (
                             <Badge variant={order.status === 'completed' || order.status === 'paid' ? 'default' : 'secondary'}>
                               {order.status}
                             </Badge>
                           )}
                         </TableCell>
+
                       </TableRow>
                     );
                   })

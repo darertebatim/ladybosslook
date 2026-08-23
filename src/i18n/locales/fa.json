@@ -365,6 +365,7 @@
     "recentTransactions": "تراکنش‌های اخیر",
     "enrolled": "ثبت‌نام در {{date}}",
     "refunded": "بازپرداخت‌شده",
+    "partiallyRefunded": "بازپرداخت جزئی",
     "completed": "تکمیل‌شده",
     "sections": {
       "journal": "آمار دفترچه",
