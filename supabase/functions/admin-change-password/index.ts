@@ -13,23 +13,25 @@ serve(async (req) => {
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    
-    // Create client with ANON_KEY for user authentication verification
-    const supabaseAuth = createClient(
-      supabaseUrl,
-      supabaseAnonKey,
-      {
-        global: { 
-          headers: { Authorization: req.headers.get('Authorization')! } 
-        },
-        auth: { persistSession: false }
-      }
-    );
 
-    // Verify admin authentication
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
+    // Create service role client for admin operations
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    // Verify caller identity from the bearer token directly
+    const authHeader = req.headers.get('Authorization') ?? '';
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+
+    if (!token) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
 
     if (authError || !user) {
       console.error('Auth error:', authError);
@@ -39,22 +41,22 @@ serve(async (req) => {
       );
     }
 
-    // Create service role client for admin operations
-    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
     // Check if user is admin
-    const { data: roleData, error: roleError } = await supabaseAdmin
+    const { data: roleRows } = await supabaseAdmin
       .from('user_roles')
       .select('role')
-      .eq('user_id', user.id)
-      .single();
+      .eq('user_id', user.id);
 
-    if (roleError || roleData?.role !== 'admin') {
+    const isAdmin = (roleRows ?? []).some((r: { role: string }) => r.role === 'admin');
+
+    if (!isAdmin) {
       return new Response(
         JSON.stringify({ error: 'Admin access required' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
 
     // Get request body
     const { userId, newPassword } = await req.json();
