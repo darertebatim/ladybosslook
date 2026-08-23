@@ -106,11 +106,11 @@ serve(async (req) => {
     let mergedEnrollments = 0
 
 
-    // Transfer orders from secondary email to primary user
+    // Transfer orders from the merged email (and merged account) to the primary user
     const { data: ordersToTransfer, error: ordersError } = await supabaseAdmin
       .from('orders')
       .select('id, product_name')
-      .ilike('email', normalizedEmail)
+      .ilike('email', mergedEmail)
 
     if (ordersError) {
       console.error('Error fetching orders:', ordersError)
@@ -124,7 +124,7 @@ serve(async (req) => {
           user_id: primaryUserId,
           email: primaryProfile.email // Update email to primary
         })
-        .ilike('email', normalizedEmail)
+        .ilike('email', mergedEmail)
 
       if (updateOrdersError) {
         console.error('Error updating orders:', updateOrdersError)
@@ -132,8 +132,17 @@ serve(async (req) => {
       }
 
       mergedOrders = ordersToTransfer.length
-      console.log(`Transferred ${mergedOrders} orders from ${normalizedEmail} to ${primaryProfile.email}`)
+      console.log(`Transferred ${mergedOrders} orders from ${mergedEmail} to ${primaryProfile.email}`)
     }
+
+    // Also move any remaining orders still attached to the merged account id
+    if (secondaryProfile?.id) {
+      await supabaseAdmin
+        .from('orders')
+        .update({ user_id: primaryUserId })
+        .eq('user_id', secondaryProfile.id)
+    }
+
 
     // Transfer enrollments from secondary user to primary user
     if (secondaryProfile) {
