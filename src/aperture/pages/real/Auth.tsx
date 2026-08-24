@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ApertureMonoLabel, ApertureButton } from "@/aperture/components/primitives";
 import { ApertureLogo } from "@/aperture/brand/ApertureLogo";
+import { getPasswordResetRedirectUrl } from "@/lib/authRedirect";
 
 type Mode = "signup" | "login" | "forgot";
 
@@ -34,10 +35,10 @@ export default function ApertureAuth() {
     try {
       if (mode === "forgot") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/app/rilobiz/auth`,
+          redirectTo: getPasswordResetRedirectUrl(),
         });
         if (error) throw error;
-        toast({ title: "Check your email", description: "We've sent you a reset link." });
+        toast({ title: "Check your email", description: `If an account exists for ${email}, we've sent a reset link.` });
         setMode("login");
       } else if (mode === "login") {
         const { error } = await signIn(email, password);
