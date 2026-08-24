@@ -78,23 +78,24 @@ export default function Auth() {
 
     try {
       if (isForgotPassword) {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: 'https://ladybosslook.com/auth',
+        const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+          redirectTo: getPasswordResetRedirectUrl(),
         });
 
-        if (error) {
+        if (error && (error as any).status === 429) {
           toast({
             variant: "destructive",
-            title: "Error",
-            description: error.message,
+            title: "Too many requests",
+            description: "Please wait a few minutes before asking for another reset email.",
           });
         } else {
+          // Neutral response either way — never reveal whether an account exists.
+          setResetSentTo(email.trim());
+          setResendIn(60);
           toast({
             title: "Check your email",
-            description: "We've sent you a password reset link.",
+            description: `If an account exists for ${email.trim()}, we've sent a reset link.`,
           });
-          setIsForgotPassword(false);
-          setShowEmailForm(false);
         }
       } else {
         if (!isLogin) Analytics.signupStarted('email');
