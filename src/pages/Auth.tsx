@@ -448,10 +448,35 @@ export default function Auth() {
                 <Button 
                   type="submit" 
                   className="w-full h-[52px] rounded-full font-semibold text-[16px] bg-[#1a1f3d] active:bg-[#1a1f3d]/90 text-white shadow-[0_12px_30px_-12px_rgba(26,31,61,0.6)]"
-                  disabled={loading || oauthLoading !== null}
+                  disabled={loading || oauthLoading !== null || (isForgotPassword && resendIn > 0)}
                 >
-                  {loading ? 'Loading...' : (isForgotPassword ? 'Send reset link' : (isLogin ? 'Sign in' : 'Create account'))}
+                  {loading
+                    ? 'Loading...'
+                    : isForgotPassword
+                      ? (resendIn > 0 ? `Resend in ${resendIn}s` : (resetSentTo ? 'Resend reset link' : 'Send reset link'))
+                      : (isLogin ? 'Sign in' : 'Create account')}
                 </Button>
+
+                {/* Confirmation + troubleshooting for the reset email */}
+                {isForgotPassword && resetSentTo && (
+                  <div className="rounded-2xl bg-white/70 border border-white/70 p-4 space-y-2">
+                    <p className="text-[13px] font-semibold text-[#1a1f3d]">
+                      If an account exists for {resetSentTo}, a reset link is on its way.
+                    </p>
+                    <p className="text-[12px] text-[#1a1f3d]/65 leading-relaxed">
+                      Check your spam folder. The link works once and expires — open it on this
+                      device, then choose a new password.
+                    </p>
+                  </div>
+                )}
+
+                {/* Social-account hint */}
+                {isForgotPassword && (
+                  <p className="text-[12px] text-[#1a1f3d]/65 text-center leading-relaxed">
+                    Signed up with Apple or Google? You don't have a password — go back and use
+                    "Continue with Apple" or "Continue with Google" instead.
+                  </p>
+                )}
 
                 {/* Forgot password link */}
                 {!isForgotPassword && isLogin && (
@@ -473,13 +498,17 @@ export default function Auth() {
                     <Button
                       type="button"
                       variant="link"
-                      onClick={() => setIsForgotPassword(false)}
+                      onClick={() => {
+                        setIsForgotPassword(false);
+                        setResetSentTo(null);
+                      }}
                       className="text-sm text-[#1a1f3d]"
                     >
                       Back to sign in
                     </Button>
                   </div>
                 )}
+
               </form>
             )}
 
