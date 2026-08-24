@@ -14,6 +14,7 @@ import riloAppIcon from '@/assets/rilo-app-icon.png';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { Capacitor } from '@capacitor/core';
 import { Analytics } from '@/lib/firebaseAnalytics';
+import { getPasswordResetRedirectUrl } from '@/lib/authRedirect';
 
 
 export default function Auth() {
@@ -28,6 +29,8 @@ export default function Auth() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<'google' | 'apple' | null>(null);
+  const [resetSentTo, setResetSentTo] = useState<string | null>(null);
+  const [resendIn, setResendIn] = useState(0);
   const { signIn, signUp, signInWithGoogle, signInWithApple, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -48,6 +51,13 @@ export default function Auth() {
     }
     prevKeyboardOpen.current = isKeyboardOpen;
   }, [isKeyboardOpen]);
+
+  // Resend cooldown countdown for the password-reset email
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const t = setTimeout(() => setResendIn((n) => n - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendIn]);
 
   // Read redirect param from URL (e.g. /auth?redirect=/cart)
   const searchParams = new URLSearchParams(window.location.search);
