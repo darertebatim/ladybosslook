@@ -199,6 +199,7 @@ const Programs = lazy(() => import("@/pages/Programs"));
 const About = lazy(() => import("@/pages/About"));
 const AssertLanding = lazy(() => import("@/pages/AssertLanding"));
 const Auth = lazy(() => import("@/pages/Auth"));
+const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
 const PublicDedication = lazy(() => import("@/pages/PublicDedication"));
 const PublicPlaylistGift = lazy(() => import("@/pages/PublicPlaylistGift"));
 const BusinessIdeas = lazy(() => import("@/pages/BusinessIdeas"));
@@ -483,6 +484,7 @@ const App = () => (
                   <Route path="/landing" element={<Landing />} />
                   <Route path="/asac" element={<AssertLanding />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/cart" element={<CartPage />} />
                   <Route path="/d/:token" element={<PublicDedication />} />
                   <Route path="/g/:token" element={<PublicPlaylistGift />} />

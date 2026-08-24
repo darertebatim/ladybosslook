@@ -37,7 +37,7 @@ export function useDeepLinks() {
         });
 
         // Only handle paths that should open in the app
-        if (path.startsWith('/app/') || path === '/app' || path.startsWith('/auth')) {
+        if (path.startsWith('/app/') || path === '/app' || path.startsWith('/auth') || path.startsWith('/reset-password')) {
           const fullPath = path + url.search + url.hash;
           console.log('[DeepLinks] ✅ Navigating to:', fullPath);
           navigate(fullPath);

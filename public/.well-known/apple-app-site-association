@@ -6,7 +6,8 @@
         "appID": "W37S6CA72P.com.ladybosslook.academy",
         "paths": [
           "/app/*",
-          "/d/*"
+          "/d/*",
+          "/reset-password*"
         ]
       }
     ]
