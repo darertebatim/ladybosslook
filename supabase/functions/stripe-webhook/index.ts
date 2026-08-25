@@ -484,6 +484,131 @@ serve(async (req) => {
       }
     }
 
+    // Handle payment_intent.succeeded (manual/dashboard charges, off-session charges)
+    if (event.type === 'payment_intent.succeeded') {
+      const pi = event.data.object as Stripe.PaymentIntent;
+      console.log('[WEBHOOK] Processing payment intent:', pi.id);
+
+      // Skip invoice-driven payments (handled by invoice.paid)
+      if ((pi as any).invoice) {
+        console.log('[WEBHOOK] Skipping PI tied to an invoice');
+        return new Response(JSON.stringify({ received: true }), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Skip payments that came from a Checkout Session (handled above)
+      try {
+        const sessions = await stripe.checkout.sessions.list({ payment_intent: pi.id, limit: 1 });
+        if (sessions.data.length > 0) {
+          console.log('[WEBHOOK] Skipping PI created by a checkout session');
+          return new Response(JSON.stringify({ received: true }), {
+            status: 200,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+      } catch (e: any) {
+        console.error('[WEBHOOK] Could not list checkout sessions for PI:', e.message);
+      }
+
+      // Avoid duplicates
+      const { data: existingPiOrder } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('stripe_session_id', pi.id)
+        .maybeSingle();
+
+      if (existingPiOrder) {
+        console.log('[WEBHOOK] Order already exists for PI:', pi.id);
+        return new Response(JSON.stringify({ received: true }), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Resolve customer + charge details
+      let piEmail: string | null = (pi as any).receipt_email || null;
+      let piName: string | null = null;
+      let billingCity: string | null = null;
+      let billingState: string | null = null;
+      let billingCountry: string | null = null;
+      let usdAmount: number | null = null;
+      let usdExchangeRate: number | null = null;
+
+      try {
+        const fullPi = await stripe.paymentIntents.retrieve(pi.id, {
+          expand: ['latest_charge.balance_transaction', 'customer'],
+        });
+        const charge: any = (fullPi as any).latest_charge;
+        if (charge) {
+          piEmail = piEmail || charge.billing_details?.email || null;
+          piName = charge.billing_details?.name || null;
+          billingCity = charge.billing_details?.address?.city || null;
+          billingState = charge.billing_details?.address?.state || null;
+          billingCountry = charge.billing_details?.address?.country || null;
+          const bt = charge.balance_transaction;
+          if (bt && (bt.currency || '').toLowerCase() === 'usd') {
+            usdAmount = bt.amount;
+            usdExchangeRate = bt.exchange_rate ?? null;
+          }
+        }
+        const cust: any = (fullPi as any).customer;
+        if (cust && typeof cust === 'object') {
+          piEmail = piEmail || cust.email || null;
+          piName = piName || cust.name || null;
+        }
+      } catch (e: any) {
+        console.error('[WEBHOOK] Could not expand PI:', e.message);
+      }
+
+      // Link to an existing account when possible (primary email or alias)
+      let piUserId: string | null = pi.metadata?.auth_user_id || pi.metadata?.user_id || null;
+      const normalizedEmail = (piEmail || '').toLowerCase().trim();
+      if (!piUserId && normalizedEmail) {
+        const { data: prof } = await supabase
+          .from('profiles')
+          .select('id')
+          .ilike('email', normalizedEmail)
+          .maybeSingle();
+        if (prof) {
+          piUserId = prof.id;
+        } else {
+          const { data: alias } = await supabase
+            .from('account_email_aliases')
+            .select('primary_user_id')
+            .eq('email', normalizedEmail)
+            .maybeSingle();
+          if (alias) piUserId = alias.primary_user_id;
+        }
+      }
+
+      const { error: piInsertError } = await supabase.from('orders').insert({
+        stripe_session_id: pi.id,
+        email: normalizedEmail || 'unknown@example.com',
+        name: piName || 'Customer',
+        billing_city: billingCity,
+        billing_state: billingState,
+        billing_country: billingCountry,
+        amount: pi.amount_received ?? pi.amount ?? 0,
+        currency: pi.currency || 'usd',
+        status: 'paid',
+        product_name: pi.metadata?.product_name || pi.description || 'Manual charge',
+        program_slug: pi.metadata?.program_slug || pi.metadata?.program || null,
+        payment_type: 'manual',
+        user_id: piUserId,
+        usd_amount: usdAmount,
+        usd_exchange_rate: usdExchangeRate,
+      });
+
+      if (piInsertError) {
+        console.error('[WEBHOOK] Error inserting manual charge order:', piInsertError);
+      } else {
+        console.log('[WEBHOOK] Manual charge order created for PI:', pi.id);
+      }
+    }
+
+
     // Handle invoice.paid (for recurring subscription payments)
     if (event.type === 'invoice.paid') {
       const invoice = event.data.object as Stripe.Invoice;
