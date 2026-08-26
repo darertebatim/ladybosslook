@@ -316,7 +316,7 @@ export function ProgramStudentsManager() {
 
             <div className="text-sm text-muted-foreground">
               {filtered.length} student{filtered.length === 1 ? '' : 's'}
-              {students.length > 0 && ` · ${students.filter(s => !s.everOpened).length} never opened the app`}
+              {students.length > 0 && ` · ${students.filter(s => !s.everOpened).length} never signed in`}
             </div>
 
             <div className="border rounded-lg overflow-x-auto">
