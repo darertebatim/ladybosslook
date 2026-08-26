@@ -545,6 +545,15 @@ serve(async (req) => {
             })
             .eq("email", r.email)
             .in("source", SOURCES);
+        } else if (!testEmail && morningOf) {
+          await supabase
+            .from("form_submissions")
+            .update({
+              morning_sent_at: new Date().toISOString(),
+              morning_round_id: targetRoundId,
+            })
+            .eq("email", r.email)
+            .in("source", SOURCES);
         } else if (!testEmail) {
           await supabase
             .from("form_submissions")
