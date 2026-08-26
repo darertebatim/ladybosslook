@@ -267,9 +267,11 @@ export function ProgramStudentsManager() {
   const exportCsv = () => {
     const headers = ['Name', 'Email', 'Other emails', 'Phone', 'WhatsApp', 'City', 'State', 'Country', 'Timezone', 'Occupation', 'Instagram', 'Ever signed in', 'Last seen', 'Active days', 'Platforms', 'Plus', 'Order status', 'Payment date', 'Support chat', 'Round', 'Enrolled'];
     const rows = filtered.map(u => [
-      u.fullName || '', u.email, u.aliases.join(' | '), u.phone || '', u.city || '', u.state || '', u.country || '',
+      u.fullName || '', u.email, u.aliases.join(' | '), u.phone || '', waLink(u.phone) || '', u.city || '', u.state || '', u.country || '',
       u.timezone || '', u.occupation || '', u.instagram || '', u.everOpened ? 'Yes' : 'No', u.lastActiveDate || '',
       String(u.totalActiveDays ?? ''), u.platforms.join('/'), u.plusStatus || '', u.orderStatus || '',
+      u.orderDate ? format(new Date(u.orderDate), 'yyyy-MM-dd') : '',
+      u.hasSupportChat ? (u.supportLastMessageAt ? format(new Date(u.supportLastMessageAt), 'yyyy-MM-dd') : 'Yes') : '',
       u.roundName || '', u.enrolledAt ? format(new Date(u.enrolledAt), 'yyyy-MM-dd') : '',
     ]);
     const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
