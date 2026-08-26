@@ -4,6 +4,7 @@ import { ProgramRoundsManager } from '@/components/admin/ProgramRoundsManager';
 import AutoEnrollmentManager from '@/components/admin/AutoEnrollmentManager';
 import PastSessionsManager from '@/components/admin/PastSessionsManager';
 import OneOnOneClientsManager from '@/components/admin/OneOnOneClientsManager';
+import { ProgramStudentsManager } from '@/components/admin/ProgramStudentsManager';
 
 export default function Programs() {
   return (
@@ -14,13 +15,19 @@ export default function Programs() {
       </div>
 
       <Tabs defaultValue="catalog">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="catalog">Program Catalog</TabsTrigger>
           <TabsTrigger value="rounds">Program Rounds</TabsTrigger>
+          <TabsTrigger value="students">Students</TabsTrigger>
           <TabsTrigger value="sessions">Sessions</TabsTrigger>
           <TabsTrigger value="one-on-one">1:1 Clients</TabsTrigger>
           <TabsTrigger value="auto-enroll">Auto-Enrollment</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="students">
+          <ProgramStudentsManager />
+        </TabsContent>
+
 
         <TabsContent value="catalog">
           <ProgramsManager />
