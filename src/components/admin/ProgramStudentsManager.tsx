@@ -176,7 +176,7 @@ export function ProgramStudentsManager() {
         return results;
       };
 
-      const [profiles, aliases, installs, subs, orders, allEnroll, activity, chats] = await Promise.all([
+      const [profiles, aliases, installs, subs, orders, allEnroll, activity, chats, adminNotes] = await Promise.all([
         fetchIn('profiles', 'id, email, full_name, phone, city, state, country, timezone, occupation, social_instagram, bio, preferred_language, goals, referral_source, date_of_birth, created_at, last_active_date, total_active_days', 'id'),
         fetchIn('account_email_aliases', 'primary_user_id, email', 'primary_user_id'),
         fetchIn('app_installations', 'user_id, platform, last_seen_at'),
@@ -185,7 +185,19 @@ export function ProgramStudentsManager() {
         fetchIn('course_enrollments', 'user_id, program_slug, status'),
         fetchActivity(),
         fetchIn('chat_conversations', 'user_id, inbox_type, last_message_at, updated_at'),
+        fetchIn('student_admin_notes', 'user_id, whatsapp_number, check_whatsapp, check_connection, check_ontrack'),
       ]);
+
+      const notesMap: Record<string, AdminNote> = {};
+      adminNotes.forEach((n: any) => {
+        notesMap[n.user_id] = {
+          whatsapp_number: n.whatsapp_number || null,
+          check_whatsapp: !!n.check_whatsapp,
+          check_connection: !!n.check_connection,
+          check_ontrack: !!n.check_ontrack,
+        };
+      });
+      setNotes(notesMap);
 
       const chatMap = new Map<string, any>();
       chats.forEach((c: any) => {
@@ -193,6 +205,7 @@ export function ProgramStudentsManager() {
         const prev = chatMap.get(c.user_id);
         if (!prev || (at && new Date(at) > new Date(prev.at || 0))) chatMap.set(c.user_id, { at });
       });
+
 
       const actMap = new Map<string, any>(activity.map((a: any) => [a.user_id, a]));
 
