@@ -557,9 +557,10 @@ export function ProgramStudentsManager() {
                   <SheetDescription>{detail.email}</SheetDescription>
                 </SheetHeader>
                 <div className="mt-6 space-y-4 text-sm">
-                  <Field label="App email" value={detail.email} />
-                  <Field label="Payment email" value={detail.paymentEmail} />
-                  <Field label="All emails" value={[...new Set([detail.email, detail.paymentEmail, ...detail.aliases].filter(Boolean))].join(', ')} />
+                  <Field label="App email (signed in)" value={detail.signInEmail || 'Never signed in'} />
+                  <Field label="Payment email (Stripe)" value={detail.paymentEmail} />
+                  <Field label="Account email" value={detail.email} />
+                  <Field label="All emails" value={[...new Set([detail.email, detail.signInEmail, detail.paymentEmail, ...detail.aliases].filter(Boolean))].join(', ')} />
                   <Field label="Phone" value={detail.phone} />
                   <div>
                     <div className="text-xs uppercase tracking-wide text-muted-foreground">WhatsApp</div>
