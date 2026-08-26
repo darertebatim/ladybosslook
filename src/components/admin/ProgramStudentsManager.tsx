@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { GraduationCap, RefreshCw, Download, Search } from 'lucide-react';
+import { GraduationCap, RefreshCw, Download, Search, MessageCircle, MessagesSquare } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface Program { slug: string; title: string; }
@@ -412,6 +412,24 @@ export function ProgramStudentsManager() {
                           <Badge variant="destructive">Never signed in</Badge>
                         )}
                       </TableCell>
+                      <TableCell className="whitespace-nowrap text-sm">
+                        {u.hasSupportChat ? (
+                          <div className="space-y-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 px-2"
+                              onClick={(e) => { e.stopPropagation(); window.open(`/admin/support?userId=${u.userId}`, '_blank', 'noopener'); }}
+                            >
+                              <MessagesSquare className="h-3.5 w-3.5 mr-1" />
+                              Open chat
+                            </Button>
+                            {u.supportLastMessageAt && (
+                              <div className="text-xs text-muted-foreground">{format(new Date(u.supportLastMessageAt), 'MMM d, yyyy')}</div>
+                            )}
+                          </div>
+                        ) : <span className="text-muted-foreground">-</span>}
+                      </TableCell>
                       <TableCell className="text-sm">{loc(u)}</TableCell>
                       <TableCell className="text-sm max-w-[200px]">
                         <div className="truncate">{u.occupation || '-'}</div>
@@ -423,6 +441,7 @@ export function ProgramStudentsManager() {
                           <Badge variant={u.orderStatus === 'paid' || u.orderStatus === 'completed' ? 'secondary' : 'outline'}>{u.orderStatus}</Badge>
                         ) : <span className="text-muted-foreground">-</span>}
                       </TableCell>
+                      <TableCell className="whitespace-nowrap text-sm">{u.orderDate ? format(new Date(u.orderDate), 'MMM d, yyyy') : '-'}</TableCell>
                       <TableCell className="whitespace-nowrap">
                         {u.roundName ? <Badge variant="secondary">{u.roundName}</Badge> : <Badge variant="outline" className="text-muted-foreground">No round</Badge>}
                       </TableCell>
@@ -469,6 +488,8 @@ export function ProgramStudentsManager() {
                       : 'Never signed in'} />
                   <Field label="Rilo Plus" value={detail.plusStatus} />
                   <Field label="Payment for this program" value={detail.orderStatus ? `${detail.orderStatus}${detail.orderAmount ? ` · ${(detail.orderAmount / 100).toFixed(2)} ${(detail.orderCurrency || '').toUpperCase()}` : ''}` : 'No order record'} />
+                  <Field label="Payment date" value={detail.orderDate ? format(new Date(detail.orderDate), 'MMM d, yyyy') : null} />
+                  <Field label="Support chat" value={detail.hasSupportChat ? (detail.supportLastMessageAt ? `Active · last message ${format(new Date(detail.supportLastMessageAt), 'MMM d, yyyy')}` : 'Active') : 'No conversation'} />
                   <Field label="Round" value={detail.roundName} />
                   <Field label="Enrolled" value={detail.enrolledAt ? format(new Date(detail.enrolledAt), 'MMM d, yyyy') : null} />
                   <Field label="Other enrollments" value={detail.otherEnrollments.join(', ') || null} />
