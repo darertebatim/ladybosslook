@@ -472,7 +472,9 @@ serve(async (req) => {
         if (onlyUnsent) {
           query = joinNow
             ? query.is("join_now_sent_at", null)
-            : query.is("reminder_sent_at", null);
+            : morningOf
+              ? query.is("morning_sent_at", null)
+              : query.is("reminder_sent_at", null);
         }
       }
       const { data: rows, error } = await query;
