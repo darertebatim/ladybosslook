@@ -302,20 +302,28 @@ export function ProgramStudentsManager() {
       (u.fullName || '').toLowerCase().includes(s) ||
       u.email.toLowerCase().includes(s) ||
       u.aliases.some(a => a.toLowerCase().includes(s)) ||
-      (u.phone || '').toLowerCase().includes(s)
+      (u.phone || '').toLowerCase().includes(s) ||
+      (noteFor(u.userId).whatsapp_number || '').toLowerCase().includes(s)
     );
-  }, [students, search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [students, search, notes]);
 
   const exportCsv = () => {
-    const headers = ['Name', 'Email', 'Other emails', 'Phone', 'WhatsApp', 'City', 'State', 'Country', 'Timezone', 'Occupation', 'Instagram', 'Ever signed in', 'Last seen', 'Active days', 'Platforms', 'Plus', 'Order status', 'Payment date', 'Support chat', 'Round', 'Enrolled'];
-    const rows = filtered.map(u => [
-      u.fullName || '', u.email, u.aliases.join(' | '), u.phone || '', waLink(u.phone) || '', u.city || '', u.state || '', u.country || '',
-      u.timezone || '', u.occupation || '', u.instagram || '', u.everOpened ? 'Yes' : 'No', u.lastActiveDate || '',
-      String(u.totalActiveDays ?? ''), u.platforms.join('/'), u.plusStatus || '', u.orderStatus || '',
-      u.orderDate ? format(new Date(u.orderDate), 'yyyy-MM-dd') : '',
-      u.hasSupportChat ? (u.supportLastMessageAt ? format(new Date(u.supportLastMessageAt), 'yyyy-MM-dd') : 'Yes') : '',
-      u.roundName || '', u.enrolledAt ? format(new Date(u.enrolledAt), 'yyyy-MM-dd') : '',
-    ]);
+    const headers = ['Name', 'Email', 'Other emails', 'Phone', 'WhatsApp', 'WhatsApp found', 'Connection', 'On track', 'City', 'State', 'Country', 'Timezone', 'Occupation', 'Instagram', 'Ever signed in', 'Last seen', 'Active days', 'Platforms', 'Plus', 'Order status', 'Payment date', 'Support chat', 'Round', 'Enrolled'];
+    const rows = filtered.map(u => {
+      const n = noteFor(u.userId);
+      return [
+        u.fullName || '', u.email, u.aliases.join(' | '), u.phone || '', n.whatsapp_number || '',
+        n.check_whatsapp ? 'Yes' : 'No', n.check_connection ? 'Yes' : 'No', n.check_ontrack ? 'Yes' : 'No',
+        u.city || '', u.state || '', u.country || '',
+        u.timezone || '', u.occupation || '', u.instagram || '', u.everOpened ? 'Yes' : 'No', u.lastActiveDate || '',
+        String(u.totalActiveDays ?? ''), u.platforms.join('/'), u.plusStatus || '', u.orderStatus || '',
+        u.orderDate ? format(new Date(u.orderDate), 'yyyy-MM-dd') : '',
+        u.hasSupportChat ? (u.supportLastMessageAt ? format(new Date(u.supportLastMessageAt), 'yyyy-MM-dd') : 'Yes') : '',
+        u.roundName || '', u.enrolledAt ? format(new Date(u.enrolledAt), 'yyyy-MM-dd') : '',
+      ];
+    });
+
     const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
     const a = document.createElement('a');
