@@ -378,7 +378,24 @@ export function ProgramStudentsManager() {
                           <Badge variant="outline" className="mt-1">+{u.aliases.length} email{u.aliases.length > 1 ? 's' : ''}</Badge>
                         )}
                       </TableCell>
-                      <TableCell className="whitespace-nowrap">{u.phone || '-'}</TableCell>
+                      <TableCell className="whitespace-nowrap text-sm">
+                        {u.phone ? (
+                          <div className="space-y-1">
+                            <div>{u.phone}</div>
+                            {waLink(u.phone) && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-7 px-2"
+                                onClick={(e) => { e.stopPropagation(); window.open(waLink(u.phone)!, '_blank', 'noopener'); }}
+                              >
+                                <MessageCircle className="h-3.5 w-3.5 mr-1" />
+                                WhatsApp
+                              </Button>
+                            )}
+                          </div>
+                        ) : '-'}
+                      </TableCell>
                       <TableCell className="whitespace-nowrap text-sm">
                         {u.everOpened ? (
                           <div>
