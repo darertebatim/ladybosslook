@@ -367,7 +367,7 @@ export function ProgramStudentsManager() {
                             </div>
                           </div>
                         ) : (
-                          <Badge variant="destructive">Never opened</Badge>
+                          <Badge variant="destructive">Never signed in</Badge>
                         )}
                       </TableCell>
                       <TableCell className="text-sm">{loc(u)}</TableCell>
