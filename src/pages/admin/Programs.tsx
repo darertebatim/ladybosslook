@@ -4,6 +4,7 @@ import { ProgramRoundsManager } from '@/components/admin/ProgramRoundsManager';
 import AutoEnrollmentManager from '@/components/admin/AutoEnrollmentManager';
 import PastSessionsManager from '@/components/admin/PastSessionsManager';
 import OneOnOneClientsManager from '@/components/admin/OneOnOneClientsManager';
+import { ProgramStudentsManager } from '@/components/admin/ProgramStudentsManager';
 
 export default function Programs() {
   return (
