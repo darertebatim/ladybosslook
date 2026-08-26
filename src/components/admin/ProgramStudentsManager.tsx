@@ -414,7 +414,17 @@ export function ProgramStudentsManager() {
                   <Field label="Referral source" value={detail.referralSource} />
                   <Field label="Date of birth" value={detail.dateOfBirth} />
                   <Field label="Account created" value={detail.profileCreatedAt ? format(new Date(detail.profileCreatedAt), 'MMM d, yyyy') : null} />
-                  <Field label="App activity" value={detail.everOpened ? `Last active ${detail.lastActiveDate || 'unknown'} · ${detail.totalActiveDays ?? 0} active days · ${detail.platforms.join('/') || 'no install record'}` : 'Never opened the app'} />
+                  <Field
+                    label="App activity"
+                    value={detail.everOpened
+                      ? [
+                          detail.lastSignInAt ? `Last sign-in ${format(new Date(detail.lastSignInAt), 'MMM d, yyyy')}` : null,
+                          detail.lastActiveDate ? `Last seen ${detail.lastActiveDate}` : null,
+                          `${detail.returnEvents} app visits`,
+                          `${detail.totalActiveDays ?? 0} active days`,
+                          detail.platforms.length ? detail.platforms.join('/') : 'no native install record',
+                        ].filter(Boolean).join(' · ')
+                      : 'Never signed in'} />
                   <Field label="Rilo Plus" value={detail.plusStatus} />
                   <Field label="Payment for this program" value={detail.orderStatus ? `${detail.orderStatus}${detail.orderAmount ? ` · ${(detail.orderAmount / 100).toFixed(2)} ${(detail.orderCurrency || '').toUpperCase()}` : ''}` : 'No order record'} />
                   <Field label="Round" value={detail.roundName} />
