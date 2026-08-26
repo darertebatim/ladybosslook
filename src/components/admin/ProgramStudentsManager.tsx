@@ -125,14 +125,27 @@ export function ProgramStudentsManager() {
         return results;
       };
 
-      const [profiles, aliases, installs, subs, orders, allEnroll] = await Promise.all([
+      const fetchActivity = async () => {
+        const results: any[] = [];
+        for (const part of chunk(userIds)) {
+          const { data, error } = await (supabase.rpc as any)('admin_get_user_activity', { _ids: part });
+          if (error) throw error;
+          results.push(...(data || []));
+        }
+        return results;
+      };
+
+      const [profiles, aliases, installs, subs, orders, allEnroll, activity] = await Promise.all([
         fetchIn('profiles', 'id, email, full_name, phone, city, state, country, timezone, occupation, social_instagram, bio, preferred_language, goals, referral_source, date_of_birth, created_at, last_active_date, total_active_days', 'id'),
         fetchIn('account_email_aliases', 'primary_user_id, email', 'primary_user_id'),
         fetchIn('app_installations', 'user_id, platform, last_seen_at'),
         fetchIn('user_subscriptions', 'user_id, status, expires_at, trial_ends_at'),
         fetchIn('orders', 'user_id, program_slug, status, amount, currency, created_at'),
         fetchIn('course_enrollments', 'user_id, program_slug, status'),
+        fetchActivity(),
       ]);
+
+      const actMap = new Map<string, any>(activity.map((a: any) => [a.user_id, a]));
 
       const pMap = new Map(profiles.map((p: any) => [p.id, p]));
       const aliasMap = new Map<string, string[]>();
