@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -3296,6 +3296,8 @@ export type Database = {
           join_now_sent_at: string | null
           mailchimp_error: string | null
           mailchimp_success: boolean | null
+          morning_round_id: string | null
+          morning_sent_at: string | null
           name: string
           next_session_round_id: string | null
           next_session_sent_at: string | null
@@ -3316,6 +3318,8 @@ export type Database = {
           join_now_sent_at?: string | null
           mailchimp_error?: string | null
           mailchimp_success?: boolean | null
+          morning_round_id?: string | null
+          morning_sent_at?: string | null
           name: string
           next_session_round_id?: string | null
           next_session_sent_at?: string | null
@@ -3336,6 +3340,8 @@ export type Database = {
           join_now_sent_at?: string | null
           mailchimp_error?: string | null
           mailchimp_success?: boolean | null
+          morning_round_id?: string | null
+          morning_sent_at?: string | null
           name?: string
           next_session_round_id?: string | null
           next_session_sent_at?: string | null

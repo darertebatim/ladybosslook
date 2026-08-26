@@ -189,6 +189,86 @@ function buildJoinNowHtml(
 </html>`;
 }
 
+function buildMorningHtml(
+  name: string,
+  startUtc: Date | null,
+  meetUrl: string,
+  supportUrl: string,
+): string {
+  const rows = startUtc
+    ? CITY_ZONES.map(
+        (z) => `
+        <tr>
+          <td style="padding:6px 10px;font-size:13px;border-bottom:1px solid #fde68a;">${z.label}</td>
+          <td style="padding:6px 10px;font-size:13px;border-bottom:1px solid #fde68a;" dir="ltr"><strong>${fmtZone(startUtc, z.tz)}</strong></td>
+        </tr>`,
+      ).join("")
+    : "";
+
+  const p = (t: string) =>
+    `<p style="margin:0 0 12px;font-size:15px;line-height:2;">${t}</p>`;
+
+  return `
+<!doctype html>
+<html dir="rtl" lang="fa">
+  <body style="margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
+    <div style="max-width:560px;margin:0 auto;padding:24px 20px;">
+      ${p(`سلام ${name}،`)}
+      ${p("ممکن است مرتب در اینستاگرام پست بگذارید،<br>بازدید بگیرید،<br>حتی افراد زیادی وارد پیجتان شوند…")}
+      ${p("اما در نهایت، تعداد مشتری‌ها و درآمدی که از اینستاگرام می‌گیرید، با تمام وقتی که برایش می‌گذارید متناسب نباشد.")}
+      ${p("<strong>مشکل لزوماً کم‌کاری شما نیست.</strong>")}
+      ${p("بسیاری از بیزینس‌های ایرانی در آمریکا و کانادا، بدون اینکه متوجه باشند، درگیر چند اشتباه پنهان هستند:")}
+      <ul style="margin:0 0 14px;padding:0 20px 0 0;font-size:15px;line-height:2;">
+        <li>چرا بازدیدها به مشتری تبدیل نمی‌شوند؟</li>
+        <li>چرا افراد وارد پیج می‌شوند، اما پیام نمی‌دهند؟</li>
+        <li>چرا بعضی بیزینس‌ها با فالوور کمتر، فروش بیشتری دارند؟</li>
+        <li>و چرا روش‌هایی که در ایران جواب می‌دادند، اینجا نتیجه مشابهی نمی‌سازند؟</li>
+      </ul>
+      ${p("<strong>امشب در وبینار رایگان:</strong>")}
+      ${p("«۶ تله اینستاگرامی بیزینس‌های ایرانی در آمریکا و کانادا»")}
+      ${p("این ۶ اشتباه را قدم‌به‌قدم بررسی می‌کنم و به شما نشان می‌دهم چطور از اینستاگرام برای سه نتیجه واقعی استفاده کنید:")}
+      <ul style="margin:0 0 14px;padding:0 20px 0 0;font-size:15px;line-height:2;">
+        <li>جذب مشتری بیشتر</li>
+        <li>جلوگیری از هدررفتن مشتری‌های بالقوه</li>
+        <li>ساختن درآمد بیشتر، بدون اینکه تمام وقتتان را صرف تولید محتوا کنید</li>
+      </ul>
+      ${p("این وبینار درباره بیشتر پست‌گذاشتن یا دنبال‌کردن ترندها نیست.")}
+      ${p("قرار است یاد بگیرید اینستاگرام دقیقاً چه نقشی باید در بیزینس شما داشته باشد و چرا ممکن است روش فعلی‌تان، با وجود تمام زحمتی که می‌کشید، نتیجه‌ای که می‌خواهید را نسازد.")}
+
+      ${
+        rows
+          ? `<div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:12px;margin:20px 0;">
+               <p style="margin:0 0 8px;font-size:14px;font-weight:bold;">⏰ زمان برگزاری: امشب</p>
+               <table style="width:100%;border-collapse:collapse;">${rows}</table>
+             </div>`
+          : ""
+      }
+
+      ${p("برای ورود به وبینار روی لینک زیر بزنید:")}
+      ${
+        meetUrl
+          ? `<p style="text-align:center;margin:20px 0;">
+               <a href="${meetUrl}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:16px 32px;border-radius:12px;font-size:17px;font-weight:bold;">
+                 ورود به وبینار رایگان
+               </a>
+             </p>
+             <p style="text-align:center;margin:0 0 8px;font-size:13px;">
+               <a href="${meetUrl}" style="color:#e11d48;word-break:break-all;" dir="ltr">${meetUrl}</a>
+             </p>`
+          : ""
+      }
+
+      ${p("امشب منتظرتان هستم،<br><strong>علی لطفی</strong>")}
+
+      <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
+        سوالی داشتی؟ واتس‌اپ پشتیبانی:
+        <a href="${supportUrl}" style="color:#059669;">${supportUrl}</a>
+      </p>
+    </div>
+  </body>
+</html>`;
+}
+
 const SIGNUP_URL = "https://ladybosslook.com/sixtraps";
 
 function buildNextSessionHtml(
@@ -292,6 +372,7 @@ serve(async (req) => {
     const requestedRoundId = String(body?.roundId || "").trim();
     const onlyUnsent = body?.onlyUnsent !== false;
     const joinNow = body?.joinNow === true;
+    const morningOf = body?.morningOf === true;
     const nextSession = body?.nextSession === true;
     // For the "next session" email, roundId selects the AUDIENCE (people who
     // signed up for that past round); the content uses the upcoming round.
@@ -391,7 +472,9 @@ serve(async (req) => {
         if (onlyUnsent) {
           query = joinNow
             ? query.is("join_now_sent_at", null)
-            : query.is("reminder_sent_at", null);
+            : morningOf
+              ? query.is("morning_sent_at", null)
+              : query.is("reminder_sent_at", null);
         }
       }
       const { data: rows, error } = await query;
@@ -413,7 +496,9 @@ serve(async (req) => {
         ? buildNextSessionHtml(r.name, startUtc, supportUrl)
         : joinNow
           ? buildJoinNowHtml(r.name, meetUrl, supportUrl)
-          : buildHtml(r.name, startUtc, meetUrl, gcalUrl, supportUrl);
+          : morningOf
+            ? buildMorningHtml(r.name, startUtc, meetUrl, supportUrl)
+            : buildHtml(r.name, startUtc, meetUrl, gcalUrl, supportUrl);
       const { data: sendData, error } = await resend.emails.send({
         from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>",
         to: [r.email],
@@ -421,7 +506,9 @@ serve(async (req) => {
           ? "جلسه زنده رو از دست دادی؟ هفته آینده دوباره برگزار می‌شه 🌷"
           : joinNow
             ? "وبینار در حال شروع است — همین حالا وارد شوید 🚀"
-            : "یادآوری: وبینار ۵ آگست + ویدیوی پیش‌نیاز 🌷",
+            : morningOf
+              ? "امشب: ۶ تله اینستاگرامی بیزینس‌های ایرانی در آمریکا و کانادا 🌷"
+              : "یادآوری: وبینار ۵ آگست + ویدیوی پیش‌نیاز 🌷",
         html,
       });
 
@@ -455,6 +542,15 @@ serve(async (req) => {
             .update({
               join_now_sent_at: new Date().toISOString(),
               join_now_round_id: targetRoundId,
+            })
+            .eq("email", r.email)
+            .in("source", SOURCES);
+        } else if (!testEmail && morningOf) {
+          await supabase
+            .from("form_submissions")
+            .update({
+              morning_sent_at: new Date().toISOString(),
+              morning_round_id: targetRoundId,
             })
             .eq("email", r.email)
             .in("source", SOURCES);
