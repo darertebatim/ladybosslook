@@ -6252,6 +6252,42 @@ export type Database = {
           },
         ]
       }
+      student_admin_notes: {
+        Row: {
+          check_connection: boolean
+          check_ontrack: boolean
+          check_whatsapp: boolean
+          created_at: string
+          id: string
+          notes: string | null
+          updated_at: string
+          user_id: string
+          whatsapp_number: string | null
+        }
+        Insert: {
+          check_connection?: boolean
+          check_ontrack?: boolean
+          check_whatsapp?: boolean
+          created_at?: string
+          id?: string
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+          whatsapp_number?: string | null
+        }
+        Update: {
+          check_connection?: boolean
+          check_ontrack?: boolean
+          check_whatsapp?: boolean
+          created_at?: string
+          id?: string
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+          whatsapp_number?: string | null
+        }
+        Relationships: []
+      }
       subscription_products: {
         Row: {
           created_at: string

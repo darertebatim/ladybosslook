@@ -2,14 +2,17 @@ import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { GraduationCap, RefreshCw, Download, Search, MessageCircle, MessagesSquare } from 'lucide-react';
+import { GraduationCap, RefreshCw, Download, Search, MessageCircle, MessagesSquare, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
+
 
 interface Program { slug: string; title: string; }
 interface Round { id: string; round_name: string; round_number: number; status: string; }
@@ -52,6 +55,15 @@ interface Student {
   otherEnrollments: string[];
 }
 
+interface AdminNote {
+  whatsapp_number: string | null;
+  check_whatsapp: boolean;
+  check_connection: boolean;
+  check_ontrack: boolean;
+}
+
+const emptyNote: AdminNote = { whatsapp_number: null, check_whatsapp: false, check_connection: false, check_ontrack: false };
+
 const waLink = (phone?: string | null) => {
   if (!phone) return null;
   const digits = phone.replace(/[^\d]/g, '');
@@ -74,7 +86,24 @@ export function ProgramStudentsManager() {
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [detail, setDetail] = useState<Student | null>(null);
+  const [notes, setNotes] = useState<Record<string, AdminNote>>({});
+  const [editUser, setEditUser] = useState<Student | null>(null);
+  const [editWhatsapp, setEditWhatsapp] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
   const { toast } = useToast();
+
+  const noteFor = (userId: string): AdminNote => notes[userId] || emptyNote;
+
+  const saveNote = async (userId: string, patch: Partial<AdminNote>) => {
+    const next = { ...noteFor(userId), ...patch };
+    setNotes(prev => ({ ...prev, [userId]: next }));
+    const { error } = await (supabase.from('student_admin_notes' as any) as any)
+      .upsert({ user_id: userId, ...next }, { onConflict: 'user_id' });
+    if (error) {
+      toast({ title: 'Could not save', description: error.message, variant: 'destructive' });
+    }
+  };
+
 
   useEffect(() => {
     (async () => {
@@ -147,7 +176,7 @@ export function ProgramStudentsManager() {
         return results;
       };
 
-      const [profiles, aliases, installs, subs, orders, allEnroll, activity, chats] = await Promise.all([
+      const [profiles, aliases, installs, subs, orders, allEnroll, activity, chats, adminNotes] = await Promise.all([
         fetchIn('profiles', 'id, email, full_name, phone, city, state, country, timezone, occupation, social_instagram, bio, preferred_language, goals, referral_source, date_of_birth, created_at, last_active_date, total_active_days', 'id'),
         fetchIn('account_email_aliases', 'primary_user_id, email', 'primary_user_id'),
         fetchIn('app_installations', 'user_id, platform, last_seen_at'),
@@ -156,7 +185,19 @@ export function ProgramStudentsManager() {
         fetchIn('course_enrollments', 'user_id, program_slug, status'),
         fetchActivity(),
         fetchIn('chat_conversations', 'user_id, inbox_type, last_message_at, updated_at'),
+        fetchIn('student_admin_notes', 'user_id, whatsapp_number, check_whatsapp, check_connection, check_ontrack'),
       ]);
+
+      const notesMap: Record<string, AdminNote> = {};
+      adminNotes.forEach((n: any) => {
+        notesMap[n.user_id] = {
+          whatsapp_number: n.whatsapp_number || null,
+          check_whatsapp: !!n.check_whatsapp,
+          check_connection: !!n.check_connection,
+          check_ontrack: !!n.check_ontrack,
+        };
+      });
+      setNotes(notesMap);
 
       const chatMap = new Map<string, any>();
       chats.forEach((c: any) => {
@@ -164,6 +205,7 @@ export function ProgramStudentsManager() {
         const prev = chatMap.get(c.user_id);
         if (!prev || (at && new Date(at) > new Date(prev.at || 0))) chatMap.set(c.user_id, { at });
       });
+
 
       const actMap = new Map<string, any>(activity.map((a: any) => [a.user_id, a]));
 
@@ -260,20 +302,28 @@ export function ProgramStudentsManager() {
       (u.fullName || '').toLowerCase().includes(s) ||
       u.email.toLowerCase().includes(s) ||
       u.aliases.some(a => a.toLowerCase().includes(s)) ||
-      (u.phone || '').toLowerCase().includes(s)
+      (u.phone || '').toLowerCase().includes(s) ||
+      (noteFor(u.userId).whatsapp_number || '').toLowerCase().includes(s)
     );
-  }, [students, search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [students, search, notes]);
 
   const exportCsv = () => {
-    const headers = ['Name', 'Email', 'Other emails', 'Phone', 'WhatsApp', 'City', 'State', 'Country', 'Timezone', 'Occupation', 'Instagram', 'Ever signed in', 'Last seen', 'Active days', 'Platforms', 'Plus', 'Order status', 'Payment date', 'Support chat', 'Round', 'Enrolled'];
-    const rows = filtered.map(u => [
-      u.fullName || '', u.email, u.aliases.join(' | '), u.phone || '', waLink(u.phone) || '', u.city || '', u.state || '', u.country || '',
-      u.timezone || '', u.occupation || '', u.instagram || '', u.everOpened ? 'Yes' : 'No', u.lastActiveDate || '',
-      String(u.totalActiveDays ?? ''), u.platforms.join('/'), u.plusStatus || '', u.orderStatus || '',
-      u.orderDate ? format(new Date(u.orderDate), 'yyyy-MM-dd') : '',
-      u.hasSupportChat ? (u.supportLastMessageAt ? format(new Date(u.supportLastMessageAt), 'yyyy-MM-dd') : 'Yes') : '',
-      u.roundName || '', u.enrolledAt ? format(new Date(u.enrolledAt), 'yyyy-MM-dd') : '',
-    ]);
+    const headers = ['Name', 'Email', 'Other emails', 'Phone', 'WhatsApp', 'WhatsApp found', 'Connection', 'On track', 'City', 'State', 'Country', 'Timezone', 'Occupation', 'Instagram', 'Ever signed in', 'Last seen', 'Active days', 'Platforms', 'Plus', 'Order status', 'Payment date', 'Support chat', 'Round', 'Enrolled'];
+    const rows = filtered.map(u => {
+      const n = noteFor(u.userId);
+      return [
+        u.fullName || '', u.email, u.aliases.join(' | '), u.phone || '', n.whatsapp_number || '',
+        n.check_whatsapp ? 'Yes' : 'No', n.check_connection ? 'Yes' : 'No', n.check_ontrack ? 'Yes' : 'No',
+        u.city || '', u.state || '', u.country || '',
+        u.timezone || '', u.occupation || '', u.instagram || '', u.everOpened ? 'Yes' : 'No', u.lastActiveDate || '',
+        String(u.totalActiveDays ?? ''), u.platforms.join('/'), u.plusStatus || '', u.orderStatus || '',
+        u.orderDate ? format(new Date(u.orderDate), 'yyyy-MM-dd') : '',
+        u.hasSupportChat ? (u.supportLastMessageAt ? format(new Date(u.supportLastMessageAt), 'yyyy-MM-dd') : 'Yes') : '',
+        u.roundName || '', u.enrolledAt ? format(new Date(u.enrolledAt), 'yyyy-MM-dd') : '',
+      ];
+    });
+
     const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
     const a = document.createElement('a');
@@ -348,7 +398,11 @@ export function ProgramStudentsManager() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Phone / WhatsApp</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>WhatsApp</TableHead>
+                    <TableHead className="text-center">WA found</TableHead>
+                    <TableHead className="text-center">Connection</TableHead>
+                    <TableHead className="text-center">On track</TableHead>
                     <TableHead>App</TableHead>
                     <TableHead>Support chat</TableHead>
                     <TableHead>Location</TableHead>
@@ -362,10 +416,12 @@ export function ProgramStudentsManager() {
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
-                    <TableRow><TableCell colSpan={12} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={16} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
                   ) : filtered.length === 0 ? (
-                    <TableRow><TableCell colSpan={12} className="text-center py-8 text-muted-foreground">No students found</TableCell></TableRow>
-                  ) : filtered.map(u => (
+                    <TableRow><TableCell colSpan={16} className="text-center py-8 text-muted-foreground">No students found</TableCell></TableRow>
+                  ) : filtered.map(u => {
+                    const n = noteFor(u.userId);
+                    return (
                     <TableRow
                       key={u.enrollmentId}
                       className={`cursor-pointer ${!u.everOpened ? 'bg-amber-50 dark:bg-amber-950/20' : ''}`}
@@ -378,24 +434,45 @@ export function ProgramStudentsManager() {
                           <Badge variant="outline" className="mt-1">+{u.aliases.length} email{u.aliases.length > 1 ? 's' : ''}</Badge>
                         )}
                       </TableCell>
+                      <TableCell className="whitespace-nowrap text-sm">{u.phone || '-'}</TableCell>
                       <TableCell className="whitespace-nowrap text-sm">
-                        {u.phone ? (
-                          <div className="space-y-1">
-                            <div>{u.phone}</div>
-                            {waLink(u.phone) && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-7 px-2"
-                                onClick={(e) => { e.stopPropagation(); window.open(waLink(u.phone)!, '_blank', 'noopener'); }}
-                              >
-                                <MessageCircle className="h-3.5 w-3.5 mr-1" />
-                                WhatsApp
-                              </Button>
-                            )}
-                          </div>
-                        ) : '-'}
+                        <div className="flex items-center gap-1">
+                          {n.whatsapp_number ? (
+                            <div className="space-y-1">
+                              <div>{n.whatsapp_number}</div>
+                              {waLink(n.whatsapp_number) && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-7 px-2"
+                                  onClick={(e) => { e.stopPropagation(); window.open(waLink(n.whatsapp_number)!, '_blank', 'noopener'); }}
+                                >
+                                  <MessageCircle className="h-3.5 w-3.5 mr-1" />
+                                  WhatsApp
+                                </Button>
+                              )}
+                            </div>
+                          ) : <span className="text-muted-foreground">-</span>}
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-7 w-7"
+                            onClick={(e) => { e.stopPropagation(); setEditUser(u); setEditWhatsapp(n.whatsapp_number || ''); }}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
                       </TableCell>
+                      <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
+                        <Checkbox checked={n.check_whatsapp} onCheckedChange={(v) => saveNote(u.userId, { check_whatsapp: !!v })} />
+                      </TableCell>
+                      <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
+                        <Checkbox checked={n.check_connection} onCheckedChange={(v) => saveNote(u.userId, { check_connection: !!v })} />
+                      </TableCell>
+                      <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
+                        <Checkbox checked={n.check_ontrack} onCheckedChange={(v) => saveNote(u.userId, { check_ontrack: !!v })} />
+                      </TableCell>
+
                       <TableCell className="whitespace-nowrap text-sm">
                         {u.everOpened ? (
                           <div>
@@ -447,7 +524,7 @@ export function ProgramStudentsManager() {
                       </TableCell>
                       <TableCell className="whitespace-nowrap text-sm">{u.enrolledAt ? format(new Date(u.enrolledAt), 'MMM d, yyyy') : '-'}</TableCell>
                     </TableRow>
-                  ))}
+                  );})}
                 </TableBody>
               </Table>
             </div>
@@ -465,6 +542,32 @@ export function ProgramStudentsManager() {
                 <div className="mt-6 space-y-4 text-sm">
                   <Field label="All emails" value={[detail.email, ...detail.aliases].join(', ')} />
                   <Field label="Phone" value={detail.phone} />
+                  <div>
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">WhatsApp</div>
+                    <div className="flex items-center gap-2">
+                      <span className="break-words">{noteFor(detail.userId).whatsapp_number || '-'}</span>
+                      <Button size="sm" variant="outline" className="h-7 px-2" onClick={() => { setEditUser(detail); setEditWhatsapp(noteFor(detail.userId).whatsapp_number || ''); }}>
+                        <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Quality check</div>
+                    {([
+                      ['check_whatsapp', 'WhatsApp found'],
+                      ['check_connection', 'Connection (responding)'],
+                      ['check_ontrack', 'On track'],
+                    ] as const).map(([key, label]) => (
+                      <label key={key} className="flex items-center gap-2">
+                        <Checkbox
+                          checked={noteFor(detail.userId)[key]}
+                          onCheckedChange={(v) => saveNote(detail.userId, { [key]: !!v } as any)}
+                        />
+                        <span>{label}</span>
+                      </label>
+                    ))}
+                  </div>
+
                   <Field label="Location" value={loc(detail)} />
                   <Field label="Timezone" value={detail.timezone} />
                   <Field label="Occupation / business" value={detail.occupation} />
@@ -499,6 +602,44 @@ export function ProgramStudentsManager() {
             )}
           </SheetContent>
         </Sheet>
+
+        <Dialog open={!!editUser} onOpenChange={(o) => !o && setEditUser(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>WhatsApp number</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-2">
+              <div className="text-sm text-muted-foreground">{editUser?.fullName || editUser?.email}</div>
+              <Input
+                placeholder="+1 415 555 0123 (leave empty if none)"
+                value={editWhatsapp}
+                onChange={(e) => setEditWhatsapp(e.target.value)}
+              />
+              {editUser?.phone && (
+                <Button variant="ghost" size="sm" onClick={() => setEditWhatsapp(editUser.phone || '')}>
+                  Use profile phone ({editUser.phone})
+                </Button>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditUser(null)}>Cancel</Button>
+              <Button
+                disabled={savingEdit}
+                onClick={async () => {
+                  if (!editUser) return;
+                  setSavingEdit(true);
+                  await saveNote(editUser.userId, { whatsapp_number: editWhatsapp.trim() || null });
+                  setSavingEdit(false);
+                  setEditUser(null);
+                  toast({ title: 'Saved' });
+                }}
+              >
+                Save
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
       </CardContent>
     </Card>
   );
