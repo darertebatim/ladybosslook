@@ -398,7 +398,11 @@ export function ProgramStudentsManager() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Phone / WhatsApp</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>WhatsApp</TableHead>
+                    <TableHead className="text-center">WA found</TableHead>
+                    <TableHead className="text-center">Connection</TableHead>
+                    <TableHead className="text-center">On track</TableHead>
                     <TableHead>App</TableHead>
                     <TableHead>Support chat</TableHead>
                     <TableHead>Location</TableHead>
@@ -412,10 +416,12 @@ export function ProgramStudentsManager() {
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
-                    <TableRow><TableCell colSpan={12} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={16} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
                   ) : filtered.length === 0 ? (
-                    <TableRow><TableCell colSpan={12} className="text-center py-8 text-muted-foreground">No students found</TableCell></TableRow>
-                  ) : filtered.map(u => (
+                    <TableRow><TableCell colSpan={16} className="text-center py-8 text-muted-foreground">No students found</TableCell></TableRow>
+                  ) : filtered.map(u => {
+                    const n = noteFor(u.userId);
+                    return (
                     <TableRow
                       key={u.enrollmentId}
                       className={`cursor-pointer ${!u.everOpened ? 'bg-amber-50 dark:bg-amber-950/20' : ''}`}
@@ -428,24 +434,45 @@ export function ProgramStudentsManager() {
                           <Badge variant="outline" className="mt-1">+{u.aliases.length} email{u.aliases.length > 1 ? 's' : ''}</Badge>
                         )}
                       </TableCell>
+                      <TableCell className="whitespace-nowrap text-sm">{u.phone || '-'}</TableCell>
                       <TableCell className="whitespace-nowrap text-sm">
-                        {u.phone ? (
-                          <div className="space-y-1">
-                            <div>{u.phone}</div>
-                            {waLink(u.phone) && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-7 px-2"
-                                onClick={(e) => { e.stopPropagation(); window.open(waLink(u.phone)!, '_blank', 'noopener'); }}
-                              >
-                                <MessageCircle className="h-3.5 w-3.5 mr-1" />
-                                WhatsApp
-                              </Button>
-                            )}
-                          </div>
-                        ) : '-'}
+                        <div className="flex items-center gap-1">
+                          {n.whatsapp_number ? (
+                            <div className="space-y-1">
+                              <div>{n.whatsapp_number}</div>
+                              {waLink(n.whatsapp_number) && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-7 px-2"
+                                  onClick={(e) => { e.stopPropagation(); window.open(waLink(n.whatsapp_number)!, '_blank', 'noopener'); }}
+                                >
+                                  <MessageCircle className="h-3.5 w-3.5 mr-1" />
+                                  WhatsApp
+                                </Button>
+                              )}
+                            </div>
+                          ) : <span className="text-muted-foreground">-</span>}
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-7 w-7"
+                            onClick={(e) => { e.stopPropagation(); setEditUser(u); setEditWhatsapp(n.whatsapp_number || ''); }}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
                       </TableCell>
+                      <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
+                        <Checkbox checked={n.check_whatsapp} onCheckedChange={(v) => saveNote(u.userId, { check_whatsapp: !!v })} />
+                      </TableCell>
+                      <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
+                        <Checkbox checked={n.check_connection} onCheckedChange={(v) => saveNote(u.userId, { check_connection: !!v })} />
+                      </TableCell>
+                      <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
+                        <Checkbox checked={n.check_ontrack} onCheckedChange={(v) => saveNote(u.userId, { check_ontrack: !!v })} />
+                      </TableCell>
+
                       <TableCell className="whitespace-nowrap text-sm">
                         {u.everOpened ? (
                           <div>
