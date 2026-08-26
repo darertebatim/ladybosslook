@@ -2,14 +2,17 @@ import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { GraduationCap, RefreshCw, Download, Search, MessageCircle, MessagesSquare } from 'lucide-react';
+import { GraduationCap, RefreshCw, Download, Search, MessageCircle, MessagesSquare, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
+
 
 interface Program { slug: string; title: string; }
 interface Round { id: string; round_name: string; round_number: number; status: string; }
