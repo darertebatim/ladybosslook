@@ -24,6 +24,7 @@ interface Student {
   roundId: string | null;
   roundName: string | null;
   email: string;
+  paymentEmail: string | null;
   aliases: string[];
   fullName: string | null;
   phone: string | null;
@@ -181,7 +182,7 @@ export function ProgramStudentsManager() {
         fetchIn('account_email_aliases', 'primary_user_id, email', 'primary_user_id'),
         fetchIn('app_installations', 'user_id, platform, last_seen_at'),
         fetchIn('user_subscriptions', 'user_id, status, expires_at, trial_ends_at'),
-        fetchIn('orders', 'user_id, program_slug, status, amount, currency, created_at'),
+        fetchIn('orders', 'user_id, program_slug, status, amount, currency, created_at, email'),
         fetchIn('course_enrollments', 'user_id, program_slug, status'),
         fetchActivity(),
         fetchIn('chat_conversations', 'user_id, inbox_type, last_message_at, updated_at'),
@@ -254,6 +255,7 @@ export function ProgramStudentsManager() {
           roundId: e.round_id,
           roundName: e.round_id ? roundMap.get(e.round_id) || null : null,
           email: p.email || 'Unknown',
+          paymentEmail: order?.email || null,
           aliases: aliasMap.get(e.user_id) || [],
           fullName: p.full_name || null,
           phone: p.phone || null,
@@ -429,7 +431,12 @@ export function ProgramStudentsManager() {
                     >
                       <TableCell className="font-medium whitespace-nowrap">{u.fullName || '-'}</TableCell>
                       <TableCell className="whitespace-nowrap">
+                        <div className="text-xs text-muted-foreground">App</div>
                         <div>{u.email}</div>
+                        <div className="text-xs text-muted-foreground mt-1.5">Payment</div>
+                        <div className={u.paymentEmail && u.paymentEmail.toLowerCase() !== u.email.toLowerCase() ? 'text-amber-600 dark:text-amber-400' : ''}>
+                          {u.paymentEmail || '-'}
+                        </div>
                         {u.aliases.length > 0 && (
                           <Badge variant="outline" className="mt-1">+{u.aliases.length} email{u.aliases.length > 1 ? 's' : ''}</Badge>
                         )}
