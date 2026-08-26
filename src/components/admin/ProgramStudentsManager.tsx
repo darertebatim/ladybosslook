@@ -39,6 +39,8 @@ interface Student {
   lastActiveDate: string | null;
   totalActiveDays: number | null;
   platforms: string[];
+  lastSignInAt: string | null;
+  returnEvents: number;
   everOpened: boolean;
   plusStatus: string | null;
   orderStatus: string | null;
@@ -125,14 +127,27 @@ export function ProgramStudentsManager() {
         return results;
       };
 
-      const [profiles, aliases, installs, subs, orders, allEnroll] = await Promise.all([
+      const fetchActivity = async () => {
+        const results: any[] = [];
+        for (const part of chunk(userIds)) {
+          const { data, error } = await (supabase.rpc as any)('admin_get_user_activity', { _ids: part });
+          if (error) throw error;
+          results.push(...(data || []));
+        }
+        return results;
+      };
+
+      const [profiles, aliases, installs, subs, orders, allEnroll, activity] = await Promise.all([
         fetchIn('profiles', 'id, email, full_name, phone, city, state, country, timezone, occupation, social_instagram, bio, preferred_language, goals, referral_source, date_of_birth, created_at, last_active_date, total_active_days', 'id'),
         fetchIn('account_email_aliases', 'primary_user_id, email', 'primary_user_id'),
         fetchIn('app_installations', 'user_id, platform, last_seen_at'),
         fetchIn('user_subscriptions', 'user_id, status, expires_at, trial_ends_at'),
         fetchIn('orders', 'user_id, program_slug, status, amount, currency, created_at'),
         fetchIn('course_enrollments', 'user_id, program_slug, status'),
+        fetchActivity(),
       ]);
+
+      const actMap = new Map<string, any>(activity.map((a: any) => [a.user_id, a]));
 
       const pMap = new Map(profiles.map((p: any) => [p.id, p]));
       const aliasMap = new Map<string, string[]>();
@@ -166,6 +181,12 @@ export function ProgramStudentsManager() {
         const plats = [...(platMap.get(e.user_id) || new Set<string>())];
         const sub = subMap.get(e.user_id);
         const order = orderMap.get(e.user_id);
+        const act = actMap.get(e.user_id);
+        const lastSignIn = act?.last_sign_in_at || null;
+        const returnEvents = act?.return_events ?? 0;
+        const lastSeen = [lastSignIn, act?.last_return_at, p.last_active_date]
+          .filter(Boolean)
+          .sort((x: string, y: string) => new Date(y).getTime() - new Date(x).getTime())[0] || null;
         return {
           enrollmentId: e.id,
           userId: e.user_id,
@@ -188,10 +209,12 @@ export function ProgramStudentsManager() {
           referralSource: p.referral_source || null,
           dateOfBirth: p.date_of_birth || null,
           profileCreatedAt: p.created_at || null,
-          lastActiveDate: p.last_active_date || null,
+          lastActiveDate: lastSeen ? String(lastSeen).slice(0, 10) : null,
           totalActiveDays: p.total_active_days ?? null,
           platforms: plats,
-          everOpened: plats.length > 0 || !!p.last_active_date,
+          lastSignInAt: lastSignIn,
+          returnEvents,
+          everOpened: !!lastSignIn || returnEvents > 0 || plats.length > 0 || !!p.last_active_date,
           plusStatus: sub?.status || null,
           orderStatus: order?.status || null,
           orderAmount: order?.amount ?? null,
@@ -221,7 +244,7 @@ export function ProgramStudentsManager() {
   }, [students, search]);
 
   const exportCsv = () => {
-    const headers = ['Name', 'Email', 'Other emails', 'Phone', 'City', 'State', 'Country', 'Timezone', 'Occupation', 'Instagram', 'Ever opened app', 'Last active', 'Active days', 'Platforms', 'Plus', 'Order status', 'Round', 'Enrolled'];
+    const headers = ['Name', 'Email', 'Other emails', 'Phone', 'City', 'State', 'Country', 'Timezone', 'Occupation', 'Instagram', 'Ever signed in', 'Last seen', 'Active days', 'Platforms', 'Plus', 'Order status', 'Round', 'Enrolled'];
     const rows = filtered.map(u => [
       u.fullName || '', u.email, u.aliases.join(' | '), u.phone || '', u.city || '', u.state || '', u.country || '',
       u.timezone || '', u.occupation || '', u.instagram || '', u.everOpened ? 'Yes' : 'No', u.lastActiveDate || '',
@@ -293,7 +316,7 @@ export function ProgramStudentsManager() {
 
             <div className="text-sm text-muted-foreground">
               {filtered.length} student{filtered.length === 1 ? '' : 's'}
-              {students.length > 0 && ` · ${students.filter(s => !s.everOpened).length} never opened the app`}
+              {students.length > 0 && ` · ${students.filter(s => !s.everOpened).length} never signed in`}
             </div>
 
             <div className="border rounded-lg overflow-x-auto">
@@ -334,13 +357,17 @@ export function ProgramStudentsManager() {
                       <TableCell className="whitespace-nowrap text-sm">
                         {u.everOpened ? (
                           <div>
-                            <div>{u.lastActiveDate ? `Active ${u.lastActiveDate}` : 'Installed'}</div>
+                            <div>{u.lastActiveDate ? `Seen ${u.lastActiveDate}` : 'Signed in'}</div>
                             <div className="text-xs text-muted-foreground">
-                              {u.totalActiveDays ? `${u.totalActiveDays} days` : ''}{u.platforms.length ? ` · ${u.platforms.join('/')}` : ''}
+                              {[
+                                u.returnEvents ? `${u.returnEvents} visits` : null,
+                                u.totalActiveDays ? `${u.totalActiveDays} days` : null,
+                                u.platforms.length ? u.platforms.join('/') : null,
+                              ].filter(Boolean).join(' · ')}
                             </div>
                           </div>
                         ) : (
-                          <Badge variant="destructive">Never opened</Badge>
+                          <Badge variant="destructive">Never signed in</Badge>
                         )}
                       </TableCell>
                       <TableCell className="text-sm">{loc(u)}</TableCell>
@@ -387,7 +414,17 @@ export function ProgramStudentsManager() {
                   <Field label="Referral source" value={detail.referralSource} />
                   <Field label="Date of birth" value={detail.dateOfBirth} />
                   <Field label="Account created" value={detail.profileCreatedAt ? format(new Date(detail.profileCreatedAt), 'MMM d, yyyy') : null} />
-                  <Field label="App activity" value={detail.everOpened ? `Last active ${detail.lastActiveDate || 'unknown'} · ${detail.totalActiveDays ?? 0} active days · ${detail.platforms.join('/') || 'no install record'}` : 'Never opened the app'} />
+                  <Field
+                    label="App activity"
+                    value={detail.everOpened
+                      ? [
+                          detail.lastSignInAt ? `Last sign-in ${format(new Date(detail.lastSignInAt), 'MMM d, yyyy')}` : null,
+                          detail.lastActiveDate ? `Last seen ${detail.lastActiveDate}` : null,
+                          `${detail.returnEvents} app visits`,
+                          `${detail.totalActiveDays ?? 0} active days`,
+                          detail.platforms.length ? detail.platforms.join('/') : 'no native install record',
+                        ].filter(Boolean).join(' · ')
+                      : 'Never signed in'} />
                   <Field label="Rilo Plus" value={detail.plusStatus} />
                   <Field label="Payment for this program" value={detail.orderStatus ? `${detail.orderStatus}${detail.orderAmount ? ` · ${(detail.orderAmount / 100).toFixed(2)} ${(detail.orderCurrency || '').toUpperCase()}` : ''}` : 'No order record'} />
                   <Field label="Round" value={detail.roundName} />
