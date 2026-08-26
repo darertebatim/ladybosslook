@@ -155,7 +155,15 @@ export function ProgramStudentsManager() {
         fetchIn('orders', 'user_id, program_slug, status, amount, currency, created_at'),
         fetchIn('course_enrollments', 'user_id, program_slug, status'),
         fetchActivity(),
+        fetchIn('chat_conversations', 'user_id, inbox_type, last_message_at, updated_at'),
       ]);
+
+      const chatMap = new Map<string, any>();
+      chats.forEach((c: any) => {
+        const at = c.last_message_at || c.updated_at || null;
+        const prev = chatMap.get(c.user_id);
+        if (!prev || (at && new Date(at) > new Date(prev.at || 0))) chatMap.set(c.user_id, { at });
+      });
 
       const actMap = new Map<string, any>(activity.map((a: any) => [a.user_id, a]));
 
