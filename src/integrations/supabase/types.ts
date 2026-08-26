@@ -7567,6 +7567,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_get_user_activity: {
+        Args: { _ids: string[] }
+        Returns: {
+          account_created_at: string
+          last_return_at: string
+          last_sign_in_at: string
+          return_events: number
+          user_id: string
+        }[]
+      }
       aperture_bucket_half_valid: {
         Args: { _bucket: string; _half: string }
         Returns: boolean
