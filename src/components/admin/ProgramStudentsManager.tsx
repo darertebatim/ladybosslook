@@ -55,6 +55,15 @@ interface Student {
   otherEnrollments: string[];
 }
 
+interface AdminNote {
+  whatsapp_number: string | null;
+  check_whatsapp: boolean;
+  check_connection: boolean;
+  check_ontrack: boolean;
+}
+
+const emptyNote: AdminNote = { whatsapp_number: null, check_whatsapp: false, check_connection: false, check_ontrack: false };
+
 const waLink = (phone?: string | null) => {
   if (!phone) return null;
   const digits = phone.replace(/[^\d]/g, '');
@@ -77,7 +86,24 @@ export function ProgramStudentsManager() {
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [detail, setDetail] = useState<Student | null>(null);
+  const [notes, setNotes] = useState<Record<string, AdminNote>>({});
+  const [editUser, setEditUser] = useState<Student | null>(null);
+  const [editWhatsapp, setEditWhatsapp] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
   const { toast } = useToast();
+
+  const noteFor = (userId: string): AdminNote => notes[userId] || emptyNote;
+
+  const saveNote = async (userId: string, patch: Partial<AdminNote>) => {
+    const next = { ...noteFor(userId), ...patch };
+    setNotes(prev => ({ ...prev, [userId]: next }));
+    const { error } = await (supabase.from('student_admin_notes' as any) as any)
+      .upsert({ user_id: userId, ...next }, { onConflict: 'user_id' });
+    if (error) {
+      toast({ title: 'Could not save', description: error.message, variant: 'destructive' });
+    }
+  };
+
 
   useEffect(() => {
     (async () => {
