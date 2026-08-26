@@ -602,6 +602,44 @@ export function ProgramStudentsManager() {
             )}
           </SheetContent>
         </Sheet>
+
+        <Dialog open={!!editUser} onOpenChange={(o) => !o && setEditUser(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>WhatsApp number</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-2">
+              <div className="text-sm text-muted-foreground">{editUser?.fullName || editUser?.email}</div>
+              <Input
+                placeholder="+1 415 555 0123 (leave empty if none)"
+                value={editWhatsapp}
+                onChange={(e) => setEditWhatsapp(e.target.value)}
+              />
+              {editUser?.phone && (
+                <Button variant="ghost" size="sm" onClick={() => setEditWhatsapp(editUser.phone || '')}>
+                  Use profile phone ({editUser.phone})
+                </Button>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditUser(null)}>Cancel</Button>
+              <Button
+                disabled={savingEdit}
+                onClick={async () => {
+                  if (!editUser) return;
+                  setSavingEdit(true);
+                  await saveNote(editUser.userId, { whatsapp_number: editWhatsapp.trim() || null });
+                  setSavingEdit(false);
+                  setEditUser(null);
+                  toast({ title: 'Saved' });
+                }}
+              >
+                Save
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
       </CardContent>
     </Card>
   );
