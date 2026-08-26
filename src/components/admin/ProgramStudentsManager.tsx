@@ -39,6 +39,8 @@ interface Student {
   lastActiveDate: string | null;
   totalActiveDays: number | null;
   platforms: string[];
+  lastSignInAt: string | null;
+  returnEvents: number;
   everOpened: boolean;
   plusStatus: string | null;
   orderStatus: string | null;
