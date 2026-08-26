@@ -179,6 +179,12 @@ export function ProgramStudentsManager() {
         const plats = [...(platMap.get(e.user_id) || new Set<string>())];
         const sub = subMap.get(e.user_id);
         const order = orderMap.get(e.user_id);
+        const act = actMap.get(e.user_id);
+        const lastSignIn = act?.last_sign_in_at || null;
+        const returnEvents = act?.return_events ?? 0;
+        const lastSeen = [lastSignIn, act?.last_return_at, p.last_active_date]
+          .filter(Boolean)
+          .sort((x: string, y: string) => new Date(y).getTime() - new Date(x).getTime())[0] || null;
         return {
           enrollmentId: e.id,
           userId: e.user_id,
