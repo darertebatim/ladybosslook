@@ -496,7 +496,9 @@ serve(async (req) => {
         ? buildNextSessionHtml(r.name, startUtc, supportUrl)
         : joinNow
           ? buildJoinNowHtml(r.name, meetUrl, supportUrl)
-          : buildHtml(r.name, startUtc, meetUrl, gcalUrl, supportUrl);
+          : morningOf
+            ? buildMorningHtml(r.name, startUtc, meetUrl, supportUrl)
+            : buildHtml(r.name, startUtc, meetUrl, gcalUrl, supportUrl);
       const { data: sendData, error } = await resend.emails.send({
         from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>",
         to: [r.email],
@@ -504,7 +506,9 @@ serve(async (req) => {
           ? "جلسه زنده رو از دست دادی؟ هفته آینده دوباره برگزار می‌شه 🌷"
           : joinNow
             ? "وبینار در حال شروع است — همین حالا وارد شوید 🚀"
-            : "یادآوری: وبینار ۵ آگست + ویدیوی پیش‌نیاز 🌷",
+            : morningOf
+              ? "امشب: ۶ تله اینستاگرامی بیزینس‌های ایرانی در آمریکا و کانادا 🌷"
+              : "یادآوری: وبینار ۵ آگست + ویدیوی پیش‌نیاز 🌷",
         html,
       });
 
