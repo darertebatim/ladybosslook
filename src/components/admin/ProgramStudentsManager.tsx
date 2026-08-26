@@ -434,16 +434,23 @@ export function ProgramStudentsManager() {
                     >
                       <TableCell className="font-medium whitespace-nowrap">{u.fullName || '-'}</TableCell>
                       <TableCell className="whitespace-nowrap">
-                        <div className="text-xs text-muted-foreground">App</div>
-                        <div>{u.email}</div>
-                        <div className="text-xs text-muted-foreground mt-1.5">Payment</div>
-                        <div className={u.paymentEmail && u.paymentEmail.toLowerCase() !== u.email.toLowerCase() ? 'text-amber-600 dark:text-amber-400' : ''}>
+                        <div className="text-xs text-muted-foreground">App (signed in)</div>
+                        {u.signInEmail ? (
+                          <div>{u.signInEmail}</div>
+                        ) : (
+                          <div className="text-destructive">Never signed in</div>
+                        )}
+                        <div className="text-xs text-muted-foreground mt-1.5">Payment (Stripe)</div>
+                        <div className={u.paymentEmail && u.paymentEmail.toLowerCase() !== (u.signInEmail || '').toLowerCase() ? 'text-amber-600 dark:text-amber-400' : ''}>
                           {u.paymentEmail || '-'}
                         </div>
                         {u.aliases.length > 0 && (
-                          <Badge variant="outline" className="mt-1">+{u.aliases.length} email{u.aliases.length > 1 ? 's' : ''}</Badge>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            merged: {u.aliases.join(', ')}
+                          </div>
                         )}
                       </TableCell>
+
                       <TableCell className="whitespace-nowrap text-sm">{u.phone || '-'}</TableCell>
                       <TableCell className="whitespace-nowrap text-sm">
                         <div className="flex items-center gap-1">
