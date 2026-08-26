@@ -244,7 +244,7 @@ export function ProgramStudentsManager() {
   }, [students, search]);
 
   const exportCsv = () => {
-    const headers = ['Name', 'Email', 'Other emails', 'Phone', 'City', 'State', 'Country', 'Timezone', 'Occupation', 'Instagram', 'Ever opened app', 'Last active', 'Active days', 'Platforms', 'Plus', 'Order status', 'Round', 'Enrolled'];
+    const headers = ['Name', 'Email', 'Other emails', 'Phone', 'City', 'State', 'Country', 'Timezone', 'Occupation', 'Instagram', 'Ever signed in', 'Last seen', 'Active days', 'Platforms', 'Plus', 'Order status', 'Round', 'Enrolled'];
     const rows = filtered.map(u => [
       u.fullName || '', u.email, u.aliases.join(' | '), u.phone || '', u.city || '', u.state || '', u.country || '',
       u.timezone || '', u.occupation || '', u.instagram || '', u.everOpened ? 'Yes' : 'No', u.lastActiveDate || '',
