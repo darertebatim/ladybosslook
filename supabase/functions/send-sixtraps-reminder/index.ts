@@ -292,6 +292,7 @@ serve(async (req) => {
     const requestedRoundId = String(body?.roundId || "").trim();
     const onlyUnsent = body?.onlyUnsent !== false;
     const joinNow = body?.joinNow === true;
+    const morningOf = body?.morningOf === true;
     const nextSession = body?.nextSession === true;
     // For the "next session" email, roundId selects the AUDIENCE (people who
     // signed up for that past round); the content uses the upcoming round.
