@@ -542,6 +542,32 @@ export function ProgramStudentsManager() {
                 <div className="mt-6 space-y-4 text-sm">
                   <Field label="All emails" value={[detail.email, ...detail.aliases].join(', ')} />
                   <Field label="Phone" value={detail.phone} />
+                  <div>
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">WhatsApp</div>
+                    <div className="flex items-center gap-2">
+                      <span className="break-words">{noteFor(detail.userId).whatsapp_number || '-'}</span>
+                      <Button size="sm" variant="outline" className="h-7 px-2" onClick={() => { setEditUser(detail); setEditWhatsapp(noteFor(detail.userId).whatsapp_number || ''); }}>
+                        <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Quality check</div>
+                    {([
+                      ['check_whatsapp', 'WhatsApp found'],
+                      ['check_connection', 'Connection (responding)'],
+                      ['check_ontrack', 'On track'],
+                    ] as const).map(([key, label]) => (
+                      <label key={key} className="flex items-center gap-2">
+                        <Checkbox
+                          checked={noteFor(detail.userId)[key]}
+                          onCheckedChange={(v) => saveNote(detail.userId, { [key]: !!v } as any)}
+                        />
+                        <span>{label}</span>
+                      </label>
+                    ))}
+                  </div>
+
                   <Field label="Location" value={loc(detail)} />
                   <Field label="Timezone" value={detail.timezone} />
                   <Field label="Occupation / business" value={detail.occupation} />
