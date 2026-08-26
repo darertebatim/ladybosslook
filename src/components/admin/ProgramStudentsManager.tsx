@@ -147,7 +147,7 @@ export function ProgramStudentsManager() {
         return results;
       };
 
-      const [profiles, aliases, installs, subs, orders, allEnroll, activity] = await Promise.all([
+      const [profiles, aliases, installs, subs, orders, allEnroll, activity, chats] = await Promise.all([
         fetchIn('profiles', 'id, email, full_name, phone, city, state, country, timezone, occupation, social_instagram, bio, preferred_language, goals, referral_source, date_of_birth, created_at, last_active_date, total_active_days', 'id'),
         fetchIn('account_email_aliases', 'primary_user_id, email', 'primary_user_id'),
         fetchIn('app_installations', 'user_id, platform, last_seen_at'),
