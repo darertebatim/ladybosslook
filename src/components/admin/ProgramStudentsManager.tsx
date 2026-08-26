@@ -524,7 +524,7 @@ export function ProgramStudentsManager() {
                       </TableCell>
                       <TableCell className="whitespace-nowrap text-sm">{u.enrolledAt ? format(new Date(u.enrolledAt), 'MMM d, yyyy') : '-'}</TableCell>
                     </TableRow>
-                  ))}
+                  );})}
                 </TableBody>
               </Table>
             </div>
