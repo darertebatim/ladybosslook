@@ -7607,6 +7607,7 @@ export type Database = {
         Args: { _ids: string[] }
         Returns: {
           account_created_at: string
+          auth_email: string
           last_return_at: string
           last_sign_in_at: string
           return_events: number
