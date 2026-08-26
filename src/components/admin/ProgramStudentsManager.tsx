@@ -24,6 +24,7 @@ interface Student {
   roundId: string | null;
   roundName: string | null;
   email: string;
+  signInEmail: string | null;
   paymentEmail: string | null;
   aliases: string[];
   fullName: string | null;
