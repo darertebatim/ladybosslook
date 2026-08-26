@@ -315,11 +315,11 @@ export function ProgramStudentsManager() {
   }, [students, search, notes]);
 
   const exportCsv = () => {
-    const headers = ['Name', 'App email', 'Payment email', 'Other emails', 'Phone', 'WhatsApp', 'WhatsApp found', 'Connection', 'On track', 'City', 'State', 'Country', 'Timezone', 'Occupation', 'Instagram', 'Ever signed in', 'Last seen', 'Active days', 'Platforms', 'Plus', 'Order status', 'Payment date', 'Support chat', 'Round', 'Enrolled'];
+    const headers = ['Name', 'App email (signed in)', 'Payment email (Stripe)', 'Account email', 'Merged emails', 'Phone', 'WhatsApp', 'WhatsApp found', 'Connection', 'On track', 'City', 'State', 'Country', 'Timezone', 'Occupation', 'Instagram', 'Ever signed in', 'Last seen', 'Active days', 'Platforms', 'Plus', 'Order status', 'Payment date', 'Support chat', 'Round', 'Enrolled'];
     const rows = filtered.map(u => {
       const n = noteFor(u.userId);
       return [
-        u.fullName || '', u.email, u.paymentEmail || '', u.aliases.join(' | '), u.phone || '', n.whatsapp_number || '',
+        u.fullName || '', u.signInEmail || '', u.paymentEmail || '', u.email, u.aliases.join(' | '), u.phone || '', n.whatsapp_number || '',
         n.check_whatsapp ? 'Yes' : 'No', n.check_connection ? 'Yes' : 'No', n.check_ontrack ? 'Yes' : 'No',
         u.city || '', u.state || '', u.country || '',
         u.timezone || '', u.occupation || '', u.instagram || '', u.everOpened ? 'Yes' : 'No', u.lastActiveDate || '',
