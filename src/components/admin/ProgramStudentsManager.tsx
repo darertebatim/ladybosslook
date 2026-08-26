@@ -24,6 +24,7 @@ interface Student {
   roundId: string | null;
   roundName: string | null;
   email: string;
+  signInEmail: string | null;
   paymentEmail: string | null;
   aliases: string[];
   fullName: string | null;
@@ -255,6 +256,7 @@ export function ProgramStudentsManager() {
           roundId: e.round_id,
           roundName: e.round_id ? roundMap.get(e.round_id) || null : null,
           email: p.email || 'Unknown',
+          signInEmail: lastSignIn ? (act?.auth_email || p.email || null) : null,
           paymentEmail: order?.email || null,
           aliases: aliasMap.get(e.user_id) || [],
           fullName: p.full_name || null,
@@ -303,6 +305,7 @@ export function ProgramStudentsManager() {
     return students.filter(u =>
       (u.fullName || '').toLowerCase().includes(s) ||
       u.email.toLowerCase().includes(s) ||
+      (u.signInEmail || '').toLowerCase().includes(s) ||
       (u.paymentEmail || '').toLowerCase().includes(s) ||
       u.aliases.some(a => a.toLowerCase().includes(s)) ||
       (u.phone || '').toLowerCase().includes(s) ||
@@ -312,11 +315,11 @@ export function ProgramStudentsManager() {
   }, [students, search, notes]);
 
   const exportCsv = () => {
-    const headers = ['Name', 'App email', 'Payment email', 'Other emails', 'Phone', 'WhatsApp', 'WhatsApp found', 'Connection', 'On track', 'City', 'State', 'Country', 'Timezone', 'Occupation', 'Instagram', 'Ever signed in', 'Last seen', 'Active days', 'Platforms', 'Plus', 'Order status', 'Payment date', 'Support chat', 'Round', 'Enrolled'];
+    const headers = ['Name', 'App email (signed in)', 'Payment email (Stripe)', 'Account email', 'Merged emails', 'Phone', 'WhatsApp', 'WhatsApp found', 'Connection', 'On track', 'City', 'State', 'Country', 'Timezone', 'Occupation', 'Instagram', 'Ever signed in', 'Last seen', 'Active days', 'Platforms', 'Plus', 'Order status', 'Payment date', 'Support chat', 'Round', 'Enrolled'];
     const rows = filtered.map(u => {
       const n = noteFor(u.userId);
       return [
-        u.fullName || '', u.email, u.paymentEmail || '', u.aliases.join(' | '), u.phone || '', n.whatsapp_number || '',
+        u.fullName || '', u.signInEmail || '', u.paymentEmail || '', u.email, u.aliases.join(' | '), u.phone || '', n.whatsapp_number || '',
         n.check_whatsapp ? 'Yes' : 'No', n.check_connection ? 'Yes' : 'No', n.check_ontrack ? 'Yes' : 'No',
         u.city || '', u.state || '', u.country || '',
         u.timezone || '', u.occupation || '', u.instagram || '', u.everOpened ? 'Yes' : 'No', u.lastActiveDate || '',
@@ -432,16 +435,23 @@ export function ProgramStudentsManager() {
                     >
                       <TableCell className="font-medium whitespace-nowrap">{u.fullName || '-'}</TableCell>
                       <TableCell className="whitespace-nowrap">
-                        <div className="text-xs text-muted-foreground">App</div>
-                        <div>{u.email}</div>
-                        <div className="text-xs text-muted-foreground mt-1.5">Payment</div>
-                        <div className={u.paymentEmail && u.paymentEmail.toLowerCase() !== u.email.toLowerCase() ? 'text-amber-600 dark:text-amber-400' : ''}>
+                        <div className="text-xs text-muted-foreground">App (signed in)</div>
+                        {u.signInEmail ? (
+                          <div>{u.signInEmail}</div>
+                        ) : (
+                          <div className="text-destructive">Never signed in</div>
+                        )}
+                        <div className="text-xs text-muted-foreground mt-1.5">Payment (Stripe)</div>
+                        <div className={u.paymentEmail && u.paymentEmail.toLowerCase() !== (u.signInEmail || '').toLowerCase() ? 'text-amber-600 dark:text-amber-400' : ''}>
                           {u.paymentEmail || '-'}
                         </div>
                         {u.aliases.length > 0 && (
-                          <Badge variant="outline" className="mt-1">+{u.aliases.length} email{u.aliases.length > 1 ? 's' : ''}</Badge>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            merged: {u.aliases.join(', ')}
+                          </div>
                         )}
                       </TableCell>
+
                       <TableCell className="whitespace-nowrap text-sm">{u.phone || '-'}</TableCell>
                       <TableCell className="whitespace-nowrap text-sm">
                         <div className="flex items-center gap-1">
@@ -548,9 +558,10 @@ export function ProgramStudentsManager() {
                   <SheetDescription>{detail.email}</SheetDescription>
                 </SheetHeader>
                 <div className="mt-6 space-y-4 text-sm">
-                  <Field label="App email" value={detail.email} />
-                  <Field label="Payment email" value={detail.paymentEmail} />
-                  <Field label="All emails" value={[...new Set([detail.email, detail.paymentEmail, ...detail.aliases].filter(Boolean))].join(', ')} />
+                  <Field label="App email (signed in)" value={detail.signInEmail || 'Never signed in'} />
+                  <Field label="Payment email (Stripe)" value={detail.paymentEmail} />
+                  <Field label="Account email" value={detail.email} />
+                  <Field label="All emails" value={[...new Set([detail.email, detail.signInEmail, detail.paymentEmail, ...detail.aliases].filter(Boolean))].join(', ')} />
                   <Field label="Phone" value={detail.phone} />
                   <div>
                     <div className="text-xs uppercase tracking-wide text-muted-foreground">WhatsApp</div>

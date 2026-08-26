@@ -117,14 +117,13 @@ serve(async (req) => {
     }
 
     if (ordersToTransfer && ordersToTransfer.length > 0) {
-      // Update orders to point to primary user
+      // Re-point orders to the primary user, but KEEP the original Stripe email
+      // on the order so we never lose the email the payment was actually made with.
       const { error: updateOrdersError } = await supabaseAdmin
         .from('orders')
-        .update({ 
-          user_id: primaryUserId,
-          email: primaryProfile.email // Update email to primary
-        })
+        .update({ user_id: primaryUserId })
         .ilike('email', mergedEmail)
+
 
       if (updateOrdersError) {
         console.error('Error updating orders:', updateOrdersError)
