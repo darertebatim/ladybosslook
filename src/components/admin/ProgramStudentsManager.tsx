@@ -348,21 +348,23 @@ export function ProgramStudentsManager() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Phone</TableHead>
+                    <TableHead>Phone / WhatsApp</TableHead>
                     <TableHead>App</TableHead>
+                    <TableHead>Support chat</TableHead>
                     <TableHead>Location</TableHead>
                     <TableHead>Business</TableHead>
                     <TableHead>Plus</TableHead>
                     <TableHead>Payment</TableHead>
+                    <TableHead>Payment date</TableHead>
                     <TableHead>Round</TableHead>
                     <TableHead>Enrolled</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
-                    <TableRow><TableCell colSpan={10} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={12} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
                   ) : filtered.length === 0 ? (
-                    <TableRow><TableCell colSpan={10} className="text-center py-8 text-muted-foreground">No students found</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={12} className="text-center py-8 text-muted-foreground">No students found</TableCell></TableRow>
                   ) : filtered.map(u => (
                     <TableRow
                       key={u.enrollmentId}
