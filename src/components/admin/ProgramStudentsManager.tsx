@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { GraduationCap, RefreshCw, Download, Search } from 'lucide-react';
+import { GraduationCap, RefreshCw, Download, Search, MessageCircle, MessagesSquare } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface Program { slug: string; title: string; }
@@ -46,8 +46,18 @@ interface Student {
   orderStatus: string | null;
   orderAmount: number | null;
   orderCurrency: string | null;
+  orderDate: string | null;
+  hasSupportChat: boolean;
+  supportLastMessageAt: string | null;
   otherEnrollments: string[];
 }
+
+const waLink = (phone?: string | null) => {
+  if (!phone) return null;
+  const digits = phone.replace(/[^\d]/g, '');
+  if (digits.length < 8) return null;
+  return `https://wa.me/${digits}`;
+};
 
 const chunk = <T,>(arr: T[], size = 200): T[][] => {
   const out: T[][] = [];
@@ -137,7 +147,7 @@ export function ProgramStudentsManager() {
         return results;
       };
 
-      const [profiles, aliases, installs, subs, orders, allEnroll, activity] = await Promise.all([
+      const [profiles, aliases, installs, subs, orders, allEnroll, activity, chats] = await Promise.all([
         fetchIn('profiles', 'id, email, full_name, phone, city, state, country, timezone, occupation, social_instagram, bio, preferred_language, goals, referral_source, date_of_birth, created_at, last_active_date, total_active_days', 'id'),
         fetchIn('account_email_aliases', 'primary_user_id, email', 'primary_user_id'),
         fetchIn('app_installations', 'user_id, platform, last_seen_at'),
@@ -145,7 +155,15 @@ export function ProgramStudentsManager() {
         fetchIn('orders', 'user_id, program_slug, status, amount, currency, created_at'),
         fetchIn('course_enrollments', 'user_id, program_slug, status'),
         fetchActivity(),
+        fetchIn('chat_conversations', 'user_id, inbox_type, last_message_at, updated_at'),
       ]);
+
+      const chatMap = new Map<string, any>();
+      chats.forEach((c: any) => {
+        const at = c.last_message_at || c.updated_at || null;
+        const prev = chatMap.get(c.user_id);
+        if (!prev || (at && new Date(at) > new Date(prev.at || 0))) chatMap.set(c.user_id, { at });
+      });
 
       const actMap = new Map<string, any>(activity.map((a: any) => [a.user_id, a]));
 
@@ -219,6 +237,9 @@ export function ProgramStudentsManager() {
           orderStatus: order?.status || null,
           orderAmount: order?.amount ?? null,
           orderCurrency: order?.currency || null,
+          orderDate: order?.created_at || null,
+          hasSupportChat: chatMap.has(e.user_id),
+          supportLastMessageAt: chatMap.get(e.user_id)?.at || null,
           otherEnrollments: [...new Set(otherMap.get(e.user_id) || [])],
         };
       }).sort((a, b) => (a.fullName || a.email).localeCompare(b.fullName || b.email));
@@ -244,11 +265,13 @@ export function ProgramStudentsManager() {
   }, [students, search]);
 
   const exportCsv = () => {
-    const headers = ['Name', 'Email', 'Other emails', 'Phone', 'City', 'State', 'Country', 'Timezone', 'Occupation', 'Instagram', 'Ever signed in', 'Last seen', 'Active days', 'Platforms', 'Plus', 'Order status', 'Round', 'Enrolled'];
+    const headers = ['Name', 'Email', 'Other emails', 'Phone', 'WhatsApp', 'City', 'State', 'Country', 'Timezone', 'Occupation', 'Instagram', 'Ever signed in', 'Last seen', 'Active days', 'Platforms', 'Plus', 'Order status', 'Payment date', 'Support chat', 'Round', 'Enrolled'];
     const rows = filtered.map(u => [
-      u.fullName || '', u.email, u.aliases.join(' | '), u.phone || '', u.city || '', u.state || '', u.country || '',
+      u.fullName || '', u.email, u.aliases.join(' | '), u.phone || '', waLink(u.phone) || '', u.city || '', u.state || '', u.country || '',
       u.timezone || '', u.occupation || '', u.instagram || '', u.everOpened ? 'Yes' : 'No', u.lastActiveDate || '',
       String(u.totalActiveDays ?? ''), u.platforms.join('/'), u.plusStatus || '', u.orderStatus || '',
+      u.orderDate ? format(new Date(u.orderDate), 'yyyy-MM-dd') : '',
+      u.hasSupportChat ? (u.supportLastMessageAt ? format(new Date(u.supportLastMessageAt), 'yyyy-MM-dd') : 'Yes') : '',
       u.roundName || '', u.enrolledAt ? format(new Date(u.enrolledAt), 'yyyy-MM-dd') : '',
     ]);
     const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
@@ -325,21 +348,23 @@ export function ProgramStudentsManager() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Phone</TableHead>
+                    <TableHead>Phone / WhatsApp</TableHead>
                     <TableHead>App</TableHead>
+                    <TableHead>Support chat</TableHead>
                     <TableHead>Location</TableHead>
                     <TableHead>Business</TableHead>
                     <TableHead>Plus</TableHead>
                     <TableHead>Payment</TableHead>
+                    <TableHead>Payment date</TableHead>
                     <TableHead>Round</TableHead>
                     <TableHead>Enrolled</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
-                    <TableRow><TableCell colSpan={10} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={12} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
                   ) : filtered.length === 0 ? (
-                    <TableRow><TableCell colSpan={10} className="text-center py-8 text-muted-foreground">No students found</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={12} className="text-center py-8 text-muted-foreground">No students found</TableCell></TableRow>
                   ) : filtered.map(u => (
                     <TableRow
                       key={u.enrollmentId}
@@ -353,7 +378,24 @@ export function ProgramStudentsManager() {
                           <Badge variant="outline" className="mt-1">+{u.aliases.length} email{u.aliases.length > 1 ? 's' : ''}</Badge>
                         )}
                       </TableCell>
-                      <TableCell className="whitespace-nowrap">{u.phone || '-'}</TableCell>
+                      <TableCell className="whitespace-nowrap text-sm">
+                        {u.phone ? (
+                          <div className="space-y-1">
+                            <div>{u.phone}</div>
+                            {waLink(u.phone) && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-7 px-2"
+                                onClick={(e) => { e.stopPropagation(); window.open(waLink(u.phone)!, '_blank', 'noopener'); }}
+                              >
+                                <MessageCircle className="h-3.5 w-3.5 mr-1" />
+                                WhatsApp
+                              </Button>
+                            )}
+                          </div>
+                        ) : '-'}
+                      </TableCell>
                       <TableCell className="whitespace-nowrap text-sm">
                         {u.everOpened ? (
                           <div>
@@ -370,6 +412,24 @@ export function ProgramStudentsManager() {
                           <Badge variant="destructive">Never signed in</Badge>
                         )}
                       </TableCell>
+                      <TableCell className="whitespace-nowrap text-sm">
+                        {u.hasSupportChat ? (
+                          <div className="space-y-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 px-2"
+                              onClick={(e) => { e.stopPropagation(); window.open(`/admin/support?userId=${u.userId}`, '_blank', 'noopener'); }}
+                            >
+                              <MessagesSquare className="h-3.5 w-3.5 mr-1" />
+                              Open chat
+                            </Button>
+                            {u.supportLastMessageAt && (
+                              <div className="text-xs text-muted-foreground">{format(new Date(u.supportLastMessageAt), 'MMM d, yyyy')}</div>
+                            )}
+                          </div>
+                        ) : <span className="text-muted-foreground">-</span>}
+                      </TableCell>
                       <TableCell className="text-sm">{loc(u)}</TableCell>
                       <TableCell className="text-sm max-w-[200px]">
                         <div className="truncate">{u.occupation || '-'}</div>
@@ -381,6 +441,7 @@ export function ProgramStudentsManager() {
                           <Badge variant={u.orderStatus === 'paid' || u.orderStatus === 'completed' ? 'secondary' : 'outline'}>{u.orderStatus}</Badge>
                         ) : <span className="text-muted-foreground">-</span>}
                       </TableCell>
+                      <TableCell className="whitespace-nowrap text-sm">{u.orderDate ? format(new Date(u.orderDate), 'MMM d, yyyy') : '-'}</TableCell>
                       <TableCell className="whitespace-nowrap">
                         {u.roundName ? <Badge variant="secondary">{u.roundName}</Badge> : <Badge variant="outline" className="text-muted-foreground">No round</Badge>}
                       </TableCell>
@@ -427,6 +488,8 @@ export function ProgramStudentsManager() {
                       : 'Never signed in'} />
                   <Field label="Rilo Plus" value={detail.plusStatus} />
                   <Field label="Payment for this program" value={detail.orderStatus ? `${detail.orderStatus}${detail.orderAmount ? ` · ${(detail.orderAmount / 100).toFixed(2)} ${(detail.orderCurrency || '').toUpperCase()}` : ''}` : 'No order record'} />
+                  <Field label="Payment date" value={detail.orderDate ? format(new Date(detail.orderDate), 'MMM d, yyyy') : null} />
+                  <Field label="Support chat" value={detail.hasSupportChat ? (detail.supportLastMessageAt ? `Active · last message ${format(new Date(detail.supportLastMessageAt), 'MMM d, yyyy')}` : 'Active') : 'No conversation'} />
                   <Field label="Round" value={detail.roundName} />
                   <Field label="Enrolled" value={detail.enrolledAt ? format(new Date(detail.enrolledAt), 'MMM d, yyyy') : null} />
                   <Field label="Other enrollments" value={detail.otherEnrollments.join(', ') || null} />
