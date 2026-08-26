@@ -32,6 +32,8 @@ interface Row {
   join_now_round_id: string | null;
   next_session_sent_at: string | null;
   next_session_round_id: string | null;
+  morning_sent_at: string | null;
+  morning_round_id: string | null;
 }
 
 interface RoundRow {
@@ -45,13 +47,22 @@ export function SixTrapsSignups() {
   const [search, setSearch] = useState('');
   const [testEmail, setTestEmail] = useState('');
   const [sending, setSending] = useState<
-    'test' | 'all' | 'join-test' | 'join-all' | 'next-test' | 'next-all' | null
+    | 'test'
+    | 'all'
+    | 'join-test'
+    | 'join-all'
+    | 'next-test'
+    | 'next-all'
+    | 'morning-test'
+    | 'morning-all'
+    | null
   >(null);
   const [roundChoice, setRoundChoice] = useState<string>('auto');
   const [onlyUnsent, setOnlyUnsent] = useState(true);
   const [onlyUnsentJoinNow, setOnlyUnsentJoinNow] = useState(true);
   const [nextAudienceRound, setNextAudienceRound] = useState<string>('all');
   const [onlyUnsentNext, setOnlyUnsentNext] = useState(true);
+  const [onlyUnsentMorning, setOnlyUnsentMorning] = useState(true);
 
   const { data: rounds } = useQuery({
     queryKey: ['sixtraps-rounds'],
@@ -84,7 +95,7 @@ export function SixTrapsSignups() {
       const { data, error } = await supabase
         .from('form_submissions')
         .select(
-          'id, email, name, city, source, submitted_at, round_id, reminder_sent_at, reminder_round_id, join_now_sent_at, join_now_round_id, next_session_sent_at, next_session_round_id',
+          'id, email, name, city, source, submitted_at, round_id, reminder_sent_at, reminder_round_id, join_now_sent_at, join_now_round_id, next_session_sent_at, next_session_round_id, morning_sent_at, morning_round_id',
         )
         .in('source', SOURCES)
         .order('submitted_at', { ascending: false })
@@ -127,6 +138,14 @@ export function SixTrapsSignups() {
       (r) =>
         (!effectiveRoundId || r.round_id === effectiveRoundId) &&
         (!onlyUnsentJoinNow || !r.join_now_sent_at),
+    ),
+  );
+
+  const morningTargetCount = uniqueEmails(
+    rows.filter(
+      (r) =>
+        (!effectiveRoundId || r.round_id === effectiveRoundId) &&
+        (!onlyUnsentMorning || !r.morning_sent_at),
     ),
   );
 
@@ -184,18 +203,31 @@ export function SixTrapsSignups() {
     mode: 'test' | 'all',
     joinNow = false,
     nextSession = false,
+    morningOf = false,
   ) {
     const key = (nextSession
       ? `next-${mode}`
       : joinNow
         ? `join-${mode}`
-        : mode) as typeof sending;
+        : morningOf
+          ? `morning-${mode}`
+          : mode) as typeof sending;
     if (mode === 'test' && !testEmail.trim()) {
       toast.error('Enter a test email first');
       return;
     }
     if (
       mode === 'all' &&
+      morningOf &&
+      !window.confirm(
+        `Send the "morning of webinar" email to ${morningTargetCount} signup(s) for ${roundLabel(effectiveRoundId)}?`,
+      )
+    ) {
+      return;
+    }
+    if (
+      mode === 'all' &&
+      !morningOf &&
       !nextSession &&
       !window.confirm(
         `Send the ${joinNow ? '"starting now"' : 'reminder'} email to ${joinNow ? joinNowTargetCount : targetCount} signup(s) for ${roundLabel(effectiveRoundId)}${
@@ -234,6 +266,7 @@ export function SixTrapsSignups() {
                     : roundChoice,
                 joinNow,
                 nextSession,
+                morningOf,
               }
             : nextSession
               ? {
@@ -244,8 +277,13 @@ export function SixTrapsSignups() {
                 }
               : {
                 roundId: roundChoice === 'auto' ? undefined : roundChoice,
-                onlyUnsent: joinNow ? onlyUnsentJoinNow : onlyUnsent,
+                onlyUnsent: joinNow
+                  ? onlyUnsentJoinNow
+                  : morningOf
+                    ? onlyUnsentMorning
+                    : onlyUnsent,
                 joinNow,
+                morningOf,
               },
       });
       if (error) throw error;
@@ -347,6 +385,54 @@ export function SixTrapsSignups() {
                 <Send className="mr-1 h-4 w-4" />
               )}
               Send to {targetCount}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">“Morning of the webinar” email</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Long Farsi email (“امشب در وبینار رایگان…”) with the 6 traps hook, session times per
+            city, and a big join button to the selected round’s Meet link. Uses the round selected
+            above.
+          </p>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={onlyUnsentMorning}
+              onChange={(e) => setOnlyUnsentMorning(e.target.checked)}
+            />
+            Only those who haven't received it
+          </label>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => sendReminder('test', false, false, true)}
+              disabled={sending !== null}
+            >
+              {sending === 'morning-test' ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-1 h-4 w-4" />
+              )}
+              Send test
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => sendReminder('all', false, false, true)}
+              disabled={sending !== null}
+            >
+              {sending === 'morning-all' ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-1 h-4 w-4" />
+              )}
+              Send morning email to {morningTargetCount}
             </Button>
           </div>
         </CardContent>
