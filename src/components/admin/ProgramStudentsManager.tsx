@@ -46,8 +46,18 @@ interface Student {
   orderStatus: string | null;
   orderAmount: number | null;
   orderCurrency: string | null;
+  orderDate: string | null;
+  hasSupportChat: boolean;
+  supportLastMessageAt: string | null;
   otherEnrollments: string[];
 }
+
+const waLink = (phone?: string | null) => {
+  if (!phone) return null;
+  const digits = phone.replace(/[^\d]/g, '');
+  if (digits.length < 8) return null;
+  return `https://wa.me/${digits}`;
+};
 
 const chunk = <T,>(arr: T[], size = 200): T[][] => {
   const out: T[][] = [];
