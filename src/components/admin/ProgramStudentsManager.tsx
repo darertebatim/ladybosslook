@@ -256,6 +256,7 @@ export function ProgramStudentsManager() {
           roundId: e.round_id,
           roundName: e.round_id ? roundMap.get(e.round_id) || null : null,
           email: p.email || 'Unknown',
+          signInEmail: lastSignIn ? (act?.auth_email || p.email || null) : null,
           paymentEmail: order?.email || null,
           aliases: aliasMap.get(e.user_id) || [],
           fullName: p.full_name || null,
