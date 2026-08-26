@@ -357,9 +357,13 @@ export function ProgramStudentsManager() {
                       <TableCell className="whitespace-nowrap text-sm">
                         {u.everOpened ? (
                           <div>
-                            <div>{u.lastActiveDate ? `Active ${u.lastActiveDate}` : 'Installed'}</div>
+                            <div>{u.lastActiveDate ? `Seen ${u.lastActiveDate}` : 'Signed in'}</div>
                             <div className="text-xs text-muted-foreground">
-                              {u.totalActiveDays ? `${u.totalActiveDays} days` : ''}{u.platforms.length ? ` · ${u.platforms.join('/')}` : ''}
+                              {[
+                                u.returnEvents ? `${u.returnEvents} visits` : null,
+                                u.totalActiveDays ? `${u.totalActiveDays} days` : null,
+                                u.platforms.length ? u.platforms.join('/') : null,
+                              ].filter(Boolean).join(' · ')}
                             </div>
                           </div>
                         ) : (
