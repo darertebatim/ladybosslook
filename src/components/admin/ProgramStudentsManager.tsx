@@ -305,6 +305,7 @@ export function ProgramStudentsManager() {
     return students.filter(u =>
       (u.fullName || '').toLowerCase().includes(s) ||
       u.email.toLowerCase().includes(s) ||
+      (u.signInEmail || '').toLowerCase().includes(s) ||
       (u.paymentEmail || '').toLowerCase().includes(s) ||
       u.aliases.some(a => a.toLowerCase().includes(s)) ||
       (u.phone || '').toLowerCase().includes(s) ||
