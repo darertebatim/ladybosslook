@@ -237,6 +237,9 @@ export function ProgramStudentsManager() {
           orderStatus: order?.status || null,
           orderAmount: order?.amount ?? null,
           orderCurrency: order?.currency || null,
+          orderDate: order?.created_at || null,
+          hasSupportChat: chatMap.has(e.user_id),
+          supportLastMessageAt: chatMap.get(e.user_id)?.at || null,
           otherEnrollments: [...new Set(otherMap.get(e.user_id) || [])],
         };
       }).sort((a, b) => (a.fullName || a.email).localeCompare(b.fullName || b.email));
