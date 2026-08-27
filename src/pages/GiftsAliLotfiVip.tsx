@@ -49,15 +49,6 @@ const GIFTS: GiftItem[] = [
     href: workbookAsset.url,
     isDownload: true,
   },
-  {
-    id: "session-video",
-    icon: "▶️",
-    title: "ویدیوی جلسه اینستاگرام هوشمند",
-    description: "ضبط کامل جلسه وبینار فریم‌ورک اینستاگرام هوشمند را دوباره تماشا کنید.",
-    actionLabel: "تماشای جلسه",
-    href: "https://drive.google.com/file/d/1_N5loM7C5eu6Db8Un535x_hIUJe6JdWH/view?usp=drive_link",
-    isVideo: true,
-  },
 ];
 
 export default function GiftsAliLotfiVip() {
