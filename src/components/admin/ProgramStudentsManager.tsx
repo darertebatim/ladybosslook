@@ -457,17 +457,18 @@ export function ProgramStudentsManager() {
                         <div className="flex items-center gap-1">
                           {n.whatsapp_number ? (
                             <div className="space-y-1">
-                              <div>{n.whatsapp_number}</div>
-                              {waLink(n.whatsapp_number) && (
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="h-7 px-2"
-                                  onClick={(e) => { e.stopPropagation(); window.open(waLink(n.whatsapp_number)!, '_blank', 'noopener'); }}
+                              {waLink(n.whatsapp_number) ? (
+                                <a
+                                  href={waLink(n.whatsapp_number)!}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 dark:text-blue-400 hover:underline block"
+                                  onClick={(e) => e.stopPropagation()}
                                 >
-                                  <MessageCircle className="h-3.5 w-3.5 mr-1" />
-                                  WhatsApp
-                                </Button>
+                                  {waLink(n.whatsapp_number)!.replace('https://', '')}
+                                </a>
+                              ) : (
+                                <div>{n.whatsapp_number}</div>
                               )}
                             </div>
                           ) : <span className="text-muted-foreground">-</span>}
