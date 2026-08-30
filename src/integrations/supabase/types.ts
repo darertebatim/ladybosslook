@@ -3329,6 +3329,7 @@ export type Database = {
           join_now_sent_at: string | null
           mailchimp_error: string | null
           mailchimp_success: boolean | null
+          meta: Json | null
           morning_round_id: string | null
           morning_sent_at: string | null
           name: string
@@ -3351,6 +3352,7 @@ export type Database = {
           join_now_sent_at?: string | null
           mailchimp_error?: string | null
           mailchimp_success?: boolean | null
+          meta?: Json | null
           morning_round_id?: string | null
           morning_sent_at?: string | null
           name: string
@@ -3373,6 +3375,7 @@ export type Database = {
           join_now_sent_at?: string | null
           mailchimp_error?: string | null
           mailchimp_success?: boolean | null
+          meta?: Json | null
           morning_round_id?: string | null
           morning_sent_at?: string | null
           name?: string
