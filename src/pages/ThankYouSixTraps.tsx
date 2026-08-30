@@ -133,8 +133,8 @@ export default function ThankYouSixTraps() {
           {/* Calendar buttons */}
           {event && (
             <section className="mt-6">
-              <p className="mb-3 text-center text-sm font-semibold text-neutral-800">
-                الآن به تقویم‌تان اضافه کنید تا یادتان نرود:
+              <p className="mb-3 text-center text-lg font-black text-rose-600">
+                قدم اول
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <a
@@ -153,24 +153,29 @@ export default function ThankYouSixTraps() {
                   افزودن به Apple Calendar
                 </button>
               </div>
-              <p className="mt-4 text-center text-sm font-bold text-rose-600">
-                لینک ورود به وبینار در ایمیل شما ارسال شده است
-              </p>
             </section>
           )}
 
           {/* WhatsApp */}
           {webinar && (
-            <a
-              href={`${webinar.supportUrl}?text=${encodeURIComponent(
-                "سلام، در وبینار ۶ تله اینستاگرام ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.",
-              )}`}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-4 flex min-h-[52px] w-full items-center justify-center rounded-xl bg-emerald-500 px-4 text-base font-bold text-white shadow-md transition active:scale-[0.98]"
-            >
-              ارسال جزئیات به واتس‌اپ من
-            </a>
+            <>
+              <p className="mt-6 text-center text-lg font-black text-rose-600">
+                قدم دوم
+              </p>
+              <a
+                href={`${webinar.supportUrl}?text=${encodeURIComponent(
+                  "سلام، در وبینار ۶ تله اینستاگرام ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.",
+                )}`}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 flex min-h-[52px] w-full items-center justify-center rounded-xl bg-emerald-500 px-4 text-base font-bold text-white shadow-md transition active:scale-[0.98]"
+              >
+                ارسال جزئیات به واتس‌اپ من
+              </a>
+              <p className="mt-3 text-center text-sm font-bold text-rose-600">
+                لینک ورود به وبینار در ایمیل شما ارسال شده است
+              </p>
+            </>
           )}
 
           {/* Webinar details card */}
