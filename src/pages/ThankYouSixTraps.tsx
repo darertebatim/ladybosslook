@@ -131,35 +131,6 @@ export default function ThankYouSixTraps() {
             />
           </div>
 
-          {/* Webinar details card */}
-          {webinar && (
-            <section className="mt-6 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-              <h2 className="text-lg font-semibold text-neutral-900">
-                جزئیات وبینار
-              </h2>
-              <p className="mt-1 text-sm text-neutral-700">{webinar.title}</p>
-              <div className="mt-3 space-y-2 text-sm text-neutral-800">
-                <div dir="ltr" className="text-left">📅 {laDate}</div>
-                {localDate && (
-                  <div dir="ltr" className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-100 px-3 py-2 text-center text-base font-bold text-emerald-900 border border-emerald-300 whitespace-pre-line">
-                    🕒 Your Local time: {localDate}
-                  </div>
-                )}
-                <div className="flex flex-wrap items-center gap-2">
-                  <span>⏱ مدت: {webinar.durationMinutes} دقیقه</span>
-                  <span className="text-neutral-400">|</span>
-                  <span>🔴 Live in Google Meet</span>
-                </div>
-              </div>
-              <p className="mt-3 text-xs text-neutral-500">
-                لینک ورود در ایمیل شما ارسال شده است.
-              </p>
-              <p className="mt-1 text-xs text-neutral-500" dir="ltr">
-                Sender: <strong>onboarding@resend.dev</strong> (Ali Lotfi - Ladyboss Academy). Please check your spam folder.
-              </p>
-            </section>
-          )}
-
           {/* Calendar buttons */}
           {event && (
             <section className="mt-6">
@@ -201,6 +172,35 @@ export default function ThankYouSixTraps() {
             >
               ارسال جزئیات به واتس‌اپ من
             </a>
+          )}
+
+          {/* Webinar details card */}
+          {webinar && (
+            <section className="mt-6 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+              <h2 className="text-lg font-semibold text-neutral-900">
+                جزئیات وبینار
+              </h2>
+              <p className="mt-1 text-sm text-neutral-700">{webinar.title}</p>
+              <div className="mt-3 space-y-2 text-sm text-neutral-800">
+                <div dir="ltr" className="text-left">📅 {laDate}</div>
+                {localDate && (
+                  <div dir="ltr" className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-100 px-3 py-2 text-center text-base font-bold text-emerald-900 border border-emerald-300 whitespace-pre-line">
+                    🕒 Your Local time: {localDate}
+                  </div>
+                )}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span>⏱ مدت: {webinar.durationMinutes} دقیقه</span>
+                  <span className="text-neutral-400">|</span>
+                  <span>🔴 Live in Google Meet</span>
+                </div>
+              </div>
+              <p className="mt-3 text-xs text-neutral-500">
+                لینک ورود در ایمیل شما ارسال شده است.
+              </p>
+              <p className="mt-1 text-xs text-neutral-500" dir="ltr">
+                Sender: <strong>onboarding@resend.dev</strong> (Ali Lotfi - Ladyboss Academy). Please check your spam folder.
+              </p>
+            </section>
           )}
         </main>
       </div>
