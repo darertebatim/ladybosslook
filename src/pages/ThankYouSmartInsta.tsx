@@ -217,6 +217,14 @@ export default function ThankYouSmartInsta() {
             </section>
           )}
 
+          {registeredEmail && (
+            <WebinarAddEmailBox
+              originalEmail={registeredEmail}
+              source="smartinsta"
+              roundId={registeredRoundId}
+            />
+          )}
+
           {/* Gift PDF */}
           <section className="mt-6 rounded-2xl border border-violet-200 bg-white p-5 shadow-sm text-center">
             <p className="text-base font-bold text-neutral-900">🎁 هدیه شما</p>
