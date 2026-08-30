@@ -57,6 +57,11 @@ export default function Communications() {
           <EmailGenerator />
         </TabsContent>
 
+        <TabsContent value="opens" className="space-y-6">
+          <EmailOpenRates />
+        </TabsContent>
+
+
         <TabsContent value="mailchimp" className="space-y-6">
           <MailchimpTagManager />
         </TabsContent>
