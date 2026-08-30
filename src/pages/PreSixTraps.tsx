@@ -175,7 +175,7 @@ export default function PreSixTraps() {
               </h2>
               <p className="mt-1 text-sm text-neutral-700">{webinar.title}</p>
               <div className="mt-3 space-y-2 text-sm text-neutral-800">
-                <div dir="ltr" className="text-left">📅 {laDate}</div>
+                <div dir="ltr" className="text-left">📅 LA time: {laDate}</div>
                 {localDate && (
                   <div dir="ltr" className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-2 text-left text-base font-bold text-emerald-900 border border-emerald-300">
                     🕒 Your Local time: {localDate}
