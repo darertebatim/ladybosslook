@@ -27,6 +27,8 @@ function extractYouTubeId(url?: string | null): string {
 
 export default function ThankYouSmartInsta() {
   const location = useLocation();
+  const registeredEmail = (location.state as any)?.email as string | undefined;
+  const registeredRoundId = (location.state as any)?.roundId as string | undefined;
   const [webinar, setWebinar] = useState<{
     title: string;
     startUtc: Date;
