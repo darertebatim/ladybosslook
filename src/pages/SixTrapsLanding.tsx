@@ -126,7 +126,11 @@ export default function SixTrapsLanding() {
         .catch((err) => console.error("confirmation email error", err));
 
       navigate("/thankyousixtraps", {
-        state: { sixTrapsRegistrationCompleted: true },
+        state: {
+          sixTrapsRegistrationCompleted: true,
+          email: parsed.data.email.toLowerCase(),
+          roundId,
+        },
       });
     } catch (err) {
       console.error("submit error", err);
