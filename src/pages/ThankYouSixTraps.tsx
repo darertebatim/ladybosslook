@@ -111,10 +111,10 @@ export default function ThankYouSixTraps() {
             <h1 className="text-2xl font-bold text-neutral-900">
               ثبت‌نام شما با موفقیت انجام شد
             </h1>
-            <p className="mt-2 text-sm font-bold text-violet-700">
+            <p className="mt-2 text-xl font-black text-rose-600">
               اما هنوز ۲ قدم دیگر مانده !
             </p>
-            <p className="mt-2 text-sm leading-6 text-neutral-700">
+            <p className="mt-1 text-xl font-black text-rose-600">
               همین حالا این ویدیو را ببینید
             </p>
           </div>
