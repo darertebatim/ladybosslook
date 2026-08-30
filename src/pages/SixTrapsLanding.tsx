@@ -197,6 +197,7 @@ export default function SixTrapsLanding() {
             )}
           </section>
 
+          {!blockedRegion && (
           <form
             onSubmit={handleSubmit}
             dir="ltr"
@@ -275,6 +276,7 @@ export default function SixTrapsLanding() {
               Sender: <strong>onboarding@resend.dev</strong> (Ali Lotfi - Ladyboss Academy). Please check your spam folder.
             </p>
           </form>
+          )}
         </main>
       </div>
     </>
