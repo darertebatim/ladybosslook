@@ -8,6 +8,7 @@ import { SEOHead } from "@/components/SEOHead";
 import heroAsset from "@/assets/sixtraps-hero.png.asset.json";
 import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
 import { trackLead } from "@/lib/metaPixel";
+import { isIranTimezone } from "@/lib/regionRestrictions";
 
 const PROGRAM_SLUG = "instagram6traps";
 
@@ -20,6 +21,7 @@ const schema = z.object({
 export default function SixTrapsLanding() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const blockedRegion = useMemo(() => isIranTimezone(), []);
   const [name, setName] = useState("");
   const [city, setCity] = useState("");
   const [email, setEmail] = useState("");
@@ -164,7 +166,19 @@ export default function SixTrapsLanding() {
             <p className="text-sm leading-6 text-neutral-700">
               اگر از اینستاگرام برای کسب‌وکارت نتیجه نمی‌گیری، در این وبینار رایگان ۶ اشتباه بزرگ را یاد بگیر و فروش بیشتری ببر.
             </p>
-            {laLabel && (
+            {blockedRegion ? (
+              <div className="mx-auto rounded-2xl border border-rose-200 bg-rose-50 p-4">
+                <p className="text-sm font-bold leading-7 text-rose-700">
+                  متأسفیم، این وبینار برای منطقه شما در دسترس نیست.
+                </p>
+                <p className="mt-1 text-xs leading-6 text-rose-600">
+                  (کلاس زنده ساعت ۳ بامداد به وقت شما برگزار می‌شود)
+                </p>
+                <p dir="ltr" className="mt-2 text-[11px] leading-5 text-rose-500">
+                  We're sorry, this webinar is not available for your region (the live class would be at 3 AM in your area).
+                </p>
+              </div>
+            ) : laLabel && (
               <div className="mx-auto flex flex-col items-center gap-2">
                 <div dir="ltr" className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 text-sm font-medium text-white">
                   📅 {laLabel}
@@ -183,6 +197,7 @@ export default function SixTrapsLanding() {
             )}
           </section>
 
+          {!blockedRegion && (
           <form
             onSubmit={handleSubmit}
             dir="ltr"
@@ -261,6 +276,7 @@ export default function SixTrapsLanding() {
               Sender: <strong>onboarding@resend.dev</strong> (Ali Lotfi - Ladyboss Academy). Please check your spam folder.
             </p>
           </form>
+          )}
         </main>
       </div>
     </>
