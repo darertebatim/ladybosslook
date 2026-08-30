@@ -4,6 +4,7 @@ import { Download, ArrowDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SEOHead } from "@/components/SEOHead";
 import { trackCompleteRegistration } from "@/lib/metaPixel";
+import WebinarAddEmailBox from "@/components/WebinarAddEmailBox";
 import workbookAsset from "@/assets/build-trustworthy-instagram-profile-workbook.pdf.asset.json";
 import {
   buildGoogleCalendarUrl,
@@ -26,6 +27,8 @@ function extractYouTubeId(url?: string | null): string {
 
 export default function ThankYouSmartInsta() {
   const location = useLocation();
+  const registeredEmail = (location.state as any)?.email as string | undefined;
+  const registeredRoundId = (location.state as any)?.roundId as string | undefined;
   const [webinar, setWebinar] = useState<{
     title: string;
     startUtc: Date;
@@ -212,6 +215,14 @@ export default function ThankYouSmartInsta() {
                 Sender: <strong>hi@ladybosslook.com</strong> (Ali Lotfi - Ladyboss Academy). Please check your spam folder.
               </p>
             </section>
+          )}
+
+          {registeredEmail && (
+            <WebinarAddEmailBox
+              originalEmail={registeredEmail}
+              source="smartinsta"
+              roundId={registeredRoundId}
+            />
           )}
 
           {/* Gift PDF */}

@@ -33,6 +33,7 @@ export default function SixTrapsLanding() {
     durationMinutes: number;
     meetUrl: string;
   } | null>(null);
+  const [roundId, setRoundId] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -43,12 +44,15 @@ export default function SixTrapsLanding() {
         .eq("program_slug", PROGRAM_SLUG)
         .maybeSingle();
 
+      const effectiveRoundId = autoRule?.round_id || null;
+      setRoundId(effectiveRoundId);
+
       const roundQuery = (supabase as any)
         .from("program_rounds")
-        .select("first_session_date, first_session_duration, google_meet_link");
+        .select("id, first_session_date, first_session_duration, google_meet_link");
 
-      const { data: round } = autoRule?.round_id
-        ? await roundQuery.eq("id", autoRule.round_id).maybeSingle()
+      const { data: round } = effectiveRoundId
+        ? await roundQuery.eq("id", effectiveRoundId).maybeSingle()
         : await roundQuery
             .eq("program_slug", PROGRAM_SLUG)
             .eq("status", "active")
@@ -67,6 +71,7 @@ export default function SixTrapsLanding() {
           durationMinutes: round.first_session_duration || 90,
           meetUrl: round.google_meet_link || "",
         });
+        if (!effectiveRoundId && round.id) setRoundId(round.id);
       }
     })();
   }, []);
@@ -121,7 +126,11 @@ export default function SixTrapsLanding() {
         .catch((err) => console.error("confirmation email error", err));
 
       navigate("/thankyousixtraps", {
-        state: { sixTrapsRegistrationCompleted: true },
+        state: {
+          sixTrapsRegistrationCompleted: true,
+          email: parsed.data.email.toLowerCase(),
+          roundId,
+        },
       });
     } catch (err) {
       console.error("submit error", err);

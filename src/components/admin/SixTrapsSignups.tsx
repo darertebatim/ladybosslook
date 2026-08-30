@@ -15,7 +15,7 @@ import {
 import { Download, RefreshCw, Send, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const SOURCES = ['sixtraps_registration', 'presixtraps_interest'];
+const SOURCES = ['sixtraps_registration', 'presixtraps_interest', 'sixtraps_additional_email'];
 const PROGRAM_SLUG = 'instagram6traps';
 
 interface Row {

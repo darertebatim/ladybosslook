@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SEOHead } from "@/components/SEOHead";
 import { trackCompleteRegistration } from "@/lib/metaPixel";
+import WebinarAddEmailBox from "@/components/WebinarAddEmailBox";
 import {
   buildGoogleCalendarUrl,
   downloadIcs,
@@ -18,6 +19,8 @@ const YOUTUBE_ID = "nccqY4M6GZ4";
 
 export default function ThankYouSixTraps() {
   const location = useLocation();
+  const registeredEmail = (location.state as any)?.email as string | undefined;
+  const registeredRoundId = (location.state as any)?.roundId as string | undefined;
   const [webinar, setWebinar] = useState<{
     title: string;
     startUtc: Date;
@@ -220,6 +223,14 @@ export default function ThankYouSixTraps() {
                 Sender: <strong>onboarding@resend.dev</strong> (Ali Lotfi - Ladyboss Academy). Please check your spam folder.
               </p>
             </section>
+          )}
+
+          {registeredEmail && (
+            <WebinarAddEmailBox
+              originalEmail={registeredEmail}
+              source="sixtraps"
+              roundId={registeredRoundId}
+            />
           )}
         </main>
       </div>
