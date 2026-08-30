@@ -91,6 +91,8 @@ export function SixTrapsSignups() {
 
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['sixtraps-signups'],
+    staleTime: 0,
+    refetchOnMount: 'always',
     queryFn: async () => {
       const { data, error } = await supabase
         .from('form_submissions')
