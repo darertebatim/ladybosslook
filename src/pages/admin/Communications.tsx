@@ -9,6 +9,7 @@ import { UpdateNotificationSender } from '@/components/admin/UpdateNotificationS
 import { AppReviewKPIPanel } from '@/components/admin/AppReviewKPIPanel';
 import { SixTrapsSignups } from '@/components/admin/SixTrapsSignups';
 import { SmartInstaSignups } from '@/components/admin/SmartInstaSignups';
+import { WebinarStats } from '@/components/admin/WebinarStats';
 
 export default function Communications() {
   return (
