@@ -15,7 +15,7 @@ import {
 import { Download, RefreshCw, Send, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const SOURCES = ['smartinsta_registration'];
+const SOURCES = ['smartinsta_registration', 'smartinsta_additional_email'];
 const PROGRAM_SLUG = 'smartinstagramframework';
 
 interface Row {
