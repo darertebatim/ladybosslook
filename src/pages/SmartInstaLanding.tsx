@@ -27,6 +27,7 @@ export default function SmartInstaLanding() {
     meetUrl: string;
     coverUrl: string;
   } | null>(null);
+  const [roundId, setRoundId] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
