@@ -151,7 +151,7 @@ export default function ThankYouSmartInsta() {
               <div className="mt-3 space-y-2 text-sm text-neutral-800">
                 <div dir="ltr" className="text-left">📅 {laDate}</div>
                 {localDate && (
-                  <div dir="ltr" className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-2 text-left text-base font-bold text-emerald-900 border border-emerald-300">
+                  <div dir="ltr" className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-100 px-3 py-2 text-center text-base font-bold text-emerald-900 border border-emerald-300 whitespace-pre-line">
                     🕒 Your Local time: {localDate}
                   </div>
                 )}

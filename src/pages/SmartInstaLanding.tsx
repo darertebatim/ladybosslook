@@ -168,7 +168,7 @@ export default function SmartInstaLanding() {
                   📅 LA time: {laLabel}
                 </div>
                 {localLabel && (
-                  <div dir="ltr" className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-base font-bold text-white shadow-sm">
+                  <div dir="ltr" className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-center text-base font-bold text-white shadow-sm whitespace-pre-line">
                     🕒 Your Local time: {localLabel}
                   </div>
                 )}

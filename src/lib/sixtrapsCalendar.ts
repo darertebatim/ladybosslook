@@ -106,8 +106,7 @@ export function formatLocalDateTime(d: Date): string {
       day: "numeric",
       year: "numeric",
     }).format(d);
-    const formatted = `${time}, ${date}`;
-    return tz ? `${formatted} (${tz})` : formatted;
+    return tz ? `${time} (${tz}),\n${date}` : `${time},\n${date}`;
   } catch {
     return d.toString();
   }
