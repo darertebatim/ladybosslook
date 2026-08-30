@@ -37,12 +37,15 @@ export default function SmartInstaLanding() {
         .eq("program_slug", PROGRAM_SLUG)
         .maybeSingle();
 
+      const effectiveRoundId = autoRule?.round_id || null;
+      setRoundId(effectiveRoundId);
+
       const roundQuery = (supabase as any)
         .from("program_rounds")
-        .select("first_session_date, first_session_duration, google_meet_link");
+        .select("id, first_session_date, first_session_duration, google_meet_link");
 
-      const { data: round } = autoRule?.round_id
-        ? await roundQuery.eq("id", autoRule.round_id).maybeSingle()
+      const { data: round } = effectiveRoundId
+        ? await roundQuery.eq("id", effectiveRoundId).maybeSingle()
         : await roundQuery
             .eq("program_slug", PROGRAM_SLUG)
             .eq("status", "active")
@@ -64,6 +67,7 @@ export default function SmartInstaLanding() {
           meetUrl: round.google_meet_link || "",
           coverUrl: prog?.cover_image_url || "",
         });
+        if (!effectiveRoundId && round.id) setRoundId(round.id);
       }
     })();
   }, []);
