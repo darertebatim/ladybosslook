@@ -2771,6 +2771,39 @@ export type Database = {
         }
         Relationships: []
       }
+      email_delivery_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          occurred_at: string
+          recipient: string | null
+          resend_email_id: string | null
+          subject: string | null
+          tags: Json
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          occurred_at?: string
+          recipient?: string | null
+          resend_email_id?: string | null
+          subject?: string | null
+          tags?: Json
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          occurred_at?: string
+          recipient?: string | null
+          resend_email_id?: string | null
+          subject?: string | null
+          tags?: Json
+        }
+        Relationships: []
+      }
       email_logs: {
         Row: {
           announcement_id: string | null
