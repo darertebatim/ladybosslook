@@ -120,7 +120,11 @@ export default function SmartInstaLanding() {
         .catch((err) => console.error("confirmation email error", err));
 
       navigate("/thankyousmartinstaframework", {
-        state: { smartInstaRegistrationCompleted: true },
+        state: {
+          smartInstaRegistrationCompleted: true,
+          email: parsed.data.email.toLowerCase(),
+          roundId,
+        },
       });
     } catch (err) {
       console.error("submit error", err);
