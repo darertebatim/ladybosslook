@@ -95,9 +95,10 @@ export const COMMON_TIMEZONES: { label: string; tz: string }[] = [
   { label: "Vancouver", tz: "America/Vancouver" },
   { label: "New York", tz: "America/New_York" },
   { label: "Toronto", tz: "America/Toronto" },
-  { label: "London", tz: "Europe/London" },
-  { label: "Berlin", tz: "Europe/Berlin" },
-  { label: "Dubai", tz: "Asia/Dubai" },
+  { label: "Sydney", tz: "Australia/Sydney" },
+  { label: "Texas", tz: "America/Chicago" },
+  { label: "Chicago", tz: "America/Chicago" },
+  { label: "Calgary", tz: "America/Edmonton" },
 ];
 
 /**
