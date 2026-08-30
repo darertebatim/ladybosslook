@@ -25,7 +25,6 @@ const SOURCE_MAP: Record<Props["source"], { registration: string; additional: st
 };
 
 export default function WebinarAddEmailBox({ originalEmail, source, roundId }: Props) {
-  const [expanded, setExpanded] = useState(false);
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
@@ -102,7 +101,6 @@ export default function WebinarAddEmailBox({ originalEmail, source, roundId }: P
         description: "جزئیات وبینار به ایمیل جدید ارسال خواهد شد.",
       });
       setEmail("");
-      setExpanded(false);
     } catch (err) {
       console.error("add email error", err);
       toast({
@@ -117,42 +115,25 @@ export default function WebinarAddEmailBox({ originalEmail, source, roundId }: P
 
   return (
     <section className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4">
-      {!expanded ? (
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <p className="text-sm font-semibold text-amber-900">ایمیل دیگری وارد کنید:</p>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          dir="ltr"
+          maxLength={255}
+          className="min-h-[48px] w-full rounded-xl border border-neutral-300 bg-white px-4 text-base text-neutral-900 outline-none focus:border-amber-500"
+        />
         <button
-          type="button"
-          onClick={() => setExpanded(true)}
-          className="w-full text-center text-sm font-semibold text-amber-800 transition active:opacity-70"
+          type="submit"
+          disabled={submitting}
+          className="min-h-[48px] w-full rounded-xl bg-amber-500 text-base font-bold text-white shadow-sm transition active:scale-[0.98] disabled:opacity-60"
         >
-          من ایمیل جزییات را نگرفتم
+          {submitting ? "در حال ثبت..." : "ثبت و ارسال جزئیات"}
         </button>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <p className="text-sm font-semibold text-amber-900">ایمیل دیگری وارد کنید:</p>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            dir="ltr"
-            maxLength={255}
-            className="min-h-[48px] w-full rounded-xl border border-neutral-300 bg-white px-4 text-base text-neutral-900 outline-none focus:border-amber-500"
-          />
-          <button
-            type="submit"
-            disabled={submitting}
-            className="min-h-[48px] w-full rounded-xl bg-amber-500 text-base font-bold text-white shadow-sm transition active:scale-[0.98] disabled:opacity-60"
-          >
-            {submitting ? "در حال ثبت..." : "ثبت و ارسال جزئیات"}
-          </button>
-          <button
-            type="button"
-            onClick={() => setExpanded(false)}
-            className="w-full text-center text-xs text-amber-700 transition active:opacity-70"
-          >
-            انصراف
-          </button>
-        </form>
-      )}
+      </form>
     </section>
   );
 }
