@@ -33,6 +33,7 @@ export default function SixTrapsLanding() {
     durationMinutes: number;
     meetUrl: string;
   } | null>(null);
+  const [roundId, setRoundId] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
