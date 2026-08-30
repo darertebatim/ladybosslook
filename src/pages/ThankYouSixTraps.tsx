@@ -111,12 +111,11 @@ export default function ThankYouSixTraps() {
             <h1 className="text-2xl font-bold text-neutral-900">
               ثبت‌نام شما با موفقیت انجام شد
             </h1>
-            <p className="mt-2 text-xs font-semibold text-rose-600">
-              این وبینار مخصوص صاحبان کسب‌وکار در آمریکا و کانادا است
+            <p className="mt-2 text-sm font-bold text-violet-700">
+              اما هنوز ۲ قدم دیگر مانده !
             </p>
             <p className="mt-2 text-sm leading-6 text-neutral-700">
-              لینک ورود به وبینار و جزئیات کامل به ایمیل شما ارسال شد. تا وبینار،
-              این ویدیوی کوتاه از علی لطفی را ببینید.
+              همین حالا این ویدیو را ببینید
             </p>
           </div>
 
