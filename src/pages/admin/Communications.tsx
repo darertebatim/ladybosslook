@@ -10,6 +10,7 @@ import { AppReviewKPIPanel } from '@/components/admin/AppReviewKPIPanel';
 import { SixTrapsSignups } from '@/components/admin/SixTrapsSignups';
 import { SmartInstaSignups } from '@/components/admin/SmartInstaSignups';
 import { WebinarStats } from '@/components/admin/WebinarStats';
+import { EmailOpenRates } from '@/components/admin/EmailOpenRates';
 
 export default function Communications() {
   return (
@@ -20,17 +21,19 @@ export default function Communications() {
       </div>
 
       <Tabs defaultValue="updates">
-        <TabsList className="grid w-full grid-cols-9">
+        <TabsList className="grid w-full grid-cols-10">
           <TabsTrigger value="updates">Updates</TabsTrigger>
           <TabsTrigger value="broadcasts">Broadcasts</TabsTrigger>
           <TabsTrigger value="push">Push Only</TabsTrigger>
           <TabsTrigger value="reviews">Reviews</TabsTrigger>
           <TabsTrigger value="email-gen">Email Gen</TabsTrigger>
+          <TabsTrigger value="opens">Opens</TabsTrigger>
           <TabsTrigger value="mailchimp">Mailchimp</TabsTrigger>
           <TabsTrigger value="sixtraps">6 Traps</TabsTrigger>
           <TabsTrigger value="smartinsta">Smart IG</TabsTrigger>
           <TabsTrigger value="webinar-stats">Stats</TabsTrigger>
         </TabsList>
+
 
         <TabsContent value="updates" className="space-y-6">
           <UpdateNotificationSender />
@@ -53,6 +56,11 @@ export default function Communications() {
         <TabsContent value="email-gen" className="space-y-6">
           <EmailGenerator />
         </TabsContent>
+
+        <TabsContent value="opens" className="space-y-6">
+          <EmailOpenRates />
+        </TabsContent>
+
 
         <TabsContent value="mailchimp" className="space-y-6">
           <MailchimpTagManager />
