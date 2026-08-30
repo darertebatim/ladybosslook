@@ -89,6 +89,36 @@ export function formatLADateTime(d: Date): string {
   }
 }
 
+/** Common timezones for the "other time zones" list. */
+export const COMMON_TIMEZONES: { label: string; tz: string }[] = [
+  { label: "Los Angeles", tz: "America/Los_Angeles" },
+  { label: "Vancouver", tz: "America/Vancouver" },
+  { label: "New York", tz: "America/New_York" },
+  { label: "Toronto", tz: "America/Toronto" },
+  { label: "London", tz: "Europe/London" },
+  { label: "Berlin", tz: "Europe/Berlin" },
+  { label: "Dubai", tz: "Asia/Dubai" },
+];
+
+/**
+ * Format a UTC date in a specific timezone: "4:30 PM, Wed Aug 26".
+ */
+export function formatTimeZoneTime(d: Date, tz: string): string {
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      timeZone: tz,
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    }).format(d);
+  } catch {
+    return "";
+  }
+}
+
 /**
  * Format a UTC date in the user's local browser timezone (American calendar).
  */
