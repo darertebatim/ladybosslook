@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SEOHead } from "@/components/SEOHead";
 import { trackCompleteRegistration } from "@/lib/metaPixel";
+import WebinarAddEmailBox from "@/components/WebinarAddEmailBox";
 import {
   buildGoogleCalendarUrl,
   downloadIcs,
