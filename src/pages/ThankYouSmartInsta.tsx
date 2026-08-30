@@ -4,6 +4,7 @@ import { Download, ArrowDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SEOHead } from "@/components/SEOHead";
 import { trackCompleteRegistration } from "@/lib/metaPixel";
+import WebinarAddEmailBox from "@/components/WebinarAddEmailBox";
 import workbookAsset from "@/assets/build-trustworthy-instagram-profile-workbook.pdf.asset.json";
 import {
   buildGoogleCalendarUrl,
