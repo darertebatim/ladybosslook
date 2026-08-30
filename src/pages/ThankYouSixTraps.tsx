@@ -224,6 +224,14 @@ export default function ThankYouSixTraps() {
               </p>
             </section>
           )}
+
+          {registeredEmail && (
+            <WebinarAddEmailBox
+              originalEmail={registeredEmail}
+              source="sixtraps"
+              roundId={registeredRoundId}
+            />
+          )}
         </main>
       </div>
     </>
