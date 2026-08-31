@@ -42,28 +42,10 @@ export default function SixTrapsLanding() {
 
   useEffect(() => {
     (async () => {
-      // Prefer the round configured for auto-enrollment; fall back to earliest active round
-      const { data: autoRule } = await (supabase as any)
-        .from("program_auto_enrollment")
-        .select("round_id")
-        .eq("program_slug", PROGRAM_SLUG)
-        .maybeSingle();
+      // ?round=<uuid|number> pins a round; otherwise next upcoming round wins
+      const round = await resolveWebinarRound(PROGRAM_SLUG, roundParam);
+      if (round?.id) setRoundId(round.id);
 
-      const effectiveRoundId = autoRule?.round_id || null;
-      setRoundId(effectiveRoundId);
-
-      const roundQuery = (supabase as any)
-        .from("program_rounds")
-        .select("id, first_session_date, first_session_duration, google_meet_link");
-
-      const { data: round } = effectiveRoundId
-        ? await roundQuery.eq("id", effectiveRoundId).maybeSingle()
-        : await roundQuery
-            .eq("program_slug", PROGRAM_SLUG)
-            .eq("status", "active")
-            .order("first_session_date", { ascending: true })
-            .limit(1)
-            .maybeSingle();
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
         .select("title")
@@ -76,10 +58,10 @@ export default function SixTrapsLanding() {
           durationMinutes: round.first_session_duration || 90,
           meetUrl: round.google_meet_link || "",
         });
-        if (!effectiveRoundId && round.id) setRoundId(round.id);
       }
     })();
-  }, []);
+  }, [roundParam]);
+
 
   const laLabel = useMemo(
     () => (webinar ? formatLADateTime(webinar.startUtc) : ""),
