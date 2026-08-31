@@ -22,6 +22,9 @@ const schema = z.object({
 
 export default function SixTrapsLanding() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const roundParam = searchParams.get("round");
+
   const { toast } = useToast();
   const blockedRegion = useMemo(() => isIranTimezone(), []);
   const [name, setName] = useState("");
