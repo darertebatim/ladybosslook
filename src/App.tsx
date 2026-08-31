@@ -234,10 +234,8 @@ const ThankFreeLive = lazy(() => import("@/pages/ThankFreeLive"));
 const ThankOne = lazy(() => import("@/pages/ThankOne"));
 const SixTrapsLanding = lazy(() => import("@/pages/SixTrapsLanding"));
 const ThankYouSixTraps = lazy(() => import("@/pages/ThankYouSixTraps"));
-const PreSixTraps = lazy(() => import("@/pages/PreSixTraps"));
 const IgAdsLanding = lazy(() => import("@/pages/IgAdsLanding"));
 const ThankYouIgAds = lazy(() => import("@/pages/ThankYouIgAds"));
-const PreIgAds = lazy(() => import("@/pages/PreIgAds"));
 const SmartInstaLanding = lazy(() => import("@/pages/SmartInstaLanding"));
 const ThankYouSmartInsta = lazy(() => import("@/pages/ThankYouSmartInsta"));
 const GiftsAliLotfiVip = lazy(() => import("@/pages/GiftsAliLotfiVip"));
@@ -571,10 +569,11 @@ const App = () => (
                   {!isNativeApp() && <Route path="/thankone" element={<ThankOne />} />}
                   {!isNativeApp() && <Route path="/sixtraps" element={<SixTrapsLanding />} />}
                   {!isNativeApp() && <Route path="/thankyousixtraps" element={<ThankYouSixTraps />} />}
-                  {!isNativeApp() && <Route path="/presixtraps" element={<PreSixTraps />} />}
+                  {/* Legacy pre pages redirect to thank-you pages (old emails still link here) */}
+                  {!isNativeApp() && <Route path="/presixtraps" element={<Navigate to="/thankyousixtraps" replace />} />}
                   {!isNativeApp() && <Route path="/l/igadsfree" element={<IgAdsLanding />} />}
                   {!isNativeApp() && <Route path="/l/igadsfree/thankyou" element={<ThankYouIgAds />} />}
-                  {!isNativeApp() && <Route path="/l/igadsfree/pre" element={<PreIgAds />} />}
+                  {!isNativeApp() && <Route path="/l/igadsfree/pre" element={<Navigate to="/l/igadsfree/thankyou" replace />} />}
                   {!isNativeApp() && <Route path="/smartinstaframework" element={<SmartInstaLanding />} />}
                   {!isNativeApp() && <Route path="/thankyousmartinstaframework" element={<ThankYouSmartInsta />} />}
                   {!isNativeApp() && <Route path="/giftsalilotfivip" element={<GiftsAliLotfiVip />} />}

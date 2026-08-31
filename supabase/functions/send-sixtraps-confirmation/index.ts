@@ -15,7 +15,7 @@ const corsHeaders = {
 };
 
 const DEFAULT_PROGRAM_SLUG = "instagram6traps";
-const DEFAULT_PREREQ_VIDEO_URL = "https://ladybosslook.com/presixtraps";
+const DEFAULT_PREREQ_VIDEO_URL = "https://ladybosslook.com/thankyousixtraps";
 const DEFAULT_SOURCES = ["sixtraps_registration", "presixtraps_interest"];
 
 const CITY_ZONES: { label: string; tz: string }[] = [
@@ -239,7 +239,7 @@ serve(async (req) => {
         </p>
         <p style="text-align:center;margin:0;">
           <a href="${PREREQ_VIDEO_URL}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
-            تماشای ویدیوی پیش‌نیاز
+            مشاهده جزئیات وبینار و ویدیو
           </a>
         </p>
       </div>
