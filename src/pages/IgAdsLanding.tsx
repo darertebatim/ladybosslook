@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { resolveWebinarRound } from "@/lib/webinarRounds";
+
 import { z } from "zod";
 import { ArrowDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
