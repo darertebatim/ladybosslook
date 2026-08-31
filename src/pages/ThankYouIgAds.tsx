@@ -216,7 +216,7 @@ export default function ThankYouIgAds() {
                   <p className="mb-1 font-semibold text-neutral-500">Other time zones:</p>
                   <ul className="space-y-0.5">
                     {COMMON_TIMEZONES.map(({ label, tz }) => (
-                      <li key={tz} className="flex justify-between gap-4">
+                      <li key={`${label}-${tz}`} className="flex justify-between gap-4">
                         <span>{label}</span>
                         <span className="font-medium text-neutral-800">
                           {formatTimeZoneTime(webinar.startUtc, tz)}
