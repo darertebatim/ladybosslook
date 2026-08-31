@@ -25,10 +25,7 @@ interface RoundRow {
 }
 
 function origin() {
-  if (typeof window === 'undefined') return '';
-  return window.location.origin.includes('localhost')
-    ? 'https://ladybosslook.com'
-    : window.location.origin;
+  return 'https://ladybosslook.com';
 }
 
 export function LeadCampaignDirectory() {
