@@ -119,6 +119,13 @@ export default function SmartInstaLanding() {
         })
         .catch((err) => console.error("confirmation email error", err));
 
+      try {
+        localStorage.setItem(
+          "smartinsta_registration",
+          JSON.stringify({ email: parsed.data.email.toLowerCase(), roundId }),
+        );
+      } catch {}
+
       navigate("/thankyousmartinstaframework", {
         state: {
           smartInstaRegistrationCompleted: true,

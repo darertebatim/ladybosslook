@@ -27,8 +27,17 @@ function extractYouTubeId(url?: string | null): string {
 
 export default function ThankYouSmartInsta() {
   const location = useLocation();
-  const registeredEmail = (location.state as any)?.email as string | undefined;
-  const registeredRoundId = (location.state as any)?.roundId as string | undefined;
+  const stored = useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem("smartinsta_registration") || "null") as
+        | { email?: string; roundId?: string }
+        | null;
+    } catch {
+      return null;
+    }
+  }, []);
+  const registeredEmail = ((location.state as any)?.email || stored?.email) as string | undefined;
+  const registeredRoundId = ((location.state as any)?.roundId || stored?.roundId) as string | undefined;
   const [webinar, setWebinar] = useState<{
     title: string;
     startUtc: Date;
