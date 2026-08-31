@@ -89,6 +89,7 @@ export default function SmartInstaLanding() {
         city: "",
         phone: "",
         source: "smartinsta_registration",
+        round_id: roundId,
       });
       if (error) throw error;
 
@@ -102,6 +103,7 @@ export default function SmartInstaLanding() {
           body: {
             name: "",
             email: parsed.data.email.toLowerCase(),
+            roundId,
           },
         })
         .catch((err) => console.error("confirmation email error", err));
@@ -113,13 +115,17 @@ export default function SmartInstaLanding() {
         );
       } catch {}
 
-      navigate("/thankyousmartinstaframework", {
-        state: {
-          smartInstaRegistrationCompleted: true,
-          email: parsed.data.email.toLowerCase(),
-          roundId,
+      navigate(
+        `/thankyousmartinstaframework${roundId ? `?round=${roundId}` : ""}`,
+        {
+          state: {
+            smartInstaRegistrationCompleted: true,
+            email: parsed.data.email.toLowerCase(),
+            roundId,
+          },
         },
-      });
+      );
+
     } catch (err) {
       console.error("submit error", err);
       toast({
