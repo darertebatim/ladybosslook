@@ -21,6 +21,9 @@ const YOUTUBE_ID = "nccqY4M6GZ4";
 
 export default function ThankYouSixTraps() {
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const roundParam = searchParams.get("round");
+
   const stored = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem("sixtraps_registration") || "null") as
