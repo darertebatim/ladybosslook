@@ -16,7 +16,7 @@ const corsHeaders = {
 
 const PROGRAM_SLUG = "instagram6traps";
 const SOURCES = ["sixtraps_registration", "presixtraps_interest"];
-const PREREQ_VIDEO_URL = "https://ladybosslook.com/presixtraps";
+const PREREQ_VIDEO_URL = "https://ladybosslook.com/thankyousixtraps";
 
 function pad(n: number) {
   return String(n).padStart(2, "0");
@@ -104,7 +104,7 @@ function buildHtml(
       </p>
       <p style="text-align:center;margin:16px 0;">
         <a href="${PREREQ_VIDEO_URL}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
-          تماشای ویدیوی پیش‌نیاز
+          مشاهده جزئیات وبینار و ویدیو
         </a>
       </p>
 
