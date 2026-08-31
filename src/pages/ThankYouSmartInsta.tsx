@@ -29,6 +29,9 @@ function extractYouTubeId(url?: string | null): string {
 
 export default function ThankYouSmartInsta() {
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const roundParam = searchParams.get("round");
+
   const stored = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem("smartinsta_registration") || "null") as
