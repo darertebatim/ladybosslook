@@ -111,7 +111,7 @@ export default function WebinarAddEmailBox({ originalEmail, source, roundId }: P
       // Send confirmation email to the new address (fire-and-forget, non-blocking).
       supabase.functions
         .invoke(config.functionName, {
-          body: { name: "", email: newEmail },
+          body: { name: "", email: newEmail, ...(config.extraBody || {}), ...(roundId ? { roundId } : {}) },
         })
         .catch((err) => console.error("additional confirmation email error", err));
 

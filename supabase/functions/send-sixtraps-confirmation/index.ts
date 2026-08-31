@@ -14,8 +14,9 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const PROGRAM_SLUG = "instagram6traps";
-const PREREQ_VIDEO_URL = "https://ladybosslook.com/presixtraps";
+const DEFAULT_PROGRAM_SLUG = "instagram6traps";
+const DEFAULT_PREREQ_VIDEO_URL = "https://ladybosslook.com/presixtraps";
+const DEFAULT_SOURCES = ["sixtraps_registration", "presixtraps_interest"];
 
 const CITY_ZONES: { label: string; tz: string }[] = [
   { label: "Los Angeles / Vancouver", tz: "America/Los_Angeles" },
@@ -91,6 +92,17 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const name = String(body?.name || "دوست عزیز").trim().slice(0, 100);
     const email = String(body?.email || "").trim().toLowerCase().slice(0, 255);
+    const programSlug =
+      typeof body?.programSlug === "string" && /^[a-z0-9-]{2,60}$/i.test(body.programSlug)
+        ? body.programSlug
+        : DEFAULT_PROGRAM_SLUG;
+    const PREREQ_VIDEO_URL =
+      typeof body?.prereqUrl === "string" && body.prereqUrl.startsWith("https://")
+        ? body.prereqUrl.slice(0, 300)
+        : DEFAULT_PREREQ_VIDEO_URL;
+    const sources: string[] = Array.isArray(body?.sources)
+      ? body.sources.filter((s: unknown) => typeof s === "string").slice(0, 5)
+      : DEFAULT_SOURCES;
     const requestedRoundId =
       typeof body?.roundId === "string" &&
       /^[0-9a-f-]{36}$/i.test(body.roundId)
@@ -112,7 +124,7 @@ serve(async (req) => {
       : await supabase
           .from("program_auto_enrollment")
           .select("round_id")
-          .eq("program_slug", PROGRAM_SLUG)
+          .eq("program_slug", programSlug)
           .maybeSingle();
 
     const roundCols =
@@ -126,7 +138,7 @@ serve(async (req) => {
       : await supabase
           .from("program_rounds")
           .select(roundCols)
-          .eq("program_slug", PROGRAM_SLUG)
+          .eq("program_slug", programSlug)
           .eq("status", "active")
           .order("first_session_date", { ascending: true })
           .limit(1)
@@ -135,7 +147,7 @@ serve(async (req) => {
     const { data: prog } = await supabase
       .from("program_catalog")
       .select("title, description")
-      .eq("slug", PROGRAM_SLUG)
+      .eq("slug", programSlug)
       .maybeSingle();
 
     // Stamp the signup with the round they registered for
@@ -145,7 +157,7 @@ serve(async (req) => {
         .update({ round_id: round.id })
         .eq("email", email)
         .is("round_id", null)
-        .in("source", ["sixtraps_registration", "presixtraps_interest"]);
+        .in("source", sources);
     }
 
     const title = prog?.title || "وبینار ۶ تله اینستاگرام";
