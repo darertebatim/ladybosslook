@@ -26,6 +26,9 @@ function youtubeId(url: string | null | undefined): string {
 
 export default function ThankYouIgAds() {
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const roundParam = searchParams.get("round");
+
   const stored = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem("igads_registration") || "null") as
