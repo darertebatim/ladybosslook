@@ -37,6 +37,12 @@ const WEBINARS = [
     regSource: 'smartinsta_registration',
     interestSource: null as string | null,
   },
+  {
+    key: 'igads',
+    label: 'Instagram Ads',
+    regSource: 'igads_registration',
+    interestSource: 'preigads_interest',
+  },
 ];
 
 export function WebinarStats() {
@@ -55,6 +61,8 @@ export function WebinarStats() {
             'sixtraps_registration',
             'presixtraps_interest',
             'smartinsta_registration',
+            'igads_registration',
+            'preigads_interest',
           ])
           .range(from, from + 999);
         if (error) throw error;
