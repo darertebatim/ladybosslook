@@ -93,6 +93,7 @@ export default function SixTrapsLanding() {
         city: parsed.data.city,
         phone: "",
         source: "sixtraps_registration",
+        round_id: roundId,
       });
       if (error) throw error;
 
@@ -108,6 +109,7 @@ export default function SixTrapsLanding() {
           body: {
             name: parsed.data.name,
             email: parsed.data.email.toLowerCase(),
+            roundId,
           },
         })
         .catch((err) => console.error("confirmation email error", err));
@@ -119,13 +121,14 @@ export default function SixTrapsLanding() {
         );
       } catch {}
 
-      navigate("/thankyousixtraps", {
+      navigate(`/thankyousixtraps${roundId ? `?round=${roundId}` : ""}`, {
         state: {
           sixTrapsRegistrationCompleted: true,
           email: parsed.data.email.toLowerCase(),
           roundId,
         },
       });
+
     } catch (err) {
       console.error("submit error", err);
       toast({
