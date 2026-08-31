@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
 import heroAsset from "@/assets/sixtraps-hero.png.asset.json";
 import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
-import { trackLead } from "@/lib/metaPixel";
+import { trackLead, trackCustomLead } from "@/lib/metaPixel";
 import { isIranTimezone } from "@/lib/regionRestrictions";
 import { resolveWebinarRound } from "@/lib/webinarRounds";
 
@@ -99,6 +99,10 @@ export default function SixTrapsLanding() {
 
       // Meta Pixel conversion events (used for Custom Audiences / optimization)
       trackLead({
+        content_name: "6 Traps Webinar Registration",
+        content_category: "webinar",
+      });
+      trackCustomLead("SixTrapsLead", {
         content_name: "6 Traps Webinar Registration",
         content_category: "webinar",
       });

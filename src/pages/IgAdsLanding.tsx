@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
 import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
-import { trackLead } from "@/lib/metaPixel";
+import { trackLead, trackCustomLead } from "@/lib/metaPixel";
 import { isIranTimezone } from "@/lib/regionRestrictions";
 
 const PROGRAM_SLUG = "igadsfree";
@@ -100,6 +100,10 @@ export default function IgAdsLanding() {
       if (error) throw error;
 
       trackLead({
+        content_name: "Instagram Ads Webinar Registration",
+        content_category: "webinar",
+      });
+      trackCustomLead("IGAdsFreeLead", {
         content_name: "Instagram Ads Webinar Registration",
         content_category: "webinar",
       });
