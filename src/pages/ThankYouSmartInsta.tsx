@@ -181,8 +181,13 @@ export default function ThankYouSmartInsta() {
                 </button>
               </div>
               <p className="mt-4 text-center text-sm font-bold text-rose-600">
-                لینک ورود به وبینار در ایمیل شما ارسال شده است
+                لینک ورود به وبینار به این ایمیل ارسال شده است:
               </p>
+              {registeredEmail && (
+                <p className="mt-1 text-center text-sm font-bold text-neutral-900" dir="ltr">
+                  {registeredEmail}
+                </p>
+              )}
             </section>
           )}
 
@@ -218,7 +223,10 @@ export default function ThankYouSmartInsta() {
                 </div>
               </div>
               <p className="mt-3 text-xs text-neutral-500">
-                لینک ورود در ایمیل شما ارسال شده است.
+                لینک ورود به ایمیل شما ارسال شده است:
+                {registeredEmail && (
+                  <span className="mr-1 font-semibold text-neutral-800" dir="ltr">{registeredEmail}</span>
+                )}
               </p>
               <p className="mt-1 text-xs text-neutral-500" dir="ltr">
                 Sender: <strong>hi@ladybosslook.com</strong> (Ali Lotfi - Ladyboss Academy). Please check your spam folder.
