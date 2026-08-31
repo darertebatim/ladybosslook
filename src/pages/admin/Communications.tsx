@@ -7,10 +7,7 @@ import { MailchimpTagManager } from '@/components/admin/MailchimpTagManager';
 import { EmailGenerator } from '@/components/admin/EmailGenerator';
 import { UpdateNotificationSender } from '@/components/admin/UpdateNotificationSender';
 import { AppReviewKPIPanel } from '@/components/admin/AppReviewKPIPanel';
-import { SixTrapsSignups } from '@/components/admin/SixTrapsSignups';
-import { SmartInstaSignups } from '@/components/admin/SmartInstaSignups';
-import { WebinarStats } from '@/components/admin/WebinarStats';
-import { EmailOpenRates } from '@/components/admin/EmailOpenRates';
+
 
 export default function Communications() {
   return (
