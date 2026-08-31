@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { ArrowDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,8 @@ import heroAsset from "@/assets/sixtraps-hero.png.asset.json";
 import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
 import { trackLead } from "@/lib/metaPixel";
 import { isIranTimezone } from "@/lib/regionRestrictions";
+import { resolveWebinarRound } from "@/lib/webinarRounds";
+
 
 const PROGRAM_SLUG = "instagram6traps";
 
