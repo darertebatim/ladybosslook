@@ -110,7 +110,7 @@ export default function IgAdsLanding() {
             name: parsed.data.name,
             email: parsed.data.email.toLowerCase(),
             programSlug: PROGRAM_SLUG,
-            prereqUrl: "https://ladybosslook.com/l/igadsfree/pre",
+            prereqUrl: "https://ladybosslook.com/l/igadsfree/thankyou",
             sources: ["igads_registration", "preigads_interest"],
             ...(roundId ? { roundId } : {}),
           },
