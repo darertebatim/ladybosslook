@@ -135,7 +135,12 @@ export default function WebinarAddEmailBox({ originalEmail, source, roundId }: P
   return (
     <section className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4">
       <form onSubmit={handleSubmit} className="space-y-3">
-        <p className="text-sm font-semibold text-amber-900">ایمیل دیگری وارد کنید:</p>
+        <div>
+          <p className="text-sm font-semibold text-amber-900">ایمیل دیگری وارد کنید:</p>
+          <p className="mt-1 text-xs text-amber-700">
+            اگر ایمیل تأییدیه را دریافت نکرده‌اید، می‌توانید ایمیل دیگری وارد کنید.
+          </p>
+        </div>
         <input
           type="email"
           value={email}
