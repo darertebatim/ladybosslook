@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { ArrowDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,8 @@ import heroAsset from "@/assets/sixtraps-hero.png.asset.json";
 import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
 import { trackLead } from "@/lib/metaPixel";
 import { isIranTimezone } from "@/lib/regionRestrictions";
+import { resolveWebinarRound } from "@/lib/webinarRounds";
+
 
 const PROGRAM_SLUG = "instagram6traps";
 
@@ -20,6 +22,9 @@ const schema = z.object({
 
 export default function SixTrapsLanding() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const roundParam = searchParams.get("round");
+
   const { toast } = useToast();
   const blockedRegion = useMemo(() => isIranTimezone(), []);
   const [name, setName] = useState("");
@@ -37,28 +42,10 @@ export default function SixTrapsLanding() {
 
   useEffect(() => {
     (async () => {
-      // Prefer the round configured for auto-enrollment; fall back to earliest active round
-      const { data: autoRule } = await (supabase as any)
-        .from("program_auto_enrollment")
-        .select("round_id")
-        .eq("program_slug", PROGRAM_SLUG)
-        .maybeSingle();
+      // ?round=<uuid|number> pins a round; otherwise next upcoming round wins
+      const round = await resolveWebinarRound(PROGRAM_SLUG, roundParam);
+      if (round?.id) setRoundId(round.id);
 
-      const effectiveRoundId = autoRule?.round_id || null;
-      setRoundId(effectiveRoundId);
-
-      const roundQuery = (supabase as any)
-        .from("program_rounds")
-        .select("id, first_session_date, first_session_duration, google_meet_link");
-
-      const { data: round } = effectiveRoundId
-        ? await roundQuery.eq("id", effectiveRoundId).maybeSingle()
-        : await roundQuery
-            .eq("program_slug", PROGRAM_SLUG)
-            .eq("status", "active")
-            .order("first_session_date", { ascending: true })
-            .limit(1)
-            .maybeSingle();
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
         .select("title")
@@ -71,10 +58,10 @@ export default function SixTrapsLanding() {
           durationMinutes: round.first_session_duration || 90,
           meetUrl: round.google_meet_link || "",
         });
-        if (!effectiveRoundId && round.id) setRoundId(round.id);
       }
     })();
-  }, []);
+  }, [roundParam]);
+
 
   const laLabel = useMemo(
     () => (webinar ? formatLADateTime(webinar.startUtc) : ""),
@@ -106,6 +93,7 @@ export default function SixTrapsLanding() {
         city: parsed.data.city,
         phone: "",
         source: "sixtraps_registration",
+        round_id: roundId,
       });
       if (error) throw error;
 
@@ -121,6 +109,7 @@ export default function SixTrapsLanding() {
           body: {
             name: parsed.data.name,
             email: parsed.data.email.toLowerCase(),
+            roundId,
           },
         })
         .catch((err) => console.error("confirmation email error", err));
@@ -132,13 +121,14 @@ export default function SixTrapsLanding() {
         );
       } catch {}
 
-      navigate("/thankyousixtraps", {
+      navigate(`/thankyousixtraps${roundId ? `?round=${roundId}` : ""}`, {
         state: {
           sixTrapsRegistrationCompleted: true,
           email: parsed.data.email.toLowerCase(),
           roundId,
         },
       });
+
     } catch (err) {
       console.error("submit error", err);
       toast({

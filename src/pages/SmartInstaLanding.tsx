@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+
 import { z } from "zod";
 import { ArrowDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
 import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
 import { trackLead } from "@/lib/metaPixel";
+import { resolveWebinarRound } from "@/lib/webinarRounds";
+
 
 const PROGRAM_SLUG = "smartinstagramframework";
 
@@ -16,6 +19,9 @@ const schema = z.object({
 
 export default function SmartInstaLanding() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const roundParam = searchParams.get("round");
+
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -31,27 +37,8 @@ export default function SmartInstaLanding() {
 
   useEffect(() => {
     (async () => {
-      const { data: autoRule } = await (supabase as any)
-        .from("program_auto_enrollment")
-        .select("round_id")
-        .eq("program_slug", PROGRAM_SLUG)
-        .maybeSingle();
-
-      const effectiveRoundId = autoRule?.round_id || null;
-      setRoundId(effectiveRoundId);
-
-      const roundQuery = (supabase as any)
-        .from("program_rounds")
-        .select("id, first_session_date, first_session_duration, google_meet_link");
-
-      const { data: round } = effectiveRoundId
-        ? await roundQuery.eq("id", effectiveRoundId).maybeSingle()
-        : await roundQuery
-            .eq("program_slug", PROGRAM_SLUG)
-            .eq("status", "active")
-            .order("first_session_date", { ascending: true })
-            .limit(1)
-            .maybeSingle();
+      const round = await resolveWebinarRound(PROGRAM_SLUG, roundParam);
+      if (round?.id) setRoundId(round.id);
 
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
@@ -67,10 +54,10 @@ export default function SmartInstaLanding() {
           meetUrl: round.google_meet_link || "",
           coverUrl: prog?.cover_image_url || "",
         });
-        if (!effectiveRoundId && round.id) setRoundId(round.id);
       }
     })();
-  }, []);
+  }, [roundParam]);
+
 
   const laLabel = useMemo(
     () => (webinar ? formatLADateTime(webinar.startUtc) : ""),
@@ -102,6 +89,7 @@ export default function SmartInstaLanding() {
         city: "",
         phone: "",
         source: "smartinsta_registration",
+        round_id: roundId,
       });
       if (error) throw error;
 
@@ -115,6 +103,7 @@ export default function SmartInstaLanding() {
           body: {
             name: "",
             email: parsed.data.email.toLowerCase(),
+            roundId,
           },
         })
         .catch((err) => console.error("confirmation email error", err));
@@ -126,13 +115,17 @@ export default function SmartInstaLanding() {
         );
       } catch {}
 
-      navigate("/thankyousmartinstaframework", {
-        state: {
-          smartInstaRegistrationCompleted: true,
-          email: parsed.data.email.toLowerCase(),
-          roundId,
+      navigate(
+        `/thankyousmartinstaframework${roundId ? `?round=${roundId}` : ""}`,
+        {
+          state: {
+            smartInstaRegistrationCompleted: true,
+            email: parsed.data.email.toLowerCase(),
+            roundId,
+          },
         },
-      });
+      );
+
     } catch (err) {
       console.error("submit error", err);
       toast({

@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { resolveWebinarRound } from "@/lib/webinarRounds";
+
 import { z } from "zod";
 import { ArrowDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +21,9 @@ const schema = z.object({
 
 export default function IgAdsLanding() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const roundParam = searchParams.get("round");
+
   const { toast } = useToast();
   const blockedRegion = useMemo(() => isIranTimezone(), []);
   const [name, setName] = useState("");
@@ -37,27 +42,8 @@ export default function IgAdsLanding() {
 
   useEffect(() => {
     (async () => {
-      const { data: autoRule } = await (supabase as any)
-        .from("program_auto_enrollment")
-        .select("round_id")
-        .eq("program_slug", PROGRAM_SLUG)
-        .maybeSingle();
-
-      const effectiveRoundId = autoRule?.round_id || null;
-      setRoundId(effectiveRoundId);
-
-      const roundQuery = (supabase as any)
-        .from("program_rounds")
-        .select("id, first_session_date, first_session_duration, google_meet_link");
-
-      const { data: round } = effectiveRoundId
-        ? await roundQuery.eq("id", effectiveRoundId).maybeSingle()
-        : await roundQuery
-            .eq("program_slug", PROGRAM_SLUG)
-            .eq("status", "active")
-            .order("first_session_date", { ascending: true })
-            .limit(1)
-            .maybeSingle();
+      const round = await resolveWebinarRound(PROGRAM_SLUG, roundParam);
+      if (round?.id) setRoundId(round.id);
 
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
@@ -74,10 +60,10 @@ export default function IgAdsLanding() {
           durationMinutes: round.first_session_duration || 120,
           meetUrl: round.google_meet_link || "",
         });
-        if (!effectiveRoundId && round.id) setRoundId(round.id);
       }
     })();
-  }, []);
+  }, [roundParam]);
+
 
   const laLabel = useMemo(
     () => (webinar ? formatLADateTime(webinar.startUtc) : ""),
@@ -138,13 +124,14 @@ export default function IgAdsLanding() {
         );
       } catch {}
 
-      navigate("/l/igadsfree/thankyou", {
+      navigate(`/l/igadsfree/thankyou${roundId ? `?round=${roundId}` : ""}`, {
         state: {
           igAdsRegistrationCompleted: true,
           email: parsed.data.email.toLowerCase(),
           roundId,
         },
       });
+
     } catch (err) {
       console.error("submit error", err);
       toast({

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
+import { resolveWebinarRound } from "@/lib/webinarRounds";
+
 import { supabase } from "@/integrations/supabase/client";
 import { SEOHead } from "@/components/SEOHead";
 import { trackCompleteRegistration } from "@/lib/metaPixel";
@@ -24,6 +26,9 @@ function youtubeId(url: string | null | undefined): string {
 
 export default function ThankYouIgAds() {
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const roundParam = searchParams.get("round");
+
   const stored = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem("igads_registration") || "null") as
@@ -63,22 +68,7 @@ export default function ThankYouIgAds() {
 
   useEffect(() => {
     (async () => {
-      const { data: autoRule } = await (supabase as any)
-        .from("program_auto_enrollment")
-        .select("round_id")
-        .eq("program_slug", PROGRAM_SLUG)
-        .maybeSingle();
-      const roundQuery = (supabase as any)
-        .from("program_rounds")
-        .select("first_session_date, first_session_duration, google_meet_link, support_link_url, video_url");
-      const { data: round } = autoRule?.round_id
-        ? await roundQuery.eq("id", autoRule.round_id).maybeSingle()
-        : await roundQuery
-            .eq("program_slug", PROGRAM_SLUG)
-            .eq("status", "active")
-            .order("first_session_date", { ascending: true })
-            .limit(1)
-            .maybeSingle();
+      const round = await resolveWebinarRound(PROGRAM_SLUG, roundParam || registeredRoundId);
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
         .select("title, video_url")
@@ -97,7 +87,8 @@ export default function ThankYouIgAds() {
         });
       }
     })();
-  }, []);
+  }, [roundParam, registeredRoundId]);
+
 
   const event: WebinarEvent | null = useMemo(() => {
     if (!webinar) return null;
