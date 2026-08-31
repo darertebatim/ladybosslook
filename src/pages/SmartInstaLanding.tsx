@@ -19,6 +19,9 @@ const schema = z.object({
 
 export default function SmartInstaLanding() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const roundParam = searchParams.get("round");
+
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
