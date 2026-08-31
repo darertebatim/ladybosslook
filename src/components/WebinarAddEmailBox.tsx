@@ -5,13 +5,21 @@ import { useToast } from "@/hooks/use-toast";
 
 interface Props {
   originalEmail: string;
-  source: "sixtraps" | "smartinsta";
+  source: "sixtraps" | "smartinsta" | "igads";
   roundId?: string | null;
 }
 
 const emailSchema = z.string().trim().email("ایمیل معتبر نیست").max(255);
 
-const SOURCE_MAP: Record<Props["source"], { registration: string; additional: string; functionName: string }> = {
+const SOURCE_MAP: Record<
+  Props["source"],
+  {
+    registration: string;
+    additional: string;
+    functionName: string;
+    extraBody?: Record<string, unknown>;
+  }
+> = {
   sixtraps: {
     registration: "sixtraps_registration",
     additional: "sixtraps_additional_email",
@@ -22,7 +30,18 @@ const SOURCE_MAP: Record<Props["source"], { registration: string; additional: st
     additional: "smartinsta_additional_email",
     functionName: "send-smartinsta-confirmation",
   },
+  igads: {
+    registration: "igads_registration",
+    additional: "igads_additional_email",
+    functionName: "send-sixtraps-confirmation",
+    extraBody: {
+      programSlug: "igadsfree",
+      prereqUrl: "https://ladybosslook.com/l/igadsfree/pre",
+      sources: ["igads_registration", "preigads_interest"],
+    },
+  },
 };
+
 
 export default function WebinarAddEmailBox({ originalEmail, source, roundId }: Props) {
   const [email, setEmail] = useState("");
@@ -92,7 +111,7 @@ export default function WebinarAddEmailBox({ originalEmail, source, roundId }: P
       // Send confirmation email to the new address (fire-and-forget, non-blocking).
       supabase.functions
         .invoke(config.functionName, {
-          body: { name: "", email: newEmail },
+          body: { name: "", email: newEmail, ...(config.extraBody || {}), ...(roundId ? { roundId } : {}) },
         })
         .catch((err) => console.error("additional confirmation email error", err));
 
