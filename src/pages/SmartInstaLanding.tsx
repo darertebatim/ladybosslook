@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
 import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
-import { trackLead } from "@/lib/metaPixel";
+import { trackLead, trackCustomLead } from "@/lib/metaPixel";
 import { resolveWebinarRound } from "@/lib/webinarRounds";
 
 
@@ -94,6 +94,10 @@ export default function SmartInstaLanding() {
       if (error) throw error;
 
       trackLead({
+        content_name: "Smart Instagram Framework Registration",
+        content_category: "webinar",
+      });
+      trackCustomLead("SmartInstaLead", {
         content_name: "Smart Instagram Framework Registration",
         content_category: "webinar",
       });
