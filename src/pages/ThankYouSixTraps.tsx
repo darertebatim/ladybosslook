@@ -58,22 +58,7 @@ export default function ThankYouSixTraps() {
 
   useEffect(() => {
     (async () => {
-      const { data: autoRule } = await (supabase as any)
-        .from("program_auto_enrollment")
-        .select("round_id")
-        .eq("program_slug", PROGRAM_SLUG)
-        .maybeSingle();
-      const roundQuery = (supabase as any)
-        .from("program_rounds")
-        .select("first_session_date, first_session_duration, google_meet_link, support_link_url");
-      const { data: round } = autoRule?.round_id
-        ? await roundQuery.eq("id", autoRule.round_id).maybeSingle()
-        : await roundQuery
-            .eq("program_slug", PROGRAM_SLUG)
-            .eq("status", "active")
-            .order("first_session_date", { ascending: true })
-            .limit(1)
-            .maybeSingle();
+      const round = await resolveWebinarRound(PROGRAM_SLUG, roundParam || registeredRoundId);
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
         .select("title")
@@ -89,7 +74,8 @@ export default function ThankYouSixTraps() {
         });
       }
     })();
-  }, []);
+  }, [roundParam, registeredRoundId]);
+
 
   const event: WebinarEvent | null = useMemo(() => {
     if (!webinar) return null;
