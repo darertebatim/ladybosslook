@@ -138,13 +138,14 @@ export default function IgAdsLanding() {
         );
       } catch {}
 
-      navigate("/l/igadsfree/thankyou", {
+      navigate(`/l/igadsfree/thankyou${roundId ? `?round=${roundId}` : ""}`, {
         state: {
           igAdsRegistrationCompleted: true,
           email: parsed.data.email.toLowerCase(),
           roundId,
         },
       });
+
     } catch (err) {
       console.error("submit error", err);
       toast({
