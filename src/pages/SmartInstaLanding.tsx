@@ -37,27 +37,8 @@ export default function SmartInstaLanding() {
 
   useEffect(() => {
     (async () => {
-      const { data: autoRule } = await (supabase as any)
-        .from("program_auto_enrollment")
-        .select("round_id")
-        .eq("program_slug", PROGRAM_SLUG)
-        .maybeSingle();
-
-      const effectiveRoundId = autoRule?.round_id || null;
-      setRoundId(effectiveRoundId);
-
-      const roundQuery = (supabase as any)
-        .from("program_rounds")
-        .select("id, first_session_date, first_session_duration, google_meet_link");
-
-      const { data: round } = effectiveRoundId
-        ? await roundQuery.eq("id", effectiveRoundId).maybeSingle()
-        : await roundQuery
-            .eq("program_slug", PROGRAM_SLUG)
-            .eq("status", "active")
-            .order("first_session_date", { ascending: true })
-            .limit(1)
-            .maybeSingle();
+      const round = await resolveWebinarRound(PROGRAM_SLUG, roundParam);
+      if (round?.id) setRoundId(round.id);
 
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
@@ -73,10 +54,10 @@ export default function SmartInstaLanding() {
           meetUrl: round.google_meet_link || "",
           coverUrl: prog?.cover_image_url || "",
         });
-        if (!effectiveRoundId && round.id) setRoundId(round.id);
       }
     })();
-  }, []);
+  }, [roundParam]);
+
 
   const laLabel = useMemo(
     () => (webinar ? formatLADateTime(webinar.startUtc) : ""),
