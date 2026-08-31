@@ -8,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
 import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
 import { trackLead } from "@/lib/metaPixel";
+import { resolveWebinarRound } from "@/lib/webinarRounds";
+
 
 const PROGRAM_SLUG = "smartinstagramframework";
 
