@@ -14,6 +14,22 @@ function fire(event: string, params?: PixelParams, eventID?: string) {
   }
 }
 
+function fireCustom(event: string, params?: PixelParams, eventID?: string) {
+  if (typeof window === "undefined" || !window.fbq) return;
+  try {
+    const fbq = window.fbq as (...args: any[]) => void;
+    if (eventID) fbq("trackCustom", event, params, { eventID });
+    else fbq("trackCustom", event, params);
+  } catch {
+    // no-op
+  }
+}
+
+/** Custom per-webinar lead events for Meta Ads optimization (e.g. "IGAdsFreeLead"). */
+export function trackCustomLead(event: string, params?: PixelParams, eventID?: string) {
+  fireCustom(event, params, eventID);
+}
+
 /** Top-of-funnel interest (email captured, not a full registration). */
 export function trackLead(params?: PixelParams, eventID?: string) {
   fire("Lead", params, eventID);
