@@ -188,7 +188,7 @@ export default function SixTrapsLanding() {
               </div>
             ) : laLabel && (
               <div className="mx-auto flex flex-col items-center gap-2">
-                <div dir="ltr" className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 text-sm font-medium text-white">
+                <div dir="ltr" className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white whitespace-nowrap">
                   📅 LA time: {laLabel}
                 </div>
                 {localLabel && (
