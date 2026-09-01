@@ -62,9 +62,17 @@ interface AdminNote {
   check_whatsapp: boolean;
   check_connection: boolean;
   check_ontrack: boolean;
+  check_attended: boolean;
+  check_qualified: boolean;
 }
 
-const emptyNote: AdminNote = { whatsapp_number: null, check_whatsapp: false, check_connection: false, check_ontrack: false };
+const emptyNote: AdminNote = { whatsapp_number: null, check_whatsapp: false, check_connection: false, check_ontrack: false, check_attended: false, check_qualified: false };
+
+/** Lead stages we report to Meta's Conversions API as CRM events. */
+const CRM_STAGE_BY_FLAG: Partial<Record<keyof AdminNote, string>> = {
+  check_attended: 'attended',
+  check_qualified: 'qualified',
+};
 
 const waLink = (phone?: string | null) => {
   if (!phone) return null;
@@ -96,13 +104,41 @@ export function ProgramStudentsManager() {
 
   const noteFor = (userId: string): AdminNote => notes[userId] || emptyNote;
 
-  const saveNote = async (userId: string, patch: Partial<AdminNote>) => {
+  const saveNote = async (userId: string, patch: Partial<AdminNote>, student?: StudentRow) => {
     const next = { ...noteFor(userId), ...patch };
     setNotes(prev => ({ ...prev, [userId]: next }));
     const { error } = await (supabase.from('student_admin_notes' as any) as any)
       .upsert({ user_id: userId, ...next }, { onConflict: 'user_id' });
     if (error) {
       toast({ title: 'Could not save', description: error.message, variant: 'destructive' });
+      return;
+    }
+
+    // Report newly-reached lead stages to Meta (CRM events).
+    const stages = Object.entries(patch)
+      .filter(([key, value]) => value === true && CRM_STAGE_BY_FLAG[key as keyof AdminNote])
+      .map(([key]) => CRM_STAGE_BY_FLAG[key as keyof AdminNote]!);
+    if (!stages.length) return;
+
+    const target = student || students.find(s => s.userId === userId);
+    const email = target?.signInEmail || target?.email || target?.paymentEmail;
+    if (!email) return;
+
+    try {
+      await supabase.functions.invoke('meta-crm-event', {
+        body: {
+          events: stages.map(stage => ({
+            stage,
+            email,
+            name: target?.fullName || null,
+            phone: next.whatsapp_number || target?.phone || null,
+            refId: userId,
+            source: target?.roundName || null,
+          })),
+        },
+      });
+    } catch (err) {
+      console.error('meta crm event error', err);
     }
   };
 
@@ -187,7 +223,7 @@ export function ProgramStudentsManager() {
         fetchIn('course_enrollments', 'user_id, program_slug, status'),
         fetchActivity(),
         fetchIn('chat_conversations', 'user_id, inbox_type, last_message_at, updated_at'),
-        fetchIn('student_admin_notes', 'user_id, whatsapp_number, check_whatsapp, check_connection, check_ontrack'),
+        fetchIn('student_admin_notes', 'user_id, whatsapp_number, check_whatsapp, check_connection, check_ontrack, check_attended, check_qualified'),
       ]);
 
       const notesMap: Record<string, AdminNote> = {};
@@ -197,6 +233,8 @@ export function ProgramStudentsManager() {
           check_whatsapp: !!n.check_whatsapp,
           check_connection: !!n.check_connection,
           check_ontrack: !!n.check_ontrack,
+          check_attended: !!n.check_attended,
+          check_qualified: !!n.check_qualified,
         };
       });
       setNotes(notesMap);
@@ -579,11 +617,13 @@ export function ProgramStudentsManager() {
                       ['check_whatsapp', 'WhatsApp found'],
                       ['check_connection', 'Connection (responding)'],
                       ['check_ontrack', 'On track'],
+                      ['check_attended', 'Attended webinar (sent to Meta)'],
+                      ['check_qualified', 'Qualified lead (sent to Meta)'],
                     ] as const).map(([key, label]) => (
                       <label key={key} className="flex items-center gap-2">
                         <Checkbox
                           checked={noteFor(detail.userId)[key]}
-                          onCheckedChange={(v) => saveNote(detail.userId, { [key]: !!v } as any)}
+                          onCheckedChange={(v) => saveNote(detail.userId, { [key]: !!v } as any, detail)}
                         />
                         <span>{label}</span>
                       </label>
