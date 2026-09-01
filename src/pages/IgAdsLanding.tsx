@@ -243,6 +243,32 @@ export default function IgAdsLanding() {
                   We're sorry, this webinar is not available for your region (the live class would be at 3 AM in your area).
                 </p>
               </div>
+            ) : needsRoundChoice ? (
+              <div className="mx-auto rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+                <p className="text-sm font-bold text-neutral-900">انتخاب زمان وبینار</p>
+                <p className="mt-1 text-xs leading-5 text-neutral-600">
+                  منطقه زمانی دستگاه شما شناسایی نشد. لطفاً جلسه‌ای که برایتان مناسب‌تر است را انتخاب کنید.
+                </p>
+                <div className="mt-4 space-y-3">
+                  {roundOptions.map((r) => (
+                    <button
+                      key={r.id}
+                      type="button"
+                      onClick={() => selectRound(r)}
+                      className="w-full rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-right active:bg-neutral-100"
+                    >
+                      <div className="font-semibold text-neutral-900">
+                        {r.round_name || `Round ${r.round_number}`}
+                      </div>
+                      {r.first_session_date && (
+                        <div className="mt-1 text-sm text-neutral-600" dir="ltr">
+                          {formatLADateTime(new Date(r.first_session_date))}
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ) : laLabel && (
               <div className="mx-auto flex flex-col items-center gap-2">
                 <div dir="ltr" className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 text-sm font-medium text-white">
