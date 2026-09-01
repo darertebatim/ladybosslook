@@ -211,7 +211,7 @@ Deno.serve(async (req) => {
       return json({ error: 'meta_error', details: result }, 502);
     }
 
-    await db.from('meta_crm_events').upsert(
+    const { error: logErr } = await db.from('meta_crm_events').insert(
       fresh.map((e) => ({
         stage: e.stage,
         event_name: STAGES[e.stage],
@@ -224,8 +224,8 @@ Deno.serve(async (req) => {
         response: result,
         occurred_at: e.occurredAt ?? new Date().toISOString(),
       })),
-      { onConflict: 'stage,email,ref_id', ignoreDuplicates: true },
     );
+    if (logErr) console.error('[META-CRM] log error', logErr.message);
 
     console.log('[META-CRM] sent', fresh.length, JSON.stringify(result));
     return json({ ok: true, sent: fresh.length, skipped: queue.length - fresh.length, result });
