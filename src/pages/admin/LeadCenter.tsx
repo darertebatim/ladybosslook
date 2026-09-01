@@ -45,7 +45,12 @@ export default function LeadCenter() {
 
         <TabsContent value="sixtraps" className="space-y-6">
           <SixTrapsSignups />
+          <WebinarEmailEngagement
+            campaignKey="sixtraps"
+            sources={['sixtraps_registration', 'presixtraps_interest', 'sixtraps_additional_email']}
+          />
         </TabsContent>
+
 
         <TabsContent value="smartinsta" className="space-y-6">
           <SmartInstaSignups />
