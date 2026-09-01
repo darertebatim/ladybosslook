@@ -80,7 +80,7 @@ serve(async (req) => {
       // Fetch current price from catalog
       const { data: program } = await supabase
         .from('program_catalog')
-        .select('title, price_amount, deposit_price, payment_type, stripe_product_id, is_active')
+        .select('title, price_amount, deposit_price, payment_type, stripe_product_id, stripe_price_id, is_active')
         .eq('slug', item.program_slug)
         .eq('is_active', true)
         .single();
