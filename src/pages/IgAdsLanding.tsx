@@ -41,6 +41,8 @@ export default function IgAdsLanding() {
     meetUrl: string;
   } | null>(null);
   const [roundId, setRoundId] = useState<string | null>(null);
+  const [needsRoundChoice, setNeedsRoundChoice] = useState(false);
+  const [roundOptions, setRoundOptions] = useState<WebinarRoundRow[]>([]);
 
   useEffect(() => {
     (async () => {
