@@ -347,8 +347,30 @@ serve(async (req) => {
       // Build line items - reuse existing product if available
       let lineItems: Stripe.Checkout.SessionCreateParams.LineItem[];
       
-      if (programData.stripe_product_id) {
-        // Create a price using the existing product
+      // Preferred: use the product's default price (supports multi-currency / presentment currency).
+      // Only when we're charging the full price (not a deposit) and the default price is one-time.
+      let resolvedPriceId: string | null = null;
+      if (programData.stripe_product_id && !isDeposit) {
+        try {
+          const product = await stripe.products.retrieve(programData.stripe_product_id, {
+            expand: ['default_price'],
+          });
+          const dp: any = (product as any).default_price;
+          if (dp && typeof dp === 'object' && dp.active && !dp.recurring) {
+            resolvedPriceId = dp.id;
+            logStep("Using product default price", { priceId: dp.id, currency: dp.currency, unitAmount: dp.unit_amount });
+          } else {
+            logStep("Default price unusable, falling back to dynamic price", { hasDefault: !!dp, recurring: !!dp?.recurring });
+          }
+        } catch (e: any) {
+          logStep("Could not retrieve Stripe product", { error: e?.message });
+        }
+      }
+
+      if (resolvedPriceId) {
+        lineItems = [{ price: resolvedPriceId, quantity: 1 }];
+      } else if (programData.stripe_product_id) {
+        // Create an ad-hoc price attached to the existing product
         logStep("Reusing existing Stripe product", { productId: programData.stripe_product_id });
         lineItems = [
           {
@@ -376,6 +398,7 @@ serve(async (req) => {
           },
         ];
       }
+
       
       const sessionCreateParams: Stripe.Checkout.SessionCreateParams = {
         line_items: lineItems,
