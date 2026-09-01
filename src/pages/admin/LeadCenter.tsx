@@ -5,6 +5,9 @@ import { SixTrapsSignups } from '@/components/admin/SixTrapsSignups';
 import { SmartInstaSignups } from '@/components/admin/SmartInstaSignups';
 import { GenericWebinarSignups } from '@/components/admin/GenericWebinarSignups';
 import { EmailOpenRates } from '@/components/admin/EmailOpenRates';
+import { WebinarEmailSender } from '@/components/admin/WebinarEmailSender';
+import { WebinarEmailEngagement } from '@/components/admin/WebinarEmailEngagement';
+
 import { MetaCrmEvents } from '@/components/admin/MetaCrmEvents';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 
