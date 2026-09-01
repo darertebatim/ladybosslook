@@ -18,7 +18,7 @@ const SELECT =
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** East-friendly and Central timezones → Round 1. */
-const ROUND_1_TIMEZONES = new Set<string>([
+export const ROUND_1_TIMEZONE_LIST = [
   "America/New_York",
   "America/Toronto",
   "America/Detroit",
@@ -50,10 +50,12 @@ const ROUND_1_TIMEZONES = new Set<string>([
   "America/Charlotte",
   "America/Chicago",
   "America/Dallas",
-]);
+] as const;
+
+const ROUND_1_TIMEZONES = new Set<string>(ROUND_1_TIMEZONE_LIST);
 
 /** West-friendly timezones → Round 2. */
-const ROUND_2_TIMEZONES = new Set<string>([
+export const ROUND_2_TIMEZONE_LIST = [
   "America/Los_Angeles",
   "America/Vancouver",
   "America/Seattle",
@@ -69,7 +71,9 @@ const ROUND_2_TIMEZONES = new Set<string>([
   "America/Oakland",
   "America/San_Jose",
   "America/Tijuana",
-]);
+] as const;
+
+const ROUND_2_TIMEZONES = new Set<string>(ROUND_2_TIMEZONE_LIST);
 
 export function inferWebinarRoundNumberFromTimezone(timezone: string): 1 | 2 | null {
   if (ROUND_1_TIMEZONES.has(timezone)) return 1;
