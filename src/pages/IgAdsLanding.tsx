@@ -288,7 +288,7 @@ export default function IgAdsLanding() {
             )}
           </section>
 
-          {!blockedRegion && (
+          {!blockedRegion && !needsRoundChoice && (
           <form
             onSubmit={handleSubmit}
             dir="ltr"
