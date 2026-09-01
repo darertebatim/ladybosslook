@@ -5,6 +5,9 @@ import { SixTrapsSignups } from '@/components/admin/SixTrapsSignups';
 import { SmartInstaSignups } from '@/components/admin/SmartInstaSignups';
 import { GenericWebinarSignups } from '@/components/admin/GenericWebinarSignups';
 import { EmailOpenRates } from '@/components/admin/EmailOpenRates';
+import { WebinarEmailSender } from '@/components/admin/WebinarEmailSender';
+import { WebinarEmailEngagement } from '@/components/admin/WebinarEmailEngagement';
+
 import { MetaCrmEvents } from '@/components/admin/MetaCrmEvents';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 
@@ -42,15 +45,31 @@ export default function LeadCenter() {
 
         <TabsContent value="sixtraps" className="space-y-6">
           <SixTrapsSignups />
+          <WebinarEmailEngagement
+            campaignKey="sixtraps"
+            sources={['sixtraps_registration', 'presixtraps_interest', 'sixtraps_additional_email']}
+          />
         </TabsContent>
+
 
         <TabsContent value="smartinsta" className="space-y-6">
           <SmartInstaSignups />
         </TabsContent>
 
         <TabsContent value="igads" className="space-y-6">
+          <WebinarEmailSender
+            campaignKey="igads"
+            programSlug={igads.programSlug}
+            sources={[igads.regSource, ...igads.extraSources]}
+            signupPath={igads.landingPath}
+          />
+          <WebinarEmailEngagement
+            campaignKey="igads"
+            sources={[igads.regSource, ...igads.extraSources]}
+          />
           <GenericWebinarSignups campaign={igads} />
         </TabsContent>
+
 
         <TabsContent value="opens" className="space-y-6">
           <EmailOpenRates />

@@ -14,9 +14,110 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const PROGRAM_SLUG = "instagram6traps";
-const SOURCES = ["sixtraps_registration", "presixtraps_interest"];
-const PREREQ_VIDEO_URL = "https://ladybosslook.com/thankyousixtraps";
+const p = (t: string) =>
+  `<p style="margin:0 0 12px;font-size:15px;line-height:2;">${t}</p>`;
+
+interface Campaign {
+  programSlug: string;
+  sources: string[];
+  prereqUrl: string;
+  signupUrl: string;
+  fallbackTitle: string;
+  reminderHeadline: string;
+  reminderClosing: string;
+  subjects: {
+    reminder: string;
+    joinNow: string;
+    morning: string;
+    nextSession: string;
+  };
+  morningBody: string;
+  nextSessionBody: string;
+}
+
+const CAMPAIGNS: Record<string, Campaign> = {
+  sixtraps: {
+    programSlug: "instagram6traps",
+    sources: ["sixtraps_registration", "presixtraps_interest"],
+    prereqUrl: "https://ladybosslook.com/thankyousixtraps",
+    signupUrl: "https://ladybosslook.com/sixtraps",
+    fallbackTitle: "وبینار ۶ تله اینستاگرام",
+    reminderHeadline: "میخوام مطمئن بشم وبینار رو از دست نمیدین 🌷",
+    reminderClosing: "🌷🌷 منتظرتون هستم",
+    subjects: {
+      reminder: "یادآوری وبینار + ویدیوی پیش‌نیاز 🌷",
+      joinNow: "وبینار در حال شروع است — همین حالا وارد شوید 🚀",
+      morning: "امشب: ۶ تله اینستاگرامی بیزینس‌های ایرانی در آمریکا و کانادا 🌷",
+      nextSession: "جلسه زنده رو از دست دادی؟ هفته آینده دوباره برگزار می‌شه 🌷",
+    },
+    morningBody: [
+      p("ممکن است مرتب در اینستاگرام پست بگذارید،<br>بازدید بگیرید،<br>حتی افراد زیادی وارد پیجتان شوند…"),
+      p("اما در نهایت، تعداد مشتری‌ها و درآمدی که از اینستاگرام می‌گیرید، با تمام وقتی که برایش می‌گذارید متناسب نباشد."),
+      p("<strong>مشکل لزوماً کم‌کاری شما نیست.</strong>"),
+      p("بسیاری از بیزینس‌های ایرانی در آمریکا و کانادا، بدون اینکه متوجه باشند، درگیر چند اشتباه پنهان هستند:"),
+      `<ul style="margin:0 0 14px;padding:0 20px 0 0;font-size:15px;line-height:2;">
+        <li>چرا بازدیدها به مشتری تبدیل نمی‌شوند؟</li>
+        <li>چرا افراد وارد پیج می‌شوند، اما پیام نمی‌دهند؟</li>
+        <li>چرا بعضی بیزینس‌ها با فالوور کمتر، فروش بیشتری دارند؟</li>
+        <li>و چرا روش‌هایی که در ایران جواب می‌دادند، اینجا نتیجه مشابهی نمی‌سازند؟</li>
+      </ul>`,
+      p("<strong>امشب در وبینار رایگان:</strong>"),
+      p("«۶ تله اینستاگرامی بیزینس‌های ایرانی در آمریکا و کانادا»"),
+      p("این ۶ اشتباه را قدم‌به‌قدم بررسی می‌کنم و به شما نشان می‌دهم چطور از اینستاگرام برای سه نتیجه واقعی استفاده کنید:"),
+      `<ul style="margin:0 0 14px;padding:0 20px 0 0;font-size:15px;line-height:2;">
+        <li>جذب مشتری بیشتر</li>
+        <li>جلوگیری از هدررفتن مشتری‌های بالقوه</li>
+        <li>ساختن درآمد بیشتر، بدون اینکه تمام وقتتان را صرف تولید محتوا کنید</li>
+      </ul>`,
+      p("این وبینار درباره بیشتر پست‌گذاشتن یا دنبال‌کردن ترندها نیست."),
+      p("قرار است یاد بگیرید اینستاگرام دقیقاً چه نقشی باید در بیزینس شما داشته باشد و چرا ممکن است روش فعلی‌تان، با وجود تمام زحمتی که می‌کشید، نتیجه‌ای که می‌خواهید را نسازد."),
+    ].join(""),
+    nextSessionBody: [
+      p("وبینار با حضور بیش از ۲۰۰ نفر از ایرانیان، با بالاترین رضایت برگزار شد. اما اگر جلسه زنده را از دست دادید، آخرین فرصت برای تبدیل اینستاگرامتان به یک منبع درآمد باقی مانده است…"),
+      p("خبر خوب: هفته آینده یک جلسه دیگه از وبینار «۶ تله اینستاگرام» برگزار می‌شه. کافیه روی دکمه زیر بزنید و برای جلسه جدید ثبت‌نام کنید."),
+    ].join(""),
+  },
+  igads: {
+    programSlug: "instagramads",
+    sources: ["igads_registration", "preigads_interest"],
+    prereqUrl: "https://ladybosslook.com/l/igadsfree/thankyou",
+    signupUrl: "https://ladybosslook.com/l/igadsfree",
+    fallbackTitle: "وبینار جذب مشتری با اینستاگرام ادز",
+    reminderHeadline: "میخوام مطمئن بشم وبینار اینستاگرام ادز رو از دست نمیدین 🌷",
+    reminderClosing: "🌷🌷 منتظرتون هستم",
+    subjects: {
+      reminder: "یادآوری وبینار اینستاگرام ادز + ویدیوی پیش‌نیاز 🌷",
+      joinNow: "وبینار در حال شروع است — همین حالا وارد شوید 🚀",
+      morning: "امشب: جذب مشتری واقعی با تبلیغات اینستاگرام 🌷",
+      nextSession: "جلسه زنده رو از دست دادی؟ جلسه بعدی وبینار اینستاگرام ادز 🌷",
+    },
+    morningBody: [
+      p("ممکن است تا حالا چند بار در اینستاگرام تبلیغ (Ads) اجرا کرده باشید،<br>بودجه گذاشته باشید،<br>حتی کلیک و بازدید گرفته باشید…"),
+      p("اما در نهایت مشتری واقعی و فروشی که انتظارش را داشتید، اتفاق نیفتاده."),
+      p("<strong>مشکل معمولاً بودجه کم نیست.</strong>"),
+      p("بیشتر بیزینس‌های ایرانی در آمریکا و کانادا، بدون اینکه بدانند، بودجه‌شان را جایی هدر می‌دهند:"),
+      `<ul style="margin:0 0 14px;padding:0 20px 0 0;font-size:15px;line-height:2;">
+        <li>چرا تبلیغ کلیک می‌گیرد اما مشتری نمی‌آورد؟</li>
+        <li>کدام نوع کمپین برای بیزینس شما درست است؟</li>
+        <li>چه بودجه‌ای برای شروع منطقی است؟</li>
+        <li>و چطور بفهمید تبلیغ‌تان دارد جواب می‌دهد یا نه؟</li>
+      </ul>`,
+      p("<strong>امشب در وبینار رایگان:</strong>"),
+      p("«جذب مشتری با تبلیغات اینستاگرام»"),
+      p("قدم‌به‌قدم نشان می‌دهم چطور یک کمپین درست بسازید تا:"),
+      `<ul style="margin:0 0 14px;padding:0 20px 0 0;font-size:15px;line-height:2;">
+        <li>مشتری واقعی جذب کنید، نه فقط لایک و بازدید</li>
+        <li>از هدر رفتن بودجه جلوگیری کنید</li>
+        <li>درآمد بیزینس‌تان را بالا ببرید</li>
+      </ul>`,
+      p("این وبینار درباره ترفندهای زودگذر نیست؛ درباره ساختن یک سیستم تبلیغاتی است که برای بیزینس شما مشتری می‌آورد."),
+    ].join(""),
+    nextSessionBody: [
+      p("جلسه زنده وبینار اینستاگرام ادز برگزار شد و اگر آن را از دست دادید، هنوز فرصت دارید."),
+      p("خبر خوب: جلسه بعدی وبینار «جذب مشتری با اینستاگرام ادز» به‌زودی برگزار می‌شود. کافیه روی دکمه زیر بزنید و ثبت‌نام کنید."),
+    ].join(""),
+  },
+};
 
 function pad(n: number) {
   return String(n).padStart(2, "0");
@@ -73,22 +174,26 @@ function fmtZone(d: Date, tz: string): string {
   }
 }
 
+function zoneRows(startUtc: Date | null): string {
+  if (!startUtc) return "";
+  return CITY_ZONES.map(
+    (z) => `
+        <tr>
+          <td style="padding:6px 10px;font-size:13px;border-bottom:1px solid #fde68a;">${z.label}</td>
+          <td style="padding:6px 10px;font-size:13px;border-bottom:1px solid #fde68a;" dir="ltr"><strong>${fmtZone(startUtc, z.tz)}</strong></td>
+        </tr>`,
+  ).join("");
+}
+
 function buildHtml(
+  c: Campaign,
   name: string,
   startUtc: Date | null,
   meetUrl: string,
   gcalUrl: string,
   supportUrl: string,
 ): string {
-  const rows = startUtc
-    ? CITY_ZONES.map(
-        (z) => `
-        <tr>
-          <td style="padding:6px 10px;font-size:13px;border-bottom:1px solid #fde68a;">${z.label}</td>
-          <td style="padding:6px 10px;font-size:13px;border-bottom:1px solid #fde68a;" dir="ltr"><strong>${fmtZone(startUtc, z.tz)}</strong></td>
-        </tr>`,
-      ).join("")
-    : "";
+  const rows = zoneRows(startUtc);
 
   return `
 <!doctype html>
@@ -96,14 +201,14 @@ function buildHtml(
   <body style="margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
     <div style="max-width:560px;margin:0 auto;padding:24px 20px;">
       <h1 style="margin:0 0 14px;font-size:20px;line-height:1.6;">
-        سلام ${name}، میخوام مطمئن بشم وبینار ۵ اگست رو از دست نمیدین 🌷
+        سلام ${name}، ${c.reminderHeadline}
       </h1>
 
       <p style="margin:0 0 10px;font-size:15px;line-height:1.9;">
         آیا ویدیوی ۵ دقیقه‌ای پیش‌نیاز رو نگاه کردین؟
       </p>
       <p style="text-align:center;margin:16px 0;">
-        <a href="${PREREQ_VIDEO_URL}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
+        <a href="${c.prereqUrl}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
           مشاهده جزئیات وبینار و ویدیو
         </a>
       </p>
@@ -138,7 +243,7 @@ function buildHtml(
       }
 
       <p style="margin:20px 0 0;font-size:16px;line-height:1.9;font-weight:bold;">
-        🌷🌷 چهارشنبه ۵ آگست میبینمتون
+        ${c.reminderClosing}
       </p>
 
       <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
@@ -190,23 +295,13 @@ function buildJoinNowHtml(
 }
 
 function buildMorningHtml(
+  c: Campaign,
   name: string,
   startUtc: Date | null,
   meetUrl: string,
   supportUrl: string,
 ): string {
-  const rows = startUtc
-    ? CITY_ZONES.map(
-        (z) => `
-        <tr>
-          <td style="padding:6px 10px;font-size:13px;border-bottom:1px solid #fde68a;">${z.label}</td>
-          <td style="padding:6px 10px;font-size:13px;border-bottom:1px solid #fde68a;" dir="ltr"><strong>${fmtZone(startUtc, z.tz)}</strong></td>
-        </tr>`,
-      ).join("")
-    : "";
-
-  const p = (t: string) =>
-    `<p style="margin:0 0 12px;font-size:15px;line-height:2;">${t}</p>`;
+  const rows = zoneRows(startUtc);
 
   return `
 <!doctype html>
@@ -214,26 +309,7 @@ function buildMorningHtml(
   <body style="margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
     <div style="max-width:560px;margin:0 auto;padding:24px 20px;">
       ${p(`سلام ${name}،`)}
-      ${p("ممکن است مرتب در اینستاگرام پست بگذارید،<br>بازدید بگیرید،<br>حتی افراد زیادی وارد پیجتان شوند…")}
-      ${p("اما در نهایت، تعداد مشتری‌ها و درآمدی که از اینستاگرام می‌گیرید، با تمام وقتی که برایش می‌گذارید متناسب نباشد.")}
-      ${p("<strong>مشکل لزوماً کم‌کاری شما نیست.</strong>")}
-      ${p("بسیاری از بیزینس‌های ایرانی در آمریکا و کانادا، بدون اینکه متوجه باشند، درگیر چند اشتباه پنهان هستند:")}
-      <ul style="margin:0 0 14px;padding:0 20px 0 0;font-size:15px;line-height:2;">
-        <li>چرا بازدیدها به مشتری تبدیل نمی‌شوند؟</li>
-        <li>چرا افراد وارد پیج می‌شوند، اما پیام نمی‌دهند؟</li>
-        <li>چرا بعضی بیزینس‌ها با فالوور کمتر، فروش بیشتری دارند؟</li>
-        <li>و چرا روش‌هایی که در ایران جواب می‌دادند، اینجا نتیجه مشابهی نمی‌سازند؟</li>
-      </ul>
-      ${p("<strong>امشب در وبینار رایگان:</strong>")}
-      ${p("«۶ تله اینستاگرامی بیزینس‌های ایرانی در آمریکا و کانادا»")}
-      ${p("این ۶ اشتباه را قدم‌به‌قدم بررسی می‌کنم و به شما نشان می‌دهم چطور از اینستاگرام برای سه نتیجه واقعی استفاده کنید:")}
-      <ul style="margin:0 0 14px;padding:0 20px 0 0;font-size:15px;line-height:2;">
-        <li>جذب مشتری بیشتر</li>
-        <li>جلوگیری از هدررفتن مشتری‌های بالقوه</li>
-        <li>ساختن درآمد بیشتر، بدون اینکه تمام وقتتان را صرف تولید محتوا کنید</li>
-      </ul>
-      ${p("این وبینار درباره بیشتر پست‌گذاشتن یا دنبال‌کردن ترندها نیست.")}
-      ${p("قرار است یاد بگیرید اینستاگرام دقیقاً چه نقشی باید در بیزینس شما داشته باشد و چرا ممکن است روش فعلی‌تان، با وجود تمام زحمتی که می‌کشید، نتیجه‌ای که می‌خواهید را نسازد.")}
+      ${c.morningBody}
 
       ${
         rows
@@ -269,22 +345,13 @@ function buildMorningHtml(
 </html>`;
 }
 
-const SIGNUP_URL = "https://ladybosslook.com/sixtraps";
-
 function buildNextSessionHtml(
+  c: Campaign,
   name: string,
   startUtc: Date | null,
   supportUrl: string,
 ): string {
-  const rows = startUtc
-    ? CITY_ZONES.map(
-        (z) => `
-        <tr>
-          <td style="padding:6px 10px;font-size:13px;border-bottom:1px solid #fde68a;">${z.label}</td>
-          <td style="padding:6px 10px;font-size:13px;border-bottom:1px solid #fde68a;" dir="ltr"><strong>${fmtZone(startUtc, z.tz)}</strong></td>
-        </tr>`,
-      ).join("")
-    : "";
+  const rows = zoneRows(startUtc);
 
   return `
 <!doctype html>
@@ -295,18 +362,10 @@ function buildNextSessionHtml(
         سلام ${name} 🌷
       </h1>
 
-      <p style="margin:0 0 12px;font-size:15px;line-height:1.9;">
-        وبینار با حضور بیش از ۲۰۰ نفر از ایرانیان، با بالاترین رضایت برگزار شد.
-        اما اگر جلسه زنده را از دست دادید، آخرین فرصت برای تبدیل اینستاگرامتان به یک منبع درآمد باقی مانده است…
-      </p>
-
-      <p style="margin:0 0 12px;font-size:15px;line-height:1.9;">
-        خبر خوب: هفته آینده یک جلسه دیگه از وبینار «۶ تله اینستاگرام» برگزار می‌شه.
-        کافیه روی دکمه زیر بزنید و برای جلسه جدید ثبت‌نام کنید.
-      </p>
+      ${c.nextSessionBody}
 
       <p style="text-align:center;margin:22px 0;">
-        <a href="${SIGNUP_URL}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:16px 32px;border-radius:12px;font-size:17px;font-weight:bold;">
+        <a href="${c.signupUrl}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:16px 32px;border-radius:12px;font-size:17px;font-weight:bold;">
           ثبت‌نام در جلسه جدید
         </a>
       </p>
@@ -368,6 +427,17 @@ serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
+    const campaignKey = String(body?.campaign || "sixtraps").trim();
+    const c = CAMPAIGNS[campaignKey];
+    if (!c) {
+      return new Response(JSON.stringify({ error: "unknown_campaign" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const PROGRAM_SLUG = c.programSlug;
+    const SOURCES = c.sources;
+
     const testEmail = String(body?.testEmail || "").trim().toLowerCase();
     const requestedRoundId = String(body?.roundId || "").trim();
     const onlyUnsent = body?.onlyUnsent !== false;
@@ -430,7 +500,7 @@ serve(async (req) => {
       .eq("slug", PROGRAM_SLUG)
       .maybeSingle();
 
-    const title = prog?.title || "وبینار ۶ تله اینستاگرام";
+    const title = prog?.title || c.fallbackTitle;
     const meetUrl = round?.google_meet_link || "";
     const supportUrl = round?.support_link_url || "https://wa.me/16265028538";
     const durationMinutes = round?.first_session_duration || 90;
@@ -443,8 +513,8 @@ serve(async (req) => {
           title,
           startUtc,
           durationMinutes,
-          `ویدیوی پیش‌نیاز: ${PREREQ_VIDEO_URL}\n${meetUrl ? `لینک ورود: ${meetUrl}\n` : ""}پشتیبانی: ${supportUrl}`,
-          meetUrl || PREREQ_VIDEO_URL,
+          `ویدیوی پیش‌نیاز: ${c.prereqUrl}\n${meetUrl ? `لینک ورود: ${meetUrl}\n` : ""}پشتیبانی: ${supportUrl}`,
+          meetUrl || c.prereqUrl,
         )
       : "";
 
@@ -493,22 +563,22 @@ serve(async (req) => {
 
     for (const r of recipients) {
       const html = nextSession
-        ? buildNextSessionHtml(r.name, startUtc, supportUrl)
+        ? buildNextSessionHtml(c, r.name, startUtc, supportUrl)
         : joinNow
           ? buildJoinNowHtml(r.name, meetUrl, supportUrl)
           : morningOf
-            ? buildMorningHtml(r.name, startUtc, meetUrl, supportUrl)
-            : buildHtml(r.name, startUtc, meetUrl, gcalUrl, supportUrl);
+            ? buildMorningHtml(c, r.name, startUtc, meetUrl, supportUrl)
+            : buildHtml(c, r.name, startUtc, meetUrl, gcalUrl, supportUrl);
       const { data: sendData, error } = await resend.emails.send({
         from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>",
         to: [r.email],
         subject: nextSession
-          ? "جلسه زنده رو از دست دادی؟ هفته آینده دوباره برگزار می‌شه 🌷"
+          ? c.subjects.nextSession
           : joinNow
-            ? "وبینار در حال شروع است — همین حالا وارد شوید 🚀"
+            ? c.subjects.joinNow
             : morningOf
-              ? "امشب: ۶ تله اینستاگرامی بیزینس‌های ایرانی در آمریکا و کانادا 🌷"
-              : "یادآوری: وبینار ۵ آگست + ویدیوی پیش‌نیاز 🌷",
+              ? c.subjects.morning
+              : c.subjects.reminder,
         html,
       });
 
@@ -574,7 +644,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
-    console.error("send-sixtraps-reminder error", e);
+    console.error("send-webinar-reminder error", e);
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
