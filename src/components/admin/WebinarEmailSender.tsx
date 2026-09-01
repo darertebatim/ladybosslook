@@ -333,7 +333,8 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">
             Short Farsi email: “وبینار در حال شروع است” with a big join button to the round’s Google
-            Meet link. Tracked separately from the reminder email.
+            Meet link. Tracked separately from the reminder email. Sends only to signups of the round
+            selected in the first card — pick Round 1 or Round 2 there and send each separately.
           </p>
           <label className="flex items-center gap-2 text-sm">
             <input
