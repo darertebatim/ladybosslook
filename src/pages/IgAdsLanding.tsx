@@ -104,6 +104,26 @@ export default function IgAdsLanding() {
     [webinar],
   );
 
+  function selectRound(round: WebinarRoundRow) {
+    if (!round.id) return;
+    if (round.round_number) {
+      try {
+        localStorage.setItem(
+          ROUND_ASSIGNMENT_STORAGE_KEY,
+          JSON.stringify({ roundNumber: round.round_number, assignedAt: Date.now() }),
+        );
+      } catch {}
+    }
+    setNeedsRoundChoice(false);
+    setRoundId(round.id);
+    setWebinar({
+      title: "وبینار جذب مشتری با اینستاگرام ادز",
+      startUtc: new Date(round.first_session_date!),
+      durationMinutes: round.first_session_duration || 120,
+      meetUrl: round.google_meet_link || "",
+    });
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (submitting) return;
