@@ -3898,6 +3898,51 @@ export type Database = {
         }
         Relationships: []
       }
+      meta_crm_events: {
+        Row: {
+          created_at: string
+          email: string | null
+          event_name: string
+          id: string
+          name: string | null
+          occurred_at: string
+          phone: string | null
+          ref_id: string | null
+          response: Json | null
+          source: string | null
+          stage: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          event_name: string
+          id?: string
+          name?: string | null
+          occurred_at?: string
+          phone?: string | null
+          ref_id?: string | null
+          response?: Json | null
+          source?: string | null
+          stage: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          event_name?: string
+          id?: string
+          name?: string | null
+          occurred_at?: string
+          phone?: string | null
+          ref_id?: string | null
+          response?: Json | null
+          source?: string | null
+          stage?: string
+          status?: string
+        }
+        Relationships: []
+      }
       module_progress: {
         Row: {
           created_at: string | null
@@ -6290,8 +6335,10 @@ export type Database = {
       }
       student_admin_notes: {
         Row: {
+          check_attended: boolean
           check_connection: boolean
           check_ontrack: boolean
+          check_qualified: boolean
           check_whatsapp: boolean
           created_at: string
           id: string
@@ -6301,8 +6348,10 @@ export type Database = {
           whatsapp_number: string | null
         }
         Insert: {
+          check_attended?: boolean
           check_connection?: boolean
           check_ontrack?: boolean
+          check_qualified?: boolean
           check_whatsapp?: boolean
           created_at?: string
           id?: string
@@ -6312,8 +6361,10 @@ export type Database = {
           whatsapp_number?: string | null
         }
         Update: {
+          check_attended?: boolean
           check_connection?: boolean
           check_ontrack?: boolean
+          check_qualified?: boolean
           check_whatsapp?: boolean
           created_at?: string
           id?: string
