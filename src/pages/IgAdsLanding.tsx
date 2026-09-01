@@ -229,10 +229,6 @@ export default function IgAdsLanding() {
             <p className="text-xs font-semibold text-rose-600">
               این وبینار مخصوص صاحبان بیزینس در آمریکا و کانادا است
             </p>
-            <p className="text-sm leading-6 text-neutral-700">
-              یاد بگیر چطور با تبلیغات اینستاگرام، مشتری واقعی جذب کنی و
-              درآمد کسب‌وکارت را بالا ببری — بدون هدر دادن بودجه.
-            </p>
             {blockedRegion ? (
               <div className="mx-auto rounded-2xl border border-rose-200 bg-rose-50 p-4">
                 <p className="text-sm font-bold leading-7 text-rose-700">
