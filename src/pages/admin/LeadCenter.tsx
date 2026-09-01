@@ -49,8 +49,19 @@ export default function LeadCenter() {
         </TabsContent>
 
         <TabsContent value="igads" className="space-y-6">
+          <WebinarEmailSender
+            campaignKey="igads"
+            programSlug={igads.programSlug}
+            sources={[igads.regSource, ...igads.extraSources]}
+            signupPath={igads.landingPath}
+          />
+          <WebinarEmailEngagement
+            campaignKey="igads"
+            sources={[igads.regSource, ...igads.extraSources]}
+          />
           <GenericWebinarSignups campaign={igads} />
         </TabsContent>
+
 
         <TabsContent value="opens" className="space-y-6">
           <EmailOpenRates />
