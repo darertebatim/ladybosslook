@@ -181,9 +181,19 @@ export function WebinarEmailEngagement({ campaignKey, sources }: Props) {
             <Loader2 className="h-4 w-4 animate-spin" /> Loading email events…
           </div>
         ) : rows.length === 0 ? (
-          <div className="text-sm text-muted-foreground py-8">
-            No email events for this campaign in the selected range yet.
+          <div className="text-sm text-muted-foreground py-8 space-y-2">
+            <p>No email events for this campaign in the selected range yet.</p>
+            <p>
+              Opens/clicks only appear here once Resend is pushing events to us. In Resend →
+              Webhooks, add an endpoint pointing to{' '}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                https://mnukhzjcvbwpvktxqlej.supabase.co/functions/v1/resend-webhook
+              </code>{' '}
+              with the email.sent / delivered / opened / clicked / bounced events selected, and turn
+              on Open &amp; Click tracking under Domains → Tracking.
+            </p>
           </div>
+
         ) : (
           <>
             <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
