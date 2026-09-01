@@ -5,6 +5,7 @@ import { SixTrapsSignups } from '@/components/admin/SixTrapsSignups';
 import { SmartInstaSignups } from '@/components/admin/SmartInstaSignups';
 import { GenericWebinarSignups } from '@/components/admin/GenericWebinarSignups';
 import { EmailOpenRates } from '@/components/admin/EmailOpenRates';
+import { MetaCrmEvents } from '@/components/admin/MetaCrmEvents';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 
 const igads = LEAD_CAMPAIGNS.find((c) => c.key === 'igads')!;
@@ -21,13 +22,14 @@ export default function LeadCenter() {
       </div>
 
       <Tabs defaultValue="campaigns">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
           <TabsTrigger value="stats">Stats</TabsTrigger>
           <TabsTrigger value="sixtraps">6 Traps</TabsTrigger>
           <TabsTrigger value="smartinsta">Smart IG</TabsTrigger>
           <TabsTrigger value="igads">IG Ads</TabsTrigger>
           <TabsTrigger value="opens">Email Opens</TabsTrigger>
+          <TabsTrigger value="crm">Meta CRM</TabsTrigger>
         </TabsList>
 
         <TabsContent value="campaigns" className="space-y-6">
@@ -52,6 +54,10 @@ export default function LeadCenter() {
 
         <TabsContent value="opens" className="space-y-6">
           <EmailOpenRates />
+        </TabsContent>
+
+        <TabsContent value="crm" className="space-y-6">
+          <MetaCrmEvents />
         </TabsContent>
       </Tabs>
     </div>

@@ -104,7 +104,7 @@ export function ProgramStudentsManager() {
 
   const noteFor = (userId: string): AdminNote => notes[userId] || emptyNote;
 
-  const saveNote = async (userId: string, patch: Partial<AdminNote>, student?: StudentRow) => {
+  const saveNote = async (userId: string, patch: Partial<AdminNote>, student?: Student) => {
     const next = { ...noteFor(userId), ...patch };
     setNotes(prev => ({ ...prev, [userId]: next }));
     const { error } = await (supabase.from('student_admin_notes' as any) as any)
