@@ -46,8 +46,27 @@ export default function IgAdsLanding() {
 
   useEffect(() => {
     (async () => {
-      const round = await resolveWebinarRound(PROGRAM_SLUG, roundParam);
-      if (round?.id) setRoundId(round.id);
+      // 1. Pinned ?round= param always wins.
+      // 2. Otherwise restore a previously saved assignment.
+      let effectiveRoundParam = roundParam;
+      if (!effectiveRoundParam) {
+        try {
+          const saved = localStorage.getItem(ROUND_ASSIGNMENT_STORAGE_KEY);
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed.roundNumber) effectiveRoundParam = String(parsed.roundNumber);
+          }
+        } catch {}
+      }
+
+      // 3. If still no pinned round, use device timezone to auto-assign.
+      const timezone = !effectiveRoundParam ? getDeviceTimezone() : null;
+      const round = await resolveWebinarRound(PROGRAM_SLUG, effectiveRoundParam, timezone);
+
+      if (round?.id) {
+        setRoundId(round.id);
+        setNeedsRoundChoice(false);
+      }
 
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
@@ -64,6 +83,13 @@ export default function IgAdsLanding() {
           durationMinutes: round.first_session_duration || 120,
           meetUrl: round.google_meet_link || "",
         });
+      } else if (!effectiveRoundParam && !round) {
+        // Unmatched/unknown timezone — let the visitor pick.
+        const rounds = await listActiveWebinarRounds(PROGRAM_SLUG);
+        if (rounds.length) {
+          setRoundOptions(rounds);
+          setNeedsRoundChoice(true);
+        }
       }
     })();
   }, [roundParam]);
