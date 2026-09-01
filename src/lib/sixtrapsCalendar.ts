@@ -81,9 +81,14 @@ export function formatLADateTime(d: Date): string {
   try {
     return new Intl.DateTimeFormat("en-US", {
       timeZone: "America/Los_Angeles",
-      dateStyle: "full",
-      timeStyle: "short",
-    }).format(d) + " (PT)";
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(d) + " PT";
   } catch {
     return d.toISOString();
   }
