@@ -174,11 +174,11 @@ export default function IgAdsLanding() {
               وبینار رایگان: جذب مشتری با اینستاگرام ادز
             </h1>
             <p className="text-xs font-semibold text-rose-600">
-              این وبینار مخصوص صاحبان کسب‌وکار در آمریکا و کانادا است
+              این وبینار مخصوص صاحبان بیزینس در آمریکا و کانادا است
             </p>
             <p className="text-sm leading-6 text-neutral-700">
               یاد بگیر چطور با تبلیغات اینستاگرام، مشتری واقعی جذب کنی و
-              فروشت را بالا ببری — بدون هدر دادن بودجه.
+              درآمد کسب‌وکارت را بالا ببری — بدون هدر دادن بودجه.
             </p>
             {blockedRegion ? (
               <div className="mx-auto rounded-2xl border border-rose-200 bg-rose-50 p-4">
