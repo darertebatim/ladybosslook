@@ -119,7 +119,7 @@ export default function IgAdsLanding() {
     setNeedsRoundChoice(false);
     setRoundId(round.id);
     setWebinar({
-      title: "وبینار جذب مشتری با اینستاگرام ادز",
+      title: programTitle,
       startUtc: new Date(round.first_session_date!),
       durationMinutes: round.first_session_duration || 120,
       meetUrl: round.google_meet_link || "",
