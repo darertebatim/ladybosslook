@@ -34,6 +34,7 @@ export default function IgAdsLanding() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [cover, setCover] = useState<string>("");
+  const [programTitle, setProgramTitle] = useState<string>("وبینار جذب مشتری با اینستاگرام ادز");
   const [webinar, setWebinar] = useState<{
     title: string;
     startUtc: Date;
