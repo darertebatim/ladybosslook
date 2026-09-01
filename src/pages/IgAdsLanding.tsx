@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { resolveWebinarRound } from "@/lib/webinarRounds";
+import { resolveWebinarRound, listActiveWebinarRounds, type WebinarRoundRow } from "@/lib/webinarRounds";
 
 import { z } from "zod";
 import { ArrowDown } from "lucide-react";
@@ -9,7 +9,9 @@ import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
 import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
 import { trackWebinarLead } from "@/lib/metaCapi";
-import { isIranTimezone } from "@/lib/regionRestrictions";
+import { isIranTimezone, getDeviceTimezone } from "@/lib/regionRestrictions";
+
+const ROUND_ASSIGNMENT_STORAGE_KEY = "igadsfree_round_assignment";
 
 const PROGRAM_SLUG = "igadsfree";
 
@@ -32,6 +34,7 @@ export default function IgAdsLanding() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [cover, setCover] = useState<string>("");
+  const [programTitle, setProgramTitle] = useState<string>("وبینار جذب مشتری با اینستاگرام ادز");
   const [webinar, setWebinar] = useState<{
     title: string;
     startUtc: Date;
@@ -39,11 +42,32 @@ export default function IgAdsLanding() {
     meetUrl: string;
   } | null>(null);
   const [roundId, setRoundId] = useState<string | null>(null);
+  const [needsRoundChoice, setNeedsRoundChoice] = useState(false);
+  const [roundOptions, setRoundOptions] = useState<WebinarRoundRow[]>([]);
 
   useEffect(() => {
     (async () => {
-      const round = await resolveWebinarRound(PROGRAM_SLUG, roundParam);
-      if (round?.id) setRoundId(round.id);
+      // 1. Pinned ?round= param always wins.
+      // 2. Otherwise restore a previously saved assignment.
+      let effectiveRoundParam = roundParam;
+      if (!effectiveRoundParam) {
+        try {
+          const saved = localStorage.getItem(ROUND_ASSIGNMENT_STORAGE_KEY);
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed.roundNumber) effectiveRoundParam = String(parsed.roundNumber);
+          }
+        } catch {}
+      }
+
+      // 3. If still no pinned round, use device timezone to auto-assign.
+      const timezone = !effectiveRoundParam ? getDeviceTimezone() : null;
+      const round = await resolveWebinarRound(PROGRAM_SLUG, effectiveRoundParam, timezone);
+
+      if (round?.id) {
+        setRoundId(round.id);
+        setNeedsRoundChoice(false);
+      }
 
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
@@ -51,15 +75,23 @@ export default function IgAdsLanding() {
         .eq("slug", PROGRAM_SLUG)
         .maybeSingle();
 
+      if (prog?.title) setProgramTitle(prog.title);
       if (prog?.cover_image_url) setCover(prog.cover_image_url);
 
       if (round?.first_session_date) {
         setWebinar({
-          title: prog?.title || "وبینار جذب مشتری با اینستاگرام ادز",
+          title: prog?.title || programTitle,
           startUtc: new Date(round.first_session_date),
           durationMinutes: round.first_session_duration || 120,
           meetUrl: round.google_meet_link || "",
         });
+      } else if (!effectiveRoundParam && !round) {
+        // Unmatched/unknown timezone — let the visitor pick.
+        const rounds = await listActiveWebinarRounds(PROGRAM_SLUG);
+        if (rounds.length) {
+          setRoundOptions(rounds);
+          setNeedsRoundChoice(true);
+        }
       }
     })();
   }, [roundParam]);
@@ -73,6 +105,26 @@ export default function IgAdsLanding() {
     () => (webinar ? formatLocalDateTime(webinar.startUtc) : ""),
     [webinar],
   );
+
+  function selectRound(round: WebinarRoundRow) {
+    if (!round.id) return;
+    if (round.round_number) {
+      try {
+        localStorage.setItem(
+          ROUND_ASSIGNMENT_STORAGE_KEY,
+          JSON.stringify({ roundNumber: round.round_number, assignedAt: Date.now() }),
+        );
+      } catch {}
+    }
+    setNeedsRoundChoice(false);
+    setRoundId(round.id);
+    setWebinar({
+      title: programTitle,
+      startUtc: new Date(round.first_session_date!),
+      durationMinutes: round.first_session_duration || 120,
+      meetUrl: round.google_meet_link || "",
+    });
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -193,6 +245,32 @@ export default function IgAdsLanding() {
                   We're sorry, this webinar is not available for your region (the live class would be at 3 AM in your area).
                 </p>
               </div>
+            ) : needsRoundChoice ? (
+              <div className="mx-auto rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+                <p className="text-sm font-bold text-neutral-900">انتخاب زمان وبینار</p>
+                <p className="mt-1 text-xs leading-5 text-neutral-600">
+                  منطقه زمانی دستگاه شما شناسایی نشد. لطفاً جلسه‌ای که برایتان مناسب‌تر است را انتخاب کنید.
+                </p>
+                <div className="mt-4 space-y-3">
+                  {roundOptions.map((r) => (
+                    <button
+                      key={r.id}
+                      type="button"
+                      onClick={() => selectRound(r)}
+                      className="w-full rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-right active:bg-neutral-100"
+                    >
+                      <div className="font-semibold text-neutral-900">
+                        {r.round_name || `Round ${r.round_number}`}
+                      </div>
+                      {r.first_session_date && (
+                        <div className="mt-1 text-sm text-neutral-600" dir="ltr">
+                          {formatLADateTime(new Date(r.first_session_date))}
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ) : laLabel && (
               <div className="mx-auto flex flex-col items-center gap-2">
                 <div dir="ltr" className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 text-sm font-medium text-white">
@@ -212,7 +290,7 @@ export default function IgAdsLanding() {
             )}
           </section>
 
-          {!blockedRegion && (
+          {!blockedRegion && !needsRoundChoice && (
           <form
             onSubmit={handleSubmit}
             dir="ltr"
