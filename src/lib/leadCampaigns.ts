@@ -46,7 +46,7 @@ export const LEAD_CAMPAIGNS: LeadCampaign[] = [
     key: 'igads',
     label: 'Instagram Ads',
     labelFa: 'وبینار جذب مشتری با اینستاگرام ادز',
-    programSlug: 'instagramads',
+    programSlug: 'igadsfree',
     landingPath: '/l/igadsfree',
     thankYouPath: '/l/igadsfree/thankyou',
     regSource: 'igads_registration',

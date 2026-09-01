@@ -78,7 +78,7 @@ const CAMPAIGNS: Record<string, Campaign> = {
     ].join(""),
   },
   igads: {
-    programSlug: "instagramads",
+    programSlug: "igadsfree",
     sources: ["igads_registration", "preigads_interest"],
     prereqUrl: "https://ladybosslook.com/l/igadsfree/thankyou",
     signupUrl: "https://ladybosslook.com/l/igadsfree",
