@@ -75,11 +75,12 @@ export default function IgAdsLanding() {
         .eq("slug", PROGRAM_SLUG)
         .maybeSingle();
 
+      if (prog?.title) setProgramTitle(prog.title);
       if (prog?.cover_image_url) setCover(prog.cover_image_url);
 
       if (round?.first_session_date) {
         setWebinar({
-          title: prog?.title || "وبینار جذب مشتری با اینستاگرام ادز",
+          title: prog?.title || programTitle,
           startUtc: new Date(round.first_session_date),
           durationMinutes: round.first_session_duration || 120,
           meetUrl: round.google_meet_link || "",
