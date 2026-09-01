@@ -1013,6 +1013,21 @@ export function ProgramsManager() {
                       </p>
                     </div>
 
+                    {formData.payment_type === 'one-time' && (
+                      <div className="space-y-2">
+                        <Label htmlFor="stripe_price_id">Stripe Price ID (Optional)</Label>
+                        <Input
+                          id="stripe_price_id"
+                          value={formData.stripe_price_id}
+                          onChange={(e) => setFormData({ ...formData, stripe_price_id: e.target.value })}
+                          placeholder="price_xxx"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          One-time price. If empty, the product's <strong>default price</strong> is used (supports multi-currency). Find in Stripe Dashboard → Products → Pricing
+                        </p>
+                      </div>
+                    )}
+
                     {formData.payment_type === 'subscription' && (
                       <>
                         <div className="space-y-2">

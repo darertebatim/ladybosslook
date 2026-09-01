@@ -347,10 +347,24 @@ serve(async (req) => {
       // Build line items - reuse existing product if available
       let lineItems: Stripe.Checkout.SessionCreateParams.LineItem[];
       
-      // Preferred: use the product's default price (supports multi-currency / presentment currency).
-      // Only when we're charging the full price (not a deposit) and the default price is one-time.
+      // Preferred: use the program's stored stripe_price_id (safest — explicit).
+      // Fallback: the product's default price (supports multi-currency / presentment currency).
+      // Only when we're charging the full price (not a deposit) and the price is one-time.
       let resolvedPriceId: string | null = null;
-      if (programData.stripe_product_id && !isDeposit) {
+      if (programData.stripe_price_id && !isDeposit) {
+        try {
+          const storedPrice = await stripe.prices.retrieve(programData.stripe_price_id);
+          if (storedPrice.active && !storedPrice.recurring) {
+            resolvedPriceId = storedPrice.id;
+            logStep("Using stored stripe_price_id", { priceId: storedPrice.id, currency: storedPrice.currency, unitAmount: storedPrice.unit_amount });
+          } else {
+            logStep("Stored stripe_price_id unusable (inactive or recurring), trying default price", { active: storedPrice.active, recurring: !!storedPrice.recurring });
+          }
+        } catch (e: any) {
+          logStep("Could not retrieve stored stripe_price_id, trying default price", { error: e?.message });
+        }
+      }
+      if (!resolvedPriceId && programData.stripe_product_id && !isDeposit) {
         try {
           const product = await stripe.products.retrieve(programData.stripe_product_id, {
             expand: ['default_price'],
