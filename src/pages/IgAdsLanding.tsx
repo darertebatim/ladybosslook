@@ -223,7 +223,7 @@ export default function IgAdsLanding() {
 
           <section className="mt-6 space-y-3 text-center">
             <h1 className="text-2xl font-bold leading-tight text-neutral-900">
-              وبینار رایگان: جذب مشتری
+              🎁وبینار رایگان: جذب مشتری
               با اینستاگرام ادز
             </h1>
             <p className="text-xs font-semibold text-rose-600">
