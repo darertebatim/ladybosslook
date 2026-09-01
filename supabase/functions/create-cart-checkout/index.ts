@@ -101,7 +101,25 @@ serve(async (req) => {
 
       const productName = isDeposit ? `${program.title} (Deposit)` : program.title;
 
-      if (program.stripe_product_id) {
+      let resolvedPriceId: string | null = null;
+      if (program.stripe_product_id && !isDeposit) {
+        try {
+          const stripeProduct = await stripe.products.retrieve(program.stripe_product_id, {
+            expand: ['default_price'],
+          });
+          const dp: any = (stripeProduct as any).default_price;
+          if (dp && typeof dp === 'object' && dp.active && !dp.recurring) {
+            resolvedPriceId = dp.id;
+            console.log('[CART-CHECKOUT] Using default price', dp.id, dp.currency, dp.unit_amount);
+          }
+        } catch (e: any) {
+          console.error('[CART-CHECKOUT] Product lookup failed:', e?.message);
+        }
+      }
+
+      if (resolvedPriceId) {
+        lineItems.push({ price: resolvedPriceId, quantity: 1 });
+      } else if (program.stripe_product_id) {
         lineItems.push({
           price_data: {
             currency: 'usd',
@@ -120,6 +138,7 @@ serve(async (req) => {
           quantity: 1,
         });
       }
+
 
       programSlugs.push(item.program_slug);
     }
