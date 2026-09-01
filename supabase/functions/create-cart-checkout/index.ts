@@ -102,7 +102,21 @@ serve(async (req) => {
       const productName = isDeposit ? `${program.title} (Deposit)` : program.title;
 
       let resolvedPriceId: string | null = null;
-      if (program.stripe_product_id && !isDeposit) {
+      // Preferred: explicit stored stripe_price_id; fallback: product default price.
+      if ((program as any).stripe_price_id && !isDeposit) {
+        try {
+          const storedPrice = await stripe.prices.retrieve((program as any).stripe_price_id);
+          if (storedPrice.active && !storedPrice.recurring) {
+            resolvedPriceId = storedPrice.id;
+            console.log('[CART-CHECKOUT] Using stored stripe_price_id', storedPrice.id, storedPrice.currency, storedPrice.unit_amount);
+          } else {
+            console.log('[CART-CHECKOUT] Stored stripe_price_id unusable, trying default price');
+          }
+        } catch (e: any) {
+          console.error('[CART-CHECKOUT] Stored price lookup failed:', e?.message);
+        }
+      }
+      if (!resolvedPriceId && program.stripe_product_id && !isDeposit) {
         try {
           const stripeProduct = await stripe.products.retrieve(program.stripe_product_id, {
             expand: ['default_price'],
