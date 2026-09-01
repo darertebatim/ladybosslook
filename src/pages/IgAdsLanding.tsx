@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { resolveWebinarRound } from "@/lib/webinarRounds";
+import { resolveWebinarRound, listActiveWebinarRounds, type WebinarRoundRow } from "@/lib/webinarRounds";
 
 import { z } from "zod";
 import { ArrowDown } from "lucide-react";
@@ -9,7 +9,9 @@ import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
 import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
 import { trackWebinarLead } from "@/lib/metaCapi";
-import { isIranTimezone } from "@/lib/regionRestrictions";
+import { isIranTimezone, getDeviceTimezone } from "@/lib/regionRestrictions";
+
+const ROUND_ASSIGNMENT_STORAGE_KEY = "igadsfree_round_assignment";
 
 const PROGRAM_SLUG = "igadsfree";
 
