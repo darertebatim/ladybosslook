@@ -389,6 +389,17 @@ serve(async (req) => {
         .maybeSingle();
       round = (data as any) || null;
     }
+    if (!round && roundNumberIn) {
+      const { data } = await supabase
+        .from("program_rounds")
+        .select(
+          "id, round_name, round_number, start_date, end_date, first_session_date, first_session_duration, google_meet_link, google_drive_link, whatsapp_support_number, important_message, status",
+        )
+        .eq("program_slug", programSlug)
+        .eq("round_number", roundNumberIn)
+        .maybeSingle();
+      round = (data as any) || null;
+    }
     if (!round) {
       const { data: auto } = await supabase
         .from("program_auto_enrollment")
