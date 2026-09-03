@@ -127,20 +127,30 @@ export const useCart = () => {
     },
   });
 
-  // After sign-in, automatically complete a cart add that was interrupted by auth.
+  // After sign-in, automatically complete a cart add or free enrollment
+  // that was interrupted by auth.
   useEffect(() => {
     if (!user) return;
-    const raw = localStorage.getItem(PENDING_CART_KEY);
-    if (!raw) return;
-    // Claim it synchronously so other mounted useCart instances don't double-add.
-    localStorage.removeItem(PENDING_CART_KEY);
-    try {
-      const program = JSON.parse(raw) as PendingCartProgram;
-      if (program?.slug && program?.title) {
-        addToCartMutation.mutate(program);
+
+    // Claim both synchronously so other mounted useCart instances don't double-fire.
+    const pendingCart = localStorage.getItem(PENDING_CART_KEY);
+    const pendingFree = localStorage.getItem(PENDING_FREE_KEY);
+    if (pendingCart) localStorage.removeItem(PENDING_CART_KEY);
+    if (pendingFree) localStorage.removeItem(PENDING_FREE_KEY);
+
+    if (pendingCart) {
+      try {
+        const program = JSON.parse(pendingCart) as PendingCartProgram;
+        if (program?.slug && program?.title) {
+          addToCartMutation.mutate(program);
+        }
+      } catch {
+        // ignore malformed payload
       }
-    } catch {
-      // ignore malformed payload
+    }
+
+    if (pendingFree && typeof pendingFree === 'string' && pendingFree.trim()) {
+      enrollFreeMutation.mutate(pendingFree);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
