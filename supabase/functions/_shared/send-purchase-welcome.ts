@@ -22,7 +22,7 @@ function buildWelcome(programSlug: string, programTitle: string) {
     return `${text}\n\n🔗 LINK_BUTTON:${linkUrl}:${linkText}`;
   }
 
-  const text = `Welcome to ${programTitle}! 🎉\n\nYour lessons and materials are ready. Tap below to open your program.`;
+  const text = `Welcome to ${programTitle}! 🎉\n\nOpen Rilo, go to My Program, and start it.`;
   const linkUrl = `/app/programs/${programSlug}`;
   const linkText = "Open program";
   return `${text}\n\n🔗 LINK_BUTTON:${linkUrl}:${linkText}`;
