@@ -78,13 +78,27 @@ export default function PaymentSuccess() {
       }
       
       if (isTestMode) {
-        const testProgramData: Record<string, { title: string; amount: number }> = {
-          'empowered-woman-coaching': { title: 'Empowered Woman Coaching', amount: 99700 },
-          'courageous-character': { title: 'Courageous Character Course', amount: 4999 },
-          'iqmoney-workshop': { title: 'IQ Money Workshop', amount: 9900 }
-        };
-        
-        const programData = (programSlug && testProgramData[programSlug]) || testProgramData['courageous-character'];
+        let programData: { title: string; amount: number } | null = null;
+
+        // Fetch the real program from the catalog so test mode reflects live data
+        if (programSlug) {
+          const { data: program } = await supabase
+            .from('program_catalog')
+            .select('title, price_amount')
+            .eq('slug', programSlug)
+            .maybeSingle();
+          if (program) {
+            programData = {
+              title: program.title,
+              amount: Math.round((program.price_amount ?? 0) * 100),
+            };
+          }
+        }
+
+        if (!programData) {
+          programData = { title: 'Courageous Character Course', amount: 4999 };
+        }
+
         
         setPaymentVerified(true);
         setOrderDetails({
