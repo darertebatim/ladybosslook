@@ -135,17 +135,20 @@ function renderEmail(opts: {
         appStore: "App Store",
         playStore: "Google Play",
         viewWeb: "مشاهده در وبسایت",
+        webFallback: "اگر در دانلود اپلیکیشن مشکل داری، می‌توانی از نسخه دسکتاپ استفاده کنی:",
         orderTitle: "خلاصه سفارش",
         amount: "مبلغ",
         free: "رایگان",
         outro: "منتظر دیدنت هستیم!",
-        signoff: "تیم Ladyboss Academy",
+        signoff: "اپلیکیشن Rilo (Ladybosslook LLC.)",
         support: "اگر سوالی داشتی، به این ایمیل جواب بده یا با hi@ladybosslook.com در تماس باش.",
+        supportApp: "اگر به برنامه‌ات دسترسی نداری، از پشتیبانی داخل اپلیکیشن پیام بده (دکمه‌اش بالا سمت چپ است).",
         hostLabel: "مدرس",
         langLabel: "زبان",
         stepsTitle: "چطور شروع کنم؟",
         manual: "📘 راهنمای اپلیکیشن Rilo (PDF)",
       }
+
     : {
         subject: `You're enrolled in ${program.title} 🎉`,
         hi: `Hi ${name} 👋`,
@@ -166,17 +169,20 @@ function renderEmail(opts: {
         appStore: "App Store",
         playStore: "Google Play",
         viewWeb: "View on the web",
+        webFallback: "If you have trouble downloading the app, you can use desktop mode:",
         orderTitle: "Order summary",
         amount: "Amount",
         free: "Free",
         outro: "We can't wait to have you.",
-        signoff: "The Ladyboss Academy team",
+        signoff: "Rilo App (Ladybosslook LLC.)",
         support: "Questions? Reply to this email or reach us at hi@ladybosslook.com.",
+        supportApp: "If you have trouble accessing your program, message our support in the app (button is on the top left).",
         hostLabel: "Host",
         langLabel: "Language",
         stepsTitle: "How to access your program",
         manual: "📘 Rilo app guide (PDF)",
       };
+
 
   const cover = program.cover_image_url
     ? `<img src="${escapeHtml(program.cover_image_url)}" alt="" style="width:100%;max-width:520px;border-radius:14px;display:block;margin:0 auto 16px;" />`
@@ -305,9 +311,13 @@ function renderEmail(opts: {
       <br>
       <br>
       <a href="${RILO_MANUAL_URL}" style="display:inline-block;margin-top:10px;background:#fff7ed;color:#9a3412;text-decoration:none;padding:10px 16px;border-radius:10px;font-size:14px;border:1px solid #fed7aa;">${t.manual}</a>
-      <br>
-      <a href="${escapeHtml(webUrl)}" style="display:inline-block;margin-top:8px;color:#6b7280;font-size:13px;text-decoration:underline;">${t.viewWeb}</a>
     </div>`;
+
+  const webFallbackHtml = `
+    <div style="background:#f9fafb;border-radius:10px;padding:12px 14px;margin:16px 0;font-size:13px;color:#374151;">
+      ${t.webFallback} <a href="${escapeHtml(webUrl)}" style="color:#ea580c;text-decoration:underline;word-break:break-all;">${escapeHtml(webUrl)}</a>
+    </div>`;
+
 
   // Order summary
   let orderHtml = "";
@@ -331,12 +341,15 @@ function renderEmail(opts: {
       ${descHtml}
       ${accessHtml}
       ${roundHtml}
+      ${webFallbackHtml}
       ${orderHtml}
-      <p style="margin:20px 0 0;font-size:13px;color:#6b7280;line-height:1.8;">${t.support}</p>
+      <p style="margin:20px 0 0;font-size:13px;color:#6b7280;line-height:1.8;">${t.supportApp}</p>
+      <p style="margin:12px 0 0;font-size:13px;color:#6b7280;line-height:1.8;">${t.support}</p>
       <p style="margin:16px 0 0;font-size:13px;color:#6b7280;line-height:1.8;">${t.outro}<br>${t.signoff}</p>
     </div>
   </body>
 </html>`;
+
 
   return { subject: t.subject, html };
 }
