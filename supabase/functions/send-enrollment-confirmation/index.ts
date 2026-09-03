@@ -326,10 +326,13 @@ serve(async (req) => {
     const userId = String(body?.user_id || "").trim();
     const programSlug = String(body?.program_slug || "").trim();
     const roundIdIn = body?.round_id ? String(body.round_id) : null;
+    const roundNumberIn = body?.round_number ? Number(body.round_number) : null;
     const orderIdIn = body?.order_id ? String(body.order_id) : null;
+    // Test mode: send to an arbitrary email without a user account (skips idempotency)
+    const testEmail = String(body?.test_email || "").trim().toLowerCase();
 
-    if (!userId || !programSlug) {
-      return new Response(JSON.stringify({ error: "user_id and program_slug required" }), {
+    if ((!userId && !testEmail) || !programSlug) {
+      return new Response(JSON.stringify({ error: "user_id (or test_email) and program_slug required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -337,22 +340,29 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Load user
-    const { data: authUser } = await supabase.auth.admin.getUserById(userId);
-    const email = authUser?.user?.email || "";
-    if (!email) {
-      return new Response(JSON.stringify({ error: "user_email_not_found" }), {
-        status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    // Load user (or use test email)
+    let email = "";
+    let name = "there";
+    if (testEmail) {
+      email = testEmail;
+      name = testEmail.split("@")[0] || "there";
+    } else {
+      const { data: authUser } = await supabase.auth.admin.getUserById(userId);
+      email = authUser?.user?.email || "";
+      if (!email) {
+        return new Response(JSON.stringify({ error: "user_email_not_found" }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", userId)
+        .maybeSingle();
+      name =
+        (profile?.full_name || authUser?.user?.user_metadata?.full_name || email.split("@")[0] || "there").toString().slice(0, 100);
     }
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("id", userId)
-      .maybeSingle();
-    const name =
-      (profile?.full_name || authUser?.user?.user_metadata?.full_name || email.split("@")[0] || "there").toString().slice(0, 100);
 
     // Load program
     const { data: program } = await supabase
