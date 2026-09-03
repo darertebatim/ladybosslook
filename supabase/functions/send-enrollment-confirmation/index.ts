@@ -12,6 +12,9 @@ const APP_STORE_URL =
 const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=com.ladybosslook.academy";
 const WEB_BASE = "https://ladybosslook.com";
+const RILO_MANUAL_URL =
+  "https://ladybosslook.com/__l5e/assets-v1/17e4c966-fbbd-42f5-80ce-0774df439ff8/RiloManual.pdf";
+
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -140,6 +143,8 @@ function renderEmail(opts: {
         support: "اگر سوالی داشتی، به این ایمیل جواب بده یا با hi@ladybosslook.com در تماس باش.",
         hostLabel: "مدرس",
         langLabel: "زبان",
+        stepsTitle: "چطور شروع کنم؟",
+        manual: "📘 راهنمای اپلیکیشن Rilo (PDF)",
       }
     : {
         subject: `You're enrolled in ${program.title} 🎉`,
@@ -169,6 +174,8 @@ function renderEmail(opts: {
         support: "Questions? Reply to this email or reach us at hi@ladybosslook.com.",
         hostLabel: "Host",
         langLabel: "Language",
+        stepsTitle: "How to access your program",
+        manual: "📘 Rilo app guide (PDF)",
       };
 
   const cover = program.cover_image_url
@@ -182,9 +189,29 @@ function renderEmail(opts: {
     ? `<p style="margin:0 0 12px;font-size:13px;color:#6b7280;">${meta.join(" · ")}</p>`
     : "";
 
-  const descHtml = program.description
-    ? `<p dir="auto" style="margin:0 0 16px;font-size:14px;line-height:1.7;color:#374151;">${escapeHtml(program.description).slice(0, 500)}</p>`
-    : "";
+  const steps = isFa
+    ? [
+        "اپلیکیشن Rilo را باز کن و وارد حساب کاربری‌ات شو.",
+        "از منوی بالا سمت راست (آیکون سه خط) روی «My Program» بزن.",
+        "برنامه‌ات را انتخاب کن و شروع کن.",
+      ]
+    : [
+        "Open the Rilo app and sign in.",
+        "Tap the menu (three lines) at the top left and go to My Program.",
+        "Choose your program and start.",
+      ];
+
+  const descHtml = `
+    <div style="background:#ffffff;border:1px solid #fed7aa;border-radius:14px;padding:16px;margin:0 0 16px;">
+      <h2 style="margin:0 0 10px;font-size:16px;color:#9a3412;">${t.stepsTitle}</h2>
+      ${steps
+        .map(
+          (s, i) =>
+            `<p dir="auto" style="margin:6px 0;font-size:14px;line-height:1.7;color:#374151;"><strong style="color:#ea580c;">${i + 1}.</strong> ${escapeHtml(s)}</p>`,
+        )
+        .join("")}
+    </div>`;
+
 
   // Round block
   let roundHtml = "";
@@ -276,6 +303,9 @@ function renderEmail(opts: {
       <br>
       ${downloadHtml}
       <br>
+      <br>
+      <a href="${RILO_MANUAL_URL}" style="display:inline-block;margin-top:10px;background:#fff7ed;color:#9a3412;text-decoration:none;padding:10px 16px;border-radius:10px;font-size:14px;border:1px solid #fed7aa;">${t.manual}</a>
+      <br>
       <a href="${escapeHtml(webUrl)}" style="display:inline-block;margin-top:8px;color:#6b7280;font-size:13px;text-decoration:underline;">${t.viewWeb}</a>
     </div>`;
 
@@ -299,8 +329,8 @@ function renderEmail(opts: {
       ${cover}
       ${metaHtml}
       ${descHtml}
-      ${roundHtml}
       ${accessHtml}
+      ${roundHtml}
       ${orderHtml}
       <p style="margin:20px 0 0;font-size:13px;color:#6b7280;line-height:1.8;">${t.support}</p>
       <p style="margin:16px 0 0;font-size:13px;color:#6b7280;line-height:1.8;">${t.outro}<br>${t.signoff}</p>
