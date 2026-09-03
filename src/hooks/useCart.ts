@@ -1,8 +1,20 @@
+import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+
+const PENDING_CART_KEY = 'simora_pending_cart_item';
+
+interface PendingCartProgram {
+  slug: string;
+  title: string;
+  price_amount: number;
+  payment_type: string;
+  deposit_price?: number | null;
+  payment_option?: string | null;
+}
 
 export interface CartItem {
   id: string;
@@ -66,15 +78,10 @@ export const useCart = () => {
   });
 
   const addToCartMutation = useMutation({
-    mutationFn: async (program: {
-      slug: string;
-      title: string;
-      price_amount: number;
-      payment_type: string;
-      deposit_price?: number | null;
-      payment_option?: string | null;
-    }) => {
+    mutationFn: async (program: PendingCartProgram) => {
       if (!user) {
+        // Deferred action: remember the item so we can auto-add it after sign-in.
+        localStorage.setItem(PENDING_CART_KEY, JSON.stringify(program));
         navigate(`/auth?redirect=${window.location.pathname}`);
         throw new Error('Sign in required');
       }
@@ -116,6 +123,24 @@ export const useCart = () => {
       toast.success('Removed from cart');
     },
   });
+
+  // After sign-in, automatically complete a cart add that was interrupted by auth.
+  useEffect(() => {
+    if (!user) return;
+    const raw = localStorage.getItem(PENDING_CART_KEY);
+    if (!raw) return;
+    // Claim it synchronously so other mounted useCart instances don't double-add.
+    localStorage.removeItem(PENDING_CART_KEY);
+    try {
+      const program = JSON.parse(raw) as PendingCartProgram;
+      if (program?.slug && program?.title) {
+        addToCartMutation.mutate(program);
+      }
+    } catch {
+      // ignore malformed payload
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const isInCart = (programSlug: string) =>
     cartItems.some((item) => item.program_slug === programSlug);
