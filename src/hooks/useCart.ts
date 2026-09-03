@@ -124,6 +124,24 @@ export const useCart = () => {
     },
   });
 
+  // After sign-in, automatically complete a cart add that was interrupted by auth.
+  useEffect(() => {
+    if (!user) return;
+    const raw = localStorage.getItem(PENDING_CART_KEY);
+    if (!raw) return;
+    // Claim it synchronously so other mounted useCart instances don't double-add.
+    localStorage.removeItem(PENDING_CART_KEY);
+    try {
+      const program = JSON.parse(raw) as PendingCartProgram;
+      if (program?.slug && program?.title) {
+        addToCartMutation.mutate(program);
+      }
+    } catch {
+      // ignore malformed payload
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
   const isInCart = (programSlug: string) =>
     cartItems.some((item) => item.program_slug === programSlug);
 
