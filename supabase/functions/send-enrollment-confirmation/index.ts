@@ -169,17 +169,20 @@ function renderEmail(opts: {
         appStore: "App Store",
         playStore: "Google Play",
         viewWeb: "View on the web",
+        webFallback: "If you have trouble downloading the app, you can use desktop mode:",
         orderTitle: "Order summary",
         amount: "Amount",
         free: "Free",
         outro: "We can't wait to have you.",
-        signoff: "The Ladyboss Academy team",
+        signoff: "Rilo App (Ladybosslook LLC.)",
         support: "Questions? Reply to this email or reach us at hi@ladybosslook.com.",
+        supportApp: "If you have trouble accessing your program, message our support in the app (button is on the top left).",
         hostLabel: "Host",
         langLabel: "Language",
         stepsTitle: "How to access your program",
         manual: "📘 Rilo app guide (PDF)",
       };
+
 
   const cover = program.cover_image_url
     ? `<img src="${escapeHtml(program.cover_image_url)}" alt="" style="width:100%;max-width:520px;border-radius:14px;display:block;margin:0 auto 16px;" />`
