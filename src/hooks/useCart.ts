@@ -53,6 +53,8 @@ export const useCart = () => {
   const enrollFreeMutation = useMutation({
     mutationFn: async (slug: string) => {
       if (!user) {
+        // Deferred action: remember the free enrollment so it resumes after sign-in.
+        localStorage.setItem(PENDING_FREE_KEY, slug);
         navigate(`/auth?redirect=${window.location.pathname}`);
         throw new Error('Sign in required');
       }
