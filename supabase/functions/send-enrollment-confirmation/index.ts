@@ -135,17 +135,20 @@ function renderEmail(opts: {
         appStore: "App Store",
         playStore: "Google Play",
         viewWeb: "مشاهده در وبسایت",
+        webFallback: "اگر در دانلود اپلیکیشن مشکل داری، می‌توانی از نسخه دسکتاپ استفاده کنی:",
         orderTitle: "خلاصه سفارش",
         amount: "مبلغ",
         free: "رایگان",
         outro: "منتظر دیدنت هستیم!",
-        signoff: "تیم Ladyboss Academy",
+        signoff: "اپلیکیشن Rilo (Ladybosslook LLC.)",
         support: "اگر سوالی داشتی، به این ایمیل جواب بده یا با hi@ladybosslook.com در تماس باش.",
+        supportApp: "اگر به برنامه‌ات دسترسی نداری، از پشتیبانی داخل اپلیکیشن پیام بده (دکمه‌اش بالا سمت چپ است).",
         hostLabel: "مدرس",
         langLabel: "زبان",
         stepsTitle: "چطور شروع کنم؟",
         manual: "📘 راهنمای اپلیکیشن Rilo (PDF)",
       }
+
     : {
         subject: `You're enrolled in ${program.title} 🎉`,
         hi: `Hi ${name} 👋`,
