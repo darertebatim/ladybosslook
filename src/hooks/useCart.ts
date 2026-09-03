@@ -78,15 +78,10 @@ export const useCart = () => {
   });
 
   const addToCartMutation = useMutation({
-    mutationFn: async (program: {
-      slug: string;
-      title: string;
-      price_amount: number;
-      payment_type: string;
-      deposit_price?: number | null;
-      payment_option?: string | null;
-    }) => {
+    mutationFn: async (program: PendingCartProgram) => {
       if (!user) {
+        // Deferred action: remember the item so we can auto-add it after sign-in.
+        localStorage.setItem(PENDING_CART_KEY, JSON.stringify(program));
         navigate(`/auth?redirect=${window.location.pathname}`);
         throw new Error('Sign in required');
       }
