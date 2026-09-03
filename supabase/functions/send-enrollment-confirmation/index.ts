@@ -311,9 +311,13 @@ function renderEmail(opts: {
       <br>
       <br>
       <a href="${RILO_MANUAL_URL}" style="display:inline-block;margin-top:10px;background:#fff7ed;color:#9a3412;text-decoration:none;padding:10px 16px;border-radius:10px;font-size:14px;border:1px solid #fed7aa;">${t.manual}</a>
-      <br>
-      <a href="${escapeHtml(webUrl)}" style="display:inline-block;margin-top:8px;color:#6b7280;font-size:13px;text-decoration:underline;">${t.viewWeb}</a>
     </div>`;
+
+  const webFallbackHtml = `
+    <div style="background:#f9fafb;border-radius:10px;padding:12px 14px;margin:16px 0;font-size:13px;color:#374151;">
+      ${t.webFallback} <a href="${escapeHtml(webUrl)}" style="color:#ea580c;text-decoration:underline;word-break:break-all;">${escapeHtml(webUrl)}</a>
+    </div>`;
+
 
   // Order summary
   let orderHtml = "";
