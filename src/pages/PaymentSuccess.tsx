@@ -282,7 +282,7 @@ export default function PaymentSuccess() {
             <p className="mt-3 text-[15px] text-[#1a1f3d]/70 max-w-md mx-auto">
               {isPlus
                 ? 'Every tool, sound, and guided session — unlocked. Open the Rilo app to start.'
-                : 'Your lessons and materials are ready. Open the Rilo app to begin.'}
+                : 'Open Rilo, go to My Program, and start it.'}
             </p>
           </div>
 
@@ -320,7 +320,7 @@ export default function PaymentSuccess() {
               <div className="mt-4 flex items-start gap-2 text-[12px] text-[#1a1f3d]/65 bg-[#FFF6EC] rounded-xl p-3">
                 <CheckCircle2 className="h-4 w-4 text-[#22A06B] mt-[1px] shrink-0" />
                 <p>
-                  Sign in to Rilo with <span className="font-semibold text-[#1a1f3d]">{orderDetails.email}</span> — your access is already linked.
+                  Details on how to access your program were also sent to <span className="font-semibold text-[#1a1f3d]">{orderDetails.email}</span>.
                 </p>
               </div>
             )}
