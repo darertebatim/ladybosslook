@@ -1,8 +1,20 @@
+import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+
+const PENDING_CART_KEY = 'simora_pending_cart_item';
+
+interface PendingCartProgram {
+  slug: string;
+  title: string;
+  price_amount: number;
+  payment_type: string;
+  deposit_price?: number | null;
+  payment_option?: string | null;
+}
 
 export interface CartItem {
   id: string;
