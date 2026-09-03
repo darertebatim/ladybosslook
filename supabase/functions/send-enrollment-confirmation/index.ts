@@ -341,12 +341,15 @@ function renderEmail(opts: {
       ${descHtml}
       ${accessHtml}
       ${roundHtml}
+      ${webFallbackHtml}
       ${orderHtml}
-      <p style="margin:20px 0 0;font-size:13px;color:#6b7280;line-height:1.8;">${t.support}</p>
+      <p style="margin:20px 0 0;font-size:13px;color:#6b7280;line-height:1.8;">${t.supportApp}</p>
+      <p style="margin:12px 0 0;font-size:13px;color:#6b7280;line-height:1.8;">${t.support}</p>
       <p style="margin:16px 0 0;font-size:13px;color:#6b7280;line-height:1.8;">${t.outro}<br>${t.signoff}</p>
     </div>
   </body>
 </html>`;
+
 
   return { subject: t.subject, html };
 }
