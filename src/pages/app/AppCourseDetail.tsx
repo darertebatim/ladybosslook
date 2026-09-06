@@ -612,78 +612,6 @@ const AppCourseDetail = () => {
     return baseDescription;
   };
 
-  const handleAddToCalendar = async () => {
-    if (!nextSession || !program) return;
-
-    const event = {
-      title: nextSession.title,
-      description: getEventDescription(
-        nextSession.description ||
-          `Session ${nextSession.session_number} of ${program.title}`,
-      ),
-      startDate: new Date(nextSession.session_date),
-      endDate: new Date(
-        new Date(nextSession.session_date).getTime() +
-          (nextSession.duration_minutes || 90) * 60000,
-      ),
-      location: getEventLocation(
-        nextSession.meeting_link || round?.google_meet_link,
-      ),
-    };
-
-    // Native iOS/Android: Use native calendar integration
-    if (isNativeApp() && isCalendarAvailable()) {
-      try {
-        const oldCalEventId = getCalendarEventId(nextSession.id);
-        const result = await addEventToCalendar({
-          ...event,
-          reminderMinutes: 60, // 1 hour reminder
-        });
-
-        // Delete old calendar event if it existed (session time may have changed)
-        if (oldCalEventId) {
-          const { deleteCalendarEventsById } =
-            await import("@/lib/calendarIntegration");
-          await deleteCalendarEventsById([oldCalEventId]);
-        }
-
-        if (result.success) {
-          toast.success(t('courseDetailPage.sessionAddedToCalendar'));
-          markSessionSynced(nextSession.id, result.calendarEventId);
-        } else if (result.error === "Calendar permission denied") {
-          toast.error(t('courseDetailPage.allowCalendarAccess'));
-        } else {
-          // Fallback to share sheet if native calendar fails
-          const icsContent = generateICSFile(event);
-          const fileName = `${program.title.replace(/\s+/g, "-")}.ics`;
-
-          const fileResult = await Filesystem.writeFile({
-            path: fileName,
-            data: icsContent,
-            directory: Directory.Cache,
-          });
-
-          await Share.share({
-            title: "Add to Calendar",
-            text: `${event.title}`,
-            url: fileResult.uri,
-            dialogTitle: "Add Event to Calendar",
-          });
-
-          toast.success(t('courseDetailPage.selectCalendarApp'));
-          markSessionSynced(nextSession.id);
-        }
-      } catch (error) {
-        console.error("Error adding calendar event:", error);
-        toast.error(t('courseDetailPage.failedAddCalendar'));
-      }
-    } else {
-      // Web: Download ICS file
-      downloadICSFile(event, `${program.title.replace(/\s+/g, "-")}.ics`);
-      toast.success(t('courseDetailPage.calendarDownloaded'));
-      markSessionSynced(nextSession.id);
-    }
-  };
 
   // Generate all session events for the course - use DB sessions if available, otherwise fallback to weekly generation
   const generateAllSessionEvents = (): CalendarEvent[] => {
@@ -1968,36 +1896,7 @@ const AppCourseDetail = () => {
                           </Button>
                         )}
 
-                        {/* 4. Add Next Session to Calendar - only shows if there's an upcoming session */}
-                        {nextSession && (
-                          <Button
-                            size="lg"
-                            className={cn(
-                              "w-full tour-calendar-btn shadow-ios rounded-full border-0",
-                              isSessionSynced(nextSession.id) &&
-                                "bg-card-warm text-fg-warm",
-                              !isSessionSynced(nextSession.id) &&
-                                "bg-white text-fg-warm",
-                            )}
-                            onClick={handleAddToCalendar}
-                          >
-                            {isSessionSynced(nextSession.id) ? (
-                              <>
-                                <CheckCircle2 className="h-5 w-5 mr-2" />
-                                Session {nextSession.session_number} Synced
-                              </>
-                            ) : (
-                              <>
-                                <Calendar className="h-5 w-5 mr-2" />
-                                {nextSession.session_number === 1
-                                  ? "Add First Session"
-                                  : `Add Session ${nextSession.session_number}`}
-                              </>
-                            )}
-                          </Button>
-                        )}
-
-                        {/* 5. Sync All Sessions to Calendar */}
+                        {/* 4. Sync All Sessions to Calendar */}
                         {dbSessions && dbSessions.length > 1 && (
                           <Button
                             size="lg"
@@ -2037,7 +1936,7 @@ const AppCourseDetail = () => {
                           </Button>
                         )}
 
-                        {/* 6. Access Google Drive - Resources */}
+                        {/* 5. Access Google Drive - Resources */}
                         {round.google_drive_link && (
                           <Button
                             size="lg"
@@ -2051,7 +1950,7 @@ const AppCourseDetail = () => {
                           </Button>
                         )}
 
-                        {/* 7. Contact Support - When needed */}
+                        {/* 6. Contact Support - When needed */}
                         {(round as any).support_link_url && (
                           <Button
                             size="lg"
@@ -2064,7 +1963,7 @@ const AppCourseDetail = () => {
                           </Button>
                         )}
 
-                        {/* 8. In-App Support Chat - optional per round */}
+                        {/* 7. In-App Support Chat - optional per round */}
                         {(round as any).in_app_support_enabled && (
                           <Button
                             size="lg"
