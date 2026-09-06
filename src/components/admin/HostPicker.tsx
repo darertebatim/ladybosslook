@@ -151,22 +151,23 @@ export function HostPicker({ value, onChange, label = 'Hosts', hint }: HostPicke
       )}
 
       {available.length > 0 && (
-        <div className="flex gap-2">
-          <Select value={pendingId} onValueChange={setPendingId}>
-            <SelectTrigger className="flex-1">
-              <SelectValue placeholder="Select a host…" />
-            </SelectTrigger>
-            <SelectContent>
-              {available.map((i: any) => (
-                <SelectItem key={i.id} value={i.id}>
-                  {i.display_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button type="button" onClick={addHost} disabled={!pendingId} size="sm">
-            <Plus className="h-4 w-4 mr-1" /> Add
-          </Button>
+        <div className="flex flex-wrap gap-2">
+          {available.map((i: any) => (
+            <Button
+              key={i.id}
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => addHost(i.id)}
+            >
+              {i.photo_url ? (
+                <img src={i.photo_url} alt="" className="h-5 w-5 rounded-full object-cover mr-1.5" />
+              ) : (
+                <Plus className="h-4 w-4 mr-1" />
+              )}
+              {i.display_name}
+            </Button>
+          ))}
         </div>
       )}
 
