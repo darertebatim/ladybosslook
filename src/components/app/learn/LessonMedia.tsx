@@ -169,9 +169,17 @@ export function LessonAudio({
     setCurrent(v);
   };
 
+  const skip = (delta: number) => {
+    const el = audioRef.current;
+    if (!el) return;
+    const next = Math.min(Math.max(el.currentTime + delta, 0), el.duration || Infinity);
+    el.currentTime = next;
+    setCurrent(next);
+  };
+
   return (
     <div className="rounded-2xl overflow-hidden bg-background">
-      <div className="relative w-full aspect-square bg-peach">
+      <div className="relative w-full aspect-video bg-peach">
         {cover ? (
           <img src={cover} alt={title || ''} className="w-full h-full object-cover" />
         ) : (
@@ -179,12 +187,20 @@ export function LessonAudio({
             <Headphones className="h-10 w-10 text-white" />
           </div>
         )}
-        <button
-          onClick={toggle}
-          aria-label={playing ? 'Pause' : 'Play'}
-          className="absolute inset-0 flex items-center justify-center active:opacity-90 transition-opacity"
-        >
-          <span className="w-16 h-16 rounded-full bg-white/95 shadow-ios flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center gap-5">
+          <button
+            onClick={() => skip(-30)}
+            aria-label="Back 30 seconds"
+            className="w-11 h-11 rounded-full bg-white/85 shadow-ios flex items-center justify-center active:scale-95 transition-transform relative"
+          >
+            <RotateCcw className="h-5 w-5 text-brand" />
+            <span className="absolute text-[8px] font-bold text-brand">30</span>
+          </button>
+          <button
+            onClick={toggle}
+            aria-label={playing ? 'Pause' : 'Play'}
+            className="w-16 h-16 rounded-full bg-white/95 shadow-ios flex items-center justify-center active:opacity-90 transition-opacity"
+          >
             {loading && !playing ? (
               <Loader2 className="h-6 w-6 text-brand animate-spin" />
             ) : playing ? (
@@ -192,8 +208,16 @@ export function LessonAudio({
             ) : (
               <Play className="h-7 w-7 text-brand fill-brand ml-0.5" />
             )}
-          </span>
-        </button>
+          </button>
+          <button
+            onClick={() => skip(30)}
+            aria-label="Forward 30 seconds"
+            className="w-11 h-11 rounded-full bg-white/85 shadow-ios flex items-center justify-center active:scale-95 transition-transform relative"
+          >
+            <RotateCw className="h-5 w-5 text-brand" />
+            <span className="absolute text-[8px] font-bold text-brand">30</span>
+          </button>
+        </div>
       </div>
 
       <div className="p-3 space-y-1.5">
