@@ -72,9 +72,8 @@ export function HostPicker({ value, onChange, label = 'Hosts', hint }: HostPicke
     (i: any) => !value.some((h) => h.host_id === i.id),
   );
 
-  const addHost = () => {
-    if (!pendingId) return;
-    const inst = instructors.find((i: any) => i.id === pendingId);
+  const addHost = (id: string) => {
+    const inst = instructors.find((i: any) => i.id === id);
     if (!inst) return;
     onChange([
       ...value,
