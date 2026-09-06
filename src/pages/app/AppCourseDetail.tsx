@@ -1890,15 +1890,15 @@ const AppCourseDetail = () => {
                         {roundChannel && (
                           <Button
                             size="lg"
-                            className="w-full relative tour-community-btn bg-brand text-white shadow-ios rounded-full border-0"
+                            className="w-full h-auto px-4 py-3 relative tour-community-btn bg-brand text-white shadow-ios rounded-2xl border-0 justify-start"
                             onClick={() =>
                               navigate(
                                 `/app/channels?channel=${roundChannel.id}`,
                               )
                             }
                           >
-                            <MessageCircle className="h-5 w-5 mr-2" />
-                            Visit Community
+                            <MessageCircle className="h-5 w-5 mr-3 shrink-0" />
+                            <span className="truncate">Visit Community</span>
                             {channelUnreadCount && channelUnreadCount > 0 && (
                               <Badge
                                 variant="destructive"
@@ -1917,7 +1917,7 @@ const AppCourseDetail = () => {
                           <Button
                             key={rp.id}
                             size="lg"
-                            className={`w-full h-auto py-2.5 ${idx === 0 ? "tour-playlist-btn " : ""}bg-fg-warm text-white shadow-ios rounded-full border-0`}
+                            className={`w-full h-auto px-4 py-3 ${idx === 0 ? "tour-playlist-btn " : ""}bg-fg-warm text-white shadow-ios rounded-2xl border-0 justify-start`}
                             onClick={() => {
                               const isMainAudio =
                                 rp.playlist_type === "audio" &&
@@ -1938,17 +1938,12 @@ const AppCourseDetail = () => {
                             }}
                           >
                             {rp.playlist_type === "video" ? (
-                              <Video className="h-5 w-5 mr-2 shrink-0" />
+                              <Video className="h-5 w-5 mr-3 shrink-0" />
                             ) : (
-                              <Music className="h-5 w-5 mr-2 shrink-0" />
+                              <Music className="h-5 w-5 mr-3 shrink-0" />
                             )}
-                            <span className="flex flex-col items-start leading-tight min-w-0">
-                              <span className="text-[13px] font-semibold">
-                                {rp.playlist_type === "video" ? "Watch" : "Listen"}
-                              </span>
-                              <span className="text-[11px] font-normal text-white/80 truncate max-w-[200px]">
-                                {rp.playlist?.name}
-                              </span>
+                            <span className="truncate">
+                              {rp.playlist_type === "video" ? "Watch" : "Listen"}: {rp.playlist?.name}
                             </span>
                           </Button>
                         ))}
@@ -1958,13 +1953,13 @@ const AppCourseDetail = () => {
                         {round.google_meet_link && (
                           <Button
                             size="lg"
-                            className="w-full tour-meet-btn bg-fg-warm text-white shadow-ios rounded-full border-0"
+                            className="w-full h-auto px-4 py-3 tour-meet-btn bg-fg-warm text-white shadow-ios rounded-2xl border-0 justify-start"
                             onClick={() =>
                               window.open(round.google_meet_link!, "_blank")
                             }
                           >
-                            <Video className="h-5 w-5 mr-2" />
-                            Join Google Meet
+                            <Video className="h-5 w-5 mr-3 shrink-0" />
+                            <span className="truncate">Join Google Meet</span>
                           </Button>
                         )}
 
@@ -1973,7 +1968,7 @@ const AppCourseDetail = () => {
                           <Button
                             size="lg"
                             className={cn(
-                              "w-full tour-sync-all-btn shadow-ios rounded-full border-0",
+                              "w-full h-auto px-4 py-3 tour-sync-all-btn shadow-ios rounded-2xl border-0 justify-start",
                               areAllSessionsSynced(sessionIds) &&
                                 "bg-card-warm text-fg-warm",
                               !areAllSessionsSynced(sessionIds) &&
@@ -1984,25 +1979,25 @@ const AppCourseDetail = () => {
                           >
                             {isSyncingAllSessions ? (
                               <>
-                                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                                Syncing...
+                                <Loader2 className="h-5 w-5 mr-3 shrink-0 animate-spin" />
+                                <span className="truncate">Syncing...</span>
                               </>
                             ) : areAllSessionsSynced(sessionIds) ? (
                               <>
-                                <CheckCircle2 className="h-5 w-5 mr-2" />
-                                All Sessions Synced
+                                <CheckCircle2 className="h-5 w-5 mr-3 shrink-0" />
+                                <span className="truncate">All Sessions Synced</span>
                               </>
                             ) : getUnsyncedCount(sessionIds) > 0 &&
                               getUnsyncedCount(sessionIds) <
                                 sessionIds.length ? (
                               <>
-                                <CalendarPlus className="h-5 w-5 mr-2" />
-                                Sync {getUnsyncedCount(sessionIds)} New Sessions
+                                <CalendarPlus className="h-5 w-5 mr-3 shrink-0" />
+                                <span className="truncate">Sync {getUnsyncedCount(sessionIds)} New Sessions</span>
                               </>
                             ) : (
                               <>
-                                <CalendarPlus className="h-5 w-5 mr-2" />
-                                Sync All Sessions
+                                <CalendarPlus className="h-5 w-5 mr-3 shrink-0" />
+                                <span className="truncate">Sync All Sessions</span>
                               </>
                             )}
                           </Button>
@@ -2012,13 +2007,13 @@ const AppCourseDetail = () => {
                         {round.google_drive_link && (
                           <Button
                             size="lg"
-                            className="w-full tour-drive-btn bg-white text-fg-warm shadow-ios rounded-full border-0"
+                            className="w-full h-auto px-4 py-3 tour-drive-btn bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
                             onClick={() =>
                               window.open(round.google_drive_link!, "_blank")
                             }
                           >
-                            <FolderOpen className="h-5 w-5 mr-2" />
-                            Access Google Drive
+                            <FolderOpen className="h-5 w-5 mr-3 shrink-0" />
+                            <span className="truncate">Access Google Drive</span>
                           </Button>
                         )}
 
@@ -2026,12 +2021,12 @@ const AppCourseDetail = () => {
                         {(round as any).support_link_url && (
                           <Button
                             size="lg"
-                            className="w-full tour-support-btn bg-white text-fg-warm shadow-ios rounded-full border-0"
+                            className="w-full h-auto px-4 py-3 tour-support-btn bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
                             onClick={handleContactSupport}
                           >
-                            <MessageCircle className="h-5 w-5 mr-2" />
-                            {(round as any).support_link_label ||
-                              "Contact Support"}
+                            <MessageCircle className="h-5 w-5 mr-3 shrink-0" />
+                            <span className="truncate">{(round as any).support_link_label ||
+                              "Contact Support"}</span>
                           </Button>
                         )}
 
@@ -2039,11 +2034,11 @@ const AppCourseDetail = () => {
                         {(round as any).in_app_support_enabled && (
                           <Button
                             size="lg"
-                            className="w-full bg-white text-fg-warm shadow-ios rounded-full border-0"
+                            className="w-full h-auto px-4 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
                             onClick={() => navigate("/app/chat")}
                           >
-                            <HelpCircle className="h-5 w-5 mr-2" />
-                            In-App Support Chat
+                            <HelpCircle className="h-5 w-5 mr-3 shrink-0" />
+                            <span className="truncate">In-App Support Chat</span>
                           </Button>
                         )}
                       </CardContent>
