@@ -2486,7 +2486,7 @@ const AppCourseDetail = () => {
                           Playlists
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-2">
+                      <CardContent className="space-y-3">
                         {allRoundPlaylists
                           .map((rp: any) => (
                             <button
@@ -2500,7 +2500,7 @@ const AppCourseDetail = () => {
                                   { state: { from: location.pathname } }
                                 )
                               }
-                              className="w-full flex items-center gap-3 p-3 rounded-2xl bg-white text-left active:scale-[0.99] transition-transform"
+                              className="w-full flex items-center gap-3 p-3 rounded-2xl bg-white shadow-ios text-left active:scale-[0.99] transition-transform"
                             >
                               {rp.playlist?.cover_image_url ? (
                                 <img
