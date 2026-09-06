@@ -424,7 +424,7 @@ export default function LearnCourses() {
     });
     const roundIds = course?.rounds.map((r) => r.round_id) || [];
     setCRounds(roundIds);
-    const first = (allRounds || []).find((r: any) => roundIds.includes(r.id));
+    const first = (allRounds?.rounds || []).find((r: any) => roundIds.includes(r.id));
     setCProgram(first?.program_slug ?? null);
     setCHosts([]);
     setCTagIds([]);
