@@ -885,6 +885,18 @@ export default function LearnCourses() {
                 </div>
               )}
             </div>
+
+            <HostPicker
+              value={cHosts}
+              onChange={setCHosts}
+              hint="Who teaches this course? Shown to students on the course page."
+            />
+
+            <PlaylistTagPicker
+              value={cTagIds}
+              onChange={setCTagIds}
+              hint="Group courses by subject (e.g. Business, Self-Care)."
+            />
           </div>
           <DialogFooter>
             <Button onClick={() => saveCourse.mutate()} disabled={!cForm.title.trim() || saveCourse.isPending}>
