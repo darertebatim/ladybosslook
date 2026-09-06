@@ -45,7 +45,7 @@ function CourseCard({ course, onOpen, onContinue }: {
             <img
               src={course.cover_image_url}
               alt={course.title}
-              className="w-full h-40 object-cover"
+              className="w-full aspect-square object-cover"
               loading="lazy"
             />
           ) : (
@@ -111,7 +111,7 @@ export default function AppLearn() {
 
   return (
     <div className="app-theme min-h-screen bg-background pb-28">
-      <PageHeader title="Learn" back />
+      <PageHeader title="Learn" back backStyle="plain" />
       <div className="px-4 py-4 space-y-4">
         {isLoading ? (
           <div className="flex justify-center py-16">

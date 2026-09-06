@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useReadingContentById, useContentSections, useReadingUserProgress, useUpsertReadingProgress } from '@/hooks/useReading';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,6 +12,9 @@ export default function AppReadReader() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = (location.state as { from?: string } | null)?.from ?? null;
+  const backTo = returnTo ?? `/app/read/${id}`;
   const { toast } = useToast();
   const { data: content } = useReadingContentById(id || null);
   const { data: sections = [] } = useContentSections(id || null);
@@ -126,7 +129,7 @@ export default function AppReadReader() {
         </div>
         <h1 className="text-2xl font-bold mb-2">{t('read.wellDone')}</h1>
         <p className="text-black mb-8">{t('read.youveFinished', { title: content.title })}</p>
-        <Button size="lg" className="rounded-xl h-12 px-8" onClick={() => navigate('/app/read')}>
+        <Button size="lg" className="rounded-xl h-12 px-8" onClick={() => navigate(returnTo ?? '/app/read')}>
           {t('read.backToLibrary')}
         </Button>
       </div>
@@ -140,7 +143,7 @@ export default function AppReadReader() {
         className="flex items-center gap-3 px-4 py-3 border-b bg-background sticky top-0 z-10"
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
       >
-        <button onClick={() => navigate(`/app/read/${id}`)} className="p-1 active:scale-95 transition-transform">
+        <button onClick={() => navigate(backTo)} className="p-1 active:scale-95 transition-transform">
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
