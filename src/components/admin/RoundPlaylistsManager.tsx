@@ -225,6 +225,17 @@ export const RoundPlaylistsManager = ({ roundId, roundName, inline = false, isOp
             </div>
           )}
         </div>
+  );
+
+  if (inline) return body;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(o) => !o && onClose?.()}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Playlists: {roundName}</DialogTitle>
+        </DialogHeader>
+        {body}
       </DialogContent>
     </Dialog>
   );
