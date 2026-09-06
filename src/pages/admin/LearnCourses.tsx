@@ -23,6 +23,12 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ImageUploader } from '@/components/admin/ImageUploader';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import { HostPicker, saveContentHosts, loadContentHosts, type HostAssignment } from '@/components/admin/HostPicker';
+import { PlaylistTagPicker } from '@/components/admin/PlaylistTagPicker';
+import { useSaveContentTags } from '@/hooks/useContentTags';
 import { LessonEditorDialog } from '@/components/admin/learn/LessonEditorDialog';
 import { CourseStudentsPanel } from '@/components/admin/learn/CourseStudentsPanel';
 import {
