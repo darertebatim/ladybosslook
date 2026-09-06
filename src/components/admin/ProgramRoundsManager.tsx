@@ -943,6 +943,21 @@ export const ProgramRoundsManager = () => {
               <p className="text-xs text-muted-foreground">Select the audio playlist for this round's supplementary materials</p>
             </div>
 
+            <div className="space-y-2 mt-4 border-t pt-4">
+              <Label className="font-semibold">Round Playlists (Audio &amp; Video)</Label>
+              <p className="text-xs text-muted-foreground">
+                Attach multiple audio or video playlists to this round. Students see them on the course page.
+              </p>
+              {editingId ? (
+                <RoundPlaylistsManager inline roundId={editingId} />
+              ) : (
+                <p className="text-xs text-muted-foreground italic">
+                  Save the round first, then edit it to attach playlists.
+                </p>
+              )}
+            </div>
+
+
             <div className="space-y-2 mt-4">
               <div className="flex items-center gap-3">
                 <input
@@ -1077,14 +1092,6 @@ export const ProgramRoundsManager = () => {
         </DialogContent>
       </Dialog>
 
-      {managingPlaylistsRound && false && (
-        <RoundPlaylistsManager
-          roundId={managingPlaylistsRound.id}
-          roundName={managingPlaylistsRound.round_name}
-          isOpen={!!managingPlaylistsRound}
-          onClose={() => setManagingPlaylistsRound(null)}
-        />
-      )}
 
     </div>
   );
