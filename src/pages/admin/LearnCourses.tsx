@@ -252,6 +252,8 @@ export default function LearnCourses() {
         );
         if (error) throw error;
       }
+      await saveContentHosts('course' as any, courseId!, cHosts);
+      await saveTagLinks.mutateAsync({ contentType: 'course' as any, contentId: courseId!, tagIds: cTagIds });
       return courseId!;
     },
     onSuccess: (id) => {
