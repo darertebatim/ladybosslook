@@ -5,27 +5,52 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, Library, Music, Video as VideoIcon } from 'lucide-react';
+import { Search, Library, Music, Video as VideoIcon, BookOpen } from 'lucide-react';
 
-type Kind = 'video' | 'audio';
+type Kind = 'video' | 'audio' | 'reading';
+
+export interface MediaPickResult {
+  id: string;
+  title: string;
+  file_url: string;
+  duration_seconds?: number | null;
+}
 
 interface Props {
   kind: Kind;
-  onPick: (item: { id: string; title: string; file_url: string }) => void;
+  onPick: (item: MediaPickResult) => void;
   triggerLabel?: string;
+  variant?: 'default' | 'outline' | 'secondary';
+  size?: 'sm' | 'default';
 }
 
-export function MediaLibraryPicker({ kind, onPick, triggerLabel }: Props) {
+export function MediaLibraryPicker({ kind, onPick, triggerLabel, variant = 'outline', size = 'sm' }: Props) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ['media-library-picker', kind],
     queryFn: async () => {
+      if (kind === 'reading') {
+        const { data, error } = await supabase
+          .from('reading_content')
+          .select('id, title, cover_url, category')
+          .order('created_at', { ascending: false })
+          .limit(500);
+        if (error) throw error;
+        return (data || []).map((r: any) => ({
+          id: r.id,
+          title: r.title,
+          file_url: '',
+          duration_seconds: null,
+          cover_image_url: r.cover_url,
+          category: r.category,
+        }));
+      }
       const table = kind === 'video' ? 'video_content' : 'audio_content';
       const { data, error } = await supabase
         .from(table)
-        .select('id, title, file_url, cover_image_url, category')
+        .select('id, title, file_url, cover_image_url, category, duration_seconds')
         .not('file_url', 'is', null)
         .order('created_at', { ascending: false })
         .limit(500);
@@ -39,14 +64,15 @@ export function MediaLibraryPicker({ kind, onPick, triggerLabel }: Props) {
     !search.trim() || (it.title || '').toLowerCase().includes(search.toLowerCase())
   );
 
-  const Icon = kind === 'video' ? VideoIcon : Music;
+  const Icon = kind === 'video' ? VideoIcon : kind === 'audio' ? Music : BookOpen;
+  const label = kind === 'video' ? 'a video' : kind === 'audio' ? 'an audio' : 'a reading';
 
   return (
     <>
       <Button
         type="button"
-        variant="outline"
-        size="sm"
+        variant={variant}
+        size={size}
         onClick={() => setOpen(true)}
         className="gap-2"
       >
@@ -59,7 +85,7 @@ export function MediaLibraryPicker({ kind, onPick, triggerLabel }: Props) {
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
               <Icon className="w-5 h-5" />
-              Pick {kind === 'video' ? 'a video' : 'an audio'}
+              Pick {label}
             </SheetTitle>
           </SheetHeader>
           <div className="relative mt-4">
@@ -75,7 +101,7 @@ export function MediaLibraryPicker({ kind, onPick, triggerLabel }: Props) {
             {isLoading ? (
               <p className="text-sm text-muted-foreground p-4 text-center">Loading...</p>
             ) : filtered.length === 0 ? (
-              <p className="text-sm text-muted-foreground p-4 text-center">No {kind}s found.</p>
+              <p className="text-sm text-muted-foreground p-4 text-center">Nothing found.</p>
             ) : (
               <div className="space-y-2 pb-6">
                 {filtered.map((it: any) => (
@@ -83,7 +109,12 @@ export function MediaLibraryPicker({ kind, onPick, triggerLabel }: Props) {
                     key={it.id}
                     type="button"
                     onClick={() => {
-                      onPick({ id: it.id, title: it.title, file_url: it.file_url });
+                      onPick({
+                        id: it.id,
+                        title: it.title,
+                        file_url: it.file_url,
+                        duration_seconds: it.duration_seconds ?? null,
+                      });
                       setOpen(false);
                     }}
                     className="w-full text-left flex items-center gap-3 p-2 rounded-lg border hover:bg-muted transition-colors"

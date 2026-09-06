@@ -4,10 +4,18 @@ import { useAuth } from '@/hooks/useAuth';
 
 export type LessonType = 'video' | 'audio' | 'document' | 'pdf';
 
+export interface LessonAttachment {
+  name: string;
+  url: string;
+}
+
 export interface LearnCourse {
   id: string;
   title: string;
+  subtitle?: string | null;
   description: string | null;
+  intro_note?: string | null;
+  language?: string | null;
   cover_image_url: string | null;
   is_published: boolean;
   sort_order: number;
@@ -19,6 +27,7 @@ export interface LearnModule {
   title: string;
   description: string | null;
   sort_order: number;
+  is_published?: boolean;
 }
 
 export interface LearnLesson {
@@ -26,6 +35,7 @@ export interface LearnLesson {
   module_id: string;
   title: string;
   description: string | null;
+  content_html?: string | null;
   lesson_type: LessonType;
   video_id: string | null;
   audio_id: string | null;
@@ -33,6 +43,11 @@ export interface LearnLesson {
   pdf_url: string | null;
   duration_seconds: number | null;
   sort_order: number;
+  is_published?: boolean;
+  is_free_preview?: boolean;
+  drip_days?: number | null;
+  drip_date?: string | null;
+  attachments?: LessonAttachment[] | null;
   video?: {
     id: string;
     title: string;
@@ -78,6 +93,24 @@ export function useLearnCourses() {
   });
 }
 
+/** A single course record. */
+export function useLearnCourse(courseId: string | undefined) {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ['learn-course', courseId],
+    enabled: !!user && !!courseId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('learn_courses')
+        .select('*')
+        .eq('id', courseId!)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as LearnCourse) ?? null;
+    },
+  });
+}
+
 /** Modules + lessons (with joined media) for one course. */
 export function useLearnCourseContent(courseId: string | undefined) {
   const { user } = useAuth();
@@ -92,7 +125,11 @@ export function useLearnCourseContent(courseId: string | undefined) {
         .order('sort_order');
       if (mErr) throw mErr;
 
-      const moduleIds = (modules || []).map((m) => m.id);
+      const visibleModules = ((modules || []) as LearnModule[]).filter(
+        (m) => m.is_published !== false
+      );
+
+      const moduleIds = visibleModules.map((m) => m.id);
       let lessons: LearnLesson[] = [];
       if (moduleIds.length > 0) {
         const { data, error: lErr } = await supabase
@@ -106,11 +143,65 @@ export function useLearnCourseContent(courseId: string | undefined) {
           .in('module_id', moduleIds)
           .order('sort_order');
         if (lErr) throw lErr;
-        lessons = (data || []) as unknown as LearnLesson[];
+        lessons = ((data || []) as unknown as LearnLesson[]).filter(
+          (l) => l.is_published !== false
+        );
       }
-      return { modules: (modules || []) as LearnModule[], lessons } as LearnCourseContent;
+      return { modules: visibleModules, lessons } as LearnCourseContent;
     },
   });
+}
+
+/**
+ * Earliest enrollment date for the rounds linked to a course.
+ * Used to work out when drip-scheduled lessons unlock.
+ */
+export function useLearnCourseStartDate(courseId: string | undefined) {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ['learn-course-start', courseId, user?.id],
+    enabled: !!user && !!courseId,
+    queryFn: async () => {
+      const { data: links, error: lErr } = await supabase
+        .from('learn_course_rounds')
+        .select('round_id')
+        .eq('course_id', courseId!);
+      if (lErr) throw lErr;
+      const roundIds = (links || []).map((l) => l.round_id);
+      if (!roundIds.length) return null;
+      const { data, error } = await supabase
+        .from('course_enrollments')
+        .select('enrolled_at')
+        .in('round_id', roundIds)
+        .order('enrolled_at', { ascending: true })
+        .limit(1);
+      if (error) throw error;
+      return (data?.[0]?.enrolled_at as string) ?? null;
+    },
+  });
+}
+
+/** null = unlocked, otherwise the Date it unlocks. */
+export function lessonUnlockDate(
+  lesson: LearnLesson,
+  startDate: string | null | undefined
+): Date | null {
+  if (lesson.drip_date) {
+    const d = new Date(lesson.drip_date);
+    return d.getTime() > Date.now() ? d : null;
+  }
+  if (lesson.drip_days && startDate) {
+    const d = new Date(startDate);
+    d.setDate(d.getDate() + lesson.drip_days);
+    return d.getTime() > Date.now() ? d : null;
+  }
+  return null;
+}
+
+export function formatUnlockLabel(date: Date): string {
+  const days = Math.ceil((date.getTime() - Date.now()) / 86400000);
+  if (days <= 1) return 'Unlocks tomorrow';
+  return `Unlocks in ${days} days`;
 }
 
 /** Set of completed lesson ids for the current user. */
@@ -182,4 +273,17 @@ export function formatLessonDuration(seconds: number | null | undefined): string
   const m = Math.floor(seconds / 60);
   const s = Math.round(seconds % 60);
   return `${m}:${String(s).padStart(2, '0')}`;
+}
+
+/** "1h 20m" / "45m" for a whole course. */
+export function formatTotalDuration(seconds: number): string {
+  if (!seconds) return '';
+  const h = Math.floor(seconds / 3600);
+  const m = Math.round((seconds % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+export function lessonDurationSeconds(l: LearnLesson): number | null {
+  return l.duration_seconds ?? l.video?.duration_seconds ?? l.audio?.duration_seconds ?? null;
 }

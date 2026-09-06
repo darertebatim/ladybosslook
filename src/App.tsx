@@ -193,6 +193,7 @@ const AppReadDetail = lazy(() => import("@/pages/app/AppReadDetail"));
 const AppReadReader = lazy(() => import("@/pages/app/AppReadReader"));
 const AppLearn = lazy(() => import("@/pages/app/AppLearn"));
 const AppLearnCourse = lazy(() => import("@/pages/app/AppLearnCourse"));
+const AppLearnLesson = lazy(() => import("@/pages/app/AppLearnLesson"));
 const QuizLibrary = lazy(() => import("@/pages/app/QuizLibrary"));
 const QuizDetail = lazy(() => import("@/pages/app/QuizDetail"));
 const QuizPlay = lazy(() => import("@/pages/app/QuizPlay"));
@@ -628,6 +629,7 @@ const App = () => (
                      <Route path="/app/quiz/:slug/play" element={<ProtectedRoute><QuizPlay /></ProtectedRoute>} />
                      <Route path="/app/learn" element={<ProtectedRoute><AppLearn /></ProtectedRoute>} />
                      <Route path="/app/learn/:courseId" element={<ProtectedRoute><AppLearnCourse /></ProtectedRoute>} />
+                     <Route path="/app/learn/:courseId/:lessonId" element={<ProtectedRoute><AppLearnLesson /></ProtectedRoute>} />
                      {/* Redirect old feed post route */}
                     <Route path="/app/feed/post/:postId" element={<Navigate to="/app/channels/post/:postId" replace />} />
                     
