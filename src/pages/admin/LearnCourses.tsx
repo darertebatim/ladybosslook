@@ -23,6 +23,12 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ImageUploader } from '@/components/admin/ImageUploader';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import { HostPicker, saveContentHosts, loadContentHosts, type HostAssignment } from '@/components/admin/HostPicker';
+import { PlaylistTagPicker } from '@/components/admin/PlaylistTagPicker';
+import { useSaveContentTags } from '@/hooks/useContentTags';
 import { LessonEditorDialog } from '@/components/admin/learn/LessonEditorDialog';
 import { CourseStudentsPanel } from '@/components/admin/learn/CourseStudentsPanel';
 import {
@@ -38,11 +44,11 @@ import type { LearnCourse, LearnModule, LearnLesson, LessonType } from '@/hooks/
 import { formatTotalDuration } from '@/hooks/useLearn';
 
 const LANGUAGE_OPTIONS = [
-  { code: '', label: 'Any' },
-  { code: 'en', label: 'English' },
-  { code: 'fa', label: 'فارسی' },
-  { code: 'tr', label: 'Türkçe' },
-  { code: 'es', label: 'Español' },
+  { code: '', label: '🌐 All / Multilanguage' },
+  { code: 'en', label: '🇺🇸 English' },
+  { code: 'fa', label: '🇮🇷 Persian' },
+  { code: 'tr', label: '🇹🇷 Turkish' },
+  { code: 'es', label: '🇪🇸 Spanish' },
 ];
 
 const LESSON_META: Record<LessonType, { label: string; icon: typeof Play }> = {
@@ -176,6 +182,9 @@ export default function LearnCourses() {
   });
   const [cRounds, setCRounds] = useState<string[]>([]);
   const [cProgram, setCProgram] = useState<string | null>(null);
+  const [cHosts, setCHosts] = useState<HostAssignment[]>([]);
+  const [cTagIds, setCTagIds] = useState<string[]>([]);
+  const saveTagLinks = useSaveContentTags();
 
   const [moduleDialog, setModuleDialog] = useState<{ open: boolean; module?: LearnModule }>({ open: false });
   const [mForm, setMForm] = useState({ title: '', description: '', is_published: true });
@@ -243,6 +252,8 @@ export default function LearnCourses() {
         );
         if (error) throw error;
       }
+      await saveContentHosts('course' as any, courseId!, cHosts);
+      await saveTagLinks.mutateAsync({ contentType: 'course' as any, contentId: courseId!, tagIds: cTagIds });
       return courseId!;
     },
     onSuccess: (id) => {
@@ -411,6 +422,17 @@ export default function LearnCourses() {
     setCRounds(roundIds);
     const first = (allRounds || []).find((r: any) => roundIds.includes(r.id));
     setCProgram(first?.program_slug ?? null);
+    setCHosts([]);
+    setCTagIds([]);
+    if (course?.id) {
+      loadContentHosts('course' as any, course.id).then(setCHosts).catch(() => {});
+      supabase
+        .from('content_tags')
+        .select('tag_id')
+        .eq('content_type', 'course' as any)
+        .eq('content_id', course.id)
+        .then(({ data }) => setCTagIds((data || []).map((r: any) => r.tag_id)));
+    }
     setCourseDialog({ open: true, course });
   };
 
@@ -780,19 +802,21 @@ export default function LearnCourses() {
             />
             <div className="space-y-1.5">
               <Label>Language</Label>
-              <div className="flex flex-wrap gap-2">
-                {LANGUAGE_OPTIONS.map((l) => (
-                  <Button
-                    key={l.code || 'none'}
-                    type="button"
-                    size="sm"
-                    variant={(cForm.language || '') === l.code ? 'default' : 'outline'}
-                    onClick={() => setCForm({ ...cForm, language: l.code })}
-                  >
-                    {l.label}
-                  </Button>
-                ))}
-              </div>
+              <Select
+                value={cForm.language || 'all'}
+                onValueChange={(v) => setCForm({ ...cForm, language: v === 'all' ? '' : v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {LANGUAGE_OPTIONS.map((l) => (
+                    <SelectItem key={l.code || 'all'} value={l.code || 'all'}>
+                      {l.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label>Sort order</Label>
@@ -861,6 +885,18 @@ export default function LearnCourses() {
                 </div>
               )}
             </div>
+
+            <HostPicker
+              value={cHosts}
+              onChange={setCHosts}
+              hint="Who teaches this course? Shown to students on the course page."
+            />
+
+            <PlaylistTagPicker
+              value={cTagIds}
+              onChange={setCTagIds}
+              hint="Group courses by subject (e.g. Business, Self-Care)."
+            />
           </div>
           <DialogFooter>
             <Button onClick={() => saveCourse.mutate()} disabled={!cForm.title.trim() || saveCourse.isPending}>
