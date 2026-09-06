@@ -1896,36 +1896,7 @@ const AppCourseDetail = () => {
                           </Button>
                         )}
 
-                        {/* 4. Add Next Session to Calendar - only shows if there's an upcoming session */}
-                        {nextSession && (
-                          <Button
-                            size="lg"
-                            className={cn(
-                              "w-full tour-calendar-btn shadow-ios rounded-full border-0",
-                              isSessionSynced(nextSession.id) &&
-                                "bg-card-warm text-fg-warm",
-                              !isSessionSynced(nextSession.id) &&
-                                "bg-white text-fg-warm",
-                            )}
-                            onClick={handleAddToCalendar}
-                          >
-                            {isSessionSynced(nextSession.id) ? (
-                              <>
-                                <CheckCircle2 className="h-5 w-5 mr-2" />
-                                Session {nextSession.session_number} Synced
-                              </>
-                            ) : (
-                              <>
-                                <Calendar className="h-5 w-5 mr-2" />
-                                {nextSession.session_number === 1
-                                  ? "Add First Session"
-                                  : `Add Session ${nextSession.session_number}`}
-                              </>
-                            )}
-                          </Button>
-                        )}
-
-                        {/* 5. Sync All Sessions to Calendar */}
+                        {/* 4. Sync All Sessions to Calendar */}
                         {dbSessions && dbSessions.length > 1 && (
                           <Button
                             size="lg"
