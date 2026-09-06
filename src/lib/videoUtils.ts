@@ -1,4 +1,4 @@
-export type VideoType = 'youtube' | 'vimeo' | 'instagram' | 'tiktok' | 'direct' | null;
+export type VideoType = 'youtube' | 'vimeo' | 'instagram' | 'tiktok' | 'gdrive' | 'direct' | null;
 
 export function detectVideoType(url: string): VideoType {
   if (!url) return null;
@@ -14,6 +14,9 @@ export function detectVideoType(url: string): VideoType {
   
   // TikTok
   if (/tiktok\.com/i.test(url)) return 'tiktok';
+  
+  // Google Drive
+  if (/drive\.google\.com/i.test(url)) return 'gdrive';
   
   // Direct video files
   if (/\.(mp4|webm|mov|m4v)(\?|$)/i.test(url)) return 'direct';
