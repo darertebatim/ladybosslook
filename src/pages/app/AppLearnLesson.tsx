@@ -6,7 +6,6 @@ import {
   ExternalLink, ChevronLeft, ChevronRight, Paperclip, Download, Lock, Trophy, List,
 } from 'lucide-react';
 import { PageHeader } from '@/components/app/ui/PageHeader';
-import { Progress } from '@/components/ui/progress';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { AppVideoPlayer } from '@/components/app/AppVideoPlayer';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
@@ -224,7 +223,7 @@ export default function AppLearnLesson() {
     return (
       <div className="space-y-2">
         {!isNativeApp() && (
-          <div className="w-full h-[50vh] bg-background rounded-2xl overflow-hidden">
+          <div className="hidden md:block w-full h-[60vh] bg-background rounded-2xl overflow-hidden">
             <iframe src={lesson.pdf_url} className="w-full h-full" title={lesson.title} />
           </div>
         )}
@@ -290,7 +289,12 @@ export default function AppLearnLesson() {
         }
         subRow={
           <div className="flex items-center gap-2 w-full">
-            <Progress value={pct} className="h-1.5 flex-1" />
+            <div className="h-1.5 flex-1 rounded-full bg-peach overflow-hidden">
+              <div
+                className="h-full rounded-full bg-brand transition-[width] duration-500"
+                style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
+              />
+            </div>
             <span className="text-xs font-medium text-fg-warm-muted shrink-0">
               {index + 1}/{total}
             </span>
@@ -314,7 +318,7 @@ export default function AppLearnLesson() {
                 <Icon className="h-4 w-4 text-brand" />
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="font-bold text-fg-warm leading-tight">{lesson.title}</h2>
+                <h2 className="font-bold text-fg-warm leading-tight break-words">{lesson.title}</h2>
                 <p className="text-xs text-fg-warm-muted mt-0.5">
                   <span className="capitalize">{lesson.lesson_type}</span>
                   {lessonDurationSeconds(lesson)
