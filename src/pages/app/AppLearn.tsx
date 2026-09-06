@@ -110,7 +110,7 @@ export default function AppLearn() {
   const { data: courses, isLoading } = useLearnCourses();
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="app-theme min-h-screen bg-background pb-28">
       <PageHeader title="Learn" back />
       <div className="px-4 py-4 space-y-4">
         {isLoading ? (

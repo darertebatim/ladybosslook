@@ -69,7 +69,7 @@ export default function AppLearnCourse() {
   const openLesson = (lessonId: string) => navigate(`/app/learn/${courseId}/${lessonId}`);
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="app-theme min-h-screen bg-background pb-28">
       <PageHeader
         title={course?.title || 'Course'}
         back
@@ -179,7 +179,7 @@ export default function AppLearnCourse() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-fg-warm truncate">{mod.title}</p>
+                          <p className="font-semibold text-fg-warm line-clamp-2 break-words">{mod.title}</p>
                           <div className="flex items-center gap-2 mt-1.5">
                             <ProgressBar value={modPct} className="max-w-[120px] flex-1" />
                             <p className="text-xs text-fg-warm-muted">{doneInModule}/{lessons.length}</p>
@@ -224,7 +224,7 @@ export default function AppLearnCourse() {
                                 <span className="flex-1 min-w-0">
                                   <span
                                     className={cn(
-                                      'block truncate text-sm',
+                                      'block text-sm line-clamp-2 break-words',
                                       isDone ? 'text-fg-warm-muted' : 'text-fg-warm font-medium'
                                     )}
                                   >
