@@ -589,14 +589,6 @@ export const ProgramRoundsManager = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setManagingPlaylistsRound(round)}
-                          title="Manage Playlists"
-                        >
-                          <ListMusic className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
                           onClick={() => handleDuplicate(round)}
                           title="Duplicate Round"
                         >
@@ -1085,7 +1077,7 @@ export const ProgramRoundsManager = () => {
         </DialogContent>
       </Dialog>
 
-      {managingPlaylistsRound && (
+      {managingPlaylistsRound && false && (
         <RoundPlaylistsManager
           roundId={managingPlaylistsRound.id}
           roundName={managingPlaylistsRound.round_name}
