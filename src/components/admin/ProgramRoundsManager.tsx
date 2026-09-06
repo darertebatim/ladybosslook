@@ -29,7 +29,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Calendar, Plus, Trash2, Edit, Video, FolderOpen, CalendarDays, ListChecks, Copy, ListMusic, Pause, FastForward } from "lucide-react";
+import { Calendar, Plus, Trash2, Edit, Video, FolderOpen, CalendarDays, ListChecks, Copy, Pause, FastForward } from "lucide-react";
 import { SessionsManager } from "./SessionsManager";
 import { RoundPlaylistsManager } from "./RoundPlaylistsManager";
 import { format } from "date-fns";
@@ -87,7 +87,7 @@ export const ProgramRoundsManager = () => {
   const queryClient = useQueryClient();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [managingSessionsRound, setManagingSessionsRound] = useState<ProgramRound | null>(null);
-  const [managingPlaylistsRound, setManagingPlaylistsRound] = useState<any>(null);
+  
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   
   // Notify students dialog state
