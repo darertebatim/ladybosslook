@@ -1963,7 +1963,7 @@ const AppCourseDetail = () => {
                           </Button>
                         )}
 
-                        {/* 8. In-App Support Chat - optional per round */}
+                        {/* 7. In-App Support Chat - optional per round */}
                         {(round as any).in_app_support_enabled && (
                           <Button
                             size="lg"
