@@ -29,7 +29,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Calendar, Plus, Trash2, Edit, Video, FolderOpen, CalendarDays, ListChecks, Copy, ListMusic, Pause, FastForward } from "lucide-react";
+import { Calendar, Plus, Trash2, Edit, Video, FolderOpen, CalendarDays, ListChecks, Copy, Pause, FastForward } from "lucide-react";
 import { SessionsManager } from "./SessionsManager";
 import { RoundPlaylistsManager } from "./RoundPlaylistsManager";
 import { format } from "date-fns";
@@ -87,7 +87,7 @@ export const ProgramRoundsManager = () => {
   const queryClient = useQueryClient();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [managingSessionsRound, setManagingSessionsRound] = useState<ProgramRound | null>(null);
-  const [managingPlaylistsRound, setManagingPlaylistsRound] = useState<any>(null);
+  
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   
   // Notify students dialog state
@@ -589,14 +589,6 @@ export const ProgramRoundsManager = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setManagingPlaylistsRound(round)}
-                          title="Manage Playlists"
-                        >
-                          <ListMusic className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
                           onClick={() => handleDuplicate(round)}
                           title="Duplicate Round"
                         >
@@ -951,6 +943,21 @@ export const ProgramRoundsManager = () => {
               <p className="text-xs text-muted-foreground">Select the audio playlist for this round's supplementary materials</p>
             </div>
 
+            <div className="space-y-2 mt-4 border-t pt-4">
+              <Label className="font-semibold">Round Playlists (Audio &amp; Video)</Label>
+              <p className="text-xs text-muted-foreground">
+                Attach multiple audio or video playlists to this round. Students see them on the course page.
+              </p>
+              {editingId ? (
+                <RoundPlaylistsManager inline roundId={editingId} />
+              ) : (
+                <p className="text-xs text-muted-foreground italic">
+                  Save the round first, then edit it to attach playlists.
+                </p>
+              )}
+            </div>
+
+
             <div className="space-y-2 mt-4">
               <div className="flex items-center gap-3">
                 <input
@@ -1085,14 +1092,6 @@ export const ProgramRoundsManager = () => {
         </DialogContent>
       </Dialog>
 
-      {managingPlaylistsRound && (
-        <RoundPlaylistsManager
-          roundId={managingPlaylistsRound.id}
-          roundName={managingPlaylistsRound.round_name}
-          isOpen={!!managingPlaylistsRound}
-          onClose={() => setManagingPlaylistsRound(null)}
-        />
-      )}
 
     </div>
   );
