@@ -19,7 +19,7 @@ import {
 import {
   Plus, Pencil, Trash2, ChevronUp, ChevronDown, Loader2, GraduationCap,
   Play, Headphones, BookOpen, FileText, Search, Copy, ExternalLink, GripVertical,
-  EyeOff, Lock, Sparkles,
+  EyeOff, Lock, Sparkles, X, Check,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ImageUploader } from '@/components/admin/ImageUploader';
