@@ -158,6 +158,7 @@ export default function LearnCourses() {
     cover_image_url: '', is_published: false, sort_order: 0,
   });
   const [cRounds, setCRounds] = useState<string[]>([]);
+  const [cProgram, setCProgram] = useState<string | null>(null);
 
   const [moduleDialog, setModuleDialog] = useState<{ open: boolean; module?: LearnModule }>({ open: false });
   const [mForm, setMForm] = useState({ title: '', description: '', is_published: true });
