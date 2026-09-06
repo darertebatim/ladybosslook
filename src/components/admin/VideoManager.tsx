@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { detectVideoType } from "@/lib/videoUtils";
+import { detectVideoType, extractYouTubeId } from "@/lib/videoUtils";
 
 export const VideoManager = () => {
   const queryClient = useQueryClient();
@@ -157,6 +157,7 @@ export const VideoManager = () => {
             video_type: videoType === 'direct' ? 'direct' : videoType,
             is_vertical: formData.is_vertical,
             thumbnail_url: formData.thumbnail_url || null,
+            duration_seconds: parseDuration(formData.duration),
             is_free: true, sort_order: 0,
             published_at: new Date().toISOString(),
           })
@@ -193,6 +194,7 @@ export const VideoManager = () => {
             video_type: 'direct',
             is_vertical: formData.is_vertical,
             thumbnail_url: formData.thumbnail_url || null,
+            duration_seconds: parseDuration(formData.duration),
             file_size_mb: file.size / (1024 * 1024),
             is_free: true, sort_order: 0,
             published_at: new Date().toISOString(),
@@ -211,7 +213,7 @@ export const VideoManager = () => {
       toast.success('Video(s) uploaded successfully');
       queryClient.invalidateQueries({ queryKey: ['admin-video-content'] });
       queryClient.invalidateQueries({ queryKey: ['video-playlists-admin'] });
-      setFormData({ title: '', description: '', playlist_id: '', url: '', is_vertical: false, thumbnail_url: '' });
+      setFormData({ title: '', description: '', playlist_id: '', url: '', is_vertical: false, thumbnail_url: '', duration: '' });
       setVideoFiles([]);
       setIsUploading(false);
       setUploadProgress({ current: 0, total: 0 });
@@ -253,6 +255,7 @@ export const VideoManager = () => {
       playlist_id: v.video_playlist_items?.[0]?.playlist_id || '',
       url: v.file_url, is_vertical: v.is_vertical || false,
       thumbnail_url: v.thumbnail_url || '',
+      duration: secondsToInput(v.duration_seconds),
     });
     setIsEditOpen(true);
   };
@@ -295,7 +298,12 @@ export const VideoManager = () => {
             {urlMode ? (
               <div>
                 <Label>Video URL (YouTube, Vimeo, or direct MP4) *</Label>
-                <Input value={formData.url} onChange={(e) => setFormData({ ...formData, url: e.target.value })} placeholder="https://..." required />
+                <div className="flex gap-2">
+                  <Input value={formData.url} onChange={(e) => setFormData({ ...formData, url: e.target.value })} onBlur={(e) => fetchMetaFromUrl(e.target.value)} placeholder="https://..." required />
+                  <Button type="button" variant="outline" onClick={() => fetchMetaFromUrl(formData.url)} disabled={isFetchingMeta || !formData.url}>
+                    {isFetchingMeta ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Get thumbnail'}
+                  </Button>
+                </div>
               </div>
             ) : (
               <div>
@@ -305,6 +313,12 @@ export const VideoManager = () => {
                 {videoFiles.length > 0 && <p className="text-xs text-muted-foreground mt-1">{videoFiles.length} file(s)</p>}
               </div>
             )}
+
+            <div>
+              <Label>Length (mm:ss)</Label>
+              <Input value={formData.duration} onChange={(e) => setFormData({ ...formData, duration: e.target.value })} placeholder="e.g. 12:30" />
+              <p className="text-xs text-muted-foreground mt-1">Needed for videos added by link (YouTube, Instagram…)</p>
+            </div>
 
             <ThumbnailField isEdit={false} />
 
@@ -388,9 +402,10 @@ export const VideoManager = () => {
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader><DialogTitle>Edit Video</DialogTitle></DialogHeader>
-          <form onSubmit={(e) => { e.preventDefault(); if (!editingVideo) return; updateMutation.mutate({ id: editingVideo.id, updates: { title: formData.title, description: formData.description, is_vertical: formData.is_vertical, thumbnail_url: formData.thumbnail_url || null }, playlistId: formData.playlist_id }); }} className="space-y-4">
+          <form onSubmit={(e) => { e.preventDefault(); if (!editingVideo) return; updateMutation.mutate({ id: editingVideo.id, updates: { title: formData.title, description: formData.description, is_vertical: formData.is_vertical, thumbnail_url: formData.thumbnail_url || null, duration_seconds: parseDuration(formData.duration) }, playlistId: formData.playlist_id }); }} className="space-y-4">
             <div><Label>Title</Label><Input value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required /></div>
             <div><Label>Description</Label><Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={2} /></div>
+            <div><Label>Length (mm:ss)</Label><Input value={formData.duration} onChange={(e) => setFormData({ ...formData, duration: e.target.value })} placeholder="e.g. 12:30" /></div>
             <ThumbnailField isEdit={true} />
             <div>
               <Label>Playlist</Label>
