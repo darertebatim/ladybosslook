@@ -802,19 +802,21 @@ export default function LearnCourses() {
             />
             <div className="space-y-1.5">
               <Label>Language</Label>
-              <div className="flex flex-wrap gap-2">
-                {LANGUAGE_OPTIONS.map((l) => (
-                  <Button
-                    key={l.code || 'none'}
-                    type="button"
-                    size="sm"
-                    variant={(cForm.language || '') === l.code ? 'default' : 'outline'}
-                    onClick={() => setCForm({ ...cForm, language: l.code })}
-                  >
-                    {l.label}
-                  </Button>
-                ))}
-              </div>
+              <Select
+                value={cForm.language || 'all'}
+                onValueChange={(v) => setCForm({ ...cForm, language: v === 'all' ? '' : v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {LANGUAGE_OPTIONS.map((l) => (
+                    <SelectItem key={l.code || 'all'} value={l.code || 'all'}>
+                      {l.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label>Sort order</Label>
