@@ -1083,6 +1083,8 @@ export const ProgramRoundsManager = () => {
             </Button>
           </DialogFooter>
         </DialogContent>
+      </Dialog>
+
       {managingPlaylistsRound && (
         <RoundPlaylistsManager
           roundId={managingPlaylistsRound.id}
@@ -1092,7 +1094,6 @@ export const ProgramRoundsManager = () => {
         />
       )}
 
-      </Dialog>
     </div>
   );
 };
