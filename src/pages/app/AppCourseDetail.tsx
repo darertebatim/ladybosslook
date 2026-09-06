@@ -1905,7 +1905,7 @@ const AppCourseDetail = () => {
                             }
                           >
                             <MessageCircle className="h-5 w-5 mr-3 shrink-0" />
-                            <span className="truncate">Visit Community</span>
+                            <span className="truncate">Visit Community: {roundChannel.name}</span>
                             {channelUnreadCount && channelUnreadCount > 0 && (
                               <Badge
                                 variant="destructive"
