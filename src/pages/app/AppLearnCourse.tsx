@@ -69,7 +69,7 @@ export default function AppLearnCourse() {
   const openLesson = (lessonId: string) => navigate(`/app/learn/${courseId}/${lessonId}`);
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="app-theme min-h-screen bg-background pb-28">
       <PageHeader
         title={course?.title || 'Course'}
         back

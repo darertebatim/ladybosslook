@@ -241,7 +241,7 @@ export default function AppLearnLesson() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="app-theme min-h-screen bg-background">
         <PageHeader title="Lesson" back />
         <div className="flex justify-center py-20">
           <Loader2 className="h-6 w-6 animate-spin text-brand" />
@@ -252,7 +252,7 @@ export default function AppLearnLesson() {
 
   if (!lesson) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="app-theme min-h-screen bg-background">
         <PageHeader title="Lesson" back onBack={() => navigate(`/app/learn/${courseId}`)} />
         <div className="px-4 py-6">
           <div className="bg-card-warm shadow-card-warm rounded-3xl p-8 text-center space-y-3">
@@ -274,7 +274,7 @@ export default function AppLearnLesson() {
   const attachments = Array.isArray(lesson.attachments) ? lesson.attachments : [];
 
   return (
-    <div className="min-h-screen bg-background pb-32">
+    <div className="app-theme min-h-screen bg-background pb-32">
       <PageHeader
         title={course?.title || 'Lesson'}
         back
