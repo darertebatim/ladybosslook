@@ -494,6 +494,41 @@ const AppCourseDetail = () => {
     enabled: !!round?.audio_playlist_id,
   });
 
+  // Extra playlists attached to this round (audio + video)
+  const { data: roundPlaylists = [] } = useQuery({
+    queryKey: ["course-round-playlists", round?.id],
+    queryFn: async () => {
+      if (!round?.id) return [];
+      const { data, error } = await supabase
+        .from("program_round_playlists")
+        .select("id, playlist_type, playlist_id, sort_order")
+        .eq("round_id", round.id)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      const rows = data || [];
+      const audioIds = rows.filter((r) => r.playlist_type === "audio").map((r) => r.playlist_id);
+      const videoIds = rows.filter((r) => r.playlist_type === "video").map((r) => r.playlist_id);
+      const [audioRes, videoRes] = await Promise.all([
+        audioIds.length
+          ? supabase.from("audio_playlists").select("id, name, cover_image_url").in("id", audioIds)
+          : Promise.resolve({ data: [] as any[] }),
+        videoIds.length
+          ? supabase.from("video_playlists").select("id, name, cover_image_url").in("id", videoIds)
+          : Promise.resolve({ data: [] as any[] }),
+      ]);
+      const byId: Record<string, any> = {};
+      [...((audioRes as any).data || []), ...((videoRes as any).data || [])].forEach((p: any) => {
+        byId[p.id] = p;
+      });
+      return rows
+        .map((r) => ({ ...r, playlist: byId[r.playlist_id] }))
+        .filter((r) => !!r.playlist);
+    },
+    enabled: !!round?.id,
+  });
+
+
+
   // Fetch unread post count for the round's channel
   const { data: channelUnreadCount } = useQuery({
     queryKey: ["channel-unread-count", roundChannel?.id, user?.id],
