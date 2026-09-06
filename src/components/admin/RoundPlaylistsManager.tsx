@@ -139,13 +139,7 @@ export const RoundPlaylistsManager = ({ roundId, roundName, inline = false, isOp
 
   const options = type === "video" ? videoPlaylists : audioPlaylists;
 
-  return (
-    <Dialog open={isOpen} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Playlists: {roundName}</DialogTitle>
-        </DialogHeader>
-
+  const body = (
         <div className="space-y-4">
           <div className="flex flex-wrap items-end gap-2">
             <div className="space-y-1">
