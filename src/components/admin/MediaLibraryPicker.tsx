@@ -47,9 +47,18 @@ export function MediaLibraryPicker({ kind, onPick, triggerLabel, variant = 'outl
           category: r.category,
         }));
       }
-      const table = kind === 'video' ? 'video_content' : 'audio_content';
+      if (kind === 'video') {
+        const { data, error } = await supabase
+          .from('video_content')
+          .select('id, title, file_url, thumbnail_url, duration_seconds')
+          .not('file_url', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(500);
+        if (error) throw error;
+        return (data || []).map((v: any) => ({ ...v, cover_image_url: v.thumbnail_url, category: null }));
+      }
       const { data, error } = await supabase
-        .from(table)
+        .from('audio_content')
         .select('id, title, file_url, cover_image_url, category, duration_seconds')
         .not('file_url', 'is', null)
         .order('created_at', { ascending: false })
