@@ -411,6 +411,17 @@ export default function LearnCourses() {
     setCRounds(roundIds);
     const first = (allRounds || []).find((r: any) => roundIds.includes(r.id));
     setCProgram(first?.program_slug ?? null);
+    setCHosts([]);
+    setCTagIds([]);
+    if (course?.id) {
+      loadContentHosts('course' as any, course.id).then(setCHosts).catch(() => {});
+      supabase
+        .from('content_tags')
+        .select('tag_id')
+        .eq('content_type', 'course' as any)
+        .eq('content_id', course.id)
+        .then(({ data }) => setCTagIds((data || []).map((r: any) => r.tag_id)));
+    }
     setCourseDialog({ open: true, course });
   };
 
