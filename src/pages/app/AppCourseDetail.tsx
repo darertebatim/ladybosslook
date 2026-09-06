@@ -1912,27 +1912,47 @@ const AppCourseDetail = () => {
                           </Button>
                         )}
 
-                        {/* 2. Round Audio Playlist - Primary content */}
-                        {round.audio_playlist_id && (
+                        {/* 2. Round playlists - Primary content */}
+                        {allRoundPlaylists.map((rp: any, idx: number) => (
                           <Button
+                            key={rp.id}
                             size="lg"
-                            className="w-full tour-playlist-btn bg-fg-warm text-white shadow-ios rounded-full border-0"
+                            className={`w-full h-auto py-2.5 ${idx === 0 ? "tour-playlist-btn " : ""}bg-fg-warm text-white shadow-ios rounded-full border-0`}
                             onClick={() => {
-                              const el = document.getElementById("playlist-schedule-section");
+                              const isMainAudio =
+                                rp.playlist_type === "audio" &&
+                                rp.playlist_id === round.audio_playlist_id;
+                              const el = isMainAudio
+                                ? document.getElementById("playlist-schedule-section")
+                                : null;
                               if (el) {
                                 el.scrollIntoView({ behavior: "smooth", block: "start" });
                               } else {
                                 navigate(
-                                  `/app/player/playlist/${round.audio_playlist_id}`,
+                                  rp.playlist_type === "video"
+                                    ? `/app/watch/playlist/${rp.playlist_id}`
+                                    : `/app/player/playlist/${rp.playlist_id}`,
                                   { state: { from: location.pathname } }
                                 );
                               }
                             }}
                           >
-                          <Music className="h-5 w-5 mr-2" />
-                            Round Playlist
+                            {rp.playlist_type === "video" ? (
+                              <Video className="h-5 w-5 mr-2 shrink-0" />
+                            ) : (
+                              <Music className="h-5 w-5 mr-2 shrink-0" />
+                            )}
+                            <span className="flex flex-col items-start leading-tight min-w-0">
+                              <span className="text-[13px] font-semibold">
+                                {rp.playlist_type === "video" ? "Watch" : "Listen"}
+                              </span>
+                              <span className="text-[11px] font-normal text-white/80 truncate max-w-[200px]">
+                                {rp.playlist?.name}
+                              </span>
+                            </span>
                           </Button>
-                        )}
+                        ))}
+
 
                         {/* 3. Join Google Meet - Time-sensitive */}
                         {round.google_meet_link && (
