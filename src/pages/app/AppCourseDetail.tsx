@@ -1919,12 +1919,26 @@ const AppCourseDetail = () => {
                           </Button>
                         )}
 
-                        {/* 2. Round playlists - Primary content */}
+                        {/* 2. Join Google Meet - Time-sensitive */}
+                        {round.google_meet_link && (
+                          <Button
+                            size="lg"
+                            className="w-full h-auto px-4 py-3 tour-meet-btn bg-fg-warm text-white shadow-ios rounded-2xl border-0 justify-start"
+                            onClick={() =>
+                              window.open(round.google_meet_link!, "_blank")
+                            }
+                          >
+                            <Video className="h-5 w-5 mr-3 shrink-0" />
+                            <span className="truncate">Join Google Meet</span>
+                          </Button>
+                        )}
+
+                        {/* 3. Round playlists - Primary content */}
                         {allRoundPlaylists.map((rp: any, idx: number) => (
                           <Button
                             key={rp.id}
                             size="lg"
-                            className={`w-full h-auto px-4 py-3 ${idx === 0 ? "tour-playlist-btn " : ""}bg-fg-warm text-white shadow-ios rounded-2xl border-0 justify-start`}
+                            className={`w-full h-auto px-4 py-3 ${idx === 0 ? "tour-playlist-btn " : ""}bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start`}
                             onClick={() => {
                               const isMainAudio =
                                 rp.playlist_type === "audio" &&
@@ -1950,27 +1964,51 @@ const AppCourseDetail = () => {
                               <Music className="h-5 w-5 mr-3 shrink-0" />
                             )}
                             <span className="truncate">
-                              {rp.playlist_type === "video" ? "Watch" : "Listen"}: {rp.playlist?.name}
+                              {rp.playlist_type === "video" ? "Watch playlist" : "Listen playlist"}: {rp.playlist?.name}
                             </span>
                           </Button>
                         ))}
 
-
-                        {/* 3. Join Google Meet - Time-sensitive */}
-                        {round.google_meet_link && (
+                        {/* 4. Access Google Drive - Resources */}
+                        {round.google_drive_link && (
                           <Button
                             size="lg"
-                            className="w-full h-auto px-4 py-3 tour-meet-btn bg-fg-warm text-white shadow-ios rounded-2xl border-0 justify-start"
+                            className="w-full h-auto px-4 py-3 tour-drive-btn bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
                             onClick={() =>
-                              window.open(round.google_meet_link!, "_blank")
+                              window.open(round.google_drive_link!, "_blank")
                             }
                           >
-                            <Video className="h-5 w-5 mr-3 shrink-0" />
-                            <span className="truncate">Join Google Meet</span>
+                            <FolderOpen className="h-5 w-5 mr-3 shrink-0" />
+                            <span className="truncate">Access Google Drive</span>
                           </Button>
                         )}
 
-                        {/* 4. Sync All Sessions to Calendar */}
+                        {/* 5. Contact Support - When needed */}
+                        {(round as any).support_link_url && (
+                          <Button
+                            size="lg"
+                            className="w-full h-auto px-4 py-3 tour-support-btn bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
+                            onClick={handleContactSupport}
+                          >
+                            <MessageCircle className="h-5 w-5 mr-3 shrink-0" />
+                            <span className="truncate">{(round as any).support_link_label ||
+                              "Contact Support"}</span>
+                          </Button>
+                        )}
+
+                        {/* 6. In-App Support Chat - optional per round */}
+                        {(round as any).in_app_support_enabled && (
+                          <Button
+                            size="lg"
+                            className="w-full h-auto px-4 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
+                            onClick={() => navigate("/app/chat")}
+                          >
+                            <HelpCircle className="h-5 w-5 mr-3 shrink-0" />
+                            <span className="truncate">In-App Support Chat</span>
+                          </Button>
+                        )}
+
+                        {/* 7. Sync All Sessions to Calendar */}
                         {dbSessions && dbSessions.length > 1 && (
                           <Button
                             size="lg"
@@ -2007,45 +2045,6 @@ const AppCourseDetail = () => {
                                 <span className="truncate">Sync All Sessions</span>
                               </>
                             )}
-                          </Button>
-                        )}
-
-                        {/* 5. Access Google Drive - Resources */}
-                        {round.google_drive_link && (
-                          <Button
-                            size="lg"
-                            className="w-full h-auto px-4 py-3 tour-drive-btn bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
-                            onClick={() =>
-                              window.open(round.google_drive_link!, "_blank")
-                            }
-                          >
-                            <FolderOpen className="h-5 w-5 mr-3 shrink-0" />
-                            <span className="truncate">Access Google Drive</span>
-                          </Button>
-                        )}
-
-                        {/* 6. Contact Support - When needed */}
-                        {(round as any).support_link_url && (
-                          <Button
-                            size="lg"
-                            className="w-full h-auto px-4 py-3 tour-support-btn bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
-                            onClick={handleContactSupport}
-                          >
-                            <MessageCircle className="h-5 w-5 mr-3 shrink-0" />
-                            <span className="truncate">{(round as any).support_link_label ||
-                              "Contact Support"}</span>
-                          </Button>
-                        )}
-
-                        {/* 7. In-App Support Chat - optional per round */}
-                        {(round as any).in_app_support_enabled && (
-                          <Button
-                            size="lg"
-                            className="w-full h-auto px-4 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
-                            onClick={() => navigate("/app/chat")}
-                          >
-                            <HelpCircle className="h-5 w-5 mr-3 shrink-0" />
-                            <span className="truncate">In-App Support Chat</span>
                           </Button>
                         )}
                       </CardContent>
