@@ -39,6 +39,7 @@ export function PageHeader({
   right,
   subRow,
   variant = "light",
+  backStyle = "circle",
   sticky = true,
   className,
 }: PageHeaderProps) {
@@ -61,18 +62,29 @@ export function PageHeader({
     >
       <div className="flex items-center gap-3 min-h-[44px]">
         {back && (
-          <IOSIconButton
-            variant={variant}
-            size="sm"
-            onClick={handleBack}
-            aria-label="Back"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </IOSIconButton>
+          backStyle === "plain" ? (
+            <button
+              onClick={handleBack}
+              aria-label="Back"
+              className="flex items-center justify-center min-h-[44px] min-w-[44px] -ml-2 text-brand active:opacity-70 transition-opacity"
+            >
+              <ChevronLeft className="h-7 w-7" />
+            </button>
+          ) : (
+            <IOSIconButton
+              variant={variant}
+              size="sm"
+              onClick={handleBack}
+              aria-label="Back"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </IOSIconButton>
+          )
         )}
         <h1 className="flex-1 text-2xl font-bold leading-tight truncate">{title}</h1>
         {right && <div className="flex items-center gap-2">{right}</div>}
       </div>
+
       {subRow && <div className="mt-3">{subRow}</div>}
     </header>
   );
