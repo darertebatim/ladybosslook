@@ -629,6 +629,7 @@ const App = () => (
                      <Route path="/app/quiz/:slug/play" element={<ProtectedRoute><QuizPlay /></ProtectedRoute>} />
                      <Route path="/app/learn" element={<ProtectedRoute><AppLearn /></ProtectedRoute>} />
                      <Route path="/app/learn/:courseId" element={<ProtectedRoute><AppLearnCourse /></ProtectedRoute>} />
+                     <Route path="/app/learn/:courseId/:lessonId" element={<ProtectedRoute><AppLearnLesson /></ProtectedRoute>} />
                      {/* Redirect old feed post route */}
                     <Route path="/app/feed/post/:postId" element={<Navigate to="/app/channels/post/:postId" replace />} />
                     
