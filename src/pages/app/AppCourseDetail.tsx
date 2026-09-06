@@ -1936,7 +1936,7 @@ const AppCourseDetail = () => {
                           </Button>
                         )}
 
-                        {/* 6. Access Google Drive - Resources */}
+                        {/* 5. Access Google Drive - Resources */}
                         {round.google_drive_link && (
                           <Button
                             size="lg"
@@ -1950,7 +1950,7 @@ const AppCourseDetail = () => {
                           </Button>
                         )}
 
-                        {/* 7. Contact Support - When needed */}
+                        {/* 6. Contact Support - When needed */}
                         {(round as any).support_link_url && (
                           <Button
                             size="lg"
