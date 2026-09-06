@@ -627,9 +627,6 @@ const App = () => (
                     <Route path="/app/read/:id/reader" element={<ProtectedRoute><AppReadReader /></ProtectedRoute>} />
                      <Route path="/app/quiz/:slug" element={<ProtectedRoute><QuizDetail /></ProtectedRoute>} />
                      <Route path="/app/quiz/:slug/play" element={<ProtectedRoute><QuizPlay /></ProtectedRoute>} />
-                     <Route path="/app/learn" element={<ProtectedRoute><AppLearn /></ProtectedRoute>} />
-                     <Route path="/app/learn/:courseId" element={<ProtectedRoute><AppLearnCourse /></ProtectedRoute>} />
-                     <Route path="/app/learn/:courseId/:lessonId" element={<ProtectedRoute><AppLearnLesson /></ProtectedRoute>} />
                      {/* Redirect old feed post route */}
                     <Route path="/app/feed/post/:postId" element={<Navigate to="/app/channels/post/:postId" replace />} />
                     
@@ -678,6 +675,9 @@ const App = () => (
                       <Route path="projects" element={<AppTaskDrafts />} />
                       <Route path="quizzes" element={<QuizLibrary />} />
                       <Route path="read" element={<AppRead />} />
+                      <Route path="learn" element={<AppLearn />} />
+                      <Route path="learn/:courseId" element={<AppLearnCourse />} />
+                      <Route path="learn/:courseId/:lessonId" element={<AppLearnLesson />} />
                       <Route path="routineplayer" element={<AppRoutinePlayerPage />} />
                       {/* Redirects for backward compatibility with older app versions */}
                       <Route path="rituals" element={<Navigate to="/app/routines" replace />} />
