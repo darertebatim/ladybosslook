@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Play, Pause, ExternalLink, Loader2, Headphones, FileText } from 'lucide-react';
-import { detectVideoType, extractYouTubeId, extractVimeoId, getVideoPlatformLabel, isVerticalVideo } from '@/lib/videoUtils';
+import { detectVideoType, extractYouTubeId, extractVimeoId, extractGoogleDriveId, getVideoPlatformLabel, isVerticalVideo } from '@/lib/videoUtils';
 import { smartOpenUrl } from '@/lib/navigation-utils';
 import { cn } from '@/lib/utils';
 
@@ -41,6 +41,10 @@ export function LessonVideo({
     if (type === 'instagram') {
       const m = url.match(/instagram\.com\/(?:reel|p|reels)\/([^/?#]+)/i);
       return m ? `https://www.instagram.com/p/${m[1]}/embed/` : null;
+    }
+    if (type === 'gdrive') {
+      const id = extractGoogleDriveId(url);
+      return id ? `https://drive.google.com/file/d/${id}/preview` : null;
     }
     return null;
   }, [type, url]);
