@@ -122,19 +122,20 @@ export function HostPicker({ value, onChange, label = 'Hosts', hint }: HostPicke
               <span className="flex-1 text-sm font-medium truncate">
                 {h.display_name || h.host_id}
               </span>
-              <Select
-                value={h.role}
-                onValueChange={(v) => updateRole(h.host_id, v as HostAssignment['role'])}
-              >
-                <SelectTrigger className="w-[120px] h-8">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="host">Host</SelectItem>
-                  <SelectItem value="co-host">Co-host</SelectItem>
-                  <SelectItem value="guest">Guest</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex gap-1">
+                {(['host', 'co-host', 'guest'] as const).map((role) => (
+                  <Button
+                    key={role}
+                    type="button"
+                    size="sm"
+                    variant={h.role === role ? 'default' : 'outline'}
+                    className="h-8 px-2.5 text-xs capitalize"
+                    onClick={() => updateRole(h.host_id, role)}
+                  >
+                    {role === 'co-host' ? 'Co-host' : role}
+                  </Button>
+                ))}
+              </div>
               <Button
                 type="button"
                 size="icon"
