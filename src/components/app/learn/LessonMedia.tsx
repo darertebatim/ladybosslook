@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Pause, ExternalLink, Loader2, Headphones, FileText } from 'lucide-react';
+import { Play, Pause, ExternalLink, Loader2, Headphones, FileText, RotateCcw, RotateCw } from 'lucide-react';
 import { detectVideoType, extractYouTubeId, extractVimeoId, extractGoogleDriveId, getVideoPlatformLabel, isVerticalVideo } from '@/lib/videoUtils';
 import { smartOpenUrl } from '@/lib/navigation-utils';
 import { cn } from '@/lib/utils';
@@ -31,7 +31,7 @@ export function LessonVideo({
     if (type === 'youtube') {
       const id = extractYouTubeId(url);
       return id
-        ? `https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1`
+        ? `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&color=white&disablekb=1`
         : null;
     }
     if (type === 'vimeo') {
