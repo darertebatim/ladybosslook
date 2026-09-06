@@ -44,11 +44,11 @@ import type { LearnCourse, LearnModule, LearnLesson, LessonType } from '@/hooks/
 import { formatTotalDuration } from '@/hooks/useLearn';
 
 const LANGUAGE_OPTIONS = [
-  { code: '', label: 'Any' },
-  { code: 'en', label: 'English' },
-  { code: 'fa', label: 'فارسی' },
-  { code: 'tr', label: 'Türkçe' },
-  { code: 'es', label: 'Español' },
+  { code: '', label: '🌐 All / Multilanguage' },
+  { code: 'en', label: '🇺🇸 English' },
+  { code: 'fa', label: '🇮🇷 Persian' },
+  { code: 'tr', label: '🇹🇷 Turkish' },
+  { code: 'es', label: '🇪🇸 Spanish' },
 ];
 
 const LESSON_META: Record<LessonType, { label: string; icon: typeof Play }> = {
