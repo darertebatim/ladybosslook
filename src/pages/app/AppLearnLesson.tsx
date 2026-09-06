@@ -3,11 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import {
   Play, Pause, Headphones, FileText, BookOpen, Check, Loader2,
-  ExternalLink, ChevronLeft, ChevronRight, Paperclip, Download, Lock, Trophy,
+  ExternalLink, ChevronLeft, ChevronRight, Paperclip, Download, Lock, Trophy, List,
 } from 'lucide-react';
 import { PageHeader } from '@/components/app/ui/PageHeader';
-import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { AppVideoPlayer } from '@/components/app/AppVideoPlayer';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import { isNativeApp } from '@/lib/platform';
@@ -37,6 +37,7 @@ export default function AppLearnLesson() {
   const audioPlayer = useAudioPlayer();
 
   const [videoOpen, setVideoOpen] = useState(false);
+  const [listOpen, setListOpen] = useState(false);
   const [celebrated, setCelebrated] = useState(false);
 
   const flatLessons = useMemo(() => {
@@ -46,8 +47,20 @@ export default function AppLearnLesson() {
 
   const index = flatLessons.findIndex((l) => l.id === lessonId);
   const lesson = index >= 0 ? flatLessons[index] : null;
-  const prev = index > 0 ? flatLessons[index - 1] : null;
-  const next = index >= 0 && index < flatLessons.length - 1 ? flatLessons[index + 1] : null;
+
+  // Skip locked lessons when moving around.
+  const prev = useMemo(() => {
+    for (let i = index - 1; i >= 0; i--) {
+      if (!lessonUnlockDate(flatLessons[i], startDate)) return flatLessons[i];
+    }
+    return null;
+  }, [index, flatLessons, startDate]);
+  const next = useMemo(() => {
+    for (let i = index + 1; i < flatLessons.length; i++) {
+      if (!lessonUnlockDate(flatLessons[i], startDate)) return flatLessons[i];
+    }
+    return null;
+  }, [index, flatLessons, startDate]);
 
   const total = flatLessons.length;
   const doneCount = flatLessons.filter((l) => progress?.has(l.id)).length;
@@ -58,10 +71,12 @@ export default function AppLearnLesson() {
   useEffect(() => {
     window.scrollTo({ top: 0 });
     setVideoOpen(false);
+    setListOpen(false);
   }, [lessonId]);
 
   const goTo = (l: LearnLesson | null) => {
     if (!l) return;
+    setListOpen(false);
     navigate(`/app/learn/${courseId}/${l.id}`, { replace: true });
   };
 
@@ -94,20 +109,23 @@ export default function AppLearnLesson() {
         <>
           <button
             onClick={() => v?.file_url && setVideoOpen(true)}
-            className="relative w-full aspect-video rounded-2xl overflow-hidden bg-bg-warm active:opacity-90 transition-opacity"
+            className="relative w-full aspect-video rounded-2xl overflow-hidden bg-peach active:opacity-90 transition-opacity"
           >
             {v?.thumbnail_url ? (
               <img src={v.thumbnail_url} alt={lesson.title} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Play className="h-10 w-10 text-fg-warm-muted" />
-              </div>
+              <div className="w-full h-full bg-gradient-orange" />
             )}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 rounded-full bg-brand shadow-ios flex items-center justify-center">
-                <Play className="h-7 w-7 text-white fill-white ml-0.5" />
+              <div className="w-16 h-16 rounded-full bg-white/95 shadow-ios flex items-center justify-center">
+                <Play className="h-7 w-7 text-brand fill-brand ml-0.5" />
               </div>
             </div>
+            {!v?.file_url && (
+              <span className="absolute bottom-2 left-2 rounded-full bg-white/90 px-2.5 py-1 text-xs text-fg-warm-muted">
+                Video coming soon
+              </span>
+            )}
           </button>
           {v?.file_url && (
             <AppVideoPlayer
@@ -132,7 +150,7 @@ export default function AppLearnLesson() {
       const isThisTrack = audioPlayer.currentTrack?.id === a?.id;
       const playing = isThisTrack && audioPlayer.isPlaying;
       return (
-        <div className="flex items-center gap-3 bg-bg-warm rounded-2xl p-3">
+        <div className="flex items-center gap-3 bg-background rounded-2xl p-3">
           <div className="w-14 h-14 rounded-xl overflow-hidden bg-peach shrink-0 flex items-center justify-center">
             {a?.cover_image_url ? (
               <img src={a.cover_image_url} alt="" className="w-full h-full object-cover" />
@@ -142,11 +160,14 @@ export default function AppLearnLesson() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-medium text-fg-warm truncate">{a?.title || lesson.title}</p>
-            {lessonDurationSeconds(lesson) && (
+            {lessonDurationSeconds(lesson) ? (
               <p className="text-xs text-fg-warm-muted">{formatLessonDuration(lessonDurationSeconds(lesson))}</p>
+            ) : (
+              !a?.file_url && <p className="text-xs text-fg-warm-muted">Audio coming soon</p>
             )}
           </div>
           <button
+            disabled={!a?.file_url}
             onClick={() => {
               if (!a?.file_url) return;
               if (isThisTrack) {
@@ -162,7 +183,7 @@ export default function AppLearnLesson() {
                 });
               }
             }}
-            className="w-12 h-12 rounded-full bg-brand shadow-ios flex items-center justify-center shrink-0 active:scale-95 transition-transform"
+            className="w-12 h-12 rounded-full bg-brand shadow-ios flex items-center justify-center shrink-0 active:scale-95 transition-transform disabled:opacity-50"
           >
             {playing ? (
               <Pause className="h-5 w-5 text-white fill-white" />
@@ -176,16 +197,21 @@ export default function AppLearnLesson() {
 
     if (lesson.lesson_type === 'document') {
       const r = lesson.reading;
+      if (!r?.id) return null;
       return (
         <button
-          onClick={() => r?.id && navigate(`/app/read/${r.id}/reader`)}
-          className="w-full flex items-center gap-3 bg-bg-warm rounded-2xl p-4 text-left active:scale-[0.99] transition-transform"
+          onClick={() => navigate(`/app/read/${r.id}/reader`)}
+          className="w-full flex items-center gap-3 bg-background rounded-2xl p-4 text-left active:scale-[0.99] transition-transform min-h-[56px]"
         >
-          <div className="w-12 h-12 rounded-xl bg-peach flex items-center justify-center shrink-0">
-            <BookOpen className="h-6 w-6 text-brand" />
+          <div className="w-12 h-12 rounded-xl bg-peach flex items-center justify-center shrink-0 overflow-hidden">
+            {r.cover_url ? (
+              <img src={r.cover_url} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <BookOpen className="h-6 w-6 text-brand" />
+            )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-fg-warm">{r?.title || lesson.title}</p>
+            <p className="font-medium text-fg-warm truncate">{r.title || lesson.title}</p>
             <p className="text-xs text-fg-warm-muted">Tap to start reading</p>
           </div>
           <ChevronRight className="h-5 w-5 text-fg-warm-muted shrink-0" />
@@ -194,27 +220,28 @@ export default function AppLearnLesson() {
     }
 
     // pdf
+    if (!lesson.pdf_url) return null;
     return (
       <div className="space-y-2">
-        {!isNativeApp() && lesson.pdf_url && (
-          <div className="w-full h-[50vh] bg-bg-warm rounded-2xl overflow-hidden">
+        {!isNativeApp() && (
+          <div className="w-full h-[50vh] bg-background rounded-2xl overflow-hidden">
             <iframe src={lesson.pdf_url} className="w-full h-full" title={lesson.title} />
           </div>
         )}
-        <Button
-          onClick={() => lesson.pdf_url && smartOpenUrl(lesson.pdf_url, navigate)}
-          className="w-full rounded-full gap-2 bg-brand text-white border-0"
+        <button
+          onClick={() => smartOpenUrl(lesson.pdf_url!, navigate)}
+          className="w-full flex items-center justify-center gap-2 rounded-full bg-peach text-fg-warm font-semibold py-3.5 min-h-[48px] active:scale-[0.98] transition-transform"
         >
-          <ExternalLink className="h-4 w-4" />
+          <ExternalLink className="h-4 w-4 text-brand" />
           Open / download file
-        </Button>
+        </button>
       </div>
     );
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-bg-warm">
+      <div className="min-h-screen bg-background">
         <PageHeader title="Lesson" back />
         <div className="flex justify-center py-20">
           <Loader2 className="h-6 w-6 animate-spin text-brand" />
@@ -225,15 +252,18 @@ export default function AppLearnLesson() {
 
   if (!lesson) {
     return (
-      <div className="min-h-screen bg-bg-warm">
-        <PageHeader title="Lesson" back />
+      <div className="min-h-screen bg-background">
+        <PageHeader title="Lesson" back onBack={() => navigate(`/app/learn/${courseId}`)} />
         <div className="px-4 py-6">
           <div className="bg-card-warm shadow-card-warm rounded-3xl p-8 text-center space-y-3">
             <p className="font-semibold text-fg-warm">Lesson not available</p>
-            <p className="text-sm text-fg-warm-muted">It may have been removed or you don't have access.</p>
-            <Button className="rounded-full" onClick={() => navigate(`/app/learn/${courseId}`)}>
+            <p className="text-sm text-fg-warm-muted">It may have been removed or you don't have access yet.</p>
+            <button
+              className="rounded-full bg-brand text-white px-5 py-3 font-semibold shadow-ios min-h-[48px]"
+              onClick={() => navigate(`/app/learn/${courseId}`)}
+            >
               Back to course
-            </Button>
+            </button>
           </div>
         </div>
       </div>
@@ -244,15 +274,24 @@ export default function AppLearnLesson() {
   const attachments = Array.isArray(lesson.attachments) ? lesson.attachments : [];
 
   return (
-    <div className="min-h-screen bg-bg-warm pb-32">
+    <div className="min-h-screen bg-background pb-32">
       <PageHeader
         title={course?.title || 'Lesson'}
         back
         onBack={() => navigate(`/app/learn/${courseId}`)}
+        right={
+          <button
+            onClick={() => setListOpen(true)}
+            aria-label="All lessons"
+            className="w-10 h-10 rounded-full bg-white text-brand shadow-ios flex items-center justify-center active:scale-95 transition-transform"
+          >
+            <List className="h-5 w-5" />
+          </button>
+        }
         subRow={
           <div className="flex items-center gap-2 w-full">
             <Progress value={pct} className="h-1.5 flex-1" />
-            <span className="text-xs text-fg-warm-muted shrink-0">
+            <span className="text-xs font-medium text-fg-warm-muted shrink-0">
               {index + 1}/{total}
             </span>
           </div>
@@ -261,7 +300,7 @@ export default function AppLearnLesson() {
 
       <div className="px-4 py-4 space-y-4">
         {unlockAt ? (
-          <div className="bg-white rounded-3xl shadow-ios p-8 text-center space-y-3">
+          <div className="bg-card-warm shadow-card-warm rounded-3xl p-8 text-center space-y-3">
             <div className="mx-auto w-14 h-14 rounded-full bg-peach flex items-center justify-center">
               <Lock className="h-7 w-7 text-brand" />
             </div>
@@ -269,23 +308,31 @@ export default function AppLearnLesson() {
             <p className="text-sm text-fg-warm-muted">{formatUnlockLabel(unlockAt)}</p>
           </div>
         ) : (
-          <div className="bg-white rounded-3xl shadow-ios p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-peach flex items-center justify-center shrink-0">
+          <div className="bg-card-warm shadow-card-warm rounded-3xl p-4 space-y-3.5">
+            <div className="flex items-start gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-peach flex items-center justify-center shrink-0 mt-0.5">
                 <Icon className="h-4 w-4 text-brand" />
               </div>
-              <h1 className="font-bold text-fg-warm flex-1 min-w-0">{lesson.title}</h1>
+              <div className="flex-1 min-w-0">
+                <h2 className="font-bold text-fg-warm leading-tight">{lesson.title}</h2>
+                <p className="text-xs text-fg-warm-muted mt-0.5">
+                  <span className="capitalize">{lesson.lesson_type}</span>
+                  {lessonDurationSeconds(lesson)
+                    ? ` · ${formatLessonDuration(lessonDurationSeconds(lesson))}`
+                    : ''}
+                </p>
+              </div>
             </div>
 
             {renderMedia()}
 
             {lesson.description && (
-              <p className="text-sm text-fg-warm-muted">{lesson.description}</p>
+              <p className="text-sm text-fg-warm-muted whitespace-pre-line">{lesson.description}</p>
             )}
 
             {lesson.content_html && (
               <div
-                className="prose prose-sm max-w-none text-fg-warm [&_a]:text-brand [&_img]:rounded-2xl"
+                className="prose prose-sm max-w-none text-fg-warm [&_a]:text-brand [&_img]:rounded-2xl [&_p]:text-fg-warm [&_li]:text-fg-warm [&_h1]:text-fg-warm [&_h2]:text-fg-warm [&_h3]:text-fg-warm [&_strong]:text-fg-warm"
                 dangerouslySetInnerHTML={{ __html: lesson.content_html }}
               />
             )}
@@ -293,13 +340,13 @@ export default function AppLearnLesson() {
             {attachments.length > 0 && (
               <div className="space-y-2 pt-1">
                 <p className="text-sm font-semibold text-fg-warm flex items-center gap-2">
-                  <Paperclip className="h-4 w-4" /> Attachments
+                  <Paperclip className="h-4 w-4 text-brand" /> Attachments
                 </p>
                 {attachments.map((a, i) => (
                   <button
                     key={i}
                     onClick={() => smartOpenUrl(a.url, navigate)}
-                    className="w-full flex items-center gap-3 bg-bg-warm rounded-2xl p-3 text-left active:scale-[0.99] transition-transform min-h-[48px]"
+                    className="w-full flex items-center gap-3 bg-background rounded-2xl p-3 text-left active:scale-[0.99] transition-transform min-h-[48px]"
                   >
                     <Download className="h-4 w-4 text-brand shrink-0" />
                     <span className="flex-1 min-w-0 truncate text-sm text-fg-warm">{a.name}</span>
@@ -308,21 +355,21 @@ export default function AppLearnLesson() {
               </div>
             )}
 
-            <Button
+            <button
               onClick={handleComplete}
               disabled={setComplete.isPending}
               className={cn(
-                'w-full rounded-full gap-2 shadow-ios border-0 h-12',
-                isDone ? 'bg-mint text-fg-warm' : 'bg-brand text-white'
+                'w-full flex items-center justify-center gap-2 rounded-full font-semibold shadow-ios min-h-[52px] active:scale-[0.98] transition-transform',
+                isDone ? 'bg-peach text-fg-warm' : 'bg-brand text-white'
               )}
             >
               {setComplete.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <Check className="h-4 w-4" />
+                <Check className={cn('h-4 w-4', isDone && 'text-brand')} />
               )}
               {isDone ? 'Completed — tap to undo' : next ? 'Complete & continue' : 'Mark as complete'}
-            </Button>
+            </button>
           </div>
         )}
 
@@ -336,24 +383,75 @@ export default function AppLearnLesson() {
 
         {/* Prev / next */}
         <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
+          <button
             disabled={!prev}
             onClick={() => goTo(prev)}
-            className="flex-1 rounded-full bg-white shadow-ios h-12 gap-2 text-fg-warm"
+            className="flex-1 flex items-center justify-center gap-1.5 rounded-full bg-card-warm shadow-card-warm min-h-[48px] text-sm font-medium text-fg-warm disabled:opacity-40 active:scale-[0.98] transition-transform"
           >
             <ChevronLeft className="h-4 w-4" /> Previous
-          </Button>
-          <Button
-            variant="ghost"
+          </button>
+          <button
             disabled={!next}
             onClick={() => goTo(next)}
-            className="flex-1 rounded-full bg-white shadow-ios h-12 gap-2 text-fg-warm"
+            className="flex-1 flex items-center justify-center gap-1.5 rounded-full bg-card-warm shadow-card-warm min-h-[48px] text-sm font-medium text-fg-warm disabled:opacity-40 active:scale-[0.98] transition-transform"
           >
             Next <ChevronRight className="h-4 w-4" />
-          </Button>
+          </button>
         </div>
       </div>
+
+      {/* All lessons sheet */}
+      <Sheet open={listOpen} onOpenChange={setListOpen}>
+        <SheetContent side="bottom" className="rounded-t-3xl max-h-[80vh] overflow-y-auto bg-background border-0">
+          <SheetHeader className="text-left">
+            <SheetTitle className="text-fg-warm">All lessons</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-4 pt-3 pb-6">
+            {content?.modules.map((mod) => {
+              const lessons = content.lessons.filter((l) => l.module_id === mod.id);
+              if (!lessons.length) return null;
+              return (
+                <div key={mod.id} className="space-y-1.5">
+                  <p className="text-xs font-semibold text-fg-warm-muted px-1 uppercase tracking-wide">{mod.title}</p>
+                  {lessons.map((l) => {
+                    const lDone = progress?.has(l.id);
+                    const lLock = lessonUnlockDate(l, startDate);
+                    const active = l.id === lessonId;
+                    const LIcon = LESSON_ICONS[l.lesson_type] || Play;
+                    return (
+                      <button
+                        key={l.id}
+                        disabled={!!lLock}
+                        onClick={() => goTo(l)}
+                        className={cn(
+                          'w-full flex items-center gap-3 p-3 rounded-2xl text-left min-h-[48px] transition-all',
+                          active ? 'bg-peach shadow-ios' : 'bg-card-warm shadow-card-warm',
+                          lLock && 'opacity-60'
+                        )}
+                      >
+                        <div className={cn(
+                          'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
+                          lDone ? 'bg-brand' : 'bg-peach'
+                        )}>
+                          {lLock ? <Lock className="h-4 w-4 text-fg-warm-muted" />
+                            : lDone ? <Check className="h-4 w-4 text-white" />
+                            : <LIcon className="h-4 w-4 text-brand" />}
+                        </div>
+                        <span className="flex-1 min-w-0">
+                          <span className="block truncate text-sm font-medium text-fg-warm">{l.title}</span>
+                          {lLock && (
+                            <span className="block text-xs text-fg-warm-muted">{formatUnlockLabel(lLock)}</span>
+                          )}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
