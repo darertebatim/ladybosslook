@@ -92,12 +92,16 @@ function useAdminRounds() {
   return useQuery({
     queryKey: ['admin-learn-rounds'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('program_rounds')
-        .select('id, round_name, program_slug')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data || [];
+      const [{ data: rounds, error: rErr }, { data: programs, error: pErr }] = await Promise.all([
+        supabase.from('program_rounds').select('id, round_name, program_slug').order('created_at', { ascending: false }),
+        supabase.from('program_catalog').select('slug, title').order('title'),
+      ]);
+      if (rErr) throw rErr;
+      if (pErr) throw pErr;
+      return {
+        rounds: (rounds || []) as { id: string; round_name: string; program_slug: string }[],
+        programTitles: Object.fromEntries((programs || []).map((p: any) => [p.slug, p.title || p.slug])),
+      };
     },
   });
 }
@@ -162,13 +166,13 @@ export default function LearnCourses() {
   const { data: courses, isLoading } = useAdminCourses();
   const { data: allRounds } = useAdminRounds();
   const programGroups = useMemo(() => {
-    const map = new Map<string, { slug: string; rounds: any[] }>();
-    (allRounds || []).forEach((r: any) => {
+    const map = new Map<string, { slug: string; title: string; rounds: any[] }>();
+    (allRounds?.rounds || []).forEach((r: any) => {
       const slug = r.program_slug || 'other';
-      if (!map.has(slug)) map.set(slug, { slug, rounds: [] });
+      if (!map.has(slug)) map.set(slug, { slug, title: allRounds?.programTitles[slug] || slug, rounds: [] });
       map.get(slug)!.rounds.push(r);
     });
-    return Array.from(map.values()).sort((a, b) => a.slug.localeCompare(b.slug));
+    return Array.from(map.values()).sort((a, b) => a.title.localeCompare(b.title));
   }, [allRounds]);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -420,7 +424,7 @@ export default function LearnCourses() {
     });
     const roundIds = course?.rounds.map((r) => r.round_id) || [];
     setCRounds(roundIds);
-    const first = (allRounds || []).find((r: any) => roundIds.includes(r.id));
+    const first = (allRounds?.rounds || []).find((r: any) => roundIds.includes(r.id));
     setCProgram(first?.program_slug ?? null);
     setCHosts([]);
     setCTagIds([]);
@@ -832,7 +836,8 @@ export default function LearnCourses() {
               {cRounds.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {cRounds.map((id) => {
-                    const r = allRounds?.find((x: any) => x.id === id);
+                    const r = allRounds?.rounds.find((x: any) => x.id === id);
+                    const title = r ? allRounds?.programTitles[r.program_slug] || r.program_slug : '';
                     return (
                       <button
                         key={id}
@@ -840,7 +845,7 @@ export default function LearnCourses() {
                         onClick={() => setCRounds(cRounds.filter((x) => x !== id))}
                         className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-2.5 py-1 text-xs font-medium"
                       >
-                        {r ? `${r.round_name} · ${r.program_slug}` : 'Round'}
+                        {r ? `${title} · ${r.round_name}` : 'Round'}
                         <X className="h-3 w-3" />
                       </button>
                     );
@@ -848,40 +853,44 @@ export default function LearnCourses() {
                 </div>
               )}
 
-              <div className="flex flex-wrap gap-2">
-                {programGroups.map((g) => (
-                  <Button
-                    key={g.slug}
-                    type="button"
-                    size="sm"
-                    variant={cProgram === g.slug ? 'default' : 'outline'}
-                    onClick={() => setCProgram(cProgram === g.slug ? null : g.slug)}
-                  >
-                    {g.slug}
-                    <span className="ml-1.5 opacity-60">{g.rounds.length}</span>
-                  </Button>
-                ))}
-              </div>
+              <Select value={cProgram || ''} onValueChange={(v) => setCProgram(v || null)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a program…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {programGroups.map((g) => (
+                    <SelectItem key={g.slug} value={g.slug}>
+                      {g.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
               {cProgram && (
-                <div className="rounded-lg border p-2 flex flex-wrap gap-2">
-                  {programGroups.find((g) => g.slug === cProgram)?.rounds.map((r: any) => {
-                    const on = cRounds.includes(r.id);
-                    return (
-                      <Button
-                        key={r.id}
-                        type="button"
-                        size="sm"
-                        variant={on ? 'default' : 'outline'}
-                        onClick={() =>
-                          setCRounds(on ? cRounds.filter((x) => x !== r.id) : [...cRounds, r.id])
-                        }
-                      >
-                        {on && <Check className="h-3.5 w-3.5 mr-1" />}
-                        {r.round_name}
-                      </Button>
-                    );
-                  })}
+                <div className="rounded-lg border p-2">
+                  <p className="text-xs text-muted-foreground mb-1.5">Rounds for {programGroups.find((g) => g.slug === cProgram)?.title}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {programGroups.find((g) => g.slug === cProgram)?.rounds.map((r: any) => {
+                      const on = cRounds.includes(r.id);
+                      return (
+                        <button
+                          key={r.id}
+                          type="button"
+                          onClick={() =>
+                            setCRounds(on ? cRounds.filter((x) => x !== r.id) : [...cRounds, r.id])
+                          }
+                          className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium border transition-colors ${
+                            on
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'bg-background hover:bg-muted'
+                          }`}
+                        >
+                          {on && <Check className="h-3 w-3" />}
+                          {r.round_name}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>
