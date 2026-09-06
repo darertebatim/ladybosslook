@@ -836,7 +836,8 @@ export default function LearnCourses() {
               {cRounds.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {cRounds.map((id) => {
-                    const r = allRounds?.find((x: any) => x.id === id);
+                    const r = allRounds?.rounds.find((x: any) => x.id === id);
+                    const title = r ? allRounds?.programTitles[r.program_slug] || r.program_slug : '';
                     return (
                       <button
                         key={id}
@@ -844,7 +845,7 @@ export default function LearnCourses() {
                         onClick={() => setCRounds(cRounds.filter((x) => x !== id))}
                         className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-2.5 py-1 text-xs font-medium"
                       >
-                        {r ? `${r.round_name} · ${r.program_slug}` : 'Round'}
+                        {r ? `${title} · ${r.round_name}` : 'Round'}
                         <X className="h-3 w-3" />
                       </button>
                     );
@@ -852,40 +853,44 @@ export default function LearnCourses() {
                 </div>
               )}
 
-              <div className="flex flex-wrap gap-2">
-                {programGroups.map((g) => (
-                  <Button
-                    key={g.slug}
-                    type="button"
-                    size="sm"
-                    variant={cProgram === g.slug ? 'default' : 'outline'}
-                    onClick={() => setCProgram(cProgram === g.slug ? null : g.slug)}
-                  >
-                    {g.slug}
-                    <span className="ml-1.5 opacity-60">{g.rounds.length}</span>
-                  </Button>
-                ))}
-              </div>
+              <Select value={cProgram || ''} onValueChange={(v) => setCProgram(v || null)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a program…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {programGroups.map((g) => (
+                    <SelectItem key={g.slug} value={g.slug}>
+                      {g.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
               {cProgram && (
-                <div className="rounded-lg border p-2 flex flex-wrap gap-2">
-                  {programGroups.find((g) => g.slug === cProgram)?.rounds.map((r: any) => {
-                    const on = cRounds.includes(r.id);
-                    return (
-                      <Button
-                        key={r.id}
-                        type="button"
-                        size="sm"
-                        variant={on ? 'default' : 'outline'}
-                        onClick={() =>
-                          setCRounds(on ? cRounds.filter((x) => x !== r.id) : [...cRounds, r.id])
-                        }
-                      >
-                        {on && <Check className="h-3.5 w-3.5 mr-1" />}
-                        {r.round_name}
-                      </Button>
-                    );
-                  })}
+                <div className="rounded-lg border p-2">
+                  <p className="text-xs text-muted-foreground mb-1.5">Rounds for {programGroups.find((g) => g.slug === cProgram)?.title}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {programGroups.find((g) => g.slug === cProgram)?.rounds.map((r: any) => {
+                      const on = cRounds.includes(r.id);
+                      return (
+                        <button
+                          key={r.id}
+                          type="button"
+                          onClick={() =>
+                            setCRounds(on ? cRounds.filter((x) => x !== r.id) : [...cRounds, r.id])
+                          }
+                          className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium border transition-colors ${
+                            on
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'bg-background hover:bg-muted'
+                          }`}
+                        >
+                          {on && <Check className="h-3 w-3" />}
+                          {r.round_name}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>
