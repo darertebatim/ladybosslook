@@ -758,37 +758,88 @@ export default function LearnCourses() {
               label="Cover image"
               previewHeight="h-36"
             />
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>Language</Label>
-                <Input value={cForm.language} onChange={(e) => setCForm({ ...cForm, language: e.target.value })} placeholder="en / fa / ..." />
+            <div className="space-y-1.5">
+              <Label>Language</Label>
+              <div className="flex flex-wrap gap-2">
+                {LANGUAGE_OPTIONS.map((l) => (
+                  <Button
+                    key={l.code || 'none'}
+                    type="button"
+                    size="sm"
+                    variant={(cForm.language || '') === l.code ? 'default' : 'outline'}
+                    onClick={() => setCForm({ ...cForm, language: l.code })}
+                  >
+                    {l.label}
+                  </Button>
+                ))}
               </div>
-              <div className="space-y-1.5">
-                <Label>Sort order</Label>
-                <Input type="number" value={cForm.sort_order} onChange={(e) => setCForm({ ...cForm, sort_order: parseInt(e.target.value) || 0 })} />
-              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Sort order</Label>
+              <Input type="number" value={cForm.sort_order} onChange={(e) => setCForm({ ...cForm, sort_order: parseInt(e.target.value) || 0 })} className="w-32" />
             </div>
             <div className="flex items-center justify-between">
               <Label>Published (visible to enrolled students)</Label>
               <Switch checked={cForm.is_published} onCheckedChange={(v) => setCForm({ ...cForm, is_published: v })} />
             </div>
-            <div className="space-y-1.5">
-              <Label>Linked rounds (students enrolled in these get access)</Label>
-              <div className="border rounded-lg max-h-48 overflow-y-auto p-2 space-y-1">
-                {allRounds?.map((r) => (
-                  <label key={r.id} className="flex items-center gap-2 text-sm py-1 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={cRounds.includes(r.id)}
-                      onChange={(e) =>
-                        setCRounds(e.target.checked ? [...cRounds, r.id] : cRounds.filter((x) => x !== r.id))
-                      }
-                    />
-                    <span>{r.round_name}</span>
-                    <span className="text-muted-foreground">({r.program_slug})</span>
-                  </label>
+            <div className="space-y-2">
+              <Label>Access — pick a program, then its rounds</Label>
+
+              {cRounds.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {cRounds.map((id) => {
+                    const r = allRounds?.find((x: any) => x.id === id);
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => setCRounds(cRounds.filter((x) => x !== id))}
+                        className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-2.5 py-1 text-xs font-medium"
+                      >
+                        {r ? `${r.round_name} · ${r.program_slug}` : 'Round'}
+                        <X className="h-3 w-3" />
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-2">
+                {programGroups.map((g) => (
+                  <Button
+                    key={g.slug}
+                    type="button"
+                    size="sm"
+                    variant={cProgram === g.slug ? 'default' : 'outline'}
+                    onClick={() => setCProgram(cProgram === g.slug ? null : g.slug)}
+                  >
+                    {g.slug}
+                    <span className="ml-1.5 opacity-60">{g.rounds.length}</span>
+                  </Button>
                 ))}
               </div>
+
+              {cProgram && (
+                <div className="rounded-lg border p-2 flex flex-wrap gap-2">
+                  {programGroups.find((g) => g.slug === cProgram)?.rounds.map((r: any) => {
+                    const on = cRounds.includes(r.id);
+                    return (
+                      <Button
+                        key={r.id}
+                        type="button"
+                        size="sm"
+                        variant={on ? 'default' : 'outline'}
+                        onClick={() =>
+                          setCRounds(on ? cRounds.filter((x) => x !== r.id) : [...cRounds, r.id])
+                        }
+                      >
+                        {on && <Check className="h-3.5 w-3.5 mr-1" />}
+                        {r.round_name}
+                      </Button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
           <DialogFooter>
