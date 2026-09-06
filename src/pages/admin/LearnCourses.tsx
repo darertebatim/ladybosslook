@@ -407,7 +407,10 @@ export default function LearnCourses() {
       is_published: course?.is_published ?? false,
       sort_order: course?.sort_order ?? (courses?.length || 0),
     });
-    setCRounds(course?.rounds.map((r) => r.round_id) || []);
+    const roundIds = course?.rounds.map((r) => r.round_id) || [];
+    setCRounds(roundIds);
+    const first = (allRounds || []).find((r: any) => roundIds.includes(r.id));
+    setCProgram(first?.program_slug ?? null);
     setCourseDialog({ open: true, course });
   };
 
