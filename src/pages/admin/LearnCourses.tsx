@@ -182,6 +182,9 @@ export default function LearnCourses() {
   });
   const [cRounds, setCRounds] = useState<string[]>([]);
   const [cProgram, setCProgram] = useState<string | null>(null);
+  const [cHosts, setCHosts] = useState<HostAssignment[]>([]);
+  const [cTagIds, setCTagIds] = useState<string[]>([]);
+  const saveTagLinks = useSaveContentTags();
 
   const [moduleDialog, setModuleDialog] = useState<{ open: boolean; module?: LearnModule }>({ open: false });
   const [mForm, setMForm] = useState({ title: '', description: '', is_published: true });
