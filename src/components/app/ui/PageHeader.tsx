@@ -24,9 +24,12 @@ export interface PageHeaderProps {
   /** Sub-row below the title (e.g. TabPills). */
   subRow?: ReactNode;
   variant?: "light" | "dark";
+  /** Back button look: iOS circle (default) or plain chevron like other app pages. */
+  backStyle?: "circle" | "plain";
   /** Sticky vs static. Default: sticky to top. */
   sticky?: boolean;
   className?: string;
+
 }
 
 export function PageHeader({
