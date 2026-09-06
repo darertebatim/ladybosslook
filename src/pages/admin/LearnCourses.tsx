@@ -112,7 +112,7 @@ function useAdminCourseContent(courseId: string | null) {
           .in('module_id', ids)
           .order('sort_order');
         if (error) throw error;
-        lessons = (data || []) as LearnLesson[];
+        lessons = (data || []) as unknown as LearnLesson[];
       }
       return { modules: (modules || []) as LearnModule[], lessons };
     },
