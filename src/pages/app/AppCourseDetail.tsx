@@ -2047,6 +2047,20 @@ const AppCourseDetail = () => {
                             )}
                           </Button>
                         )}
+
+                        {/* Join Google Meet - moved to end when first session is not on Meet */}
+                        {round.google_meet_link && (round as any).first_session_is_google_meet === false && (
+                          <Button
+                            size="lg"
+                            className="w-full h-auto px-4 py-3 tour-meet-btn bg-fg-warm text-white shadow-ios rounded-2xl border-0 justify-start"
+                            onClick={() =>
+                              window.open(round.google_meet_link!, "_blank")
+                            }
+                          >
+                            <Video className="h-5 w-5 mr-3 shrink-0" />
+                            <span className="truncate">Join Google Meet</span>
+                          </Button>
+                        )}
                       </CardContent>
                     </Card>
                   )}
