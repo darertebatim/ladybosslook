@@ -7,9 +7,7 @@ import {
 } from 'lucide-react';
 import { PageHeader } from '@/components/app/ui/PageHeader';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { AppVideoPlayer } from '@/components/app/AppVideoPlayer';
-import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
-import { isNativeApp } from '@/lib/platform';
+import { LessonVideo, LessonAudio, LessonPdf } from '@/components/app/learn/LessonMedia';
 import { smartOpenUrl } from '@/lib/navigation-utils';
 import { cn } from '@/lib/utils';
 import {
@@ -33,9 +31,7 @@ export default function AppLearnLesson() {
   const { data: progress } = useLearnProgress();
   const { data: startDate } = useLearnCourseStartDate(courseId);
   const setComplete = useSetLessonComplete();
-  const audioPlayer = useAudioPlayer();
 
-  const [videoOpen, setVideoOpen] = useState(false);
   const [listOpen, setListOpen] = useState(false);
   const [celebrated, setCelebrated] = useState(false);
 
@@ -69,7 +65,6 @@ export default function AppLearnLesson() {
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
-    setVideoOpen(false);
     setListOpen(false);
   }, [lessonId]);
 
@@ -104,93 +99,39 @@ export default function AppLearnLesson() {
 
     if (lesson.lesson_type === 'video') {
       const v = lesson.video;
+      if (!v?.file_url) {
+        return (
+          <div className="w-full aspect-video rounded-2xl bg-peach flex items-center justify-center">
+            <span className="text-xs text-fg-warm-muted">Video coming soon</span>
+          </div>
+        );
+      }
       return (
-        <>
-          <button
-            onClick={() => v?.file_url && setVideoOpen(true)}
-            className="relative w-full aspect-video rounded-2xl overflow-hidden bg-peach active:opacity-90 transition-opacity"
-          >
-            {v?.thumbnail_url ? (
-              <img src={v.thumbnail_url} alt={lesson.title} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-gradient-orange" />
-            )}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 rounded-full bg-white/95 shadow-ios flex items-center justify-center">
-                <Play className="h-7 w-7 text-brand fill-brand ml-0.5" />
-              </div>
-            </div>
-            {!v?.file_url && (
-              <span className="absolute bottom-2 left-2 rounded-full bg-white/90 px-2.5 py-1 text-xs text-fg-warm-muted">
-                Video coming soon
-              </span>
-            )}
-          </button>
-          {v?.file_url && (
-            <AppVideoPlayer
-              isOpen={videoOpen}
-              onClose={() => {
-                setVideoOpen(false);
-                if (!isDone) setComplete.mutate({ lessonId: lesson.id, complete: true });
-              }}
-              url={v.file_url}
-              title={lesson.title}
-              description={lesson.description || undefined}
-              isVertical={v.is_vertical || undefined}
-              videoId={v.id}
-            />
-          )}
-        </>
+        <LessonVideo
+          url={v.file_url}
+          poster={v.thumbnail_url}
+          title={lesson.title}
+          isVertical={v.is_vertical}
+        />
       );
     }
 
     if (lesson.lesson_type === 'audio') {
       const a = lesson.audio;
-      const isThisTrack = audioPlayer.currentTrack?.id === a?.id;
-      const playing = isThisTrack && audioPlayer.isPlaying;
+      if (!a?.file_url) {
+        return (
+          <div className="w-full aspect-square rounded-2xl bg-peach flex items-center justify-center">
+            <span className="text-xs text-fg-warm-muted">Audio coming soon</span>
+          </div>
+        );
+      }
       return (
-        <div className="flex items-center gap-3 bg-background rounded-2xl p-3">
-          <div className="w-14 h-14 rounded-xl overflow-hidden bg-peach shrink-0 flex items-center justify-center">
-            {a?.cover_image_url ? (
-              <img src={a.cover_image_url} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <Headphones className="h-6 w-6 text-brand" />
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-fg-warm truncate">{a?.title || lesson.title}</p>
-            {lessonDurationSeconds(lesson) ? (
-              <p className="text-xs text-fg-warm-muted">{formatLessonDuration(lessonDurationSeconds(lesson))}</p>
-            ) : (
-              !a?.file_url && <p className="text-xs text-fg-warm-muted">Audio coming soon</p>
-            )}
-          </div>
-          <button
-            disabled={!a?.file_url}
-            onClick={() => {
-              if (!a?.file_url) return;
-              if (isThisTrack) {
-                if (playing) audioPlayer.pause();
-                else audioPlayer.resume();
-              } else {
-                audioPlayer.playTrack({
-                  id: a.id,
-                  title: a.title || lesson.title,
-                  coverImageUrl: a.cover_image_url || undefined,
-                  fileUrl: a.file_url,
-                  duration: a.duration_seconds || undefined,
-                });
-              }
-            }}
-            className="w-12 h-12 rounded-full bg-brand shadow-ios flex items-center justify-center shrink-0 active:scale-95 transition-transform disabled:opacity-50"
-          >
-            {playing ? (
-              <Pause className="h-5 w-5 text-white fill-white" />
-            ) : (
-              <Play className="h-5 w-5 text-white fill-white ml-0.5" />
-            )}
-          </button>
-        </div>
+        <LessonAudio
+          url={a.file_url}
+          cover={a.cover_image_url || course?.cover_image_url}
+          title={a.title || lesson.title}
+          durationSeconds={a.duration_seconds || lessonDurationSeconds(lesson)}
+        />
       );
     }
 
@@ -199,7 +140,11 @@ export default function AppLearnLesson() {
       if (!r?.id) return null;
       return (
         <button
-          onClick={() => navigate(`/app/read/${r.id}/reader`)}
+          onClick={() =>
+            navigate(`/app/read/${r.id}/reader`, {
+              state: { from: `/app/learn/${courseId}/${lesson.id}` },
+            })
+          }
           className="w-full flex items-center gap-3 bg-background rounded-2xl p-4 text-left active:scale-[0.99] transition-transform min-h-[56px]"
         >
           <div className="w-12 h-12 rounded-xl bg-peach flex items-center justify-center shrink-0 overflow-hidden">
@@ -220,28 +165,13 @@ export default function AppLearnLesson() {
 
     // pdf
     if (!lesson.pdf_url) return null;
-    return (
-      <div className="space-y-2">
-        {!isNativeApp() && (
-          <div className="hidden md:block w-full h-[60vh] bg-background rounded-2xl overflow-hidden">
-            <iframe src={lesson.pdf_url} className="w-full h-full" title={lesson.title} />
-          </div>
-        )}
-        <button
-          onClick={() => smartOpenUrl(lesson.pdf_url!, navigate)}
-          className="w-full flex items-center justify-center gap-2 rounded-full bg-peach text-fg-warm font-semibold py-3.5 min-h-[48px] active:scale-[0.98] transition-transform"
-        >
-          <ExternalLink className="h-4 w-4 text-brand" />
-          Open / download file
-        </button>
-      </div>
-    );
+    return <LessonPdf url={lesson.pdf_url} title={lesson.title} />;
   };
 
   if (isLoading) {
     return (
       <div className="app-theme min-h-screen bg-background">
-        <PageHeader title="Lesson" back />
+        <PageHeader title="Lesson" back backStyle="plain" />
         <div className="flex justify-center py-20">
           <Loader2 className="h-6 w-6 animate-spin text-brand" />
         </div>
@@ -252,7 +182,7 @@ export default function AppLearnLesson() {
   if (!lesson) {
     return (
       <div className="app-theme min-h-screen bg-background">
-        <PageHeader title="Lesson" back onBack={() => navigate(`/app/learn/${courseId}`)} />
+        <PageHeader title="Lesson" back backStyle="plain" onBack={() => navigate(`/app/learn/${courseId}`)} />
         <div className="px-4 py-6">
           <div className="bg-card-warm shadow-card-warm rounded-3xl p-8 text-center space-y-3">
             <p className="font-semibold text-fg-warm">Lesson not available</p>
@@ -277,6 +207,7 @@ export default function AppLearnLesson() {
       <PageHeader
         title={course?.title || 'Lesson'}
         back
+        backStyle="plain"
         onBack={() => navigate(`/app/learn/${courseId}`)}
         right={
           <button

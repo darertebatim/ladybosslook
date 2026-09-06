@@ -73,6 +73,7 @@ export default function AppLearnCourse() {
       <PageHeader
         title={course?.title || 'Course'}
         back
+        backStyle="plain"
         onBack={() => navigate('/app/learn')}
         subRow={
           total > 0 ? (
@@ -94,7 +95,7 @@ export default function AppLearnCourse() {
             {/* Course hero */}
             <div className="bg-card-warm shadow-card-warm rounded-3xl overflow-hidden">
               {course?.cover_image_url ? (
-                <img src={course.cover_image_url} alt={course.title} className="w-full h-44 object-cover" />
+                <img src={course.cover_image_url} alt={course.title} className="w-full aspect-square object-cover" />
               ) : (
                 <div className="w-full h-24 bg-gradient-orange flex items-center justify-center">
                   <GraduationCap className="h-8 w-8 text-white" />
