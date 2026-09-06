@@ -8,7 +8,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { SEOHead } from '@/components/SEOHead';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 import { CachedImage } from '@/components/ui/CachedImage';
 import { HostBadges } from '@/components/app/HostBadges';
