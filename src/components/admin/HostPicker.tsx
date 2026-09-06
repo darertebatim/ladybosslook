@@ -72,9 +72,8 @@ export function HostPicker({ value, onChange, label = 'Hosts', hint }: HostPicke
     (i: any) => !value.some((h) => h.host_id === i.id),
   );
 
-  const addHost = () => {
-    if (!pendingId) return;
-    const inst = instructors.find((i: any) => i.id === pendingId);
+  const addHost = (id: string) => {
+    const inst = instructors.find((i: any) => i.id === id);
     if (!inst) return;
     onChange([
       ...value,
@@ -122,19 +121,20 @@ export function HostPicker({ value, onChange, label = 'Hosts', hint }: HostPicke
               <span className="flex-1 text-sm font-medium truncate">
                 {h.display_name || h.host_id}
               </span>
-              <Select
-                value={h.role}
-                onValueChange={(v) => updateRole(h.host_id, v as HostAssignment['role'])}
-              >
-                <SelectTrigger className="w-[120px] h-8">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="host">Host</SelectItem>
-                  <SelectItem value="co-host">Co-host</SelectItem>
-                  <SelectItem value="guest">Guest</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex gap-1">
+                {(['host', 'co-host', 'guest'] as const).map((role) => (
+                  <Button
+                    key={role}
+                    type="button"
+                    size="sm"
+                    variant={h.role === role ? 'default' : 'outline'}
+                    className="h-8 px-2.5 text-xs capitalize"
+                    onClick={() => updateRole(h.host_id, role)}
+                  >
+                    {role === 'co-host' ? 'Co-host' : role}
+                  </Button>
+                ))}
+              </div>
               <Button
                 type="button"
                 size="icon"
@@ -150,22 +150,23 @@ export function HostPicker({ value, onChange, label = 'Hosts', hint }: HostPicke
       )}
 
       {available.length > 0 && (
-        <div className="flex gap-2">
-          <Select value={pendingId} onValueChange={setPendingId}>
-            <SelectTrigger className="flex-1">
-              <SelectValue placeholder="Select a host…" />
-            </SelectTrigger>
-            <SelectContent>
-              {available.map((i: any) => (
-                <SelectItem key={i.id} value={i.id}>
-                  {i.display_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button type="button" onClick={addHost} disabled={!pendingId} size="sm">
-            <Plus className="h-4 w-4 mr-1" /> Add
-          </Button>
+        <div className="flex flex-wrap gap-2">
+          {available.map((i: any) => (
+            <Button
+              key={i.id}
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => addHost(i.id)}
+            >
+              {i.photo_url ? (
+                <img src={i.photo_url} alt="" className="h-5 w-5 rounded-full object-cover mr-1.5" />
+              ) : (
+                <Plus className="h-4 w-4 mr-1" />
+              )}
+              {i.display_name}
+            </Button>
+          ))}
         </div>
       )}
 
