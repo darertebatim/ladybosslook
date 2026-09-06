@@ -193,6 +193,7 @@ const AppReadDetail = lazy(() => import("@/pages/app/AppReadDetail"));
 const AppReadReader = lazy(() => import("@/pages/app/AppReadReader"));
 const AppLearn = lazy(() => import("@/pages/app/AppLearn"));
 const AppLearnCourse = lazy(() => import("@/pages/app/AppLearnCourse"));
+const AppLearnLesson = lazy(() => import("@/pages/app/AppLearnLesson"));
 const QuizLibrary = lazy(() => import("@/pages/app/QuizLibrary"));
 const QuizDetail = lazy(() => import("@/pages/app/QuizDetail"));
 const QuizPlay = lazy(() => import("@/pages/app/QuizPlay"));
