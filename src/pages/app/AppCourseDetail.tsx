@@ -1797,12 +1797,17 @@ const AppCourseDetail = () => {
                               </Badge>
                             )}
                           </div>
-                          <div
-                            className={`flex items-center gap-3 p-3 rounded-2xl shadow-ios ${
+                          <button
+                            className={`w-full flex items-center gap-3 p-3 rounded-2xl shadow-ios text-left active:scale-[0.99] transition-transform ${
                               isTodayNext
                                 ? "bg-[hsl(var(--tint-peach))] text-fg-warm"
                                 : "bg-white"
                             }`}
+                            onClick={() =>
+                              round.google_meet_link
+                                ? window.open(round.google_meet_link, "_blank")
+                                : navigate(`/app/programs/${slug}`)
+                            }
                           >
                             <div className="flex flex-col items-center justify-center w-12 shrink-0">
                               <span className="text-xs text-muted-foreground uppercase">
@@ -1821,16 +1826,18 @@ const AppCourseDetail = () => {
                                 {nextSession.duration_minutes || 90} min
                               </p>
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
+                            <span
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddSingleSession(nextSession);
+                              }}
                               className={cn(
-                                "shrink-0",
-                                isSessionSynced(nextSession.id) &&
-                                  "text-green-600 dark:text-green-400",
+                                "shrink-0 inline-flex items-center justify-center h-9 w-9 rounded-full",
+                                isSessionSynced(nextSession.id)
+                                  ? "text-green-600 dark:text-green-400"
+                                  : "text-muted-foreground",
+                                addingSessionId === nextSession.id && "opacity-50",
                               )}
-                              onClick={() => handleAddSingleSession(nextSession)}
-                              disabled={addingSessionId === nextSession.id}
                             >
                               {addingSessionId === nextSession.id ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -1839,8 +1846,8 @@ const AppCourseDetail = () => {
                               ) : (
                                 <CalendarPlus className="h-4 w-4" />
                               )}
-                            </Button>
-                          </div>
+                            </span>
+                          </button>
                         </CardContent>
                       </Card>
                     );
