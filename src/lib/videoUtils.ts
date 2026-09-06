@@ -41,6 +41,14 @@ export function extractVimeoId(url: string): string | null {
   return match ? match[1] : null;
 }
 
+export function extractGoogleDriveId(url: string): string | null {
+  // https://drive.google.com/file/d/FILE_ID/view... or /open?id=FILE_ID
+  const fileMatch = url.match(/drive\.google\.com\/file\/d\/([^/?#]+)/i);
+  if (fileMatch) return fileMatch[1];
+  const idMatch = url.match(/drive\.google\.com\/[^?]*[?&]id=([^&#]+)/i);
+  return idMatch ? idMatch[1] : null;
+}
+
 export function getVideoThumbnail(url: string, videoType: VideoType): string | null {
   switch (videoType) {
     case 'youtube': {
@@ -74,6 +82,10 @@ export function getVideoEmbedUrl(url: string, videoType: VideoType, autoplay = f
       }
       return null;
     }
+    case 'gdrive': {
+      const id = extractGoogleDriveId(url);
+      return id ? `https://drive.google.com/file/d/${id}/preview` : null;
+    }
     default:
       return null;
   }
@@ -85,6 +97,7 @@ export function getVideoPlatformLabel(videoType: VideoType): string {
     case 'vimeo': return 'Vimeo';
     case 'instagram': return 'Instagram';
     case 'tiktok': return 'TikTok';
+    case 'gdrive': return 'Google Drive';
     case 'direct': return 'Video';
     default: return 'Video';
   }
