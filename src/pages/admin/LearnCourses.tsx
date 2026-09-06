@@ -37,6 +37,14 @@ import { CSS } from '@dnd-kit/utilities';
 import type { LearnCourse, LearnModule, LearnLesson, LessonType } from '@/hooks/useLearn';
 import { formatTotalDuration } from '@/hooks/useLearn';
 
+const LANGUAGE_OPTIONS = [
+  { code: '', label: 'Any' },
+  { code: 'en', label: 'English' },
+  { code: 'fa', label: 'فارسی' },
+  { code: 'tr', label: 'Türkçe' },
+  { code: 'es', label: 'Español' },
+];
+
 const LESSON_META: Record<LessonType, { label: string; icon: typeof Play }> = {
   video: { label: 'Video', icon: Play },
   audio: { label: 'Audio', icon: Headphones },
