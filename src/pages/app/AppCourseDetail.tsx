@@ -1919,8 +1919,8 @@ const AppCourseDetail = () => {
                           </Button>
                         )}
 
-                        {/* 2. Join Google Meet - Time-sensitive */}
-                        {round.google_meet_link && (
+                        {/* 2. Join Google Meet - Time-sensitive (only when first session is on Meet) */}
+                        {round.google_meet_link && (round as any).first_session_is_google_meet !== false && (
                           <Button
                             size="lg"
                             className="w-full h-auto px-4 py-3 tour-meet-btn bg-fg-warm text-white shadow-ios rounded-2xl border-0 justify-start"
