@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useReadingContentById, useContentSections, useReadingUserProgress, useUpsertReadingProgress } from '@/hooks/useReading';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,6 +12,9 @@ export default function AppReadReader() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = (location.state as { from?: string } | null)?.from ?? null;
+  const backTo = returnTo ?? `/app/read/${id}`;
   const { toast } = useToast();
   const { data: content } = useReadingContentById(id || null);
   const { data: sections = [] } = useContentSections(id || null);
