@@ -527,6 +527,23 @@ const AppCourseDetail = () => {
     enabled: !!round?.id,
   });
 
+  // Main round playlist + extra playlists, de-duplicated
+  const allRoundPlaylists = useMemo(() => {
+    const list: any[] = [];
+    if (round?.audio_playlist_id) {
+      list.push({
+        id: `main-${round.audio_playlist_id}`,
+        playlist_type: "audio",
+        playlist_id: round.audio_playlist_id,
+        playlist: schedulePlaylistInfo || { name: "Round playlist" },
+      });
+    }
+    (roundPlaylists as any[]).forEach((rp) => {
+      if (rp.playlist_type === "audio" && rp.playlist_id === round?.audio_playlist_id) return;
+      list.push(rp);
+    });
+    return list;
+  }, [round?.audio_playlist_id, schedulePlaylistInfo, roundPlaylists]);
 
 
   // Fetch unread post count for the round's channel
