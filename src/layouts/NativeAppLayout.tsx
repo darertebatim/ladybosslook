@@ -206,7 +206,10 @@ const NativeAppLayout = () => {
   if (showAudioMini) aiFabBottomOffset += 84; // clears the audio mini-player
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-background app-theme font-farsi">
+    <div className={cn(
+      "flex flex-col h-[100dvh] app-theme font-farsi",
+      location.pathname.startsWith('/app/watch') ? 'bg-[#132240]' : 'bg-background'
+    )}>
       {/* Offline / sync status pill */}
       <OfflineStatusBar />
       {/* Main Content */}
