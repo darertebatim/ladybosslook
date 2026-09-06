@@ -373,6 +373,7 @@ const AppCourseDetail = () => {
   });
 
   const round = enrollment?.program_rounds;
+  const { data: roundCourseId } = useRoundCourse(round?.id);
 
   // Calendar sync tracking hook - tracks which sessions have been synced to calendar
   const {
