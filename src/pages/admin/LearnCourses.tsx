@@ -155,6 +155,15 @@ export default function LearnCourses() {
   const queryClient = useQueryClient();
   const { data: courses, isLoading } = useAdminCourses();
   const { data: allRounds } = useAdminRounds();
+  const programGroups = useMemo(() => {
+    const map = new Map<string, { slug: string; rounds: any[] }>();
+    (allRounds || []).forEach((r: any) => {
+      const slug = r.program_slug || 'other';
+      if (!map.has(slug)) map.set(slug, { slug, rounds: [] });
+      map.get(slug)!.rounds.push(r);
+    });
+    return Array.from(map.values()).sort((a, b) => a.slug.localeCompare(b.slug));
+  }, [allRounds]);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [listSearch, setListSearch] = useState('');
