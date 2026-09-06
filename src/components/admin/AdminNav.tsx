@@ -23,6 +23,7 @@ const menuItems = [
   { title: 'Banners', url: '/admin/banners', icon: Image, pageSlug: 'communications' },
   { title: 'Audiences', url: '/admin/audiences', icon: Library, pageSlug: 'communications' },
   { title: 'Programs', url: '/admin/programs', icon: UserCog, pageSlug: 'programs' },
+  { title: 'Courses', url: '/admin/learn', icon: Presentation, pageSlug: 'programs' },
   { title: 'Payments', url: '/admin/payments', icon: CreditCard, pageSlug: 'payments' },
   { title: 'Subscriptions', url: '/admin/subscriptions', icon: Sparkles, pageSlug: 'payments' },
   { title: 'Support', url: '/admin/support', icon: MessageCircle, pageSlug: 'support' },
