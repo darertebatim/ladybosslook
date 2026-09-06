@@ -16,14 +16,16 @@ import { Music, Video as VideoIcon, Plus, Trash2, ArrowUp, ArrowDown } from "luc
 
 interface Props {
   roundId: string;
-  roundName: string;
-  isOpen: boolean;
-  onClose: () => void;
+  roundName?: string;
+  /** Render as a dialog (table button) or inline inside the Edit Round dialog */
+  inline?: boolean;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 type PlaylistType = "audio" | "video";
 
-export const RoundPlaylistsManager = ({ roundId, roundName, isOpen, onClose }: Props) => {
+export const RoundPlaylistsManager = ({ roundId, roundName, inline = false, isOpen = true, onClose }: Props) => {
   const queryClient = useQueryClient();
   const [type, setType] = useState<PlaylistType>("audio");
   const [selectedId, setSelectedId] = useState<string>("");
