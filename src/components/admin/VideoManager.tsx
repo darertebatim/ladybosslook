@@ -33,8 +33,55 @@ export const VideoManager = () => {
   const editThumbInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
-    title: "", description: "", playlist_id: "", url: "", is_vertical: false, thumbnail_url: "",
+    title: "", description: "", playlist_id: "", url: "", is_vertical: false, thumbnail_url: "", duration: "",
   });
+  const [isFetchingMeta, setIsFetchingMeta] = useState(false);
+
+  // "mm:ss", "h:mm:ss" or plain seconds -> seconds
+  const parseDuration = (v: string): number => {
+    const s = v.trim();
+    if (!s) return 0;
+    const parts = s.split(':').map((p) => parseInt(p, 10));
+    if (parts.some((n) => isNaN(n))) return 0;
+    return parts.reduce((acc, n) => acc * 60 + n, 0);
+  };
+  const secondsToInput = (s?: number | null) => {
+    if (!s || s <= 0) return '';
+    const m = Math.floor(s / 60);
+    return `${m}:${(s % 60).toString().padStart(2, '0')}`;
+  };
+
+  // Pull thumbnail (and duration where available) from the video platform
+  const fetchMetaFromUrl = async (url: string) => {
+    if (!url) return;
+    const type = detectVideoType(url);
+    setIsFetchingMeta(true);
+    try {
+      if (type === 'youtube') {
+        const id = extractYouTubeId(url);
+        if (id) {
+          setFormData((p) => ({ ...p, thumbnail_url: p.thumbnail_url || `https://img.youtube.com/vi/${id}/maxresdefault.jpg` }));
+          toast.success('Thumbnail copied from YouTube');
+        }
+      } else if (type === 'vimeo') {
+        const res = await fetch(`https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`);
+        const data = await res.json();
+        setFormData((p) => ({
+          ...p,
+          thumbnail_url: p.thumbnail_url || data.thumbnail_url || '',
+          duration: p.duration || (data.duration ? secondsToInput(data.duration) : ''),
+        }));
+        toast.success('Thumbnail and length copied from Vimeo');
+      } else if (type === 'instagram' || type === 'tiktok') {
+        toast.info('Instagram/TikTok do not share thumbnails — please upload one and type the length');
+      }
+    } catch {
+      toast.error('Could not read the video info — add thumbnail and length manually');
+    } finally {
+      setIsFetchingMeta(false);
+    }
+  };
+
 
   const { data: playlists } = useQuery({
     queryKey: ['video-playlists-admin'],
