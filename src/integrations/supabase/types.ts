@@ -3863,8 +3863,11 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          intro_note: string | null
           is_published: boolean
+          language: string | null
           sort_order: number
+          subtitle: string | null
           title: string
           updated_at: string
         }
@@ -3873,8 +3876,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          intro_note?: string | null
           is_published?: boolean
+          language?: string | null
           sort_order?: number
+          subtitle?: string | null
           title: string
           updated_at?: string
         }
@@ -3883,8 +3889,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          intro_note?: string | null
           is_published?: boolean
+          language?: string | null
           sort_order?: number
+          subtitle?: string | null
           title?: string
           updated_at?: string
         }
@@ -3924,11 +3933,17 @@ export type Database = {
       }
       learn_lessons: {
         Row: {
+          attachments: Json
           audio_id: string | null
+          content_html: string | null
           created_at: string
           description: string | null
+          drip_date: string | null
+          drip_days: number | null
           duration_seconds: number | null
           id: string
+          is_free_preview: boolean
+          is_published: boolean
           lesson_type: string
           module_id: string
           pdf_url: string | null
@@ -3939,11 +3954,17 @@ export type Database = {
           video_id: string | null
         }
         Insert: {
+          attachments?: Json
           audio_id?: string | null
+          content_html?: string | null
           created_at?: string
           description?: string | null
+          drip_date?: string | null
+          drip_days?: number | null
           duration_seconds?: number | null
           id?: string
+          is_free_preview?: boolean
+          is_published?: boolean
           lesson_type?: string
           module_id: string
           pdf_url?: string | null
@@ -3954,11 +3975,17 @@ export type Database = {
           video_id?: string | null
         }
         Update: {
+          attachments?: Json
           audio_id?: string | null
+          content_html?: string | null
           created_at?: string
           description?: string | null
+          drip_date?: string | null
+          drip_days?: number | null
           duration_seconds?: number | null
           id?: string
+          is_free_preview?: boolean
+          is_published?: boolean
           lesson_type?: string
           module_id?: string
           pdf_url?: string | null
@@ -4005,6 +4032,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          is_published: boolean
           sort_order: number
           title: string
           updated_at: string
@@ -4014,6 +4042,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          is_published?: boolean
           sort_order?: number
           title: string
           updated_at?: string
@@ -4023,6 +4052,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          is_published?: boolean
           sort_order?: number
           title?: string
           updated_at?: string
