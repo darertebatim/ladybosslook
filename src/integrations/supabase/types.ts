@@ -4798,6 +4798,44 @@ export type Database = {
           },
         ]
       }
+      program_round_playlists: {
+        Row: {
+          created_at: string
+          id: string
+          playlist_id: string
+          playlist_type: string
+          round_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          playlist_id: string
+          playlist_type: string
+          round_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          playlist_id?: string
+          playlist_type?: string
+          round_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_round_playlists_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "program_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       program_rounds: {
         Row: {
           audio_playlist_id: string | null

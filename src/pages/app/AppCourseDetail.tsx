@@ -494,6 +494,41 @@ const AppCourseDetail = () => {
     enabled: !!round?.audio_playlist_id,
   });
 
+  // Extra playlists attached to this round (audio + video)
+  const { data: roundPlaylists = [] } = useQuery({
+    queryKey: ["course-round-playlists", round?.id],
+    queryFn: async () => {
+      if (!round?.id) return [];
+      const { data, error } = await supabase
+        .from("program_round_playlists")
+        .select("id, playlist_type, playlist_id, sort_order")
+        .eq("round_id", round.id)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      const rows = data || [];
+      const audioIds = rows.filter((r) => r.playlist_type === "audio").map((r) => r.playlist_id);
+      const videoIds = rows.filter((r) => r.playlist_type === "video").map((r) => r.playlist_id);
+      const [audioRes, videoRes] = await Promise.all([
+        audioIds.length
+          ? supabase.from("audio_playlists").select("id, name, cover_image_url").in("id", audioIds)
+          : Promise.resolve({ data: [] as any[] }),
+        videoIds.length
+          ? supabase.from("video_playlists").select("id, name, cover_image_url").in("id", videoIds)
+          : Promise.resolve({ data: [] as any[] }),
+      ]);
+      const byId: Record<string, any> = {};
+      [...((audioRes as any).data || []), ...((videoRes as any).data || [])].forEach((p: any) => {
+        byId[p.id] = p;
+      });
+      return rows
+        .map((r) => ({ ...r, playlist: byId[r.playlist_id] }))
+        .filter((r) => !!r.playlist);
+    },
+    enabled: !!round?.id,
+  });
+
+
+
   // Fetch unread post count for the round's channel
   const { data: channelUnreadCount } = useQuery({
     queryKey: ["channel-unread-count", roundChannel?.id, user?.id],
@@ -2404,6 +2439,62 @@ const AppCourseDetail = () => {
                       </CardContent>
                     </Card>
                   )}
+
+                  {/* Additional playlists attached to this round */}
+                  {enrollment && roundPlaylists.filter((rp: any) => !(rp.playlist_type === "audio" && rp.playlist_id === round?.audio_playlist_id)).length > 0 && (
+                    <Card className="rounded-2xl border-0 shadow-ios bg-card-warm">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-fg-warm">
+                          <Music className="h-5 w-5" />
+                          Playlists
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        {roundPlaylists
+                          .filter((rp: any) => !(rp.playlist_type === "audio" && rp.playlist_id === round?.audio_playlist_id))
+                          .map((rp: any) => (
+                            <button
+                              key={rp.id}
+                              onClick={() =>
+                                navigate(
+                                  rp.playlist_type === "video"
+                                    ? `/app/watch/playlist/${rp.playlist_id}`
+                                    : `/app/player/playlist/${rp.playlist_id}`,
+                                  { state: { from: location.pathname } }
+                                )
+                              }
+                              className="w-full flex items-center gap-3 p-3 rounded-2xl bg-white text-left active:scale-[0.99] transition-transform"
+                            >
+                              {rp.playlist?.cover_image_url ? (
+                                <img
+                                  src={rp.playlist.cover_image_url}
+                                  alt=""
+                                  className="w-11 h-11 rounded-xl object-cover shrink-0"
+                                />
+                              ) : (
+                                <div className="w-11 h-11 rounded-xl bg-peach flex items-center justify-center shrink-0">
+                                  {rp.playlist_type === "video" ? (
+                                    <Video className="h-5 w-5 text-brand" />
+                                  ) : (
+                                    <Music className="h-5 w-5 text-brand" />
+                                  )}
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-fg-warm truncate">
+                                  {rp.playlist?.name}
+                                </p>
+                                <p className="text-xs text-fg-warm/70">
+                                  {rp.playlist_type === "video" ? "Video playlist" : "Audio playlist"}
+                                </p>
+                              </div>
+                            </button>
+                          ))}
+                      </CardContent>
+                    </Card>
+                  )}
+
+
 
                   <Card className="tour-program-info rounded-2xl border-0 shadow-ios bg-card-warm">
                     <CardHeader>
