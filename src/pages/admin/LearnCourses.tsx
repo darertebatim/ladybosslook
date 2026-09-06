@@ -92,12 +92,16 @@ function useAdminRounds() {
   return useQuery({
     queryKey: ['admin-learn-rounds'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('program_rounds')
-        .select('id, round_name, program_slug')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data || [];
+      const [{ data: rounds, error: rErr }, { data: programs, error: pErr }] = await Promise.all([
+        supabase.from('program_rounds').select('id, round_name, program_slug').order('created_at', { ascending: false }),
+        supabase.from('program_catalog').select('slug, title').order('title'),
+      ]);
+      if (rErr) throw rErr;
+      if (pErr) throw pErr;
+      return {
+        rounds: (rounds || []) as { id: string; round_name: string; program_slug: string }[],
+        programTitles: Object.fromEntries((programs || []).map((p: any) => [p.slug, p.title || p.slug])),
+      };
     },
   });
 }
