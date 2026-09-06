@@ -3821,6 +3821,222 @@ export type Database = {
         }
         Relationships: []
       }
+      learn_course_rounds: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          round_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          round_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          round_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learn_course_rounds_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "learn_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learn_course_rounds_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "program_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learn_courses: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_published: boolean
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_published?: boolean
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_published?: boolean
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      learn_lesson_progress: {
+        Row: {
+          completed_at: string
+          created_at: string
+          id: string
+          lesson_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          created_at?: string
+          id?: string
+          lesson_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learn_lesson_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "learn_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learn_lessons: {
+        Row: {
+          audio_id: string | null
+          created_at: string
+          description: string | null
+          duration_seconds: number | null
+          id: string
+          lesson_type: string
+          module_id: string
+          pdf_url: string | null
+          reading_id: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+          video_id: string | null
+        }
+        Insert: {
+          audio_id?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          lesson_type?: string
+          module_id: string
+          pdf_url?: string | null
+          reading_id?: string | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+          video_id?: string | null
+        }
+        Update: {
+          audio_id?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          lesson_type?: string
+          module_id?: string
+          pdf_url?: string | null
+          reading_id?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learn_lessons_audio_id_fkey"
+            columns: ["audio_id"]
+            isOneToOne: false
+            referencedRelation: "audio_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learn_lessons_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "learn_modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learn_lessons_reading_id_fkey"
+            columns: ["reading_id"]
+            isOneToOne: false
+            referencedRelation: "reading_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learn_lessons_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "video_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learn_modules: {
+        Row: {
+          course_id: string
+          created_at: string
+          description: string | null
+          id: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learn_modules_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "learn_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       local_notification_events: {
         Row: {
           created_at: string
@@ -7746,6 +7962,10 @@ export type Database = {
       aperture_full_reset: { Args: { p_user_id: string }; Returns: Json }
       can_access_admin_page: {
         Args: { _page_slug: string; _user_id: string }
+        Returns: boolean
+      }
+      can_access_learn_course: {
+        Args: { _course_id: string; _user_id: string }
         Returns: boolean
       }
       claim_dedication: { Args: { t: string }; Returns: Json }
