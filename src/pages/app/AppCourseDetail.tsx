@@ -2477,8 +2477,8 @@ const AppCourseDetail = () => {
                     </Card>
                   )}
 
-                  {/* Additional playlists attached to this round */}
-                  {enrollment && roundPlaylists.filter((rp: any) => !(rp.playlist_type === "audio" && rp.playlist_id === round?.audio_playlist_id)).length > 0 && (
+                  {/* Playlists attached to this round */}
+                  {enrollment && allRoundPlaylists.length > 0 && (
                     <Card className="rounded-2xl border-0 shadow-ios bg-card-warm">
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-fg-warm">
@@ -2487,10 +2487,10 @@ const AppCourseDetail = () => {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-2">
-                        {roundPlaylists
-                          .filter((rp: any) => !(rp.playlist_type === "audio" && rp.playlist_id === round?.audio_playlist_id))
+                        {allRoundPlaylists
                           .map((rp: any) => (
                             <button
+
                               key={rp.id}
                               onClick={() =>
                                 navigate(
