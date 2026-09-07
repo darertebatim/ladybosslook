@@ -137,6 +137,8 @@ export function LeadEmailCampaign() {
     buttons: buttons.filter((b) => b.label.trim() && b.url.trim()),
     sources: includeSources,
     excludeSources,
+    programs: includePrograms,
+    excludePrograms,
   });
 
   async function send(mode: 'test' | 'all') {
