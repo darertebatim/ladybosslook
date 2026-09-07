@@ -35,6 +35,8 @@ interface Body {
   rtl?: boolean;
   testEmail?: string;
   preheader?: string;
+  offset?: number;
+  limit?: number;
 }
 
 const esc = (s: string) =>
@@ -272,21 +274,26 @@ const handler = async (req: Request): Promise<Response> => {
       for (const e of await collectProgramEmails(supabase, (body.excludePrograms || []).map(String).filter(Boolean))) exclude.add(e);
       for (const e of await collectUnsubscribed(supabase)) exclude.add(e);
       for (const e of exclude) include.delete(e);
-      recipients = Array.from(include);
+      recipients = Array.from(include).sort();
     }
 
-    if (!recipients.length) {
-      return new Response(JSON.stringify({ success: true, sent: 0, failed: 0, total: 0 }), {
-        status: 200,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      });
+    const total = recipients.length;
+    const offset = Math.max(0, Number(body.offset) || 0);
+    const limit = Math.min(Math.max(1, Number(body.limit) || total || 1), 1000);
+    const slice = body.testEmail ? recipients : recipients.slice(offset, offset + limit);
+
+    if (!slice.length) {
+      return new Response(
+        JSON.stringify({ success: true, sent: 0, failed: 0, total, processed: 0, done: true }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
+      );
     }
 
     let sent = 0;
     let failed = 0;
     const batchSize = 20;
-    for (let i = 0; i < recipients.length; i += batchSize) {
-      const batch = recipients.slice(i, i + batchSize);
+    for (let i = 0; i < slice.length; i += batchSize) {
+      const batch = slice.slice(i, i + batchSize);
       const results = await Promise.allSettled(
         batch.map(async (email) => {
           const unsubscribeUrl = await unsubUrl(email);
@@ -327,13 +334,22 @@ const handler = async (req: Request): Promise<Response> => {
           console.error("send failed:", (r as PromiseRejectedResult).reason);
         }
       }
-      if (i + batchSize < recipients.length) await new Promise((r) => setTimeout(r, 600));
+      if (i + batchSize < slice.length) await new Promise((r) => setTimeout(r, 300));
     }
 
-    return new Response(JSON.stringify({ success: true, sent, failed, total: recipients.length }), {
-      status: 200,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
-    });
+    const processed = slice.length;
+    return new Response(
+      JSON.stringify({
+        success: true,
+        sent,
+        failed,
+        total,
+        processed,
+        done: !!body.testEmail || offset + processed >= total,
+      }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
+    );
+
   } catch (error: any) {
     console.error("send-lead-email error:", error);
     return new Response(JSON.stringify({ error: error?.message || "Failed" }), {
