@@ -298,6 +298,11 @@ const handler = async (req: Request): Promise<Response> => {
       const exclude = await collectEmails(supabase, (body.excludeSources || []).map(String).filter(Boolean));
       for (const e of await collectProgramEmails(supabase, (body.excludePrograms || []).map(String).filter(Boolean))) exclude.add(e);
       for (const e of await collectUnsubscribed(supabase)) exclude.add(e);
+      const skipSubject = String(body.skipSubject || "").trim();
+      if (skipSubject) {
+        for (const e of await collectAlreadySent(supabase, skipSubject)) exclude.add(e);
+      }
+
       for (const e of exclude) include.delete(e);
       recipients = Array.from(include).sort();
     }
