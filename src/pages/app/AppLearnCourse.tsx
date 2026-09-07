@@ -86,14 +86,6 @@ export default function AppLearnCourse() {
         back
         backStyle="plain"
         onBack={() => navigate('/app/learn')}
-        subRow={
-          total > 0 ? (
-            <div className="flex items-center gap-2 w-full">
-              <ProgressBar value={pct} className="flex-1" />
-              <span className="text-xs font-medium text-fg-warm-muted shrink-0">{pct}%</span>
-            </div>
-          ) : undefined
-        }
       />
 
       <div className="px-4 py-4 space-y-4">
