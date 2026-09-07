@@ -18,6 +18,7 @@ export interface LearnCourse {
   language?: string | null;
   cover_image_url: string | null;
   is_published: boolean;
+  sequential_lessons?: boolean | null;
   sort_order: number;
 }
 
@@ -196,6 +197,40 @@ export function lessonUnlockDate(
     return d.getTime() > Date.now() ? d : null;
   }
   return null;
+}
+
+export interface LessonLock {
+  type: 'drip' | 'sequence';
+  label: string;
+}
+
+/**
+ * Returns a lock checker for a course.
+ * Drip schedule always applies; when `sequential` is on, a lesson also stays
+ * locked until every earlier (non-preview, already-released) lesson is done.
+ */
+export function makeLessonLocker(opts: {
+  flatLessons: LearnLesson[];
+  startDate: string | null | undefined;
+  progress: Set<string> | undefined;
+  sequential: boolean;
+}) {
+  const { flatLessons, startDate, progress, sequential } = opts;
+  return (lesson: LearnLesson): LessonLock | null => {
+    const d = lessonUnlockDate(lesson, startDate);
+    if (d) return { type: 'drip', label: formatUnlockLabel(d) };
+    if (!sequential || lesson.is_free_preview) return null;
+    const idx = flatLessons.findIndex((l) => l.id === lesson.id);
+    for (let i = 0; i < idx; i++) {
+      const prev = flatLessons[i];
+      if (prev.is_free_preview) continue;
+      if (lessonUnlockDate(prev, startDate)) continue;
+      if (!progress?.has(prev.id)) {
+        return { type: 'sequence', label: 'Finish the previous lesson first' };
+      }
+    }
+    return null;
+  };
 }
 
 export function formatUnlockLabel(date: Date): string {

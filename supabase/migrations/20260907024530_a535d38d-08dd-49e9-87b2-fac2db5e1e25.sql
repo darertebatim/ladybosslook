@@ -1,0 +1,1 @@
+ALTER TABLE public.learn_courses ADD COLUMN IF NOT EXISTS sequential_lessons boolean NOT NULL DEFAULT false;

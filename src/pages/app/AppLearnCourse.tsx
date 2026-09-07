@@ -10,7 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { cn } from '@/lib/utils';
 import {
   useLearnCourse, useLearnCourseContent, useLearnProgress, useLearnCourseStartDate,
-  lessonUnlockDate, formatUnlockLabel, formatLessonDuration, formatTotalDuration,
+  lessonUnlockDate, makeLessonLocker, formatLessonDuration, formatTotalDuration,
   lessonDurationSeconds, type LearnLesson, type LessonType,
 } from '@/hooks/useLearn';
 
@@ -57,13 +57,23 @@ export default function AppLearnCourse() {
     return content.modules.flatMap((m) => content.lessons.filter((l) => l.module_id === m.id));
   }, [content]);
 
+  const lockOf = useMemo(
+    () => makeLessonLocker({
+      flatLessons,
+      startDate,
+      progress,
+      sequential: !!(course as any)?.sequential_lessons,
+    }),
+    [flatLessons, startDate, progress, course]
+  );
+
   const total = flatLessons.length;
   const doneCount = flatLessons.filter((l) => progress?.has(l.id)).length;
   const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
   const totalSeconds = flatLessons.reduce((s, l) => s + (lessonDurationSeconds(l) || 0), 0);
 
   const nextLesson = flatLessons.find(
-    (l) => !progress?.has(l.id) && !lessonUnlockDate(l, startDate)
+    (l) => !progress?.has(l.id) && !lockOf(l)
   );
   const nextIndex = nextLesson ? flatLessons.findIndex((l) => l.id === nextLesson.id) + 1 : 0;
 
@@ -225,7 +235,7 @@ export default function AppLearnCourse() {
                           {lessons.map((lesson, li) => {
                             const Icon = LESSON_ICONS[lesson.lesson_type] || Play;
                             const isDone = progress?.has(lesson.id);
-                            const unlockAt = lessonUnlockDate(lesson, startDate);
+                            const unlockAt = lockOf(lesson);
                             const isCurrent = nextLesson?.id === lesson.id;
                             const dur = lessonDurationSeconds(lesson);
                             return (
@@ -262,7 +272,7 @@ export default function AppLearnCourse() {
                                   </span>
                                   <span className="flex items-center gap-2 text-xs text-fg-warm-muted">
                                     {unlockAt ? (
-                                      formatUnlockLabel(unlockAt)
+                                      unlockAt.label
                                     ) : (
                                       <>
                                         <span className="capitalize">{lesson.lesson_type}</span>
