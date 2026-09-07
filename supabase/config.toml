@@ -250,3 +250,6 @@ verify_jwt = true
 
 [functions.send-lead-email]
 verify_jwt = true
+
+[functions.email-unsubscribe]
+verify_jwt = false
