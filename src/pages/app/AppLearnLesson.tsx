@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import {
   Play, Pause, Headphones, FileText, BookOpen, Check, Loader2,
-  ExternalLink, ChevronLeft, ChevronRight, Paperclip, Download, Lock, Trophy, List,
+  ExternalLink, ChevronLeft, ChevronRight, Paperclip, Download, Lock, Trophy, List, Link2, Video, Calendar,
 } from 'lucide-react';
 import { PageHeader } from '@/components/app/ui/PageHeader';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -21,6 +21,8 @@ const LESSON_ICONS: Record<LessonType, typeof Play> = {
   audio: Headphones,
   document: BookOpen,
   pdf: FileText,
+  link: Link2,
+  session: Video,
 };
 
 export default function AppLearnLesson() {
@@ -142,6 +144,51 @@ export default function AppLearnLesson() {
           title={a.title || lesson.title}
           durationSeconds={a.duration_seconds || lessonDurationSeconds(lesson)}
         />
+      );
+    }
+
+    if (lesson.lesson_type === 'link') {
+      if (!lesson.link_url) return null;
+      return (
+        <button
+          onClick={() => smartOpenUrl(lesson.link_url!, navigate)}
+          className="w-full flex items-center justify-center gap-2 bg-gradient-orange text-white rounded-2xl p-4 font-semibold min-h-[56px] active:scale-[0.99] transition-transform"
+        >
+          <ExternalLink className="h-5 w-5" />
+          {lesson.link_label || 'Open link'}
+        </button>
+      );
+    }
+
+    if (lesson.lesson_type === 'session') {
+      const when = lesson.session_at ? new Date(lesson.session_at) : null;
+      return (
+        <div className="space-y-3">
+          {when && (
+            <div className="flex items-center gap-2.5 bg-background rounded-2xl p-3.5">
+              <Calendar className="h-5 w-5 text-brand shrink-0" />
+              <span className="text-sm font-medium text-fg-warm">
+                {when.toLocaleString(undefined, {
+                  weekday: 'short', month: 'short', day: 'numeric',
+                  hour: 'numeric', minute: '2-digit',
+                })}
+              </span>
+            </div>
+          )}
+          {lesson.session_url ? (
+            <button
+              onClick={() => smartOpenUrl(lesson.session_url!, navigate)}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-orange text-white rounded-2xl p-4 font-semibold min-h-[56px] active:scale-[0.99] transition-transform"
+            >
+              <Video className="h-5 w-5" />
+              Join the session
+            </button>
+          ) : (
+            <div className="w-full rounded-2xl bg-peach p-4 text-center text-xs text-fg-warm-muted">
+              The link will be added before the session
+            </div>
+          )}
+        </div>
       );
     }
 

@@ -3948,9 +3948,13 @@ export type Database = {
           is_free_preview: boolean
           is_published: boolean
           lesson_type: string
+          link_label: string | null
+          link_url: string | null
           module_id: string
           pdf_url: string | null
           reading_id: string | null
+          session_at: string | null
+          session_url: string | null
           sort_order: number
           title: string
           updated_at: string
@@ -3969,9 +3973,13 @@ export type Database = {
           is_free_preview?: boolean
           is_published?: boolean
           lesson_type?: string
+          link_label?: string | null
+          link_url?: string | null
           module_id: string
           pdf_url?: string | null
           reading_id?: string | null
+          session_at?: string | null
+          session_url?: string | null
           sort_order?: number
           title: string
           updated_at?: string
@@ -3990,9 +3998,13 @@ export type Database = {
           is_free_preview?: boolean
           is_published?: boolean
           lesson_type?: string
+          link_label?: string | null
+          link_url?: string | null
           module_id?: string
           pdf_url?: string | null
           reading_id?: string | null
+          session_at?: string | null
+          session_url?: string | null
           sort_order?: number
           title?: string
           updated_at?: string

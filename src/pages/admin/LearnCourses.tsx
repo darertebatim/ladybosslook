@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import {
   Plus, Pencil, Trash2, ChevronUp, ChevronDown, Loader2, GraduationCap,
-  Play, Headphones, BookOpen, FileText, Search, Copy, ExternalLink, GripVertical,
+  Play, Headphones, BookOpen, FileText, Search, Copy, ExternalLink, GripVertical, Link2, Video,
   EyeOff, Lock, Sparkles, X, Check,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -56,6 +56,8 @@ const LESSON_META: Record<LessonType, { label: string; icon: typeof Play }> = {
   audio: { label: 'Audio', icon: Headphones },
   document: { label: 'Reading', icon: BookOpen },
   pdf: { label: 'PDF', icon: FileText },
+  link: { label: 'Link', icon: Link2 },
+  session: { label: 'Online session', icon: Video },
 };
 
 type CourseWithRounds = LearnCourse & { rounds: { round_id: string; label: string }[] };
