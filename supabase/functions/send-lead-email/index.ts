@@ -37,6 +37,9 @@ interface Body {
   preheader?: string;
   offset?: number;
   limit?: number;
+  /** Skip anyone who already received an email with this subject. */
+  skipSubject?: string;
+
 }
 
 const esc = (s: string) =>
