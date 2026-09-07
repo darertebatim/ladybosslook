@@ -38,6 +38,54 @@ const CHUNK = 500;
 /** Handoff key used by the Email Opens tab ("Resend to who didn't get it"). */
 export const RESEND_HANDOFF_KEY = 'lead_email_resend_subject';
 
+const DRAFTS_KEY = 'lead_email_drafts';
+
+type SavedDraft = {
+  subject: string;
+  preheader?: string;
+  message?: string;
+  signature?: string;
+  fromName?: string;
+  address?: string;
+  rtl?: boolean;
+  buttons?: { label: string; url: string }[];
+  includeSel?: string[];
+  excludeSel?: string[];
+  savedAt?: string;
+};
+
+function readDrafts(): Record<string, SavedDraft> {
+  try {
+    return JSON.parse(localStorage.getItem(DRAFTS_KEY) || '{}') as Record<string, SavedDraft>;
+  } catch {
+    return {};
+  }
+}
+
+function loadDraft(subject: string): SavedDraft | null {
+  return readDrafts()[subject.trim()] ?? null;
+}
+
+function saveDraft(d: SavedDraft) {
+  const key = d.subject.trim();
+  if (!key) return;
+  try {
+    const all = readDrafts();
+    all[key] = { ...d, savedAt: new Date().toISOString() };
+    // keep only the 30 most recent drafts
+    const trimmed = Object.values(all)
+      .sort((a, b) => (a.savedAt! < b.savedAt! ? 1 : -1))
+      .slice(0, 30);
+    localStorage.setItem(
+      DRAFTS_KEY,
+      JSON.stringify(Object.fromEntries(trimmed.map((x) => [x.subject.trim(), x]))),
+    );
+  } catch {
+    /* storage full — ignore */
+  }
+}
+
+
 /** Everyone who already received an email with this subject. */
 async function fetchAlreadySent(subject: string): Promise<Set<string>> {
   const set = new Set<string>();
@@ -225,13 +273,29 @@ export function LeadEmailCampaign() {
   // Coming from the Email Opens tab: "Send again to who didn't get it".
   useEffect(() => {
     const s = localStorage.getItem(RESEND_HANDOFF_KEY);
-    if (s) {
-      setSubject(s);
-      setSkipAlreadySent(true);
-      localStorage.removeItem(RESEND_HANDOFF_KEY);
-      toast.info('Subject filled in. Only people who never received it will be emailed.');
+    if (!s) return;
+    localStorage.removeItem(RESEND_HANDOFF_KEY);
+    setSubject(s);
+    setSkipAlreadySent(true);
+    const saved = loadDraft(s);
+    if (saved) {
+      setPreheader(saved.preheader ?? '');
+      setMessage(saved.message ?? '');
+      setSignature(saved.signature ?? '');
+      setFromName(saved.fromName || 'Ali Lotfi');
+      setAddress(saved.address ?? '');
+      setRtl(saved.rtl ?? true);
+      setButtons(saved.buttons?.length ? saved.buttons : [{ label: '', url: '' }]);
+      setIncludeSel(saved.includeSel ?? []);
+      setExcludeSel(saved.excludeSel ?? []);
+      toast.info('Email restored. Only people who never received it will be emailed.');
+    } else {
+      toast.info(
+        'Subject filled in — this email was sent before we started saving drafts, so paste the message again.',
+      );
     }
   }, []);
+
 
 
   const { data: programs = [] } = useQuery({
@@ -274,6 +338,29 @@ export function LeadEmailCampaign() {
 
   const inc = useMemo(() => split(includeSel), [includeSel]);
   const exc = useMemo(() => split(excludeSel), [excludeSel]);
+
+  // Keep a copy of every email we write, so it can be re-opened / re-sent later.
+  useEffect(() => {
+    if (!subject.trim() || !message.trim()) return;
+    const t = setTimeout(
+      () =>
+        saveDraft({
+          subject,
+          preheader,
+          message,
+          signature,
+          fromName,
+          address,
+          rtl,
+          buttons,
+          includeSel,
+          excludeSel,
+        }),
+      800,
+    );
+    return () => clearTimeout(t);
+  }, [subject, preheader, message, signature, fromName, address, rtl, buttons, includeSel, excludeSel]);
+
 
   const { data: count, isFetching, refetch } = useQuery({
     queryKey: ['lead-email-audience', inc, exc, skipAlreadySent ? subject.trim() : ''],
