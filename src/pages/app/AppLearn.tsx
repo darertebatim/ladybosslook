@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GraduationCap, Loader2, Play, BookOpen, Clock, CheckCircle2, Globe } from 'lucide-react';
 import { PageHeader } from '@/components/app/ui/PageHeader';
 import { HostBadges } from '@/components/app/HostBadges';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import {
   useLearnCourses, useLearnCourseContent, useLearnProgress, useLearnCourseStartDate,
@@ -27,10 +29,11 @@ function ProgressBar({ value, tone = 'brand' }: { value: number; tone?: 'brand' 
   );
 }
 
-function CourseCard({ course, onOpen, onContinue }: {
+function CourseCard({ course, onOpen, onContinue, onShowDescription }: {
   course: LearnCourse;
   onOpen: () => void;
   onContinue: (lessonId: string) => void;
+  onShowDescription: () => void;
 }) {
   const { data: content } = useLearnCourseContent(course.id);
   const { data: progress } = useLearnProgress();
@@ -72,9 +75,22 @@ function CourseCard({ course, onOpen, onContinue }: {
         <div className="p-4 space-y-2.5">
           <h2 className="font-bold text-lg text-fg-warm leading-tight">{course.title}</h2>
           {(course.subtitle || course.description) && (
-            <p className="text-sm text-fg-warm-muted line-clamp-2">
-              {course.subtitle || course.description}
-            </p>
+            <div className="relative">
+              <p className="text-sm text-fg-warm-muted line-clamp-2 pr-[4.5em]">
+                {course.subtitle || course.description}
+              </p>
+              {course.description && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onShowDescription();
+                  }}
+                  className="absolute bottom-0 right-0 text-sm font-semibold text-brand active:opacity-70 transition-opacity bg-gradient-to-l from-card-warm via-card-warm to-transparent pl-8 pr-0"
+                >
+                  ...more
+                </button>
+              )}
+            </div>
           )}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-fg-warm-muted">
             <span className="flex items-center gap-1">
@@ -130,6 +146,7 @@ function CourseCard({ course, onOpen, onContinue }: {
 export default function AppLearn() {
   const navigate = useNavigate();
   const { data: courses, isLoading } = useLearnCourses();
+  const [descCourse, setDescCourse] = useState<LearnCourse | null>(null);
 
   return (
     <div className="app-theme min-h-screen bg-background pb-28">
@@ -156,10 +173,24 @@ export default function AppLearn() {
               course={c}
               onOpen={() => navigate(`/app/learn/${c.id}`)}
               onContinue={(lessonId) => navigate(`/app/learn/${c.id}/${lessonId}`)}
+              onShowDescription={() => setDescCourse(c)}
             />
           ))
         )}
       </div>
+
+      <Sheet open={!!descCourse} onOpenChange={(open) => !open && setDescCourse(null)}>
+        <SheetContent side="bottom" className="rounded-t-3xl pb-8">
+          <SheetHeader>
+            <SheetTitle className="text-left text-fg-warm">{descCourse?.title}</SheetTitle>
+          </SheetHeader>
+          <div className="mt-4 max-h-[60vh] overflow-y-auto">
+            <p className="text-sm text-fg-warm-muted whitespace-pre-line leading-relaxed">
+              {descCourse?.description}
+            </p>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
