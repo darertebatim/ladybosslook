@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Play, Headphones, FileText, BookOpen, CheckCircle2,
-  Loader2, ChevronRight, GraduationCap, Lock, Sparkles, Info, Clock, Globe,
+  Loader2, ChevronRight, GraduationCap, Lock, Sparkles, Info, Clock, Globe, Link2, Video,
 } from 'lucide-react';
 import { PageHeader } from '@/components/app/ui/PageHeader';
 import { HostBadges } from '@/components/app/HostBadges';
