@@ -150,7 +150,9 @@ export function LeadEmailCampaign() {
 
 
   async function send(mode: 'test' | 'all') {
-    if (!subject.trim() || !message.trim()) {
+    const plain = message.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+    if (!subject.trim() || !plain) {
+
       toast.error('Add a title and a message first');
       return;
     }
@@ -380,6 +382,19 @@ export function LeadEmailCampaign() {
               </Button>
             )}
           </div>
+
+          <div>
+            <Label>Signature (under the buttons)</Label>
+            <div dir={rtl ? 'rtl' : 'ltr'}>
+              <RichTextEditor
+                value={signature}
+                onChange={setSignature}
+                placeholder="با احترام، علی لطفی"
+                imageBucket="routine-images"
+              />
+            </div>
+          </div>
+
         </CardContent>
       </Card>
 
