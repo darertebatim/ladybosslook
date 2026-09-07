@@ -18,6 +18,40 @@ interface ButtonRow {
   url: string;
 }
 
+async function fetchProgramEmails(slugs: string[]): Promise<Set<string>> {
+  const set = new Set<string>();
+  if (!slugs.length) return set;
+  const userIds = new Set<string>();
+  for (let page = 0; page < 30; page++) {
+    const { data, error } = await supabase
+      .from('course_enrollments')
+      .select('user_id, status')
+      .in('program_slug', slugs)
+      .range(page * 1000, page * 1000 + 999);
+    if (error) throw error;
+    for (const r of data || []) {
+      const s = (r as any).status;
+      if (!s || s === 'active' || s === 'completed') {
+        if ((r as any).user_id) userIds.add(String((r as any).user_id));
+      }
+    }
+    if (!data || data.length < 1000) break;
+  }
+  const ids = Array.from(userIds);
+  for (let i = 0; i < ids.length; i += 500) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('email')
+      .in('id', ids.slice(i, i + 500));
+    if (error) throw error;
+    for (const r of data || []) {
+      const e = String((r as any).email || '').trim().toLowerCase();
+      if (e.includes('@')) set.add(e);
+    }
+  }
+  return set;
+}
+
 async function fetchEmails(sources: string[]): Promise<Set<string>> {
   const set = new Set<string>();
   if (!sources.length) return set;
