@@ -179,14 +179,10 @@ export function LessonAudio({
 
   return (
     <div className="rounded-2xl overflow-hidden bg-background">
-      <div className="relative w-full aspect-video bg-peach">
-        {cover ? (
-          <img src={cover} alt={title || ''} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full bg-gradient-orange flex items-center justify-center">
-            <Headphones className="h-10 w-10 text-white" />
-          </div>
-        )}
+      <div className="relative w-full aspect-video bg-gradient-orange">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Headphones className="h-10 w-10 text-white/80" />
+        </div>
         <div className="absolute inset-0 flex items-center justify-center gap-5">
           <button
             onClick={() => skip(-30)}
