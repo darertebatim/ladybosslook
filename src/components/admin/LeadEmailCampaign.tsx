@@ -276,7 +276,7 @@ export function LeadEmailCampaign() {
   const exc = useMemo(() => split(excludeSel), [excludeSel]);
 
   const { data: count, isFetching, refetch } = useQuery({
-    queryKey: ['lead-email-audience', inc, exc],
+    queryKey: ['lead-email-audience', inc, exc, skipAlreadySent ? subject.trim() : ''],
     enabled: inc.sources.length > 0 || inc.slugs.length > 0,
     queryFn: async () => {
       const set = await fetchEmails(inc.sources);
@@ -284,6 +284,9 @@ export function LeadEmailCampaign() {
       const out = await fetchEmails(exc.sources);
       for (const e of await fetchProgramEmails(exc.slugs)) out.add(e);
       for (const e of await fetchUnsubscribed()) out.add(e);
+      if (skipAlreadySent && subject.trim()) {
+        for (const e of await fetchAlreadySent(subject.trim())) out.add(e);
+      }
       for (const e of out) set.delete(e);
       return set.size;
     },
@@ -302,7 +305,9 @@ export function LeadEmailCampaign() {
     excludeSources: exc.sources,
     programs: inc.slugs,
     excludePrograms: exc.slugs,
+    skipSubject: skipAlreadySent ? subject.trim() : '',
   });
+
 
   async function send(mode: 'test' | 'all') {
     const plain = message.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
