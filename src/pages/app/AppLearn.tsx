@@ -146,6 +146,7 @@ function CourseCard({ course, onOpen, onContinue, onShowDescription }: {
 export default function AppLearn() {
   const navigate = useNavigate();
   const { data: courses, isLoading } = useLearnCourses();
+  const [descCourse, setDescCourse] = useState<LearnCourse | null>(null);
 
   return (
     <div className="app-theme min-h-screen bg-background pb-28">
@@ -172,10 +173,24 @@ export default function AppLearn() {
               course={c}
               onOpen={() => navigate(`/app/learn/${c.id}`)}
               onContinue={(lessonId) => navigate(`/app/learn/${c.id}/${lessonId}`)}
+              onShowDescription={() => setDescCourse(c)}
             />
           ))
         )}
       </div>
+
+      <Sheet open={!!descCourse} onOpenChange={(open) => !open && setDescCourse(null)}>
+        <SheetContent side="bottom" className="rounded-t-3xl pb-8">
+          <SheetHeader>
+            <SheetTitle className="text-left text-fg-warm">{descCourse?.title}</SheetTitle>
+          </SheetHeader>
+          <div className="mt-4 max-h-[60vh] overflow-y-auto">
+            <p className="text-sm text-fg-warm-muted whitespace-pre-line leading-relaxed">
+              {descCourse?.description}
+            </p>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
