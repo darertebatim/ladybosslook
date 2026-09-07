@@ -39,7 +39,8 @@ interface Body {
   limit?: number;
   /** Skip anyone who already received an email with this subject. */
   skipSubject?: string;
-
+  /** Extra addresses to skip (already handled earlier in this run). */
+  alsoSkip?: string[];
 }
 
 const esc = (s: string) =>
