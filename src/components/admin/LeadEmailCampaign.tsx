@@ -225,13 +225,29 @@ export function LeadEmailCampaign() {
   // Coming from the Email Opens tab: "Send again to who didn't get it".
   useEffect(() => {
     const s = localStorage.getItem(RESEND_HANDOFF_KEY);
-    if (s) {
-      setSubject(s);
-      setSkipAlreadySent(true);
-      localStorage.removeItem(RESEND_HANDOFF_KEY);
-      toast.info('Subject filled in. Only people who never received it will be emailed.');
+    if (!s) return;
+    localStorage.removeItem(RESEND_HANDOFF_KEY);
+    setSubject(s);
+    setSkipAlreadySent(true);
+    const saved = loadDraft(s);
+    if (saved) {
+      setPreheader(saved.preheader ?? '');
+      setMessage(saved.message ?? '');
+      setSignature(saved.signature ?? '');
+      setFromName(saved.fromName || 'Ali Lotfi');
+      setAddress(saved.address ?? '');
+      setRtl(saved.rtl ?? true);
+      setButtons(saved.buttons?.length ? saved.buttons : [{ label: '', url: '' }]);
+      setIncludeSel(saved.includeSel ?? []);
+      setExcludeSel(saved.excludeSel ?? []);
+      toast.info('Email restored. Only people who never received it will be emailed.');
+    } else {
+      toast.info(
+        'Subject filled in — this email was sent before we started saving drafts, so paste the message again.',
+      );
     }
   }, []);
+
 
 
   const { data: programs = [] } = useQuery({
