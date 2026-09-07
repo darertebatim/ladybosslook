@@ -406,6 +406,25 @@ export function LeadEmailCampaign() {
             </div>
           </div>
 
+          <div className="flex items-center gap-3 rounded-lg border p-3">
+            <Switch
+              id="skip-already"
+              checked={skipAlreadySent}
+              onCheckedChange={setSkipAlreadySent}
+            />
+            <div>
+              <Label htmlFor="skip-already" className="text-sm">
+                Only people who never received this email
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Skips everyone who already got an email with this exact title — use it to send
+                again to the ones who missed it.
+              </p>
+            </div>
+          </div>
+
+
+
           <div className="flex items-center gap-3">
             <Badge variant="secondary">
               {isFetching ? 'Counting…' : `${count ?? 0} recipients`}
