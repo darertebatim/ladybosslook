@@ -119,13 +119,13 @@ export default function AppLearnCourse() {
                   <div className="pt-0.5">
                     <p className="text-sm text-fg-warm-muted whitespace-pre-line line-clamp-2">
                       {course.description}
+                      <button
+                        onClick={() => setDescOpen(true)}
+                        className="inline font-semibold text-brand active:opacity-70 transition-opacity ml-0.5"
+                      >
+                        ...more
+                      </button>
                     </p>
-                    <button
-                      onClick={() => setDescOpen(true)}
-                      className="text-sm font-semibold text-brand mt-0.5 active:opacity-70 transition-opacity"
-                    >
-                      ... more
-                    </button>
                   </div>
                 )}
 
