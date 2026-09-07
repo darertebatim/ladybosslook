@@ -14,6 +14,14 @@ import {
   lessonDurationSeconds, type LearnLesson, type LessonType,
 } from '@/hooks/useLearn';
 
+const LANGUAGE_OPTIONS = [
+  { code: '', label: 'Multilanguage' },
+  { code: 'en', label: 'English' },
+  { code: 'fa', label: 'Persian' },
+  { code: 'tr', label: 'Turkish' },
+  { code: 'es', label: 'Spanish' },
+];
+
 const LESSON_ICONS: Record<LessonType, typeof Play> = {
   video: Play,
   audio: Headphones,
