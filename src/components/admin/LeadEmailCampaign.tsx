@@ -151,7 +151,7 @@ export function LeadEmailCampaign() {
       return;
     }
     if (mode === 'all') {
-      if (!includeSources.length) {
+      if (!includeSources.length && !includePrograms.length) {
         toast.error('Pick at least one audience');
         return;
       }
@@ -210,6 +210,40 @@ export function LeadEmailCampaign() {
                   />
                   <span>{c.label}</span>
                 </label>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <Label className="text-sm">Also send to people in these programs</Label>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {programs.map((p) => (
+                <Button
+                  key={p.slug}
+                  type="button"
+                  size="sm"
+                  variant={includePrograms.includes(p.slug) ? 'default' : 'outline'}
+                  onClick={() => toggle(includePrograms, setIncludePrograms, p.slug)}
+                >
+                  {p.title}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <Label className="text-sm">Exclude people in these programs</Label>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {programs.map((p) => (
+                <Button
+                  key={p.slug}
+                  type="button"
+                  size="sm"
+                  variant={excludePrograms.includes(p.slug) ? 'destructive' : 'outline'}
+                  onClick={() => toggle(excludePrograms, setExcludePrograms, p.slug)}
+                >
+                  {p.title}
+                </Button>
               ))}
             </div>
           </div>
