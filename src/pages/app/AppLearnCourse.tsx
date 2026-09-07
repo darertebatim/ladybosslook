@@ -27,6 +27,8 @@ const LESSON_ICONS: Record<LessonType, typeof Play> = {
   audio: Headphones,
   document: BookOpen,
   pdf: FileText,
+  link: Link2,
+  session: Video,
 };
 
 function ProgressBar({ value, className }: { value: number; className?: string }) {
