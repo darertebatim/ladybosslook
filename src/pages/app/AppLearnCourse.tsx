@@ -41,6 +41,7 @@ export default function AppLearnCourse() {
 
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
   const [collapsedTouched, setCollapsedTouched] = useState(false);
+  const [descOpen, setDescOpen] = useState(false);
 
   const flatLessons = useMemo(() => {
     if (!content) return [] as LearnLesson[];
