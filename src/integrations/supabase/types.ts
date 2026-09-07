@@ -3866,6 +3866,7 @@ export type Database = {
           intro_note: string | null
           is_published: boolean
           language: string | null
+          sequential_lessons: boolean
           sort_order: number
           subtitle: string | null
           title: string
@@ -3879,6 +3880,7 @@ export type Database = {
           intro_note?: string | null
           is_published?: boolean
           language?: string | null
+          sequential_lessons?: boolean
           sort_order?: number
           subtitle?: string | null
           title: string
@@ -3892,6 +3894,7 @@ export type Database = {
           intro_note?: string | null
           is_published?: boolean
           language?: string | null
+          sequential_lessons?: boolean
           sort_order?: number
           subtitle?: string | null
           title?: string
