@@ -81,6 +81,20 @@ export function LeadEmailCampaign() {
   const [buttons, setButtons] = useState<ButtonRow[]>([{ label: '', url: '' }]);
   const [testEmail, setTestEmail] = useState('');
   const [sending, setSending] = useState<'test' | 'all' | null>(null);
+  const [includePrograms, setIncludePrograms] = useState<string[]>([]);
+  const [excludePrograms, setExcludePrograms] = useState<string[]>([]);
+
+  const { data: programs = [] } = useQuery({
+    queryKey: ['lead-email-programs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('program_catalog')
+        .select('slug, title')
+        .order('title');
+      if (error) throw error;
+      return (data || []) as { slug: string; title: string }[];
+    },
+  });
 
   const includeSources = useMemo(
     () =>
@@ -100,11 +114,13 @@ export function LeadEmailCampaign() {
   );
 
   const { data: count, isFetching, refetch } = useQuery({
-    queryKey: ['lead-email-audience', includeSources, excludeSources],
-    enabled: includeSources.length > 0,
+    queryKey: ['lead-email-audience', includeSources, excludeSources, includePrograms, excludePrograms],
+    enabled: includeSources.length > 0 || includePrograms.length > 0,
     queryFn: async () => {
       const inc = await fetchEmails(includeSources);
+      for (const e of await fetchProgramEmails(includePrograms)) inc.add(e);
       const exc = await fetchEmails(excludeSources);
+      for (const e of await fetchProgramEmails(excludePrograms)) exc.add(e);
       for (const e of exc) inc.delete(e);
       return inc.size;
     },
