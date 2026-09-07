@@ -433,19 +433,36 @@ export function LeadEmailCampaign() {
     let offset = 0;
     let sent = 0;
     let failed = 0;
+    let doneCount = 0;
+    let grandTotal = count ?? 0;
+    // When we skip people who already got this email, the list shrinks after
+    // every part, so we always ask for the next part from the start and tell
+    // the server which addresses were already handled in this run.
+    const handled: string[] = [];
     try {
       // Sent in parts so a very large list (10k+) never times out.
       for (;;) {
         const { data, error } = await supabase.functions.invoke('send-lead-email', {
-          body: { ...payload(), offset, limit: CHUNK },
+          body: {
+            ...payload(),
+            offset: skipAlreadySent ? 0 : offset,
+            limit: CHUNK,
+            alsoSkip: skipAlreadySent ? handled : [],
+          },
         });
         if (error) throw error;
         const d = data as any;
         sent += d?.sent ?? 0;
         failed += d?.failed ?? 0;
-        offset += d?.processed ?? 0;
-        setProgress({ done: offset, total: d?.total ?? count ?? 0, failed });
-        if (d?.done || !d?.processed) break;
+        const processed = d?.processed ?? 0;
+        offset += processed;
+        doneCount += processed;
+        for (const e of (d?.emails as string[] | undefined) || []) handled.push(e);
+        if (doneCount === processed) grandTotal = d?.total ?? grandTotal;
+        setProgress({ done: doneCount, total: Math.max(grandTotal, doneCount), failed });
+        if (!processed) break;
+        if (!skipAlreadySent && d?.done) break;
+        if (skipAlreadySent && (d?.remaining ?? 0) <= 0) break;
       }
       toast.success(`Sent ${sent}${failed ? ` · failed ${failed}` : ''}`);
     } catch (e: any) {

@@ -39,7 +39,8 @@ interface Body {
   limit?: number;
   /** Skip anyone who already received an email with this subject. */
   skipSubject?: string;
-
+  /** Extra addresses to skip (already handled earlier in this run). */
+  alsoSkip?: string[];
 }
 
 const esc = (s: string) =>
@@ -302,6 +303,10 @@ const handler = async (req: Request): Promise<Response> => {
       if (skipSubject) {
         for (const e of await collectAlreadySent(supabase, skipSubject)) exclude.add(e);
       }
+      for (const e of body.alsoSkip || []) {
+        const v = String(e || "").trim().toLowerCase();
+        if (v) exclude.add(v);
+      }
 
       for (const e of exclude) include.delete(e);
       recipients = Array.from(include).sort();
@@ -406,6 +411,8 @@ const handler = async (req: Request): Promise<Response> => {
         failed,
         total,
         processed,
+        emails: body.testEmail ? [] : slice,
+        remaining: Math.max(0, total - (offset + processed)),
         done: !!body.testEmail || offset + processed >= total,
       }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
