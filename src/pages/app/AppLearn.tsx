@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GraduationCap, Loader2, Play, BookOpen, Clock, CheckCircle2, Globe } from 'lucide-react';
 import { PageHeader } from '@/components/app/ui/PageHeader';
 import { HostBadges } from '@/components/app/HostBadges';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import {
   useLearnCourses, useLearnCourseContent, useLearnProgress, useLearnCourseStartDate,
