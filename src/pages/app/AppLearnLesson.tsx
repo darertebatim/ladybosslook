@@ -12,7 +12,7 @@ import { smartOpenUrl } from '@/lib/navigation-utils';
 import { cn } from '@/lib/utils';
 import {
   useLearnCourse, useLearnCourseContent, useLearnProgress, useSetLessonComplete,
-  useLearnCourseStartDate, lessonUnlockDate, formatUnlockLabel, formatLessonDuration,
+  useLearnCourseStartDate, lessonUnlockDate, makeLessonLocker, formatLessonDuration,
   lessonDurationSeconds, type LearnLesson, type LessonType,
 } from '@/hooks/useLearn';
 
@@ -43,25 +43,35 @@ export default function AppLearnLesson() {
   const index = flatLessons.findIndex((l) => l.id === lessonId);
   const lesson = index >= 0 ? flatLessons[index] : null;
 
+  const lockOf = useMemo(
+    () => makeLessonLocker({
+      flatLessons,
+      startDate,
+      progress,
+      sequential: !!(course as any)?.sequential_lessons,
+    }),
+    [flatLessons, startDate, progress, course]
+  );
+
   // Skip locked lessons when moving around.
   const prev = useMemo(() => {
     for (let i = index - 1; i >= 0; i--) {
-      if (!lessonUnlockDate(flatLessons[i], startDate)) return flatLessons[i];
+      if (!lockOf(flatLessons[i])) return flatLessons[i];
     }
     return null;
-  }, [index, flatLessons, startDate]);
+  }, [index, flatLessons, lockOf]);
   const next = useMemo(() => {
     for (let i = index + 1; i < flatLessons.length; i++) {
-      if (!lessonUnlockDate(flatLessons[i], startDate)) return flatLessons[i];
+      if (!lockOf(flatLessons[i])) return flatLessons[i];
     }
     return null;
-  }, [index, flatLessons, startDate]);
+  }, [index, flatLessons, lockOf]);
 
   const total = flatLessons.length;
   const doneCount = flatLessons.filter((l) => progress?.has(l.id)).length;
   const pct = total ? Math.round((doneCount / total) * 100) : 0;
   const isDone = lesson ? !!progress?.has(lesson.id) : false;
-  const unlockAt = lesson ? lessonUnlockDate(lesson, startDate) : null;
+  const unlockAt = lesson ? lockOf(lesson) : null;
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -240,7 +250,7 @@ export default function AppLearnLesson() {
               <Lock className="h-7 w-7 text-brand" />
             </div>
             <p className="font-semibold text-fg-warm">{lesson.title}</p>
-            <p className="text-sm text-fg-warm-muted">{formatUnlockLabel(unlockAt)}</p>
+            <p className="text-sm text-fg-warm-muted">{unlockAt.label}</p>
           </div>
         ) : (
           <div className="bg-card-warm shadow-card-warm rounded-3xl p-4 space-y-3.5">
@@ -350,7 +360,7 @@ export default function AppLearnLesson() {
                   <p className="text-xs font-semibold text-fg-warm-muted px-1 uppercase tracking-wide">{mod.title}</p>
                   {lessons.map((l) => {
                     const lDone = progress?.has(l.id);
-                    const lLock = lessonUnlockDate(l, startDate);
+                    const lLock = lockOf(l);
                     const active = l.id === lessonId;
                     const LIcon = LESSON_ICONS[l.lesson_type] || Play;
                     return (
@@ -375,7 +385,7 @@ export default function AppLearnLesson() {
                         <span className="flex-1 min-w-0">
                           <span className="block truncate text-sm font-medium text-fg-warm">{l.title}</span>
                           {lLock && (
-                            <span className="block text-xs text-fg-warm-muted">{formatUnlockLabel(lLock)}</span>
+                            <span className="block text-xs text-fg-warm-muted">{lLock.label}</span>
                           )}
                         </span>
                       </button>
