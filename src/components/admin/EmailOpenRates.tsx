@@ -57,8 +57,21 @@ type Agg = {
   lastAt: string;
 };
 
-export function EmailOpenRates() {
+type Person = {
+  email: string;
+  delivered: boolean;
+  opened: boolean;
+  clicked: boolean;
+  bounced: boolean;
+  lastAt: string;
+};
+
+export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => void }) {
   const [days, setDays] = useState(30);
+  const [detail, setDetail] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+
+
 
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['email-delivery-events', days],
