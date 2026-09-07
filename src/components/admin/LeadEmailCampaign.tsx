@@ -38,6 +38,54 @@ const CHUNK = 500;
 /** Handoff key used by the Email Opens tab ("Resend to who didn't get it"). */
 export const RESEND_HANDOFF_KEY = 'lead_email_resend_subject';
 
+const DRAFTS_KEY = 'lead_email_drafts';
+
+type SavedDraft = {
+  subject: string;
+  preheader?: string;
+  message?: string;
+  signature?: string;
+  fromName?: string;
+  address?: string;
+  rtl?: boolean;
+  buttons?: { label: string; url: string }[];
+  includeSel?: string[];
+  excludeSel?: string[];
+  savedAt?: string;
+};
+
+function readDrafts(): Record<string, SavedDraft> {
+  try {
+    return JSON.parse(localStorage.getItem(DRAFTS_KEY) || '{}') as Record<string, SavedDraft>;
+  } catch {
+    return {};
+  }
+}
+
+function loadDraft(subject: string): SavedDraft | null {
+  return readDrafts()[subject.trim()] ?? null;
+}
+
+function saveDraft(d: SavedDraft) {
+  const key = d.subject.trim();
+  if (!key) return;
+  try {
+    const all = readDrafts();
+    all[key] = { ...d, savedAt: new Date().toISOString() };
+    // keep only the 30 most recent drafts
+    const trimmed = Object.values(all)
+      .sort((a, b) => (a.savedAt! < b.savedAt! ? 1 : -1))
+      .slice(0, 30);
+    localStorage.setItem(
+      DRAFTS_KEY,
+      JSON.stringify(Object.fromEntries(trimmed.map((x) => [x.subject.trim(), x]))),
+    );
+  } catch {
+    /* storage full — ignore */
+  }
+}
+
+
 /** Everyone who already received an email with this subject. */
 async function fetchAlreadySent(subject: string): Promise<Set<string>> {
   const set = new Set<string>();
