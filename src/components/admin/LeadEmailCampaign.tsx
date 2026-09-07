@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
@@ -77,9 +77,13 @@ export function LeadEmailCampaign() {
   const [subject, setSubject] = useState('');
   const [preheader, setPreheader] = useState('');
   const [message, setMessage] = useState('');
+  const [signature, setSignature] = useState('');
+  const [fromName, setFromName] = useState('Ali Lotfi');
+  const [address, setAddress] = useState('');
   const [rtl, setRtl] = useState(true);
   const [buttons, setButtons] = useState<ButtonRow[]>([{ label: '', url: '' }]);
   const [testEmail, setTestEmail] = useState('');
+
   const [sending, setSending] = useState<'test' | 'all' | null>(null);
   const [includePrograms, setIncludePrograms] = useState<string[]>([]);
   const [excludePrograms, setExcludePrograms] = useState<string[]>([]);
@@ -133,6 +137,9 @@ export function LeadEmailCampaign() {
     subject: subject.trim(),
     preheader: preheader.trim(),
     message,
+    signature,
+    fromName: fromName.trim(),
+    address: address.trim(),
     rtl,
     buttons: buttons.filter((b) => b.label.trim() && b.url.trim()),
     sources: includeSources,
@@ -140,6 +147,7 @@ export function LeadEmailCampaign() {
     programs: includePrograms,
     excludePrograms,
   });
+
 
   async function send(mode: 'test' | 'all') {
     if (!subject.trim() || !message.trim()) {
@@ -264,8 +272,34 @@ export function LeadEmailCampaign() {
           <CardTitle className="text-base">Email content</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="lead-from">Sender name</Label>
+              <Input
+                id="lead-from"
+                value={fromName}
+                onChange={(e) => setFromName(e.target.value)}
+                maxLength={60}
+                placeholder="Ali Lotfi"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Shown as “{fromName || 'Ali Lotfi'} &lt;support@ladybosslook.com&gt;”
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="lead-address">Business address (shown in footer)</Label>
+              <Input
+                id="lead-address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                maxLength={200}
+                placeholder="123 Main St, Irvine, CA 92618, USA"
+              />
+            </div>
+          </div>
           <div>
             <Label htmlFor="lead-subject">Title (subject)</Label>
+
             <Input
               id="lead-subject"
               value={subject}
@@ -286,16 +320,20 @@ export function LeadEmailCampaign() {
             />
           </div>
           <div>
-            <Label htmlFor="lead-message">Message</Label>
-            <Textarea
-              id="lead-message"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              rows={10}
-              dir={rtl ? 'rtl' : 'ltr'}
-              placeholder="متن ایمیل…"
-            />
+            <Label>Message</Label>
+            <div dir={rtl ? 'rtl' : 'ltr'}>
+              <RichTextEditor
+                value={message}
+                onChange={setMessage}
+                placeholder="متن ایمیل…"
+                imageBucket="routine-images"
+              />
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Bold, lists, links and images are supported. Images are uploaded and hosted for you.
+            </p>
           </div>
+
           <div className="flex items-center justify-between rounded-md border p-3">
             <div>
               <p className="text-sm font-medium">Right-to-left (Farsi)</p>
