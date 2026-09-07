@@ -307,6 +307,58 @@ export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => v
           </>
         )}
       </CardContent>
+
+      <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-base leading-snug">{detail}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-wrap items-center gap-2">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search an email address"
+              className="max-w-xs"
+            />
+            <Badge variant="secondary">{detailPeople.length} people</Badge>
+            <Button size="sm" variant="outline" onClick={downloadCsv}>
+              <Download className="mr-1 h-4 w-4" /> Download CSV
+            </Button>
+            <Button size="sm" variant="secondary" onClick={() => detail && resend(detail)}>
+              <Send className="mr-1 h-4 w-4" /> Send to who missed it
+            </Button>
+          </div>
+          <div className="max-h-[55vh] overflow-y-auto">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 bg-background">
+                <tr className="border-b text-left text-muted-foreground">
+                  <th className="py-2 pr-3">Email</th>
+                  <th className="py-2 px-3">Delivered</th>
+                  <th className="py-2 px-3">Opened</th>
+                  <th className="py-2 px-3">Clicked</th>
+                  <th className="py-2 px-3">Bounced</th>
+                  <th className="py-2 pl-3">Last activity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {detailPeople.map((p) => (
+                  <tr key={p.email} className="border-b last:border-0">
+                    <td className="py-2 pr-3">{p.email}</td>
+                    <td className="py-2 px-3">{p.delivered ? '✓' : '—'}</td>
+                    <td className="py-2 px-3">{p.opened ? '✓' : '—'}</td>
+                    <td className="py-2 px-3">{p.clicked ? '✓' : '—'}</td>
+                    <td className="py-2 px-3">{p.bounced ? '✓' : '—'}</td>
+                    <td className="py-2 pl-3 whitespace-nowrap text-muted-foreground">
+                      {new Date(p.lastAt).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
+
 }
