@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
-export type LessonType = 'video' | 'audio' | 'document' | 'pdf';
+export type LessonType = 'video' | 'audio' | 'document' | 'pdf' | 'link' | 'session';
 
 export interface LessonAttachment {
   name: string;
@@ -42,6 +42,10 @@ export interface LearnLesson {
   audio_id: string | null;
   reading_id: string | null;
   pdf_url: string | null;
+  link_url?: string | null;
+  link_label?: string | null;
+  session_url?: string | null;
+  session_at?: string | null;
   duration_seconds: number | null;
   sort_order: number;
   is_published?: boolean;

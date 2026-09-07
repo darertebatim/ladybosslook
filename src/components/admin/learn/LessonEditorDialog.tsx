@@ -13,7 +13,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Play, Headphones, BookOpen, FileText, Upload, X, Paperclip } from 'lucide-react';
+import { Loader2, Play, Headphones, BookOpen, FileText, Upload, X, Paperclip, Link2, Video } from 'lucide-react';
 import { toast } from 'sonner';
 import { MediaLibraryPicker } from '@/components/admin/MediaLibraryPicker';
 import { RichTextEditor } from '@/components/admin/RichTextEditor';
@@ -24,9 +24,17 @@ export const LESSON_TYPE_OPTIONS: { value: LessonType; label: string; icon: type
   { value: 'audio', label: 'Audio', icon: Headphones },
   { value: 'document', label: 'Document (Reading)', icon: BookOpen },
   { value: 'pdf', label: 'PDF / file', icon: FileText },
+  { value: 'link', label: 'Link (button)', icon: Link2 },
+  { value: 'session', label: 'Online session (Google Meet)', icon: Video },
 ];
 
 const FILES_BUCKET = 'documents';
+
+function toLocalInput(iso: string) {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 
 async function uploadFile(file: File, folder: string) {
   const ext = file.name.split('.').pop() || 'bin';
@@ -59,6 +67,10 @@ interface FormState {
   reading_id: string;
   media_label: string;
   pdf_url: string;
+  link_url: string;
+  link_label: string;
+  session_url: string;
+  session_at: string;
   duration_minutes: string;
   is_published: boolean;
   is_free_preview: boolean;
@@ -70,6 +82,7 @@ interface FormState {
 const emptyForm: FormState = {
   title: '', description: '', content_html: '', lesson_type: 'video',
   video_id: '', audio_id: '', reading_id: '', media_label: '', pdf_url: '',
+  link_url: '', link_label: '', session_url: '', session_at: '',
   duration_minutes: '', is_published: true, is_free_preview: false,
   drip_days: '', drip_date: '', attachments: [],
 };
@@ -94,6 +107,10 @@ export function LessonEditorDialog({ open, onOpenChange, moduleId, lesson, nextS
         reading_id: lesson.reading_id || '',
         media_label: '',
         pdf_url: lesson.pdf_url || '',
+        link_url: lesson.link_url || '',
+        link_label: lesson.link_label || '',
+        session_url: lesson.session_url || '',
+        session_at: lesson.session_at ? toLocalInput(lesson.session_at) : '',
         duration_minutes: lesson.duration_seconds ? String(Math.round(lesson.duration_seconds / 60)) : '',
         is_published: lesson.is_published !== false,
         is_free_preview: !!lesson.is_free_preview,
@@ -120,6 +137,10 @@ export function LessonEditorDialog({ open, onOpenChange, moduleId, lesson, nextS
         audio_id: form.lesson_type === 'audio' ? form.audio_id || null : null,
         reading_id: form.lesson_type === 'document' ? form.reading_id || null : null,
         pdf_url: form.lesson_type === 'pdf' ? form.pdf_url.trim() || null : null,
+        link_url: form.lesson_type === 'link' ? form.link_url.trim() || null : null,
+        link_label: form.lesson_type === 'link' ? form.link_label.trim() || null : null,
+        session_url: form.lesson_type === 'session' ? form.session_url.trim() || null : null,
+        session_at: form.lesson_type === 'session' && form.session_at ? new Date(form.session_at).toISOString() : null,
         duration_seconds: durationSeconds,
         is_published: form.is_published,
         is_free_preview: form.is_free_preview,
@@ -267,6 +288,48 @@ export function LessonEditorDialog({ open, onOpenChange, moduleId, lesson, nextS
                   {uploadingPdf ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                   Upload
                 </Button>
+              </div>
+            </div>
+          )}
+
+          {form.lesson_type === 'link' && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Link address</Label>
+                <Input
+                  value={form.link_url}
+                  onChange={(e) => setForm({ ...form, link_url: e.target.value })}
+                  placeholder="https://... or /app/tools"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Button text</Label>
+                <Input
+                  value={form.link_label}
+                  onChange={(e) => setForm({ ...form, link_label: e.target.value })}
+                  placeholder="Open link"
+                />
+              </div>
+            </div>
+          )}
+
+          {form.lesson_type === 'session' && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Meeting link (Google Meet, Zoom...)</Label>
+                <Input
+                  value={form.session_url}
+                  onChange={(e) => setForm({ ...form, session_url: e.target.value })}
+                  placeholder="https://meet.google.com/..."
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Date & time (optional)</Label>
+                <Input
+                  type="datetime-local"
+                  value={form.session_at}
+                  onChange={(e) => setForm({ ...form, session_at: e.target.value })}
+                />
               </div>
             </div>
           )}
