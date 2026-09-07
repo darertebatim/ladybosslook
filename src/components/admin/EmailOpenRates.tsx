@@ -263,7 +263,8 @@ export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => v
                     <th className="py-2 px-3">Open rate</th>
                     <th className="py-2 px-3">Clicked</th>
                     <th className="py-2 px-3">Bounced</th>
-                    <th className="py-2 pl-3">Last activity</th>
+                    <th className="py-2 px-3">Last activity</th>
+                    <th className="py-2 pl-3 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -277,11 +278,29 @@ export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => v
                       </td>
                       <td className="py-2 px-3">{r.clicked}</td>
                       <td className="py-2 px-3">{r.bounced}</td>
-                      <td className="py-2 pl-3 whitespace-nowrap text-muted-foreground">
+                      <td className="py-2 px-3 whitespace-nowrap text-muted-foreground">
                         {new Date(r.lastAt).toLocaleString()}
+                      </td>
+                      <td className="py-2 pl-3">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSearch('');
+                              setDetail(r.subject);
+                            }}
+                          >
+                            <Eye className="mr-1 h-4 w-4" /> Details
+                          </Button>
+                          <Button size="sm" variant="secondary" onClick={() => resend(r.subject)}>
+                            <Send className="mr-1 h-4 w-4" /> Send to who missed it
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}
+
                 </tbody>
               </table>
             </div>
