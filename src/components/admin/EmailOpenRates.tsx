@@ -4,7 +4,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, MailOpen, RefreshCw } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Download, Eye, Loader2, MailOpen, RefreshCw, Send } from 'lucide-react';
+import { toast } from 'sonner';
+import { RESEND_HANDOFF_KEY } from '@/components/admin/LeadEmailCampaign';
 
 type EventRow = {
   event_type: string;
@@ -18,6 +27,7 @@ const RANGES = [
   { label: 'Last 30 days', days: 30 },
   { label: 'Last 90 days', days: 90 },
 ];
+
 
 async function fetchEvents(days: number): Promise<EventRow[]> {
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
