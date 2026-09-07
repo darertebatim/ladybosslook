@@ -80,8 +80,9 @@ export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => v
     refetchOnMount: 'always',
   });
 
-  const { rows, totals } = useMemo(() => {
+  const { rows, totals, peopleBySubject } = useMemo(() => {
     const map = new Map<string, Agg & { openedSet: Set<string>; sentSet: Set<string>; deliveredSet: Set<string>; clickedSet: Set<string>; bouncedSet: Set<string> }>();
+    const people = new Map<string, Map<string, Person>>();
 
     for (const e of data ?? []) {
       const subject = e.subject || '(no subject)';
@@ -110,6 +111,23 @@ export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => v
       if (e.event_type === 'opened') agg.openedSet.add(who);
       if (e.event_type === 'clicked') agg.clickedSet.add(who);
       if (e.event_type.startsWith('bounce')) agg.bouncedSet.add(who);
+
+      if (who) {
+        let byEmail = people.get(subject);
+        if (!byEmail) {
+          byEmail = new Map<string, Person>();
+          people.set(subject, byEmail);
+        }
+        const p =
+          byEmail.get(who) ??
+          { email: who, delivered: false, opened: false, clicked: false, bounced: false, lastAt: e.occurred_at };
+        if (e.event_type === 'delivered' || e.event_type === 'sent') p.delivered = true;
+        if (e.event_type === 'opened') p.opened = true;
+        if (e.event_type === 'clicked') p.clicked = true;
+        if (e.event_type.startsWith('bounce')) p.bounced = true;
+        if (e.occurred_at > p.lastAt) p.lastAt = e.occurred_at;
+        byEmail.set(who, p);
+      }
     }
 
     const rows: Agg[] = [...map.values()]
@@ -135,11 +153,41 @@ export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => v
       { sent: 0, delivered: 0, opened: 0, clicked: 0, bounced: 0 },
     );
 
-    return { rows, totals };
+    return { rows, totals, peopleBySubject: people };
   }, [data]);
+
+  const detailPeople = useMemo(() => {
+    const list = [...(peopleBySubject.get(detail || '')?.values() ?? [])];
+    const q = search.trim().toLowerCase();
+    return list
+      .filter((p) => !q || p.email.includes(q))
+      .sort((a, b) => (a.lastAt < b.lastAt ? 1 : -1));
+  }, [peopleBySubject, detail, search]);
+
+  const downloadCsv = () => {
+    const header = 'email,delivered,opened,clicked,bounced,last_activity';
+    const body = detailPeople
+      .map((p) =>
+        [p.email, p.delivered, p.opened, p.clicked, p.bounced, p.lastAt].join(','),
+      )
+      .join('\n');
+    const url = URL.createObjectURL(new Blob([`${header}\n${body}`], { type: 'text/csv' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'email-recipients.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const resend = (subject: string) => {
+    localStorage.setItem(RESEND_HANDOFF_KEY, subject);
+    if (onResend) onResend(subject);
+    else toast.success('Open the Email Marketing tab to finish the re-send.');
+  };
 
   const pct = (n: number, d: number) => (d > 0 ? `${Math.round((n / d) * 100)}%` : '—');
   const base = (r: { delivered: number; sent: number }) => r.delivered || r.sent;
+
 
   return (
     <Card>
