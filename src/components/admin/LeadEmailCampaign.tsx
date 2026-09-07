@@ -7,9 +7,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { Switch } from '@/components/ui/switch';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Mail, Plus, Send, Trash2, RefreshCw } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import { Check, ChevronsUpDown, Loader2, Mail, Plus, Send, Trash2, RefreshCw, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 
@@ -17,6 +26,14 @@ interface ButtonRow {
   label: string;
   url: string;
 }
+
+interface Option {
+  value: string; // "lead:key" | "prog:slug"
+  label: string;
+  group: 'Lead lists' | 'Programs';
+}
+
+const CHUNK = 500;
 
 async function fetchProgramEmails(slugs: string[]): Promise<Set<string>> {
   const set = new Set<string>();
@@ -71,9 +88,102 @@ async function fetchEmails(sources: string[]): Promise<Set<string>> {
   return set;
 }
 
+async function fetchUnsubscribed(): Promise<Set<string>> {
+  const set = new Set<string>();
+  for (let page = 0; page < 30; page++) {
+    const { data, error } = await supabase
+      .from('email_unsubscribes')
+      .select('email')
+      .range(page * 1000, page * 1000 + 999);
+    if (error) throw error;
+    for (const r of data || []) set.add(String((r as any).email || '').trim().toLowerCase());
+    if (!data || data.length < 1000) break;
+  }
+  return set;
+}
+
+function AudiencePicker({
+  placeholder,
+  options,
+  selected,
+  onChange,
+  tone,
+}: {
+  placeholder: string;
+  options: Option[];
+  selected: string[];
+  onChange: (v: string[]) => void;
+  tone: 'default' | 'destructive';
+}) {
+  const [open, setOpen] = useState(false);
+  const groups = useMemo(() => {
+    const g: Record<string, Option[]> = {};
+    for (const o of options) (g[o.group] ||= []).push(o);
+    return g;
+  }, [options]);
+  const labelOf = (v: string) => options.find((o) => o.value === v)?.label ?? v;
+  const toggle = (v: string) =>
+    onChange(selected.includes(v) ? selected.filter((x) => x !== v) : [...selected, v]);
+
+  return (
+    <div className="space-y-2">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className="w-full justify-between font-normal">
+            <span className="truncate">
+              {selected.length ? `${selected.length} selected` : placeholder}
+            </span>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[420px] p-0" align="start">
+          <Command>
+            <CommandInput placeholder="Search lists and programs…" />
+            <CommandList className="max-h-72">
+              <CommandEmpty>Nothing found.</CommandEmpty>
+              {Object.entries(groups).map(([name, opts]) => (
+                <CommandGroup key={name} heading={name}>
+                  {opts.map((o) => (
+                    <CommandItem key={o.value} value={`${name} ${o.label}`} onSelect={() => toggle(o.value)}>
+                      <Check
+                        className={`mr-2 h-4 w-4 ${selected.includes(o.value) ? 'opacity-100' : 'opacity-0'}`}
+                      />
+                      <span className="truncate">{o.label}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              ))}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {selected.map((v) => (
+            <Badge
+              key={v}
+              variant={tone === 'destructive' ? 'destructive' : 'secondary'}
+              className="gap-1 max-w-[260px]"
+            >
+              <span className="truncate">{labelOf(v)}</span>
+              <button type="button" onClick={() => toggle(v)} aria-label="Remove">
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))}
+          <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => onChange([])}>
+            Clear all
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function LeadEmailCampaign() {
-  const [include, setInclude] = useState<string[]>([]);
-  const [exclude, setExclude] = useState<string[]>([]);
+  const [includeSel, setIncludeSel] = useState<string[]>([]);
+  const [excludeSel, setExcludeSel] = useState<string[]>([]);
   const [subject, setSubject] = useState('');
   const [preheader, setPreheader] = useState('');
   const [message, setMessage] = useState('');
@@ -83,10 +193,8 @@ export function LeadEmailCampaign() {
   const [rtl, setRtl] = useState(true);
   const [buttons, setButtons] = useState<ButtonRow[]>([{ label: '', url: '' }]);
   const [testEmail, setTestEmail] = useState('');
-
   const [sending, setSending] = useState<'test' | 'all' | null>(null);
-  const [includePrograms, setIncludePrograms] = useState<string[]>([]);
-  const [excludePrograms, setExcludePrograms] = useState<string[]>([]);
+  const [progress, setProgress] = useState<{ done: number; total: number; failed: number } | null>(null);
 
   const { data: programs = [] } = useQuery({
     queryKey: ['lead-email-programs'],
@@ -100,38 +208,48 @@ export function LeadEmailCampaign() {
     },
   });
 
-  const includeSources = useMemo(
-    () =>
-      LEAD_CAMPAIGNS.filter((c) => include.includes(c.key)).flatMap((c) => [
-        c.regSource,
-        ...c.extraSources,
-      ]),
-    [include],
+  const options: Option[] = useMemo(
+    () => [
+      ...LEAD_CAMPAIGNS.map((c) => ({
+        value: `lead:${c.key}`,
+        label: c.label,
+        group: 'Lead lists' as const,
+      })),
+      ...programs.map((p) => ({
+        value: `prog:${p.slug}`,
+        label: p.title,
+        group: 'Programs' as const,
+      })),
+    ],
+    [programs],
   );
-  const excludeSources = useMemo(
-    () =>
-      LEAD_CAMPAIGNS.filter((c) => exclude.includes(c.key)).flatMap((c) => [
-        c.regSource,
-        ...c.extraSources,
-      ]),
-    [exclude],
-  );
+
+  const split = (sel: string[]) => {
+    const leadKeys = sel.filter((v) => v.startsWith('lead:')).map((v) => v.slice(5));
+    const slugs = sel.filter((v) => v.startsWith('prog:')).map((v) => v.slice(5));
+    const sources = LEAD_CAMPAIGNS.filter((c) => leadKeys.includes(c.key)).flatMap((c) => [
+      c.regSource,
+      ...c.extraSources,
+    ]);
+    return { sources, slugs };
+  };
+
+  const inc = useMemo(() => split(includeSel), [includeSel]);
+  const exc = useMemo(() => split(excludeSel), [excludeSel]);
 
   const { data: count, isFetching, refetch } = useQuery({
-    queryKey: ['lead-email-audience', includeSources, excludeSources, includePrograms, excludePrograms],
-    enabled: includeSources.length > 0 || includePrograms.length > 0,
+    queryKey: ['lead-email-audience', inc, exc],
+    enabled: inc.sources.length > 0 || inc.slugs.length > 0,
     queryFn: async () => {
-      const inc = await fetchEmails(includeSources);
-      for (const e of await fetchProgramEmails(includePrograms)) inc.add(e);
-      const exc = await fetchEmails(excludeSources);
-      for (const e of await fetchProgramEmails(excludePrograms)) exc.add(e);
-      for (const e of exc) inc.delete(e);
-      return inc.size;
+      const set = await fetchEmails(inc.sources);
+      for (const e of await fetchProgramEmails(inc.slugs)) set.add(e);
+      const out = await fetchEmails(exc.sources);
+      for (const e of await fetchProgramEmails(exc.slugs)) out.add(e);
+      for (const e of await fetchUnsubscribed()) out.add(e);
+      for (const e of out) set.delete(e);
+      return set.size;
     },
   });
-
-  const toggle = (list: string[], setList: (v: string[]) => void, key: string) =>
-    setList(list.includes(key) ? list.filter((k) => k !== key) : [...list, key]);
 
   const payload = () => ({
     subject: subject.trim(),
@@ -142,45 +260,72 @@ export function LeadEmailCampaign() {
     address: address.trim(),
     rtl,
     buttons: buttons.filter((b) => b.label.trim() && b.url.trim()),
-    sources: includeSources,
-    excludeSources,
-    programs: includePrograms,
-    excludePrograms,
+    sources: inc.sources,
+    excludeSources: exc.sources,
+    programs: inc.slugs,
+    excludePrograms: exc.slugs,
   });
-
 
   async function send(mode: 'test' | 'all') {
     const plain = message.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
     if (!subject.trim() || !plain) {
-
       toast.error('Add a title and a message first');
       return;
     }
-    if (mode === 'test' && !testEmail.trim()) {
-      toast.error('Enter a test email first');
-      return;
-    }
-    if (mode === 'all') {
-      if (!includeSources.length && !includePrograms.length) {
-        toast.error('Pick at least one audience');
+    if (mode === 'test') {
+      if (!testEmail.trim()) {
+        toast.error('Enter a test email first');
         return;
       }
-      if (!window.confirm(`Send this email to ${count ?? 0} people?`)) return;
+      setSending('test');
+      try {
+        const { data, error } = await supabase.functions.invoke('send-lead-email', {
+          body: { ...payload(), testEmail: testEmail.trim() },
+        });
+        if (error) throw error;
+        toast.success(`Test sent (${(data as any)?.sent ?? 0})`);
+      } catch (e: any) {
+        toast.error(e?.message || 'Failed to send');
+      } finally {
+        setSending(null);
+      }
+      return;
     }
-    setSending(mode);
+
+    if (!inc.sources.length && !inc.slugs.length) {
+      toast.error('Pick at least one audience');
+      return;
+    }
+    if (!window.confirm(`Send this email to ${count ?? 0} people?`)) return;
+
+    setSending('all');
+    setProgress({ done: 0, total: count ?? 0, failed: 0 });
+    let offset = 0;
+    let sent = 0;
+    let failed = 0;
     try {
-      const { data, error } = await supabase.functions.invoke('send-lead-email', {
-        body: mode === 'test' ? { ...payload(), testEmail: testEmail.trim() } : payload(),
-      });
-      if (error) throw error;
-      const d = data as any;
-      toast.success(`Sent ${d?.sent ?? 0}${d?.failed ? ` · failed ${d.failed}` : ''}`);
+      // Sent in parts so a very large list (10k+) never times out.
+      for (;;) {
+        const { data, error } = await supabase.functions.invoke('send-lead-email', {
+          body: { ...payload(), offset, limit: CHUNK },
+        });
+        if (error) throw error;
+        const d = data as any;
+        sent += d?.sent ?? 0;
+        failed += d?.failed ?? 0;
+        offset += d?.processed ?? 0;
+        setProgress({ done: offset, total: d?.total ?? count ?? 0, failed });
+        if (d?.done || !d?.processed) break;
+      }
+      toast.success(`Sent ${sent}${failed ? ` · failed ${failed}` : ''}`);
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to send');
+      toast.error(`${e?.message || 'Failed to send'} — stopped after ${sent} emails`);
     } finally {
       setSending(null);
     }
   }
+
+  const pct = progress && progress.total ? Math.round((progress.done / progress.total) * 100) : 0;
 
   return (
     <div className="space-y-4">
@@ -191,70 +336,30 @@ export function LeadEmailCampaign() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <Label className="text-sm">Send to</Label>
-            <div className="mt-2 grid gap-2 sm:grid-cols-2">
-              {LEAD_CAMPAIGNS.map((c) => (
-                <label key={c.key} className="flex items-center gap-2 rounded-md border p-2 text-sm">
-                  <Checkbox
-                    checked={include.includes(c.key)}
-                    onCheckedChange={() => toggle(include, setInclude, c.key)}
-                  />
-                  <span>{c.label}</span>
-                </label>
-              ))}
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <Label className="text-sm">Send to</Label>
+              <div className="mt-2">
+                <AudiencePicker
+                  placeholder="Pick lead lists or programs"
+                  options={options}
+                  selected={includeSel}
+                  onChange={setIncludeSel}
+                  tone="default"
+                />
+              </div>
             </div>
-          </div>
-
-          <div>
-            <Label className="text-sm">Exclude (already signed up)</Label>
-            <div className="mt-2 grid gap-2 sm:grid-cols-2">
-              {LEAD_CAMPAIGNS.map((c) => (
-                <label
-                  key={c.key}
-                  className="flex items-center gap-2 rounded-md border p-2 text-sm"
-                >
-                  <Checkbox
-                    checked={exclude.includes(c.key)}
-                    onCheckedChange={() => toggle(exclude, setExclude, c.key)}
-                  />
-                  <span>{c.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <Label className="text-sm">Also send to people in these programs</Label>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {programs.map((p) => (
-                <Button
-                  key={p.slug}
-                  type="button"
-                  size="sm"
-                  variant={includePrograms.includes(p.slug) ? 'default' : 'outline'}
-                  onClick={() => toggle(includePrograms, setIncludePrograms, p.slug)}
-                >
-                  {p.title}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <Label className="text-sm">Exclude people in these programs</Label>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {programs.map((p) => (
-                <Button
-                  key={p.slug}
-                  type="button"
-                  size="sm"
-                  variant={excludePrograms.includes(p.slug) ? 'destructive' : 'outline'}
-                  onClick={() => toggle(excludePrograms, setExcludePrograms, p.slug)}
-                >
-                  {p.title}
-                </Button>
-              ))}
+            <div>
+              <Label className="text-sm">Don't send to</Label>
+              <div className="mt-2">
+                <AudiencePicker
+                  placeholder="Pick lists or programs to skip"
+                  options={options}
+                  selected={excludeSel}
+                  onChange={setExcludeSel}
+                  tone="destructive"
+                />
+              </div>
             </div>
           </div>
 
@@ -265,6 +370,9 @@ export function LeadEmailCampaign() {
             <Button variant="ghost" size="sm" onClick={() => refetch()} disabled={isFetching}>
               <RefreshCw className="mr-1 h-4 w-4" /> Refresh
             </Button>
+            <span className="text-xs text-muted-foreground">
+              People who unsubscribed are always removed.
+            </span>
           </div>
         </CardContent>
       </Card>
@@ -301,7 +409,6 @@ export function LeadEmailCampaign() {
           </div>
           <div>
             <Label htmlFor="lead-subject">Title (subject)</Label>
-
             <Input
               id="lead-subject"
               value={subject}
@@ -335,7 +442,6 @@ export function LeadEmailCampaign() {
               Bold, lists, links and images are supported. Images are uploaded and hosted for you.
             </p>
           </div>
-
           <div className="flex items-center justify-between rounded-md border p-3">
             <div>
               <p className="text-sm font-medium">Right-to-left (Farsi)</p>
@@ -394,34 +500,46 @@ export function LeadEmailCampaign() {
               />
             </div>
           </div>
-
         </CardContent>
       </Card>
 
       <Card>
-        <CardContent className="flex flex-wrap items-center gap-2 pt-6">
-          <Input
-            value={testEmail}
-            onChange={(e) => setTestEmail(e.target.value)}
-            placeholder="test@email.com"
-            className="w-64"
-          />
-          <Button variant="outline" onClick={() => send('test')} disabled={!!sending}>
-            {sending === 'test' ? (
-              <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="mr-1 h-4 w-4" />
-            )}
-            Send test
-          </Button>
-          <Button onClick={() => send('all')} disabled={!!sending}>
-            {sending === 'all' ? (
-              <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="mr-1 h-4 w-4" />
-            )}
-            Send to {count ?? 0}
-          </Button>
+        <CardContent className="space-y-3 pt-6">
+          <div className="flex flex-wrap items-center gap-2">
+            <Input
+              value={testEmail}
+              onChange={(e) => setTestEmail(e.target.value)}
+              placeholder="test@email.com"
+              className="w-64"
+            />
+            <Button variant="outline" onClick={() => send('test')} disabled={!!sending}>
+              {sending === 'test' ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-1 h-4 w-4" />
+              )}
+              Send test
+            </Button>
+            <Button onClick={() => send('all')} disabled={!!sending}>
+              {sending === 'all' ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-1 h-4 w-4" />
+              )}
+              Send to {count ?? 0}
+            </Button>
+          </div>
+
+          {progress && (
+            <div className="space-y-1">
+              <Progress value={pct} />
+              <p className="text-xs text-muted-foreground">
+                {pct}% · {progress.done} of {progress.total} sent
+                {progress.failed ? ` · ${progress.failed} failed` : ''}
+                {sending === 'all' ? ' — keep this page open' : ''}
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
