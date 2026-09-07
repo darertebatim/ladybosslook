@@ -35,6 +35,31 @@ interface Option {
 
 const CHUNK = 500;
 
+/** Handoff key used by the Email Opens tab ("Resend to who didn't get it"). */
+export const RESEND_HANDOFF_KEY = 'lead_email_resend_subject';
+
+/** Everyone who already received an email with this subject. */
+async function fetchAlreadySent(subject: string): Promise<Set<string>> {
+  const set = new Set<string>();
+  if (!subject) return set;
+  for (let page = 0; page < 40; page++) {
+    const { data, error } = await supabase
+      .from('email_delivery_events')
+      .select('recipient')
+      .eq('subject', subject)
+      .in('event_type', ['sent', 'delivered'])
+      .range(page * 1000, page * 1000 + 999);
+    if (error) throw error;
+    for (const r of data || []) {
+      const e = String((r as any).recipient || '').trim().toLowerCase();
+      if (e) set.add(e);
+    }
+    if (!data || data.length < 1000) break;
+  }
+  return set;
+}
+
+
 async function fetchProgramEmails(slugs: string[]): Promise<Set<string>> {
   const set = new Set<string>();
   if (!slugs.length) return set;
