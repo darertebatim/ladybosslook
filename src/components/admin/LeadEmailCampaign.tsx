@@ -339,6 +339,29 @@ export function LeadEmailCampaign() {
   const inc = useMemo(() => split(includeSel), [includeSel]);
   const exc = useMemo(() => split(excludeSel), [excludeSel]);
 
+  // Keep a copy of every email we write, so it can be re-opened / re-sent later.
+  useEffect(() => {
+    if (!subject.trim() || !message.trim()) return;
+    const t = setTimeout(
+      () =>
+        saveDraft({
+          subject,
+          preheader,
+          message,
+          signature,
+          fromName,
+          address,
+          rtl,
+          buttons,
+          includeSel,
+          excludeSel,
+        }),
+      800,
+    );
+    return () => clearTimeout(t);
+  }, [subject, preheader, message, signature, fromName, address, rtl, buttons, includeSel, excludeSel]);
+
+
   const { data: count, isFetching, refetch } = useQuery({
     queryKey: ['lead-email-audience', inc, exc, skipAlreadySent ? subject.trim() : ''],
     enabled: inc.sources.length > 0 || inc.slugs.length > 0,
