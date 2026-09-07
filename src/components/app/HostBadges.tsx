@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-type ContentType = 'playlist' | 'routine' | 'program';
+type ContentType = 'playlist' | 'routine' | 'program' | 'course';
 
 interface HostBadgesProps {
   contentType: ContentType;

@@ -1,11 +1,20 @@
 import { useNavigate } from 'react-router-dom';
-import { GraduationCap, Loader2, Play, BookOpen, Clock, CheckCircle2 } from 'lucide-react';
+import { GraduationCap, Loader2, Play, BookOpen, Clock, CheckCircle2, Globe } from 'lucide-react';
 import { PageHeader } from '@/components/app/ui/PageHeader';
+import { HostBadges } from '@/components/app/HostBadges';
 import { cn } from '@/lib/utils';
 import {
   useLearnCourses, useLearnCourseContent, useLearnProgress, useLearnCourseStartDate,
   lessonUnlockDate, formatTotalDuration, lessonDurationSeconds, type LearnCourse,
 } from '@/hooks/useLearn';
+
+const LANGUAGE_OPTIONS = [
+  { code: '', label: 'Multilanguage' },
+  { code: 'en', label: 'English' },
+  { code: 'fa', label: 'Persian' },
+  { code: 'tr', label: 'Turkish' },
+  { code: 'es', label: 'Spanish' },
+];
 
 function ProgressBar({ value, tone = 'brand' }: { value: number; tone?: 'brand' | 'light' }) {
   return (
@@ -67,7 +76,7 @@ function CourseCard({ course, onOpen, onContinue }: {
               {course.subtitle || course.description}
             </p>
           )}
-          <div className="flex items-center gap-3 text-xs text-fg-warm-muted">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-fg-warm-muted">
             <span className="flex items-center gap-1">
               <BookOpen className="h-3.5 w-3.5" /> {total} {total === 1 ? 'lesson' : 'lessons'}
             </span>
@@ -76,6 +85,19 @@ function CourseCard({ course, onOpen, onContinue }: {
                 <Clock className="h-3.5 w-3.5" /> {formatTotalDuration(totalSeconds)}
               </span>
             )}
+            {course.language && (
+              <span className="flex items-center gap-1">
+                <Globe className="h-3.5 w-3.5" />
+                {LANGUAGE_OPTIONS.find((l) => l.code === course.language)?.label || course.language}
+              </span>
+            )}
+            <HostBadges
+              contentType="course"
+              contentId={course.id}
+              size="sm"
+              prefix=""
+              className="text-fg-warm-muted"
+            />
           </div>
           {total > 0 && (
             <div className="space-y-1.5 pt-0.5">
