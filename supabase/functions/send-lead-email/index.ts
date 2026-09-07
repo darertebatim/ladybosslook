@@ -411,6 +411,8 @@ const handler = async (req: Request): Promise<Response> => {
         failed,
         total,
         processed,
+        emails: body.testEmail ? [] : slice,
+        remaining: Math.max(0, total - (offset + processed)),
         done: !!body.testEmail || offset + processed >= total,
       }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
