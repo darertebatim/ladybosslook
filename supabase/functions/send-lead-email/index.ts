@@ -35,6 +35,8 @@ interface Body {
   rtl?: boolean;
   testEmail?: string;
   preheader?: string;
+  offset?: number;
+  limit?: number;
 }
 
 const esc = (s: string) =>
