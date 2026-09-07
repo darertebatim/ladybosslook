@@ -247,3 +247,6 @@ verify_jwt = false
 
 [functions.backfill-usd-amounts]
 verify_jwt = true
+
+[functions.send-lead-email]
+verify_jwt = true
