@@ -212,6 +212,28 @@ async function collectUnsubscribed(supabase: any): Promise<Set<string>> {
   return set;
 }
 
+/** Everyone who already received (sent or delivered) an email with this subject. */
+async function collectAlreadySent(supabase: any, subject: string): Promise<Set<string>> {
+  const set = new Set<string>();
+  if (!subject) return set;
+  for (let page = 0; page < 40; page++) {
+    const { data, error } = await supabase
+      .from("email_delivery_events")
+      .select("recipient")
+      .eq("subject", subject)
+      .in("event_type", ["sent", "delivered"])
+      .range(page * 1000, page * 1000 + 999);
+    if (error) throw error;
+    for (const r of data || []) {
+      const e = String(r.recipient || "").trim().toLowerCase();
+      if (e) set.add(e);
+    }
+    if (!data || data.length < 1000) break;
+  }
+  return set;
+}
+
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
