@@ -270,6 +270,19 @@ export default function AppLearnCourse() {
           </>
         )}
       </div>
+
+      <Sheet open={descOpen} onOpenChange={setDescOpen}>
+        <SheetContent side="bottom" className="rounded-t-3xl pb-8">
+          <SheetHeader>
+            <SheetTitle className="text-left text-fg-warm">About this course</SheetTitle>
+          </SheetHeader>
+          <div className="mt-4 max-h-[60vh] overflow-y-auto">
+            <p className="text-sm text-fg-warm-muted whitespace-pre-line leading-relaxed">
+              {course?.description}
+            </p>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
