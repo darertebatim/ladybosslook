@@ -116,16 +116,16 @@ export default function AppLearnCourse() {
                 </div>
 
                 {course?.description && (
-                  <div className="pt-0.5">
-                    <p className="text-sm text-fg-warm-muted whitespace-pre-line line-clamp-2">
+                  <div className="pt-0.5 relative">
+                    <p className="text-sm text-fg-warm-muted whitespace-pre-line line-clamp-2 pr-[4.5em]">
                       {course.description}
-                      <button
-                        onClick={() => setDescOpen(true)}
-                        className="inline whitespace-nowrap text-brand font-semibold active:opacity-70 transition-opacity ml-0.5"
-                      >
-                        ...more
-                      </button>
                     </p>
+                    <button
+                      onClick={() => setDescOpen(true)}
+                      className="absolute bottom-0 right-0 text-sm font-semibold text-brand active:opacity-70 transition-opacity bg-gradient-to-l from-card-warm via-card-warm to-transparent pl-8 pr-0"
+                    >
+                      ...more
+                    </button>
                   </div>
                 )}
 
