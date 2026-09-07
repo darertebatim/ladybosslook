@@ -16,6 +16,8 @@ import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 const igads = LEAD_CAMPAIGNS.find((c) => c.key === 'igads')!;
 
 export default function LeadCenter() {
+  const [tab, setTab] = useState('campaigns');
+
   return (
     <div className="space-y-6">
       <div>
@@ -26,7 +28,8 @@ export default function LeadCenter() {
         </p>
       </div>
 
-      <Tabs defaultValue="campaigns">
+      <Tabs value={tab} onValueChange={setTab}>
+
         <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
           <TabsTrigger value="stats">Stats</TabsTrigger>
