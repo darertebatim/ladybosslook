@@ -198,9 +198,12 @@ const handler = async (req: Request): Promise<Response> => {
       recipients = [t];
     } else {
       const sources = (body.sources || []).map(String).filter(Boolean);
-      if (!sources.length) throw new Error("Pick at least one audience");
+      const programs = (body.programs || []).map(String).filter(Boolean);
+      if (!sources.length && !programs.length) throw new Error("Pick at least one audience");
       const include = await collectEmails(supabase, sources);
+      for (const e of await collectProgramEmails(supabase, programs)) include.add(e);
       const exclude = await collectEmails(supabase, (body.excludeSources || []).map(String).filter(Boolean));
+      for (const e of await collectProgramEmails(supabase, (body.excludePrograms || []).map(String).filter(Boolean))) exclude.add(e);
       for (const e of exclude) include.delete(e);
       recipients = Array.from(include);
     }
