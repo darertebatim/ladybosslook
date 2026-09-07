@@ -5,6 +5,7 @@ import {
   Loader2, ChevronRight, GraduationCap, Lock, Sparkles, Info, Clock,
 } from 'lucide-react';
 import { PageHeader } from '@/components/app/ui/PageHeader';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import {
   useLearnCourse, useLearnCourseContent, useLearnProgress, useLearnCourseStartDate,
@@ -40,6 +41,7 @@ export default function AppLearnCourse() {
 
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
   const [collapsedTouched, setCollapsedTouched] = useState(false);
+  const [descOpen, setDescOpen] = useState(false);
 
   const flatLessons = useMemo(() => {
     if (!content) return [] as LearnLesson[];
@@ -114,7 +116,17 @@ export default function AppLearnCourse() {
                 </div>
 
                 {course?.description && (
-                  <p className="text-sm text-fg-warm-muted whitespace-pre-line pt-0.5">{course.description}</p>
+                  <div className="pt-0.5">
+                    <p className="text-sm text-fg-warm-muted whitespace-pre-line line-clamp-2">
+                      {course.description}
+                    </p>
+                    <button
+                      onClick={() => setDescOpen(true)}
+                      className="text-sm font-semibold text-brand mt-0.5 active:opacity-70 transition-opacity"
+                    >
+                      ... more
+                    </button>
+                  </div>
                 )}
 
                 {total > 0 && (
@@ -258,6 +270,19 @@ export default function AppLearnCourse() {
           </>
         )}
       </div>
+
+      <Sheet open={descOpen} onOpenChange={setDescOpen}>
+        <SheetContent side="bottom" className="rounded-t-3xl pb-8">
+          <SheetHeader>
+            <SheetTitle className="text-left text-fg-warm">About this course</SheetTitle>
+          </SheetHeader>
+          <div className="mt-4 max-h-[60vh] overflow-y-auto">
+            <p className="text-sm text-fg-warm-muted whitespace-pre-line leading-relaxed">
+              {course?.description}
+            </p>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
