@@ -4,7 +4,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, MailOpen, RefreshCw } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Download, Eye, Loader2, MailOpen, RefreshCw, Send } from 'lucide-react';
+import { toast } from 'sonner';
+import { RESEND_HANDOFF_KEY } from '@/components/admin/LeadEmailCampaign';
 
 type EventRow = {
   event_type: string;
@@ -18,6 +27,7 @@ const RANGES = [
   { label: 'Last 30 days', days: 30 },
   { label: 'Last 90 days', days: 90 },
 ];
+
 
 async function fetchEvents(days: number): Promise<EventRow[]> {
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
@@ -47,8 +57,21 @@ type Agg = {
   lastAt: string;
 };
 
-export function EmailOpenRates() {
+type Person = {
+  email: string;
+  delivered: boolean;
+  opened: boolean;
+  clicked: boolean;
+  bounced: boolean;
+  lastAt: string;
+};
+
+export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => void }) {
   const [days, setDays] = useState(30);
+  const [detail, setDetail] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+
+
 
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['email-delivery-events', days],
@@ -57,8 +80,9 @@ export function EmailOpenRates() {
     refetchOnMount: 'always',
   });
 
-  const { rows, totals } = useMemo(() => {
+  const { rows, totals, peopleBySubject } = useMemo(() => {
     const map = new Map<string, Agg & { openedSet: Set<string>; sentSet: Set<string>; deliveredSet: Set<string>; clickedSet: Set<string>; bouncedSet: Set<string> }>();
+    const people = new Map<string, Map<string, Person>>();
 
     for (const e of data ?? []) {
       const subject = e.subject || '(no subject)';
@@ -87,6 +111,23 @@ export function EmailOpenRates() {
       if (e.event_type === 'opened') agg.openedSet.add(who);
       if (e.event_type === 'clicked') agg.clickedSet.add(who);
       if (e.event_type.startsWith('bounce')) agg.bouncedSet.add(who);
+
+      if (who) {
+        let byEmail = people.get(subject);
+        if (!byEmail) {
+          byEmail = new Map<string, Person>();
+          people.set(subject, byEmail);
+        }
+        const p =
+          byEmail.get(who) ??
+          { email: who, delivered: false, opened: false, clicked: false, bounced: false, lastAt: e.occurred_at };
+        if (e.event_type === 'delivered' || e.event_type === 'sent') p.delivered = true;
+        if (e.event_type === 'opened') p.opened = true;
+        if (e.event_type === 'clicked') p.clicked = true;
+        if (e.event_type.startsWith('bounce')) p.bounced = true;
+        if (e.occurred_at > p.lastAt) p.lastAt = e.occurred_at;
+        byEmail.set(who, p);
+      }
     }
 
     const rows: Agg[] = [...map.values()]
@@ -112,11 +153,41 @@ export function EmailOpenRates() {
       { sent: 0, delivered: 0, opened: 0, clicked: 0, bounced: 0 },
     );
 
-    return { rows, totals };
+    return { rows, totals, peopleBySubject: people };
   }, [data]);
+
+  const detailPeople = useMemo(() => {
+    const list = [...(peopleBySubject.get(detail || '')?.values() ?? [])];
+    const q = search.trim().toLowerCase();
+    return list
+      .filter((p) => !q || p.email.includes(q))
+      .sort((a, b) => (a.lastAt < b.lastAt ? 1 : -1));
+  }, [peopleBySubject, detail, search]);
+
+  const downloadCsv = () => {
+    const header = 'email,delivered,opened,clicked,bounced,last_activity';
+    const body = detailPeople
+      .map((p) =>
+        [p.email, p.delivered, p.opened, p.clicked, p.bounced, p.lastAt].join(','),
+      )
+      .join('\n');
+    const url = URL.createObjectURL(new Blob([`${header}\n${body}`], { type: 'text/csv' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'email-recipients.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const resend = (subject: string) => {
+    localStorage.setItem(RESEND_HANDOFF_KEY, subject);
+    if (onResend) onResend(subject);
+    else toast.success('Open the Email Marketing tab to finish the re-send.');
+  };
 
   const pct = (n: number, d: number) => (d > 0 ? `${Math.round((n / d) * 100)}%` : '—');
   const base = (r: { delivered: number; sent: number }) => r.delivered || r.sent;
+
 
   return (
     <Card>
@@ -192,7 +263,8 @@ export function EmailOpenRates() {
                     <th className="py-2 px-3">Open rate</th>
                     <th className="py-2 px-3">Clicked</th>
                     <th className="py-2 px-3">Bounced</th>
-                    <th className="py-2 pl-3">Last activity</th>
+                    <th className="py-2 px-3">Last activity</th>
+                    <th className="py-2 pl-3 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -206,17 +278,87 @@ export function EmailOpenRates() {
                       </td>
                       <td className="py-2 px-3">{r.clicked}</td>
                       <td className="py-2 px-3">{r.bounced}</td>
-                      <td className="py-2 pl-3 whitespace-nowrap text-muted-foreground">
+                      <td className="py-2 px-3 whitespace-nowrap text-muted-foreground">
                         {new Date(r.lastAt).toLocaleString()}
+                      </td>
+                      <td className="py-2 pl-3">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSearch('');
+                              setDetail(r.subject);
+                            }}
+                          >
+                            <Eye className="mr-1 h-4 w-4" /> Details
+                          </Button>
+                          <Button size="sm" variant="secondary" onClick={() => resend(r.subject)}>
+                            <Send className="mr-1 h-4 w-4" /> Send to who missed it
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}
+
                 </tbody>
               </table>
             </div>
           </>
         )}
       </CardContent>
+
+      <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-base leading-snug">{detail}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-wrap items-center gap-2">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search an email address"
+              className="max-w-xs"
+            />
+            <Badge variant="secondary">{detailPeople.length} people</Badge>
+            <Button size="sm" variant="outline" onClick={downloadCsv}>
+              <Download className="mr-1 h-4 w-4" /> Download CSV
+            </Button>
+            <Button size="sm" variant="secondary" onClick={() => detail && resend(detail)}>
+              <Send className="mr-1 h-4 w-4" /> Send to who missed it
+            </Button>
+          </div>
+          <div className="max-h-[55vh] overflow-y-auto">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 bg-background">
+                <tr className="border-b text-left text-muted-foreground">
+                  <th className="py-2 pr-3">Email</th>
+                  <th className="py-2 px-3">Delivered</th>
+                  <th className="py-2 px-3">Opened</th>
+                  <th className="py-2 px-3">Clicked</th>
+                  <th className="py-2 px-3">Bounced</th>
+                  <th className="py-2 pl-3">Last activity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {detailPeople.map((p) => (
+                  <tr key={p.email} className="border-b last:border-0">
+                    <td className="py-2 pr-3">{p.email}</td>
+                    <td className="py-2 px-3">{p.delivered ? '✓' : '—'}</td>
+                    <td className="py-2 px-3">{p.opened ? '✓' : '—'}</td>
+                    <td className="py-2 px-3">{p.clicked ? '✓' : '—'}</td>
+                    <td className="py-2 px-3">{p.bounced ? '✓' : '—'}</td>
+                    <td className="py-2 pl-3 whitespace-nowrap text-muted-foreground">
+                      {new Date(p.lastAt).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
+
 }

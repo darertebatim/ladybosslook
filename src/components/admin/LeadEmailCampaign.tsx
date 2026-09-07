@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,6 +34,31 @@ interface Option {
 }
 
 const CHUNK = 500;
+
+/** Handoff key used by the Email Opens tab ("Resend to who didn't get it"). */
+export const RESEND_HANDOFF_KEY = 'lead_email_resend_subject';
+
+/** Everyone who already received an email with this subject. */
+async function fetchAlreadySent(subject: string): Promise<Set<string>> {
+  const set = new Set<string>();
+  if (!subject) return set;
+  for (let page = 0; page < 40; page++) {
+    const { data, error } = await supabase
+      .from('email_delivery_events')
+      .select('recipient')
+      .eq('subject', subject)
+      .in('event_type', ['sent', 'delivered'])
+      .range(page * 1000, page * 1000 + 999);
+    if (error) throw error;
+    for (const r of data || []) {
+      const e = String((r as any).recipient || '').trim().toLowerCase();
+      if (e) set.add(e);
+    }
+    if (!data || data.length < 1000) break;
+  }
+  return set;
+}
+
 
 async function fetchProgramEmails(slugs: string[]): Promise<Set<string>> {
   const set = new Set<string>();
@@ -195,6 +220,19 @@ export function LeadEmailCampaign() {
   const [testEmail, setTestEmail] = useState('');
   const [sending, setSending] = useState<'test' | 'all' | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number; failed: number } | null>(null);
+  const [skipAlreadySent, setSkipAlreadySent] = useState(false);
+
+  // Coming from the Email Opens tab: "Send again to who didn't get it".
+  useEffect(() => {
+    const s = localStorage.getItem(RESEND_HANDOFF_KEY);
+    if (s) {
+      setSubject(s);
+      setSkipAlreadySent(true);
+      localStorage.removeItem(RESEND_HANDOFF_KEY);
+      toast.info('Subject filled in. Only people who never received it will be emailed.');
+    }
+  }, []);
+
 
   const { data: programs = [] } = useQuery({
     queryKey: ['lead-email-programs'],
@@ -238,7 +276,7 @@ export function LeadEmailCampaign() {
   const exc = useMemo(() => split(excludeSel), [excludeSel]);
 
   const { data: count, isFetching, refetch } = useQuery({
-    queryKey: ['lead-email-audience', inc, exc],
+    queryKey: ['lead-email-audience', inc, exc, skipAlreadySent ? subject.trim() : ''],
     enabled: inc.sources.length > 0 || inc.slugs.length > 0,
     queryFn: async () => {
       const set = await fetchEmails(inc.sources);
@@ -246,6 +284,9 @@ export function LeadEmailCampaign() {
       const out = await fetchEmails(exc.sources);
       for (const e of await fetchProgramEmails(exc.slugs)) out.add(e);
       for (const e of await fetchUnsubscribed()) out.add(e);
+      if (skipAlreadySent && subject.trim()) {
+        for (const e of await fetchAlreadySent(subject.trim())) out.add(e);
+      }
       for (const e of out) set.delete(e);
       return set.size;
     },
@@ -264,7 +305,9 @@ export function LeadEmailCampaign() {
     excludeSources: exc.sources,
     programs: inc.slugs,
     excludePrograms: exc.slugs,
+    skipSubject: skipAlreadySent ? subject.trim() : '',
   });
+
 
   async function send(mode: 'test' | 'all') {
     const plain = message.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
@@ -362,6 +405,25 @@ export function LeadEmailCampaign() {
               </div>
             </div>
           </div>
+
+          <div className="flex items-center gap-3 rounded-lg border p-3">
+            <Switch
+              id="skip-already"
+              checked={skipAlreadySent}
+              onCheckedChange={setSkipAlreadySent}
+            />
+            <div>
+              <Label htmlFor="skip-already" className="text-sm">
+                Only people who never received this email
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Skips everyone who already got an email with this exact title — use it to send
+                again to the ones who missed it.
+              </p>
+            </div>
+          </div>
+
+
 
           <div className="flex items-center gap-3">
             <Badge variant="secondary">
