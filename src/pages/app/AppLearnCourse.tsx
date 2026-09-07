@@ -272,7 +272,7 @@ export default function AppLearnCourse() {
                                   </span>
                                   <span className="flex items-center gap-2 text-xs text-fg-warm-muted">
                                     {unlockAt ? (
-                                      formatUnlockLabel(unlockAt)
+                                      unlockAt.label
                                     ) : (
                                       <>
                                         <span className="capitalize">{lesson.lesson_type}</span>

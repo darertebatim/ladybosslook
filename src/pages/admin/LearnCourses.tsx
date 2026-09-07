@@ -182,7 +182,7 @@ export default function LearnCourses() {
   const [courseDialog, setCourseDialog] = useState<{ open: boolean; course?: CourseWithRounds }>({ open: false });
   const [cForm, setCForm] = useState({
     title: '', subtitle: '', description: '', intro_note: '', language: '',
-    cover_image_url: '', is_published: false, sort_order: 0,
+    cover_image_url: '', is_published: false, sequential_lessons: false, sort_order: 0,
   });
   const [cRounds, setCRounds] = useState<string[]>([]);
   const [cProgram, setCProgram] = useState<string | null>(null);
@@ -232,6 +232,7 @@ export default function LearnCourses() {
         language: cForm.language.trim() || null,
         cover_image_url: cForm.cover_image_url.trim() || null,
         is_published: cForm.is_published,
+        sequential_lessons: cForm.sequential_lessons,
         sort_order: cForm.sort_order,
       };
       let courseId = courseDialog.course?.id;
@@ -420,6 +421,7 @@ export default function LearnCourses() {
       language: (course as any)?.language || '',
       cover_image_url: course?.cover_image_url || '',
       is_published: course?.is_published ?? false,
+      sequential_lessons: (course as any)?.sequential_lessons ?? false,
       sort_order: course?.sort_order ?? (courses?.length || 0),
     });
     const roundIds = course?.rounds.map((r) => r.round_id) || [];
@@ -829,6 +831,13 @@ export default function LearnCourses() {
             <div className="flex items-center justify-between">
               <Label>Published (visible to enrolled students)</Label>
               <Switch checked={cForm.is_published} onCheckedChange={(v) => setCForm({ ...cForm, is_published: v })} />
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <Label>Sequential lessons</Label>
+                <p className="text-xs text-muted-foreground">Each lesson stays locked until the previous one is completed (free previews stay open).</p>
+              </div>
+              <Switch checked={cForm.sequential_lessons} onCheckedChange={(v) => setCForm({ ...cForm, sequential_lessons: v })} />
             </div>
             <div className="space-y-2">
               <Label>Access — pick a program, then its rounds</Label>
