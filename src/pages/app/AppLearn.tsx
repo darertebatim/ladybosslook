@@ -1,11 +1,20 @@
 import { useNavigate } from 'react-router-dom';
-import { GraduationCap, Loader2, Play, BookOpen, Clock, CheckCircle2 } from 'lucide-react';
+import { GraduationCap, Loader2, Play, BookOpen, Clock, CheckCircle2, Globe } from 'lucide-react';
 import { PageHeader } from '@/components/app/ui/PageHeader';
+import { HostBadges } from '@/components/app/HostBadges';
 import { cn } from '@/lib/utils';
 import {
   useLearnCourses, useLearnCourseContent, useLearnProgress, useLearnCourseStartDate,
   lessonUnlockDate, formatTotalDuration, lessonDurationSeconds, type LearnCourse,
 } from '@/hooks/useLearn';
+
+const LANGUAGE_OPTIONS = [
+  { code: '', label: 'Multilanguage' },
+  { code: 'en', label: 'English' },
+  { code: 'fa', label: 'Persian' },
+  { code: 'tr', label: 'Turkish' },
+  { code: 'es', label: 'Spanish' },
+];
 
 function ProgressBar({ value, tone = 'brand' }: { value: number; tone?: 'brand' | 'light' }) {
   return (
