@@ -29,10 +29,11 @@ function ProgressBar({ value, tone = 'brand' }: { value: number; tone?: 'brand' 
   );
 }
 
-function CourseCard({ course, onOpen, onContinue }: {
+function CourseCard({ course, onOpen, onContinue, onShowDescription }: {
   course: LearnCourse;
   onOpen: () => void;
   onContinue: (lessonId: string) => void;
+  onShowDescription: () => void;
 }) {
   const { data: content } = useLearnCourseContent(course.id);
   const { data: progress } = useLearnProgress();
