@@ -303,6 +303,10 @@ const handler = async (req: Request): Promise<Response> => {
       if (skipSubject) {
         for (const e of await collectAlreadySent(supabase, skipSubject)) exclude.add(e);
       }
+      for (const e of body.alsoSkip || []) {
+        const v = String(e || "").trim().toLowerCase();
+        if (v) exclude.add(v);
+      }
 
       for (const e of exclude) include.delete(e);
       recipients = Array.from(include).sort();
