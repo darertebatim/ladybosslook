@@ -5,6 +5,7 @@ import {
   Loader2, ChevronRight, GraduationCap, Lock, Sparkles, Info, Clock,
 } from 'lucide-react';
 import { PageHeader } from '@/components/app/ui/PageHeader';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import {
   useLearnCourse, useLearnCourseContent, useLearnProgress, useLearnCourseStartDate,
