@@ -2,9 +2,10 @@ import { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Play, Headphones, FileText, BookOpen, CheckCircle2,
-  Loader2, ChevronRight, GraduationCap, Lock, Sparkles, Info, Clock,
+  Loader2, ChevronRight, GraduationCap, Lock, Sparkles, Info, Clock, Globe,
 } from 'lucide-react';
 import { PageHeader } from '@/components/app/ui/PageHeader';
+import { HostBadges } from '@/components/app/HostBadges';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import {
@@ -12,6 +13,14 @@ import {
   lessonUnlockDate, formatUnlockLabel, formatLessonDuration, formatTotalDuration,
   lessonDurationSeconds, type LearnLesson, type LessonType,
 } from '@/hooks/useLearn';
+
+const LANGUAGE_OPTIONS = [
+  { code: '', label: 'Multilanguage' },
+  { code: 'en', label: 'English' },
+  { code: 'fa', label: 'Persian' },
+  { code: 'tr', label: 'Turkish' },
+  { code: 'es', label: 'Spanish' },
+];
 
 const LESSON_ICONS: Record<LessonType, typeof Play> = {
   video: Play,
@@ -77,14 +86,6 @@ export default function AppLearnCourse() {
         back
         backStyle="plain"
         onBack={() => navigate('/app/learn')}
-        subRow={
-          total > 0 ? (
-            <div className="flex items-center gap-2 w-full">
-              <ProgressBar value={pct} className="flex-1" />
-              <span className="text-xs font-medium text-fg-warm-muted shrink-0">{pct}%</span>
-            </div>
-          ) : undefined
-        }
       />
 
       <div className="px-4 py-4 space-y-4">
@@ -104,43 +105,59 @@ export default function AppLearnCourse() {
                 </div>
               )}
               <div className="p-4 space-y-2.5">
-                <h2 className="text-xl font-bold text-fg-warm leading-tight">{course?.title || 'Course'}</h2>
-                {course?.subtitle && <p className="text-sm text-fg-warm-muted">{course.subtitle}</p>}
+                <h2 className="font-bold text-lg text-fg-warm leading-tight">{course?.title || 'Course'}</h2>
 
-                <div className="flex items-center gap-3 text-xs text-fg-warm-muted flex-wrap">
-                  <span>{content?.modules.length || 0} modules</span>
-                  <span className="flex items-center gap-1"><BookOpen className="h-3.5 w-3.5" /> {total} lessons</span>
-                  {totalSeconds > 0 && (
-                    <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {formatTotalDuration(totalSeconds)}</span>
-                  )}
-                </div>
-
-                {course?.description && (
-                  <div className="pt-0.5 relative">
-                    <p className="text-sm text-fg-warm-muted whitespace-pre-line line-clamp-2 pr-[4.5em]">
-                      {course.description}
+                {(course?.subtitle || course?.description) && (
+                  <div className="relative">
+                    <p className="text-sm text-fg-warm-muted line-clamp-2 pr-[4.5em]">
+                      {course.subtitle || course.description}
                     </p>
-                    <button
-                      onClick={() => setDescOpen(true)}
-                      className="absolute bottom-0 right-0 text-sm font-semibold text-brand active:opacity-70 transition-opacity bg-gradient-to-l from-card-warm via-card-warm to-transparent pl-8 pr-0"
-                    >
-                      ...more
-                    </button>
+                    {course.description && (
+                      <button
+                        onClick={() => setDescOpen(true)}
+                        className="absolute bottom-0 right-0 text-sm font-semibold text-brand active:opacity-70 transition-opacity bg-gradient-to-l from-card-warm via-card-warm to-transparent pl-8 pr-0"
+                      >
+                        ...more
+                      </button>
+                    )}
                   </div>
                 )}
 
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-fg-warm-muted">
+                  <span className="flex items-center gap-1">
+                    <BookOpen className="h-3.5 w-3.5" /> {total} {total === 1 ? 'lesson' : 'lessons'}
+                  </span>
+                  {totalSeconds > 0 && (
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-3.5 w-3.5" /> {formatTotalDuration(totalSeconds)}
+                    </span>
+                  )}
+                  {course?.language && (
+                    <span className="flex items-center gap-1">
+                      <Globe className="h-3.5 w-3.5" />
+                      {LANGUAGE_OPTIONS.find((l) => l.code === course.language)?.label || course.language}
+                    </span>
+                  )}
+                  <HostBadges
+                    contentType="course"
+                    contentId={course!.id}
+                    size="sm"
+                    prefix=""
+                    className="text-fg-warm-muted"
+                  />
+                </div>
+
                 {total > 0 && (
-                  <p className="text-sm font-semibold text-fg-warm pt-0.5">
-                    {doneCount === total
-                      ? 'Course completed 🎉'
-                      : `Lesson ${Math.max(nextIndex, 1)} of ${total}`}
-                  </p>
+                  <div className="space-y-1.5 pt-0.5">
+                    <ProgressBar value={pct} />
+                    <p className="text-xs text-fg-warm-muted">{doneCount} of {total} done · {pct}%</p>
+                  </div>
                 )}
 
                 {nextLesson && (
                   <button
                     onClick={() => openLesson(nextLesson.id)}
-                    className="w-full flex items-center justify-center gap-2 bg-brand text-white rounded-full py-3.5 font-semibold shadow-ios active:scale-[0.98] transition-transform mt-1 min-h-[48px]"
+                    className="w-full flex items-center justify-center gap-2 bg-brand text-white rounded-full py-3.5 font-semibold shadow-ios active:scale-[0.98] transition-transform min-h-[48px]"
                   >
                     <Play className="h-4 w-4 fill-white" />
                     {doneCount === 0 ? 'Start course' : 'Continue'}
