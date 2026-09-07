@@ -87,7 +87,7 @@ export default function LeadCenter() {
         </TabsContent>
 
         <TabsContent value="opens" className="space-y-6">
-          <EmailOpenRates />
+          <EmailOpenRates onResend={() => setTab('marketing')} />
         </TabsContent>
 
         <TabsContent value="crm" className="space-y-6">
