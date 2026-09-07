@@ -116,7 +116,17 @@ export default function AppLearnCourse() {
                 </div>
 
                 {course?.description && (
-                  <p className="text-sm text-fg-warm-muted whitespace-pre-line pt-0.5">{course.description}</p>
+                  <div className="pt-0.5">
+                    <p className="text-sm text-fg-warm-muted whitespace-pre-line line-clamp-2">
+                      {course.description}
+                    </p>
+                    <button
+                      onClick={() => setDescOpen(true)}
+                      className="text-sm font-semibold text-brand mt-0.5 active:opacity-70 transition-opacity"
+                    >
+                      ... more
+                    </button>
+                  </div>
                 )}
 
                 {total > 0 && (
