@@ -75,9 +75,22 @@ function CourseCard({ course, onOpen, onContinue, onShowDescription }: {
         <div className="p-4 space-y-2.5">
           <h2 className="font-bold text-lg text-fg-warm leading-tight">{course.title}</h2>
           {(course.subtitle || course.description) && (
-            <p className="text-sm text-fg-warm-muted line-clamp-2">
-              {course.subtitle || course.description}
-            </p>
+            <div className="relative">
+              <p className="text-sm text-fg-warm-muted line-clamp-2 pr-[4.5em]">
+                {course.subtitle || course.description}
+              </p>
+              {course.description && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onShowDescription();
+                  }}
+                  className="absolute bottom-0 right-0 text-sm font-semibold text-brand active:opacity-70 transition-opacity bg-gradient-to-l from-card-warm via-card-warm to-transparent pl-8 pr-0"
+                >
+                  ...more
+                </button>
+              )}
+            </div>
           )}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-fg-warm-muted">
             <span className="flex items-center gap-1">
