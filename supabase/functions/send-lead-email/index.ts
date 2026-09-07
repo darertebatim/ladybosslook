@@ -291,51 +291,82 @@ const handler = async (req: Request): Promise<Response> => {
 
     let sent = 0;
     let failed = 0;
-    const batchSize = 20;
+
+    // Resend allows 10 requests/sec. Use the batch endpoint (up to 100 messages
+    // per single request) and pace requests, with retry/back-off on 429.
+    const buildPayload = async (email: string) => {
+      const unsubscribeUrl = await unsubUrl(email);
+      return {
+        from,
+        to: [email],
+        subject,
+        html: buildHtml({
+          subject,
+          message,
+          signature,
+          buttons,
+          rtl: !!body.rtl,
+          preheader: String(body.preheader || "").slice(0, 160),
+          address,
+          unsubscribeUrl,
+        }),
+        reply_to: SENDER_EMAIL,
+        headers: {
+          "List-Unsubscribe": `<${unsubscribeUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
+      };
+    };
+
+    const sendBatch = async (payload: any[]): Promise<{ ids: (string | null)[] } | null> => {
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const res = await fetch("https://api.resend.com/emails/batch", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${RESEND_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+        if (res.status === 429) {
+          await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
+          continue;
+        }
+        const json = await res.json().catch(() => null);
+        if (!res.ok) {
+          console.error("batch send failed:", res.status, JSON.stringify(json));
+          if (res.status >= 500) {
+            await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
+            continue;
+          }
+          return null;
+        }
+        const ids = (json?.data ?? []).map((d: any) => d?.id ?? null);
+        return { ids };
+      }
+      return null;
+    };
+
+    const batchSize = 100;
     for (let i = 0; i < slice.length; i += batchSize) {
       const batch = slice.slice(i, i + batchSize);
-      const results = await Promise.allSettled(
-        batch.map(async (email) => {
-          const unsubscribeUrl = await unsubUrl(email);
-          const html = buildHtml({
-            subject,
-            message,
-            signature,
-            buttons,
-            rtl: !!body.rtl,
-            preheader: String(body.preheader || "").slice(0, 160),
-            address,
-            unsubscribeUrl,
-          });
-          const res = await resend.emails.send({
-            from,
-            to: [email],
-            subject,
-            html,
-            reply_to: SENDER_EMAIL,
-            headers: {
-              "List-Unsubscribe": `<${unsubscribeUrl}>`,
-              "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-            },
-          } as any);
-          if ((res as any)?.error) throw new Error(JSON.stringify((res as any).error));
-          await supabase.from("email_logs").insert({
-            recipient_email: email,
-            status: "success",
-            resend_id: (res as any)?.data?.id ?? null,
-          });
-          return true;
-        }),
-      );
-      for (const r of results) {
-        if (r.status === "fulfilled") sent++;
-        else {
-          failed++;
-          console.error("send failed:", (r as PromiseRejectedResult).reason);
-        }
+      const payload = await Promise.all(batch.map(buildPayload));
+      const result = await sendBatch(payload);
+      if (!result) {
+        failed += batch.length;
+      } else {
+        sent += batch.length;
+        const logs = batch.map((email, idx) => ({
+          recipient_email: email,
+          status: "success",
+          resend_id: result.ids[idx] ?? null,
+        }));
+        const { error: logErr } = await supabase.from("email_logs").insert(logs);
+        if (logErr) console.error("log insert failed:", logErr.message);
       }
-      if (i + batchSize < slice.length) await new Promise((r) => setTimeout(r, 300));
+      if (i + batchSize < slice.length) await new Promise((r) => setTimeout(r, 600));
     }
+
 
     const processed = slice.length;
     return new Response(
