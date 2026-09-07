@@ -18,6 +18,40 @@ interface ButtonRow {
   url: string;
 }
 
+async function fetchProgramEmails(slugs: string[]): Promise<Set<string>> {
+  const set = new Set<string>();
+  if (!slugs.length) return set;
+  const userIds = new Set<string>();
+  for (let page = 0; page < 30; page++) {
+    const { data, error } = await supabase
+      .from('course_enrollments')
+      .select('user_id, status')
+      .in('program_slug', slugs)
+      .range(page * 1000, page * 1000 + 999);
+    if (error) throw error;
+    for (const r of data || []) {
+      const s = (r as any).status;
+      if (!s || s === 'active' || s === 'completed') {
+        if ((r as any).user_id) userIds.add(String((r as any).user_id));
+      }
+    }
+    if (!data || data.length < 1000) break;
+  }
+  const ids = Array.from(userIds);
+  for (let i = 0; i < ids.length; i += 500) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('email')
+      .in('id', ids.slice(i, i + 500));
+    if (error) throw error;
+    for (const r of data || []) {
+      const e = String((r as any).email || '').trim().toLowerCase();
+      if (e.includes('@')) set.add(e);
+    }
+  }
+  return set;
+}
+
 async function fetchEmails(sources: string[]): Promise<Set<string>> {
   const set = new Set<string>();
   if (!sources.length) return set;
@@ -47,6 +81,20 @@ export function LeadEmailCampaign() {
   const [buttons, setButtons] = useState<ButtonRow[]>([{ label: '', url: '' }]);
   const [testEmail, setTestEmail] = useState('');
   const [sending, setSending] = useState<'test' | 'all' | null>(null);
+  const [includePrograms, setIncludePrograms] = useState<string[]>([]);
+  const [excludePrograms, setExcludePrograms] = useState<string[]>([]);
+
+  const { data: programs = [] } = useQuery({
+    queryKey: ['lead-email-programs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('program_catalog')
+        .select('slug, title')
+        .order('title');
+      if (error) throw error;
+      return (data || []) as { slug: string; title: string }[];
+    },
+  });
 
   const includeSources = useMemo(
     () =>
@@ -66,11 +114,13 @@ export function LeadEmailCampaign() {
   );
 
   const { data: count, isFetching, refetch } = useQuery({
-    queryKey: ['lead-email-audience', includeSources, excludeSources],
-    enabled: includeSources.length > 0,
+    queryKey: ['lead-email-audience', includeSources, excludeSources, includePrograms, excludePrograms],
+    enabled: includeSources.length > 0 || includePrograms.length > 0,
     queryFn: async () => {
       const inc = await fetchEmails(includeSources);
+      for (const e of await fetchProgramEmails(includePrograms)) inc.add(e);
       const exc = await fetchEmails(excludeSources);
+      for (const e of await fetchProgramEmails(excludePrograms)) exc.add(e);
       for (const e of exc) inc.delete(e);
       return inc.size;
     },
@@ -87,6 +137,8 @@ export function LeadEmailCampaign() {
     buttons: buttons.filter((b) => b.label.trim() && b.url.trim()),
     sources: includeSources,
     excludeSources,
+    programs: includePrograms,
+    excludePrograms,
   });
 
   async function send(mode: 'test' | 'all') {
@@ -99,7 +151,7 @@ export function LeadEmailCampaign() {
       return;
     }
     if (mode === 'all') {
-      if (!includeSources.length) {
+      if (!includeSources.length && !includePrograms.length) {
         toast.error('Pick at least one audience');
         return;
       }
@@ -158,6 +210,40 @@ export function LeadEmailCampaign() {
                   />
                   <span>{c.label}</span>
                 </label>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <Label className="text-sm">Also send to people in these programs</Label>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {programs.map((p) => (
+                <Button
+                  key={p.slug}
+                  type="button"
+                  size="sm"
+                  variant={includePrograms.includes(p.slug) ? 'default' : 'outline'}
+                  onClick={() => toggle(includePrograms, setIncludePrograms, p.slug)}
+                >
+                  {p.title}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <Label className="text-sm">Exclude people in these programs</Label>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {programs.map((p) => (
+                <Button
+                  key={p.slug}
+                  type="button"
+                  size="sm"
+                  variant={excludePrograms.includes(p.slug) ? 'destructive' : 'outline'}
+                  onClick={() => toggle(excludePrograms, setExcludePrograms, p.slug)}
+                >
+                  {p.title}
+                </Button>
               ))}
             </div>
           </div>

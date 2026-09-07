@@ -24,6 +24,8 @@ interface Body {
   buttons?: ButtonInput[];
   sources?: string[];
   excludeSources?: string[];
+  programs?: string[];
+  excludePrograms?: string[];
   rtl?: boolean;
   testEmail?: string;
   preheader?: string;
@@ -103,6 +105,39 @@ async function collectEmails(supabase: any, sources: string[]): Promise<Set<stri
   return set;
 }
 
+async function collectProgramEmails(supabase: any, slugs: string[]): Promise<Set<string>> {
+  const set = new Set<string>();
+  if (!slugs.length) return set;
+  const userIds = new Set<string>();
+  for (let page = 0; page < 30; page++) {
+    const { data, error } = await supabase
+      .from("course_enrollments")
+      .select("user_id, status")
+      .in("program_slug", slugs)
+      .range(page * 1000, page * 1000 + 999);
+    if (error) throw error;
+    for (const r of data || []) {
+      if (!r.status || r.status === "active" || r.status === "completed") {
+        if (r.user_id) userIds.add(r.user_id);
+      }
+    }
+    if (!data || data.length < 1000) break;
+  }
+  const ids = Array.from(userIds);
+  for (let i = 0; i < ids.length; i += 500) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("email")
+      .in("id", ids.slice(i, i + 500));
+    if (error) throw error;
+    for (const r of data || []) {
+      const e = String(r.email || "").trim().toLowerCase();
+      if (e.includes("@")) set.add(e);
+    }
+  }
+  return set;
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -163,9 +198,12 @@ const handler = async (req: Request): Promise<Response> => {
       recipients = [t];
     } else {
       const sources = (body.sources || []).map(String).filter(Boolean);
-      if (!sources.length) throw new Error("Pick at least one audience");
+      const programs = (body.programs || []).map(String).filter(Boolean);
+      if (!sources.length && !programs.length) throw new Error("Pick at least one audience");
       const include = await collectEmails(supabase, sources);
+      for (const e of await collectProgramEmails(supabase, programs)) include.add(e);
       const exclude = await collectEmails(supabase, (body.excludeSources || []).map(String).filter(Boolean));
+      for (const e of await collectProgramEmails(supabase, (body.excludePrograms || []).map(String).filter(Boolean))) exclude.add(e);
       for (const e of exclude) include.delete(e);
       recipients = Array.from(include);
     }
