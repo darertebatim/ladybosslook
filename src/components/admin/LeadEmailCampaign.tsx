@@ -220,6 +220,19 @@ export function LeadEmailCampaign() {
   const [testEmail, setTestEmail] = useState('');
   const [sending, setSending] = useState<'test' | 'all' | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number; failed: number } | null>(null);
+  const [skipAlreadySent, setSkipAlreadySent] = useState(false);
+
+  // Coming from the Email Opens tab: "Send again to who didn't get it".
+  useEffect(() => {
+    const s = localStorage.getItem(RESEND_HANDOFF_KEY);
+    if (s) {
+      setSubject(s);
+      setSkipAlreadySent(true);
+      localStorage.removeItem(RESEND_HANDOFF_KEY);
+      toast.info('Subject filled in. Only people who never received it will be emailed.');
+    }
+  }, []);
+
 
   const { data: programs = [] } = useQuery({
     queryKey: ['lead-email-programs'],
