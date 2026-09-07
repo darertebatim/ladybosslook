@@ -10,6 +10,7 @@ import { WebinarEmailEngagement } from '@/components/admin/WebinarEmailEngagemen
 import { WebinarRoundBreakdown } from '@/components/admin/WebinarRoundBreakdown';
 
 import { MetaCrmEvents } from '@/components/admin/MetaCrmEvents';
+import { LeadEmailCampaign } from '@/components/admin/LeadEmailCampaign';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 
 const igads = LEAD_CAMPAIGNS.find((c) => c.key === 'igads')!;
@@ -26,12 +27,13 @@ export default function LeadCenter() {
       </div>
 
       <Tabs defaultValue="campaigns">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
           <TabsTrigger value="stats">Stats</TabsTrigger>
           <TabsTrigger value="sixtraps">6 Traps</TabsTrigger>
           <TabsTrigger value="smartinsta">Smart IG</TabsTrigger>
           <TabsTrigger value="igads">IG Ads</TabsTrigger>
+          <TabsTrigger value="marketing">Email Marketing</TabsTrigger>
           <TabsTrigger value="opens">Email Opens</TabsTrigger>
           <TabsTrigger value="crm">Meta CRM</TabsTrigger>
         </TabsList>
@@ -75,6 +77,10 @@ export default function LeadCenter() {
           <GenericWebinarSignups campaign={igads} />
         </TabsContent>
 
+
+        <TabsContent value="marketing" className="space-y-6">
+          <LeadEmailCampaign />
+        </TabsContent>
 
         <TabsContent value="opens" className="space-y-6">
           <EmailOpenRates />
