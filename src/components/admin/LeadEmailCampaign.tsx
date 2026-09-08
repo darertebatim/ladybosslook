@@ -575,7 +575,9 @@ export function LeadEmailCampaign() {
               </div>
             </div>
           </div>
+          )}
 
+          {!retarget && (
           <div className="flex items-center gap-3 rounded-lg border p-3">
             <Switch
               id="skip-already"
