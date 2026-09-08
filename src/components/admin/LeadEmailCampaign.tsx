@@ -594,14 +594,13 @@ export function LeadEmailCampaign() {
               </p>
             </div>
           </div>
-
-
+          )}
 
           <div className="flex items-center gap-3">
             <Badge variant="secondary">
               {isFetching ? 'Counting…' : `${count ?? 0} recipients`}
             </Badge>
-            <Button variant="ghost" size="sm" onClick={() => refetch()} disabled={isFetching}>
+            <Button variant="ghost" size="sm" onClick={() => refetch()} disabled={isFetching || !!retarget}>
               <RefreshCw className="mr-1 h-4 w-4" /> Refresh
             </Button>
             <span className="text-xs text-muted-foreground">
