@@ -359,9 +359,7 @@ export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => v
                           >
                             <Eye className="mr-1 h-4 w-4" /> Details
                           </Button>
-                          <Button size="sm" variant="secondary" onClick={() => resend(r.subject)}>
-                            <Send className="mr-1 h-4 w-4" /> Send to who missed it
-                          </Button>
+                          <RetargetMenu subject={r.subject} />
                         </div>
                       </td>
                     </tr>
@@ -390,9 +388,7 @@ export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => v
             <Button size="sm" variant="outline" onClick={downloadCsv}>
               <Download className="mr-1 h-4 w-4" /> Download CSV
             </Button>
-            <Button size="sm" variant="secondary" onClick={() => detail && resend(detail)}>
-              <Send className="mr-1 h-4 w-4" /> Send to who missed it
-            </Button>
+            {detail && <RetargetMenu subject={detail} />}
           </div>
           <div className="max-h-[55vh] overflow-y-auto">
             <table className="w-full text-sm">
