@@ -38,6 +38,14 @@ const CHUNK = 500;
 /** Handoff key used by the Email Opens tab ("Resend to who didn't get it"). */
 export const RESEND_HANDOFF_KEY = 'lead_email_resend_subject';
 
+/** Handoff key used by the Email Opens tab ("Retarget with a new message"). */
+export const RETARGET_HANDOFF_KEY = 'lead_email_retarget';
+
+export type RetargetHandoff = {
+  label: string;
+  emails: string[];
+};
+
 const DRAFTS_KEY = 'lead_email_drafts';
 
 type SavedDraft = {
