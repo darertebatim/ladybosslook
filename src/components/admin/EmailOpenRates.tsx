@@ -11,9 +11,17 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Download, Eye, Loader2, MailOpen, RefreshCw, Send } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Download, Eye, Loader2, MailOpen, RefreshCw, Send, Target } from 'lucide-react';
 import { toast } from 'sonner';
-import { RESEND_HANDOFF_KEY } from '@/components/admin/LeadEmailCampaign';
+import { RESEND_HANDOFF_KEY, RETARGET_HANDOFF_KEY } from '@/components/admin/LeadEmailCampaign';
 
 type EventRow = {
   event_type: string;
