@@ -38,6 +38,14 @@ const CHUNK = 500;
 /** Handoff key used by the Email Opens tab ("Resend to who didn't get it"). */
 export const RESEND_HANDOFF_KEY = 'lead_email_resend_subject';
 
+/** Handoff key used by the Email Opens tab ("Retarget with a new message"). */
+export const RETARGET_HANDOFF_KEY = 'lead_email_retarget';
+
+export type RetargetHandoff = {
+  label: string;
+  emails: string[];
+};
+
 const DRAFTS_KEY = 'lead_email_drafts';
 
 type SavedDraft = {
@@ -269,6 +277,24 @@ export function LeadEmailCampaign() {
   const [sending, setSending] = useState<'test' | 'all' | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number; failed: number } | null>(null);
   const [skipAlreadySent, setSkipAlreadySent] = useState(false);
+  const [retarget, setRetarget] = useState<RetargetHandoff | null>(null);
+
+  // Coming from the Email Opens tab: "Retarget with a new message".
+  useEffect(() => {
+    const raw = localStorage.getItem(RETARGET_HANDOFF_KEY);
+    if (!raw) return;
+    localStorage.removeItem(RETARGET_HANDOFF_KEY);
+    try {
+      const parsed = JSON.parse(raw) as RetargetHandoff;
+      if (parsed?.emails?.length) {
+        setRetarget(parsed);
+        setSkipAlreadySent(false);
+        toast.info(`${parsed.emails.length} people loaded — write your new message.`);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   // Coming from the Email Opens tab: "Send again to who didn't get it".
   useEffect(() => {
@@ -362,9 +388,9 @@ export function LeadEmailCampaign() {
   }, [subject, preheader, message, signature, fromName, address, rtl, buttons, includeSel, excludeSel]);
 
 
-  const { data: count, isFetching, refetch } = useQuery({
+  const { data: audienceCount, isFetching, refetch } = useQuery({
     queryKey: ['lead-email-audience', inc, exc, skipAlreadySent ? subject.trim() : ''],
-    enabled: inc.sources.length > 0 || inc.slugs.length > 0,
+    enabled: !retarget && (inc.sources.length > 0 || inc.slugs.length > 0),
     queryFn: async () => {
       const set = await fetchEmails(inc.sources);
       for (const e of await fetchProgramEmails(inc.slugs)) set.add(e);
@@ -378,6 +404,8 @@ export function LeadEmailCampaign() {
       return set.size;
     },
   });
+
+  const count = retarget ? retarget.emails.length : audienceCount;
 
   const payload = () => ({
     subject: subject.trim(),
@@ -422,11 +450,40 @@ export function LeadEmailCampaign() {
       return;
     }
 
-    if (!inc.sources.length && !inc.slugs.length) {
+    if (!retarget && !inc.sources.length && !inc.slugs.length) {
       toast.error('Pick at least one audience');
       return;
     }
     if (!window.confirm(`Send this email to ${count ?? 0} people?`)) return;
+
+    if (retarget) {
+      setSending('all');
+      const list = retarget.emails;
+      setProgress({ done: 0, total: list.length, failed: 0 });
+      let sent = 0;
+      let failed = 0;
+      let done = 0;
+      try {
+        for (let i = 0; i < list.length; i += CHUNK) {
+          const chunk = list.slice(i, i + CHUNK);
+          const { data, error } = await supabase.functions.invoke('send-lead-email', {
+            body: { ...payload(), emails: chunk, sources: [], programs: [], skipSubject: '' },
+          });
+          if (error) throw error;
+          const d = data as any;
+          sent += d?.sent ?? 0;
+          failed += d?.failed ?? 0;
+          done += chunk.length;
+          setProgress({ done, total: list.length, failed });
+        }
+        toast.success(`Sent ${sent}${failed ? ` · failed ${failed}` : ''}`);
+      } catch (e: any) {
+        toast.error(`${e?.message || 'Failed to send'} — stopped after ${sent} emails`);
+      } finally {
+        setSending(null);
+      }
+      return;
+    }
 
     setSending('all');
     setProgress({ done: 0, total: count ?? 0, failed: 0 });
@@ -483,6 +540,15 @@ export function LeadEmailCampaign() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {retarget ? (
+            <div className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
+              <Badge>{retarget.emails.length} people</Badge>
+              <span className="text-sm">{retarget.label}</span>
+              <Button variant="ghost" size="sm" onClick={() => setRetarget(null)}>
+                <X className="mr-1 h-4 w-4" /> Use normal lists instead
+              </Button>
+            </div>
+          ) : (
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <Label className="text-sm">Send to</Label>
@@ -509,7 +575,9 @@ export function LeadEmailCampaign() {
               </div>
             </div>
           </div>
+          )}
 
+          {!retarget && (
           <div className="flex items-center gap-3 rounded-lg border p-3">
             <Switch
               id="skip-already"
@@ -526,14 +594,13 @@ export function LeadEmailCampaign() {
               </p>
             </div>
           </div>
-
-
+          )}
 
           <div className="flex items-center gap-3">
             <Badge variant="secondary">
               {isFetching ? 'Counting…' : `${count ?? 0} recipients`}
             </Badge>
-            <Button variant="ghost" size="sm" onClick={() => refetch()} disabled={isFetching}>
+            <Button variant="ghost" size="sm" onClick={() => refetch()} disabled={isFetching || !!retarget}>
               <RefreshCw className="mr-1 h-4 w-4" /> Refresh
             </Button>
             <span className="text-xs text-muted-foreground">

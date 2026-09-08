@@ -11,9 +11,17 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Download, Eye, Loader2, MailOpen, RefreshCw, Send } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Download, Eye, Loader2, MailOpen, RefreshCw, Send, Target } from 'lucide-react';
 import { toast } from 'sonner';
-import { RESEND_HANDOFF_KEY } from '@/components/admin/LeadEmailCampaign';
+import { RESEND_HANDOFF_KEY, RETARGET_HANDOFF_KEY } from '@/components/admin/LeadEmailCampaign';
 
 type EventRow = {
   event_type: string;
@@ -185,6 +193,64 @@ export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => v
     else toast.success('Open the Email Marketing tab to finish the re-send.');
   };
 
+  type RetargetKind = 'noclick' | 'noopen' | 'opened' | 'clicked';
+
+  const RETARGET_LABELS: Record<RetargetKind, string> = {
+    noclick: 'got it but never clicked',
+    noopen: 'got it but never opened',
+    opened: 'opened it',
+    clicked: 'clicked a button',
+  };
+
+  const peopleFor = (subject: string, kind: RetargetKind) => {
+    const list = [...(peopleBySubject.get(subject)?.values() ?? [])].filter((p) => !p.bounced);
+    if (kind === 'noclick') return list.filter((p) => p.delivered && !p.clicked);
+    if (kind === 'noopen') return list.filter((p) => p.delivered && !p.opened);
+    if (kind === 'opened') return list.filter((p) => p.opened);
+    return list.filter((p) => p.clicked);
+  };
+
+  const retarget = (subject: string, kind: RetargetKind) => {
+    const emails = peopleFor(subject, kind).map((p) => p.email);
+    if (!emails.length) {
+      toast.error('Nobody matches that group for this email.');
+      return;
+    }
+    localStorage.setItem(
+      RETARGET_HANDOFF_KEY,
+      JSON.stringify({
+        label: `People who ${RETARGET_LABELS[kind]} “${subject}”`,
+        emails,
+      }),
+    );
+    if (onResend) onResend(subject);
+    else toast.success('Open the Email Marketing tab to write the new message.');
+  };
+
+  const RetargetMenu = ({ subject }: { subject: string }) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="sm">
+          <Target className="mr-1 h-4 w-4" /> Retarget
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-64">
+        <DropdownMenuLabel>Send a new message to…</DropdownMenuLabel>
+        {(['noclick', 'noopen', 'opened', 'clicked'] as RetargetKind[]).map((k) => (
+          <DropdownMenuItem key={k} onSelect={() => retarget(subject, k)}>
+            <span className="truncate">
+              People who {RETARGET_LABELS[k]} ({peopleFor(subject, k).length})
+            </span>
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={() => resend(subject)}>
+          <Send className="mr-2 h-4 w-4" /> Send the same email to who missed it
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   const pct = (n: number, d: number) => (d > 0 ? `${Math.round((n / d) * 100)}%` : '—');
   const base = (r: { delivered: number; sent: number }) => r.delivered || r.sent;
 
@@ -293,9 +359,7 @@ export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => v
                           >
                             <Eye className="mr-1 h-4 w-4" /> Details
                           </Button>
-                          <Button size="sm" variant="secondary" onClick={() => resend(r.subject)}>
-                            <Send className="mr-1 h-4 w-4" /> Send to who missed it
-                          </Button>
+                          <RetargetMenu subject={r.subject} />
                         </div>
                       </td>
                     </tr>
@@ -324,9 +388,7 @@ export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => v
             <Button size="sm" variant="outline" onClick={downloadCsv}>
               <Download className="mr-1 h-4 w-4" /> Download CSV
             </Button>
-            <Button size="sm" variant="secondary" onClick={() => detail && resend(detail)}>
-              <Send className="mr-1 h-4 w-4" /> Send to who missed it
-            </Button>
+            {detail && <RetargetMenu subject={detail} />}
           </div>
           <div className="max-h-[55vh] overflow-y-auto">
             <table className="w-full text-sm">

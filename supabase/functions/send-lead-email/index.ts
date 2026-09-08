@@ -28,6 +28,8 @@ interface Body {
   fromName?: string;
   address?: string;
   buttons?: ButtonInput[];
+  /** Explicit recipient list (retargeting). Overrides audience selection. */
+  emails?: string[];
   sources?: string[];
   excludeSources?: string[];
   programs?: string[];
@@ -290,6 +292,15 @@ const handler = async (req: Request): Promise<Response> => {
       const t = String(body.testEmail).trim().toLowerCase();
       if (!t.includes("@")) throw new Error("Invalid test email");
       recipients = [t];
+    } else if (body.emails && body.emails.length) {
+      const include = new Set<string>();
+      for (const e of body.emails) {
+        const v = String(e || "").trim().toLowerCase();
+        if (v.includes("@")) include.add(v);
+      }
+      for (const e of await collectUnsubscribed(supabase)) include.delete(e);
+      for (const e of body.alsoSkip || []) include.delete(String(e || "").trim().toLowerCase());
+      recipients = Array.from(include).sort();
     } else {
       const sources = (body.sources || []).map(String).filter(Boolean);
       const programs = (body.programs || []).map(String).filter(Boolean);
