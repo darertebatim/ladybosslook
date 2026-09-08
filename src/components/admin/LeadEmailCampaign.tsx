@@ -277,6 +277,24 @@ export function LeadEmailCampaign() {
   const [sending, setSending] = useState<'test' | 'all' | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number; failed: number } | null>(null);
   const [skipAlreadySent, setSkipAlreadySent] = useState(false);
+  const [retarget, setRetarget] = useState<RetargetHandoff | null>(null);
+
+  // Coming from the Email Opens tab: "Retarget with a new message".
+  useEffect(() => {
+    const raw = localStorage.getItem(RETARGET_HANDOFF_KEY);
+    if (!raw) return;
+    localStorage.removeItem(RETARGET_HANDOFF_KEY);
+    try {
+      const parsed = JSON.parse(raw) as RetargetHandoff;
+      if (parsed?.emails?.length) {
+        setRetarget(parsed);
+        setSkipAlreadySent(false);
+        toast.info(`${parsed.emails.length} people loaded — write your new message.`);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   // Coming from the Email Opens tab: "Send again to who didn't get it".
   useEffect(() => {
@@ -370,9 +388,9 @@ export function LeadEmailCampaign() {
   }, [subject, preheader, message, signature, fromName, address, rtl, buttons, includeSel, excludeSel]);
 
 
-  const { data: count, isFetching, refetch } = useQuery({
+  const { data: audienceCount, isFetching, refetch } = useQuery({
     queryKey: ['lead-email-audience', inc, exc, skipAlreadySent ? subject.trim() : ''],
-    enabled: inc.sources.length > 0 || inc.slugs.length > 0,
+    enabled: !retarget && (inc.sources.length > 0 || inc.slugs.length > 0),
     queryFn: async () => {
       const set = await fetchEmails(inc.sources);
       for (const e of await fetchProgramEmails(inc.slugs)) set.add(e);
