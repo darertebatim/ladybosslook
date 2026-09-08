@@ -405,6 +405,8 @@ export function LeadEmailCampaign() {
     },
   });
 
+  const count = retarget ? retarget.emails.length : audienceCount;
+
   const payload = () => ({
     subject: subject.trim(),
     preheader: preheader.trim(),
@@ -448,11 +450,40 @@ export function LeadEmailCampaign() {
       return;
     }
 
-    if (!inc.sources.length && !inc.slugs.length) {
+    if (!retarget && !inc.sources.length && !inc.slugs.length) {
       toast.error('Pick at least one audience');
       return;
     }
     if (!window.confirm(`Send this email to ${count ?? 0} people?`)) return;
+
+    if (retarget) {
+      setSending('all');
+      const list = retarget.emails;
+      setProgress({ done: 0, total: list.length, failed: 0 });
+      let sent = 0;
+      let failed = 0;
+      let done = 0;
+      try {
+        for (let i = 0; i < list.length; i += CHUNK) {
+          const chunk = list.slice(i, i + CHUNK);
+          const { data, error } = await supabase.functions.invoke('send-lead-email', {
+            body: { ...payload(), emails: chunk, sources: [], programs: [], skipSubject: '' },
+          });
+          if (error) throw error;
+          const d = data as any;
+          sent += d?.sent ?? 0;
+          failed += d?.failed ?? 0;
+          done += chunk.length;
+          setProgress({ done, total: list.length, failed });
+        }
+        toast.success(`Sent ${sent}${failed ? ` · failed ${failed}` : ''}`);
+      } catch (e: any) {
+        toast.error(`${e?.message || 'Failed to send'} — stopped after ${sent} emails`);
+      } finally {
+        setSending(null);
+      }
+      return;
+    }
 
     setSending('all');
     setProgress({ done: 0, total: count ?? 0, failed: 0 });
