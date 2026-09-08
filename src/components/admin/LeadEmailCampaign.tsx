@@ -540,6 +540,15 @@ export function LeadEmailCampaign() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {retarget ? (
+            <div className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
+              <Badge>{retarget.emails.length} people</Badge>
+              <span className="text-sm">{retarget.label}</span>
+              <Button variant="ghost" size="sm" onClick={() => setRetarget(null)}>
+                <X className="mr-1 h-4 w-4" /> Use normal lists instead
+              </Button>
+            </div>
+          ) : (
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <Label className="text-sm">Send to</Label>
