@@ -12,12 +12,18 @@ export interface WebinarRoundRow {
   status: string | null;
 }
 
+export interface WebinarRoundRouting {
+  program_slug: string;
+  east_round_number: number;
+  west_round_number: number;
+}
+
 const SELECT =
   "id, round_number, round_name, first_session_date, first_session_duration, google_meet_link, support_link_url, video_url, status";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** East-friendly and Central timezones → Round 1. */
+/** East-friendly and Central timezones. */
 export const ROUND_1_TIMEZONE_LIST = [
   "America/New_York",
   "America/Toronto",
@@ -54,7 +60,7 @@ export const ROUND_1_TIMEZONE_LIST = [
 
 const ROUND_1_TIMEZONES = new Set<string>(ROUND_1_TIMEZONE_LIST);
 
-/** West-friendly timezones → Round 2. */
+/** West-friendly timezones. */
 export const ROUND_2_TIMEZONE_LIST = [
   "America/Los_Angeles",
   "America/Vancouver",
@@ -75,17 +81,40 @@ export const ROUND_2_TIMEZONE_LIST = [
 
 const ROUND_2_TIMEZONES = new Set<string>(ROUND_2_TIMEZONE_LIST);
 
-/**
- * ── WHERE TO CHANGE THE ROUNDS NEW SIGNUPS GO INTO ──
- * Set these two numbers to the current active round numbers.
- * EAST = earlier (East/Central) session, WEST = later (West) session.
- */
-export const EAST_ROUND_NUMBER = 3;
-export const WEST_ROUND_NUMBER = 4;
+/** Fallback round numbers when no routing row exists in the DB yet. */
+export const FALLBACK_EAST_ROUND_NUMBER = 3;
+export const FALLBACK_WEST_ROUND_NUMBER = 4;
 
 /** Timezones routed to each side. */
 export const EAST_TIMEZONE_LIST = ROUND_1_TIMEZONE_LIST;
 export const WEST_TIMEZONE_LIST = ROUND_2_TIMEZONE_LIST;
+
+/** Read the current East/West round mapping for a program from the admin settings. */
+export async function getWebinarRoundRouting(
+  programSlug: string,
+): Promise<WebinarRoundRouting | null> {
+  const { data, error } = await (supabase as any)
+    .from("webinar_round_routing")
+    .select("program_slug, east_round_number, west_round_number")
+    .eq("program_slug", programSlug)
+    .maybeSingle();
+  if (error || !data) return null;
+  return {
+    program_slug: data.program_slug,
+    east_round_number: Number(data.east_round_number),
+    west_round_number: Number(data.west_round_number),
+  };
+}
+
+function routingOrFallback(routing?: WebinarRoundRouting | null): {
+  east: number;
+  west: number;
+} {
+  return {
+    east: routing?.east_round_number ?? FALLBACK_EAST_ROUND_NUMBER,
+    west: routing?.west_round_number ?? FALLBACK_WEST_ROUND_NUMBER,
+  };
+}
 
 export function inferWebinarSideFromTimezone(timezone: string): 'east' | 'west' | null {
   if (ROUND_1_TIMEZONES.has(timezone)) return 'east';
@@ -93,18 +122,26 @@ export function inferWebinarSideFromTimezone(timezone: string): 'east' | 'west' 
   return null;
 }
 
-/** Timezone → current round number (uses the config above). */
-export function inferWebinarRoundNumberFromTimezone(timezone: string): number | null {
+/** Timezone → current round number (uses the DB routing config when provided). */
+export function inferWebinarRoundNumberFromTimezone(
+  timezone: string,
+  routing?: WebinarRoundRouting | null,
+): number | null {
   const side = inferWebinarSideFromTimezone(timezone);
-  if (side === 'east') return EAST_ROUND_NUMBER;
-  if (side === 'west') return WEST_ROUND_NUMBER;
+  const { east, west } = routingOrFallback(routing);
+  if (side === 'east') return east;
+  if (side === 'west') return west;
   return null;
 }
 
 /** Timezones handled by a given round number, for admin display. */
-export function timezonesForRoundNumber(roundNumber: number | null): readonly string[] {
-  if (roundNumber === EAST_ROUND_NUMBER) return ROUND_1_TIMEZONE_LIST;
-  if (roundNumber === WEST_ROUND_NUMBER) return ROUND_2_TIMEZONE_LIST;
+export function timezonesForRoundNumber(
+  roundNumber: number | null,
+  routing?: WebinarRoundRouting | null,
+): readonly string[] {
+  const { east, west } = routingOrFallback(routing);
+  if (roundNumber === east) return ROUND_1_TIMEZONE_LIST;
+  if (roundNumber === west) return ROUND_2_TIMEZONE_LIST;
   return [];
 }
 
@@ -125,7 +162,7 @@ export async function listActiveWebinarRounds(programSlug: string): Promise<Webi
  * Priority:
  * 1. Explicit `roundParam` (round UUID, or the round number like "1" / "2") — pinned forever.
  * 2. Timezone-based assignment (when `timezone` is provided and no `roundParam`).
- *    East/Central timezones → Round 1, West timezones → Round 2.
+ *    East/Central timezones → configured East round, West timezones → configured West round.
  *    Unmatched timezones return `null` so the caller can show a manual selector.
  * 3. Next upcoming active round
  * 4. The round configured for auto-enrollment.
@@ -153,9 +190,11 @@ export async function resolveWebinarRound(
 
   // 2. Timezone-based assignment (only when no pinned round and timezone is known)
   if (timezone) {
+    const routing = await getWebinarRoundRouting(programSlug);
     const side = inferWebinarSideFromTimezone(timezone);
     if (side) {
-      const inferred = side === "east" ? EAST_ROUND_NUMBER : WEST_ROUND_NUMBER;
+      const { east, west } = routingOrFallback(routing);
+      const inferred = side === "east" ? east : west;
       const { data } = await base()
         .eq("round_number", inferred)
         .eq("status", "active")
