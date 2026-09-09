@@ -52,6 +52,7 @@ function WebinarCountdown({ startUtc }: { startUtc: Date }) {
   return (
     <div className="mx-auto max-w-xs">
       <div dir="ltr" className="flex items-center justify-center gap-2">
+        <ArrowDown className="h-5 w-5 animate-bounce text-rose-500" />
         {items.map((it) => (
           <div
             key={it.l}
@@ -61,6 +62,7 @@ function WebinarCountdown({ startUtc }: { startUtc: Date }) {
             <div className="text-[10px] font-semibold text-neutral-500">{it.l}</div>
           </div>
         ))}
+        <ArrowDown className="h-5 w-5 animate-bounce text-rose-500" />
       </div>
     </div>
   );
