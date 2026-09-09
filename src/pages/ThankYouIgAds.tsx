@@ -274,10 +274,6 @@ export default function ThankYouIgAds() {
           )}
 
           {webinar && (
-            <CountdownToWebinar targetDate={webinar.startUtc} />
-          )}
-
-          {webinar && (
             <section className="mt-6 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
               <h2 className="text-lg font-semibold text-neutral-900">
                 جزئیات وبینار
@@ -290,6 +286,7 @@ export default function ThankYouIgAds() {
                     🕒 Your Local time: {localDate}
                   </div>
                 )}
+                <CountdownToWebinar targetDate={webinar.startUtc} />
                 <div dir="ltr" className="mt-1 rounded-xl bg-neutral-50 px-3 py-2 text-left text-xs text-neutral-600">
                   <p className="mb-1 font-semibold text-neutral-500">Other time zones:</p>
                   <ul className="space-y-0.5">
