@@ -51,8 +51,7 @@ function WebinarCountdown({ startUtc }: { startUtc: Date }) {
 
   return (
     <div className="mx-auto max-w-xs">
-      <p className="text-[11px] font-semibold text-neutral-500">تا شروع وبینار</p>
-      <div dir="ltr" className="mt-2 flex items-center justify-center gap-2">
+      <div dir="ltr" className="flex items-center justify-center gap-2">
         {items.map((it) => (
           <div
             key={it.l}
