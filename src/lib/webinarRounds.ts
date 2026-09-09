@@ -75,10 +75,37 @@ export const ROUND_2_TIMEZONE_LIST = [
 
 const ROUND_2_TIMEZONES = new Set<string>(ROUND_2_TIMEZONE_LIST);
 
-export function inferWebinarRoundNumberFromTimezone(timezone: string): 1 | 2 | null {
-  if (ROUND_1_TIMEZONES.has(timezone)) return 1;
-  if (ROUND_2_TIMEZONES.has(timezone)) return 2;
+/**
+ * ── WHERE TO CHANGE THE ROUNDS NEW SIGNUPS GO INTO ──
+ * Set these two numbers to the current active round numbers.
+ * EAST = earlier (East/Central) session, WEST = later (West) session.
+ */
+export const EAST_ROUND_NUMBER = 3;
+export const WEST_ROUND_NUMBER = 4;
+
+/** Timezones routed to each side. */
+export const EAST_TIMEZONE_LIST = ROUND_1_TIMEZONE_LIST;
+export const WEST_TIMEZONE_LIST = ROUND_2_TIMEZONE_LIST;
+
+export function inferWebinarSideFromTimezone(timezone: string): 'east' | 'west' | null {
+  if (ROUND_1_TIMEZONES.has(timezone)) return 'east';
+  if (ROUND_2_TIMEZONES.has(timezone)) return 'west';
   return null;
+}
+
+/** Timezone → current round number (uses the config above). */
+export function inferWebinarRoundNumberFromTimezone(timezone: string): number | null {
+  const side = inferWebinarSideFromTimezone(timezone);
+  if (side === 'east') return EAST_ROUND_NUMBER;
+  if (side === 'west') return WEST_ROUND_NUMBER;
+  return null;
+}
+
+/** Timezones handled by a given round number, for admin display. */
+export function timezonesForRoundNumber(roundNumber: number | null): readonly string[] {
+  if (roundNumber === EAST_ROUND_NUMBER) return ROUND_1_TIMEZONE_LIST;
+  if (roundNumber === WEST_ROUND_NUMBER) return ROUND_2_TIMEZONE_LIST;
+  return [];
 }
 
 /** All active rounds for a program, ordered by round number. */
@@ -126,13 +153,21 @@ export async function resolveWebinarRound(
 
   // 2. Timezone-based assignment (only when no pinned round and timezone is known)
   if (timezone) {
-    const inferred = inferWebinarRoundNumberFromTimezone(timezone);
-    if (inferred) {
+    const side = inferWebinarSideFromTimezone(timezone);
+    if (side) {
+      const inferred = side === "east" ? EAST_ROUND_NUMBER : WEST_ROUND_NUMBER;
       const { data } = await base()
         .eq("round_number", inferred)
         .eq("status", "active")
         .maybeSingle();
       if (data) return data as WebinarRoundRow;
+      // Configured round missing/closed: use the next two upcoming active rounds
+      // (earlier session = East, later session = West).
+      const upcomingPair = await listUpcomingWebinarRounds(programSlug);
+      if (upcomingPair.length) {
+        const pick = side === "east" ? upcomingPair[0] : upcomingPair[1] || upcomingPair[0];
+        return pick;
+      }
     }
     // Unmatched timezone: let the caller show a manual selector instead of falling back.
     return null;
