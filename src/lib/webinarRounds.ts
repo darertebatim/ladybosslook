@@ -60,7 +60,7 @@ export const ROUND_1_TIMEZONE_LIST = [
 
 const ROUND_1_TIMEZONES = new Set<string>(ROUND_1_TIMEZONE_LIST);
 
-/** West-friendly timezones. */
+/** West-friendly timezones + East Asia / Oceania (routed to the later West round). */
 export const ROUND_2_TIMEZONE_LIST = [
   "America/Los_Angeles",
   "America/Vancouver",
@@ -77,6 +77,30 @@ export const ROUND_2_TIMEZONE_LIST = [
   "America/Oakland",
   "America/San_Jose",
   "America/Tijuana",
+  "Australia/Sydney",
+  "Australia/Melbourne",
+  "Australia/Brisbane",
+  "Australia/Canberra",
+  "Australia/Hobart",
+  "Australia/Adelaide",
+  "Australia/Darwin",
+  "Australia/Perth",
+  "Pacific/Auckland",
+  "Pacific/Fiji",
+  "Pacific/Noumea",
+  "Pacific/Port_Moresby",
+  "Asia/Tokyo",
+  "Asia/Seoul",
+  "Asia/Hong_Kong",
+  "Asia/Singapore",
+  "Asia/Shanghai",
+  "Asia/Taipei",
+  "Asia/Manila",
+  "Asia/Bangkok",
+  "Asia/Jakarta",
+  "Asia/Ho_Chi_Minh",
+  "Asia/Kuala_Lumpur",
+  "Asia/Hanoi",
 ] as const;
 
 const ROUND_2_TIMEZONES = new Set<string>(ROUND_2_TIMEZONE_LIST);
