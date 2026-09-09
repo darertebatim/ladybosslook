@@ -153,13 +153,21 @@ export async function resolveWebinarRound(
 
   // 2. Timezone-based assignment (only when no pinned round and timezone is known)
   if (timezone) {
-    const inferred = inferWebinarRoundNumberFromTimezone(timezone);
-    if (inferred) {
+    const side = inferWebinarSideFromTimezone(timezone);
+    if (side) {
+      const inferred = side === "east" ? EAST_ROUND_NUMBER : WEST_ROUND_NUMBER;
       const { data } = await base()
         .eq("round_number", inferred)
         .eq("status", "active")
         .maybeSingle();
       if (data) return data as WebinarRoundRow;
+      // Configured round missing/closed: use the next two upcoming active rounds
+      // (earlier session = East, later session = West).
+      const upcomingPair = await listUpcomingWebinarRounds(programSlug);
+      if (upcomingPair.length) {
+        const pick = side === "east" ? upcomingPair[0] : upcomingPair[1] || upcomingPair[0];
+        return pick;
+      }
     }
     // Unmatched timezone: let the caller show a manual selector instead of falling back.
     return null;
