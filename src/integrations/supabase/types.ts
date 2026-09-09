@@ -7978,6 +7978,33 @@ export type Database = {
           },
         ]
       }
+      webinar_round_routing: {
+        Row: {
+          created_at: string
+          east_round_number: number
+          id: string
+          program_slug: string
+          updated_at: string
+          west_round_number: number
+        }
+        Insert: {
+          created_at?: string
+          east_round_number?: number
+          id?: string
+          program_slug: string
+          updated_at?: string
+          west_round_number?: number
+        }
+        Update: {
+          created_at?: string
+          east_round_number?: number
+          id?: string
+          program_slug?: string
+          updated_at?: string
+          west_round_number?: number
+        }
+        Relationships: []
+      }
       weight_logs: {
         Row: {
           created_at: string
