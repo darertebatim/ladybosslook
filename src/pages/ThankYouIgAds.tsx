@@ -32,7 +32,7 @@ export default function ThankYouIgAds() {
   const stored = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem("igads_registration") || "null") as
-        | { email?: string; roundId?: string }
+        | { email?: string; roundId?: string; name?: string; city?: string }
         | null;
     } catch {
       return null;
@@ -40,6 +40,8 @@ export default function ThankYouIgAds() {
   }, []);
   const registeredEmail = ((location.state as any)?.email || stored?.email) as string | undefined;
   const registeredRoundId = ((location.state as any)?.roundId || stored?.roundId) as string | undefined;
+  const registeredName = ((location.state as any)?.name || stored?.name) as string | undefined;
+  const registeredCity = ((location.state as any)?.city || stored?.city) as string | undefined;
   const [videoId, setVideoId] = useState("");
   const [webinar, setWebinar] = useState<{
     title: string;
