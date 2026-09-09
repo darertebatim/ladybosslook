@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { resolveWebinarRound } from "@/lib/webinarRounds";
 
