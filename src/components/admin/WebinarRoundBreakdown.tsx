@@ -79,11 +79,7 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
   const activeRounds = (rounds || []).filter((r) => r.status === 'active');
   const noRoundCount = counts.get('none')?.size || 0;
 
-  const tzFor = (roundNumber: number | null) => {
-    if (roundNumber === 1) return ROUND_1_TIMEZONE_LIST as readonly string[];
-    if (roundNumber === 2) return ROUND_2_TIMEZONE_LIST as readonly string[];
-    return [];
-  };
+  const tzFor = (roundNumber: number | null) => timezonesForRoundNumber(roundNumber);
 
   return (
     <Card>
