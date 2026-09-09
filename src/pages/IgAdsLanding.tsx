@@ -338,7 +338,7 @@ export default function IgAdsLanding() {
             className="mt-8 space-y-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm text-left"
           >
             <h2 className="text-center text-lg font-semibold text-neutral-900">
-              Free Registration
+              🎁 Free Registration 🎁
             </h2>
 
             <div>
