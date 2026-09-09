@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { resolveWebinarRound } from "@/lib/webinarRounds";
 
@@ -134,8 +135,15 @@ export default function ThankYouIgAds() {
             </p>
           </div>
 
+          <div className="mt-4 flex justify-center gap-2 text-emerald-600">
+            <ArrowDown className="h-6 w-6 animate-bounce" />
+            <ArrowDown className="h-6 w-6 animate-bounce" style={{ animationDelay: "100ms" }} />
+            <ArrowDown className="h-6 w-6 animate-bounce" style={{ animationDelay: "200ms" }} />
+            <ArrowDown className="h-6 w-6 animate-bounce" style={{ animationDelay: "300ms" }} />
+          </div>
+
           {videoId && (
-            <div className="mt-6 aspect-video overflow-hidden rounded-2xl shadow-md">
+            <div className="mt-2 aspect-video overflow-hidden rounded-2xl shadow-md">
               <iframe
                 className="h-full w-full"
                 src={`https://www.youtube.com/embed/${videoId}`}
@@ -145,6 +153,13 @@ export default function ThankYouIgAds() {
               />
             </div>
           )}
+
+          <div className="mt-2 flex justify-center gap-2 text-emerald-600">
+            <ArrowUp className="h-6 w-6 animate-bounce" />
+            <ArrowUp className="h-6 w-6 animate-bounce" style={{ animationDelay: "100ms" }} />
+            <ArrowUp className="h-6 w-6 animate-bounce" style={{ animationDelay: "200ms" }} />
+            <ArrowUp className="h-6 w-6 animate-bounce" style={{ animationDelay: "300ms" }} />
+          </div>
 
           {event && (
             <section className="mt-6">
