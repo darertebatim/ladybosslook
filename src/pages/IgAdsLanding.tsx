@@ -226,9 +226,7 @@ export default function IgAdsLanding() {
               🎁وبینار رایگان: جذب مشتری
               با اینستاگرام ادز
             </h1>
-            <p className="text-xs font-semibold text-rose-600">
-              این وبینار مخصوص صاحبان بیزینس در آمریکا و کانادا است
-            </p>
+            {webinar && !blockedRegion && <WebinarCountdown startUtc={webinar.startUtc} />}
             {blockedRegion ? (
               <div className="mx-auto rounded-2xl border border-rose-200 bg-rose-50 p-4">
                 <p className="text-sm font-bold leading-7 text-rose-700">
