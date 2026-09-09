@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Users, Clock, Globe } from 'lucide-react';
-import { ROUND_1_TIMEZONE_LIST, ROUND_2_TIMEZONE_LIST } from '@/lib/webinarRounds';
+import { timezonesForRoundNumber } from '@/lib/webinarRounds';
 
 interface RoundRow {
   id: string;
