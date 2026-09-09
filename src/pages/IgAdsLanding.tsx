@@ -266,13 +266,25 @@ export default function IgAdsLanding() {
       >
         <main className="mx-auto w-full max-w-md px-4 pb-16 pt-6">
           {cover && (
-            <div className="overflow-hidden rounded-3xl shadow-lg">
-              <img
-                src={cover}
-                alt="وبینار جذب مشتری با اینستاگرام ادز"
-                className="h-auto w-full object-cover"
-              />
-            </div>
+            <>
+              <div className="mb-2 flex items-center justify-center gap-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <ArrowDown key={`down-${i}`} className="h-6 w-6 animate-bounce text-rose-500" />
+                ))}
+              </div>
+              <div className="overflow-hidden rounded-3xl shadow-lg">
+                <img
+                  src={cover}
+                  alt="وبینار جذب مشتری با اینستاگرام ادز"
+                  className="h-auto w-full object-cover"
+                />
+              </div>
+              <div className="mt-2 flex items-center justify-center gap-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <ArrowUp key={`up-${i}`} className="h-6 w-6 animate-bounce text-rose-500" />
+                ))}
+              </div>
+            </>
           )}
 
           <section className="mt-6 space-y-3 text-center">
