@@ -178,7 +178,14 @@ export default function ThankYouIgAds() {
               </p>
               <a
                 href={`${webinar.supportUrl}?text=${encodeURIComponent(
-                  "سلام، در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.",
+                  [
+                    "سلام، در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.",
+                    registeredName && `نام: ${registeredName}`,
+                    registeredCity && `شهر: ${registeredCity}`,
+                    registeredEmail && `ایمیل: ${registeredEmail}`,
+                  ]
+                    .filter(Boolean)
+                    .join("\n"),
                 )}`}
                 target="_blank"
                 rel="noreferrer"
