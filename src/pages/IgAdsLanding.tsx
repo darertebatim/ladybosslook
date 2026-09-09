@@ -21,6 +21,52 @@ const schema = z.object({
   email: z.string().trim().email("ایمیل معتبر نیست").max(255),
 });
 
+const fa = (n: number) => String(n).padStart(2, "0").replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
+
+function WebinarCountdown({ startUtc }: { startUtc: Date }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const diff = startUtc.getTime() - now;
+  if (diff <= 0) {
+    return (
+      <p className="text-xs font-bold text-rose-600">وبینار شروع شده است!</p>
+    );
+  }
+
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const minutes = Math.floor((diff % 3600000) / 60000);
+  const seconds = Math.floor((diff % 60000) / 1000);
+
+  const items = [
+    { v: days, l: "روز" },
+    { v: hours, l: "ساعت" },
+    { v: minutes, l: "دقیقه" },
+    { v: seconds, l: "ثانیه" },
+  ];
+
+  return (
+    <div className="mx-auto max-w-xs">
+      <p className="text-[11px] font-semibold text-neutral-500">تا شروع وبینار</p>
+      <div dir="ltr" className="mt-2 flex items-center justify-center gap-2">
+        {items.map((it) => (
+          <div
+            key={it.l}
+            className="min-w-[58px] rounded-2xl bg-white px-2 py-2 shadow-sm ring-1 ring-rose-100"
+          >
+            <div className="text-xl font-extrabold tabular-nums text-rose-600">{fa(it.v)}</div>
+            <div className="text-[10px] font-semibold text-neutral-500">{it.l}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function IgAdsLanding() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
