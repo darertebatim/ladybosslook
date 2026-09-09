@@ -19,6 +19,60 @@ import {
 
 const PROGRAM_SLUG = "igadsfree";
 
+function CountdownToWebinar({ targetDate }: { targetDate: Date }) {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const calculate = () => {
+      const diff = +targetDate - +new Date();
+      if (diff > 0) {
+        setTimeLeft({
+          days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((diff / 1000 / 60) % 60),
+          seconds: Math.floor((diff / 1000) % 60),
+        });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      }
+    };
+    calculate();
+    const timer = setInterval(calculate, 1000);
+    return () => clearInterval(timer);
+  }, [targetDate]);
+
+  const pad = (n: number) => n.toString().padStart(2, "0");
+
+  return (
+    <section className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm">
+      <p className="text-center text-sm font-bold text-emerald-700">
+        تا شروع وبینار
+      </p>
+      <div className="mt-2 inline-flex w-full items-center justify-center gap-1 text-emerald-900" dir="ltr">
+        <span className="flex min-w-[52px] flex-col items-center rounded-lg bg-white px-2 py-1 text-base font-black shadow-sm">
+          {pad(timeLeft.days)}
+          <span className="text-[10px] font-medium text-emerald-600">روز</span>
+        </span>
+        <span className="text-emerald-400">:</span>
+        <span className="flex min-w-[52px] flex-col items-center rounded-lg bg-white px-2 py-1 text-base font-black shadow-sm">
+          {pad(timeLeft.hours)}
+          <span className="text-[10px] font-medium text-emerald-600">ساعت</span>
+        </span>
+        <span className="text-emerald-400">:</span>
+        <span className="flex min-w-[52px] flex-col items-center rounded-lg bg-white px-2 py-1 text-base font-black shadow-sm">
+          {pad(timeLeft.minutes)}
+          <span className="text-[10px] font-medium text-emerald-600">دقیقه</span>
+        </span>
+        <span className="text-emerald-400">:</span>
+        <span className="flex min-w-[52px] flex-col items-center rounded-lg bg-white px-2 py-1 text-base font-black shadow-sm">
+          {pad(timeLeft.seconds)}
+          <span className="text-[10px] font-medium text-emerald-600">ثانیه</span>
+        </span>
+      </div>
+    </section>
+  );
+}
+
 function youtubeId(url: string | null | undefined): string {
   if (!url) return "";
   const m = url.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{6,})/);
