@@ -271,7 +271,6 @@ export default function IgAdsLanding() {
               🎁وبینار رایگان: جذب مشتری
               با اینستاگرام ادز
             </h1>
-            {webinar && !blockedRegion && <WebinarCountdown startUtc={webinar.startUtc} />}
             {blockedRegion ? (
               <div className="mx-auto rounded-2xl border border-rose-200 bg-rose-50 p-4">
                 <p className="text-sm font-bold leading-7 text-rose-700">
@@ -315,6 +314,7 @@ export default function IgAdsLanding() {
                 <div dir="ltr" className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 text-sm font-medium text-white">
                   📅 LA time: {laLabel}
                 </div>
+                {webinar && <WebinarCountdown startUtc={webinar.startUtc} />}
                 {localLabel && (
                   <div dir="ltr" className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-center text-base font-bold text-white shadow-sm whitespace-pre-line">
                     🕒 Your Local time: {localLabel}
