@@ -221,7 +221,12 @@ export default function IgAdsLanding() {
       try {
         localStorage.setItem(
           "igads_registration",
-          JSON.stringify({ email: parsed.data.email.toLowerCase(), roundId }),
+          JSON.stringify({
+            email: parsed.data.email.toLowerCase(),
+            roundId,
+            name: parsed.data.name,
+            city: parsed.data.city,
+          }),
         );
       } catch {}
 
