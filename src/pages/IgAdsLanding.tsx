@@ -235,6 +235,8 @@ export default function IgAdsLanding() {
           igAdsRegistrationCompleted: true,
           email: parsed.data.email.toLowerCase(),
           roundId,
+          name: parsed.data.name,
+          city: parsed.data.city,
         },
       });
 
