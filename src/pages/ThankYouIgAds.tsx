@@ -274,10 +274,6 @@ export default function ThankYouIgAds() {
           )}
 
           {webinar && (
-            <CountdownToWebinar targetDate={webinar.startUtc} />
-          )}
-
-          {webinar && (
             <section className="mt-6 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
               <h2 className="text-lg font-semibold text-neutral-900">
                 جزئیات وبینار
