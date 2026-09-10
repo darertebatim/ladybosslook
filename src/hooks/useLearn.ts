@@ -18,6 +18,9 @@ export interface LearnCourse {
   language?: string | null;
   cover_image_url: string | null;
   is_published: boolean;
+  is_free?: boolean | null;
+  requires_subscription?: boolean | null;
+  available_on_mobile?: boolean | null;
   sequential_lessons?: boolean | null;
   sort_order: number;
 }
@@ -95,7 +98,7 @@ export function useLearnCourses() {
         .eq('is_published', true)
         .order('sort_order');
       if (error) throw error;
-      return data as LearnCourse[];
+      return ((data || []) as LearnCourse[]).filter((c) => c.available_on_mobile !== false);
     },
   });
 }

@@ -3924,13 +3924,16 @@ export type Database = {
       }
       learn_courses: {
         Row: {
+          available_on_mobile: boolean
           cover_image_url: string | null
           created_at: string
           description: string | null
           id: string
           intro_note: string | null
+          is_free: boolean
           is_published: boolean
           language: string | null
+          requires_subscription: boolean
           sequential_lessons: boolean
           sort_order: number
           subtitle: string | null
@@ -3938,13 +3941,16 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          available_on_mobile?: boolean
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
           id?: string
           intro_note?: string | null
+          is_free?: boolean
           is_published?: boolean
           language?: string | null
+          requires_subscription?: boolean
           sequential_lessons?: boolean
           sort_order?: number
           subtitle?: string | null
@@ -3952,13 +3958,16 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          available_on_mobile?: boolean
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
           id?: string
           intro_note?: string | null
+          is_free?: boolean
           is_published?: boolean
           language?: string | null
+          requires_subscription?: boolean
           sequential_lessons?: boolean
           sort_order?: number
           subtitle?: string | null
