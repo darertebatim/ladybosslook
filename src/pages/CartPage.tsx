@@ -103,7 +103,7 @@ const CartPage = () => {
         <div className="container mx-auto px-6 max-w-3xl">
           <h1 className="font-display text-3xl md:text-4xl font-bold mb-8">Your Cart</h1>
 
-          {isLoading ? (
+          {user && isLoading ? (
             <div className="flex justify-center py-20">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
