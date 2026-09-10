@@ -51,6 +51,7 @@ const NativeAppLayout = () => {
   const location = useLocation();
   const { user } = useAuth();
   const { t } = useTranslation();
+  const isDesktopShell = useDesktopShell();
   
   // Push notification flow - handles full-screen onboarding
   const { 
