@@ -253,6 +253,8 @@ export default function DashboardChat() {
           </div>
         </Card>
       </main>
+
+      <DownloadRiloDialog open={showAppPromo} onOpenChange={setShowAppPromo} />
     </div>
   );
 }
