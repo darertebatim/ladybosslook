@@ -206,6 +206,7 @@ const AssertLanding = lazy(() => import("@/pages/AssertLanding"));
 const Auth = lazy(() => import("@/pages/Auth"));
 const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
 const PublicDedication = lazy(() => import("@/pages/PublicDedication"));
+const Unsubscribe = lazy(() => import("@/pages/Unsubscribe"));
 const PublicPlaylistGift = lazy(() => import("@/pages/PublicPlaylistGift"));
 const BusinessIdeas = lazy(() => import("@/pages/BusinessIdeas"));
 const RathusAssessment = lazy(() => import("@/pages/RathusAssessment"));
@@ -493,6 +494,7 @@ const App = () => (
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/cart" element={<CartPage />} />
+                  <Route path="/unsubscribe" element={<Unsubscribe />} />
                   <Route path="/d/:token" element={<PublicDedication />} />
                   <Route path="/g/:token" element={<PublicPlaylistGift />} />
 

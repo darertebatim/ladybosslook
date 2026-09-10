@@ -14,7 +14,7 @@ const corsHeaders = {
 };
 
 const SENDER_EMAIL = "support@ladybosslook.com";
-const UNSUB_BASE = `${supabaseUrl}/functions/v1/email-unsubscribe`;
+const UNSUB_BASE = "https://ladybosslook.com/unsubscribe";
 
 interface ButtonInput {
   label?: string;
