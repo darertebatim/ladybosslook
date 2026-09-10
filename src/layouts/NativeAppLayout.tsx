@@ -30,6 +30,8 @@ import { OfflineStatusBar } from '@/components/app/OfflineStatusBar';
 import { useOnboardingProfileSync } from '@/hooks/useOnboardingProfileSync';
 import { useRoutePreloader } from '@/hooks/useRoutePreloader';
 import { useFirebaseScreenTracking } from '@/hooks/useFirebaseScreenTracking';
+import { useDesktopShell } from '@/hooks/useDesktopShell';
+import { DesktopSidebar } from '@/components/app/DesktopSidebar';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
@@ -49,6 +51,7 @@ const NativeAppLayout = () => {
   const location = useLocation();
   const { user } = useAuth();
   const { t } = useTranslation();
+  const isDesktopShell = useDesktopShell();
   
   // Push notification flow - handles full-screen onboarding
   const { 
@@ -207,9 +210,13 @@ const NativeAppLayout = () => {
 
   return (
     <div className={cn(
-      "flex flex-col h-[100dvh] app-theme font-farsi",
+      "h-[100dvh] app-theme font-farsi",
+      isDesktopShell ? "flex flex-row" : "flex flex-col",
       location.pathname.startsWith('/app/watch') ? 'bg-[#132240]' : 'bg-background'
     )}>
+      {isDesktopShell && <DesktopSidebar />}
+
+      <div className="flex flex-col flex-1 min-w-0 h-full">
       {/* Offline / sync status pill */}
       <OfflineStatusBar />
       {/* Main Content */}
@@ -220,13 +227,18 @@ const NativeAppLayout = () => {
           (isOnPlayerPage || isOwnScrollPage) ? "overflow-hidden" : "overflow-y-auto"
         )}
         style={{
-          paddingBottom: (isOnChatPage || isFullScreenTool || isKeyboardOpen || isOnPlayerPage) ? 0 : TAB_BAR_CONTENT_HEIGHT + 8,
+          paddingBottom: isDesktopShell
+            ? 0
+            : (isOnChatPage || isFullScreenTool || isKeyboardOpen || isOnPlayerPage) ? 0 : TAB_BAR_CONTENT_HEIGHT + 8,
           WebkitOverflowScrolling: (isOnPlayerPage || isOwnScrollPage) ? 'auto' : 'touch',
           touchAction: 'pan-y',
         }}
       >
-        <Outlet />
+        <div className={cn(isDesktopShell && !isOwnScrollPage && !isOnPlayerPage && "mx-auto w-full max-w-5xl")}>
+          <Outlet />
+        </div>
       </main>
+      </div>
 
       {/* Deferred background hooks — mount after 5s to free initial render */}
       {deferredReady && <DeferredLayoutHooks userId={user?.id} />}
@@ -235,8 +247,8 @@ const NativeAppLayout = () => {
       {!isOnPlayerPage && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen && <MiniPlayer />}
       {!isOnChatPage && !isFullScreenTool && !isKeyboardOpen && <RoutineMiniPlayer />}
 
-      {/* Bottom Navigation - hidden on chat page for full-screen experience */}
-      {!isOnChatPage && !isFullScreenTool && !isKeyboardOpen && (
+      {/* Bottom Navigation - hidden on chat page and on the desktop sidebar shell */}
+      {!isDesktopShell && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen && (
       <nav
         className={cn(
           'fixed left-3 right-3 z-50',
