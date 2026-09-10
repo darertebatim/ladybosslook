@@ -402,11 +402,14 @@ export default function AppLearnLesson() {
 
       {/* All lessons sheet */}
       <Sheet open={listOpen} onOpenChange={setListOpen}>
-        <SheetContent side="bottom" className="rounded-t-3xl max-h-[80vh] overflow-y-auto bg-background border-0">
-          <SheetHeader className="text-left">
-            <SheetTitle className="text-fg-warm">All lessons</SheetTitle>
+        <SheetContent
+          side="bottom"
+          className="app-theme rounded-t-3xl max-h-[80vh] overflow-y-auto bg-background border-0 px-4 pt-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
+        >
+          <SheetHeader className="text-left space-y-0 pb-2">
+            <SheetTitle className="text-fg-warm text-lg font-bold pr-10">All lessons</SheetTitle>
           </SheetHeader>
-          <div className="space-y-4 pt-3 pb-6">
+          <div className="space-y-4 pt-1 pb-2">
             {content?.modules.map((mod) => {
               const lessons = content.lessons.filter((l) => l.module_id === mod.id);
               if (!lessons.length) return null;
@@ -438,7 +441,7 @@ export default function AppLearnLesson() {
                             : <LIcon className="h-4 w-4 text-brand" />}
                         </div>
                         <span className="flex-1 min-w-0">
-                          <span className="block truncate text-sm font-medium text-fg-warm">{l.title}</span>
+                          <span className="block text-sm font-medium text-fg-warm leading-snug line-clamp-2 break-words">{l.title}</span>
                           {lLock && (
                             <span className="block text-xs text-fg-warm-muted">{lLock.label}</span>
                           )}
