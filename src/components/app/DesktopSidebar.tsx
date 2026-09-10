@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { RILO_DOWNLOAD_URL } from "@/components/chat/DownloadRiloDialog";
+import riloLogo from "@/assets/rilo-app-icon.png";
 
 type NavItem = { path: string; label: string; icon: typeof ClipboardList; match?: string };
 
@@ -82,9 +83,7 @@ export function DesktopSidebar() {
   return (
     <aside className="hidden lg:flex w-[248px] shrink-0 flex-col border-r border-border/60 bg-bg-warm/40 h-full overflow-y-auto">
       <Link to="/dashboard" className="flex items-center gap-2 px-5 py-5">
-        <span className="h-8 w-8 rounded-xl bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-primary-dark))] flex items-center justify-center text-white font-bold">
-          R
-        </span>
+        <img src={riloLogo} alt="Rilo" className="h-8 w-8 rounded-xl" />
         <span className="text-lg font-bold tracking-tight">Rilo</span>
       </Link>
 

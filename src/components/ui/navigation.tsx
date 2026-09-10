@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
 import { Link, useLocation } from 'react-router-dom';
 import { authUrlFor } from '@/lib/authRedirect';
+import riloLogo from '@/assets/rilo-app-icon.png';
 
 const NAV_ITEMS = [
   { label: 'Home', href: '#home' },
@@ -14,12 +15,10 @@ const NAV_ITEMS = [
 ];
 
 const Logo = () => (
-  <div className="flex items-center space-x-2">
-    <div className="w-10 h-10 bg-gradient-hero rounded-lg flex items-center justify-center">
-      <span className="text-white font-bold text-xl">LB</span>
-    </div>
-    <span className="font-display text-2xl font-bold gradient-text">LadyBoss</span>
-  </div>
+  <Link to="/" className="flex items-center space-x-2">
+    <img src={riloLogo} alt="Rilo" className="w-10 h-10 rounded-xl" />
+    <span className="font-display text-2xl font-bold gradient-text">Rilo</span>
+  </Link>
 );
 
 const NavLinks = ({ mobile, onClose }: { mobile?: boolean; onClose?: () => void }) => (
