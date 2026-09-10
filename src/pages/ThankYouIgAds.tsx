@@ -12,6 +12,7 @@ import {
   downloadIcs,
   formatLADateTime,
   formatLocalDateTime,
+  formatCompactLocalDateTime,
   formatTimeZoneTime,
   COMMON_TIMEZONES,
   type WebinarEvent,
