@@ -107,7 +107,7 @@ const CartPage = () => {
             <div className="flex justify-center py-20">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
-          ) : cartItems.length === 0 ? (
+          ) : displayItems.length === 0 ? (
             <div className="text-center py-20 space-y-4">
               <ShoppingBag className="w-16 h-16 mx-auto text-muted-foreground/40" />
               <h2 className="text-xl font-semibold">Your cart is empty</h2>
@@ -120,7 +120,7 @@ const CartPage = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {cartItems.map((item) => {
+              {displayItems.map((item) => {
                 const displayPrice = item.payment_type === 'deposit' && item.deposit_price
                   ? item.deposit_price
                   : item.price_amount;
