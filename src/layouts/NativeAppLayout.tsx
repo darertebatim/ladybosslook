@@ -210,13 +210,10 @@ const NativeAppLayout = () => {
 
   return (
     <div className={cn(
-      "h-[100dvh] app-theme font-farsi",
-      isDesktopShell ? "flex flex-row" : "flex flex-col",
+      "h-[100dvh] app-theme font-farsi flex flex-col",
       location.pathname.startsWith('/app/watch') ? 'bg-[#132240]' : 'bg-background'
     )}>
-      {isDesktopShell && <DesktopSidebar />}
-
-      <div className="flex flex-col flex-1 min-w-0 h-full min-h-0">
+      {isDesktopShell && !isOnChatPage && !isFullScreenTool && <DesktopSidebar />}
       {/* Offline / sync status pill */}
       <OfflineStatusBar />
       {/* Main Content */}
@@ -224,6 +221,7 @@ const NativeAppLayout = () => {
         data-scroll-container="true"
         className={cn(
           "flex-1 min-h-0 overflow-x-hidden overscroll-contain",
+          isDesktopShell && !isOnChatPage && !isFullScreenTool && "pl-[224px]",
           (isOnPlayerPage || isOwnScrollPage) ? "overflow-hidden" : "overflow-y-auto"
         )}
         style={{
@@ -238,7 +236,6 @@ const NativeAppLayout = () => {
           <Outlet />
         </div>
       </main>
-      </div>
 
       {/* Deferred background hooks — mount after 5s to free initial render */}
       {deferredReady && <DeferredLayoutHooks userId={user?.id} />}
