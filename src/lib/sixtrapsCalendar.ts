@@ -150,7 +150,7 @@ export function formatLocalDateTime(d: Date): string {
 
 /**
  * Compact two-line version of the user's local browser timezone.
- * Line 1: time, Line 2: (timezone), date
+ * Line 1: time + weekday, Line 2: (timezone), date
  */
 export function formatCompactLocalDateTime(d: Date): string {
   try {
@@ -160,13 +160,15 @@ export function formatCompactLocalDateTime(d: Date): string {
       minute: "2-digit",
       hour12: true,
     }).format(d);
-    const date = new Intl.DateTimeFormat("en-US", {
+    const weekday = new Intl.DateTimeFormat("en-US", {
       weekday: "long",
+    }).format(d);
+    const date = new Intl.DateTimeFormat("en-US", {
       month: "long",
       day: "numeric",
       year: "numeric",
     }).format(d);
-    return tz ? `${time}\n(${tz}), ${date}` : `${time}\n${date}`;
+    return tz ? `${time}, ${weekday}\n(${tz}), ${date}` : `${time}, ${weekday}\n${date}`;
   } catch {
     return d.toString();
   }
