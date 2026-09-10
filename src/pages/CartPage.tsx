@@ -220,7 +220,7 @@ const CartPage = () => {
               )}
 
               {/* Total & Checkout */}
-              <div className="border-t pt-6 mt-6 space-y-4">
+              <div className="border-t pt-4 mt-4 space-y-3">
                 <div className="flex justify-between items-center text-sm text-muted-foreground">
                   <span>Subtotal</span>
                   <span>{totalCents === 0 ? 'Free' : formatPrice(totalCents)}</span>
