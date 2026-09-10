@@ -178,6 +178,7 @@ export default function ThankYouIgAds() {
 
   const laDate = webinar ? formatLADateTime(webinar.startUtc) : "";
   const localDate = webinar ? formatLocalDateTime(webinar.startUtc) : "";
+  const compactLocalDate = webinar ? formatCompactLocalDateTime(webinar.startUtc) : "";
 
   return (
     <>
