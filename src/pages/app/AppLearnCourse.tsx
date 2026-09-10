@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import {
   Play, Headphones, FileText, BookOpen, CheckCircle2,
   Loader2, ChevronRight, GraduationCap, Lock, Sparkles, Info, Clock, Globe, Link2, Video,
@@ -45,6 +45,8 @@ function ProgressBar({ value, className }: { value: number; className?: string }
 export default function AppLearnCourse() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = (location.state as { from?: string } | null)?.from || '/app/learn';
   const { data: course } = useLearnCourse(courseId);
   const { data: content, isLoading } = useLearnCourseContent(courseId);
   const { data: progress } = useLearnProgress();
@@ -89,7 +91,9 @@ export default function AppLearnCourse() {
     });
   };
 
-  const openLesson = (lessonId: string) => navigate(`/app/learn/${courseId}/${lessonId}`);
+  const openLesson = (lessonId: string) => navigate(`/app/learn/${courseId}/${lessonId}`, {
+    state: { from: returnTo },
+  });
 
   return (
     <div className="app-theme min-h-screen bg-background pb-28">
@@ -97,7 +101,7 @@ export default function AppLearnCourse() {
         title={course?.title || 'Course'}
         back
         backStyle="plain"
-        onBack={() => navigate('/app/learn')}
+        onBack={() => navigate(returnTo)}
       />
 
       <div className="px-4 py-4 space-y-4">

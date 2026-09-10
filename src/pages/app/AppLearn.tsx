@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { GraduationCap, Loader2, Play, BookOpen, Clock, CheckCircle2, Globe } from 'lucide-react';
 import { PageHeader } from '@/components/app/ui/PageHeader';
 import { HostBadges } from '@/components/app/HostBadges';
@@ -145,6 +145,7 @@ function CourseCard({ course, onOpen, onContinue, onShowDescription }: {
 
 export default function AppLearn() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { data: courses, isLoading } = useLearnCourses();
   const [descCourse, setDescCourse] = useState<LearnCourse | null>(null);
 
@@ -171,8 +172,10 @@ export default function AppLearn() {
             <CourseCard
               key={c.id}
               course={c}
-              onOpen={() => navigate(`/app/learn/${c.id}`)}
-              onContinue={(lessonId) => navigate(`/app/learn/${c.id}/${lessonId}`)}
+              onOpen={() => navigate(`/app/learn/${c.id}`, { state: { from: location.pathname } })}
+              onContinue={(lessonId) => navigate(`/app/learn/${c.id}/${lessonId}`, {
+                state: { from: location.pathname },
+              })}
               onShowDescription={() => setDescCourse(c)}
             />
           ))

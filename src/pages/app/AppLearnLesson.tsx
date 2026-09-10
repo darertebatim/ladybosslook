@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import {
   Play, Pause, Headphones, FileText, BookOpen, Check, Loader2,
@@ -28,6 +28,11 @@ const LESSON_ICONS: Record<LessonType, typeof Play> = {
 export default function AppLearnLesson() {
   const { courseId, lessonId } = useParams<{ courseId: string; lessonId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const courseReturnTo = (location.state as { from?: string } | null)?.from;
+  const backToCourse = () => navigate(`/app/learn/${courseId}`, {
+    state: courseReturnTo ? { from: courseReturnTo } : undefined,
+  });
   const { data: course } = useLearnCourse(courseId);
   const { data: content, isLoading } = useLearnCourseContent(courseId);
   const { data: progress } = useLearnProgress();
@@ -83,7 +88,10 @@ export default function AppLearnLesson() {
   const goTo = (l: LearnLesson | null) => {
     if (!l) return;
     setListOpen(false);
-    navigate(`/app/learn/${courseId}/${l.id}`, { replace: true });
+    navigate(`/app/learn/${courseId}/${l.id}`, {
+      replace: true,
+      state: courseReturnTo ? { from: courseReturnTo } : undefined,
+    });
   };
 
   const handleComplete = () => {
@@ -239,14 +247,14 @@ export default function AppLearnLesson() {
   if (!lesson) {
     return (
       <div className="app-theme min-h-screen bg-background">
-        <PageHeader title="Lesson" back backStyle="plain" onBack={() => navigate(`/app/learn/${courseId}`)} />
+        <PageHeader title="Lesson" back backStyle="plain" onBack={backToCourse} />
         <div className="px-4 py-6">
           <div className="bg-card-warm shadow-card-warm rounded-3xl p-8 text-center space-y-3">
             <p className="font-semibold text-fg-warm">Lesson not available</p>
             <p className="text-sm text-fg-warm-muted">It may have been removed or you don't have access yet.</p>
             <button
               className="rounded-full bg-brand text-white px-5 py-3 font-semibold shadow-ios min-h-[48px]"
-              onClick={() => navigate(`/app/learn/${courseId}`)}
+              onClick={backToCourse}
             >
               Back to course
             </button>
@@ -265,7 +273,7 @@ export default function AppLearnLesson() {
         title={course?.title || 'Lesson'}
         back
         backStyle="plain"
-        onBack={() => navigate(`/app/learn/${courseId}`)}
+        onBack={backToCourse}
         right={
           <button
             onClick={() => setListOpen(true)}
