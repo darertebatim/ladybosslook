@@ -177,10 +177,12 @@ export default function DashboardChat() {
       }
 
       // Give people a moment to see their own message land before promoting the app.
+      // Shown at most once every 7 days (not once forever).
       let shouldPromote = true;
       try {
-        shouldPromote = !localStorage.getItem("rilo_chat_app_promo_seen");
-        if (shouldPromote) localStorage.setItem("rilo_chat_app_promo_seen", "1");
+        const last = Number(localStorage.getItem("rilo_chat_app_promo_last") || 0);
+        shouldPromote = !last || Date.now() - last > 7 * 24 * 60 * 60 * 1000;
+        if (shouldPromote) localStorage.setItem("rilo_chat_app_promo_last", String(Date.now()));
       } catch {
         shouldPromote = true;
       }
