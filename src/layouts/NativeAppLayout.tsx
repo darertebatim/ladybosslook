@@ -187,6 +187,8 @@ const NativeAppLayout = () => {
   const isOwnScrollPage =
     location.pathname === '/app/projects'
     || location.pathname === '/app/path'
+    || location.pathname === '/app/home'
+    || location.pathname === '/app/tools'
     || location.pathname === '/app/breathe'
     || location.pathname === '/app/hub';
 

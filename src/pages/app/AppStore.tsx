@@ -382,7 +382,7 @@ const AppStore = () => {
   const comingSoonTools = getVisibleComingSoon();
 
   return (
-    <div className="h-full overflow-hidden flex flex-col bg-background">
+    <div className="h-full min-h-0 overflow-hidden flex flex-col bg-background">
       <SEOHead
         title="Explore - Rilo"
         description="Explore tools, audio experiences, and educational programs"
@@ -450,7 +450,7 @@ const AppStore = () => {
 
       {/* Scrollable Content */}
       <div
-        className="flex-1 overflow-y-auto overscroll-contain px-4 space-y-4 pb-24"
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 space-y-4 pb-24"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
         {programsLoading ? (
