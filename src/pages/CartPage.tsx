@@ -162,7 +162,7 @@ const CartPage = () => {
                         <h3 className="font-semibold leading-snug">{item.program_title}</h3>
                         {program?.description && (
                           <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                            {program.description}
+                            {stripHtml(program.description)}
                           </p>
                         )}
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground mt-2">
@@ -171,6 +171,20 @@ const CartPage = () => {
                           </span>
                           {program?.duration && (
                             <span className="px-2 py-0.5 rounded-full bg-muted">{program.duration}</span>
+                          )}
+                          {program?.language !== undefined && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted">
+                              <Globe className="w-3 h-3" />
+                              {LANGUAGE_LABELS[program.language] ?? program.language}
+                            </span>
+                          )}
+                          {program?.id && (
+                            <HostBadges
+                              contentType="program"
+                              contentId={program.id}
+                              size="sm"
+                              prefix="with"
+                            />
                           )}
                         </div>
                         {item.payment_type === 'deposit' && remaining > 0 && (
