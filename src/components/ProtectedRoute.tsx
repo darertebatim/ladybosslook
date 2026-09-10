@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { BrandedSplash } from '@/components/app/BrandedSplash';
+import { authUrlFor } from '@/lib/authRedirect';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
