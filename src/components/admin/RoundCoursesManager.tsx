@@ -85,8 +85,10 @@ export const RoundCoursesManager = ({ roundId }: Props) => {
     onError: (e: any) => toast.error(e.message || "Failed to remove"),
   });
 
-  const nameFor = (courseId: string) =>
-    (courses as any[]).find((c) => c.id === courseId)?.title || "(deleted course)";
+  const nameFor = (row: any) =>
+    row?.learn_courses?.title ||
+    (courses as any[]).find((c) => c.id === row?.course_id)?.title ||
+    "(deleted course)";
 
   const available = (courses as any[]).filter(
     (c) => !(linked as any[]).some((l) => l.course_id === c.id)
