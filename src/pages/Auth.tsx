@@ -14,7 +14,7 @@ import riloAppIcon from '@/assets/rilo-app-icon.png';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { Capacitor } from '@capacitor/core';
 import { Analytics } from '@/lib/firebaseAnalytics';
-import { getPasswordResetRedirectUrl } from '@/lib/authRedirect';
+import { getPasswordResetRedirectUrl, sanitizeRedirectPath } from '@/lib/authRedirect';
 
 
 export default function Auth() {
@@ -61,18 +61,20 @@ export default function Auth() {
 
   // Read redirect param from URL (e.g. /auth?redirect=/cart)
   const searchParams = new URLSearchParams(window.location.search);
-  const redirectPath = searchParams.get('redirect') || '/app/path';
-  const hasCustomRedirect = searchParams.has('redirect');
+  const requestedRedirect = sanitizeRedirectPath(searchParams.get('redirect'));
+  const redirectPath = requestedRedirect || '/app/path';
+  const hasCustomRedirect = !!requestedRedirect;
 
   // Redirect if already authenticated, or to onboarding if not seen yet
   useEffect(() => {
     if (user) {
       const hasSeenDoors = localStorage.getItem('simora_onboarding_completed_rilo-doors') === 'true';
-      // First sign-in/up: show "Rilo Doors" onboarding once
+      // First sign-in/up: show "Rilo Doors" onboarding once — but never when the
+      // person came from a website page; they must land back where they started.
       if (!hasSeenDoors && !hasCustomRedirect) {
         navigate('/app/onboarding/rilo-doors', { replace: true });
       } else {
-        navigate(redirectPath);
+        navigate(redirectPath, { replace: true });
       }
     }
   }, [user, authLoading, navigate, redirectPath, hasCustomRedirect]);

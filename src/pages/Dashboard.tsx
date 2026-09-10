@@ -14,7 +14,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!user) {
-      navigate('/auth');
+      navigate('/auth?redirect=/dashboard', { replace: true });
     }
   }, [user, navigate]);
 
