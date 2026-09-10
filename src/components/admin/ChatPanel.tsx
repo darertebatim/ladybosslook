@@ -189,7 +189,14 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
     attachment?: { file: File; name: string; type: string; size: number },
     messageButtons?: MessageButton[]
   ) => {
-    if (!conversation || !user) return;
+    if (!conversation) {
+      toast({ title: "Open a chat first", description: "Select a conversation, then send.", variant: "destructive" });
+      return;
+    }
+    if (!user) {
+      toast({ title: "Not signed in", description: "Refresh the page and sign in again.", variant: "destructive" });
+      return;
+    }
     setSending(true);
     setUploading(!!attachment);
 
@@ -200,9 +207,15 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
       }
 
       const messageContent = content || (attachment ? `Sent an attachment: ${attachment.name}` : '');
-      const clean = (messageButtons || []).filter(b => b.label && b.url).slice(0, 3);
+      if (!messageContent.trim() && !attachmentUrl) {
+        throw new Error("The message is empty.");
+      }
+      const clean = (messageButtons || [])
+        .filter(b => b && b.label && b.url)
+        .slice(0, 3)
+        .map(b => ({ label: String(b.label), url: String(b.url) }));
 
-      const { error } = await (supabase as any)
+      const { data: inserted, error } = await (supabase as any)
         .from('chat_messages')
         .insert({
           conversation_id: conversation.id,
@@ -214,17 +227,30 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
           attachment_type: attachment?.type || null,
           attachment_size: attachment?.size || null,
           buttons: clean.length ? clean : null,
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
+      if (!inserted) throw new Error("The message was not saved.");
+
+      // Keep the customer's side in sync (inbox ordering + unread badge)
+      await (supabase as any)
+        .from('chat_conversations')
+        .update({
+          last_message_at: new Date().toISOString(),
+          unread_count_user: ((conversation as any).unread_count_user || 0) + 1,
+        })
+        .eq('id', conversation.id);
 
       setButtons([]);
       setShowButtons(false);
       await sendNotification(conversation.id, messageContent);
     } catch (error: any) {
+      console.error('[ChatPanel] send failed', error);
       toast({
-        title: "Error",
-        description: "Failed to send message",
+        title: "Message not sent",
+        description: error?.message || "Something went wrong. Please try again.",
         variant: "destructive"
       });
     } finally {
