@@ -45,30 +45,30 @@ function CountdownToWebinar({ targetDate }: { targetDate: Date }) {
   const pad = (n: number) => n.toString().padStart(2, "0");
 
   return (
-    <section className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm">
-      <p className="text-center text-sm font-bold text-emerald-700">
-        تا شروع وبینار
-      </p>
-      <div className="mt-2 inline-flex w-full items-center justify-center gap-1 text-emerald-900" dir="ltr">
-        <span className="flex min-w-[52px] flex-col items-center rounded-lg bg-white px-2 py-1 text-base font-black shadow-sm">
-          {pad(timeLeft.days)}
-          <span className="text-[10px] font-medium text-emerald-600">روز</span>
-        </span>
-        <span className="text-emerald-400">:</span>
-        <span className="flex min-w-[52px] flex-col items-center rounded-lg bg-white px-2 py-1 text-base font-black shadow-sm">
-          {pad(timeLeft.hours)}
-          <span className="text-[10px] font-medium text-emerald-600">ساعت</span>
-        </span>
-        <span className="text-emerald-400">:</span>
-        <span className="flex min-w-[52px] flex-col items-center rounded-lg bg-white px-2 py-1 text-base font-black shadow-sm">
-          {pad(timeLeft.minutes)}
-          <span className="text-[10px] font-medium text-emerald-600">دقیقه</span>
-        </span>
-        <span className="text-emerald-400">:</span>
-        <span className="flex min-w-[52px] flex-col items-center rounded-lg bg-white px-2 py-1 text-base font-black shadow-sm">
-          {pad(timeLeft.seconds)}
-          <span className="text-[10px] font-medium text-emerald-600">ثانیه</span>
-        </span>
+    <section className="mt-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 shadow-sm">
+      <div className="flex items-center justify-center gap-3" dir="rtl">
+        <p className="text-xs font-bold text-emerald-700">تا شروع وبینار</p>
+        <div className="inline-flex items-center justify-center gap-1 text-emerald-900" dir="ltr">
+          <span className="flex min-w-[40px] flex-col items-center rounded-md bg-white px-1.5 py-0.5 text-sm font-black shadow-sm leading-tight">
+            {pad(timeLeft.days)}
+            <span className="text-[9px] font-medium text-emerald-600 leading-tight">روز</span>
+          </span>
+          <span className="text-emerald-400">:</span>
+          <span className="flex min-w-[40px] flex-col items-center rounded-md bg-white px-1.5 py-0.5 text-sm font-black shadow-sm leading-tight">
+            {pad(timeLeft.hours)}
+            <span className="text-[9px] font-medium text-emerald-600 leading-tight">ساعت</span>
+          </span>
+          <span className="text-emerald-400">:</span>
+          <span className="flex min-w-[40px] flex-col items-center rounded-md bg-white px-1.5 py-0.5 text-sm font-black shadow-sm leading-tight">
+            {pad(timeLeft.minutes)}
+            <span className="text-[9px] font-medium text-emerald-600 leading-tight">دقیقه</span>
+          </span>
+          <span className="text-emerald-400">:</span>
+          <span className="flex min-w-[40px] flex-col items-center rounded-md bg-white px-1.5 py-0.5 text-sm font-black shadow-sm leading-tight">
+            {pad(timeLeft.seconds)}
+            <span className="text-[9px] font-medium text-emerald-600 leading-tight">ثانیه</span>
+          </span>
+        </div>
       </div>
     </section>
   );
@@ -192,31 +192,28 @@ export default function ThankYouIgAds() {
         lang="fa"
         className="min-h-screen bg-gradient-to-b from-emerald-50 via-white to-amber-50 font-farsi"
       >
-        <main className="mx-auto w-full max-w-md px-4 pb-16 pt-8">
+        <main className="mx-auto w-full max-w-md px-4 pb-10 pt-4">
           <div className="text-center">
-            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-2xl text-white shadow-md">
+            <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-xl text-white shadow-md">
               ✓
             </div>
-            <h1 className="text-2xl font-bold text-neutral-900">
+            <h1 className="text-xl font-bold text-neutral-900">
               ثبت‌نام شما با موفقیت انجام شد
             </h1>
-            <p className="mt-2 text-xl font-black text-rose-600">
-              اما هنوز ۲ قدم دیگر مانده !
-            </p>
-            <p className="mt-1 text-xl font-black text-rose-600">
-              همین حالا این ویدیو را ببینید
+            <p className="mt-1 text-base font-black text-rose-600">
+              اما هنوز ۲ قدم دیگر مانده! همین حالا این ویدیو را ببینید
             </p>
           </div>
 
-          <div className="mt-4 flex justify-center gap-2 text-emerald-600">
-            <ArrowDown className="h-6 w-6 animate-bounce" />
-            <ArrowDown className="h-6 w-6 animate-bounce" style={{ animationDelay: "100ms" }} />
-            <ArrowDown className="h-6 w-6 animate-bounce" style={{ animationDelay: "200ms" }} />
-            <ArrowDown className="h-6 w-6 animate-bounce" style={{ animationDelay: "300ms" }} />
+          <div className="mt-2 flex justify-center gap-1.5 text-emerald-600">
+            <ArrowDown className="h-4 w-4 animate-bounce" />
+            <ArrowDown className="h-4 w-4 animate-bounce" style={{ animationDelay: "100ms" }} />
+            <ArrowDown className="h-4 w-4 animate-bounce" style={{ animationDelay: "200ms" }} />
+            <ArrowDown className="h-4 w-4 animate-bounce" style={{ animationDelay: "300ms" }} />
           </div>
 
           {videoId && (
-            <div className="mt-2 aspect-video overflow-hidden rounded-2xl shadow-md">
+            <div className="mt-1.5 aspect-video overflow-hidden rounded-xl shadow-md">
               <iframe
                 className="h-full w-full"
                 src={`https://www.youtube.com/embed/${videoId}`}
@@ -227,31 +224,31 @@ export default function ThankYouIgAds() {
             </div>
           )}
 
-          <div className="mt-2 flex justify-center gap-2 text-emerald-600">
-            <ArrowUp className="h-6 w-6 animate-bounce" />
-            <ArrowUp className="h-6 w-6 animate-bounce" style={{ animationDelay: "100ms" }} />
-            <ArrowUp className="h-6 w-6 animate-bounce" style={{ animationDelay: "200ms" }} />
-            <ArrowUp className="h-6 w-6 animate-bounce" style={{ animationDelay: "300ms" }} />
+          <div className="mt-1.5 flex justify-center gap-1.5 text-emerald-600">
+            <ArrowUp className="h-4 w-4 animate-bounce" />
+            <ArrowUp className="h-4 w-4 animate-bounce" style={{ animationDelay: "100ms" }} />
+            <ArrowUp className="h-4 w-4 animate-bounce" style={{ animationDelay: "200ms" }} />
+            <ArrowUp className="h-4 w-4 animate-bounce" style={{ animationDelay: "300ms" }} />
           </div>
 
           {event && (
-            <section className="mt-6">
-              <p className="mb-3 text-center text-lg font-black text-rose-600">
+            <section className="mt-3">
+              <p className="mb-1.5 text-center text-base font-black text-rose-600">
                 قدم اول
               </p>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 <a
                   href={buildGoogleCalendarUrl(event)}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex min-h-[52px] items-center justify-center rounded-xl bg-neutral-900 px-3 text-sm font-semibold text-white shadow-sm transition active:scale-[0.98]"
+                  className="flex min-h-[44px] items-center justify-center rounded-xl bg-neutral-900 px-2 text-xs font-semibold text-white shadow-sm transition active:scale-[0.98]"
                 >
                   افزودن به Google Calendar
                 </a>
                 <button
                   type="button"
                   onClick={() => downloadIcs(event, "igads-webinar.ics")}
-                  className="flex min-h-[52px] items-center justify-center rounded-xl border border-neutral-300 bg-white px-3 text-sm font-semibold text-neutral-900 shadow-sm transition active:scale-[0.98]"
+                  className="flex min-h-[44px] items-center justify-center rounded-xl border border-neutral-300 bg-white px-2 text-xs font-semibold text-neutral-900 shadow-sm transition active:scale-[0.98]"
                 >
                   افزودن به Apple Calendar
                 </button>
@@ -260,11 +257,11 @@ export default function ThankYouIgAds() {
           )}
 
           {webinar && compactLocalDate && (
-            <div className="mt-6 flex w-full flex-col items-center justify-center rounded-full border border-emerald-300 bg-emerald-100 px-4 py-3 text-center">
-              <p className="text-base font-bold text-emerald-900" dir="ltr">
+            <div className="mt-3 flex w-full flex-col items-center justify-center rounded-full border border-emerald-300 bg-emerald-100 px-3 py-1.5 text-center">
+              <p className="text-sm font-bold text-emerald-900" dir="ltr">
                 🕒 Your Local time: {compactLocalDate.split("\n")[0]}
               </p>
-              <p className="text-sm font-semibold text-emerald-800" dir="ltr">
+              <p className="text-xs font-semibold text-emerald-800" dir="ltr">
                 {compactLocalDate.split("\n")[1]}
               </p>
             </div>
@@ -272,7 +269,7 @@ export default function ThankYouIgAds() {
 
           {webinar && (
             <>
-              <p className="mt-6 text-center text-lg font-black text-rose-600">
+              <p className="mt-3 text-center text-base font-black text-rose-600">
                 قدم دوم
               </p>
               <a
@@ -286,38 +283,35 @@ export default function ThankYouIgAds() {
                     .filter(Boolean)
                     .join("\n"),
                 )}`}
-                className="mt-2 flex min-h-[52px] w-full items-center justify-center rounded-xl bg-emerald-500 px-4 text-base font-bold text-white shadow-md transition active:scale-[0.98]"
+                className="mt-1.5 flex min-h-[44px] w-full items-center justify-center rounded-xl bg-emerald-500 px-4 text-sm font-bold text-white shadow-md transition active:scale-[0.98]"
               >
                 ارسال جزئیات به پشتیبانی
               </a>
-              <p className="mt-3 text-center text-sm font-bold text-rose-600">
-                لینک ورود به وبینار به این ایمیل ارسال شده است:
-              </p>
               {registeredEmail && (
-                <p className="mt-1 text-center text-sm font-bold text-neutral-900" dir="ltr">
-                  {registeredEmail}
+                <p className="mt-1.5 text-center text-xs font-bold text-neutral-800">
+                  <span className="text-rose-600">لینک ورود به این ایمیل ارسال شد: </span>
+                  <span dir="ltr">{registeredEmail}</span>
                 </p>
               )}
             </>
           )}
 
           {webinar && (
-            <section className="mt-6 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-              <h2 className="text-lg font-semibold text-neutral-900">
+            <section className="mt-3 rounded-xl border border-neutral-200 bg-white p-3 shadow-sm">
+              <h2 className="text-base font-semibold text-neutral-900">
                 جزئیات وبینار
               </h2>
-              <p className="mt-1 text-sm text-neutral-700">{webinar.title}</p>
-              <div className="mt-3 space-y-2 text-sm text-neutral-800">
-                <div dir="ltr" className="text-left">📅 {laDate}</div>
+              <div className="mt-1.5 space-y-1.5 text-sm text-neutral-800">
+                <div dir="ltr" className="text-left text-xs">📅 {laDate}</div>
                 {localDate && (
-                  <div dir="ltr" className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-100 px-3 py-2 text-center text-base font-bold text-emerald-900 border border-emerald-300 whitespace-pre-line">
+                  <div dir="ltr" className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-center text-sm font-bold text-emerald-900 border border-emerald-300 whitespace-pre-line">
                     🕒 Your Local time: {localDate}
                   </div>
                 )}
                 <CountdownToWebinar targetDate={webinar.startUtc} />
-                <div dir="ltr" className="mt-1 rounded-xl bg-neutral-50 px-3 py-2 text-left text-xs text-neutral-600">
-                  <p className="mb-1 font-semibold text-neutral-500">Other time zones:</p>
-                  <ul className="space-y-0.5">
+                <details dir="ltr" className="rounded-lg bg-neutral-50 px-3 py-1.5 text-left text-xs text-neutral-600">
+                  <summary className="cursor-pointer font-semibold text-neutral-500">Other time zones</summary>
+                  <ul className="mt-1 space-y-0.5">
                     {COMMON_TIMEZONES.map(({ label, tz }) => (
                       <li key={`${label}-${tz}`} className="flex justify-between gap-4">
                         <span>{label}</span>
@@ -327,20 +321,14 @@ export default function ThankYouIgAds() {
                       </li>
                     ))}
                   </ul>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
+                </details>
+                <div className="flex flex-wrap items-center gap-2 text-xs">
                   <span>⏱ مدت: {webinar.durationMinutes} دقیقه</span>
                   <span className="text-neutral-400">|</span>
                   <span>🔴 Live in Google Meet</span>
                 </div>
               </div>
-              <p className="mt-3 text-xs text-neutral-500">
-                لینک ورود به ایمیل شما ارسال شده است:
-                {registeredEmail && (
-                  <span className="mr-1 font-semibold text-neutral-800" dir="ltr">{registeredEmail}</span>
-                )}
-              </p>
-              <p className="mt-1 text-xs text-neutral-500" dir="ltr">
+              <p className="mt-2 text-[11px] leading-snug text-neutral-500" dir="ltr">
                 Sender: <strong>hi@ladybosslook.com</strong> (Ali Lotfi - Ladyboss Academy). Please check your spam folder.
               </p>
             </section>
