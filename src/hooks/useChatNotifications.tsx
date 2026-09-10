@@ -93,6 +93,7 @@ export const useChatNotifications = () => {
       .subscribe();
 
     return () => {
+      if (popupTimer) clearTimeout(popupTimer);
       supabase.removeChannel(channel);
     };
   }, [user?.id, location.pathname, navigate]);
