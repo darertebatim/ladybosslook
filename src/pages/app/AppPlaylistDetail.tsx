@@ -410,9 +410,11 @@ export default function AppPlaylistDetail() {
   // Regular paid playlists require enrollment
   const hasAccess = playlist?.is_free
     ? !!playlistSave
-    : playlist?.requires_subscription
-      ? hasAccessToProgram("simora-plus") && !!playlistSave
-      : enrollments?.includes(playlist?.program_slug) || !!enrolledViaProgram;
+    : unlockedViaRound
+      ? true
+      : playlist?.requires_subscription
+        ? hasAccessToProgram("simora-plus") && !!playlistSave
+        : enrollments?.includes(playlist?.program_slug) || !!enrolledViaProgram;
 
   const getTrackProgress = (audioId: string) => {
     const progress = progressData?.find((p) => p.audio_id === audioId);
