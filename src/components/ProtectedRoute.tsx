@@ -13,11 +13,17 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children, requireAdmin = false, requiredPage }: ProtectedRouteProps) {
   const { user, loading, isAdmin, hasAdminAccess, canAccessAdminPage } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!loading) {
       if (!user) {
-        navigate('/auth');
+        // Send the visitor back to exactly this page after signing in,
+        // instead of dropping them inside the app.
+        navigate(
+          authUrlFor(`${location.pathname}${location.search}${location.hash}`),
+          { replace: true },
+        );
       } else if (requireAdmin && !isAdmin) {
         navigate('/');
       } else if (requiredPage && !canAccessAdminPage(requiredPage)) {
