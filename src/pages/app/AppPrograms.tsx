@@ -152,6 +152,9 @@ const AppCourses = () => {
     return { hasNotification, nextSessionDate, nextContent, onMarkViewed };
   };
 
+  const coverFor = (slug: string) =>
+    programs.find((p) => p.slug === slug)?.image || null;
+
   const totalPrograms = filteredEnrollments.length;
 
   return (
