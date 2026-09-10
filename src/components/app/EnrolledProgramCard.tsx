@@ -1,9 +1,16 @@
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle2, AlertCircle, ChevronRight, Sparkles, Unlock, CalendarClock } from 'lucide-react';
+import {
+  CheckCircle2,
+  AlertCircle,
+  ChevronRight,
+  Sparkles,
+  Unlock,
+  CalendarClock,
+  GraduationCap,
+} from 'lucide-react';
 import { format, isToday } from 'date-fns';
 import { haptic } from '@/lib/haptics';
-import { pickPeach } from '@/lib/peachPalette';
 import { cn } from '@/lib/utils';
 
 interface EnrolledProgramCardProps {
@@ -22,6 +29,7 @@ interface EnrolledProgramCardProps {
     } | null;
     status?: string | null;
   };
+  coverImage?: string | null;
   isCompleted?: boolean;
   nextSessionDate?: string | null;
   nextContent?: { title: string; countdownText: string } | null;
@@ -29,30 +37,9 @@ interface EnrolledProgramCardProps {
   onMarkViewed?: () => void;
 }
 
-/** Small warm pill used for status/meta chips */
-function Chip({
-  children,
-  tone = 'muted',
-}: {
-  children: React.ReactNode;
-  tone?: 'muted' | 'brand' | 'solid';
-}) {
-  return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1 h-5 px-2 rounded-full text-[10px] font-semibold capitalize',
-        tone === 'solid' && 'bg-brand text-white',
-        tone === 'brand' && 'bg-brand/12 text-brand',
-        tone === 'muted' && 'bg-fg-warm/8 text-fg-warm-muted',
-      )}
-    >
-      {children}
-    </span>
-  );
-}
-
 export const EnrolledProgramCard = memo(function EnrolledProgramCard({
   enrollment,
+  coverImage,
   isCompleted = false,
   nextSessionDate,
   nextContent,
@@ -60,122 +47,140 @@ export const EnrolledProgramCard = memo(function EnrolledProgramCard({
   onMarkViewed,
 }: EnrolledProgramCardProps) {
   const round = enrollment.program_rounds;
-  const isSelfPaced = !round;
-
   const isUpcoming = round?.status === 'upcoming';
   const isActive = round?.status === 'active';
 
   const displayDate = nextSessionDate || round?.first_session_date;
   const isSessionToday = displayDate && isToday(new Date(displayDate));
 
-  // Get first sentence of important_message
   const importantNote = round?.important_message
     ? round.important_message.split(/[.!?]/)[0]?.trim()
     : null;
 
-  const peachBg = pickPeach(enrollment.program_slug || enrollment.id);
+  const to = `/app/programs/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`;
+
+  const statusLabel = isCompleted
+    ? 'Completed'
+    : round
+      ? isActive
+        ? 'Active'
+        : isUpcoming
+          ? 'Upcoming'
+          : round.status
+      : 'Self-paced';
 
   return (
-    <Link
-      to={`/app/programs/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`}
-      onClick={() => { haptic.light(); onMarkViewed?.(); }}
-      className="block"
+    <div
+      className={cn(
+        'bg-card-warm shadow-card-warm rounded-3xl overflow-hidden',
+        isCompleted && 'opacity-75',
+      )}
     >
-      <div
-        className={cn(
-          'relative w-full rounded-3xl overflow-hidden shadow-card-warm transition-transform active:scale-[0.98]',
-          isCompleted && 'opacity-70'
-        )}
-        style={{ backgroundColor: isCompleted ? undefined : peachBg }}
+      <Link
+        to={to}
+        onClick={() => {
+          haptic.light();
+          onMarkViewed?.();
+        }}
+        className="block active:opacity-90 transition-opacity"
       >
-        {isCompleted && <div className="absolute inset-0 bg-muted/50 dark:bg-muted/30" />}
+        {/* Cover */}
+        <div className="relative">
+          {coverImage ? (
+            <img
+              src={coverImage}
+              alt={enrollment.course_name}
+              className="w-full aspect-video object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-24 bg-gradient-orange flex items-center justify-center">
+              <GraduationCap className="h-8 w-8 text-white" />
+            </div>
+          )}
 
-        {/* Updated indicator — small brand dot instead of a heavy ring */}
-        {hasNotification && !isCompleted && (
-          <span className="absolute top-3 right-3 flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-60" />
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand" />
+          {/* Status pill */}
+          <span
+            className={cn(
+              'absolute top-3 left-3 inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold shadow-ios capitalize',
+              isCompleted ? 'bg-white/95 text-fg-warm-muted' : 'bg-white/95 text-brand',
+            )}
+          >
+            {isCompleted && <CheckCircle2 className="h-3.5 w-3.5" />}
+            {statusLabel}
           </span>
-        )}
 
-        <div className={cn('relative p-4 flex flex-col justify-between gap-2', isSelfPaced ? 'min-h-[64px]' : 'min-h-[112px]')}>
-          {/* Top row: single status chip */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {hasNotification && !isCompleted && (
-              <Chip tone="solid">
-                <Sparkles className="h-3 w-3" />
-                Updated
-              </Chip>
-            )}
-            {isCompleted ? (
-              <Chip tone="muted">
-                <CheckCircle2 className="h-3 w-3" />
-                Completed
-              </Chip>
-            ) : round ? (
-              <Chip tone={isActive ? 'brand' : 'muted'}>
-                {round.status}
-              </Chip>
-            ) : (
-              <Chip tone="muted">Self-Paced</Chip>
-            )}
-          </div>
-
-          {/* Bottom content */}
-          <div className="space-y-1">
-            {/* Course name */}
-            <h3 className="font-bold text-base leading-tight line-clamp-1 text-fg-warm">
-              {enrollment.course_name}
-            </h3>
-
-            {/* Round name + View schedule link - only for cohort-based */}
-            {round && (
-              <div className="flex items-center gap-1.5 text-xs text-fg-warm-muted">
-                <span className="truncate">{round.round_name}</span>
-                <span>•</span>
-                <span className="flex items-center whitespace-nowrap font-medium text-brand">
-                  View schedule
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </span>
-              </div>
-            )}
-
-            {/* Next session info - only for cohort-based */}
-            {!isCompleted && displayDate && (
-              <p className={cn(
-                'flex items-center gap-1.5 text-xs font-medium',
-                isSessionToday ? 'text-brand' : 'text-fg-warm-muted'
-              )}>
-                <CalendarClock className="h-3 w-3 flex-shrink-0" />
-                {isSessionToday
-                  ? `Next: Today at ${format(new Date(displayDate), 'h:mm a')}`
-                  : isUpcoming
-                    ? `Starts: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
-                    : `Next: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
-                }
-              </p>
-            )}
-
-            {/* Next content unlock info - only for cohort-based */}
-            {!isCompleted && nextContent && (
-              <div className="flex items-center gap-1.5 text-[11px] text-fg-warm-muted">
-                <Unlock className="h-3 w-3 flex-shrink-0 text-brand" />
-                <span className="line-clamp-1">
-                  {nextContent.title} unlocks {nextContent.countdownText}
-                </span>
-              </div>
-            )}
-
-            {/* Important note (if exists) - only for cohort-based */}
-            {!isCompleted && importantNote && (
-              <div className="flex items-center gap-1.5 text-[11px] text-fg-warm-muted">
-                <AlertCircle className="h-3 w-3 flex-shrink-0 text-brand" />
-                <span className="line-clamp-1">{importantNote}</span>
-              </div>
-            )}
-          </div>
+          {/* Updated pill */}
+          {hasNotification && !isCompleted && (
+            <span className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-brand px-3 py-1 text-[11px] font-semibold text-white shadow-ios">
+              <Sparkles className="h-3 w-3" />
+              Updated
+            </span>
+          )}
         </div>
+
+        {/* Body */}
+        <div className="p-4 space-y-2">
+          <h3 className="font-bold text-lg leading-tight text-fg-warm line-clamp-2">
+            {enrollment.course_name}
+          </h3>
+
+          {round && (
+            <p className="text-sm text-fg-warm-muted line-clamp-1">{round.round_name}</p>
+          )}
+
+          {!isCompleted && displayDate && (
+            <p
+              className={cn(
+                'flex items-center gap-1.5 text-sm font-medium',
+                isSessionToday ? 'text-brand' : 'text-fg-warm-muted',
+              )}
+            >
+              <CalendarClock className="h-4 w-4 flex-shrink-0 text-brand" />
+              {isSessionToday
+                ? `Today at ${format(new Date(displayDate), 'h:mm a')}`
+                : isUpcoming
+                  ? `Starts ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
+                  : `Next ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`}
+            </p>
+          )}
+
+          {!isCompleted && nextContent && (
+            <p className="flex items-center gap-1.5 text-sm text-fg-warm-muted">
+              <Unlock className="h-4 w-4 flex-shrink-0 text-brand" />
+              <span className="line-clamp-1">
+                {nextContent.title} unlocks {nextContent.countdownText}
+              </span>
+            </p>
+          )}
+
+          {!isCompleted && importantNote && (
+            <p className="flex items-center gap-1.5 text-sm text-fg-warm-muted">
+              <AlertCircle className="h-4 w-4 flex-shrink-0 text-brand" />
+              <span className="line-clamp-1">{importantNote}</span>
+            </p>
+          )}
+        </div>
+      </Link>
+
+      <div className="px-4 pb-4">
+        <Link
+          to={to}
+          onClick={() => {
+            haptic.light();
+            onMarkViewed?.();
+          }}
+          className={cn(
+            'w-full flex items-center justify-center gap-1.5 rounded-full py-3.5 font-semibold min-h-[48px] active:scale-[0.98] transition-transform',
+            isCompleted
+              ? 'bg-peach text-brand'
+              : 'bg-brand text-white shadow-ios',
+          )}
+        >
+          {isCompleted ? 'Review program' : 'Open program'}
+          <ChevronRight className="h-4 w-4" />
+        </Link>
       </div>
-    </Link>
+    </div>
   );
 });
