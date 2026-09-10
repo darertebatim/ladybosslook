@@ -237,6 +237,9 @@ export default function LearnCourses() {
         is_published: cForm.is_published,
         sequential_lessons: cForm.sequential_lessons,
         sort_order: cForm.sort_order,
+        is_free: cForm.is_free,
+        requires_subscription: cForm.requires_subscription,
+        available_on_mobile: cForm.available_on_mobile,
       };
       let courseId = courseDialog.course?.id;
       if (courseId) {
