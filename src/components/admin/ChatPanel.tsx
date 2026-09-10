@@ -235,6 +235,11 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
       if (error) throw error;
       if (!inserted) throw new Error("The message was not saved.");
 
+      // Show it right away (realtime echo is deduped by id)
+      const saved = inserted as Message;
+      setMessages(prev => (prev.some(m => m.id === saved.id) ? prev : [...prev, saved]));
+
+
       // Keep the customer's side in sync (inbox ordering + unread badge)
       await (supabase as any)
         .from('chat_conversations')
