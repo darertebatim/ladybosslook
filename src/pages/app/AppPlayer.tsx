@@ -69,9 +69,11 @@ export default function AppPlayer() {
     "all" | "following" | "in_progress" | "completed"
   >("all");
   const [showPaywall, setShowPaywall] = useState(false);
-  const { hasAccessToProgram } = useSubscription();
+  const { hasAccessToProgram, isSubscribed } = useSubscription();
   // Soundscape is free for all users
   const hasSoundscapeAccess = true;
+  // Real Plus subscription state — drives PLUS badge visibility
+  const hasPlusAccess = isSubscribed;
   const [preferredLanguage, setPreferredLanguage] = useState("all");
   const todayDate = useMemo(() => parseISO(getLocalDateStr()), []);
   const { data: programEvents = [] } = useProgramEventsForDate(todayDate);
