@@ -47,6 +47,7 @@ export default function DashboardChat() {
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [showAppPromo, setShowAppPromo] = useState(false);
 
 
@@ -99,7 +100,7 @@ export default function DashboardChat() {
         { event: "INSERT", schema: "public", table: "chat_messages", filter: `conversation_id=eq.${conversation.id}` },
         (payload) => {
           const newMessage = payload.new as Message;
-          setMessages((prev) => [...prev, newMessage]);
+          setMessages((prev) => (prev.some((m) => m.id === newMessage.id) ? prev : [...prev, newMessage]));
           if (newMessage.sender_type === "admin") {
             supabase.from("chat_conversations").update({ unread_count_user: 0 }).eq("id", conversation.id);
           }
@@ -112,8 +113,13 @@ export default function DashboardChat() {
   }, [conversation?.id]);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    const el = scrollRef.current;
+    if (!el) return;
+    // Scroll the chat container itself (not the whole page) to the newest message.
+    requestAnimationFrame(() => {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    });
+  }, [messages, loading]);
 
   const uploadAttachment = async (file: File): Promise<string | null> => {
     if (!user) return null;
