@@ -219,7 +219,7 @@ export default function DashboardChat() {
       <main className="container max-w-3xl pt-24 md:pt-28 pb-8 px-4">
         <Card className="flex flex-col overflow-hidden" style={{ height: "70vh" }}>
           <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-            <Button variant="ghost" size="icon-sm" className="shrink-0 -ml-2" onClick={goBack} aria-label="Back">
+            <Button variant="ghost" size="icon" className="shrink-0 -ml-2 h-9 w-9" onClick={goBack} aria-label="Back">
               <ChevronLeft className="h-5 w-5" />
             </Button>
             <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center shrink-0">
