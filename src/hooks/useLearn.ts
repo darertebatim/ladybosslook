@@ -29,6 +29,8 @@ export interface LearnModule {
   description: string | null;
   sort_order: number;
   is_published?: boolean;
+  drip_days?: number | null;
+  drip_date?: string | null;
 }
 
 export interface LearnLesson {
@@ -158,7 +160,7 @@ export function useLearnCourseContent(courseId: string | undefined) {
 }
 
 /**
- * Earliest enrollment date for the rounds linked to a course.
+ * The current user's own enrollment date for the rounds linked to a course.
  * Used to work out when drip-scheduled lessons unlock.
  */
 export function useLearnCourseStartDate(courseId: string | undefined) {
@@ -177,6 +179,7 @@ export function useLearnCourseStartDate(courseId: string | undefined) {
       const { data, error } = await supabase
         .from('course_enrollments')
         .select('enrolled_at')
+        .eq('user_id', user!.id)
         .in('round_id', roundIds)
         .order('enrolled_at', { ascending: true })
         .limit(1);
@@ -186,21 +189,40 @@ export function useLearnCourseStartDate(courseId: string | undefined) {
   });
 }
 
-/** null = unlocked, otherwise the Date it unlocks. */
-export function lessonUnlockDate(
-  lesson: LearnLesson,
+/** Parses a drip date, treating date-only values as local midnight. */
+function parseDripDate(value: string): Date {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+  if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 0, 0, 0, 0);
+  return new Date(value);
+}
+
+function dripUnlockDate(
+  drip: { drip_days?: number | null; drip_date?: string | null },
   startDate: string | null | undefined
 ): Date | null {
-  if (lesson.drip_date) {
-    const d = new Date(lesson.drip_date);
+  if (drip.drip_date) {
+    const d = parseDripDate(drip.drip_date);
     return d.getTime() > Date.now() ? d : null;
   }
-  if (lesson.drip_days && startDate) {
+  if (drip.drip_days && startDate) {
     const d = new Date(startDate);
-    d.setDate(d.getDate() + lesson.drip_days);
+    d.setDate(d.getDate() + drip.drip_days);
+    d.setHours(0, 0, 0, 0);
     return d.getTime() > Date.now() ? d : null;
   }
   return null;
+}
+
+/** null = unlocked, otherwise the Date it unlocks (latest of module + lesson drip). */
+export function lessonUnlockDate(
+  lesson: LearnLesson,
+  startDate: string | null | undefined,
+  module?: LearnModule | null
+): Date | null {
+  const lessonAt = dripUnlockDate(lesson, startDate);
+  const moduleAt = module ? dripUnlockDate(module, startDate) : null;
+  if (lessonAt && moduleAt) return lessonAt.getTime() > moduleAt.getTime() ? lessonAt : moduleAt;
+  return lessonAt || moduleAt;
 }
 
 export interface LessonLock {
@@ -218,17 +240,20 @@ export function makeLessonLocker(opts: {
   startDate: string | null | undefined;
   progress: Set<string> | undefined;
   sequential: boolean;
+  modules?: LearnModule[];
 }) {
-  const { flatLessons, startDate, progress, sequential } = opts;
+  const { flatLessons, startDate, progress, sequential, modules } = opts;
+  const moduleById = new Map((modules || []).map((m) => [m.id, m]));
+  const unlockOf = (l: LearnLesson) => lessonUnlockDate(l, startDate, moduleById.get(l.module_id));
   return (lesson: LearnLesson): LessonLock | null => {
-    const d = lessonUnlockDate(lesson, startDate);
+    const d = unlockOf(lesson);
     if (d) return { type: 'drip', label: formatUnlockLabel(d) };
     if (!sequential || lesson.is_free_preview) return null;
     const idx = flatLessons.findIndex((l) => l.id === lesson.id);
     for (let i = 0; i < idx; i++) {
       const prev = flatLessons[i];
       if (prev.is_free_preview) continue;
-      if (lessonUnlockDate(prev, startDate)) continue;
+      if (unlockOf(prev)) continue;
       if (!progress?.has(prev.id)) {
         return { type: 'sequence', label: 'Finish the previous lesson first' };
       }
