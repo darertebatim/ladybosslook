@@ -30,6 +30,7 @@ export const usePrograms = () => {
       // Map database records to Program type with images
       // Prefer cover_image_url from DB, fallback to static programImages mapping
       return filteredData.map((dbProgram: any) => ({
+        id: dbProgram.id,
         title: dbProgram.title,
         slug: dbProgram.slug,
         description: dbProgram.description || '',
