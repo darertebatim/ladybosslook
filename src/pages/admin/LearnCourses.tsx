@@ -185,6 +185,7 @@ export default function LearnCourses() {
   const [cForm, setCForm] = useState({
     title: '', subtitle: '', description: '', intro_note: '', language: '',
     cover_image_url: '', is_published: false, sequential_lessons: false, sort_order: 0,
+    is_free: false, requires_subscription: false, available_on_mobile: true,
   });
   const [cRounds, setCRounds] = useState<string[]>([]);
   const [cProgram, setCProgram] = useState<string | null>(null);
