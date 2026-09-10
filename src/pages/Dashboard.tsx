@@ -116,7 +116,7 @@ const Dashboard = () => {
       />
       <Navigation />
 
-      <main className="container max-w-6xl pt-24 md:pt-28 pb-12 px-4">
+      <main className="rilo-surface container max-w-6xl pt-24 md:pt-28 pb-12 px-4">
         {/* Header */}
         <div className="rounded-2xl bg-card shadow-ios p-5 md:p-6 flex flex-wrap items-center justify-between gap-4">
           <div className="min-w-0">
