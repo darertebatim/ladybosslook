@@ -155,25 +155,37 @@ export default function DashboardChat() {
       if (attachment) attachmentUrl = await uploadAttachment(attachment.file);
 
       const messageContent = content || (attachment ? `Sent an attachment: ${attachment.name}` : "");
-      const { error: msgError } = await supabase.from("chat_messages").insert({
-        conversation_id: conversationId,
-        sender_id: user.id,
-        sender_type: "user",
-        content: messageContent,
-        attachment_url: attachmentUrl,
-        attachment_name: attachment?.name || null,
-        attachment_type: attachment?.type || null,
-        attachment_size: attachment?.size || null,
-      });
+      const { data: inserted, error: msgError } = await supabase
+        .from("chat_messages")
+        .insert({
+          conversation_id: conversationId,
+          sender_id: user.id,
+          sender_type: "user",
+          content: messageContent,
+          attachment_url: attachmentUrl,
+          attachment_name: attachment?.name || null,
+          attachment_type: attachment?.type || null,
+          attachment_size: attachment?.size || null,
+        })
+        .select()
+        .single();
       if (msgError) throw msgError;
 
+      if (inserted) {
+        const sent = inserted as unknown as Message;
+        setMessages((prev) => (prev.some((m) => m.id === sent.id) ? prev : [...prev, sent]));
+      }
+
+      // Give people a moment to see their own message land before promoting the app.
+      let shouldPromote = true;
       try {
-        if (!localStorage.getItem("rilo_chat_app_promo_seen")) {
-          localStorage.setItem("rilo_chat_app_promo_seen", "1");
-          setShowAppPromo(true);
-        }
+        shouldPromote = !localStorage.getItem("rilo_chat_app_promo_seen");
+        if (shouldPromote) localStorage.setItem("rilo_chat_app_promo_seen", "1");
       } catch {
-        setShowAppPromo(true);
+        shouldPromote = true;
+      }
+      if (shouldPromote) {
+        window.setTimeout(() => setShowAppPromo(true), 2500);
       }
 
       try {
