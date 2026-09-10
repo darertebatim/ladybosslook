@@ -582,6 +582,7 @@ const App = () => (
                   {!isNativeApp() && <Route path="/l/igadsfree" element={<IgAdsLanding />} />}
                   {!isNativeApp() && <Route path="/l/igadsfree/thankyou" element={<ThankYouIgAds />} />}
                   {!isNativeApp() && <Route path="/l/igadsfree/pre" element={<Navigate to="/l/igadsfree/thankyou" replace />} />}
+                  {!isNativeApp() && <Route path="/l/igads/gifts" element={<IgAdsGifts />} />}
                   {!isNativeApp() && <Route path="/smartinstaframework" element={<SmartInstaLanding />} />}
                   {!isNativeApp() && <Route path="/thankyousmartinstaframework" element={<ThankYouSmartInsta />} />}
                   {!isNativeApp() && <Route path="/giftsalilotfivip" element={<GiftsAliLotfiVip />} />}
