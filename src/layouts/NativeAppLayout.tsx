@@ -216,7 +216,7 @@ const NativeAppLayout = () => {
     )}>
       {isDesktopShell && <DesktopSidebar />}
 
-      <div className="flex flex-col flex-1 min-w-0 h-full">
+      <div className="flex flex-col flex-1 min-w-0 h-full min-h-0">
       {/* Offline / sync status pill */}
       <OfflineStatusBar />
       {/* Main Content */}
