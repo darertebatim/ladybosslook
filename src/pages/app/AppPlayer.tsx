@@ -653,11 +653,27 @@ export default function AppPlayer() {
             </div>
           </div>
 
+          {/* My Playlists — followed + program/round playlists, still in progress */}
+          {showSections && myPlaylists.length > 0 && (
+            <div className="px-4 pt-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <FluentEmoji emoji="⭐" size={16} />
+                <h2 className="text-[11px] font-bold text-fg-warm-muted uppercase tracking-[0.12em]">
+                  {t("player.myPlaylists", "My Playlists")}
+                </h2>
+              </div>
+              <div className="flex flex-col gap-3">
+                {myPlaylists.map(renderCard)}
+              </div>
+            </div>
+          )}
+
           {/* Continue Learning */}
           {progressFilter === "all" &&
             selectedCategory === "all" &&
             !searchQuery &&
-            continueListening.length > 0 && (
+            continueListening.filter((p) => !myPlaylists.includes(p)).length >
+              0 && (
               <div className="px-4 pt-4 space-y-2 tour-continue-listening">
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-brand" />
@@ -666,10 +682,14 @@ export default function AppPlayer() {
                   </h2>
                 </div>
                 <div className="flex flex-col gap-3">
-                  {continueListening.slice(0, 4).map(renderCard)}
+                  {continueListening
+                    .filter((p) => !myPlaylists.includes(p))
+                    .slice(0, 4)
+                    .map(renderCard)}
                 </div>
               </div>
             )}
+
 
           {/* Hot Tracks — individually featured audios */}
           {progressFilter === "all" &&
