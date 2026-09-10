@@ -42,6 +42,7 @@ export default function DashboardChat() {
   const draftMessage = searchParams.get("draft") || "";
   const { user } = useAuth();
   const { toast } = useToast();
+  const goBack = useGoBack("/dashboard");
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
