@@ -129,7 +129,7 @@ export const RoundCoursesManager = ({ roundId }: Props) => {
           {(linked as any[]).map((row) => (
             <div key={row.id} className="flex items-center gap-3 p-3 border rounded-lg">
               <GraduationCap className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="text-sm font-medium flex-1 truncate">{nameFor(row.course_id)}</span>
+              <span className="text-sm font-medium flex-1 truncate">{nameFor(row)}</span>
               <Button
                 variant="ghost"
                 size="icon"
