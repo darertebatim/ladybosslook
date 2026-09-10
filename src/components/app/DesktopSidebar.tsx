@@ -92,8 +92,6 @@ export function DesktopSidebar() {
         <NavGroup items={PRIMARY} pathname={pathname} />
         <div className="h-px bg-border/60 mx-3" />
         <NavGroup items={SECONDARY} pathname={pathname} />
-        <div className="h-px bg-border/60 mx-3" />
-        <NavGroup items={FOOTER_NAV} pathname={pathname} />
       </nav>
 
       <div className="p-3">
