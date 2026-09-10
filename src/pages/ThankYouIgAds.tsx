@@ -95,8 +95,9 @@ export default function ThankYouIgAds() {
   }, []);
   const registeredEmail = ((location.state as any)?.email || stored?.email) as string | undefined;
   const registeredRoundId = ((location.state as any)?.roundId || stored?.roundId) as string | undefined;
-  const registeredName = ((location.state as any)?.name || stored?.name) as string | undefined;
-  const registeredCity = ((location.state as any)?.city || stored?.city) as string | undefined;
+  const [fallbackDetails, setFallbackDetails] = useState<{ name?: string; city?: string }>({});
+  const registeredName = (((location.state as any)?.name || stored?.name || fallbackDetails.name) as string | undefined);
+  const registeredCity = (((location.state as any)?.city || stored?.city || fallbackDetails.city) as string | undefined);
   const [videoId, setVideoId] = useState("");
   const [webinar, setWebinar] = useState<{
     title: string;
