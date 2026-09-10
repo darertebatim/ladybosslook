@@ -41,6 +41,9 @@ export interface Program {
   annual_ios_product_id?: string;
   annual_price_amount?: number;
   is_free_on_ios?: boolean;
+  id?: string;
+  language?: string;
+  show_in_app_waitlist?: boolean;
 }
 
 // Image mapping for programs
