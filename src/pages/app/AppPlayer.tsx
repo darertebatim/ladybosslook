@@ -356,7 +356,7 @@ export default function AppPlayer() {
         isLocked={isPlaylistLocked(playlist)}
         programSlug={playlist.program_slug}
         requiresSubscription={playlist.requires_subscription}
-        isSubscribed={hasSoundscapeAccess}
+        isSubscribed={hasPlusAccess}
         trackCount={stats.trackCount}
         completedTracks={stats.completedTracks}
         totalDuration={stats.totalDuration}
@@ -717,7 +717,8 @@ export default function AppPlayer() {
                     const isLocked = (() => {
                       if (!trackPlaylist) return false;
                       if (trackPlaylist.is_free) return false;
-                      if (trackPlaylist.requires_subscription) return !hasSoundscapeAccess;
+                      if (trackPlaylist.requires_subscription)
+                        return !hasPlusAccess && !hasRoundAccess(trackPlaylist.id);
                       if (trackPlaylist.program_slug)
                         return !enrollments?.includes(trackPlaylist.program_slug);
                       return false;
