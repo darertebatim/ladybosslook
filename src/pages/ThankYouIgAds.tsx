@@ -140,7 +140,7 @@ export default function ThankYouIgAds() {
           startUtc: new Date(round.first_session_date),
           durationMinutes: round.first_session_duration || 120,
           meetUrl: round.google_meet_link || "",
-          supportUrl: round.support_link_url || "https://wa.me/16265028538",
+          supportUrl: round.support_link_url || "/dashboard/chat",
         });
       }
     })();
@@ -151,7 +151,7 @@ export default function ThankYouIgAds() {
     if (!webinar) return null;
     return {
       title: webinar.title,
-      description: `لینک ورود:\n${webinar.meetUrl}\n\nپشتیبانی واتس‌اپ:\n${webinar.supportUrl}`,
+      description: `لینک ورود:\n${webinar.meetUrl}\n\nپشتیبانی:\n${webinar.supportUrl}`,
       startUtc: webinar.startUtc,
       durationMinutes: webinar.durationMinutes,
       location: webinar.meetUrl,
@@ -246,7 +246,7 @@ export default function ThankYouIgAds() {
                 قدم دوم
               </p>
               <a
-                href={`${webinar.supportUrl}?text=${encodeURIComponent(
+                href={`/dashboard/chat?draft=${encodeURIComponent(
                   [
                     "سلام، در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.",
                     registeredName && `نام: ${registeredName}`,
@@ -256,11 +256,9 @@ export default function ThankYouIgAds() {
                     .filter(Boolean)
                     .join("\n"),
                 )}`}
-                target="_blank"
-                rel="noreferrer"
                 className="mt-2 flex min-h-[52px] w-full items-center justify-center rounded-xl bg-emerald-500 px-4 text-base font-bold text-white shadow-md transition active:scale-[0.98]"
               >
-                ارسال جزئیات به واتس‌اپ من
+                ارسال جزئیات به پشتیبانی
               </a>
               <p className="mt-3 text-center text-sm font-bold text-rose-600">
                 لینک ورود به وبینار به این ایمیل ارسال شده است:

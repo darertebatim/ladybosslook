@@ -6,7 +6,7 @@ import Footer from '@/components/sections/Footer';
 import { SEOHead } from '@/components/SEOHead';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Award, TrendingUp, Users } from 'lucide-react';
+import { BookOpen, Award, TrendingUp, Users, MessageCircle } from 'lucide-react';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -152,6 +152,14 @@ const Dashboard = () => {
                   >
                     <Users className="mr-2 h-4 w-4" />
                     Open App Dashboard
+                  </Button>
+                  <Button 
+                    className="w-full justify-start" 
+                    variant="outline"
+                    onClick={() => navigate('/dashboard/chat')}
+                  >
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    Chat with Support
                   </Button>
                 </CardContent>
               </Card>
