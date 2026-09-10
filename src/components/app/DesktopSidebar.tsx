@@ -5,11 +5,8 @@ import {
   ClipboardList,
   Route as RouteIcon,
   GraduationCap,
-  BookOpen,
   Headphones,
-  Play,
   Compass,
-  MessageCircle,
   LifeBuoy,
   Settings,
   Smartphone,
@@ -24,19 +21,13 @@ const PRIMARY: NavItem[] = [
   { path: "/app/path", label: "My Rilo Path", icon: RouteIcon },
   { path: "/app/home", label: "Today", icon: ClipboardList },
   { path: "/app/myprograms", label: "My Programs", icon: GraduationCap, match: "/app/myprograms" },
-  { path: "/app/learn", label: "Learn", icon: BookOpen, match: "/app/learn" },
+  { path: "/app/chat", label: "Support", icon: LifeBuoy },
 ];
 
 const SECONDARY: NavItem[] = [
   { path: "/app/player", label: "Listen", icon: Headphones, match: "/app/player" },
-  { path: "/app/watch", label: "Watch", icon: Play, match: "/app/watch" },
   { path: "/app/tools", label: "Tools", icon: Compass },
-  { path: "/app/channels", label: "Chats", icon: MessageCircle, match: "/app/channels" },
-];
-
-const FOOTER_NAV: NavItem[] = [
   { path: "/app/academy", label: "Academy", icon: Sparkles },
-  { path: "/app/chat", label: "Support", icon: LifeBuoy },
   { path: "/app/settings", label: "Profile", icon: Settings },
 ];
 
