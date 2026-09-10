@@ -98,7 +98,7 @@ export function useLearnCourses() {
         .eq('is_published', true)
         .order('sort_order');
       if (error) throw error;
-      return data as LearnCourse[];
+      return ((data || []) as LearnCourse[]).filter((c) => c.available_on_mobile !== false);
     },
   });
 }
