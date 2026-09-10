@@ -95,15 +95,10 @@ const AuthButtons = ({ mobile, onClose }: { mobile?: boolean; onClose?: () => vo
         </Button>
       ) : (
         <Link to={signInHref} onClick={onClose}>
-          <Button variant="ghost" size="sm" className={buttonClass}>
+          <Button variant="default" size="sm" className={buttonClass}>
             Sign In
           </Button>
         </Link>
-      )}
-      {!user && (
-        <Button variant="default" className={`bg-primary hover:bg-primary-dark ${buttonClass}`}>
-          Join Community
-        </Button>
       )}
     </>
   );
