@@ -399,6 +399,8 @@ export default function AppPlaylistDetail() {
   const programBackState = cameFromProgram ? { state: { from } } : undefined;
 
   const { hasAccessToProgram } = useSubscription();
+  const { hasRoundAccess } = useRoundPlaylistAccess();
+  const unlockedViaRound = hasRoundAccess(playlistId);
 
   const displayMode = (playlist as any)?.display_mode || "tracks";
   // Free playlists require activation (playlist_saves)
