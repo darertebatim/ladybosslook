@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useGoBack } from "@/hooks/useGoBack";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -41,6 +42,7 @@ export default function DashboardChat() {
   const draftMessage = searchParams.get("draft") || "";
   const { user } = useAuth();
   const { toast } = useToast();
+  const goBack = useGoBack("/dashboard");
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
@@ -177,10 +179,12 @@ export default function DashboardChat() {
       }
 
       // Give people a moment to see their own message land before promoting the app.
+      // Shown at most once every 7 days (not once forever).
       let shouldPromote = true;
       try {
-        shouldPromote = !localStorage.getItem("rilo_chat_app_promo_seen");
-        if (shouldPromote) localStorage.setItem("rilo_chat_app_promo_seen", "1");
+        const last = Number(localStorage.getItem("rilo_chat_app_promo_last") || 0);
+        shouldPromote = !last || Date.now() - last > 7 * 24 * 60 * 60 * 1000;
+        if (shouldPromote) localStorage.setItem("rilo_chat_app_promo_last", String(Date.now()));
       } catch {
         shouldPromote = true;
       }
@@ -213,11 +217,9 @@ export default function DashboardChat() {
       <Navigation />
 
       <main className="container max-w-3xl py-8 px-4">
-        <Button asChild variant="ghost" size="sm" className="mb-4 -ml-2">
-          <Link to="/dashboard">
-            <ChevronLeft className="mr-1 h-4 w-4" />
-            Dashboard
-          </Link>
+        <Button variant="ghost" size="sm" className="mb-4 -ml-2" onClick={goBack}>
+          <ChevronLeft className="mr-1 h-4 w-4" />
+          Back
         </Button>
 
         <Card className="flex flex-col overflow-hidden" style={{ height: "70vh" }}>
