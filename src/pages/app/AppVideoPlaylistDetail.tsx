@@ -11,6 +11,7 @@ import { BackButton } from "@/components/app/BackButton";
 import { AppVideoPlayer } from "@/components/app/AppVideoPlayer";
 import { useEnrollments } from "@/hooks/useAppData";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useRoundPlaylistAccess } from "@/hooks/useRoundPlaylistAccess";
 import { cn } from "@/lib/utils";
 import { AddedToRoutineButton } from "@/components/app/AddedToRoutineButton";
 import { RoutinePreviewSheet, EditedTask } from "@/components/app/RoutinePreviewSheet";
@@ -75,6 +76,7 @@ export default function AppVideoPlaylistDetail() {
 
   const { data: enrollments } = useEnrollments();
   const { hasAccessToProgram } = useSubscription();
+  const { hasRoundAccess } = useRoundPlaylistAccess();
 
   // Add to routines via RoutinePreviewSheet
   const { data: existingTask } = useExistingVideoPlaylistTask(playlistId);
@@ -126,11 +128,14 @@ export default function AppVideoPlaylistDetail() {
     }
   };
 
+  const unlockedViaRound = hasRoundAccess(playlistId);
   const hasAccess = playlist?.is_free
     ? true
-    : playlist?.requires_subscription
-      ? hasAccessToProgram('simora-plus')
-      : enrollments?.includes(playlist?.program_slug);
+    : unlockedViaRound
+      ? true
+      : playlist?.requires_subscription
+        ? hasAccessToProgram('simora-plus')
+        : enrollments?.includes(playlist?.program_slug);
 
   const getProgress = (videoId: string) => {
     const p = progressData?.find(pr => pr.video_id === videoId);

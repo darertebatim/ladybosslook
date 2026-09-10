@@ -44,6 +44,7 @@ import { RoutinePreviewSheet } from "@/components/app/RoutinePreviewSheet";
 import { AddedToRoutineButton } from "@/components/app/AddedToRoutineButton";
 import { PersianFlag } from "@/components/ui/PersianFlag";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useRoundPlaylistAccess } from "@/hooks/useRoundPlaylistAccess";
 import { PaywallSheet } from "@/components/app/PaywallSheet";
 import { PlusUpsellBanner } from "@/components/app/PlusUpsellBanner";
 import { PlaylistTagChips } from "@/components/app/PlaylistTagChips";
@@ -399,6 +400,8 @@ export default function AppPlaylistDetail() {
   const programBackState = cameFromProgram ? { state: { from } } : undefined;
 
   const { hasAccessToProgram } = useSubscription();
+  const { hasRoundAccess } = useRoundPlaylistAccess();
+  const unlockedViaRound = hasRoundAccess(playlistId);
 
   const displayMode = (playlist as any)?.display_mode || "tracks";
   // Free playlists require activation (playlist_saves)
@@ -408,9 +411,11 @@ export default function AppPlaylistDetail() {
   // Regular paid playlists require enrollment
   const hasAccess = playlist?.is_free
     ? !!playlistSave
-    : playlist?.requires_subscription
-      ? hasAccessToProgram("simora-plus") && !!playlistSave
-      : enrollments?.includes(playlist?.program_slug) || !!enrolledViaProgram;
+    : unlockedViaRound
+      ? true
+      : playlist?.requires_subscription
+        ? hasAccessToProgram("simora-plus") && !!playlistSave
+        : enrollments?.includes(playlist?.program_slug) || !!enrolledViaProgram;
 
   const getTrackProgress = (audioId: string) => {
     const progress = progressData?.find((p) => p.audio_id === audioId);
