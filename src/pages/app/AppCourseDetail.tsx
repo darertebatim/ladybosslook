@@ -1927,7 +1927,9 @@ const AppCourseDetail = () => {
                           <Button
                             size="lg"
                             className="w-full h-auto px-4 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
-                            onClick={() => navigate(`/app/learn/${roundCourseId}`)}
+                            onClick={() => navigate(`/app/learn/${roundCourseId}`, {
+                              state: { from: location.pathname },
+                            })}
                           >
                             <GraduationCap className="h-5 w-5 mr-3 shrink-0" />
                             <span className="truncate">Course Lessons</span>
