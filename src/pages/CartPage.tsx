@@ -110,9 +110,9 @@ const CartPage = () => {
     <div className="min-h-screen bg-background">
       <SEOHead title="Your Cart" description="Review your selected programs" />
       <Navigation />
-      <main className="pt-24 pb-16">
+      <main className="pt-16 pb-12">
         <div className="container mx-auto px-6 max-w-3xl">
-          <h1 className="font-display text-3xl md:text-4xl font-bold mb-8">Your Cart</h1>
+          <h1 className="font-display text-3xl md:text-4xl font-bold mb-4">Your Cart</h1>
 
           {user && isLoading ? (
             <div className="flex justify-center py-20">
