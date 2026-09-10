@@ -67,8 +67,9 @@ export default function AppLearnCourse() {
       startDate,
       progress,
       sequential: !!(course as any)?.sequential_lessons,
+      modules: content?.modules,
     }),
-    [flatLessons, startDate, progress, course]
+    [flatLessons, startDate, progress, course, content]
   );
 
   const total = flatLessons.length;

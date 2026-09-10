@@ -56,8 +56,9 @@ export default function AppLearnLesson() {
       startDate,
       progress,
       sequential: !!(course as any)?.sequential_lessons,
+      modules: content?.modules,
     }),
-    [flatLessons, startDate, progress, course]
+    [flatLessons, startDate, progress, course, content]
   );
 
   // Skip locked lessons when moving around.
