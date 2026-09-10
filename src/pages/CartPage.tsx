@@ -84,7 +84,16 @@ const CartPage = () => {
 
   const formatPrice = (cents: number) => `$${(cents / 100).toFixed(0)}`;
 
-  if (!user) return null;
+  const removeItem = (slug: string) => {
+    if (user) {
+      removeFromCart(slug);
+    } else {
+      localStorage.removeItem(PENDING_CART_KEY);
+      setGuestItem(null);
+      toast.success('Removed from cart');
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-background">
