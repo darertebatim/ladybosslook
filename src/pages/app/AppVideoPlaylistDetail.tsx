@@ -126,11 +126,14 @@ export default function AppVideoPlaylistDetail() {
     }
   };
 
+  const unlockedViaRound = hasRoundAccess(playlistId);
   const hasAccess = playlist?.is_free
     ? true
-    : playlist?.requires_subscription
-      ? hasAccessToProgram('simora-plus')
-      : enrollments?.includes(playlist?.program_slug);
+    : unlockedViaRound
+      ? true
+      : playlist?.requires_subscription
+        ? hasAccessToProgram('simora-plus')
+        : enrollments?.includes(playlist?.program_slug);
 
   const getProgress = (videoId: string) => {
     const p = progressData?.find(pr => pr.video_id === videoId);
