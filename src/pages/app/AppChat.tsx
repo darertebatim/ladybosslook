@@ -433,10 +433,11 @@ export default function AppChat() {
     isPulling.current = false;
   };
 
+  const goBack = useGoBack('/app/path');
+
   const handleBack = () => {
     haptic.light();
-    const from = (location as any).state?.from;
-    navigate(from || '/app/home');
+    goBack();
   };
 
   // Track scroll position to show/hide scroll-to-bottom button
