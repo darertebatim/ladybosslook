@@ -248,6 +248,7 @@ const ThankYouSmartInsta = lazy(() => import("@/pages/ThankYouSmartInsta"));
 const GiftsAliLotfiVip = lazy(() => import("@/pages/GiftsAliLotfiVip"));
 const Video = lazy(() => import("@/pages/Video"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const DashboardChat = lazy(() => import("@/pages/DashboardChat"));
 const SendTestEmail = lazy(() => import("@/pages/SendTestEmail"));
 const AppSupport = lazy(() => import("@/pages/AppSupport"));
 const CartPage = lazy(() => import("@/pages/CartPage"));
@@ -591,6 +592,7 @@ const App = () => (
                   {!isNativeApp() && <Route path="/iqmoney" element={<IQMoneyWorkshop />} />}
                   <Route path="/rathus" element={<RathusAssessment />} />
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                  <Route path="/dashboard/chat" element={<ProtectedRoute><DashboardChat /></ProtectedRoute>} />
                   
                   {/* All /app/* routes wrapped with Audio + Focus player providers */}
                   <Route element={<AppProvidersLayout />}>
