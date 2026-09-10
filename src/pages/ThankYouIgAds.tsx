@@ -95,8 +95,9 @@ export default function ThankYouIgAds() {
   }, []);
   const registeredEmail = ((location.state as any)?.email || stored?.email) as string | undefined;
   const registeredRoundId = ((location.state as any)?.roundId || stored?.roundId) as string | undefined;
-  const registeredName = ((location.state as any)?.name || stored?.name) as string | undefined;
-  const registeredCity = ((location.state as any)?.city || stored?.city) as string | undefined;
+  const [fallbackDetails, setFallbackDetails] = useState<{ name?: string; city?: string }>({});
+  const registeredName = (((location.state as any)?.name || stored?.name || fallbackDetails.name) as string | undefined);
+  const registeredCity = (((location.state as any)?.city || stored?.city || fallbackDetails.city) as string | undefined);
   const [videoId, setVideoId] = useState("");
   const [webinar, setWebinar] = useState<{
     title: string;
@@ -122,6 +123,22 @@ export default function ThankYouIgAds() {
 
     return () => window.clearTimeout(timer);
   }, [location.state]);
+
+  // If name/city weren't carried over (old registration, cleared storage),
+  // look them up by email so the support message can still include them.
+  useEffect(() => {
+    const hasName = (location.state as any)?.name || stored?.name;
+    const hasCity = (location.state as any)?.city || stored?.city;
+    if (!registeredEmail || (hasName && hasCity)) return;
+    supabase.functions
+      .invoke("lookup-webinar-registration", {
+        body: { email: registeredEmail, source: "igads_registration" },
+      })
+      .then(({ data }) => {
+        if (data?.found) setFallbackDetails({ name: data.name, city: data.city });
+      })
+      .catch((e) => console.error("registration lookup failed", e));
+  }, [registeredEmail, location.state, stored]);
 
   useEffect(() => {
     (async () => {
