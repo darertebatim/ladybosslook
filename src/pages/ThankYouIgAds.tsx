@@ -124,6 +124,22 @@ export default function ThankYouIgAds() {
     return () => window.clearTimeout(timer);
   }, [location.state]);
 
+  // If name/city weren't carried over (old registration, cleared storage),
+  // look them up by email so the support message can still include them.
+  useEffect(() => {
+    const hasName = (location.state as any)?.name || stored?.name;
+    const hasCity = (location.state as any)?.city || stored?.city;
+    if (!registeredEmail || (hasName && hasCity)) return;
+    supabase.functions
+      .invoke("lookup-webinar-registration", {
+        body: { email: registeredEmail, source: "igads_registration" },
+      })
+      .then(({ data }) => {
+        if (data?.found) setFallbackDetails({ name: data.name, city: data.city });
+      })
+      .catch((e) => console.error("registration lookup failed", e));
+  }, [registeredEmail, location.state, stored]);
+
   useEffect(() => {
     (async () => {
       const round = await resolveWebinarRound(PROGRAM_SLUG, roundParam || registeredRoundId);
