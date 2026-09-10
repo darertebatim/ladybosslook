@@ -107,7 +107,10 @@ export const nativeAppleSignIn = async (): Promise<{ error: any }> => {
 const browserGoogleSignIn = async (): Promise<{ error: any }> => {
   // Preserve the redirect path so user returns to the page they were on (e.g. /cart)
   const searchParams = new URLSearchParams(window.location.search);
-  const redirectPath = searchParams.get('redirect') || '/app/home';
+  // If we're signing in from a normal page (e.g. /cart), come back to that page.
+  const here = `${window.location.pathname}${window.location.search}`;
+  const fallback = window.location.pathname.startsWith('/auth') ? '/app/home' : here;
+  const redirectPath = searchParams.get('redirect') || fallback;
   const redirectTo = `${window.location.origin}${redirectPath}`;
 
   const isCustomDomain =
@@ -135,7 +138,9 @@ const browserGoogleSignIn = async (): Promise<{ error: any }> => {
 
 const browserAppleSignIn = async (): Promise<{ error: any }> => {
   const searchParams = new URLSearchParams(window.location.search);
-  const redirectPath = searchParams.get('redirect') || '/app/home';
+  const here = `${window.location.pathname}${window.location.search}`;
+  const fallback = window.location.pathname.startsWith('/auth') ? '/app/home' : here;
+  const redirectPath = searchParams.get('redirect') || fallback;
   const redirectTo = `${window.location.origin}${redirectPath}`;
 
   const isCustomDomain =

@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
-const PENDING_CART_KEY = 'simora_pending_cart_item';
+export const PENDING_CART_KEY = 'simora_pending_cart_item';
 const PENDING_FREE_KEY = 'simora_pending_free_enroll';
 
 interface PendingCartProgram {
@@ -83,9 +83,10 @@ export const useCart = () => {
   const addToCartMutation = useMutation({
     mutationFn: async (program: PendingCartProgram) => {
       if (!user) {
-        // Deferred action: remember the item so we can auto-add it after sign-in.
+        // Guest: keep them in the flow — the cart page shows the item plus an
+        // inline sign-in step, and the item is added automatically afterwards.
         localStorage.setItem(PENDING_CART_KEY, JSON.stringify(program));
-        navigate(`/auth?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+        navigate('/cart');
         throw new Error('Sign in required');
       }
       const { error } = await supabase.from('cart_items').upsert({
