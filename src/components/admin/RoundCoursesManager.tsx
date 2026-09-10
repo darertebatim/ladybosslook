@@ -36,10 +36,12 @@ export const RoundCoursesManager = ({ roundId }: Props) => {
   const { data: linked = [], isLoading } = useQuery({
     queryKey: ["round-courses", roundId],
     enabled: !!roundId,
+    staleTime: 0,
+    refetchOnMount: "always",
     queryFn: async () => {
       const { data, error } = await supabase
         .from("learn_course_rounds")
-        .select("id, course_id")
+        .select("id, course_id, learn_courses(title)")
         .eq("round_id", roundId);
       if (error) throw error;
       return data || [];
