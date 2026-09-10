@@ -434,6 +434,9 @@ export default function LearnCourses() {
       is_published: course?.is_published ?? false,
       sequential_lessons: (course as any)?.sequential_lessons ?? false,
       sort_order: course?.sort_order ?? (courses?.length || 0),
+      is_free: (course as any)?.is_free ?? false,
+      requires_subscription: (course as any)?.requires_subscription ?? false,
+      available_on_mobile: (course as any)?.available_on_mobile ?? true,
     });
     const roundIds = course?.rounds.map((r) => r.round_id) || [];
     setCRounds(roundIds);
