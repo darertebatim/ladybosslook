@@ -875,15 +875,31 @@ export default function AppPlayer() {
               className="mb-2"
             />
 
-            {filteredPlaylists.length === 0 ? (
+            {otherPlaylists.length === 0 && completedPlaylists.length === 0 ? (
               <div className="text-center py-12 text-fg-warm-muted">
                 <p className="text-base">{t("player.noPlaylists")}</p>
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {filteredPlaylists.map(renderCard)}
+                {otherPlaylists.map(renderCard)}
               </div>
             )}
+
+            {/* Completed — always last */}
+            {completedPlaylists.length > 0 && (
+              <div className="pt-6 space-y-2">
+                <div className="flex items-center gap-2">
+                  <FluentEmoji emoji="✅" size={16} />
+                  <h2 className="text-[11px] font-bold text-fg-warm-muted uppercase tracking-[0.12em]">
+                    {t("player.filters.completed")}
+                  </h2>
+                </div>
+                <div className="flex flex-col gap-3">
+                  {completedPlaylists.map(renderCard)}
+                </div>
+              </div>
+            )}
+
 
             {/* CTA */}
             <div className="pt-4 pb-safe">
