@@ -56,7 +56,7 @@ export const useCart = () => {
       if (!user) {
         // Deferred action: remember the free enrollment so it resumes after sign-in.
         localStorage.setItem(PENDING_FREE_KEY, slug);
-        navigate(`/auth?redirect=${window.location.pathname}`);
+        navigate(`/auth?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
         throw new Error('Sign in required');
       }
       const { data, error } = await supabase.functions.invoke('enroll-free-programs', {
@@ -85,7 +85,7 @@ export const useCart = () => {
       if (!user) {
         // Deferred action: remember the item so we can auto-add it after sign-in.
         localStorage.setItem(PENDING_CART_KEY, JSON.stringify(program));
-        navigate(`/auth?redirect=${window.location.pathname}`);
+        navigate(`/auth?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
         throw new Error('Sign in required');
       }
       const { error } = await supabase.from('cart_items').upsert({
