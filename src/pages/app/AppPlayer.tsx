@@ -88,10 +88,29 @@ export default function AppPlayer() {
     [tagDimensions],
   );
   const playlistTags = useMemo(
-    () =>
-      allTags
-        .filter((t) => t.is_active !== false && t.dimension_id === doorDimensionId)
-        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)),
+    () => {
+      const tags = allTags.filter(
+        (t) => t.is_active !== false && t.dimension_id === doorDimensionId,
+      );
+      // Custom Player topic order: Financial 2nd, Business 3rd, Emotional Health last
+      const topicOrder = [
+        "selfcare",
+        "financial",
+        "business",
+        "immigrant",
+        "productivity",
+        "emotion",
+      ];
+      const orderMap = new Map(topicOrder.map((slug, idx) => [slug, idx]));
+      return tags.sort((a, b) => {
+        const orderA = orderMap.get(a.slug ?? "");
+        const orderB = orderMap.get(b.slug ?? "");
+        if (orderA != null && orderB != null) return orderA - orderB;
+        if (orderA != null) return -1;
+        if (orderB != null) return 1;
+        return (a.sort_order ?? 0) - (b.sort_order ?? 0);
+      });
+    },
     [allTags, doorDimensionId],
   );
   const playlistIdsByTag = useMemo(() => {
