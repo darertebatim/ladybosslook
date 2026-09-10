@@ -178,10 +178,10 @@ const CartPage = () => {
                               {LANGUAGE_LABELS[program.language] ?? program.language}
                             </span>
                           )}
-                          {program?.id && (
+                          {item.program_slug && (
                             <HostBadges
                               contentType="program"
-                              contentId={program.id}
+                              contentId={item.program_slug}
                               size="sm"
                               prefix="with"
                             />
@@ -195,6 +195,17 @@ const CartPage = () => {
                       </div>
 
                       <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                        {(() => {
+                          const orig = program?.originalPrice
+                            ? Number(program.originalPrice.replace(/[^0-9.]/g, ''))
+                            : 0;
+                          const now = displayPrice / 100;
+                          return orig > now ? (
+                            <span className="text-sm text-muted-foreground line-through">
+                              {program?.originalPrice}
+                            </span>
+                          ) : null;
+                        })()}
                         <span className="font-bold text-lg">{formatPrice(displayPrice)}</span>
                         <Button
                           variant="ghost"
