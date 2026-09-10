@@ -217,14 +217,12 @@ export default function DashboardChat() {
       <Navigation />
 
       <main className="container max-w-3xl pt-24 md:pt-28 pb-8 px-4">
-        <Button variant="outline" size="sm" className="mb-3 rounded-xl" onClick={goBack}>
-          <ChevronLeft className="mr-1 h-4 w-4" />
-          Back
-        </Button>
-
         <Card className="flex flex-col overflow-hidden" style={{ height: "70vh" }}>
           <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-            <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+            <Button variant="ghost" size="icon" className="shrink-0 -ml-2 h-9 w-9" onClick={goBack} aria-label="Back">
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center shrink-0">
               <MessageCircle className="h-5 w-5 text-primary" />
             </div>
             <div>
