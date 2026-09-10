@@ -239,12 +239,9 @@ export default function AppPlayer() {
   );
   const isFollowingPlaylist = (playlist: any) => {
     if (followedSet.has(playlist.id)) return true;
-    if (
-      playlist.program_slug &&
-      !playlist.is_free &&
-      !playlist.requires_subscription &&
-      enrollments?.includes(playlist.program_slug)
-    )
+    // Playlists attached to a round the user is enrolled in count as "mine"
+    if (hasRoundAccess(playlist.id)) return true;
+    if (playlist.program_slug && enrollments?.includes(playlist.program_slug))
       return true;
     return false;
   };
@@ -304,6 +301,32 @@ export default function AppPlayer() {
       ?.filter(filterPlaylistBySearch)
       ?.filter(filterPlaylistByProgress)
       ?.sort(preferredLanguageSorter(userLang)) || [];
+
+  const playlistProgress = (playlist: any) => {
+    const stats = getPlaylistStats(playlist.id);
+    return stats.trackCount > 0
+      ? (stats.completedTracks / stats.trackCount) * 100
+      : 0;
+  };
+
+  // Section split (default view only): My Playlists → others → completed
+  const showSections =
+    progressFilter === "all" && selectedCategory === "all" && !searchQuery;
+  const myPlaylists = showSections
+    ? filteredPlaylists.filter(
+        (p) => isFollowingPlaylist(p) && playlistProgress(p) < 100,
+      )
+    : [];
+  const completedPlaylists = showSections
+    ? filteredPlaylists.filter((p) => playlistProgress(p) >= 100)
+    : [];
+  const otherPlaylists = showSections
+    ? filteredPlaylists.filter(
+        (p) => !myPlaylists.includes(p) && !completedPlaylists.includes(p),
+      )
+    : filteredPlaylists;
+
+
 
   const continueListening =
     playlists
@@ -630,11 +653,27 @@ export default function AppPlayer() {
             </div>
           </div>
 
+          {/* My Playlists — followed + program/round playlists, still in progress */}
+          {showSections && myPlaylists.length > 0 && (
+            <div className="px-4 pt-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <FluentEmoji emoji="⭐" size={16} />
+                <h2 className="text-[11px] font-bold text-fg-warm-muted uppercase tracking-[0.12em]">
+                  {t("player.myPlaylists", "My Playlists")}
+                </h2>
+              </div>
+              <div className="flex flex-col gap-3">
+                {myPlaylists.map(renderCard)}
+              </div>
+            </div>
+          )}
+
           {/* Continue Learning */}
           {progressFilter === "all" &&
             selectedCategory === "all" &&
             !searchQuery &&
-            continueListening.length > 0 && (
+            continueListening.filter((p) => !myPlaylists.includes(p)).length >
+              0 && (
               <div className="px-4 pt-4 space-y-2 tour-continue-listening">
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-brand" />
@@ -643,10 +682,14 @@ export default function AppPlayer() {
                   </h2>
                 </div>
                 <div className="flex flex-col gap-3">
-                  {continueListening.slice(0, 4).map(renderCard)}
+                  {continueListening
+                    .filter((p) => !myPlaylists.includes(p))
+                    .slice(0, 4)
+                    .map(renderCard)}
                 </div>
               </div>
             )}
+
 
           {/* Hot Tracks — individually featured audios */}
           {progressFilter === "all" &&
@@ -832,15 +875,31 @@ export default function AppPlayer() {
               className="mb-2"
             />
 
-            {filteredPlaylists.length === 0 ? (
+            {otherPlaylists.length === 0 && completedPlaylists.length === 0 ? (
               <div className="text-center py-12 text-fg-warm-muted">
                 <p className="text-base">{t("player.noPlaylists")}</p>
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {filteredPlaylists.map(renderCard)}
+                {otherPlaylists.map(renderCard)}
               </div>
             )}
+
+            {/* Completed — always last */}
+            {completedPlaylists.length > 0 && (
+              <div className="pt-6 space-y-2">
+                <div className="flex items-center gap-2">
+                  <FluentEmoji emoji="✅" size={16} />
+                  <h2 className="text-[11px] font-bold text-fg-warm-muted uppercase tracking-[0.12em]">
+                    {t("player.filters.completed")}
+                  </h2>
+                </div>
+                <div className="flex flex-col gap-3">
+                  {completedPlaylists.map(renderCard)}
+                </div>
+              </div>
+            )}
+
 
             {/* CTA */}
             <div className="pt-4 pb-safe">
