@@ -125,7 +125,7 @@ const Dashboard = () => {
             </h1>
             <p className="text-muted-foreground mt-1">{user.email}</p>
           </div>
-          <Button onClick={() => navigate('/app/home')} className="gap-2">
+          <Button onClick={() => navigate('/app/path')} className="gap-2">
             Open Rilo <ArrowRight className="h-4 w-4" />
           </Button>
         </div>

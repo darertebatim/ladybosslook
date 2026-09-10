@@ -63,7 +63,7 @@ const AuthButtons = ({ mobile, onClose }: { mobile?: boolean; onClose?: () => vo
     <>
       {user && !isAdmin && (
         <>
-          <Link to="/app/home" onClick={onClose}>
+          <Link to="/app/path" onClick={onClose}>
             <Button variant="outline" size="sm" className={buttonClass}>
               Open App
             </Button>
@@ -129,7 +129,7 @@ const Navigation = () => {
           </div>
 
           <div className="md:hidden flex items-center gap-2">
-            <Link to="/app/home">
+            <Link to="/app/path">
               <Button
                 variant="ghost"
                 size="icon"
@@ -150,7 +150,7 @@ const Navigation = () => {
         {isMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-border pt-4">
             <div className="flex flex-col space-y-4">
-              <Link to="/app/home" onClick={() => setIsMenuOpen(false)}>
+              <Link to="/app/path" onClick={() => setIsMenuOpen(false)}>
                 <Button variant="default" size="lg" className="w-full bg-primary hover:bg-primary/90">
                   📱 Open App
                 </Button>
