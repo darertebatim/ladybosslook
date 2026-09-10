@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
-const PENDING_CART_KEY = 'simora_pending_cart_item';
+export const PENDING_CART_KEY = 'simora_pending_cart_item';
 const PENDING_FREE_KEY = 'simora_pending_free_enroll';
 
 interface PendingCartProgram {

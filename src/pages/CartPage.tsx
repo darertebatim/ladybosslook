@@ -6,25 +6,51 @@ import { SEOHead } from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Trash2, ShoppingBag, ArrowRight, Loader2 } from 'lucide-react';
-import { useCart } from '@/hooks/useCart';
+import { useCart, PENDING_CART_KEY, type CartItem } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import InlineAuth from '@/components/checkout/InlineAuth';
+
+/** Item a signed-out visitor picked — kept in localStorage until they sign in. */
+const readGuestItem = (): CartItem | null => {
+  try {
+    const raw = localStorage.getItem(PENDING_CART_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw);
+    if (!p?.slug || !p?.title) return null;
+    return {
+      id: 'guest',
+      user_id: 'guest',
+      program_slug: p.slug,
+      program_title: p.title,
+      price_amount: p.price_amount ?? 0,
+      payment_type: p.payment_type ?? 'one-time',
+      deposit_price: p.deposit_price ?? null,
+      payment_option: p.payment_option ?? null,
+      added_by: null,
+      created_at: new Date().toISOString(),
+    };
+  } catch {
+    return null;
+  }
+};
 
 const CartPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { cartItems, isLoading, removeFromCart } = useCart();
   const [checkingOut, setCheckingOut] = useState(false);
+  const [guestItem, setGuestItem] = useState<CartItem | null>(() => readGuestItem());
 
   useEffect(() => {
-    if (!user && !isLoading) {
-      navigate('/auth?redirect=/cart');
-    }
-  }, [user, isLoading, navigate]);
+    if (user) setGuestItem(null);
+  }, [user]);
 
-  const totalCents = cartItems.reduce((sum, item) => {
+  const displayItems: CartItem[] = user ? cartItems : (guestItem ? [guestItem] : []);
+
+  const totalCents = displayItems.reduce((sum, item) => {
     const price = item.payment_type === 'deposit' && item.deposit_price
       ? item.deposit_price
       : item.price_amount;
