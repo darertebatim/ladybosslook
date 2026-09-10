@@ -8,19 +8,12 @@ import { ChevronLeft } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 
-interface Conversation {
-  id: string;
-  user_id: string;
-  status: string;
-  unread_count_admin: number;
-  last_message_at: string;
-  created_at: string;
-  profiles?: {
-    full_name: string | null;
-    email: string;
-  };
-  last_message?: string;
-}
+import {
+  conversationEmail,
+  conversationName,
+  fetchSupportConversations,
+  type SupportConversation as Conversation,
+} from "@/components/admin/support/supportData";
 
 export default function AppAdminSupport() {
   const { t } = useTranslation();
@@ -33,45 +26,11 @@ export default function AppAdminSupport() {
 
   const fetchConversations = async () => {
     try {
-      const { data: convData, error: convError } = await supabase
-        .from('chat_conversations')
-        .select('*')
-        .eq('inbox_type', inboxType)
-        .order('last_message_at', { ascending: false });
-
-      if (convError) throw convError;
-
-      const conversationsWithDetails = await Promise.all(
-        (convData || []).map(async (conv) => {
-          const [profileRes, lastMsgRes] = await Promise.all([
-            supabase
-              .from('profiles')
-              .select('full_name, email')
-              .eq('id', conv.user_id)
-              .maybeSingle(),
-            supabase
-              .from('chat_messages')
-              .select('content')
-              .eq('conversation_id', conv.id)
-              .order('created_at', { ascending: false })
-              .limit(1)
-              .maybeSingle()
-          ]);
-
-          return {
-            ...conv,
-            profiles: profileRes.data || undefined,
-            last_message: lastMsgRes.data?.content
-          } as Conversation;
-        })
-      );
-
-      setConversations(conversationsWithDetails);
-      
+      const rows = await fetchSupportConversations(inboxType);
+      setConversations(rows);
       setSelectedConversation(prev => {
         if (!prev) return null;
-        const updated = conversationsWithDetails.find(c => c.id === prev.id);
-        return updated || prev;
+        return rows.find(c => c.id === prev.id) || prev;
       });
     } catch (error) {
       console.error('Error fetching conversations:', error);
@@ -169,10 +128,10 @@ export default function AppAdminSupport() {
           {selectedConversation ? (
             <>
               <h1 className="text-[17px] font-semibold truncate">
-                {selectedConversation.profiles?.full_name || 'Unknown User'}
+                {conversationName(selectedConversation)}
               </h1>
               <p className="text-[11px] text-muted-foreground truncate">
-                {selectedConversation.profiles?.email}
+                {conversationEmail(selectedConversation)}
               </p>
             </>
           ) : (

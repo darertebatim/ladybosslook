@@ -2435,10 +2435,12 @@ export type Database = {
       }
       chat_conversations: {
         Row: {
+          assigned_to: string | null
           created_at: string
           id: string
           inbox_type: string
           last_message_at: string | null
+          resolved_at: string | null
           status: string
           subject: string | null
           unread_count_admin: number
@@ -2447,10 +2449,12 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assigned_to?: string | null
           created_at?: string
           id?: string
           inbox_type?: string
           last_message_at?: string | null
+          resolved_at?: string | null
           status?: string
           subject?: string | null
           unread_count_admin?: number
@@ -2459,10 +2463,12 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assigned_to?: string | null
           created_at?: string
           id?: string
           inbox_type?: string
           last_message_at?: string | null
+          resolved_at?: string | null
           status?: string
           subject?: string | null
           unread_count_admin?: number
@@ -2472,6 +2478,41 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_internal_notes: {
+        Row: {
+          author_id: string
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_internal_notes_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_messages: {
         Row: {
           attachment_name: string | null
@@ -2479,6 +2520,7 @@ export type Database = {
           attachment_type: string | null
           attachment_url: string | null
           broadcast_id: string | null
+          buttons: Json | null
           content: string
           conversation_id: string
           created_at: string
@@ -2494,6 +2536,7 @@ export type Database = {
           attachment_type?: string | null
           attachment_url?: string | null
           broadcast_id?: string | null
+          buttons?: Json | null
           content: string
           conversation_id: string
           created_at?: string
@@ -2509,6 +2552,7 @@ export type Database = {
           attachment_type?: string | null
           attachment_url?: string | null
           broadcast_id?: string | null
+          buttons?: Json | null
           content?: string
           conversation_id?: string
           created_at?: string
@@ -6763,6 +6807,48 @@ export type Database = {
           },
         ]
       }
+      support_canned_replies: {
+        Row: {
+          body: string
+          buttons: Json
+          category: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          language: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          buttons?: Json
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          language?: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          buttons?: Json
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          language?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tag_dimensions: {
         Row: {
           created_at: string
@@ -8045,6 +8131,27 @@ export type Database = {
           last_return_at: string
           last_sign_in_at: string
           return_events: number
+          user_id: string
+        }[]
+      }
+      admin_support_conversations: {
+        Args: { _inbox: string }
+        Returns: {
+          assigned_to: string
+          created_at: string
+          display_name: string
+          email: string
+          id: string
+          last_message: string
+          last_message_at: string
+          last_sender_type: string
+          orders_count: number
+          phone: string
+          programs: string[]
+          resolved_at: string
+          status: string
+          total_spent: number
+          unread_count_admin: number
           user_id: string
         }[]
       }

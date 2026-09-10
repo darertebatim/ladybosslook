@@ -602,6 +602,7 @@ export default function AppCoachChat() {
                         attachmentName={msg.attachment_name}
                         attachmentType={msg.attachment_type}
                         isBroadcast={msg.is_broadcast}
+                        buttons={(msg as any).buttons}
                         senderName={t("chatPage.coach.senderName")}
                         showAvatar={showAvatar}
                         isFirstInGroup={firstInGrp}
