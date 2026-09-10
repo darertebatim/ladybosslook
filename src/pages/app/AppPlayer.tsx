@@ -239,12 +239,9 @@ export default function AppPlayer() {
   );
   const isFollowingPlaylist = (playlist: any) => {
     if (followedSet.has(playlist.id)) return true;
-    if (
-      playlist.program_slug &&
-      !playlist.is_free &&
-      !playlist.requires_subscription &&
-      enrollments?.includes(playlist.program_slug)
-    )
+    // Playlists attached to a round the user is enrolled in count as "mine"
+    if (hasRoundAccess(playlist.id)) return true;
+    if (playlist.program_slug && enrollments?.includes(playlist.program_slug))
       return true;
     return false;
   };
