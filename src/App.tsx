@@ -241,6 +241,7 @@ const SixTrapsLanding = lazy(() => import("@/pages/SixTrapsLanding"));
 const ThankYouSixTraps = lazy(() => import("@/pages/ThankYouSixTraps"));
 const IgAdsLanding = lazy(() => import("@/pages/IgAdsLanding"));
 const ThankYouIgAds = lazy(() => import("@/pages/ThankYouIgAds"));
+const IgAdsGifts = lazy(() => import("@/pages/IgAdsGifts"));
 const SmartInstaLanding = lazy(() => import("@/pages/SmartInstaLanding"));
 const ThankYouSmartInsta = lazy(() => import("@/pages/ThankYouSmartInsta"));
 const GiftsAliLotfiVip = lazy(() => import("@/pages/GiftsAliLotfiVip"));
@@ -581,6 +582,7 @@ const App = () => (
                   {!isNativeApp() && <Route path="/l/igadsfree" element={<IgAdsLanding />} />}
                   {!isNativeApp() && <Route path="/l/igadsfree/thankyou" element={<ThankYouIgAds />} />}
                   {!isNativeApp() && <Route path="/l/igadsfree/pre" element={<Navigate to="/l/igadsfree/thankyou" replace />} />}
+                  {!isNativeApp() && <Route path="/l/igads/gifts" element={<IgAdsGifts />} />}
                   {!isNativeApp() && <Route path="/smartinstaframework" element={<SmartInstaLanding />} />}
                   {!isNativeApp() && <Route path="/thankyousmartinstaframework" element={<ThankYouSmartInsta />} />}
                   {!isNativeApp() && <Route path="/giftsalilotfivip" element={<GiftsAliLotfiVip />} />}
