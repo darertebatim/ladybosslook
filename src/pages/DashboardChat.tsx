@@ -215,11 +215,9 @@ export default function DashboardChat() {
       <Navigation />
 
       <main className="container max-w-3xl py-8 px-4">
-        <Button asChild variant="ghost" size="sm" className="mb-4 -ml-2">
-          <Link to="/dashboard">
-            <ChevronLeft className="mr-1 h-4 w-4" />
-            Dashboard
-          </Link>
+        <Button variant="ghost" size="sm" className="mb-4 -ml-2" onClick={goBack}>
+          <ChevronLeft className="mr-1 h-4 w-4" />
+          Back
         </Button>
 
         <Card className="flex flex-col overflow-hidden" style={{ height: "70vh" }}>
