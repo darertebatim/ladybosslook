@@ -5,9 +5,10 @@ import Footer from '@/components/sections/Footer';
 import { SEOHead } from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Trash2, ShoppingBag, ArrowRight, Loader2 } from 'lucide-react';
+import { Trash2, ShoppingBag, ArrowRight, Loader2, Lock, Zap, MessageCircle, CheckCircle2, Smartphone } from 'lucide-react';
 import { useCart, PENDING_CART_KEY, type CartItem } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
+import { usePrograms } from '@/hooks/usePrograms';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useState } from 'react';
@@ -41,6 +42,7 @@ const CartPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { cartItems, isLoading, removeFromCart } = useCart();
+  const { getProgramBySlug } = usePrograms();
   const [checkingOut, setCheckingOut] = useState(false);
   const [guestItem, setGuestItem] = useState<CartItem | null>(() => readGuestItem());
 
@@ -94,7 +96,6 @@ const CartPage = () => {
     }
   };
 
-
   return (
     <div className="min-h-screen bg-background">
       <SEOHead title="Your Cart" description="Review your selected programs" />
@@ -124,35 +125,78 @@ const CartPage = () => {
                 const displayPrice = item.payment_type === 'deposit' && item.deposit_price
                   ? item.deposit_price
                   : item.price_amount;
+                const program = getProgramBySlug(item.program_slug);
+                const remaining = item.payment_type === 'deposit' && item.deposit_price
+                  ? item.price_amount - item.deposit_price
+                  : 0;
                 return (
-                  <Card key={item.id} className="p-5 flex items-center justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold truncate">{item.program_title}</h3>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                        <span className="capitalize">{item.payment_type === 'one-time' ? 'One-time' : item.payment_type}</span>
-                        {item.payment_type === 'deposit' && item.deposit_price && (
-                          <span>• Deposit</span>
+                  <Card key={item.id} className="p-4 sm:p-5">
+                    <div className="flex items-start gap-4">
+                      {program?.image ? (
+                        <img
+                          src={program.image}
+                          alt={item.program_title}
+                          loading="lazy"
+                          className="w-20 h-20 rounded-xl object-cover flex-shrink-0 border border-border/50"
+                        />
+                      ) : (
+                        <div className="w-20 h-20 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <ShoppingBag className="w-7 h-7 text-primary/50" />
+                        </div>
+                      )}
+
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold leading-snug">{item.program_title}</h3>
+                        {program?.description && (
+                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                            {program.description}
+                          </p>
+                        )}
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground mt-2">
+                          <span className="capitalize px-2 py-0.5 rounded-full bg-muted">
+                            {item.payment_type === 'one-time' ? 'One-time payment' : item.payment_type}
+                          </span>
+                          {program?.duration && (
+                            <span className="px-2 py-0.5 rounded-full bg-muted">{program.duration}</span>
+                          )}
+                        </div>
+                        {item.payment_type === 'deposit' && remaining > 0 && (
+                          <p className="text-xs text-muted-foreground mt-2">
+                            Pay {formatPrice(displayPrice)} today • {formatPrice(remaining)} remaining later
+                          </p>
                         )}
                       </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="font-bold text-lg">{formatPrice(displayPrice)}</span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeItem(item.program_slug)}
-                      >
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </Button>
+
+                      <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                        <span className="font-bold text-lg">{formatPrice(displayPrice)}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={`Remove ${item.program_title} from cart`}
+                          onClick={() => removeItem(item.program_slug)}
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </div>
                     </div>
                   </Card>
                 );
               })}
 
+              {user && (
+                <p className="flex items-center gap-2 text-sm text-green-600 dark:text-green-500">
+                  <CheckCircle2 className="w-4 h-4" /> Saved to your account — signed in as {user.email}
+                </p>
+              )}
+
               {/* Total & Checkout */}
               <div className="border-t pt-6 mt-6 space-y-4">
+                <div className="flex justify-between items-center text-sm text-muted-foreground">
+                  <span>Subtotal</span>
+                  <span>{totalCents === 0 ? 'Free' : formatPrice(totalCents)}</span>
+                </div>
                 <div className="flex justify-between items-center text-lg">
-                  <span className="font-semibold">Total</span>
+                  <span className="font-semibold">Total due today</span>
                   <span className="font-bold text-2xl">{totalCents === 0 ? 'Free' : formatPrice(totalCents)}</span>
                 </div>
                 {user ? (
@@ -171,24 +215,40 @@ const CartPage = () => {
                         <>Proceed to Checkout <ArrowRight className="ml-2 w-4 h-4" /></>
                       )}
                     </Button>
-                    {totalCents > 0 && (
-                      <p className="text-xs text-center text-muted-foreground">
-                        Secure payment powered by Stripe
-                      </p>
-                    )}
                   </>
                 ) : (
-                  <>
-                    <InlineAuth
-                      ctaLabel={totalCents === 0 ? 'Continue to enroll' : 'Continue to payment'}
-                    />
-                    {totalCents > 0 && (
-                      <p className="text-xs text-center text-muted-foreground">
-                        Secure payment powered by Stripe
-                      </p>
-                    )}
-                  </>
+                  <InlineAuth
+                    ctaLabel={totalCents === 0 ? 'Continue to enroll' : 'Continue to payment'}
+                  />
                 )}
+
+                {/* Trust & reassurance */}
+                <div className="grid gap-2 text-xs text-muted-foreground pt-1">
+                  {totalCents > 0 && (
+                    <p className="flex items-center justify-center gap-2">
+                      <Lock className="w-3.5 h-3.5" /> Secure payment powered by Stripe
+                    </p>
+                  )}
+                  <p className="flex items-center justify-center gap-2">
+                    <Zap className="w-3.5 h-3.5" /> Instant access right after checkout
+                  </p>
+                  <p className="flex items-center justify-center gap-2">
+                    <Smartphone className="w-3.5 h-3.5" /> Open the Rilo app → My Programs to start
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 text-sm">
+                  <Link to="/programs" className="text-muted-foreground hover:text-foreground underline underline-offset-4">
+                    Continue browsing programs
+                  </Link>
+                  <span className="hidden sm:inline text-muted-foreground/40">•</span>
+                  <button
+                    onClick={() => navigate('/dashboard/chat')}
+                    className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground underline underline-offset-4"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" /> Questions? Chat with us
+                  </button>
+                </div>
               </div>
             </div>
           )}
