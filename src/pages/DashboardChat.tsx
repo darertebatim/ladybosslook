@@ -47,6 +47,8 @@ export default function DashboardChat() {
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const [showAppPromo, setShowAppPromo] = useState(false);
+
 
   const fetchMessages = async (conversationId: string) => {
     const { data, error } = await supabase
@@ -158,6 +160,15 @@ export default function DashboardChat() {
         attachment_size: attachment?.size || null,
       });
       if (msgError) throw msgError;
+
+      try {
+        if (!localStorage.getItem("rilo_chat_app_promo_seen")) {
+          localStorage.setItem("rilo_chat_app_promo_seen", "1");
+          setShowAppPromo(true);
+        }
+      } catch {
+        setShowAppPromo(true);
+      }
 
       try {
         await supabase.functions.invoke("send-chat-notification", {
