@@ -36,10 +36,12 @@ export const RoundCoursesManager = ({ roundId }: Props) => {
   const { data: linked = [], isLoading } = useQuery({
     queryKey: ["round-courses", roundId],
     enabled: !!roundId,
+    staleTime: 0,
+    refetchOnMount: "always",
     queryFn: async () => {
       const { data, error } = await supabase
         .from("learn_course_rounds")
-        .select("id, course_id")
+        .select("id, course_id, learn_courses(title)")
         .eq("round_id", roundId);
       if (error) throw error;
       return data || [];
@@ -83,8 +85,10 @@ export const RoundCoursesManager = ({ roundId }: Props) => {
     onError: (e: any) => toast.error(e.message || "Failed to remove"),
   });
 
-  const nameFor = (courseId: string) =>
-    (courses as any[]).find((c) => c.id === courseId)?.title || "(deleted course)";
+  const nameFor = (row: any) =>
+    row?.learn_courses?.title ||
+    (courses as any[]).find((c) => c.id === row?.course_id)?.title ||
+    "(deleted course)";
 
   const available = (courses as any[]).filter(
     (c) => !(linked as any[]).some((l) => l.course_id === c.id)
@@ -125,7 +129,7 @@ export const RoundCoursesManager = ({ roundId }: Props) => {
           {(linked as any[]).map((row) => (
             <div key={row.id} className="flex items-center gap-3 p-3 border rounded-lg">
               <GraduationCap className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="text-sm font-medium flex-1 truncate">{nameFor(row.course_id)}</span>
+              <span className="text-sm font-medium flex-1 truncate">{nameFor(row)}</span>
               <Button
                 variant="ghost"
                 size="icon"
