@@ -30,17 +30,14 @@ export default function IgAdsGifts() {
     setSubmitting(true);
 
     try {
-      const { error: dbError } = await (supabase as any).from("form_submissions").insert({
-        name: "",
-        email: parsed.data.email.toLowerCase(),
-        city: "",
-        phone: "",
-        source: "igads_gifts",
+      // Saves the email with a server timestamp and sends the gift email.
+      const { error: fnError } = await supabase.functions.invoke("send-igads-gifts", {
+        body: { email: parsed.data.email.toLowerCase() },
       });
 
-      if (dbError) {
-        // If it's a duplicate or any other error, still let them get the gifts.
-        console.warn("igads gifts submission error", dbError);
+      if (fnError) {
+        // If saving/sending fails, still let them get the gifts.
+        console.warn("igads gifts submission error", fnError);
       }
 
       navigate("/giftsalilotfivip", { replace: true });
