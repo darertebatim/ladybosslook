@@ -12,6 +12,7 @@ import {
   downloadIcs,
   formatLADateTime,
   formatLocalDateTime,
+  formatCompactLocalDateTime,
   formatTimeZoneTime,
   COMMON_TIMEZONES,
   type WebinarEvent,
@@ -177,6 +178,7 @@ export default function ThankYouIgAds() {
 
   const laDate = webinar ? formatLADateTime(webinar.startUtc) : "";
   const localDate = webinar ? formatLocalDateTime(webinar.startUtc) : "";
+  const compactLocalDate = webinar ? formatCompactLocalDateTime(webinar.startUtc) : "";
 
   return (
     <>
@@ -255,6 +257,17 @@ export default function ThankYouIgAds() {
                 </button>
               </div>
             </section>
+          )}
+
+          {webinar && compactLocalDate && (
+            <div className="mt-6 flex w-full flex-col items-center justify-center rounded-full border border-emerald-300 bg-emerald-100 px-4 py-3 text-center">
+              <p className="text-base font-bold text-emerald-900" dir="ltr">
+                🕒 Your Local time: {compactLocalDate.split("\n")[0]}
+              </p>
+              <p className="text-sm font-semibold text-emerald-800" dir="ltr">
+                {compactLocalDate.split("\n")[1]}
+              </p>
+            </div>
           )}
 
           {webinar && (
