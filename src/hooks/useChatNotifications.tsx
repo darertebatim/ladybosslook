@@ -25,6 +25,8 @@ export const useChatNotifications = () => {
   useEffect(() => {
     if (!user?.id) return;
 
+    let popupTimer: ReturnType<typeof setTimeout> | null = null;
+
     // Fetch conversation and check for unread messages on app open
     const fetchConversation = async () => {
       const { data } = await supabase
@@ -37,7 +39,7 @@ export const useChatNotifications = () => {
         conversationIdRef.current = data.id;
         
         // Show welcome-back popup if there are unread messages
-        // Delay briefly so the app finishes rendering first
+        // Delay so the app finishes rendering and the user sees the page first
         if (
           data.unread_count_user > 0 &&
           !hasShownInitialNotification.current &&
@@ -45,9 +47,9 @@ export const useChatNotifications = () => {
         ) {
           hasShownInitialNotification.current = true;
           setUnreadMessageCount(data.unread_count_user);
-          setTimeout(() => {
+          popupTimer = setTimeout(() => {
             setShowUnreadPopup(true);
-          }, 1800);
+          }, 4000);
         }
       }
     };
