@@ -32,6 +32,7 @@ import { toast } from "sonner";
 import { Calendar, Plus, Trash2, Edit, Video, FolderOpen, CalendarDays, ListChecks, Copy, Pause, FastForward } from "lucide-react";
 import { SessionsManager } from "./SessionsManager";
 import { RoundPlaylistsManager } from "./RoundPlaylistsManager";
+import { RoundCoursesManager } from "./RoundCoursesManager";
 import { format } from "date-fns";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { Textarea } from "@/components/ui/textarea";
@@ -953,6 +954,20 @@ export const ProgramRoundsManager = () => {
               ) : (
                 <p className="text-xs text-muted-foreground italic">
                   Save the round first, then edit it to attach playlists.
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2 mt-4 border-t pt-4">
+              <Label className="font-semibold">Courses</Label>
+              <p className="text-xs text-muted-foreground">
+                Attach Learn courses to this round. Lesson drip unlocks use each student's own enrollment date.
+              </p>
+              {editingId ? (
+                <RoundCoursesManager roundId={editingId} />
+              ) : (
+                <p className="text-xs text-muted-foreground italic">
+                  Save the round first, then edit it to attach courses.
                 </p>
               )}
             </div>
