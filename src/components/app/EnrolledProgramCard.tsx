@@ -1,7 +1,6 @@
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, AlertCircle, ChevronRight, Sparkles, Unlock } from 'lucide-react';
+import { CheckCircle2, AlertCircle, ChevronRight, Sparkles, Unlock, CalendarClock } from 'lucide-react';
 import { format, isToday } from 'date-fns';
 import { haptic } from '@/lib/haptics';
 import { pickPeach } from '@/lib/peachPalette';
@@ -30,6 +29,28 @@ interface EnrolledProgramCardProps {
   onMarkViewed?: () => void;
 }
 
+/** Small warm pill used for status/meta chips */
+function Chip({
+  children,
+  tone = 'muted',
+}: {
+  children: React.ReactNode;
+  tone?: 'muted' | 'brand' | 'solid';
+}) {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1 h-5 px-2 rounded-full text-[10px] font-semibold capitalize',
+        tone === 'solid' && 'bg-brand text-white',
+        tone === 'brand' && 'bg-brand/12 text-brand',
+        tone === 'muted' && 'bg-fg-warm/8 text-fg-warm-muted',
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
 export const EnrolledProgramCard = memo(function EnrolledProgramCard({
   enrollment,
   isCompleted = false,
@@ -43,7 +64,7 @@ export const EnrolledProgramCard = memo(function EnrolledProgramCard({
 
   const isUpcoming = round?.status === 'upcoming';
   const isActive = round?.status === 'active';
-  
+
   const displayDate = nextSessionDate || round?.first_session_date;
   const isSessionToday = displayDate && isToday(new Date(displayDate));
 
@@ -55,61 +76,61 @@ export const EnrolledProgramCard = memo(function EnrolledProgramCard({
   const peachBg = pickPeach(enrollment.program_slug || enrollment.id);
 
   return (
-    <Link 
+    <Link
       to={`/app/programs/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`}
       onClick={() => { haptic.light(); onMarkViewed?.(); }}
       className="block"
     >
       <div
         className={cn(
-          'relative w-full rounded-2xl overflow-hidden shadow-ios transition-transform active:scale-[0.98]',
-          hasNotification && !isCompleted && 'ring-2 ring-brand ring-offset-2',
-          isCompleted && 'opacity-75'
+          'relative w-full rounded-3xl overflow-hidden shadow-card-warm transition-transform active:scale-[0.98]',
+          isCompleted && 'opacity-70'
         )}
         style={{ backgroundColor: isCompleted ? undefined : peachBg }}
       >
         {isCompleted && <div className="absolute inset-0 bg-muted/50 dark:bg-muted/30" />}
 
-        <div className={cn('relative p-4 flex flex-col justify-between', isSelfPaced ? 'min-h-[72px]' : 'min-h-[120px]')}>
-          {/* Top row: Badges */}
-          <div className="flex items-center gap-2 flex-wrap">
+        {/* Updated indicator — small brand dot instead of a heavy ring */}
+        {hasNotification && !isCompleted && (
+          <span className="absolute top-3 right-3 flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-60" />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand" />
+          </span>
+        )}
+
+        <div className={cn('relative p-4 flex flex-col justify-between gap-2', isSelfPaced ? 'min-h-[64px]' : 'min-h-[112px]')}>
+          {/* Top row: single status chip */}
+          <div className="flex items-center gap-1.5 flex-wrap">
             {hasNotification && !isCompleted && (
-              <Badge className="bg-brand text-white text-[10px] px-2 py-0.5 h-5 border-0">
-                <Sparkles className="h-3 w-3 mr-1" />
+              <Chip tone="solid">
+                <Sparkles className="h-3 w-3" />
                 Updated
-              </Badge>
+              </Chip>
             )}
             {isCompleted ? (
-              <Badge className="text-[10px] px-2 py-0.5 h-5 bg-muted text-muted-foreground border-0">
-                <CheckCircle2 className="h-3 w-3 mr-1" />
+              <Chip tone="muted">
+                <CheckCircle2 className="h-3 w-3" />
                 Completed
-              </Badge>
+              </Chip>
             ) : round ? (
-              <Badge
-                className={cn(
-                  'text-[10px] px-2 py-0.5 h-5 border-0 capitalize',
-                  isActive ? 'bg-emerald-500 text-white' : 'bg-foreground/10 text-foreground/70'
-                )}
-              >
+              <Chip tone={isActive ? 'brand' : 'muted'}>
                 {round.status}
-              </Badge>
+              </Chip>
             ) : (
-              <Badge className="text-[10px] px-2 py-0.5 h-5 bg-foreground/10 text-foreground/70 border-0">
-                Self-Paced
-              </Badge>
+              <Chip tone="muted">Self-Paced</Chip>
             )}
           </div>
-          
+
           {/* Bottom content */}
           <div className="space-y-1">
             {/* Course name */}
-            <h3 className="font-bold text-base leading-tight line-clamp-1 text-foreground">
+            <h3 className="font-bold text-base leading-tight line-clamp-1 text-fg-warm">
               {enrollment.course_name}
             </h3>
-            
+
             {/* Round name + View schedule link - only for cohort-based */}
             {round && (
-              <div className="flex items-center gap-1.5 text-xs text-foreground/70">
+              <div className="flex items-center gap-1.5 text-xs text-fg-warm-muted">
                 <span className="truncate">{round.round_name}</span>
                 <span>•</span>
                 <span className="flex items-center whitespace-nowrap font-medium text-brand">
@@ -118,36 +139,37 @@ export const EnrolledProgramCard = memo(function EnrolledProgramCard({
                 </span>
               </div>
             )}
-            
+
             {/* Next session info - only for cohort-based */}
             {!isCompleted && displayDate && (
               <p className={cn(
-                'text-xs font-medium',
-                isSessionToday ? 'text-emerald-700 dark:text-emerald-400' : 'text-foreground/70'
+                'flex items-center gap-1.5 text-xs font-medium',
+                isSessionToday ? 'text-brand' : 'text-fg-warm-muted'
               )}>
-                {isSessionToday 
+                <CalendarClock className="h-3 w-3 flex-shrink-0" />
+                {isSessionToday
                   ? `Next: Today at ${format(new Date(displayDate), 'h:mm a')}`
-                  : isUpcoming 
+                  : isUpcoming
                     ? `Starts: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
                     : `Next: ${format(new Date(displayDate), 'EEE, MMM d • h:mm a')}`
                 }
               </p>
             )}
-            
+
             {/* Next content unlock info - only for cohort-based */}
             {!isCompleted && nextContent && (
-              <div className="flex items-center gap-1.5 text-[11px] text-cyan-700 dark:text-cyan-400">
-                <Unlock className="h-3 w-3 flex-shrink-0" />
+              <div className="flex items-center gap-1.5 text-[11px] text-fg-warm-muted">
+                <Unlock className="h-3 w-3 flex-shrink-0 text-brand" />
                 <span className="line-clamp-1">
                   {nextContent.title} unlocks {nextContent.countdownText}
                 </span>
               </div>
             )}
-            
+
             {/* Important note (if exists) - only for cohort-based */}
             {!isCompleted && importantNote && (
-              <div className="flex items-center gap-1.5 text-[11px] text-amber-700 dark:text-amber-400">
-                <AlertCircle className="h-3 w-3 flex-shrink-0" />
+              <div className="flex items-center gap-1.5 text-[11px] text-fg-warm-muted">
+                <AlertCircle className="h-3 w-3 flex-shrink-0 text-brand" />
                 <span className="line-clamp-1">{importantNote}</span>
               </div>
             )}

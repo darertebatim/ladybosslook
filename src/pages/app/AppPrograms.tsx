@@ -181,11 +181,11 @@ const AppCourses = () => {
             selfPacedEnrollments.length > 0) && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="text-base font-semibold flex items-center gap-2">
+                <h2 className="text-base font-semibold flex items-center gap-2 text-fg-warm">
                   <GraduationCap className="h-4 w-4 text-brand" />
                   {t("programs.active")}
                 </h2>
-                <Badge variant="secondary" className="text-xs">
+                <Badge className="text-xs bg-brand/12 text-brand border-0">
                   {sortedActiveRounds.length + selfPacedEnrollments.length}
                 </Badge>
               </div>
@@ -225,14 +225,11 @@ const AppCourses = () => {
           {completedRounds.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="text-base font-semibold flex items-center gap-2 text-muted-foreground">
+                <h2 className="text-base font-semibold flex items-center gap-2 text-fg-warm-muted">
                   <CheckCircle2 className="h-4 w-4" />
                   {t("programs.completed")}
                 </h2>
-                <Badge
-                  variant="outline"
-                  className="text-muted-foreground text-xs"
-                >
+                <Badge className="text-xs bg-fg-warm/8 text-fg-warm-muted border-0">
                   {completedRounds.length}
                 </Badge>
               </div>
