@@ -10,6 +10,7 @@ import Navigation from "@/components/ui/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, MessageCircle } from "lucide-react";
+import { DownloadRiloDialog } from "@/components/chat/DownloadRiloDialog";
 
 interface Message {
   id: string;
