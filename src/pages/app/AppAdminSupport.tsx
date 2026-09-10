@@ -128,10 +128,10 @@ export default function AppAdminSupport() {
           {selectedConversation ? (
             <>
               <h1 className="text-[17px] font-semibold truncate">
-                {selectedConversation.profiles?.full_name || 'Unknown User'}
+                {conversationName(selectedConversation)}
               </h1>
               <p className="text-[11px] text-muted-foreground truncate">
-                {selectedConversation.profiles?.email}
+                {conversationEmail(selectedConversation)}
               </p>
             </>
           ) : (
