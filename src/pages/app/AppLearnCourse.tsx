@@ -114,7 +114,7 @@ export default function AppLearnCourse() {
             {/* Course hero */}
             <div className="bg-card-warm shadow-card-warm rounded-3xl overflow-hidden">
               {course?.cover_image_url ? (
-                <img src={course.cover_image_url} alt={course.title} className="w-full aspect-square object-cover" />
+                <img src={course.cover_image_url} alt={course.title} className="w-full aspect-video object-cover" />
               ) : (
                 <div className="w-full h-24 bg-gradient-orange flex items-center justify-center">
                   <GraduationCap className="h-8 w-8 text-white" />
