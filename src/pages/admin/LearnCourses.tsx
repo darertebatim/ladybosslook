@@ -193,7 +193,7 @@ export default function LearnCourses() {
   const saveTagLinks = useSaveContentTags();
 
   const [moduleDialog, setModuleDialog] = useState<{ open: boolean; module?: LearnModule }>({ open: false });
-  const [mForm, setMForm] = useState({ title: '', description: '', is_published: true });
+  const [mForm, setMForm] = useState({ title: '', description: '', is_published: true, drip_days: '', drip_date: '' });
 
   const [lessonDialog, setLessonDialog] = useState<{ open: boolean; moduleId: string | null; lesson: LearnLesson | null }>({
     open: false, moduleId: null, lesson: null,
@@ -303,6 +303,8 @@ export default function LearnCourses() {
           description: m.description,
           sort_order: m.sort_order,
           is_published: (m as any).is_published ?? true,
+          drip_days: (m as any).drip_days ?? null,
+          drip_date: (m as any).drip_date ?? null,
         }).select('id').single();
         if (mErr) throw mErr;
         const { data: lessons } = await supabase.from('learn_lessons').select('*').eq('module_id', m.id).order('sort_order');
@@ -331,6 +333,8 @@ export default function LearnCourses() {
             title: mForm.title.trim(),
             description: mForm.description.trim() || null,
             is_published: mForm.is_published,
+            drip_days: mForm.drip_days ? Number(mForm.drip_days) : null,
+            drip_date: mForm.drip_date || null,
           })
           .eq('id', moduleDialog.module.id);
         if (error) throw error;
@@ -341,6 +345,8 @@ export default function LearnCourses() {
           title: mForm.title.trim(),
           description: mForm.description.trim() || null,
           is_published: mForm.is_published,
+          drip_days: mForm.drip_days ? Number(mForm.drip_days) : null,
+          drip_date: mForm.drip_date || null,
           sort_order: maxOrder + 1,
         });
         if (error) throw error;
@@ -357,6 +363,8 @@ export default function LearnCourses() {
         title: `${mod.title} (copy)`,
         description: mod.description,
         is_published: mod.is_published ?? true,
+        drip_days: (mod as any).drip_days ?? null,
+        drip_date: (mod as any).drip_date ?? null,
         sort_order: (mod.sort_order ?? 0) + 1,
       }).select('id').single();
       if (error) throw error;
@@ -625,7 +633,7 @@ export default function LearnCourses() {
                   <p className="text-sm text-muted-foreground">Drag to reorder. Use the arrows to move a lesson between modules.</p>
                   <Button
                     size="sm" variant="outline" className="gap-1"
-                    onClick={() => { setMForm({ title: '', description: '', is_published: true }); setModuleDialog({ open: true }); }}
+                    onClick={() => { setMForm({ title: '', description: '', is_published: true, drip_days: '', drip_date: '' }); setModuleDialog({ open: true }); }}
                   >
                     <Plus className="h-4 w-4" /> Add Module
                   </Button>
@@ -654,6 +662,14 @@ export default function LearnCourses() {
                                   {mod.is_published === false && (
                                     <Badge variant="secondary" className="gap-1"><EyeOff className="h-3 w-3" /> Draft</Badge>
                                   )}
+                                  {((mod as any).drip_days || (mod as any).drip_date) && (
+                                    <Badge variant="outline" className="text-[10px] gap-1">
+                                      <Lock className="h-3 w-3" />
+                                      {(mod as any).drip_days
+                                        ? `Day ${(mod as any).drip_days}`
+                                        : new Date(`${(mod as any).drip_date}T00:00:00`).toLocaleDateString()}
+                                    </Badge>
+                                  )}
                                   <Button variant="ghost" size="sm" onClick={() => duplicateModule.mutate(mod)}>
                                     <Copy className="h-4 w-4" />
                                   </Button>
@@ -664,6 +680,8 @@ export default function LearnCourses() {
                                         title: mod.title,
                                         description: mod.description || '',
                                         is_published: mod.is_published !== false,
+                                        drip_days: (mod as any).drip_days ? String((mod as any).drip_days) : '',
+                                        drip_date: (mod as any).drip_date || '',
                                       });
                                       setModuleDialog({ open: true, module: mod });
                                     }}
@@ -948,6 +966,31 @@ export default function LearnCourses() {
                 <p className="text-xs text-muted-foreground">Drafts are hidden from students</p>
               </div>
               <Switch checked={mForm.is_published} onCheckedChange={(v) => setMForm({ ...mForm, is_published: v })} />
+            </div>
+            <div className="border rounded-lg p-3 space-y-3">
+              <div>
+                <p className="text-sm font-medium">Scheduled release</p>
+                <p className="text-xs text-muted-foreground">
+                  Locks every lesson in this module until the date below. Leave empty for no schedule.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Unlock after (days from enrolment)</Label>
+                  <Input
+                    type="number" min={0} value={mForm.drip_days}
+                    onChange={(e) => setMForm({ ...mForm, drip_days: e.target.value })}
+                    placeholder="e.g. 7"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Or unlock on date</Label>
+                  <Input
+                    type="date" value={mForm.drip_date}
+                    onChange={(e) => setMForm({ ...mForm, drip_date: e.target.value })}
+                  />
+                </div>
+              </div>
             </div>
           </div>
           <DialogFooter>

@@ -4111,6 +4111,8 @@ export type Database = {
           course_id: string
           created_at: string
           description: string | null
+          drip_date: string | null
+          drip_days: number | null
           id: string
           is_published: boolean
           sort_order: number
@@ -4121,6 +4123,8 @@ export type Database = {
           course_id: string
           created_at?: string
           description?: string | null
+          drip_date?: string | null
+          drip_days?: number | null
           id?: string
           is_published?: boolean
           sort_order?: number
@@ -4131,6 +4135,8 @@ export type Database = {
           course_id?: string
           created_at?: string
           description?: string | null
+          drip_date?: string | null
+          drip_days?: number | null
           id?: string
           is_published?: boolean
           sort_order?: number

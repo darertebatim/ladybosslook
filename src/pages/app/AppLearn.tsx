@@ -45,7 +45,11 @@ function CourseCard({ course, onOpen, onContinue, onShowDescription }: {
   const total = ordered.length;
   const done = ordered.filter((l) => progress?.has(l.id)).length;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-  const next = ordered.find((l) => !progress?.has(l.id) && !lessonUnlockDate(l, startDate));
+  const next = ordered.find(
+    (l) =>
+      !progress?.has(l.id) &&
+      !lessonUnlockDate(l, startDate, content?.modules.find((m) => m.id === l.module_id))
+  );
   const totalSeconds = ordered.reduce((s, l) => s + (lessonDurationSeconds(l) || 0), 0);
   const finished = total > 0 && done === total;
 
