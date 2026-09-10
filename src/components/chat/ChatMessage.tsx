@@ -19,6 +19,8 @@ interface ChatMessageProps {
   attachmentName?: string | null;
   attachmentType?: string | null;
   isBroadcast?: boolean;
+  /** Optional tappable buttons attached to the message */
+  buttons?: Array<{ label: string; url: string }> | null;
   // Grouping props for Telegram-style UI
   senderName?: string;
   senderAvatar?: string;
@@ -87,7 +89,8 @@ export function ChatMessage({
   showAvatar = true,
   isFirstInGroup = true,
   isLastInGroup = true,
-  showTimestamp = true
+  showTimestamp = true,
+  buttons
 }: ChatMessageProps) {
   const isImage = attachmentType?.startsWith('image/');
   const isAudio = attachmentType?.startsWith('audio/');
@@ -399,6 +402,24 @@ export function ChatMessage({
               <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
               {linkText || 'View Details'}
             </Button>
+          </div>
+        )}
+
+        {/* Structured buttons (up to 3) */}
+        {Array.isArray(buttons) && buttons.length > 0 && (
+          <div className="px-3 pb-2.5 space-y-1.5">
+            {buttons.filter(b => b?.url && b?.label).slice(0, 3).map((b, i) => (
+              <Button
+                key={i}
+                variant={isCurrentUser ? "secondary" : "default"}
+                size="sm"
+                className="w-full rounded-xl h-9 text-[13px] font-medium"
+                onClick={() => handleOpenUrl(b.url)}
+              >
+                <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
+                {b.label}
+              </Button>
+            ))}
           </div>
         )}
 

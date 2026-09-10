@@ -686,6 +686,7 @@ export default function AppChat() {
                         attachmentName={msg.attachment_name}
                         attachmentType={msg.attachment_type}
                         isBroadcast={msg.is_broadcast}
+                        buttons={(msg as any).buttons}
                         senderName={t("chatPage.support.senderName")}
                         showAvatar={showAvatar}
                         isFirstInGroup={firstInGroup}
