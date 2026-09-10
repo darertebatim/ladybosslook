@@ -8,19 +8,12 @@ import { ChevronLeft } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 
-interface Conversation {
-  id: string;
-  user_id: string;
-  status: string;
-  unread_count_admin: number;
-  last_message_at: string;
-  created_at: string;
-  profiles?: {
-    full_name: string | null;
-    email: string;
-  };
-  last_message?: string;
-}
+import {
+  conversationEmail,
+  conversationName,
+  fetchSupportConversations,
+  type SupportConversation as Conversation,
+} from "@/components/admin/support/supportData";
 
 export default function AppAdminSupport() {
   const { t } = useTranslation();
