@@ -216,8 +216,8 @@ export default function DashboardChat() {
       />
       <Navigation />
 
-      <main className="container max-w-3xl py-8 px-4">
-        <Button variant="ghost" size="sm" className="mb-4 -ml-2" onClick={goBack}>
+      <main className="container max-w-3xl pt-24 md:pt-28 pb-8 px-4">
+        <Button variant="outline" size="sm" className="mb-3 rounded-xl" onClick={goBack}>
           <ChevronLeft className="mr-1 h-4 w-4" />
           Back
         </Button>
