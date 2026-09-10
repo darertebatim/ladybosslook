@@ -44,8 +44,6 @@ import { CachedImage } from "@/components/ui/CachedImage";
 import { useAllTags } from "@/hooks/useTags";
 import { useTagDimensions } from "@/hooks/useTagDimensions";
 import { useContentTagsByType } from "@/hooks/useContentTags";
-import { getLocalDateStr } from "@/lib/localDate";
-import { parseISO } from "date-fns";
 
 const LANGUAGE_OPTIONS = [
   { value: "all", labelKey: "player.languages.all", flag: "🌐" },
