@@ -866,6 +866,27 @@ export default function LearnCourses() {
               </div>
               <Switch checked={cForm.sequential_lessons} onCheckedChange={(v) => setCForm({ ...cForm, sequential_lessons: v })} />
             </div>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <Label>Free for everyone</Label>
+                <p className="text-xs text-muted-foreground">Anyone signed in can open this course.</p>
+              </div>
+              <Switch checked={cForm.is_free} onCheckedChange={(v) => setCForm({ ...cForm, is_free: v })} />
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <Label>Requires Rilo Plus (Plus plan)</Label>
+                <p className="text-xs text-muted-foreground">Open to anyone with an active Plus subscription.</p>
+              </div>
+              <Switch checked={cForm.requires_subscription} onCheckedChange={(v) => setCForm({ ...cForm, requires_subscription: v })} />
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <Label>Show in app (Learn tab)</Label>
+                <p className="text-xs text-muted-foreground">Turn off to hide it from the Learn page in the app.</p>
+              </div>
+              <Switch checked={cForm.available_on_mobile} onCheckedChange={(v) => setCForm({ ...cForm, available_on_mobile: v })} />
+            </div>
             <div className="space-y-2">
               <Label>Access — pick a program, then its rounds</Label>
 
