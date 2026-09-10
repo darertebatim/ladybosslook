@@ -924,7 +924,7 @@ const AppHome = () => {
     <>
       <SEOHead title="Home - LadyBoss" description="Your personal dashboard and planner" />
       
-      <div className="flex flex-col h-full overflow-hidden bg-background">
+      <div className="flex flex-col h-full min-h-0 overflow-hidden bg-background">
         {/* Fixed header with integrated week strip - Me+ style */}
         <header className="tour-header fixed top-0 left-0 right-0 z-50 bg-white/35 dark:bg-black/20 backdrop-blur-xl rounded-b-2xl shadow-[0_2px_10px_rgba(0,0,0,0.06)]" style={{
         paddingTop: 'max(12px, env(safe-area-inset-top))'
@@ -1126,7 +1126,7 @@ const AppHome = () => {
       }} />
 
         {/* Scroll container */}
-        <div ref={homeScrollRef} className="flex-1 overflow-y-auto overscroll-contain" data-home-scroll-container="true">
+        <div ref={homeScrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain" data-home-scroll-container="true">
           <div className="px-4 pt-6 pb-4 pb-safe">
             {/*
               Unified banner stack — ONLY ONE banner shows at a time.
