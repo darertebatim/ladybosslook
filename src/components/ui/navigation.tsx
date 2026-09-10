@@ -55,7 +55,9 @@ const CartIcon = () => {
 
 const AuthButtons = ({ mobile, onClose }: { mobile?: boolean; onClose?: () => void }) => {
   const { isAdmin, user, signOut } = useAuth();
+  const location = useLocation();
   const buttonClass = mobile ? 'w-full' : '';
+  const signInHref = authUrlFor(`${location.pathname}${location.search}${location.hash}`);
 
   return (
     <>
@@ -93,7 +95,7 @@ const AuthButtons = ({ mobile, onClose }: { mobile?: boolean; onClose?: () => vo
           Sign Out
         </Button>
       ) : (
-        <Link to="/auth" onClick={onClose}>
+        <Link to={signInHref} onClick={onClose}>
           <Button variant="ghost" size="sm" className={buttonClass}>
             Sign In
           </Button>
