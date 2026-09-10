@@ -57,7 +57,7 @@ function CourseCard({ course, onOpen, onContinue, onShowDescription }: {
             <img
               src={course.cover_image_url}
               alt={course.title}
-              className="w-full aspect-square object-cover"
+              className="w-full aspect-video object-cover"
               loading="lazy"
             />
           ) : (
