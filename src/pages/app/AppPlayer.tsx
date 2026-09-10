@@ -302,6 +302,32 @@ export default function AppPlayer() {
       ?.filter(filterPlaylistByProgress)
       ?.sort(preferredLanguageSorter(userLang)) || [];
 
+  const playlistProgress = (playlist: any) => {
+    const stats = getPlaylistStats(playlist.id);
+    return stats.trackCount > 0
+      ? (stats.completedTracks / stats.trackCount) * 100
+      : 0;
+  };
+
+  // Section split (default view only): My Playlists → others → completed
+  const showSections =
+    progressFilter === "all" && selectedCategory === "all" && !searchQuery;
+  const myPlaylists = showSections
+    ? filteredPlaylists.filter(
+        (p) => isFollowingPlaylist(p) && playlistProgress(p) < 100,
+      )
+    : [];
+  const completedPlaylists = showSections
+    ? filteredPlaylists.filter((p) => playlistProgress(p) >= 100)
+    : [];
+  const otherPlaylists = showSections
+    ? filteredPlaylists.filter(
+        (p) => !myPlaylists.includes(p) && !completedPlaylists.includes(p),
+      )
+    : filteredPlaylists;
+
+
+
   const continueListening =
     playlists
       ?.filter((playlist) => {
