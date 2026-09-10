@@ -512,15 +512,19 @@ const ProgramPage = () => {
                     {/* Add to Cart / In Cart / Enrolled */}
                     <EnrollButton />
 
-                    <div className="space-y-1.5 text-center">
-                      <a
-                        href="https://t.me/ladybosslook"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <div className="space-y-2 text-center">
+                      <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                        <Check className="w-3.5 h-3.5 text-primary" />
+                        <span>Instant access after purchase</span>
+                      </div>
+                      <Link
+                        to={`/dashboard/chat?draft=${encodeURIComponent(
+                          `Hi, I have a question about the ${program.title} program.`
+                        )}`}
                         className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
                       >
-                        <MessageCircle size={16} /> Questions? Chat on Telegram
-                      </a>
+                        <MessageCircle size={16} /> Questions? Chat with support
+                      </Link>
                       <p className="text-xs text-muted-foreground">Secure payment via Stripe</p>
                     </div>
                   </Card>
