@@ -156,7 +156,7 @@ const ProgramPage = () => {
   });
 
   const handleAddToCart = () => {
-    if (!user) { navigate(`/auth?redirect=/${slug}`); return; }
+    // Signed-out visitors: useCart remembers the item and resumes it after sign-in.
     if (!program) return;
     if (program.payment_type === 'free' || program.price_amount === 0) {
       enrollFree(program.slug);
@@ -173,7 +173,6 @@ const ProgramPage = () => {
 
   const handleAddSubscriptionToCart = (option: 'monthly' | 'full') => {
     if (!program) return;
-    if (!user) { navigate(`/auth?redirect=/${slug}`); return; }
     const price = option === 'full'
       ? (program.subscription_full_payment_price || 0)
       : program.price_amount;
