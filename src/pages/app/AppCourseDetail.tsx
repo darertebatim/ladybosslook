@@ -2581,20 +2581,31 @@ const AppCourseDetail = () => {
                           }}
                         />
                       )}
-                      {round && (
-                        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-fg-warm/10">
-                          <div>
-                            <p className="text-sm text-fg-warm/70">
-                              Start Date
-                            </p>
-                            <p className="font-semibold text-fg-warm">
-                              {format(
-                                new Date(round.start_date),
-                                "MMM d, yyyy",
-                              )}
-                            </p>
-                          </div>
-                          {round.end_date && (
+                       {round && (
+                         <div className="grid grid-cols-2 gap-4 pt-4 border-t border-fg-warm/10">
+                           {round.is_self_paced ? (
+                             <div>
+                               <p className="text-sm text-fg-warm/70">Started</p>
+                               <p className="font-semibold text-fg-warm">
+                                 {enrollment?.enrolled_at
+                                   ? format(new Date(enrollment.enrolled_at), "MMM d, yyyy")
+                                   : "Self-paced"}
+                               </p>
+                             </div>
+                           ) : (
+                             <div>
+                               <p className="text-sm text-fg-warm/70">
+                                 Start Date
+                               </p>
+                               <p className="font-semibold text-fg-warm">
+                                 {format(
+                                   new Date(round.start_date),
+                                   "MMM d, yyyy",
+                                 )}
+                               </p>
+                             </div>
+                           )}
+                           {!round.is_self_paced && round.end_date && (
                             <div>
                               <p className="text-sm text-fg-warm/70">
                                 End Date
