@@ -26,45 +26,11 @@ export default function AppAdminSupport() {
 
   const fetchConversations = async () => {
     try {
-      const { data: convData, error: convError } = await supabase
-        .from('chat_conversations')
-        .select('*')
-        .eq('inbox_type', inboxType)
-        .order('last_message_at', { ascending: false });
-
-      if (convError) throw convError;
-
-      const conversationsWithDetails = await Promise.all(
-        (convData || []).map(async (conv) => {
-          const [profileRes, lastMsgRes] = await Promise.all([
-            supabase
-              .from('profiles')
-              .select('full_name, email')
-              .eq('id', conv.user_id)
-              .maybeSingle(),
-            supabase
-              .from('chat_messages')
-              .select('content')
-              .eq('conversation_id', conv.id)
-              .order('created_at', { ascending: false })
-              .limit(1)
-              .maybeSingle()
-          ]);
-
-          return {
-            ...conv,
-            profiles: profileRes.data || undefined,
-            last_message: lastMsgRes.data?.content
-          } as Conversation;
-        })
-      );
-
-      setConversations(conversationsWithDetails);
-      
+      const rows = await fetchSupportConversations(inboxType);
+      setConversations(rows);
       setSelectedConversation(prev => {
         if (!prev) return null;
-        const updated = conversationsWithDetails.find(c => c.id === prev.id);
-        return updated || prev;
+        return rows.find(c => c.id === prev.id) || prev;
       });
     } catch (error) {
       console.error('Error fetching conversations:', error);
