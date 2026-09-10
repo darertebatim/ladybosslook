@@ -76,6 +76,7 @@ export default function AppVideoPlaylistDetail() {
 
   const { data: enrollments } = useEnrollments();
   const { hasAccessToProgram } = useSubscription();
+  const { hasRoundAccess } = useRoundPlaylistAccess();
 
   // Add to routines via RoutinePreviewSheet
   const { data: existingTask } = useExistingVideoPlaylistTask(playlistId);
