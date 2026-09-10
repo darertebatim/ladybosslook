@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Menu, X, Smartphone, ShoppingCart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { authUrlFor } from '@/lib/authRedirect';
 
 const NAV_ITEMS = [
   { label: 'Home', href: '#home' },
