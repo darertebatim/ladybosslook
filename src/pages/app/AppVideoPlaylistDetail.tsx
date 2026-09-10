@@ -11,6 +11,7 @@ import { BackButton } from "@/components/app/BackButton";
 import { AppVideoPlayer } from "@/components/app/AppVideoPlayer";
 import { useEnrollments } from "@/hooks/useAppData";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useRoundPlaylistAccess } from "@/hooks/useRoundPlaylistAccess";
 import { cn } from "@/lib/utils";
 import { AddedToRoutineButton } from "@/components/app/AddedToRoutineButton";
 import { RoutinePreviewSheet, EditedTask } from "@/components/app/RoutinePreviewSheet";
