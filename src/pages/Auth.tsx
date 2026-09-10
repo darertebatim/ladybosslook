@@ -14,7 +14,7 @@ import riloAppIcon from '@/assets/rilo-app-icon.png';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { Capacitor } from '@capacitor/core';
 import { Analytics } from '@/lib/firebaseAnalytics';
-import { getPasswordResetRedirectUrl } from '@/lib/authRedirect';
+import { getPasswordResetRedirectUrl, sanitizeRedirectPath } from '@/lib/authRedirect';
 
 
 export default function Auth() {
