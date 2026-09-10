@@ -31,7 +31,7 @@ export function ProtectedRoute({ children, requireAdmin = false, requiredPage }:
         navigate('/app/home');
       }
     }
-  }, [user, loading, isAdmin, requireAdmin, requiredPage, canAccessAdminPage, navigate]);
+  }, [user, loading, isAdmin, requireAdmin, requiredPage, canAccessAdminPage, navigate, location]);
 
   if (loading) {
     return <BrandedSplash />;
