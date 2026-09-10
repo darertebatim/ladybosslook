@@ -441,7 +441,7 @@ export default function AppLearnLesson() {
                             : <LIcon className="h-4 w-4 text-brand" />}
                         </div>
                         <span className="flex-1 min-w-0">
-                          <span className="block truncate text-sm font-medium text-fg-warm">{l.title}</span>
+                          <span className="block text-sm font-medium text-fg-warm leading-snug line-clamp-2 break-words">{l.title}</span>
                           {lLock && (
                             <span className="block text-xs text-fg-warm-muted">{lLock.label}</span>
                           )}
