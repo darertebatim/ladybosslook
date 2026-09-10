@@ -30,6 +30,8 @@ import { OfflineStatusBar } from '@/components/app/OfflineStatusBar';
 import { useOnboardingProfileSync } from '@/hooks/useOnboardingProfileSync';
 import { useRoutePreloader } from '@/hooks/useRoutePreloader';
 import { useFirebaseScreenTracking } from '@/hooks/useFirebaseScreenTracking';
+import { useDesktopShell } from '@/hooks/useDesktopShell';
+import { DesktopSidebar } from '@/components/app/DesktopSidebar';
 
 /**
  * Reset iOS viewport zoom - fixes stuck zoom after input focus
