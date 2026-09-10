@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -36,6 +36,8 @@ interface Conversation {
  * Same conversation thread as the mobile app support chat.
  */
 export default function DashboardChat() {
+  const [searchParams] = useSearchParams();
+  const draftMessage = searchParams.get("draft") || "";
   const { user } = useAuth();
   const { toast } = useToast();
   const [conversation, setConversation] = useState<Conversation | null>(null);
@@ -235,7 +237,7 @@ export default function DashboardChat() {
           </div>
 
           <div className="border-t border-border">
-            <ChatInput onSend={handleSendMessage} disabled={sending} uploading={uploading} />
+            <ChatInput onSend={handleSendMessage} disabled={sending} uploading={uploading} initialMessage={draftMessage} />
           </div>
         </Card>
       </main>
