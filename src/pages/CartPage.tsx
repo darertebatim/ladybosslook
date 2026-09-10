@@ -16,9 +16,6 @@ const LANGUAGE_LABELS: Record<string, string> = {
   es: 'Spanish',
 };
 
-/** Strip HTML tags from rich-text descriptions stored in the DB. */
-const stripHtml = (html: string) =>
-  html.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 import { useCart, PENDING_CART_KEY, type CartItem } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { usePrograms } from '@/hooks/usePrograms';
