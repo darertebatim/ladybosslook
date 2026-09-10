@@ -234,7 +234,7 @@ const NativeAppLayout = () => {
           touchAction: 'pan-y',
         }}
       >
-        <div className={cn(isDesktopShell && !isOwnScrollPage && !isOnPlayerPage && "mx-auto w-full max-w-5xl")}>
+        <div className={cn("w-full min-h-full", isDesktopShell && !isOwnScrollPage && !isOnPlayerPage && "mx-auto max-w-5xl")}>
           <Outlet />
         </div>
       </main>
