@@ -541,14 +541,6 @@ const AppStore = () => {
             )}
             {/* Self-Care Quiz Banner - directly under Tools row */}
             <SelfCareQuizBanner className="mb-2" />
-            {/* My Programs (active rounds) — only shown for users with active enrollments */}
-            {!searchQuery && (
-              <ActiveRoundsCarousel
-                activeRounds={activeRounds}
-                nextSessionMap={nextSessionMap}
-                programImageMap={programImageMap}
-              />
-            )}
 
             {/* Promo Banner - Under Tools */}
             <PromoBanner location="explore_tools" className="mb-2" />
