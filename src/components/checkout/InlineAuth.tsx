@@ -223,13 +223,27 @@ export const InlineAuth = ({ ctaLabel = 'Continue to payment' }: { ctaLabel?: st
               )}
             </Button>
 
-            <button
-              type="button"
-              onClick={() => setShowEmailForm(false)}
-              className="block mx-auto text-sm text-[#1a1f3d] font-medium underline-offset-4 hover:underline"
-            >
-              Back
-            </button>
+            <div className="text-center space-y-2">
+              {!isLogin && (
+                <p className="text-[#1a1f3d] text-sm font-semibold">
+                  Already have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => setIsLogin(true)}
+                    className="text-[#B8590E] font-bold underline underline-offset-4"
+                  >
+                    Log in here
+                  </button>
+                </p>
+              )}
+              <button
+                type="button"
+                onClick={() => setShowEmailForm(false)}
+                className="block mx-auto text-sm text-[#1a1f3d] font-medium underline-offset-4 hover:underline"
+              >
+                Back
+              </button>
+            </div>
           </form>
         )}
       </div>
