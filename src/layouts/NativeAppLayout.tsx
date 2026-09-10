@@ -232,9 +232,7 @@ const NativeAppLayout = () => {
           touchAction: 'pan-y',
         }}
       >
-        <div className={cn("w-full min-h-full", isDesktopShell && !isOwnScrollPage && !isOnPlayerPage && "mx-auto max-w-5xl")}>
-          <Outlet />
-        </div>
+        <Outlet />
       </main>
 
       {/* Deferred background hooks — mount after 5s to free initial render */}
