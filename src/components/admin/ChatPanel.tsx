@@ -131,7 +131,8 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
           filter: `conversation_id=eq.${conversation.id}`
         },
         (payload) => {
-          setMessages(prev => [...prev, payload.new as Message]);
+          const incoming = payload.new as Message;
+          setMessages(prev => (prev.some(m => m.id === incoming.id) ? prev : [...prev, incoming]));
         }
       )
       .subscribe();
