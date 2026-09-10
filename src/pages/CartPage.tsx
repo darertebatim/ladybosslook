@@ -160,11 +160,6 @@ const CartPage = () => {
 
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold leading-snug">{item.program_title}</h3>
-                        {program?.description && (
-                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                            {stripHtml(program.description)}
-                          </p>
-                        )}
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground mt-2">
                           <span className="capitalize px-2 py-0.5 rounded-full bg-muted">
                             {item.payment_type === 'one-time' ? 'One-time payment' : item.payment_type}
