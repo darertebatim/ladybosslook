@@ -97,6 +97,28 @@ Deno.serve(async (req) => {
     if (error) console.error("[RESEND-WEBHOOK] insert error", error.message);
     else console.log("[RESEND-WEBHOOK] ✓", eventType, recipients.join(","));
 
+    // Hard bounces & spam complaints: stop emailing these addresses.
+    const bounceType = String(
+      data?.bounce?.type ?? data?.bounce?.subType ?? data?.type ?? "",
+    ).toLowerCase();
+    const isHardBounce = eventType === "bounced" &&
+      (bounceType.includes("hard") || bounceType.includes("permanent") || !bounceType);
+    const isComplaint = eventType === "complained";
+
+    if ((isHardBounce || isComplaint) && recipients.length) {
+      const { error: unsubError } = await supabase
+        .from("email_unsubscribes")
+        .upsert(
+          recipients.map((to) => ({
+            email: String(to).toLowerCase(),
+            source: isComplaint ? "spam_complaint" : "hard_bounce",
+          })),
+          { onConflict: "email", ignoreDuplicates: true },
+        );
+      if (unsubError) console.error("[RESEND-WEBHOOK] unsub error", unsubError.message);
+      else console.log("[RESEND-WEBHOOK] suppressed", recipients.join(","));
+    }
+
     return new Response(JSON.stringify({ received: true }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
