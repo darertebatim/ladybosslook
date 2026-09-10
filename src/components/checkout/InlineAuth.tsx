@@ -139,13 +139,16 @@ export const InlineAuth = ({ ctaLabel = 'Continue to payment' }: { ctaLabel?: st
               </span>
             </Button>
 
-            <button
-              type="button"
-              onClick={() => setIsLogin((v) => !v)}
-              className="block mx-auto text-sm text-[#1a1f3d] font-medium underline-offset-4 hover:underline"
-            >
-              {isLogin ? 'New here? Create an account' : 'Already have an account? Log in here'}
-            </button>
+            <p className="text-center text-[#1a1f3d] text-sm font-semibold">
+              {isLogin ? 'New to Rilo? ' : 'Already have an account? '}
+              <button
+                type="button"
+                onClick={() => setIsLogin((v) => !v)}
+                className="text-[#B8590E] font-bold underline underline-offset-4"
+              >
+                {isLogin ? 'Create one' : 'Log in here'}
+              </button>
+            </p>
           </div>
         ) : (
           <form
