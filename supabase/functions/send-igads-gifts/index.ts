@@ -112,7 +112,7 @@ serve(async (req) => {
 
     let emailSent = false;
     if (!unsub) {
-      const unsubscribeUrl = `${supabaseUrl}/functions/v1/email-unsubscribe?e=${encodeURIComponent(clean)}&t=${await unsubToken(clean)}`;
+      const unsubscribeUrl = `https://ladybosslook.com/unsubscribe?e=${encodeURIComponent(clean)}&t=${await unsubToken(clean)}`;
       const { error: sendError } = await resend.emails.send({
         from: "Ali Lotfi <support@ladybosslook.com>",
         to: [clean],

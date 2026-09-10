@@ -43,11 +43,18 @@ Deno.serve(async (req) => {
   const email = (url.searchParams.get("e") || "").trim().toLowerCase();
   const token = (url.searchParams.get("t") || "").trim();
 
-  const html = (t: string, b: string, ok = true) =>
-    new Response(page(t, b, ok), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" },
-    });
+  const wantsJson = url.searchParams.get("format") === "json";
+
+  const html = (t: string, b: string, ok = true) => {
+    const headers = new Headers(corsHeaders);
+    headers.set("cache-control", "no-store");
+    if (wantsJson) {
+      headers.set("content-type", "application/json");
+      return new Response(JSON.stringify({ ok, email, title: t }), { status: 200, headers });
+    }
+    headers.set("content-type", "text/html; charset=utf-8");
+    return new Response(page(t, b, ok), { status: 200, headers });
+  };
 
   if (!email.includes("@") || !token) return html("Invalid link", "This unsubscribe link is not valid.", false);
   if (token !== (await sign(email))) return html("Invalid link", "This unsubscribe link is not valid.", false);
