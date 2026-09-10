@@ -140,7 +140,7 @@ const CartPage = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => removeFromCart(item.program_slug)}
+                        onClick={() => removeItem(item.program_slug)}
                       >
                         <Trash2 className="w-4 h-4 text-destructive" />
                       </Button>
@@ -155,24 +155,39 @@ const CartPage = () => {
                   <span className="font-semibold">Total</span>
                   <span className="font-bold text-2xl">{totalCents === 0 ? 'Free' : formatPrice(totalCents)}</span>
                 </div>
-                <Button
-                  className="w-full"
-                  size="lg"
-                  onClick={handleCheckout}
-                  disabled={checkingOut}
-                >
-                  {checkingOut ? (
-                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
-                  ) : totalCents === 0 ? (
-                    <>Enroll for Free <ArrowRight className="ml-2 w-4 h-4" /></>
-                  ) : (
-                    <>Proceed to Checkout <ArrowRight className="ml-2 w-4 h-4" /></>
-                  )}
-                </Button>
-                {totalCents > 0 && (
-                  <p className="text-xs text-center text-muted-foreground">
-                    Secure payment powered by Stripe
-                  </p>
+                {user ? (
+                  <>
+                    <Button
+                      className="w-full"
+                      size="lg"
+                      onClick={handleCheckout}
+                      disabled={checkingOut}
+                    >
+                      {checkingOut ? (
+                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
+                      ) : totalCents === 0 ? (
+                        <>Enroll for Free <ArrowRight className="ml-2 w-4 h-4" /></>
+                      ) : (
+                        <>Proceed to Checkout <ArrowRight className="ml-2 w-4 h-4" /></>
+                      )}
+                    </Button>
+                    {totalCents > 0 && (
+                      <p className="text-xs text-center text-muted-foreground">
+                        Secure payment powered by Stripe
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <InlineAuth
+                      ctaLabel={totalCents === 0 ? 'Continue to enroll' : 'Continue to payment'}
+                    />
+                    {totalCents > 0 && (
+                      <p className="text-xs text-center text-muted-foreground">
+                        Secure payment powered by Stripe
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
             </div>
