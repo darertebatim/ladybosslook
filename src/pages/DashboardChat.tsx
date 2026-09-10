@@ -10,6 +10,7 @@ import Navigation from "@/components/ui/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, MessageCircle } from "lucide-react";
+import { DownloadRiloDialog } from "@/components/chat/DownloadRiloDialog";
 
 interface Message {
   id: string;
@@ -46,6 +47,8 @@ export default function DashboardChat() {
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const [showAppPromo, setShowAppPromo] = useState(false);
+
 
   const fetchMessages = async (conversationId: string) => {
     const { data, error } = await supabase
@@ -159,6 +162,15 @@ export default function DashboardChat() {
       if (msgError) throw msgError;
 
       try {
+        if (!localStorage.getItem("rilo_chat_app_promo_seen")) {
+          localStorage.setItem("rilo_chat_app_promo_seen", "1");
+          setShowAppPromo(true);
+        }
+      } catch {
+        setShowAppPromo(true);
+      }
+
+      try {
         await supabase.functions.invoke("send-chat-notification", {
           body: { conversationId, messageContent, senderType: "user", senderId: user.id },
         });
@@ -241,6 +253,8 @@ export default function DashboardChat() {
           </div>
         </Card>
       </main>
+
+      <DownloadRiloDialog open={showAppPromo} onOpenChange={setShowAppPromo} />
     </div>
   );
 }

@@ -131,7 +131,8 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
           filter: `conversation_id=eq.${conversation.id}`
         },
         (payload) => {
-          setMessages(prev => [...prev, payload.new as Message]);
+          const incoming = payload.new as Message;
+          setMessages(prev => (prev.some(m => m.id === incoming.id) ? prev : [...prev, incoming]));
         }
       )
       .subscribe();
@@ -233,6 +234,11 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
 
       if (error) throw error;
       if (!inserted) throw new Error("The message was not saved.");
+
+      // Show it right away (realtime echo is deduped by id)
+      const saved = inserted as Message;
+      setMessages(prev => (prev.some(m => m.id === saved.id) ? prev : [...prev, saved]));
+
 
       // Keep the customer's side in sync (inbox ordering + unread badge)
       await (supabase as any)
