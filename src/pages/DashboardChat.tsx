@@ -47,6 +47,7 @@ export default function DashboardChat() {
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [showAppPromo, setShowAppPromo] = useState(false);
 
 
@@ -99,7 +100,7 @@ export default function DashboardChat() {
         { event: "INSERT", schema: "public", table: "chat_messages", filter: `conversation_id=eq.${conversation.id}` },
         (payload) => {
           const newMessage = payload.new as Message;
-          setMessages((prev) => [...prev, newMessage]);
+          setMessages((prev) => (prev.some((m) => m.id === newMessage.id) ? prev : [...prev, newMessage]));
           if (newMessage.sender_type === "admin") {
             supabase.from("chat_conversations").update({ unread_count_user: 0 }).eq("id", conversation.id);
           }
@@ -112,8 +113,13 @@ export default function DashboardChat() {
   }, [conversation?.id]);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    const el = scrollRef.current;
+    if (!el) return;
+    // Scroll the chat container itself (not the whole page) to the newest message.
+    requestAnimationFrame(() => {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    });
+  }, [messages, loading]);
 
   const uploadAttachment = async (file: File): Promise<string | null> => {
     if (!user) return null;
@@ -149,25 +155,37 @@ export default function DashboardChat() {
       if (attachment) attachmentUrl = await uploadAttachment(attachment.file);
 
       const messageContent = content || (attachment ? `Sent an attachment: ${attachment.name}` : "");
-      const { error: msgError } = await supabase.from("chat_messages").insert({
-        conversation_id: conversationId,
-        sender_id: user.id,
-        sender_type: "user",
-        content: messageContent,
-        attachment_url: attachmentUrl,
-        attachment_name: attachment?.name || null,
-        attachment_type: attachment?.type || null,
-        attachment_size: attachment?.size || null,
-      });
+      const { data: inserted, error: msgError } = await supabase
+        .from("chat_messages")
+        .insert({
+          conversation_id: conversationId,
+          sender_id: user.id,
+          sender_type: "user",
+          content: messageContent,
+          attachment_url: attachmentUrl,
+          attachment_name: attachment?.name || null,
+          attachment_type: attachment?.type || null,
+          attachment_size: attachment?.size || null,
+        })
+        .select()
+        .single();
       if (msgError) throw msgError;
 
+      if (inserted) {
+        const sent = inserted as unknown as Message;
+        setMessages((prev) => (prev.some((m) => m.id === sent.id) ? prev : [...prev, sent]));
+      }
+
+      // Give people a moment to see their own message land before promoting the app.
+      let shouldPromote = true;
       try {
-        if (!localStorage.getItem("rilo_chat_app_promo_seen")) {
-          localStorage.setItem("rilo_chat_app_promo_seen", "1");
-          setShowAppPromo(true);
-        }
+        shouldPromote = !localStorage.getItem("rilo_chat_app_promo_seen");
+        if (shouldPromote) localStorage.setItem("rilo_chat_app_promo_seen", "1");
       } catch {
-        setShowAppPromo(true);
+        shouldPromote = true;
+      }
+      if (shouldPromote) {
+        window.setTimeout(() => setShowAppPromo(true), 2500);
       }
 
       try {
@@ -213,7 +231,7 @@ export default function DashboardChat() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
             {loading ? (
               <p className="text-sm text-muted-foreground">Loading…</p>
             ) : messages.length === 0 ? (
