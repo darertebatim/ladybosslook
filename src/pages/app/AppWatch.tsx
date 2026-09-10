@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEnrollments } from "@/hooks/useAppData";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useRoundPlaylistAccess } from "@/hooks/useRoundPlaylistAccess";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PersianFlag } from "@/components/ui/PersianFlag";
 import { AddedToRoutineButton } from "@/components/app/AddedToRoutineButton";
@@ -153,8 +154,10 @@ export default function AppWatch() {
 
   const getStats = (id: string) => playlistStats.get(id) || { trackCount: 0, totalDuration: 0, completedTracks: 0 };
 
+  const { hasRoundAccess } = useRoundPlaylistAccess();
   const isLocked = (p: any) => {
     if (p.is_free) return false;
+    if (hasRoundAccess(p.id)) return false;
     if (p.requires_subscription) return false;
     if (!p.program_slug) return false;
     return !enrollments?.includes(p.program_slug);

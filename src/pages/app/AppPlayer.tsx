@@ -18,6 +18,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useRoundPlaylistAccess } from "@/hooks/useRoundPlaylistAccess";
 import { PaywallSheet } from "@/components/app/PaywallSheet";
 import { haptic } from "@/lib/haptics";
 import { PersianFlag } from "@/components/ui/PersianFlag";
@@ -214,8 +215,10 @@ export default function AppPlayer() {
       coverImage: null,
     };
 
+  const { hasRoundAccess } = useRoundPlaylistAccess();
   const isPlaylistLocked = (playlist: any) => {
     if (playlist.is_free) return false;
+    if (hasRoundAccess(playlist.id)) return false;
     if (playlist.requires_subscription) return false;
     if (!playlist.program_slug) return false;
     return !enrollments?.includes(playlist.program_slug);
