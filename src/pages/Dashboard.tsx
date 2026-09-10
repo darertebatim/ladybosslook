@@ -116,31 +116,31 @@ const Dashboard = () => {
       />
       <Navigation />
 
-      <main className="container max-w-6xl py-10 px-4">
+      <main className="container max-w-6xl pt-24 md:pt-28 pb-12 px-4">
         {/* Header */}
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold">
+        <div className="rounded-2xl bg-card shadow-ios p-5 md:p-6 flex flex-wrap items-center justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="text-2xl md:text-3xl font-bold truncate">
               Welcome back{firstName ? `, ${firstName}` : ''}
             </h1>
-            <p className="text-muted-foreground mt-1">{user.email}</p>
+            <p className="text-sm text-muted-foreground mt-1 truncate">{user.email}</p>
           </div>
-          <Button onClick={() => navigate('/app/path')} className="gap-2">
+          <Button onClick={() => navigate('/app/path')} size="lg" className="gap-2 rounded-xl">
             Open Rilo <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
 
         {/* Stats */}
-        <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {stats.map((s) => {
             const Icon = s.icon;
             return (
-              <div key={s.label} className="rounded-2xl bg-card shadow-ios p-5">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">{s.label}</span>
-                  <Icon className="h-4 w-4 text-brand" />
+              <div key={s.label} className="rounded-2xl bg-card shadow-ios p-4 md:p-5">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs md:text-sm text-muted-foreground truncate">{s.label}</span>
+                  <Icon className="h-4 w-4 text-brand shrink-0" />
                 </div>
-                <div className="mt-2 text-3xl font-bold">{isLoading ? '—' : s.value}</div>
+                <div className="mt-1.5 text-2xl md:text-3xl font-bold">{isLoading ? '—' : s.value}</div>
               </div>
             );
           })}
