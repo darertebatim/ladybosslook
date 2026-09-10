@@ -147,3 +147,27 @@ export function formatLocalDateTime(d: Date): string {
     return d.toString();
   }
 }
+
+/**
+ * Compact two-line version of the user's local browser timezone.
+ * Line 1: time, Line 2: (timezone), date
+ */
+export function formatCompactLocalDateTime(d: Date): string {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+    const time = new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(d);
+    const date = new Intl.DateTimeFormat("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).format(d);
+    return tz ? `${time}\n(${tz}), ${date}` : `${time}\n${date}`;
+  } catch {
+    return d.toString();
+  }
+}
