@@ -8188,6 +8188,7 @@ export type Database = {
           phone: string
           programs: string[]
           resolved_at: string
+          rounds: string[]
           status: string
           total_spent: number
           unread_count_admin: number
