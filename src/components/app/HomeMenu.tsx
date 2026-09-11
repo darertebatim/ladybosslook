@@ -37,6 +37,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { isRiloBizHiddenRegion } from "@/lib/regionRestrictions";
 import { PushPermissionDot } from "@/components/app/PushPermissionDot";
+import { useUnreadChat } from "@/hooks/useUnreadChat";
 import { useTranslation } from "react-i18next";
 import { useNewHomeData } from "@/hooks/useNewHomeData";
 // language change moved to Settings page
