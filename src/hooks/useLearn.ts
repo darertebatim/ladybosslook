@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { recordStreakActivity } from '@/lib/streakActivity';
 
 export type LessonType = 'video' | 'audio' | 'document' | 'pdf' | 'link' | 'session';
 
