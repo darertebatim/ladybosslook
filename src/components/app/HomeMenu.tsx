@@ -187,6 +187,7 @@ export function HomeMenu() {
   const { signOut, user } = useAuth();
   const { t } = useTranslation();
   const { streak } = useNewHomeData();
+  const { unreadCount } = useUnreadChat('support');
   const [isDark, setIsDark] = useState(
     () =>
       typeof document !== "undefined" &&
