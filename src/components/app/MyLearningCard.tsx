@@ -11,6 +11,7 @@ import {
   Music,
   Video,
   Folder,
+  LayoutGrid,
   Sparkles,
 } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
@@ -268,22 +269,17 @@ function MaterialTile({
   to,
   icon,
   label,
-  className,
 }: {
   to: string | null;
   icon: React.ReactNode;
   label: string;
-  className?: string;
 }) {
   if (!to) return null;
   return (
     <Link
       to={to}
       onClick={() => haptic.light()}
-      className={cn(
-        'flex flex-col items-center gap-1.5 rounded-2xl py-2.5 active:opacity-90',
-        className,
-      )}
+      className="flex flex-col items-center gap-1.5 rounded-2xl bg-peach py-2.5 text-brand active:opacity-90"
     >
       {icon}
       <span className="text-[10.5px] font-extrabold text-fg-warm">{label}</span>
