@@ -174,6 +174,7 @@ const Subscriptions = lazy(() => import("@/pages/admin/Subscriptions"));
 const BrandDesign = lazy(() => import("@/pages/admin/BrandDesign"));
 const BrandMock = lazy(() => import("@/pages/admin/BrandMock"));
 const JasperMock = lazy(() => import("@/pages/admin/JasperMock"));
+const MyLearningMock = lazy(() => import("@/pages/admin/MyLearningMock"));
 const Onboarding = lazy(() => import("@/pages/admin/Onboarding"));
 const Banners = lazy(() => import("@/pages/admin/Banners"));
 const AudienceLibrary = lazy(() => import("@/pages/admin/AudienceLibrary"));
@@ -527,6 +528,7 @@ const App = () => (
                       <Route path="brand" element={<ProtectedRoute requiredPage="system"><BrandDesign /></ProtectedRoute>} />
                       <Route path="brand/mock" element={<ProtectedRoute requiredPage="system"><BrandMock /></ProtectedRoute>} />
                       <Route path="brand/jasper-mock" element={<ProtectedRoute requiredPage="system"><JasperMock /></ProtectedRoute>} />
+                      <Route path="brand/learning-mock" element={<ProtectedRoute requiredPage="system"><MyLearningMock /></ProtectedRoute>} />
                       <Route path="support" element={<ProtectedRoute requiredPage="support"><Support /></ProtectedRoute>} />
                       <Route path="system" element={<ProtectedRoute requiredPage="system"><System /></ProtectedRoute>} />
                       
