@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format, isSameDay, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
+import { recordStreakActivity } from '@/lib/streakActivity';
 
 export interface ProgramEvent {
   id: string;
