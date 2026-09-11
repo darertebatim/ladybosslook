@@ -253,7 +253,7 @@ export function MyLearningCard() {
         </Link>
       </div>
 
-      {/* Materials — keep My Programs + the 2 highest-priority attachments */}
+      {/* Materials — show the 2 highest-priority attachments */}
       {(() => {
         const filesTo = documentCount > 0 && courseTo ? courseTo : null;
         const attachmentTiles = [
@@ -264,15 +264,11 @@ export function MyLearningCard() {
         ].filter((t) => t.to) as { to: string; icon: ReactNode; label: string; key: string }[];
 
         const shown = attachmentTiles.slice(0, 2);
-        const tiles = [
-          ...shown,
-          { to: '/app/programs', icon: <LayoutGrid className="h-4 w-4" />, label: 'My Programs', key: 'programs' },
-        ];
-        const cols = tiles.length >= 3 ? 'grid-cols-3' : tiles.length === 2 ? 'grid-cols-2' : 'grid-cols-1';
+        const cols = shown.length >= 2 ? 'grid-cols-2' : 'grid-cols-1';
 
         return (
           <div className={`grid ${cols} gap-2 px-3 pt-3`}>
-            {tiles.map((t) => (
+            {shown.map((t) => (
               <MaterialTile key={t.key} to={t.to} icon={t.icon} label={t.label} />
             ))}
           </div>
