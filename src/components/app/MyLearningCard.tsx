@@ -13,6 +13,7 @@ import { haptic } from '@/lib/haptics';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useMyLearning } from '@/hooks/useMyLearning';
+import { useUnreadChat } from '@/hooks/useUnreadChat';
 
 /**
  * "My Learning" — the first thing a program buyer sees on Path.
