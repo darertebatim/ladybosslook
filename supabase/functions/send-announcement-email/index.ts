@@ -197,48 +197,57 @@ const handler = async (req: Request): Promise<Response> => {
         console.log(`📤 [${requestId}] Sending to: ${email}`);
         
         try {
+          const isRtl = /[؀-ۿ]/.test(message + title);
+          const dir = isRtl ? 'rtl' : 'ltr';
+          const messageHtml = message
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/\n/g, '<br>');
+          const ctaLabel = isRtl ? 'باز کردن اپ ریلو' : 'Open the Rilo App';
+          const ctaSub = isRtl
+            ? 'این پیام را می‌توانید داخل اپ ببینید و پاسخ دهید'
+            : 'You can read and reply to this message inside the app';
+          const unsubUrl = `https://ladybosslook.com/unsubscribe?email=${encodeURIComponent(email)}`;
+          const html = `<!DOCTYPE html>
+<html dir="${dir}" lang="${isRtl ? 'fa' : 'en'}">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#FFF7ED;font-family:-apple-system,'Segoe UI',Tahoma,Arial,sans-serif;">
+  <div style="max-width:600px;margin:0 auto;padding:24px 16px;">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#FDBA74 0%,#F97316 100%);border-radius:20px 20px 0 0;padding:28px 24px;text-align:center;">
+      <div style="color:#fff;font-size:26px;font-weight:800;letter-spacing:0.5px;">Rilo</div>
+      <div style="color:#fff;opacity:0.9;font-size:13px;margin-top:4px;">Ladybosslook Academy</div>
+    </div>
+    <!-- Content -->
+    <div style="background:#ffffff;padding:28px 24px;border-radius:0 0 20px 20px;box-shadow:0 2px 12px rgba(249,115,22,0.08);">
+      ${badge ? `<div style="display:inline-block;background:#F97316;color:#fff;padding:4px 14px;border-radius:999px;font-size:13px;font-weight:700;margin-bottom:14px;">${badge}</div>` : ''}
+      <h1 style="margin:0 0 16px;font-size:22px;line-height:1.4;color:#1c1917;">${title}</h1>
+      <div style="background:#FFF7ED;border-radius:14px;padding:20px;font-size:17px;line-height:1.9;color:#292524;border-${isRtl ? 'right' : 'left'}:4px solid #F97316;">
+        ${messageHtml}
+      </div>
+      ${targetCourse ? `<p style="font-size:14px;color:#78716c;margin:16px 0 0;"><strong>${isRtl ? 'دوره' : 'Program'}:</strong> ${targetCourse}</p>` : ''}
+      <div style="text-align:center;margin-top:26px;">
+        <a href="https://ladybosslook.com/app" style="display:inline-block;background:linear-gradient(135deg,#FB923C,#EA580C);color:#fff;padding:14px 36px;border-radius:999px;text-decoration:none;font-size:16px;font-weight:700;">${ctaLabel}</a>
+        <p style="font-size:14px;color:#78716c;margin:12px 0 0;">${ctaSub}</p>
+        <p style="font-size:13px;margin:10px 0 0;"><a href="https://ladybosslook.com/dashboard/chat" style="color:#F97316;text-decoration:none;">${isRtl ? '💬 پاسخ در چت پشتیبانی' : '💬 Reply in Support Chat'}</a></p>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div style="text-align:center;margin-top:20px;color:#a8a29e;font-size:12px;line-height:1.8;">
+      <p style="margin:4px 0;">© ${new Date().getFullYear()} Ladybosslook LLC · <a href="https://ladybosslook.com" style="color:#F97316;text-decoration:none;">ladybosslook.com</a></p>
+      <p style="margin:4px 0;"><a href="${unsubUrl}" style="color:#a8a29e;text-decoration:underline;">${isRtl ? 'لغو اشتراک ایمیل‌ها' : 'Unsubscribe from emails'}</a></p>
+    </div>
+  </div>
+</body>
+</html>`;
           const result = await resend.emails.send({
-            from: "Support Ladyboss <support@ladybosslook.com>",
+            from: "Rilo (Ladybosslook) <support@ladybosslook.com>",
             to: [email],
             subject: `${badge ? `[${badge}] ` : ''}${title}`,
-            html: `
-              <!DOCTYPE html>
-              <html>
-                <head>
-                  <meta charset="utf-8">
-                  <style>
-                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-                    .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
-                    .badge { display: inline-block; background: #10b981; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
-                    .message { background: white; padding: 20px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #667eea; }
-                    .button { display: inline-block; background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 20px; }
-                    .footer { text-align: center; margin-top: 20px; color: #6b7280; font-size: 14px; }
-                  </style>
-                </head>
-                <body>
-                  <div class="container">
-                    <div class="header">
-                      <h1 style="margin: 0;">${title}</h1>
-                    </div>
-                    <div class="content">
-                      ${badge ? `<span class="badge">${badge}</span>` : ''}
-                      <div class="message">
-                        ${message.replace(/\n/g, '<br>')}
-                      </div>
-                      ${targetCourse ? `<p><strong>Course:</strong> ${targetCourse}</p>` : ''}
-                      <a href="https://ladybosslook.com/dashboard" class="button">View in Dashboard</a>
-                      <div class="footer">
-                        <p>This announcement was sent to you based on your course enrollment.</p>
-                        <p>© ${new Date().getFullYear()} Ladybosslook Academy. All rights reserved.</p>
-                        <p><a href="https://ladybosslook.com" style="color: #667eea; text-decoration: none;">ladybosslook.com</a></p>
-                      </div>
-                    </div>
-                  </div>
-                </body>
-              </html>
-            `,
+            headers: {
+              'List-Unsubscribe': `<${unsubUrl}>`,
+              'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+            },
+            html,
           });
           
           console.log(`✅ [${requestId}] Email sent to ${email}:`, result);
