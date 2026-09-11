@@ -359,12 +359,19 @@ export function HomeMenu() {
             </section>
           )}
 
-          {/* Navigation Pages */}
+          {/* Support */}
           <section>
-            <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-              {t("menu.navigate")}
-            </h3>
-            {renderPills(navPages)}
+            <button
+              onClick={() => handleNavClick("/app/chat")}
+              className={cn(
+                "w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-full",
+                "text-[13px] font-semibold transition-all active:scale-[0.98]",
+                "text-orange-600 bg-orange-100",
+              )}
+            >
+              <Headset className="h-4 w-4" />
+              <span>{t("menu.items.support")}</span>
+            </button>
           </section>
 
           {/* Tools — icon grid */}
