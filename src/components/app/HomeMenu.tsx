@@ -222,7 +222,7 @@ export function HomeMenu() {
           )}
         >
           {item.icon}
-          <span>{t(`menu.items.${item.nameKey}`)}</span>
+          <span>{item.label ?? t(`menu.items.${item.nameKey}`)}</span>
         </button>
       ))}
     </div>
