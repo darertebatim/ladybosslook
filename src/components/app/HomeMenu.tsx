@@ -214,12 +214,6 @@ export function HomeMenu() {
     navigate("/auth");
   };
 
-  const goToLanguageSettings = () => {
-    haptic.light();
-    setOpen(false);
-    navigate("/app/settings?section=language");
-  };
-
   // Resolve user display name + initial
   const userMeta = (user?.user_metadata ?? {}) as Record<string, unknown>;
   const displayName =
