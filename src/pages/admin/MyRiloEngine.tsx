@@ -78,15 +78,12 @@ const starterPool: Array<{
   completedWhen: string;
 }> = [
   { slot: "primary_signature", priority: 95, emoji: "🚪", title: "Primary door signature", eligible: "Primary door picked", completedWhen: "User taps or skips" },
-  { slot: "secondary_signature", priority: 85, emoji: "🚪", title: "Secondary door signature", eligible: "Secondary door picked AND primary_signature done", completedWhen: "User taps or skips" },
   { slot: "browse_routines", priority: 80, emoji: "✨", title: "Browse routines (pick your first)", eligible: "No active routines AND primary_signature done", completedWhen: "Any active routine exists OR user skips" },
   { slot: "continue_routine", priority: 75, emoji: "🔥", title: "Continue routine", eligible: "Has ≥1 active routine AND primary_signature done", completedWhen: "User taps or skips" },
   { slot: "primary_deeper", priority: 70, emoji: "🔁", title: "Primary door deeper", eligible: "Primary door picked AND primary_signature done", completedWhen: "User taps or skips" },
-  { slot: "secondary_deeper", priority: 65, emoji: "🔁", title: "Secondary door deeper", eligible: "Secondary door picked AND secondary_signature done", completedWhen: "User taps or skips" },
   { slot: "selfcare_quiz", priority: 60, emoji: "🧠", title: "Self-Care Personality Quiz teaser", eligible: "Quiz not done AND no selfcare door", completedWhen: "Quiz done OR user skips" },
   { slot: "planner_intro", priority: 55, emoji: "📋", title: "Rilo Planner Onboarding teaser", eligible: "Planner intro not done AND no productivity door", completedWhen: "Planner intro done OR user skips" },
   { slot: "featured_audio", priority: 50, emoji: "🎧", title: "Featured audio (door-aware)", eligible: "A featured audio is available today", completedWhen: "User taps or skips" },
-  { slot: "secondary_audio", priority: 45, emoji: "🎧", title: "Secondary audio (extra)", eligible: "A secondary audio is available today", completedWhen: "User taps or skips" },
 ];
 
 const day3Flow = [
