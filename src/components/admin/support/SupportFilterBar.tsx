@@ -3,9 +3,10 @@ import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select, SelectContent, SelectGroup, SelectItem, SelectLabel,
+  SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { getProgramLabel } from "./supportData";
+import { getProgramLabel, parseRoundKey } from "./supportData";
 
 export type SupportStatusFilter = "all" | "open" | "resolved" | "waiting";
 export type SupportSort = "recent" | "oldest" | "unread";
@@ -22,14 +23,20 @@ interface Props {
   program: string;
   onProgram: (v: string) => void;
   programCounts: Array<{ slug: string; count: number }>;
+  roundCounts: Array<{ key: string; count: number }>;
   total: number;
   unreadTotal: number;
 }
 
 export function SupportFilterBar({
   search, onSearch, unreadOnly, onUnreadOnly, status, onStatus,
-  sort, onSort, program, onProgram, programCounts, total, unreadTotal,
+  sort, onSort, program, onProgram, programCounts, roundCounts, total, unreadTotal,
 }: Props) {
+  const selectedLabel = program === "all"
+    ? `All programs (${total})`
+    : program.includes("::")
+      ? (() => { const r = parseRoundKey(program); return `${getProgramLabel(r.slug)} · ${r.label}`; })()
+      : getProgramLabel(program);
   return (
     <div className="border rounded-lg bg-background p-3 space-y-2 mb-4">
       <div className="flex flex-col md:flex-row gap-2">
@@ -42,6 +49,29 @@ export function SupportFilterBar({
             className="pl-9 h-9"
           />
         </div>
+        <Select value={program} onValueChange={onProgram}>
+          <SelectTrigger className="h-9 w-full md:w-56">
+            <SelectValue placeholder="All programs">{selectedLabel}</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All programs ({total})</SelectItem>
+            {programCounts.map(({ slug, count }) => {
+              const rounds = roundCounts.filter(r => parseRoundKey(r.key).slug === slug);
+              return (
+                <SelectGroup key={slug}>
+                  <SelectItem value={slug} className="font-medium">
+                    {getProgramLabel(slug)} ({count})
+                  </SelectItem>
+                  {rounds.map(({ key, count: rc }) => (
+                    <SelectItem key={key} value={key} className="pl-6 text-muted-foreground">
+                      {parseRoundKey(key).label} ({rc})
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              );
+            })}
+          </SelectContent>
+        </Select>
         <Select value={status} onValueChange={(v) => onStatus(v as SupportStatusFilter)}>
           <SelectTrigger className="h-9 w-full md:w-44"><SelectValue /></SelectTrigger>
           <SelectContent>
@@ -61,14 +91,7 @@ export function SupportFilterBar({
         </Select>
       </div>
 
-      <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
-        <Badge
-          variant={program === "all" ? "default" : "outline"}
-          className="cursor-pointer text-xs shrink-0"
-          onClick={() => onProgram("all")}
-        >
-          All ({total})
-        </Badge>
+      <div className="flex gap-1.5">
         <Badge
           variant={unreadOnly ? "default" : "outline"}
           className={cn(
@@ -81,16 +104,6 @@ export function SupportFilterBar({
         >
           Unread ({unreadTotal})
         </Badge>
-        {programCounts.map(({ slug, count }) => (
-          <Badge
-            key={slug}
-            variant={program === slug ? "default" : "outline"}
-            className="cursor-pointer text-xs shrink-0"
-            onClick={() => onProgram(program === slug ? "all" : slug)}
-          >
-            {getProgramLabel(slug)} ({count})
-          </Badge>
-        ))}
       </div>
     </div>
   );

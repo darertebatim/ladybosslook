@@ -14,6 +14,7 @@ import {
 import { NewMessageDialog } from "@/components/admin/support/NewMessageDialog";
 import {
   conversationEmail,
+  conversationMatchesProgram,
   conversationName,
   fetchSupportConversations,
   type SupportConversation,
@@ -104,6 +105,14 @@ export default function Support() {
       .sort((a, b) => b.count - a.count);
   }, [conversations]);
 
+  const roundCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    conversations.forEach(c => c.rounds?.forEach(r => map.set(r, (map.get(r) || 0) + 1)));
+    return Array.from(map.entries())
+      .map(([key, count]) => ({ key, count }))
+      .sort((a, b) => a.key.localeCompare(b.key));
+  }, [conversations]);
+
   const unreadTotal = useMemo(
     () => conversations.filter(c => c.unread_count_admin > 0).length,
     [conversations]
@@ -118,7 +127,7 @@ export default function Support() {
         conversationName(c).toLowerCase().includes(term) ||
         conversationEmail(c).toLowerCase().includes(term) ||
         (c.last_message || "").toLowerCase().includes(term);
-      const matchesProgram = program === "all" || c.programs?.includes(program);
+      const matchesProgram = conversationMatchesProgram(c, program);
       const matchesUnread = !unreadOnly || c.unread_count_admin > 0;
       const waiting =
         c.last_sender_type === 'user' &&
@@ -170,6 +179,7 @@ export default function Support() {
       program={program}
       onProgram={setProgram}
       programCounts={programCounts}
+      roundCounts={roundCounts}
       total={conversations.length}
       unreadTotal={unreadTotal}
     />

@@ -20,6 +20,8 @@ export interface SupportConversation {
   last_message?: string | null;
   last_sender_type?: string | null;
   programs?: string[];
+  /** Round keys in the form "slug::Round label" */
+  rounds?: string[];
   orders_count?: number;
   total_spent?: number;
   /** legacy shape kept for compatibility with older callers */
@@ -35,6 +37,19 @@ export function getProgramLabel(slug: string): string {
     PROGRAM_LABELS[slug] ||
     slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
   );
+}
+
+/** Splits a round key "slug::Round label" into its parts. */
+export function parseRoundKey(key: string): { slug: string; label: string } {
+  const idx = key.indexOf("::");
+  if (idx === -1) return { slug: key, label: key };
+  return { slug: key.slice(0, idx), label: key.slice(idx + 2) };
+}
+
+/** True when a filter value matches the conversation (program slug or round key). */
+export function conversationMatchesProgram(c: SupportConversation, filter: string): boolean {
+  if (filter === "all") return true;
+  return !!c.programs?.includes(filter) || !!c.rounds?.includes(filter);
 }
 
 export function conversationName(c: SupportConversation): string {
@@ -62,6 +77,7 @@ export async function fetchSupportConversations(
   return ((data || []) as SupportConversation[]).map((c) => ({
     ...c,
     programs: c.programs || [],
+    rounds: c.rounds || [],
     profiles: {
       full_name: c.display_name ?? null,
       email: c.email ?? "",
