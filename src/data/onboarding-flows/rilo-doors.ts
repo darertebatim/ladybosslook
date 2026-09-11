@@ -48,13 +48,6 @@ export const riloDoorsFlow: OnboardingFlow = {
       title: 'Which door is yours\nright now?',
       subtitle: 'Pick the one that needs you most.',
     },
-    {
-      id: 'rd-door-secondary',
-      type: 'door-cards-glass',
-      doorSlot: 'secondary',
-      title: 'And a second one?',
-      subtitle: 'Optional — you can always add more later.',
-    },
     /* ─── Sharpeners (only one runs based on primary) ─── */
     {
       id: 'rd-sharp-emotion',
