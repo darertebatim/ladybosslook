@@ -36,7 +36,6 @@ export function MyLearningCard() {
     nextLesson,
     nextLessonModuleIndex,
     nextLessonIndexInModule,
-    totalLessons,
     completedCount,
     waitingCount,
     documentCount,
@@ -67,7 +66,6 @@ export function MyLearningCard() {
 
   const round = enrollment.program_rounds;
   const programPath = `/app/programs/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`;
-  const percent = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
   const sessionDate = !isSelfPaced ? nextSessionDate || round?.first_session_date || null : null;
 
@@ -121,19 +119,25 @@ export function MyLearningCard() {
       {/* Continue where you left off */}
       {courseId && nextLesson && (
         <div className="mx-3 mt-1 overflow-hidden rounded-2xl border border-border-warm bg-card-warm">
-          <div className="relative flex aspect-[16/6] items-center justify-center bg-gradient-orange">
-            <GraduationCap className="h-9 w-9 text-white/90" />
+          <div className="relative flex aspect-[16/5] items-center justify-center bg-gradient-orange">
+            {waitingCount > 0 && (
+              <span className="absolute top-2 left-2.5 flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold text-white">
+                <Sparkles className="h-3 w-3" />
+                Just unlocked
+              </span>
+            )}
+            <GraduationCap className="h-8 w-8 text-white/90" />
             {nextLessonModuleIndex && (
               <span className="absolute bottom-2 right-2.5 rounded-full bg-black/35 px-2 py-0.5 text-[10px] font-bold text-white">
                 Module {nextLessonModuleIndex} · Lesson {nextLessonIndexInModule}
               </span>
             )}
           </div>
-          <div className="p-3.5">
+          <div className="p-3">
             <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-fg-warm-muted">
               {completedCount > 0 ? 'Continue where you left off' : 'Start here'}
             </p>
-            <p className="mt-1 mb-2.5 text-sm font-bold leading-snug text-fg-warm line-clamp-2">
+            <p className="mt-0.5 mb-2 text-sm font-bold leading-snug text-fg-warm line-clamp-2">
               {nextLesson.title}
             </p>
             <button
@@ -166,39 +170,6 @@ export function MyLearningCard() {
         </div>
       )}
 
-      {/* Progress */}
-      {totalLessons > 0 && (
-        <div className="px-4 pt-3">
-          <div className="mb-1.5 flex justify-between text-[11.5px] font-semibold">
-            <span className="text-fg-warm">
-              {completedCount} of {totalLessons} lessons done
-            </span>
-            {waitingCount > 0 && (
-              <span className="text-fg-warm-muted">{waitingCount} unlocked &amp; waiting</span>
-            )}
-          </div>
-          <div className="h-2 overflow-hidden rounded-full bg-peach">
-            <div
-              className="h-full rounded-full bg-gradient-orange transition-[width] duration-700"
-              style={{ width: `${percent}%` }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Just unlocked */}
-      {waitingCount > 0 && nextLesson && (
-        <div className="mx-3 mt-3 rounded-2xl bg-mint/60 px-3 py-2.5">
-          <p className="mb-1 flex items-center gap-1.5 text-[10.5px] font-extrabold uppercase tracking-[0.1em] text-fg-warm">
-            <Sparkles className="h-3.5 w-3.5 text-brand" />
-            Just unlocked
-          </p>
-          <p className="text-[12.5px] font-semibold text-fg-warm line-clamp-1">
-            {nextLesson.title}
-            {waitingCount > 1 ? ` +${waitingCount - 1} more` : ''}
-          </p>
-        </div>
-      )}
 
       {/* Next live session / self-paced start */}
       {sessionDate ? (
