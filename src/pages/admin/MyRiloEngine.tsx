@@ -89,7 +89,6 @@ const starterPool: Array<{
 const day3Flow = [
   { emoji: "💛", title: "Mood check-in", meta: "Same as Standard Flow — opens the day", kind: "mood", isNew: true },
   { emoji: "🌱", title: "Habit cement: today's routine", meta: "Lead with routine — turns 'try' into 'rhythm'", kind: "routine", isNew: true },
-  { emoji: "🚪", title: "Secondary door deeper step", meta: "Keeps secondary alive", kind: "door_deeper" },
   { emoji: "🎧", title: "Featured audio", meta: "Door-aware pick — bilingual playlist for immigrant; solo emotion-tagged meditation/sleep story for emotion", kind: "playlist" },
   { emoji: "🌬️", title: "Check In (door-flavored)", meta: "See Vocabulary card above", kind: "reset" },
   { emoji: "🏆", title: "Streak + affirmation", meta: "Always last", kind: "reward" },
