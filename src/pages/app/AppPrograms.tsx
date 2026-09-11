@@ -204,7 +204,7 @@ const AppCourses = () => {
                   : ""
               }`}
               onClick={() => haptic.light()}
-              className="block rounded-3xl bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-primary-dark))] p-5 text-white shadow-ios active:scale-[0.99] transition-transform"
+              className="block rounded-3xl bg-gradient-orange p-5 text-white shadow-ios active:scale-[0.99] transition-transform"
             >
               <div className="text-xs uppercase tracking-wide opacity-90">
                 Next live session
