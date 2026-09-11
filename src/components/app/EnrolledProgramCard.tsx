@@ -29,7 +29,6 @@ interface EnrolledProgramCardProps {
     } | null;
     status?: string | null;
   };
-  coverImage?: string | null;
   isCompleted?: boolean;
   nextSessionDate?: string | null;
   nextContent?: { title: string; countdownText: string } | null;
@@ -39,7 +38,6 @@ interface EnrolledProgramCardProps {
 
 export const EnrolledProgramCard = memo(function EnrolledProgramCard({
   enrollment,
-  coverImage,
   isCompleted = false,
   nextSessionDate,
   nextContent,
