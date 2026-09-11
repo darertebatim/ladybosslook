@@ -287,7 +287,7 @@ function MaterialTile({
   label,
 }: {
   to: string | null;
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
 }) {
   if (!to) return null;
