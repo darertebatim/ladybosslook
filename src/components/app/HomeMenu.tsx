@@ -110,6 +110,22 @@ const toolItems: NavItem[] = [
     color: "text-amber-600 bg-amber-100",
   },
   {
+    id: "chats",
+    nameKey: "chats",
+    label: "Chats",
+    icon: <MessagesSquare className="h-4 w-4" />,
+    route: "/app/channels",
+    color: "text-rose-600 bg-rose-100",
+  },
+  {
+    id: "presence",
+    nameKey: "presence",
+    label: "Presence",
+    icon: <Activity className="h-4 w-4" />,
+    route: "/app/presence",
+    color: "text-red-600 bg-red-100",
+  },
+  {
     id: "academy",
     nameKey: "riloAcademy",
     icon: <GraduationCap className="h-4 w-4" />,
