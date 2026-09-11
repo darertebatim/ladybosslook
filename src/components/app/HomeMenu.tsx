@@ -106,20 +106,6 @@ const toolItems: NavItem[] = [
     color: "text-amber-600 bg-amber-100",
   },
   {
-    id: "routines",
-    nameKey: "routines",
-    icon: <CalendarPlus className="h-4 w-4" />,
-    route: "/app/routines",
-    color: "text-emerald-600 bg-emerald-100",
-  },
-  {
-    id: "selfCareGoals",
-    nameKey: "selfCareGoals",
-    icon: <Target className="h-4 w-4" />,
-    route: "/app/tasksbank",
-    color: "text-rose-600 bg-rose-100",
-  },
-  {
     id: "academy",
     nameKey: "riloAcademy",
     icon: <GraduationCap className="h-4 w-4" />,
