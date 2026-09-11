@@ -1,11 +1,10 @@
 // MyLearningMock — visual mockup of the "My Learning" section on Path.
 // Self-contained demo: no real data, isolated styling, for review only.
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Play, Calendar, Lock, ChevronRight, Check, Clock, Flame, Award,
+  Play, Calendar, ChevronRight, Check, Flame, Award,
   Headphones, BookOpen, Folder, Headset, GraduationCap, Sparkles,
-  Music, Video, X,
+  Music, Video,
 } from 'lucide-react';
 import appIcon from '@/assets/app-icon.png';
 
