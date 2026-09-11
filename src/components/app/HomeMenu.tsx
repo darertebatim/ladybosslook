@@ -243,20 +243,28 @@ export function HomeMenu() {
 
   const renderPills = (items: NavItem[]) => (
     <div className="flex flex-wrap gap-2">
-      {items.map((item) => (
-        <button
-          key={item.id}
-          onClick={() => handleNavClick(item.route)}
-          className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-full",
-            "text-[13px] font-medium transition-all active:scale-95",
-            item.color,
-          )}
-        >
-          {item.icon}
-          <span>{t(`menu.items.${item.nameKey}`)}</span>
-        </button>
-      ))}
+      {items.map((item) => {
+        const showBadge = item.id === "chat" && unreadCount > 0;
+        return (
+          <button
+            key={item.id}
+            onClick={() => handleNavClick(item.route)}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-full",
+              "text-[13px] font-medium transition-all active:scale-95",
+              item.color,
+            )}
+          >
+            <span className="relative">
+              {item.icon}
+              {showBadge && (
+                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
+              )}
+            </span>
+            <span>{t(`menu.items.${item.nameKey}`)}</span>
+          </button>
+        );
+      })}
     </div>
   );
 
