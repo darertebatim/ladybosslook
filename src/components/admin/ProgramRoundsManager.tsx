@@ -653,8 +653,9 @@ export const ProgramRoundsManager = () => {
                     </TableCell>
                   </TableRow>
                 ))}
-              </TableBody>
-            </Table>
+                </TableBody>
+              </Table>
+            </div>
           ) : (
             <p className="text-muted-foreground">No rounds created yet. Click "Create New Round" to get started.</p>
           )}
