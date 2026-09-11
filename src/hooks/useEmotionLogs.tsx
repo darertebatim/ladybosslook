@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { startOfDay, differenceInDays } from 'date-fns';
 import type { Valence } from '@/lib/emotionData';
 import { Analytics } from '@/lib/firebaseAnalytics';
+import { recordStreakActivity } from '@/lib/streakActivity';
 import { runWithOfflineFallback } from '@/lib/offline/runWithOfflineFallback';
 import {
   WELLNESS_EXECUTOR_TYPES,
@@ -129,6 +130,7 @@ export const useEmotionLogs = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['emotion-logs', user?.id] });
       try { Analytics.moodLogged(data.emotion); } catch { /* ignore */ }
+      recordStreakActivity(user?.id, 'mood', queryClient);
     },
     onError: (error) => {
       console.error('Failed to save emotion log:', error);

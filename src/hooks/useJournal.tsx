@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 import { useAutoCompleteProTask } from './useAutoCompleteProTask';
+import { recordStreakActivity } from '@/lib/streakActivity';
 
 export interface JournalEntry {
   id: string;
@@ -108,6 +109,8 @@ export const useCreateJournalEntry = () => {
       queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
       queryClient.invalidateQueries({ queryKey: ['reflection-notes'] });
       await autoCompleteJournal();
+      // Writing a reflection keeps the streak alive
+      recordStreakActivity(user?.id, 'journal', queryClient);
     },
     onError: (error) => {
       console.error('Failed to create journal entry:', error);
