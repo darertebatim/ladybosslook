@@ -126,7 +126,7 @@ export default function Support() {
         conversationName(c).toLowerCase().includes(term) ||
         conversationEmail(c).toLowerCase().includes(term) ||
         (c.last_message || "").toLowerCase().includes(term);
-      const matchesProgram = program === "all" || c.programs?.includes(program);
+      const matchesProgram = conversationMatchesProgram(c, program);
       const matchesUnread = !unreadOnly || c.unread_count_admin > 0;
       const waiting =
         c.last_sender_type === 'user' &&
@@ -178,6 +178,7 @@ export default function Support() {
       program={program}
       onProgram={setProgram}
       programCounts={programCounts}
+      roundCounts={roundCounts}
       total={conversations.length}
       unreadTotal={unreadTotal}
     />
