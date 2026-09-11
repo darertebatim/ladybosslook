@@ -22,7 +22,7 @@ interface ProgramEventCardProps {
   date: Date;
 }
 
-const EVENT_STYLES = {
+export const EVENT_STYLES = {
   session: {
     tintBg: 'bg-lavender',
     doneBg: 'bg-lavender-mid',
