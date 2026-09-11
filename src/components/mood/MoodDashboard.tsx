@@ -503,14 +503,16 @@ export function MoodDashboard() {
       />
 
       {/* Routine Prompt Sheet - shown before celebration if not in routine */}
-      <MoodRoutinePromptSheet
-        open={showRoutinePrompt}
-        onOpenChange={setShowRoutinePrompt}
-        mood={selectedMood}
-        onAddToRoutine={handleRoutinePromptAdd}
-        onSkip={handleRoutinePromptSkip}
-        onNever={handleRoutinePromptNever}
-      />
+      {MOOD_ROUTINE_PROMPT_ENABLED && (
+        <MoodRoutinePromptSheet
+          open={showRoutinePrompt}
+          onOpenChange={setShowRoutinePrompt}
+          mood={selectedMood}
+          onAddToRoutine={handleRoutinePromptAdd}
+          onSkip={handleRoutinePromptSkip}
+          onNever={handleRoutinePromptNever}
+        />
+      )}
 
       {/* Mood Celebration Sheet */}
       <MoodCelebrationSheet
