@@ -173,66 +173,57 @@ export function MyLearningCard() {
       )}
 
 
-      {/* My Programs + Next live session / self-paced start */}
+      {/* Next live session / self-paced start + My Programs */}
       <div className="mx-3 mt-3 grid grid-cols-[3fr_1fr] gap-2">
-        <Link
-          to="/app/programs"
-          onClick={() => haptic.light()}
-          className="flex items-center gap-2.5 rounded-2xl bg-peach px-3 py-2.5 active:opacity-90"
-        >
-          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-card-warm">
-            <LayoutGrid className="h-4 w-4 text-brand" />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-[12.5px] font-bold leading-tight text-fg-warm line-clamp-1">
-              My Programs
-            </span>
-            <span className="block text-[11.5px] leading-tight text-fg-warm-muted line-clamp-1">
-              Rounds, sessions &amp; materials
-            </span>
-          </span>
-          <ChevronRight className="h-4 w-4 flex-shrink-0 text-fg-warm-muted" />
-        </Link>
-
         {sessionDate ? (
           <Link
             to={programPath}
             onClick={() => haptic.light()}
-            className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-peach px-2 py-2.5 text-brand active:opacity-90"
+            className="flex items-center gap-2.5 rounded-2xl bg-peach px-3 py-2.5 active:opacity-90"
           >
             <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-card-warm">
               <CalendarClock className="h-4 w-4 text-brand" />
             </span>
-            <span className="text-center">
-              <span className="block text-[10.5px] font-extrabold leading-tight text-fg-warm line-clamp-1">
-                Next live
+            <span className="min-w-0 flex-1">
+              <span className="block text-[12.5px] font-bold leading-tight text-fg-warm line-clamp-1">
+                Next live session
               </span>
-              <span className="block text-[9.5px] leading-tight text-fg-warm-muted line-clamp-1">
+              <span className="block text-[11.5px] leading-tight text-fg-warm-muted line-clamp-1">
                 {isToday(new Date(sessionDate))
-                  ? format(new Date(sessionDate), 'h:mm a')
-                  : format(new Date(sessionDate), 'MMM d')}
+                  ? `Today · ${format(new Date(sessionDate), 'h:mm a')}`
+                  : format(new Date(sessionDate), 'EEE, MMM d · h:mm a')}
               </span>
             </span>
+            <ChevronRight className="h-4 w-4 flex-shrink-0 text-fg-warm-muted" />
           </Link>
         ) : (
           <Link
             to={programPath}
             onClick={() => haptic.light()}
-            className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-peach px-2 py-2.5 text-brand active:opacity-90"
+            className="flex items-center gap-2.5 rounded-2xl bg-peach px-3 py-2.5 active:opacity-90"
           >
             <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-card-warm">
               <CalendarClock className="h-4 w-4 text-brand" />
             </span>
-            <span className="text-center">
-              <span className="block text-[10.5px] font-extrabold leading-tight text-fg-warm line-clamp-1">
-                Self paced
+            <span className="min-w-0 flex-1">
+              <span className="block text-[12.5px] font-bold leading-tight text-fg-warm line-clamp-1">
+                Learn at your own pace
               </span>
-              <span className="block text-[9.5px] leading-tight text-fg-warm-muted line-clamp-1">
-                {enrolledAt ? format(new Date(enrolledAt), 'MMM d') : 'Start'}
+              <span className="block text-[11.5px] leading-tight text-fg-warm-muted line-clamp-1">
+                {enrolledAt ? `Started ${format(new Date(enrolledAt), 'MMM d, yyyy')}` : 'No live sessions'}
               </span>
             </span>
+            <ChevronRight className="h-4 w-4 flex-shrink-0 text-fg-warm-muted" />
           </Link>
         )}
+        <Link
+          to="/app/programs"
+          onClick={() => haptic.light()}
+          className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-peach py-2.5 text-brand active:opacity-90"
+        >
+          <LayoutGrid className="h-4 w-4" />
+          <span className="text-[10.5px] font-extrabold text-fg-warm">My Programs</span>
+        </Link>
       </div>
 
 
