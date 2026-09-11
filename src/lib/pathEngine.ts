@@ -54,9 +54,7 @@ export interface PathStep {
 
 export type StarterPoolSlot =
   | "primary_signature"
-  | "secondary_signature"
   | "primary_deeper"
-  | "secondary_deeper"
   | "browse_routines"
   | "continue_routine"
   | "selfcare_quiz"
@@ -182,7 +180,6 @@ export interface PathInputs {
    *  builder runs instead of the legacy buildStandardPath. */
   doorContext?: {
     primary: DoorKey | null;
-    secondary: DoorKey | null;
     emotionKeys: string[]; // raw picker keys (e.g. "lonely", "anxious")
     immigrantKeys: string[];
     financialKeys?: string[];
@@ -373,7 +370,6 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
   const steps: PathStep[] = [];
 
   const primary = ctx.primary;
-  const secondary = ctx.secondary;
 
   // ── Mood check-in ──
   // Spec: Day 1 puts the primary signature first (the "wow"), then mood.
@@ -402,9 +398,7 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
     steps.push(moodStep);
     steps.push(buildResetStep(inputs));
   } else if (day === 1) {
-    // Day 2 — secondary signature + primary booster + continue routine + check in
-    const sec = secondary ? signatureStepForDoor(secondary, inputs) : null;
-    if (sec) steps.push(sec);
+    // Day 2 — primary booster + continue routine + check in
     const primaryBooster = primary
       ? deeperStepForDoor(primary, inputs, { kicker: "More from your door", tint: "mint" })
       : null;
@@ -441,12 +435,12 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
     } else {
       steps.push(browseRoutinesStep());
     }
-    // Secondary door deeper step — keeps the secondary thread alive (spec slot #3).
-    const secondaryDeeper = secondary
-      ? deeperStepForDoor(secondary, inputs, { kicker: "Keep your secondary alive" })
+    // Deeper step from the user's door — keeps the thread alive (spec slot #3).
+    const primaryDeeper = primary
+      ? deeperStepForDoor(primary, inputs, { kicker: "Go deeper" })
       : null;
-    if (secondaryDeeper && !steps.some((s) => s.id === secondaryDeeper.id)) {
-      steps.push(secondaryDeeper);
+    if (primaryDeeper && !steps.some((s) => s.id === primaryDeeper.id)) {
+      steps.push(primaryDeeper);
     }
     if (inputs.featuredAudio) steps.push(audioToStep(inputs.featuredAudio));
     steps.push(buildResetStep(inputs));
@@ -458,7 +452,7 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
   }
 
   // ── Always-on teasers: quiz + planner onboarding when missing ──────
-  const doors = new Set<DoorKey | null>([primary, secondary]);
+  const doors = new Set<DoorKey | null>([primary]);
   const hasSelfcareDoor = doors.has("selfcare");
   const hasProductivityDoor = doors.has("productivity");
   if (!hasSelfcareDoor && !inputs.hasPersonalityResult && !steps.some((s) => s.id === "quiz_pick:onboarding")) {
@@ -860,9 +854,8 @@ interface PoolCandidate {
 function buildPoolCandidates(inputs: PathInputs): PoolCandidate[] {
   const ctx = inputs.doorContext ?? null;
   const primary = ctx?.primary ?? null;
-  const secondary = ctx?.secondary ?? null;
-  const hasSelfcareDoor = primary === "selfcare" || secondary === "selfcare";
-  const hasProductivityDoor = primary === "productivity" || secondary === "productivity";
+  const hasSelfcareDoor = primary === "selfcare";
+  const hasProductivityDoor = primary === "productivity";
   const completed = getStarterPoolCompleted();
   const tag = (s: PathStep | null, slot: StarterPoolSlot): PathStep | null =>
     s ? { ...s, poolSlot: slot } : null;
@@ -882,14 +875,6 @@ function buildPoolCandidates(inputs: PathInputs): PoolCandidate[] {
       eligible: inputs.activeRoutines.length === 0 && completed.has("primary_signature"),
       derivedDone: inputs.activeRoutines.length > 0,
       build: () => tag(browseRoutinesStep(), "browse_routines"),
-    },
-    {
-      slot: "secondary_signature",
-      priority: 85,
-      // Only after primary signature is done.
-      eligible: !!secondary && completed.has("primary_signature"),
-      derivedDone: false,
-      build: () => tag(secondary ? signatureStepForDoor(secondary, inputs) : null, "secondary_signature"),
     },
     {
       slot: "continue_routine",
@@ -918,16 +903,6 @@ function buildPoolCandidates(inputs: PathInputs): PoolCandidate[] {
       build: () => tag(
         primary ? deeperStepForDoor(primary, inputs, { kicker: "More from your door", tint: "peach" }) : null,
         "primary_deeper",
-      ),
-    },
-    {
-      slot: "secondary_deeper",
-      priority: 65,
-      eligible: !!secondary && completed.has("secondary_signature"),
-      derivedDone: false,
-      build: () => tag(
-        secondary ? deeperStepForDoor(secondary, inputs, { kicker: "Keep your secondary alive", tint: "peach" }) : null,
-        "secondary_deeper",
       ),
     },
     {
