@@ -90,13 +90,23 @@ const AppCourses = () => {
   );
 
   // Sort active rounds: prioritize those with actual scheduled sessions, then by nearest date
+  // Effective upcoming session: a real scheduled session, or the round's
+  // first_session_date when it's still in the future.
+  const upcomingSessionFor = (e: any): string | null => {
+    const roundId = e.program_rounds?.id;
+    const scheduled = roundId ? nextSessionMap[roundId] : null;
+    if (scheduled) return scheduled;
+    const first = e.program_rounds?.first_session_date;
+    if (first && new Date(first).getTime() > Date.now() - 2 * 60 * 60 * 1000) return first;
+    return null;
+  };
+
   const sortedActiveRounds = [...activeRounds].sort((a, b) => {
     const aRoundId = a.program_rounds?.id;
     const bRoundId = b.program_rounds?.id;
 
-    // Get next session from map (actual scheduled sessions)
-    const aNextSession = aRoundId ? nextSessionMap[aRoundId] : null;
-    const bNextSession = bRoundId ? nextSessionMap[bRoundId] : null;
+    const aNextSession = upcomingSessionFor(a);
+    const bNextSession = upcomingSessionFor(b);
 
     // Check if program has actual content drip schedule
     const aNextContent = aRoundId ? nextContentMap[aRoundId] : null;
@@ -111,6 +121,7 @@ const AppCourses = () => {
     // Programs with scheduled sessions come first
     if (aHasScheduledSession && !bHasScheduledSession) return -1;
     if (!aHasScheduledSession && bHasScheduledSession) return 1;
+
 
     // If both have sessions OR both don't, check content schedule
     if (aHasContentSchedule && !bHasContentSchedule) return -1;
