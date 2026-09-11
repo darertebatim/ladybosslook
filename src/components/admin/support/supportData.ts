@@ -20,6 +20,8 @@ export interface SupportConversation {
   last_message?: string | null;
   last_sender_type?: string | null;
   programs?: string[];
+  /** Round keys in the form "slug::Round label" */
+  rounds?: string[];
   orders_count?: number;
   total_spent?: number;
   /** legacy shape kept for compatibility with older callers */
@@ -62,6 +64,7 @@ export async function fetchSupportConversations(
   return ((data || []) as SupportConversation[]).map((c) => ({
     ...c,
     programs: c.programs || [],
+    rounds: c.rounds || [],
     profiles: {
       full_name: c.display_name ?? null,
       email: c.email ?? "",
