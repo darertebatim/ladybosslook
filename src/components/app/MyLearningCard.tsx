@@ -173,7 +173,7 @@ export function MyLearningCard() {
 
 
       {/* Next live session / self-paced start + My Programs */}
-      <div className="mx-3 mt-3 grid grid-cols-[2fr_1fr] gap-2">
+      <div className="mx-3 mt-3 grid grid-cols-[3fr_1fr] gap-2">
         {sessionDate ? (
           <Link
             to={programPath}
