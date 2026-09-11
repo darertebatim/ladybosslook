@@ -143,6 +143,7 @@ const Navigation = () => {
           </div>
 
           <div className="md:hidden flex items-center gap-2">
+            <SupportChatIcon />
             <Link to="/app/path">
               <Button
                 variant="ghost"
