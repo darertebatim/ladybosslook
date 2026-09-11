@@ -3922,6 +3922,30 @@ export type Database = {
           },
         ]
       }
+      learn_course_update_reads: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          lesson_id: string
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          lesson_id: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       learn_courses: {
         Row: {
           available_on_mobile: boolean

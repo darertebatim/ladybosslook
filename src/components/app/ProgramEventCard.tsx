@@ -79,6 +79,30 @@ const EVENT_STYLES = {
     badge: 'New Audio',
     badgeClass: 'bg-secondary text-secondary-foreground',
   },
+  course_access: {
+    tintBg: 'bg-sky',
+    doneBg: 'bg-sky-mid',
+    settingsBg: 'bg-sky-mid',
+    emoji: '📚',
+    badge: 'New Course',
+    badgeClass: 'bg-secondary text-secondary-foreground',
+  },
+  course_update: {
+    tintBg: 'bg-sky',
+    doneBg: 'bg-sky-mid',
+    settingsBg: 'bg-sky-mid',
+    emoji: '🆕',
+    badge: 'New Lesson',
+    badgeClass: 'bg-secondary text-secondary-foreground',
+  },
+  lesson: {
+    tintBg: 'bg-lavender',
+    doneBg: 'bg-lavender-mid',
+    settingsBg: 'bg-lavender-mid',
+    emoji: '🔓',
+    badge: 'Lesson Unlocked',
+    badgeClass: 'bg-secondary text-secondary-foreground',
+  },
 };
 
 export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
@@ -146,7 +170,11 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
   const isRoundUpdate = event.type === 'round_update';
   const isPlaylistSave = event.type === 'playlist_save';
   const isPlaylistUpdate = event.type === 'playlist_update';
-  const isSpecialCard = isRoundUpdate || isPlaylistUpdate;
+  const isCourseAccess = event.type === 'course_access';
+  const isCourseUpdate = event.type === 'course_update';
+  const isLessonUnlock = event.type === 'lesson';
+  const isCourseEvent = isCourseAccess || isCourseUpdate || isLessonUnlock;
+  const isSpecialCard = isRoundUpdate || isPlaylistUpdate || isCourseUpdate;
   const isPlaylistEvent = isPlaylistSave || isPlaylistUpdate;
 
   const handleCardClick = async () => {
@@ -192,9 +220,29 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
       }
     }
 
+    // Mark course_update lessons as read on tap
+    if (isCourseUpdate && event.courseId) {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+        const ids = event.lessonIds || [];
+        if (user && ids.length > 0) {
+          await supabase.from('learn_course_update_reads').insert(
+            ids.map((lesson_id) => ({
+              user_id: user.id,
+              course_id: event.courseId!,
+              lesson_id,
+            }))
+          );
+        }
+      } catch (err) {
+        console.error('Failed to mark course update as read:', err);
+      }
+    }
+
     // Auto-complete on tap (for completable event types)
     if (!event.isCompleted && !isFutureDate && !isSpecialCard) {
-      const eventType = event.type as 'session' | 'module' | 'track' | 'enrollment' | 'playlist_save';
+      const eventType = event.type as 'session' | 'module' | 'track' | 'enrollment' | 'playlist_save' | 'course_access' | 'lesson';
       completeProgramEvent.mutate({ eventType, eventId: event.id, date });
     }
 
@@ -214,6 +262,19 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
       case 'playlist_update':
         if (event.playlistId) {
           navigate(`/app/player/playlist/${event.playlistId}`, { state: { from: location.pathname } });
+        }
+        break;
+      case 'lesson':
+        if (event.courseId && event.lessonId) {
+          navigate(`/app/learn/${event.courseId}/${event.lessonId}`, { state: { from: location.pathname } });
+        } else if (event.courseId) {
+          navigate(`/app/learn/${event.courseId}`, { state: { from: location.pathname } });
+        }
+        break;
+      case 'course_access':
+      case 'course_update':
+        if (event.courseId) {
+          navigate(`/app/learn/${event.courseId}`, { state: { from: location.pathname } });
         }
         break;
     }
@@ -260,7 +321,7 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
               </span>
               
               {/* Settings icon */}
-              {!isPlaylistEvent && (
+              {!isPlaylistEvent && !isCourseEvent && (
                 <button
                   onClick={handleSettingsClick}
                   className={cn("p-1 rounded-full transition-colors", style.settingsBg)}
@@ -280,7 +341,11 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
               'text-fg-warm text-[15px] font-semibold leading-tight transition-all truncate',
               event.isCompleted && 'line-through'
             )}>
-              {isPlaylistUpdate && event.audioTitle ? event.audioTitle : event.title}
+              {isPlaylistUpdate && event.audioTitle
+                ? event.audioTitle
+                : isCourseUpdate && event.lessonTitle
+                  ? event.lessonTitle
+                  : event.title}
             </p>
             
             {/* Subtitle */}
@@ -289,6 +354,9 @@ export const ProgramEventCard = ({ event, date }: ProgramEventCardProps) => {
                isRoundUpdate ? 'Tap to see changes →' :
                isPlaylistSave ? 'Tap to start listening →' :
                isPlaylistUpdate ? `New in ${event.title} • Tap to listen →` :
+               isCourseAccess ? 'Tap to start your course →' :
+               isCourseUpdate ? `New in ${event.title} • Tap to open →` :
+               isLessonUnlock ? `${event.courseTitle ?? 'Course'} • Tap to start →` :
                event.type === 'session' ? 'Tap to join your session →' :
                event.type === 'track' ? 'Tap to listen →' :
                event.type === 'module' ? 'Tap to view module →' :

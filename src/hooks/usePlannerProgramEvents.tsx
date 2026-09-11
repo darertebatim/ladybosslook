@@ -5,7 +5,7 @@ import { format, isSameDay, isWithinInterval, startOfDay, endOfDay } from 'date-
 
 export interface ProgramEvent {
   id: string;
-  type: 'session' | 'module' | 'track' | 'enrollment' | 'round_update' | 'playlist_save' | 'playlist_update';
+  type: 'session' | 'module' | 'track' | 'enrollment' | 'round_update' | 'playlist_save' | 'playlist_update' | 'course_access' | 'course_update' | 'lesson';
   title: string;
   programSlug?: string;
   programTitle?: string;
@@ -26,6 +26,13 @@ export interface ProgramEvent {
   // Aggregated playlist_update specific
   audioIds?: string[];
   audioCount?: number;
+  // Course-event specific
+  courseId?: string;
+  courseTitle?: string;
+  lessonId?: string;
+  lessonIds?: string[];
+  lessonCount?: number;
+  lessonTitle?: string;
 }
 
 interface PlannerProgramCompletion {
@@ -227,15 +234,67 @@ export function useProgramEventsForDate(date: Date) {
         });
       }
 
+      // Process course access events (course became available through a round)
+      for (const ca of (data.course_accesses || [])) {
+        events.push({
+          id: ca.id,
+          type: 'course_access',
+          title: ca.title,
+          isCompleted: ca.isCompleted || false,
+          courseId: ca.courseId,
+          courseTitle: ca.title,
+          programSlug: ca.programSlug,
+          roundId: ca.roundId,
+          coverImageUrl: ca.coverImageUrl,
+        });
+      }
+
+      // Process course update events (new lessons added to an accessible course)
+      for (const cu of (data.course_updates || [])) {
+        const count: number = cu.lessonCount ?? 1;
+        const courseName: string = cu.title || 'Course';
+        events.push({
+          id: cu.id,
+          type: 'course_update',
+          title: courseName,
+          isCompleted: false,
+          courseId: cu.courseId,
+          courseTitle: courseName,
+          lessonIds: Array.isArray(cu.lessonIds) ? cu.lessonIds : [],
+          lessonCount: count,
+          lessonTitle: count > 1 ? `${count} new lessons` : (cu.firstLessonTitle || courseName),
+          coverImageUrl: cu.coverImageUrl,
+        });
+      }
+
+      // Process lesson unlock events (dripped lessons releasing today)
+      for (const lu of (data.lesson_unlocks || [])) {
+        events.push({
+          id: lu.id,
+          type: 'lesson',
+          title: lu.title,
+          isCompleted: lu.isCompleted || false,
+          courseId: lu.courseId,
+          courseTitle: lu.courseTitle,
+          lessonId: lu.lessonId,
+          programSlug: lu.programSlug,
+          roundId: lu.roundId,
+          coverImageUrl: lu.coverImageUrl,
+        });
+      }
+
       // Sort: enrollments first, then sessions, then by time
       const typePriority: Record<string, number> = {
         enrollment: 0,
         round_update: 0.5,
         playlist_save: 0.6,
         playlist_update: 0.7,
+        course_access: 0.8,
+        course_update: 0.9,
         session: 1,
         module: 2,
         track: 3,
+        lesson: 2.5,
       };
       events.sort((a, b) => {
         const pa = typePriority[a.type] ?? 9;
@@ -265,7 +324,7 @@ export function useCompleteProgramEvent() {
       eventId, 
       date 
     }: { 
-      eventType: 'session' | 'module' | 'track' | 'enrollment' | 'playlist_save'; 
+      eventType: 'session' | 'module' | 'track' | 'enrollment' | 'playlist_save' | 'course_access' | 'lesson'; 
       eventId: string; 
       date: Date;
     }) => {
@@ -301,7 +360,7 @@ export function useUncompleteProgramEvent() {
       eventId, 
       date 
     }: { 
-      eventType: 'session' | 'module' | 'track' | 'enrollment' | 'playlist_save'; 
+      eventType: 'session' | 'module' | 'track' | 'enrollment' | 'playlist_save' | 'course_access' | 'lesson'; 
       eventId: string; 
       date: Date;
     }) => {
