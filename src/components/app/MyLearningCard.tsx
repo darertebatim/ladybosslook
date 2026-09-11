@@ -12,7 +12,6 @@ import {
   Video,
   Folder,
   LayoutGrid,
-  Sparkles,
 } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 
@@ -95,8 +94,7 @@ export function MyLearningCard() {
       icon: <Folder className="h-4 w-4" />,
       label: 'Files',
     },
-  ].filter((action): action is { to: string; icon: React.ReactNode; label: string } => !!action.to)
-    .slice(0, 2);
+  ].filter((action) => !!action.to).slice(0, 2);
 
   // Hero fallback for rounds without a course but with playlists
   const heroPlaylist =
