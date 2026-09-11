@@ -458,7 +458,7 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
   }
 
   // ── Always-on teasers: quiz + planner onboarding when missing ──────
-  const doors = new Set<DoorKey | null>([primary, secondary]);
+  const doors = new Set<DoorKey | null>([primary]);
   const hasSelfcareDoor = doors.has("selfcare");
   const hasProductivityDoor = doors.has("productivity");
   if (!hasSelfcareDoor && !inputs.hasPersonalityResult && !steps.some((s) => s.id === "quiz_pick:onboarding")) {
