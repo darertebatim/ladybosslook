@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns';
 import { useAutoCompleteProTask } from './useAutoCompleteProTask';
 import { logEvent } from '@/lib/firebaseAnalytics';
+import { recordStreakActivity } from '@/lib/streakActivity';
 import { runWithOfflineFallback } from '@/lib/offline/runWithOfflineFallback';
 import {
   WELLNESS_EXECUTOR_TYPES,
