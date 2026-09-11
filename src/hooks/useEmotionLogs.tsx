@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { startOfDay, differenceInDays } from 'date-fns';
 import type { Valence } from '@/lib/emotionData';
 import { Analytics } from '@/lib/firebaseAnalytics';
+import { recordStreakActivity } from '@/lib/streakActivity';
 import { runWithOfflineFallback } from '@/lib/offline/runWithOfflineFallback';
 import {
   WELLNESS_EXECUTOR_TYPES,
