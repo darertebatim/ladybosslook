@@ -180,6 +180,8 @@ export function useSaveBreathingSession() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['breathing-sessions'] });
+      // Breathing Check In counts as showing up today
+      recordStreakActivity(user?.id, 'breathe', queryClient);
     },
   });
 }
