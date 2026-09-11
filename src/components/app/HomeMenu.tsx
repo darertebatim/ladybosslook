@@ -18,6 +18,8 @@ import {
   Languages,
   Flame,
   ChevronRight,
+  MessagesSquare,
+  Activity,
 } from "lucide-react";
 import { ApertureLogo } from "@/aperture/brand/ApertureLogo";
 import {
