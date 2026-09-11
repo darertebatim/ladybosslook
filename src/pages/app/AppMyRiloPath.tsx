@@ -377,6 +377,7 @@ export default function AppMyRiloPath() {
   const goBack = useGoBack("/app/home");
   const { hasProgram: hasLearningProgram } = useMyLearning();
   const { user } = useAuth();
+  const { unreadCount: supportUnread } = useUnreadChat();
   const { data, isLoading } = useTodayPath();
   const skip = useSkipPathStep();
   const snooze = useSnoozePathStep();
