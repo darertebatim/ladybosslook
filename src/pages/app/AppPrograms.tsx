@@ -194,6 +194,30 @@ const AppCourses = () => {
       {/* Scroll container */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="container max-w-4xl py-4 px-4 space-y-6 pb-safe">
+          {/* Next live session */}
+          {upcoming && (
+            <Link
+              to={`/app/programs/${upcoming.enrollment.program_slug}${
+                upcoming.enrollment.program_rounds?.id
+                  ? `/${upcoming.enrollment.program_rounds.id}`
+                  : ""
+              }`}
+              onClick={() => haptic.light()}
+              className="block rounded-3xl bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-primary-dark))] p-5 text-white shadow-ios active:scale-[0.99] transition-transform"
+            >
+              <div className="text-xs uppercase tracking-wide opacity-90">
+                Next live session
+              </div>
+              <div className="mt-1 text-lg font-semibold line-clamp-1">
+                {upcoming.enrollment.course_name}
+              </div>
+              <div className="mt-1 text-sm opacity-95">
+                {format(upcoming.date, "EEEE, MMMM d • h:mm a")} (your local
+                time)
+              </div>
+            </Link>
+          )}
+
           {/* Active Rounds Section */}
           {(sortedActiveRounds.length > 0 ||
             selfPacedEnrollments.length > 0) && (
