@@ -402,9 +402,7 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
     steps.push(moodStep);
     steps.push(buildResetStep(inputs));
   } else if (day === 1) {
-    // Day 2 — secondary signature + primary booster + continue routine + check in
-    const sec = secondary ? signatureStepForDoor(secondary, inputs) : null;
-    if (sec) steps.push(sec);
+    // Day 2 — primary booster + continue routine + check in
     const primaryBooster = primary
       ? deeperStepForDoor(primary, inputs, { kicker: "More from your door", tint: "mint" })
       : null;
