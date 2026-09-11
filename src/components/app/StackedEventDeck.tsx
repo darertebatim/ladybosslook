@@ -16,7 +16,7 @@ export function StackedEventDeck({ events, date }: StackedEventDeckProps) {
   const stackEvents = [...events].sort(
     (a, b) => Number(a.isCompleted) - Number(b.isCompleted)
   );
-  const totalRemaining = stackEvents.length;
+  const totalRemaining = stackEvents.filter((e) => !e.isCompleted).length;
   const topEvent = stackEvents[0];
 
   if (totalRemaining === 0 || !topEvent) return null;
