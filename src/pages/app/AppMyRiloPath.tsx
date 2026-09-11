@@ -374,6 +374,7 @@ export default function AppMyRiloPath() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const goBack = useGoBack("/app/home");
+  const { hasProgram: hasLearningProgram } = useMyLearning();
   const { user } = useAuth();
   const { data, isLoading } = useTodayPath();
   const skip = useSkipPathStep();
