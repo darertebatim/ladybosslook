@@ -242,32 +242,13 @@ export function MyLearningCard() {
 
       {/* Materials */}
       <div className="grid grid-cols-3 gap-2 px-3 pt-3">
-        <MaterialTile
-          to={courseTo}
-          icon={<BookOpen className="h-4 w-4 text-brand" />}
-          label="Course"
-          className="bg-peach"
-        />
-        <MaterialTile
-          to={audioTo}
-          icon={<Music className="h-4 w-4 text-fg-warm" />}
-          label="Audio"
-          className="bg-chip-lavender"
-        />
-        <MaterialTile
-          to={videoTo}
-          icon={<Video className="h-4 w-4 text-brand" />}
-          label="Video"
-          className="bg-peach-mid"
-        />
+        <MaterialTile to={courseTo} icon={<BookOpen className="h-4 w-4" />} label="Course" />
+        <MaterialTile to={audioTo} icon={<Music className="h-4 w-4" />} label="Audio" />
+        <MaterialTile to={videoTo} icon={<Video className="h-4 w-4" />} label="Video" />
         {documentCount > 0 && courseTo && (
-          <MaterialTile
-            to={courseTo}
-            icon={<Folder className="h-4 w-4 text-fg-warm" />}
-            label="Files"
-            className="bg-mint"
-          />
+          <MaterialTile to={courseTo} icon={<Folder className="h-4 w-4" />} label="Files" />
         )}
+        <MaterialTile to="/app/programs" icon={<LayoutGrid className="h-4 w-4" />} label="My Programs" />
       </div>
 
       {/* Support */}
