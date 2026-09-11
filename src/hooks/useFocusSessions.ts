@@ -71,6 +71,8 @@ export const useSaveFocusSession = () => {
           completed: variables.completed,
         });
       } catch { /* ignore */ }
+      // A completed focus session counts toward the daily streak
+      if (variables.completed) recordStreakActivity(user?.id, 'focus', queryClient);
     },
   });
 };
