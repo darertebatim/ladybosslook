@@ -441,12 +441,12 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
     } else {
       steps.push(browseRoutinesStep());
     }
-    // Secondary door deeper step — keeps the secondary thread alive (spec slot #3).
-    const secondaryDeeper = secondary
-      ? deeperStepForDoor(secondary, inputs, { kicker: "Keep your secondary alive" })
+    // Deeper step from the user's door — keeps the thread alive (spec slot #3).
+    const primaryDeeper = primary
+      ? deeperStepForDoor(primary, inputs, { kicker: "Go deeper" })
       : null;
-    if (secondaryDeeper && !steps.some((s) => s.id === secondaryDeeper.id)) {
-      steps.push(secondaryDeeper);
+    if (primaryDeeper && !steps.some((s) => s.id === primaryDeeper.id)) {
+      steps.push(primaryDeeper);
     }
     if (inputs.featuredAudio) steps.push(audioToStep(inputs.featuredAudio));
     steps.push(buildResetStep(inputs));
