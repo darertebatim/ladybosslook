@@ -51,20 +51,6 @@ interface NavItem {
 
 const navPages: NavItem[] = [
   {
-    id: "listen",
-    nameKey: "listen",
-    icon: <Music className="h-4 w-4" />,
-    route: "/app/listen",
-    color: "text-rose-600 bg-rose-100",
-  },
-  {
-    id: "channels",
-    nameKey: "chats",
-    icon: <Users className="h-4 w-4" />,
-    route: "/app/feed",
-    color: "text-teal-600 bg-teal-100",
-  },
-  {
     id: "chat",
     nameKey: "support",
     icon: <Headset className="h-4 w-4" />,
