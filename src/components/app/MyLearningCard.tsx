@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { format, isToday } from 'date-fns';
 import {
@@ -7,12 +7,7 @@ import {
   CalendarClock,
   ChevronRight,
   Headset,
-  BookOpen,
-  Music,
-  Video,
-  Folder,
   LayoutGrid,
-  Sparkles,
 } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 
