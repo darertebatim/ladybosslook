@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Compass,
 } from "lucide-react";
+import { format } from "date-fns";
 import { SEOHead } from "@/components/SEOHead";
 import { PageHeader } from "@/components/app/ui/PageHeader";
 import { useUnseenContentContext } from "@/contexts/UnseenContentContext";
@@ -151,6 +152,22 @@ const AppCourses = () => {
 
     return { hasNotification, nextSessionDate, nextContent, onMarkViewed };
   };
+
+  // Nearest upcoming live session across all active rounds
+  const upcoming = sortedActiveRounds
+    .map((e) => {
+      const roundId = e.program_rounds?.id;
+      const date =
+        (roundId && nextSessionMap[roundId]) ||
+        e.program_rounds?.first_session_date ||
+        null;
+      return date ? { enrollment: e, date: new Date(date) } : null;
+    })
+    .filter(Boolean)
+    .filter((s) => s!.date.getTime() > Date.now() - 2 * 60 * 60 * 1000)
+    .sort((a, b) => a!.date.getTime() - b!.date.getTime())[0] as
+    | { enrollment: (typeof sortedActiveRounds)[0]; date: Date }
+    | undefined;
 
 
   const totalPrograms = filteredEnrollments.length;
