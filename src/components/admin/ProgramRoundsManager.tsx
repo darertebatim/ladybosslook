@@ -512,21 +512,39 @@ export const ProgramRoundsManager = () => {
           {isLoading ? (
             <p>Loading rounds...</p>
           ) : rounds && rounds.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Program</TableHead>
-                  <TableHead>Round</TableHead>
-                  <TableHead>Number</TableHead>
-                  <TableHead>Start Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Drip Offset</TableHead>
-                  <TableHead>Resources</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rounds.map((round) => (
+            <div className="space-y-4">
+              <div className="flex items-center justify-end gap-2">
+                <span className="text-sm text-muted-foreground">Sort by</span>
+                <Select
+                  value={sortBy}
+                  onValueChange={(value) => setSortBy(value as typeof sortBy)}
+                >
+                  <SelectTrigger className="w-[160px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Newest first</SelectItem>
+                    <SelectItem value="oldest">Oldest first</SelectItem>
+                    <SelectItem value="program">Program</SelectItem>
+                    <SelectItem value="round">Round #</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Program</TableHead>
+                    <TableHead>Round</TableHead>
+                    <TableHead>Number</TableHead>
+                    <TableHead>Start Date</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Drip Offset</TableHead>
+                    <TableHead>Resources</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sortedRounds.map((round) => (
                   <TableRow key={round.id}>
                     <TableCell className="font-medium">
                       {programs?.find(p => p.slug === round.program_slug)?.title || round.program_slug}
