@@ -10,6 +10,7 @@ import {
   type CreateEmotionLogPayload,
 } from '@/lib/offline/executors/wellnessExecutors';
 import { recordMoment } from '@/lib/moments';
+import { recordStreakActivity } from '@/lib/streakActivity';
 
 export interface MoodLog {
   id: string;
