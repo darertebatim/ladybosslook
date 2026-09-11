@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Smartphone, ShoppingCart } from 'lucide-react';
+import { Menu, X, Smartphone, ShoppingCart, Headset } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
+import { useUnreadChat } from '@/hooks/useUnreadChat';
 import { Link, useLocation } from 'react-router-dom';
 import { authUrlFor } from '@/lib/authRedirect';
 import riloLogo from '@/assets/rilo-app-icon.png';
