@@ -189,7 +189,6 @@ export function useTodayPath() {
         doorAnswers[row.step_id] = v.map((x: any) => String(x));
       }
       const doorPrimary = (doorAnswers["rd-door-primary"]?.[0] ?? null) as DoorKey | null;
-      const doorSecondary = (doorAnswers["rd-door-secondary"]?.[0] ?? null) as DoorKey | null;
       const emotionKeys = (doorAnswers["rd-sharp-emotion"] ?? []).filter((k) => k && k !== "unknown");
       const immigrantKeys = (doorAnswers["rd-sharp-immigrant"] ?? []).filter((k) => k && k !== "unknown");
       const financialKeys = (doorAnswers["rd-sharp-financial"] ?? []).filter((k) => k && k !== "unknown");
@@ -329,7 +328,7 @@ export function useTodayPath() {
       // as the secondary audio pick.
       if (
         hasDoorContext &&
-        (doorPrimary === "productivity" || doorSecondary === "productivity")
+        doorPrimary === "productivity"
       ) {
         doorSecondaryAudioOverride =
           accessiblePlaylists.find((p) => /wellness\s*planning/i.test(p.name)) ?? null;
@@ -808,7 +807,6 @@ export function useTodayPath() {
       const effectiveDoorContext = hasDoorContext
         ? {
             primary: doorPrimary,
-            secondary: doorSecondary,
             emotionKeys,
             immigrantKeys,
             financialKeys,
@@ -816,7 +814,6 @@ export function useTodayPath() {
           }
         : {
             primary: "exploring" as const,
-            secondary: null,
             emotionKeys: [] as string[],
             immigrantKeys: [] as string[],
             financialKeys: [] as string[],
