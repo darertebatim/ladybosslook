@@ -17,6 +17,7 @@ import {
 } from "@/hooks/useTodayPath";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
+import { useUnreadChat } from "@/hooks/useUnreadChat";
 import { useGoBack } from "@/hooks/useGoBack";
 import type { PathStep } from "@/lib/pathEngine";
 import { SwapSheet } from "@/components/path/SwapSheet";
@@ -504,11 +505,18 @@ export default function AppMyRiloPath() {
                 haptic.light();
                 navigate('/app/chat');
               }}
-              className="p-2 -ml-1 active:scale-95 transition-transform"
+              className="relative p-2 -ml-1 active:scale-95 transition-transform"
               style={{ color: O.fg }}
               aria-label="Support"
             >
               <Headset className="h-5 w-5" />
+              {supportUnread > 0 && (
+                <span
+                  className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full"
+                  style={{ background: "#EF4444", boxShadow: "0 0 0 2px rgba(255,248,243,0.95)" }}
+                  aria-hidden="true"
+                />
+              )}
             </button>
           </div>
           <div className="text-center text-[15px] font-bold tracking-tight" style={{ color: O.fg }}>
