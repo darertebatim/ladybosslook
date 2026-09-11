@@ -398,20 +398,6 @@ export function HomeMenu() {
             {renderPills(accountItems)}
           </section>
 
-          {/* Language — links to Settings */}
-          <section className="pt-2 border-t border-border/40">
-            <button
-              onClick={goToLanguageSettings}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-full",
-                "text-[13px] font-medium transition-all active:scale-95",
-                "text-slate-700 bg-slate-100",
-              )}
-            >
-              <Languages className="h-4 w-4" />
-              <span>{t("menu.language")}</span>
-            </button>
-          </section>
           {/* Dark Mode Toggle */}
           <section className="pt-2 border-t border-border/40">
             <button
