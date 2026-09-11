@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Menu,
   LayoutGrid,
-  Music,
-  Users,
   Headset,
   BookOpen,
   Wind,
