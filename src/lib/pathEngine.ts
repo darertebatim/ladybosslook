@@ -884,14 +884,6 @@ function buildPoolCandidates(inputs: PathInputs): PoolCandidate[] {
       build: () => tag(browseRoutinesStep(), "browse_routines"),
     },
     {
-      slot: "secondary_signature",
-      priority: 85,
-      // Only after primary signature is done.
-      eligible: !!secondary && completed.has("primary_signature"),
-      derivedDone: false,
-      build: () => tag(secondary ? signatureStepForDoor(secondary, inputs) : null, "secondary_signature"),
-    },
-    {
       slot: "continue_routine",
       priority: 75,
       eligible: inputs.activeRoutines.length > 0 && completed.has("primary_signature"),
