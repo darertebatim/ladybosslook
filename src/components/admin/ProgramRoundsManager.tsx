@@ -161,7 +161,7 @@ export const ProgramRoundsManager = () => {
       const { data, error } = await supabase
         .from("program_rounds")
         .select("*")
-        .order("program_slug", { ascending: true })
+        .order("start_date", { ascending: false })
         .order("round_number", { ascending: false });
       
       if (error) throw error;
