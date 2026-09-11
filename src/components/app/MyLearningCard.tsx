@@ -121,19 +121,25 @@ export function MyLearningCard() {
       {/* Continue where you left off */}
       {courseId && nextLesson && (
         <div className="mx-3 mt-1 overflow-hidden rounded-2xl border border-border-warm bg-card-warm">
-          <div className="relative flex aspect-[16/6] items-center justify-center bg-gradient-orange">
-            <GraduationCap className="h-9 w-9 text-white/90" />
+          <div className="relative flex aspect-[16/5] items-center justify-center bg-gradient-orange">
+            {waitingCount > 0 && (
+              <span className="absolute top-2 left-2.5 flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold text-white">
+                <Sparkles className="h-3 w-3" />
+                Just unlocked
+              </span>
+            )}
+            <GraduationCap className="h-8 w-8 text-white/90" />
             {nextLessonModuleIndex && (
               <span className="absolute bottom-2 right-2.5 rounded-full bg-black/35 px-2 py-0.5 text-[10px] font-bold text-white">
                 Module {nextLessonModuleIndex} · Lesson {nextLessonIndexInModule}
               </span>
             )}
           </div>
-          <div className="p-3.5">
+          <div className="p-3">
             <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-fg-warm-muted">
               {completedCount > 0 ? 'Continue where you left off' : 'Start here'}
             </p>
-            <p className="mt-1 mb-2.5 text-sm font-bold leading-snug text-fg-warm line-clamp-2">
+            <p className="mt-0.5 mb-2 text-sm font-bold leading-snug text-fg-warm line-clamp-2">
               {nextLesson.title}
             </p>
             <button
