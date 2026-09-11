@@ -94,46 +94,46 @@ const day3Flow = [
   { emoji: "🏆", title: "Streak + affirmation", meta: "Always last", kind: "reward" },
 ];
 
-/* Example scenarios — primary × secondary combinations */
+/* Example scenarios — primary-only paths */
 const scenarios = [
   {
-    name: "A · Emotion (sad) + Self-Care",
+    name: "A · Emotion (sad)",
     days: [
-      "Day 1: Solo meditation tagged 'sadness' → Check In (sadness-tagged) → Browse routines → Self-Care Goals teaser",
-      "Day 2: Pick Self-Care Goals at /app/tasksbank (secondary signature, deep-linked to quiz-outcome cluster if available) → second sadness-tagged solo track (sleep story or meditation) → Check In (sadness-tagged) → continue routine",
-      "Day 3: Routine first → Self-Care deeper (first picked goal surfaced as task) → sadness-tagged solo track → Check In (sadness-tagged)",
+      "Day 1: Solo meditation tagged 'sadness' → Check In (sadness-tagged) → Browse routines",
+      "Day 2: Primary deeper (sadness-tagged solo sleep story) → routine continue → Check In (sadness-tagged)",
+      "Day 3: Routine first → sadness-tagged solo track → Check In (sadness-tagged)",
     ],
   },
   {
-    name: "B · Immigrant + Productivity",
+    name: "B · Immigrant",
     days: [
-      "Day 1: Primary+Immigrant playlist (language-matched, e.g. Bilingual Strength EN/FA) → immigrant-tagged sleep story → Browse routines → Planner Onboarding teaser (productivity is secondary, so it still gets seeded)",
-      "Day 2: Planner Onboarding + pick first routine (secondary signature) → another immigrant-tagged sleep story (primary deeper) → Check In (bilingual if available, else generic)",
-      "Day 3: Routine first → 'Plan tomorrow' (secondary deeper) → Primary+Immigrant playlist (language-matched) → Check In (bilingual if available, else generic)",
+      "Day 1: Primary+Immigrant playlist (language-matched, e.g. Bilingual Strength EN/FA) → immigrant-tagged sleep story → Browse routines",
+      "Day 2: Another immigrant-tagged sleep story (primary deeper) → routine continue → Check In (bilingual if available, else generic)",
+      "Day 3: Routine first → Primary+Immigrant playlist (language-matched) → Check In (bilingual if available, else generic)",
     ],
   },
   {
-    name: "C · Productivity + Emotion (anxious)",
+    name: "C · Productivity",
     days: [
-      "Day 1: Open Planner → Rilo Planner Onboarding → pick first routine → Browse routines → Check In (anxiety-tagged, because emotion is secondary)",
-      "Day 2: Anxiety-tagged solo meditation (secondary signature) → 1 quick routine task (primary deeper) → Check In (anxiety-tagged)",
-      "Day 3: Routine first → anxiety-tagged reflection step (secondary deeper) → anxiety-tagged solo sleep story → Check In (anxiety-tagged)",
+      "Day 1: Open Planner → Rilo Planner Onboarding → pick first routine → Browse routines → Check In",
+      "Day 2: 1 quick routine task (primary deeper) → routine continue → Check In",
+      "Day 3: Routine first → 'Plan tomorrow' (primary deeper) → Check In",
     ],
   },
   {
-    name: "D · Self-Care only (no secondary)",
+    name: "D · Self-Care only",
     days: [
-      "Day 1: Self-Care Personality Quiz → Check In (quiz-outcome flavored) → Browse routines → Planner Onboarding teaser (productivity not picked)",
+      "Day 1: Self-Care Personality Quiz → Check In (quiz-outcome flavored) → Browse routines → Planner Onboarding teaser",
       "Day 2: Primary deeper (= Check In, quiz-outcome flavored) → routine continue → generic playlist → reward",
       "Day 3: Routine first → Check In (quiz-outcome flavored) → generic playlist → reward",
     ],
   },
   {
-    name: "E · Exploring + Emotion (lonely)",
+    name: "E · Exploring",
     days: [
-      "Day 1: Curated tour (1 playlist + quiz + planner peek) → Check In (lonely-tagged) → Browse routines",
-      "Day 2: Lonely-tagged solo meditation (secondary signature) → exploring deeper (Browse routines + 1 Check In) → routine",
-      "Day 3: Routine first → Check In (lonely-tagged) → lonely-tagged solo sleep story → reward",
+      "Day 1: Curated tour (1 playlist + quiz + planner peek) → Check In → Browse routines",
+      "Day 2: Browse routines (primary deeper) → routine → Check In",
+      "Day 3: Routine first → Check In → generic playlist → reward",
     ],
   },
 ];
