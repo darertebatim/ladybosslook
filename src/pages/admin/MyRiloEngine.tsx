@@ -56,7 +56,6 @@ const day1Flow = [
   { emoji: "🌬️", title: "Check In (door-flavored)", meta: "See Vocabulary card above", kind: "reset", isNew: true },
   { emoji: "✨", title: "Browse routines (pick your first)", meta: "Always shown on Day 1", kind: "routine" },
   { emoji: "🧠", title: "Self-Care Personality Quiz teaser", meta: "Injected if Self-Care isn't a chosen door & quiz not done · skippable", kind: "quiz_pick", isNew: true },
-  { emoji: "🎧", title: "Secondary audio (extra)", meta: "Low-commitment second pick · Day 1 only · skippable", kind: "playlist", isNew: true },
   { emoji: "🏆", title: "+1 day streak & a new affirmation", meta: "Always last", kind: "reward" },
 ];
 
