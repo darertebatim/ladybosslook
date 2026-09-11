@@ -152,8 +152,6 @@ const AppCourses = () => {
     return { hasNotification, nextSessionDate, nextContent, onMarkViewed };
   };
 
-  const coverFor = (slug: string) =>
-    programs.find((p) => p.slug === slug)?.image || null;
 
   const totalPrograms = filteredEnrollments.length;
 
@@ -200,7 +198,6 @@ const AppCourses = () => {
                     <EnrolledProgramCard
                       key={enrollment.id}
                       enrollment={enrollment}
-                      coverImage={coverFor(enrollment.program_slug)}
                       nextSessionDate={props.nextSessionDate}
                       nextContent={props.nextContent}
                       hasNotification={props.hasNotification}
@@ -214,7 +211,6 @@ const AppCourses = () => {
                     <EnrolledProgramCard
                       key={enrollment.id}
                       enrollment={enrollment}
-                      coverImage={coverFor(enrollment.program_slug)}
                       nextSessionDate={props.nextSessionDate}
                       nextContent={props.nextContent}
                       hasNotification={props.hasNotification}
@@ -246,7 +242,6 @@ const AppCourses = () => {
                     <EnrolledProgramCard
                       key={enrollment.id}
                       enrollment={enrollment}
-                      coverImage={coverFor(enrollment.program_slug)}
                       isCompleted
                       nextSessionDate={props.nextSessionDate}
                       nextContent={props.nextContent}
