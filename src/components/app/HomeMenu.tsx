@@ -150,9 +150,10 @@ const accountItems: NavItem[] = [
   {
     id: "language",
     nameKey: "language",
+    label: "Language",
     icon: <Languages className="h-4 w-4" />,
     route: "/app/settings?section=language",
-    color: "text-slate-700 bg-slate-100",
+    color: "text-violet-600 bg-violet-100",
   },
 ];
 
