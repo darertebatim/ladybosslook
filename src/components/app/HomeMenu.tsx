@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Menu,
   LayoutGrid,
-  Music,
-  Users,
   Headset,
   BookOpen,
   Wind,
@@ -50,20 +48,6 @@ interface NavItem {
 }
 
 const navPages: NavItem[] = [
-  {
-    id: "listen",
-    nameKey: "listen",
-    icon: <Music className="h-4 w-4" />,
-    route: "/app/listen",
-    color: "text-rose-600 bg-rose-100",
-  },
-  {
-    id: "channels",
-    nameKey: "chats",
-    icon: <Users className="h-4 w-4" />,
-    route: "/app/feed",
-    color: "text-teal-600 bg-teal-100",
-  },
   {
     id: "chat",
     nameKey: "support",
@@ -178,6 +162,13 @@ const accountItems: NavItem[] = [
     route: "/app/settings",
     color: "text-gray-600 bg-gray-100",
   },
+  {
+    id: "language",
+    nameKey: "language",
+    icon: <Languages className="h-4 w-4" />,
+    route: "/app/settings?section=language",
+    color: "text-slate-700 bg-slate-100",
+  },
 ];
 
 export function HomeMenu() {
@@ -219,12 +210,6 @@ export function HomeMenu() {
     setOpen(false);
     await signOut();
     navigate("/auth");
-  };
-
-  const goToLanguageSettings = () => {
-    haptic.light();
-    setOpen(false);
-    navigate("/app/settings?section=language");
   };
 
   // Resolve user display name + initial
@@ -366,12 +351,19 @@ export function HomeMenu() {
             </section>
           )}
 
-          {/* Navigation Pages */}
+          {/* Support */}
           <section>
-            <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-              {t("menu.navigate")}
-            </h3>
-            {renderPills(navPages)}
+            <button
+              onClick={() => handleNavClick("/app/chat")}
+              className={cn(
+                "w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-full",
+                "text-[13px] font-semibold transition-all active:scale-[0.98]",
+                "text-orange-600 bg-orange-100",
+              )}
+            >
+              <Headset className="h-4 w-4" />
+              <span>{t("menu.items.support")}</span>
+            </button>
           </section>
 
           {/* Tools — icon grid */}
@@ -398,20 +390,6 @@ export function HomeMenu() {
             {renderPills(accountItems)}
           </section>
 
-          {/* Language — links to Settings */}
-          <section className="pt-2 border-t border-border/40">
-            <button
-              onClick={goToLanguageSettings}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-full",
-                "text-[13px] font-medium transition-all active:scale-95",
-                "text-slate-700 bg-slate-100",
-              )}
-            >
-              <Languages className="h-4 w-4" />
-              <span>{t("menu.language")}</span>
-            </button>
-          </section>
           {/* Dark Mode Toggle */}
           <section className="pt-2 border-t border-border/40">
             <button
