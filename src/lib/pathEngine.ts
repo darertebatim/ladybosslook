@@ -373,7 +373,6 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
   const steps: PathStep[] = [];
 
   const primary = ctx.primary;
-  const secondary = ctx.secondary;
 
   // ── Mood check-in ──
   // Spec: Day 1 puts the primary signature first (the "wow"), then mood.
