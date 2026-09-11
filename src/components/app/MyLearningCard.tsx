@@ -179,10 +179,10 @@ export function MyLearningCard() {
         <Link
           to="/app/programs"
           onClick={() => haptic.light()}
-          className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-peach py-2.5 text-brand active:opacity-90"
+          className="flex items-center justify-center gap-2 rounded-2xl bg-peach px-3 py-2.5 text-brand active:opacity-90"
         >
-          <LayoutGrid className="h-4 w-4" />
-          <span className="text-[10.5px] font-extrabold text-fg-warm">My Programs</span>
+          <LayoutGrid className="h-4 w-4 flex-shrink-0" />
+          <span className="text-[11px] font-extrabold leading-tight text-fg-warm">My Courses &amp; programs</span>
         </Link>
         {sessionDate ? (
           <Link
