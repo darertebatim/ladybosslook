@@ -54,6 +54,7 @@ import { OnboardingBanner } from '@/components/app/OnboardingBanner';
 import { WeeklyReviewBanner } from '@/components/app/WeeklyReviewBanner';
 import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
 import { ToolShortcuts } from '@/components/app/ToolShortcuts';
+import { MyLearningCard } from '@/components/app/MyLearningCard';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { WelcomeSpotlightBanner } from '@/components/app/home/WelcomeSpotlightBanner';
 import { TaskCoachOverlay } from '@/components/app/home/TaskCoachOverlay';
