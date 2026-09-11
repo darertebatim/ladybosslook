@@ -54,9 +54,7 @@ export interface PathStep {
 
 export type StarterPoolSlot =
   | "primary_signature"
-  | "secondary_signature"
   | "primary_deeper"
-  | "secondary_deeper"
   | "browse_routines"
   | "continue_routine"
   | "selfcare_quiz"
@@ -181,7 +179,6 @@ export interface PathInputs {
   /** Rilo Doors onboarding picks. When `primary` is set, the door-aware
    *  builder runs instead of the legacy buildStandardPath. */
   doorContext?: {
-    primary: DoorKey | null;
     secondary: DoorKey | null;
     emotionKeys: string[]; // raw picker keys (e.g. "lonely", "anxious")
     immigrantKeys: string[];
