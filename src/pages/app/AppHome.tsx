@@ -1175,6 +1175,9 @@ const AppHome = () => {
               <WeeklyReviewBanner onVisibilityChange={setHasWeeklyBanner} />
             )}
 
+            {/* My Learning — shown to learners enrolled in a program */}
+            <MyLearningCard />
+
             {/* My Shortcuts — temporarily hidden, will be restored later */}
             {false && !hasSelfCareQuizBanner && !hasPromoBanner && !hasHomeBanner && !hasMoodBanner && !hasWeeklyBanner && (
               <div className="mb-3">
