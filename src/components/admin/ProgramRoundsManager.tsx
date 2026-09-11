@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -100,6 +100,8 @@ export const ProgramRoundsManager = () => {
   const [dripAdjustmentType, setDripAdjustmentType] = useState<'freeze' | 'forward'>('freeze');
   const [dripAdjustmentDays, setDripAdjustmentDays] = useState<string>('7');
   
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'program' | 'round'>('newest');
+  
   const [formData, setFormData] = useState<RoundFormData>({
     program_slug: "",
     round_name: "",
@@ -160,14 +162,32 @@ export const ProgramRoundsManager = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("program_rounds")
-        .select("*")
-        .order("program_slug", { ascending: true })
-        .order("round_number", { ascending: false });
+        .select("*");
       
       if (error) throw error;
       return data as ProgramRound[];
     },
   });
+
+  const sortedRounds = useMemo(() => {
+    if (!rounds) return [];
+    const list = [...rounds];
+    list.sort((a, b) => {
+      switch (sortBy) {
+        case 'newest':
+          return new Date(b.start_date).getTime() - new Date(a.start_date).getTime() || b.round_number - a.round_number;
+        case 'oldest':
+          return new Date(a.start_date).getTime() - new Date(b.start_date).getTime() || a.round_number - b.round_number;
+        case 'program':
+          return a.program_slug.localeCompare(b.program_slug) || b.round_number - a.round_number;
+        case 'round':
+          return b.round_number - a.round_number || new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
+        default:
+          return 0;
+      }
+    });
+    return list;
+  }, [rounds, sortBy]);
 
   // Create/Update mutation
   const saveMutation = useMutation({
@@ -492,21 +512,39 @@ export const ProgramRoundsManager = () => {
           {isLoading ? (
             <p>Loading rounds...</p>
           ) : rounds && rounds.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Program</TableHead>
-                  <TableHead>Round</TableHead>
-                  <TableHead>Number</TableHead>
-                  <TableHead>Start Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Drip Offset</TableHead>
-                  <TableHead>Resources</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rounds.map((round) => (
+            <div className="space-y-4">
+              <div className="flex items-center justify-end gap-2">
+                <span className="text-sm text-muted-foreground">Sort by</span>
+                <Select
+                  value={sortBy}
+                  onValueChange={(value) => setSortBy(value as typeof sortBy)}
+                >
+                  <SelectTrigger className="w-[160px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Newest first</SelectItem>
+                    <SelectItem value="oldest">Oldest first</SelectItem>
+                    <SelectItem value="program">Program</SelectItem>
+                    <SelectItem value="round">Round #</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Program</TableHead>
+                    <TableHead>Round</TableHead>
+                    <TableHead>Number</TableHead>
+                    <TableHead>Start Date</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Drip Offset</TableHead>
+                    <TableHead>Resources</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sortedRounds.map((round) => (
                   <TableRow key={round.id}>
                     <TableCell className="font-medium">
                       {programs?.find(p => p.slug === round.program_slug)?.title || round.program_slug}
@@ -615,8 +653,9 @@ export const ProgramRoundsManager = () => {
                     </TableCell>
                   </TableRow>
                 ))}
-              </TableBody>
-            </Table>
+                </TableBody>
+              </Table>
+            </div>
           ) : (
             <p className="text-muted-foreground">No rounds created yet. Click "Create New Round" to get started.</p>
           )}
