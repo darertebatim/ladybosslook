@@ -164,6 +164,13 @@ const accountItems: NavItem[] = [
     route: "/app/settings",
     color: "text-gray-600 bg-gray-100",
   },
+  {
+    id: "language",
+    nameKey: "language",
+    icon: <Languages className="h-4 w-4" />,
+    route: "/app/settings?section=language",
+    color: "text-slate-700 bg-slate-100",
+  },
 ];
 
 export function HomeMenu() {
