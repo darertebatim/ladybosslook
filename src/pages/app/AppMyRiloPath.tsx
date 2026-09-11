@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { ToolShortcuts } from "@/components/app/ToolShortcuts";
+import { MyLearningCard } from "@/components/app/MyLearningCard";
+import { useMyLearning } from "@/hooks/useMyLearning";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight, Headset, Award, Compass, GraduationCap } from "lucide-react";
@@ -555,10 +557,17 @@ export default function AppMyRiloPath() {
             <HomeBanner location="my_rilo_top" className="py-1" />
           </div>
 
-          {/* Quick shortcuts — under header, above date */}
-          <div className="px-4 pt-2 pb-1">
-            <ToolShortcuts hideWhenEmpty />
+          {/* My Learning — first thing a program learner sees */}
+          <div className="px-4 pt-2">
+            <MyLearningCard />
           </div>
+
+          {/* Quick shortcuts — hidden for learners with a program */}
+          {!hasLearningProgram && (
+            <div className="px-4 pt-2 pb-1">
+              <ToolShortcuts hideWhenEmpty />
+            </div>
+          )}
 
           {/* Today's Program Events — above the date greeting */}
           {programEvents.length > 0 && (
