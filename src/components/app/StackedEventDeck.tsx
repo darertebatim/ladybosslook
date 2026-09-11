@@ -12,8 +12,10 @@ const MAX_PEEKS = 3; // visible cards peeking behind the top card
 const PEEK_OFFSET = 16; // px of each underlying card visible below the one above
 
 export function StackedEventDeck({ events, date }: StackedEventDeckProps) {
-  // Events currently in the stack (not completed)
-  const stackEvents = events.filter((e) => !e.isCompleted);
+  // Uncompleted events first, completed ones go to the back of the stack
+  const stackEvents = [...events].sort(
+    (a, b) => Number(a.isCompleted) - Number(b.isCompleted)
+  );
   const totalRemaining = stackEvents.length;
   const topEvent = stackEvents[0];
 
