@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Smartphone, ShoppingCart } from 'lucide-react';
+import { Menu, X, Smartphone, ShoppingCart, Headset } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
+import { useUnreadChat } from '@/hooks/useUnreadChat';
 import { Link, useLocation } from 'react-router-dom';
 import { authUrlFor } from '@/lib/authRedirect';
 import riloLogo from '@/assets/rilo-app-icon.png';
@@ -47,6 +48,24 @@ const CartIcon = () => {
         <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
           {cartCount}
         </span>
+      </Button>
+    </Link>
+  );
+};
+
+const SupportChatIcon = () => {
+  const { user } = useAuth();
+  const { unreadCount } = useUnreadChat('support');
+  if (!user) return null;
+  return (
+    <Link to="/dashboard/chat" className="relative">
+      <Button variant="ghost" size="icon">
+        <Headset size={20} />
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold ring-2 ring-background">
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </span>
+        )}
       </Button>
     </Link>
   );
@@ -118,11 +137,13 @@ const Navigation = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
+            <SupportChatIcon />
             <CartIcon />
             <AuthButtons />
           </div>
 
           <div className="md:hidden flex items-center gap-2">
+            <SupportChatIcon />
             <Link to="/app/path">
               <Button
                 variant="ghost"
