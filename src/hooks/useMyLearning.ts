@@ -28,19 +28,34 @@ export function useMyLearning() {
       e.program_rounds?.status !== 'completed',
   );
 
-  // Prefer the enrollment with the nearest upcoming live session
+  // Effective upcoming session: real scheduled session, else the round's
+  // first_session_date while it's still in the future.
+  const upcomingFor = (e: any): string | null => {
+    const rid = e?.program_rounds?.id;
+    const scheduled = rid ? nextSessionMap[rid] : null;
+    if (scheduled) return scheduled;
+    const first = e?.program_rounds?.first_session_date;
+    if (first && new Date(first).getTime() > Date.now() - 2 * 60 * 60 * 1000) return first;
+    return null;
+  };
+
+  // Prefer the enrollment with the nearest upcoming live session,
+  // then the most recently enrolled program.
   const primary =
     [...active].sort((a: any, b: any) => {
-      const ad = a.program_rounds?.id ? nextSessionMap[a.program_rounds.id] : null;
-      const bd = b.program_rounds?.id ? nextSessionMap[b.program_rounds.id] : null;
+      const ad = upcomingFor(a);
+      const bd = upcomingFor(b);
       if (ad && !bd) return -1;
       if (!ad && bd) return 1;
       if (ad && bd) return new Date(ad).getTime() - new Date(bd).getTime();
-      return 0;
+      const ae = a.enrolled_at ? new Date(a.enrolled_at).getTime() : 0;
+      const be = b.enrolled_at ? new Date(b.enrolled_at).getTime() : 0;
+      return be - ae;
     })[0] || null;
 
   const roundId: string | undefined = primary?.program_rounds?.id || undefined;
-  const nextSessionDate = roundId ? nextSessionMap[roundId] || null : null;
+  const nextSessionDate = primary ? upcomingFor(primary) : null;
+
 
   // Course attached to this round
   const { data: courseId } = useQuery({
