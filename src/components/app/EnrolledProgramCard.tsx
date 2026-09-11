@@ -29,7 +29,6 @@ interface EnrolledProgramCardProps {
     } | null;
     status?: string | null;
   };
-  coverImage?: string | null;
   isCompleted?: boolean;
   nextSessionDate?: string | null;
   nextContent?: { title: string; countdownText: string } | null;
@@ -39,7 +38,6 @@ interface EnrolledProgramCardProps {
 
 export const EnrolledProgramCard = memo(function EnrolledProgramCard({
   enrollment,
-  coverImage,
   isCompleted = false,
   nextSessionDate,
   nextContent,
@@ -84,20 +82,14 @@ export const EnrolledProgramCard = memo(function EnrolledProgramCard({
         }}
         className="block active:opacity-90 transition-opacity"
       >
-        {/* Cover */}
-        <div className="relative">
-          {coverImage ? (
-            <img
-              src={coverImage}
-              alt={enrollment.course_name}
-              className="w-full aspect-video object-cover"
-              loading="lazy"
-            />
-          ) : (
-            <div className="w-full h-24 bg-gradient-orange flex items-center justify-center">
-              <GraduationCap className="h-8 w-8 text-white" />
-            </div>
+        {/* Gradient header */}
+        <div
+          className={cn(
+            'relative h-24 flex items-center justify-center bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-primary-dark))]',
+            isCompleted && 'opacity-80',
           )}
+        >
+          <GraduationCap className="h-9 w-9 text-white" />
 
           {/* Status pill */}
           <span
@@ -112,7 +104,7 @@ export const EnrolledProgramCard = memo(function EnrolledProgramCard({
 
           {/* Updated pill */}
           {hasNotification && !isCompleted && (
-            <span className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-brand px-3 py-1 text-[11px] font-semibold text-white shadow-ios">
+            <span className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1 text-[11px] font-semibold text-brand shadow-ios">
               <Sparkles className="h-3 w-3" />
               Updated
             </span>

@@ -11,6 +11,8 @@ import {
   ChevronRight,
   Compass,
 } from "lucide-react";
+import { format } from "date-fns";
+import { haptic } from "@/lib/haptics";
 import { SEOHead } from "@/components/SEOHead";
 import { PageHeader } from "@/components/app/ui/PageHeader";
 import { useUnseenContentContext } from "@/contexts/UnseenContentContext";
@@ -152,8 +154,22 @@ const AppCourses = () => {
     return { hasNotification, nextSessionDate, nextContent, onMarkViewed };
   };
 
-  const coverFor = (slug: string) =>
-    programs.find((p) => p.slug === slug)?.image || null;
+  // Nearest upcoming live session across all active rounds
+  const upcoming = sortedActiveRounds
+    .map((e) => {
+      const roundId = e.program_rounds?.id;
+      const date =
+        (roundId && nextSessionMap[roundId]) ||
+        e.program_rounds?.first_session_date ||
+        null;
+      return date ? { enrollment: e, date: new Date(date) } : null;
+    })
+    .filter(Boolean)
+    .filter((s) => s!.date.getTime() > Date.now() - 2 * 60 * 60 * 1000)
+    .sort((a, b) => a!.date.getTime() - b!.date.getTime())[0] as
+    | { enrollment: (typeof sortedActiveRounds)[0]; date: Date }
+    | undefined;
+
 
   const totalPrograms = filteredEnrollments.length;
 
@@ -179,6 +195,30 @@ const AppCourses = () => {
       {/* Scroll container */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="container max-w-4xl py-4 px-4 space-y-6 pb-safe">
+          {/* Next live session */}
+          {upcoming && (
+            <Link
+              to={`/app/programs/${upcoming.enrollment.program_slug}${
+                upcoming.enrollment.program_rounds?.id
+                  ? `/${upcoming.enrollment.program_rounds.id}`
+                  : ""
+              }`}
+              onClick={() => haptic.light()}
+              className="block rounded-3xl bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-primary-dark))] p-5 text-white shadow-ios active:scale-[0.99] transition-transform"
+            >
+              <div className="text-xs uppercase tracking-wide opacity-90">
+                Next live session
+              </div>
+              <div className="mt-1 text-lg font-semibold line-clamp-1">
+                {upcoming.enrollment.course_name}
+              </div>
+              <div className="mt-1 text-sm opacity-95">
+                {format(upcoming.date, "EEEE, MMMM d • h:mm a")} (your local
+                time)
+              </div>
+            </Link>
+          )}
+
           {/* Active Rounds Section */}
           {(sortedActiveRounds.length > 0 ||
             selfPacedEnrollments.length > 0) && (
@@ -200,7 +240,6 @@ const AppCourses = () => {
                     <EnrolledProgramCard
                       key={enrollment.id}
                       enrollment={enrollment}
-                      coverImage={coverFor(enrollment.program_slug)}
                       nextSessionDate={props.nextSessionDate}
                       nextContent={props.nextContent}
                       hasNotification={props.hasNotification}
@@ -214,7 +253,6 @@ const AppCourses = () => {
                     <EnrolledProgramCard
                       key={enrollment.id}
                       enrollment={enrollment}
-                      coverImage={coverFor(enrollment.program_slug)}
                       nextSessionDate={props.nextSessionDate}
                       nextContent={props.nextContent}
                       hasNotification={props.hasNotification}
@@ -246,7 +284,6 @@ const AppCourses = () => {
                     <EnrolledProgramCard
                       key={enrollment.id}
                       enrollment={enrollment}
-                      coverImage={coverFor(enrollment.program_slug)}
                       isCompleted
                       nextSessionDate={props.nextSessionDate}
                       nextContent={props.nextContent}
