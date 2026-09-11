@@ -36,7 +36,6 @@ export function MyLearningCard() {
     nextLesson,
     nextLessonModuleIndex,
     nextLessonIndexInModule,
-    totalLessons,
     completedCount,
     waitingCount,
     documentCount,
