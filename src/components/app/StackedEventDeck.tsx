@@ -12,9 +12,11 @@ const MAX_PEEKS = 3; // visible cards peeking behind the top card
 const PEEK_OFFSET = 16; // px of each underlying card visible below the one above
 
 export function StackedEventDeck({ events, date }: StackedEventDeckProps) {
-  // Events currently in the stack (not completed)
-  const stackEvents = events.filter((e) => !e.isCompleted);
-  const totalRemaining = stackEvents.length;
+  // Uncompleted events first, completed ones go to the back of the stack
+  const stackEvents = [...events].sort(
+    (a, b) => Number(a.isCompleted) - Number(b.isCompleted)
+  );
+  const totalRemaining = stackEvents.filter((e) => !e.isCompleted).length;
   const topEvent = stackEvents[0];
 
   if (totalRemaining === 0 || !topEvent) return null;
@@ -49,7 +51,7 @@ export function StackedEventDeck({ events, date }: StackedEventDeckProps) {
               key={`${event.type}-${event.id}`}
               className={cn(
                 'absolute inset-x-0 top-0 rounded-3xl shadow-card-warm pointer-events-none',
-                style.tintBg
+                event.isCompleted ? style.tintBg : 'bg-card-warm'
               )}
               style={{
                 bottom: stackPadding,
