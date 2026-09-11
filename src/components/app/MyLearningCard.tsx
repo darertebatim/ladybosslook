@@ -233,9 +233,14 @@ export function MyLearningCard() {
       <Link
         to="/app/chat"
         onClick={() => haptic.light()}
-        className="mx-3 mb-3.5 mt-3 flex min-h-[40px] items-center justify-center gap-2 rounded-2xl border border-dashed border-fg-warm/20 px-3 text-[12.5px] font-semibold text-fg-warm-muted active:opacity-80"
+        className="relative mx-3 mb-3.5 mt-3 flex min-h-[40px] items-center justify-center gap-2 rounded-2xl border border-dashed border-fg-warm/20 px-3 text-[12.5px] font-semibold text-fg-warm-muted active:opacity-80"
       >
-        <Headset className="h-4 w-4" />
+        <span className="relative">
+          <Headset className="h-4 w-4" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-card-warm" />
+          )}
+        </span>
         Questions about the program? Chat with support
       </Link>
     </div>
