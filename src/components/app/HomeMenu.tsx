@@ -270,7 +270,7 @@ export function HomeMenu() {
                 isWide ? "text-[13px]" : "text-[10px]",
               )}
             >
-              {t(`menu.items.${item.nameKey}`)}
+              {item.label ?? t(`menu.items.${item.nameKey}`)}
             </span>
           </button>
         );
