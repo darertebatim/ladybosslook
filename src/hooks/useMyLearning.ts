@@ -60,7 +60,7 @@ export function useMyLearning() {
 
   // Playlists attached to this round (audio / video materials)
   const { data: materials } = useQuery({
-    queryKey: ['my-learning-round-playlists', roundId],
+    queryKey: ['my-learning-round-playlists-v2', roundId],
     enabled: !!user && !!roundId,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -68,10 +68,10 @@ export function useMyLearning() {
         .select('playlist_id, playlist_type')
         .eq('round_id', roundId!);
       if (error) throw error;
-      const rows = data || [];
+      const rows = (data || []) as any[];
       return {
-        audio: rows.filter((r: any) => r.playlist_type !== 'video').length,
-        video: rows.filter((r: any) => r.playlist_type === 'video').length,
+        audio: rows.filter((r) => r.playlist_type !== 'video').map((r) => r.playlist_id as string),
+        video: rows.filter((r) => r.playlist_type === 'video').map((r) => r.playlist_id as string),
       };
     },
   });
@@ -99,6 +99,10 @@ export function useMyLearning() {
   const nextLesson = unlockedLessons.find((l) => !progress?.has(l.id)) || null;
   const waitingCount = unlockedLessons.filter((l) => !progress?.has(l.id)).length;
 
+  const documentCount = flatLessons.filter((l: any) =>
+    ['pdf', 'document'].includes(String(l.content_type || '')),
+  ).length;
+
   const nextLessonModule = nextLesson
     ? content?.modules.find((m) => m.id === nextLesson.module_id) || null
     : null;
@@ -111,10 +115,15 @@ export function useMyLearning() {
         .findIndex((l) => l.id === nextLesson.id) + 1
     : null;
 
+  const audioPlaylistIds = materials?.audio || [];
+  const videoPlaylistIds = materials?.video || [];
+
   return {
     isLoading,
     enrollment: primary,
     roundId,
+    isSelfPaced: !!primary?.program_rounds?.is_self_paced,
+    enrolledAt: (primary?.enrolled_at as string) || null,
     nextSessionDate,
     courseId: courseId || null,
     course: course || null,
@@ -124,8 +133,12 @@ export function useMyLearning() {
     totalLessons: flatLessons.length,
     completedCount,
     waitingCount,
-    audioCount: materials?.audio || 0,
-    videoCount: materials?.video || 0,
+    documentCount,
+    audioPlaylistIds,
+    videoPlaylistIds,
+    audioCount: audioPlaylistIds.length,
+    videoCount: videoPlaylistIds.length,
     hasProgram: !!primary,
   };
 }
+
