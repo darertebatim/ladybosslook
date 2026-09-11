@@ -39,6 +39,19 @@ export function getProgramLabel(slug: string): string {
   );
 }
 
+/** Splits a round key "slug::Round label" into its parts. */
+export function parseRoundKey(key: string): { slug: string; label: string } {
+  const idx = key.indexOf("::");
+  if (idx === -1) return { slug: key, label: key };
+  return { slug: key.slice(0, idx), label: key.slice(idx + 2) };
+}
+
+/** True when a filter value matches the conversation (program slug or round key). */
+export function conversationMatchesProgram(c: SupportConversation, filter: string): boolean {
+  if (filter === "all") return true;
+  return !!c.programs?.includes(filter) || !!c.rounds?.includes(filter);
+}
+
 export function conversationName(c: SupportConversation): string {
   return (
     c.display_name?.trim() ||
