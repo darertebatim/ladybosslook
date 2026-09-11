@@ -29,6 +29,10 @@ const CONTEXT_ICON_MAP: Record<string, React.ComponentType<{ className?: string 
 };
 
 // 5-level mood system (labels/buttonText resolved via i18n at render time)
+// Temporary kill-switch for the post-check-in "Add Daily Mood Check-in" prompt sheet.
+// Set to true to re-enable; all backend/state logic remains intact.
+const MOOD_ROUTINE_PROMPT_ENABLED = false;
+
 const MOODS = [
   { value: 'great', emoji: '😄', bgColor: 'bg-yellow-200', sheetBg: 'bg-yellow-100', accent: 'text-yellow-700' },
   { value: 'good', emoji: '🙂', bgColor: 'bg-green-200', sheetBg: 'bg-green-100', accent: 'text-green-700' },
