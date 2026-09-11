@@ -200,46 +200,58 @@ export function MyLearningCard() {
         </div>
       )}
 
-      {/* Next live session / self-paced start */}
-      {sessionDate ? (
+      {/* Next live session / self-paced start + My Programs */}
+      <div className="mx-3 mt-3 grid grid-cols-[2fr_1fr] gap-2">
+        {sessionDate ? (
+          <Link
+            to={programPath}
+            onClick={() => haptic.light()}
+            className="flex items-center gap-2.5 rounded-2xl bg-peach px-3 py-2.5 active:opacity-90"
+          >
+            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-card-warm">
+              <CalendarClock className="h-4 w-4 text-brand" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[12.5px] font-bold leading-tight text-fg-warm line-clamp-1">
+                Next live session
+              </span>
+              <span className="block text-[11.5px] leading-tight text-fg-warm-muted line-clamp-1">
+                {isToday(new Date(sessionDate))
+                  ? `Today · ${format(new Date(sessionDate), 'h:mm a')}`
+                  : format(new Date(sessionDate), 'EEE, MMM d · h:mm a')}
+              </span>
+            </span>
+            <ChevronRight className="h-4 w-4 flex-shrink-0 text-fg-warm-muted" />
+          </Link>
+        ) : (
+          <Link
+            to={programPath}
+            onClick={() => haptic.light()}
+            className="flex items-center gap-2.5 rounded-2xl bg-peach px-3 py-2.5 active:opacity-90"
+          >
+            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-card-warm">
+              <CalendarClock className="h-4 w-4 text-brand" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[12.5px] font-bold leading-tight text-fg-warm line-clamp-1">
+                Learn at your own pace
+              </span>
+              <span className="block text-[11.5px] leading-tight text-fg-warm-muted line-clamp-1">
+                {enrolledAt ? `Started ${format(new Date(enrolledAt), 'MMM d, yyyy')}` : 'No live sessions'}
+              </span>
+            </span>
+            <ChevronRight className="h-4 w-4 flex-shrink-0 text-fg-warm-muted" />
+          </Link>
+        )}
         <Link
-          to={programPath}
+          to="/app/programs"
           onClick={() => haptic.light()}
-          className="mx-3 mt-3 flex items-center gap-2.5 rounded-2xl bg-peach px-3 py-2.5 active:opacity-90"
+          className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-peach py-2.5 text-brand active:opacity-90"
         >
-          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-card-warm">
-            <CalendarClock className="h-4 w-4 text-brand" />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-[12.5px] font-bold text-fg-warm">Next live session</span>
-            <span className="block text-[11.5px] text-fg-warm-muted">
-              {isToday(new Date(sessionDate))
-                ? `Today · ${format(new Date(sessionDate), 'h:mm a')}`
-                : format(new Date(sessionDate), 'EEE, MMM d · h:mm a')}
-            </span>
-          </span>
-          <ChevronRight className="h-4 w-4 flex-shrink-0 text-fg-warm-muted" />
+          <LayoutGrid className="h-4 w-4" />
+          <span className="text-[10.5px] font-extrabold text-fg-warm">My Programs</span>
         </Link>
-      ) : (
-        <Link
-          to={programPath}
-          onClick={() => haptic.light()}
-          className="mx-3 mt-3 flex items-center gap-2.5 rounded-2xl bg-peach px-3 py-2.5 active:opacity-90"
-        >
-          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-card-warm">
-            <CalendarClock className="h-4 w-4 text-brand" />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-[12.5px] font-bold text-fg-warm">
-              Learn at your own pace
-            </span>
-            <span className="block text-[11.5px] text-fg-warm-muted">
-              {enrolledAt ? `Started ${format(new Date(enrolledAt), 'MMM d, yyyy')}` : 'No live sessions'}
-            </span>
-          </span>
-          <ChevronRight className="h-4 w-4 flex-shrink-0 text-fg-warm-muted" />
-        </Link>
-      )}
+      </div>
 
       {/* Materials — keep My Programs + the 2 highest-priority attachments */}
       {(() => {
