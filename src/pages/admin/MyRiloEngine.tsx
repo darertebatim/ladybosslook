@@ -18,7 +18,6 @@ const doorSignatures = [
     emoji: "🧠",
     label: "Self-Care",
     signature: "Self-Care Personality Quiz → personalized Check In (audio slot picks playlist tagged Path role = Primary + Self-care subject, language-matched — e.g. Self Care Reset EN/FA)",
-    secondarySignature: "Pick Self-Care Goals (/app/tasksbank) → seeds My Rilo Self Care",
     deeper: "Open today's Check In (door-flavored)",
   },
   {
@@ -34,7 +33,6 @@ const doorSignatures = [
     label: "Productivity",
     signature: "Open Planner → Rilo Planner Onboarding → pick first routine",
     deeper: "Plan tomorrow · 1 quick routine task",
-    secondaryAudio: "Playlist tagged Path role = Primary + Productivity (language-matched — e.g. Wellness Planning) — offered in the Secondary audio slot",
   },
   {
     door: "emotion",
@@ -58,13 +56,11 @@ const day1Flow = [
   { emoji: "🌬️", title: "Check In (door-flavored)", meta: "See Vocabulary card above", kind: "reset", isNew: true },
   { emoji: "✨", title: "Browse routines (pick your first)", meta: "Always shown on Day 1", kind: "routine" },
   { emoji: "🧠", title: "Self-Care Personality Quiz teaser", meta: "Injected if Self-Care isn't a chosen door & quiz not done · skippable", kind: "quiz_pick", isNew: true },
-  { emoji: "🎧", title: "Secondary audio (extra)", meta: "Low-commitment second pick · Day 1 only · skippable", kind: "playlist", isNew: true },
   { emoji: "🏆", title: "+1 day streak & a new affirmation", meta: "Always last", kind: "reward" },
 ];
 
 const day2Flow = [
   { emoji: "💛", title: "Mood check-in", meta: "Same as Standard Flow — opens the day", kind: "mood", isNew: true },
-  { emoji: "🚪", title: "Secondary door signature step", meta: "Hero — secondary door's signature (fallback: primary deeper)", kind: "door_signature", isNew: true },
   { emoji: "🔁", title: "Primary door deeper step", meta: "Booster — keeps primary thread alive", kind: "door_deeper", isNew: true },
   { emoji: "📋", title: "Rilo Planner Onboarding teaser", meta: "Injected if Productivity isn't a chosen door & planner onboarding not done · skippable — moved to Day 2 so Day 1 isn't overwhelming", kind: "planner_onb", isNew: true },
   { emoji: "🌬️", title: "Check In (door-flavored)", meta: "See Vocabulary card above", kind: "reset" },
@@ -82,66 +78,62 @@ const starterPool: Array<{
   completedWhen: string;
 }> = [
   { slot: "primary_signature", priority: 95, emoji: "🚪", title: "Primary door signature", eligible: "Primary door picked", completedWhen: "User taps or skips" },
-  { slot: "secondary_signature", priority: 85, emoji: "🚪", title: "Secondary door signature", eligible: "Secondary door picked AND primary_signature done", completedWhen: "User taps or skips" },
   { slot: "browse_routines", priority: 80, emoji: "✨", title: "Browse routines (pick your first)", eligible: "No active routines AND primary_signature done", completedWhen: "Any active routine exists OR user skips" },
   { slot: "continue_routine", priority: 75, emoji: "🔥", title: "Continue routine", eligible: "Has ≥1 active routine AND primary_signature done", completedWhen: "User taps or skips" },
   { slot: "primary_deeper", priority: 70, emoji: "🔁", title: "Primary door deeper", eligible: "Primary door picked AND primary_signature done", completedWhen: "User taps or skips" },
-  { slot: "secondary_deeper", priority: 65, emoji: "🔁", title: "Secondary door deeper", eligible: "Secondary door picked AND secondary_signature done", completedWhen: "User taps or skips" },
   { slot: "selfcare_quiz", priority: 60, emoji: "🧠", title: "Self-Care Personality Quiz teaser", eligible: "Quiz not done AND no selfcare door", completedWhen: "Quiz done OR user skips" },
   { slot: "planner_intro", priority: 55, emoji: "📋", title: "Rilo Planner Onboarding teaser", eligible: "Planner intro not done AND no productivity door", completedWhen: "Planner intro done OR user skips" },
   { slot: "featured_audio", priority: 50, emoji: "🎧", title: "Featured audio (door-aware)", eligible: "A featured audio is available today", completedWhen: "User taps or skips" },
-  { slot: "secondary_audio", priority: 45, emoji: "🎧", title: "Secondary audio (extra)", eligible: "A secondary audio is available today", completedWhen: "User taps or skips" },
 ];
 
 const day3Flow = [
   { emoji: "💛", title: "Mood check-in", meta: "Same as Standard Flow — opens the day", kind: "mood", isNew: true },
   { emoji: "🌱", title: "Habit cement: today's routine", meta: "Lead with routine — turns 'try' into 'rhythm'", kind: "routine", isNew: true },
-  { emoji: "🚪", title: "Secondary door deeper step", meta: "Keeps secondary alive", kind: "door_deeper" },
   { emoji: "🎧", title: "Featured audio", meta: "Door-aware pick — bilingual playlist for immigrant; solo emotion-tagged meditation/sleep story for emotion", kind: "playlist" },
   { emoji: "🌬️", title: "Check In (door-flavored)", meta: "See Vocabulary card above", kind: "reset" },
   { emoji: "🏆", title: "Streak + affirmation", meta: "Always last", kind: "reward" },
 ];
 
-/* Example scenarios — primary × secondary combinations */
+/* Example scenarios — primary-only paths */
 const scenarios = [
   {
-    name: "A · Emotion (sad) + Self-Care",
+    name: "A · Emotion (sad)",
     days: [
-      "Day 1: Solo meditation tagged 'sadness' → Check In (sadness-tagged) → Browse routines → Self-Care Goals teaser",
-      "Day 2: Pick Self-Care Goals at /app/tasksbank (secondary signature, deep-linked to quiz-outcome cluster if available) → second sadness-tagged solo track (sleep story or meditation) → Check In (sadness-tagged) → continue routine",
-      "Day 3: Routine first → Self-Care deeper (first picked goal surfaced as task) → sadness-tagged solo track → Check In (sadness-tagged)",
+      "Day 1: Solo meditation tagged 'sadness' → Check In (sadness-tagged) → Browse routines",
+      "Day 2: Primary deeper (sadness-tagged solo sleep story) → routine continue → Check In (sadness-tagged)",
+      "Day 3: Routine first → sadness-tagged solo track → Check In (sadness-tagged)",
     ],
   },
   {
-    name: "B · Immigrant + Productivity",
+    name: "B · Immigrant",
     days: [
-      "Day 1: Primary+Immigrant playlist (language-matched, e.g. Bilingual Strength EN/FA) → immigrant-tagged sleep story → Browse routines → Planner Onboarding teaser (productivity is secondary, so it still gets seeded)",
-      "Day 2: Planner Onboarding + pick first routine (secondary signature) → another immigrant-tagged sleep story (primary deeper) → Check In (bilingual if available, else generic)",
-      "Day 3: Routine first → 'Plan tomorrow' (secondary deeper) → Primary+Immigrant playlist (language-matched) → Check In (bilingual if available, else generic)",
+      "Day 1: Primary+Immigrant playlist (language-matched, e.g. Bilingual Strength EN/FA) → immigrant-tagged sleep story → Browse routines",
+      "Day 2: Another immigrant-tagged sleep story (primary deeper) → routine continue → Check In (bilingual if available, else generic)",
+      "Day 3: Routine first → Primary+Immigrant playlist (language-matched) → Check In (bilingual if available, else generic)",
     ],
   },
   {
-    name: "C · Productivity + Emotion (anxious)",
+    name: "C · Productivity",
     days: [
-      "Day 1: Open Planner → Rilo Planner Onboarding → pick first routine → Browse routines → Check In (anxiety-tagged, because emotion is secondary)",
-      "Day 2: Anxiety-tagged solo meditation (secondary signature) → 1 quick routine task (primary deeper) → Check In (anxiety-tagged)",
-      "Day 3: Routine first → anxiety-tagged reflection step (secondary deeper) → anxiety-tagged solo sleep story → Check In (anxiety-tagged)",
+      "Day 1: Open Planner → Rilo Planner Onboarding → pick first routine → Browse routines → Check In",
+      "Day 2: 1 quick routine task (primary deeper) → routine continue → Check In",
+      "Day 3: Routine first → 'Plan tomorrow' (primary deeper) → Check In",
     ],
   },
   {
-    name: "D · Self-Care only (no secondary)",
+    name: "D · Self-Care only",
     days: [
-      "Day 1: Self-Care Personality Quiz → Check In (quiz-outcome flavored) → Browse routines → Planner Onboarding teaser (productivity not picked)",
+      "Day 1: Self-Care Personality Quiz → Check In (quiz-outcome flavored) → Browse routines → Planner Onboarding teaser",
       "Day 2: Primary deeper (= Check In, quiz-outcome flavored) → routine continue → generic playlist → reward",
       "Day 3: Routine first → Check In (quiz-outcome flavored) → generic playlist → reward",
     ],
   },
   {
-    name: "E · Exploring + Emotion (lonely)",
+    name: "E · Exploring",
     days: [
-      "Day 1: Curated tour (1 playlist + quiz + planner peek) → Check In (lonely-tagged) → Browse routines",
-      "Day 2: Lonely-tagged solo meditation (secondary signature) → exploring deeper (Browse routines + 1 Check In) → routine",
-      "Day 3: Routine first → Check In (lonely-tagged) → lonely-tagged solo sleep story → reward",
+      "Day 1: Curated tour (1 playlist + quiz + planner peek) → Check In → Browse routines",
+      "Day 2: Browse routines (primary deeper) → routine → Check In",
+      "Day 3: Routine first → Check In → generic playlist → reward",
     ],
   },
 ];
@@ -170,7 +162,6 @@ const standardFlow = [
   { emoji: "🌬️", title: "Check In", meta: "See Vocabulary card above (Day 4+: no door flavor, generic pool)", kind: "reset", isNew: true },
   { emoji: "🎧", title: "Today's playlist (ready to play)", meta: "Picks a playlist tagged Path role = Primary in the user's language; falls back to educational/sort_order", kind: "playlist" },
   { emoji: "🔥", title: "Open your Planner (first active routine)", meta: "Quiz outcome already provisioned the routine — navigates to /app/home", kind: "routine" },
-  { emoji: "🎧", title: "Secondary audio (extra)", meta: "Picks a playlist tagged Path role = Secondary in the user's language; falls back to intent/rotation · skippable", kind: "playlist", isNew: true },
   { emoji: "🔒", title: "Plus locked teaser", meta: "Shown to non-Plus users when a locked Plus playlist is available · skippable", kind: "playlist", isNew: true },
   { emoji: "🏆", title: "+1 day streak & a new affirmation", meta: "Reward (always last, never skippable)", kind: "reward" },
 ];
@@ -179,7 +170,7 @@ const dataSources = [
   { table: "emotion_logs", purpose: "Today's mood check-in + valence → mood label for scorer" },
   { table: "selfcare_quiz_results", purpose: "Quiz outcome → routine provisioned via provisionRiloPicks (no separate quiz_pick step)" },
   { table: "user_routines_bank", purpose: "Up to 4 active routines, weaved into path" },
-  { table: "audio_playlists", purpose: "Featured + secondary playlists. Selection priority: door override → playlist tagged via Tag Schema · Path role = Primary / Secondary (filtered by user's preferred language) → educational/intent fallback → sort_order." },
+  { table: "audio_playlists", purpose: "Featured playlists. Selection priority: door override → playlist tagged via Tag Schema · Path role = Primary (filtered by user's preferred language) → educational/intent fallback → sort_order." },
   { table: "breathing_exercises", purpose: "Check In pool — active + not premium; one picked per day by date seed" },
   { table: "reflections", purpose: "Check In pool — active + is_free; one picked per day by date seed" },
   { table: "path_dismissals", purpose: "Per-day skip list, filtered from steps" },
@@ -400,13 +391,7 @@ export default function MyRiloEngine() {
                     <Badge variant="outline" className="text-[10px] font-mono">{d.door}</Badge>
                   </div>
                   <div className="text-xs mt-0.5"><span className="text-muted-foreground">Signature:</span> {d.signature}</div>
-                  {(d as any).secondarySignature && (
-                    <div className="text-xs mt-0.5"><span className="text-muted-foreground">Secondary signature:</span> {(d as any).secondarySignature}</div>
-                  )}
                   <div className="text-xs mt-0.5"><span className="text-muted-foreground">Deeper:</span> {d.deeper}</div>
-                  {(d as any).secondaryAudio && (
-                    <div className="text-xs mt-0.5"><span className="text-muted-foreground">Secondary audio:</span> {(d as any).secondaryAudio}</div>
-                  )}
                 </div>
               </div>
             ))}
@@ -461,7 +446,7 @@ export default function MyRiloEngine() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Example 3-day scenarios</CardTitle>
-          <CardDescription>Primary × Secondary door combinations and the resulting path.</CardDescription>
+          <CardDescription>Primary door paths and the resulting day-by-day flow.</CardDescription>
         </CardHeader>
         <CardContent className="text-sm space-y-4">
           {scenarios.map((s) => (
