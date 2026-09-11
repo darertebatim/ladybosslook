@@ -85,7 +85,7 @@ export const EnrolledProgramCard = memo(function EnrolledProgramCard({
         {/* Gradient header */}
         <div
           className={cn(
-            'relative h-24 flex items-center justify-center bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-primary-dark))]',
+            'relative h-24 flex items-center justify-center bg-gradient-orange',
             isCompleted && 'opacity-80',
           )}
         >
