@@ -48,7 +48,7 @@ export default function AppAudioPlayer() {
   const contextPlaylistId = searchParams.get('playlistId');
   const moduleIndex = parseInt(searchParams.get('moduleIndex') || '0', 10);
   const from = (location.state as any)?.from;
-  const cameFromProgram = typeof from === "string" && from.startsWith("/app/myprograms");
+  const hasReturnOrigin = typeof from === "string";
   
   // Use global audio player context
   const {
@@ -534,7 +534,10 @@ export default function AppAudioPlayer() {
               }
               const backPlaylistId = isModuleMode ? contextPlaylistId : playlistInfo?.playlist_id;
               if (backPlaylistId) {
-                navigate(`/app/player/playlist/${backPlaylistId}`);
+                navigate(
+                  `/app/player/playlist/${backPlaylistId}`,
+                  hasReturnOrigin ? { state: { from } } : undefined,
+                );
               } else {
                 navigate('/app/player');
               }
@@ -552,7 +555,7 @@ export default function AppAudioPlayer() {
                   if (navPlaylistId) {
                     navigate(
                       `/app/player/playlist/${navPlaylistId}`,
-                      cameFromProgram ? { state: { from } } : undefined
+                      hasReturnOrigin ? { state: { from } } : undefined
                     );
                   }
                 }}

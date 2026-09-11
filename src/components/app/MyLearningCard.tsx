@@ -143,6 +143,7 @@ export function MyLearningCard() {
         <div className="mx-3 mt-1">
           <Link
             to={heroPlaylist.to}
+            state={{ from: location.pathname }}
             onClick={() => haptic.light()}
             className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-gradient-orange text-[14px] font-extrabold text-white shadow-ios transition-transform active:scale-[0.98]"
           >

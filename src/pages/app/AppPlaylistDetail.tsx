@@ -397,7 +397,7 @@ export default function AppPlaylistDetail() {
   const from = (location.state as any)?.from;
   const cameFromPlanner = from === "planner";
   const cameFromProgram = typeof from === "string" && from.startsWith("/app/myprograms");
-  const programBackState = cameFromProgram ? { state: { from } } : undefined;
+  const originBackState = typeof from === "string" ? { state: { from } } : undefined;
 
   const { hasAccessToProgram } = useSubscription();
   const { hasRoundAccess } = useRoundPlaylistAccess();
@@ -551,7 +551,7 @@ export default function AppPlaylistDetail() {
           (t) => getContentAvailability(t.drip_delay_days || 0).isAvailable,
         );
       if (trackToPlay && "audio_content" in trackToPlay) {
-        navigate(`/app/player/${trackToPlay.audio_content.id}`, programBackState);
+        navigate(`/app/player/${trackToPlay.audio_content.id}`, originBackState);
       }
     }
   };
@@ -638,7 +638,7 @@ export default function AppPlaylistDetail() {
     if (!hasAccess) return;
     const { isAvailable } = getContentAvailability(dripDelayDays);
     if (!isAvailable) return;
-    navigate(`/app/player/${audioId}`, programBackState);
+    navigate(`/app/player/${audioId}`, originBackState);
   };
 
   const handleModuleClick = (module: any, index?: number) => {
@@ -657,7 +657,7 @@ export default function AppPlaylistDetail() {
           // Pass module context AND index so player can return to correct position
           navigate(
             `/app/player/${module.audio_id}?moduleMode=true&playlistId=${playlistId}&moduleIndex=${moduleIdx}`,
-            programBackState,
+            originBackState,
           );
         }
         break;
@@ -1284,7 +1284,7 @@ export default function AppPlaylistDetail() {
                         setSelectedSupplement(null);
                         navigate(
                           `/app/player/${module.audio_id}?moduleMode=true&playlistId=${playlistId}`,
-                          programBackState,
+                          originBackState,
                         );
                         return;
                       }
