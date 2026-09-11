@@ -7,9 +7,7 @@ import {
   BookOpen,
   Wind,
   Droplets,
-  HeartHandshake,
   Heart,
-  CalendarPlus,
   GraduationCap,
   User,
   LogOut,
@@ -20,7 +18,6 @@ import {
   Languages,
   Flame,
   ChevronRight,
-  Target,
 } from "lucide-react";
 import { ApertureLogo } from "@/aperture/brand/ApertureLogo";
 import {
