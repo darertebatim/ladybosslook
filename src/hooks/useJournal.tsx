@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 import { useAutoCompleteProTask } from './useAutoCompleteProTask';
+import { recordStreakActivity } from '@/lib/streakActivity';
 
 export interface JournalEntry {
   id: string;
