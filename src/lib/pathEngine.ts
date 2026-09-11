@@ -179,7 +179,7 @@ export interface PathInputs {
   /** Rilo Doors onboarding picks. When `primary` is set, the door-aware
    *  builder runs instead of the legacy buildStandardPath. */
   doorContext?: {
-    secondary: DoorKey | null;
+    primary: DoorKey | null;
     emotionKeys: string[]; // raw picker keys (e.g. "lonely", "anxious")
     immigrantKeys: string[];
     financialKeys?: string[];
