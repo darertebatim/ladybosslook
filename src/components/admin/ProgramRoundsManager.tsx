@@ -100,6 +100,8 @@ export const ProgramRoundsManager = () => {
   const [dripAdjustmentType, setDripAdjustmentType] = useState<'freeze' | 'forward'>('freeze');
   const [dripAdjustmentDays, setDripAdjustmentDays] = useState<string>('7');
   
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'program' | 'round'>('newest');
+  
   const [formData, setFormData] = useState<RoundFormData>({
     program_slug: "",
     round_name: "",
