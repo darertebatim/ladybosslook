@@ -39,6 +39,8 @@ interface NavItem {
   id: string;
   /** i18n key under `menu.items.*` */
   nameKey: string;
+  /** Optional static label override */
+  label?: string;
   icon: React.ReactNode;
   route: string;
   color: string;
