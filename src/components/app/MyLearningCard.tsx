@@ -121,8 +121,8 @@ export function MyLearningCard() {
       {/* Continue where you left off */}
       {courseId && nextLesson && (
         <div className="mx-3 mt-1 overflow-hidden rounded-2xl border border-border-warm bg-card-warm">
-          <div className="relative flex aspect-[16/6] items-center justify-center bg-gradient-orange">
-            <GraduationCap className="h-9 w-9 text-white/90" />
+          <div className="relative flex h-16 items-center justify-center rounded-2xl bg-gradient-orange">
+            <GraduationCap className="h-7 w-7 text-white/90" />
             {nextLessonModuleIndex && (
               <span className="absolute bottom-2 right-2.5 rounded-full bg-black/35 px-2 py-0.5 text-[10px] font-bold text-white">
                 Module {nextLessonModuleIndex} · Lesson {nextLessonIndexInModule}
