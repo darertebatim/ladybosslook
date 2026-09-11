@@ -291,7 +291,6 @@ function PhoneScreen({ enrolled, firstOpen }: { enrolled: boolean; firstOpen?: b
 }
 
 export default function MyLearningMock() {
-  const [showSheet, setShowSheet] = useState(true);
 
   return (
     <div style={{ minHeight: '100vh', background: '#FBF1E9', padding: '32px 20px 80px' }}>
