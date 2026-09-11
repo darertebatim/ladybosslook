@@ -446,7 +446,7 @@ export default function MyRiloEngine() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Example 3-day scenarios</CardTitle>
-          <CardDescription>Primary × Secondary door combinations and the resulting path.</CardDescription>
+          <CardDescription>Primary door paths and the resulting day-by-day flow.</CardDescription>
         </CardHeader>
         <CardContent className="text-sm space-y-4">
           {scenarios.map((s) => (
