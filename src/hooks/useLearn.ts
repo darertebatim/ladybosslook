@@ -311,8 +311,10 @@ export function useSetLessonComplete() {
         if (error) throw error;
       }
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['learn-progress'] });
+      // Course progress counts toward the daily streak
+      if (variables.complete) recordStreakActivity(user?.id, 'lesson', queryClient);
     },
   });
 }
