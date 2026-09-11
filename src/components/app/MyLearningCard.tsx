@@ -239,25 +239,3 @@ export function MyLearningCard() {
     </div>
   );
 }
-
-function MaterialTile({
-  to,
-  icon,
-  label,
-}: {
-  to: string | null;
-  icon: ReactNode;
-  label: string;
-}) {
-  if (!to) return null;
-  return (
-    <Link
-      to={to}
-      onClick={() => haptic.light()}
-      className="flex flex-col items-center gap-1.5 rounded-2xl bg-peach py-2.5 text-brand active:opacity-90"
-    >
-      {icon}
-      <span className="text-[10.5px] font-extrabold text-fg-warm">{label}</span>
-    </Link>
-  );
-}
