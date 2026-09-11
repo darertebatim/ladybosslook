@@ -172,39 +172,6 @@ export function MyLearningCard() {
         </div>
       )}
 
-      {/* Progress */}
-      {totalLessons > 0 && (
-        <div className="px-4 pt-3">
-          <div className="mb-1.5 flex justify-between text-[11.5px] font-semibold">
-            <span className="text-fg-warm">
-              {completedCount} of {totalLessons} lessons done
-            </span>
-            {waitingCount > 0 && (
-              <span className="text-fg-warm-muted">{waitingCount} unlocked &amp; waiting</span>
-            )}
-          </div>
-          <div className="h-2 overflow-hidden rounded-full bg-peach">
-            <div
-              className="h-full rounded-full bg-gradient-orange transition-[width] duration-700"
-              style={{ width: `${percent}%` }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Just unlocked */}
-      {waitingCount > 0 && nextLesson && (
-        <div className="mx-3 mt-3 rounded-2xl bg-mint/60 px-3 py-2.5">
-          <p className="mb-1 flex items-center gap-1.5 text-[10.5px] font-extrabold uppercase tracking-[0.1em] text-fg-warm">
-            <Sparkles className="h-3.5 w-3.5 text-brand" />
-            Just unlocked
-          </p>
-          <p className="text-[12.5px] font-semibold text-fg-warm line-clamp-1">
-            {nextLesson.title}
-            {waitingCount > 1 ? ` +${waitingCount - 1} more` : ''}
-          </p>
-        </div>
-      )}
 
       {/* Next live session / self-paced start */}
       {sessionDate ? (
