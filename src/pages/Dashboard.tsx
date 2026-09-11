@@ -152,7 +152,7 @@ const Dashboard = () => {
             to={`/app/myprograms/${upcoming.enrollment.program_slug}${
               upcoming.enrollment.program_rounds?.id ? `/${upcoming.enrollment.program_rounds.id}` : ''
             }`}
-            className="mt-6 block rounded-2xl bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-primary-dark))] p-5 text-white shadow-ios"
+            className="mt-6 block rounded-2xl bg-gradient-orange p-5 text-white shadow-ios"
           >
             <div className="text-xs uppercase tracking-wide opacity-90">Next live session</div>
             <div className="mt-1 text-xl font-semibold">{upcoming.enrollment.course_name}</div>
