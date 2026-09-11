@@ -8,8 +8,8 @@ interface StackedEventDeckProps {
   date: Date;
 }
 
-const MAX_PEEKS = 3; // visible cards peeking behind the top card
-const PEEK_OFFSET = 16; // px of each underlying card visible below the one above
+const MAX_PEEKS = 5; // visible cards peeking behind the top card
+const PEEK_OFFSET = 14; // px of each underlying card visible below the one above
 
 export function StackedEventDeck({ events, date }: StackedEventDeckProps) {
   // Uncompleted events first, completed ones go to the back of the stack
@@ -55,7 +55,7 @@ export function StackedEventDeck({ events, date }: StackedEventDeckProps) {
               )}
               style={{
                 bottom: stackPadding,
-                transform: `translateY(${depth * PEEK_OFFSET}px) scaleX(${1 - depth * 0.045})`,
+                transform: `translateY(${depth * PEEK_OFFSET}px) scaleX(${1 - depth * 0.03})`,
                 transformOrigin: 'top center',
                 zIndex: 10 - depth,
               }}
