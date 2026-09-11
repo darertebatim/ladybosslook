@@ -376,40 +376,38 @@ export function HomeMenu() {
             {renderPills(accountItems)}
           </section>
 
-          {/* Dark Mode Toggle */}
+          {/* Sign Out + Dark Mode */}
           <section className="pt-2 border-t border-border/40">
-            <button
-              onClick={toggleDarkMode}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-full",
-                "text-[13px] font-medium transition-all active:scale-95",
-                isDark
-                  ? "text-amber-600 bg-amber-100"
-                  : "text-indigo-600 bg-indigo-100",
-              )}
-            >
-              {isDark ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
-              <span>{isDark ? t("menu.lightMode") : t("menu.darkMode")}</span>
-            </button>
-          </section>
-
-          {/* Sign Out */}
-          <section className="pt-2 border-t border-border/40">
-            <button
-              onClick={handleSignOut}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-full",
-                "text-[13px] font-medium transition-all active:scale-95",
-                "text-destructive bg-destructive/10",
-              )}
-            >
-              <LogOut className="h-4 w-4" />
-              <span>{t("menu.signOut")}</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleSignOut}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full",
+                  "text-[13px] font-medium transition-all active:scale-95",
+                  "text-destructive bg-destructive/10",
+                )}
+              >
+                <LogOut className="h-4 w-4" />
+                <span>{t("menu.signOut")}</span>
+              </button>
+              <button
+                onClick={toggleDarkMode}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full",
+                  "text-[13px] font-medium transition-all active:scale-95",
+                  isDark
+                    ? "text-amber-600 bg-amber-100"
+                    : "text-indigo-600 bg-indigo-100",
+                )}
+              >
+                {isDark ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
+                <span>{isDark ? t("menu.lightMode") : t("menu.darkMode")}</span>
+              </button>
+            </div>
           </section>
         </div>
       </SheetContent>
