@@ -155,6 +155,9 @@ export function MoodDashboard() {
 
   // Intercept action clicks from celebration to show routine prompt
   const handleCelebrationAction = useCallback((route: string): boolean => {
+    // Temporarily disabled while we refine the prompt timing/copy.
+    if (!MOOD_ROUTINE_PROMPT_ENABLED) return false;
+
     // Only intercept when we know for sure the user has NOT added it yet.
     // While the query is loading (existingTask === undefined), assume added
     // to avoid showing the prompt to users who already have the routine.
