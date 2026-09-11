@@ -162,14 +162,32 @@ export const ProgramRoundsManager = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("program_rounds")
-        .select("*")
-        .order("program_slug", { ascending: true })
-        .order("round_number", { ascending: false });
+        .select("*");
       
       if (error) throw error;
       return data as ProgramRound[];
     },
   });
+
+  const sortedRounds = useMemo(() => {
+    if (!rounds) return [];
+    const list = [...rounds];
+    list.sort((a, b) => {
+      switch (sortBy) {
+        case 'newest':
+          return new Date(b.start_date).getTime() - new Date(a.start_date).getTime() || b.round_number - a.round_number;
+        case 'oldest':
+          return new Date(a.start_date).getTime() - new Date(b.start_date).getTime() || a.round_number - b.round_number;
+        case 'program':
+          return a.program_slug.localeCompare(b.program_slug) || b.round_number - a.round_number;
+        case 'round':
+          return b.round_number - a.round_number || new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
+        default:
+          return 0;
+      }
+    });
+    return list;
+  }, [rounds, sortBy]);
 
   // Create/Update mutation
   const saveMutation = useMutation({
