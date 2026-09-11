@@ -1,37 +1,37 @@
-# My Learning section on Path
+# My Learning — fix links, self-paced support, match the mockup
 
-## The idea
+The section on Path works but three things are off: the look doesn't match the approved mockup, the buttons go to the wrong places, and self-paced programs (no live sessions) aren't handled.
 
-Keep Path as the home. For users enrolled in a program, add a **My Learning** block directly under the header, above the shortcuts row. When it is present, the shortcuts row is removed for that user (they can still reach everything via the menu) — so the program becomes the first thing they see after buying, without inventing a new page.
+## 1. Buttons go where they should
 
-Users with no enrollment see today's Path unchanged.
+Today "Next live session" and "Course" both open the program round page, and "Audio" opens the whole player library.
 
-## The My Learning block
+New behaviour:
+- Next live session -> the round page (correct), plus a small "Add to calendar" action as in the mockup.
+- Course -> the course page for this round's course; if there is no course, the tile is hidden instead of falling back to the round page.
+- Audio -> if the round has exactly one audio playlist, open that playlist directly; if several, open the round page's materials; never the generic player.
+- Video -> same rule with the round's video playlists.
+- Continue lesson -> unchanged (opens the lesson, back goes to the round).
+- Files tile appears only when the round/course actually has downloadable documents.
 
-One bordered card with a warm orange-tinted background, containing:
+## 2. Self-paced programs
 
-1. **Greeting line** — "Welcome back, {name}" (first visit after enrollment: "You're in — {program name}"), plus program and round name in small caps.
-2. **Continue where you left off** — 16:9 cover thumb, next unfinished lesson title and its module, and a full-width orange Continue button ("Start Lesson 1" if untouched). Tapping goes straight to the lesson.
-3. **Progress line** — slim bar: X of Y lessons done, with count of lessons unlocked and waiting.
-4. **Next live session** — if the round has one upcoming: date/time in local timezone with a Join link 15 minutes before start, and Add to calendar otherwise.
-5. **Just unlocked** — anything released since their last visit (drip lessons, new modules, new playlists attached to the round) with a small orange dot.
-6. **Program materials row** — small tiles: Course, Audio, Video, Files — each opening the round's attached content.
-7. **Support line** — one subtle link to Support Chat.
+When the round is self-paced (or has no upcoming session):
+- Replace the "Next live session" row with a "Started <date>" / "Learn at your own pace" row using the learner's enrolment date, matching how the round page already shows it.
+- If the round has a course, the continue-lesson block stays the hero.
+- If the round has no course but has playlists, the hero becomes "Continue listening / watching" pointing at the next unfinished item in that playlist, so audio-only self-paced programs still get a real primary action.
+- Progress falls back to playlist completion when there are no lessons.
 
-Only rows 1–3 always show; the rest appear when data exists.
+## 3. Visual pass to match the mockup
 
-## First-open welcome
-
-The first time an enrolled user opens Path after enrolling, a one-time bottom sheet plays over it: "You're in — {program name}", how the program works (lessons unlock as you go, live sessions in your calendar), where to find things, and a Start learning button that scrolls to My Learning. Once per enrollment, never again.
+- Card: soft peach-to-white gradient, warm border, soft orange shadow (mockup styling, using existing Rilo tokens).
+- Primary button: orange gradient with the warm shadow, not the flat solid used now.
+- Material tiles: rounded, distinct soft backgrounds (peach / lavender / pink / yellow) with colored icons and bold labels, in one row.
+- Add the "Just unlocked" strip from the mockup (mint) listing newly unlocked lessons/playlists when there are any.
+- Tighter spacing so the whole card fits without scrolling on a phone.
 
 ## Technical notes
 
-- New component `src/components/app/home/MyLearningSection.tsx` rendered inside `AppHome.tsx` above the shortcuts grid, gated on an active `course_enrollments` row; the shortcuts grid and the "+ Add" tile are hidden when the section shows.
-- New hook `useStudentHome.ts`: nearest active enrollment, its round, attached course via `learn_course_rounds`, next unfinished lesson from existing lesson-progress data, next upcoming session, and items unlocked since a stored `last_seen_at` timestamp (localStorage per user).
-- Drip/sequential rules reused from `makeLessonLocker` so "next lesson" always respects existing locking.
-- Styling on Rilo tokens (`bg-gradient-orange`, `shadow-ios`, `active:` states, 16:9 covers), matching the Learn cards.
-- No backend or access-control changes.
-
-## Not included
-
-No changes to purchasing, drip rules, or the planner itself. Non-enrolled users are untouched.
+- `src/hooks/useMyLearning.ts`: return the actual playlist rows (id + type + title) instead of counts, expose `isSelfPaced`, enrolment date, document count, and a playlist-based fallback for `nextItem`/progress.
+- `src/components/app/MyLearningCard.tsx`: rewrite presentation with Rilo semantic tokens (`bg-gradient-orange`, `bg-card-warm`, `shadow-ios`, peach/lavender chips), route to `/app/player/playlist/:id` and `/app/watch/playlist/:id` for single-playlist cases, hide tiles with nothing behind them.
+- No schema changes; drip/sequential locking logic stays as-is.
