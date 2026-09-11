@@ -54,6 +54,7 @@ import { OnboardingBanner } from '@/components/app/OnboardingBanner';
 import { WeeklyReviewBanner } from '@/components/app/WeeklyReviewBanner';
 import { SelfCareQuizBanner } from '@/components/app/SelfCareQuizBanner';
 import { ToolShortcuts } from '@/components/app/ToolShortcuts';
+import { MyLearningCard } from '@/components/app/MyLearningCard';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { WelcomeSpotlightBanner } from '@/components/app/home/WelcomeSpotlightBanner';
 import { TaskCoachOverlay } from '@/components/app/home/TaskCoachOverlay';
@@ -1174,6 +1175,9 @@ const AppHome = () => {
             {!hasNotificationBanner && !hasWelcomeBannerVisible && !hasSelfCareQuizBanner && !hasPromoBanner && !hasHomeBanner && !hasMoodBanner && (
               <WeeklyReviewBanner onVisibilityChange={setHasWeeklyBanner} />
             )}
+
+            {/* My Learning — shown to learners enrolled in a program */}
+            <MyLearningCard />
 
             {/* My Shortcuts — temporarily hidden, will be restored later */}
             {false && !hasSelfCareQuizBanner && !hasPromoBanner && !hasHomeBanner && !hasMoodBanner && !hasWeeklyBanner && (
