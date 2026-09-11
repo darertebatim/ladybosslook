@@ -21,7 +21,6 @@ import {
   MessagesSquare,
   Activity,
 } from "lucide-react";
-import { ApertureLogo } from "@/aperture/brand/ApertureLogo";
 import {
   Sheet,
   SheetContent,
@@ -32,7 +31,6 @@ import {
 import { haptic } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
-import { isRiloBizHiddenRegion } from "@/lib/regionRestrictions";
 import { PushPermissionDot } from "@/components/app/PushPermissionDot";
 import { useTranslation } from "react-i18next";
 import { useNewHomeData } from "@/hooks/useNewHomeData";
