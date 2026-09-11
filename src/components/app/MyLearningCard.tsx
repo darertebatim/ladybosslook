@@ -249,7 +249,7 @@ export function MyLearningCard() {
           { to: audioTo, icon: <Music className="h-4 w-4" />, label: 'Audio', key: 'audio' },
           { to: videoTo, icon: <Video className="h-4 w-4" />, label: 'Video', key: 'video' },
           { to: filesTo, icon: <Folder className="h-4 w-4" />, label: 'Files', key: 'files' },
-        ].filter((t) => t.to) as { to: string; icon: React.ReactNode; label: string; key: string }[];
+        ].filter((t) => t.to) as { to: string; icon: ReactNode; label: string; key: string }[];
 
         const shown = attachmentTiles.slice(0, 2);
         const tiles = [
