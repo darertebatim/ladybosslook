@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { format, isToday } from 'date-fns';
 import {
@@ -241,16 +241,32 @@ export function MyLearningCard() {
         </Link>
       )}
 
-      {/* Materials */}
-      <div className="grid grid-cols-3 gap-2 px-3 pt-3">
-        <MaterialTile to={courseTo} icon={<BookOpen className="h-4 w-4" />} label="Course" />
-        <MaterialTile to={audioTo} icon={<Music className="h-4 w-4" />} label="Audio" />
-        <MaterialTile to={videoTo} icon={<Video className="h-4 w-4" />} label="Video" />
-        {documentCount > 0 && courseTo && (
-          <MaterialTile to={courseTo} icon={<Folder className="h-4 w-4" />} label="Files" />
-        )}
-        <MaterialTile to="/app/programs" icon={<LayoutGrid className="h-4 w-4" />} label="My Programs" />
-      </div>
+      {/* Materials — keep My Programs + the 2 highest-priority attachments */}
+      {(() => {
+        const filesTo = documentCount > 0 && courseTo ? courseTo : null;
+        const attachmentTiles = [
+          { to: courseTo, icon: <BookOpen className="h-4 w-4" />, label: 'Course', key: 'course' },
+          { to: audioTo, icon: <Music className="h-4 w-4" />, label: 'Audio', key: 'audio' },
+          { to: videoTo, icon: <Video className="h-4 w-4" />, label: 'Video', key: 'video' },
+          { to: filesTo, icon: <Folder className="h-4 w-4" />, label: 'Files', key: 'files' },
+        ].filter((t) => t.to) as { to: string; icon: ReactNode; label: string; key: string }[];
+
+        const shown = attachmentTiles.slice(0, 2);
+        const tiles = [
+          ...shown,
+          { to: '/app/programs', icon: <LayoutGrid className="h-4 w-4" />, label: 'My Programs', key: 'programs' },
+        ];
+        const cols = tiles.length >= 3 ? 'grid-cols-3' : tiles.length === 2 ? 'grid-cols-2' : 'grid-cols-1';
+
+        return (
+          <div className={`grid ${cols} gap-2 px-3 pt-3`}>
+            {tiles.map((t) => (
+              <MaterialTile key={t.key} to={t.to} icon={t.icon} label={t.label} />
+            ))}
+          </div>
+        );
+      })()}
+
 
       {/* Support */}
       <Link
@@ -271,7 +287,7 @@ function MaterialTile({
   label,
 }: {
   to: string | null;
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
 }) {
   if (!to) return null;
