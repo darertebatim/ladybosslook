@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { format, isToday } from 'date-fns';
 import {
   GraduationCap,
@@ -21,6 +21,7 @@ import { useMyLearning } from '@/hooks/useMyLearning';
  */
 export function MyLearningCard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const {
     enrollment,
@@ -126,7 +127,7 @@ export function MyLearningCard() {
             onClick={() => {
               haptic.light();
               navigate(`/app/learn/${courseId}/${nextLesson.id}`, {
-                state: { from: programPath },
+                state: { from: location.pathname },
               });
             }}
             className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-gradient-orange text-[14px] font-extrabold text-white shadow-ios transition-transform active:scale-[0.98]"
