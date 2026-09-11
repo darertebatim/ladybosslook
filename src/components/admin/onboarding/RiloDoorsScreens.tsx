@@ -27,15 +27,6 @@ const DOORS: {
   bubble: string;     // soft bubble bg for emoji
 }[] = [
   {
-    key: 'emotion',
-    emoji: '💗',
-    label: "I'm feeling heavy emotions",
-    blurb: 'Anxiety, sadness, anger — let Rilo help you breathe through it.',
-    tint: 'rgba(244,114,182,0.55)',
-    ring: 'from-pink-300 via-pink-400 to-rose-300',
-    bubble: 'bg-pink-100/80',
-  },
-  {
     key: 'selfcare',
     emoji: '🧩',
     label: 'I want self-care that fits me',
@@ -43,6 +34,24 @@ const DOORS: {
     tint: 'rgba(110,231,183,0.55)',
     ring: 'from-emerald-300 via-teal-300 to-emerald-200',
     bubble: 'bg-emerald-100/80',
+  },
+  {
+    key: 'financial',
+    emoji: '💰',
+    label: 'I want to understand money better',
+    blurb: 'Money stress, budgets, saving — build a steady money rhythm.',
+    tint: 'rgba(52,211,153,0.55)',
+    ring: 'from-green-300 via-emerald-300 to-lime-300',
+    bubble: 'bg-green-100/80',
+  },
+  {
+    key: 'business',
+    emoji: '💼',
+    label: 'I’m building my business',
+    blurb: 'Clients, content, pricing — grow without burning out.',
+    tint: 'rgba(96,165,250,0.55)',
+    ring: 'from-sky-300 via-blue-300 to-indigo-300',
+    bubble: 'bg-sky-100/80',
   },
   {
     key: 'immigrant',
@@ -63,22 +72,13 @@ const DOORS: {
     bubble: 'bg-yellow-100/80',
   },
   {
-    key: 'financial',
-    emoji: '💰',
-    label: 'I want to understand money better',
-    blurb: 'Money stress, budgets, saving — build a steady money rhythm.',
-    tint: 'rgba(52,211,153,0.55)',
-    ring: 'from-green-300 via-emerald-300 to-lime-300',
-    bubble: 'bg-green-100/80',
-  },
-  {
-    key: 'business',
-    emoji: '💼',
-    label: 'I’m building my business',
-    blurb: 'Clients, content, pricing — grow without burning out.',
-    tint: 'rgba(96,165,250,0.55)',
-    ring: 'from-sky-300 via-blue-300 to-indigo-300',
-    bubble: 'bg-sky-100/80',
+    key: 'emotion',
+    emoji: '💗',
+    label: "I'm feeling heavy emotions",
+    blurb: 'Anxiety, sadness, anger — let Rilo help you breathe through it.',
+    tint: 'rgba(244,114,182,0.55)',
+    ring: 'from-pink-300 via-pink-400 to-rose-300',
+    bubble: 'bg-pink-100/80',
   },
   {
     key: 'exploring',
@@ -202,23 +202,11 @@ export function DoorCardsGlassScreen({
   step,
   onNext,
   onAnswer,
-  answers,
 }: {
   step: OnboardingStep;
   onNext: () => void;
   onAnswer?: (id: string, val: string | string[]) => void;
-  answers?: OnboardingAnswers;
 }) {
-  const slot = step.doorSlot || 'primary';
-  const primary = (answers?.['rd-door-primary'] as string) || '';
-
-  const doors = useMemo(() => {
-    if (slot === 'secondary' && primary) {
-      return DOORS.filter((d) => d.key !== primary);
-    }
-    return DOORS;
-  }, [slot, primary]);
-
   const [picked, setPicked] = useState<DoorKey | null>(null);
 
   const handlePick = (k: DoorKey) => {
@@ -237,10 +225,10 @@ export function DoorCardsGlassScreen({
         className="mb-4"
       >
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#EB5E33]">
-          {slot === 'primary' ? 'Step 1 of 2' : 'Step 2 of 2'}
+          Step 1 of 1
         </p>
         <h1 className="mt-2 text-[26px] leading-[1.15] font-bold text-[#2A1810]">
-          {step.title || (slot === 'primary' ? 'Which door is yours\nright now?' : 'And a second one?')}
+          {step.title || 'Which door is yours\nright now?'}
         </h1>
         {step.subtitle && (
           <p className="mt-1.5 text-[15px] text-[#5a4a3a] leading-snug">{step.subtitle}</p>
@@ -248,7 +236,7 @@ export function DoorCardsGlassScreen({
       </motion.div>
 
       <div className="flex-1 space-y-2">
-        {doors.map((d, i) => {
+        {DOORS.map((d, i) => {
           const isPicked = picked === d.key;
           return (
             <motion.button
@@ -305,19 +293,6 @@ export function DoorCardsGlassScreen({
           );
         })}
       </div>
-
-      {slot === 'secondary' && (
-        <div className="pt-4">
-          <GhostCTA
-            onClick={() => {
-              onAnswer?.(step.id, 'skip');
-              onNext();
-            }}
-          >
-            Just one door is enough →
-          </GhostCTA>
-        </div>
-      )}
     </GlassShell>
   );
 }
