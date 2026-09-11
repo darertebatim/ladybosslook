@@ -344,6 +344,8 @@ export function useCompleteProgramEvent() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planner-program-events'] });
+      // Event tasks on the Path keep the streak alive too
+      recordStreakActivity(user?.id, 'event', queryClient);
     },
   });
 }
