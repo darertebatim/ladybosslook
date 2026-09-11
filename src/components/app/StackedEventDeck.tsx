@@ -55,7 +55,7 @@ export function StackedEventDeck({ events, date }: StackedEventDeckProps) {
               )}
               style={{
                 bottom: stackPadding,
-                transform: `translateY(${depth * PEEK_OFFSET}px) scaleX(${1 - depth * 0.045})`,
+                transform: `translateY(${depth * PEEK_OFFSET}px) scaleX(${1 - depth * 0.03})`,
                 transformOrigin: 'top center',
                 zIndex: 10 - depth,
               }}
