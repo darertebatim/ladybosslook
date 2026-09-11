@@ -182,7 +182,7 @@ export function MyLearningCard() {
           className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-peach py-2.5 text-brand active:opacity-90"
         >
           <LayoutGrid className="h-4 w-4" />
-          <span className="text-[10.5px] font-extrabold text-fg-warm">My Programs</span>
+          <span className="text-[10.5px] font-extrabold text-fg-warm">My Courses & Programs</span>
         </Link>
         {sessionDate ? (
           <Link
