@@ -15,7 +15,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
-import { cn } from '@/lib/utils';
+
 import { useAuth } from '@/hooks/useAuth';
 import { useMyLearning } from '@/hooks/useMyLearning';
 
