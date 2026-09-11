@@ -921,16 +921,6 @@ function buildPoolCandidates(inputs: PathInputs): PoolCandidate[] {
       ),
     },
     {
-      slot: "secondary_deeper",
-      priority: 65,
-      eligible: !!secondary && completed.has("secondary_signature"),
-      derivedDone: false,
-      build: () => tag(
-        secondary ? deeperStepForDoor(secondary, inputs, { kicker: "Keep your secondary alive", tint: "peach" }) : null,
-        "secondary_deeper",
-      ),
-    },
-    {
       slot: "selfcare_quiz",
       priority: 60,
       eligible: !hasSelfcareDoor && !inputs.hasQuizResult,
