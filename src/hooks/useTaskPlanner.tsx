@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 import { format, subDays, isEqual, parseISO, addDays } from 'date-fns';
 import { getLocalDateStr, taskAppliesToDate } from '@/lib/localDate';
+import { getAvailableShields } from '@/lib/recoveryShields';
 import { scheduleUrgentAlarm, cancelUrgentAlarms, isUrgentAlarmAvailable } from '@/lib/taskAlarm';
 import { scheduleTaskReminder, cancelTaskReminder, isLocalNotificationsAvailable } from '@/lib/localNotifications';
 import { getTimePeriodSortOrder, TimePeriod } from '@/lib/taskScheduling';
@@ -2043,10 +2044,7 @@ export const useUndoSkip = () => {
   });
 };
 
-/**
- * Recover a broken streak (regular or gold) using a recovery shield.
- * Users have a pool of 3 shields (1 free + 2 for subscribers). Never resets.
- */
+/** Recover a broken streak (regular or gold) using an earned recovery shield. */
 export const useRecoverStreak = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -2055,15 +2053,20 @@ export const useRecoverStreak = () => {
     mutationFn: async ({ previousStreak, type = 'streak' }: { previousStreak: number; type?: 'streak' | 'gold' }) => {
       if (!user?.id) throw new Error('Not authenticated');
 
-      // Get current recovery count
-      const { data: current } = await supabase
+      // Validate against the same milestone-based shield balance shown in the UI.
+      const { data: current, error: fetchError } = await supabase
         .from('user_streaks')
-        .select('streak_recovery_count')
+        .select('streak_recovery_count, longest_streak')
         .eq('user_id', user.id)
         .single();
 
+      if (fetchError) throw fetchError;
+
       const count = (current as any)?.streak_recovery_count || 0;
-      if (count >= 3) throw new Error('No recovery shields remaining');
+      const longestStreak = (current as any)?.longest_streak || 0;
+      if (getAvailableShields(longestStreak, count) <= 0) {
+        throw new Error('No recovery shields remaining');
+      }
 
       const updates: any = {
         streak_recovery_count: count + 1,
@@ -2073,10 +2076,10 @@ export const useRecoverStreak = () => {
 
       if (type === 'streak') {
         updates.current_streak = previousStreak;
-        updates.last_completion_date = format(new Date(), 'yyyy-MM-dd');
+        updates.last_completion_date = getLocalDateStr();
       } else {
         updates.current_gold_streak = previousStreak;
-        updates.last_gold_date = format(new Date(), 'yyyy-MM-dd');
+        updates.last_gold_date = getLocalDateStr();
       }
 
       const { error } = await supabase
