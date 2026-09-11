@@ -49,6 +49,7 @@ export default function AppAudioPlayer() {
   const moduleIndex = parseInt(searchParams.get('moduleIndex') || '0', 10);
   const from = (location.state as any)?.from;
   const hasReturnOrigin = typeof from === "string";
+  const cameFromProgram = hasReturnOrigin && from.startsWith("/app/myprograms");
   
   // Use global audio player context
   const {
