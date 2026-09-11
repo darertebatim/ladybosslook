@@ -19,7 +19,7 @@ export function StackedEventDeck({ events, date }: StackedEventDeckProps) {
   const totalRemaining = stackEvents.filter((e) => !e.isCompleted).length;
   const topEvent = stackEvents[0];
 
-  if (totalRemaining === 0 || !topEvent) return null;
+  if (stackEvents.length === 0 || !topEvent) return null;
 
   const peekEvents = stackEvents.slice(1, MAX_PEEKS + 1);
   const stackPadding = peekEvents.length * PEEK_OFFSET;

@@ -598,7 +598,7 @@ export default function AppMyRiloPath() {
               className="text-[28px] font-bold leading-[1.05] mt-1.5"
               style={{ color: O.fg }}
             >
-              {isDayOne ? "Let's build your path together" : "Your path for today"}
+              {isDayOne ? "Your path for today:" : "Your path for today"}
             </div>
             <div className="text-[13px] mt-1.5" style={{ color: O.fgMuted }}>
               {summary.total} small steps · ~{summary.totalMinutes} min
