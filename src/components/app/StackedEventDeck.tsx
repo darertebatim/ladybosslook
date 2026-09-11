@@ -51,7 +51,7 @@ export function StackedEventDeck({ events, date }: StackedEventDeckProps) {
               key={`${event.type}-${event.id}`}
               className={cn(
                 'absolute inset-x-0 top-0 rounded-3xl shadow-card-warm pointer-events-none',
-                style.tintBg
+                event.isCompleted ? style.tintBg : 'bg-card-warm'
               )}
               style={{
                 bottom: stackPadding,
