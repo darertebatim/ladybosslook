@@ -23,6 +23,7 @@ import { useUnreadChat } from '@/hooks/useUnreadChat';
 export function MyLearningCard() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { unreadCount } = useUnreadChat('support');
   const {
     enrollment,
     isSelfPaced,
