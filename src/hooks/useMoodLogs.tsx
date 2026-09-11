@@ -141,6 +141,8 @@ export function useCreateMoodLog() {
       // Invalidate so the My Rilo path refreshes immediately after logging.
       queryClient.invalidateQueries({ queryKey: ['today-path'] });
       try { Analytics.moodLogged(data.mood); } catch { /* ignore */ }
+      // Mood Check In counts as showing up today
+      recordStreakActivity(user?.id, 'mood', queryClient);
       if (user?.id) {
         void recordMoment({
           userId: user.id,
