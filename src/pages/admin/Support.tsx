@@ -14,6 +14,7 @@ import {
 import { NewMessageDialog } from "@/components/admin/support/NewMessageDialog";
 import {
   conversationEmail,
+  conversationMatchesProgram,
   conversationName,
   fetchSupportConversations,
   type SupportConversation,
