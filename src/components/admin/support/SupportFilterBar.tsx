@@ -3,9 +3,10 @@ import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select, SelectContent, SelectGroup, SelectItem, SelectLabel,
+  SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { getProgramLabel } from "./supportData";
+import { getProgramLabel, parseRoundKey } from "./supportData";
 
 export type SupportStatusFilter = "all" | "open" | "resolved" | "waiting";
 export type SupportSort = "recent" | "oldest" | "unread";
@@ -22,14 +23,20 @@ interface Props {
   program: string;
   onProgram: (v: string) => void;
   programCounts: Array<{ slug: string; count: number }>;
+  roundCounts: Array<{ key: string; count: number }>;
   total: number;
   unreadTotal: number;
 }
 
 export function SupportFilterBar({
   search, onSearch, unreadOnly, onUnreadOnly, status, onStatus,
-  sort, onSort, program, onProgram, programCounts, total, unreadTotal,
+  sort, onSort, program, onProgram, programCounts, roundCounts, total, unreadTotal,
 }: Props) {
+  const selectedLabel = program === "all"
+    ? `All programs (${total})`
+    : program.includes("::")
+      ? (() => { const r = parseRoundKey(program); return `${getProgramLabel(r.slug)} · ${r.label}`; })()
+      : getProgramLabel(program);
   return (
     <div className="border rounded-lg bg-background p-3 space-y-2 mb-4">
       <div className="flex flex-col md:flex-row gap-2">
