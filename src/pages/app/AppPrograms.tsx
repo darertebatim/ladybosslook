@@ -12,6 +12,7 @@ import {
   Compass,
 } from "lucide-react";
 import { format } from "date-fns";
+import { haptic } from "@/lib/haptics";
 import { SEOHead } from "@/components/SEOHead";
 import { PageHeader } from "@/components/app/ui/PageHeader";
 import { useUnseenContentContext } from "@/contexts/UnseenContentContext";
