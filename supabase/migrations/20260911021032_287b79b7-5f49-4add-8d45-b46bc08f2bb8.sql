@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.sync_round_first_session() FROM anon, authenticated, PUBLIC;
