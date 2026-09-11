@@ -130,6 +130,7 @@ export const useEmotionLogs = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['emotion-logs', user?.id] });
       try { Analytics.moodLogged(data.emotion); } catch { /* ignore */ }
+      recordStreakActivity(user?.id, 'mood', queryClient);
     },
     onError: (error) => {
       console.error('Failed to save emotion log:', error);
