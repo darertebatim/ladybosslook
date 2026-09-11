@@ -120,35 +120,25 @@ export function MyLearningCard() {
 
       {/* Continue where you left off */}
       {courseId && nextLesson && (
-        <div className="mx-3 mt-1 overflow-hidden rounded-2xl border border-border-warm bg-card-warm">
-          <div className="relative flex h-16 items-center justify-center rounded-2xl bg-gradient-orange">
-            <GraduationCap className="h-7 w-7 text-white/90" />
-            {nextLessonModuleIndex && (
-              <span className="absolute bottom-2 right-2.5 rounded-full bg-black/35 px-2 py-0.5 text-[10px] font-bold text-white">
-                Module {nextLessonModuleIndex} · Lesson {nextLessonIndexInModule}
-              </span>
-            )}
-          </div>
-          <div className="p-3.5">
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-fg-warm-muted">
-              {completedCount > 0 ? 'Continue where you left off' : 'Start here'}
-            </p>
-            <p className="mt-1 mb-2.5 text-sm font-bold leading-snug text-fg-warm line-clamp-2">
-              {nextLesson.title}
-            </p>
-            <button
-              onClick={() => {
-                haptic.light();
-                navigate(`/app/learn/${courseId}/${nextLesson.id}`, {
-                  state: { from: programPath },
-                });
-              }}
-              className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-gradient-orange text-[14px] font-extrabold text-white shadow-ios transition-transform active:scale-[0.98]"
-            >
-              <Play className="h-4 w-4 fill-white" />
-              {completedCount > 0 ? 'Continue lesson' : 'Start lesson'}
-            </button>
-          </div>
+        <div className="mx-3 mt-1 rounded-2xl border border-border-warm bg-card-warm p-3.5">
+          <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-fg-warm-muted">
+            {completedCount > 0 ? 'Continue where you left off' : 'Start here'}
+          </p>
+          <p className="mt-1 mb-2.5 text-sm font-bold leading-snug text-fg-warm line-clamp-2">
+            {nextLesson.title}
+          </p>
+          <button
+            onClick={() => {
+              haptic.light();
+              navigate(`/app/learn/${courseId}/${nextLesson.id}`, {
+                state: { from: programPath },
+              });
+            }}
+            className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-gradient-orange text-[14px] font-extrabold text-white shadow-ios transition-transform active:scale-[0.98]"
+          >
+            <Play className="h-4 w-4 fill-white" />
+            {completedCount > 0 ? 'Continue lesson' : 'Start lesson'}
+          </button>
         </div>
       )}
 
@@ -186,19 +176,6 @@ export function MyLearningCard() {
         </div>
       )}
 
-      {/* Just unlocked */}
-      {waitingCount > 0 && nextLesson && (
-        <div className="mx-3 mt-3 rounded-2xl bg-mint/60 px-3 py-2.5">
-          <p className="mb-1 flex items-center gap-1.5 text-[10.5px] font-extrabold uppercase tracking-[0.1em] text-fg-warm">
-            <Sparkles className="h-3.5 w-3.5 text-brand" />
-            Just unlocked
-          </p>
-          <p className="text-[12.5px] font-semibold text-fg-warm line-clamp-1">
-            {nextLesson.title}
-            {waitingCount > 1 ? ` +${waitingCount - 1} more` : ''}
-          </p>
-        </div>
-      )}
 
       {/* Next live session / self-paced start + My Programs */}
       <div className="mx-3 mt-3 grid grid-cols-[2fr_1fr] gap-2">
@@ -253,27 +230,6 @@ export function MyLearningCard() {
         </Link>
       </div>
 
-      {/* Materials — show the 2 highest-priority attachments */}
-      {(() => {
-        const filesTo = documentCount > 0 && courseTo ? courseTo : null;
-        const attachmentTiles = [
-          { to: courseTo, icon: <BookOpen className="h-4 w-4" />, label: 'Course', key: 'course' },
-          { to: audioTo, icon: <Music className="h-4 w-4" />, label: 'Audio', key: 'audio' },
-          { to: videoTo, icon: <Video className="h-4 w-4" />, label: 'Video', key: 'video' },
-          { to: filesTo, icon: <Folder className="h-4 w-4" />, label: 'Files', key: 'files' },
-        ].filter((t) => t.to) as { to: string; icon: ReactNode; label: string; key: string }[];
-
-        const shown = attachmentTiles.slice(0, 2);
-        const cols = shown.length >= 2 ? 'grid-cols-2' : 'grid-cols-1';
-
-        return (
-          <div className={`grid ${cols} gap-2 px-3 pt-3`}>
-            {shown.map((t) => (
-              <MaterialTile key={t.key} to={t.to} icon={t.icon} label={t.label} />
-            ))}
-          </div>
-        );
-      })()}
 
 
       {/* Support */}
