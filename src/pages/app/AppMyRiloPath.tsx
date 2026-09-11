@@ -31,7 +31,8 @@ import { PromoBanner } from "@/components/app/PromoBanner";
 import { HomeBanner } from "@/components/app/HomeBanner";
 import { HomeMenu } from "@/components/app/HomeMenu";
 import { useProgramEventsForDate } from "@/hooks/usePlannerProgramEvents";
-import { ProgramEventCard } from "@/components/app/ProgramEventCard";
+import { StackedEventDeck } from "@/components/app/StackedEventDeck";
+
 import { getLocalDateStr } from "@/lib/localDate";
 import { parseISO } from "date-fns";
 
