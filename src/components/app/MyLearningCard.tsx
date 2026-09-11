@@ -184,14 +184,14 @@ export function MyLearningCard() {
           to="/app/watch"
           icon={<Video className="h-4 w-4" />}
           label="Video"
-          className="bg-chip-pink text-fg-warm"
+          className="bg-peach-mid text-brand"
           disabled={videoCount === 0}
         />
       </div>
 
       {/* Support */}
       <Link
-        to="/app/chats"
+        to="/app/chat"
         onClick={() => haptic.light()}
         className="mx-3 mb-3.5 mt-3 flex min-h-[40px] items-center justify-center gap-2 rounded-2xl border border-dashed border-fg-warm/20 px-3 text-[12.5px] font-semibold text-fg-warm-muted active:opacity-80"
       >
