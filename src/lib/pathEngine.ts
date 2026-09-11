@@ -860,9 +860,8 @@ interface PoolCandidate {
 function buildPoolCandidates(inputs: PathInputs): PoolCandidate[] {
   const ctx = inputs.doorContext ?? null;
   const primary = ctx?.primary ?? null;
-  const secondary = ctx?.secondary ?? null;
-  const hasSelfcareDoor = primary === "selfcare" || secondary === "selfcare";
-  const hasProductivityDoor = primary === "productivity" || secondary === "productivity";
+  const hasSelfcareDoor = primary === "selfcare";
+  const hasProductivityDoor = primary === "productivity";
   const completed = getStarterPoolCompleted();
   const tag = (s: PathStep | null, slot: StarterPoolSlot): PathStep | null =>
     s ? { ...s, poolSlot: slot } : null;
