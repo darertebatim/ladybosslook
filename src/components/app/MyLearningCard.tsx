@@ -86,6 +86,18 @@ export function MyLearningCard() {
         : null;
   const courseTo = courseId ? `/app/learn/${courseId}` : null;
 
+  const materialActions = [
+    { to: courseTo, icon: <BookOpen className="h-4 w-4" />, label: 'Course' },
+    { to: audioTo, icon: <Music className="h-4 w-4" />, label: 'Audio' },
+    { to: videoTo, icon: <Video className="h-4 w-4" />, label: 'Video' },
+    {
+      to: documentCount > 0 ? courseTo : null,
+      icon: <Folder className="h-4 w-4" />,
+      label: 'Files',
+    },
+  ].filter((action): action is { to: string; icon: React.ReactNode; label: string } => !!action.to)
+    .slice(0, 2);
+
   // Hero fallback for rounds without a course but with playlists
   const heroPlaylist =
     !courseId && audioPlaylistIds.length > 0
@@ -120,20 +132,18 @@ export function MyLearningCard() {
 
       {/* Continue where you left off */}
       {courseId && nextLesson && (
-        <div className="mx-3 mt-1 overflow-hidden rounded-2xl border border-border-warm bg-card-warm">
-          <div className="relative flex aspect-[16/6] items-center justify-center bg-gradient-orange">
-            <GraduationCap className="h-9 w-9 text-white/90" />
-            {nextLessonModuleIndex && (
-              <span className="absolute bottom-2 right-2.5 rounded-full bg-black/35 px-2 py-0.5 text-[10px] font-bold text-white">
-                Module {nextLessonModuleIndex} · Lesson {nextLessonIndexInModule}
-              </span>
-            )}
-          </div>
-          <div className="p-3.5">
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-fg-warm-muted">
+        <div className="mx-3 mt-1 rounded-2xl border border-border-warm bg-card-warm p-3.5">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-fg-warm-muted">
               {completedCount > 0 ? 'Continue where you left off' : 'Start here'}
-            </p>
-            <p className="mt-1 mb-2.5 text-sm font-bold leading-snug text-fg-warm line-clamp-2">
+              </p>
+              {nextLessonModuleIndex && (
+                <span className="flex-shrink-0 text-[10px] font-bold text-fg-warm-muted">
+                  Module {nextLessonModuleIndex} · Lesson {nextLessonIndexInModule}
+                </span>
+              )}
+            </div>
+            <p className="mb-2.5 mt-1 text-sm font-bold leading-snug text-fg-warm line-clamp-2">
               {nextLesson.title}
             </p>
             <button
@@ -143,12 +153,16 @@ export function MyLearningCard() {
                   state: { from: programPath },
                 });
               }}
-              className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-gradient-orange text-[14px] font-extrabold text-white shadow-ios transition-transform active:scale-[0.98]"
+              className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-gradient-orange px-3 text-[14px] font-extrabold text-white shadow-ios transition-transform active:scale-[0.98]"
             >
               <Play className="h-4 w-4 fill-white" />
               {completedCount > 0 ? 'Continue lesson' : 'Start lesson'}
+              {waitingCount > 0 && (
+                <span className="rounded-full bg-card-warm/95 px-2 py-0.5 text-[9px] font-extrabold uppercase text-brand">
+                  Just unlocked
+                </span>
+              )}
             </button>
-          </div>
         </div>
       )}
 
@@ -183,20 +197,6 @@ export function MyLearningCard() {
               style={{ width: `${percent}%` }}
             />
           </div>
-        </div>
-      )}
-
-      {/* Just unlocked */}
-      {waitingCount > 0 && nextLesson && (
-        <div className="mx-3 mt-3 rounded-2xl bg-mint/60 px-3 py-2.5">
-          <p className="mb-1 flex items-center gap-1.5 text-[10.5px] font-extrabold uppercase tracking-[0.1em] text-fg-warm">
-            <Sparkles className="h-3.5 w-3.5 text-brand" />
-            Just unlocked
-          </p>
-          <p className="text-[12.5px] font-semibold text-fg-warm line-clamp-1">
-            {nextLesson.title}
-            {waitingCount > 1 ? ` +${waitingCount - 1} more` : ''}
-          </p>
         </div>
       )}
 
@@ -243,13 +243,10 @@ export function MyLearningCard() {
 
       {/* Materials */}
       <div className="grid grid-cols-3 gap-2 px-3 pt-3">
-        <MaterialTile to={courseTo} icon={<BookOpen className="h-4 w-4" />} label="Course" />
-        <MaterialTile to={audioTo} icon={<Music className="h-4 w-4" />} label="Audio" />
-        <MaterialTile to={videoTo} icon={<Video className="h-4 w-4" />} label="Video" />
-        {documentCount > 0 && courseTo && (
-          <MaterialTile to={courseTo} icon={<Folder className="h-4 w-4" />} label="Files" />
-        )}
         <MaterialTile to="/app/programs" icon={<LayoutGrid className="h-4 w-4" />} label="My Programs" />
+        {materialActions.map((action) => (
+          <MaterialTile key={action.label} {...action} />
+        ))}
       </div>
 
       {/* Support */}
@@ -279,10 +276,10 @@ function MaterialTile({
     <Link
       to={to}
       onClick={() => haptic.light()}
-      className="flex flex-col items-center gap-1.5 rounded-2xl bg-peach py-2.5 text-brand active:opacity-90"
+      className="flex min-h-[68px] flex-col items-center justify-center gap-1.5 rounded-2xl bg-gradient-orange px-1 py-2.5 text-white shadow-ios transition-transform active:scale-[0.97]"
     >
       {icon}
-      <span className="text-[10.5px] font-extrabold text-fg-warm">{label}</span>
+      <span className="text-center text-[10.5px] font-extrabold text-white">{label}</span>
     </Link>
   );
 }
