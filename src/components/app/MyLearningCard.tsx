@@ -10,6 +10,8 @@ import {
   BookOpen,
   Music,
   Video,
+  Folder,
+  Sparkles,
 } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
@@ -19,14 +21,15 @@ import { useMyLearning } from '@/hooks/useMyLearning';
 /**
  * "My Learning" — the first thing a program buyer sees on Path.
  * Shows their program, the next lesson to continue, progress, next live
- * session and the materials unlocked by their round.
+ * session (or self-paced start date) and the materials unlocked by their round.
  */
 export function MyLearningCard() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const {
     enrollment,
-    roundId,
+    isSelfPaced,
+    enrolledAt,
     nextSessionDate,
     courseId,
     nextLesson,
@@ -35,8 +38,9 @@ export function MyLearningCard() {
     totalLessons,
     completedCount,
     waitingCount,
-    audioCount,
-    videoCount,
+    documentCount,
+    audioPlaylistIds,
+    videoPlaylistIds,
     hasProgram,
   } = useMyLearning();
 
@@ -64,10 +68,33 @@ export function MyLearningCard() {
   const programPath = `/app/programs/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`;
   const percent = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
-  const sessionDate = nextSessionDate || round?.first_session_date || null;
+  const sessionDate = !isSelfPaced ? nextSessionDate || round?.first_session_date || null : null;
+
+  // Where each material tile should land
+  const audioTo =
+    audioPlaylistIds.length === 1
+      ? `/app/player/playlist/${audioPlaylistIds[0]}`
+      : audioPlaylistIds.length > 1
+        ? programPath
+        : null;
+  const videoTo =
+    videoPlaylistIds.length === 1
+      ? `/app/watch/playlist/${videoPlaylistIds[0]}`
+      : videoPlaylistIds.length > 1
+        ? programPath
+        : null;
+  const courseTo = courseId ? `/app/learn/${courseId}` : null;
+
+  // Hero fallback for rounds without a course but with playlists
+  const heroPlaylist =
+    !courseId && audioPlaylistIds.length > 0
+      ? { to: `/app/player/playlist/${audioPlaylistIds[0]}`, label: 'Continue listening' }
+      : !courseId && videoPlaylistIds.length > 0
+        ? { to: `/app/watch/playlist/${videoPlaylistIds[0]}`, label: 'Continue watching' }
+        : null;
 
   return (
-    <div className="bg-card-warm shadow-card-warm rounded-3xl overflow-hidden mb-4">
+    <div className="mb-4 overflow-hidden rounded-3xl border border-border-warm bg-gradient-to-b from-peach/50 to-card-warm shadow-card-warm">
       {/* Greeting */}
       <div className="flex items-start justify-between gap-3 p-4 pb-2">
         <div className="min-w-0">
@@ -81,7 +108,8 @@ export function MyLearningCard() {
           </h3>
           <p className="mt-0.5 text-xs text-fg-warm-muted line-clamp-1">
             {enrollment.course_name}
-            {round?.round_name ? ` · ${round.round_name}` : ' · Self-paced'}
+            {round?.round_name ? ` · ${round.round_name}` : ''}
+            {isSelfPaced ? ' · Self-paced' : ''}
           </p>
         </div>
         <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-orange shadow-ios">
@@ -91,7 +119,7 @@ export function MyLearningCard() {
 
       {/* Continue where you left off */}
       {courseId && nextLesson && (
-        <div className="mx-3 mt-1 overflow-hidden rounded-2xl bg-card shadow-ios">
+        <div className="mx-3 mt-1 overflow-hidden rounded-2xl border border-border-warm bg-card-warm">
           <div className="relative flex aspect-[16/6] items-center justify-center bg-gradient-orange">
             <GraduationCap className="h-9 w-9 text-white/90" />
             {nextLessonModuleIndex && (
@@ -114,12 +142,26 @@ export function MyLearningCard() {
                   state: { from: programPath },
                 });
               }}
-              className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-brand font-semibold text-white shadow-ios transition-transform active:scale-[0.98]"
+              className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-gradient-orange text-[14px] font-extrabold text-white shadow-ios transition-transform active:scale-[0.98]"
             >
               <Play className="h-4 w-4 fill-white" />
               {completedCount > 0 ? 'Continue lesson' : 'Start lesson'}
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Hero for playlist-only rounds */}
+      {heroPlaylist && (
+        <div className="mx-3 mt-1">
+          <Link
+            to={heroPlaylist.to}
+            onClick={() => haptic.light()}
+            className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-gradient-orange text-[14px] font-extrabold text-white shadow-ios transition-transform active:scale-[0.98]"
+          >
+            <Play className="h-4 w-4 fill-white" />
+            {heroPlaylist.label}
+          </Link>
         </div>
       )}
 
@@ -143,14 +185,28 @@ export function MyLearningCard() {
         </div>
       )}
 
-      {/* Next live session */}
-      {sessionDate && (
+      {/* Just unlocked */}
+      {waitingCount > 0 && nextLesson && (
+        <div className="mx-3 mt-3 rounded-2xl bg-mint/60 px-3 py-2.5">
+          <p className="mb-1 flex items-center gap-1.5 text-[10.5px] font-extrabold uppercase tracking-[0.1em] text-fg-warm">
+            <Sparkles className="h-3.5 w-3.5 text-brand" />
+            Just unlocked
+          </p>
+          <p className="text-[12.5px] font-semibold text-fg-warm line-clamp-1">
+            {nextLesson.title}
+            {waitingCount > 1 ? ` +${waitingCount - 1} more` : ''}
+          </p>
+        </div>
+      )}
+
+      {/* Next live session / self-paced start */}
+      {sessionDate ? (
         <Link
           to={programPath}
           onClick={() => haptic.light()}
           className="mx-3 mt-3 flex items-center gap-2.5 rounded-2xl bg-peach px-3 py-2.5 active:opacity-90"
         >
-          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-card">
+          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-card-warm">
             <CalendarClock className="h-4 w-4 text-brand" />
           </span>
           <span className="min-w-0 flex-1">
@@ -158,7 +214,26 @@ export function MyLearningCard() {
             <span className="block text-[11.5px] text-fg-warm-muted">
               {isToday(new Date(sessionDate))
                 ? `Today · ${format(new Date(sessionDate), 'h:mm a')}`
-                : format(new Date(sessionDate), "EEE, MMM d · h:mm a")}
+                : format(new Date(sessionDate), 'EEE, MMM d · h:mm a')}
+            </span>
+          </span>
+          <ChevronRight className="h-4 w-4 flex-shrink-0 text-fg-warm-muted" />
+        </Link>
+      ) : (
+        <Link
+          to={programPath}
+          onClick={() => haptic.light()}
+          className="mx-3 mt-3 flex items-center gap-2.5 rounded-2xl bg-peach px-3 py-2.5 active:opacity-90"
+        >
+          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-card-warm">
+            <CalendarClock className="h-4 w-4 text-brand" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[12.5px] font-bold text-fg-warm">
+              Learn at your own pace
+            </span>
+            <span className="block text-[11.5px] text-fg-warm-muted">
+              {enrolledAt ? `Started ${format(new Date(enrolledAt), 'MMM d, yyyy')}` : 'No live sessions'}
             </span>
           </span>
           <ChevronRight className="h-4 w-4 flex-shrink-0 text-fg-warm-muted" />
@@ -168,25 +243,31 @@ export function MyLearningCard() {
       {/* Materials */}
       <div className="grid grid-cols-3 gap-2 px-3 pt-3">
         <MaterialTile
-          to={courseId ? `/app/learn/${courseId}` : programPath}
-          icon={<BookOpen className="h-4 w-4" />}
+          to={courseTo}
+          icon={<BookOpen className="h-4 w-4 text-brand" />}
           label="Course"
-          className="bg-peach text-brand"
+          className="bg-peach"
         />
         <MaterialTile
-          to="/app/player"
-          icon={<Music className="h-4 w-4" />}
+          to={audioTo}
+          icon={<Music className="h-4 w-4 text-fg-warm" />}
           label="Audio"
-          className="bg-chip-lavender text-fg-warm"
-          disabled={audioCount === 0}
+          className="bg-chip-lavender"
         />
         <MaterialTile
-          to="/app/watch"
-          icon={<Video className="h-4 w-4" />}
+          to={videoTo}
+          icon={<Video className="h-4 w-4 text-brand" />}
           label="Video"
-          className="bg-peach-mid text-brand"
-          disabled={videoCount === 0}
+          className="bg-peach-mid"
         />
+        {documentCount > 0 && courseTo && (
+          <MaterialTile
+            to={courseTo}
+            icon={<Folder className="h-4 w-4 text-fg-warm" />}
+            label="Files"
+            className="bg-mint"
+          />
+        )}
       </div>
 
       {/* Support */}
@@ -207,15 +288,13 @@ function MaterialTile({
   icon,
   label,
   className,
-  disabled,
 }: {
-  to: string;
+  to: string | null;
   icon: React.ReactNode;
   label: string;
   className?: string;
-  disabled?: boolean;
 }) {
-  if (disabled) return null;
+  if (!to) return null;
   return (
     <Link
       to={to}
