@@ -210,9 +210,18 @@ serve(async (req) => {
     const iosUrl = "https://apps.apple.com/app/simora-ladybosslook/id6755076134";
     const androidUrl = "https://play.google.com/store/apps/details?id=com.ladybosslook.academy";
 
+    // Send in parallel batches so large fleets (thousands of devices) finish
+    // well within the function's execution time limit.
+    const BATCH_SIZE = 25;
+    const runInBatches = async <T>(items: T[], fn: (item: T) => Promise<void>) => {
+      for (let i = 0; i < items.length; i += BATCH_SIZE) {
+        await Promise.allSettled(items.slice(i, i + BATCH_SIZE).map(fn));
+      }
+    };
+
     // Send to iOS
     if (apnsJwt) {
-      for (const sub of iosSubs) {
+      await runInBatches(iosSubs, async (sub) => {
         const deviceToken = sub.endpoint.replace("native:", "");
         try {
           const response = await fetch(`https://api.push.apple.com/3/device/${deviceToken}`, {
@@ -242,7 +251,7 @@ serve(async (req) => {
           console.error(`[UpdatePush] APNs send error for ${sub.user_id}:`, err);
           failCount++;
         }
-      }
+      });
     } else if (iosSubs.length > 0) {
       failCount += iosSubs.length;
     }
