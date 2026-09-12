@@ -89,26 +89,38 @@ serve(async (req) => {
 
     console.log(`[UpdatePush] Targeting users below version: ${targetVersion} (platform=${platform || 'any'})`);
 
-    // Get push subscriptions, optionally filtered by platform
-    let query = supabase
-      .from("push_subscriptions")
-      .select("id, user_id, endpoint, app_version, platform")
-      .like("endpoint", "native:%");
-    if (platform === "ios" || platform === "android") {
-      // Include legacy null-platform rows ONLY for iOS (existing fleet was iOS-dominant before tagging shipped).
-      // For Android, require explicit platform tag to avoid pushing iOS users.
-      if (platform === "ios") {
-        query = query.or("platform.eq.ios,platform.is.null");
-      } else {
-        query = query.eq("platform", "android");
+    // Get push subscriptions, optionally filtered by platform.
+    // Paginate: PostgREST caps each response at 1000 rows, and the fleet can exceed that.
+    const buildQuery = () => {
+      let q = supabase
+        .from("push_subscriptions")
+        .select("id, user_id, endpoint, app_version, platform")
+        .like("endpoint", "native:%");
+      if (platform === "ios" || platform === "android") {
+        // Include legacy null-platform rows ONLY for iOS (existing fleet was iOS-dominant before tagging shipped).
+        // For Android, require explicit platform tag to avoid pushing iOS users.
+        if (platform === "ios") {
+          q = q.or("platform.eq.ios,platform.is.null");
+        } else {
+          q = q.eq("platform", "android");
+        }
       }
-    }
-    const { data: subscriptions, error: subError } = await query;
+      return q;
+    };
 
-    if (subError) {
-      console.error("[UpdatePush] Error fetching subscriptions:", subError);
-      throw subError;
+    const PAGE_SIZE = 1000;
+    const subscriptions: any[] = [];
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data: page, error: subError } = await buildQuery().range(from, from + PAGE_SIZE - 1);
+      if (subError) {
+        console.error("[UpdatePush] Error fetching subscriptions:", subError);
+        throw subError;
+      }
+      if (!page || page.length === 0) break;
+      subscriptions.push(...page);
+      if (page.length < PAGE_SIZE) break;
     }
+    console.log(`[UpdatePush] Loaded ${subscriptions.length} native subscriptions`);
 
     // Filter to users with outdated versions (or null/unknown versions)
     const outdatedSubscriptions = subscriptions?.filter((sub) => {
