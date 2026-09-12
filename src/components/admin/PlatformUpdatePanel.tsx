@@ -165,16 +165,27 @@ export function PlatformUpdatePanel({ platform }: Props) {
   const { data: pushCounts } = useQuery({
     queryKey: ['platform-push-counts', platform],
     queryFn: async () => {
-      let q = supabase
-        .from('push_subscriptions')
-        .select('user_id, platform', { count: 'exact' })
-        .like('endpoint', 'native:%');
-      if (platform === 'ios') q = q.or('platform.eq.ios,platform.is.null');
-      else q = q.eq('platform', 'android');
+      const build = () => {
+        let q = supabase
+          .from('push_subscriptions')
+          .select('user_id, platform', { count: 'exact' })
+          .like('endpoint', 'native:%');
+        if (platform === 'ios') q = q.or('platform.eq.ios,platform.is.null');
+        else q = q.eq('platform', 'android');
+        return q;
+      };
 
-      const { data, count } = await q;
-      const uniqueUsers = new Set(data?.map((d: any) => d.user_id)).size;
-      return { devices: count || 0, users: uniqueUsers };
+      const PAGE = 1000;
+      const users = new Set<string>();
+      let total = 0;
+      for (let from = 0; ; from += PAGE) {
+        const { data, count, error } = await build().range(from, from + PAGE - 1);
+        if (error) throw error;
+        total = count ?? total;
+        (data || []).forEach((d: any) => users.add(d.user_id));
+        if (!data || data.length < PAGE) break;
+      }
+      return { devices: total, users: users.size };
     },
   });
 
