@@ -121,6 +121,7 @@ export function ProgramsManager() {
       const { data, error } = await supabase
         .from('program_catalog')
         .select('*')
+        .order('is_active', { ascending: false })
         .order('created_at', { ascending: false });
 
       if (error) throw error;
