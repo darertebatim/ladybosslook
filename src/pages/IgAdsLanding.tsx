@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { resolveWebinarRound, listActiveWebinarRounds, type WebinarRoundRow } from "@/lib/webinarRounds";
+import { resolveWebinarRound, listActiveWebinarRounds, getWebinarRoundRouting, type WebinarRoundRow } from "@/lib/webinarRounds";
 
 import { z } from "zod";
 import { ArrowDown } from "lucide-react";
