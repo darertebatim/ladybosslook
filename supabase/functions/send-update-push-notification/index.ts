@@ -258,7 +258,7 @@ serve(async (req) => {
 
     // Send to Android via FCM
     if (fcmAccess) {
-      for (const sub of androidSubs) {
+      await runInBatches(androidSubs, async (sub) => {
         const fcmToken = sub.endpoint.replace("native:", "");
         try {
           const response = await fetch(
