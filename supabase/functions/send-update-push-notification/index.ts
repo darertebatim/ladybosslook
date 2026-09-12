@@ -296,7 +296,7 @@ serve(async (req) => {
           console.error(`[UpdatePush] FCM send error for ${sub.user_id}:`, err);
           failCount++;
         }
-      }
+      });
     } else if (androidSubs.length > 0) {
       failCount += androidSubs.length;
     }
