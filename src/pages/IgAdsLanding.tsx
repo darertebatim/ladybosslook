@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { resolveWebinarRound, listActiveWebinarRounds, type WebinarRoundRow } from "@/lib/webinarRounds";
+import { resolveWebinarRound, listActiveWebinarRounds, getWebinarRoundRouting, type WebinarRoundRow } from "@/lib/webinarRounds";
 
 import { z } from "zod";
 import { ArrowDown } from "lucide-react";
@@ -95,14 +95,24 @@ export default function IgAdsLanding() {
   useEffect(() => {
     (async () => {
       // 1. Pinned ?round= param always wins.
-      // 2. Otherwise restore a previously saved assignment.
+      // 2. Otherwise restore a previously saved assignment — but only if it
+      //    still matches the current East/West routing, so admin routing
+      //    changes always reach returning visitors.
       let effectiveRoundParam = roundParam;
       if (!effectiveRoundParam) {
         try {
           const saved = localStorage.getItem(ROUND_ASSIGNMENT_STORAGE_KEY);
           if (saved) {
             const parsed = JSON.parse(saved);
-            if (parsed.roundNumber) effectiveRoundParam = String(parsed.roundNumber);
+            if (parsed.roundNumber) {
+              const routing = await getWebinarRoundRouting(PROGRAM_SLUG);
+              const current = [routing?.east_round_number, routing?.west_round_number];
+              if (current.includes(Number(parsed.roundNumber))) {
+                effectiveRoundParam = String(parsed.roundNumber);
+              } else {
+                localStorage.removeItem(ROUND_ASSIGNMENT_STORAGE_KEY);
+              }
+            }
           }
         } catch {}
       }
