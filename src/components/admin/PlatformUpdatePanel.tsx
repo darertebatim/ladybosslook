@@ -72,23 +72,30 @@ export function PlatformUpdatePanel({ platform }: Props) {
   const { data: versionStats, isLoading: loadingStats } = useQuery({
     queryKey: ['push-version-stats', platform],
     queryFn: async () => {
-      let query = supabase
-        .from('push_subscriptions')
-        .select('app_version, platform')
-        .like('endpoint', 'native:%');
+      // Paginate: Supabase caps a single request at 1000 rows
+      const PAGE = 1000;
+      const rows: any[] = [];
+      for (let from = 0; ; from += PAGE) {
+        let query = supabase
+          .from('push_subscriptions')
+          .select('app_version, platform')
+          .like('endpoint', 'native:%');
 
-      if (platform === 'ios') {
-        query = query.or('platform.eq.ios,platform.is.null');
-      } else {
-        query = query.eq('platform', 'android');
+        if (platform === 'ios') {
+          query = query.or('platform.eq.ios,platform.is.null');
+        } else {
+          query = query.eq('platform', 'android');
+        }
+
+        const { data, error } = await query.range(from, from + PAGE - 1);
+        if (error) throw error;
+        rows.push(...(data || []));
+        if (!data || data.length < PAGE) break;
       }
-
-      const { data, error } = await query;
-      if (error) throw error;
 
       const counts: Record<string, number> = {};
       let unknownPlatformCount = 0;
-      data?.forEach((sub: any) => {
+      rows.forEach((sub: any) => {
         const v = sub.app_version || 'unknown';
         counts[v] = (counts[v] || 0) + 1;
         if (platform === 'ios' && !sub.platform) unknownPlatformCount++;
@@ -158,16 +165,27 @@ export function PlatformUpdatePanel({ platform }: Props) {
   const { data: pushCounts } = useQuery({
     queryKey: ['platform-push-counts', platform],
     queryFn: async () => {
-      let q = supabase
-        .from('push_subscriptions')
-        .select('user_id, platform', { count: 'exact' })
-        .like('endpoint', 'native:%');
-      if (platform === 'ios') q = q.or('platform.eq.ios,platform.is.null');
-      else q = q.eq('platform', 'android');
+      const build = () => {
+        let q = supabase
+          .from('push_subscriptions')
+          .select('user_id, platform', { count: 'exact' })
+          .like('endpoint', 'native:%');
+        if (platform === 'ios') q = q.or('platform.eq.ios,platform.is.null');
+        else q = q.eq('platform', 'android');
+        return q;
+      };
 
-      const { data, count } = await q;
-      const uniqueUsers = new Set(data?.map((d: any) => d.user_id)).size;
-      return { devices: count || 0, users: uniqueUsers };
+      const PAGE = 1000;
+      const users = new Set<string>();
+      let total = 0;
+      for (let from = 0; ; from += PAGE) {
+        const { data, count, error } = await build().range(from, from + PAGE - 1);
+        if (error) throw error;
+        total = count ?? total;
+        (data || []).forEach((d: any) => users.add(d.user_id));
+        if (!data || data.length < PAGE) break;
+      }
+      return { devices: total, users: users.size };
     },
   });
 
