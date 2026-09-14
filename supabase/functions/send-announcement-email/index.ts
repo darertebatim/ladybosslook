@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { buildUnsubUrl, fetchUnsubscribed } from "../_shared/unsubscribe.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -177,6 +178,16 @@ const handler = async (req: Request): Promise<Response> => {
       console.log(`📧 [${requestId}] Email list:`, userEmails);
     }
 
+    // Respect opt-outs.
+    {
+      const optedOut = await fetchUnsubscribed(supabase, userEmails);
+      const before = userEmails.length;
+      userEmails = userEmails.filter((e: string) => !optedOut.has(String(e).trim().toLowerCase()));
+      if (before !== userEmails.length) {
+        console.log(`🚫 [${requestId}] Skipped ${before - userEmails.length} unsubscribed recipients`);
+      }
+    }
+
     if (userEmails.length === 0) {
       console.log(`⚠️  [${requestId}] No users to notify - returning success`);
       return new Response(
@@ -206,7 +217,7 @@ const handler = async (req: Request): Promise<Response> => {
           const ctaSub = isRtl
             ? 'این پیام را می‌توانید داخل اپ ببینید و پاسخ دهید'
             : 'You can read and reply to this message inside the app';
-          const unsubUrl = `https://ladybosslook.com/unsubscribe?email=${encodeURIComponent(email)}`;
+          const unsubUrl = await buildUnsubUrl(email);
           const html = `<!DOCTYPE html>
 <html dir="${dir}" lang="${isRtl ? 'fa' : 'en'}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>

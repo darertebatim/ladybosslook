@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { buildUnsubUrl, unsubHeaders, appendUnsubFooter, fetchUnsubscribed } from "../_shared/unsubscribe.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -587,6 +588,11 @@ serve(async (req) => {
       }
     }
 
+    if (!testEmail && recipients.length) {
+      const optedOut = await fetchUnsubscribed(supabase, recipients.map((r) => r.email));
+      recipients = recipients.filter((r) => !optedOut.has(r.email.trim().toLowerCase()));
+    }
+
     let sent = 0;
     let failed = 0;
 
@@ -598,6 +604,7 @@ serve(async (req) => {
           : morningOf
             ? buildMorningHtml(c, r.name, startUtc, meetUrl, supportUrl)
             : buildHtml(c, r.name, startUtc, meetUrl, gcalUrl, supportUrl);
+      const unsubUrl = await buildUnsubUrl(r.email);
       const { data: sendData, error } = await resend.emails.send({
         from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>",
         to: [r.email],
@@ -608,7 +615,8 @@ serve(async (req) => {
             : morningOf
               ? c.subjects.morning
               : c.subjects.reminder,
-        html,
+        html: appendUnsubFooter(html, unsubUrl),
+        headers: unsubHeaders(unsubUrl),
       });
 
       if (error) {
