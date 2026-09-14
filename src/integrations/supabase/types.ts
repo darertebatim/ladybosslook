@@ -8137,6 +8137,7 @@ export type Database = {
         Row: {
           created_at: string
           east_round_number: number
+          europe_round_number: number | null
           id: string
           program_slug: string
           updated_at: string
@@ -8145,6 +8146,7 @@ export type Database = {
         Insert: {
           created_at?: string
           east_round_number?: number
+          europe_round_number?: number | null
           id?: string
           program_slug: string
           updated_at?: string
@@ -8153,6 +8155,7 @@ export type Database = {
         Update: {
           created_at?: string
           east_round_number?: number
+          europe_round_number?: number | null
           id?: string
           program_slug?: string
           updated_at?: string

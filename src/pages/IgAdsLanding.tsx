@@ -106,7 +106,11 @@ export default function IgAdsLanding() {
             const parsed = JSON.parse(saved);
             if (parsed.roundNumber) {
               const routing = await getWebinarRoundRouting(PROGRAM_SLUG);
-              const current = [routing?.east_round_number, routing?.west_round_number];
+              const current = [
+                routing?.east_round_number,
+                routing?.west_round_number,
+                routing?.europe_round_number,
+              ].filter((n) => n !== null && n !== undefined);
               if (current.includes(Number(parsed.roundNumber))) {
                 effectiveRoundParam = String(parsed.roundNumber);
               } else {

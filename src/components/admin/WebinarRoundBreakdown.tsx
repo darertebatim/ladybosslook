@@ -65,16 +65,18 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
 
   const [draftEast, setDraftEast] = useState<number | ''>('');
   const [draftWest, setDraftWest] = useState<number | ''>('');
+  const [draftEurope, setDraftEurope] = useState<number | '' | 'none'>('');
 
   const activeRounds = (rounds || []).filter((r) => r.status === 'active');
 
   const saveRouting = useMutation({
-    mutationFn: async (payload: { east: number; west: number }) => {
-      const { error } = await supabase.from('webinar_round_routing').upsert(
+    mutationFn: async (payload: { east: number; west: number; europe: number | null }) => {
+      const { error } = await (supabase as any).from('webinar_round_routing').upsert(
         {
           program_slug: programSlug,
           east_round_number: payload.east,
           west_round_number: payload.west,
+          europe_round_number: payload.europe,
         },
         { onConflict: 'program_slug' },
       );
@@ -112,13 +114,18 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
 
   const currentEast = routing?.east_round_number ?? null;
   const currentWest = routing?.west_round_number ?? null;
+  const currentEurope = routing?.europe_round_number ?? null;
 
   const eastValue = draftEast !== '' ? draftEast : currentEast ?? '';
   const westValue = draftWest !== '' ? draftWest : currentWest ?? '';
+  const europeValue: number | 'none' =
+    draftEurope !== '' ? draftEurope : currentEurope ?? 'none';
+  const europeToSave: number | null = europeValue === 'none' ? null : Number(europeValue);
 
   const hasChanges =
-    draftEast !== '' && draftEast !== (currentEast ?? '') ||
-    draftWest !== '' && draftWest !== (currentWest ?? '');
+    (draftEast !== '' && draftEast !== (currentEast ?? '')) ||
+    (draftWest !== '' && draftWest !== (currentWest ?? '')) ||
+    (draftEurope !== '' && europeToSave !== currentEurope);
 
   return (
     <Card>
@@ -148,7 +155,7 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
             {routingLoading && <p className="text-xs text-muted-foreground">Loading…</p>}
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-3">
             <div className="space-y-1.5">
               <label className="text-xs text-muted-foreground">East / Central timezones → round</label>
               <Select
@@ -186,6 +193,27 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-1.5">
+              <label className="text-xs text-muted-foreground">
+                Europe / Middle East timezones → round (optional)
+              </label>
+              <Select
+                value={String(europeValue)}
+                onValueChange={(v) => setDraftEurope(v === 'none' ? 'none' : Number(v))}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="No Europe round" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No Europe round (use East / West)</SelectItem>
+                  {activeRounds.map((r) => (
+                    <SelectItem key={`europe-${r.id}`} value={String(r.round_number ?? '')}>
+                      Round {r.round_number ?? '?'} — {r.round_name || 'Untitled'}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -194,7 +222,11 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
               disabled={!hasChanges || saveRouting.isPending || eastValue === '' || westValue === ''}
               onClick={() => {
                 if (eastValue === '' || westValue === '') return;
-                saveRouting.mutate({ east: Number(eastValue), west: Number(westValue) });
+                saveRouting.mutate({
+                  east: Number(eastValue),
+                  west: Number(westValue),
+                  europe: europeToSave,
+                });
               }}
             >
               <Save className="mr-1.5 h-4 w-4" />
@@ -218,6 +250,7 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
             const zones = tzFor(r.round_number);
             const isEast = r.round_number === currentEast;
             const isWest = r.round_number === currentWest;
+            const isEurope = currentEurope !== null && r.round_number === currentEurope;
             return (
               <div key={r.id} className="rounded-xl border p-4 space-y-2">
                 <div className="flex items-start justify-between gap-2">
@@ -251,7 +284,9 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
                       ? 'East / Central timezones'
                       : isWest
                         ? 'West timezones'
-                        : 'No automatic timezone routing'}
+                        : isEurope
+                          ? 'Europe / Middle East timezones'
+                          : 'No automatic timezone routing'}
                   </p>
                   {zones.length > 0 && (
                     <p className="mt-1 leading-relaxed">
