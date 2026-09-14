@@ -3,6 +3,7 @@ import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { sendPurchaseWelcomeMessage } from "../_shared/send-purchase-welcome.ts";
 import { sendEnrollmentEmail } from "../_shared/send-enrollment-email.ts";
+import { resolveAutoEnrollRoundId } from "../_shared/auto-enroll-round.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -80,11 +81,7 @@ async function applyAutoEnrollment(supabase: any, userId: string, programSlug: s
   console.log('[WEBHOOK] Checking auto-enrollment for program:', programSlug, 'user:', userId);
   
   // Get auto-enrollment rule for this program
-  const { data: autoEnrollRule } = await supabase
-    .from('program_auto_enrollment')
-    .select('round_id')
-    .eq('program_slug', programSlug)
-    .single();
+  const autoRoundId = await resolveAutoEnrollRoundId(supabase, programSlug, userId);
 
   // Check if enrollment already exists
   const { data: existingEnrollment } = await supabase
@@ -107,9 +104,9 @@ async function applyAutoEnrollment(supabase: any, userId: string, programSlug: s
     status: 'active',
   };
 
-  if (autoEnrollRule) {
-    enrollmentData.round_id = autoEnrollRule.round_id;
-    console.log('[WEBHOOK] Using auto-enrollment round:', autoEnrollRule.round_id);
+  if (autoRoundId) {
+    enrollmentData.round_id = autoRoundId;
+    console.log('[WEBHOOK] Using auto-enrollment round:', autoRoundId);
   }
 
   const { error: enrollmentError } = await supabase

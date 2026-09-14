@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { sendEnrollmentEmail } from "../_shared/send-enrollment-email.ts";
 import { checkProgramRegionBlocks } from "../_shared/region-restriction.ts";
+import { resolveAutoEnrollRoundId } from "../_shared/auto-enroll-round.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,11 +15,7 @@ const log = (step: string, details?: any) => {
 
 async function enrollFreeProgram(supabase: any, userId: string, program: any, userEmail: string, userName: string) {
   // Auto-enroll round if configured
-  const { data: autoEnrollRule } = await supabase
-    .from('program_auto_enrollment')
-    .select('round_id')
-    .eq('program_slug', program.slug)
-    .maybeSingle();
+  const autoRoundId = await resolveAutoEnrollRoundId(supabase, program.slug, userId);
 
   // Skip if already enrolled
   const { data: existing } = await supabase
@@ -35,7 +32,7 @@ async function enrollFreeProgram(supabase: any, userId: string, program: any, us
       program_slug: program.slug,
       status: 'active',
     };
-    if (autoEnrollRule?.round_id) enrollmentData.round_id = autoEnrollRule.round_id;
+    if (autoRoundId) enrollmentData.round_id = autoRoundId;
 
     const { error: enrollErr } = await supabase.from('course_enrollments').insert(enrollmentData);
     if (enrollErr) log('enrollment error', { slug: program.slug, error: enrollErr.message });
