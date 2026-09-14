@@ -1,0 +1,1 @@
+ALTER TABLE public.program_auto_enrollment ADD COLUMN IF NOT EXISTS europe_round_id uuid REFERENCES public.program_rounds(id) ON DELETE SET NULL;

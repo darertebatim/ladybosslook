@@ -4971,6 +4971,7 @@ export type Database = {
         Row: {
           created_at: string
           east_round_id: string | null
+          europe_round_id: string | null
           id: string
           program_slug: string
           round_id: string
@@ -4980,6 +4981,7 @@ export type Database = {
         Insert: {
           created_at?: string
           east_round_id?: string | null
+          europe_round_id?: string | null
           id?: string
           program_slug: string
           round_id: string
@@ -4989,6 +4991,7 @@ export type Database = {
         Update: {
           created_at?: string
           east_round_id?: string | null
+          europe_round_id?: string | null
           id?: string
           program_slug?: string
           round_id?: string
@@ -4999,6 +5002,13 @@ export type Database = {
           {
             foreignKeyName: "program_auto_enrollment_east_round_id_fkey"
             columns: ["east_round_id"]
+            isOneToOne: false
+            referencedRelation: "program_rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_auto_enrollment_europe_round_id_fkey"
+            columns: ["europe_round_id"]
             isOneToOne: false
             referencedRelation: "program_rounds"
             referencedColumns: ["id"]
