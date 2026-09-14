@@ -16,6 +16,26 @@ export const ONELINK_TEMPLATE_ID = 'lt6v';
 export const ONELINK_SUBDOMAIN = 'ladyboss.onelink.me';
 export const ONELINK_BASE_URL = `https://${ONELINK_SUBDOMAIN}/${ONELINK_TEMPLATE_ID}`;
 
+/** deep_link_value entries that must NOT be treated as instructor slugs. */
+const RESERVED_DEEP_LINK_VALUES = new Set(['dedication', 'support']);
+
+/**
+ * Build a OneLink URL for support (used in lead emails).
+ * - Mobile with app installed → opens the app; `deep_link_value=support`
+ *   routes the user into the in-app support chat (see useSupportDeepLink).
+ * - Desktop / no app → af_web_dp sends them to the web support chat.
+ */
+export function buildSupportOneLink(): string {
+  const params = new URLSearchParams({
+    af_xp: 'custom',
+    pid: 'email_support',
+    c: 'lead_email',
+    deep_link_value: 'support',
+    af_web_dp: 'https://ladybosslook.com/dashboard/chat',
+  });
+  return `${ONELINK_BASE_URL}?${params.toString()}`;
+}
+
 /**
  * Build a OneLink URL for a specific instructor.
  * The follower clicks this → goes to the App Store → on first launch, AppsFlyer
