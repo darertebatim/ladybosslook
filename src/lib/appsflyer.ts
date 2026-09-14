@@ -244,14 +244,15 @@ export async function initAppsFlyer(): Promise<void> {
           const packageSlug =
             (data?.deep_link_sub1 as string | undefined) ||
             (data?.af_sub2 as string | undefined);
-          if (deepLinkValue === 'dedication' || instructorSlug) {
+          const isReserved = RESERVED_DEEP_LINK_VALUES.has(deepLinkValue ?? '');
+          if (deepLinkValue === 'dedication' || deepLinkValue === 'support' || instructorSlug) {
             const payload: AppsFlyerAttribution = {
               deepLinkValue,
               dedicationToken: deepLinkValue === 'dedication' ? dedicationToken : undefined,
-              instructorSlug: deepLinkValue === 'dedication'
+              instructorSlug: isReserved
                 ? undefined
                 : String(instructorSlug).trim().toLowerCase(),
-              packageSlug: deepLinkValue === 'dedication'
+              packageSlug: isReserved
                 ? undefined
                 : (packageSlug ? String(packageSlug).trim().toLowerCase() : undefined),
               raw: data as Record<string, unknown>,
