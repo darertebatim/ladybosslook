@@ -284,7 +284,9 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
                       ? 'East / Central timezones'
                       : isWest
                         ? 'West timezones'
-                        : 'No automatic timezone routing'}
+                        : isEurope
+                          ? 'Europe / Middle East timezones'
+                          : 'No automatic timezone routing'}
                   </p>
                   {zones.length > 0 && (
                     <p className="mt-1 leading-relaxed">
