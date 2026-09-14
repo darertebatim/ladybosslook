@@ -96,7 +96,7 @@ export default function AutoEnrollmentManager() {
         east_round_id,
         west_round_id,
         created_at,
-        program_rounds (
+        program_rounds!program_auto_enrollment_round_id_fkey (
           round_name,
           round_number,
           program_slug
@@ -113,10 +113,11 @@ export default function AutoEnrollmentManager() {
   };
 
   const handleAddRule = async () => {
-    if (!selectedProgram || !selectedRound) {
+    const fallbackRound = selectedRound || selectedEastRound || selectedWestRound;
+    if (!selectedProgram || !fallbackRound) {
       toast({
         title: "Validation Error",
-        description: "Please select both a program and a round",
+        description: "Select a program and at least one round (target, East or West)",
         variant: "destructive",
       });
       return;
@@ -128,7 +129,7 @@ export default function AutoEnrollmentManager() {
         .from('program_auto_enrollment' as any)
         .upsert({
           program_slug: selectedProgram,
-          round_id: selectedRound,
+          round_id: fallbackRound,
           east_round_id: selectedEastRound || null,
           west_round_id: selectedWestRound || null,
         } as any, {
@@ -252,7 +253,7 @@ export default function AutoEnrollmentManager() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Target Round</label>
+              <label className="text-sm font-medium">Target Round (fallback)</label>
               <Select 
                 value={selectedRound} 
                 onValueChange={setSelectedRound}
@@ -338,7 +339,7 @@ export default function AutoEnrollmentManager() {
 
           <Button 
             onClick={handleAddRule} 
-            disabled={!selectedProgram || !selectedRound || isSaving}
+            disabled={!selectedProgram || (!selectedRound && !selectedEastRound && !selectedWestRound) || isSaving}
             className="w-full"
           >
             {isSaving ? (
