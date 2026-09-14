@@ -110,17 +110,65 @@ const ROUND_2_TIMEZONES = new Set<string>(ROUND_2_TIMEZONE_LIST);
 export const FALLBACK_EAST_ROUND_NUMBER = 3;
 export const FALLBACK_WEST_ROUND_NUMBER = 4;
 
+/** Europe + Middle East (UK eastwards through Dubai). Optional third side. */
+export const ROUND_3_TIMEZONE_LIST = [
+  "Europe/London",
+  "Europe/Dublin",
+  "Europe/Lisbon",
+  "Europe/Madrid",
+  "Europe/Paris",
+  "Europe/Brussels",
+  "Europe/Amsterdam",
+  "Europe/Berlin",
+  "Europe/Zurich",
+  "Europe/Rome",
+  "Europe/Vienna",
+  "Europe/Prague",
+  "Europe/Warsaw",
+  "Europe/Stockholm",
+  "Europe/Oslo",
+  "Europe/Copenhagen",
+  "Europe/Helsinki",
+  "Europe/Athens",
+  "Europe/Bucharest",
+  "Europe/Kyiv",
+  "Europe/Moscow",
+  "Europe/Istanbul",
+  "Asia/Istanbul",
+  "Asia/Jerusalem",
+  "Asia/Tel_Aviv",
+  "Asia/Beirut",
+  "Asia/Damascus",
+  "Asia/Amman",
+  "Asia/Nicosia",
+  "Asia/Baghdad",
+  "Asia/Kuwait",
+  "Asia/Riyadh",
+  "Asia/Bahrain",
+  "Asia/Qatar",
+  "Asia/Dubai",
+  "Asia/Muscat",
+  "Asia/Tehran",
+  "Asia/Baku",
+  "Asia/Tbilisi",
+  "Asia/Yerevan",
+] as const;
+
+const ROUND_3_TIMEZONES = new Set<string>(ROUND_3_TIMEZONE_LIST);
+const EUROPE_PREFIXES = ["Europe/", "Atlantic/", "Africa/"];
+
 /** Timezones routed to each side. */
 export const EAST_TIMEZONE_LIST = ROUND_1_TIMEZONE_LIST;
 export const WEST_TIMEZONE_LIST = ROUND_2_TIMEZONE_LIST;
+export const EUROPE_TIMEZONE_LIST = ROUND_3_TIMEZONE_LIST;
 
-/** Read the current East/West round mapping for a program from the admin settings. */
+/** Read the current East/West/Europe round mapping for a program from the admin settings. */
 export async function getWebinarRoundRouting(
   programSlug: string,
 ): Promise<WebinarRoundRouting | null> {
   const { data, error } = await (supabase as any)
     .from("webinar_round_routing")
-    .select("program_slug, east_round_number, west_round_number")
+    .select("program_slug, east_round_number, west_round_number, europe_round_number")
     .eq("program_slug", programSlug)
     .maybeSingle();
   if (error || !data) return null;
@@ -128,22 +176,33 @@ export async function getWebinarRoundRouting(
     program_slug: data.program_slug,
     east_round_number: Number(data.east_round_number),
     west_round_number: Number(data.west_round_number),
+    europe_round_number:
+      data.europe_round_number === null || data.europe_round_number === undefined
+        ? null
+        : Number(data.europe_round_number),
   };
 }
 
 function routingOrFallback(routing?: WebinarRoundRouting | null): {
   east: number;
   west: number;
+  europe: number | null;
 } {
   return {
     east: routing?.east_round_number ?? FALLBACK_EAST_ROUND_NUMBER,
     west: routing?.west_round_number ?? FALLBACK_WEST_ROUND_NUMBER,
+    europe: routing?.europe_round_number ?? null,
   };
 }
 
-export function inferWebinarSideFromTimezone(timezone: string): 'east' | 'west' | null {
+/** Raw timezone side, including Europe (which is only used when a Europe round is configured). */
+export function inferWebinarSideFromTimezone(
+  timezone: string,
+): 'east' | 'west' | 'europe' | null {
   if (ROUND_1_TIMEZONES.has(timezone)) return 'east';
   if (ROUND_2_TIMEZONES.has(timezone)) return 'west';
+  if (ROUND_3_TIMEZONES.has(timezone)) return 'europe';
+  if (EUROPE_PREFIXES.some((p) => timezone.startsWith(p))) return 'europe';
   return null;
 }
 
@@ -153,9 +212,10 @@ export function inferWebinarRoundNumberFromTimezone(
   routing?: WebinarRoundRouting | null,
 ): number | null {
   const side = inferWebinarSideFromTimezone(timezone);
-  const { east, west } = routingOrFallback(routing);
+  const { east, west, europe } = routingOrFallback(routing);
   if (side === 'east') return east;
   if (side === 'west') return west;
+  if (side === 'europe' && europe !== null) return europe;
   return null;
 }
 
@@ -164,9 +224,10 @@ export function timezonesForRoundNumber(
   roundNumber: number | null,
   routing?: WebinarRoundRouting | null,
 ): readonly string[] {
-  const { east, west } = routingOrFallback(routing);
+  const { east, west, europe } = routingOrFallback(routing);
   if (roundNumber === east) return ROUND_1_TIMEZONE_LIST;
   if (roundNumber === west) return ROUND_2_TIMEZONE_LIST;
+  if (europe !== null && roundNumber === europe) return ROUND_3_TIMEZONE_LIST;
   return [];
 }
 
