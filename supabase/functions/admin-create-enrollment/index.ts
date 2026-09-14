@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.56.0';
 import { sendPurchaseWelcomeMessage } from "../_shared/send-purchase-welcome.ts";
 import { sendEnrollmentEmail } from "../_shared/send-enrollment-email.ts";
+import { resolveAutoEnrollRoundId } from "../_shared/auto-enroll-round.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -279,12 +280,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     let finalRoundId = roundId;
     if (!finalRoundId && programSlug) {
-      const { data: autoRound } = await supabase
-        .from('program_auto_enrollment')
-        .select('round_id')
-        .eq('program_slug', programSlug)
-        .maybeSingle();
-      finalRoundId = autoRound?.round_id ?? undefined;
+      finalRoundId = (await resolveAutoEnrollRoundId(supabase, programSlug, userId)) ?? undefined;
     }
 
     if (finalRoundId) {

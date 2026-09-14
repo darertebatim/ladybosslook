@@ -4970,29 +4970,49 @@ export type Database = {
       program_auto_enrollment: {
         Row: {
           created_at: string
+          east_round_id: string | null
           id: string
           program_slug: string
           round_id: string
           updated_at: string
+          west_round_id: string | null
         }
         Insert: {
           created_at?: string
+          east_round_id?: string | null
           id?: string
           program_slug: string
           round_id: string
           updated_at?: string
+          west_round_id?: string | null
         }
         Update: {
           created_at?: string
+          east_round_id?: string | null
           id?: string
           program_slug?: string
           round_id?: string
           updated_at?: string
+          west_round_id?: string | null
         }
         Relationships: [
           {
+            foreignKeyName: "program_auto_enrollment_east_round_id_fkey"
+            columns: ["east_round_id"]
+            isOneToOne: false
+            referencedRelation: "program_rounds"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "program_auto_enrollment_round_id_fkey"
             columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "program_rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_auto_enrollment_west_round_id_fkey"
+            columns: ["west_round_id"]
             isOneToOne: false
             referencedRelation: "program_rounds"
             referencedColumns: ["id"]

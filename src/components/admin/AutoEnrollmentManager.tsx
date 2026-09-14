@@ -24,6 +24,8 @@ interface AutoEnrollmentRule {
   id: string;
   program_slug: string;
   round_id: string;
+  east_round_id: string | null;
+  west_round_id: string | null;
   created_at: string;
   program_rounds: {
     round_name: string;
@@ -38,6 +40,8 @@ export default function AutoEnrollmentManager() {
   const [rules, setRules] = useState<AutoEnrollmentRule[]>([]);
   const [selectedProgram, setSelectedProgram] = useState<string>("");
   const [selectedRound, setSelectedRound] = useState<string>("");
+  const [selectedEastRound, setSelectedEastRound] = useState<string>("");
+  const [selectedWestRound, setSelectedWestRound] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
@@ -89,6 +93,8 @@ export default function AutoEnrollmentManager() {
         id,
         program_slug,
         round_id,
+        east_round_id,
+        west_round_id,
         created_at,
         program_rounds (
           round_name,
@@ -123,6 +129,8 @@ export default function AutoEnrollmentManager() {
         .upsert({
           program_slug: selectedProgram,
           round_id: selectedRound,
+          east_round_id: selectedEastRound || null,
+          west_round_id: selectedWestRound || null,
         } as any, {
           onConflict: 'program_slug'
         });
@@ -136,6 +144,8 @@ export default function AutoEnrollmentManager() {
 
       setSelectedProgram("");
       setSelectedRound("");
+      setSelectedEastRound("");
+      setSelectedWestRound("");
       await loadRules();
     } catch (error) {
       console.error('Error saving rule:', error);
@@ -178,6 +188,12 @@ export default function AutoEnrollmentManager() {
     return programs.find(p => p.slug === slug)?.title || slug;
   };
 
+  const roundLabel = (id: string | null) => {
+    if (!id) return null;
+    const r = rounds.find((x) => x.id === id);
+    return r ? `Round #${r.round_number} - ${r.round_name}` : null;
+  };
+
   const getAvailableRounds = () => {
     if (!selectedProgram) return [];
     return rounds.filter(r => r.program_slug === selectedProgram);
@@ -213,7 +229,15 @@ export default function AutoEnrollmentManager() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Program</label>
-              <Select value={selectedProgram} onValueChange={setSelectedProgram}>
+              <Select
+                value={selectedProgram}
+                onValueChange={(v) => {
+                  setSelectedProgram(v);
+                  setSelectedRound("");
+                  setSelectedEastRound("");
+                  setSelectedWestRound("");
+                }}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select program..." />
                 </SelectTrigger>
@@ -246,6 +270,70 @@ export default function AutoEnrollmentManager() {
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="space-y-3 rounded-lg border bg-background p-3">
+            <div>
+              <h4 className="text-sm font-semibold">Time zone rounds (optional)</h4>
+              <p className="text-xs text-muted-foreground">
+                When set, new sign-ups land in the round matching their device time zone.
+                East/Central time zones get the East round, West / Asia-Pacific get the West round.
+                Anyone whose time zone doesn't match falls back to the target round above.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">East round</label>
+                <Select
+                  value={selectedEastRound}
+                  onValueChange={setSelectedEastRound}
+                  disabled={!selectedProgram}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="No East round..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getAvailableRounds().map((round) => (
+                      <SelectItem key={round.id} value={round.id}>
+                        Round #{round.round_number} - {round.round_name} ({round.status})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">West round</label>
+                <Select
+                  value={selectedWestRound}
+                  onValueChange={setSelectedWestRound}
+                  disabled={!selectedProgram}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="No West round..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getAvailableRounds().map((round) => (
+                      <SelectItem key={round.id} value={round.id}>
+                        Round #{round.round_number} - {round.round_name} ({round.status})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            {(selectedEastRound || selectedWestRound) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSelectedEastRound("");
+                  setSelectedWestRound("");
+                }}
+              >
+                Clear time zone rounds
+              </Button>
+            )}
           </div>
 
           <Button 
@@ -296,6 +384,17 @@ export default function AutoEnrollmentManager() {
                         Round #{rule.program_rounds.round_number} - {rule.program_rounds.round_name}
                       </Badge>
                     </div>
+                    {(rule.east_round_id || rule.west_round_id) && (
+                      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                        <span>By time zone:</span>
+                        {rule.east_round_id && (
+                          <Badge variant="outline">East → {roundLabel(rule.east_round_id)}</Badge>
+                        )}
+                        {rule.west_round_id && (
+                          <Badge variant="outline">West → {roundLabel(rule.west_round_id)}</Badge>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <Button
                     variant="ghost"
