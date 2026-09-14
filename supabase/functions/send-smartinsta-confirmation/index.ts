@@ -195,8 +195,8 @@ serve(async (req) => {
     const html = `
 <!doctype html>
 <html dir="rtl" lang="fa">
-  <body style="margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
-    <div style="max-width:560px;margin:0 auto;padding:24px 20px;">
+  <body dir="rtl" style="direction:rtl;text-align:right;margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
+    <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;">
       <h1 style="margin:0 0 12px;font-size:22px;line-height:1.4;">
         سلام ${name} عزیز 👋
       </h1>
