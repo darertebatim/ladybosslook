@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.56.0';
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { create } from 'https://deno.land/x/djwt@v3.0.2/mod.ts';
+import { buildUnsubUrl, unsubHeaders, appendUnsubFooter, fetchUnsubscribed } from "../_shared/unsubscribe.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -624,13 +625,21 @@ const handler = async (req: Request): Promise<Response> => {
 
         const emailHtml = generateEmailHtml(title, content, linkUrl, linkText);
 
+        const optedOut = await fetchUnsubscribed(
+          supabase,
+          (profiles || []).map((p: any) => p.email),
+        );
+
         for (const profile of profiles || []) {
+          if (optedOut.has(String(profile.email).trim().toLowerCase())) continue;
           try {
+            const unsubUrl = await buildUnsubUrl(profile.email);
             const result = await resend.emails.send({
               from: "Support Ladyboss <support@ladybosslook.com>",
               to: [profile.email],
               subject: `📢 ${title}`,
-              html: emailHtml,
+              html: appendUnsubFooter(emailHtml, unsubUrl),
+              headers: unsubHeaders(unsubUrl),
             });
 
             if (result.data?.id) {
