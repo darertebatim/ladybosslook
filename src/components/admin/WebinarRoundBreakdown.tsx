@@ -65,16 +65,18 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
 
   const [draftEast, setDraftEast] = useState<number | ''>('');
   const [draftWest, setDraftWest] = useState<number | ''>('');
+  const [draftEurope, setDraftEurope] = useState<number | '' | 'none'>('');
 
   const activeRounds = (rounds || []).filter((r) => r.status === 'active');
 
   const saveRouting = useMutation({
-    mutationFn: async (payload: { east: number; west: number }) => {
-      const { error } = await supabase.from('webinar_round_routing').upsert(
+    mutationFn: async (payload: { east: number; west: number; europe: number | null }) => {
+      const { error } = await (supabase as any).from('webinar_round_routing').upsert(
         {
           program_slug: programSlug,
           east_round_number: payload.east,
           west_round_number: payload.west,
+          europe_round_number: payload.europe,
         },
         { onConflict: 'program_slug' },
       );
