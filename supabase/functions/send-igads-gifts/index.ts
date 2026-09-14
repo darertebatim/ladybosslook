@@ -15,7 +15,11 @@ const corsHeaders = {
 };
 
 const GIFTS_URL = "https://ladybosslook.com/giftsalilotfivip";
-const WHATSAPP_URL = "https://wa.me/16265028538";
+// Support smart-link: opens the Rilo app support chat on mobile; on desktop
+// it redirects to the web support chat (/dashboard/chat). Users can also
+// simply reply to the email.
+const SUPPORT_URL =
+  "https://ladyboss.onelink.me/lt6v?af_xp=custom&pid=email_support&c=lead_email&deep_link_value=support&af_web_dp=https%3A%2F%2Fladybosslook.com%2Fdashboard%2Fchat";
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -53,12 +57,12 @@ function buildHtml(unsubscribeUrl: string): string {
               ممنون که در وبینار «جذب مشتری با اینستاگرام ادز» همراه ما بودید! همان‌طور که قول داده بودیم، هدایای ویژه شما آماده است.
             </p>
             <p style="margin:0 0 16px;font-size:16px;line-height:1.9;color:#333;text-align:right;">
-              برای دریافت هدایا روی دکمه زیر بزنید. اگر هم سؤالی داشتید، از طریق واتس‌اپ در خدمت شما هستیم.
+              برای دریافت هدایا روی دکمه زیر بزنید. اگر هم سؤالی داشتید، از طریق چت اپ ریلو در خدمت شما هستیم (یا همین ایمیل را جواب بدهید).
             </p>
           </td></tr>
           <tr><td style="padding:8px 28px 24px;"><table width="100%" cellpadding="0" cellspacing="0">
             ${btn("دریافت هدایا 🎁", GIFTS_URL, "#EA5B2B")}
-            ${btn("گفتگو در واتس‌اپ 💬", WHATSAPP_URL, "#25D366")}
+            ${btn("گفتگو در اپ ریلو 💬", SUPPORT_URL, "#EA5B2B")}
           </table></td></tr>
           <tr><td style="padding:4px 28px 24px;" dir="rtl">
             <div style="font-size:15px;line-height:1.8;color:#444;text-align:right;">

@@ -3,12 +3,14 @@ import { AudioPlayerProvider } from '@/contexts/AudioPlayerContext';
 import { RoutinePlayerProvider } from '@/components/app/RoutinePlayerProvider';
 import { useClaimPendingDedication } from '@/hooks/useClaimPendingDedication';
 import { useClaimPendingPlaylistGift } from '@/hooks/useClaimPendingPlaylistGift';
+import { useSupportDeepLink } from '@/hooks/useSupportDeepLink';
 import { GlobalCelebrationHost } from '@/components/app/GlobalCelebrationHost';
 import { useApertureAdminLockSync } from '@/aperture/hooks/useApertureAdminLockSync';
 
 function DedicationClaimer() {
   useClaimPendingDedication();
   useClaimPendingPlaylistGift();
+  useSupportDeepLink();
   useApertureAdminLockSync();
   return null;
 }

@@ -8,6 +8,13 @@ const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const resend = new Resend(RESEND_API_KEY);
 
+
+// Support smart-link: opens the Rilo app support chat on mobile; on desktop
+// it redirects to the web support chat (/dashboard/chat). Users can also
+// simply reply to the email.
+const SUPPORT_URL =
+  "https://ladyboss.onelink.me/lt6v?af_xp=custom&pid=email_support&c=lead_email&deep_link_value=support&af_web_dp=https%3A%2F%2Fladybosslook.com%2Fdashboard%2Fchat";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -162,7 +169,7 @@ serve(async (req) => {
 
     const title = prog?.title || "وبینار ۶ تله اینستاگرام";
     const meetUrl = round?.google_meet_link || "";
-    const supportUrl = round?.support_link_url || "https://wa.me/16265028538";
+    const supportUrl = SUPPORT_URL;
     const durationMinutes = round?.first_session_duration || 90;
     const startUtc = round?.first_session_date
       ? new Date(round.first_session_date)
@@ -255,9 +262,9 @@ serve(async (req) => {
       }
 
       <p style="margin:16px 0;font-size:14px;line-height:1.8;">
-        اگر سوالی داشتی، از طریق واتس‌اپ پشتیبانی با ما در تماس باش:
+        اگر سوالی داشتی، از چت اپ ریلو با ما در تماس باش (یا همین ایمیل را جواب بده):
         <br>
-        <a href="${supportUrl}" style="color:#059669;">${supportUrl}</a>
+        <a href="${supportUrl}" style="color:#EA5B2B;">باز کردن چت پشتیبانی 💬</a>
       </p>
 
       <p style="margin:24px 0 0;font-size:13px;color:#6b7280;line-height:1.8;">

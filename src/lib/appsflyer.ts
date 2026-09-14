@@ -16,6 +16,26 @@ export const ONELINK_TEMPLATE_ID = 'lt6v';
 export const ONELINK_SUBDOMAIN = 'ladyboss.onelink.me';
 export const ONELINK_BASE_URL = `https://${ONELINK_SUBDOMAIN}/${ONELINK_TEMPLATE_ID}`;
 
+/** deep_link_value entries that must NOT be treated as instructor slugs. */
+const RESERVED_DEEP_LINK_VALUES = new Set(['dedication', 'support']);
+
+/**
+ * Build a OneLink URL for support (used in lead emails).
+ * - Mobile with app installed → opens the app; `deep_link_value=support`
+ *   routes the user into the in-app support chat (see useSupportDeepLink).
+ * - Desktop / no app → af_web_dp sends them to the web support chat.
+ */
+export function buildSupportOneLink(): string {
+  const params = new URLSearchParams({
+    af_xp: 'custom',
+    pid: 'email_support',
+    c: 'lead_email',
+    deep_link_value: 'support',
+    af_web_dp: 'https://ladybosslook.com/dashboard/chat',
+  });
+  return `${ONELINK_BASE_URL}?${params.toString()}`;
+}
+
 /**
  * Build a OneLink URL for a specific instructor.
  * The follower clicks this → goes to the App Store → on first launch, AppsFlyer
@@ -128,6 +148,12 @@ export function getStoredAttribution(): AppsFlyerAttribution | null {
   }
 }
 
+export function clearStoredAttribution(): void {
+  try {
+    localStorage.removeItem(ATTRIBUTION_STORAGE_KEY);
+  } catch {/* ignore */}
+}
+
 export function markAttributionProcessed(): void {
   try {
     localStorage.setItem(ATTRIBUTION_PROCESSED_KEY, '1');
@@ -184,13 +210,14 @@ export async function initAppsFlyer(): Promise<void> {
           const packageSlug =
             (data?.af_sub2 as string | undefined) ||
             (data?.deep_link_sub1 as string | undefined);
+          const isReserved = RESERVED_DEEP_LINK_VALUES.has(deepLinkValue ?? '');
           const payload: AppsFlyerAttribution = {
             deepLinkValue,
             dedicationToken: deepLinkValue === 'dedication' ? dedicationToken : undefined,
-            instructorSlug: deepLinkValue === 'dedication'
+            instructorSlug: isReserved
               ? undefined
               : (instructorSlug ? String(instructorSlug).trim().toLowerCase() : undefined),
-            packageSlug: deepLinkValue === 'dedication'
+            packageSlug: isReserved
               ? undefined
               : (packageSlug ? String(packageSlug).trim().toLowerCase() : undefined),
             raw: data as Record<string, unknown>,
@@ -198,7 +225,9 @@ export async function initAppsFlyer(): Promise<void> {
           };
           localStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(payload));
           console.log('[AppsFlyer] ✅ Conversion data captured. Slug:', payload.instructorSlug ?? '(none)', 'Package:', payload.packageSlug ?? '(none)');
-          if (payload.instructorSlug) dispatchAttributionEvent(payload.instructorSlug);
+          if (payload.instructorSlug || payload.deepLinkValue === 'support') {
+            dispatchAttributionEvent(payload.instructorSlug ?? 'support');
+          }
         } catch (err) {
           console.warn('[AppsFlyer] Conversion data parse failed:', err);
         }
@@ -221,14 +250,15 @@ export async function initAppsFlyer(): Promise<void> {
           const packageSlug =
             (data?.deep_link_sub1 as string | undefined) ||
             (data?.af_sub2 as string | undefined);
-          if (deepLinkValue === 'dedication' || instructorSlug) {
+          const isReserved = RESERVED_DEEP_LINK_VALUES.has(deepLinkValue ?? '');
+          if (deepLinkValue === 'dedication' || deepLinkValue === 'support' || instructorSlug) {
             const payload: AppsFlyerAttribution = {
               deepLinkValue,
               dedicationToken: deepLinkValue === 'dedication' ? dedicationToken : undefined,
-              instructorSlug: deepLinkValue === 'dedication'
+              instructorSlug: isReserved
                 ? undefined
                 : String(instructorSlug).trim().toLowerCase(),
-              packageSlug: deepLinkValue === 'dedication'
+              packageSlug: isReserved
                 ? undefined
                 : (packageSlug ? String(packageSlug).trim().toLowerCase() : undefined),
               raw: data as Record<string, unknown>,
