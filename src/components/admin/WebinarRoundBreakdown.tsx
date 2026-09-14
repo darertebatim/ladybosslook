@@ -250,6 +250,7 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
             const zones = tzFor(r.round_number);
             const isEast = r.round_number === currentEast;
             const isWest = r.round_number === currentWest;
+            const isEurope = currentEurope !== null && r.round_number === currentEurope;
             return (
               <div key={r.id} className="rounded-xl border p-4 space-y-2">
                 <div className="flex items-start justify-between gap-2">
