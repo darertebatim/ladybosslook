@@ -46,7 +46,7 @@ function buildHtml(unsubscribeUrl: string): string {
   return `<!DOCTYPE html>
 <html dir="rtl">
   <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-  <body style="margin:0;padding:0;background:#f6f6f7;font-family:Tahoma, 'Iranian Sans', Arial, sans-serif;">
+  <body dir="rtl" style="direction:rtl;text-align:right;margin:0;padding:0;background:#f6f6f7;font-family:Tahoma, 'Iranian Sans', Arial, sans-serif;">
     <span style="display:none;font-size:0;line-height:0;opacity:0;">هدایای ویژه وبینار اینستاگرام ادز</span>
     <table width="100%" cellpadding="0" cellspacing="0" style="background:#f6f6f7;padding:24px 12px;">
       <tr><td align="center">

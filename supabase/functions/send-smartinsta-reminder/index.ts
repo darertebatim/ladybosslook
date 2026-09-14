@@ -100,8 +100,8 @@ function buildHtml(
   return `
 <!doctype html>
 <html dir="rtl" lang="fa">
-  <body style="margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
-    <div style="max-width:560px;margin:0 auto;padding:24px 20px;">
+  <body dir="rtl" style="direction:rtl;text-align:right;margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
+    <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;">
       <h1 style="margin:0 0 14px;font-size:20px;line-height:1.6;">
         سلام ${name}، میخوام مطمئن بشم وبینار فریم‌ورک اینستاگرام هوشمند رو از دست نمیدین 🌷
       </h1>
@@ -150,7 +150,7 @@ function buildHtml(
 
       <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
         سوالی داشتی؟ <a href="${supportUrl}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
-        <br>روی کامپیوتر؟ همین لینک چت پشتیبانی را باز می‌کند — یا همین ایمیل را جواب بده.
+        <br>روی کامپیوتر هستی؟ <a href="https://ladybosslook.com/dashboard/chat" style="color:#EA5B2B;">چت پشتیبانی در داشبورد</a> — یا همین ایمیل را جواب بده.
         <br><br>علی لطفی
       </p>
     </div>
@@ -166,8 +166,8 @@ function buildJoinNowHtml(
   return `
 <!doctype html>
 <html dir="rtl" lang="fa">
-  <body style="margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
-    <div style="max-width:560px;margin:0 auto;padding:24px 20px;text-align:center;">
+  <body dir="rtl" style="direction:rtl;text-align:right;margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
+    <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;text-align:center;">
       <h1 style="margin:0 0 14px;font-size:22px;line-height:1.6;">
         سلام ${name} 🌷 وبینار در حال شروع است
       </h1>
@@ -188,7 +188,7 @@ function buildJoinNowHtml(
       }
       <p style="margin:22px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
         مشکلی داشتی؟ <a href="${supportUrl}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
-        <br>روی کامپیوتر؟ همین لینک چت پشتیبانی را باز می‌کند — یا همین ایمیل را جواب بده.
+        <br>روی کامپیوتر هستی؟ <a href="https://ladybosslook.com/dashboard/chat" style="color:#EA5B2B;">چت پشتیبانی در داشبورد</a> — یا همین ایمیل را جواب بده.
         <br><br>علی لطفی
       </p>
     </div>
@@ -216,8 +216,8 @@ function buildNextSessionHtml(
   return `
 <!doctype html>
 <html dir="rtl" lang="fa">
-  <body style="margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
-    <div style="max-width:560px;margin:0 auto;padding:24px 20px;">
+  <body dir="rtl" style="direction:rtl;text-align:right;margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
+    <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;">
       <h1 style="margin:0 0 14px;font-size:20px;line-height:1.6;">
         سلام ${name} 🌷
       </h1>
@@ -249,7 +249,7 @@ function buildNextSessionHtml(
 
       <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
         سوالی داشتی؟ <a href="${supportUrl}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
-        <br>روی کامپیوتر؟ همین لینک چت پشتیبانی را باز می‌کند — یا همین ایمیل را جواب بده.
+        <br>روی کامپیوتر هستی؟ <a href="https://ladybosslook.com/dashboard/chat" style="color:#EA5B2B;">چت پشتیبانی در داشبورد</a> — یا همین ایمیل را جواب بده.
         <br><br>علی لطفی
       </p>
     </div>
