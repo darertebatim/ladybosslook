@@ -350,7 +350,7 @@ const AppCourseDetail = () => {
       if (!slug) return null;
       const { data: autoEnroll } = await (supabase as any)
         .from("program_auto_enrollment")
-        .select("round_id, program_rounds(*)")
+        .select("round_id, program_rounds!program_auto_enrollment_round_id_fkey(*)")
         .eq("program_slug", slug)
         .maybeSingle();
 

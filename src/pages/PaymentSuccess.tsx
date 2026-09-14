@@ -206,7 +206,7 @@ export default function PaymentSuccess() {
       const slug = roundSlug!;
       const { data: autoEnroll } = await (supabase as any)
         .from('program_auto_enrollment')
-        .select('round_id, program_rounds(*)')
+        .select('round_id, program_rounds!program_auto_enrollment_round_id_fkey(*)')
         .eq('program_slug', slug)
         .maybeSingle();
       if (autoEnroll?.program_rounds) return autoEnroll.program_rounds as any;

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { getLocalDateStr } from '@/lib/localDate';
+import { resolveAutoEnrollRoundId } from '@/lib/autoEnrollRound';
 
 // Types for Routines Bank
 export interface RoutineBankItem {
@@ -701,16 +702,9 @@ export async function addRoutineToUserPlanner(
 
         if (!existingEnrollment) {
           // Find the auto-enrollment round for this program (same logic as store/stripe)
-          let roundId: string | null = null;
-          const { data: autoEnroll } = await supabase
-            .from('program_auto_enrollment')
-            .select('round_id')
-            .eq('program_slug', programSlug)
-            .maybeSingle();
+          let roundId: string | null = await resolveAutoEnrollRoundId(programSlug);
 
-          if (autoEnroll?.round_id) {
-            roundId = autoEnroll.round_id;
-          } else {
+          if (!roundId) {
             // Fallback: find active round
             const { data: activeRound } = await (supabase
               .from('program_rounds')
