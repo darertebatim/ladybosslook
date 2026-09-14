@@ -296,16 +296,7 @@ const AppStore = () => {
     setEnrollingSlug(program.slug);
 
     try {
-      let roundId: string | null = null;
-      const { data: autoEnroll } = await supabase
-        .from("program_auto_enrollment")
-        .select("round_id")
-        .eq("program_slug", program.slug)
-        .maybeSingle();
-
-      if (autoEnroll?.round_id) {
-        roundId = autoEnroll.round_id;
-      }
+      const roundId: string | null = await resolveAutoEnrollRoundId(program.slug);
 
       const { error } = await supabase.from("course_enrollments").insert({
         user_id: user.id,

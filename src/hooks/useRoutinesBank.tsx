@@ -701,16 +701,9 @@ export async function addRoutineToUserPlanner(
 
         if (!existingEnrollment) {
           // Find the auto-enrollment round for this program (same logic as store/stripe)
-          let roundId: string | null = null;
-          const { data: autoEnroll } = await supabase
-            .from('program_auto_enrollment')
-            .select('round_id')
-            .eq('program_slug', programSlug)
-            .maybeSingle();
+          let roundId: string | null = await resolveAutoEnrollRoundId(programSlug);
 
-          if (autoEnroll?.round_id) {
-            roundId = autoEnroll.round_id;
-          } else {
+          if (!roundId) {
             // Fallback: find active round
             const { data: activeRound } = await (supabase
               .from('program_rounds')
