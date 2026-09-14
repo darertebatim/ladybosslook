@@ -58,12 +58,12 @@ export async function resolveAutoEnrollRoundId(
 ): Promise<string | null> {
   const { data: rule } = await supabase
     .from('program_auto_enrollment')
-    .select('round_id, east_round_id, west_round_id')
+    .select('round_id, east_round_id, west_round_id, europe_round_id')
     .eq('program_slug', programSlug)
     .maybeSingle();
 
   if (!rule) return null;
-  if (!rule.east_round_id && !rule.west_round_id) return rule.round_id ?? null;
+  if (!rule.east_round_id && !rule.west_round_id && !rule.europe_round_id) return rule.round_id ?? null;
 
   let tz = timezoneOverride || null;
   if (!tz && userId) {
@@ -78,5 +78,6 @@ export async function resolveAutoEnrollRoundId(
   const side = sideForTimezone(tz);
   if (side === 'west' && rule.west_round_id) return rule.west_round_id;
   if (side === 'east' && rule.east_round_id) return rule.east_round_id;
-  return rule.round_id ?? rule.east_round_id ?? rule.west_round_id ?? null;
+  if (side === 'europe' && rule.europe_round_id) return rule.europe_round_id;
+  return rule.round_id ?? rule.east_round_id ?? rule.west_round_id ?? rule.europe_round_id ?? null;
 }
