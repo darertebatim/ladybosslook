@@ -148,6 +148,12 @@ export function getStoredAttribution(): AppsFlyerAttribution | null {
   }
 }
 
+export function clearStoredAttribution(): void {
+  try {
+    localStorage.removeItem(ATTRIBUTION_STORAGE_KEY);
+  } catch {/* ignore */}
+}
+
 export function markAttributionProcessed(): void {
   try {
     localStorage.setItem(ATTRIBUTION_PROCESSED_KEY, '1');
