@@ -40,6 +40,10 @@ interface Campaign {
   };
   morningBody: string;
   nextSessionBody: string;
+  /** Show the multi-city time table in the "next session" email. */
+  nextSessionShowTimes?: boolean;
+  /** Extra block rendered right after the signup button in the "next session" email. */
+  nextSessionAfterCta?: string;
 }
 
 const CAMPAIGNS: Record<string, Campaign> = {
