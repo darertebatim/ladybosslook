@@ -155,7 +155,7 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
             {routingLoading && <p className="text-xs text-muted-foreground">Loading…</p>}
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-3">
             <div className="space-y-1.5">
               <label className="text-xs text-muted-foreground">East / Central timezones → round</label>
               <Select
@@ -193,6 +193,27 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-1.5">
+              <label className="text-xs text-muted-foreground">
+                Europe / Middle East timezones → round (optional)
+              </label>
+              <Select
+                value={String(europeValue)}
+                onValueChange={(v) => setDraftEurope(v === 'none' ? 'none' : Number(v))}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="No Europe round" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No Europe round (use East / West)</SelectItem>
+                  {activeRounds.map((r) => (
+                    <SelectItem key={`europe-${r.id}`} value={String(r.round_number ?? '')}>
+                      Round {r.round_number ?? '?'} — {r.round_name || 'Untitled'}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -201,7 +222,11 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
               disabled={!hasChanges || saveRouting.isPending || eastValue === '' || westValue === ''}
               onClick={() => {
                 if (eastValue === '' || westValue === '') return;
-                saveRouting.mutate({ east: Number(eastValue), west: Number(westValue) });
+                saveRouting.mutate({
+                  east: Number(eastValue),
+                  west: Number(westValue),
+                  europe: europeToSave,
+                });
               }}
             >
               <Save className="mr-1.5 h-4 w-4" />
