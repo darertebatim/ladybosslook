@@ -118,9 +118,9 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
 
   const eastValue = draftEast !== '' ? draftEast : currentEast ?? '';
   const westValue = draftWest !== '' ? draftWest : currentWest ?? '';
-  const europeValue: number | '' | 'none' =
+  const europeValue: number | 'none' =
     draftEurope !== '' ? draftEurope : currentEurope ?? 'none';
-  const europeToSave = europeValue === 'none' || europeValue === '' ? null : Number(europeValue);
+  const europeToSave: number | null = europeValue === 'none' ? null : Number(europeValue);
 
   const hasChanges =
     (draftEast !== '' && draftEast !== (currentEast ?? '')) ||
