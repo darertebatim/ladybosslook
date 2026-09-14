@@ -204,13 +204,14 @@ export async function initAppsFlyer(): Promise<void> {
           const packageSlug =
             (data?.af_sub2 as string | undefined) ||
             (data?.deep_link_sub1 as string | undefined);
+          const isReserved = RESERVED_DEEP_LINK_VALUES.has(deepLinkValue ?? '');
           const payload: AppsFlyerAttribution = {
             deepLinkValue,
             dedicationToken: deepLinkValue === 'dedication' ? dedicationToken : undefined,
-            instructorSlug: deepLinkValue === 'dedication'
+            instructorSlug: isReserved
               ? undefined
               : (instructorSlug ? String(instructorSlug).trim().toLowerCase() : undefined),
-            packageSlug: deepLinkValue === 'dedication'
+            packageSlug: isReserved
               ? undefined
               : (packageSlug ? String(packageSlug).trim().toLowerCase() : undefined),
             raw: data as Record<string, unknown>,
@@ -218,7 +219,9 @@ export async function initAppsFlyer(): Promise<void> {
           };
           localStorage.setItem(ATTRIBUTION_STORAGE_KEY, JSON.stringify(payload));
           console.log('[AppsFlyer] ✅ Conversion data captured. Slug:', payload.instructorSlug ?? '(none)', 'Package:', payload.packageSlug ?? '(none)');
-          if (payload.instructorSlug) dispatchAttributionEvent(payload.instructorSlug);
+          if (payload.instructorSlug || payload.deepLinkValue === 'support') {
+            dispatchAttributionEvent(payload.instructorSlug ?? 'support');
+          }
         } catch (err) {
           console.warn('[AppsFlyer] Conversion data parse failed:', err);
         }
