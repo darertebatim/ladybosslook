@@ -96,7 +96,7 @@ export default function AutoEnrollmentManager() {
         east_round_id,
         west_round_id,
         created_at,
-        program_rounds (
+        program_rounds!program_auto_enrollment_round_id_fkey (
           round_name,
           round_number,
           program_slug
@@ -113,10 +113,11 @@ export default function AutoEnrollmentManager() {
   };
 
   const handleAddRule = async () => {
-    if (!selectedProgram || !selectedRound) {
+    const fallbackRound = selectedRound || selectedEastRound || selectedWestRound;
+    if (!selectedProgram || !fallbackRound) {
       toast({
         title: "Validation Error",
-        description: "Please select both a program and a round",
+        description: "Select a program and at least one round (target, East or West)",
         variant: "destructive",
       });
       return;
