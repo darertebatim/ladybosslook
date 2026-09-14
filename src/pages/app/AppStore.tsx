@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { resolveAutoEnrollRoundId } from "@/lib/autoEnrollRound";
 import { usePrograms } from "@/hooks/usePrograms";
 import { SEOHead } from "@/components/SEOHead";
 import {
