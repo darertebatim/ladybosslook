@@ -27,11 +27,22 @@ const WEST_TIMEZONES = new Set<string>([
   'Asia/Kuala_Lumpur', 'Asia/Hanoi',
 ]);
 
-export function sideForTimezone(tz?: string | null): 'east' | 'west' | null {
+// Europe + Middle East: from the UK eastwards through Dubai.
+const EUROPE_PREFIXES = ['Europe/', 'Atlantic/', 'Africa/'];
+const EUROPE_TIMEZONES = new Set<string>([
+  'Asia/Dubai', 'Asia/Muscat', 'Asia/Qatar', 'Asia/Bahrain', 'Asia/Kuwait',
+  'Asia/Riyadh', 'Asia/Baghdad', 'Asia/Tehran', 'Asia/Jerusalem', 'Asia/Tel_Aviv',
+  'Asia/Beirut', 'Asia/Damascus', 'Asia/Amman', 'Asia/Nicosia', 'Asia/Istanbul',
+  'Europe/Istanbul', 'Asia/Baku', 'Asia/Tbilisi', 'Asia/Yerevan',
+]);
+
+export function sideForTimezone(tz?: string | null): 'east' | 'west' | 'europe' | null {
   const t = (tz || '').trim();
   if (!t) return null;
   if (EAST_TIMEZONES.has(t)) return 'east';
   if (WEST_TIMEZONES.has(t)) return 'west';
+  if (EUROPE_TIMEZONES.has(t)) return 'europe';
+  if (EUROPE_PREFIXES.some((p) => t.startsWith(p))) return 'europe';
   return null;
 }
 
