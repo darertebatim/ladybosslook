@@ -135,7 +135,7 @@ End Date: ${round.end_date || 'N/A'}
 First Session Date: ${round.first_session_date || 'N/A'}
 Google Meet Link: ${round.google_meet_link || 'Will be provided'}
 Google Drive Link: ${round.google_drive_link || 'N/A'}
-WhatsApp Support: ${round.whatsapp_support_number || 'N/A'}
+Support: Rilo app chat (https://ladyboss.onelink.me/lt6v?af_xp=custom&pid=email_support&c=lead_email&deep_link_value=support&af_web_dp=https%3A%2F%2Fladybosslook.com%2Fdashboard%2Fchat) or reply to this email
 Important Notes: ${round.important_message || 'None'}
 ${custom_context ? `Additional Context: ${custom_context}` : ''}
     `.trim();

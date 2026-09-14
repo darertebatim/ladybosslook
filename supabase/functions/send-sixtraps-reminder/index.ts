@@ -254,8 +254,8 @@ function buildHtml(
       </p>
 
       <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
-        سوالی داشتی؟ واتس‌اپ پشتیبانی:
-        <a href="${supportUrl}" style="color:#059669;">${supportUrl}</a>
+        سوالی داشتی؟ <a href="${supportUrl}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
+        <br>روی کامپیوتر؟ همین لینک چت پشتیبانی را باز می‌کند — یا همین ایمیل را جواب بده.
         <br><br>علی لطفی
       </p>
     </div>
@@ -292,8 +292,8 @@ function buildJoinNowHtml(
           : ""
       }
       <p style="margin:22px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
-        مشکلی داشتی؟ واتس‌اپ پشتیبانی:
-        <a href="${supportUrl}" style="color:#059669;">${supportUrl}</a>
+        مشکلی داشتی؟ <a href="${supportUrl}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
+        <br>روی کامپیوتر؟ همین لینک چت پشتیبانی را باز می‌کند — یا همین ایمیل را جواب بده.
         <br><br>علی لطفی
       </p>
     </div>
@@ -344,8 +344,8 @@ function buildMorningHtml(
       ${p("امشب منتظرتان هستم،<br><strong>علی لطفی</strong>")}
 
       <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
-        سوالی داشتی؟ واتس‌اپ پشتیبانی:
-        <a href="${supportUrl}" style="color:#059669;">${supportUrl}</a>
+        سوالی داشتی؟ <a href="${supportUrl}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
+        <br>روی کامپیوتر؟ همین لینک چت پشتیبانی را باز می‌کند — یا همین ایمیل را جواب بده.
       </p>
     </div>
   </body>
@@ -387,8 +387,8 @@ function buildNextSessionHtml(
       }
 
       <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
-        سوالی داشتی؟ واتس‌اپ پشتیبانی:
-        <a href="${supportUrl}" style="color:#059669;">${supportUrl}</a>
+        سوالی داشتی؟ <a href="${supportUrl}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
+        <br>روی کامپیوتر؟ همین لینک چت پشتیبانی را باز می‌کند — یا همین ایمیل را جواب بده.
         <br><br>علی لطفی
       </p>
     </div>

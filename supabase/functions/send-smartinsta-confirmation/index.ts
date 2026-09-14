@@ -250,9 +250,9 @@ serve(async (req) => {
       }
 
       <p style="margin:16px 0;font-size:14px;line-height:1.8;">
-        اگر سوالی داشتی، از طریق واتس‌اپ پشتیبانی با ما در تماس باش:
+        اگر سوالی داشتی، از چت اپ ریلو با ما در تماس باش (یا همین ایمیل را جواب بده):
         <br>
-        <a href="${supportUrl}" style="color:#059669;">${supportUrl}</a>
+        <a href="${supportUrl}" style="color:#EA5B2B;">باز کردن چت پشتیبانی 💬</a>
       </p>
 
       <p style="margin:24px 0 0;font-size:13px;color:#6b7280;line-height:1.8;">
