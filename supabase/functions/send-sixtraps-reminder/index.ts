@@ -397,8 +397,10 @@ function buildNextSessionHtml(
         </a>
       </p>
 
+      ${c.nextSessionAfterCta ?? ""}
+
       ${
-        rows
+        rows && c.nextSessionShowTimes
           ? `<div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:12px;margin:20px 0;">
                <p style="margin:0 0 8px;font-size:14px;font-weight:bold;">⏰ ساعت جلسه جدید در شهرهای مختلف</p>
                <table style="width:100%;border-collapse:collapse;">${rows}</table>
