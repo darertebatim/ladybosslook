@@ -114,13 +114,18 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
 
   const currentEast = routing?.east_round_number ?? null;
   const currentWest = routing?.west_round_number ?? null;
+  const currentEurope = routing?.europe_round_number ?? null;
 
   const eastValue = draftEast !== '' ? draftEast : currentEast ?? '';
   const westValue = draftWest !== '' ? draftWest : currentWest ?? '';
+  const europeValue: number | '' | 'none' =
+    draftEurope !== '' ? draftEurope : currentEurope ?? 'none';
+  const europeToSave = europeValue === 'none' || europeValue === '' ? null : Number(europeValue);
 
   const hasChanges =
-    draftEast !== '' && draftEast !== (currentEast ?? '') ||
-    draftWest !== '' && draftWest !== (currentWest ?? '');
+    (draftEast !== '' && draftEast !== (currentEast ?? '')) ||
+    (draftWest !== '' && draftWest !== (currentWest ?? '')) ||
+    (draftEurope !== '' && europeToSave !== currentEurope);
 
   return (
     <Card>
