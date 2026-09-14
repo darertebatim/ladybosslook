@@ -277,10 +277,13 @@ export async function resolveWebinarRound(
   // 2. Timezone-based assignment (only when no pinned round and timezone is known)
   if (timezone) {
     const routing = await getWebinarRoundRouting(programSlug);
-    const side = inferWebinarSideFromTimezone(timezone);
+    const rawSide = inferWebinarSideFromTimezone(timezone);
+    const { east, west, europe } = routingOrFallback(routing);
+    // Europe only applies when a Europe round is configured; otherwise those
+    // visitors fall through to the manual selector, exactly as before.
+    const side = rawSide === "europe" && europe === null ? null : rawSide;
     if (side) {
-      const { east, west } = routingOrFallback(routing);
-      const inferred = side === "east" ? east : west;
+      const inferred = side === "east" ? east : side === "west" ? west : (europe as number);
       const { data } = await base()
         .eq("round_number", inferred)
         .eq("status", "active")
