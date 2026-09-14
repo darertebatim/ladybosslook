@@ -16,6 +16,7 @@ export interface WebinarRoundRouting {
   program_slug: string;
   east_round_number: number;
   west_round_number: number;
+  europe_round_number: number | null;
 }
 
 const SELECT =
