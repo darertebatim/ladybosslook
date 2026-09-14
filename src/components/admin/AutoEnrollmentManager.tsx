@@ -129,7 +129,7 @@ export default function AutoEnrollmentManager() {
         .from('program_auto_enrollment' as any)
         .upsert({
           program_slug: selectedProgram,
-          round_id: selectedRound,
+          round_id: fallbackRound,
           east_round_id: selectedEastRound || null,
           west_round_id: selectedWestRound || null,
         } as any, {
@@ -253,7 +253,7 @@ export default function AutoEnrollmentManager() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Target Round</label>
+              <label className="text-sm font-medium">Target Round (fallback)</label>
               <Select 
                 value={selectedRound} 
                 onValueChange={setSelectedRound}
@@ -339,7 +339,7 @@ export default function AutoEnrollmentManager() {
 
           <Button 
             onClick={handleAddRule} 
-            disabled={!selectedProgram || !selectedRound || isSaving}
+            disabled={!selectedProgram || (!selectedRound && !selectedEastRound && !selectedWestRound) || isSaving}
             className="w-full"
           >
             {isSaving ? (
