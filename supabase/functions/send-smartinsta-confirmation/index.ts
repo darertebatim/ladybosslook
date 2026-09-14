@@ -264,11 +264,13 @@ serve(async (req) => {
   </body>
 </html>`;
 
+    const unsubUrl = await buildUnsubUrl(email);
     const { data: sendData, error } = await resend.emails.send({
       from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>",
       to: [email],
       subject: `تایید ثبت‌نام: ${title}`,
-      html,
+      html: appendUnsubFooter(html, unsubUrl),
+      headers: unsubHeaders(unsubUrl),
     });
 
     if (error) {

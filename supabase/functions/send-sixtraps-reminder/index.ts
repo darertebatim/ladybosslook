@@ -588,6 +588,11 @@ serve(async (req) => {
       }
     }
 
+    if (!testEmail && recipients.length) {
+      const optedOut = await fetchUnsubscribed(supabase, recipients.map((r) => r.email));
+      recipients = recipients.filter((r) => !optedOut.has(r.email.trim().toLowerCase()));
+    }
+
     let sent = 0;
     let failed = 0;
 
@@ -599,6 +604,7 @@ serve(async (req) => {
           : morningOf
             ? buildMorningHtml(c, r.name, startUtc, meetUrl, supportUrl)
             : buildHtml(c, r.name, startUtc, meetUrl, gcalUrl, supportUrl);
+      const unsubUrl = await buildUnsubUrl(r.email);
       const { data: sendData, error } = await resend.emails.send({
         from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>",
         to: [r.email],
@@ -609,7 +615,8 @@ serve(async (req) => {
             : morningOf
               ? c.subjects.morning
               : c.subjects.reminder,
-        html,
+        html: appendUnsubFooter(html, unsubUrl),
+        headers: unsubHeaders(unsubUrl),
       });
 
       if (error) {
