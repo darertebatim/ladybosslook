@@ -358,14 +358,17 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    if (!RESEND_API_KEY) {
+    const body = await req.json().catch(() => ({}));
+    // Preview mode: render the email and return it without sending anything
+    const previewOnly = body?.preview === true;
+
+    if (!RESEND_API_KEY && !previewOnly) {
       return new Response(JSON.stringify({ error: "RESEND_API_KEY missing" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const body = await req.json().catch(() => ({}));
     const userId = String(body?.user_id || "").trim();
     const programSlug = String(body?.program_slug || "").trim();
     const roundIdIn = body?.round_id ? String(body.round_id) : null;
@@ -373,8 +376,9 @@ serve(async (req) => {
     const orderIdIn = body?.order_id ? String(body.order_id) : null;
     // Test mode: send to an arbitrary email without a user account (skips idempotency)
     const testEmail = String(body?.test_email || "").trim().toLowerCase();
+    const previewName = String(body?.preview_name || "").trim();
 
-    if ((!userId && !testEmail) || !programSlug) {
+    if ((!userId && !testEmail && !previewOnly) || !programSlug) {
       return new Response(JSON.stringify({ error: "user_id (or test_email) and program_slug required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -386,9 +390,12 @@ serve(async (req) => {
     // Load user (or use test email)
     let email = "";
     let name = "there";
-    if (testEmail) {
+    if (previewOnly && !userId) {
+      email = testEmail || "preview@example.com";
+      name = previewName || (testEmail ? testEmail.split("@")[0] : "") || "there";
+    } else if (testEmail) {
       email = testEmail;
-      name = testEmail.split("@")[0] || "there";
+      name = previewName || testEmail.split("@")[0] || "there";
     } else {
       const { data: authUser } = await supabase.auth.admin.getUserById(userId);
       email = authUser?.user?.email || "";
@@ -489,7 +496,7 @@ serve(async (req) => {
 
     // Idempotency: skip if we've already sent this enrollment email
     const marker = testEmail ? `enroll-test:${programSlug}` : `enroll:${programSlug}`;
-    const { data: existing } = testEmail ? { data: null } : await supabase
+    const { data: existing } = (testEmail || previewOnly) ? { data: null } : await supabase
       .from("email_logs")
       .select("id")
       .eq("recipient_email", email)
@@ -531,6 +538,22 @@ serve(async (req) => {
       openInAppUrl,
       webUrl,
     });
+
+    if (previewOnly) {
+      return new Response(
+        JSON.stringify({
+          ok: true,
+          preview: true,
+          subject,
+          html,
+          language: lang,
+          round: round
+            ? { id: round.id, round_name: round.round_name, round_number: round.round_number }
+            : null,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     const { data: sendData, error } = await resend.emails.send({
       from: "Ladyboss Academy <hi@ladybosslook.com>",
