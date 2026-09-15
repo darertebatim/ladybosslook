@@ -82,7 +82,7 @@ export default function ThankYouSmartInsta() {
           startUtc: new Date(round.first_session_date),
           durationMinutes: round.first_session_duration || 90,
           meetUrl: round.google_meet_link || "",
-          supportUrl: round.support_link_url || "/dashboard/chat",
+          supportUrl: "https://ladybosslook.com/dashboard/chat",
         });
       }
     })();
