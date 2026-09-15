@@ -302,7 +302,7 @@
       },
       "message": "پیام",
       "messagePlaceholder": "پیام خود را اینجا بنویسید…",
-      "sendTelegram": "ارسال در تلگرام",
+      "sendTelegram": "باز کردن چت پشتیبانی",
       "fillRequired": "لطفاً یک موضوع انتخاب کرده و پیامی بنویسید"
     },
     "admin_section": {

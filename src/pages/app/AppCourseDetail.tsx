@@ -821,10 +821,7 @@ const AppCourseDetail = () => {
   };
 
   const handleContactSupport = () => {
-    // Open the customizable support link from the round
-    const supportUrl =
-      (round as any)?.support_link_url || "https://t.me/ladybosslook";
-    window.open(supportUrl, "_blank");
+    window.open("https://ladybosslook.com/dashboard/chat", "_blank");
   };
 
   // Add single session to calendar using GLOBAL reminder settings

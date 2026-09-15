@@ -141,10 +141,10 @@ const handler = async (req: Request): Promise<Response> => {
       
       <div style="background: linear-gradient(135deg, #0088cc 0%, #00a8e8 100%); border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;">
         <p style="color: #ffffff; margin: 0 0 15px 0; font-size: 16px;">
-          📱 برای دریافت لینک کانال خصوصی، لطفاً به تلگرام پیام بدهید:
+          📱 برای دریافت لینک کانال خصوصی، لطفاً با پشتیبانی چت کنید:
         </p>
-        <a href="https://t.me/ladybosslook" style="display: inline-block; background-color: #ffffff; color: #0088cc; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 16px;">
-          👉 t.me/ladybosslook
+        <a href="https://ladybosslook.com/dashboard/chat" style="display: inline-block; background-color: #ffffff; color: #0088cc; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 16px;">
+          👉 چت پشتیبانی
         </a>
       </div>
       
@@ -181,10 +181,10 @@ const handler = async (req: Request): Promise<Response> => {
       
       <div style="background: linear-gradient(135deg, #0088cc 0%, #00a8e8 100%); border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;">
         <p style="color: #ffffff; margin: 0 0 15px 0; font-size: 16px;">
-          📱 To receive the private channel link, please message us on Telegram:
+          📱 To receive the private channel link, please contact support:
         </p>
-        <a href="https://t.me/ladybosslook" style="display: inline-block; background-color: #ffffff; color: #0088cc; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 16px;">
-          👉 t.me/ladybosslook
+        <a href="https://ladybosslook.com/dashboard/chat" style="display: inline-block; background-color: #ffffff; color: #0088cc; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 16px;">
+          👉 Open support chat
         </a>
       </div>
       

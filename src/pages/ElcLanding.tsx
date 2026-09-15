@@ -66,16 +66,16 @@ const ElcLanding = () => {
           </a>
         </div>
 
-        {/* Telegram Support */}
+        {/* Support */}
         <div className="text-center pt-4 space-y-2">
           <a
-            href="https://t.me/lbpool_admin"
+            href="https://ladybosslook.com/dashboard/chat"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
           >
             <MessageCircle className="h-4 w-4" />
-            ادمین پشتیبان در تلگرام: @lbpool_admin
+            چت با پشتیبانی
           </a>
           <div>
             <a

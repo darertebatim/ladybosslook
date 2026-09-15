@@ -27,9 +27,7 @@ export function QuickActions() {
   });
 
   const handleContactSupport = () => {
-    const message = `Hi! I need support.\n\nName: ${profile?.full_name || 'N/A'}\nEmail: ${profile?.email || user?.email || 'N/A'}\nPhone: ${profile?.phone || 'N/A'}\nCity: ${profile?.city || 'N/A'}`;
-    const telegramUrl = `https://t.me/ladybosslook?text=${encodeURIComponent(message)}`;
-    window.open(telegramUrl, '_blank');
+    navigate('/dashboard/chat');
   };
 
   // Filter out purchase-related actions for native app (App Store compliance)
@@ -45,7 +43,7 @@ export function QuickActions() {
     {
       icon: Send,
       label: "Get Support",
-      description: "Contact us on Telegram",
+      description: "Chat with our support team",
       action: handleContactSupport,
       color: "text-purple-600",
       showInNative: true

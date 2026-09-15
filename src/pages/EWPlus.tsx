@@ -118,8 +118,8 @@ const EWPlus = () => {
     }
   };
 
-  const handleTelegram = () => {
-    window.open('https://t.me/ladybosslook', '_blank');
+  const handleSupport = () => {
+    window.open('https://ladybosslook.com/dashboard/chat', '_blank');
   };
 
   const isProcessing = isLoadingMonthly || isLoadingFull;
@@ -252,16 +252,16 @@ const EWPlus = () => {
           </div>
         </Card>
 
-        {/* Telegram Support */}
+        {/* Support */}
         <div className="text-center">
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleTelegram}
+            onClick={handleSupport}
             className="font-[Vazirmatn] text-muted-foreground"
           >
             <MessageCircle className="ml-2 h-4 w-4" />
-            سوالی دارید؟ پشتیبانی تلگرام
+            سوالی دارید؟ چت پشتیبانی
           </Button>
         </div>
       </div>

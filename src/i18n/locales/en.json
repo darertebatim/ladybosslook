@@ -289,7 +289,7 @@
     },
     "support_section": {
       "chatWithSupport": "Chat with Support",
-      "orVia": "or via Telegram",
+      "orVia": "or via support chat",
       "subject": "Subject",
       "selectTopic": "Select a topic...",
       "topics": {
@@ -303,7 +303,7 @@
       },
       "message": "Message",
       "messagePlaceholder": "Type your message here...",
-      "sendTelegram": "Send via Telegram",
+      "sendTelegram": "Open support chat",
       "fillRequired": "Please select a subject and enter a message"
     },
     "admin_section": {

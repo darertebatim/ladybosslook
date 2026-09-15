@@ -1041,11 +1041,7 @@ const AppSettings = () => {
                       });
                       return;
                     }
-                    const telegramMessage = `Subject: ${contactSubject}\n\nMessage:\n${contactMessage}`;
-                    window.open(
-                      `https://t.me/ladybosslook?text=${encodeURIComponent(telegramMessage)}`,
-                      "_blank",
-                    );
+                    navigate("/app/chat");
                   }}
                 >
                   <Send className="mr-2 h-4 w-4" />
