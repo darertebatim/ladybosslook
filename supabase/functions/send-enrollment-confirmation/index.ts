@@ -496,7 +496,7 @@ serve(async (req) => {
 
     // Idempotency: skip if we've already sent this enrollment email
     const marker = testEmail ? `enroll-test:${programSlug}` : `enroll:${programSlug}`;
-    const { data: existing } = testEmail ? { data: null } : await supabase
+    const { data: existing } = (testEmail || previewOnly) ? { data: null } : await supabase
       .from("email_logs")
       .select("id")
       .eq("recipient_email", email)
