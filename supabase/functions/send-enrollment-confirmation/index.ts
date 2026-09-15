@@ -575,9 +575,7 @@ serve(async (req) => {
 
     const { data: sendData, error } = await resend.emails.send({
       from: "Ladyboss Academy <hi@ladybosslook.com>",
-      to: [email],
-      subject,
-      html,
+      to: recipients,
     });
 
     if (error) {
