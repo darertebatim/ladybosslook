@@ -49,14 +49,14 @@ const AppSupport = () => {
                   <div className="flex items-start gap-4">
                     <MessageCircle className="w-5 h-5 text-primary mt-1" />
                     <div>
-                      <p className="font-semibold">Telegram Support</p>
+                      <p className="font-semibold">Support Chat</p>
                       <a 
-                        href="https://t.me/ladybosslook" 
+                        href="https://ladybosslook.com/dashboard/chat" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
                       >
-                        @ladybosslook
+                        Open support chat
                       </a>
                     </div>
                   </div>

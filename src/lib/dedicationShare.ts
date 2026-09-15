@@ -28,11 +28,6 @@ export function smsLink(p: SharePayload): string {
   return `sms:?&body=${encodeURIComponent(text)}`;
 }
 
-export function telegramLink(p: SharePayload): string {
-  const url = dedicationUrl(p.token);
-  return `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(baseMessage(p))}`;
-}
-
 export async function nativeShare(p: SharePayload): Promise<boolean> {
   const text = `${baseMessage(p)} — ${dedicationUrl(p.token)}`;
   try {

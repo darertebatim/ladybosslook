@@ -75,7 +75,7 @@ export default function ThankYouSixTraps() {
           startUtc: new Date(round.first_session_date),
           durationMinutes: round.first_session_duration || 90,
           meetUrl: round.google_meet_link || "",
-          supportUrl: round.support_link_url || "/dashboard/chat",
+          supportUrl: "https://ladybosslook.com/dashboard/chat",
         });
       }
     })();
@@ -86,7 +86,7 @@ export default function ThankYouSixTraps() {
     if (!webinar) return null;
     return {
       title: webinar.title,
-      description: `لینک ورود:\n${webinar.meetUrl}\n\nپشتیبانی واتس‌اپ:\n${webinar.supportUrl}`,
+      description: `لینک ورود:\n${webinar.meetUrl}\n\nچت پشتیبانی:\n${webinar.supportUrl}`,
       startUtc: webinar.startUtc,
       durationMinutes: webinar.durationMinutes,
       location: webinar.meetUrl,

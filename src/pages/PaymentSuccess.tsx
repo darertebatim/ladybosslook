@@ -414,9 +414,9 @@ export default function PaymentSuccess() {
                 <Mail className="h-3.5 w-3.5" /> Email support
               </a>
               <span className="text-[#1a1f3d]/20">·</span>
-              <a href="https://t.me/ladybosslook" target="_blank" rel="noopener noreferrer"
+              <a href="https://ladybosslook.com/dashboard/chat" target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-[#1a1f3d]/70 active:opacity-70">
-                <MessageCircle className="h-3.5 w-3.5" /> Telegram
+                <MessageCircle className="h-3.5 w-3.5" /> Support chat
               </a>
             </div>
           </div>

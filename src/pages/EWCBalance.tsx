@@ -243,13 +243,13 @@ const EWCBalance = () => {
             سوالی دارید؟ با پشتیبانی تماس بگیرید
           </p>
           <a
-            href="https://t.me/ladybosslook"
+            href="https://ladybosslook.com/dashboard/chat"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-primary hover:underline"
           >
             <MessageCircle className="h-4 w-4" />
-            @ladybosslook
+            چت پشتیبانی
           </a>
         </div>
       </div>

@@ -66,22 +66,7 @@ const ThankOne = () => {
     fetchOrderDetails();
   }, [sessionId, searchParams]);
 
-  const createTelegramMessage = () => {
-    if (!orderDetails) {
-      return 'https://t.me/ladybosslook?text=Hello%2C%20I%20just%20registered%20for%20the%20Bilingual%20Power%20Class!';
-    }
-    
-    const message = `سلام ادمین! من در کلاس قدرت دو زبانه ثبت نام کردم
-    
-اطلاعات من:
-نام: ${orderDetails.name}
-ایمیل: ${orderDetails.email}
-${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
-
-من آماده شروع کلاس هستم! 🎉`;
-    
-    return `https://t.me/ladybosslook?text=${encodeURIComponent(message)}`;
-  };
+  const supportChatUrl = 'https://ladybosslook.com/dashboard/chat';
 
   const handleAddToCalendar = (type: 'google' | 'ics') => {
     const classEvent = {
@@ -194,13 +179,13 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                   <div className="text-2xl md:text-3xl animate-bounce">👇</div>
                 </div>
                 
-                {/* Telegram Contact Button */}
+                {/* Support Contact Button */}
                 <div className="text-center">
                   {isLoading ? (
                     <div className="w-full h-14 rounded-lg animate-pulse" style={{ background: 'hsl(var(--card-bg))' }}></div>
                   ) : (
                     <Button 
-                      onClick={() => window.open(createTelegramMessage(), '_blank')} 
+                      onClick={() => window.open(supportChatUrl, '_blank')} 
                       className="w-full font-bold text-sm md:text-lg px-4 md:px-8 py-4 md:py-5 h-auto rounded-lg md:rounded-xl shadow-lg transition-all duration-300 whitespace-normal leading-tight hover:scale-[1.02]"
                       style={{
                         background: 'linear-gradient(135deg, hsl(var(--cta-primary)), hsl(var(--cta-primary-hover)))',
@@ -208,7 +193,7 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                       }}
                     >
                       <MessageCircle className="w-5 h-5 md:w-6 md:h-6 ml-2" />
-                      <span>همین الان به تلگرام پیام دهید ✨</span>
+                      <span>همین الان با پشتیبانی چت کنید ✨</span>
                     </Button>
                   )}
                   <p className="text-white/80 text-xs md:text-sm px-2 mt-3 font-bold">
@@ -231,7 +216,7 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
               </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
-                {/* Step 1 - Contact Telegram */}
+                {/* Step 1 - Contact Support */}
                 <Card className="backdrop-blur-sm border" 
                       style={{ 
                         background: 'hsl(var(--card-bg) / 0.3)', 
@@ -244,7 +229,7 @@ ${orderDetails.phone ? `تلفن: ${orderDetails.phone}` : ''}
                     </div>
                     <h3 className="text-base md:text-lg font-bold mb-2 md:mb-3" 
                         style={{ color: 'hsl(var(--cta-primary))' }}>
-                      💬 پیام در تلگرام
+                      💬 چت با پشتیبانی
                     </h3>
                     <p className="text-xs md:text-sm text-white/80">
                       برای دریافت لینک جلسه و تکمیل ۱۰۰٪ ثبت نام

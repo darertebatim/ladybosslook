@@ -930,10 +930,10 @@ export const ProgramRoundsManager = () => {
                 type="url"
                 value={formData.support_link_url}
                 onChange={(e) => setFormData({ ...formData, support_link_url: e.target.value })}
-                placeholder="e.g., https://t.me/username or https://wa.me/1234567890"
+                placeholder="e.g., https://ladybosslook.com/dashboard/chat"
               />
               <p className="text-xs text-muted-foreground">
-                Telegram: https://t.me/username • WhatsApp: https://wa.me/1234567890
+                Recommended: https://ladybosslook.com/dashboard/chat
               </p>
             </div>
 
@@ -944,7 +944,7 @@ export const ProgramRoundsManager = () => {
                 type="text"
                 value={formData.support_link_label}
                 onChange={(e) => setFormData({ ...formData, support_link_label: e.target.value })}
-                placeholder="e.g., Contact Telegram Support"
+                placeholder="e.g., Contact Support"
               />
               <p className="text-xs text-muted-foreground">The text shown on the support button</p>
             </div>
