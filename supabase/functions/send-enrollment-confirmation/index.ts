@@ -539,6 +539,22 @@ serve(async (req) => {
       webUrl,
     });
 
+    if (previewOnly) {
+      return new Response(
+        JSON.stringify({
+          ok: true,
+          preview: true,
+          subject,
+          html,
+          language: lang,
+          round: round
+            ? { id: round.id, round_name: round.round_name, round_number: round.round_number }
+            : null,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const { data: sendData, error } = await resend.emails.send({
       from: "Ladyboss Academy <hi@ladybosslook.com>",
       to: [email],
