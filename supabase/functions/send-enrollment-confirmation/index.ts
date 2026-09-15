@@ -485,14 +485,32 @@ serve(async (req) => {
 
     // Load order (optional)
     let order: { amount: number | null; currency: string | null } | null = null;
+    let orderEmail = "";
     if (orderIdIn) {
       const { data } = await supabase
         .from("orders")
-        .select("amount, currency")
+        .select("amount, currency, email")
         .eq("id", orderIdIn)
         .maybeSingle();
       order = (data as any) || null;
+      orderEmail = String((data as any)?.email || "").trim().toLowerCase();
     }
+
+    // Recipients: account email + payment/alias emails so nobody misses it
+    const recipients: string[] = [email.toLowerCase()];
+    const pushEmail = (e?: string | null) => {
+      const v = String(e || "").trim().toLowerCase();
+      if (v && v.includes("@") && !recipients.includes(v)) recipients.push(v);
+    };
+    if (!testEmail && !previewOnly && userId) {
+      pushEmail(orderEmail);
+      const { data: aliases } = await supabase
+        .from("account_email_aliases")
+        .select("email")
+        .eq("primary_user_id", userId);
+      (aliases || []).forEach((a: any) => pushEmail(a?.email));
+    }
+
 
     // Idempotency: skip if we've already sent this enrollment email
     const marker = testEmail ? `enroll-test:${programSlug}` : `enroll:${programSlug}`;
@@ -557,7 +575,7 @@ serve(async (req) => {
 
     const { data: sendData, error } = await resend.emails.send({
       from: "Ladyboss Academy <hi@ladybosslook.com>",
-      to: [email],
+      to: recipients,
       subject,
       html,
     });
