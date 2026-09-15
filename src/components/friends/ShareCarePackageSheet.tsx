@@ -1,11 +1,11 @@
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
-import { MessageCircle, Send, Link2, Share2, Check } from "lucide-react";
+import { MessageCircle, Link2, Share2, Check } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { haptic } from "@/lib/haptics";
 import {
-  dedicationUrl, whatsappLink, smsLink, telegramLink,
+  dedicationUrl, whatsappLink, smsLink,
   nativeShare, copyLink, type SharePayload,
 } from "@/lib/dedicationShare";
 
@@ -77,11 +77,6 @@ export function ShareCarePackageSheet({ open, onOpenChange, payload, momentEmoji
               icon={<MessageCircle className="w-5 h-5" />}
               label="Messages"
               onClick={() => { window.location.href = smsLink(payload); }}
-            />
-            <ShareBtn
-              icon={<Send className="w-5 h-5" />}
-              label="Telegram"
-              onClick={() => open_(telegramLink(payload))}
             />
             <ShareBtn
               icon={<Share2 className="w-5 h-5" />}
