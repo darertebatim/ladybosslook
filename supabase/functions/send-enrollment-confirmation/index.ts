@@ -13,7 +13,7 @@ const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=com.ladybosslook.academy";
 const WEB_BASE = "https://ladybosslook.com";
 const RILO_MANUAL_URL =
-  "https://ladybosslook.com/__l5e/assets-v1/17e4c966-fbbd-42f5-80ce-0774df439ff8/RiloManual.pdf";
+  "https://ladybosslook.com/__l5e/assets-v1/2a593da1-7c85-431a-865e-937d81186df5/Rilo_Manual.pdf";
 
 
 const corsHeaders = {
