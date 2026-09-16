@@ -106,6 +106,7 @@ const ProfileAnalyzeForm = () => {
         question: parsed.data.question || null,
       });
       if (error) throw error;
+      await sendSupportNotice(user.id, parsed.data.instagram_url);
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
