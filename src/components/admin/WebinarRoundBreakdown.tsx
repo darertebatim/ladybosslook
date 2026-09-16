@@ -48,13 +48,22 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
     queryKey: ['round-breakdown-signups', programSlug, sources.join(',')],
     staleTime: 0,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('form_submissions')
-        .select('email, round_id')
-        .in('source', sources)
-        .limit(5000);
-      if (error) throw error;
-      return (data || []) as { email: string; round_id: string | null }[];
+      const all: { email: string; round_id: string | null }[] = [];
+      let from = 0;
+      // PostgREST caps each response at 1000 rows — page through everything.
+      while (true) {
+        const { data, error } = await supabase
+          .from('form_submissions')
+          .select('email, round_id')
+          .in('source', sources)
+          .order('submitted_at', { ascending: false })
+          .range(from, from + 999);
+        if (error) throw error;
+        all.push(...((data || []) as { email: string; round_id: string | null }[]));
+        if (!data || data.length < 1000) break;
+        from += 1000;
+      }
+      return all;
     },
   });
 
