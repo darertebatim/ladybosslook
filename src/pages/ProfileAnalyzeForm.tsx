@@ -45,6 +45,49 @@ const formSchema = z.object({
   question: z.string().trim().max(2000, 'متن خیلی طولانی است').optional().or(z.literal('')),
 });
 
+// After submitting the form, post a message from the student into support chat
+// so the team sees the request in their normal inbox.
+const sendSupportNotice = async (userId: string, instagramUrl: string) => {
+  try {
+    const { data: existing } = await supabase
+      .from('chat_conversations')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('inbox_type', 'support')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    let conversationId = existing?.id as string | undefined;
+    if (!conversationId) {
+      const { data: created, error: convError } = await supabase
+        .from('chat_conversations')
+        .insert({ user_id: userId, status: 'open' })
+        .select('id')
+        .single();
+      if (convError) throw convError;
+      conversationId = created.id;
+    }
+
+    const messageContent = `سلام 🌷 فرم تحلیل پیج اینستاگرام رو پر کردم.\nآدرس پیج: ${instagramUrl}\nممنون می‌شم بررسی کنید و نتیجه تحلیل رو برام بفرستید.`;
+
+    const { error: msgError } = await supabase.from('chat_messages').insert({
+      conversation_id: conversationId,
+      sender_id: userId,
+      sender_type: 'user',
+      content: messageContent,
+    });
+    if (msgError) throw msgError;
+
+    await supabase.functions.invoke('send-chat-notification', {
+      body: { conversationId, messageContent, senderType: 'user', senderId: userId },
+    });
+  } catch (e) {
+    // Never block the form submission on the chat notice.
+    console.error('Failed to post support chat notice:', e);
+  }
+};
+
 type FormValues = z.infer<typeof formSchema>;
 type FieldKey = keyof FormValues;
 
@@ -106,6 +149,7 @@ const ProfileAnalyzeForm = () => {
         question: parsed.data.question || null,
       });
       if (error) throw error;
+      await sendSupportNotice(user.id, parsed.data.instagram_url);
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
