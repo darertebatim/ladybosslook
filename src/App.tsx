@@ -250,6 +250,7 @@ const GiftsAliLotfiVip = lazy(() => import("@/pages/GiftsAliLotfiVip"));
 const Video = lazy(() => import("@/pages/Video"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const DashboardChat = lazy(() => import("@/pages/DashboardChat"));
+const ProfileAnalyzeForm = lazy(() => import("@/pages/ProfileAnalyzeForm"));
 const SendTestEmail = lazy(() => import("@/pages/SendTestEmail"));
 const AppSupport = lazy(() => import("@/pages/AppSupport"));
 const CartPage = lazy(() => import("@/pages/CartPage"));
@@ -595,6 +596,8 @@ const App = () => (
                   <Route path="/rathus" element={<RathusAssessment />} />
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                   <Route path="/dashboard/chat" element={<ProtectedRoute><DashboardChat /></ProtectedRoute>} />
+                  <Route path="/dashboard/forms/profileanalyze" element={<ProtectedRoute><ProfileAnalyzeForm /></ProtectedRoute>} />
+
                   
                   {/* All /app/* routes wrapped with Audio + Focus player providers */}
                   <Route element={<AppProvidersLayout />}>
