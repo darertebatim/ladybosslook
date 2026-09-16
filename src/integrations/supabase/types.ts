@@ -4853,6 +4853,51 @@ export type Database = {
           },
         ]
       }
+      profile_analysis_requests: {
+        Row: {
+          business_field: string
+          business_name: string | null
+          conversion_action: string
+          created_at: string
+          id: string
+          instagram_url: string
+          offer_includes: string
+          product_service: string
+          question: string | null
+          status: string
+          target_audience: string
+          user_id: string | null
+        }
+        Insert: {
+          business_field: string
+          business_name?: string | null
+          conversion_action: string
+          created_at?: string
+          id?: string
+          instagram_url: string
+          offer_includes: string
+          product_service: string
+          question?: string | null
+          status?: string
+          target_audience: string
+          user_id?: string | null
+        }
+        Update: {
+          business_field?: string
+          business_name?: string | null
+          conversion_action?: string
+          created_at?: string
+          id?: string
+          instagram_url?: string
+          offer_includes?: string
+          product_service?: string
+          question?: string | null
+          status?: string
+          target_audience?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
