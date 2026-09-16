@@ -128,10 +128,14 @@ const ProfileAnalyzeForm = () => {
 
   if (submitted) {
     return (
-      <div dir="rtl" className="min-h-screen bg-bg-warm flex flex-col" style={{ fontFamily: 'var(--font-farsi)' }}>
+      <div className="min-h-screen bg-background flex flex-col">
         <SEOHead title="درخواست تحلیل پیج اینستاگرام | Rilo" description="فرم درخواست تحلیل پیج اینستاگرام توسط علی لطفی" />
         <Navigation />
-        <main className="flex-1 flex items-center justify-center px-4 py-16">
+        <main
+          dir="rtl"
+          className="rilo-surface flex-1 flex items-center justify-center px-4 py-16 pt-24"
+          style={{ fontFamily: 'var(--font-farsi)' }}
+        >
           <div className="w-full max-w-lg bg-card-warm rounded-3xl shadow-card-warm p-8 sm:p-10 text-center space-y-4">
             <div className="mx-auto w-16 h-16 rounded-full bg-mint flex items-center justify-center">
               <CheckCircle2 className="w-8 h-8 text-green-700" />
@@ -160,10 +164,10 @@ const ProfileAnalyzeForm = () => {
   }
 
   return (
-    <div dir="rtl" className="min-h-screen bg-bg-warm flex flex-col" style={{ fontFamily: 'var(--font-farsi)' }}>
+    <div className="min-h-screen bg-background flex flex-col">
       <SEOHead title="درخواست تحلیل پیج اینستاگرام | Rilo" description="فرم درخواست تحلیل پیج اینستاگرام توسط علی لطفی" />
       <Navigation />
-      <main className="flex-1 px-4 py-10 sm:py-14">
+      <main dir="rtl" className="rilo-surface flex-1 px-4 pt-24 pb-10 sm:pt-28 sm:pb-14" style={{ fontFamily: 'var(--font-farsi)' }}>
         <div className="w-full max-w-2xl mx-auto space-y-6">
           {/* Header */}
           <div className="bg-gradient-orange rounded-3xl p-6 sm:p-8 text-white shadow-card-warm">
