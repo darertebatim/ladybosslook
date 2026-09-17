@@ -496,6 +496,15 @@ export const StripePaymentsViewer = () => {
             <Button variant="outline" size="sm" onClick={() => setDatePreset('this-year')}>
               This Year
             </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={importMissingStripePayments}
+              disabled={importing}
+              className="ml-auto"
+            >
+              {importing ? 'Importing…' : 'Import missing Stripe payments'}
+            </Button>
           </div>
 
           {chartData.length > 0 && (
