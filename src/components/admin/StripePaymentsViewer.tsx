@@ -39,6 +39,7 @@ export const StripePaymentsViewer = () => {
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [converting, setConverting] = useState(false);
+  const [importing, setImporting] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -102,6 +103,28 @@ export const StripePaymentsViewer = () => {
       toast.error(message);
     } finally {
       setConverting(false);
+    }
+  };
+
+  const importMissingStripePayments = async () => {
+    setImporting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('import-missing-stripe-payments', {
+        body: { days: 365 },
+      });
+      if (error) throw error;
+      if ((data?.imported ?? 0) > 0) {
+        toast.success(`Imported ${data.imported} missing payment(s) from Stripe`);
+      } else {
+        toast.info(`No missing payments found (checked ${data?.scanned ?? 0} Stripe charges)`);
+      }
+      await fetchOrders();
+    } catch (err) {
+      console.error('Import error:', err);
+      const message = err instanceof Error ? err.message : 'Failed to import Stripe payments';
+      toast.error(message);
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -495,6 +518,15 @@ export const StripePaymentsViewer = () => {
             </Button>
             <Button variant="outline" size="sm" onClick={() => setDatePreset('this-year')}>
               This Year
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={importMissingStripePayments}
+              disabled={importing}
+              className="ml-auto"
+            >
+              {importing ? 'Importing…' : 'Import missing Stripe payments'}
             </Button>
           </div>
 

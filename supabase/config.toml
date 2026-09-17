@@ -253,3 +253,6 @@ verify_jwt = true
 
 [functions.email-unsubscribe]
 verify_jwt = false
+
+[functions.import-missing-stripe-payments]
+verify_jwt = true
