@@ -106,6 +106,28 @@ export const StripePaymentsViewer = () => {
     }
   };
 
+  const importMissingStripePayments = async () => {
+    setImporting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('import-missing-stripe-payments', {
+        body: { days: 365 },
+      });
+      if (error) throw error;
+      if ((data?.imported ?? 0) > 0) {
+        toast.success(`Imported ${data.imported} missing payment(s) from Stripe`);
+      } else {
+        toast.info(`No missing payments found (checked ${data?.scanned ?? 0} Stripe charges)`);
+      }
+      await fetchOrders();
+    } catch (err) {
+      console.error('Import error:', err);
+      const message = err instanceof Error ? err.message : 'Failed to import Stripe payments';
+      toast.error(message);
+    } finally {
+      setImporting(false);
+    }
+  };
+
   const filterOrders = () => {
     let filtered = [...orders];
 
