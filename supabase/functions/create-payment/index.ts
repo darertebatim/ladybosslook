@@ -109,7 +109,7 @@ serve(async (req) => {
     // Fetch program details from database
     const { data: programData, error: programError } = await supabase
       .from('program_catalog')
-      .select('slug, title, price_amount, description, payment_type, deposit_price, subscription_interval, subscription_interval_count, subscription_full_payment_price, stripe_product_id, stripe_price_id, full_payment_stripe_price_id, trial_days')
+      .select('slug, title, price_amount, description, payment_type, deposit_price, balance_full_price, balance_monthly_price, balance_monthly_count, subscription_interval, subscription_interval_count, subscription_full_payment_price, stripe_product_id, stripe_price_id, full_payment_stripe_price_id, deposit_stripe_price_id, balance_full_stripe_price_id, balance_monthly_stripe_price_id, trial_days')
       .eq('slug', program)
       .eq('is_active', true)
       .single();
@@ -190,19 +190,37 @@ serve(async (req) => {
       paymentOption === 'full' && 
       programData.subscription_full_payment_price;
     
-    const isSubscription = programData.payment_type === 'subscription' && !isFullPaymentForSubscription;
     const isDeposit = programData.payment_type === 'deposit';
-    
+    // Deposit programs: remaining-balance payments (e.g. Empowered Woman Coaching)
+    const isBalanceFull = isDeposit && paymentOption === 'balance_full';
+    const isBalanceMonthly = isDeposit && paymentOption === 'balance_monthly';
+    const isSubscription = (programData.payment_type === 'subscription' && !isFullPaymentForSubscription) || isBalanceMonthly;
+
+    // Recurring settings for subscription mode (balance installments are always monthly)
+    const recurringInterval = (isBalanceMonthly ? 'month' : programData.subscription_interval || 'month') as 'day' | 'week' | 'month' | 'year';
+    const autoCancelCount = isBalanceMonthly
+      ? ((programData as any).balance_monthly_count || 0)
+      : (programData.subscription_interval_count || 0);
+
     // Calculate charge amount
     let chargeAmount: number;
     let productName: string;
     let productDescription: string;
-    
+
     if (isFullPaymentForSubscription) {
       // One-time full payment for a subscription program
       chargeAmount = programData.subscription_full_payment_price!;
       productName = `${programData.title} (Full Payment)`;
       productDescription = `One-time full payment for ${programData.title}`;
+    } else if (isBalanceFull) {
+      chargeAmount = (programData as any).balance_full_price || programData.price_amount;
+      productName = `${programData.title} (Balance - Full)`;
+      productDescription = `One-time balance payment for ${programData.title}`;
+    } else if (isBalanceMonthly) {
+      chargeAmount = (programData as any).balance_monthly_price;
+      if (!chargeAmount) throw new Error('Monthly balance price is not configured for this program');
+      productName = `${programData.title} (Balance - Monthly)`;
+      productDescription = `Monthly balance installment for ${programData.title}`;
     } else if (isDeposit && programData.deposit_price) {
       chargeAmount = programData.deposit_price;
       productName = `${programData.title} (Deposit)`;
