@@ -478,11 +478,13 @@ export function LeadEmailCampaign() {
       try {
         for (let i = 0; i < list.length; i += CHUNK) {
           const chunk = list.slice(i, i + CHUNK);
-          const { data, error } = await supabase.functions.invoke('send-lead-email', {
-            body: { ...payload(), emails: chunk, sources: [], programs: [], skipSubject: '' },
-          });
-          if (error) throw error;
-          const d = data as any;
+          const d = (await invokeSend({
+            ...payload(),
+            emails: chunk,
+            sources: [],
+            programs: [],
+            skipSubject: '',
+          })) as any;
           sent += d?.sent ?? 0;
           failed += d?.failed ?? 0;
           done += chunk.length;
