@@ -9,10 +9,24 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
+// Detected device/browser timezone, sent with every request so server-side
+// logic (e.g. timezone-based round assignment at checkout) works before the
+// user ever opens the app.
+const detectedTimezone = (() => {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+  } catch {
+    return '';
+  }
+})();
+
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     storage: brokeredPreviewStorage(),
     persistSession: true,
     autoRefreshToken: true,
-  }
+  },
+  global: {
+    headers: detectedTimezone ? { 'x-timezone': detectedTimezone } : {},
+  },
 });
