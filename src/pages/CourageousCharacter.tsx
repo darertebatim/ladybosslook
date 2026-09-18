@@ -29,7 +29,7 @@ import {
 import { Link, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, browserTimezone } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
 
@@ -231,6 +231,7 @@ const CourageousWorkshop = () => {
       // Call the create-payment edge function
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: {
+          timezone: browserTimezone,
           program: 'courageous-character'
         }
       });

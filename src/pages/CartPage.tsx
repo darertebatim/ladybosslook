@@ -19,7 +19,7 @@ const LANGUAGE_LABELS: Record<string, string> = {
 import { useCart, PENDING_CART_KEY, type CartItem } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { usePrograms } from '@/hooks/usePrograms';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, browserTimezone } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import InlineAuth from '@/components/checkout/InlineAuth';
@@ -76,11 +76,12 @@ const CartPage = () => {
       const { data, error } = subscriptionItem
         ? await supabase.functions.invoke('create-payment', {
             body: {
+              timezone: browserTimezone,
               program: subscriptionItem.program_slug,
               paymentOption: subscriptionItem.payment_option || 'monthly',
             },
           })
-        : await supabase.functions.invoke('create-cart-checkout');
+        : await supabase.functions.invoke('create-cart-checkout', { body: { timezone: browserTimezone } });
       if (error) throw error;
       if (data?.url) {
         window.location.href = data.url;

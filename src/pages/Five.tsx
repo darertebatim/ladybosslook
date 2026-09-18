@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, browserTimezone } from '@/integrations/supabase/client';
 import { Shield, Lock, CheckCircle2, Clock, Users, Star, Sparkles, Brain, MessageCircle, Globe, Mic, Zap, Play } from "lucide-react";
 import SpotCounter from "@/components/SpotCounter";
 
@@ -82,6 +82,7 @@ const Five = () => {
       // Create payment session - Mailchimp will be called after successful payment
       const { data: paymentData, error: paymentError } = await supabase.functions.invoke('create-payment', {
         body: {
+          timezone: browserTimezone,
           program: 'Five-Language',
           email: email.trim().toLowerCase(),
           name: name.trim()
