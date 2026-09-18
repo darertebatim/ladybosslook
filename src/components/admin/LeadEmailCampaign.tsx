@@ -513,16 +513,12 @@ export function LeadEmailCampaign() {
     try {
       // Sent in parts so a very large list (10k+) never times out.
       for (;;) {
-        const { data, error } = await supabase.functions.invoke('send-lead-email', {
-          body: {
-            ...payload(),
-            offset: skipAlreadySent ? 0 : offset,
-            limit: CHUNK,
-            alsoSkip: skipAlreadySent ? handled : [],
-          },
-        });
-        if (error) throw error;
-        const d = data as any;
+        const d = (await invokeSend({
+          ...payload(),
+          offset: skipAlreadySent ? 0 : offset,
+          limit: CHUNK,
+          alsoSkip: skipAlreadySent ? handled : [],
+        })) as any;
         sent += d?.sent ?? 0;
         failed += d?.failed ?? 0;
         const processed = d?.processed ?? 0;
