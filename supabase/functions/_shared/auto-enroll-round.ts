@@ -69,10 +69,12 @@ export async function resolveAutoEnrollRoundId(
   if (!tz && userId) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('timezone')
+      .select('timezone, timezone_synced_at')
       .eq('id', userId)
       .maybeSingle();
-    tz = profile?.timezone ?? null;
+    // profiles.timezone defaults to America/Los_Angeles, so only trust it once
+    // the device actually reported a timezone (timezone_synced_at is set).
+    tz = profile?.timezone_synced_at ? (profile?.timezone ?? null) : null;
   }
 
   const side = sideForTimezone(tz);
