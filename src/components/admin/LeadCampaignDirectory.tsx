@@ -6,7 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Copy, ExternalLink, Link2, Mail, Target } from 'lucide-react';
 import { toast } from 'sonner';
+import { Switch } from '@/components/ui/switch';
 import { LEAD_CAMPAIGNS, ALL_LEAD_SOURCES } from '@/lib/leadCampaigns';
+import { useInactiveLeadCampaigns, useSetLeadCampaignActive } from '@/hooks/useLeadCampaignStatus';
 
 interface SubRow {
   email: string | null;
