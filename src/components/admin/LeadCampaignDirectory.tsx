@@ -6,7 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Copy, ExternalLink, Link2, Mail, Target } from 'lucide-react';
 import { toast } from 'sonner';
+import { Switch } from '@/components/ui/switch';
 import { LEAD_CAMPAIGNS, ALL_LEAD_SOURCES } from '@/lib/leadCampaigns';
+import { useInactiveLeadCampaigns, useSetLeadCampaignActive } from '@/hooks/useLeadCampaignStatus';
 
 interface SubRow {
   email: string | null;
@@ -67,6 +69,17 @@ export function LeadCampaignDirectory() {
     toast.success('Copied');
   };
 
+  const { inactive } = useInactiveLeadCampaigns();
+  const setActive = useSetLeadCampaignActive();
+
+  const toggle = (key: string, active: boolean) => {
+    const next = active ? inactive.filter((k) => k !== key) : [...inactive, key];
+    setActive.mutate(
+      { keys: next },
+      { onSuccess: () => toast.success(active ? 'Campaign activated' : 'Campaign deactivated') }
+    );
+  };
+
   const cards = useMemo(() => {
     const now = Date.now();
     const week = now - 7 * 24 * 60 * 60 * 1000;
@@ -98,11 +111,14 @@ export function LeadCampaignDirectory() {
   return (
     <div className="space-y-6">
       {isLoading && <p className="text-sm text-muted-foreground">Loading campaigns…</p>}
-      {cards.map(({ c, total, last7, extras, programRounds, nextRound }) => {
+      {[...cards]
+        .sort((a, b) => Number(inactive.includes(a.c.key)) - Number(inactive.includes(b.c.key)))
+        .map(({ c, total, last7, extras, programRounds, nextRound }) => {
         const landing = `${origin()}${c.landingPath}`;
         const thankyou = `${origin()}${c.thankYouPath}`;
+        const isActive = !inactive.includes(c.key);
         return (
-          <Card key={c.key}>
+          <Card key={c.key} className={isActive ? undefined : 'opacity-60'}>
             <CardHeader className="pb-3">
               <div className="flex flex-wrap items-center gap-3">
                 <CardTitle className="text-lg">{c.label}</CardTitle>
@@ -114,6 +130,16 @@ export function LeadCampaignDirectory() {
                 <Badge variant="secondary">{total} leads</Badge>
                 <Badge variant="outline">{last7} last 7d</Badge>
                 {extras > 0 && <Badge variant="outline">{extras} extra sources</Badge>}
+                <div className="ml-auto flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    {isActive ? 'Active' : 'Hidden'}
+                  </span>
+                  <Switch
+                    checked={isActive}
+                    disabled={setActive.isPending}
+                    onCheckedChange={(v) => toggle(c.key, v)}
+                  />
+                </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">

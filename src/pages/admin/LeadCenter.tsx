@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useInactiveLeadCampaigns } from '@/hooks/useLeadCampaignStatus';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LeadCampaignDirectory } from '@/components/admin/LeadCampaignDirectory';
 import { WebinarStats } from '@/components/admin/WebinarStats';
@@ -18,6 +19,15 @@ const igads = LEAD_CAMPAIGNS.find((c) => c.key === 'igads')!;
 
 export default function LeadCenter() {
   const [tab, setTab] = useState('campaigns');
+  const { inactive } = useInactiveLeadCampaigns();
+  const show = (key: string) => !inactive.includes(key);
+  const visibleCampaignTabs = ['sixtraps', 'smartinsta', 'igads'].filter(show).length;
+  const colCount = 5 + visibleCampaignTabs;
+
+  useEffect(() => {
+    if (['sixtraps', 'smartinsta', 'igads'].includes(tab) && !show(tab)) setTab('campaigns');
+  }, [inactive, tab]);
+
 
   return (
     <div className="space-y-6">
@@ -31,12 +41,15 @@ export default function LeadCenter() {
 
       <Tabs value={tab} onValueChange={setTab}>
 
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList
+          className="grid w-full"
+          style={{ gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))` }}
+        >
           <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
           <TabsTrigger value="stats">Stats</TabsTrigger>
-          <TabsTrigger value="sixtraps">6 Traps</TabsTrigger>
-          <TabsTrigger value="smartinsta">Smart IG</TabsTrigger>
-          <TabsTrigger value="igads">IG Ads</TabsTrigger>
+          {show('sixtraps') && <TabsTrigger value="sixtraps">6 Traps</TabsTrigger>}
+          {show('smartinsta') && <TabsTrigger value="smartinsta">Smart IG</TabsTrigger>}
+          {show('igads') && <TabsTrigger value="igads">IG Ads</TabsTrigger>}
           <TabsTrigger value="marketing">Email Marketing</TabsTrigger>
           <TabsTrigger value="opens">Email Opens</TabsTrigger>
           <TabsTrigger value="crm">Meta CRM</TabsTrigger>
