@@ -5090,13 +5090,16 @@ export type Database = {
           available_on_web: boolean | null
           balance_full_discount: number | null
           balance_full_price: number | null
+          balance_full_stripe_price_id: string | null
           balance_monthly_count: number | null
           balance_monthly_price: number | null
+          balance_monthly_stripe_price_id: string | null
           cover_image_url: string | null
           created_at: string | null
           default_session_count: number | null
           delivery_method: string | null
           deposit_price: number | null
+          deposit_stripe_price_id: string | null
           description: string | null
           duration: string | null
           features: Json | null
@@ -5142,13 +5145,16 @@ export type Database = {
           available_on_web?: boolean | null
           balance_full_discount?: number | null
           balance_full_price?: number | null
+          balance_full_stripe_price_id?: string | null
           balance_monthly_count?: number | null
           balance_monthly_price?: number | null
+          balance_monthly_stripe_price_id?: string | null
           cover_image_url?: string | null
           created_at?: string | null
           default_session_count?: number | null
           delivery_method?: string | null
           deposit_price?: number | null
+          deposit_stripe_price_id?: string | null
           description?: string | null
           duration?: string | null
           features?: Json | null
@@ -5194,13 +5200,16 @@ export type Database = {
           available_on_web?: boolean | null
           balance_full_discount?: number | null
           balance_full_price?: number | null
+          balance_full_stripe_price_id?: string | null
           balance_monthly_count?: number | null
           balance_monthly_price?: number | null
+          balance_monthly_stripe_price_id?: string | null
           cover_image_url?: string | null
           created_at?: string | null
           default_session_count?: number | null
           delivery_method?: string | null
           deposit_price?: number | null
+          deposit_stripe_price_id?: string | null
           description?: string | null
           duration?: string | null
           features?: Json | null

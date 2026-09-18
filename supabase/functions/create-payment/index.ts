@@ -109,7 +109,7 @@ serve(async (req) => {
     // Fetch program details from database
     const { data: programData, error: programError } = await supabase
       .from('program_catalog')
-      .select('slug, title, price_amount, description, payment_type, deposit_price, subscription_interval, subscription_interval_count, subscription_full_payment_price, stripe_product_id, stripe_price_id, full_payment_stripe_price_id, trial_days')
+      .select('slug, title, price_amount, description, payment_type, deposit_price, balance_full_price, balance_monthly_price, balance_monthly_count, subscription_interval, subscription_interval_count, subscription_full_payment_price, stripe_product_id, stripe_price_id, full_payment_stripe_price_id, deposit_stripe_price_id, balance_full_stripe_price_id, balance_monthly_stripe_price_id, trial_days')
       .eq('slug', program)
       .eq('is_active', true)
       .single();
@@ -190,19 +190,37 @@ serve(async (req) => {
       paymentOption === 'full' && 
       programData.subscription_full_payment_price;
     
-    const isSubscription = programData.payment_type === 'subscription' && !isFullPaymentForSubscription;
     const isDeposit = programData.payment_type === 'deposit';
-    
+    // Deposit programs: remaining-balance payments (e.g. Empowered Woman Coaching)
+    const isBalanceFull = isDeposit && paymentOption === 'balance_full';
+    const isBalanceMonthly = isDeposit && paymentOption === 'balance_monthly';
+    const isSubscription = (programData.payment_type === 'subscription' && !isFullPaymentForSubscription) || isBalanceMonthly;
+
+    // Recurring settings for subscription mode (balance installments are always monthly)
+    const recurringInterval = (isBalanceMonthly ? 'month' : programData.subscription_interval || 'month') as 'day' | 'week' | 'month' | 'year';
+    const autoCancelCount = isBalanceMonthly
+      ? ((programData as any).balance_monthly_count || 0)
+      : (programData.subscription_interval_count || 0);
+
     // Calculate charge amount
     let chargeAmount: number;
     let productName: string;
     let productDescription: string;
-    
+
     if (isFullPaymentForSubscription) {
       // One-time full payment for a subscription program
       chargeAmount = programData.subscription_full_payment_price!;
       productName = `${programData.title} (Full Payment)`;
       productDescription = `One-time full payment for ${programData.title}`;
+    } else if (isBalanceFull) {
+      chargeAmount = (programData as any).balance_full_price || programData.price_amount;
+      productName = `${programData.title} (Balance - Full)`;
+      productDescription = `One-time balance payment for ${programData.title}`;
+    } else if (isBalanceMonthly) {
+      chargeAmount = (programData as any).balance_monthly_price;
+      if (!chargeAmount) throw new Error('Monthly balance price is not configured for this program');
+      productName = `${programData.title} (Balance - Monthly)`;
+      productDescription = `Monthly balance installment for ${programData.title}`;
     } else if (isDeposit && programData.deposit_price) {
       chargeAmount = programData.deposit_price;
       productName = `${programData.title} (Deposit)`;
@@ -243,13 +261,16 @@ serve(async (req) => {
       logStep("Creating subscription checkout session");
       
       let priceId: string;
-      
+
       // Check if we have an existing Stripe price ID and verify it's a recurring price
-      if (programData.stripe_price_id) {
+      const storedRecurringPriceId = isBalanceMonthly
+        ? (programData as any).balance_monthly_stripe_price_id
+        : programData.stripe_price_id;
+      if (storedRecurringPriceId) {
         try {
-          const existingPrice = await stripe.prices.retrieve(programData.stripe_price_id);
+          const existingPrice = await stripe.prices.retrieve(storedRecurringPriceId);
           if (existingPrice.recurring) {
-            priceId = programData.stripe_price_id;
+            priceId = storedRecurringPriceId;
             logStep("Reusing existing recurring Stripe price", { priceId });
           } else {
             // Stored price is not recurring, create a new recurring price
@@ -258,7 +279,7 @@ serve(async (req) => {
               unit_amount: chargeAmount,
               currency: 'usd',
               recurring: {
-                interval: (programData.subscription_interval as 'day' | 'week' | 'month' | 'year') || 'month',
+                interval: recurringInterval,
               },
               product: existingPrice.product as string,
             });
@@ -272,7 +293,7 @@ serve(async (req) => {
             unit_amount: chargeAmount,
             currency: 'usd',
             recurring: {
-              interval: (programData.subscription_interval as 'day' | 'week' | 'month' | 'year') || 'month',
+              interval: recurringInterval,
             },
             product_data: {
               name: productName,
@@ -290,7 +311,7 @@ serve(async (req) => {
           unit_amount: chargeAmount,
           currency: 'usd',
           recurring: {
-            interval: (programData.subscription_interval as 'day' | 'week' | 'month' | 'year') || 'month',
+            interval: recurringInterval,
           },
           product_data: {
             name: productName,
@@ -311,7 +332,7 @@ serve(async (req) => {
           program: program,
           payment_type: programData.payment_type,
           product_name: productName,
-          auto_cancel_after_months: programData.subscription_interval_count?.toString() || '',
+          auto_cancel_after_months: autoCancelCount ? autoCancelCount.toString() : '',
         },
       };
 
@@ -324,9 +345,9 @@ serve(async (req) => {
         logStep("Trial configured", { trialDays: Number(trialDays) });
       }
 
-      if (programData.subscription_interval_count) {
-        logStep("Subscription configured for auto-cancel", { 
-          intervalCount: programData.subscription_interval_count,
+      if (autoCancelCount) {
+        logStep("Subscription configured for auto-cancel", {
+          intervalCount: autoCancelCount,
           note: "Will be set via webhook after subscription creation"
         });
       }
@@ -349,13 +370,14 @@ serve(async (req) => {
         metadata: {
           program: program,
           payment_type: programData.payment_type,
+          payment_option: paymentOption || (isSubscription ? 'subscription' : 'one-time'),
           product_name: productName,
           ...(authUserId ? { auth_user_id: authUserId } : {}),
           ...(buyerTimezone ? { buyer_timezone: buyerTimezone } : {}),
         },
       };
 
-      session = stripeIdempotencyKey 
+      session = stripeIdempotencyKey
         ? await stripe.checkout.sessions.create(sessionCreateParams, { idempotencyKey: stripeIdempotencyKey })
         : await stripe.checkout.sessions.create(sessionCreateParams);
 
@@ -371,10 +393,14 @@ serve(async (req) => {
       // Only when we're charging the full price (not a deposit) and the price is one-time.
       let resolvedPriceId: string | null = null;
       // For the "pay in full" option on subscription programs, prefer its dedicated one-time price.
-      const oneTimePriceId = (isFullPaymentForSubscription && (programData as any).full_payment_stripe_price_id)
-        ? (programData as any).full_payment_stripe_price_id
-        : (!isFullPaymentForSubscription ? programData.stripe_price_id : null);
-      if (oneTimePriceId && !isDeposit) {
+      const oneTimePriceId = isBalanceFull
+        ? (programData as any).balance_full_stripe_price_id
+        : isDeposit
+          ? (programData as any).deposit_stripe_price_id
+          : (isFullPaymentForSubscription
+            ? ((programData as any).full_payment_stripe_price_id || programData.stripe_price_id)
+            : programData.stripe_price_id);
+      if (oneTimePriceId) {
         try {
           const storedPrice = await stripe.prices.retrieve(oneTimePriceId);
           if (storedPrice.active && !storedPrice.recurring) {
@@ -452,7 +478,8 @@ serve(async (req) => {
           metadata: {
             program: program,
             payment_type: programData.payment_type,
-            is_deposit: isDeposit ? 'true' : 'false',
+          is_deposit: isDeposit ? 'true' : 'false',
+            payment_option: paymentOption || 'one-time',
             product_name: productName,
           },
         },
@@ -460,6 +487,7 @@ serve(async (req) => {
           program: program,
           program_slug: program,
           payment_type: programData.payment_type,
+          payment_option: paymentOption || 'one-time',
           product_name: productName,
           ...(authUserId ? { auth_user_id: authUserId } : {}),
           ...(buyerTimezone ? { buyer_timezone: buyerTimezone } : {}),

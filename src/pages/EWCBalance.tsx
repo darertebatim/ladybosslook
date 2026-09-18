@@ -64,13 +64,13 @@ const EWCBalance = () => {
     }
   };
 
-  const handlePayment = async (url: string, type: 'onetime' | 'monthly') => {
+  const handlePayment = async (type: 'onetime' | 'monthly') => {
     if (!validateEmail(email)) return;
-    
+
     // Immediate lock to prevent double-clicks
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
-    
+
     if (type === 'onetime') {
       setIsLoadingOneTime(true);
     } else {
@@ -78,7 +78,7 @@ const EWCBalance = () => {
     }
 
     const trimmedEmail = email.trim().toLowerCase();
-    
+
     // Check for duplicate payment
     const isDuplicate = await checkDuplicatePayment(trimmedEmail);
     if (isDuplicate) {
@@ -87,13 +87,40 @@ const EWCBalance = () => {
       setIsLoadingMonthly(false);
       return;
     }
-    
-    // Add email as query param for Stripe prefill
-    const separator = url.includes('?') ? '&' : '?';
-    const urlWithEmail = `${url}${separator}prefilled_email=${encodeURIComponent(trimmedEmail)}`;
-    
-    // Navigate to payment
-    window.location.href = urlWithEmail;
+
+    try {
+      // Go through our checkout so the payment is linked to the account and program
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: {
+          program: 'empowered-woman-coaching',
+          email: trimmedEmail,
+          paymentOption: type === 'onetime' ? 'balance_full' : 'balance_monthly',
+          idempotencyKey: `ewcbalance-${type}-${trimmedEmail}-${Math.floor(Date.now() / (5 * 60 * 1000))}`,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) {
+        toast.error(data.error === 'duplicate_detected'
+          ? 'شما یک پرداخت در حال انتظار دارید. لطفاً چند دقیقه صبر کنید.'
+          : data.error);
+        isSubmittingRef.current = false;
+        setIsLoadingOneTime(false);
+        setIsLoadingMonthly(false);
+        return;
+      }
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
+    } catch (error: any) {
+      console.error('Payment error:', error);
+      toast.error('خطا در اتصال به درگاه پرداخت. لطفاً دوباره تلاش کنید.');
+      isSubmittingRef.current = false;
+      setIsLoadingOneTime(false);
+      setIsLoadingMonthly(false);
+    }
   };
 
   const isProcessing = isLoadingOneTime || isLoadingMonthly;
@@ -174,7 +201,7 @@ const EWCBalance = () => {
                   <span className="text-sm text-green-600 font-medium">صرفه‌جویی $150</span>
                 </div>
                 <Button 
-                  onClick={() => handlePayment('https://buy.stripe.com/14AdR84Zz5XcaVhgS59Ve06', 'onetime')}
+                  onClick={() => handlePayment('onetime')}
                   disabled={isProcessing}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-6 text-lg"
                   style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}
@@ -214,7 +241,7 @@ const EWCBalance = () => {
                   <span className="text-sm text-muted-foreground">(مجموع: $897)</span>
                 </div>
                 <Button 
-                  onClick={() => handlePayment('https://buy.stripe.com/28EbJ03Vv2L0fbx0T79Ve05', 'monthly')}
+                  onClick={() => handlePayment('monthly')}
                   disabled={isProcessing}
                   variant="outline"
                   className="w-full py-6 text-lg font-medium font-[Vazirmatn]"
