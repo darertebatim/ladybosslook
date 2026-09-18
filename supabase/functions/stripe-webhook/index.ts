@@ -7,7 +7,7 @@ import { resolveAutoEnrollRoundId } from "../_shared/auto-enroll-round.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-timezone, stripe-signature',
 };
 
 // Helper to find or create user by email
