@@ -4,7 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-timezone",
 };
 
 // Input validation helpers with strict length limits
@@ -76,6 +76,24 @@ serve(async (req) => {
     // Parse and validate request data
     const requestBody = await req.json();
     const { program, paymentOption, name, email, phone, idempotencyKey } = requestBody;
+
+    // Buyer timezone (sent by the browser) so the webhook can pick the right
+    // timezone-based round without waiting for them to open the app.
+    const rawTimezone = (requestBody?.timezone || req.headers.get('x-timezone') || '').trim();
+    const buyerTimezone = /^[A-Za-z_\/+\-0-9]{3,64}$/.test(rawTimezone) ? rawTimezone : '';
+    if (buyerTimezone) {
+      logStep('Buyer timezone detected', { buyerTimezone });
+      if (authUserId) {
+        try {
+          await supabase
+            .from('profiles')
+            .update({ timezone: buyerTimezone, timezone_synced_at: new Date().toISOString() })
+            .eq('id', authUserId);
+        } catch (e: any) {
+          logStep('Could not persist buyer timezone', { error: e?.message });
+        }
+      }
+    }
 
     
     // Validate required program field
@@ -333,6 +351,7 @@ serve(async (req) => {
           payment_type: programData.payment_type,
           product_name: productName,
           ...(authUserId ? { auth_user_id: authUserId } : {}),
+          ...(buyerTimezone ? { buyer_timezone: buyerTimezone } : {}),
         },
       };
 
@@ -439,6 +458,7 @@ serve(async (req) => {
           payment_type: programData.payment_type,
           product_name: productName,
           ...(authUserId ? { auth_user_id: authUserId } : {}),
+          ...(buyerTimezone ? { buyer_timezone: buyerTimezone } : {}),
         },
       };
 
