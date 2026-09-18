@@ -86,6 +86,7 @@ export function ProgramsManager() {
     // Stripe product IDs for reuse
     stripe_product_id: '',
     stripe_price_id: '',
+    full_payment_stripe_price_id: '',
     // Cover image
     cover_image_url: '',
     language: 'american',
@@ -169,6 +170,8 @@ export function ProgramsManager() {
       balance_full_discount: 0,
       stripe_product_id: '',
       stripe_price_id: '',
+      full_payment_stripe_price_id: '',
+    full_payment_stripe_price_id: '',
       cover_image_url: '',
       language: 'american',
       trial_days: 0,
@@ -261,6 +264,7 @@ export function ProgramsManager() {
       balance_full_discount: (program as any).balance_full_discount || 0,
       stripe_product_id: (program as any).stripe_product_id || '',
       stripe_price_id: (program as any).stripe_price_id || '',
+      full_payment_stripe_price_id: (program as any).full_payment_stripe_price_id || '',
       // Use cover_image_url from DB, or fallback to programImages mapping
       cover_image_url: program.cover_image_url || programImages[program.slug] || '',
       language: (program as any).language || 'american',
