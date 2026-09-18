@@ -279,7 +279,7 @@ serve(async (req) => {
               unit_amount: chargeAmount,
               currency: 'usd',
               recurring: {
-                interval: (programData.subscription_interval as 'day' | 'week' | 'month' | 'year') || 'month',
+                interval: recurringInterval,
               },
               product: existingPrice.product as string,
             });
@@ -293,7 +293,7 @@ serve(async (req) => {
             unit_amount: chargeAmount,
             currency: 'usd',
             recurring: {
-              interval: (programData.subscription_interval as 'day' | 'week' | 'month' | 'year') || 'month',
+              interval: recurringInterval,
             },
             product_data: {
               name: productName,
@@ -311,7 +311,7 @@ serve(async (req) => {
           unit_amount: chargeAmount,
           currency: 'usd',
           recurring: {
-            interval: (programData.subscription_interval as 'day' | 'week' | 'month' | 'year') || 'month',
+            interval: recurringInterval,
           },
           product_data: {
             name: productName,
