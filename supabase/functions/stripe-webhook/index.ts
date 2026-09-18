@@ -77,11 +77,23 @@ async function findOrCreateUser(supabase: any, email: string, name: string): Pro
 }
 
 // Helper to apply auto-enrollment rules
-async function applyAutoEnrollment(supabase: any, userId: string, programSlug: string, courseName: string): Promise<void> {
-  console.log('[WEBHOOK] Checking auto-enrollment for program:', programSlug, 'user:', userId);
-  
-  // Get auto-enrollment rule for this program
-  const autoRoundId = await resolveAutoEnrollRoundId(supabase, programSlug, userId);
+async function applyAutoEnrollment(supabase: any, userId: string, programSlug: string, courseName: string, buyerTimezone?: string | null): Promise<void> {
+  console.log('[WEBHOOK] Checking auto-enrollment for program:', programSlug, 'user:', userId, 'tz:', buyerTimezone || '(none)');
+
+  // Remember the buyer's real timezone on their profile (covers guest checkouts too)
+  if (buyerTimezone) {
+    try {
+      await supabase
+        .from('profiles')
+        .update({ timezone: buyerTimezone, timezone_synced_at: new Date().toISOString() })
+        .eq('id', userId);
+    } catch (e: any) {
+      console.error('[WEBHOOK] Could not persist buyer timezone:', e?.message);
+    }
+  }
+
+  // Get auto-enrollment rule for this program (browser timezone wins when present)
+  const autoRoundId = await resolveAutoEnrollRoundId(supabase, programSlug, userId, buyerTimezone || null);
 
   // Check if enrollment already exists
   const { data: existingEnrollment } = await supabase
@@ -418,7 +430,7 @@ serve(async (req) => {
 
       // Apply auto-enrollment if we have a user and program
       if (userId && programSlug) {
-        await applyAutoEnrollment(supabase, userId, programSlug, productName);
+        await applyAutoEnrollment(supabase, userId, programSlug, productName, session.metadata?.buyer_timezone || null);
         await sendPurchaseWelcomeMessage(supabase, {
           userId,
           programSlug,
@@ -448,7 +460,7 @@ serve(async (req) => {
               .eq('slug', cartSlug)
               .single();
             if (cartProgram) {
-              await applyAutoEnrollment(supabase, cartUserId, cartSlug, cartProgram.title);
+              await applyAutoEnrollment(supabase, cartUserId, cartSlug, cartProgram.title, session.metadata?.buyer_timezone || null);
               await sendPurchaseWelcomeMessage(supabase, {
                 userId: cartUserId,
                 programSlug: cartSlug,
