@@ -19,7 +19,7 @@ const RILO_MANUAL_URL =
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-timezone",
 };
 
 const resend = new Resend(RESEND_API_KEY);

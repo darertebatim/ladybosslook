@@ -5,7 +5,7 @@ import { checkProgramRegionBlocks } from "../_shared/region-restriction.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-timezone',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-timezone, x-timezone',
 };
 
 serve(async (req) => {

@@ -3,7 +3,7 @@ import { resolveAutoEnrollRoundId } from "../_shared/auto-enroll-round.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-timezone",
 };
 
 // Re-evaluates the caller's timezone-based round assignments once their real
