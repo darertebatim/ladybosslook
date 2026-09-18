@@ -370,13 +370,14 @@ serve(async (req) => {
         metadata: {
           program: program,
           payment_type: programData.payment_type,
+          payment_option: paymentOption || (isSubscription ? 'subscription' : 'one-time'),
           product_name: productName,
           ...(authUserId ? { auth_user_id: authUserId } : {}),
           ...(buyerTimezone ? { buyer_timezone: buyerTimezone } : {}),
         },
       };
 
-      session = stripeIdempotencyKey 
+      session = stripeIdempotencyKey
         ? await stripe.checkout.sessions.create(sessionCreateParams, { idempotencyKey: stripeIdempotencyKey })
         : await stripe.checkout.sessions.create(sessionCreateParams);
 
