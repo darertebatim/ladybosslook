@@ -24,6 +24,7 @@ interface ProgramCatalog {
   payment_type: string;
   price_amount: number;
   original_price?: number | null;
+  monthly_original_price?: number | null;
   duration?: string | null;
   delivery_method?: string | null;
   subscription_full_payment_discount?: number | null;
@@ -61,6 +62,7 @@ export function ProgramsManager() {
     payment_type: 'one-time',
     price_amount: 0,
     original_price: 0,
+    monthly_original_price: 0,
     deposit_price: 0,
     duration: '',
     delivery_method: 'on-demand',
@@ -151,6 +153,7 @@ export function ProgramsManager() {
       payment_type: 'one-time',
       price_amount: 0,
       original_price: 0,
+      monthly_original_price: 0,
       deposit_price: 0,
       duration: '',
       delivery_method: 'on-demand',
@@ -247,6 +250,7 @@ export function ProgramsManager() {
       payment_type: program.payment_type,
       price_amount: program.price_amount,
       original_price: program.original_price || 0,
+      monthly_original_price: (program as any).monthly_original_price || 0,
       deposit_price: (program as any).deposit_price || 0,
       duration: program.duration || '',
       delivery_method: program.delivery_method || 'on-demand',
@@ -867,6 +871,19 @@ export function ProgramsManager() {
                       />
                       <p className="text-xs text-muted-foreground">
                         Full: ${(formData.subscription_full_payment_price / 100).toFixed(2)} (pay once instead of monthly)
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="monthly_original_price">Monthly Original Price ($)</Label>
+                      <Input
+                        id="monthly_original_price"
+                        type="number"
+                        value={formData.monthly_original_price / 100}
+                        onChange={(e) => setFormData({ ...formData, monthly_original_price: Math.round(parseFloat(e.target.value || '0') * 100) })}
+                        placeholder="e.g., 399"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Crossed-out price shown next to the monthly plan (leave 0 to hide). The crossed-out one-time price uses the general "Original Price" field above.
                       </p>
                     </div>
                     <div className="space-y-2">
