@@ -392,10 +392,14 @@ serve(async (req) => {
       // Only when we're charging the full price (not a deposit) and the price is one-time.
       let resolvedPriceId: string | null = null;
       // For the "pay in full" option on subscription programs, prefer its dedicated one-time price.
-      const oneTimePriceId = (isFullPaymentForSubscription && (programData as any).full_payment_stripe_price_id)
-        ? (programData as any).full_payment_stripe_price_id
-        : (!isFullPaymentForSubscription ? programData.stripe_price_id : null);
-      if (oneTimePriceId && !isDeposit) {
+      const oneTimePriceId = isBalanceFull
+        ? (programData as any).balance_full_stripe_price_id
+        : isDeposit
+          ? (programData as any).deposit_stripe_price_id
+          : (isFullPaymentForSubscription
+            ? ((programData as any).full_payment_stripe_price_id || programData.stripe_price_id)
+            : programData.stripe_price_id);
+      if (oneTimePriceId) {
         try {
           const storedPrice = await stripe.prices.retrieve(oneTimePriceId);
           if (storedPrice.active && !storedPrice.recurring) {
