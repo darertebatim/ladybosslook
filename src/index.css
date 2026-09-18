@@ -203,10 +203,11 @@ html.native-app [data-scroll-container="true"] {
     --cta-urgent: 345 85% 55%;
     --cta-urgent-hover: 345 90% 60%;
     
-    /* Secondary - warm magenta from logo */
-    --secondary: 340 70% 50%;
-    --secondary-light: 340 75% 60%;
-    --secondary-dark: 340 75% 40%;
+    /* Secondary - soft Rilo peach (matches orange brand) */
+    --secondary: 28 95% 92%;
+    --secondary-light: 30 100% 95%;
+    --secondary-dark: 24 75% 80%;
+    --secondary-foreground: 22 53% 12%;
     
     /* Luxury Gradients */
     --gradient-luxury: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 15%), hsl(0 0% 25%));
