@@ -370,17 +370,21 @@ serve(async (req) => {
       // Fallback: the product's default price (supports multi-currency / presentment currency).
       // Only when we're charging the full price (not a deposit) and the price is one-time.
       let resolvedPriceId: string | null = null;
-      if (programData.stripe_price_id && !isDeposit) {
+      // For the "pay in full" option on subscription programs, prefer its dedicated one-time price.
+      const oneTimePriceId = (isFullPaymentForSubscription && (programData as any).full_payment_stripe_price_id)
+        ? (programData as any).full_payment_stripe_price_id
+        : (!isFullPaymentForSubscription ? programData.stripe_price_id : null);
+      if (oneTimePriceId && !isDeposit) {
         try {
-          const storedPrice = await stripe.prices.retrieve(programData.stripe_price_id);
+          const storedPrice = await stripe.prices.retrieve(oneTimePriceId);
           if (storedPrice.active && !storedPrice.recurring) {
             resolvedPriceId = storedPrice.id;
-            logStep("Using stored stripe_price_id", { priceId: storedPrice.id, currency: storedPrice.currency, unitAmount: storedPrice.unit_amount });
+            logStep("Using stored one-time price id", { priceId: storedPrice.id, currency: storedPrice.currency, unitAmount: storedPrice.unit_amount });
           } else {
-            logStep("Stored stripe_price_id unusable (inactive or recurring), trying default price", { active: storedPrice.active, recurring: !!storedPrice.recurring });
+            logStep("Stored price unusable (inactive or recurring), trying default price", { active: storedPrice.active, recurring: !!storedPrice.recurring });
           }
         } catch (e: any) {
-          logStep("Could not retrieve stored stripe_price_id, trying default price", { error: e?.message });
+          logStep("Could not retrieve stored price id, trying default price", { error: e?.message });
         }
       }
       if (!resolvedPriceId && programData.stripe_product_id && !isDeposit) {
