@@ -332,7 +332,7 @@ serve(async (req) => {
           program: program,
           payment_type: programData.payment_type,
           product_name: productName,
-          auto_cancel_after_months: programData.subscription_interval_count?.toString() || '',
+          auto_cancel_after_months: autoCancelCount ? autoCancelCount.toString() : '',
         },
       };
 
@@ -345,9 +345,9 @@ serve(async (req) => {
         logStep("Trial configured", { trialDays: Number(trialDays) });
       }
 
-      if (programData.subscription_interval_count) {
-        logStep("Subscription configured for auto-cancel", { 
-          intervalCount: programData.subscription_interval_count,
+      if (autoCancelCount) {
+        logStep("Subscription configured for auto-cancel", {
+          intervalCount: autoCancelCount,
           note: "Will be set via webhook after subscription creation"
         });
       }
