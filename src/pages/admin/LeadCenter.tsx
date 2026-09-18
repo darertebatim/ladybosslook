@@ -41,12 +41,15 @@ export default function LeadCenter() {
 
       <Tabs value={tab} onValueChange={setTab}>
 
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList
+          className="grid w-full"
+          style={{ gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))` }}
+        >
           <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
           <TabsTrigger value="stats">Stats</TabsTrigger>
-          <TabsTrigger value="sixtraps">6 Traps</TabsTrigger>
-          <TabsTrigger value="smartinsta">Smart IG</TabsTrigger>
-          <TabsTrigger value="igads">IG Ads</TabsTrigger>
+          {show('sixtraps') && <TabsTrigger value="sixtraps">6 Traps</TabsTrigger>}
+          {show('smartinsta') && <TabsTrigger value="smartinsta">Smart IG</TabsTrigger>}
+          {show('igads') && <TabsTrigger value="igads">IG Ads</TabsTrigger>}
           <TabsTrigger value="marketing">Email Marketing</TabsTrigger>
           <TabsTrigger value="opens">Email Opens</TabsTrigger>
           <TabsTrigger value="crm">Meta CRM</TabsTrigger>
