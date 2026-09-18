@@ -33,7 +33,22 @@ interface Option {
   group: 'Lead lists' | 'Programs';
 }
 
-const CHUNK = 500;
+const CHUNK = 100;
+
+/** Invoke the send function, retrying when the network/edge request drops. */
+async function invokeSend(body: any, attempts = 3): Promise<any> {
+  let lastErr: any = null;
+  for (let i = 0; i < attempts; i++) {
+    const { data, error } = await supabase.functions.invoke('send-lead-email', { body });
+    if (!error) return data;
+    lastErr = error;
+    // Real errors returned by the function shouldn't be retried.
+    const msg = String(error?.message || '');
+    if (!/Failed to send a request|fetch|network/i.test(msg)) break;
+    await new Promise((r) => setTimeout(r, 2000 * (i + 1)));
+  }
+  throw lastErr;
+}
 
 /** Handoff key used by the Email Opens tab ("Resend to who didn't get it"). */
 export const RESEND_HANDOFF_KEY = 'lead_email_resend_subject';
