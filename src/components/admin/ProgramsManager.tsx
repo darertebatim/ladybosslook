@@ -735,6 +735,19 @@ export function ProgramsManager() {
                       </p>
                     </div>
 
+                    <div className="space-y-2">
+                      <Label htmlFor="deposit_stripe_price_id">Deposit Stripe Price ID (Optional)</Label>
+                      <Input
+                        id="deposit_stripe_price_id"
+                        value={formData.deposit_stripe_price_id}
+                        onChange={(e) => setFormData({ ...formData, deposit_stripe_price_id: e.target.value })}
+                        placeholder="price_..."
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        One-time price for the deposit. If set, checkout reuses it instead of creating a new price.
+                      </p>
+                    </div>
+
                     {/* Balance Payment Options Section */}
                     <div className="col-span-2 space-y-4 border-t pt-4 mt-2">
                       <Label className="text-base font-semibold">💳 Balance Payment Options</Label>
@@ -809,6 +822,32 @@ export function ProgramsManager() {
                               Total: ${((formData.balance_monthly_price / 100) * formData.balance_monthly_count).toFixed(2)} ({formData.balance_monthly_count} × ${(formData.balance_monthly_price / 100).toFixed(2)})
                             </p>
                           )}
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="balance_full_stripe_price_id">One-Time Balance Stripe Price ID (Optional)</Label>
+                          <Input
+                            id="balance_full_stripe_price_id"
+                            value={formData.balance_full_stripe_price_id}
+                            onChange={(e) => setFormData({ ...formData, balance_full_stripe_price_id: e.target.value })}
+                            placeholder="price_..."
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            One-time price for paying the balance in full.
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="balance_monthly_stripe_price_id">Monthly Balance Stripe Price ID (Optional)</Label>
+                          <Input
+                            id="balance_monthly_stripe_price_id"
+                            value={formData.balance_monthly_stripe_price_id}
+                            onChange={(e) => setFormData({ ...formData, balance_monthly_stripe_price_id: e.target.value })}
+                            placeholder="price_..."
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Recurring monthly price for the installment plan.
+                          </p>
                         </div>
                       </div>
                     </div>
