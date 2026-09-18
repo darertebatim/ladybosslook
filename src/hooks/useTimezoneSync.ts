@@ -34,17 +34,23 @@ export const useTimezoneSync = (userId: string | undefined) => {
           return;
         }
 
-        // Only update if different
-        if (profile?.timezone !== detectedTimezone) {
+        const needsUpdate =
+          profile?.timezone !== detectedTimezone || !(profile as any)?.timezone_synced_at;
+
+        if (needsUpdate) {
           const { error: updateError } = await supabase
             .from('profiles')
-            .update({ timezone: detectedTimezone })
+            .update({ timezone: detectedTimezone, timezone_synced_at: new Date().toISOString() } as any)
             .eq('id', userId);
 
           if (updateError) {
             console.error('[TimezoneSync] Error updating timezone:', updateError);
           } else {
             console.log(`[TimezoneSync] Updated timezone from ${profile?.timezone} to ${detectedTimezone}`);
+            // Correct any round assignment made before the real timezone was known.
+            supabase.functions
+              .invoke('resync-my-enrollment-rounds', { body: { timezone: detectedTimezone } })
+              .catch(() => {});
           }
         } else {
           console.log(`[TimezoneSync] Timezone already set to ${detectedTimezone}`);

@@ -258,3 +258,5 @@ verify_jwt = false
 verify_jwt = true
 
 
+[functions.import-missing-stripe-payments]
+verify_jwt = true
