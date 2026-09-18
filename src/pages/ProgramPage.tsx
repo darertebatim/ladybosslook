@@ -517,7 +517,7 @@ const ProgramPage = () => {
                       <div className="space-y-2">
                           {isDeposit ? (
                             <>
-                              <div className="flex items-baseline justify-between gap-2">
+                              <div className="flex items-baseline gap-3">
                                 <span className="text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground leading-none">
                                   ${(displayPrice / 100).toFixed(0)} <span className="text-sm font-semibold text-muted-foreground tracking-normal">deposit</span>
                                 </span>
@@ -536,7 +536,7 @@ const ProgramPage = () => {
                             </>
                           ) : (
                             <>
-                              <div className="flex items-baseline justify-between gap-2">
+                              <div className="flex items-baseline gap-3">
                                 <span className="text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground leading-none">
                                   ${(displayPrice / 100).toFixed(0)}
                                 </span>
