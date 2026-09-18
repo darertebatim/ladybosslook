@@ -80,6 +80,18 @@ async function findOrCreateUser(supabase: any, email: string, name: string): Pro
 async function applyAutoEnrollment(supabase: any, userId: string, programSlug: string, courseName: string, buyerTimezone?: string | null): Promise<void> {
   console.log('[WEBHOOK] Checking auto-enrollment for program:', programSlug, 'user:', userId, 'tz:', buyerTimezone || '(none)');
 
+  // Remember the buyer's real timezone on their profile (covers guest checkouts too)
+  if (buyerTimezone) {
+    try {
+      await supabase
+        .from('profiles')
+        .update({ timezone: buyerTimezone, timezone_synced_at: new Date().toISOString() })
+        .eq('id', userId);
+    } catch (e: any) {
+      console.error('[WEBHOOK] Could not persist buyer timezone:', e?.message);
+    }
+  }
+
   // Get auto-enrollment rule for this program (browser timezone wins when present)
   const autoRoundId = await resolveAutoEnrollRoundId(supabase, programSlug, userId, buyerTimezone || null);
 
