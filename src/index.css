@@ -289,10 +289,10 @@ html.native-app [data-scroll-container="true"] {
     --primary-dark: 5 70% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 45 85% 65%;
-    --secondary-light: 45 90% 75%;
-    --secondary-dark: 40 80% 50%;
-    --secondary-foreground: 230 15% 15%;
+    --secondary: 25 39% 17%;
+    --secondary-light: 28 45% 24%;
+    --secondary-dark: 22 35% 12%;
+    --secondary-foreground: 30 100% 92%;
 
     --accent: 330 40% 25%;
     --accent-light: 330 50% 35%;
