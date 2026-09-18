@@ -61,6 +61,7 @@ interface ProgramData {
   features: string[];
   price_amount: number;
   original_price: number | null;
+  monthly_original_price: number | null;
   deposit_price: number | null;
   payment_type: string;
   type: string;
@@ -422,9 +423,16 @@ const ProgramPage = () => {
                         >
                           <div className="flex items-baseline justify-between gap-2">
                             <span className="font-semibold text-sm">Monthly</span>
-                            <span className="text-xl font-bold">
-                              ${(program.price_amount / 100).toFixed(0)}
-                              <span className="text-sm font-medium text-muted-foreground">/mo</span>
+                            <span className="flex items-baseline gap-1.5">
+                              {!!program.monthly_original_price && program.monthly_original_price > program.price_amount && (
+                                <span className="text-muted-foreground line-through text-sm">
+                                  ${(program.monthly_original_price / 100).toFixed(0)}
+                                </span>
+                              )}
+                              <span className="text-xl font-bold">
+                                ${(program.price_amount / 100).toFixed(0)}
+                                <span className="text-sm font-medium text-muted-foreground">/mo</span>
+                              </span>
                             </span>
                           </div>
                           {program.subscription_interval_count && program.subscription_interval_count > 1 && (
