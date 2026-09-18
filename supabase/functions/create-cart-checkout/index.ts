@@ -5,7 +5,7 @@ import { checkProgramRegionBlocks } from "../_shared/region-restriction.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-timezone',
 };
 
 serve(async (req) => {
@@ -38,6 +38,20 @@ serve(async (req) => {
     }
 
     console.log('[CART-CHECKOUT] User:', user.id);
+
+    // Buyer timezone from the browser -> used for timezone-based round assignment.
+    const rawTimezone = (req.headers.get('x-timezone') || '').trim();
+    const buyerTimezone = /^[A-Za-z_\/+\-0-9]{3,64}$/.test(rawTimezone) ? rawTimezone : '';
+    if (buyerTimezone) {
+      try {
+        await supabase
+          .from('profiles')
+          .update({ timezone: buyerTimezone, timezone_synced_at: new Date().toISOString() })
+          .eq('id', user.id);
+      } catch (e: any) {
+        console.error('[CART-CHECKOUT] Could not persist timezone:', e?.message);
+      }
+    }
 
     // Fetch cart items
     const { data: cartItems, error: cartError } = await supabase
@@ -199,6 +213,7 @@ serve(async (req) => {
         user_id: user.id,
         program_slugs: programSlugs.join(','),
         product_name: programSlugs.length === 1 ? programSlugs[0] : `Cart (${programSlugs.length} programs)`,
+        ...(buyerTimezone ? { buyer_timezone: buyerTimezone } : {}),
       },
     });
 
