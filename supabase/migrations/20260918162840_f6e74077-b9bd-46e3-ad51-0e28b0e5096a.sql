@@ -1,0 +1,1 @@
+ALTER TABLE public.program_catalog ADD COLUMN IF NOT EXISTS monthly_original_price integer;

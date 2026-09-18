@@ -5112,6 +5112,7 @@ export type Database = {
           language: string
           mailchimp_program_name: string | null
           mailchimp_tags: Json | null
+          monthly_original_price: number | null
           original_price: number | null
           payment_type: string
           price_amount: number
@@ -5167,6 +5168,7 @@ export type Database = {
           language?: string
           mailchimp_program_name?: string | null
           mailchimp_tags?: Json | null
+          monthly_original_price?: number | null
           original_price?: number | null
           payment_type: string
           price_amount?: number
@@ -5222,6 +5224,7 @@ export type Database = {
           language?: string
           mailchimp_program_name?: string | null
           mailchimp_tags?: Json | null
+          monthly_original_price?: number | null
           original_price?: number | null
           payment_type?: string
           price_amount?: number
