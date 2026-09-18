@@ -69,6 +69,17 @@ export function LeadCampaignDirectory() {
     toast.success('Copied');
   };
 
+  const { inactive } = useInactiveLeadCampaigns();
+  const setActive = useSetLeadCampaignActive();
+
+  const toggle = (key: string, active: boolean) => {
+    const next = active ? inactive.filter((k) => k !== key) : [...inactive, key];
+    setActive.mutate(
+      { keys: next },
+      { onSuccess: () => toast.success(active ? 'Campaign activated' : 'Campaign deactivated') }
+    );
+  };
+
   const cards = useMemo(() => {
     const now = Date.now();
     const week = now - 7 * 24 * 60 * 60 * 1000;
