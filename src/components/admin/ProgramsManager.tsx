@@ -87,6 +87,10 @@ export function ProgramsManager() {
     stripe_product_id: '',
     stripe_price_id: '',
     full_payment_stripe_price_id: '',
+    // Stripe price IDs for deposit-type programs
+    deposit_stripe_price_id: '',
+    balance_full_stripe_price_id: '',
+    balance_monthly_stripe_price_id: '',
     // Cover image
     cover_image_url: '',
     language: 'american',
