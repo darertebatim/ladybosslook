@@ -477,7 +477,8 @@ serve(async (req) => {
           metadata: {
             program: program,
             payment_type: programData.payment_type,
-            is_deposit: isDeposit ? 'true' : 'false',
+          is_deposit: isDeposit ? 'true' : 'false',
+            payment_option: paymentOption || 'one-time',
             product_name: productName,
           },
         },
@@ -485,6 +486,7 @@ serve(async (req) => {
           program: program,
           program_slug: program,
           payment_type: programData.payment_type,
+          payment_option: paymentOption || 'one-time',
           product_name: productName,
           ...(authUserId ? { auth_user_id: authUserId } : {}),
           ...(buyerTimezone ? { buyer_timezone: buyerTimezone } : {}),
