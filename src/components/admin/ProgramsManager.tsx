@@ -271,6 +271,9 @@ export function ProgramsManager() {
       stripe_product_id: (program as any).stripe_product_id || '',
       stripe_price_id: (program as any).stripe_price_id || '',
       full_payment_stripe_price_id: (program as any).full_payment_stripe_price_id || '',
+      deposit_stripe_price_id: (program as any).deposit_stripe_price_id || '',
+      balance_full_stripe_price_id: (program as any).balance_full_stripe_price_id || '',
+      balance_monthly_stripe_price_id: (program as any).balance_monthly_stripe_price_id || '',
       // Use cover_image_url from DB, or fallback to programImages mapping
       cover_image_url: program.cover_image_url || programImages[program.slug] || '',
       language: (program as any).language || 'american',
