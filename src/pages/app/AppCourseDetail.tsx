@@ -1497,7 +1497,7 @@ const AppCourseDetail = () => {
                                       Program Price
                                     </p>
                                     <div className="flex items-baseline justify-center gap-2">
-                                      {program.original_price &&
+                                      {!!program.original_price &&
                                         program.original_price >
                                           program.price_amount && (
                                           <span className="text-lg text-muted-foreground line-through">
@@ -1601,7 +1601,7 @@ const AppCourseDetail = () => {
                                   >
                                     {`Enroll · $${(program.price_amount / 100).toFixed(0)}`}
                                   </Button>
-                                  {program.original_price &&
+                                  {!!program.original_price &&
                                     program.original_price >
                                       program.price_amount && (
                                     <p className="text-xs text-center text-muted-foreground mt-2 line-through">

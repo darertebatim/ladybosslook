@@ -1387,7 +1387,7 @@ export function ProgramsManager() {
                         <span>{program.delivery_method === 'live-online' ? 'Live Online' : 'On-Demand'}</span>
                       </div>
                       <div className="flex items-center gap-4">
-                        {program.original_price && (
+                        {!!program.original_price && (
                           <>
                             <span className="line-through">${(program.original_price / 100).toFixed(2)}</span>
                             <span>→</span>
