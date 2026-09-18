@@ -171,7 +171,6 @@ export function ProgramsManager() {
       stripe_product_id: '',
       stripe_price_id: '',
       full_payment_stripe_price_id: '',
-    full_payment_stripe_price_id: '',
       cover_image_url: '',
       language: 'american',
       trial_days: 0,
