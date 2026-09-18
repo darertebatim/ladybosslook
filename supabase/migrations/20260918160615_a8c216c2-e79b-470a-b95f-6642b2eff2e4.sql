@@ -1,0 +1,1 @@
+ALTER TABLE public.program_catalog ADD COLUMN IF NOT EXISTS full_payment_stripe_price_id text;

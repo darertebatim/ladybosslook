@@ -5100,6 +5100,7 @@ export type Database = {
           description: string | null
           duration: string | null
           features: Json | null
+          full_payment_stripe_price_id: string | null
           id: string
           ios_product_id: string | null
           is_active: boolean | null
@@ -5151,6 +5152,7 @@ export type Database = {
           description?: string | null
           duration?: string | null
           features?: Json | null
+          full_payment_stripe_price_id?: string | null
           id?: string
           ios_product_id?: string | null
           is_active?: boolean | null
@@ -5202,6 +5204,7 @@ export type Database = {
           description?: string | null
           duration?: string | null
           features?: Json | null
+          full_payment_stripe_price_id?: string | null
           id?: string
           ios_product_id?: string | null
           is_active?: boolean | null

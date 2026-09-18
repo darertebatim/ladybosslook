@@ -86,6 +86,7 @@ export function ProgramsManager() {
     // Stripe product IDs for reuse
     stripe_product_id: '',
     stripe_price_id: '',
+    full_payment_stripe_price_id: '',
     // Cover image
     cover_image_url: '',
     language: 'american',
@@ -169,6 +170,7 @@ export function ProgramsManager() {
       balance_full_discount: 0,
       stripe_product_id: '',
       stripe_price_id: '',
+      full_payment_stripe_price_id: '',
       cover_image_url: '',
       language: 'american',
       trial_days: 0,
@@ -261,6 +263,7 @@ export function ProgramsManager() {
       balance_full_discount: (program as any).balance_full_discount || 0,
       stripe_product_id: (program as any).stripe_product_id || '',
       stripe_price_id: (program as any).stripe_price_id || '',
+      full_payment_stripe_price_id: (program as any).full_payment_stripe_price_id || '',
       // Use cover_image_url from DB, or fallback to programImages mapping
       cover_image_url: program.cover_image_url || programImages[program.slug] || '',
       language: (program as any).language || 'american',
@@ -1043,6 +1046,20 @@ export function ProgramsManager() {
                             Monthly recurring price. Stripe Dashboard → Products → Pricing
                           </p>
                         </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="full_payment_stripe_price_id">One-Time Full Payment Price ID</Label>
+                          <Input
+                            id="full_payment_stripe_price_id"
+                            value={formData.full_payment_stripe_price_id}
+                            onChange={(e) => setFormData({ ...formData, full_payment_stripe_price_id: e.target.value })}
+                            placeholder="price_xxx"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            One-time price for the "pay in full" option. Must be a one-time (not recurring) price.
+                          </p>
+                        </div>
+
 
                         <div className="col-span-2 grid grid-cols-2 gap-4 border-t pt-4 mt-2">
                           <Label className="col-span-2 text-sm font-semibold">📅 Annual Plan (Optional)</Label>
