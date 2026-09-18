@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Navigate, Link, useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, browserTimezone } from '@/integrations/supabase/client';
 import { Loader2, Check, MessageCircle, ShoppingCart, Clock, ArrowLeft, Calendar, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -111,7 +111,7 @@ const ProgramPage = () => {
         const actualSlug = slug.slice(0, -3);
         try {
           const { data, error } = await supabase.functions.invoke('create-payment', {
-            body: { program: actualSlug },
+            body: { program: actualSlug, timezone: browserTimezone },
           });
           if (error || !data?.url) { setPaymentError('Error'); setLoading(false); return; }
           window.location.href = data.url;
@@ -237,7 +237,7 @@ const ProgramPage = () => {
     setCheckingOut(true);
     try {
       const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: { program: program.slug, paymentOption: option },
+        body: { program: program.slug, paymentOption: option, timezone: browserTimezone },
       });
       if (error || !data?.url) throw new Error('checkout failed');
       window.location.href = data.url;

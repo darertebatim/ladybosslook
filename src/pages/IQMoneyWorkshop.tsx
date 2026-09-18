@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 import { SEOHead } from "@/components/SEOHead";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, browserTimezone } from '@/integrations/supabase/client';
 import moneyLiteracyHero from "@/assets/money-literacy-workshop-hero.jpg";
 
 export default function IQMoneyWorkshop() {
@@ -94,7 +94,7 @@ export default function IQMoneyWorkshop() {
     
     try {
       const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: { program: 'money-literacy' }
+        body: { program: 'money-literacy', timezone: browserTimezone }
       });
 
       if (error) throw error;

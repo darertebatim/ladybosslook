@@ -40,7 +40,12 @@ serve(async (req) => {
     console.log('[CART-CHECKOUT] User:', user.id);
 
     // Buyer timezone from the browser -> used for timezone-based round assignment.
-    const rawTimezone = (req.headers.get('x-timezone') || '').trim();
+    let bodyTimezone = '';
+    try {
+      const body = await req.json();
+      bodyTimezone = typeof body?.timezone === 'string' ? body.timezone : '';
+    } catch { /* no body */ }
+    const rawTimezone = (bodyTimezone || req.headers.get('x-timezone') || '').trim();
     const buyerTimezone = /^[A-Za-z_\/+\-0-9]{3,64}$/.test(rawTimezone) ? rawTimezone : '';
     if (buyerTimezone) {
       try {

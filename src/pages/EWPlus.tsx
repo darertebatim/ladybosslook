@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, browserTimezone } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 import { Loader2, Check, MessageCircle, Sparkles, Calendar, Users, Gift, Mail } from "lucide-react";
 
@@ -87,7 +87,8 @@ const EWPlus = () => {
       const idempotencyKey = `ewplus-${selectedPaymentType}-${trimmedEmail}-${timeWindow}`;
       
       const { data, error } = await supabase.functions.invoke('create-payment', {
-        body: { 
+        body: {
+          timezone: browserTimezone,
           program: 'ewpluscoaching',
           email: trimmedEmail,
           ...(selectedPaymentType === 'full' && { paymentOption: 'full' }),

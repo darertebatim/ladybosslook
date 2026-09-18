@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { CheckCircle, CreditCard, Calendar, Sparkles, MessageCircle, Loader2, Mail } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, browserTimezone } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 
 const EWCBalance = () => {
@@ -92,6 +92,7 @@ const EWCBalance = () => {
       // Go through our checkout so the payment is linked to the account and program
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: {
+          timezone: browserTimezone,
           program: 'empowered-woman-coaching',
           email: trimmedEmail,
           paymentOption: type === 'onetime' ? 'balance_full' : 'balance_monthly',

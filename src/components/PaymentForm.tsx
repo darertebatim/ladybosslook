@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, browserTimezone } from '@/integrations/supabase/client';
 import { Loader2, CreditCard, Shield, CheckCircle } from 'lucide-react';
 import { paymentFormSchema } from '@/lib/validation';
 import { z } from 'zod';
@@ -98,6 +98,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
       
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: {
+          timezone: browserTimezone,
           name: formData.name.trim(),
           email: formData.email.trim().toLowerCase(),
           phone: formData.phone.trim(),
