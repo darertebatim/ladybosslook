@@ -4928,6 +4928,7 @@ export type Database = {
           state: string | null
           this_month_active_days: number | null
           timezone: string | null
+          timezone_synced_at: string | null
           total_active_days: number | null
           updated_at: string
         }
@@ -4960,6 +4961,7 @@ export type Database = {
           state?: string | null
           this_month_active_days?: number | null
           timezone?: string | null
+          timezone_synced_at?: string | null
           total_active_days?: number | null
           updated_at?: string
         }
@@ -4992,6 +4994,7 @@ export type Database = {
           state?: string | null
           this_month_active_days?: number | null
           timezone?: string | null
+          timezone_synced_at?: string | null
           total_active_days?: number | null
           updated_at?: string
         }
