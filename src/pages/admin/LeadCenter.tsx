@@ -18,6 +18,15 @@ const igads = LEAD_CAMPAIGNS.find((c) => c.key === 'igads')!;
 
 export default function LeadCenter() {
   const [tab, setTab] = useState('campaigns');
+  const { inactive } = useInactiveLeadCampaigns();
+  const show = (key: string) => !inactive.includes(key);
+  const visibleCampaignTabs = ['sixtraps', 'smartinsta', 'igads'].filter(show).length;
+  const colCount = 5 + visibleCampaignTabs;
+
+  useEffect(() => {
+    if (['sixtraps', 'smartinsta', 'igads'].includes(tab) && !show(tab)) setTab('campaigns');
+  }, [inactive, tab]);
+
 
   return (
     <div className="space-y-6">
