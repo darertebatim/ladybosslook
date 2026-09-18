@@ -9,10 +9,11 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-// Detected device/browser timezone, sent with every request so server-side
-// logic (e.g. timezone-based round assignment at checkout) works before the
-// user ever opens the app.
-const detectedTimezone = (() => {
+// Detected device/browser timezone. Passed explicitly in checkout request
+// bodies (never as a global header, which would break CORS on other
+// functions) so timezone-based round assignment works before the user ever
+// opens the app.
+export const browserTimezone = (() => {
   try {
     return Intl.DateTimeFormat().resolvedOptions().timeZone || '';
   } catch {
