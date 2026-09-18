@@ -25,7 +25,7 @@ export const useTimezoneSync = (userId: string | undefined) => {
         // Check current profile timezone
         const { data: profile, error: fetchError } = await supabase
           .from('profiles')
-          .select('timezone')
+          .select('timezone, timezone_synced_at')
           .eq('id', userId)
           .single();
 
