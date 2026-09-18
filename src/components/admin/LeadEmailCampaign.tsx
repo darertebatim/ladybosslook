@@ -33,7 +33,22 @@ interface Option {
   group: 'Lead lists' | 'Programs';
 }
 
-const CHUNK = 500;
+const CHUNK = 100;
+
+/** Invoke the send function, retrying when the network/edge request drops. */
+async function invokeSend(body: any, attempts = 3): Promise<any> {
+  let lastErr: any = null;
+  for (let i = 0; i < attempts; i++) {
+    const { data, error } = await supabase.functions.invoke('send-lead-email', { body });
+    if (!error) return data;
+    lastErr = error;
+    // Real errors returned by the function shouldn't be retried.
+    const msg = String(error?.message || '');
+    if (!/Failed to send a request|fetch|network/i.test(msg)) break;
+    await new Promise((r) => setTimeout(r, 2000 * (i + 1)));
+  }
+  throw lastErr;
+}
 
 /** Handoff key used by the Email Opens tab ("Resend to who didn't get it"). */
 export const RESEND_HANDOFF_KEY = 'lead_email_resend_subject';
@@ -437,10 +452,7 @@ export function LeadEmailCampaign() {
       }
       setSending('test');
       try {
-        const { data, error } = await supabase.functions.invoke('send-lead-email', {
-          body: { ...payload(), testEmail: testEmail.trim() },
-        });
-        if (error) throw error;
+        const data = await invokeSend({ ...payload(), testEmail: testEmail.trim() });
         toast.success(`Test sent (${(data as any)?.sent ?? 0})`);
       } catch (e: any) {
         toast.error(e?.message || 'Failed to send');
@@ -466,11 +478,13 @@ export function LeadEmailCampaign() {
       try {
         for (let i = 0; i < list.length; i += CHUNK) {
           const chunk = list.slice(i, i + CHUNK);
-          const { data, error } = await supabase.functions.invoke('send-lead-email', {
-            body: { ...payload(), emails: chunk, sources: [], programs: [], skipSubject: '' },
-          });
-          if (error) throw error;
-          const d = data as any;
+          const d = (await invokeSend({
+            ...payload(),
+            emails: chunk,
+            sources: [],
+            programs: [],
+            skipSubject: '',
+          })) as any;
           sent += d?.sent ?? 0;
           failed += d?.failed ?? 0;
           done += chunk.length;
@@ -499,16 +513,12 @@ export function LeadEmailCampaign() {
     try {
       // Sent in parts so a very large list (10k+) never times out.
       for (;;) {
-        const { data, error } = await supabase.functions.invoke('send-lead-email', {
-          body: {
-            ...payload(),
-            offset: skipAlreadySent ? 0 : offset,
-            limit: CHUNK,
-            alsoSkip: skipAlreadySent ? handled : [],
-          },
-        });
-        if (error) throw error;
-        const d = data as any;
+        const d = (await invokeSend({
+          ...payload(),
+          offset: skipAlreadySent ? 0 : offset,
+          limit: CHUNK,
+          alsoSkip: skipAlreadySent ? handled : [],
+        })) as any;
         sent += d?.sent ?? 0;
         failed += d?.failed ?? 0;
         const processed = d?.processed ?? 0;
