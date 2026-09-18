@@ -452,10 +452,7 @@ export function LeadEmailCampaign() {
       }
       setSending('test');
       try {
-        const { data, error } = await supabase.functions.invoke('send-lead-email', {
-          body: { ...payload(), testEmail: testEmail.trim() },
-        });
-        if (error) throw error;
+        const data = await invokeSend({ ...payload(), testEmail: testEmail.trim() });
         toast.success(`Test sent (${(data as any)?.sent ?? 0})`);
       } catch (e: any) {
         toast.error(e?.message || 'Failed to send');
