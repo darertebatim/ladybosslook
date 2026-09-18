@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 import { Link as RLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { resolveAutoEnrollRoundId } from '@/lib/autoEnrollRound';
 
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
