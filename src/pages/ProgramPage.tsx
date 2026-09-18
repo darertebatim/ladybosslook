@@ -284,7 +284,15 @@ const ProgramPage = () => {
       );
     }
     return (
-      <Button className={cn('w-full gap-2', className)} size={size} onClick={handleAddToCart} disabled={isAdding || isEnrollingFree}>
+      <Button
+        className={cn(
+          'w-full gap-2 font-bold transition-all shadow-[0_4px_0_0] shadow-brand-dark active:translate-y-1 active:shadow-none',
+          className
+        )}
+        size={size}
+        onClick={handleAddToCart}
+        disabled={isAdding || isEnrollingFree}
+      >
         {isFree ? (
           <><Check size={18} /> {isEnrollingFree ? 'Enrolling…' : (user ? 'Enroll for Free' : 'Sign In to Enroll')}</>
         ) : (
@@ -428,7 +436,7 @@ const ProgramPage = () => {
                     {hasFullOption ? (
                       <div className="space-y-2">
                         {!!program.original_price && program.original_price > 0 && (
-                          <div className="text-muted-foreground line-through text-sm">
+                          <div className="text-red-500 line-through decoration-red-500/40 text-sm font-medium">
                             ${(program.original_price / 100).toFixed(0)}
                           </div>
                         )}
@@ -506,34 +514,47 @@ const ProgramPage = () => {
                           <span className="text-2xl lg:text-3xl font-bold text-primary">FREE</span>
                         </div>
                       ) : (
-                      <div className="space-y-0.5">
+                      <div className="space-y-2">
                           {isDeposit ? (
                             <>
-                              <div className="flex items-baseline gap-2">
-                                {!!program.original_price && program.original_price > 0 && program.original_price > program.price_amount && (
-                                  <span className="text-muted-foreground line-through text-base">
+                              <div className="flex items-baseline justify-between gap-2">
+                                <span className="text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground leading-none">
+                                  ${(displayPrice / 100).toFixed(0)} <span className="text-sm font-semibold text-muted-foreground tracking-normal">deposit</span>
+                                </span>
+                                {!!program.original_price && program.original_price > program.price_amount && (
+                                  <span className="text-lg font-medium text-red-500 line-through decoration-red-500/40">
                                     ${(program.original_price / 100).toFixed(0)}
                                   </span>
                                 )}
-                                <span className="text-2xl lg:text-3xl font-bold text-foreground">
-                                  ${(displayPrice / 100).toFixed(0)} <span className="text-sm font-medium text-muted-foreground">deposit</span>
+                              </div>
+                              <div className="flex items-center gap-2 w-fit py-1 px-3 bg-primary/10 rounded-full">
+                                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                <span className="text-[11px] font-bold text-primary uppercase tracking-wider">
+                                  Full price: ${(program.price_amount / 100).toFixed(0)} • Remaining: ${((program.price_amount - displayPrice) / 100).toFixed(0)}
                                 </span>
                               </div>
-                              <p className="text-xs text-muted-foreground">
-                                Full price: ${(program.price_amount / 100).toFixed(0)} • Remaining: ${((program.price_amount - displayPrice) / 100).toFixed(0)}
-                              </p>
                             </>
                           ) : (
-                            <div className="flex items-baseline gap-2">
-                              {!!program.original_price && program.original_price > 0 && program.original_price > program.price_amount && (
-                                <span className="text-muted-foreground line-through text-base">
-                                  ${(program.original_price / 100).toFixed(0)}
+                            <>
+                              <div className="flex items-baseline justify-between gap-2">
+                                <span className="text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground leading-none">
+                                  ${(displayPrice / 100).toFixed(0)}
                                 </span>
+                                {!!program.original_price && program.original_price > program.price_amount && (
+                                  <span className="text-lg font-medium text-red-500 line-through decoration-red-500/40">
+                                    ${(program.original_price / 100).toFixed(0)}
+                                  </span>
+                                )}
+                              </div>
+                              {!!program.original_price && program.original_price > program.price_amount && (
+                                <div className="flex items-center gap-2 w-fit py-1 px-3 bg-primary/10 rounded-full">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                  <span className="text-[11px] font-bold text-primary uppercase tracking-wider">
+                                    Save ${((program.original_price - program.price_amount) / 100).toFixed(0)} — Limited Time
+                                  </span>
+                                </div>
                               )}
-                              <span className="text-2xl lg:text-3xl font-bold text-foreground">
-                                ${(displayPrice / 100).toFixed(0)}
-                              </span>
-                            </div>
+                            </>
                           )}
                         </div>
                       )}
