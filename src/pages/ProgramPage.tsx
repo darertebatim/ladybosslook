@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { PersianFlag } from '@/components/ui/PersianFlag';
 import { Link as RLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { resolveAutoEnrollRoundId } from '@/lib/autoEnrollRound';
 
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
@@ -134,16 +135,38 @@ const ProgramPage = () => {
   }, [slug]);
 
   const { data: autoEnrollRound } = useQuery({
-    queryKey: ['program-page-auto-round', slug],
+    queryKey: ['program-page-auto-round', slug, user?.id],
     enabled: !!slug,
     queryFn: async () => {
       if (!slug) return null;
-      const { data: autoEnroll } = await (supabase as any)
-        .from('program_auto_enrollment')
-        .select('round_id, program_rounds!program_auto_enrollment_round_id_fkey(*)')
-        .eq('program_slug', slug)
-        .maybeSingle();
-      if (autoEnroll?.program_rounds) return autoEnroll.program_rounds as any;
+      const fetchRound = async (id?: string | null) => {
+        if (!id) return null;
+        const { data } = await (supabase as any)
+          .from('program_rounds')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
+        return data || null;
+      };
+
+      // 1. Already enrolled → always show the round they are actually in.
+      if (user?.id) {
+        const { data: enrollment } = await (supabase as any)
+          .from('course_enrollments')
+          .select('round_id')
+          .eq('user_id', user.id)
+          .ilike('program_slug', slug)
+          .not('round_id', 'is', null)
+          .maybeSingle();
+        const mine = await fetchRound(enrollment?.round_id);
+        if (mine) return mine;
+      }
+
+      // 2. Otherwise the round their time zone would place them in.
+      const tzRoundId = await resolveAutoEnrollRoundId(slug);
+      const tzRound = await fetchRound(tzRoundId);
+      if (tzRound) return tzRound;
+
       const { data: activeRound } = await (supabase as any)
         .from('program_rounds')
         .select('*')
