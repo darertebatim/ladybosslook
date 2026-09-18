@@ -261,13 +261,16 @@ serve(async (req) => {
       logStep("Creating subscription checkout session");
       
       let priceId: string;
-      
+
       // Check if we have an existing Stripe price ID and verify it's a recurring price
-      if (programData.stripe_price_id) {
+      const storedRecurringPriceId = isBalanceMonthly
+        ? (programData as any).balance_monthly_stripe_price_id
+        : programData.stripe_price_id;
+      if (storedRecurringPriceId) {
         try {
-          const existingPrice = await stripe.prices.retrieve(programData.stripe_price_id);
+          const existingPrice = await stripe.prices.retrieve(storedRecurringPriceId);
           if (existingPrice.recurring) {
-            priceId = programData.stripe_price_id;
+            priceId = storedRecurringPriceId;
             logStep("Reusing existing recurring Stripe price", { priceId });
           } else {
             // Stored price is not recurring, create a new recurring price
