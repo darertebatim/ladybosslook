@@ -201,7 +201,7 @@ const EWCBalance = () => {
                   <span className="text-sm text-green-600 font-medium">صرفه‌جویی $150</span>
                 </div>
                 <Button 
-                  onClick={() => handlePayment('https://buy.stripe.com/14AdR84Zz5XcaVhgS59Ve06', 'onetime')}
+                  onClick={() => handlePayment('onetime')}
                   disabled={isProcessing}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-6 text-lg"
                   style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}
@@ -241,7 +241,7 @@ const EWCBalance = () => {
                   <span className="text-sm text-muted-foreground">(مجموع: $897)</span>
                 </div>
                 <Button 
-                  onClick={() => handlePayment('https://buy.stripe.com/28EbJ03Vv2L0fbx0T79Ve05', 'monthly')}
+                  onClick={() => handlePayment('monthly')}
                   disabled={isProcessing}
                   variant="outline"
                   className="w-full py-6 text-lg font-medium font-[Vazirmatn]"
