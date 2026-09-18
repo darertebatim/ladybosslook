@@ -403,7 +403,7 @@ const ProgramPage = () => {
                     {/* Price */}
                     {hasFullOption ? (
                       <div className="space-y-2">
-                        {program.original_price && program.original_price > 0 && (
+                        {!!program.original_price && program.original_price > 0 && (
                           <div className="text-muted-foreground line-through text-sm">
                             ${(program.original_price / 100).toFixed(0)}
                           </div>
@@ -467,7 +467,7 @@ const ProgramPage = () => {
                     <div>
                       {isFree ? (
                         <div className="flex items-baseline gap-2">
-                          {program.original_price && program.original_price > 0 && (
+                          {!!program.original_price && program.original_price > 0 && (
                             <span className="text-muted-foreground line-through text-base">
                               ${(program.original_price / 100).toFixed(0)}
                             </span>
@@ -479,7 +479,7 @@ const ProgramPage = () => {
                           {isDeposit ? (
                             <>
                               <div className="flex items-baseline gap-2">
-                                {program.original_price && program.original_price > 0 && program.original_price > program.price_amount && (
+                                {!!program.original_price && program.original_price > 0 && program.original_price > program.price_amount && (
                                   <span className="text-muted-foreground line-through text-base">
                                     ${(program.original_price / 100).toFixed(0)}
                                   </span>
@@ -494,7 +494,7 @@ const ProgramPage = () => {
                             </>
                           ) : (
                             <div className="flex items-baseline gap-2">
-                              {program.original_price && program.original_price > 0 && program.original_price > program.price_amount && (
+                              {!!program.original_price && program.original_price > 0 && program.original_price > program.price_amount && (
                                 <span className="text-muted-foreground line-through text-base">
                                   ${(program.original_price / 100).toFixed(0)}
                                 </span>
