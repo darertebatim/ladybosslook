@@ -85,6 +85,17 @@ export function LeadCampaignDirectory() {
     );
   };
 
+  const { waitlist } = useWaitlistLeadCampaigns();
+  const setWaitlist = useSetLeadCampaignWaitlist();
+
+  const toggleWaitlist = (key: string, on: boolean) => {
+    const next = on ? [...waitlist, key] : waitlist.filter((k) => k !== key);
+    setWaitlist.mutate(
+      { keys: next },
+      { onSuccess: () => toast.success(on ? 'Waitlist mode on' : 'Waitlist mode off') }
+    );
+  };
+
   const cards = useMemo(() => {
     const now = Date.now();
     const week = now - 7 * 24 * 60 * 60 * 1000;
