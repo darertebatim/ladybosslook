@@ -50,7 +50,7 @@ export const LEAD_CAMPAIGNS: LeadCampaign[] = [
     landingPath: '/l/igadsfree',
     thankYouPath: '/l/igadsfree/thankyou',
     regSource: 'igads_registration',
-    extraSources: ['preigads_interest', 'igads_additional_email'],
+    extraSources: ['preigads_interest', 'igads_additional_email', 'igads_waitlist'],
     metaEvent: 'IGAdsFreeLead',
     confirmationFunction: 'send-sixtraps-confirmation',
   },
