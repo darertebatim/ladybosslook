@@ -144,19 +144,28 @@ export default function IgAdsLanding() {
       if (prog?.title) setProgramTitle(prog.title);
       if (prog?.cover_image_url) setCover(prog.cover_image_url);
 
-      if (round?.first_session_date) {
+      const isUpcoming =
+        !!round?.first_session_date &&
+        new Date(round.first_session_date).getTime() > Date.now();
+
+      if (isUpcoming) {
         setWebinar({
           title: prog?.title || programTitle,
-          startUtc: new Date(round.first_session_date),
-          durationMinutes: round.first_session_duration || 120,
-          meetUrl: round.google_meet_link || "",
+          startUtc: new Date(round!.first_session_date!),
+          durationMinutes: round!.first_session_duration || 120,
+          meetUrl: round!.google_meet_link || "",
         });
-      } else if (!effectiveRoundParam && !round) {
-        // Unmatched/unknown timezone — let the visitor pick.
-        const rounds = await listActiveWebinarRounds(PROGRAM_SLUG);
-        if (rounds.length) {
+      } else {
+        // No upcoming session for this visitor — offer the other active rounds,
+        // and fall back to the waitlist when nothing is scheduled at all.
+        const rounds = (await listActiveWebinarRounds(PROGRAM_SLUG)).filter(
+          (r) => r.first_session_date && new Date(r.first_session_date).getTime() > Date.now(),
+        );
+        if (rounds.length && !effectiveRoundParam) {
           setRoundOptions(rounds);
           setNeedsRoundChoice(true);
+        } else if (!rounds.length) {
+          setNoUpcomingWebinar(true);
         }
       }
     })();
