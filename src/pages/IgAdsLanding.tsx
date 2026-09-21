@@ -10,6 +10,8 @@ import { SEOHead } from "@/components/SEOHead";
 import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
 import { trackWebinarLead } from "@/lib/metaCapi";
 import { isIranTimezone, getDeviceTimezone } from "@/lib/regionRestrictions";
+import { useWaitlistLeadCampaigns } from "@/hooks/useLeadCampaignStatus";
+import WebinarWaitlistBox from "@/components/WebinarWaitlistBox";
 
 const ROUND_ASSIGNMENT_STORAGE_KEY = "igadsfree_round_assignment";
 
@@ -91,6 +93,9 @@ export default function IgAdsLanding() {
   const [roundId, setRoundId] = useState<string | null>(null);
   const [needsRoundChoice, setNeedsRoundChoice] = useState(false);
   const [roundOptions, setRoundOptions] = useState<WebinarRoundRow[]>([]);
+  const [noUpcomingWebinar, setNoUpcomingWebinar] = useState(false);
+  const { waitlist } = useWaitlistLeadCampaigns();
+  const waitlistMode = waitlist.includes("igads") || noUpcomingWebinar;
 
   useEffect(() => {
     (async () => {
