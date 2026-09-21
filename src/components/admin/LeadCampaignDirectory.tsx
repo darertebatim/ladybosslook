@@ -146,7 +146,19 @@ export function LeadCampaignDirectory() {
                 <Badge variant="secondary">{total} leads</Badge>
                 <Badge variant="outline">{last7} last 7d</Badge>
                 {extras > 0 && <Badge variant="outline">{extras} extra sources</Badge>}
-                <div className="ml-auto flex items-center gap-2">
+                <div className="ml-auto flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">
+                      {waitlist.includes(c.key) ? 'Waitlist mode' : 'Waitlist off'}
+                    </span>
+                    <Switch
+                      checked={waitlist.includes(c.key)}
+                      disabled={setWaitlist.isPending}
+                      onCheckedChange={(v) => toggleWaitlist(c.key, v)}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
                   <span className="text-xs text-muted-foreground">
                     {isActive ? 'Active' : 'Hidden'}
                   </span>
