@@ -27,6 +27,49 @@ export function useInactiveLeadCampaigns() {
   return { inactive: data, isLoading };
 }
 
+const WAITLIST_KEY = 'lead_campaigns_waitlist';
+const WAITLIST_QK = ['app-setting', WAITLIST_KEY];
+
+/** Keys of lead campaigns currently in waitlist mode (no active webinar). */
+export function useWaitlistLeadCampaigns() {
+  const { data = [] as string[], isLoading } = useQuery({
+    queryKey: WAITLIST_QK,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data } = await (supabase
+        .from('app_settings')
+        .select('value')
+        .eq('key', WAITLIST_KEY)
+        .maybeSingle() as any);
+      try {
+        const parsed = JSON.parse((data?.value as string) || '[]');
+        return Array.isArray(parsed) ? (parsed as string[]) : [];
+      } catch {
+        return [];
+      }
+    },
+  });
+
+  return { waitlist: data, isLoading };
+}
+
+export function useSetLeadCampaignWaitlist() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ keys }: { keys: string[] }) => {
+      const { error } = await (supabase
+        .from('app_settings')
+        .upsert(
+          { key: WAITLIST_KEY, value: JSON.stringify(keys), updated_at: new Date().toISOString() },
+          { onConflict: 'key' }
+        ) as any);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: WAITLIST_QK }),
+  });
+}
+
 export function useSetLeadCampaignActive() {
   const queryClient = useQueryClient();
 

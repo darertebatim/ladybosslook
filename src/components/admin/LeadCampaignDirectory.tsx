@@ -8,7 +8,12 @@ import { Copy, ExternalLink, Link2, Mail, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
 import { LEAD_CAMPAIGNS, ALL_LEAD_SOURCES } from '@/lib/leadCampaigns';
-import { useInactiveLeadCampaigns, useSetLeadCampaignActive } from '@/hooks/useLeadCampaignStatus';
+import {
+  useInactiveLeadCampaigns,
+  useSetLeadCampaignActive,
+  useWaitlistLeadCampaigns,
+  useSetLeadCampaignWaitlist,
+} from '@/hooks/useLeadCampaignStatus';
 
 interface SubRow {
   email: string | null;
@@ -80,6 +85,17 @@ export function LeadCampaignDirectory() {
     );
   };
 
+  const { waitlist } = useWaitlistLeadCampaigns();
+  const setWaitlist = useSetLeadCampaignWaitlist();
+
+  const toggleWaitlist = (key: string, on: boolean) => {
+    const next = on ? [...waitlist, key] : waitlist.filter((k) => k !== key);
+    setWaitlist.mutate(
+      { keys: next },
+      { onSuccess: () => toast.success(on ? 'Waitlist mode on' : 'Waitlist mode off') }
+    );
+  };
+
   const cards = useMemo(() => {
     const now = Date.now();
     const week = now - 7 * 24 * 60 * 60 * 1000;
@@ -130,7 +146,19 @@ export function LeadCampaignDirectory() {
                 <Badge variant="secondary">{total} leads</Badge>
                 <Badge variant="outline">{last7} last 7d</Badge>
                 {extras > 0 && <Badge variant="outline">{extras} extra sources</Badge>}
-                <div className="ml-auto flex items-center gap-2">
+                <div className="ml-auto flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">
+                      {waitlist.includes(c.key) ? 'Waitlist mode' : 'Waitlist off'}
+                    </span>
+                    <Switch
+                      checked={waitlist.includes(c.key)}
+                      disabled={setWaitlist.isPending}
+                      onCheckedChange={(v) => toggleWaitlist(c.key, v)}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
                   <span className="text-xs text-muted-foreground">
                     {isActive ? 'Active' : 'Hidden'}
                   </span>

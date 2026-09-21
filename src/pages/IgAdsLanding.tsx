@@ -10,6 +10,8 @@ import { SEOHead } from "@/components/SEOHead";
 import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
 import { trackWebinarLead } from "@/lib/metaCapi";
 import { isIranTimezone, getDeviceTimezone } from "@/lib/regionRestrictions";
+import { useWaitlistLeadCampaigns } from "@/hooks/useLeadCampaignStatus";
+import WebinarWaitlistBox from "@/components/WebinarWaitlistBox";
 
 const ROUND_ASSIGNMENT_STORAGE_KEY = "igadsfree_round_assignment";
 
@@ -91,6 +93,9 @@ export default function IgAdsLanding() {
   const [roundId, setRoundId] = useState<string | null>(null);
   const [needsRoundChoice, setNeedsRoundChoice] = useState(false);
   const [roundOptions, setRoundOptions] = useState<WebinarRoundRow[]>([]);
+  const [noUpcomingWebinar, setNoUpcomingWebinar] = useState(false);
+  const { waitlist } = useWaitlistLeadCampaigns();
+  const waitlistMode = waitlist.includes("igads") || noUpcomingWebinar;
 
   useEffect(() => {
     (async () => {
@@ -139,19 +144,28 @@ export default function IgAdsLanding() {
       if (prog?.title) setProgramTitle(prog.title);
       if (prog?.cover_image_url) setCover(prog.cover_image_url);
 
-      if (round?.first_session_date) {
+      const isUpcoming =
+        !!round?.first_session_date &&
+        new Date(round.first_session_date).getTime() > Date.now();
+
+      if (isUpcoming) {
         setWebinar({
           title: prog?.title || programTitle,
-          startUtc: new Date(round.first_session_date),
-          durationMinutes: round.first_session_duration || 120,
-          meetUrl: round.google_meet_link || "",
+          startUtc: new Date(round!.first_session_date!),
+          durationMinutes: round!.first_session_duration || 120,
+          meetUrl: round!.google_meet_link || "",
         });
-      } else if (!effectiveRoundParam && !round) {
-        // Unmatched/unknown timezone — let the visitor pick.
-        const rounds = await listActiveWebinarRounds(PROGRAM_SLUG);
-        if (rounds.length) {
+      } else {
+        // No upcoming session for this visitor — offer the other active rounds,
+        // and fall back to the waitlist when nothing is scheduled at all.
+        const rounds = (await listActiveWebinarRounds(PROGRAM_SLUG)).filter(
+          (r) => r.first_session_date && new Date(r.first_session_date).getTime() > Date.now(),
+        );
+        if (rounds.length && !effectiveRoundParam) {
           setRoundOptions(rounds);
           setNeedsRoundChoice(true);
+        } else if (!rounds.length) {
+          setNoUpcomingWebinar(true);
         }
       }
     })();
@@ -306,7 +320,7 @@ export default function IgAdsLanding() {
                   We're sorry, this webinar is not available for your region (the live class would be at 3 AM in your area).
                 </p>
               </div>
-            ) : needsRoundChoice ? (
+            ) : waitlistMode ? null : needsRoundChoice ? (
               <div className="mx-auto rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
                 <p className="text-sm font-bold text-neutral-900">انتخاب زمان وبینار</p>
                 <p className="mt-1 text-xs leading-5 text-neutral-600">
@@ -352,7 +366,11 @@ export default function IgAdsLanding() {
             )}
           </section>
 
-          {!blockedRegion && !needsRoundChoice && (
+          {!blockedRegion && waitlistMode && (
+            <WebinarWaitlistBox source="igads_waitlist" />
+          )}
+
+          {!blockedRegion && !waitlistMode && !needsRoundChoice && (
           <form
             onSubmit={handleSubmit}
             dir="ltr"
