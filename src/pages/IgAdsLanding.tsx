@@ -10,7 +10,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
 import { trackWebinarLead } from "@/lib/metaCapi";
 import { isIranTimezone, getDeviceTimezone } from "@/lib/regionRestrictions";
-import { useWaitlistLeadCampaigns } from "@/hooks/useLeadCampaignStatus";
+import { useWaitlistLeadCampaigns, useSlotChoiceLeadCampaigns } from "@/hooks/useLeadCampaignStatus";
 import WebinarWaitlistBox from "@/components/WebinarWaitlistBox";
 
 const ROUND_ASSIGNMENT_STORAGE_KEY = "igadsfree_round_assignment";
