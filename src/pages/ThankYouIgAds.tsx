@@ -245,6 +245,12 @@ export default function ThankYouIgAds() {
             <ArrowUp className="h-4 w-4 animate-bounce" style={{ animationDelay: "300ms" }} />
           </div>
 
+          <div className="mt-5 flex items-center gap-2" dir="ltr">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-neutral-200" />
+            <div className="h-1.5 w-1.5 rounded-full bg-rose-300" />
+            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-neutral-200" />
+          </div>
+
           {event && (
             <section className="mt-3">
               <p className="mb-0.5 text-center text-base font-black text-rose-600">
@@ -288,6 +294,12 @@ export default function ThankYouIgAds() {
               </p>
             </div>
           )}
+
+          <div className="mt-5 flex items-center gap-2" dir="ltr">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-neutral-200" />
+            <div className="h-1.5 w-1.5 rounded-full bg-rose-300" />
+            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-neutral-200" />
+          </div>
 
           {webinar && (
             <>
