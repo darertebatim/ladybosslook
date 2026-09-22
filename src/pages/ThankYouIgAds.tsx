@@ -213,14 +213,28 @@ export default function ThankYouIgAds() {
           </div>
 
           {videoId && (
-            <div className="mt-1.5 aspect-video overflow-hidden rounded-xl shadow-md">
-              <iframe
-                className="h-full w-full"
-                src={`https://www.youtube.com/embed/${videoId}`}
-                title="پیام علی لطفی"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+            <div className="mt-1.5">
+              <div className="mb-1.5 flex justify-center">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-[11px] font-black text-rose-700">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
+                  </span>
+                  همین حالا ببینید — دسترسی به این ویدیو محدود است
+                </span>
+              </div>
+              <div className="aspect-video overflow-hidden rounded-xl shadow-md">
+                <iframe
+                  className="h-full w-full"
+                  src={`https://www.youtube.com/embed/${videoId}`}
+                  title="پیام علی لطفی"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+              <p className="mt-1.5 text-center text-[11px] font-bold text-neutral-600">
+                این ویدیو فقط برای ثبت‌نامی‌هاست — قبل از وبینار تماشا کنید تا آماده لایو باشید
+              </p>
             </div>
           )}
 
