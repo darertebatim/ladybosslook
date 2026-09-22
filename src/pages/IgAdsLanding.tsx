@@ -195,7 +195,7 @@ export default function IgAdsLanding() {
         }
       }
     })();
-  }, [roundParam]);
+  }, [roundParam, letUserPick, slotLoading]);
 
 
   const laLabel = useMemo(
