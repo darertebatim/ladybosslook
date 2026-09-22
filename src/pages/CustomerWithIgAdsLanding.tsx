@@ -66,7 +66,7 @@ export default function CustomerWithIgAdsLanding() {
         </section>
 
         <p className="mt-3 text-center text-xs leading-6 text-neutral-500">
-          ویدیو را تا انتها ببینید — روشی که در ادامه توضیح داده می‌شود، پایه دوره بعدی ماست.
+          ببینید چرا بیزینس شما آن‌طور که باید از اینستاگرام مشتری نمی‌گیرد — و بیزینس‌های موفق فارسی‌زبان چطور بیش از ظرفیت‌شان مشتری می‌گیرند.
         </p>
 
         <div className="mt-8 flex items-center gap-3">
