@@ -335,6 +335,10 @@ export default function IgAdsLanding() {
       durationMinutes: round.first_session_duration || 120,
       meetUrl: round.google_meet_link || "",
     });
+    // Scroll down to the registration form once it mounts
+    window.setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 120);
   }
 
   async function handleSubmit(e: React.FormEvent) {
