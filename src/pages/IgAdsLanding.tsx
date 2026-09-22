@@ -462,16 +462,16 @@ export default function IgAdsLanding() {
               </div>
             ) : waitlistMode ? null : needsRoundChoice ? (
               <div className="mx-auto rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-                <div className="mb-3 flex justify-center">
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-100 bg-rose-50 px-3 py-1 text-[11px] font-bold text-rose-600">
+                <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
+                  <p className="text-base font-bold text-neutral-900">زمان وبینار را انتخاب کنید</p>
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500 px-3 py-1 text-[11px] font-bold text-white shadow-sm">
                     <span className="relative flex h-2 w-2">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-300 opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
                     </span>
                     آخرین فرصت ثبت‌نام رایگان
                   </span>
                 </div>
-                <p className="text-center text-base font-bold text-neutral-900">زمان وبینار را انتخاب کنید</p>
                 <div className="mt-3 rounded-2xl border border-dashed border-orange-200 bg-orange-50/50 px-3 py-2.5">
                   <p className="text-center text-xs font-medium leading-6 text-neutral-700">
                     فقط <span className="font-bold text-orange-600">۲ سانس زنده</span> برای این جمعه باقی‌مانده است.
@@ -490,18 +490,24 @@ export default function IgAdsLanding() {
                       key={r.id}
                       type="button"
                       onClick={() => selectRound(r)}
-                      className="w-full rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-right active:bg-neutral-100"
+                      className="w-full rounded-xl border-2 border-orange-300 bg-white p-4 text-right shadow-[0_4px_12px_rgba(0,0,0,0.10)] transition-transform duration-150 active:scale-[0.98] active:bg-orange-50"
                     >
-                      {r.first_session_date && (
-                        <div dir="ltr" className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-left">
-                          <span className="font-semibold text-neutral-900" dir="rtl">
-                            {sessionLabel}
-                          </span>
-                          <span className="text-sm text-neutral-600">
-                            LA: {laTimeLabel(new Date(r.first_session_date))} PT
-                          </span>
-                        </div>
-                      )}
+                      <div dir="ltr" className="pointer-events-none flex items-center justify-between">
+                        {r.first_session_date ? (
+                          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-left">
+                            <span className="font-semibold text-neutral-900" dir="rtl">
+                              {sessionLabel}
+                            </span>
+                            <span className="text-sm text-neutral-600">
+                              LA: {laTimeLabel(new Date(r.first_session_date))} PT
+                            </span>
+                          </div>
+                        ) : <span />}
+                        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-orange-500 px-3 py-1.5 text-xs font-bold text-white shadow-sm">
+                          <ChevronLeft className="h-3.5 w-3.5" />
+                          انتخاب
+                        </span>
+                      </div>
                       {r.first_session_date && (
                         <div dir="ltr" className="mt-3 text-left text-base font-bold leading-6 text-emerald-700">
                           <div className="whitespace-nowrap">🕒 {localTimeLabels(new Date(r.first_session_date)).date}</div>
