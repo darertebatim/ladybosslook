@@ -247,8 +247,11 @@ export default function ThankYouIgAds() {
 
           {event && (
             <section className="mt-3">
-              <p className="mb-1.5 text-center text-base font-black text-rose-600">
+              <p className="mb-0.5 text-center text-base font-black text-rose-600">
                 قدم اول
+              </p>
+              <p className="mb-1.5 text-center text-[11px] font-bold text-neutral-600">
+                ظرفیت لایو محدود است — جلسه را در تقویم‌تان ثبت کنید تا از دست نرود
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <a
@@ -266,6 +269,11 @@ export default function ThankYouIgAds() {
                 >
                   افزودن به Apple Calendar
                 </button>
+              </div>
+              <div className="mt-2 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 px-3 py-2 text-center">
+                <p className="text-[11px] font-black leading-snug text-amber-800">
+                  🔥 این آخرین جلسه رایگان است — بدون ضبط و بدون پخش مجدد
+                </p>
               </div>
             </section>
           )}
