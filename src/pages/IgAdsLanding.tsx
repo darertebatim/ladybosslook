@@ -348,9 +348,11 @@ export default function IgAdsLanding() {
               </div>
             ) : waitlistMode ? null : needsRoundChoice ? (
               <div className="mx-auto rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-                <p className="text-sm font-bold text-neutral-900">انتخاب زمان وبینار</p>
+                <p className="text-sm font-bold text-neutral-900">زمان وبینار را انتخاب کنید</p>
                 <p className="mt-1 text-xs leading-5 text-neutral-600">
-                  منطقه زمانی دستگاه شما شناسایی نشد. لطفاً جلسه‌ای که برایتان مناسب‌تر است را انتخاب کنید.
+                  {letUserPick
+                    ? "هر کدام از این جلسه‌ها که برایتان مناسب‌تر است را انتخاب کنید. لینک همان جلسه برایتان ایمیل می‌شود."
+                    : "منطقه زمانی دستگاه شما شناسایی نشد. لطفاً جلسه‌ای که برایتان مناسب‌تر است را انتخاب کنید."}
                 </p>
                 <div className="mt-4 space-y-3">
                   {roundOptions.map((r) => (
@@ -364,9 +366,14 @@ export default function IgAdsLanding() {
                         {r.round_name || `Round ${r.round_number}`}
                       </div>
                       {r.first_session_date && (
-                        <div className="mt-1 text-sm text-neutral-600" dir="ltr">
-                          {formatLADateTime(new Date(r.first_session_date))}
-                        </div>
+                        <>
+                          <div className="mt-1 text-sm text-neutral-600" dir="ltr">
+                            LA: {formatLADateTime(new Date(r.first_session_date))}
+                          </div>
+                          <div className="mt-0.5 text-sm font-semibold text-emerald-700" dir="ltr">
+                            🕒 Your time: {formatLocalDateTime(new Date(r.first_session_date))}
+                          </div>
+                        </>
                       )}
                     </button>
                   ))}
