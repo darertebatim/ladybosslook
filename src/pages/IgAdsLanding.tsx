@@ -268,7 +268,7 @@ export default function IgAdsLanding() {
         // and fall back to the waitlist when nothing is scheduled at all.
         const rounds = (await listActiveWebinarRounds(PROGRAM_SLUG)).filter(
           (r) => r.first_session_date && new Date(r.first_session_date).getTime() > Date.now(),
-        );
+        ).sort((a, b) => new Date(a.first_session_date!).getTime() - new Date(b.first_session_date!).getTime());
         if (rounds.length && !effectiveRoundParam) {
           setRoundOptions(rounds);
           setNeedsRoundChoice(true);
