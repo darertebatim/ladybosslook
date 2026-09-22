@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { resolveWebinarRound, listActiveWebinarRounds, getWebinarRoundRouting, type WebinarRoundRow } from "@/lib/webinarRounds";
+import { resolveWebinarRound, listActiveWebinarRounds, getWebinarRoundRouting, inferWebinarSideFromTimezone, type WebinarRoundRow } from "@/lib/webinarRounds";
 
 import { z } from "zod";
 import { ArrowDown } from "lucide-react";
@@ -70,6 +70,50 @@ function WebinarCountdown({ startUtc }: { startUtc: Date }) {
   );
 }
 
+/** Compact one-line local time: "Fri, 11:00 AM (Los Angeles)" */
+function shortLocalLabel(d: Date): string {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+    const city = tz.includes("/") ? tz.split("/").pop()!.replace(/_/g, " ") : tz;
+    return new Intl.DateTimeFormat("en-US", {
+      weekday: "short",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(d) + (city ? ` (${city})` : "");
+  } catch {
+    return "";
+  }
+}
+
+/** Small "starts in" countdown shown under each session option. */
+function MiniCountdown({ startUtc }: { startUtc: Date }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const diff = startUtc.getTime() - now;
+  if (diff <= 0) {
+    return <p dir="rtl" className="mt-2 text-[11px] font-bold text-rose-600">این جلسه شروع شده است</p>;
+  }
+
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const minutes = Math.floor((diff % 3600000) / 60000);
+  const seconds = Math.floor((diff % 60000) / 1000);
+  const clock = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+    .replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
+
+  return (
+    <p dir="rtl" className="mt-2 text-[11px] font-bold text-rose-600">
+      ⏳ تا شروع: {days > 0 ? `${fa(days)} روز و ` : ""}
+      <span dir="ltr" className="tabular-nums">{clock}</span>
+    </p>
+  );
+}
+
 export default function IgAdsLanding() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -98,6 +142,19 @@ export default function IgAdsLanding() {
   const waitlistMode = waitlist.includes("igads") || noUpcomingWebinar;
   const { slotChoice, isLoading: slotLoading } = useSlotChoiceLeadCampaigns();
   const letUserPick = slotChoice.includes("igads");
+
+  // Recommend the session that fits the visitor's timezone side
+  // (East = earlier UTC start, West = later UTC start).
+  const recommendedRoundId = useMemo(() => {
+    if (roundOptions.length < 2) return null;
+    const side = inferWebinarSideFromTimezone(getDeviceTimezone());
+    if (!side || side === "europe") return null;
+    const sorted = [...roundOptions]
+      .filter((r) => r.first_session_date)
+      .sort((a, b) => new Date(a.first_session_date!).getTime() - new Date(b.first_session_date!).getTime());
+    if (!sorted.length) return null;
+    return side === "east" ? sorted[0].id : sorted[sorted.length - 1].id;
+  }, [roundOptions]);
 
   useEffect(() => {
     if (slotLoading) return;
@@ -362,18 +419,28 @@ export default function IgAdsLanding() {
                       onClick={() => selectRound(r)}
                       className="w-full rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-right active:bg-neutral-100"
                     >
-                      <div className="font-semibold text-neutral-900">
-                        {r.round_name || `Round ${r.round_number}`}
-                      </div>
                       {r.first_session_date && (
-                        <>
-                          <div className="mt-1 text-sm text-neutral-600" dir="ltr">
-                            LA: {formatLADateTime(new Date(r.first_session_date))}
-                          </div>
-                          <div className="mt-0.5 text-sm font-semibold text-emerald-700" dir="ltr">
-                            🕒 Your time: {formatLocalDateTime(new Date(r.first_session_date))}
-                          </div>
-                        </>
+                        <div dir="ltr" className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                          <span className="font-semibold text-neutral-900">
+                            {r.round_name || `Round ${r.round_number}`}
+                          </span>
+                          <span className="text-sm text-neutral-600">
+                            — LA: {formatLADateTime(new Date(r.first_session_date))}
+                          </span>
+                        </div>
+                      )}
+                      {r.first_session_date && (
+                        <div dir="ltr" className="mt-1 text-sm font-semibold text-emerald-700">
+                          🕒 Your time: {shortLocalLabel(new Date(r.first_session_date))}
+                        </div>
+                      )}
+                      {r.first_session_date && (
+                        <MiniCountdown startUtc={new Date(r.first_session_date)} />
+                      )}
+                      {recommendedRoundId === r.id && (
+                        <span className="mt-2 inline-block rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700">
+                          پیشنهاد ما برای منطقه شما
+                        </span>
                       )}
                     </button>
                   ))}
