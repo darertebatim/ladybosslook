@@ -390,6 +390,15 @@ export default function IgAdsLanding() {
                     🕒 Your Local time: {localLabel}
                   </div>
                 )}
+                {letUserPick && roundOptions.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setNeedsRoundChoice(true)}
+                    className="text-xs font-semibold text-neutral-600 underline underline-offset-4"
+                  >
+                    تغییر زمان جلسه
+                  </button>
+                )}
                 <div className="flex flex-col items-center gap-1 pt-1 text-sm font-semibold text-emerald-700">
                   <span>برای دریافت لینک وبینار، فرم زیر را پر کنید</span>
                   <span dir="ltr" className="text-xs font-medium text-emerald-600">Fill out the form below to receive the webinar link</span>
