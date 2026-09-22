@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { resolveWebinarRound, listActiveWebinarRounds, getWebinarRoundRouting, inferWebinarSideFromTimezone, type WebinarRoundRow } from "@/lib/webinarRounds";
 
@@ -139,6 +139,33 @@ function MiniCountdown({ startUtc }: { startUtc: Date }) {
   );
 }
 
+/** English "registration closes in" countdown shown inside the form box. */
+function FormCountdown({ startUtc }: { startUtc: Date }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const diff = startUtc.getTime() - now;
+  if (diff <= 0) {
+    return <span className="font-bold text-rose-600">Registration is closing</span>;
+  }
+
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const minutes = Math.floor((diff % 3600000) / 60000);
+  const seconds = Math.floor((diff % 60000) / 1000);
+  const clock = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+  return (
+    <span dir="ltr" className="tabular-nums">
+      {days > 0 ? `${days}d ` : ""}
+      {clock}
+    </span>
+  );
+}
+
 export default function IgAdsLanding() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -159,6 +186,7 @@ export default function IgAdsLanding() {
     durationMinutes: number;
     meetUrl: string;
   } | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
   const [roundId, setRoundId] = useState<string | null>(null);
   const [needsRoundChoice, setNeedsRoundChoice] = useState(false);
   const [roundOptions, setRoundOptions] = useState<WebinarRoundRow[]>([]);
@@ -307,6 +335,10 @@ export default function IgAdsLanding() {
       durationMinutes: round.first_session_duration || 120,
       meetUrl: round.google_meet_link || "",
     });
+    // Scroll down to the registration form once it mounts
+    window.setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 120);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -524,13 +556,28 @@ export default function IgAdsLanding() {
 
           {!blockedRegion && !waitlistMode && !needsRoundChoice && (
           <form
+            ref={formRef}
             onSubmit={handleSubmit}
             dir="ltr"
-            className="mt-8 space-y-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm text-left"
+            className="mt-8 space-y-4 scroll-mt-4 rounded-2xl border-2 border-rose-200 bg-white p-5 shadow-sm text-left"
           >
+            <div className="flex justify-center">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-[11px] font-bold text-rose-600">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
+                </span>
+                🔥 Free seats are limited
+              </span>
+            </div>
             <h2 className="text-center text-lg font-semibold text-neutral-900">
               🎁 Free Registration 🎁
             </h2>
+            {webinar && (
+              <p className="text-center text-xs font-semibold text-neutral-600">
+                ⏳ Registration closes in <FormCountdown startUtc={webinar.startUtc} />
+              </p>
+            )}
 
             <div>
               <label className="mb-1 block text-sm font-medium text-neutral-800">
@@ -593,6 +640,10 @@ export default function IgAdsLanding() {
             >
               {submitting ? "Registering..." : "Register Free"}
             </button>
+
+            <p className="text-center text-[11px] font-semibold leading-5 text-rose-600">
+              🔒 Seats are limited — this is the last free live session. No recording will be shared.
+            </p>
 
             <p className="text-center text-[11px] leading-5 text-neutral-500">
               By registering, the webinar link and reminders will be sent to your email.
