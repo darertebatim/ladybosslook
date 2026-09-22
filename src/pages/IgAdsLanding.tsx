@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { resolveWebinarRound, listActiveWebinarRounds, getWebinarRoundRouting, inferWebinarSideFromTimezone, type WebinarRoundRow } from "@/lib/webinarRounds";
 
 import { z } from "zod";
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, ChevronLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
