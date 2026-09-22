@@ -13,6 +13,8 @@ import {
   useSetLeadCampaignActive,
   useWaitlistLeadCampaigns,
   useSetLeadCampaignWaitlist,
+  useSlotChoiceLeadCampaigns,
+  useSetLeadCampaignSlotChoice,
 } from '@/hooks/useLeadCampaignStatus';
 
 interface SubRow {
