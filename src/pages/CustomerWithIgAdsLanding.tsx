@@ -20,7 +20,7 @@ export default function CustomerWithIgAdsLanding() {
         />
       </Helmet>
 
-      <main dir="rtl" className="mx-auto w-full max-w-2xl px-4 pb-16 pt-8">
+      <main dir="rtl" className="mx-auto w-full max-w-2xl px-4 pb-16 pt-8 font-farsi">
         <div className="text-center">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500 px-3 py-1 text-[11px] font-bold text-white shadow-sm">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
