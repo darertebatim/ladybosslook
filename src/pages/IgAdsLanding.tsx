@@ -556,13 +556,28 @@ export default function IgAdsLanding() {
 
           {!blockedRegion && !waitlistMode && !needsRoundChoice && (
           <form
+            ref={formRef}
             onSubmit={handleSubmit}
             dir="ltr"
-            className="mt-8 space-y-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm text-left"
+            className="mt-8 space-y-4 scroll-mt-4 rounded-2xl border-2 border-rose-200 bg-white p-5 shadow-sm text-left"
           >
+            <div className="flex justify-center">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-[11px] font-bold text-rose-600">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
+                </span>
+                🔥 Free seats are limited
+              </span>
+            </div>
             <h2 className="text-center text-lg font-semibold text-neutral-900">
               🎁 Free Registration 🎁
             </h2>
+            {webinar && (
+              <p className="text-center text-xs font-semibold text-neutral-600">
+                ⏳ Registration closes in <FormCountdown startUtc={webinar.startUtc} />
+              </p>
+            )}
 
             <div>
               <label className="mb-1 block text-sm font-medium text-neutral-800">
