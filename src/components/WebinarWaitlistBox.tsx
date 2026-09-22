@@ -18,7 +18,7 @@ const schema = z.object({
   email: z.string().trim().email("ایمیل معتبر نیست").max(255),
 });
 
-export default function WebinarWaitlistBox({ source, title }: Props) {
+export default function WebinarWaitlistBox({ source, title, onSuccess }: Props) {
   const { toast } = useToast();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -53,6 +53,7 @@ export default function WebinarWaitlistBox({ source, title }: Props) {
       });
       if (error) throw error;
       setDone(true);
+      onSuccess?.();
     } catch (err) {
       console.error("waitlist submit error", err);
       toast({
