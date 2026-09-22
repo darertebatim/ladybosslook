@@ -99,6 +99,15 @@ export default function LeadCenter() {
           <GenericWebinarSignups campaign={igads} />
         </TabsContent>
 
+        <TabsContent value="customerwithigads" className="space-y-6">
+          <WebinarEmailEngagement
+            campaignKey="customerwithigads"
+            sources={[customerVideo.regSource]}
+          />
+          <GenericWebinarSignups campaign={customerVideo} />
+        </TabsContent>
+
+
 
         <TabsContent value="marketing" className="space-y-6">
           <LeadEmailCampaign />
