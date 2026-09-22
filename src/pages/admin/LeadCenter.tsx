@@ -16,16 +16,18 @@ import { LeadEmailCampaign } from '@/components/admin/LeadEmailCampaign';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 
 const igads = LEAD_CAMPAIGNS.find((c) => c.key === 'igads')!;
+const customerVideo = LEAD_CAMPAIGNS.find((c) => c.key === 'customerwithigads')!;
 
 export default function LeadCenter() {
   const [tab, setTab] = useState('campaigns');
   const { inactive } = useInactiveLeadCampaigns();
   const show = (key: string) => !inactive.includes(key);
-  const visibleCampaignTabs = ['sixtraps', 'smartinsta', 'igads'].filter(show).length;
+  const campaignTabKeys = ['sixtraps', 'smartinsta', 'igads', 'customerwithigads'];
+  const visibleCampaignTabs = campaignTabKeys.filter(show).length;
   const colCount = 5 + visibleCampaignTabs;
 
   useEffect(() => {
-    if (['sixtraps', 'smartinsta', 'igads'].includes(tab) && !show(tab)) setTab('campaigns');
+    if (campaignTabKeys.includes(tab) && !show(tab)) setTab('campaigns');
   }, [inactive, tab]);
 
 
