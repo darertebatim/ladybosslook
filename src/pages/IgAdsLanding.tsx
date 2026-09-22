@@ -96,9 +96,35 @@ export default function IgAdsLanding() {
   const [noUpcomingWebinar, setNoUpcomingWebinar] = useState(false);
   const { waitlist } = useWaitlistLeadCampaigns();
   const waitlistMode = waitlist.includes("igads") || noUpcomingWebinar;
+  const { slotChoice, isLoading: slotLoading } = useSlotChoiceLeadCampaigns();
+  const letUserPick = slotChoice.includes("igads");
 
   useEffect(() => {
+    if (slotLoading) return;
     (async () => {
+      // Slot-choice mode: visitors pick their own session (timezone routing stays
+      // available, it's just bypassed while this mode is on).
+      if (letUserPick && !roundParam) {
+        const { data: progA } = await (supabase as any)
+          .from("program_catalog")
+          .select("title, cover_image_url")
+          .eq("slug", PROGRAM_SLUG)
+          .maybeSingle();
+        if (progA?.title) setProgramTitle(progA.title);
+        if (progA?.cover_image_url) setCover(progA.cover_image_url);
+
+        const upcoming = (await listActiveWebinarRounds(PROGRAM_SLUG)).filter(
+          (r) => r.first_session_date && new Date(r.first_session_date).getTime() > Date.now(),
+        );
+        if (upcoming.length) {
+          setRoundOptions(upcoming);
+          setNeedsRoundChoice(true);
+        } else {
+          setNoUpcomingWebinar(true);
+        }
+        return;
+      }
+
       // 1. Pinned ?round= param always wins.
       // 2. Otherwise restore a previously saved assignment — but only if it
       //    still matches the current East/West routing, so admin routing
