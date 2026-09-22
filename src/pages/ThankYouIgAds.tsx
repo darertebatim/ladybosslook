@@ -213,14 +213,28 @@ export default function ThankYouIgAds() {
           </div>
 
           {videoId && (
-            <div className="mt-1.5 aspect-video overflow-hidden rounded-xl shadow-md">
-              <iframe
-                className="h-full w-full"
-                src={`https://www.youtube.com/embed/${videoId}`}
-                title="پیام علی لطفی"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+            <div className="mt-1.5">
+              <div className="mb-1.5 flex justify-center">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-[11px] font-black text-rose-700">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
+                  </span>
+                  همین حالا ببینید — دسترسی به این ویدیو محدود است
+                </span>
+              </div>
+              <div className="aspect-video overflow-hidden rounded-xl shadow-md">
+                <iframe
+                  className="h-full w-full"
+                  src={`https://www.youtube.com/embed/${videoId}`}
+                  title="پیام علی لطفی"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+              <p className="mt-1.5 text-center text-[11px] font-bold text-neutral-600">
+                این ویدیو فقط برای ثبت‌نامی‌هاست — قبل از وبینار تماشا کنید تا آماده لایو باشید
+              </p>
             </div>
           )}
 
@@ -233,8 +247,11 @@ export default function ThankYouIgAds() {
 
           {event && (
             <section className="mt-3">
-              <p className="mb-1.5 text-center text-base font-black text-rose-600">
+              <p className="mb-0.5 text-center text-base font-black text-rose-600">
                 قدم اول
+              </p>
+              <p className="mb-1.5 text-center text-[11px] font-bold text-neutral-600">
+                ظرفیت لایو محدود است — جلسه را در تقویم‌تان ثبت کنید تا از دست نرود
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <a
@@ -252,6 +269,11 @@ export default function ThankYouIgAds() {
                 >
                   افزودن به Apple Calendar
                 </button>
+              </div>
+              <div className="mt-2 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 px-3 py-2 text-center">
+                <p className="text-[11px] font-black leading-snug text-amber-800">
+                  🔥 این آخرین جلسه رایگان است — بدون ضبط و بدون پخش مجدد
+                </p>
               </div>
             </section>
           )}
@@ -272,6 +294,9 @@ export default function ThankYouIgAds() {
               <p className="mt-3 text-center text-base font-black text-rose-600">
                 قدم دوم
               </p>
+              <p className="mb-0.5 text-center text-[11px] font-bold text-neutral-600">
+                لینک ورود فقط به ایمیل ثبت‌نام‌شده ارسال می‌شود — همین حالا جزئیات را دریافت کنید
+              </p>
               <a
                 href={`/dashboard/chat?draft=${encodeURIComponent(
                   [
@@ -288,10 +313,21 @@ export default function ThankYouIgAds() {
                 ارسال جزئیات به پشتیبانی
               </a>
               {registeredEmail && (
-                <p className="mt-1.5 text-center text-xs font-bold text-neutral-800">
-                  <span className="text-rose-600">لینک ورود به این ایمیل ارسال شد: </span>
-                  <span dir="ltr">{registeredEmail}</span>
-                </p>
+                <>
+                  <p className="mt-1.5 text-center text-xs font-bold text-neutral-800">
+                    <span className="text-rose-600">لینک ورود به این ایمیل ارسال شد: </span>
+                    <span dir="ltr">{registeredEmail}</span>
+                  </p>
+                  <div className="mt-1.5 flex justify-center">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-[11px] font-black text-rose-700">
+                      <span className="relative flex h-2 w-2">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
+                      </span>
+                      جای شما رزرو شد — ظرفیت جلسه محدود است
+                    </span>
+                  </div>
+                </>
               )}
             </>
           )}
