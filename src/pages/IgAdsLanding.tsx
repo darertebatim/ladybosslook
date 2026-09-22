@@ -70,19 +70,42 @@ function WebinarCountdown({ startUtc }: { startUtc: Date }) {
   );
 }
 
-/** Compact one-line local time: "Fri, 11:00 AM (Los Angeles)" */
-function shortLocalLabel(d: Date): string {
+function laTimeLabel(d: Date): string {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Los_Angeles",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).format(d);
+}
+
+function localTimeLabels(d: Date): { date: string; time: string } {
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
     const city = tz.includes("/") ? tz.split("/").pop()!.replace(/_/g, " ") : tz;
-    return new Intl.DateTimeFormat("en-US", {
-      weekday: "short",
+    const zonePrefix: Record<string, string> = {
+      "America/Los_Angeles": "Pacific",
+      "America/Vancouver": "Pacific",
+      "America/New_York": "Eastern",
+      "America/Toronto": "Eastern",
+      "America/Chicago": "Central",
+      "America/Denver": "Mountain",
+    };
+    const date = new Intl.DateTimeFormat("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).format(d);
+    const time = new Intl.DateTimeFormat("en-US", {
       hour: "numeric",
       minute: "2-digit",
       hour12: true,
-    }).format(d) + (city ? ` (${city})` : "");
+    }).format(d);
+    const location = [zonePrefix[tz], city].filter(Boolean).join(" / ");
+    return { date, time: `${time}${location ? ` (${location} Time)` : ""}` };
   } catch {
-    return "";
+    return { date: "", time: "" };
   }
 }
 
@@ -107,10 +130,12 @@ function MiniCountdown({ startUtc }: { startUtc: Date }) {
     .replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
 
   return (
-    <p dir="rtl" className="mt-2 text-[11px] font-bold text-rose-600">
-      ⏳ تا شروع: {days > 0 ? `${fa(days)} روز و ` : ""}
+    <div dir="rtl" className="mt-2 flex flex-wrap items-center justify-start gap-1 text-[11px] font-bold text-rose-600">
+      <span aria-hidden="true">⏳</span>
+      <span>تا شروع:</span>
+      {days > 0 && <span>{fa(days)} روز و</span>}
       <span dir="ltr" className="tabular-nums">{clock}</span>
-    </p>
+    </div>
   );
 }
 
@@ -425,13 +450,14 @@ export default function IgAdsLanding() {
                             {r.round_name || `Round ${r.round_number}`}
                           </span>
                           <span className="text-sm text-neutral-600">
-                            LA: {formatLADateTime(new Date(r.first_session_date))}
+                            LA: {laTimeLabel(new Date(r.first_session_date))} PT
                           </span>
                         </div>
                       )}
                       {r.first_session_date && (
-                        <div dir="ltr" className="mt-1 text-sm font-semibold text-emerald-700">
-                          🕒 Your time: {shortLocalLabel(new Date(r.first_session_date))}
+                        <div dir="ltr" className="mt-3 text-base font-bold leading-6 text-emerald-700">
+                          <div>🕒 Your time: {localTimeLabels(new Date(r.first_session_date)).date}</div>
+                          <div className="pl-7">{localTimeLabels(new Date(r.first_session_date)).time}</div>
                         </div>
                       )}
                       {r.first_session_date && (
