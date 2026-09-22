@@ -272,7 +272,7 @@ export default function ThankYouIgAds() {
               </div>
               <div className="mt-2 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 px-3 py-2 text-center">
                 <p className="text-[11px] font-black leading-snug text-amber-800">
-                  🔥 این آخرین جلسه رایگان است — بدون ضبط و بدون پخش مجدد
+                  🔥 این آخرین جلسه رایگان است — بدون ضبط
                 </p>
               </div>
             </section>
