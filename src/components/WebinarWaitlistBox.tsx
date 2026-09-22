@@ -9,6 +9,8 @@ interface Props {
   source: string;
   /** Farsi title shown above the form */
   title?: string;
+  /** Called after a successful submission (tracking, etc.) */
+  onSuccess?: () => void;
 }
 
 const schema = z.object({
@@ -16,7 +18,7 @@ const schema = z.object({
   email: z.string().trim().email("ایمیل معتبر نیست").max(255),
 });
 
-export default function WebinarWaitlistBox({ source, title }: Props) {
+export default function WebinarWaitlistBox({ source, title, onSuccess }: Props) {
   const { toast } = useToast();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -51,6 +53,7 @@ export default function WebinarWaitlistBox({ source, title }: Props) {
       });
       if (error) throw error;
       setDone(true);
+      onSuccess?.();
     } catch (err) {
       console.error("waitlist submit error", err);
       toast({
