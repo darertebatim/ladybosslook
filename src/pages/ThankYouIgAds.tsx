@@ -295,6 +295,12 @@ export default function ThankYouIgAds() {
             </div>
           )}
 
+          <div className="mt-5 flex items-center gap-2" dir="ltr">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-neutral-200" />
+            <div className="h-1.5 w-1.5 rounded-full bg-rose-300" />
+            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-neutral-200" />
+          </div>
+
           {webinar && (
             <>
               <p className="mt-3 text-center text-base font-black text-rose-600">
