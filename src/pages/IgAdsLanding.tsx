@@ -430,12 +430,26 @@ export default function IgAdsLanding() {
               </div>
             ) : waitlistMode ? null : needsRoundChoice ? (
               <div className="mx-auto rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-                <p className="text-sm font-bold text-neutral-900">زمان وبینار را انتخاب کنید</p>
-                <p className="mt-1 text-xs leading-5 text-neutral-600">
-                  {letUserPick
-                    ? "هر کدام از این جلسه‌ها که برایتان مناسب‌تر است را انتخاب کنید. لینک همان جلسه برایتان ایمیل می‌شود."
-                    : "منطقه زمانی دستگاه شما شناسایی نشد. لطفاً جلسه‌ای که برایتان مناسب‌تر است را انتخاب کنید."}
-                </p>
+                <div className="mb-3 flex justify-center">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-100 bg-rose-50 px-3 py-1 text-[11px] font-bold text-rose-600">
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
+                    </span>
+                    آخرین فرصت ثبت‌نام رایگان
+                  </span>
+                </div>
+                <p className="text-center text-base font-bold text-neutral-900">زمان وبینار را انتخاب کنید</p>
+                <div className="mt-3 rounded-2xl border border-dashed border-orange-200 bg-orange-50/50 px-3 py-2.5">
+                  <p className="text-center text-xs font-medium leading-6 text-neutral-700">
+                    فقط <span className="font-bold text-orange-600">۲ سانس زنده</span> برای این جمعه باقی‌مانده است.
+                  </p>
+                  <p className="mt-0.5 text-center text-[11px] leading-5 text-neutral-500">
+                    {letUserPick
+                      ? "لینک همان جلسه بلافاصله برایتان ایمیل می‌شود."
+                      : "منطقه زمانی دستگاه شما شناسایی نشد. لطفاً جلسه‌ای که برایتان مناسب‌تر است را انتخاب کنید."}
+                  </p>
+                </div>
                 <div className="mt-4 space-y-3">
                   {roundOptions.map((r, idx) => {
                     const sessionLabel = idx === 0 ? "سانس اول" : "سانس دوم";
