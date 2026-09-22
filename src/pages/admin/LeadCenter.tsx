@@ -52,6 +52,9 @@ export default function LeadCenter() {
           {show('sixtraps') && <TabsTrigger value="sixtraps">6 Traps</TabsTrigger>}
           {show('smartinsta') && <TabsTrigger value="smartinsta">Smart IG</TabsTrigger>}
           {show('igads') && <TabsTrigger value="igads">IG Ads</TabsTrigger>}
+          {show('customerwithigads') && (
+            <TabsTrigger value="customerwithigads">IG Video</TabsTrigger>
+          )}
           <TabsTrigger value="marketing">Email Marketing</TabsTrigger>
           <TabsTrigger value="opens">Email Opens</TabsTrigger>
           <TabsTrigger value="crm">Meta CRM</TabsTrigger>
