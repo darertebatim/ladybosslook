@@ -162,6 +162,16 @@ export function LeadCampaignDirectory() {
                 <div className="ml-auto flex items-center gap-4">
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">
+                      {slotChoice.includes(c.key) ? 'Visitor picks session' : 'Timezone routing'}
+                    </span>
+                    <Switch
+                      checked={slotChoice.includes(c.key)}
+                      disabled={setSlotChoice.isPending}
+                      onCheckedChange={(v) => toggleSlotChoice(c.key, v)}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">
                       {waitlist.includes(c.key) ? 'Waitlist mode' : 'Waitlist off'}
                     </span>
                     <Switch
