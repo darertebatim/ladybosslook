@@ -438,7 +438,7 @@ export default function IgAdsLanding() {
                 </p>
                 <div className="mt-4 space-y-3">
                   {roundOptions.map((r, idx) => {
-                    const sessionLabel = fa(idx === 0 ? "1" : "2") && (idx === 0 ? "سانس اول" : "سانس دوم");
+                    const sessionLabel = idx === 0 ? "سانس اول" : "سانس دوم";
                     return (
                     <button
                       key={r.id}
@@ -471,7 +471,8 @@ export default function IgAdsLanding() {
                         </span>
                       )}
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ) : laLabel && (
