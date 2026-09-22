@@ -70,6 +70,49 @@ export function useSetLeadCampaignWaitlist() {
   });
 }
 
+const SLOT_KEY = 'lead_campaigns_slot_choice';
+const SLOT_QK = ['app-setting', SLOT_KEY];
+
+/** Keys of lead campaigns where visitors pick their own session instead of timezone routing. */
+export function useSlotChoiceLeadCampaigns() {
+  const { data = [] as string[], isLoading } = useQuery({
+    queryKey: SLOT_QK,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data } = await (supabase
+        .from('app_settings')
+        .select('value')
+        .eq('key', SLOT_KEY)
+        .maybeSingle() as any);
+      try {
+        const parsed = JSON.parse((data?.value as string) || '[]');
+        return Array.isArray(parsed) ? (parsed as string[]) : [];
+      } catch {
+        return [];
+      }
+    },
+  });
+
+  return { slotChoice: data, isLoading };
+}
+
+export function useSetLeadCampaignSlotChoice() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ keys }: { keys: string[] }) => {
+      const { error } = await (supabase
+        .from('app_settings')
+        .upsert(
+          { key: SLOT_KEY, value: JSON.stringify(keys), updated_at: new Date().toISOString() },
+          { onConflict: 'key' }
+        ) as any);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: SLOT_QK }),
+  });
+}
+
 export function useSetLeadCampaignActive() {
   const queryClient = useQueryClient();
 

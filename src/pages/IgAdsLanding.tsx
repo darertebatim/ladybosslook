@@ -10,7 +10,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
 import { trackWebinarLead } from "@/lib/metaCapi";
 import { isIranTimezone, getDeviceTimezone } from "@/lib/regionRestrictions";
-import { useWaitlistLeadCampaigns } from "@/hooks/useLeadCampaignStatus";
+import { useWaitlistLeadCampaigns, useSlotChoiceLeadCampaigns } from "@/hooks/useLeadCampaignStatus";
 import WebinarWaitlistBox from "@/components/WebinarWaitlistBox";
 
 const ROUND_ASSIGNMENT_STORAGE_KEY = "igadsfree_round_assignment";
@@ -96,9 +96,35 @@ export default function IgAdsLanding() {
   const [noUpcomingWebinar, setNoUpcomingWebinar] = useState(false);
   const { waitlist } = useWaitlistLeadCampaigns();
   const waitlistMode = waitlist.includes("igads") || noUpcomingWebinar;
+  const { slotChoice, isLoading: slotLoading } = useSlotChoiceLeadCampaigns();
+  const letUserPick = slotChoice.includes("igads");
 
   useEffect(() => {
+    if (slotLoading) return;
     (async () => {
+      // Slot-choice mode: visitors pick their own session (timezone routing stays
+      // available, it's just bypassed while this mode is on).
+      if (letUserPick && !roundParam) {
+        const { data: progA } = await (supabase as any)
+          .from("program_catalog")
+          .select("title, cover_image_url")
+          .eq("slug", PROGRAM_SLUG)
+          .maybeSingle();
+        if (progA?.title) setProgramTitle(progA.title);
+        if (progA?.cover_image_url) setCover(progA.cover_image_url);
+
+        const upcoming = (await listActiveWebinarRounds(PROGRAM_SLUG)).filter(
+          (r) => r.first_session_date && new Date(r.first_session_date).getTime() > Date.now(),
+        );
+        if (upcoming.length) {
+          setRoundOptions(upcoming);
+          setNeedsRoundChoice(true);
+        } else {
+          setNoUpcomingWebinar(true);
+        }
+        return;
+      }
+
       // 1. Pinned ?round= param always wins.
       // 2. Otherwise restore a previously saved assignment — but only if it
       //    still matches the current East/West routing, so admin routing
@@ -169,7 +195,7 @@ export default function IgAdsLanding() {
         }
       }
     })();
-  }, [roundParam]);
+  }, [roundParam, letUserPick, slotLoading]);
 
 
   const laLabel = useMemo(
@@ -322,9 +348,11 @@ export default function IgAdsLanding() {
               </div>
             ) : waitlistMode ? null : needsRoundChoice ? (
               <div className="mx-auto rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-                <p className="text-sm font-bold text-neutral-900">انتخاب زمان وبینار</p>
+                <p className="text-sm font-bold text-neutral-900">زمان وبینار را انتخاب کنید</p>
                 <p className="mt-1 text-xs leading-5 text-neutral-600">
-                  منطقه زمانی دستگاه شما شناسایی نشد. لطفاً جلسه‌ای که برایتان مناسب‌تر است را انتخاب کنید.
+                  {letUserPick
+                    ? "هر کدام از این جلسه‌ها که برایتان مناسب‌تر است را انتخاب کنید. لینک همان جلسه برایتان ایمیل می‌شود."
+                    : "منطقه زمانی دستگاه شما شناسایی نشد. لطفاً جلسه‌ای که برایتان مناسب‌تر است را انتخاب کنید."}
                 </p>
                 <div className="mt-4 space-y-3">
                   {roundOptions.map((r) => (
@@ -338,9 +366,14 @@ export default function IgAdsLanding() {
                         {r.round_name || `Round ${r.round_number}`}
                       </div>
                       {r.first_session_date && (
-                        <div className="mt-1 text-sm text-neutral-600" dir="ltr">
-                          {formatLADateTime(new Date(r.first_session_date))}
-                        </div>
+                        <>
+                          <div className="mt-1 text-sm text-neutral-600" dir="ltr">
+                            LA: {formatLADateTime(new Date(r.first_session_date))}
+                          </div>
+                          <div className="mt-0.5 text-sm font-semibold text-emerald-700" dir="ltr">
+                            🕒 Your time: {formatLocalDateTime(new Date(r.first_session_date))}
+                          </div>
+                        </>
                       )}
                     </button>
                   ))}
@@ -356,6 +389,15 @@ export default function IgAdsLanding() {
                   <div dir="ltr" className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-center text-base font-bold text-white shadow-sm whitespace-pre-line">
                     🕒 Your Local time: {localLabel}
                   </div>
+                )}
+                {letUserPick && roundOptions.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setNeedsRoundChoice(true)}
+                    className="text-xs font-semibold text-neutral-600 underline underline-offset-4"
+                  >
+                    تغییر زمان جلسه
+                  </button>
                 )}
                 <div className="flex flex-col items-center gap-1 pt-1 text-sm font-semibold text-emerald-700">
                   <span>برای دریافت لینک وبینار، فرم زیر را پر کنید</span>

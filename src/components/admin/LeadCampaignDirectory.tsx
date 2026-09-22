@@ -13,6 +13,8 @@ import {
   useSetLeadCampaignActive,
   useWaitlistLeadCampaigns,
   useSetLeadCampaignWaitlist,
+  useSlotChoiceLeadCampaigns,
+  useSetLeadCampaignSlotChoice,
 } from '@/hooks/useLeadCampaignStatus';
 
 interface SubRow {
@@ -88,6 +90,17 @@ export function LeadCampaignDirectory() {
   const { waitlist } = useWaitlistLeadCampaigns();
   const setWaitlist = useSetLeadCampaignWaitlist();
 
+  const { slotChoice } = useSlotChoiceLeadCampaigns();
+  const setSlotChoice = useSetLeadCampaignSlotChoice();
+
+  const toggleSlotChoice = (key: string, on: boolean) => {
+    const next = on ? [...slotChoice, key] : slotChoice.filter((k) => k !== key);
+    setSlotChoice.mutate(
+      { keys: next },
+      { onSuccess: () => toast.success(on ? 'Visitors pick their session' : 'Timezone routing') }
+    );
+  };
+
   const toggleWaitlist = (key: string, on: boolean) => {
     const next = on ? [...waitlist, key] : waitlist.filter((k) => k !== key);
     setWaitlist.mutate(
@@ -147,6 +160,16 @@ export function LeadCampaignDirectory() {
                 <Badge variant="outline">{last7} last 7d</Badge>
                 {extras > 0 && <Badge variant="outline">{extras} extra sources</Badge>}
                 <div className="ml-auto flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">
+                      {slotChoice.includes(c.key) ? 'Visitor picks session' : 'Timezone routing'}
+                    </span>
+                    <Switch
+                      checked={slotChoice.includes(c.key)}
+                      disabled={setSlotChoice.isPending}
+                      onCheckedChange={(v) => toggleSlotChoice(c.key, v)}
+                    />
+                  </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">
                       {waitlist.includes(c.key) ? 'Waitlist mode' : 'Waitlist off'}
