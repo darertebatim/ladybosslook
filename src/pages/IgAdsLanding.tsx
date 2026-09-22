@@ -462,9 +462,9 @@ export default function IgAdsLanding() {
               </div>
             ) : waitlistMode ? null : needsRoundChoice ? (
               <div className="mx-auto rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-                <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
-                  <p className="text-base font-bold text-neutral-900">زمان وبینار را انتخاب کنید</p>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500 px-3 py-1 text-[11px] font-bold text-white shadow-sm">
+                <div className="mb-3 flex items-center justify-center gap-2">
+                  <p className="text-sm font-bold text-neutral-900">زمان وبینار را انتخاب کنید</p>
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-rose-500 px-2.5 py-1 text-[10px] font-bold text-white shadow-sm">
                     <span className="relative flex h-2 w-2">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-300 opacity-75" />
                       <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
