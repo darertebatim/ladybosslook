@@ -9,6 +9,8 @@ interface Props {
   source: string;
   /** Farsi title shown above the form */
   title?: string;
+  /** Called after a successful submission (tracking, etc.) */
+  onSuccess?: () => void;
 }
 
 const schema = z.object({

@@ -54,6 +54,17 @@ export const LEAD_CAMPAIGNS: LeadCampaign[] = [
     metaEvent: 'IGAdsFreeLead',
     confirmationFunction: 'send-sixtraps-confirmation',
   },
+  {
+    key: 'customerwithigads',
+    label: 'Customers with Instagram (video)',
+    labelFa: 'ویدیو بهترین روش جذب مشتری از اینستاگرام',
+    programSlug: 'customerwithigads',
+    landingPath: '/l/customerwithigads',
+    thankYouPath: '/l/customerwithigads',
+    regSource: 'customerwithigads_waitlist',
+    extraSources: [],
+    metaEvent: 'CustomerWithIgAdsLead',
+  },
 ];
 
 export const ALL_LEAD_SOURCES = LEAD_CAMPAIGNS.flatMap((c) => [c.regSource, ...c.extraSources]);
