@@ -425,7 +425,7 @@ export default function IgAdsLanding() {
                             {r.round_name || `Round ${r.round_number}`}
                           </span>
                           <span className="text-sm text-neutral-600">
-                            — LA: {formatLADateTime(new Date(r.first_session_date))}
+                            LA: {formatLADateTime(new Date(r.first_session_date))}
                           </span>
                         </div>
                       )}
