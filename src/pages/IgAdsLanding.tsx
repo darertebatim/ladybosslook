@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { resolveWebinarRound, listActiveWebinarRounds, getWebinarRoundRouting, inferWebinarSideFromTimezone, type WebinarRoundRow } from "@/lib/webinarRounds";
 
@@ -136,6 +136,33 @@ function MiniCountdown({ startUtc }: { startUtc: Date }) {
       {days > 0 && <span dir="rtl">{fa(days)} روز و</span>}
       <span dir="ltr" className="tabular-nums">{clock}</span>
     </div>
+  );
+}
+
+/** English "registration closes in" countdown shown inside the form box. */
+function FormCountdown({ startUtc }: { startUtc: Date }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const diff = startUtc.getTime() - now;
+  if (diff <= 0) {
+    return <span className="font-bold text-rose-600">Registration is closing</span>;
+  }
+
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const minutes = Math.floor((diff % 3600000) / 60000);
+  const seconds = Math.floor((diff % 60000) / 1000);
+  const clock = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+  return (
+    <span dir="ltr" className="tabular-nums">
+      {days > 0 ? `${days}d ` : ""}
+      {clock}
+    </span>
   );
 }
 
