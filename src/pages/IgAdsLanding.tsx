@@ -130,10 +130,10 @@ function MiniCountdown({ startUtc }: { startUtc: Date }) {
     .replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
 
   return (
-    <div dir="rtl" className="mt-2 flex flex-wrap items-center justify-start gap-1 text-[11px] font-bold text-rose-600">
+    <div dir="ltr" className="mt-2 flex flex-wrap items-center justify-start gap-1 text-left text-[11px] font-bold text-rose-600">
       <span aria-hidden="true">⏳</span>
-      <span>تا شروع:</span>
-      {days > 0 && <span>{fa(days)} روز و</span>}
+      <span dir="rtl">تا شروع:</span>
+      {days > 0 && <span dir="rtl">{fa(days)} روز و</span>}
       <span dir="ltr" className="tabular-nums">{clock}</span>
     </div>
   );
@@ -445,7 +445,7 @@ export default function IgAdsLanding() {
                       className="w-full rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-right active:bg-neutral-100"
                     >
                       {r.first_session_date && (
-                        <div dir="ltr" className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                        <div dir="ltr" className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-left">
                           <span className="font-semibold text-neutral-900">
                             {r.round_name || `Round ${r.round_number}`}
                           </span>
@@ -455,9 +455,9 @@ export default function IgAdsLanding() {
                         </div>
                       )}
                       {r.first_session_date && (
-                        <div dir="ltr" className="mt-3 text-base font-bold leading-6 text-emerald-700">
-                          <div>🕒 Your time: {localTimeLabels(new Date(r.first_session_date)).date}</div>
-                          <div className="pl-7">{localTimeLabels(new Date(r.first_session_date)).time}</div>
+                        <div dir="ltr" className="mt-3 text-left text-base font-bold leading-6 text-emerald-700">
+                          <div className="whitespace-nowrap">🕒 {localTimeLabels(new Date(r.first_session_date)).date}</div>
+                          <div>{localTimeLabels(new Date(r.first_session_date)).time}</div>
                         </div>
                       )}
                       {r.first_session_date && (
