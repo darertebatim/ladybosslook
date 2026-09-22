@@ -268,7 +268,7 @@ export default function IgAdsLanding() {
         // and fall back to the waitlist when nothing is scheduled at all.
         const rounds = (await listActiveWebinarRounds(PROGRAM_SLUG)).filter(
           (r) => r.first_session_date && new Date(r.first_session_date).getTime() > Date.now(),
-        );
+        ).sort((a, b) => new Date(a.first_session_date!).getTime() - new Date(b.first_session_date!).getTime());
         if (rounds.length && !effectiveRoundParam) {
           setRoundOptions(rounds);
           setNeedsRoundChoice(true);
@@ -437,7 +437,9 @@ export default function IgAdsLanding() {
                     : "منطقه زمانی دستگاه شما شناسایی نشد. لطفاً جلسه‌ای که برایتان مناسب‌تر است را انتخاب کنید."}
                 </p>
                 <div className="mt-4 space-y-3">
-                  {roundOptions.map((r) => (
+                  {roundOptions.map((r, idx) => {
+                    const sessionLabel = idx === 0 ? "سانس اول" : "سانس دوم";
+                    return (
                     <button
                       key={r.id}
                       type="button"
@@ -446,8 +448,8 @@ export default function IgAdsLanding() {
                     >
                       {r.first_session_date && (
                         <div dir="ltr" className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-left">
-                          <span className="font-semibold text-neutral-900">
-                            {r.round_name || `Round ${r.round_number}`}
+                          <span className="font-semibold text-neutral-900" dir="rtl">
+                            {sessionLabel}
                           </span>
                           <span className="text-sm text-neutral-600">
                             LA: {laTimeLabel(new Date(r.first_session_date))} PT
@@ -469,7 +471,8 @@ export default function IgAdsLanding() {
                         </span>
                       )}
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ) : laLabel && (
