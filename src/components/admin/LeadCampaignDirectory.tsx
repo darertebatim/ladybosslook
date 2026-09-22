@@ -90,6 +90,17 @@ export function LeadCampaignDirectory() {
   const { waitlist } = useWaitlistLeadCampaigns();
   const setWaitlist = useSetLeadCampaignWaitlist();
 
+  const { slotChoice } = useSlotChoiceLeadCampaigns();
+  const setSlotChoice = useSetLeadCampaignSlotChoice();
+
+  const toggleSlotChoice = (key: string, on: boolean) => {
+    const next = on ? [...slotChoice, key] : slotChoice.filter((k) => k !== key);
+    setSlotChoice.mutate(
+      { keys: next },
+      { onSuccess: () => toast.success(on ? 'Visitors pick their session' : 'Timezone routing') }
+    );
+  };
+
   const toggleWaitlist = (key: string, on: boolean) => {
     const next = on ? [...waitlist, key] : waitlist.filter((k) => k !== key);
     setWaitlist.mutate(
