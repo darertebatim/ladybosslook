@@ -186,6 +186,7 @@ export default function IgAdsLanding() {
     durationMinutes: number;
     meetUrl: string;
   } | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
   const [roundId, setRoundId] = useState<string | null>(null);
   const [needsRoundChoice, setNeedsRoundChoice] = useState(false);
   const [roundOptions, setRoundOptions] = useState<WebinarRoundRow[]>([]);
