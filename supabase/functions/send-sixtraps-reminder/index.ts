@@ -33,6 +33,14 @@ interface Campaign {
   fallbackTitle: string;
   reminderHeadline: string;
   reminderClosing: string;
+  /** Custom lead paragraphs for the reminder email (replaces the default admin questions). */
+  reminderBody?: string[];
+  /** Button text for the prereq-video CTA in the reminder email. */
+  reminderVideoCta?: string;
+  /** Prompt above the add-to-calendar button in the reminder email. */
+  reminderCalendarPrompt?: string;
+  /** Scarcity box rendered after the calendar button in the reminder email. */
+  reminderScarcity?: string;
   subjects: {
     reminder: string;
     joinNow: string;
@@ -98,6 +106,15 @@ const CAMPAIGNS: Record<string, Campaign> = {
     fallbackTitle: "وبینار جذب مشتری با اینستاگرام ادز",
     reminderHeadline: "میخوام مطمئن بشم وبینار اینستاگرام ادز رو از دست نمیدین 🌷",
     reminderClosing: "🌷🌷 منتظرتون هستم",
+    reminderBody: [
+      p("جمعه فقط <strong>یک ساعت</strong> از وقت‌تان را بگذارید — نه برای تماشای یک ویدیو، برای جلوگیری از هدر رفتن بودجه تبلیغات‌تان."),
+      p("هر روزی که کمپین تبلیغ‌تان درست تنظیم نشده باشد، بودجه‌تان بی‌صدا می‌سوزد: کلیک می‌گیرید، بازدید می‌گیرید… اما مشتری واقعی نمی‌آید."),
+      p("در این یک ساعت زنده، قدم‌به‌قدم روی صفحه نشان می‌دهم دقیقاً پول‌تان کجا هدر می‌رود و چطور کمپینی بسازید که مشتری واقعی می‌آورد — همان کاری که بیزینس‌های موفق ایرانی در آمریکا و کانادا انجام می‌دهند."),
+      p("ویدیوی ۵ دقیقه‌ای پیش‌نیاز را قبل از جلسه ببینید تا با ذهنی آماده وارد شوید و <strong>۱۰ برابر بیشتر</strong> از جلسه بگیرید."),
+    ],
+    reminderVideoCta: "دیدن ویدیوی ۵ دقیقه‌ای — قبل از جلسه",
+    reminderCalendarPrompt: "جلسه را همین حالا به تقویم‌تان اضافه کنید تا جای‌تان از دست نرود 👇",
+    reminderScarcity: "🔥 این آخرین جلسه رایگان این آموزش است — جلسه ضبط نمی‌شود و ظرفیت اتاق زنده محدود است.",
     subjects: {
       reminder: "یادآوری وبینار اینستاگرام ادز + ویدیوی پیش‌نیاز 🌷",
       joinNow: "وبینار در حال شروع است — همین حالا وارد شوید 🚀",
