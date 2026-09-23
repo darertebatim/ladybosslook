@@ -514,45 +514,34 @@ serve(async (req) => {
     const roundCols =
       "id, first_session_date, first_session_duration, google_meet_link, support_link_url";
 
-    let roundId = requestedRoundId;
-    if (!roundId) {
-      const { data: autoRule } = await supabase
-        .from("program_auto_enrollment")
-        .select("round_id")
-        .eq("program_slug", PROGRAM_SLUG)
-        .maybeSingle();
-      roundId = autoRule?.round_id || "";
-    }
+    // Upcoming rounds (include sessions that started within the last 3h so
+    // "join now" / morning-of still work during the live session).
+    const cutoff = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
+    const { data: upcomingRounds } = await supabase
+      .from("program_rounds")
+      .select(roundCols)
+      .eq("program_slug", PROGRAM_SLUG)
+      .gt("first_session_date", cutoff)
+      .order("first_session_date", { ascending: true });
+    const roundMap = new Map<string, any>();
+    for (const r of upcomingRounds || []) roundMap.set(r.id, r);
 
-    // Next-session email: always resolve the next upcoming round for content
+    let round: any = null;
     if (nextSession) {
-      const { data: upcoming } = await supabase
-        .from("program_rounds")
-        .select(roundCols)
-        .eq("program_slug", PROGRAM_SLUG)
-        .gt("first_session_date", new Date().toISOString())
-        .order("first_session_date", { ascending: true })
-        .limit(1)
-        .maybeSingle();
-      if (upcoming?.id) roundId = upcoming.id;
+      round = (upcomingRounds || []).find(
+        (r: any) => new Date(r.first_session_date) > new Date(),
+      ) || null;
+    } else if (requestedRoundId) {
+      const { data } = await supabase
+        .from("program_rounds").select(roundCols).eq("id", requestedRoundId).maybeSingle();
+      round = data;
+      if (round) roundMap.set(round.id, round);
+    } else {
+      // Auto: each recipient gets their OWN round; this is only the fallback.
+      round = (upcomingRounds || [])[0] || null;
     }
-
-    const { data: round } = roundId
-      ? await supabase
-          .from("program_rounds")
-          .select(roundCols)
-          .eq("id", roundId)
-          .maybeSingle()
-      : await supabase
-          .from("program_rounds")
-          .select(roundCols)
-          .eq("program_slug", PROGRAM_SLUG)
-          .eq("status", "active")
-          .order("first_session_date", { ascending: true })
-          .limit(1)
-          .maybeSingle();
-
-    const targetRoundId = round?.id || roundId || null;
+    const autoMode = !nextSession && !requestedRoundId;
+    const targetRoundId = round?.id || requestedRoundId || null;
 
     const { data: prog } = await supabase
       .from("program_catalog")
@@ -561,24 +550,24 @@ serve(async (req) => {
       .maybeSingle();
 
     const title = prog?.title || c.fallbackTitle;
-    const meetUrl = round?.google_meet_link || "";
     const supportUrl = SUPPORT_URL;
-    const durationMinutes = round?.first_session_duration || 90;
-    const startUtc = round?.first_session_date
-      ? new Date(round.first_session_date)
-      : null;
+    const contentFor = (rd: any) => {
+      const meetUrl = rd?.google_meet_link || "";
+      const durationMinutes = rd?.first_session_duration || 90;
+      const startUtc = rd?.first_session_date ? new Date(rd.first_session_date) : null;
+      const gcalUrl = startUtc
+        ? buildGoogleCalendarUrl(
+            title,
+            startUtc,
+            durationMinutes,
+            `ویدیوی پیش‌نیاز: ${c.prereqUrl}\n${meetUrl ? `لینک ورود: ${meetUrl}\n` : ""}پشتیبانی: ${supportUrl}`,
+            meetUrl || c.prereqUrl,
+          )
+        : "";
+      return { meetUrl, startUtc, gcalUrl };
+    };
 
-    const gcalUrl = startUtc
-      ? buildGoogleCalendarUrl(
-          title,
-          startUtc,
-          durationMinutes,
-          `ویدیوی پیش‌نیاز: ${c.prereqUrl}\n${meetUrl ? `لینک ورود: ${meetUrl}\n` : ""}پشتیبانی: ${supportUrl}`,
-          meetUrl || c.prereqUrl,
-        )
-      : "";
-
-    let recipients: { email: string; name: string }[] = [];
+    let recipients: { email: string; name: string; roundId: string | null }[] = [];
 
     if (testEmail) {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(testEmail)) {
@@ -587,18 +576,27 @@ serve(async (req) => {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      recipients = [{ email: testEmail, name: "دوست عزیز" }];
+      recipients = [{ email: testEmail, name: "دوست عزیز", roundId: targetRoundId }];
     } else {
       let query = supabase
         .from("form_submissions")
-        .select("email, name")
+        .select("email, name, round_id")
         .in("source", SOURCES)
         .limit(5000);
       if (nextSession) {
         if (audienceRoundId) query = query.eq("round_id", audienceRoundId);
         if (onlyUnsent) query = query.is("next_session_sent_at", null);
       } else {
-        if (targetRoundId) query = query.eq("round_id", targetRoundId);
+        if (autoMode) {
+          const ids = [...roundMap.keys()];
+          if (!ids.length) {
+            return new Response(JSON.stringify({ error: "no_upcoming_round" }), {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+          query = query.in("round_id", ids);
+        } else if (targetRoundId) query = query.eq("round_id", targetRoundId);
         if (onlyUnsent) {
           query = joinNow
             ? query.is("join_now_sent_at", null)
@@ -614,7 +612,7 @@ serve(async (req) => {
         const em = String(r.email || "").trim().toLowerCase();
         if (!em || seen.has(em)) continue;
         seen.add(em);
-        recipients.push({ email: em, name: (r.name || "دوست عزیز").trim() });
+        recipients.push({ email: em, name: (r.name || "دوست عزیز").trim(), roundId: autoMode ? (r as any).round_id : targetRoundId });
       }
     }
 
@@ -627,6 +625,9 @@ serve(async (req) => {
     let failed = 0;
 
     for (const r of recipients) {
+      const rRound = (r.roundId && roundMap.get(r.roundId)) || round;
+      const rRoundId = rRound?.id || targetRoundId;
+      const { meetUrl, startUtc, gcalUrl } = contentFor(rRound);
       const html = nextSession
         ? buildNextSessionHtml(c, r.name, startUtc, supportUrl)
         : joinNow
@@ -669,7 +670,7 @@ serve(async (req) => {
             .from("form_submissions")
             .update({
               next_session_sent_at: new Date().toISOString(),
-              next_session_round_id: targetRoundId,
+              next_session_round_id: rRoundId,
             })
             .eq("email", r.email)
             .in("source", SOURCES);
@@ -678,7 +679,7 @@ serve(async (req) => {
             .from("form_submissions")
             .update({
               join_now_sent_at: new Date().toISOString(),
-              join_now_round_id: targetRoundId,
+              join_now_round_id: rRoundId,
             })
             .eq("email", r.email)
             .in("source", SOURCES);
@@ -687,7 +688,7 @@ serve(async (req) => {
             .from("form_submissions")
             .update({
               morning_sent_at: new Date().toISOString(),
-              morning_round_id: targetRoundId,
+              morning_round_id: rRoundId,
             })
             .eq("email", r.email)
             .in("source", SOURCES);
@@ -696,7 +697,7 @@ serve(async (req) => {
             .from("form_submissions")
             .update({
               reminder_sent_at: new Date().toISOString(),
-              reminder_round_id: targetRoundId,
+              reminder_round_id: rRoundId,
             })
             .eq("email", r.email)
             .in("source", SOURCES);
