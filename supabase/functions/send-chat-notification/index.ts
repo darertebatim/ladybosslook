@@ -246,7 +246,7 @@ const handler = async (req: Request): Promise<Response> => {
           {
             title: notificationTitle,
             body: notificationBody,
-            url: '/app/support-chat',
+            url: senderType === 'user' ? '/app/admin/support' : '/app/chat',
           },
           apnsJwt,
           topic,
