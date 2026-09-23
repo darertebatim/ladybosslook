@@ -249,17 +249,21 @@ function buildHtml(
         سلام ${name}، ${c.reminderHeadline}
       </h1>
 
-      <p style="margin:0 0 10px;font-size:15px;line-height:1.9;">
-        آیا ویدیوی ۵ دقیقه‌ای پیش‌نیاز رو نگاه کردین؟
-      </p>
+      ${
+        c.reminderBody
+          ? c.reminderBody.join("")
+          : `<p style="margin:0 0 10px;font-size:15px;line-height:1.9;">
+               آیا ویدیوی ۵ دقیقه‌ای پیش‌نیاز رو نگاه کردین؟
+             </p>`
+      }
       <p style="text-align:center;margin:16px 0;">
         <a href="${c.prereqUrl}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
-          مشاهده جزئیات وبینار و ویدیو
+          ${c.reminderVideoCta ?? "مشاهده جزئیات وبینار و ویدیو"}
         </a>
       </p>
 
       <p style="margin:18px 0 10px;font-size:15px;line-height:1.9;">
-        آیا جلسه رو به کلندر ادد کردین؟
+        ${c.reminderCalendarPrompt ?? "آیا جلسه رو به کلندر ادد کردین؟"}
       </p>
       ${
         gcalUrl
