@@ -100,7 +100,13 @@ export function ProfileAnalysisManager() {
     });
   }, [requests, profiles, search, statusFilter]);
 
-  const igHref = (url: string) => (url.startsWith('http') ? url : `https://${url.replace(/^\/+/, '')}`);
+  const igHref = (url: string) => {
+    const v = url.trim();
+    if (!v) return '#';
+    if (v.startsWith('http')) return v;
+    if (/^@?[A-Za-z0-9._]+$/.test(v)) return `https://instagram.com/${v.replace(/^@/, '')}`;
+    return `https://${v.replace(/^\/+/, '')}`;
+  };
 
   return (
     <div className="space-y-4">
