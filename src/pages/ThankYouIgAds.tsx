@@ -100,6 +100,7 @@ export default function ThankYouIgAds() {
   const registeredName = (((location.state as any)?.name || stored?.name || fallbackDetails.name) as string | undefined);
   const registeredCity = (((location.state as any)?.city || stored?.city || fallbackDetails.city) as string | undefined);
   const [videoId, setVideoId] = useState("");
+  const [videoPlaying, setVideoPlaying] = useState(false);
   const [webinar, setWebinar] = useState<{
     title: string;
     startUtc: Date;
@@ -223,14 +224,43 @@ export default function ThankYouIgAds() {
                   همین حالا ببینید — دسترسی به این ویدیو محدود است
                 </span>
               </div>
-              <div className="aspect-video overflow-hidden rounded-xl shadow-md">
-                <iframe
-                  className="h-full w-full"
-                  src={`https://www.youtube.com/embed/${videoId}`}
-                  title="پیام علی لطفی"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+              <div className="relative aspect-video overflow-hidden rounded-xl shadow-md">
+                {videoPlaying ? (
+                  <iframe
+                    className="h-full w-full"
+                    src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
+                    title="پیام علی لطفی"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setVideoPlaying(true)}
+                    aria-label="پخش ویدیو"
+                    className="group relative block h-full w-full"
+                  >
+                    <img
+                      src={`https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`}
+                      onError={(e) => {
+                        const img = e.currentTarget;
+                        if (!img.src.includes("hqdefault")) {
+                          img.src = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+                        }
+                      }}
+                      alt="پیام علی لطفی"
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/20 transition group-active:bg-black/30">
+                      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/95 shadow-xl transition group-active:scale-95">
+                        <svg viewBox="0 0 24 24" className="ml-1 h-7 w-7 fill-rose-600">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </span>
+                    </span>
+                  </button>
+                )}
               </div>
               <p className="mt-1.5 text-center text-[11px] font-bold text-neutral-600">
                 این ویدیو فقط برای ثبت‌نامی‌هاست — قبل از وبینار تماشا کنید تا آماده لایو باشید
