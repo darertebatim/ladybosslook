@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Loader2, ExternalLink, RefreshCw, Instagram } from 'lucide-react';
+import { Loader2, ExternalLink, RefreshCw, Instagram, MessageCircle, MessageSquare } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 
 interface AnalysisRequest {
@@ -33,9 +34,18 @@ const STATUS_LABEL: Record<string, string> = {
   done: 'Done',
 };
 
+const waLink = (phone?: string | null) => {
+  if (!phone) return null;
+  const digits = phone.replace(/[^\d]/g, '');
+  if (digits.length < 7) return null;
+  return `https://wa.me/${digits}`;
+};
+
 export function ProfileAnalysisManager() {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState<AnalysisRequest[]>([]);
   const [profiles, setProfiles] = useState<Record<string, ProfileInfo>>({});
+  const [whatsapps, setWhatsapps] = useState<Record<string, string | null>>({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -65,6 +75,17 @@ export function ProfileAnalysisManager() {
           };
         }
         setProfiles(map);
+
+        const { data: noteRows } = await supabase
+          .from('student_admin_notes')
+          .select('user_id, whatsapp_number')
+          .in('user_id', ids);
+        const wa: Record<string, string | null> = {};
+        for (const n of noteRows || []) {
+          const row = n as { user_id: string; whatsapp_number: string | null };
+          wa[row.user_id] = row.whatsapp_number;
+        }
+        setWhatsapps(wa);
       }
     } catch (e) {
       console.error(e);
@@ -182,7 +203,7 @@ export function ProfileAnalysisManager() {
                   <Field label="Offer includes" value={r.offer_includes} />
                   <Field label="Action & conversion point" value={r.conversion_action} />
                   {r.question && <Field label="Their question" value={r.question} />}
-                  <div className="flex gap-2 pt-1">
+                  <div className="flex flex-wrap gap-2 pt-1">
                     {['new', 'in_progress', 'done'].map((s) => (
                       <Button
                         key={s}
@@ -193,6 +214,27 @@ export function ProfileAnalysisManager() {
                         {STATUS_LABEL[s]}
                       </Button>
                     ))}
+                    {r.user_id && waLink(whatsapps[r.user_id]) && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-green-500 text-green-700"
+                        onClick={() => window.open(waLink(whatsapps[r.user_id])!, '_blank', 'noreferrer')}
+                      >
+                        <MessageCircle className="w-4 h-4 mr-1" />
+                        WhatsApp
+                      </Button>
+                    )}
+                    {r.user_id && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => navigate(`/admin/support?userId=${r.user_id}`)}
+                      >
+                        <MessageSquare className="w-4 h-4 mr-1" />
+                        Message in app
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
