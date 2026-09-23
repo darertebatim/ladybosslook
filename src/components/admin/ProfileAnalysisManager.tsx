@@ -332,6 +332,18 @@ export function ProfileAnalysisManager() {
                         Message in app
                       </Button>
                     )}
+                    {r.user_id && (
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setVideoTarget(r);
+                          setVideoLink('');
+                        }}
+                      >
+                        <Video className="w-4 h-4 mr-1" />
+                        Send analysis video
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
