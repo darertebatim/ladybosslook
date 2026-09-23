@@ -33,6 +33,14 @@ interface Campaign {
   fallbackTitle: string;
   reminderHeadline: string;
   reminderClosing: string;
+  /** Custom lead paragraphs for the reminder email (replaces the default admin questions). */
+  reminderBody?: string[];
+  /** Button text for the prereq-video CTA in the reminder email. */
+  reminderVideoCta?: string;
+  /** Prompt above the add-to-calendar button in the reminder email. */
+  reminderCalendarPrompt?: string;
+  /** Scarcity box rendered after the calendar button in the reminder email. */
+  reminderScarcity?: string;
   subjects: {
     reminder: string;
     joinNow: string;
@@ -98,6 +106,15 @@ const CAMPAIGNS: Record<string, Campaign> = {
     fallbackTitle: "وبینار جذب مشتری با اینستاگرام ادز",
     reminderHeadline: "میخوام مطمئن بشم وبینار اینستاگرام ادز رو از دست نمیدین 🌷",
     reminderClosing: "🌷🌷 منتظرتون هستم",
+    reminderBody: [
+      p("جمعه فقط <strong>یک ساعت</strong> از وقت‌تان را بگذارید — نه برای تماشای یک ویدیو، برای جلوگیری از هدر رفتن بودجه تبلیغات‌تان."),
+      p("هر روزی که کمپین تبلیغ‌تان درست تنظیم نشده باشد، بودجه‌تان بی‌صدا می‌سوزد: کلیک می‌گیرید، بازدید می‌گیرید… اما مشتری واقعی نمی‌آید."),
+      p("در این یک ساعت زنده، قدم‌به‌قدم روی صفحه نشان می‌دهم دقیقاً پول‌تان کجا هدر می‌رود و چطور کمپینی بسازید که مشتری واقعی می‌آورد — همان کاری که بیزینس‌های موفق ایرانی در آمریکا و کانادا انجام می‌دهند."),
+      p("ویدیوی ۵ دقیقه‌ای پیش‌نیاز را قبل از جلسه ببینید تا با ذهنی آماده وارد شوید و <strong>۱۰ برابر بیشتر</strong> از جلسه بگیرید."),
+    ],
+    reminderVideoCta: "دیدن ویدیوی ۵ دقیقه‌ای — قبل از جلسه",
+    reminderCalendarPrompt: "جلسه را همین حالا به تقویم‌تان اضافه کنید تا جای‌تان از دست نرود 👇",
+    reminderScarcity: "🔥 این آخرین جلسه رایگان این آموزش است — جلسه ضبط نمی‌شود و ظرفیت اتاق زنده محدود است.",
     subjects: {
       reminder: "یادآوری وبینار اینستاگرام ادز + ویدیوی پیش‌نیاز 🌷",
       joinNow: "وبینار در حال شروع است — همین حالا وارد شوید 🚀",
@@ -232,17 +249,21 @@ function buildHtml(
         سلام ${name}، ${c.reminderHeadline}
       </h1>
 
-      <p style="margin:0 0 10px;font-size:15px;line-height:1.9;">
-        آیا ویدیوی ۵ دقیقه‌ای پیش‌نیاز رو نگاه کردین؟
-      </p>
+      ${
+        c.reminderBody
+          ? c.reminderBody.join("")
+          : `<p style="margin:0 0 10px;font-size:15px;line-height:1.9;">
+               آیا ویدیوی ۵ دقیقه‌ای پیش‌نیاز رو نگاه کردین؟
+             </p>`
+      }
       <p style="text-align:center;margin:16px 0;">
         <a href="${c.prereqUrl}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
-          مشاهده جزئیات وبینار و ویدیو
+          ${c.reminderVideoCta ?? "مشاهده جزئیات وبینار و ویدیو"}
         </a>
       </p>
 
       <p style="margin:18px 0 10px;font-size:15px;line-height:1.9;">
-        آیا جلسه رو به کلندر ادد کردین؟
+        ${c.reminderCalendarPrompt ?? "آیا جلسه رو به کلندر ادد کردین؟"}
       </p>
       ${
         gcalUrl
@@ -253,6 +274,15 @@ function buildHtml(
              </p>`
           : ""
       }
+
+      ${
+        c.reminderScarcity
+          ? `<div style="border:2px dashed #fda4af;background:#fff1f2;border-radius:14px;padding:12px 16px;margin:18px 0;">
+               <p style="margin:0;font-size:14px;line-height:1.9;font-weight:bold;color:#be123c;">${c.reminderScarcity}</p>
+             </div>`
+          : ""
+      }
+
 
       ${
         rows
