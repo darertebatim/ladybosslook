@@ -75,6 +75,17 @@ export function ProfileAnalysisManager() {
           };
         }
         setProfiles(map);
+
+        const { data: noteRows } = await supabase
+          .from('student_admin_notes')
+          .select('user_id, whatsapp_number')
+          .in('user_id', ids);
+        const wa: Record<string, string | null> = {};
+        for (const n of noteRows || []) {
+          const row = n as { user_id: string; whatsapp_number: string | null };
+          wa[row.user_id] = row.whatsapp_number;
+        }
+        setWhatsapps(wa);
       }
     } catch (e) {
       console.error(e);
