@@ -351,6 +351,49 @@ export function ProfileAnalysisManager() {
           })}
         </div>
       )}
+
+      <Dialog
+        open={!!videoTarget}
+        onOpenChange={(open) => {
+          if (!open && !videoSending) {
+            setVideoTarget(null);
+            setVideoLink('');
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Send analysis video</DialogTitle>
+            <DialogDescription>
+              Paste the Google Drive link — it goes to {videoTarget?.user_id ? profiles[videoTarget.user_id]?.full_name || 'this student' : 'this student'}'s in-app chat with a watch button.
+              Make sure the Drive file is shared as "Anyone with the link can view".
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            placeholder="https://drive.google.com/file/d/…"
+            value={videoLink}
+            onChange={(e) => setVideoLink(e.target.value)}
+            dir="ltr"
+            autoFocus
+          />
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setVideoTarget(null);
+                setVideoLink('');
+              }}
+              disabled={videoSending}
+            >
+              Cancel
+            </Button>
+            <Button onClick={sendAnalysisVideo} disabled={videoSending || !videoLink.trim()}>
+              {videoSending && <Loader2 className="w-4 h-4 mr-1 animate-spin" />}
+              Send to their chat
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
