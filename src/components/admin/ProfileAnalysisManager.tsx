@@ -34,9 +34,18 @@ const STATUS_LABEL: Record<string, string> = {
   done: 'Done',
 };
 
+const waLink = (phone?: string | null) => {
+  if (!phone) return null;
+  const digits = phone.replace(/[^\d]/g, '');
+  if (digits.length < 7) return null;
+  return `https://wa.me/${digits}`;
+};
+
 export function ProfileAnalysisManager() {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState<AnalysisRequest[]>([]);
   const [profiles, setProfiles] = useState<Record<string, ProfileInfo>>({});
+  const [whatsapps, setWhatsapps] = useState<Record<string, string | null>>({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
