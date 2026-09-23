@@ -276,6 +276,15 @@ function buildHtml(
       }
 
       ${
+        c.reminderScarcity
+          ? `<div style="border:2px dashed #fda4af;background:#fff1f2;border-radius:14px;padding:12px 16px;margin:18px 0;">
+               <p style="margin:0;font-size:14px;line-height:1.9;font-weight:bold;color:#be123c;">${c.reminderScarcity}</p>
+             </div>`
+          : ""
+      }
+
+
+      ${
         rows
           ? `<div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:12px;margin:20px 0;">
                <p style="margin:0 0 8px;font-size:14px;font-weight:bold;">⏰ ساعت جلسه در شهرهای مختلف</p>
