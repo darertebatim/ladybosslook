@@ -203,7 +203,7 @@ export function ProfileAnalysisManager() {
                   <Field label="Offer includes" value={r.offer_includes} />
                   <Field label="Action & conversion point" value={r.conversion_action} />
                   {r.question && <Field label="Their question" value={r.question} />}
-                  <div className="flex gap-2 pt-1">
+                  <div className="flex flex-wrap gap-2 pt-1">
                     {['new', 'in_progress', 'done'].map((s) => (
                       <Button
                         key={s}
@@ -214,6 +214,27 @@ export function ProfileAnalysisManager() {
                         {STATUS_LABEL[s]}
                       </Button>
                     ))}
+                    {r.user_id && waLink(whatsapps[r.user_id]) && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-green-500 text-green-700"
+                        onClick={() => window.open(waLink(whatsapps[r.user_id])!, '_blank', 'noreferrer')}
+                      >
+                        <MessageCircle className="w-4 h-4 mr-1" />
+                        WhatsApp
+                      </Button>
+                    )}
+                    {r.user_id && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => navigate(`/admin/support?userId=${r.user_id}`)}
+                      >
+                        <MessageSquare className="w-4 h-4 mr-1" />
+                        Message in app
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
