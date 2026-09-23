@@ -4,9 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Loader2, ExternalLink, RefreshCw, Instagram, MessageCircle, MessageSquare } from 'lucide-react';
+import { Loader2, ExternalLink, RefreshCw, Instagram, MessageCircle, MessageSquare, Video } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface AnalysisRequest {
   id: string;
@@ -49,6 +57,95 @@ export function ProfileAnalysisManager() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [videoTarget, setVideoTarget] = useState<AnalysisRequest | null>(null);
+  const [videoLink, setVideoLink] = useState('');
+  const [videoSending, setVideoSending] = useState(false);
+
+  const normalizeVideoUrl = (raw: string): string | null => {
+    const v = raw.trim();
+    if (!v) return null;
+    if (/^https?:\/\//i.test(v)) return v;
+    return `https://${v.replace(/^\/+/, '')}`;
+  };
+
+  const sendAnalysisVideo = async () => {
+    if (!videoTarget?.user_id) return;
+    const url = normalizeVideoUrl(videoLink);
+    if (!url) {
+      toast({ title: 'Missing link', description: 'Paste the Google Drive video link first.', variant: 'destructive' });
+      return;
+    }
+    setVideoSending(true);
+    try {
+      const { data: authData } = await supabase.auth.getUser();
+      const adminId = authData.user?.id;
+      if (!adminId) throw new Error('Not signed in.');
+
+      // Find or create the student's support conversation
+      let conversationId: string | null = null;
+      let unread = 0;
+      const { data: existing } = await supabase
+        .from('chat_conversations')
+        .select('id, unread_count_user')
+        .eq('user_id', videoTarget.user_id)
+        .eq('inbox_type', 'support')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (existing) {
+        conversationId = (existing as { id: string }).id;
+        unread = (existing as { unread_count_user: number | null }).unread_count_user || 0;
+      } else {
+        const { data: created, error: convErr } = await supabase
+          .from('chat_conversations')
+          .insert({ user_id: videoTarget.user_id, status: 'open' })
+          .select('id')
+          .single();
+        if (convErr) throw convErr;
+        conversationId = (created as { id: string }).id;
+      }
+
+      const content =
+        '🎬 تحلیل پیج اینستاگرام شما آماده شد!\nویدیوی تحلیل پیجتان را از دکمه زیر تماشا کنید 👇';
+      const { error: msgErr } = await (supabase as any)
+        .from('chat_messages')
+        .insert({
+          conversation_id: conversationId,
+          sender_id: adminId,
+          sender_type: 'admin',
+          content,
+          buttons: [{ label: 'تماشای ویدیوی تحلیل 🎥', url }],
+        });
+      if (msgErr) throw msgErr;
+
+      await (supabase as any)
+        .from('chat_conversations')
+        .update({ last_message_at: new Date().toISOString(), unread_count_user: unread + 1 })
+        .eq('id', conversationId);
+
+      try {
+        await supabase.functions.invoke('send-chat-notification', {
+          body: {
+            conversationId,
+            messageContent: '🎬 تحلیل پیج اینستاگرام شما آماده شد!',
+            senderType: 'admin',
+            senderId: adminId,
+          },
+        });
+      } catch (e) {
+        console.error('notify failed', e);
+      }
+
+      toast({ title: 'Sent 🎉', description: 'The video link was delivered to their in-app chat.' });
+      setVideoTarget(null);
+      setVideoLink('');
+    } catch (e: any) {
+      console.error(e);
+      toast({ title: 'Send failed', description: e?.message || 'Something went wrong.', variant: 'destructive' });
+    } finally {
+      setVideoSending(false);
+    }
+  };
 
   const load = async () => {
     setLoading(true);
@@ -235,6 +332,18 @@ export function ProfileAnalysisManager() {
                         Message in app
                       </Button>
                     )}
+                    {r.user_id && (
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setVideoTarget(r);
+                          setVideoLink('');
+                        }}
+                      >
+                        <Video className="w-4 h-4 mr-1" />
+                        Send analysis video
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -242,6 +351,49 @@ export function ProfileAnalysisManager() {
           })}
         </div>
       )}
+
+      <Dialog
+        open={!!videoTarget}
+        onOpenChange={(open) => {
+          if (!open && !videoSending) {
+            setVideoTarget(null);
+            setVideoLink('');
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Send analysis video</DialogTitle>
+            <DialogDescription>
+              Paste the Google Drive link — it goes to {videoTarget?.user_id ? profiles[videoTarget.user_id]?.full_name || 'this student' : 'this student'}'s in-app chat with a watch button.
+              Make sure the Drive file is shared as "Anyone with the link can view".
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            placeholder="https://drive.google.com/file/d/…"
+            value={videoLink}
+            onChange={(e) => setVideoLink(e.target.value)}
+            dir="ltr"
+            autoFocus
+          />
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setVideoTarget(null);
+                setVideoLink('');
+              }}
+              disabled={videoSending}
+            >
+              Cancel
+            </Button>
+            <Button onClick={sendAnalysisVideo} disabled={videoSending || !videoLink.trim()}>
+              {videoSending && <Loader2 className="w-4 h-4 mr-1 animate-spin" />}
+              Send to their chat
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
