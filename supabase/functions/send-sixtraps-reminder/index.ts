@@ -230,6 +230,36 @@ function zoneRows(startUtc: Date | null): string {
   ).join("");
 }
 
+const FA_WEEKDAYS: Record<string, string> = {
+  Saturday: "شنبه",
+  Sunday: "یکشنبه",
+  Monday: "دوشنبه",
+  Tuesday: "سه‌شنبه",
+  Wednesday: "چهارشنبه",
+  Thursday: "پنجشنبه",
+  Friday: "جمعه",
+};
+
+/** Persian weekday of the session (Los Angeles time). */
+function faWeekday(d: Date | null): string {
+  if (!d) return "";
+  try {
+    const en = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Los_Angeles",
+      weekday: "long",
+    }).format(d);
+    return FA_WEEKDAYS[en] || "";
+  } catch {
+    return "";
+  }
+}
+
+/** Replace {{WEEKDAY}} with the session's own weekday (or a neutral phrase). */
+function withWeekday(html: string, startUtc: Date | null): string {
+  const w = faWeekday(startUtc);
+  return html.replaceAll("{{WEEKDAY}}", w || "در این جلسه زنده");
+}
+
 function buildHtml(
   c: Campaign,
   name: string,
@@ -239,6 +269,7 @@ function buildHtml(
   supportUrl: string,
 ): string {
   const rows = zoneRows(startUtc);
+
 
   return `
 <!doctype html>
