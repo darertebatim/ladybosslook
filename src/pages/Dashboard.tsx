@@ -69,6 +69,26 @@ const Dashboard = () => {
     enabled: !!user?.id,
   });
 
+  const roundIds = enrollments
+    .filter((e: any) => e.program_slug !== 'simora-plus' && e.program_rounds?.id)
+    .map((e: any) => e.program_rounds.id);
+
+  const { data: upcomingSessions = [], isLoading: sessionsLoading } = useQuery({
+    queryKey: ['dashboard-upcoming-sessions', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('program_sessions')
+        .select('id, round_id, title, session_date')
+        .in('round_id', roundIds)
+        .gt('session_date', new Date().toISOString())
+        .order('session_date', { ascending: true })
+        .limit(20);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user?.id && roundIds.length > 0,
+  });
+
   if (!user) return null;
 
   const active = enrollments.filter(
@@ -161,6 +181,64 @@ const Dashboard = () => {
             </div>
           </Link>
         )}
+
+        {/* Upcoming sessions */}
+        {(() => {
+          const roundInfo = new Map<string, { slug: string; name: string; roundId: string }>();
+          active.forEach((e: any) => {
+            if (e.program_rounds?.id) {
+              roundInfo.set(e.program_rounds.id, {
+                slug: e.program_slug,
+                name: e.course_name,
+                roundId: e.program_rounds.id,
+              });
+            }
+          });
+          const sessions = (upcomingSessions as any[])
+            .filter((s) => roundInfo.has(s.round_id))
+            .slice(0, 6);
+
+          if (sessionsLoading) {
+            return (
+              <section className="mt-8">
+                <h2 className="text-xl font-semibold mb-3">Upcoming sessions</h2>
+                <Skeleton className="h-40 rounded-2xl" />
+              </section>
+            );
+          }
+          if (sessions.length === 0) return null;
+
+          return (
+            <section className="mt-8">
+              <h2 className="text-xl font-semibold mb-3">Upcoming sessions</h2>
+              <div className="rounded-2xl bg-card shadow-ios divide-y">
+                {sessions.map((s) => {
+                  const info = roundInfo.get(s.round_id)!;
+                  const d = new Date(s.session_date);
+                  return (
+                    <Link
+                      key={s.id}
+                      to={`/app/myprograms/${info.slug}/${info.roundId}`}
+                      className="flex items-center gap-4 p-4 hover:bg-muted/60 transition-colors"
+                    >
+                      <div className="shrink-0 w-14 text-center rounded-xl bg-brand/10 py-2">
+                        <div className="text-[11px] uppercase font-semibold text-brand">{format(d, 'MMM')}</div>
+                        <div className="text-lg font-bold leading-none">{format(d, 'd')}</div>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium truncate">{s.title || 'Live session'}</div>
+                        <div className="text-xs text-muted-foreground truncate">
+                          {info.name} • {format(d, 'EEEE, MMMM d • h:mm a')} (your local time)
+                        </div>
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          );
+        })()}
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Programs */}
