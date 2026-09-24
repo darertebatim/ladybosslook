@@ -91,6 +91,52 @@ export default function Overview() {
     }
   };
 
+  const fetchUpcomingSessions = async () => {
+    try {
+      const { data: sessions, error } = await supabase
+        .from('program_sessions')
+        .select(`
+          id, session_number, title, session_date, duration_minutes, meeting_link,
+          program_rounds(round_name, program_slug, status)
+        `)
+        .gte('session_date', new Date().toISOString())
+        .order('session_date', { ascending: true })
+        .limit(12);
+
+      if (error) throw error;
+
+      const roundRows = (sessions || []).map((s: any) => s.program_rounds).filter(Boolean) as any[];
+      const slugs = [...new Set(roundRows.map(r => r.program_slug).filter(Boolean))];
+      let slugToTitle = new Map<string, string>();
+      if (slugs.length > 0) {
+        const { data: catalogPrograms } = await supabase
+          .from('program_catalog')
+          .select('slug, title')
+          .in('slug', slugs);
+        slugToTitle = new Map((catalogPrograms || []).map(p => [p.slug, p.title]));
+      }
+
+      setUpcomingSessions(
+        (sessions || []).map((s: any) => {
+          const round = s.program_rounds || {};
+          return {
+            id: s.id,
+            session_number: s.session_number,
+            title: s.title,
+            session_date: s.session_date,
+            duration_minutes: s.duration_minutes,
+            meeting_link: s.meeting_link,
+            round_name: round.round_name || null,
+            program_slug: round.program_slug || null,
+            program_title: round.program_slug ? slugToTitle.get(round.program_slug) || round.program_slug : null,
+          };
+        })
+      );
+    } catch (error: any) {
+      console.error('Error fetching upcoming sessions:', error);
+    }
+  };
+
   const fetchWaitlistStats = async () => {
     try {
       const { data: waitlist, error } = await supabase
