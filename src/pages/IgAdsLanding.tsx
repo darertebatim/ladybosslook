@@ -25,6 +25,32 @@ const schema = z.object({
 
 const fa = (n: number) => String(n).padStart(2, "0").replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
 
+/** Farsi digits without zero padding (for counts like "۲ سانس"). */
+const faNum = (n: number) => String(n).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
+
+const FA_WEEKDAYS: Record<string, string> = {
+  Saturday: "شنبه",
+  Sunday: "یکشنبه",
+  Monday: "دوشنبه",
+  Tuesday: "سه‌شنبه",
+  Wednesday: "چهارشنبه",
+  Thursday: "پنجشنبه",
+  Friday: "جمعه",
+};
+
+/** Persian weekday name of a session, in Los Angeles time. */
+function faWeekday(date: Date): string {
+  try {
+    const en = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Los_Angeles",
+      weekday: "long",
+    }).format(date);
+    return FA_WEEKDAYS[en] || "";
+  } catch {
+    return "";
+  }
+}
+
 function WebinarCountdown({ startUtc }: { startUtc: Date }) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
