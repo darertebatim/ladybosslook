@@ -282,7 +282,7 @@ function buildHtml(
 
       ${
         c.reminderBody
-          ? c.reminderBody.join("")
+          ? withWeekday(c.reminderBody.join(""), startUtc)
           : `<p style="margin:0 0 10px;font-size:15px;line-height:1.9;">
                آیا ویدیوی ۵ دقیقه‌ای پیش‌نیاز رو نگاه کردین؟
              </p>`
