@@ -235,6 +235,18 @@ export default function IgAdsLanding() {
     return side === "east" ? sorted[0].id : sorted[sorted.length - 1].id;
   }, [roundOptions]);
 
+  // Weekday shown in the scarcity line — only when every session is on the
+  // same day, so it never claims a day that doesn't match the cards.
+  const sessionsDayLabel = useMemo(() => {
+    const days = roundOptions
+      .filter((r) => r.first_session_date)
+      .map((r) => faWeekday(new Date(r.first_session_date!)))
+      .filter(Boolean);
+    if (!days.length) return "";
+    return days.every((d) => d === days[0]) ? days[0] : "";
+  }, [roundOptions]);
+
+
   useEffect(() => {
     if (slotLoading) return;
     (async () => {
