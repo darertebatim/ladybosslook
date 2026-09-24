@@ -24,6 +24,10 @@ const TOOLS = [
   { slug: 'presence', label: '🔥 Presence', description: 'Users who track presence streak' },
 ];
 
+export const AUDIENCE_FORMS = [
+  { slug: 'profile_analysis', label: '📝 Profile Analysis form' },
+];
+
 const LANGUAGE_OPTIONS = [
   { value: 'en', label: '🇺🇸 English' },
   { value: 'fa', label: '🇮🇷 فارسی (Persian)' },
@@ -75,6 +79,10 @@ interface PromoAudienceSelectorProps {
   targetInstructorIds?: string[];
   setTargetInstructorIds?: (ids: string[]) => void;
   /** Optional: preset linkage. When provided, a saved-audience picker is shown. */
+  includeForms?: string[];
+  setIncludeForms?: (f: string[]) => void;
+  excludeForms?: string[];
+  setExcludeForms?: (f: string[]) => void;
   presetId?: string | null;
   setPresetId?: (id: string | null) => void;
 }
@@ -102,6 +110,10 @@ export function PromoAudienceSelector({
   setIncludeUpdateStatus,
   targetInstructorIds = [],
   setTargetInstructorIds,
+  includeForms = [],
+  setIncludeForms,
+  excludeForms = [],
+  setExcludeForms,
   presetId,
   setPresetId,
 }: PromoAudienceSelectorProps) {
@@ -414,6 +426,35 @@ export function PromoAudienceSelector({
               </p>
             </div>
           </div>
+
+          {/* Forms Section */}
+          {setIncludeForms && setExcludeForms && (
+            <div className="space-y-3">
+              <Label className="text-xs text-muted-foreground uppercase tracking-wider">Forms</Label>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs font-medium text-green-600"><Plus className="h-3 w-3" />Include users who filled:</div>
+                <div className="flex flex-wrap gap-2">
+                  {AUDIENCE_FORMS.map((f) => (
+                    <Badge key={f.slug} variant={includeForms.includes(f.slug) ? 'default' : 'outline'} className="cursor-pointer"
+                      onClick={() => { toggleItem(includeForms, setIncludeForms, f.slug); setExcludeForms(excludeForms.filter((x) => x !== f.slug)); }}>
+                      {f.label}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs font-medium text-red-600"><Minus className="h-3 w-3" />Exclude users who filled:</div>
+                <div className="flex flex-wrap gap-2">
+                  {AUDIENCE_FORMS.map((f) => (
+                    <Badge key={f.slug} variant={excludeForms.includes(f.slug) ? 'destructive' : 'outline'} className="cursor-pointer"
+                      onClick={() => { toggleItem(excludeForms, setExcludeForms, f.slug); setIncludeForms(includeForms.filter((x) => x !== f.slug)); }}>
+                      {f.label}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Instructor Section */}
           {setTargetInstructorIds && (

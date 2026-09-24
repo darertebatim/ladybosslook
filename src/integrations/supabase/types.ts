@@ -1879,10 +1879,12 @@ export type Database = {
           created_by: string | null
           description: string | null
           emoji: string
+          exclude_forms: string[]
           exclude_playlists: string[]
           exclude_programs: string[]
           exclude_tools: string[]
           id: string
+          include_forms: string[]
           include_playlists: string[]
           include_programs: string[]
           include_tools: string[]
@@ -1899,10 +1901,12 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           emoji?: string
+          exclude_forms?: string[]
           exclude_playlists?: string[]
           exclude_programs?: string[]
           exclude_tools?: string[]
           id?: string
+          include_forms?: string[]
           include_playlists?: string[]
           include_programs?: string[]
           include_tools?: string[]
@@ -1919,10 +1923,12 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           emoji?: string
+          exclude_forms?: string[]
           exclude_playlists?: string[]
           exclude_programs?: string[]
           exclude_tools?: string[]
           id?: string
+          include_forms?: string[]
           include_playlists?: string[]
           include_programs?: string[]
           include_tools?: string[]

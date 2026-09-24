@@ -425,6 +425,8 @@ function NotificationForm({ environment }: NotificationFormProps) {
               target_timezones: preset.target_timezones ?? [],
               include_update_status: preset.include_update_status ?? [],
               target_instructor_ids: preset.target_instructor_ids ?? [],
+              include_forms: preset.include_forms ?? [],
+              exclude_forms: preset.exclude_forms ?? [],
             });
             setAudiencePresetId(preset.id);
           }}
