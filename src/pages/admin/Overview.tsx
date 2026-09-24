@@ -266,7 +266,7 @@ export default function Overview() {
       }));
 
       setCourseStats(statsArray.sort((a, b) => b.student_count - a.student_count));
-      await Promise.all([fetchDeviceStats(), fetchInstallStats(), fetchWaitlistStats()]);
+      await Promise.all([fetchDeviceStats(), fetchInstallStats(), fetchWaitlistStats(), fetchUpcomingSessions()]);
     } catch (error: any) {
       console.error('Error fetching course stats:', error);
       toast({
