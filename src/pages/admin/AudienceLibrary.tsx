@@ -9,7 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Library, Trash2, Pencil, Save, X } from 'lucide-react';
+import { Library, Trash2, Pencil, Save, X, Plus, SlidersHorizontal } from 'lucide-react';
+import { AudienceEditorDialog } from '@/components/admin/AudienceEditorDialog';
 
 interface Preset {
   id: string;
@@ -27,6 +28,8 @@ interface Preset {
   target_timezones: string[];
   include_update_status: string[];
   target_instructor_ids: string[];
+  include_forms?: string[];
+  exclude_forms?: string[];
   updated_at: string;
 }
 
@@ -38,6 +41,8 @@ export default function AudienceLibrary() {
   const [editDesc, setEditDesc] = useState('');
   const [editEmoji, setEditEmoji] = useState('🎯');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorPreset, setEditorPreset] = useState<Preset | null>(null);
 
   const { data: presets, isLoading } = useQuery({
     queryKey: ['audience-presets'],
@@ -115,6 +120,8 @@ export default function AudienceLibrary() {
     if (p.target_languages.length) parts.push(`🌐 ${p.target_languages.length} langs`);
     if (p.target_timezones.length) parts.push(`🕐 ${p.target_timezones.length} TZs`);
     if (p.target_instructor_ids.length) parts.push(`👩‍🏫 ${p.target_instructor_ids.length} instructors`);
+    if (p.include_forms?.length) parts.push(`📝 filled ${p.include_forms.length} form(s)`);
+    if (p.exclude_forms?.length) parts.push(`🚫 not filled ${p.exclude_forms.length} form(s)`);
     if (p.include_update_status.length) parts.push(`📱 ${p.include_update_status.join(', ')}`);
     return parts.join(' · ') || 'Empty audience';
   };
@@ -129,8 +136,11 @@ export default function AudienceLibrary() {
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Saved audiences</CardTitle>
+          <Button size="sm" onClick={() => { setEditorPreset(null); setEditorOpen(true); }}>
+            <Plus className="h-4 w-4 mr-1" /> New audience
+          </Button>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -138,7 +148,7 @@ export default function AudienceLibrary() {
           ) : !presets?.length ? (
             <div className="text-center py-12 text-muted-foreground">
               <p className="mb-2">No saved audiences yet.</p>
-              <p className="text-xs">Open any banner or channel, configure targeting, then click "Save current as preset".</p>
+              <p className="text-xs">Click "New audience" to build one.</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -185,6 +195,7 @@ export default function AudienceLibrary() {
                             )}
                           </div>
                           <div className="flex gap-1 shrink-0">
+                            <Button size="icon" variant="ghost" onClick={() => { setEditorPreset(p); setEditorOpen(true); }} title="Edit targeting"><SlidersHorizontal className="h-4 w-4" /></Button>
                             <Button size="icon" variant="ghost" onClick={() => startEdit(p)} title="Rename"><Pencil className="h-4 w-4" /></Button>
                             <Button size="icon" variant="ghost" onClick={() => setDeleteId(p.id)} title="Delete"><Trash2 className="h-4 w-4" /></Button>
                           </div>
@@ -197,10 +208,12 @@ export default function AudienceLibrary() {
             </div>
           )}
           <p className="text-xs text-muted-foreground mt-4">
-            💡 To edit the targeting itself (programs, languages, etc.), open any banner or channel that uses this preset, change the fields, then click "Update [preset name]".
+            💡 Use the sliders icon to edit an audience's targeting. Changes apply everywhere it's used (broadcasts, push, banners, channels).
           </p>
         </CardContent>
       </Card>
+
+      <AudienceEditorDialog open={editorOpen} onOpenChange={setEditorOpen} preset={editorPreset as any} />
 
       <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
         <AlertDialogContent>
