@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, GraduationCap, Smartphone, ListChecks, MessageCircle } from 'lucide-react';
+import { RefreshCw, GraduationCap, Smartphone, ListChecks, MessageCircle, CalendarDays, Video } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -21,6 +21,18 @@ interface InstallStats {
   totalInstalls: number;
   recentInstalls: number;
   lastInstall: string | null;
+}
+
+interface UpcomingSession {
+  id: string;
+  session_number: number | null;
+  title: string | null;
+  session_date: string;
+  duration_minutes: number | null;
+  meeting_link: string | null;
+  round_name: string | null;
+  program_slug: string | null;
+  program_title: string | null;
 }
 
 interface WaitlistStats {
