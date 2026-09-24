@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, GraduationCap, Smartphone, ListChecks, MessageCircle } from 'lucide-react';
+import { RefreshCw, GraduationCap, Smartphone, ListChecks, MessageCircle, CalendarDays, Video } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -21,6 +21,18 @@ interface InstallStats {
   totalInstalls: number;
   recentInstalls: number;
   lastInstall: string | null;
+}
+
+interface UpcomingSession {
+  id: string;
+  session_number: number | null;
+  title: string | null;
+  session_date: string;
+  duration_minutes: number | null;
+  meeting_link: string | null;
+  round_name: string | null;
+  program_slug: string | null;
+  program_title: string | null;
 }
 
 interface WaitlistStats {
@@ -43,6 +55,7 @@ export default function Overview() {
   const [installStats, setInstallStats] = useState<InstallStats>({ totalInstalls: 0, recentInstalls: 0, lastInstall: null });
   const [waitlistStats, setWaitlistStats] = useState<WaitlistStats[]>([]);
   const [waitlistEntries, setWaitlistEntries] = useState<WaitlistEntry[]>([]);
+  const [upcomingSessions, setUpcomingSessions] = useState<UpcomingSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -75,6 +88,52 @@ export default function Overview() {
         description: "Failed to fetch installation statistics",
         variant: "destructive",
       });
+    }
+  };
+
+  const fetchUpcomingSessions = async () => {
+    try {
+      const { data: sessions, error } = await supabase
+        .from('program_sessions')
+        .select(`
+          id, session_number, title, session_date, duration_minutes, meeting_link,
+          program_rounds(round_name, program_slug, status)
+        `)
+        .gte('session_date', new Date().toISOString())
+        .order('session_date', { ascending: true })
+        .limit(12);
+
+      if (error) throw error;
+
+      const roundRows = (sessions || []).map((s: any) => s.program_rounds).filter(Boolean) as any[];
+      const slugs = [...new Set(roundRows.map(r => r.program_slug).filter(Boolean))];
+      let slugToTitle = new Map<string, string>();
+      if (slugs.length > 0) {
+        const { data: catalogPrograms } = await supabase
+          .from('program_catalog')
+          .select('slug, title')
+          .in('slug', slugs);
+        slugToTitle = new Map((catalogPrograms || []).map(p => [p.slug, p.title]));
+      }
+
+      setUpcomingSessions(
+        (sessions || []).map((s: any) => {
+          const round = s.program_rounds || {};
+          return {
+            id: s.id,
+            session_number: s.session_number,
+            title: s.title,
+            session_date: s.session_date,
+            duration_minutes: s.duration_minutes,
+            meeting_link: s.meeting_link,
+            round_name: round.round_name || null,
+            program_slug: round.program_slug || null,
+            program_title: round.program_slug ? slugToTitle.get(round.program_slug) || round.program_slug : null,
+          };
+        })
+      );
+    } catch (error: any) {
+      console.error('Error fetching upcoming sessions:', error);
     }
   };
 
@@ -207,7 +266,7 @@ export default function Overview() {
       }));
 
       setCourseStats(statsArray.sort((a, b) => b.student_count - a.student_count));
-      await Promise.all([fetchDeviceStats(), fetchInstallStats(), fetchWaitlistStats()]);
+      await Promise.all([fetchDeviceStats(), fetchInstallStats(), fetchWaitlistStats(), fetchUpcomingSessions()]);
     } catch (error: any) {
       console.error('Error fetching course stats:', error);
       toast({
@@ -247,6 +306,65 @@ export default function Overview() {
           Refresh
         </Button>
       </div>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <CalendarDays className="h-5 w-5" />
+            <CardTitle>Upcoming Sessions</CardTitle>
+          </div>
+          <CardDescription>Next live sessions across all rounds, soonest first</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {upcomingSessions.length > 0 ? (
+            <div className="space-y-2">
+              {upcomingSessions.map((s) => (
+                <div
+                  key={s.id}
+                  className="flex items-center justify-between gap-3 py-3 px-3 -mx-3 rounded-md border-b last:border-0"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-semibold truncate">
+                        {s.title || `Session ${s.session_number ?? ''}`}
+                      </span>
+                      <span className="text-xs text-muted-foreground truncate">
+                        {s.program_title || s.program_slug}
+                        {s.round_name ? ` · ${s.round_name}` : ''}
+                      </span>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {new Date(s.session_date).toLocaleString([], {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                      })}
+                      {s.duration_minutes ? ` · ${s.duration_minutes} min` : ''}
+                    </div>
+                  </div>
+                  {s.meeting_link && (
+                    <a
+                      href={s.meeting_link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="shrink-0 text-xs font-medium text-primary flex items-center gap-1 hover:underline"
+                    >
+                      <Video className="h-4 w-4" />
+                      Join
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-4 text-muted-foreground text-sm">
+              No upcoming sessions scheduled
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
