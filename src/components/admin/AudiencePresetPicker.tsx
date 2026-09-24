@@ -24,9 +24,11 @@ export interface AudiencePayload {
   target_timezones: string[];
   include_update_status: string[];
   target_instructor_ids: string[];
+  include_forms?: string[];
+  exclude_forms?: string[];
 }
 
-interface Preset extends AudiencePayload {
+export interface Preset extends AudiencePayload {
   id: string;
   name: string;
   description: string | null;
@@ -54,6 +56,8 @@ const EMPTY_AUDIENCE: AudiencePayload = {
   target_timezones: [],
   include_update_status: [],
   target_instructor_ids: [],
+  include_forms: [],
+  exclude_forms: [],
 };
 
 export function AudiencePresetPicker({ current, presetId, onApplyPreset }: Props) {
