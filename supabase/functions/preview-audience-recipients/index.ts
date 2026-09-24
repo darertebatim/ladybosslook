@@ -18,6 +18,8 @@ interface AudienceFilter {
   target_timezones?: string[];
   include_update_status?: string[];
   target_instructor_ids?: string[];
+  include_forms?: string[];
+  exclude_forms?: string[];
 }
 
 interface PreviewRequest {
@@ -65,7 +67,9 @@ async function resolveAudienceUserIds(
     (audience.target_languages?.length ?? 0) > 0 ||
     (audience.target_timezones?.length ?? 0) > 0 ||
     (audience.include_update_status?.length ?? 0) > 0 ||
-    (audience.target_instructor_ids?.length ?? 0) > 0;
+    (audience.target_instructor_ids?.length ?? 0) > 0 ||
+    (audience.include_forms?.length ?? 0) > 0 ||
+    (audience.exclude_forms?.length ?? 0) > 0;
   if (!hasAnyRule) return null;
 
   let candidates: Set<string>;
@@ -166,6 +170,32 @@ async function resolveAudienceUserIds(
         }),
       );
     }
+  }
+  // Form submissions (e.g. profile analysis request)
+  const FORM_TABLES: Record<string, string> = { profile_analysis: "profile_analysis_requests" };
+  async function formUserIds(forms: string[]): Promise<Set<string>> {
+    const out = new Set<string>();
+    for (const f of forms) {
+      const table = FORM_TABLES[f];
+      if (!table) continue;
+      let from = 0;
+      while (true) {
+        const { data, error } = await supabase.from(table).select("user_id").range(from, from + 999);
+        if (error || !data) break;
+        for (const r of data) if (r.user_id) out.add(r.user_id);
+        if (data.length < 1000) break;
+        from += 1000;
+      }
+    }
+    return out;
+  }
+  if ((audience.include_forms?.length ?? 0) > 0) {
+    const allowed = await formUserIds(audience.include_forms!);
+    candidates = new Set([...candidates].filter((id) => allowed.has(id)));
+  }
+  if ((audience.exclude_forms?.length ?? 0) > 0) {
+    const blocked = await formUserIds(audience.exclude_forms!);
+    candidates = new Set([...candidates].filter((id) => !blocked.has(id)));
   }
   return candidates;
 }
