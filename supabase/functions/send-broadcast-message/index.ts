@@ -440,10 +440,18 @@ const handler = async (req: Request): Promise<Response> => {
     let targetUserIds: string[] = [];
 
     if (targetType === 'all') {
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id');
-      targetUserIds = profiles?.map(p => p.id) || [];
+      // Paginate — default query caps at 1000 rows
+      const ids: string[] = [];
+      let from = 0;
+      while (true) {
+        const { data: profiles, error } = await supabase
+          .from('profiles').select('id').range(from, from + 999);
+        if (error || !profiles) break;
+        for (const p of profiles) ids.push(p.id);
+        if (profiles.length < 1000) break;
+        from += 1000;
+      }
+      targetUserIds = ids;
     } else if (targetType === 'round' && targetRoundId) {
       const { data: enrollments } = await supabase
         .from('course_enrollments')
