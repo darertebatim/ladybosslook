@@ -500,7 +500,8 @@ export default function IgAdsLanding() {
                 </div>
                 <div className="mt-3 rounded-2xl border border-dashed border-orange-200 bg-orange-50/50 px-3 py-2.5">
                   <p className="text-center text-xs font-medium leading-6 text-neutral-700">
-                    فقط <span className="font-bold text-orange-600">۲ سانس زنده</span> برای این جمعه باقی‌مانده است.
+                    فقط <span className="font-bold text-orange-600">{faNum(roundOptions.length)} سانس زنده</span>
+                    {sessionsDayLabel ? ` برای این ${sessionsDayLabel}` : ""} باقی‌مانده است.
                   </p>
                   <p className="mt-0.5 text-center text-[11px] leading-5 text-neutral-500">
                     {letUserPick
