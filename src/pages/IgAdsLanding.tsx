@@ -25,6 +25,32 @@ const schema = z.object({
 
 const fa = (n: number) => String(n).padStart(2, "0").replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
 
+/** Farsi digits without zero padding (for counts like "۲ سانس"). */
+const faNum = (n: number) => String(n).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
+
+const FA_WEEKDAYS: Record<string, string> = {
+  Saturday: "شنبه",
+  Sunday: "یکشنبه",
+  Monday: "دوشنبه",
+  Tuesday: "سه‌شنبه",
+  Wednesday: "چهارشنبه",
+  Thursday: "پنجشنبه",
+  Friday: "جمعه",
+};
+
+/** Persian weekday name of a session, in Los Angeles time. */
+function faWeekday(date: Date): string {
+  try {
+    const en = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Los_Angeles",
+      weekday: "long",
+    }).format(date);
+    return FA_WEEKDAYS[en] || "";
+  } catch {
+    return "";
+  }
+}
+
 function WebinarCountdown({ startUtc }: { startUtc: Date }) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -208,6 +234,18 @@ export default function IgAdsLanding() {
     if (!sorted.length) return null;
     return side === "east" ? sorted[0].id : sorted[sorted.length - 1].id;
   }, [roundOptions]);
+
+  // Weekday shown in the scarcity line — only when every session is on the
+  // same day, so it never claims a day that doesn't match the cards.
+  const sessionsDayLabel = useMemo(() => {
+    const days = roundOptions
+      .filter((r) => r.first_session_date)
+      .map((r) => faWeekday(new Date(r.first_session_date!)))
+      .filter(Boolean);
+    if (!days.length) return "";
+    return days.every((d) => d === days[0]) ? days[0] : "";
+  }, [roundOptions]);
+
 
   useEffect(() => {
     if (slotLoading) return;
@@ -474,7 +512,8 @@ export default function IgAdsLanding() {
                 </div>
                 <div className="mt-3 rounded-2xl border border-dashed border-orange-200 bg-orange-50/50 px-3 py-2.5">
                   <p className="text-center text-xs font-medium leading-6 text-neutral-700">
-                    فقط <span className="font-bold text-orange-600">۲ سانس زنده</span> برای این جمعه باقی‌مانده است.
+                    فقط <span className="font-bold text-orange-600">{faNum(roundOptions.length)} سانس زنده</span>
+                    {sessionsDayLabel ? ` برای این ${sessionsDayLabel}` : ""} باقی‌مانده است.
                   </p>
                   <p className="mt-0.5 text-center text-[11px] leading-5 text-neutral-500">
                     {letUserPick

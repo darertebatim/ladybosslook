@@ -107,7 +107,7 @@ const CAMPAIGNS: Record<string, Campaign> = {
     reminderHeadline: "میخوام مطمئن بشم وبینار اینستاگرام ادز رو از دست نمیدین 🌷",
     reminderClosing: "🌷🌷 منتظرتون هستم",
     reminderBody: [
-      p("جمعه فقط <strong>یک ساعت</strong> از وقت‌تان را بگذارید — نه برای تماشای یک ویدیو، برای جلوگیری از هدر رفتن بودجه تبلیغات‌تان."),
+      p("{{WEEKDAY}} فقط <strong>یک ساعت</strong> از وقت‌تان را بگذارید — نه برای تماشای یک ویدیو، برای جلوگیری از هدر رفتن بودجه تبلیغات‌تان."),
       p("هر روزی که کمپین تبلیغ‌تان درست تنظیم نشده باشد، بودجه‌تان بی‌صدا می‌سوزد: کلیک می‌گیرید، بازدید می‌گیرید… اما مشتری واقعی نمی‌آید."),
       p("در این یک ساعت زنده، قدم‌به‌قدم روی صفحه نشان می‌دهم دقیقاً پول‌تان کجا هدر می‌رود و چطور کمپینی بسازید که مشتری واقعی می‌آورد — همان کاری که بیزینس‌های موفق ایرانی در آمریکا و کانادا انجام می‌دهند."),
       p("ویدیوی ۵ دقیقه‌ای پیش‌نیاز را قبل از جلسه ببینید تا با ذهنی آماده وارد شوید و <strong>۱۰ برابر بیشتر</strong> از جلسه بگیرید."),
@@ -230,6 +230,36 @@ function zoneRows(startUtc: Date | null): string {
   ).join("");
 }
 
+const FA_WEEKDAYS: Record<string, string> = {
+  Saturday: "شنبه",
+  Sunday: "یکشنبه",
+  Monday: "دوشنبه",
+  Tuesday: "سه‌شنبه",
+  Wednesday: "چهارشنبه",
+  Thursday: "پنجشنبه",
+  Friday: "جمعه",
+};
+
+/** Persian weekday of the session (Los Angeles time). */
+function faWeekday(d: Date | null): string {
+  if (!d) return "";
+  try {
+    const en = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Los_Angeles",
+      weekday: "long",
+    }).format(d);
+    return FA_WEEKDAYS[en] || "";
+  } catch {
+    return "";
+  }
+}
+
+/** Replace {{WEEKDAY}} with the session's own weekday (or a neutral phrase). */
+function withWeekday(html: string, startUtc: Date | null): string {
+  const w = faWeekday(startUtc);
+  return html.replaceAll("{{WEEKDAY}}", w || "در این جلسه زنده");
+}
+
 function buildHtml(
   c: Campaign,
   name: string,
@@ -239,6 +269,7 @@ function buildHtml(
   supportUrl: string,
 ): string {
   const rows = zoneRows(startUtc);
+
 
   return `
 <!doctype html>
@@ -251,7 +282,7 @@ function buildHtml(
 
       ${
         c.reminderBody
-          ? c.reminderBody.join("")
+          ? withWeekday(c.reminderBody.join(""), startUtc)
           : `<p style="margin:0 0 10px;font-size:15px;line-height:1.9;">
                آیا ویدیوی ۵ دقیقه‌ای پیش‌نیاز رو نگاه کردین؟
              </p>`
