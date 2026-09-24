@@ -310,6 +310,65 @@ export default function Overview() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
+            <CalendarDays className="h-5 w-5" />
+            <CardTitle>Upcoming Sessions</CardTitle>
+          </div>
+          <CardDescription>Next live sessions across all rounds, soonest first</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {upcomingSessions.length > 0 ? (
+            <div className="space-y-2">
+              {upcomingSessions.map((s) => (
+                <div
+                  key={s.id}
+                  className="flex items-center justify-between gap-3 py-3 px-3 -mx-3 rounded-md border-b last:border-0"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-semibold truncate">
+                        {s.title || `Session ${s.session_number ?? ''}`}
+                      </span>
+                      <span className="text-xs text-muted-foreground truncate">
+                        {s.program_title || s.program_slug}
+                        {s.round_name ? ` · ${s.round_name}` : ''}
+                      </span>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {new Date(s.session_date).toLocaleString([], {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                      })}
+                      {s.duration_minutes ? ` · ${s.duration_minutes} min` : ''}
+                    </div>
+                  </div>
+                  {s.meeting_link && (
+                    <a
+                      href={s.meeting_link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="shrink-0 text-xs font-medium text-primary flex items-center gap-1 hover:underline"
+                    >
+                      <Video className="h-4 w-4" />
+                      Join
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-4 text-muted-foreground text-sm">
+              No upcoming sessions scheduled
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
             <ListChecks className="h-5 w-5" />
             <CardTitle>Program Waitlist Requests</CardTitle>
           </div>
