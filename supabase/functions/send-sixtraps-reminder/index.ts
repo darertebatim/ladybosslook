@@ -789,7 +789,7 @@ serve(async (req) => {
             })
             .eq("email", r.email)
             .in("source", SOURCES);
-        } else if (!testEmail) {
+        } else if (!testEmail && !timeChange) {
           await supabase
             .from("form_submissions")
             .update({
