@@ -46,6 +46,7 @@ interface Campaign {
     joinNow: string;
     morning: string;
     nextSession: string;
+    timeChange: string;
   };
   morningBody: string;
   nextSessionBody: string;
