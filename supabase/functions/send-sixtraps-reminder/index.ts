@@ -46,6 +46,7 @@ interface Campaign {
     joinNow: string;
     morning: string;
     nextSession: string;
+    timeChange: string;
   };
   morningBody: string;
   nextSessionBody: string;
@@ -69,6 +70,7 @@ const CAMPAIGNS: Record<string, Campaign> = {
       joinNow: "وبینار در حال شروع است — همین حالا وارد شوید 🚀",
       morning: "امروز: ۶ تله اینستاگرامی بیزینس‌های ایرانی در آمریکا و کانادا 🌷",
       nextSession: "جلسه زنده رو از دست دادی؟ هفته آینده دوباره برگزار می‌شه 🌷",
+      timeChange: "مهم: تغییر ساعت وبینار ⏰",
     },
     morningBody: [
       p("ممکن است مرتب در اینستاگرام پست بگذارید،<br>بازدید بگیرید،<br>حتی افراد زیادی وارد پیجتان شوند…"),
@@ -120,6 +122,7 @@ const CAMPAIGNS: Record<string, Campaign> = {
       joinNow: "وبینار در حال شروع است — همین حالا وارد شوید 🚀",
       morning: "امروز: جذب مشتری واقعی با تبلیغات اینستاگرام 🌷",
       nextSession: "آخرین جلسه رایگان اینستاگرام ادز — جای شما خالی بود 🌷",
+      timeChange: "مهم: تغییر ساعت وبینار جذب مشتری با تبلیغات اینستاگرام ⏰",
     },
     morningBody: [
       p("ممکن است تا حالا چند بار در اینستاگرام تبلیغ (Ads) اجرا کرده باشید،<br>بودجه گذاشته باشید،<br>حتی کلیک و بازدید گرفته باشید…"),
@@ -434,6 +437,64 @@ function buildMorningHtml(
 </html>`;
 }
 
+function buildTimeChangeHtml(
+  c: Campaign,
+  name: string,
+  startUtc: Date | null,
+  gcalUrl: string,
+  supportUrl: string,
+): string {
+  const rows = zoneRows(startUtc);
+
+  return `
+<!doctype html>
+<html dir="rtl" lang="fa">
+  <body dir="rtl" style="direction:rtl;text-align:right;margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
+    <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;">
+      <h1 style="margin:0 0 14px;font-size:20px;line-height:1.6;">
+        سلام ${name} 🌷
+      </h1>
+
+      ${p("امیدواریم عالی و پرانرژی باشید.")}
+      ${p("برای اینکه بتوانیم همه پرسش‌ها و تمرین‌ها را با تمرکز و انرژی صددرصدی در یک جمع پرشور برگزار کنیم، <strong>سانس‌های وبینار را ادغام کرده‌ایم</strong> تا همه در یک جلسه زنده و جامع در کنار هم باشیم.")}
+
+      ${
+        rows
+          ? `<div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:12px;margin:20px 0;">
+               <p style="margin:0 0 8px;font-size:14px;font-weight:bold;">⏰ ساعت جدید و نهایی جلسه</p>
+               <table style="width:100%;border-collapse:collapse;">${rows}</table>
+             </div>`
+          : ""
+      }
+
+      ${p("✅ جای شما کاملاً محفوظ است و <strong>نیازی به ثبت‌نام دوباره نیست</strong>.")}
+      ${p("لینک ورود به وبینار و یادآوری‌ها دقیقاً پیش از شروع جلسه برایتان ارسال می‌شود.")}
+
+      <p style="margin:18px 0 10px;font-size:15px;line-height:1.9;">
+        لطفاً همین حالا ساعت جدید را در تقویم خود ثبت کنید 👇
+      </p>
+      ${
+        gcalUrl
+          ? `<p style="text-align:center;margin:16px 0;">
+               <a href="${gcalUrl}" style="display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:14px 28px;border-radius:10px;font-size:16px;font-weight:bold;">
+                 📅 افزودن به تقویم
+               </a>
+             </p>`
+          : ""
+      }
+
+      ${p("به امید دیدار شما در این جلسه زنده و تحول‌آفرین! 🌷")}
+
+      <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
+        سوالی داشتی؟ <a href="${supportUrl}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
+        <br>روی کامپیوتر هستی؟ <a href="https://ladybosslook.com/dashboard/chat" style="color:#EA5B2B;">چت پشتیبانی در داشبورد</a> — یا همین ایمیل را جواب بده.
+        <br><br>علی لطفی
+      </p>
+    </div>
+  </body>
+</html>`;
+}
+
 function buildNextSessionHtml(
   c: Campaign,
   name: string,
@@ -535,6 +596,7 @@ serve(async (req) => {
     const joinNow = body?.joinNow === true;
     const morningOf = body?.morningOf === true;
     const nextSession = body?.nextSession === true;
+    const timeChange = body?.timeChange === true;
     // For the "next session" email, roundId selects the AUDIENCE (people who
     // signed up for that past round); the content uses the upcoming round.
     const audienceRoundId = nextSession
@@ -628,7 +690,7 @@ serve(async (req) => {
           }
           query = query.in("round_id", ids);
         } else if (targetRoundId) query = query.eq("round_id", targetRoundId);
-        if (onlyUnsent) {
+        if (onlyUnsent && !timeChange) {
           query = joinNow
             ? query.is("join_now_sent_at", null)
             : morningOf
@@ -659,24 +721,28 @@ serve(async (req) => {
       const rRound = (r.roundId && roundMap.get(r.roundId)) || round;
       const rRoundId = rRound?.id || targetRoundId;
       const { meetUrl, startUtc, gcalUrl } = contentFor(rRound);
-      const html = nextSession
-        ? buildNextSessionHtml(c, r.name, startUtc, supportUrl)
-        : joinNow
-          ? buildJoinNowHtml(r.name, meetUrl, supportUrl)
-          : morningOf
-            ? buildMorningHtml(c, r.name, startUtc, meetUrl, supportUrl)
-            : buildHtml(c, r.name, startUtc, meetUrl, gcalUrl, supportUrl);
+      const html = timeChange
+        ? buildTimeChangeHtml(c, r.name, startUtc, gcalUrl, supportUrl)
+        : nextSession
+          ? buildNextSessionHtml(c, r.name, startUtc, supportUrl)
+          : joinNow
+            ? buildJoinNowHtml(r.name, meetUrl, supportUrl)
+            : morningOf
+              ? buildMorningHtml(c, r.name, startUtc, meetUrl, supportUrl)
+              : buildHtml(c, r.name, startUtc, meetUrl, gcalUrl, supportUrl);
       const unsubUrl = await buildUnsubUrl(r.email);
       const { data: sendData, error } = await resend.emails.send({
         from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>",
         to: [r.email],
-        subject: nextSession
-          ? c.subjects.nextSession
-          : joinNow
-            ? c.subjects.joinNow
-            : morningOf
-              ? c.subjects.morning
-              : c.subjects.reminder,
+        subject: timeChange
+          ? c.subjects.timeChange
+          : nextSession
+            ? c.subjects.nextSession
+            : joinNow
+              ? c.subjects.joinNow
+              : morningOf
+                ? c.subjects.morning
+                : c.subjects.reminder,
         html: appendUnsubFooter(html, unsubUrl),
         headers: unsubHeaders(unsubUrl),
       });
@@ -723,7 +789,7 @@ serve(async (req) => {
             })
             .eq("email", r.email)
             .in("source", SOURCES);
-        } else if (!testEmail) {
+        } else if (!testEmail && !timeChange) {
           await supabase
             .from("form_submissions")
             .update({
