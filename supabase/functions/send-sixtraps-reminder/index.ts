@@ -67,7 +67,7 @@ const CAMPAIGNS: Record<string, Campaign> = {
     subjects: {
       reminder: "یادآوری وبینار + ویدیوی پیش‌نیاز 🌷",
       joinNow: "وبینار در حال شروع است — همین حالا وارد شوید 🚀",
-      morning: "امشب: ۶ تله اینستاگرامی بیزینس‌های ایرانی در آمریکا و کانادا 🌷",
+      morning: "امروز: ۶ تله اینستاگرامی بیزینس‌های ایرانی در آمریکا و کانادا 🌷",
       nextSession: "جلسه زنده رو از دست دادی؟ هفته آینده دوباره برگزار می‌شه 🌷",
     },
     morningBody: [
@@ -81,7 +81,7 @@ const CAMPAIGNS: Record<string, Campaign> = {
         <li>چرا بعضی بیزینس‌ها با فالوور کمتر، فروش بیشتری دارند؟</li>
         <li>و چرا روش‌هایی که در ایران جواب می‌دادند، اینجا نتیجه مشابهی نمی‌سازند؟</li>
       </ul>`,
-      p("<strong>امشب در وبینار رایگان:</strong>"),
+      p("<strong>امروز در وبینار رایگان:</strong>"),
       p("«۶ تله اینستاگرامی بیزینس‌های ایرانی در آمریکا و کانادا»"),
       p("این ۶ اشتباه را قدم‌به‌قدم بررسی می‌کنم و به شما نشان می‌دهم چطور از اینستاگرام برای سه نتیجه واقعی استفاده کنید:"),
       `<ul style="margin:0 0 14px;padding:0 20px 0 0;font-size:15px;line-height:2;">
@@ -118,7 +118,7 @@ const CAMPAIGNS: Record<string, Campaign> = {
     subjects: {
       reminder: "یادآوری وبینار اینستاگرام ادز + ویدیوی پیش‌نیاز 🌷",
       joinNow: "وبینار در حال شروع است — همین حالا وارد شوید 🚀",
-      morning: "امشب: جذب مشتری واقعی با تبلیغات اینستاگرام 🌷",
+      morning: "امروز: جذب مشتری واقعی با تبلیغات اینستاگرام 🌷",
       nextSession: "آخرین جلسه رایگان اینستاگرام ادز — جای شما خالی بود 🌷",
     },
     morningBody: [
@@ -132,7 +132,7 @@ const CAMPAIGNS: Record<string, Campaign> = {
         <li>چه بودجه‌ای برای شروع منطقی است؟</li>
         <li>و چطور بفهمید تبلیغ‌تان دارد جواب می‌دهد یا نه؟</li>
       </ul>`,
-      p("<strong>امشب در وبینار رایگان:</strong>"),
+      p("<strong>امروز در وبینار رایگان:</strong>"),
       p("«جذب مشتری با تبلیغات اینستاگرام»"),
       p("قدم‌به‌قدم نشان می‌دهم چطور یک کمپین درست بسازید تا:"),
       `<ul style="margin:0 0 14px;padding:0 20px 0 0;font-size:15px;line-height:2;">
@@ -403,7 +403,7 @@ function buildMorningHtml(
       ${
         rows
           ? `<div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:12px;margin:20px 0;">
-               <p style="margin:0 0 8px;font-size:14px;font-weight:bold;">⏰ زمان برگزاری: امشب</p>
+               <p style="margin:0 0 8px;font-size:14px;font-weight:bold;">⏰ زمان برگزاری: امروز</p>
                <table style="width:100%;border-collapse:collapse;">${rows}</table>
              </div>`
           : ""
@@ -423,7 +423,7 @@ function buildMorningHtml(
           : ""
       }
 
-      ${p("امشب منتظرتان هستم،<br><strong>علی لطفی</strong>")}
+      ${p("امروز منتظرتان هستم،<br><strong>علی لطفی</strong>")}
 
       <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
         سوالی داشتی؟ <a href="${supportUrl}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
