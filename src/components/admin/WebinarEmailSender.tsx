@@ -379,6 +379,36 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
 
       <Card>
         <CardHeader className="pb-3">
+          <CardTitle className="text-base">“Session time changed” announcement</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Farsi email telling registrants the sessions were merged into one, with the new times per
+            city and an Add to Calendar button. Sends to everyone in the round selected in the first
+            card (ignores the "only unsent" filter).
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => send('test', false, false, false, true)}
+              disabled={!!sending}
+            >
+              {spinner('time-test')} Send test
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => send('all', false, false, false, true)}
+              disabled={!!sending}
+            >
+              {spinner('time-all')} Send time-change email to {timeChangeTargetCount}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-3">
           <CardTitle className="text-base">“Missed it? Next session” invite</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
