@@ -721,24 +721,28 @@ serve(async (req) => {
       const rRound = (r.roundId && roundMap.get(r.roundId)) || round;
       const rRoundId = rRound?.id || targetRoundId;
       const { meetUrl, startUtc, gcalUrl } = contentFor(rRound);
-      const html = nextSession
-        ? buildNextSessionHtml(c, r.name, startUtc, supportUrl)
-        : joinNow
-          ? buildJoinNowHtml(r.name, meetUrl, supportUrl)
-          : morningOf
-            ? buildMorningHtml(c, r.name, startUtc, meetUrl, supportUrl)
-            : buildHtml(c, r.name, startUtc, meetUrl, gcalUrl, supportUrl);
+      const html = timeChange
+        ? buildTimeChangeHtml(c, r.name, startUtc, gcalUrl, supportUrl)
+        : nextSession
+          ? buildNextSessionHtml(c, r.name, startUtc, supportUrl)
+          : joinNow
+            ? buildJoinNowHtml(r.name, meetUrl, supportUrl)
+            : morningOf
+              ? buildMorningHtml(c, r.name, startUtc, meetUrl, supportUrl)
+              : buildHtml(c, r.name, startUtc, meetUrl, gcalUrl, supportUrl);
       const unsubUrl = await buildUnsubUrl(r.email);
       const { data: sendData, error } = await resend.emails.send({
         from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>",
         to: [r.email],
-        subject: nextSession
-          ? c.subjects.nextSession
-          : joinNow
-            ? c.subjects.joinNow
-            : morningOf
-              ? c.subjects.morning
-              : c.subjects.reminder,
+        subject: timeChange
+          ? c.subjects.timeChange
+          : nextSession
+            ? c.subjects.nextSession
+            : joinNow
+              ? c.subjects.joinNow
+              : morningOf
+                ? c.subjects.morning
+                : c.subjects.reminder,
         html: appendUnsubFooter(html, unsubUrl),
         headers: unsubHeaders(unsubUrl),
       });
