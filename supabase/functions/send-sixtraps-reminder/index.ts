@@ -690,6 +690,10 @@ serve(async (req) => {
           }
           query = query.in("round_id", ids);
         } else if (targetRoundId) query = query.eq("round_id", targetRoundId);
+        if (timeChange) {
+          // Only people moved from the cancelled West session (flagged via meta)
+          query = query.eq("meta->>time_change_notice", "true");
+        }
         if (onlyUnsent && !timeChange) {
           query = joinNow
             ? query.is("join_now_sent_at", null)
