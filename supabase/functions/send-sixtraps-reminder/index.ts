@@ -596,6 +596,7 @@ serve(async (req) => {
     const joinNow = body?.joinNow === true;
     const morningOf = body?.morningOf === true;
     const nextSession = body?.nextSession === true;
+    const timeChange = body?.timeChange === true;
     // For the "next session" email, roundId selects the AUDIENCE (people who
     // signed up for that past round); the content uses the upcoming round.
     const audienceRoundId = nextSession
@@ -689,7 +690,7 @@ serve(async (req) => {
           }
           query = query.in("round_id", ids);
         } else if (targetRoundId) query = query.eq("round_id", targetRoundId);
-        if (onlyUnsent) {
+        if (onlyUnsent && !timeChange) {
           query = joinNow
             ? query.is("join_now_sent_at", null)
             : morningOf
