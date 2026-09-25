@@ -437,6 +437,64 @@ function buildMorningHtml(
 </html>`;
 }
 
+function buildTimeChangeHtml(
+  c: Campaign,
+  name: string,
+  startUtc: Date | null,
+  gcalUrl: string,
+  supportUrl: string,
+): string {
+  const rows = zoneRows(startUtc);
+
+  return `
+<!doctype html>
+<html dir="rtl" lang="fa">
+  <body dir="rtl" style="direction:rtl;text-align:right;margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
+    <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;">
+      <h1 style="margin:0 0 14px;font-size:20px;line-height:1.6;">
+        سلام ${name} 🌷
+      </h1>
+
+      ${p("امیدواریم عالی و پرانرژی باشید.")}
+      ${p("برای اینکه بتوانیم همه پرسش‌ها و تمرین‌ها را با تمرکز و انرژی صددرصدی در یک جمع پرشور برگزار کنیم، <strong>سانس‌های وبینار را ادغام کرده‌ایم</strong> تا همه در یک جلسه زنده و جامع در کنار هم باشیم.")}
+
+      ${
+        rows
+          ? `<div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:12px;margin:20px 0;">
+               <p style="margin:0 0 8px;font-size:14px;font-weight:bold;">⏰ ساعت جدید و نهایی جلسه</p>
+               <table style="width:100%;border-collapse:collapse;">${rows}</table>
+             </div>`
+          : ""
+      }
+
+      ${p("✅ جای شما کاملاً محفوظ است و <strong>نیازی به ثبت‌نام دوباره نیست</strong>.")}
+      ${p("لینک ورود به وبینار و یادآوری‌ها دقیقاً پیش از شروع جلسه برایتان ارسال می‌شود.")}
+
+      <p style="margin:18px 0 10px;font-size:15px;line-height:1.9;">
+        لطفاً همین حالا ساعت جدید را در تقویم خود ثبت کنید 👇
+      </p>
+      ${
+        gcalUrl
+          ? `<p style="text-align:center;margin:16px 0;">
+               <a href="${gcalUrl}" style="display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:14px 28px;border-radius:10px;font-size:16px;font-weight:bold;">
+                 📅 افزودن به تقویم
+               </a>
+             </p>`
+          : ""
+      }
+
+      ${p("به امید دیدار شما در این جلسه زنده و تحول‌آفرین! 🌷")}
+
+      <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
+        سوالی داشتی؟ <a href="${supportUrl}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
+        <br>روی کامپیوتر هستی؟ <a href="https://ladybosslook.com/dashboard/chat" style="color:#EA5B2B;">چت پشتیبانی در داشبورد</a> — یا همین ایمیل را جواب بده.
+        <br><br>علی لطفی
+      </p>
+    </div>
+  </body>
+</html>`;
+}
+
 function buildNextSessionHtml(
   c: Campaign,
   name: string,
