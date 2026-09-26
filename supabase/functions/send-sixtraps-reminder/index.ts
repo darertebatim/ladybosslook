@@ -718,6 +718,26 @@ serve(async (req) => {
       recipients = recipients.filter((r) => !optedOut.has(r.email.trim().toLowerCase()));
     }
 
+    // "Missed it" email: skip people who already joined the paid
+    // Customer Acquisition System course — no point pitching them again.
+    if (!testEmail && nextSession && recipients.length) {
+      const { data: enrollments } = await supabase
+        .from("course_enrollments")
+        .select("user_id")
+        .eq("program_slug", "casigads");
+      const userIds = [...new Set((enrollments || []).map((e: any) => e.user_id).filter(Boolean))];
+      if (userIds.length) {
+        const { data: profs } = await supabase
+          .from("profiles")
+          .select("email")
+          .in("id", userIds);
+        const enrolledEmails = new Set(
+          (profs || []).map((p: any) => String(p.email || "").trim().toLowerCase()).filter(Boolean),
+        );
+        recipients = recipients.filter((r) => !enrolledEmails.has(r.email.trim().toLowerCase()));
+      }
+    }
+
     let sent = 0;
     let failed = 0;
 
