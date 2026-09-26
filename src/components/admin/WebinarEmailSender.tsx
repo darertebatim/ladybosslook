@@ -95,7 +95,7 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
       const { data, error } = await supabase
         .from('form_submissions')
         .select(
-          'email, round_id, reminder_sent_at, join_now_sent_at, next_session_sent_at, morning_sent_at',
+          'email, round_id, reminder_sent_at, join_now_sent_at, next_session_sent_at, morning_sent_at, meta',
         )
         .in('source', sources)
         .order('submitted_at', { ascending: false })
@@ -154,7 +154,12 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
   );
 
   const timeChangeTargetCount = uniqueEmails(
-    rows.filter((r) => !effectiveRoundId || r.round_id === effectiveRoundId),
+    rows.filter(
+      (r) =>
+        (!effectiveRoundId || r.round_id === effectiveRoundId) &&
+        (r as Row & { meta?: { time_change_notice?: string } }).meta?.time_change_notice ===
+          'true',
+    ),
   );
 
   async function send(
