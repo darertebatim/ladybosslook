@@ -146,7 +146,9 @@ function renderEmail(opts: {
         hostLabel: "مدرس",
         langLabel: "زبان",
         stepsTitle: "چطور شروع کنم؟",
-        manual: "📘 راهنمای اپلیکیشن Rilo (PDF)",
+        manual: "مشاهده راهنمای اپلیکیشن 📘",
+        manualTitle: "📘 راهنمای کامل اپلیکیشن Rilo",
+        manualText: "همه چیزهایی که برای شروع نیاز داری داخل این راهنماست — حتماً یک نگاهی بهش بنداز!",
       }
 
     : {
@@ -180,7 +182,9 @@ function renderEmail(opts: {
         hostLabel: "Host",
         langLabel: "Language",
         stepsTitle: "How to access your program",
-        manual: "📘 Rilo app guide (PDF)",
+        manual: "View the app guide 📘",
+        manualTitle: "📘 The complete Rilo app guide",
+        manualText: "Everything you need to get started is in this guide — make sure to check it out!",
       };
 
 
@@ -308,9 +312,11 @@ function renderEmail(opts: {
       <a href="${escapeHtml(openInAppUrl)}" style="display:inline-block;background:#ea580c;color:#fff;text-decoration:none;padding:12px 22px;border-radius:12px;font-size:15px;font-weight:600;margin:0 4px 10px;">${t.openInApp}</a>
       <br>
       ${downloadHtml}
-      <br>
-      <br>
-      <a href="${RILO_MANUAL_URL}" style="display:inline-block;margin-top:10px;background:#fff7ed;color:#9a3412;text-decoration:none;padding:10px 16px;border-radius:10px;font-size:14px;border:1px solid #fed7aa;">${t.manual}</a>
+    </div>
+    <div style="background:#ffffff;border:2px solid #fdba74;border-radius:16px;padding:20px 16px;margin:20px 0;text-align:center;">
+      <h2 style="margin:0 0 8px;font-size:17px;color:#9a3412;">${t.manualTitle}</h2>
+      <p dir="auto" style="margin:0 0 14px;font-size:14px;line-height:1.7;color:#374151;">${t.manualText}</p>
+      <a href="${RILO_MANUAL_URL}" style="display:inline-block;background:#ea580c;color:#fff;text-decoration:none;padding:14px 28px;border-radius:12px;font-size:16px;font-weight:700;">${t.manual}</a>
     </div>`;
 
   const webFallbackHtml = `
@@ -535,7 +541,13 @@ serve(async (req) => {
     const languageLabel =
       lang === "fa" ? (program.language ? "فارسی" : null) : program.language ? String(program.language).toUpperCase() : null;
 
-    const openInAppUrl = `${WEB_BASE}/app/programs/${programSlug}`;
+    // OneLink: opens the app if installed, otherwise the store / web page.
+    const webProgramUrl = `${WEB_BASE}/app/programs/${programSlug}`;
+    const onelinkBase = APPSFLYER_ONELINK_URL || "https://ladyboss.onelink.me/lt6v";
+    const openInAppUrl =
+      `${onelinkBase}${onelinkBase.includes("?") ? "&" : "?"}` +
+      `af_xp=custom&pid=email_enrollment&c=${encodeURIComponent(programSlug)}` +
+      `&af_web_dp=${encodeURIComponent(webProgramUrl)}`;
     const webUrl = `${WEB_BASE}/programs/${programSlug}`;
     const downloadUrl = APPSFLYER_ONELINK_URL || APP_STORE_URL;
 
