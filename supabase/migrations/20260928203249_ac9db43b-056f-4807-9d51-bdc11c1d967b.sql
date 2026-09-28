@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.resubscribe_on_form_submission() FROM PUBLIC, anon, authenticated;
