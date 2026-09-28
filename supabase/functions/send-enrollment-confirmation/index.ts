@@ -541,7 +541,13 @@ serve(async (req) => {
     const languageLabel =
       lang === "fa" ? (program.language ? "فارسی" : null) : program.language ? String(program.language).toUpperCase() : null;
 
-    const openInAppUrl = `${WEB_BASE}/app/programs/${programSlug}`;
+    // OneLink: opens the app if installed, otherwise the store / web page.
+    const webProgramUrl = `${WEB_BASE}/app/programs/${programSlug}`;
+    const onelinkBase = APPSFLYER_ONELINK_URL || "https://ladyboss.onelink.me/lt6v";
+    const openInAppUrl =
+      `${onelinkBase}${onelinkBase.includes("?") ? "&" : "?"}` +
+      `af_xp=custom&pid=email_enrollment&c=${encodeURIComponent(programSlug)}` +
+      `&af_web_dp=${encodeURIComponent(webProgramUrl)}`;
     const webUrl = `${WEB_BASE}/programs/${programSlug}`;
     const downloadUrl = APPSFLYER_ONELINK_URL || APP_STORE_URL;
 
