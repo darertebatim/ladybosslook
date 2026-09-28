@@ -135,7 +135,9 @@ function renderEmail(opts: {
         appStore: "App Store",
         playStore: "Google Play",
         viewWeb: "مشاهده در وبسایت",
-        webFallback: "اگر در دانلود اپلیکیشن مشکل داری، می‌توانی از نسخه دسکتاپ استفاده کنی:",
+        desktopTitle: "💻 ریلو روی کامپیوتر",
+        desktopText: "اگر ترجیح می‌دی با صفحه بزرگ‌تر کار کنی، بدون نیاز به نصب اپلیکیشن، مستقیم از مرورگر وارد ریلو شو:",
+        desktopButton: "ورود به ریلو در مرورگر",
         orderTitle: "خلاصه سفارش",
         amount: "مبلغ",
         free: "رایگان",
@@ -171,7 +173,9 @@ function renderEmail(opts: {
         appStore: "App Store",
         playStore: "Google Play",
         viewWeb: "View on the web",
-        webFallback: "If you have trouble downloading the app, you can use desktop mode:",
+        desktopTitle: "💻 Use Rilo on your computer",
+        desktopText: "Prefer a bigger screen? No download needed — use the whole Rilo app right in your browser:",
+        desktopButton: "Open Rilo in your browser",
         orderTitle: "Order summary",
         amount: "Amount",
         free: "Free",
@@ -320,8 +324,11 @@ function renderEmail(opts: {
     </div>`;
 
   const webFallbackHtml = `
-    <div style="background:#f9fafb;border-radius:10px;padding:12px 14px;margin:16px 0;font-size:13px;color:#374151;">
-      ${t.webFallback} <a href="${escapeHtml(webUrl)}" style="color:#ea580c;text-decoration:underline;word-break:break-all;">${escapeHtml(webUrl)}</a>
+    <div style="background:#ffffff;border:2px solid #fdba74;border-radius:16px;padding:20px 16px;margin:20px 0;text-align:center;">
+      <h2 style="margin:0 0 8px;font-size:17px;color:#9a3412;">${t.desktopTitle}</h2>
+      <p dir="auto" style="margin:0 0 14px;font-size:14px;line-height:1.7;color:#374151;">${t.desktopText}</p>
+      <a href="${escapeHtml(webUrl)}" style="display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:14px 28px;border-radius:12px;font-size:16px;font-weight:700;">${t.desktopButton}</a>
+      <p dir="ltr" style="margin:12px 0 0;font-size:12px;color:#6b7280;word-break:break-all;">${escapeHtml(webUrl)}</p>
     </div>`;
 
 
@@ -542,13 +549,12 @@ serve(async (req) => {
       lang === "fa" ? (program.language ? "فارسی" : null) : program.language ? String(program.language).toUpperCase() : null;
 
     // OneLink: opens the app if installed, otherwise the store / web page.
-    const webProgramUrl = `${WEB_BASE}/app/programs/${programSlug}`;
+    const webUrl = `${WEB_BASE}/app`;
     const onelinkBase = APPSFLYER_ONELINK_URL || "https://ladyboss.onelink.me/lt6v";
     const openInAppUrl =
       `${onelinkBase}${onelinkBase.includes("?") ? "&" : "?"}` +
       `af_xp=custom&pid=email_enrollment&c=${encodeURIComponent(programSlug)}` +
-      `&af_web_dp=${encodeURIComponent(webProgramUrl)}`;
-    const webUrl = `${WEB_BASE}/programs/${programSlug}`;
+      `&af_web_dp=${encodeURIComponent(webUrl)}`;
     const downloadUrl = APPSFLYER_ONELINK_URL || APP_STORE_URL;
 
     const { subject, html } = renderEmail({
