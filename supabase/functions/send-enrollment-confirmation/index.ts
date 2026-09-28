@@ -146,7 +146,9 @@ function renderEmail(opts: {
         hostLabel: "مدرس",
         langLabel: "زبان",
         stepsTitle: "چطور شروع کنم؟",
-        manual: "📘 راهنمای اپلیکیشن Rilo (PDF)",
+        manual: "مشاهده راهنمای اپلیکیشن 📘",
+        manualTitle: "📘 راهنمای کامل اپلیکیشن Rilo",
+        manualText: "همه چیزهایی که برای شروع نیاز داری داخل این راهنماست — حتماً یک نگاهی بهش بنداز!",
       }
 
     : {
@@ -180,7 +182,9 @@ function renderEmail(opts: {
         hostLabel: "Host",
         langLabel: "Language",
         stepsTitle: "How to access your program",
-        manual: "📘 Rilo app guide (PDF)",
+        manual: "View the app guide 📘",
+        manualTitle: "📘 The complete Rilo app guide",
+        manualText: "Everything you need to get started is in this guide — make sure to check it out!",
       };
 
 
