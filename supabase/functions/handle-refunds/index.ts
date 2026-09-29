@@ -29,6 +29,8 @@ serve(async (req) => {
     );
 
     // Get all paid orders
+    let onlyInvoices = false;
+    try { onlyInvoices = !!(await req.json())?.only_invoices; } catch (_) {}
     const { data: orders, error: ordersError } = await supabase
       .from('orders')
       .select('id, email, stripe_session_id, product_name, user_id')
@@ -49,6 +51,7 @@ serve(async (req) => {
     // Check each order for refunds
     for (const order of orders) {
       if (!order.stripe_session_id) continue;
+      if (onlyInvoices && !order.stripe_session_id.startsWith('in_')) continue;
 
       try {
         let piId: string | null = null;
@@ -66,10 +69,12 @@ serve(async (req) => {
           }
         }
 
+        if (!piId && isInvoice) console.log(`[HANDLE-REFUNDS] INVOICE ${order.stripe_session_id} has no payment intent`);
         if (piId) {
           const paymentIntent = await stripe.paymentIntents.retrieve(piId, { expand: ['latest_charge'] });
           const latestCharge: any = paymentIntent.latest_charge;
           (paymentIntent as any).amount_refunded = latestCharge?.amount_refunded ?? 0;
+          if (isInvoice) console.log(`[HANDLE-REFUNDS] INVOICE ${order.stripe_session_id} ${order.email} pi=${piId} refunded=${latestCharge?.amount_refunded}`);
           
           
           console.log(`[HANDLE-REFUNDS] Checking order ${order.id}, PI status: ${paymentIntent.status}, amount_refunded: ${paymentIntent.amount_received || 0}`);
