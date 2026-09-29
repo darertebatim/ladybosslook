@@ -187,7 +187,7 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
       }
     });
     return list;
-  }, [rounds, sortBy]);
+  }, [rounds, sortBy, filterSlug]);
 
   // Create/Update mutation
   const saveMutation = useMutation({
