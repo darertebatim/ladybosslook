@@ -51,13 +51,26 @@ serve(async (req) => {
       if (!order.stripe_session_id) continue;
 
       try {
-        const session = await stripe.checkout.sessions.retrieve(order.stripe_session_id);
-        
-        if (session.payment_intent) {
-          const paymentIntent = await stripe.paymentIntents.retrieve(
-            session.payment_intent as string,
-            { expand: ['charges'] }
-          );
+        let piId: string | null = null;
+        const isInvoice = order.stripe_session_id.startsWith('in_');
+        if (isInvoice) {
+          const invoice = await stripe.invoices.retrieve(order.stripe_session_id);
+          piId = typeof invoice.payment_intent === 'string' ? invoice.payment_intent : invoice.payment_intent?.id ?? null;
+        } else {
+          const session = await stripe.checkout.sessions.retrieve(order.stripe_session_id);
+          if (session.payment_intent) {
+            piId = session.payment_intent as string;
+          } else if (session.invoice) {
+            const invoice = await stripe.invoices.retrieve(session.invoice as string);
+            piId = typeof invoice.payment_intent === 'string' ? invoice.payment_intent : invoice.payment_intent?.id ?? null;
+          }
+        }
+
+        if (piId) {
+          const paymentIntent = await stripe.paymentIntents.retrieve(piId, { expand: ['latest_charge'] });
+          const latestCharge: any = paymentIntent.latest_charge;
+          (paymentIntent as any).amount_refunded = latestCharge?.amount_refunded ?? 0;
+          
           
           console.log(`[HANDLE-REFUNDS] Checking order ${order.id}, PI status: ${paymentIntent.status}, amount_refunded: ${paymentIntent.amount_received || 0}`);
           
