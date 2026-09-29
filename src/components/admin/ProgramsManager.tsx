@@ -236,9 +236,6 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       const slug = formData.slug.trim();
       const { audio_playlist_id: featuredAudio, ...programFields } = formData;
       const links = [...contentLinks];
-      if (featuredAudio && !links.some((link) => link.content_type === 'audio' && link.content_id === featuredAudio)) {
-        links.unshift({ content_type: 'audio', content_id: featuredAudio });
-      }
       if (editingId) {
         const { error } = await supabase
           .from('program_catalog')
@@ -302,7 +299,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       toast({ title: 'Could not load program content', description: linksError.message, variant: 'destructive' });
       return;
     }
-    setContentLinks((existingLinks || []) as { content_type: 'audio' | 'video' | 'course'; content_id: string }[]);
+    setContentLinks((existingLinks || []).filter((link) => !(link.content_type === 'audio' && link.content_id === (program as any).audio_playlist_id)) as { content_type: 'audio' | 'video' | 'course'; content_id: string }[]);
     setContentSelection({ type: 'audio', id: '' });
     setFormData({
       slug: program.slug,
@@ -1123,11 +1120,11 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                     <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
                     <SelectContent><SelectItem value="audio">Audio playlist</SelectItem><SelectItem value="video">Video playlist</SelectItem><SelectItem value="course">Course</SelectItem></SelectContent>
                   </Select>
-                  <Select value={contentSelection.id || undefined} onValueChange={(id) => setContentSelection((prev) => ({ ...prev, id }))}>
+                  <Select key={contentSelection.type + ':' + contentSelection.id} value={contentSelection.id || undefined} onValueChange={(id) => setContentSelection((prev) => ({ ...prev, id }))}>
                     <SelectTrigger className="min-w-48 flex-1"><SelectValue placeholder="Select content" /></SelectTrigger>
                     <SelectContent>{contentOptions.map((item) => <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>)}</SelectContent>
                   </Select>
-                  <Button type="button" variant="outline" disabled={!contentSelection.id || contentLinks.some((link) => link.content_type === contentSelection.type && link.content_id === contentSelection.id)} onClick={() => {
+                  <Button type="button" variant="outline" disabled={!contentSelection.id || (contentSelection.type === 'audio' && contentSelection.id === formData.audio_playlist_id) || contentLinks.some((link) => link.content_type === contentSelection.type && link.content_id === contentSelection.id)} onClick={() => {
                     setContentLinks((prev) => [...prev, { content_type: contentSelection.type, content_id: contentSelection.id }]);
                     setContentSelection((prev) => ({ ...prev, id: '' }));
                   }}><Plus className="mr-1 h-4 w-4" />Add</Button>
