@@ -34,8 +34,8 @@ serve(async (req) => {
     try { const b = await req.json(); onlyInvoices = !!b?.only_invoices; onlyIds = Array.isArray(b?.ids) ? b.ids : null; } catch (_) {}
     const { data: orders, error: ordersError } = await supabase
       .from('orders')
-      .select('id, email, stripe_session_id, product_name, user_id')
-      .eq('status', 'paid');
+      .select('id, email, stripe_session_id, product_name, user_id, payment_type')
+      .in('status', ['paid', 'completed']);
 
     if (ordersError) throw ordersError;
     if (!orders || orders.length === 0) {
