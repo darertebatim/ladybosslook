@@ -2498,7 +2498,7 @@ const AppCourseDetail = () => {
                     </Card>
                   )}
 
-                   {/* Playlists attached to the program or round */}
+                  {/* Playlists attached to the program or round */}
                   {enrollment && allRoundPlaylists.length > 0 && (
                     <Card className="rounded-2xl border-0 shadow-ios bg-card-warm">
                       <CardHeader>

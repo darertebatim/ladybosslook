@@ -26,7 +26,7 @@ export function CompactRoundCard({
 
   const isActive = round.status === 'active';
   const isUpcoming = round.status === 'upcoming';
-  const displayDate = nextSessionDate || round.first_session_date;
+  const displayDate = round.is_self_paced ? null : nextSessionDate || round.first_session_date;
   const isSessionToday = displayDate && isToday(new Date(displayDate));
 
   // Get video thumbnail
@@ -84,7 +84,7 @@ export function CompactRoundCard({
             className="text-[10px] font-bold uppercase tracking-wider truncate"
             style={{ color: isActive ? '#EB5E33' : '#8B6E5A' }}
           >
-            {isActive ? 'Active Program' : round.status}
+            {round.is_self_paced ? 'Self-paced' : isActive ? 'Active Program' : round.status}
           </div>
           <div
             className="text-[13.5px] font-semibold leading-tight mt-0.5 truncate"

@@ -196,7 +196,6 @@ export function useMyLearning() {
     enrollment: primary,
     roundId,
     isSelfPaced: !primary?.program_rounds || !!primary.program_rounds.is_self_paced,
-    enrolledAt: (primary?.enrolled_at as string) || null,
     nextSessionDate,
     courseId: courseId || null,
     course: course || null,
