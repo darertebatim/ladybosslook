@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { format, isToday, formatDistanceToNowStrict } from 'date-fns';
+import { format, isToday } from 'date-fns';
 import {
   GraduationCap,
   Play,
