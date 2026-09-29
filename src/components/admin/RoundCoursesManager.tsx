@@ -112,7 +112,7 @@ export const RoundCoursesManager = ({ roundId }: Props) => {
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={() => addMutation.mutate()} disabled={!selectedId || addMutation.isPending}>
+        <Button type="button" onClick={() => addMutation.mutate()} disabled={!selectedId || addMutation.isPending}>
           <Plus className="h-4 w-4 mr-2" />
           Add
         </Button>
@@ -130,7 +130,7 @@ export const RoundCoursesManager = ({ roundId }: Props) => {
             <div key={row.id} className="flex items-center gap-3 p-3 border rounded-lg">
               <GraduationCap className="h-4 w-4 text-muted-foreground shrink-0" />
               <span className="text-sm font-medium flex-1 truncate">{nameFor(row)}</span>
-              <Button
+              <Button type="button"
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-destructive"

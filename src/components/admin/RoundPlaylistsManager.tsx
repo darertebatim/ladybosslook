@@ -175,7 +175,7 @@ export const RoundPlaylistsManager = ({ roundId, roundName, inline = false, isOp
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={() => addMutation.mutate()} disabled={!selectedId || addMutation.isPending}>
+            <Button type="button" onClick={() => addMutation.mutate()} disabled={!selectedId || addMutation.isPending}>
               <Plus className="h-4 w-4 mr-2" />
               Add
             </Button>
@@ -200,10 +200,10 @@ export const RoundPlaylistsManager = ({ roundId, roundName, inline = false, isOp
                   <Badge variant="outline" className="text-[10px] uppercase">
                     {row.playlist_type}
                   </Badge>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" disabled={i === 0} onClick={() => move(i, -1)}>
+                  <Button type="button" variant="ghost" size="icon" className="h-8 w-8" disabled={i === 0} onClick={() => move(i, -1)}>
                     <ArrowUp className="h-4 w-4" />
                   </Button>
-                  <Button
+                  <Button type="button"
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
@@ -212,7 +212,7 @@ export const RoundPlaylistsManager = ({ roundId, roundName, inline = false, isOp
                   >
                     <ArrowDown className="h-4 w-4" />
                   </Button>
-                  <Button
+                  <Button type="button"
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 text-destructive"
