@@ -105,11 +105,11 @@ serve(async (req) => {
             // Update order status
             await supabase
               .from('orders')
-              .update({ status: 'refunded', refunded: true, refund_amount: amountRefunded })
+              .update({ status: 'refunded', refunded: true, refund_amount: amountRefunded, refunded_at: new Date().toISOString() })
               .eq('id', order.id);
 
             // Remove enrollment
-            if (order.user_id) {
+            if (order.user_id && order.payment_type !== 'subscription_recurring') {
               await supabase
                 .from('course_enrollments')
                 .delete()
