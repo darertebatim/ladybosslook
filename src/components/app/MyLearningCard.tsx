@@ -20,7 +20,7 @@ import { useUnreadChat } from '@/hooks/useUnreadChat';
 /**
  * "My Learning" — the first thing a program buyer sees on Path.
  * Shows their program, the next lesson to continue, progress, next live
- * session (or self-paced start date) and the materials unlocked by their round.
+  * session and the materials unlocked by their program or round.
  */
 export function MyLearningCard() {
   const navigate = useNavigate();
@@ -29,7 +29,6 @@ export function MyLearningCard() {
   const {
     enrollment,
     isSelfPaced,
-    enrolledAt,
     nextSessionDate,
     courseId,
     course,
@@ -229,7 +228,7 @@ export function MyLearningCard() {
       )}
 
 
-      {/* Next live session / self-paced start + My Programs */}
+       {/* Next live session / self-paced learning + My Programs */}
       <div className="mx-3 mt-3 grid grid-cols-[3fr_1fr] gap-2">
         {sessionDate ? (
           <Link
@@ -264,9 +263,6 @@ export function MyLearningCard() {
             <span className="min-w-0 flex-1">
               <span className="block text-[12.5px] font-bold leading-tight text-fg-warm line-clamp-1">
                 Learn at your own pace
-              </span>
-              <span className="block text-[11.5px] leading-tight text-fg-warm-muted line-clamp-1">
-                {enrolledAt ? `Started ${format(new Date(enrolledAt), 'MMM d, yyyy')}` : 'No live sessions'}
               </span>
             </span>
             <ChevronRight className="h-4 w-4 flex-shrink-0 text-fg-warm-muted" />

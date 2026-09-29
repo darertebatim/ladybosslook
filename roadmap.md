@@ -1,0 +1,3 @@
+- [x] Hide start dates for self-paced programs in Path and program details.
+- [x] Show directly attached program playlists in the same titled learning layout as round playlists.
+- [ ] Verify the enrolled self-paced program and playlist flow in the app — blocked by unavailable authenticated preview access.

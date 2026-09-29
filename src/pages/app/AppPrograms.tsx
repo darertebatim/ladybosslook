@@ -93,6 +93,7 @@ const AppCourses = () => {
   // Effective upcoming session: a real scheduled session, or the round's
   // first_session_date when it's still in the future.
   const upcomingSessionFor = (e: any): string | null => {
+    if (e.program_rounds?.is_self_paced) return null;
     const roundId = e.program_rounds?.id;
     const scheduled = roundId ? nextSessionMap[roundId] : null;
     if (scheduled) return scheduled;
@@ -150,7 +151,7 @@ const AppCourses = () => {
     const isEnrollmentUnseen = unseenEnrollments.has(enrollment.id);
     const isRoundUnseen = round?.id ? unseenRounds.has(round.id) : false;
     const hasNotification = isEnrollmentUnseen || isRoundUnseen;
-    const nextSessionDate = round?.id ? nextSessionMap[round.id] : null;
+    const nextSessionDate = round?.id && !round.is_self_paced ? nextSessionMap[round.id] : null;
     const nextContent = round?.id ? nextContentMap[round.id] : null;
 
     const onMarkViewed = () => {
@@ -168,6 +169,7 @@ const AppCourses = () => {
   // Nearest upcoming live session across all active rounds
   const upcoming = sortedActiveRounds
     .map((e) => {
+      if (e.program_rounds?.is_self_paced) return null;
       const roundId = e.program_rounds?.id;
       const date =
         (roundId && nextSessionMap[roundId]) ||

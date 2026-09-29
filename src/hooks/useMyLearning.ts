@@ -31,6 +31,7 @@ export function useMyLearning() {
   // Effective upcoming session: real scheduled session, else the round's
   // first_session_date while it's still in the future.
   const upcomingFor = (e: any): string | null => {
+    if (e?.program_rounds?.is_self_paced) return null;
     const rid = e?.program_rounds?.id;
     const scheduled = rid ? nextSessionMap[rid] : null;
     if (scheduled) return scheduled;
@@ -55,6 +56,21 @@ export function useMyLearning() {
 
   const roundId: string | undefined = primary?.program_rounds?.id || undefined;
   const nextSessionDate = primary ? upcomingFor(primary) : null;
+
+  // Older self-paced programs attach their featured playlist directly to the catalog.
+  const { data: programPlaylistId } = useQuery({
+    queryKey: ['my-learning-program-playlist', primary?.program_slug],
+    enabled: !!user && !!primary?.program_slug,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('program_catalog')
+        .select('audio_playlist_id')
+        .eq('slug', primary.program_slug)
+        .maybeSingle();
+      if (error) throw error;
+      return data?.audio_playlist_id || null;
+    },
+  });
 
 
   // Course attached to this round
@@ -153,7 +169,24 @@ export function useMyLearning() {
         .findIndex((l) => l.id === nextLesson.id) + 1
     : null;
 
-  const audioPlaylists = materials?.audio || [];
+  const { data: programPlaylist } = useQuery({
+    queryKey: ['my-learning-program-playlist-details', programPlaylistId],
+    enabled: !!user && !!programPlaylistId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('audio_playlists')
+        .select('id, name')
+        .eq('id', programPlaylistId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const audioPlaylists = [...(materials?.audio || [])];
+  if (programPlaylist && !audioPlaylists.some((playlist) => playlist.id === programPlaylist.id)) {
+    audioPlaylists.push(programPlaylist);
+  }
   const videoPlaylists = materials?.video || [];
   const audioPlaylistIds = audioPlaylists.map((playlist) => playlist.id);
   const videoPlaylistIds = videoPlaylists.map((playlist) => playlist.id);
@@ -162,8 +195,7 @@ export function useMyLearning() {
     isLoading,
     enrollment: primary,
     roundId,
-    isSelfPaced: !!primary?.program_rounds?.is_self_paced,
-    enrolledAt: (primary?.enrolled_at as string) || null,
+    isSelfPaced: !primary?.program_rounds || !!primary.program_rounds.is_self_paced,
     nextSessionDate,
     courseId: courseId || null,
     course: course || null,
