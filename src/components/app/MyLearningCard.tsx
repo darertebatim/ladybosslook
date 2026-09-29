@@ -20,7 +20,7 @@ import { useUnreadChat } from '@/hooks/useUnreadChat';
 /**
  * "My Learning" — the first thing a program buyer sees on Path.
  * Shows their program, the next lesson to continue, progress, next live
- * session (or self-paced start date) and the materials unlocked by their round.
+   * session and the materials unlocked by their program or round.
  */
 export function MyLearningCard() {
   const navigate = useNavigate();
@@ -29,7 +29,6 @@ export function MyLearningCard() {
   const {
     enrollment,
     isSelfPaced,
-    enrolledAt,
     nextSessionDate,
     courseId,
     course,

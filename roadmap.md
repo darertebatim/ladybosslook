@@ -1,0 +1,3 @@
+- [ ] Hide start dates for self-paced programs in Path and program details.
+- [ ] Show directly attached program playlists in the same titled learning layout as round playlists.
+- [ ] Verify self-paced and directly attached playlist flows.
