@@ -84,7 +84,7 @@ interface RoundFormData {
   in_app_support_enabled: boolean;
 }
 
-export const ProgramRoundsManager = () => {
+export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug?: string | null; onClearFilter?: () => void } = {}) => {
   const queryClient = useQueryClient();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [managingSessionsRound, setManagingSessionsRound] = useState<ProgramRound | null>(null);
@@ -171,7 +171,7 @@ export const ProgramRoundsManager = () => {
 
   const sortedRounds = useMemo(() => {
     if (!rounds) return [];
-    const list = [...rounds];
+    const list = filterSlug ? rounds.filter((r) => r.program_slug === filterSlug) : [...rounds];
     list.sort((a, b) => {
       switch (sortBy) {
         case 'newest':
@@ -499,11 +499,21 @@ export const ProgramRoundsManager = () => {
       {/* Main Rounds List Card */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Program Rounds
-          </CardTitle>
-          <Button onClick={handleCreateNew}>
+          <div className="flex items-center gap-3 flex-wrap">
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Program Rounds
+            </CardTitle>
+            {filterSlug && (
+              <Button type="button" variant="secondary" size="sm" onClick={onClearFilter}>
+                {programs?.find((p) => p.slug === filterSlug)?.title || filterSlug} · Show all ✕
+              </Button>
+            )}
+          </div>
+          <Button onClick={() => {
+            handleCreateNew();
+            if (filterSlug) setFormData((f) => ({ ...f, program_slug: filterSlug }));
+          }}>
             <Plus className="h-4 w-4 mr-2" />
             Create New Round
           </Button>
