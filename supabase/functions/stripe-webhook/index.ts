@@ -839,7 +839,7 @@ serve(async (req) => {
         });
       }
 
-      let order: { id: string; user_id: string | null; program_slug: string | null } | null = null;
+      let order: { id: string; user_id: string | null; program_slug: string | null; payment_type: string | null } | null = null;
 
       // Subscription renewals are stored with the invoice ID
       const invoiceId = typeof (charge as any).invoice === 'string'
@@ -848,7 +848,7 @@ serve(async (req) => {
       if (invoiceId) {
         const { data } = await supabase
           .from('orders')
-          .select('id, user_id, program_slug')
+          .select('id, user_id, program_slug, payment_type')
           .eq('stripe_session_id', invoiceId)
           .maybeSingle();
         order = data;
@@ -872,7 +872,7 @@ serve(async (req) => {
         if (sessionId) {
           const { data } = await supabase
             .from('orders')
-            .select('id, user_id, program_slug')
+            .select('id, user_id, program_slug, payment_type')
             .eq('stripe_session_id', sessionId)
             .maybeSingle();
           order = data;
@@ -910,7 +910,7 @@ serve(async (req) => {
       }
 
       // Only revoke access on a FULL refund — partial refunds keep the enrollment
-      if (isFullRefund && order.user_id && order.program_slug) {
+      if (isFullRefund && order.payment_type !== 'subscription_recurring' && order.user_id && order.program_slug) {
         const { error: enrollmentError } = await supabase
           .from('course_enrollments')
           .delete()
