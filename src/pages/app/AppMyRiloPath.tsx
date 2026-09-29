@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ToolShortcuts } from "@/components/app/ToolShortcuts";
+import { StartHereCard } from "@/components/app/StartHereCard";
 import { MyLearningCard } from "@/components/app/MyLearningCard";
 import { useMyLearning } from "@/hooks/useMyLearning";
 import { useNavigate } from "react-router-dom";
