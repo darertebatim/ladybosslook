@@ -171,7 +171,7 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
           <ArrowRight size={20} color="#fff" strokeWidth={2.5} />
         </button>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 10 }}>
-          <Link to="/sms-terms" style={{ fontSize: 11, color: '#8e8e93', textDecoration: 'none' }}>Terms</Link>
+          <Link to="/terms" style={{ fontSize: 11, color: '#8e8e93', textDecoration: 'none' }}>Terms</Link>
           <Link to="/privacy" style={{ fontSize: 11, color: '#8e8e93', textDecoration: 'none' }}>Privacy</Link>
         </div>
       </div>
@@ -221,7 +221,7 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
           <ArrowRight size={20} color="#fff" strokeWidth={2.5} />
         </button>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 10 }}>
-          <Link to="/sms-terms" style={{ fontSize: 11, color: '#8e8e93', textDecoration: 'none' }}>Terms</Link>
+          <Link to="/terms" style={{ fontSize: 11, color: '#8e8e93', textDecoration: 'none' }}>Terms</Link>
           <Link to="/privacy" style={{ fontSize: 11, color: '#8e8e93', textDecoration: 'none' }}>Privacy</Link>
         </div>
       </div>
@@ -351,7 +351,7 @@ export function PaywallVIP({ program, onPurchase, onRestore, onClose, preview }:
           {!isPurchasing && <ArrowRight size={20} color="#fff" strokeWidth={2.5} />}
         </button>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 10 }}>
-          <Link to="/sms-terms" style={{ fontSize: 11, color: '#8e8e93', textDecoration: 'none' }}>Terms</Link>
+          <Link to="/terms" style={{ fontSize: 11, color: '#8e8e93', textDecoration: 'none' }}>Terms</Link>
           <Link to="/privacy" style={{ fontSize: 11, color: '#8e8e93', textDecoration: 'none' }}>Privacy</Link>
         </div>
       </div>

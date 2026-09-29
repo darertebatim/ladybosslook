@@ -318,7 +318,7 @@ export function PaywallSunriseCard({ program, onPurchase, onRestore, onClose, pr
         >
           <button onClick={onClose} className="active:opacity-60">Maybe later</button>
           <span>·</span>
-          <Link to="/sms-terms" className="active:opacity-60">Terms</Link>
+          <Link to="/terms" className="active:opacity-60">Terms</Link>
           <span>·</span>
           <Link to="/privacy" className="active:opacity-60">Privacy</Link>
         </motion.div>

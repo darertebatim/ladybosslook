@@ -235,8 +235,7 @@ const NotFound = lazy(() => import("@/pages/NotFound"));
 const PaymentSuccess = lazy(() => import("@/pages/PaymentSuccess"));
 const Privacy = lazy(() => import("@/pages/Privacy"));
 const DeleteAccount = lazy(() => import("@/pages/DeleteAccount"));
-const RefundPolicy = lazy(() => import("@/pages/RefundPolicy"));
-const SMSTerms = lazy(() => import("@/pages/SMSTerms"));
+const Terms = lazy(() => import("@/pages/Terms"));
 const ThankFreeLive = lazy(() => import("@/pages/ThankFreeLive"));
 const ThankOne = lazy(() => import("@/pages/ThankOne"));
 const SixTrapsLanding = lazy(() => import("@/pages/SixTrapsLanding"));
@@ -565,8 +564,10 @@ const App = () => (
                   {!isNativeApp() && <Route path="/payment-success" element={<PaymentSuccess />} />}
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/delete-account" element={<DeleteAccount />} />
-                  <Route path="/refund-policy" element={<RefundPolicy />} />
-                  <Route path="/sms-terms" element={<SMSTerms />} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/refund-policy" element={<Navigate to="/terms#refunds" replace />} />
+                  <Route path="/terms-of-service" element={<Navigate to="/terms" replace />} />
+                  <Route path="/sms-terms" element={<Navigate to="/terms#messaging" replace />} />
                   <Route path="/appsupport" element={<AppSupport />} />
                   <Route path="/giveaway" element={<Giveaway />} />
                   {!isNativeApp() && <Route path="/ewc" element={<EmpoweredWomanCoaching />} />}
