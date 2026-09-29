@@ -63,12 +63,7 @@ const CTA = () => {
                   <div className="text-4xl font-bold font-display text-secondary">
                     $197
                   </div>
-                  <div className="text-white/70 line-through text-lg">
-                    Regular Price: $497
-                  </div>
-                  <div className="text-secondary font-semibold">
-                    Limited Time: 60% OFF
-                  </div>
+                  {/* Temporarily hidden: Regular Price + Limited Time discount lines */}
                 </div>
 
                 <Button 
