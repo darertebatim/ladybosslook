@@ -140,7 +140,7 @@ export function PaywallOnboarding({ program, onPurchase, onRestore, onClose, pre
       </div>
 
       <div className="flex items-center justify-center gap-3 mt-3">
-        <Link to="/sms-terms" className="text-[10px] text-gray-400 underline">Terms</Link>
+        <Link to="/terms" className="text-[10px] text-gray-400 underline">Terms</Link>
         <span className="text-[10px] text-gray-300">·</span>
         <Link to="/privacy" className="text-[10px] text-gray-400 underline">Privacy</Link>
       </div>

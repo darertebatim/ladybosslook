@@ -302,7 +302,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
           Maybe later
         </button>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 10 }}>
-          <Link to="/sms-terms" style={{ fontSize: 11, color: 'rgba(26,31,61,0.5)', textDecoration: 'none' }}>Terms</Link>
+          <Link to="/terms" style={{ fontSize: 11, color: 'rgba(26,31,61,0.5)', textDecoration: 'none' }}>Terms</Link>
           <Link to="/privacy" style={{ fontSize: 11, color: 'rgba(26,31,61,0.5)', textDecoration: 'none' }}>Privacy</Link>
         </div>
       </div>
@@ -470,7 +470,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
           <ArrowRight size={20} color="#fff" strokeWidth={2.5} />
         </button>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 10 }}>
-          <Link to="/sms-terms" style={{ fontSize: 11, color: 'rgba(26,31,61,0.5)', textDecoration: 'none' }}>Terms</Link>
+          <Link to="/terms" style={{ fontSize: 11, color: 'rgba(26,31,61,0.5)', textDecoration: 'none' }}>Terms</Link>
           <Link to="/privacy" style={{ fontSize: 11, color: 'rgba(26,31,61,0.5)', textDecoration: 'none' }}>Privacy</Link>
         </div>
       </div>
@@ -690,7 +690,7 @@ export function PaywallRiloV2({ program, onPurchase, onRestore, onClose, preview
           Maybe later
         </button>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 6 }}>
-          <Link to="/sms-terms" style={{ fontSize: 11, color: 'rgba(26,31,61,0.5)', textDecoration: 'none' }}>Terms</Link>
+          <Link to="/terms" style={{ fontSize: 11, color: 'rgba(26,31,61,0.5)', textDecoration: 'none' }}>Terms</Link>
           <Link to="/privacy" style={{ fontSize: 11, color: 'rgba(26,31,61,0.5)', textDecoration: 'none' }}>Privacy</Link>
         </div>
       </div>

@@ -286,7 +286,7 @@ export function PaywallPersonalized({
         <div className="mt-3 flex items-center justify-center gap-4 text-[11px] text-[#1a1f3d]/50">
           <button onClick={onClose} className="active:opacity-60">Maybe later</button>
           <span>·</span>
-          <Link to="/sms-terms" className="active:opacity-60">Terms</Link>
+          <Link to="/terms" className="active:opacity-60">Terms</Link>
           <span>·</span>
           <Link to="/privacy" className="active:opacity-60">Privacy</Link>
         </div>
