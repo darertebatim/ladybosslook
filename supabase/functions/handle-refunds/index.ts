@@ -30,7 +30,8 @@ serve(async (req) => {
 
     // Get all paid orders
     let onlyInvoices = false;
-    try { onlyInvoices = !!(await req.json())?.only_invoices; } catch (_) {}
+    let onlyIds: string[] | null = null;
+    try { const b = await req.json(); onlyInvoices = !!b?.only_invoices; onlyIds = Array.isArray(b?.ids) ? b.ids : null; } catch (_) {}
     const { data: orders, error: ordersError } = await supabase
       .from('orders')
       .select('id, email, stripe_session_id, product_name, user_id')
@@ -47,10 +48,12 @@ serve(async (req) => {
     console.log(`[HANDLE-REFUNDS] Checking ${orders.length} orders`);
 
     const refundedOrders = [];
+    const debug: any[] = [];
 
     // Check each order for refunds
     for (const order of orders) {
       if (!order.stripe_session_id) continue;
+      if (onlyIds && !onlyIds.includes(order.stripe_session_id)) continue;
       if (onlyInvoices && !order.stripe_session_id.startsWith('in_')) continue;
 
       try {
@@ -69,11 +72,13 @@ serve(async (req) => {
           }
         }
 
+        if (!piId && onlyIds) debug.push({ id: order.stripe_session_id, pi: null });
         if (!piId && isInvoice) console.log(`[HANDLE-REFUNDS] INVOICE ${order.stripe_session_id} has no payment intent`);
         if (piId) {
           const paymentIntent = await stripe.paymentIntents.retrieve(piId, { expand: ['latest_charge'] });
           const latestCharge: any = paymentIntent.latest_charge;
           (paymentIntent as any).amount_refunded = latestCharge?.amount_refunded ?? 0;
+          if (onlyIds) debug.push({ id: order.stripe_session_id, pi: piId, status: paymentIntent.status, charge: latestCharge?.id, refunded: latestCharge?.amount_refunded });
           if (isInvoice) console.log(`[HANDLE-REFUNDS] INVOICE ${order.stripe_session_id} ${order.email} pi=${piId} refunded=${latestCharge?.amount_refunded}`);
           
           
@@ -159,6 +164,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({ 
       success: true,
       refundedCount: refundedOrders.length,
+      debug,
       refundedOrders: refundedOrders.map(o => ({ email: o.email, product: o.product_name }))
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
