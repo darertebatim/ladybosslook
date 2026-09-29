@@ -246,34 +246,39 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
           .eq('id', editingId);
 
         if (error) throw error;
-        await saveContentHosts('program', formData.slug, hosts);
-
-        toast({
-          title: 'Success',
-          description: 'Program updated successfully',
-        });
       } else {
         const { error } = await supabase
           .from('program_catalog')
           .insert([{ ...programFields, slug, audio_playlist_id: featuredAudio }] as any);
 
         if (error) throw error;
-        await saveContentHosts('program', slug, hosts);
-
-        toast({
-          title: 'Success',
-          description: 'Program created successfully',
-        });
       }
 
-      const { error: linksError } = await supabase.from('program_content_links').delete().eq('program_slug', slug);
-      if (linksError) throw linksError;
-      if (links.length) {
-        const { error: insertError } = await supabase.from('program_content_links').insert(
-          links.map((link, sort_order) => ({ ...link, program_slug: slug, sort_order })),
-        );
-        if (insertError) throw insertError;
+      const { data: savedLinks, error: readError } = await supabase.from('program_content_links')
+        .select('id, content_type, content_id, sort_order').eq('program_slug', slug);
+      if (readError) throw readError;
+      const desiredIds = new Set(links.map((link) => `${link.content_type}:${link.content_id}`));
+      const removed = (savedLinks || []).filter((link) => !desiredIds.has(`${link.content_type}:${link.content_id}`));
+      if (removed.length) {
+        const { error } = await supabase.from('program_content_links').delete().in('id', removed.map((link) => link.id));
+        if (error) throw error;
       }
+      const additions = links.filter((link) => !(savedLinks || []).some((saved) => saved.content_type === link.content_type && saved.content_id === link.content_id));
+      if (additions.length) {
+        const { error } = await supabase.from('program_content_links').insert(additions.map((link) => ({
+          ...link, program_slug: slug, sort_order: links.indexOf(link),
+        })));
+        if (error) throw error;
+      }
+      for (const saved of savedLinks || []) {
+        const order = links.findIndex((link) => link.content_type === saved.content_type && link.content_id === saved.content_id);
+        if (order >= 0 && saved.sort_order !== order) {
+          const { error } = await supabase.from('program_content_links').update({ sort_order: order }).eq('id', saved.id);
+          if (error) throw error;
+        }
+      }
+      await saveContentHosts('program', slug, hosts);
+      toast({ title: 'Success', description: editingId ? 'Program updated successfully' : 'Program created successfully' });
 
       resetForm();
       fetchPrograms();
