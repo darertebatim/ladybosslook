@@ -26,6 +26,7 @@ interface EnrolledProgramCardProps {
       first_session_date?: string | null;
       start_date?: string | null;
       important_message?: string | null;
+      is_self_paced?: boolean | null;
     } | null;
     status?: string | null;
   };
@@ -48,7 +49,7 @@ export const EnrolledProgramCard = memo(function EnrolledProgramCard({
   const isUpcoming = round?.status === 'upcoming';
   const isActive = round?.status === 'active';
 
-  const displayDate = nextSessionDate || round?.first_session_date;
+  const displayDate = round?.is_self_paced ? null : nextSessionDate || round?.first_session_date;
   const isSessionToday = displayDate && isToday(new Date(displayDate));
 
   const importantNote = round?.important_message
@@ -59,6 +60,8 @@ export const EnrolledProgramCard = memo(function EnrolledProgramCard({
 
   const statusLabel = isCompleted
     ? 'Completed'
+    : round?.is_self_paced
+      ? 'Self-paced'
     : round
       ? isActive
         ? 'Active'

@@ -2102,7 +2102,7 @@ const AppCourseDetail = () => {
                   )}
 
                   {/* Upcoming Sessions Card */}
-                  {dbSessions && dbSessions.length > 0 && (
+                   {!round?.is_self_paced && dbSessions && dbSessions.length > 0 && (
                     <Card className="tour-sessions-list rounded-2xl border-0 shadow-ios bg-card-warm">
                       <CardHeader className="tour-sessions-header">
                         <CardTitle className="tour-sessions-title flex items-center gap-2 text-fg-warm">
