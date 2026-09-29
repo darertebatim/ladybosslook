@@ -376,6 +376,20 @@ const AppCourseDetail = () => {
   const round = enrollment?.program_rounds;
   const { data: roundCourseId } = useRoundCourse(round?.id);
 
+  const { data: programPlaylistInfo } = useQuery({
+    queryKey: ["course-program-playlist-info", program?.audio_playlist_id],
+    enabled: !!enrollment && !!program?.audio_playlist_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("audio_playlists")
+        .select("id, name, cover_image_url")
+        .eq("id", program.audio_playlist_id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Calendar sync tracking hook - tracks which sessions have been synced to calendar
   const {
     markSessionSynced,
@@ -530,11 +544,19 @@ const AppCourseDetail = () => {
     enabled: !!round?.id,
   });
 
-  // Main round playlist + extra playlists, de-duplicated
+  // Direct program playlist + round playlists, de-duplicated
   const allRoundPlaylists = useMemo(() => {
     const list: any[] = [];
-    if (round?.audio_playlist_id) {
+    if (programPlaylistInfo) {
       list.push({
+        id: `program-${programPlaylistInfo.id}`,
+        playlist_type: "audio",
+        playlist_id: programPlaylistInfo.id,
+        playlist: programPlaylistInfo,
+      });
+    }
+    if (round?.audio_playlist_id) {
+      if (!list.some((rp) => rp.playlist_id === round.audio_playlist_id)) list.push({
         id: `main-${round.audio_playlist_id}`,
         playlist_type: "audio",
         playlist_id: round.audio_playlist_id,
@@ -542,11 +564,11 @@ const AppCourseDetail = () => {
       });
     }
     (roundPlaylists as any[]).forEach((rp) => {
-      if (rp.playlist_type === "audio" && rp.playlist_id === round?.audio_playlist_id) return;
+      if (list.some((item) => item.playlist_id === rp.playlist_id)) return;
       list.push(rp);
     });
     return list;
-  }, [round?.audio_playlist_id, schedulePlaylistInfo, roundPlaylists]);
+  }, [programPlaylistInfo, round?.audio_playlist_id, schedulePlaylistInfo, roundPlaylists]);
 
 
   // Fetch unread post count for the round's channel
@@ -2476,37 +2498,7 @@ const AppCourseDetail = () => {
                     </Card>
                   )}
 
-                  {/* Program Playlist Card */}
-                  {(program as any)?.audio_playlist_id && enrollment && (
-                    <Card className="rounded-2xl border-0 shadow-ios bg-card-warm">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-fg-warm">
-                          <Music className="h-5 w-5" />
-                          Program Playlist
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-fg-warm/75 mb-4">
-                          Content for this program
-                        </p>
-                        <Button
-                          className="w-full bg-brand text-white shadow-ios rounded-full border-0"
-                          size="lg"
-                          onClick={() =>
-                            navigate(
-                              `/app/player/playlist/${(program as any).audio_playlist_id}`,
-                              { state: { from: location.pathname } }
-                            )
-                          }
-                        >
-                          <Music className="h-5 w-5 mr-2" />
-                          Open Playlist
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Playlists attached to this round */}
+                   {/* Playlists attached to the program or round */}
                   {enrollment && allRoundPlaylists.length > 0 && (
                     <Card className="rounded-2xl border-0 shadow-ios bg-card-warm">
                       <CardHeader>
@@ -2580,16 +2572,7 @@ const AppCourseDetail = () => {
                       )}
                        {round && (
                          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-fg-warm/10">
-                           {round.is_self_paced ? (
-                             <div>
-                               <p className="text-sm text-fg-warm/70">Started</p>
-                               <p className="font-semibold text-fg-warm">
-                                 {enrollment?.enrolled_at
-                                   ? format(new Date(enrollment.enrolled_at), "MMM d, yyyy")
-                                   : "Self-paced"}
-                               </p>
-                             </div>
-                           ) : (
+                            {!round.is_self_paced && (
                              <div>
                                <p className="text-sm text-fg-warm/70">
                                  Start Date
