@@ -839,31 +839,48 @@ serve(async (req) => {
         });
       }
 
-      // Get the checkout session for this payment intent
-      const sessions = await stripe.checkout.sessions.list({
-        payment_intent: paymentIntentId,
-        limit: 1,
-      });
+      let order: { id: string; user_id: string | null; program_slug: string | null; payment_type: string | null } | null = null;
 
-      if (sessions.data.length === 0) {
-        console.log('[WEBHOOK] No session found for payment intent:', paymentIntentId);
-        return new Response(JSON.stringify({ received: true }), {
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+      // Subscription renewals are stored with the invoice ID
+      const invoiceId = typeof (charge as any).invoice === 'string'
+        ? (charge as any).invoice
+        : (charge as any).invoice?.id;
+      if (invoiceId) {
+        const { data } = await supabase
+          .from('orders')
+          .select('id, user_id, program_slug, payment_type')
+          .eq('stripe_session_id', invoiceId)
+          .maybeSingle();
+        order = data;
       }
 
-      const sessionId = sessions.data[0].id;
+      if (!order) {
+        // One-time payments (or first subscription payment) are stored by checkout session
+        let sessionId: string | null = null;
+        const sessions = await stripe.checkout.sessions.list({ payment_intent: paymentIntentId, limit: 1 });
+        if (sessions.data.length > 0) sessionId = sessions.data[0].id;
 
-      // Find the order
-      const { data: order } = await supabase
-        .from('orders')
-        .select('id, user_id, program_slug')
-        .eq('stripe_session_id', sessionId)
-        .single();
+        if (!sessionId && invoiceId) {
+          const invoice = await stripe.invoices.retrieve(invoiceId);
+          const subId = typeof invoice.subscription === 'string' ? invoice.subscription : invoice.subscription?.id;
+          if (subId && invoice.billing_reason === 'subscription_create') {
+            const subSessions = await stripe.checkout.sessions.list({ subscription: subId, limit: 1 } as any);
+            if (subSessions.data.length > 0) sessionId = subSessions.data[0].id;
+          }
+        }
+
+        if (sessionId) {
+          const { data } = await supabase
+            .from('orders')
+            .select('id, user_id, program_slug, payment_type')
+            .eq('stripe_session_id', sessionId)
+            .maybeSingle();
+          order = data;
+        }
+      }
 
       if (!order) {
-        console.log('[WEBHOOK] No order found for session:', sessionId);
+        console.log('[WEBHOOK] No order found for charge:', charge.id);
         return new Response(JSON.stringify({ received: true }), {
           status: 200,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -893,7 +910,7 @@ serve(async (req) => {
       }
 
       // Only revoke access on a FULL refund — partial refunds keep the enrollment
-      if (isFullRefund && order.user_id && order.program_slug) {
+      if (isFullRefund && order.payment_type !== 'subscription_recurring' && order.user_id && order.program_slug) {
         const { error: enrollmentError } = await supabase
           .from('course_enrollments')
           .delete()
