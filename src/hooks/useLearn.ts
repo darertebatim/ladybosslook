@@ -86,7 +86,7 @@ export interface LearnCourseContent {
   lessons: LearnLesson[];
 }
 
-/** Courses the current user can access (RLS enforces enrollment via linked rounds). */
+/** Courses the current user can access (RLS enforces enrollment via linked programs or rounds). */
 export function useLearnCourses() {
   const { user } = useAuth();
   return useQuery({

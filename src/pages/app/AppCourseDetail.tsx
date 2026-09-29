@@ -2546,7 +2546,7 @@ const AppCourseDetail = () => {
                   )}
 
                   {/* Courses attached directly to the program */}
-                  {enrollment && directCourses.length > 0 && (
+                  {enrollment?.status === "active" && directCourses.length > 0 && (
                     <Card className="rounded-2xl border-0 shadow-ios bg-card-warm">
                       <CardHeader><CardTitle className="flex items-center gap-2 text-fg-warm"><GraduationCap className="h-5 w-5" />Courses</CardTitle></CardHeader>
                       <CardContent className="space-y-3">
@@ -2561,7 +2561,7 @@ const AppCourseDetail = () => {
                   )}
 
                   {/* Playlists attached to the program or round */}
-                  {enrollment && allRoundPlaylists.length > 0 && (
+                  {enrollment?.status === "active" && allRoundPlaylists.length > 0 && (
                     <Card className="rounded-2xl border-0 shadow-ios bg-card-warm">
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-fg-warm">
