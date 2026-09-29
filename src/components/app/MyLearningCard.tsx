@@ -106,13 +106,13 @@ export function MyLearningCard() {
       ? {
           to: `/app/player/playlist/${audioPlaylists[0].id}`,
           title: audioPlaylists[0].name,
-          label: 'Start listening',
+          label: 'Continue listening',
         }
       : !courseId && videoPlaylists.length > 0
         ? {
             to: `/app/watch/playlist/${videoPlaylists[0].id}`,
             title: videoPlaylists[0].name,
-            label: 'Start watching',
+            label: 'Continue watching',
           }
         : null;
 
