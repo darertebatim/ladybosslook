@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { format, isToday, formatDistanceToNowStrict } from 'date-fns';
+import { format, isToday } from 'date-fns';
 import {
   GraduationCap,
   Play,
@@ -278,7 +278,14 @@ export function MyLearningCard() {
                 New message from Support
               </span>
               <span className="flex-shrink-0 text-[10.5px] font-semibold text-fg-warm-muted">
-                {formatDistanceToNowStrict(new Date(supportSummary.lastMessage.created_at), { addSuffix: true })}
+                {(() => {
+                  const mins = Math.floor((Date.now() - new Date(supportSummary.lastMessage.created_at).getTime()) / 60000);
+                  if (mins < 1) return 'now';
+                  if (mins < 60) return `${mins}m`;
+                  const hrs = Math.floor(mins / 60);
+                  if (hrs < 24) return `${hrs}h`;
+                  return `${Math.floor(hrs / 24)}d`;
+                })()}
               </span>
             </span>
             <span className="mt-0.5 block truncate text-[11.5px] leading-tight text-fg-warm-muted">
