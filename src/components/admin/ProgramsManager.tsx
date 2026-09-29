@@ -108,6 +108,8 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
     restricted_regions: [] as string[],
   });
   const [hosts, setHosts] = useState<HostAssignment[]>([]);
+  const [contentLinks, setContentLinks] = useState<{ content_type: 'audio' | 'video' | 'course'; content_id: string }[]>([]);
+  const [contentSelection, setContentSelection] = useState({ type: 'audio' as 'audio' | 'video' | 'course', id: '' });
 
   // Fetch playlists for dropdown
   const { data: playlists } = useQuery({
@@ -121,6 +123,32 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       return data;
     },
   });
+
+  const { data: videoPlaylists } = useQuery({
+    queryKey: ['admin-program-video-playlists'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('video_playlists').select('id, name').order('name');
+      if (error) throw error;
+      return data || [];
+    },
+  });
+  const { data: courses } = useQuery({
+    queryKey: ['admin-program-learn-courses'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('learn_courses').select('id, title').order('title');
+      if (error) throw error;
+      return data || [];
+    },
+  });
+  const contentOptions = contentSelection.type === 'audio'
+    ? (playlists || []).map((p) => ({ id: p.id, name: p.name }))
+    : contentSelection.type === 'video'
+      ? videoPlaylists || []
+      : (courses || []).map((c) => ({ id: c.id, name: c.title }));
+  const contentName = (link: { content_type: 'audio' | 'video' | 'course'; content_id: string }) =>
+    (link.content_type === 'audio' ? playlists?.find((p) => p.id === link.content_id)?.name
+      : link.content_type === 'video' ? videoPlaylists?.find((p) => p.id === link.content_id)?.name
+      : courses?.find((c) => c.id === link.content_id)?.title) || link.content_id;
 
   const fetchPrograms = async () => {
     setIsLoading(true);
@@ -197,16 +225,24 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
     setEditingId(null);
     setShowForm(false);
     setHosts([]);
+    setContentLinks([]);
+    setContentSelection({ type: 'audio', id: '' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      const slug = formData.slug.trim();
+      const { audio_playlist_id: featuredAudio, ...programFields } = formData;
+      const links = [...contentLinks];
+      if (featuredAudio && !links.some((link) => link.content_type === 'audio' && link.content_id === featuredAudio)) {
+        links.unshift({ content_type: 'audio', content_id: featuredAudio });
+      }
       if (editingId) {
         const { error } = await supabase
           .from('program_catalog')
-          .update(formData as any)
+          .update({ ...programFields, slug, audio_playlist_id: featuredAudio } as any)
           .eq('id', editingId);
 
         if (error) throw error;
@@ -219,15 +255,24 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       } else {
         const { error } = await supabase
           .from('program_catalog')
-          .insert([formData] as any);
+          .insert([{ ...programFields, slug, audio_playlist_id: featuredAudio }] as any);
 
         if (error) throw error;
-        await saveContentHosts('program', formData.slug, hosts);
+        await saveContentHosts('program', slug, hosts);
 
         toast({
           title: 'Success',
           description: 'Program created successfully',
         });
+      }
+
+      const { error: linksError } = await supabase.from('program_content_links').delete().eq('program_slug', slug);
+      if (linksError) throw linksError;
+      if (links.length) {
+        const { error: insertError } = await supabase.from('program_content_links').insert(
+          links.map((link, sort_order) => ({ ...link, program_slug: slug, sort_order })),
+        );
+        if (insertError) throw insertError;
       }
 
       resetForm();
@@ -243,6 +288,17 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
   };
 
   const handleEdit = async (program: ProgramCatalog) => {
+    const { data: existingLinks, error: linksError } = await supabase
+      .from('program_content_links')
+      .select('content_type, content_id')
+      .eq('program_slug', program.slug)
+      .order('sort_order');
+    if (linksError) {
+      toast({ title: 'Could not load program content', description: linksError.message, variant: 'destructive' });
+      return;
+    }
+    setContentLinks((existingLinks || []) as { content_type: 'audio' | 'video' | 'course'; content_id: string }[]);
+    setContentSelection({ type: 'audio', id: '' });
     setFormData({
       slug: program.slug,
       title: program.title,
@@ -1018,7 +1074,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
 
 
               <div className="space-y-2">
-                <Label htmlFor="audio_playlist_id">Featured Playlist (Optional)</Label>
+                <Label htmlFor="audio_playlist_id">Featured Audio Playlist (Optional)</Label>
                 <Select 
                   value={formData.audio_playlist_id || 'none'} 
                   onValueChange={(value) => setFormData({ 
@@ -1044,8 +1100,33 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
-                  Playlist button will appear on course detail page in the app
+                  This audio playlist also appears in the program's learning content.
                 </p>
+              </div>
+
+              <div className="space-y-3 border-t border-border pt-4">
+                <Label>Program Learning Content</Label>
+                <p className="text-xs text-muted-foreground">Add courses and audio or video playlists directly to this program, regardless of round. Changes are saved with the program.</p>
+                {contentLinks.map((link) => (
+                  <div key={`${link.content_type}-${link.content_id}`} className="flex items-center justify-between gap-2 rounded-lg border border-border p-2 text-sm">
+                    <span className="min-w-0 truncate capitalize">{link.content_type}: {contentName(link)}</span>
+                    <Button type="button" variant="ghost" size="icon" className="shrink-0" aria-label={`Remove ${contentName(link)}`} onClick={() => setContentLinks((prev) => prev.filter((item) => item !== link))}><X className="h-4 w-4" /></Button>
+                  </div>
+                ))}
+                <div className="flex flex-wrap gap-2">
+                  <Select value={contentSelection.type} onValueChange={(type: 'audio' | 'video' | 'course') => setContentSelection({ type, id: '' })}>
+                    <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
+                    <SelectContent><SelectItem value="audio">Audio playlist</SelectItem><SelectItem value="video">Video playlist</SelectItem><SelectItem value="course">Course</SelectItem></SelectContent>
+                  </Select>
+                  <Select value={contentSelection.id || undefined} onValueChange={(id) => setContentSelection((prev) => ({ ...prev, id }))}>
+                    <SelectTrigger className="min-w-48 flex-1"><SelectValue placeholder="Select content" /></SelectTrigger>
+                    <SelectContent>{contentOptions.map((item) => <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>)}</SelectContent>
+                  </Select>
+                  <Button type="button" variant="outline" disabled={!contentSelection.id || contentLinks.some((link) => link.content_type === contentSelection.type && link.content_id === contentSelection.id)} onClick={() => {
+                    setContentLinks((prev) => [...prev, { content_type: contentSelection.type, content_id: contentSelection.id }]);
+                    setContentSelection((prev) => ({ ...prev, id: '' }));
+                  }}><Plus className="mr-1 h-4 w-4" />Add</Button>
+                </div>
               </div>
 
               <div className="space-y-2">
