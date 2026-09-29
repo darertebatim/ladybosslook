@@ -39,6 +39,8 @@ export function MyLearningCard() {
     completedCount,
     waitingCount,
     documentCount,
+    audioPlaylists,
+    videoPlaylists,
     audioPlaylistIds,
     videoPlaylistIds,
     hasProgram,
@@ -100,10 +102,18 @@ export function MyLearningCard() {
 
   // Hero fallback for rounds without a course but with playlists
   const heroPlaylist =
-    !courseId && audioPlaylistIds.length > 0
-      ? { to: `/app/player/playlist/${audioPlaylistIds[0]}`, label: 'Continue listening' }
-      : !courseId && videoPlaylistIds.length > 0
-        ? { to: `/app/watch/playlist/${videoPlaylistIds[0]}`, label: 'Continue watching' }
+    !courseId && audioPlaylists.length > 0
+      ? {
+          to: `/app/player/playlist/${audioPlaylists[0].id}`,
+          title: audioPlaylists[0].name,
+          label: 'Start listening',
+        }
+      : !courseId && videoPlaylists.length > 0
+        ? {
+            to: `/app/watch/playlist/${videoPlaylists[0].id}`,
+            title: videoPlaylists[0].name,
+            label: 'Start watching',
+          }
         : null;
 
   return (
@@ -156,7 +166,13 @@ export function MyLearningCard() {
 
       {/* Hero for playlist-only rounds */}
       {heroPlaylist && (
-        <div className="mx-3 mt-1">
+        <div className="mx-3 mt-1 rounded-2xl border border-border-warm bg-card-warm p-3.5">
+          <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-fg-warm-muted">
+            Start here
+          </p>
+          <p className="mb-2.5 mt-1 line-clamp-2 text-sm font-bold leading-snug text-fg-warm">
+            {heroPlaylist.title}
+          </p>
           <Link
             to={heroPlaylist.to}
             state={{ from: location.pathname }}
