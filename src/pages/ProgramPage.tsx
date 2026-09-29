@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Navigate, Link, useNavigate } from 'react-router-dom';
 import { supabase, browserTimezone } from '@/integrations/supabase/client';
-import { Loader2, Check, MessageCircle, ShoppingCart, Clock, ArrowLeft, Calendar, Video } from 'lucide-react';
+import { Loader2, Check, MessageCircle, ShoppingCart, Clock, ArrowLeft, Calendar, Video, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Navigation from '@/components/ui/navigation';
@@ -565,6 +565,10 @@ const ProgramPage = () => {
                     <EnrollButton />
 
                     <div className="space-y-2 text-center">
+                      <div className="flex items-center justify-center gap-2 w-fit mx-auto py-1.5 px-3 bg-primary/10 rounded-full">
+                        <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-xs font-semibold text-primary">30-day money-back guarantee</span>
+                      </div>
                       <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                         <Check className="w-3.5 h-3.5 text-primary" />
                         <span>Instant access after purchase</span>
