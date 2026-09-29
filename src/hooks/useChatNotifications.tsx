@@ -17,14 +17,23 @@ export const useChatNotifications = () => {
   pathnameRef.current = location.pathname;
 
   // Popup timer lives in its own effect so route changes (e.g. /app -> /app/path)
-  // never reset or skip it. Waits 12s after unread messages are detected.
+  // never reset or skip it. The 4s countdown only starts once the page has fully
+  // loaded (window load), so the popup never appears while the page is still loading.
   useEffect(() => {
     if (!pendingPopup) return;
-    const t = setTimeout(() => {
-      if (pathnameRef.current !== '/app/chat') setShowUnreadPopup(true);
-      setPendingPopup(false);
-    }, 12000);
-    return () => clearTimeout(t);
+    let t: ReturnType<typeof setTimeout> | undefined;
+    const startCountdown = () => {
+      t = setTimeout(() => {
+        if (pathnameRef.current !== '/app/chat') setShowUnreadPopup(true);
+        setPendingPopup(false);
+      }, 4000);
+    };
+    if (document.readyState === 'complete') {
+      startCountdown();
+      return () => clearTimeout(t);
+    }
+    window.addEventListener('load', startCountdown, { once: true });
+    return () => window.removeEventListener('load', startCountdown);
   }, [pendingPopup]);
 
   const dismissPopup = () => {
