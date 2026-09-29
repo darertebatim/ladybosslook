@@ -47,6 +47,15 @@ export function MyLearningCard() {
   const { data: supportSummary } = useSupportChatSummary('support');
   const { unreadCount: supportUnread } = useUnreadChat('support');
 
+  // Build a clean one-line preview: strip link tokens, collapse whitespace
+  const supportPreview = (() => {
+    const raw = supportSummary?.lastMessage?.content ?? '';
+    return raw
+      .replace(/LINK_BUTTON:\S+?:([^\n]+)/g, '$1')
+      .replace(/\s+/g, ' ')
+      .trim();
+  })();
+
   const [isNew, setIsNew] = useState(false);
 
 
