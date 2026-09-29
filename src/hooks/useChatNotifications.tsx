@@ -49,7 +49,7 @@ export const useChatNotifications = () => {
           setUnreadMessageCount(data.unread_count_user);
           popupTimer = setTimeout(() => {
             setShowUnreadPopup(true);
-          }, 4000);
+          }, 12000);
         }
       }
     };
