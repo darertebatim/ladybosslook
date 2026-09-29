@@ -44,7 +44,11 @@ export function MyLearningCard() {
     hasProgram,
   } = useMyLearning();
 
+  const { data: supportSummary } = useSupportChatSummary('support');
+  const { unreadCount: supportUnread } = useUnreadChat('support');
+
   const [isNew, setIsNew] = useState(false);
+
 
   const enrollmentId = enrollment?.id;
   useEffect(() => {
