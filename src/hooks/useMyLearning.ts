@@ -75,7 +75,7 @@ export function useMyLearning() {
 
   // Playlists attached to this round (audio / video materials)
   const { data: materials } = useQuery({
-    queryKey: ['my-learning-round-playlists-v2', roundId],
+    queryKey: ['my-learning-round-playlists-v3', roundId],
     enabled: !!user && !!roundId,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -84,9 +84,32 @@ export function useMyLearning() {
         .eq('round_id', roundId!);
       if (error) throw error;
       const rows = (data || []) as any[];
+
+      const audioIds = rows
+        .filter((r) => r.playlist_type !== 'video')
+        .map((r) => r.playlist_id as string);
+      const videoIds = rows
+        .filter((r) => r.playlist_type === 'video')
+        .map((r) => r.playlist_id as string);
+
+      const [audioResult, videoResult] = await Promise.all([
+        audioIds.length > 0
+          ? supabase.from('audio_playlists').select('id, name').in('id', audioIds)
+          : Promise.resolve({ data: [], error: null }),
+        videoIds.length > 0
+          ? supabase.from('video_playlists').select('id, name').in('id', videoIds)
+          : Promise.resolve({ data: [], error: null }),
+      ]);
+
+      if (audioResult.error) throw audioResult.error;
+      if (videoResult.error) throw videoResult.error;
+
+      const audioById = new Map((audioResult.data || []).map((playlist) => [playlist.id, playlist]));
+      const videoById = new Map((videoResult.data || []).map((playlist) => [playlist.id, playlist]));
+
       return {
-        audio: rows.filter((r) => r.playlist_type !== 'video').map((r) => r.playlist_id as string),
-        video: rows.filter((r) => r.playlist_type === 'video').map((r) => r.playlist_id as string),
+        audio: audioIds.map((id) => audioById.get(id)).filter(Boolean),
+        video: videoIds.map((id) => videoById.get(id)).filter(Boolean),
       };
     },
   });
@@ -130,8 +153,10 @@ export function useMyLearning() {
         .findIndex((l) => l.id === nextLesson.id) + 1
     : null;
 
-  const audioPlaylistIds = materials?.audio || [];
-  const videoPlaylistIds = materials?.video || [];
+  const audioPlaylists = materials?.audio || [];
+  const videoPlaylists = materials?.video || [];
+  const audioPlaylistIds = audioPlaylists.map((playlist) => playlist.id);
+  const videoPlaylistIds = videoPlaylists.map((playlist) => playlist.id);
 
   return {
     isLoading,
@@ -149,6 +174,8 @@ export function useMyLearning() {
     completedCount,
     waitingCount,
     documentCount,
+    audioPlaylists,
+    videoPlaylists,
     audioPlaylistIds,
     videoPlaylistIds,
     audioCount: audioPlaylistIds.length,
