@@ -12,6 +12,20 @@ export const useChatNotifications = () => {
   const hasShownInitialNotification = useRef(false);
   const [showUnreadPopup, setShowUnreadPopup] = useState(false);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+  const [pendingPopup, setPendingPopup] = useState(false);
+  const pathnameRef = useRef(location.pathname);
+  pathnameRef.current = location.pathname;
+
+  // Popup timer lives in its own effect so route changes (e.g. /app -> /app/path)
+  // never reset or skip it. Waits 12s after unread messages are detected.
+  useEffect(() => {
+    if (!pendingPopup) return;
+    const t = setTimeout(() => {
+      if (pathnameRef.current !== '/app/chat') setShowUnreadPopup(true);
+      setPendingPopup(false);
+    }, 12000);
+    return () => clearTimeout(t);
+  }, [pendingPopup]);
 
   const dismissPopup = () => {
     setShowUnreadPopup(false);
@@ -25,7 +39,6 @@ export const useChatNotifications = () => {
   useEffect(() => {
     if (!user?.id) return;
 
-    let popupTimer: ReturnType<typeof setTimeout> | null = null;
 
     // Fetch conversation and check for unread messages on app open
     const fetchConversation = async () => {
@@ -43,13 +56,11 @@ export const useChatNotifications = () => {
         if (
           data.unread_count_user > 0 &&
           !hasShownInitialNotification.current &&
-          location.pathname !== '/app/chat'
+          pathnameRef.current !== '/app/chat'
         ) {
           hasShownInitialNotification.current = true;
           setUnreadMessageCount(data.unread_count_user);
-          popupTimer = setTimeout(() => {
-            setShowUnreadPopup(true);
-          }, 12000);
+          setPendingPopup(true);
         }
       }
     };
@@ -93,7 +104,6 @@ export const useChatNotifications = () => {
       .subscribe();
 
     return () => {
-      if (popupTimer) clearTimeout(popupTimer);
       supabase.removeChannel(channel);
     };
   }, [user?.id, location.pathname, navigate]);
