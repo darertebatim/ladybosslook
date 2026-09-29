@@ -573,10 +573,10 @@ export default function AppMyRiloPath() {
             <MyLearningCard />
           </div>
 
-          {/* Quick shortcuts — hidden for learners with a program */}
+          {/* Start here — one personalized free playlist for non-learners */}
           {!hasLearningProgram && (
             <div className="px-4 pt-2 pb-1">
-              <ToolShortcuts hideWhenEmpty />
+              <StartHereCard />
             </div>
           )}
 
