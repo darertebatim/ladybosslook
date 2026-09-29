@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ProgramsManager } from '@/components/admin/ProgramsManager';
 import { ProgramRoundsManager } from '@/components/admin/ProgramRoundsManager';
@@ -9,6 +10,8 @@ import { EnrollmentEmailsManager } from '@/components/admin/EnrollmentEmailsMana
 import { ProfileAnalysisManager } from '@/components/admin/ProfileAnalysisManager';
 
 export default function Programs() {
+  const [tab, setTab] = useState('catalog');
+  const [roundsSlug, setRoundsSlug] = useState<string | null>(null);
   return (
     <div className="space-y-6">
       <div>
@@ -16,7 +19,7 @@ export default function Programs() {
         <p className="text-muted-foreground">Manage program catalog, rounds, sessions, and auto-enrollment</p>
       </div>
 
-      <Tabs defaultValue="catalog">
+      <Tabs value={tab} onValueChange={(v) => { setTab(v); if (v !== 'rounds') setRoundsSlug(null); }}>
         <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="catalog">Program Catalog</TabsTrigger>
           <TabsTrigger value="rounds">Program Rounds</TabsTrigger>
@@ -43,11 +46,11 @@ export default function Programs() {
 
 
         <TabsContent value="catalog">
-          <ProgramsManager />
+          <ProgramsManager onOpenRounds={(slug) => { setRoundsSlug(slug); setTab('rounds'); }} />
         </TabsContent>
 
         <TabsContent value="rounds">
-          <ProgramRoundsManager />
+          <ProgramRoundsManager filterSlug={roundsSlug} onClearFilter={() => setRoundsSlug(null)} />
         </TabsContent>
 
         <TabsContent value="sessions">

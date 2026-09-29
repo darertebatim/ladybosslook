@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { GraduationCap, Plus, RefreshCw, Pencil, Trash2, Copy, Link2, Upload, X, ImageIcon, Sparkles } from 'lucide-react';
+import { GraduationCap, Plus, RefreshCw, Pencil, Trash2, Copy, Link2, Upload, X, ImageIcon, Sparkles, CalendarDays } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { HostPicker, HostAssignment, saveContentHosts, loadContentHosts } from '@/components/admin/HostPicker';
 import { RichTextEditor } from './RichTextEditor';
@@ -45,7 +45,7 @@ interface ProgramCatalog {
   auto_create_feed_channel?: boolean;
 }
 
-export function ProgramsManager() {
+export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string) => void } = {}) {
   const [programs, setPrograms] = useState<ProgramCatalog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -1425,6 +1425,12 @@ export function ProgramsManager() {
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    {onOpenRounds && (
+                      <Button variant="outline" size="sm" onClick={() => onOpenRounds(program.slug)} title="Rounds">
+                        <CalendarDays className="h-4 w-4 mr-1" />
+                        Rounds
+                      </Button>
+                    )}
                     <Button 
                       variant="outline" 
                       size="sm" 
