@@ -142,7 +142,22 @@ export function MyLearningCard() {
 
       {/* Continue where you left off */}
       {courseId && nextLesson && (
-        <div className="mx-3 mt-1 rounded-2xl border border-border-warm bg-card-warm p-3.5">
+        <div className="mx-3 mt-1 overflow-hidden rounded-2xl border border-border-warm bg-card-warm">
+          <div className="relative flex min-h-[88px] items-center gap-3 bg-gradient-orange px-4 py-3">
+            {course?.cover_image_url && (
+              <img src={course.cover_image_url} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />
+            )}
+            <GraduationCap className="relative h-7 w-7 flex-shrink-0 text-white" />
+            <p className="relative min-w-0 flex-1 text-[15px] font-extrabold leading-snug text-white line-clamp-2">
+              {course?.title || enrollment.course_name}
+            </p>
+            {nextLessonModuleIndex && nextLessonIndexInModule ? (
+              <span className="absolute bottom-2 right-2 rounded-full bg-black/35 px-2.5 py-0.5 text-[10.5px] font-bold text-white">
+                Module {nextLessonModuleIndex} · Lesson {nextLessonIndexInModule}
+              </span>
+            ) : null}
+          </div>
+          <div className="p-3.5">
           <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-fg-warm-muted">
             {completedCount > 0 ? 'Continue where you left off' : 'Start here'}
           </p>
@@ -161,18 +176,24 @@ export function MyLearningCard() {
             <Play className="h-4 w-4 fill-white" />
             {completedCount > 0 ? 'Continue lesson' : 'Start lesson'}
           </button>
+          </div>
         </div>
       )}
 
       {/* Hero for playlist-only rounds */}
       {heroPlaylist && (
-        <div className="mx-3 mt-1 rounded-2xl border border-border-warm bg-card-warm p-3.5">
-          <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-fg-warm-muted">
+        <div className="mx-3 mt-1 overflow-hidden rounded-2xl border border-border-warm bg-card-warm">
+          <div className="flex min-h-[88px] items-center gap-3 bg-gradient-orange px-4 py-3">
+            <Play className="h-7 w-7 flex-shrink-0 fill-white text-white" />
+            <p className="min-w-0 flex-1 text-[15px] font-extrabold leading-snug text-white line-clamp-2">
+              {heroPlaylist.title}
+            </p>
+          </div>
+          <div className="p-3.5">
+          <p className="mb-2.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-fg-warm-muted">
             Start here
           </p>
-          <p className="mb-2.5 mt-1 line-clamp-2 text-sm font-bold leading-snug text-fg-warm">
-            {heroPlaylist.title}
-          </p>
+
           <Link
             to={heroPlaylist.to}
             state={{ from: location.pathname }}
