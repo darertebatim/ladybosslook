@@ -635,9 +635,8 @@ const ProgramPage = () => {
               </p>
               <div className="flex flex-wrap justify-center gap-x-4 lg:gap-x-6 gap-y-1.5 text-xs lg:text-sm">
                 <RLink to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</RLink>
-                <RLink to="/terms" className="text-muted-foreground hover:text-primary transition-colors">Refund Policy</RLink>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</a>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Cookie Policy</a>
+                <RLink to="/terms#refunds" className="text-muted-foreground hover:text-primary transition-colors">Refund Policy</RLink>
+                <RLink to="/terms" className="text-muted-foreground hover:text-primary transition-colors">Terms of Use</RLink>
               </div>
             </div>
           </div>
