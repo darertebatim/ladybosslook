@@ -257,16 +257,16 @@ export function MyLearningCard() {
             <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-brand ring-2 ring-mint" />
           </span>
           <span className="min-w-0 flex-1">
-            <span className="flex items-center gap-1.5">
-              <span className="block text-[12.5px] font-extrabold leading-tight text-fg-warm line-clamp-1">
+            <span className="flex items-baseline justify-between gap-2">
+              <span className="min-w-0 truncate text-[12.5px] font-extrabold leading-tight text-fg-warm">
                 New message from Support
               </span>
               <span className="flex-shrink-0 text-[10.5px] font-semibold text-fg-warm-muted">
                 {formatDistanceToNowStrict(new Date(supportSummary.lastMessage.created_at), { addSuffix: true })}
               </span>
             </span>
-            <span className="mt-0.5 block text-[11.5px] leading-tight text-fg-warm-muted line-clamp-1">
-              {supportSummary.lastMessage.content}
+            <span className="mt-0.5 block truncate text-[11.5px] leading-tight text-fg-warm-muted">
+              {supportPreview}
             </span>
           </span>
           <span className="flex h-5 min-w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand px-1.5 text-[11px] font-bold text-white">
