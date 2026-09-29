@@ -1735,7 +1735,7 @@ function PaywallScreen({ step, onNext }: Props) {
         </button>
       </div>
       <div className="flex items-center justify-center gap-3 mt-3">
-        <a href="/sms-terms" target="_blank" className="text-[10px] text-gray-400 underline">Terms</a>
+        <a href="/terms" target="_blank" className="text-[10px] text-gray-400 underline">Terms</a>
         <span className="text-[10px] text-gray-300">·</span>
         <a href="/privacy" target="_blank" className="text-[10px] text-gray-400 underline">Privacy</a>
       </div>
