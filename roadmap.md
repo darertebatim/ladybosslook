@@ -1,3 +1,6 @@
 - [x] Hide start dates for self-paced programs in Path and program details.
 - [x] Show directly attached program playlists in the same titled learning layout as round playlists.
 - [ ] Verify the enrolled self-paced program and playlist flow in the app — blocked by unavailable authenticated preview access.
+- [x] Let admins attach courses and video playlists directly to programs and show them to enrolled students on program pages.
+- [x] Unlock directly attached course lessons and audio/video playlists for active program enrollments.
+- [ ] Verify the program content editor and enrolled student playback end to end — blocked by unavailable authenticated preview access.
