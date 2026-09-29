@@ -32,6 +32,7 @@ export function MyLearningCard() {
     enrolledAt,
     nextSessionDate,
     courseId,
+    course,
     nextLesson,
     nextLessonModuleIndex,
     nextLessonIndexInModule,
@@ -203,6 +204,7 @@ export function MyLearningCard() {
             <Play className="h-4 w-4 fill-white" />
             {heroPlaylist.label}
           </Link>
+          </div>
         </div>
       )}
 
