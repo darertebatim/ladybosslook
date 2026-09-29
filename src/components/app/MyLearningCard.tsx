@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { format, isToday } from 'date-fns';
+import { format, isToday, formatDistanceToNowStrict } from 'date-fns';
 import {
   GraduationCap,
   Play,
@@ -13,6 +13,9 @@ import { haptic } from '@/lib/haptics';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useMyLearning } from '@/hooks/useMyLearning';
+import { useSupportChatSummary } from '@/hooks/useSupportChatSummary';
+import { useUnreadChat } from '@/hooks/useUnreadChat';
+
 
 /**
  * "My Learning" — the first thing a program buyer sees on Path.
