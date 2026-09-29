@@ -1799,7 +1799,7 @@ const AppCourseDetail = () => {
 
                   {/* Next Session Card - shown at the top for quick visibility */}
                   {(() => {
-                    const nextSession = dbSessions?.find(
+                     const nextSession = !round?.is_self_paced && dbSessions?.find(
                       (s) => !isSessionPast(s.session_date),
                     );
                     if (!nextSession) return null;
@@ -2570,7 +2570,7 @@ const AppCourseDetail = () => {
                           }}
                         />
                       )}
-                       {round && (
+                       {round && !round.is_self_paced && (
                          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-fg-warm/10">
                             {!round.is_self_paced && (
                              <div>
