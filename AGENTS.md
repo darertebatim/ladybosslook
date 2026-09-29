@@ -1,1 +1,1 @@
-- Resolve direct program playlists alongside round playlists in learner views, deduplicating by playlist ID, so self-paced enrollments without a round still show their learning content.
+- Resolve direct program courses and audio/video playlists alongside round content in learner views, deduplicating by content ID; program enrollment must unlock directly attached content even without a round.

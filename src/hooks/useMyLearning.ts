@@ -57,24 +57,35 @@ export function useMyLearning() {
   const roundId: string | undefined = primary?.program_rounds?.id || undefined;
   const nextSessionDate = primary ? upcomingFor(primary) : null;
 
-  // Older self-paced programs attach their featured playlist directly to the catalog.
-  const { data: programPlaylistId } = useQuery({
-    queryKey: ['my-learning-program-playlist', primary?.program_slug],
+  // Resolve content attached directly to the program as well as to its round.
+  const { data: programContent } = useQuery({
+    queryKey: ['my-learning-program-content', primary?.program_slug],
     enabled: !!user && !!primary?.program_slug,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('program_catalog')
-        .select('audio_playlist_id')
-        .eq('slug', primary.program_slug)
-        .maybeSingle();
-      if (error) throw error;
-      return data?.audio_playlist_id || null;
+      const slug = primary?.program_slug;
+      if (!slug) return { audio: [], video: [], courses: [] };
+      const [{ data: program, error: programError }, { data: links, error: linkError }] = await Promise.all([
+        supabase.from('program_catalog').select('audio_playlist_id').eq('slug', slug).maybeSingle(),
+        supabase.from('program_content_links').select('content_type, content_id').eq('program_slug', slug).order('sort_order'),
+      ]);
+      if (programError) throw programError;
+      if (linkError) throw linkError;
+      const audioIds = [...new Set([program?.audio_playlist_id, ...(links || []).filter((l) => l.content_type === 'audio').map((l) => l.content_id)].filter((id): id is string => !!id))];
+      const videoIds = (links || []).filter((l) => l.content_type === 'video').map((l) => l.content_id);
+      const courses = (links || []).filter((l) => l.content_type === 'course').map((l) => l.content_id);
+      const [audioResult, videoResult] = await Promise.all([
+        audioIds.length ? supabase.from('audio_playlists').select('id, name').in('id', audioIds) : Promise.resolve({ data: [], error: null }),
+        videoIds.length ? supabase.from('video_playlists').select('id, name').in('id', videoIds) : Promise.resolve({ data: [], error: null }),
+      ]);
+      if (audioResult.error) throw audioResult.error;
+      if (videoResult.error) throw videoResult.error;
+      return { audio: audioResult.data || [], video: videoResult.data || [], courses };
     },
   });
 
 
   // Course attached to this round
-  const { data: courseId } = useQuery({
+  const { data: roundCourseId } = useQuery({
     queryKey: ['my-learning-round-course', roundId],
     enabled: !!user && !!roundId,
     queryFn: async () => {
@@ -88,6 +99,7 @@ export function useMyLearning() {
       return (data?.course_id as string) ?? null;
     },
   });
+  const courseId = roundCourseId || programContent?.courses[0] || null;
 
   // Playlists attached to this round (audio / video materials)
   const { data: materials } = useQuery({
@@ -169,25 +181,14 @@ export function useMyLearning() {
         .findIndex((l) => l.id === nextLesson.id) + 1
     : null;
 
-  const { data: programPlaylist } = useQuery({
-    queryKey: ['my-learning-program-playlist-details', programPlaylistId],
-    enabled: !!user && !!programPlaylistId,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('audio_playlists')
-        .select('id, name')
-        .eq('id', programPlaylistId)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
+  const audioPlaylists = [...(programContent?.audio || [])];
+  (materials?.audio || []).forEach((playlist) => {
+    if (!audioPlaylists.some((item) => item.id === playlist.id)) audioPlaylists.push(playlist);
   });
-
-  const audioPlaylists = [...(materials?.audio || [])];
-  if (programPlaylist && !audioPlaylists.some((playlist) => playlist.id === programPlaylist.id)) {
-    audioPlaylists.push(programPlaylist);
-  }
-  const videoPlaylists = materials?.video || [];
+  const videoPlaylists = [...(programContent?.video || [])];
+  (materials?.video || []).forEach((playlist) => {
+    if (!videoPlaylists.some((item) => item.id === playlist.id)) videoPlaylists.push(playlist);
+  });
   const audioPlaylistIds = audioPlaylists.map((playlist) => playlist.id);
   const videoPlaylistIds = videoPlaylists.map((playlist) => playlist.id);
 

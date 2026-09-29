@@ -376,6 +376,53 @@ const AppCourseDetail = () => {
   const round = enrollment?.program_rounds;
   const { data: roundCourseId } = useRoundCourse(round?.id);
 
+  const { data: directContent = [] } = useQuery({
+    queryKey: ["course-program-content", enrollment?.program_slug],
+    enabled: !!enrollment?.program_slug,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("program_content_links")
+        .select("content_type, content_id")
+        .eq("program_slug", enrollment.program_slug)
+        .order("sort_order");
+      if (error) throw error;
+      return data || [];
+    },
+  });
+  const { data: directCourses = [] } = useQuery({
+    queryKey: ["course-program-courses", enrollment?.program_slug, directContent],
+    enabled: !!enrollment && directContent.some((link) => link.content_type === "course"),
+    queryFn: async () => {
+      const ids = directContent.filter((link) => link.content_type === "course").map((link) => link.content_id);
+      const { data, error } = await supabase.from("learn_courses")
+        .select("id, title, cover_image_url")
+        .eq("is_published", true)
+        .in("id", ids);
+      if (error) throw error;
+      return ids.map((id) => data?.find((course) => course.id === id)).filter((course) => !!course);
+    },
+  });
+
+  const { data: directPlaylists = [] } = useQuery({
+    queryKey: ["course-program-direct-playlists", enrollment?.program_slug, directContent],
+    enabled: !!enrollment && directContent.some((link) => link.content_type === "audio" || link.content_type === "video"),
+    queryFn: async () => {
+      const audioIds = directContent.filter((link) => link.content_type === "audio").map((link) => link.content_id);
+      const videoIds = directContent.filter((link) => link.content_type === "video").map((link) => link.content_id);
+      const [audio, video] = await Promise.all([
+        audioIds.length ? supabase.from("audio_playlists").select("id, name, cover_image_url").in("id", audioIds) : Promise.resolve({ data: [], error: null }),
+        videoIds.length ? supabase.from("video_playlists").select("id, name, cover_image_url").in("id", videoIds) : Promise.resolve({ data: [], error: null }),
+      ]);
+      if (audio.error) throw audio.error;
+      if (video.error) throw video.error;
+      return directContent.filter((l) => l.content_type === "audio" || l.content_type === "video").map((link) => ({
+        id: `program-${link.content_type}-${link.content_id}`,
+        playlist_type: link.content_type,
+        playlist_id: link.content_id,
+        playlist: [...(audio.data || []), ...(video.data || [])].find((p) => p.id === link.content_id),
+      })).filter((link) => !!link.playlist);
+    },
+  });
+
   const { data: programPlaylistInfo } = useQuery({
     queryKey: ["course-program-playlist-info", program?.audio_playlist_id],
     enabled: !!enrollment && !!program?.audio_playlist_id,
@@ -546,9 +593,9 @@ const AppCourseDetail = () => {
 
   // Direct program playlist + round playlists, de-duplicated
   const allRoundPlaylists = useMemo(() => {
-    const list: any[] = [];
+    const list: any[] = [...directPlaylists];
     if (programPlaylistInfo) {
-      list.push({
+      if (!list.some((rp) => rp.playlist_id === programPlaylistInfo.id)) list.push({
         id: `program-${programPlaylistInfo.id}`,
         playlist_type: "audio",
         playlist_id: programPlaylistInfo.id,
@@ -568,7 +615,7 @@ const AppCourseDetail = () => {
       list.push(rp);
     });
     return list;
-  }, [programPlaylistInfo, round?.audio_playlist_id, schedulePlaylistInfo, roundPlaylists]);
+  }, [directPlaylists, programPlaylistInfo, round?.audio_playlist_id, schedulePlaylistInfo, roundPlaylists]);
 
 
   // Fetch unread post count for the round's channel
@@ -1942,7 +1989,7 @@ const AppCourseDetail = () => {
                         )}
 
                         {/* 1b. Course lessons (Learn player) */}
-                        {roundCourseId && (
+                        {roundCourseId && !directCourses.some((course) => course.id === roundCourseId) && (
                           <Button
                             size="lg"
                             className="w-full h-auto px-4 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
@@ -1978,7 +2025,7 @@ const AppCourseDetail = () => {
                             onClick={() => {
                               const isMainAudio =
                                 rp.playlist_type === "audio" &&
-                                rp.playlist_id === round.audio_playlist_id;
+                                rp.playlist_id === round?.audio_playlist_id;
                               const el = isMainAudio
                                 ? document.getElementById("playlist-schedule-section")
                                 : null;
@@ -2498,8 +2545,23 @@ const AppCourseDetail = () => {
                     </Card>
                   )}
 
+                  {/* Courses attached directly to the program */}
+                  {enrollment?.status === "active" && directCourses.length > 0 && (
+                    <Card className="rounded-2xl border-0 shadow-ios bg-card-warm">
+                      <CardHeader><CardTitle className="flex items-center gap-2 text-fg-warm"><GraduationCap className="h-5 w-5" />Courses</CardTitle></CardHeader>
+                      <CardContent className="space-y-3">
+                        {directCourses.map((course) => (
+                          <Button key={course.id} variant="outline" className="h-auto min-h-14 w-full justify-start gap-3 rounded-2xl text-left" onClick={() => navigate(`/app/learn/${course.id}`, { state: { from: location.pathname } })}>
+                            {course.cover_image_url ? <img src={course.cover_image_url} alt="" className="h-11 w-11 shrink-0 rounded-xl object-cover" /> : <GraduationCap className="h-6 w-6 shrink-0 text-brand" />}
+                            <span className="min-w-0 whitespace-normal font-semibold text-fg-warm">{course.title}</span>
+                          </Button>
+                        ))}
+                      </CardContent>
+                    </Card>
+                  )}
+
                   {/* Playlists attached to the program or round */}
-                  {enrollment && allRoundPlaylists.length > 0 && (
+                  {enrollment?.status === "active" && allRoundPlaylists.length > 0 && (
                     <Card className="rounded-2xl border-0 shadow-ios bg-card-warm">
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-fg-warm">
@@ -2510,7 +2572,9 @@ const AppCourseDetail = () => {
                       <CardContent className="space-y-3">
                         {allRoundPlaylists
                           .map((rp: any) => (
-                            <button
+                            <Button
+                              type="button"
+                              variant="ghost"
 
                               key={rp.id}
                               onClick={() =>
@@ -2521,7 +2585,7 @@ const AppCourseDetail = () => {
                                   { state: { from: location.pathname } }
                                 )
                               }
-                              className="w-full flex items-center gap-3 p-3 rounded-2xl bg-white shadow-ios text-left active:scale-[0.99] transition-transform"
+                              className="w-full h-auto flex items-center justify-start gap-3 p-3 rounded-2xl bg-card shadow-ios text-left active:scale-[0.99] transition-transform"
                             >
                               {rp.playlist?.cover_image_url ? (
                                 <img
@@ -2546,7 +2610,7 @@ const AppCourseDetail = () => {
                                   {rp.playlist_type === "video" ? "Video playlist" : "Audio playlist"}
                                 </p>
                               </div>
-                            </button>
+                            </Button>
                           ))}
                       </CardContent>
                     </Card>

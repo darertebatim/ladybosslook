@@ -288,14 +288,13 @@ export default function AppPlaylistDetail() {
   const { categories: audioCategories } = useMediaCategories("audio");
 
   // Check if this playlist is attached to a program the user is enrolled in
-  // (either at the program level via program_catalog.audio_playlist_id, or
-  // at a round level via program_rounds.audio_playlist_id). This lets
+  // (via program catalog, program content, or round playlist). This lets
   // program-attached playlists unlock without requiring playlist.program_slug.
   const { data: enrolledViaProgram } = useQuery({
     queryKey: ["playlist-program-enrollment", playlistId, user?.id],
     queryFn: async () => {
       if (!user || !playlistId) return false;
-      const [{ data: progs }, { data: rounds }] = await Promise.all([
+      const [{ data: progs }, { data: rounds }, { data: links }] = await Promise.all([
         supabase
           .from("program_catalog")
           .select("slug")
@@ -304,10 +303,15 @@ export default function AppPlaylistDetail() {
           .from("program_rounds")
           .select("program_slug")
           .eq("audio_playlist_id", playlistId),
+        supabase.from("program_content_links")
+          .select("program_slug")
+          .eq("content_type", "audio")
+          .eq("content_id", playlistId),
       ]);
       const slugs = new Set<string>([
         ...((progs || []).map((p: any) => p.slug).filter(Boolean)),
         ...((rounds || []).map((r: any) => r.program_slug).filter(Boolean)),
+        ...((links || []).map((l) => l.program_slug)),
       ]);
       const { data: enr } = await supabase
         .from("course_enrollments")

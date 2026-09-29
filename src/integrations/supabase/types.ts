@@ -5262,6 +5262,44 @@ export type Database = {
           },
         ]
       }
+      program_content_links: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          id: string
+          program_slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          id?: string
+          program_slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          program_slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_content_links_program_slug_fkey"
+            columns: ["program_slug"]
+            isOneToOne: false
+            referencedRelation: "program_catalog"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       program_round_playlists: {
         Row: {
           created_at: string

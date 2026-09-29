@@ -747,8 +747,9 @@ export default function AppPlayer() {
                     const isLocked = (() => {
                       if (!trackPlaylist) return false;
                       if (trackPlaylist.is_free) return false;
+                      if (hasRoundAccess(trackPlaylist.id)) return false;
                       if (trackPlaylist.requires_subscription)
-                        return !hasPlusAccess && !hasRoundAccess(trackPlaylist.id);
+                        return !hasPlusAccess;
                       if (trackPlaylist.program_slug)
                         return !enrollments?.includes(trackPlaylist.program_slug);
                       return false;
