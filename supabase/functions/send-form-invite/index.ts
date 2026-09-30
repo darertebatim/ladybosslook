@@ -168,7 +168,7 @@ serve(async (req) => {
         }
         // Plain link (no button): points to our redirector, which opens in the
         // browser and signs the student into their own account.
-        const content = `**${form.chatTitle}**\n\n${form.chatBody.replace("{LINK}", chatUrl)}`;
+        const content = `${form.chatTitle}\n\n${form.chatBody.replace("{LINK}", chatUrl)}`;
         const { error: mErr } = await admin.from("chat_messages").insert({
           conversation_id: convId,
           sender_id: adminId,
