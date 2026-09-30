@@ -4900,6 +4900,7 @@ export type Database = {
           status: string
           target_audience: string
           user_id: string | null
+          video_sent_at: string | null
         }
         Insert: {
           business_field: string
@@ -4914,6 +4915,7 @@ export type Database = {
           status?: string
           target_audience: string
           user_id?: string | null
+          video_sent_at?: string | null
         }
         Update: {
           business_field?: string
@@ -4928,6 +4930,7 @@ export type Database = {
           status?: string
           target_audience?: string
           user_id?: string | null
+          video_sent_at?: string | null
         }
         Relationships: []
       }

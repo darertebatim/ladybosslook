@@ -30,6 +30,7 @@ interface AnalysisRequest {
   question: string | null;
   status: string;
   created_at: string;
+  video_sent_at: string | null;
 }
 
 interface ProfileInfo {
@@ -113,11 +114,10 @@ export function ProfileAnalysisManager() {
         conversationId = (created as { id: string }).id;
       }
 
-      const buttonLabel = 'تماشای ویدیوی تحلیل 🎥';
-      const baseContent =
-        '🎬 تحلیل پیج اینستاگرام شما آماده شد!\nویدیوی تحلیل پیجتان را از دکمه زیر تماشا کنید 👇';
-      // Dual format: legacy LINK_BUTTON tag (older app builds) + structured buttons (new app / web)
-      const content = `${baseContent}\n\n🔗 LINK_BUTTON:${url}:${buttonLabel}`;
+      // Plain link (no button): works on every app version, no 404 risk.
+      const content =
+        '🎬 تحلیل پیج اینستاگرام شما آماده شد!\nویدیوی تحلیل پیجتان را از لینک زیر تماشا کنید 👇\n\n' +
+        url;
       const { error: msgErr } = await (supabase as any)
         .from('chat_messages')
         .insert({
@@ -125,9 +125,16 @@ export function ProfileAnalysisManager() {
           sender_id: adminId,
           sender_type: 'admin',
           content,
-          buttons: [{ label: buttonLabel, url }],
         });
       if (msgErr) throw msgErr;
+
+      // Mark the submission as video-sent
+      const sentAt = new Date().toISOString();
+      await (supabase as any)
+        .from('profile_analysis_requests')
+        .update({ video_sent_at: sentAt })
+        .eq('id', videoTarget.id);
+      setRequests((prev) => prev.map((r) => (r.id === videoTarget.id ? { ...r, video_sent_at: sentAt } : r)));
 
 
       await (supabase as any)
@@ -296,6 +303,11 @@ export function ProfileAnalysisManager() {
                       <Badge variant={r.status === 'done' ? 'secondary' : 'default'}>
                         {STATUS_LABEL[r.status] || r.status}
                       </Badge>
+                      {r.video_sent_at && (
+                        <Badge variant="outline" className="border-green-500 text-green-700">
+                          Video sent {new Date(r.video_sent_at).toLocaleDateString()}
+                        </Badge>
+                      )}
                       <span className="text-xs text-muted-foreground">
                         {new Date(r.created_at).toLocaleString()}
                       </span>
@@ -349,13 +361,14 @@ export function ProfileAnalysisManager() {
                     {r.user_id && (
                       <Button
                         size="sm"
+                        variant={r.video_sent_at ? 'outline' : 'default'}
                         onClick={() => {
                           setVideoTarget(r);
                           setVideoLink('');
                         }}
                       >
                         <Video className="w-4 h-4 mr-1" />
-                        Send analysis video
+                        {r.video_sent_at ? 'Resend video' : 'Send analysis video'}
                       </Button>
                     )}
                   </div>
@@ -379,7 +392,7 @@ export function ProfileAnalysisManager() {
           <DialogHeader>
             <DialogTitle>Send analysis video</DialogTitle>
             <DialogDescription>
-              Paste the Google Drive link — it goes to {videoTarget?.user_id ? profiles[videoTarget.user_id]?.full_name || 'this student' : 'this student'}'s in-app chat with a watch button.
+              Paste the Google Drive link — it goes to {videoTarget?.user_id ? profiles[videoTarget.user_id]?.full_name || 'this student' : 'this student'}'s in-app chat as a tappable link.
               Make sure the Drive file is shared as "Anyone with the link can view".
             </DialogDescription>
           </DialogHeader>
