@@ -11,6 +11,7 @@ interface Row {
   full_name: string | null;
   email: string | null;
   lastInvite: string | null;
+  submitted: boolean;
 }
 
 interface Props {
@@ -25,6 +26,7 @@ export function FormInvitesPanel({ formKey, programSlug, submissionTable }: Prop
   const [sending, setSending] = useState<string | null>(null);
   const [program, setProgram] = useState(programSlug);
   const [round, setRound] = useState(ALL);
+  const [scope, setScope] = useState<'pending' | 'all'>('pending');
 
   const load = async () => {
     setLoading(true);
@@ -47,14 +49,14 @@ export function FormInvitesPanel({ formKey, programSlug, submissionTable }: Prop
       const pmap = Object.fromEntries((profs || []).map((p: any) => [p.id, p]));
       setRows(
         ids
-          .filter((id) => !submitted.has(id))
           .map((id) => ({
             user_id: id,
             full_name: pmap[id]?.full_name ?? null,
             email: pmap[id]?.email ?? null,
             lastInvite: last[id] ?? null,
+            submitted: submitted.has(id),
           }))
-          .sort((a, b) => (a.lastInvite ? 1 : 0) - (b.lastInvite ? 1 : 0)),
+          .sort((a, b) => Number(a.submitted) - Number(b.submitted) || (a.lastInvite ? 1 : 0) - (b.lastInvite ? 1 : 0)),
       );
     } catch (e) {
       console.error(e);
@@ -88,19 +90,28 @@ export function FormInvitesPanel({ formKey, programSlug, submissionTable }: Prop
     }
   };
 
-  const notInvited = useMemo(() => rows.filter((r) => !r.lastInvite).map((r) => r.user_id), [rows]);
-  const everyone = rows.map((r) => r.user_id);
+  const visible = useMemo(() => (scope === 'pending' ? rows.filter((r) => !r.submitted) : rows), [rows, scope]);
+  const notInvited = useMemo(() => visible.filter((r) => !r.lastInvite).map((r) => r.user_id), [visible]);
+  const everyone = visible.map((r) => r.user_id);
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <ProgramRoundFilter program={program} round={round} onChange={(p, r) => { setProgram(p); setRound(r); }} />
+        <select
+          value={scope}
+          onChange={(e) => setScope(e.target.value as 'pending' | 'all')}
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+        >
+          <option value="pending">Haven't submitted yet</option>
+          <option value="all">All students</option>
+        </select>
         <Button
           size="sm"
           variant="outline"
           disabled={!everyone.length || !!sending}
           onClick={() => {
-            if (confirm(`Send the form link to all ${everyone.length} students in this ${round === ALL ? 'program' : 'round'} who haven't submitted (including already invited)?`))
+            if (confirm(`Send the form link to all ${everyone.length} students in this ${round === ALL ? 'program' : 'round'}?`))
               send(everyone, 'everyone');
           }}
         >
@@ -110,8 +121,11 @@ export function FormInvitesPanel({ formKey, programSlug, submissionTable }: Prop
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <p className="text-sm text-muted-foreground">
-          Active students who haven't submitted yet. They get an in-app message with a form button, plus an email
-          with a one-time sign-in link that opens the form in their own account.
+          {scope === 'pending'
+            ? "Active students who haven't submitted yet."
+            : 'All active students, including those who already submitted.'}{' '}
+          They get an in-app message with a form button, plus an email with a one-time sign-in link that opens the
+          form in their own account.
         </p>
         <div className="ml-auto flex gap-2">
           <Button size="sm" variant="ghost" onClick={load} disabled={loading}>
@@ -136,15 +150,24 @@ export function FormInvitesPanel({ formKey, programSlug, submissionTable }: Prop
         <div className="flex justify-center py-12">
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </div>
-      ) : rows.length === 0 ? (
-        <p className="text-muted-foreground py-12 text-center">Everyone has submitted 🎉</p>
+      ) : visible.length === 0 ? (
+        <p className="text-muted-foreground py-12 text-center">
+          {scope === 'pending' ? 'Everyone has submitted 🎉' : 'No students in this selection.'}
+        </p>
       ) : (
         <Card>
           <CardContent className="p-0 divide-y">
-            {rows.map((r) => (
+            {visible.map((r) => (
               <div key={r.user_id} className="flex items-center gap-3 px-4 py-3">
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium truncate">{r.full_name || 'Unknown'}</p>
+                  <p className="font-medium truncate">
+                    {r.full_name || 'Unknown'}
+                    {r.submitted && (
+                      <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-medium text-green-700">
+                        Submitted
+                      </span>
+                    )}
+                  </p>
                   <p className="text-xs text-muted-foreground truncate">{r.email}</p>
                 </div>
                 <span className="text-xs text-muted-foreground">
