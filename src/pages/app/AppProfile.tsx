@@ -13,7 +13,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import {
   User, Mail, Phone, MapPin, Calendar as CalendarIcon, BookOpen, Wallet,
   Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight,
-  ChevronDown, Settings, Camera, Globe, Heart, Briefcase, Instagram, Send, MessageSquare, Sparkles
+  ChevronDown, Settings, Camera, Globe, Heart, Briefcase, Instagram, Send, MessageSquare, Sparkles, Plus
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { PageHeader } from '@/components/app/ui/PageHeader';
@@ -373,6 +373,19 @@ const AppProfile = () => {
   const genderLabel = (() => { const o = GENDER_OPTIONS.find(o => o.value === (p?.gender || '')); return o ? t(o.labelKey) : undefined; })();
   const relationshipLabel = (() => { const o = RELATIONSHIP_OPTIONS.find(o => o.value === (p?.relationship_status || '')); return o ? t(o.labelKey) : undefined; })();
   const languageLabel = (() => { const o = LANGUAGE_OPTIONS.find(o => o.value === (p?.preferred_language || '')); return o ? (o.labelKey ? t(o.labelKey) : o.label) : undefined; })();
+
+  // Compact header detail pills (Presence-card style)
+  const locationLabel = [p?.city, p?.country].filter(Boolean).join(', ') || null;
+  const timezoneLabel = p?.timezone
+    ? p.timezone.replace(/_/g, ' ').replace('America/', '').replace('Europe/', '').replace('Asia/', '')
+    : null;
+  const birthdayLabel = (() => {
+    if (!p?.date_of_birth) return null;
+    try {
+      return new Date(p.date_of_birth + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch { return null; }
+  })();
+  const relationshipLabelCompact = p?.relationship_status || null;
 
   // Helper for info rows in view mode
   const InfoRow = ({ icon: Icon, value, label }: { icon: React.ComponentType<{ className?: string }>; value?: string | null; label?: string }) => {
