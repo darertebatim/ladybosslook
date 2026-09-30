@@ -1,5 +1,4 @@
-import { useNavigate } from 'react-router-dom';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { GraduationCap, Play, Headset, LayoutGrid, Sparkles } from 'lucide-react';
 
