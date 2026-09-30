@@ -10,10 +10,13 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { GraduationCap, Plus, RefreshCw, Pencil, Trash2, Copy, Link2, Upload, X, ImageIcon, Sparkles, CalendarDays } from 'lucide-react';
+import { GraduationCap, Plus, RefreshCw, Pencil, Trash2, Copy, Link2, Upload, X, ImageIcon, Sparkles, CalendarDays, Tags } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { HostPicker, HostAssignment, saveContentHosts, loadContentHosts } from '@/components/admin/HostPicker';
 import { RichTextEditor } from './RichTextEditor';
+import { TagPicker } from '@/components/admin/TagPicker';
+import { useContentTagsByType, useSaveContentTags } from '@/hooks/useContentTags';
 import { programImages } from '@/data/programs';
 
 interface ProgramCatalog {
