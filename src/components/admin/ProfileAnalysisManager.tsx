@@ -303,6 +303,11 @@ export function ProfileAnalysisManager() {
                       <Badge variant={r.status === 'done' ? 'secondary' : 'default'}>
                         {STATUS_LABEL[r.status] || r.status}
                       </Badge>
+                      {r.video_sent_at && (
+                        <Badge variant="outline" className="border-green-500 text-green-700">
+                          Video sent {new Date(r.video_sent_at).toLocaleDateString()}
+                        </Badge>
+                      )}
                       <span className="text-xs text-muted-foreground">
                         {new Date(r.created_at).toLocaleString()}
                       </span>
@@ -356,13 +361,14 @@ export function ProfileAnalysisManager() {
                     {r.user_id && (
                       <Button
                         size="sm"
+                        variant={r.video_sent_at ? 'outline' : 'default'}
                         onClick={() => {
                           setVideoTarget(r);
                           setVideoLink('');
                         }}
                       >
                         <Video className="w-4 h-4 mr-1" />
-                        Send analysis video
+                        {r.video_sent_at ? 'Resend video' : 'Send analysis video'}
                       </Button>
                     )}
                   </div>
