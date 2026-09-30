@@ -313,9 +313,9 @@ const AppProfile = () => {
               className="relative shrink-0 active:scale-95 transition-transform"
               aria-label="Change profile photo"
             >
-              <Avatar className="h-16 w-16 border-2 border-white shadow-ios">
+              <Avatar className="h-24 w-24 border-2 border-white shadow-ios">
                 {avatarUrl && <AvatarImage src={avatarUrl} alt="Profile photo" />}
-                <AvatarFallback className="text-xl font-bold bg-[hsl(var(--tint-peach))] text-[hsl(var(--brand-primary))]">
+                <AvatarFallback className="text-2xl font-bold bg-[hsl(var(--tint-peach))] text-[hsl(var(--brand-primary))]">
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -332,10 +332,16 @@ const AppProfile = () => {
               <h2 className="text-lg font-bold text-[hsl(var(--fg-warm))] truncate leading-tight">
                 {p?.full_name || t('profile.user')}
               </h2>
-              <p className="flex items-center gap-1.5 text-xs text-[hsl(var(--fg-warm-muted))] mt-0.5">
-                <Mail className="h-3 w-3 shrink-0" />
+              <p className="flex items-center gap-1.5 text-sm font-medium text-[hsl(var(--fg-warm))] mt-1">
+                <Mail className="h-3.5 w-3.5 shrink-0 text-[hsl(var(--brand-primary))]" />
                 <span className="truncate">{user?.email}</span>
               </p>
+              {p?.phone && (
+                <p className="flex items-center gap-1.5 text-sm font-medium text-[hsl(var(--fg-warm))] mt-0.5" dir="ltr">
+                  <Phone className="h-3.5 w-3.5 shrink-0 text-[hsl(var(--brand-primary))]" />
+                  <span className="truncate">{p.phone}</span>
+                </p>
+              )}
             </div>
           </div>
 
