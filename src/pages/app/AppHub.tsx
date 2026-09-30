@@ -69,7 +69,7 @@ export default function AppHub() {
     [friendships, openFriendId],
   );
 
-  const displayName = (user?.user_metadata as any)?.full_name || (user?.email?.split("@")[0] ?? null);
+  const displayName = useProfileDisplayName() || null;
 
   const openGiftInvite = () => setGiftInviteOpen(true);
 
