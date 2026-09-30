@@ -11,6 +11,7 @@ interface Row {
   full_name: string | null;
   email: string | null;
   lastInvite: string | null;
+  submitted: boolean;
 }
 
 interface Props {
@@ -25,6 +26,7 @@ export function FormInvitesPanel({ formKey, programSlug, submissionTable }: Prop
   const [sending, setSending] = useState<string | null>(null);
   const [program, setProgram] = useState(programSlug);
   const [round, setRound] = useState(ALL);
+  const [scope, setScope] = useState<'pending' | 'all'>('pending');
 
   const load = async () => {
     setLoading(true);
