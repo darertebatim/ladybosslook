@@ -141,7 +141,7 @@ export function MoodCelebrationSheet({
           type="button"
           onClick={handleDone}
           aria-label={t('common.close', { defaultValue: 'Close' })}
-          className="absolute right-4 top-4 h-8 w-8 rounded-full bg-white/70 text-black flex items-center justify-center active:scale-95 transition-transform"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/70 text-black shadow-ios backdrop-blur-sm transition-opacity active:opacity-60"
         >
           <X className="h-4 w-4" />
         </button>
