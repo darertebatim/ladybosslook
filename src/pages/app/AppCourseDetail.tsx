@@ -595,6 +595,23 @@ const AppCourseDetail = () => {
     enabled: !!round?.id,
   });
 
+  // Courses shown in the content section: round-attached course first, then program courses
+  const allRoundCourses = useMemo(() => {
+    const list: any[] = [];
+    if (roundCourse?.courseId) {
+      list.push({
+        id: roundCourse.courseId,
+        title: roundCourse.title || "Course",
+        cover_image_url: roundCourse.coverImageUrl,
+      });
+    }
+    (directCourses as any[]).forEach((c) => {
+      if (list.some((item) => item.id === c.id)) return;
+      list.push(c);
+    });
+    return list;
+  }, [roundCourse, directCourses]);
+
   // Direct program playlist + round playlists, de-duplicated
   const allRoundPlaylists = useMemo(() => {
     const list: any[] = [...directPlaylists];
