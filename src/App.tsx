@@ -159,6 +159,7 @@ const Audio = lazy(() => import("@/pages/admin/Audio"));
 const VideoAdmin = lazy(() => import("@/pages/admin/VideoAdmin"));
 const Communications = lazy(() => import("@/pages/admin/Communications"));
 const ProgramsAdmin = lazy(() => import("@/pages/admin/Programs"));
+const FormsAdmin = lazy(() => import("@/pages/admin/Forms"));
 const Payments = lazy(() => import("@/pages/admin/Payments"));
 const System = lazy(() => import("@/pages/admin/System"));
 
@@ -523,6 +524,7 @@ const App = () => (
                       <Route path="leads" element={<ProtectedRoute requiredPage="communications"><LeadCenter /></ProtectedRoute>} />
                       <Route path="pn" element={<ProtectedRoute requiredPage="communications"><PushNotifications /></ProtectedRoute>} />
                        <Route path="programs" element={<ProtectedRoute requiredPage="programs"><ProgramsAdmin /></ProtectedRoute>} />
+                       <Route path="forms" element={<ProtectedRoute requiredPage="programs"><FormsAdmin /></ProtectedRoute>} />
                        <Route path="learn" element={<ProtectedRoute requiredPage="programs"><LearnCoursesAdmin /></ProtectedRoute>} />
                       <Route path="payments" element={<ProtectedRoute requiredPage="payments"><Payments /></ProtectedRoute>} />
                       <Route path="subscriptions" element={<ProtectedRoute requiredPage="payments"><Subscriptions /></ProtectedRoute>} />

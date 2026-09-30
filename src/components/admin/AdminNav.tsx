@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, GraduationCap, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft, Sparkles, Palette, FlaskConical, Smartphone, Image, Video, FileText, BookOpen, Brain, BarChart3, UserPlus, Library, Route as RouteIcon, Tags, TagsIcon, Aperture, Magnet, Presentation } from 'lucide-react';
+import { LayoutDashboard, Users, GraduationCap, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft, Sparkles, Palette, FlaskConical, Smartphone, Image, Video, FileText, BookOpen, Brain, BarChart3, UserPlus, Library, Route as RouteIcon, Tags, TagsIcon, Aperture, Magnet, Presentation, ClipboardList } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,6 +24,7 @@ const menuItems = [
   { title: 'Audiences', url: '/admin/audiences', icon: Library, pageSlug: 'communications' },
   { title: 'Programs', url: '/admin/programs', icon: UserCog, pageSlug: 'programs' },
   { title: 'Courses', url: '/admin/learn', icon: Presentation, pageSlug: 'programs' },
+  { title: 'Forms', url: '/admin/forms', icon: ClipboardList, pageSlug: 'programs' },
   { title: 'Payments', url: '/admin/payments', icon: CreditCard, pageSlug: 'payments' },
   { title: 'Subscriptions', url: '/admin/subscriptions', icon: Sparkles, pageSlug: 'payments' },
   { title: 'Support', url: '/admin/support', icon: MessageCircle, pageSlug: 'support' },

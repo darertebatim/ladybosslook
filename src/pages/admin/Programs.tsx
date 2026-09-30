@@ -7,7 +7,6 @@ import PastSessionsManager from '@/components/admin/PastSessionsManager';
 import OneOnOneClientsManager from '@/components/admin/OneOnOneClientsManager';
 import { ProgramStudentsManager } from '@/components/admin/ProgramStudentsManager';
 import { EnrollmentEmailsManager } from '@/components/admin/EnrollmentEmailsManager';
-import { ProfileAnalysisManager } from '@/components/admin/ProfileAnalysisManager';
 
 export default function Programs() {
   const [tab, setTab] = useState('catalog');
@@ -20,7 +19,7 @@ export default function Programs() {
       </div>
 
       <Tabs value={tab} onValueChange={(v) => { setTab(v); if (v !== 'rounds') setRoundsSlug(null); }}>
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="catalog">Program Catalog</TabsTrigger>
           <TabsTrigger value="rounds">Program Rounds</TabsTrigger>
           <TabsTrigger value="students">Students</TabsTrigger>
@@ -28,12 +27,7 @@ export default function Programs() {
           <TabsTrigger value="sessions">Sessions</TabsTrigger>
           <TabsTrigger value="one-on-one">1:1 Clients</TabsTrigger>
           <TabsTrigger value="auto-enroll">Auto-Enrollment</TabsTrigger>
-          <TabsTrigger value="profile-analysis">Profile Analysis</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="profile-analysis">
-          <ProfileAnalysisManager />
-        </TabsContent>
 
         <TabsContent value="students">
           <ProgramStudentsManager />
