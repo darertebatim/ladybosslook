@@ -155,6 +155,9 @@ const handler = async (req: Request): Promise<Response> => {
         }
         
         userEmails = profiles?.map(p => p.email).filter(email => email) || [];
+        const { data: aliases } = await supabase
+          .from('account_email_aliases').select('email').in('primary_user_id', userIds);
+        userEmails.push(...(aliases || []).map((a: any) => a.email));
         console.log(`✅ [${requestId}] Retrieved ${userEmails.length} valid emails`);
         console.log(`📧 [${requestId}] Email list:`, userEmails);
       } else {
@@ -174,9 +177,12 @@ const handler = async (req: Request): Promise<Response> => {
       }
       
       userEmails = profiles?.map(p => p.email).filter(email => email) || [];
+      const { data: aliases } = await supabase.from('account_email_aliases').select('email');
+      userEmails.push(...(aliases || []).map((a: any) => a.email));
       console.log(`✅ [${requestId}] Retrieved ${userEmails.length} total user emails`);
       console.log(`📧 [${requestId}] Email list:`, userEmails);
     }
+    userEmails = [...new Set(userEmails.map((e) => String(e).trim().toLowerCase()).filter(Boolean))];
 
     // Respect opt-outs.
     {
