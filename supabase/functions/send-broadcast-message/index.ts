@@ -663,12 +663,31 @@ const handler = async (req: Request): Promise<Response> => {
 
         const emailHtml = generateEmailHtml(title, content, linkUrl, linkText);
 
+        // Include merged (alias) emails for each recipient
+        const recipients: { email: string }[] = [];
+        const seenEmails = new Set<string>();
+        const pushEmail = (e: string | null | undefined) => {
+          const k = String(e || '').trim().toLowerCase();
+          if (!k || seenEmails.has(k)) return;
+          seenEmails.add(k);
+          recipients.push({ email: k });
+        };
+        (profiles || []).forEach((p: any) => pushEmail(p.email));
+        const recipientIds = (profiles || []).map((p: any) => p.id);
+        for (let i = 0; i < recipientIds.length; i += 500) {
+          const { data: aliases } = await supabase
+            .from('account_email_aliases')
+            .select('email')
+            .in('primary_user_id', recipientIds.slice(i, i + 500));
+          (aliases || []).forEach((a: any) => pushEmail(a.email));
+        }
+
         const optedOut = await fetchUnsubscribed(
           supabase,
-          (profiles || []).map((p: any) => p.email),
+          recipients.map((p) => p.email),
         );
 
-        for (const profile of profiles || []) {
+        for (const profile of recipients) {
           if (optedOut.has(String(profile.email).trim().toLowerCase())) continue;
           try {
             const unsubUrl = await buildUnsubUrl(profile.email);

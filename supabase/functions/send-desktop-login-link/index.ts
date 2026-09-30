@@ -134,9 +134,16 @@ serve(async (req) => {
       programName,
     });
 
+    const { data: aliasRows } = await admin
+      .from("account_email_aliases").select("email").eq("primary_user_id", user.id);
+    const recipients = [...new Set(
+      [user.email, ...(aliasRows || []).map((a: any) => a.email)]
+        .map((e) => String(e || "").trim().toLowerCase()).filter(Boolean),
+    )];
+
     const { error: sendErr } = await resend.emails.send({
       from: "Ladyboss Academy <hi@ladybosslook.com>",
-      to: [user.email],
+      to: recipients,
       subject:
         lang === "fa"
           ? "لینک ورود یک‌بار مصرف به ریلو روی کامپیوتر 💻"
@@ -155,7 +162,7 @@ serve(async (req) => {
       );
     }
 
-    return new Response(JSON.stringify({ success: true, email: user.email }), {
+    return new Response(JSON.stringify({ success: true, email: user.email, emails: recipients }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
