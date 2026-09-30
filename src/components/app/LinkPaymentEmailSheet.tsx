@@ -132,13 +132,13 @@ export const LinkPaymentEmailSheet = ({ open, onOpenChange }: Props) => {
               </div>
               <div>
                 <h2 className="text-lg font-bold text-[hsl(var(--fg-warm))]">
-                  {isFa ? 'اتصال ایمیل خرید' : 'Link your purchase email'}
+                  {isFa ? 'ادغام حساب‌ها' : 'Merge accounts'}
                 </h2>
                 <p className="text-sm text-[hsl(var(--fg-warm-muted))] mt-1 leading-relaxed">
                   {step === 'email'
                     ? isFa
-                      ? 'ایمیلی که موقع پرداخت استفاده کردید را وارد کنید تا دوره‌هایتان به همین حساب اضافه شود.'
-                      : 'Enter the email you used at checkout and we will add those courses to this account.'
+                      ? 'ایمیل حساب دیگر یا ایمیلی که با آن خرید کردید را وارد کنید تا دوره‌ها و خریدهایتان به همین حساب منتقل شود.'
+                      : 'Enter your other email — the one you paid with or signed up with — and we will move its courses and purchases into this account.'
                     : isFa
                       ? `کد ۶ رقمی را به ${email} فرستادیم.`
                       : `We sent a 6-digit code to ${email}.`}
@@ -155,7 +155,7 @@ export const LinkPaymentEmailSheet = ({ open, onOpenChange }: Props) => {
                 autoCapitalize="none"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder={isFa ? 'ایمیل خرید' : 'Purchase email'}
+                placeholder={isFa ? 'ایمیل دیگر شما' : 'Your other email'}
                 className="h-12 rounded-2xl bg-card-warm border-0 shadow-card-warm text-base"
                 dir="ltr"
               />
@@ -197,7 +197,7 @@ export const LinkPaymentEmailSheet = ({ open, onOpenChange }: Props) => {
               >
                 {loading
                   ? isFa ? 'در حال بررسی…' : 'Checking…'
-                  : isFa ? 'تایید و اتصال' : 'Verify & link'}
+                  : isFa ? 'تایید و ادغام' : 'Verify & merge'}
               </Button>
               <button
                 onClick={() => setStep('email')}
@@ -216,7 +216,7 @@ export const LinkPaymentEmailSheet = ({ open, onOpenChange }: Props) => {
               </div>
               <div>
                 <h2 className="text-lg font-bold text-[hsl(var(--fg-warm))]">
-                  {isFa ? 'ایمیل وصل شد 🎉' : 'Email linked 🎉'}
+                  {isFa ? 'حساب‌ها ادغام شد 🎉' : 'Accounts merged 🎉'}
                 </h2>
                 <p className="text-sm text-[hsl(var(--fg-warm-muted))] mt-1.5 leading-relaxed">
                   {result && (result.courses > 0 || result.orders > 0)
@@ -224,8 +224,8 @@ export const LinkPaymentEmailSheet = ({ open, onOpenChange }: Props) => {
                       ? `${result.courses} دوره و ${result.orders} خرید به حساب شما اضافه شد.`
                       : `${result.courses} course(s) and ${result.orders} purchase(s) added to your account.`
                     : isFa
-                      ? 'خریدی با این ایمیل پیدا نشد، اما از این به بعد خریدهای این ایمیل به همین حساب می‌آید.'
-                      : 'No purchases found yet, but future purchases with this email will land here.'}
+                      ? 'چیزی برای انتقال پیدا نشد، اما از این به بعد خریدهای این ایمیل به همین حساب می‌آید.'
+                      : 'Nothing to move yet, but future purchases with this email will land here.'}
                 </p>
               </div>
               <Button
