@@ -42,8 +42,8 @@ export const LANGUAGE_OPTIONS = [
 ];
 
 const GOAL_OPTIONS = [
-  'Personal Growth', 'Career', 'Relationships', 'Health', 'Finance',
-  'Creativity', 'Mindfulness', 'Leadership', 'Confidence', 'Communication',
+  'Open My Business Doors', 'Get More Clients', 'Grow My Income',
+  'Sell Online', 'Build My Brand', 'Financial Independence',
 ];
 
 interface EditProfileSheetProps {
@@ -67,6 +67,7 @@ const emptyFields = {
   date_of_birth: null as Date | null,
   social_instagram: '',
   social_telegram: '',
+  social_whatsapp: '',
 };
 
 export const EditProfileSheet = ({ open, onOpenChange, profile, onSaved }: EditProfileSheetProps) => {
@@ -94,6 +95,7 @@ export const EditProfileSheet = ({ open, onOpenChange, profile, onSaved }: EditP
         date_of_birth: p.date_of_birth ? new Date(p.date_of_birth) : null,
         social_instagram: p.social_instagram || '',
         social_telegram: p.social_telegram || '',
+        social_whatsapp: p.social_whatsapp || '',
       });
     }
   }, [open, profile]);
@@ -125,6 +127,7 @@ export const EditProfileSheet = ({ open, onOpenChange, profile, onSaved }: EditP
           date_of_birth: editedFields.date_of_birth ? format(editedFields.date_of_birth, 'yyyy-MM-dd') : null,
           social_instagram: editedFields.social_instagram.trim() || null,
           social_telegram: editedFields.social_telegram.trim() || null,
+          social_whatsapp: editedFields.social_whatsapp.trim() || null,
         } as any)
         .eq('id', user.id);
       if (error) throw error;
@@ -294,6 +297,11 @@ export const EditProfileSheet = ({ open, onOpenChange, profile, onSaved }: EditP
           <div className="space-y-1.5">
             <Label className="text-xs text-[hsl(var(--fg-warm-muted))]">{t('profile.fields.telegram')}</Label>
             <Input value={editedFields.social_telegram} onChange={e => setEditedFields(prev => ({ ...prev, social_telegram: e.target.value }))} placeholder={t('profile.placeholders.username')} className="h-11 rounded-2xl bg-card-warm border-0 shadow-card-warm" dir="ltr" />
+          </div>
+          {/* WhatsApp */}
+          <div className="space-y-1.5">
+            <Label className="text-xs text-[hsl(var(--fg-warm-muted))]">{t('profile.fields.whatsapp')}</Label>
+            <Input value={editedFields.social_whatsapp} onChange={e => setEditedFields(prev => ({ ...prev, social_whatsapp: e.target.value }))} placeholder={t('profile.placeholders.whatsapp')} className="h-11 rounded-2xl bg-card-warm border-0 shadow-card-warm" dir="ltr" inputMode="tel" />
           </div>
 
           {/* Save */}
