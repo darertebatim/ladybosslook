@@ -13,14 +13,18 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const FORMS: Record<string, { path: string; titleFa: string; titleEn: string; chatFa: string; buttonFa: string }> = {
+// Chat copy: `{LINK}` is replaced with the per-student one-time sign-in link.
+const FORMS: Record<string, { path: string; titleFa: string; titleEn: string; chatTitle: string; chatBody: string }> = {
   profileanalyze: {
     path: "/dashboard/forms/profileanalyze",
     titleFa: "فرم تحلیل پیج اینستاگرام",
     titleEn: "Instagram profile analysis form",
-    chatFa:
-      "📝 برای دریافت تحلیل پیج اینستاگرامتان، لطفاً فرم تحلیل را پر کنید.\nاز دکمه زیر وارد فرم شوید 👇",
-    buttonFa: "پر کردن فرم تحلیل 📝",
+    chatTitle: "📢 بونس آنالیز پیج با استاد علی",
+    chatBody:
+      "سلام ، خبر خوب برای شمایی که برنده آنالیز پروفایل اینستاگرام با استاد لطفی هستی\n\n" +
+      "حتما این فرم رو پر کنید تا توی هفته آینده استاد صفحه ایسنتاگرام شما رو هم آنالیز کنن و بهتون نتیجه رو بفرستن:\n" +
+      "{LINK}\n\n" +
+      "البته مطمئن بشید مواردی که داخل جزوه پروفایل اعتمادساز قرار گرفته رو اجرا کردین و بتونیم راهنمایی بهتر بدیم",
   },
 };
 
@@ -162,13 +166,14 @@ serve(async (req) => {
           if (cErr) throw cErr;
           convId = (created as any).id;
         }
-        const content = `${form.chatFa}\n\n🔗 LINK_BUTTON:${formUrl}:${form.buttonFa}`;
+        // Plain link (no button): points to our redirector, which opens in the
+        // browser and signs the student into their own account.
+        const content = `**${form.chatTitle}**\n\n${form.chatBody.replace("{LINK}", chatUrl)}`;
         const { error: mErr } = await admin.from("chat_messages").insert({
           conversation_id: convId,
           sender_id: adminId,
           sender_type: "admin",
           content,
-          buttons: [{ label: form.buttonFa, url: formUrl }],
         });
         if (mErr) throw mErr;
         await admin
@@ -178,7 +183,7 @@ serve(async (req) => {
         r.chat = true;
         admin.functions
           .invoke("send-chat-notification", {
-            body: { conversationId: convId, messageContent: form.chatFa.split("\n")[0], senderType: "admin", senderId: adminId },
+            body: { conversationId: convId, messageContent: form.chatTitle, senderType: "admin", senderId: adminId },
           })
           .catch((e) => console.error("notify failed", e));
 
@@ -201,12 +206,10 @@ serve(async (req) => {
           }
         }
 
-        await admin.from("form_invites").insert({
-          user_id: userId,
-          form_key: formKey,
-          invited_by: adminId,
-          channels: [r.chat ? "chat" : null, r.email ? "email" : null].filter(Boolean),
-        });
+        await admin
+          .from("form_invites")
+          .update({ channels: [r.chat ? "chat" : null, r.email ? "email" : null].filter(Boolean) })
+          .eq("id", inviteId);
       } catch (e) {
         console.error("invite failed", userId, e);
         r.error = String((e as any)?.message || e);
