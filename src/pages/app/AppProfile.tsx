@@ -4,15 +4,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   User, Mail, Phone, MapPin, Calendar as CalendarIcon, BookOpen, Wallet,
-  Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight,
+  Receipt, Pencil, TrendingUp, TrendingDown, ChevronRight,
   ChevronDown, Settings, Camera, Globe, Heart, Briefcase, Instagram, Send, MessageSquare, Sparkles, Plus
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -20,14 +17,14 @@ import { PageHeader } from '@/components/app/ui/PageHeader';
 import { IOSIconButton } from '@/components/app/ui/IOSIconButton';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { format, startOfMonth } from 'date-fns';
 import { useJournalEntries, JournalEntry } from '@/hooks/useJournal';
-import { cn } from '@/lib/utils';
 import { SubscriptionCard } from '@/components/app/SubscriptionManagement';
 import { SyncStatusCard } from '@/components/app/SyncStatusCard';
 import { LinkPaymentEmailSheet } from '@/components/app/LinkPaymentEmailSheet';
+import { EditProfileSheet, GENDER_OPTIONS, RELATIONSHIP_OPTIONS } from '@/components/app/EditProfileSheet';
 
 // Stats Pill Component — used in the hero stats row.
 const StatPill = ({ label, value, icon: Icon }: { label: string; value: number | string; icon?: React.ComponentType<{ className?: string }> }) => (
