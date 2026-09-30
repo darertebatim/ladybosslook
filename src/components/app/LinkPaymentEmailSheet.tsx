@@ -34,6 +34,9 @@ const ERRORS: Record<string, { en: string; fa: string }> = {
   no_pending_code: { en: 'Send a code first.', fa: 'ابتدا کد را دریافت کنید.' },
   too_many_attempts: { en: 'Too many tries. Send a new code.', fa: 'تلاش زیاد. کد جدید بگیرید.' },
   could_not_send: { en: 'We could not send the email.', fa: 'ارسال ایمیل ممکن نشد.' },
+  not_authenticated: { en: 'Please sign in again and retry.', fa: 'لطفاً دوباره وارد شوید و امتحان کنید.' },
+  could_not_start: { en: 'Could not start verification. Try again.', fa: 'شروع تایید ممکن نشد. دوباره امتحان کنید.' },
+  email_not_configured: { en: 'Email sending is not set up.', fa: 'ارسال ایمیل تنظیم نشده است.' },
 };
 
 export const LinkPaymentEmailSheet = ({ open, onOpenChange }: Props) => {

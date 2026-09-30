@@ -71,12 +71,15 @@ serve(async (req) => {
       .trim();
     if (!token) return json({ error: "Not authenticated" }, 401);
 
-    const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
+    const authClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+      auth: { persistSession: false },
     });
-    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    const { data: userData, error: userErr } = await authClient.auth.getUser(token);
     const user = userData?.user;
-    if (userErr || !user?.id) return json({ error: "Not authenticated" }, 401);
+    if (userErr || !user?.id) {
+      console.error("auth failed:", userErr?.message);
+      return json({ error: "not_authenticated" }, 401);
+    }
 
     const body = await req.json().catch(() => ({}));
     const action = body.action as string;
