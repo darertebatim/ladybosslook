@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import { Sheet as SheetPrimitive, Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Monitor, Mail, Copy, Check, Loader2, CheckCircle2 } from 'lucide-react';
+import { X, Monitor, Mail, Copy, Check, Loader2, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserPreferredLanguage } from '@/hooks/useUserPreferredLanguage';
