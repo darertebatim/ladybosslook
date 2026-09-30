@@ -238,7 +238,12 @@ const AppCourses = () => {
             onClick={() => haptic.light()}
             className="block rounded-xl bg-bg-warm border border-[hsl(var(--border-warm))]/60 px-3 py-2.5 active:opacity-70"
           >
-            <p className="text-xs text-[hsl(var(--fg-warm))] leading-relaxed">
+            <p className="text-xs font-bold text-[hsl(var(--fg-warm))]">
+              {i18n.language === "fa"
+                ? "برنامه‌ای که اخیراً ثبت‌نام کردید را پیدا نمی‌کنید؟"
+                : "Trouble finding your program that enrolled recently?"}
+            </p>
+            <p className="mt-1 text-xs text-[hsl(var(--fg-warm-muted))] leading-relaxed">
               {i18n.language === "fa"
                 ? "حساب دیگری دارید یا با ایمیل دیگری خرید کردید؟ آن را متصل کنید تا دوره‌ها و سوابق شما به این حساب منتقل شود."
                 : "Have another account or paid with a different email? Link it here to merge your programs, purchases, and progress into this account."}
