@@ -35,7 +35,8 @@ export function useProfileDisplayName(): string {
     profileName ||
     (user?.user_metadata?.full_name || user?.user_metadata?.name || '')
       .toString()
-      .trim();
+      .trim() ||
+    (user?.email?.split('@')[0] ?? '');
 
-  return raw.split(' ')[0] || '';
+  return raw;
 }
