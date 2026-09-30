@@ -54,6 +54,10 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [tagsProgram, setTagsProgram] = useState<ProgramCatalog | null>(null);
+  const [tagsSelection, setTagsSelection] = useState<string[]>([]);
+  const { data: programTagLinks = [] } = useContentTagsByType('program');
+  const saveProgramTags = useSaveContentTags();
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1517,6 +1521,19 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                         Rounds
                       </Button>
                     )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setTagsProgram(program);
+                        setTagsSelection(
+                          programTagLinks.filter((l) => l.content_id === program.id).map((l) => l.tag_id)
+                        );
+                      }}
+                      title="Tags"
+                    >
+                      <Tags className="h-4 w-4" />
+                    </Button>
                     <Button 
                       variant="outline" 
                       size="sm" 
