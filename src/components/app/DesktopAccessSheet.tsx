@@ -67,32 +67,32 @@ export function DesktopAccessSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-3xl border-0 px-5 pb-8 pt-5">
+      <SheetContent side="bottom" className="app-theme rounded-t-3xl border-0 bg-bg-warm px-5 pb-8 pt-5">
         <SheetHeader className="text-left">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[hsl(var(--tint-peach))]">
-            <Monitor className="h-7 w-7 text-brand" />
+          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-orange shadow-ios">
+            <Monitor className="h-8 w-8 text-white" />
           </div>
-          <SheetTitle className="text-center text-fg-warm">Use Rilo on your computer</SheetTitle>
-          <SheetDescription className="text-center">
+          <SheetTitle className="text-center text-xl text-fg-warm">Use Rilo on your computer</SheetTitle>
+          <SheetDescription className="text-center text-fg-warm-muted">
             A bigger screen is ideal for watching sessions, downloading worksheets and joining live meetings.
           </SheetDescription>
         </SheetHeader>
 
         {sent ? (
           <div className="mt-6 space-y-4">
-            <div className="rounded-2xl bg-[hsl(var(--tint-mint,var(--tint-peach)))] p-4 text-center">
+            <div className="rounded-2xl bg-mint p-4 text-center shadow-card-warm">
               <CheckCircle2 className="mx-auto mb-2 h-8 w-8 text-brand" />
               <p className="font-semibold text-fg-warm">One-time link sent!</p>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-1 text-sm text-fg-warm-muted">
                 Open your inbox on your computer and tap the button in the email.
               </p>
               {user?.email && (
-                <p className="mt-2 text-xs text-muted-foreground break-all">{user.email}</p>
+                <p className="mt-2 text-xs text-fg-warm-muted break-all">{user.email}</p>
               )}
             </div>
             <Button
               variant="ghost"
-              className="w-full h-11 rounded-2xl"
+              className="w-full h-11 rounded-2xl text-fg-warm"
               onClick={sendLink}
               disabled={sending}
             >
@@ -103,7 +103,7 @@ export function DesktopAccessSheet({
           <div className="mt-6 space-y-3">
             <Button
               size="lg"
-              className="w-full h-auto px-4 py-4 bg-brand text-white shadow-ios rounded-2xl border-0"
+              className="w-full h-auto px-4 py-4 bg-gradient-orange text-white font-semibold shadow-ios rounded-2xl border-0 hover:opacity-95"
               onClick={sendLink}
               disabled={sending}
             >
@@ -115,16 +115,16 @@ export function DesktopAccessSheet({
               Email me a one-time login link
             </Button>
             {user?.email && (
-              <p className="text-center text-xs text-muted-foreground break-all">
+              <p className="text-center text-xs text-fg-warm-muted break-all">
                 We'll send it to {user.email}
               </p>
             )}
           </div>
         )}
 
-        <div className="mt-6 rounded-2xl border border-border-warm bg-card-warm p-4">
+        <div className="mt-6 rounded-2xl bg-card-warm p-4 shadow-card-warm">
           <p className="text-sm text-fg-warm">
-            Or go directly to <span className="font-semibold">ladybosslook.com/app</span> on your computer.
+            Or go directly to <span className="font-semibold text-brand">ladybosslook.com/app</span> on your computer.
           </p>
           <Button
             variant="outline"
@@ -133,11 +133,11 @@ export function DesktopAccessSheet({
           >
             {copied ? (
               <>
-                <Check className="h-4 w-4 mr-2" /> Copied
+                <Check className="h-4 w-4 mr-2 text-brand" /> Copied
               </>
             ) : (
               <>
-                <Copy className="h-4 w-4 mr-2" /> Copy link
+                <Copy className="h-4 w-4 mr-2 text-brand" /> Copy link
               </>
             )}
           </Button>
