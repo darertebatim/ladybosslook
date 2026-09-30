@@ -38,8 +38,8 @@ const DOORS: {
   {
     key: 'financial',
     emoji: '💰',
-    label: 'I want to understand money better',
-    blurb: 'Money stress, budgets, saving — build a steady money rhythm.',
+    label: 'I want better financial literacy',
+    blurb: 'Budgets, saving, money calm — build a steady money rhythm.',
     tint: 'rgba(52,211,153,0.55)',
     ring: 'from-green-300 via-emerald-300 to-lime-300',
     bubble: 'bg-green-100/80',
