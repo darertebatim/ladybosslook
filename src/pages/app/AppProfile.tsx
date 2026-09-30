@@ -27,6 +27,7 @@ import { useJournalEntries, JournalEntry } from '@/hooks/useJournal';
 import { cn } from '@/lib/utils';
 import { SubscriptionCard } from '@/components/app/SubscriptionManagement';
 import { SyncStatusCard } from '@/components/app/SyncStatusCard';
+import { LinkPaymentEmailSheet } from '@/components/app/LinkPaymentEmailSheet';
 
 // Stats Pill Component — used in the hero stats row.
 const StatPill = ({ label, value, icon: Icon }: { label: string; value: number | string; icon?: React.ComponentType<{ className?: string }> }) => (
@@ -134,6 +135,23 @@ const AppProfile = () => {
     },
     enabled: !!user?.id,
   });
+
+  // Linked purchase emails
+  const [linkEmailOpen, setLinkEmailOpen] = useState(false);
+  const { data: linkedEmails } = useQuery({
+    queryKey: ['linked-purchase-emails', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('account_email_aliases')
+        .select('id, email')
+        .eq('primary_user_id', user?.id);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user?.id,
+  });
+
+
 
   const { data: enrollments } = useQuery({
     queryKey: ['profile-enrollments', user?.id],
