@@ -3,6 +3,7 @@ import { SlideUpPage } from "@/components/app/SlideUpPage";
 import { SEOHead } from "@/components/SEOHead";
 import { useGoBack } from "@/hooks/useGoBack";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfileDisplayName } from "@/hooks/useFirstName";
 import { useFriendships, useMyFriendCode, type FriendProfile } from "@/hooks/useFriends";
 import { Constellation } from "@/components/hub/Constellation";
 import { HubAddFriendSheet } from "@/components/hub/HubAddFriendSheet";
@@ -69,7 +70,7 @@ export default function AppHub() {
     [friendships, openFriendId],
   );
 
-  const displayName = (user?.user_metadata as any)?.full_name || (user?.email?.split("@")[0] ?? null);
+  const displayName = useProfileDisplayName() || null;
 
   const openGiftInvite = () => setGiftInviteOpen(true);
 

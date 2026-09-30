@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useProfileDisplayName } from "@/hooks/useFirstName";
 import {
   Menu,
   LayoutGrid,
@@ -214,15 +215,9 @@ export function HomeMenu() {
     navigate("/auth");
   };
 
-  // Resolve user display name + initial
-  const userMeta = (user?.user_metadata ?? {}) as Record<string, unknown>;
-  const displayName =
-    (typeof userMeta.full_name === "string" && userMeta.full_name) ||
-    (typeof userMeta.name === "string" && userMeta.name) ||
-    (typeof localStorage !== "undefined" &&
-      localStorage.getItem("simora_onboarding_nickname")) ||
-    user?.email?.split("@")[0] ||
-    "Friend";
+  // Resolve user display name + initial (profile name is the source of truth)
+  const profileName = useProfileDisplayName();
+  const displayName = profileName || "Friend";
   const initial = (displayName as string).trim().charAt(0).toUpperCase() || "R";
   const currentStreak = (streak as { current_streak?: number } | null)?.current_streak ?? 0;
 

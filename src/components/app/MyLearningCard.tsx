@@ -12,6 +12,7 @@ import {
 import { haptic } from '@/lib/haptics';
 
 import { useAuth } from '@/hooks/useAuth';
+import { useFirstName } from '@/hooks/useFirstName';
 import { useMyLearning } from '@/hooks/useMyLearning';
 import { useSupportChatSummary } from '@/hooks/useSupportChatSummary';
 import { useUnreadChat } from '@/hooks/useUnreadChat';
@@ -71,13 +72,9 @@ export function MyLearningCard() {
     }
   }, [enrollmentId]);
 
-  if (!hasProgram || !enrollment) return null;
+  const firstName = useFirstName();
 
-  const firstName =
-    (user?.user_metadata?.full_name || user?.user_metadata?.name || '')
-      .toString()
-      .trim()
-      .split(' ')[0] || '';
+  if (!hasProgram || !enrollment) return null;
 
   const round = enrollment.program_rounds;
   const programPath = `/app/programs/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`;

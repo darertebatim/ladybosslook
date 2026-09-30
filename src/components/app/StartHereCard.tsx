@@ -4,6 +4,7 @@ import { GraduationCap, Play, Headset, LayoutGrid, Sparkles } from 'lucide-react
 
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useFirstName } from '@/hooks/useFirstName';
 import { useUserPreferredLanguage } from '@/hooks/useUserPreferredLanguage';
 import { haptic } from '@/lib/haptics';
 
@@ -160,13 +161,9 @@ export function StartHereCard() {
     },
   });
 
-  if (!pick) return null;
+  const firstName = useFirstName();
 
-  const firstName =
-    (user?.user_metadata?.full_name || user?.user_metadata?.name || '')
-      .toString()
-      .trim()
-      .split(' ')[0] || '';
+  if (!pick) return null;
 
   const open = () => {
     haptic.light();
