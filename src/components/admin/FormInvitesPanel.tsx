@@ -49,14 +49,14 @@ export function FormInvitesPanel({ formKey, programSlug, submissionTable }: Prop
       const pmap = Object.fromEntries((profs || []).map((p: any) => [p.id, p]));
       setRows(
         ids
-          .filter((id) => !submitted.has(id))
           .map((id) => ({
             user_id: id,
             full_name: pmap[id]?.full_name ?? null,
             email: pmap[id]?.email ?? null,
             lastInvite: last[id] ?? null,
+            submitted: submitted.has(id),
           }))
-          .sort((a, b) => (a.lastInvite ? 1 : 0) - (b.lastInvite ? 1 : 0)),
+          .sort((a, b) => Number(a.submitted) - Number(b.submitted) || (a.lastInvite ? 1 : 0) - (b.lastInvite ? 1 : 0)),
       );
     } catch (e) {
       console.error(e);
