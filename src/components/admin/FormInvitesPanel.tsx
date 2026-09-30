@@ -90,19 +90,27 @@ export function FormInvitesPanel({ formKey, programSlug, submissionTable }: Prop
     }
   };
 
-  const notInvited = useMemo(() => rows.filter((r) => !r.lastInvite).map((r) => r.user_id), [rows]);
-  const everyone = rows.map((r) => r.user_id);
+  const notInvited = useMemo(() => visible.filter((r) => !r.lastInvite).map((r) => r.user_id), [visible]);
+  const everyone = visible.map((r) => r.user_id);
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <ProgramRoundFilter program={program} round={round} onChange={(p, r) => { setProgram(p); setRound(r); }} />
+        <select
+          value={scope}
+          onChange={(e) => setScope(e.target.value as 'pending' | 'all')}
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+        >
+          <option value="pending">Haven't submitted yet</option>
+          <option value="all">All students</option>
+        </select>
         <Button
           size="sm"
           variant="outline"
           disabled={!everyone.length || !!sending}
           onClick={() => {
-            if (confirm(`Send the form link to all ${everyone.length} students in this ${round === ALL ? 'program' : 'round'} who haven't submitted (including already invited)?`))
+            if (confirm(`Send the form link to all ${everyone.length} students in this ${round === ALL ? 'program' : 'round'}?`))
               send(everyone, 'everyone');
           }}
         >
