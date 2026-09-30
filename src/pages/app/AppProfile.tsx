@@ -13,7 +13,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import {
   User, Mail, Phone, MapPin, Calendar as CalendarIcon, BookOpen, Wallet,
   Receipt, Pencil, Check, X, TrendingUp, TrendingDown, ChevronRight,
-  ChevronDown, Settings, Camera, Globe, Heart, Briefcase, Instagram, Send, MessageSquare, Sparkles
+  ChevronDown, Settings, Camera, Globe, Heart, Briefcase, Instagram, Send, MessageSquare, Sparkles, Plus
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { PageHeader } from '@/components/app/ui/PageHeader';
@@ -36,6 +36,14 @@ const StatPill = ({ label, value, icon: Icon }: { label: string; value: number |
     <span className="text-xl font-bold text-[hsl(var(--fg-warm))] leading-none">{value}</span>
     <span className="text-[10px] text-[hsl(var(--fg-warm-muted))] mt-1">{label}</span>
   </div>
+);
+
+// Small detail pill for the compact profile header (Presence-card style).
+const HeaderInfoPill = ({ icon: Icon, text }: { icon: React.ComponentType<{ className?: string }>; text: string }) => (
+  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[hsl(var(--tint-peach))]/60 text-[11px] text-[hsl(var(--fg-warm))] font-medium max-w-full">
+    <Icon className="h-3 w-3 shrink-0 text-[hsl(var(--brand-primary))]" />
+    <span className="truncate">{text}</span>
+  </span>
 );
 
 const calculateMonthlyPresence = (entries: JournalEntry[]): number => {
@@ -374,6 +382,19 @@ const AppProfile = () => {
   const relationshipLabel = (() => { const o = RELATIONSHIP_OPTIONS.find(o => o.value === (p?.relationship_status || '')); return o ? t(o.labelKey) : undefined; })();
   const languageLabel = (() => { const o = LANGUAGE_OPTIONS.find(o => o.value === (p?.preferred_language || '')); return o ? (o.labelKey ? t(o.labelKey) : o.label) : undefined; })();
 
+  // Compact header detail pills (Presence-card style)
+  const locationLabel = [p?.city, p?.country].filter(Boolean).join(', ') || null;
+  const timezoneLabel = p?.timezone
+    ? p.timezone.replace(/_/g, ' ').replace('America/', '').replace('Europe/', '').replace('Asia/', '')
+    : null;
+  const birthdayLabel = (() => {
+    if (!p?.date_of_birth) return null;
+    try {
+      return new Date(p.date_of_birth + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch { return null; }
+  })();
+  const relationshipLabelCompact = p?.relationship_status || null;
+
   // Helper for info rows in view mode
   const InfoRow = ({ icon: Icon, value, label }: { icon: React.ComponentType<{ className?: string }>; value?: string | null; label?: string }) => {
     if (!value) return null;
@@ -411,29 +432,24 @@ const AppProfile = () => {
       {/* Content */}
       <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-safe space-y-3 pt-3">
 
-        {/* Hero identity card */}
-        <div className="relative rounded-3xl bg-card-warm shadow-card-warm overflow-hidden">
-          {/* Soft brand wash */}
-          <div
-            aria-hidden
-            className="absolute inset-x-0 top-0 h-28 opacity-80"
-            style={{ background: 'radial-gradient(120% 90% at 50% 0%, hsl(var(--tint-peach)) 0%, transparent 70%)' }}
-          />
-          <div className="relative flex flex-col items-center pt-6 pb-5 px-5">
+        {/* Compact identity card with integrated linked accounts */}
+        <div className="rounded-3xl bg-card-warm shadow-card-warm p-4">
+          {/* Identity row */}
+          <div className="flex items-center gap-3.5">
             <button
               onClick={handleAvatarClick}
               disabled={isUploadingAvatar}
-              className="relative active:scale-95 transition-transform"
+              className="relative shrink-0 active:scale-95 transition-transform"
               aria-label="Change profile photo"
             >
-              <Avatar className="h-24 w-24 shadow-ios">
+              <Avatar className="h-16 w-16 border-2 border-white shadow-ios">
                 {avatarUrl && <AvatarImage src={avatarUrl} alt="Profile photo" />}
-                <AvatarFallback className="text-2xl font-bold bg-[hsl(var(--tint-peach))] text-[hsl(var(--brand-primary))]">
+                <AvatarFallback className="text-xl font-bold bg-[hsl(var(--tint-peach))] text-[hsl(var(--brand-primary))]">
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <div className="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-[hsl(var(--brand-primary))] flex items-center justify-center shadow-ios ring-2 ring-card-warm">
-                <Camera className="h-4 w-4 text-white" />
+              <div className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full bg-[hsl(var(--brand-primary))] flex items-center justify-center shadow-ios ring-2 ring-card-warm">
+                <Camera className="h-3.5 w-3.5 text-white" />
               </div>
               {isUploadingAvatar && (
                 <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40">
@@ -441,51 +457,61 @@ const AppProfile = () => {
                 </div>
               )}
             </button>
-            <h2 className="font-bold text-xl mt-3 text-[hsl(var(--fg-warm))]">
-              {p?.full_name || t('profile.user')}
-            </h2>
-            <p className="text-sm text-[hsl(var(--fg-warm-muted))]">{user?.email}</p>
-            {p?.bio && (
-              <p className="text-xs text-[hsl(var(--fg-warm-muted))] mt-2 px-4 text-center line-clamp-2">
-                {p.bio}
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Merge accounts */}
-        <Card className="bg-card-warm border-0 shadow-card-warm rounded-2xl">
-          <CardContent className="p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <Mail className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
-              <p className="text-sm font-semibold text-[hsl(var(--fg-warm))]">
-                {t('profile.mergeEmails.title', 'Merge accounts')}
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-bold text-[hsl(var(--fg-warm))] truncate leading-tight">
+                {p?.full_name || t('profile.user')}
+              </h2>
+              <p className="flex items-center gap-1.5 text-xs text-[hsl(var(--fg-warm-muted))] mt-0.5">
+                <Mail className="h-3 w-3 shrink-0" />
+                <span className="truncate">{user?.email}</span>
               </p>
             </div>
-            <p className="text-xs text-[hsl(var(--fg-warm-muted))] leading-relaxed">
-              {t('profile.mergeEmails.hint', 'Have another account or paid with a different email? Add that email here and everything moves into this account.')}
-            </p>
-            {(linkedEmails || []).length > 0 && (
-              <div className="flex flex-wrap gap-2">
+          </div>
+
+          {/* Detail pills */}
+          {(locationLabel || timezoneLabel || birthdayLabel || relationshipLabelCompact || p?.bio) && (
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {locationLabel && <HeaderInfoPill icon={MapPin} text={locationLabel} />}
+              {timezoneLabel && <HeaderInfoPill icon={Globe} text={timezoneLabel} />}
+              {birthdayLabel && <HeaderInfoPill icon={CalendarIcon} text={birthdayLabel} />}
+              {relationshipLabelCompact && <HeaderInfoPill icon={Heart} text={relationshipLabelCompact} />}
+              {p?.bio && <HeaderInfoPill icon={MessageSquare} text={p.bio} />}
+            </div>
+          )}
+
+          {/* Linked accounts */}
+          <div className="mt-3.5 pt-3.5 border-t border-[hsl(var(--border-warm))]/60">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[hsl(var(--fg-warm-muted))]">
+                {t('profile.mergeEmails.linkedTitle', 'Linked accounts')}
+              </span>
+              <button
+                onClick={() => setLinkEmailOpen(true)}
+                className="flex items-center gap-1 text-xs font-bold text-[hsl(var(--brand-primary))] px-2 py-1.5 -mr-2 rounded-full active:opacity-60"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                {t('profile.mergeEmails.mergeNew', 'Merge new')}
+              </button>
+            </div>
+            {(linkedEmails || []).length > 0 ? (
+              <div className="flex flex-wrap gap-1.5">
                 {(linkedEmails || []).map((a: { id: string; email: string }) => (
                   <span
                     key={a.id}
-                    className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-full bg-mint text-[hsl(var(--fg-warm))]"
+                    className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-bg-warm border border-[hsl(var(--border-warm))]/60 text-[hsl(var(--fg-warm))]"
                   >
-                    <Check className="h-3 w-3" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-mint shrink-0" />
                     {a.email}
                   </span>
                 ))}
               </div>
+            ) : (
+              <p className="text-xs text-[hsl(var(--fg-warm-muted))] leading-relaxed">
+                {t('profile.mergeEmails.hint', 'Have another account or paid with a different email? Add that email here and everything moves into this account.')}
+              </p>
             )}
-            <Button
-              onClick={() => setLinkEmailOpen(true)}
-              className="w-full h-11 rounded-2xl bg-gradient-orange text-white font-semibold shadow-ios border-0"
-            >
-              {t('profile.mergeEmails.action', 'Add email to merge')}
-            </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         <LinkPaymentEmailSheet open={linkEmailOpen} onOpenChange={setLinkEmailOpen} />
 
