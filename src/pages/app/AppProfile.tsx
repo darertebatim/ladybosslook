@@ -293,7 +293,7 @@ const AppProfile = () => {
       />
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-safe space-y-3 pt-3">
+      <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(env(safe-area-inset-bottom)+7rem)] space-y-3 pt-3">
 
         {/* Compact identity card with integrated linked accounts */}
         <div className="relative rounded-3xl bg-card-warm shadow-card-warm p-4">
@@ -400,6 +400,20 @@ const AppProfile = () => {
           <StatPill label={t('profile.sections.programs')} value={programCount} icon={BookOpen} />
           <StatPill label={t('profile.credits')} value={creditBalance} icon={Wallet} />
         </div>
+
+        {/* Settings Button — directly under the stats row */}
+        <button
+          onClick={() => navigate('/app/settings')}
+          className="flex items-center justify-between w-full p-4 bg-card-warm rounded-2xl shadow-card-warm active:bg-[hsl(var(--tint-peach))]/40 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-[hsl(var(--tint-peach))] flex items-center justify-center">
+              <Settings className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
+            </div>
+            <span className="font-medium text-sm text-[hsl(var(--fg-warm))]">{t('profile.settings')}</span>
+          </div>
+          <ChevronRight className="h-4 w-4 text-[hsl(var(--fg-warm-muted))]" />
+        </button>
 
         {/* Edit Profile button */}
         <Button
@@ -602,18 +616,6 @@ const AppProfile = () => {
 
         {/* Settings Button */}
         <SyncStatusCard />
-        <button
-          onClick={() => navigate('/app/settings')}
-          className="flex items-center justify-between w-full p-4 bg-card-warm rounded-2xl shadow-card-warm active:bg-[hsl(var(--tint-peach))]/40 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-[hsl(var(--tint-peach))] flex items-center justify-center">
-              <Settings className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
-            </div>
-            <span className="font-medium text-sm text-[hsl(var(--fg-warm))]">{t('profile.settings')}</span>
-          </div>
-          <ChevronRight className="h-4 w-4 text-[hsl(var(--fg-warm-muted))]" />
-        </button>
 
       </div>
     </div>
