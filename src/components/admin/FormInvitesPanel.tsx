@@ -76,12 +76,21 @@ export function FormInvitesPanel({ formKey, programSlug, submissionTable }: Prop
       const { data, error } = await supabase.functions.invoke('send-form-invite', {
         body: { form: formKey, user_ids: ids },
       });
-      if (error) throw error;
+      if (error) {
+        const ctx = (error as any)?.context;
+        const details = ctx?.text ? await ctx.text().catch(() => '') : '';
+        throw new Error(details || error.message);
+      }
       if ((data as any)?.error) throw new Error((data as any).error);
-      const results = ((data as any)?.results || []) as { chat: boolean; email: boolean }[];
+      const results = ((data as any)?.results || []) as { chat: boolean; email: boolean; error?: string }[];
       const chats = results.filter((r) => r.chat).length;
       const emails = results.filter((r) => r.email).length;
-      toast({ title: 'Sent', description: `In-app messages: ${chats} · Sign-in emails: ${emails}` });
+      const failed = results.filter((r) => r.error);
+      toast({
+        title: failed.length ? 'Sent with problems' : 'Sent',
+        description: `In-app messages: ${chats} · Sign-in emails: ${emails}${failed.length ? ` · Failed: ${failed.length} (${failed[0].error})` : ''}`,
+        variant: failed.length && !chats ? 'destructive' : undefined,
+      });
       await load();
     } catch (e: any) {
       toast({ title: 'Send failed', description: e?.message || 'Something went wrong.', variant: 'destructive' });
