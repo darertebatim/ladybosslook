@@ -74,8 +74,8 @@ export function useMyLearning() {
       const videoIds = (links || []).filter((l) => l.content_type === 'video').map((l) => l.content_id);
       const courses = (links || []).filter((l) => l.content_type === 'course').map((l) => l.content_id);
       const [audioResult, videoResult] = await Promise.all([
-        audioIds.length ? supabase.from('audio_playlists').select('id, name').in('id', audioIds) : Promise.resolve({ data: [], error: null }),
-        videoIds.length ? supabase.from('video_playlists').select('id, name').in('id', videoIds) : Promise.resolve({ data: [], error: null }),
+        audioIds.length ? supabase.from('audio_playlists').select('id, name, cover_image_url').in('id', audioIds) : Promise.resolve({ data: [], error: null }),
+        videoIds.length ? supabase.from('video_playlists').select('id, name, cover_image_url').in('id', videoIds) : Promise.resolve({ data: [], error: null }),
       ]);
       if (audioResult.error) throw audioResult.error;
       if (videoResult.error) throw videoResult.error;
@@ -122,10 +122,10 @@ export function useMyLearning() {
 
       const [audioResult, videoResult] = await Promise.all([
         audioIds.length > 0
-          ? supabase.from('audio_playlists').select('id, name').in('id', audioIds)
+          ? supabase.from('audio_playlists').select('id, name, cover_image_url').in('id', audioIds)
           : Promise.resolve({ data: [], error: null }),
         videoIds.length > 0
-          ? supabase.from('video_playlists').select('id, name').in('id', videoIds)
+          ? supabase.from('video_playlists').select('id, name, cover_image_url').in('id', videoIds)
           : Promise.resolve({ data: [], error: null }),
       ]);
 
