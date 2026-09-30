@@ -220,6 +220,10 @@ const AppProfile = () => {
         } as any)
         .eq('id', user.id);
       if (error) throw error;
+      const newName = editedFields.full_name.trim();
+      if (newName) {
+        supabase.auth.updateUser({ data: { full_name: newName, name: newName } }).then(() => {});
+      }
       toast({ title: t('profile.toasts.saved'), description: t('profile.toasts.savedDesc') });
       setIsEditing(false);
       refetchProfile();
