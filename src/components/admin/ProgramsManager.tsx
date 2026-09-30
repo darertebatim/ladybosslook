@@ -10,10 +10,13 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { GraduationCap, Plus, RefreshCw, Pencil, Trash2, Copy, Link2, Upload, X, ImageIcon, Sparkles, CalendarDays } from 'lucide-react';
+import { GraduationCap, Plus, RefreshCw, Pencil, Trash2, Copy, Link2, Upload, X, ImageIcon, Sparkles, CalendarDays, Tags } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { HostPicker, HostAssignment, saveContentHosts, loadContentHosts } from '@/components/admin/HostPicker';
 import { RichTextEditor } from './RichTextEditor';
+import { TagPicker } from '@/components/admin/TagPicker';
+import { useContentTagsByType, useSaveContentTags } from '@/hooks/useContentTags';
 import { programImages } from '@/data/programs';
 
 interface ProgramCatalog {
@@ -51,6 +54,10 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [tagsProgram, setTagsProgram] = useState<ProgramCatalog | null>(null);
+  const [tagsSelection, setTagsSelection] = useState<string[]>([]);
+  const { data: programTagLinks = [] } = useContentTagsByType('program');
+  const saveProgramTags = useSaveContentTags();
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1514,6 +1521,19 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                         Rounds
                       </Button>
                     )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setTagsProgram(program);
+                        setTagsSelection(
+                          programTagLinks.filter((l) => l.content_id === program.id).map((l) => l.tag_id)
+                        );
+                      }}
+                      title="Tags"
+                    >
+                      <Tags className="h-4 w-4" />
+                    </Button>
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -1548,6 +1568,30 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={!!tagsProgram} onOpenChange={(open) => !open && setTagsProgram(null)}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Tags — {tagsProgram?.title}</DialogTitle>
+          </DialogHeader>
+          <TagPicker value={tagsSelection} onChange={setTagsSelection} />
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setTagsProgram(null)}>Cancel</Button>
+            <Button
+              disabled={saveProgramTags.isPending}
+              onClick={() => {
+                if (!tagsProgram) return;
+                saveProgramTags.mutate(
+                  { contentType: 'program', contentId: tagsProgram.id, tagIds: tagsSelection },
+                  { onSuccess: () => setTagsProgram(null) }
+                );
+              }}
+            >
+              Save Tags
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
