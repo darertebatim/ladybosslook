@@ -59,14 +59,13 @@ serve(async (req) => {
   try {
     const token = (req.headers.get("Authorization") || "").replace("Bearer ", "").trim();
     if (!token) return json({ error: "Not authenticated" }, 401);
-    const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
-    });
-    const { data: u } = await userClient.auth.getUser();
-    const adminId = u?.user?.id;
-    if (!adminId) return json({ error: "Not authenticated" }, 401);
-
     const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
+    const { data: u, error: uErr } = await admin.auth.getUser(token);
+    const adminId = u?.user?.id;
+    if (!adminId) {
+      console.error("auth failed", uErr?.message);
+      return json({ error: `Not authenticated${uErr?.message ? `: ${uErr.message}` : ""}` }, 401);
+    }
     const { data: isAdmin } = await admin.rpc("has_role", { _user_id: adminId, _role: "admin" });
     if (!isAdmin) return json({ error: "Forbidden" }, 403);
 
