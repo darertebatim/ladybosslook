@@ -275,9 +275,13 @@ export default function AppOnboarding() {
               localStorage.setItem('i18nextLng', langIso);
             }
           }
-          const nickname = answers['rd-nickname'];
+          const nicknameRaw = answers['rd-nickname'];
+          const nickname = (typeof nicknameRaw === 'string' ? nicknameRaw : nicknameRaw?.[0] || '').trim();
           if (nickname) {
-            localStorage.setItem('simora_onboarding_nickname', typeof nickname === 'string' ? nickname : nickname[0] || '');
+            localStorage.setItem('simora_onboarding_nickname', nickname);
+            // Always save the answered name as the user's name everywhere
+            supabase.from('profiles').update({ full_name: nickname }).eq('id', user.id).then(() => {});
+            supabase.auth.updateUser({ data: { full_name: nickname, name: nickname } }).then(() => {});
           }
         } catch {}
         navigate('/app/path');
