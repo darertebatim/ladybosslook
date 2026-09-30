@@ -377,7 +377,8 @@ const AppCourseDetail = () => {
   });
 
   const round = enrollment?.program_rounds;
-  const { data: roundCourseId } = useRoundCourse(round?.id);
+  const { data: roundCourse } = useRoundCourse(round?.id);
+  const roundCourseId = roundCourse?.courseId ?? null;
 
   const { data: directContent = [] } = useQuery({
     queryKey: ["course-program-content", enrollment?.program_slug],
@@ -2001,7 +2002,7 @@ const AppCourseDetail = () => {
                             })}
                           >
                             <GraduationCap className="h-5 w-5 mr-3 shrink-0" />
-                            <span className="truncate">Course Lessons</span>
+                            <span className="truncate">Course: {roundCourse?.title || "Course Lessons"}</span>
                           </Button>
                         )}
 
