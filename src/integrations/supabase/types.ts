@@ -5343,6 +5343,7 @@ export type Database = {
           audio_playlist_id: string | null
           auto_create_feed_channel: boolean
           created_at: string
+          desktop_link_enabled: boolean
           drip_offset_days: number
           end_date: string | null
           first_session_date: string | null
@@ -5374,6 +5375,7 @@ export type Database = {
           audio_playlist_id?: string | null
           auto_create_feed_channel?: boolean
           created_at?: string
+          desktop_link_enabled?: boolean
           drip_offset_days?: number
           end_date?: string | null
           first_session_date?: string | null
@@ -5405,6 +5407,7 @@ export type Database = {
           audio_playlist_id?: string | null
           auto_create_feed_channel?: boolean
           created_at?: string
+          desktop_link_enabled?: boolean
           drip_offset_days?: number
           end_date?: string | null
           first_session_date?: string | null

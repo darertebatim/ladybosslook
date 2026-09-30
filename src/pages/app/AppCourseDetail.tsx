@@ -93,6 +93,8 @@ import {
   ReminderSettings,
 } from "@/hooks/useSessionReminderSettings";
 import { SessionReminderSheet } from "@/components/app/SessionReminderSheet";
+import { DesktopAccessSheet } from "@/components/app/DesktopAccessSheet";
+import { Monitor } from "lucide-react";
 import { scheduleUrgentAlarm } from "@/lib/taskAlarm";
 import {
   scheduleTaskReminder,
@@ -150,6 +152,7 @@ const AppCourseDetail = () => {
     useState(false);
   const [showContentReminderSheet, setShowContentReminderSheet] =
     useState(false);
+  const [showDesktopSheet, setShowDesktopSheet] = useState(false);
 
   // Get unseen content functions for view tracking
   let markEnrollmentViewed: ((id: string) => Promise<void>) | null = null;
@@ -2091,6 +2094,18 @@ const AppCourseDetail = () => {
                           </Button>
                         )}
 
+                        {/* 6b. Use on desktop - optional per round */}
+                        {(round as any).desktop_link_enabled && (
+                          <Button
+                            size="lg"
+                            className="w-full h-auto px-4 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
+                            onClick={() => setShowDesktopSheet(true)}
+                          >
+                            <Monitor className="h-5 w-5 mr-3 shrink-0" />
+                            <span className="truncate">Use on desktop</span>
+                          </Button>
+                        )}
+
                         {/* 7. Sync All Sessions to Calendar */}
                         {dbSessions && dbSessions.length > 1 && (
                           <Button
@@ -2809,6 +2824,13 @@ const AppCourseDetail = () => {
         description="Control notifications for content unlock tasks in your planner"
         currentSettings={contentSettings}
         onSave={handleSaveContentSettings}
+      />
+      {/* Desktop access sheet - one-time login link + web address */}
+      <DesktopAccessSheet
+        open={showDesktopSheet}
+        onOpenChange={setShowDesktopSheet}
+        redirectPath={location.pathname}
+        programName={program?.title}
       />
     </>
   );
