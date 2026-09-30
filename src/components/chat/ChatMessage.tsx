@@ -405,10 +405,11 @@ export function ChatMessage({
           </div>
         )}
 
-        {/* Structured buttons (up to 3) */}
-        {Array.isArray(buttons) && buttons.length > 0 && (
+        {/* Structured buttons (up to 3) — skip any duplicate of the inline link button */}
+        {Array.isArray(buttons) && buttons.some(b => b?.url && b?.label && b.url !== linkUrl) && (
           <div className="px-3 pb-2.5 space-y-1.5">
-            {buttons.filter(b => b?.url && b?.label).slice(0, 3).map((b, i) => (
+            {buttons.filter(b => b?.url && b?.label && b.url !== linkUrl).slice(0, 3).map((b, i) => (
+
               <Button
                 key={i}
                 variant={isCurrentUser ? "secondary" : "default"}
