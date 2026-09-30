@@ -150,15 +150,24 @@ export function FormInvitesPanel({ formKey, programSlug, submissionTable }: Prop
         <div className="flex justify-center py-12">
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </div>
-      ) : rows.length === 0 ? (
-        <p className="text-muted-foreground py-12 text-center">Everyone has submitted 🎉</p>
+      ) : visible.length === 0 ? (
+        <p className="text-muted-foreground py-12 text-center">
+          {scope === 'pending' ? 'Everyone has submitted 🎉' : 'No students in this selection.'}
+        </p>
       ) : (
         <Card>
           <CardContent className="p-0 divide-y">
-            {rows.map((r) => (
+            {visible.map((r) => (
               <div key={r.user_id} className="flex items-center gap-3 px-4 py-3">
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium truncate">{r.full_name || 'Unknown'}</p>
+                  <p className="font-medium truncate">
+                    {r.full_name || 'Unknown'}
+                    {r.submitted && (
+                      <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-medium text-green-700">
+                        Submitted
+                      </span>
+                    )}
+                  </p>
                   <p className="text-xs text-muted-foreground truncate">{r.email}</p>
                 </div>
                 <span className="text-xs text-muted-foreground">
