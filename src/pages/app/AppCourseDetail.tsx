@@ -2094,6 +2094,18 @@ const AppCourseDetail = () => {
                           </Button>
                         )}
 
+                        {/* 6b. Use on desktop - optional per round */}
+                        {(round as any).desktop_link_enabled && (
+                          <Button
+                            size="lg"
+                            className="w-full h-auto px-4 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
+                            onClick={() => setShowDesktopSheet(true)}
+                          >
+                            <Monitor className="h-5 w-5 mr-3 shrink-0" />
+                            <span className="truncate">Use on desktop</span>
+                          </Button>
+                        )}
+
                         {/* 7. Sync All Sessions to Calendar */}
                         {dbSessions && dbSessions.length > 1 && (
                           <Button
