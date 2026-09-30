@@ -58,7 +58,7 @@ const calculateMonthlyPresence = (entries: JournalEntry[]): number => {
 
 const AppProfile = () => {
   const { user } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
