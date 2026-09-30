@@ -161,9 +161,9 @@ export function StartHereCard() {
     },
   });
 
-  if (!pick) return null;
-
   const firstName = useFirstName();
+
+  if (!pick) return null;
 
   const open = () => {
     haptic.light();
