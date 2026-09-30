@@ -452,6 +452,7 @@ const AppProfile = () => {
               )}
               <InfoRow icon={Instagram} value={p?.social_instagram ? `@${p.social_instagram.replace('@', '')}` : undefined} label={t('profile.fields.instagram')} />
               <InfoRow icon={Send} value={p?.social_telegram ? `@${p.social_telegram.replace('@', '')}` : undefined} label={t('profile.fields.telegram')} />
+              <InfoRow icon={MessageCircle} value={p?.social_whatsapp || undefined} label={t('profile.fields.whatsapp')} />
 
               {!p?.full_name && !p?.phone && !p?.bio && (
                 <p className="text-sm text-muted-foreground p-2 text-center">{t('profile.tapEditHint')}</p>
