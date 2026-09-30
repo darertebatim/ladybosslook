@@ -182,6 +182,7 @@ const handler = async (req: Request): Promise<Response> => {
       console.log(`✅ [${requestId}] Retrieved ${userEmails.length} total user emails`);
       console.log(`📧 [${requestId}] Email list:`, userEmails);
     }
+    userEmails = [...new Set(userEmails.map((e) => String(e).trim().toLowerCase()).filter(Boolean))];
 
     // Respect opt-outs.
     {

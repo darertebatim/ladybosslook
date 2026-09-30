@@ -30,6 +30,29 @@ export function DesktopAccessSheet({
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [aliasEmails, setAliasEmails] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!open || !user?.id) return;
+    supabase
+      .from('account_email_aliases')
+      .select('email')
+      .eq('primary_user_id', user.id)
+      .then(({ data }) => setAliasEmails((data || []).map((a: any) => a.email)));
+  }, [open, user?.id]);
+
+  const allEmails = Array.from(
+    new Set([user?.email, ...aliasEmails].filter(Boolean).map((e) => String(e).toLowerCase())),
+  );
+  const emailList = (
+    <div className="mt-2 flex flex-wrap justify-center gap-1.5">
+      {allEmails.map((e) => (
+        <span key={e} className="rounded-full bg-card-warm px-2.5 py-1 text-xs text-fg-warm shadow-ios break-all">
+          {e}
+        </span>
+      ))}
+    </div>
+  );
 
   useEffect(() => {
     if (open) {
@@ -86,9 +109,7 @@ export function DesktopAccessSheet({
               <p className="mt-1 text-sm text-fg-warm-muted">
                 Open your inbox on your computer and tap the button in the email.
               </p>
-              {user?.email && (
-                <p className="mt-2 text-xs text-fg-warm-muted break-all">{user.email}</p>
-              )}
+              {emailList}
             </div>
             <Button
               variant="ghost"
@@ -114,10 +135,13 @@ export function DesktopAccessSheet({
               )}
               Email me a one-time login link
             </Button>
-            {user?.email && (
-              <p className="text-center text-xs text-fg-warm-muted break-all">
-                We'll send it to {user.email}
-              </p>
+            {allEmails.length > 0 && (
+              <div className="text-center">
+                <p className="text-xs text-fg-warm-muted">
+                  We'll send it to {allEmails.length > 1 ? 'all your emails' : 'your email'}:
+                </p>
+                {emailList}
+              </div>
             )}
           </div>
         )}
