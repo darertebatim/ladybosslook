@@ -169,7 +169,7 @@ function WeightKeypad({ value, unit, onValueChange, onConfirm, onClose }: {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-center relative">
-        <button onClick={onClose} className="absolute left-0 p-2 -ml-2">
+        <button onClick={onClose} className="absolute left-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/60 shadow-ios backdrop-blur-sm transition-opacity active:opacity-60">
           <X className="h-5 w-5" />
         </button>
         <span className="text-lg font-semibold">Weight ({unit})</span>
