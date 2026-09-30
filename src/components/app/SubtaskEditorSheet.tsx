@@ -153,7 +153,7 @@ const SubtaskEditorSheet: React.FC<SubtaskEditorSheetProps> = ({
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between px-4 pt-4 pb-2 flex-shrink-0">
-            <button onClick={() => onOpenChange(false)} className="p-2 -ml-2">
+            <button onClick={() => onOpenChange(false)} className="flex h-8 w-8 items-center justify-center rounded-full bg-white/60 shadow-ios backdrop-blur-sm transition-opacity active:opacity-60">
               <X className="h-5 w-5" />
             </button>
             <h2 className="text-lg font-semibold">{t('task.subtasks')}</h2>

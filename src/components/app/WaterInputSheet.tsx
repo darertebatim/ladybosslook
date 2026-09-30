@@ -81,7 +81,7 @@ export const WaterInputSheet = ({
         <div className="flex items-center justify-center mb-6 relative">
           <button
             onClick={handleClose}
-            className="absolute left-0 p-2 -ml-2"
+            className="absolute left-0 flex h-8 w-8 items-center justify-center rounded-full bg-white/60 shadow-ios backdrop-blur-sm transition-opacity active:opacity-60"
           >
             <X className="h-5 w-5" />
           </button>
