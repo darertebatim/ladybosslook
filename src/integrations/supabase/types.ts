@@ -3390,6 +3390,33 @@ export type Database = {
         }
         Relationships: []
       }
+      form_invites: {
+        Row: {
+          channels: string[]
+          form_key: string
+          id: string
+          invited_by: string | null
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          channels?: string[]
+          form_key: string
+          id?: string
+          invited_by?: string | null
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          channels?: string[]
+          form_key?: string
+          id?: string
+          invited_by?: string | null
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       form_submissions: {
         Row: {
           city: string
