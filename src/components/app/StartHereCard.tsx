@@ -239,7 +239,7 @@ export function StartHereCard() {
       {/* Explore programs */}
       <div className="mx-3 mt-3 grid grid-cols-[3fr_1fr] gap-2">
         <Link
-          to="/app/myprograms"
+          to="/app/academy"
           onClick={() => haptic.light()}
           className="flex items-center gap-2.5 rounded-2xl bg-peach px-3 py-2.5 active:opacity-90"
         >
@@ -251,7 +251,7 @@ export function StartHereCard() {
               Explore programs
             </span>
             <span className="block text-[11.5px] leading-tight text-fg-warm-muted line-clamp-1">
-              Live workshops &amp; self-paced courses
+              Live workshops &amp; courses
             </span>
           </span>
         </Link>
