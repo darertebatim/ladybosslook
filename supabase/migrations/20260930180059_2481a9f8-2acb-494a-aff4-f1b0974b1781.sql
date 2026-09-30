@@ -1,0 +1,1 @@
+ALTER TABLE public.profile_analysis_requests ADD COLUMN IF NOT EXISTS video_sent_at TIMESTAMP WITH TIME ZONE;
