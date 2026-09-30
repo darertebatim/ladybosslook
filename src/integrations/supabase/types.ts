@@ -4994,6 +4994,7 @@ export type Database = {
           return_count: number | null
           social_instagram: string | null
           social_telegram: string | null
+          social_whatsapp: string | null
           state: string | null
           this_month_active_days: number | null
           timezone: string | null
@@ -5027,6 +5028,7 @@ export type Database = {
           return_count?: number | null
           social_instagram?: string | null
           social_telegram?: string | null
+          social_whatsapp?: string | null
           state?: string | null
           this_month_active_days?: number | null
           timezone?: string | null
@@ -5060,6 +5062,7 @@ export type Database = {
           return_count?: number | null
           social_instagram?: string | null
           social_telegram?: string | null
+          social_whatsapp?: string | null
           state?: string | null
           this_month_active_days?: number | null
           timezone?: string | null
