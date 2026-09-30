@@ -90,6 +90,7 @@ export function FormInvitesPanel({ formKey, programSlug, submissionTable }: Prop
     }
   };
 
+  const visible = useMemo(() => (scope === 'pending' ? rows.filter((r) => !r.submitted) : rows), [rows, scope]);
   const notInvited = useMemo(() => visible.filter((r) => !r.lastInvite).map((r) => r.user_id), [visible]);
   const everyone = visible.map((r) => r.user_id);
 
