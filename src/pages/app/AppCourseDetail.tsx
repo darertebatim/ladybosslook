@@ -2825,6 +2825,13 @@ const AppCourseDetail = () => {
         currentSettings={contentSettings}
         onSave={handleSaveContentSettings}
       />
+      {/* Desktop access sheet - one-time login link + web address */}
+      <DesktopAccessSheet
+        open={showDesktopSheet}
+        onOpenChange={setShowDesktopSheet}
+        redirectPath={location.pathname}
+        programName={program?.title}
+      />
     </>
   );
 };
