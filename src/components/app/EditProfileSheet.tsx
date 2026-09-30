@@ -41,9 +41,10 @@ export const LANGUAGE_OPTIONS = [
   { value: 'zh', label: '中文 (Chinese)' },
 ];
 
+// Goals mirror the six Rilo Doors from onboarding (minus "Just exploring").
 const GOAL_OPTIONS = [
-  'Open My Business Doors', 'Get More Clients', 'Grow My Income',
-  'Sell Online', 'Build My Brand', 'Financial Independence',
+  'Self-care that fits me', 'Better financial literacy', 'Building my business',
+  'Guidance as an immigrant', 'To be more productive', 'Feeling heavy emotions',
 ];
 
 interface EditProfileSheetProps {

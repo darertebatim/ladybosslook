@@ -425,12 +425,12 @@
       "notSet": "Not set"
     },
     "goalsList": {
-      "Open My Business Doors": "Open My Business Doors",
-      "Get More Clients": "Get More Clients",
-      "Grow My Income": "Grow My Income",
-      "Sell Online": "Sell Online",
-      "Build My Brand": "Build My Brand",
-      "Financial Independence": "Financial Independence"
+      "Self-care that fits me": "Self-care that fits me",
+      "Better financial literacy": "Better financial literacy",
+      "Building my business": "Building my business",
+      "Guidance as an immigrant": "Guidance as an immigrant",
+      "To be more productive": "To be more productive",
+      "Feeling heavy emotions": "Feeling heavy emotions"
     },
     "toasts": {
       "saved": "Profile Updated",
