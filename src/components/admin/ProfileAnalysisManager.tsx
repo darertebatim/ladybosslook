@@ -15,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { ProgramRoundFilter, fetchEnrolledUserIds, ALL } from './ProgramRoundFilter';
 
 interface AnalysisRequest {
   id: string;
@@ -57,6 +58,13 @@ export function ProfileAnalysisManager() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [program, setProgram] = useState(ALL);
+  const [round, setRound] = useState(ALL);
+  const [allowedIds, setAllowedIds] = useState<Set<string> | null>(null);
+
+  useEffect(() => {
+    fetchEnrolledUserIds(program, round).then((ids) => setAllowedIds(ids ? new Set(ids) : null));
+  }, [program, round]);
   const [videoTarget, setVideoTarget] = useState<AnalysisRequest | null>(null);
   const [videoLink, setVideoLink] = useState('');
   const [videoSending, setVideoSending] = useState(false);
@@ -214,13 +222,14 @@ export function ProfileAnalysisManager() {
     const q = search.trim().toLowerCase();
     return requests.filter((r) => {
       if (statusFilter !== 'all' && r.status !== statusFilter) return false;
+      if (allowedIds && (!r.user_id || !allowedIds.has(r.user_id))) return false;
       if (!q) return true;
       const p = r.user_id ? profiles[r.user_id] : undefined;
       return [r.instagram_url, r.business_name, r.business_field, p?.full_name, p?.email]
         .filter(Boolean)
         .some((v) => String(v).toLowerCase().includes(q));
     });
-  }, [requests, profiles, search, statusFilter]);
+  }, [requests, profiles, search, statusFilter, allowedIds]);
 
   const igHref = (url: string) => {
     const v = url.trim();
@@ -239,6 +248,7 @@ export function ProfileAnalysisManager() {
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-xs"
         />
+        <ProgramRoundFilter allowAllPrograms program={program} round={round} onChange={(p, r) => { setProgram(p); setRound(r); }} />
         {['all', 'new', 'in_progress', 'done'].map((s) => (
           <Button
             key={s}
