@@ -568,17 +568,11 @@ export default function AppMyRiloPath() {
             <HomeBanner location="my_rilo_top" className="py-1" />
           </div>
 
-          {/* My Learning — first thing a program learner sees */}
+          {/* My Learning — enrolled learners see their program, everyone else
+              sees the same card with a personalized free starting point */}
           <div className="px-4 pt-2">
-            <MyLearningCard />
+            {hasLearningProgram ? <MyLearningCard /> : <StartHereCard />}
           </div>
-
-          {/* Start here — one personalized free playlist for non-learners */}
-          {!hasLearningProgram && (
-            <div className="px-4 pt-2 pb-1">
-              <StartHereCard />
-            </div>
-          )}
 
           {/* Today's Program Events — stacked deck above the date greeting */}
           {programEvents.length > 0 && (
