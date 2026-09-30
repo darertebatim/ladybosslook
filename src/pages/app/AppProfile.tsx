@@ -383,10 +383,6 @@ const AppProfile = () => {
                   </span>
                 ))}
               </div>
-            ) : (
-              <p className="text-xs text-[hsl(var(--fg-warm-muted))] leading-relaxed">
-                {t('profile.mergeEmails.hint', 'Have another account or paid with a different email? Add that email here and everything moves into this account.')}
-              </p>
             )}
           </div>
         </div>
