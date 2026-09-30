@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, RefreshCw, Send } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { ProgramRoundFilter, fetchEnrolledUserIds, ALL } from './ProgramRoundFilter';
 
 interface Row {
   user_id: string;
@@ -22,16 +23,13 @@ export function FormInvitesPanel({ formKey, programSlug, submissionTable }: Prop
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState<string | null>(null);
+  const [program, setProgram] = useState(programSlug);
+  const [round, setRound] = useState(ALL);
 
   const load = async () => {
     setLoading(true);
     try {
-      const { data: enr } = await supabase
-        .from('course_enrollments')
-        .select('user_id')
-        .eq('program_slug', programSlug)
-        .eq('status', 'active');
-      const ids = Array.from(new Set((enr || []).map((e: any) => e.user_id).filter(Boolean))) as string[];
+      const ids = (await fetchEnrolledUserIds(program, round)) || [];
       if (!ids.length) return setRows([]);
       const [{ data: subs }, { data: profs }, { data: invites }] = await Promise.all([
         supabase.from(submissionTable).select('user_id').in('user_id', ids),
@@ -68,7 +66,7 @@ export function FormInvitesPanel({ formKey, programSlug, submissionTable }: Prop
 
   useEffect(() => {
     load();
-  }, [formKey, programSlug]);
+  }, [formKey, program, round]);
 
   const send = async (ids: string[], key: string) => {
     setSending(key);
@@ -91,9 +89,25 @@ export function FormInvitesPanel({ formKey, programSlug, submissionTable }: Prop
   };
 
   const notInvited = useMemo(() => rows.filter((r) => !r.lastInvite).map((r) => r.user_id), [rows]);
+  const everyone = rows.map((r) => r.user_id);
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <ProgramRoundFilter program={program} round={round} onChange={(p, r) => { setProgram(p); setRound(r); }} />
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={!everyone.length || !!sending}
+          onClick={() => {
+            if (confirm(`Send the form link to all ${everyone.length} students in this ${round === ALL ? 'program' : 'round'} who haven't submitted (including already invited)?`))
+              send(everyone, 'everyone');
+          }}
+        >
+          {sending === 'everyone' && <Loader2 className="w-4 h-4 mr-1 animate-spin" />}
+          Send to whole {round === ALL ? 'program' : 'round'} ({everyone.length})
+        </Button>
+      </div>
       <div className="flex flex-wrap items-center gap-2">
         <p className="text-sm text-muted-foreground">
           Active students who haven't submitted yet. They get an in-app message with a form button, plus an email
