@@ -232,6 +232,23 @@ const AppCourses = () => {
             </Link>
           )}
 
+          {/* Merge accounts banner */}
+          <Link
+            to="/app/myprofile"
+            onClick={() => haptic.light()}
+            className="block rounded-xl bg-bg-warm border border-[hsl(var(--border-warm))]/60 px-3 py-2.5 active:opacity-70"
+          >
+            <p className="text-xs text-[hsl(var(--fg-warm))] leading-relaxed">
+              {i18n.language === "fa"
+                ? "حساب دیگری دارید یا با ایمیل دیگری خرید کردید؟ آن را متصل کنید تا دوره‌ها و سوابق شما به این حساب منتقل شود."
+                : "Have another account or paid with a different email? Link it here to merge your programs, purchases, and progress into this account."}
+            </p>
+            <span className="mt-1 flex items-center gap-0.5 text-[11px] font-bold text-[hsl(var(--brand-primary))]">
+              {i18n.language === "fa" ? "ادغام حساب‌ها" : "Merge accounts"}
+              <ChevronRight className="h-3 w-3 rtl:rotate-180" />
+            </span>
+          </Link>
+
           {/* Active Rounds Section */}
           {(sortedActiveRounds.length > 0 ||
             selfPacedEnrollments.length > 0) && (
