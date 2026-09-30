@@ -2578,12 +2578,12 @@ const AppCourseDetail = () => {
                     </Card>
                   )}
 
-                  {/* Courses attached directly to the program */}
-                  {enrollment?.status === "active" && directCourses.length > 0 && (
+                  {/* Courses attached to the round or program */}
+                  {enrollment?.status === "active" && allRoundCourses.length > 0 && (
                     <Card className="rounded-2xl border-0 shadow-ios bg-card-warm">
                       <CardHeader><CardTitle className="flex items-center gap-2 text-fg-warm"><GraduationCap className="h-5 w-5" />Courses</CardTitle></CardHeader>
                       <CardContent className="space-y-3">
-                        {directCourses.map((course) => (
+                        {allRoundCourses.map((course) => (
                           <Button key={course.id} variant="outline" className="h-auto min-h-14 w-full justify-start gap-3 rounded-2xl text-left" onClick={() => navigate(`/app/learn/${course.id}`, { state: { from: location.pathname } })}>
                             {course.cover_image_url ? <img src={course.cover_image_url} alt="" className="h-11 w-11 shrink-0 rounded-xl object-cover" /> : <GraduationCap className="h-6 w-6 shrink-0 text-brand" />}
                             <span className="min-w-0 whitespace-normal font-semibold text-fg-warm">{course.title}</span>
