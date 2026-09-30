@@ -82,6 +82,7 @@ interface RoundFormData {
   is_self_paced: boolean;
   auto_create_feed_channel: boolean;
   in_app_support_enabled: boolean;
+  desktop_link_enabled: boolean;
 }
 
 export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug?: string | null; onClearFilter?: () => void } = {}) => {
@@ -124,6 +125,7 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
     is_self_paced: false,
     auto_create_feed_channel: true,
       in_app_support_enabled: false,
+      desktop_link_enabled: false,
   });
 
   // Fetch programs for dropdown
@@ -223,6 +225,7 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
         is_self_paced: data.is_self_paced,
         auto_create_feed_channel: data.auto_create_feed_channel,
         in_app_support_enabled: data.in_app_support_enabled,
+        desktop_link_enabled: data.desktop_link_enabled,
       };
 
       if (editingId) {
@@ -374,6 +377,7 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
       is_self_paced: false,
       auto_create_feed_channel: true,
       in_app_support_enabled: false,
+      desktop_link_enabled: false,
     });
     setEditingId(null);
   };
@@ -423,6 +427,7 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
       is_self_paced: round.is_self_paced || false,
       auto_create_feed_channel: round.auto_create_feed_channel ?? true,
       in_app_support_enabled: (round as any).in_app_support_enabled ?? false,
+      desktop_link_enabled: (round as any).desktop_link_enabled ?? false,
     });
     setEditingId(round.id);
     setIsFormDialogOpen(true);
@@ -455,6 +460,7 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
       is_self_paced: round.is_self_paced || false,
       auto_create_feed_channel: round.auto_create_feed_channel ?? true,
       in_app_support_enabled: (round as any).in_app_support_enabled ?? false,
+      desktop_link_enabled: (round as any).desktop_link_enabled ?? false,
     });
     setEditingId(null); // This is a new round, not editing
     setIsFormDialogOpen(true);
@@ -969,6 +975,19 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
               />
               <Label htmlFor="in_app_support_enabled" className="cursor-pointer">
                 Enable in-app Support Chat button in Quick Actions
+              </Label>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-md border p-3">
+              <input
+                id="desktop_link_enabled"
+                type="checkbox"
+                className="h-4 w-4"
+                checked={formData.desktop_link_enabled}
+                onChange={(e) => setFormData({ ...formData, desktop_link_enabled: e.target.checked })}
+              />
+              <Label htmlFor="desktop_link_enabled" className="cursor-pointer">
+                Show "Use on desktop" in Quick Actions (one-time login link by email)
               </Label>
             </div>
 
