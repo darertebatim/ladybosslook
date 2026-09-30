@@ -12,6 +12,7 @@ import {
 import { haptic } from '@/lib/haptics';
 
 import { useAuth } from '@/hooks/useAuth';
+import { useFirstName } from '@/hooks/useFirstName';
 import { useMyLearning } from '@/hooks/useMyLearning';
 import { useSupportChatSummary } from '@/hooks/useSupportChatSummary';
 import { useUnreadChat } from '@/hooks/useUnreadChat';

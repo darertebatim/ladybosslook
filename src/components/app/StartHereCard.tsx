@@ -4,6 +4,7 @@ import { GraduationCap, Play, Headset, LayoutGrid, Sparkles } from 'lucide-react
 
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useFirstName } from '@/hooks/useFirstName';
 import { useUserPreferredLanguage } from '@/hooks/useUserPreferredLanguage';
 import { haptic } from '@/lib/haptics';
 
