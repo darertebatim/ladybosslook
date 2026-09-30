@@ -3,6 +3,7 @@ import { SlideUpPage } from "@/components/app/SlideUpPage";
 import { SEOHead } from "@/components/SEOHead";
 import { useGoBack } from "@/hooks/useGoBack";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfileDisplayName } from "@/hooks/useFirstName";
 import { useFriendships, useMyFriendCode, type FriendProfile } from "@/hooks/useFriends";
 import { Constellation } from "@/components/hub/Constellation";
 import { HubAddFriendSheet } from "@/components/hub/HubAddFriendSheet";
