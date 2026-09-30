@@ -163,11 +163,7 @@ export function StartHereCard() {
 
   if (!pick) return null;
 
-  const firstName =
-    (user?.user_metadata?.full_name || user?.user_metadata?.name || '')
-      .toString()
-      .trim()
-      .split(' ')[0] || '';
+  const firstName = useFirstName();
 
   const open = () => {
     haptic.light();

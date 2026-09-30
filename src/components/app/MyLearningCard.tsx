@@ -74,11 +74,7 @@ export function MyLearningCard() {
 
   if (!hasProgram || !enrollment) return null;
 
-  const firstName =
-    (user?.user_metadata?.full_name || user?.user_metadata?.name || '')
-      .toString()
-      .trim()
-      .split(' ')[0] || '';
+  const firstName = useFirstName();
 
   const round = enrollment.program_rounds;
   const programPath = `/app/programs/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`;
