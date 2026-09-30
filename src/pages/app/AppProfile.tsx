@@ -68,25 +68,9 @@ const AppProfile = () => {
   const { data: journalEntries } = useJournalEntries();
   const daysThisMonth = useMemo(() => calculateMonthlyPresence(journalEntries || []), [journalEntries]);
 
-  // Editable profile state
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  // Edit profile sheet
+  const [editSheetOpen, setEditSheetOpen] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
-  const [editedFields, setEditedFields] = useState({
-    full_name: '',
-    phone: '',
-    city: '',
-    country: '',
-    gender: '',
-    bio: '',
-    occupation: '',
-    relationship_status: '',
-    preferred_language: '',
-    goals: [] as string[],
-    date_of_birth: null as Date | null,
-    social_instagram: '',
-    social_telegram: '',
-  });
 
   // Accordion
   const [openSections, setOpenSections] = useState<Set<string>>(new Set());
@@ -165,86 +149,7 @@ const AppProfile = () => {
     enabled: !!user?.id,
   });
 
-  // Initialize edit fields when profile loads
-  useEffect(() => {
-    if (profile) {
-      const p = profile as any;
-      setEditedFields({
-        full_name: p.full_name || '',
-        phone: p.phone || '',
-        city: p.city || '',
-        country: p.country || '',
-        gender: p.gender || '',
-        bio: p.bio || '',
-        occupation: p.occupation || '',
-        relationship_status: p.relationship_status || '',
-        preferred_language: p.preferred_language || '',
-        goals: p.goals || [],
-        date_of_birth: p.date_of_birth ? new Date(p.date_of_birth) : null,
-        social_instagram: p.social_instagram || '',
-        social_telegram: p.social_telegram || '',
-      });
-    }
-  }, [profile]);
 
-  const handleSaveProfile = async () => {
-    if (!user?.id) return;
-    setIsSaving(true);
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          full_name: editedFields.full_name.trim(),
-          phone: editedFields.phone.trim(),
-          city: editedFields.city.trim(),
-          country: editedFields.country.trim(),
-          gender: editedFields.gender || null,
-          bio: editedFields.bio.trim() || null,
-          occupation: editedFields.occupation.trim() || null,
-          relationship_status: editedFields.relationship_status || null,
-          preferred_language: editedFields.preferred_language || null,
-          goals: editedFields.goals.length > 0 ? editedFields.goals : null,
-          date_of_birth: editedFields.date_of_birth ? format(editedFields.date_of_birth, 'yyyy-MM-dd') : null,
-          social_instagram: editedFields.social_instagram.trim() || null,
-          social_telegram: editedFields.social_telegram.trim() || null,
-        } as any)
-        .eq('id', user.id);
-      if (error) throw error;
-      const newName = editedFields.full_name.trim();
-      if (newName) {
-        supabase.auth.updateUser({ data: { full_name: newName, name: newName } }).then(() => {});
-      }
-      toast({ title: t('profile.toasts.saved'), description: t('profile.toasts.savedDesc') });
-      setIsEditing(false);
-      refetchProfile();
-    } catch (error: any) {
-      toast({ title: t('profile.toasts.error'), description: error.message || t('profile.toasts.saveFailed'), variant: 'destructive' });
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    const p = profile as any;
-    if (p) {
-      setEditedFields({
-        full_name: p.full_name || '',
-        phone: p.phone || '',
-        city: p.city || '',
-        country: p.country || '',
-        gender: p.gender || '',
-        bio: p.bio || '',
-        occupation: p.occupation || '',
-        relationship_status: p.relationship_status || '',
-        preferred_language: p.preferred_language || '',
-        goals: p.goals || [],
-        date_of_birth: p.date_of_birth ? new Date(p.date_of_birth) : null,
-        social_instagram: p.social_instagram || '',
-        social_telegram: p.social_telegram || '',
-      });
-    }
-    setIsEditing(false);
-  };
 
   const handleAvatarUpload = async (rawFile: File) => {
     if (!user?.id) return;
@@ -317,12 +222,6 @@ const AppProfile = () => {
     }
   };
 
-  const toggleGoal = (goal: string) => {
-    setEditedFields(prev => ({
-      ...prev,
-      goals: prev.goals.includes(goal) ? prev.goals.filter(g => g !== goal) : [...prev.goals, goal],
-    }));
-  };
 
   const formatCurrency = (amount: number, currency: string = 'usd') =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency: currency.toUpperCase() }).format(amount / 100);
