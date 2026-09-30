@@ -10,7 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import {
   User, Mail, Phone, MapPin, Calendar as CalendarIcon, BookOpen, Wallet,
   Receipt, Pencil, TrendingUp, TrendingDown, ChevronRight,
-  ChevronDown, Settings, Camera, Globe, Heart, Briefcase, Instagram, Send, MessageSquare, Sparkles, Plus
+  ChevronDown, Settings, Camera, Globe, Heart, Briefcase, Instagram, Send, MessageSquare, MessageCircle, Sparkles, Plus
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { PageHeader } from '@/components/app/ui/PageHeader';
