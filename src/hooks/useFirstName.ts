@@ -9,6 +9,12 @@ import { useAuth } from '@/hooks/useAuth';
  * has no name yet.
  */
 export function useFirstName(): string {
+  const full = useProfileDisplayName();
+  return full.split(' ')[0] || '';
+}
+
+/** Full display name: profile name first, then account name, then email. */
+export function useProfileDisplayName(): string {
   const { user } = useAuth();
 
   const { data: profileName } = useQuery({
