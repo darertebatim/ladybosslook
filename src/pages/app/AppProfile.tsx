@@ -58,7 +58,7 @@ const calculateMonthlyPresence = (entries: JournalEntry[]): number => {
 
 const AppProfile = () => {
   const { user } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -364,7 +364,14 @@ const AppProfile = () => {
                 {t('profile.mergeEmails.mergeNew', 'Merge new')}
               </button>
             </div>
-            {(linkedEmails || []).length > 0 ? (
+            <div className="rounded-xl bg-bg-warm border border-[hsl(var(--border-warm))]/60 px-3 py-2.5 mb-2">
+              <p className="text-xs text-[hsl(var(--fg-warm))] leading-relaxed">
+                {i18n.language === 'fa'
+                  ? 'حساب دیگری دارید یا با ایمیل دیگری خرید کردید؟ آن را متصل کنید تا دوره‌ها و سوابق شما به این حساب منتقل شود.'
+                  : 'Have another account or paid with a different email? Link it here to merge your programs, purchases, and progress into this account.'}
+              </p>
+            </div>
+            {(linkedEmails || []).length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {(linkedEmails || []).map((a: { id: string; email: string }) => (
                   <span
@@ -376,10 +383,6 @@ const AppProfile = () => {
                   </span>
                 ))}
               </div>
-            ) : (
-              <p className="text-xs text-[hsl(var(--fg-warm-muted))] leading-relaxed">
-                {t('profile.mergeEmails.hint', 'Have another account or paid with a different email? Add that email here and everything moves into this account.')}
-              </p>
             )}
           </div>
         </div>
