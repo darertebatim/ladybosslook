@@ -1,90 +1,100 @@
 import { useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Play, Sparkles, Headphones } from 'lucide-react';
+import { GraduationCap, Play, Headset, LayoutGrid, Sparkles } from 'lucide-react';
 
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserPreferredLanguage } from '@/hooks/useUserPreferredLanguage';
+import { smartOpenUrl } from '@/lib/navigation-utils';
 import { haptic } from '@/lib/haptics';
 
-const O = {
-  primary: '#EB5E33',
-  primaryL: '#F2854F',
-  fg: '#2B1C15',
-  fgMuted: '#8A6F62',
-  border: '#F5DCC8',
-  card: '#FFFFFF',
-  peachSoft: '#FFEFE4',
-};
-
 type Pick = {
+  kind: 'program' | 'playlist';
   id: string;
-  name: string;
+  title: string;
   coverImageUrl: string | null;
   doorLabel: string | null;
-  trackCount: number;
+  meta: string;
+  slug?: string;
 };
 
 /**
- * "Start here" — one personalized free playlist for users who are not
- * enrolled in any program. Matched to the priority door they picked during
- * Rilo Doors onboarding and to their preferred content language.
+ * "Start here" — the My Learning card for users who are not enrolled in any
+ * program yet. Recommends an active free program matched to the door they
+ * picked during Rilo Doors onboarding, falling back to a free playlist.
  */
 export function StartHereCard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const preferredLanguage = useUserPreferredLanguage();
 
   const { data: pick } = useQuery<Pick | null>({
-    queryKey: ['start-here-pick', user?.id, preferredLanguage],
+    queryKey: ['start-here-pick-v2', user?.id, preferredLanguage],
     enabled: !!user?.id,
     staleTime: 10 * 60 * 1000,
     queryFn: async () => {
-      // 1. The door picked during onboarding (may be missing if skipped)
+      // 1. Doors onboarding answers: primary door + sharpener (secondary) tags
       const { data: answerRows } = await supabase
         .from('onboarding_answers')
-        .select('answer')
+        .select('step_id, answer, created_at')
         .eq('user_id', user!.id)
         .eq('flow_id', 'rilo-doors')
-        .eq('step_id', 'rd-door-primary')
-        .order('created_at', { ascending: false })
-        .limit(1);
-      const rawAnswer = (answerRows ?? [])[0]?.answer as unknown;
-      const doorSlug =
-        (Array.isArray(rawAnswer) ? String(rawAnswer[0] ?? '') : String(rawAnswer ?? '')) || null;
+        .order('created_at', { ascending: false });
 
-      // 2. Free, openly accessible playlists
-      const { data: playlists } = await supabase
-        .from('audio_playlists')
-        .select('id, name, cover_image_url, language, is_free, requires_subscription, program_slug')
-        .eq('is_hidden', false)
-        .eq('requires_subscription', false);
-      const openPlaylists = (playlists ?? []).filter((p) => p.is_free && !p.program_slug);
-      if (openPlaylists.length === 0) return null;
+      const toSlugs = (raw: unknown): string[] =>
+        (Array.isArray(raw) ? raw : [raw])
+          .map((v) => String(v ?? '').trim())
+          .filter((v) => v && v !== 'unknown');
 
-      // 3. Playlists tagged with that door
-      let doorLabel: string | null = null;
-      let doorPlaylistIds = new Set<string>();
-      if (doorSlug && doorSlug !== 'unknown') {
+      const primarySlugs: string[] = [];
+      const secondarySlugs: string[] = [];
+      for (const row of answerRows ?? []) {
+        const stepId = String((row as { step_id: string }).step_id || '');
+        const slugs = toSlugs((row as { answer: unknown }).answer);
+        if (stepId === 'rd-door-primary') primarySlugs.push(...slugs);
+        else if (stepId.startsWith('rd-sharp')) secondarySlugs.push(...slugs);
+      }
+
+      // 2. Resolve those answer slugs to real tags
+      const allSlugs = Array.from(new Set([...primarySlugs, ...secondarySlugs]));
+      let primaryTagIds = new Set<string>();
+      let secondaryTagIds = new Set<string>();
+      const labelByTagId = new Map<string, string>();
+      if (allSlugs.length > 0) {
         const { data: tagRows } = await supabase
           .from('tags')
-          .select('id, slug, label, tag_dimensions!inner(slug)')
-          .eq('slug', doorSlug)
-          .eq('tag_dimensions.slug', 'door')
-          .limit(1);
-        const tag = (tagRows ?? [])[0] as { id: string; label: string } | undefined;
-        if (tag) {
-          doorLabel = tag.label ?? null;
-          const { data: links } = await supabase
-            .from('content_tags')
-            .select('content_id')
-            .eq('content_type', 'playlist')
-            .eq('tag_id', tag.id);
-          doorPlaylistIds = new Set((links ?? []).map((l) => l.content_id));
+          .select('id, slug, label')
+          .in('slug', allSlugs);
+        for (const t of tagRows ?? []) {
+          labelByTagId.set(t.id, t.label ?? t.slug);
+          if (primarySlugs.includes(t.slug)) primaryTagIds.add(t.id);
+          else secondaryTagIds.add(t.id);
         }
       }
 
-      const pickFrom = (pool: typeof openPlaylists) => {
+      const tagIds = [...primaryTagIds, ...secondaryTagIds];
+      const contentTagsFor = async (contentType: string) => {
+        if (tagIds.length === 0)
+          return { primary: new Map<string, string>(), secondary: new Map<string, string>() };
+        const { data: links } = await supabase
+          .from('content_tags')
+          .select('content_id, tag_id')
+          .eq('content_type', contentType)
+          .in('tag_id', tagIds);
+        const primary = new Map<string, string>();
+        const secondary = new Map<string, string>();
+        for (const l of links ?? []) {
+          const label = labelByTagId.get(l.tag_id) ?? null;
+          if (!label) continue;
+          if (primaryTagIds.has(l.tag_id)) primary.set(l.content_id, label);
+          else secondary.set(l.content_id, label);
+        }
+        return { primary, secondary };
+      };
+
+      const byLanguage = <T extends { language?: string | null }>(pool: T[]): T | null => {
         if (pool.length === 0) return null;
         if (preferredLanguage) {
           const match = pool.find((p) => p.language === preferredLanguage);
@@ -93,84 +103,178 @@ export function StartHereCard() {
         return pool[0];
       };
 
-      const chosen =
-        pickFrom(openPlaylists.filter((p) => doorPlaylistIds.has(p.id))) ??
-        pickFrom(openPlaylists);
-      if (!chosen) return null;
+      // 3. Free programs first
+      const { data: programs } = await supabase
+        .from('program_catalog')
+        .select('id, slug, title, cover_image_url, language, payment_type, price_amount, is_active')
+        .eq('is_active', true);
+      const freePrograms = (programs ?? []).filter(
+        (p) => p.payment_type === 'free' || (p.price_amount ?? 0) === 0,
+      );
+
+      if (freePrograms.length > 0) {
+        const { primary, secondary } = await contentTagsFor('program');
+        const chosen =
+          byLanguage(freePrograms.filter((p) => primary.has(p.id))) ??
+          byLanguage(freePrograms.filter((p) => secondary.has(p.id)));
+        if (chosen) {
+          return {
+            kind: 'program',
+            id: chosen.id,
+            slug: chosen.slug,
+            title: chosen.title,
+            coverImageUrl: chosen.cover_image_url ?? null,
+            doorLabel: primary.get(chosen.id) ?? secondary.get(chosen.id) ?? null,
+            meta: 'Free program · join anytime',
+          } satisfies Pick;
+        }
+      }
+
+      // 4. Fall back to a free playlist
+      const { data: playlists } = await supabase
+        .from('audio_playlists')
+        .select('id, name, cover_image_url, language, is_free, requires_subscription, program_slug')
+        .eq('is_hidden', false)
+        .eq('requires_subscription', false);
+      const openPlaylists = (playlists ?? []).filter((p) => p.is_free && !p.program_slug);
+      if (openPlaylists.length === 0) return null;
+
+      const { primary, secondary } = await contentTagsFor('playlist');
+      const chosenPlaylist =
+        byLanguage(openPlaylists.filter((p) => primary.has(p.id))) ??
+        byLanguage(openPlaylists.filter((p) => secondary.has(p.id))) ??
+        byLanguage(openPlaylists);
+      if (!chosenPlaylist) return null;
 
       const { count } = await supabase
         .from('audio_playlist_items')
         .select('id', { count: 'exact', head: true })
-        .eq('playlist_id', chosen.id);
+        .eq('playlist_id', chosenPlaylist.id);
 
       return {
-        id: chosen.id,
-        name: chosen.name,
-        coverImageUrl: chosen.cover_image_url ?? null,
-        doorLabel: doorPlaylistIds.has(chosen.id) ? doorLabel : null,
-        trackCount: count ?? 0,
-      };
+        kind: 'playlist',
+        id: chosenPlaylist.id,
+        title: chosenPlaylist.name,
+        coverImageUrl: chosenPlaylist.cover_image_url ?? null,
+        doorLabel: primary.get(chosenPlaylist.id) ?? secondary.get(chosenPlaylist.id) ?? null,
+        meta: count ? `${count} sessions · free` : 'Free to listen',
+      } satisfies Pick;
     },
   });
 
   if (!pick) return null;
 
+  const firstName =
+    (user?.user_metadata?.full_name || user?.user_metadata?.name || '')
+      .toString()
+      .trim()
+      .split(' ')[0] || '';
+
   const open = () => {
     haptic.light();
-    navigate(`/app/player/playlist/${pick.id}`);
+    if (pick.kind === 'program' && pick.slug) {
+      smartOpenUrl(`https://ladybosslook.com/${pick.slug}`, navigate);
+    } else {
+      navigate(`/app/player/playlist/${pick.id}`, { state: { from: location.pathname } });
+    }
   };
 
   return (
-    <div
-      className="rounded-2xl p-3.5"
-      style={{
-        background: `linear-gradient(140deg, ${O.peachSoft} 0%, ${O.card} 70%)`,
-        border: `1px solid ${O.border}`,
-        boxShadow: '0 4px 16px rgba(235,94,51,0.08)',
-      }}
-    >
-      <div
-        className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.12em]"
-        style={{ color: O.primary }}
-      >
-        <Sparkles className="w-3.5 h-3.5" />
-        {pick.doorLabel ? `Start here · ${pick.doorLabel}` : 'Start here'}
+    <div className="mb-4 overflow-hidden rounded-3xl border border-border-warm bg-gradient-to-b from-peach/50 to-card-warm shadow-card-warm">
+      {/* Greeting */}
+      <div className="flex items-start justify-between gap-3 p-4 pb-2">
+        <div className="min-w-0">
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand">
+            My Learning
+          </p>
+          <h3 className="mt-1 text-[17px] font-bold leading-tight text-fg-warm line-clamp-2">
+            Welcome to Rilo{firstName ? `, ${firstName}` : ''}
+          </h3>
+          <p className="mt-0.5 flex items-center gap-1 text-xs text-fg-warm-muted line-clamp-1">
+            <Sparkles className="h-3 w-3 flex-shrink-0 text-brand" />
+            {pick.doorLabel ? `Picked for you · ${pick.doorLabel}` : 'Picked for you'}
+          </p>
+        </div>
+        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-orange shadow-ios">
+          <GraduationCap className="h-5 w-5 text-white" />
+        </div>
       </div>
 
-      <div className="flex items-center gap-3 mt-2.5">
-        <div
-          className="w-14 h-14 rounded-xl shrink-0 overflow-hidden flex items-center justify-center"
-          style={{ background: O.peachSoft, border: `1px solid ${O.border}` }}
-        >
-          {pick.coverImageUrl ? (
-            <img src={pick.coverImageUrl} alt="" className="w-full h-full object-cover" loading="lazy" />
-          ) : (
-            <Headphones className="w-6 h-6" style={{ color: O.primary }} />
+      {/* The recommendation */}
+      <div className="mx-3 mt-1 overflow-hidden rounded-2xl border border-border-warm bg-card-warm">
+        <div className="relative flex min-h-[88px] items-center gap-3 bg-gradient-orange px-4 py-3">
+          {pick.coverImageUrl && (
+            <img
+              src={pick.coverImageUrl}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover opacity-25"
+              loading="lazy"
+            />
           )}
+          {pick.kind === 'program' ? (
+            <GraduationCap className="relative h-7 w-7 flex-shrink-0 text-white" />
+          ) : (
+            <Play className="relative h-7 w-7 flex-shrink-0 fill-white text-white" />
+          )}
+          <p className="relative min-w-0 flex-1 text-[15px] font-extrabold leading-snug text-white line-clamp-2">
+            {pick.title}
+          </p>
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-[15px] font-bold leading-snug line-clamp-2" style={{ color: O.fg }}>
-            {pick.name}
-          </div>
-          <div className="text-[12px] mt-0.5" style={{ color: O.fgMuted }}>
-            {pick.trackCount > 0 ? `${pick.trackCount} sessions · free` : 'Free to listen'}
-          </div>
+        <div className="p-3.5">
+          <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-fg-warm-muted">
+            Start here
+          </p>
+          <p className="mt-1 mb-2.5 text-sm font-bold leading-snug text-fg-warm line-clamp-2">
+            {pick.meta}
+          </p>
+          <button
+            onClick={open}
+            className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-gradient-orange text-[14px] font-extrabold text-white shadow-ios transition-transform active:scale-[0.98]"
+          >
+            <Play className="h-4 w-4 fill-white" />
+            {pick.kind === 'program' ? 'Join free' : 'Start listening'}
+          </button>
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={open}
-        className="w-full mt-3 h-11 rounded-xl flex items-center justify-center gap-2 text-[15px] font-bold active:scale-[0.99] transition-transform"
-        style={{
-          background: `linear-gradient(135deg, ${O.primaryL}, ${O.primary})`,
-          color: '#FFFFFF',
-          boxShadow: '0 4px 14px rgba(235,94,51,0.3)',
-        }}
+      {/* Explore programs */}
+      <div className="mx-3 mt-3 grid grid-cols-[3fr_1fr] gap-2">
+        <Link
+          to="/app/myprograms"
+          onClick={() => haptic.light()}
+          className="flex items-center gap-2.5 rounded-2xl bg-peach px-3 py-2.5 active:opacity-90"
+        >
+          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-card-warm">
+            <GraduationCap className="h-4 w-4 text-brand" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[12.5px] font-bold leading-tight text-fg-warm line-clamp-1">
+              Explore programs
+            </span>
+            <span className="block text-[11.5px] leading-tight text-fg-warm-muted line-clamp-1">
+              Live workshops &amp; self-paced courses
+            </span>
+          </span>
+        </Link>
+        <Link
+          to="/app/myprograms"
+          onClick={() => haptic.light()}
+          className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-peach py-2.5 text-brand active:opacity-90"
+        >
+          <LayoutGrid className="h-4 w-4" />
+          <span className="text-[10.5px] font-extrabold text-fg-warm">My Programs</span>
+        </Link>
+      </div>
+
+      {/* Support */}
+      <Link
+        to="/app/chat"
+        onClick={() => haptic.light()}
+        className="mx-3 mb-3.5 mt-3 flex min-h-[40px] items-center justify-center gap-2 rounded-2xl bg-mint px-3 text-[12.5px] font-bold text-fg-warm active:scale-[0.98] transition-transform"
       >
-        <Play className="w-4 h-4 fill-current" />
-        Start listening
-      </button>
+        <Headset className="h-4 w-4" />
+        Any questions? Chat with support
+      </Link>
     </div>
   );
 }
