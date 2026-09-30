@@ -106,12 +106,14 @@ export function MyLearningCard() {
       ? {
           to: `/app/player/playlist/${audioPlaylists[0].id}`,
           title: audioPlaylists[0].name,
+          cover: audioPlaylists[0].cover_image_url,
           label: 'Continue listening',
         }
       : !courseId && videoPlaylists.length > 0
         ? {
             to: `/app/watch/playlist/${videoPlaylists[0].id}`,
             title: videoPlaylists[0].name,
+            cover: videoPlaylists[0].cover_image_url,
             label: 'Continue watching',
           }
         : null;
@@ -183,9 +185,12 @@ export function MyLearningCard() {
       {/* Hero for playlist-only rounds */}
       {heroPlaylist && (
         <div className="mx-3 mt-1 overflow-hidden rounded-2xl border border-border-warm bg-card-warm">
-          <div className="flex min-h-[88px] items-center gap-3 bg-gradient-orange px-4 py-3">
-            <Play className="h-7 w-7 flex-shrink-0 fill-white text-white" />
-            <p className="min-w-0 flex-1 text-[15px] font-extrabold leading-snug text-white line-clamp-2">
+          <div className="relative flex min-h-[88px] items-center gap-3 bg-gradient-orange px-4 py-3">
+            {heroPlaylist.cover && (
+              <img src={heroPlaylist.cover} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />
+            )}
+            <Play className="relative h-7 w-7 flex-shrink-0 fill-white text-white" />
+            <p className="relative min-w-0 flex-1 text-[15px] font-extrabold leading-snug text-white line-clamp-2">
               {heroPlaylist.title}
             </p>
           </div>
