@@ -67,7 +67,7 @@ export function DesktopAccessSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-3xl border-0 bg-bg-warm px-5 pb-8 pt-5">
+      <SheetContent side="bottom" className="app-theme rounded-t-3xl border-0 bg-bg-warm px-5 pb-8 pt-5">
         <SheetHeader className="text-left">
           <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-orange shadow-ios">
             <Monitor className="h-8 w-8 text-white" />
