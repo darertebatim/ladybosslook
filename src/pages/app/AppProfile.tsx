@@ -385,6 +385,7 @@ const AppProfile = () => {
         </div>
 
         <LinkPaymentEmailSheet open={linkEmailOpen} onOpenChange={setLinkEmailOpen} />
+        <EditProfileSheet open={editSheetOpen} onOpenChange={setEditSheetOpen} profile={profile} onSaved={refetchProfile} />
 
         {/* Stats row */}
         <div className="flex gap-2">
