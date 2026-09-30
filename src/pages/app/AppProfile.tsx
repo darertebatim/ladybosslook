@@ -24,7 +24,7 @@ import { useJournalEntries, JournalEntry } from '@/hooks/useJournal';
 import { SubscriptionCard } from '@/components/app/SubscriptionManagement';
 import { SyncStatusCard } from '@/components/app/SyncStatusCard';
 import { LinkPaymentEmailSheet } from '@/components/app/LinkPaymentEmailSheet';
-import { EditProfileSheet, GENDER_OPTIONS, RELATIONSHIP_OPTIONS } from '@/components/app/EditProfileSheet';
+import { EditProfileSheet, GENDER_OPTIONS, RELATIONSHIP_OPTIONS, LANGUAGE_OPTIONS } from '@/components/app/EditProfileSheet';
 
 // Stats Pill Component — used in the hero stats row.
 const StatPill = ({ label, value, icon: Icon }: { label: string; value: number | string; icon?: React.ComponentType<{ className?: string }> }) => (
@@ -55,39 +55,6 @@ const calculateMonthlyPresence = (entries: JournalEntry[]): number => {
   return uniqueDays.size;
 };
 
-const GENDER_OPTIONS = [
-  { value: '', labelKey: 'profile.gender.preferNot' },
-  { value: 'female', labelKey: 'profile.gender.female' },
-  { value: 'male', labelKey: 'profile.gender.male' },
-  { value: 'non-binary', labelKey: 'profile.gender.nonBinary' },
-  { value: 'other', labelKey: 'profile.gender.other' },
-];
-
-const RELATIONSHIP_OPTIONS = [
-  { value: '', labelKey: 'profile.relationship.preferNot' },
-  { value: 'single', labelKey: 'profile.relationship.single' },
-  { value: 'in-a-relationship', labelKey: 'profile.relationship.inRelationship' },
-  { value: 'married', labelKey: 'profile.relationship.married' },
-  { value: 'divorced', labelKey: 'profile.relationship.divorced' },
-];
-
-const LANGUAGE_OPTIONS = [
-  { value: '', labelKey: 'profile.language.notSet' },
-  { value: 'en', label: 'American' },
-  { value: 'fa', label: 'فارسی (Persian)' },
-  { value: 'ar', label: 'العربية (Arabic)' },
-  { value: 'es', label: 'Español' },
-  { value: 'fr', label: 'Français' },
-  { value: 'de', label: 'Deutsch' },
-  { value: 'tr', label: 'Türkçe' },
-  { value: 'hi', label: 'हिन्दी (Hindi)' },
-  { value: 'zh', label: '中文 (Chinese)' },
-];
-
-const GOAL_OPTIONS = [
-  'Personal Growth', 'Career', 'Relationships', 'Health', 'Finance',
-  'Creativity', 'Mindfulness', 'Leadership', 'Confidence', 'Communication',
-];
 
 const AppProfile = () => {
   const { user } = useAuth();

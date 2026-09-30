@@ -28,7 +28,7 @@ export const RELATIONSHIP_OPTIONS = [
   { value: 'divorced', labelKey: 'profile.relationship.divorced' },
 ];
 
-const LANGUAGE_OPTIONS = [
+export const LANGUAGE_OPTIONS = [
   { value: '', labelKey: 'profile.language.notSet' },
   { value: 'en', label: 'American' },
   { value: 'fa', label: 'فارسی (Persian)' },
