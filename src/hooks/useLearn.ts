@@ -328,12 +328,17 @@ export function useRoundCourse(roundId: string | undefined) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('learn_course_rounds')
-        .select('course_id')
+        .select('course_id, learn_courses(id, title, cover_image_url)')
         .eq('round_id', roundId!)
         .limit(1)
         .maybeSingle();
       if (error) throw error;
-      return (data?.course_id as string) ?? null;
+      if (!data) return null;
+      return {
+        courseId: data.course_id as string,
+        title: (data as any).learn_courses?.title ?? null,
+        coverImageUrl: (data as any).learn_courses?.cover_image_url ?? null,
+      };
     },
   });
 }
