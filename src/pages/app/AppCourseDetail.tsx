@@ -377,7 +377,8 @@ const AppCourseDetail = () => {
   });
 
   const round = enrollment?.program_rounds;
-  const { data: roundCourseId } = useRoundCourse(round?.id);
+  const { data: roundCourse } = useRoundCourse(round?.id);
+  const roundCourseId = roundCourse?.courseId ?? null;
 
   const { data: directContent = [] } = useQuery({
     queryKey: ["course-program-content", enrollment?.program_slug],
@@ -593,6 +594,23 @@ const AppCourseDetail = () => {
     },
     enabled: !!round?.id,
   });
+
+  // Courses shown in the content section: round-attached course first, then program courses
+  const allRoundCourses = useMemo(() => {
+    const list: any[] = [];
+    if (roundCourse?.courseId) {
+      list.push({
+        id: roundCourse.courseId,
+        title: roundCourse.title || "Course",
+        cover_image_url: roundCourse.coverImageUrl,
+      });
+    }
+    (directCourses as any[]).forEach((c) => {
+      if (list.some((item) => item.id === c.id)) return;
+      list.push(c);
+    });
+    return list;
+  }, [roundCourse, directCourses]);
 
   // Direct program playlist + round playlists, de-duplicated
   const allRoundPlaylists = useMemo(() => {
@@ -2001,7 +2019,7 @@ const AppCourseDetail = () => {
                             })}
                           >
                             <GraduationCap className="h-5 w-5 mr-3 shrink-0" />
-                            <span className="truncate">Course Lessons</span>
+                            <span className="truncate">Course: {roundCourse?.title || "Course Lessons"}</span>
                           </Button>
                         )}
 
@@ -2560,12 +2578,12 @@ const AppCourseDetail = () => {
                     </Card>
                   )}
 
-                  {/* Courses attached directly to the program */}
-                  {enrollment?.status === "active" && directCourses.length > 0 && (
+                  {/* Courses attached to the round or program */}
+                  {enrollment?.status === "active" && allRoundCourses.length > 0 && (
                     <Card className="rounded-2xl border-0 shadow-ios bg-card-warm">
                       <CardHeader><CardTitle className="flex items-center gap-2 text-fg-warm"><GraduationCap className="h-5 w-5" />Courses</CardTitle></CardHeader>
                       <CardContent className="space-y-3">
-                        {directCourses.map((course) => (
+                        {allRoundCourses.map((course) => (
                           <Button key={course.id} variant="outline" className="h-auto min-h-14 w-full justify-start gap-3 rounded-2xl text-left" onClick={() => navigate(`/app/learn/${course.id}`, { state: { from: location.pathname } })}>
                             {course.cover_image_url ? <img src={course.cover_image_url} alt="" className="h-11 w-11 shrink-0 rounded-xl object-cover" /> : <GraduationCap className="h-6 w-6 shrink-0 text-brand" />}
                             <span className="min-w-0 whitespace-normal font-semibold text-fg-warm">{course.title}</span>
