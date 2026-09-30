@@ -38,6 +38,14 @@ const StatPill = ({ label, value, icon: Icon }: { label: string; value: number |
   </div>
 );
 
+// Small detail pill for the compact profile header (Presence-card style).
+const HeaderInfoPill = ({ icon: Icon, text }: { icon: React.ComponentType<{ className?: string }>; text: string }) => (
+  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[hsl(var(--tint-peach))]/60 text-[11px] text-[hsl(var(--fg-warm))] font-medium max-w-full">
+    <Icon className="h-3 w-3 shrink-0 text-[hsl(var(--brand-primary))]" />
+    <span className="truncate">{text}</span>
+  </span>
+);
+
 const calculateMonthlyPresence = (entries: JournalEntry[]): number => {
   if (!entries || entries.length === 0) return 0;
   const now = new Date();
