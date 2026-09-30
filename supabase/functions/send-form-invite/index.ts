@@ -56,6 +56,41 @@ function buildHtml(lang: "fa" | "en", link: string, form: (typeof FORMS)[string]
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   console.log("send-form-invite request", req.method);
+
+  // Public redirector used by the in-app chat button: opens in the browser
+  // (older app builds don't have the form route) and signs the student into
+  // their own account via a fresh one-time link.
+  if (req.method === "GET") {
+    const url = new URL(req.url);
+    const inviteId = url.searchParams.get("i") || "";
+    const fallback = `${WEB_BASE}${FORMS.profileanalyze.path}`;
+    const redirect = (to: string) => new Response(null, { status: 302, headers: { Location: to } });
+    if (!/^[0-9a-f-]{36}$/i.test(inviteId)) return redirect(fallback);
+    try {
+      const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
+      const { data: inv } = await admin
+        .from("form_invites")
+        .select("user_id, form_key, sent_at")
+        .eq("id", inviteId)
+        .maybeSingle();
+      const form = inv ? FORMS[(inv as any).form_key] : null;
+      const fresh = inv && Date.now() - new Date((inv as any).sent_at).getTime() < 30 * 24 * 3600 * 1000;
+      if (!form || !fresh) return redirect(fallback);
+      const target = `${WEB_BASE}${form.path}`;
+      const { data: au } = await admin.auth.admin.getUserById((inv as any).user_id);
+      const email = au?.user?.email;
+      if (!email) return redirect(target);
+      const { data: link } = await admin.auth.admin.generateLink({
+        type: "magiclink",
+        email,
+        options: { redirectTo: target },
+      });
+      return redirect(link?.properties?.action_link || target);
+    } catch (e) {
+      console.error("redirect failed", e);
+      return redirect(fallback);
+    }
+  }
   try {
     const token = (req.headers.get("Authorization") || "").replace("Bearer ", "").trim();
     if (!token) return json({ error: "Not authenticated" }, 401);
