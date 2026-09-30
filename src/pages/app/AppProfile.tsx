@@ -453,6 +453,42 @@ const AppProfile = () => {
           </div>
         </div>
 
+        {/* Merge accounts */}
+        <Card className="bg-card-warm border-0 shadow-card-warm rounded-2xl">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Mail className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
+              <p className="text-sm font-semibold text-[hsl(var(--fg-warm))]">
+                {t('profile.mergeEmails.title', 'Merge accounts')}
+              </p>
+            </div>
+            <p className="text-xs text-[hsl(var(--fg-warm-muted))] leading-relaxed">
+              {t('profile.mergeEmails.hint', 'Have another account or paid with a different email? Add that email here and everything moves into this account.')}
+            </p>
+            {(linkedEmails || []).length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {(linkedEmails || []).map((a: { id: string; email: string }) => (
+                  <span
+                    key={a.id}
+                    className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-full bg-mint text-[hsl(var(--fg-warm))]"
+                  >
+                    <Check className="h-3 w-3" />
+                    {a.email}
+                  </span>
+                ))}
+              </div>
+            )}
+            <Button
+              onClick={() => setLinkEmailOpen(true)}
+              className="w-full h-11 rounded-2xl bg-gradient-orange text-white font-semibold shadow-ios border-0"
+            >
+              {t('profile.mergeEmails.action', 'Add email to merge')}
+            </Button>
+          </CardContent>
+        </Card>
+
+        <LinkPaymentEmailSheet open={linkEmailOpen} onOpenChange={setLinkEmailOpen} />
+
         {/* Stats row */}
         <div className="flex gap-2">
           <StatPill
@@ -656,41 +692,6 @@ const AppProfile = () => {
           </CardContent>
         </Card>
 
-        {/* Purchase emails */}
-        <Card className="bg-card-warm border-0 shadow-card-warm rounded-2xl">
-          <CardContent className="p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <Mail className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
-              <p className="text-sm font-semibold text-[hsl(var(--fg-warm))]">
-                {t('profile.purchaseEmails.title', 'Purchase emails')}
-              </p>
-            </div>
-            <p className="text-xs text-[hsl(var(--fg-warm-muted))] leading-relaxed">
-              {t('profile.purchaseEmails.hint', 'Paid with a different email? Link it here and your courses move to this account.')}
-            </p>
-            {(linkedEmails || []).length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {(linkedEmails || []).map((a: { id: string; email: string }) => (
-                  <span
-                    key={a.id}
-                    className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-full bg-mint text-[hsl(var(--fg-warm))]"
-                  >
-                    <Check className="h-3 w-3" />
-                    {a.email}
-                  </span>
-                ))}
-              </div>
-            )}
-            <Button
-              onClick={() => setLinkEmailOpen(true)}
-              className="w-full h-11 rounded-2xl bg-gradient-orange text-white font-semibold shadow-ios border-0"
-            >
-              {t('profile.purchaseEmails.action', 'Link a purchase email')}
-            </Button>
-          </CardContent>
-        </Card>
-
-        <LinkPaymentEmailSheet open={linkEmailOpen} onOpenChange={setLinkEmailOpen} />
 
 
 
