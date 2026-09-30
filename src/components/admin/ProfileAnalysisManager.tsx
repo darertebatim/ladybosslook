@@ -30,6 +30,7 @@ interface AnalysisRequest {
   question: string | null;
   status: string;
   created_at: string;
+  video_sent_at: string | null;
 }
 
 interface ProfileInfo {
@@ -113,11 +114,10 @@ export function ProfileAnalysisManager() {
         conversationId = (created as { id: string }).id;
       }
 
-      const buttonLabel = 'تماشای ویدیوی تحلیل 🎥';
-      const baseContent =
-        '🎬 تحلیل پیج اینستاگرام شما آماده شد!\nویدیوی تحلیل پیجتان را از دکمه زیر تماشا کنید 👇';
-      // Dual format: legacy LINK_BUTTON tag (older app builds) + structured buttons (new app / web)
-      const content = `${baseContent}\n\n🔗 LINK_BUTTON:${url}:${buttonLabel}`;
+      // Plain link (no button): works on every app version, no 404 risk.
+      const content =
+        '🎬 تحلیل پیج اینستاگرام شما آماده شد!\nویدیوی تحلیل پیجتان را از لینک زیر تماشا کنید 👇\n\n' +
+        url;
       const { error: msgErr } = await (supabase as any)
         .from('chat_messages')
         .insert({
@@ -125,9 +125,16 @@ export function ProfileAnalysisManager() {
           sender_id: adminId,
           sender_type: 'admin',
           content,
-          buttons: [{ label: buttonLabel, url }],
         });
       if (msgErr) throw msgErr;
+
+      // Mark the submission as video-sent
+      const sentAt = new Date().toISOString();
+      await (supabase as any)
+        .from('profile_analysis_requests')
+        .update({ video_sent_at: sentAt })
+        .eq('id', videoTarget.id);
+      setRequests((prev) => prev.map((r) => (r.id === videoTarget.id ? { ...r, video_sent_at: sentAt } : r)));
 
 
       await (supabase as any)
