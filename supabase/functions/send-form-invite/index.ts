@@ -1,8 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import { Resend } from "https://esm.sh/resend@2.0.0";
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
@@ -30,32 +28,6 @@ const FORMS: Record<string, { path: string; titleFa: string; titleEn: string; ch
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-
-function buildHtml(lang: "fa" | "en", link: string, form: (typeof FORMS)[string]) {
-  const rtl = lang === "fa";
-  const t = rtl
-    ? {
-        title: form.titleFa,
-        intro:
-          "برای دریافت تحلیل پیج اینستاگرامتان، کافی است روی دکمه زیر بزنید. مستقیم وارد حساب خودتان در ریلو می‌شوید و فرم باز می‌شود — نیازی به ورود دوباره نیست.",
-        cta: "باز کردن فرم",
-        note: "این لینک تا ۱ ساعت معتبر است و فقط یک بار قابل استفاده است. اگر منقضی شد، از داخل چت پشتیبانی اپ هم می‌توانید فرم را باز کنید.",
-      }
-    : {
-        title: form.titleEn,
-        intro:
-          "Tap the button below — you'll be signed straight into your Rilo account and the form will open. No need to sign in again.",
-        cta: "Open the form",
-        note: "This link works for 1 hour and can be used once. You can also open the form from your support chat in the app.",
-      };
-  return `<!DOCTYPE html><html dir="${rtl ? "rtl" : "ltr"}"><body style="margin:0;padding:24px;background:#FFF7F1;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Tahoma,sans-serif;">
-<div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:18px;padding:28px;">
-<h1 style="margin:0 0 14px;font-size:22px;color:#2B1A12;">📝 ${t.title}</h1>
-<p style="margin:0 0 22px;color:#4A3527;font-size:15px;line-height:1.7;">${t.intro}</p>
-<a href="${link}" style="display:block;text-align:center;background:#F26B21;color:#ffffff;text-decoration:none;font-size:17px;font-weight:700;padding:16px 20px;border-radius:14px;">${t.cta}</a>
-<p style="margin:22px 0 0;color:#7A5C4A;font-size:13px;line-height:1.7;">${t.note}</p>
-</div></body></html>`;
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
