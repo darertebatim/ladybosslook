@@ -1569,6 +1569,30 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
         </CardContent>
       </Card>
 
+      <Dialog open={!!tagsProgram} onOpenChange={(open) => !open && setTagsProgram(null)}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Tags — {tagsProgram?.title}</DialogTitle>
+          </DialogHeader>
+          <TagPicker value={tagsSelection} onChange={setTagsSelection} />
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setTagsProgram(null)}>Cancel</Button>
+            <Button
+              disabled={saveProgramTags.isPending}
+              onClick={() => {
+                if (!tagsProgram) return;
+                saveProgramTags.mutate(
+                  { contentType: 'program', contentId: tagsProgram.id, tagIds: tagsSelection },
+                  { onSuccess: () => setTagsProgram(null) }
+                );
+              }}
+            >
+              Save Tags
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
