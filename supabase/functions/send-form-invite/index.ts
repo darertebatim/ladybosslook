@@ -88,12 +88,10 @@ serve(async (req) => {
       : [];
     if (!form || userIds.length === 0) return json({ error: "Invalid form or users" }, 400);
 
-    const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
-    const formUrl = `${WEB_BASE}${form.path}`;
-    const results: { user_id: string; chat: boolean; email: boolean; error?: string }[] = [];
+    const results: { user_id: string; chat: boolean; error?: string }[] = [];
 
     for (const userId of userIds) {
-      const r = { user_id: userId, chat: false, email: false } as (typeof results)[number];
+      const r = { user_id: userId, chat: false } as (typeof results)[number];
       try {
         const inviteId = crypto.randomUUID();
         const { error: iErr } = await admin.from("form_invites").insert({
@@ -105,17 +103,8 @@ serve(async (req) => {
         });
         if (iErr) throw iErr;
         const chatUrl = `${SUPABASE_URL}/functions/v1/send-form-invite?i=${inviteId}`;
-        const { data: profile } = await admin
-          .from("profiles")
-          .select("email, preferred_language")
-          .eq("id", userId)
-          .maybeSingle();
-        const { data: authUser } = await admin.auth.admin.getUserById(userId);
-        const email = authUser?.user?.email || (profile as any)?.email;
-        const pl = String((profile as any)?.preferred_language || "").toLowerCase();
-        const lang: "fa" | "en" = pl.startsWith("fa") || pl === "persian" || !pl ? "fa" : "en";
 
-        // 1) In-app chat message with button (legacy + structured)
+        // 1) In-app chat message with the personal sign-in link
         let convId: string | null = null;
         let unread = 0;
         const { data: conv } = await admin
