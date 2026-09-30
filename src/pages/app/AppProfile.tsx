@@ -433,7 +433,15 @@ const AppProfile = () => {
       <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-safe space-y-3 pt-3">
 
         {/* Compact identity card with integrated linked accounts */}
-        <div className="rounded-3xl bg-card-warm shadow-card-warm p-4">
+        <div className="relative rounded-3xl bg-card-warm shadow-card-warm p-4">
+          {/* Edit profile pen */}
+          <button
+            onClick={() => setIsEditing(true)}
+            aria-label={t('profile.editProfile')}
+            className="absolute top-3 right-3 h-9 w-9 rounded-full bg-bg-warm flex items-center justify-center shadow-ios active:scale-90 transition-transform"
+          >
+            <Pencil className="h-3.5 w-3.5 text-[hsl(var(--fg-warm-muted))]" />
+          </button>
           {/* Identity row */}
           <div className="flex items-center gap-3.5">
             <button
