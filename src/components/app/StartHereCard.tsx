@@ -5,7 +5,6 @@ import { GraduationCap, Play, Headset, LayoutGrid, Sparkles } from 'lucide-react
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserPreferredLanguage } from '@/hooks/useUserPreferredLanguage';
-import { smartOpenUrl } from '@/lib/navigation-utils';
 import { haptic } from '@/lib/haptics';
 
 type Pick = {
@@ -172,7 +171,8 @@ export function StartHereCard() {
   const open = () => {
     haptic.light();
     if (pick.kind === 'program' && pick.slug) {
-      smartOpenUrl(`https://ladybosslook.com/${pick.slug}`, navigate);
+      // Same in-app destination the Academy page uses for programs.
+      navigate(`/app/programs/${pick.slug}`, { state: { from: location.pathname } });
     } else {
       navigate(`/app/player/playlist/${pick.id}`, { state: { from: location.pathname } });
     }
