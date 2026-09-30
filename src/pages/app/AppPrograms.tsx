@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/carousel";
 
 const AppCourses = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   // Use centralized data hook
   const { enrollments, nextSessionMap, nextContentMap, isLoading } =
     useCoursesData();
