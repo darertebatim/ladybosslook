@@ -82,10 +82,7 @@ const SheetContent = React.forwardRef<
           {children}
         </ZStackContext.Provider>
         {!hideCloseButton && (
-          <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </SheetPrimitive.Close>
+          <SheetCloseButton />
         )}
       </SheetPrimitive.Content>
     </SheetPortal>
@@ -145,7 +142,30 @@ const SheetDescription = React.forwardRef<
 ))
 SheetDescription.displayName = SheetPrimitive.Description.displayName
 
+const sheetCloseButtonClasses =
+  "absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/60 text-foreground shadow-ios backdrop-blur-sm transition-opacity active:opacity-60";
+
+/** iOS-style frosted close button for sheets. */
+const SheetCloseButton = React.forwardRef<
+  React.ElementRef<typeof SheetPrimitive.Close>,
+  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Close>
+>(({ className, children, ...props }, ref) => (
+  <SheetClose
+    ref={ref}
+    className={cn(sheetCloseButtonClasses, className)}
+    {...props}
+  >
+    {children ?? (
+      <>
+        <X className="h-4 w-4" />
+        <span className="sr-only">Close</span>
+      </>
+    )}
+  </SheetClose>
+));
+SheetCloseButton.displayName = "SheetCloseButton";
+
 export {
-  Sheet, SheetClose,
+  Sheet, SheetClose, SheetCloseButton,
   SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetOverlay, SheetPortal, SheetTitle, SheetTrigger
 }
