@@ -119,6 +119,16 @@ serve(async (req) => {
     for (const userId of userIds) {
       const r = { user_id: userId, chat: false, email: false } as (typeof results)[number];
       try {
+        const inviteId = crypto.randomUUID();
+        const { error: iErr } = await admin.from("form_invites").insert({
+          id: inviteId,
+          user_id: userId,
+          form_key: formKey,
+          invited_by: adminId,
+          channels: [],
+        });
+        if (iErr) throw iErr;
+        const chatUrl = `${SUPABASE_URL}/functions/v1/send-form-invite?i=${inviteId}`;
         const { data: profile } = await admin
           .from("profiles")
           .select("email, preferred_language")
