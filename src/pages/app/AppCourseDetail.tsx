@@ -150,6 +150,7 @@ const AppCourseDetail = () => {
     useState(false);
   const [showContentReminderSheet, setShowContentReminderSheet] =
     useState(false);
+  const [showDesktopSheet, setShowDesktopSheet] = useState(false);
 
   // Get unseen content functions for view tracking
   let markEnrollmentViewed: ((id: string) => Promise<void>) | null = null;
