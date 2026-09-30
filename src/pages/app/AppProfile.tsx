@@ -17,7 +17,7 @@ import { PageHeader } from '@/components/app/ui/PageHeader';
 import { IOSIconButton } from '@/components/app/ui/IOSIconButton';
 import { useToast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { format, startOfMonth } from 'date-fns';
 import { useJournalEntries, JournalEntry } from '@/hooks/useJournal';
