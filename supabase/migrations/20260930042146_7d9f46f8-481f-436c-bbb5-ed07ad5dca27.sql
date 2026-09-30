@@ -1,0 +1,1 @@
+ALTER TABLE public.program_rounds ADD COLUMN IF NOT EXISTS desktop_link_enabled boolean NOT NULL DEFAULT false;
