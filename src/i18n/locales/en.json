@@ -391,6 +391,7 @@
       "bio": "Bio",
       "instagram": "Instagram",
       "telegram": "Telegram",
+      "whatsapp": "WhatsApp",
       "email": "Email",
       "name": "Name",
       "location": "Location",
@@ -403,7 +404,8 @@
       "country": "Your country",
       "occupation": "Your occupation",
       "bio": "Tell us about yourself...",
-      "username": "@username"
+      "username": "@username",
+      "whatsapp": "WhatsApp number"
     },
     "gender": {
       "preferNot": "Prefer not to say",
@@ -423,16 +425,12 @@
       "notSet": "Not set"
     },
     "goalsList": {
-      "Personal Growth": "Personal Growth",
-      "Career": "Career",
-      "Relationships": "Relationships",
-      "Health": "Health",
-      "Finance": "Finance",
-      "Creativity": "Creativity",
-      "Mindfulness": "Mindfulness",
-      "Leadership": "Leadership",
-      "Confidence": "Confidence",
-      "Communication": "Communication"
+      "Open My Business Doors": "Open My Business Doors",
+      "Get More Clients": "Get More Clients",
+      "Grow My Income": "Grow My Income",
+      "Sell Online": "Sell Online",
+      "Build My Brand": "Build My Brand",
+      "Financial Independence": "Financial Independence"
     },
     "toasts": {
       "saved": "Profile Updated",

@@ -390,6 +390,7 @@
       "bio": "بیوگرافی",
       "instagram": "اینستاگرام",
       "telegram": "تلگرام",
+      "whatsapp": "واتساپ",
       "email": "ایمیل",
       "name": "نام",
       "location": "موقعیت",
@@ -402,7 +403,8 @@
       "country": "کشور شما",
       "occupation": "شغل شما",
       "bio": "درباره خودتان بنویسید…",
-      "username": "@نام‌کاربری"
+      "username": "@نام‌کاربری",
+      "whatsapp": "شماره واتساپ"
     },
     "gender": {
       "preferNot": "ترجیح می‌دهم نگویم",
@@ -422,16 +424,12 @@
       "notSet": "تنظیم نشده"
     },
     "goalsList": {
-      "Personal Growth": "رشد فردی",
-      "Career": "شغل",
-      "Relationships": "روابط",
-      "Health": "سلامتی",
-      "Finance": "مالی",
-      "Creativity": "خلاقیت",
-      "Mindfulness": "ذهن‌آگاهی",
-      "Leadership": "رهبری",
-      "Confidence": "اعتمادبه‌نفس",
-      "Communication": "ارتباطات"
+      "Open My Business Doors": "باز کردن درِ کسب‌وکارم",
+      "Get More Clients": "مشتری بیشتر",
+      "Grow My Income": "درآمد بیشتر",
+      "Sell Online": "فروش آنلاین",
+      "Build My Brand": "ساخت برندم",
+      "Financial Independence": "استقلال مالی"
     },
     "toasts": {
       "saved": "نمایه به‌روزرسانی شد",
