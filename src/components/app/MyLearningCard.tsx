@@ -72,9 +72,9 @@ export function MyLearningCard() {
     }
   }, [enrollmentId]);
 
-  if (!hasProgram || !enrollment) return null;
-
   const firstName = useFirstName();
+
+  if (!hasProgram || !enrollment) return null;
 
   const round = enrollment.program_rounds;
   const programPath = `/app/programs/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`;
