@@ -48,27 +48,6 @@ export const riloDoorsFlow: OnboardingFlow = {
       title: 'Which door is yours\nright now?',
       subtitle: 'Pick the one that needs you most.',
     },
-    /* ─── Sharpeners (only one runs based on primary) ─── */
-    {
-      id: 'rd-sharp-emotion',
-      type: 'door-emotion-picker',
-      doorBranch: 'emotion',
-    },
-    {
-      id: 'rd-sharp-immigrant',
-      type: 'door-immigrant-picker',
-      doorBranch: 'immigrant',
-    },
-    {
-      id: 'rd-sharp-financial',
-      type: 'door-financial-picker',
-      doorBranch: 'financial',
-    },
-    {
-      id: 'rd-sharp-business',
-      type: 'door-business-picker',
-      doorBranch: 'business',
-    },
     /* ─── Final loader: builds the path while teasing what they get ─── */
     {
       id: 'rd-building',
