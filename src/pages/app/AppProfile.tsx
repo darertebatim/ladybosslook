@@ -27,6 +27,7 @@ import { useJournalEntries, JournalEntry } from '@/hooks/useJournal';
 import { cn } from '@/lib/utils';
 import { SubscriptionCard } from '@/components/app/SubscriptionManagement';
 import { SyncStatusCard } from '@/components/app/SyncStatusCard';
+import { LinkPaymentEmailSheet } from '@/components/app/LinkPaymentEmailSheet';
 
 // Stats Pill Component — used in the hero stats row.
 const StatPill = ({ label, value, icon: Icon }: { label: string; value: number | string; icon?: React.ComponentType<{ className?: string }> }) => (
@@ -134,6 +135,23 @@ const AppProfile = () => {
     },
     enabled: !!user?.id,
   });
+
+  // Linked purchase emails
+  const [linkEmailOpen, setLinkEmailOpen] = useState(false);
+  const { data: linkedEmails } = useQuery({
+    queryKey: ['linked-purchase-emails', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('account_email_aliases')
+        .select('id, email')
+        .eq('primary_user_id', user?.id);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user?.id,
+  });
+
+
 
   const { data: enrollments } = useQuery({
     queryKey: ['profile-enrollments', user?.id],
@@ -637,6 +655,44 @@ const AppProfile = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Purchase emails */}
+        <Card className="bg-card-warm border-0 shadow-card-warm rounded-2xl">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Mail className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
+              <p className="text-sm font-semibold text-[hsl(var(--fg-warm))]">
+                {t('profile.purchaseEmails.title', 'Purchase emails')}
+              </p>
+            </div>
+            <p className="text-xs text-[hsl(var(--fg-warm-muted))] leading-relaxed">
+              {t('profile.purchaseEmails.hint', 'Paid with a different email? Link it here and your courses move to this account.')}
+            </p>
+            {(linkedEmails || []).length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {(linkedEmails || []).map((a: { id: string; email: string }) => (
+                  <span
+                    key={a.id}
+                    className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-full bg-mint text-[hsl(var(--fg-warm))]"
+                  >
+                    <Check className="h-3 w-3" />
+                    {a.email}
+                  </span>
+                ))}
+              </div>
+            )}
+            <Button
+              onClick={() => setLinkEmailOpen(true)}
+              className="w-full h-11 rounded-2xl bg-gradient-orange text-white font-semibold shadow-ios border-0"
+            >
+              {t('profile.purchaseEmails.action', 'Link a purchase email')}
+            </Button>
+          </CardContent>
+        </Card>
+
+        <LinkPaymentEmailSheet open={linkEmailOpen} onOpenChange={setLinkEmailOpen} />
+
+
 
         {/* Journal Stats */}
         {/* Presence link */}
