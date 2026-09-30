@@ -55,6 +55,7 @@ function buildHtml(lang: "fa" | "en", link: string, form: (typeof FORMS)[string]
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  console.log("send-form-invite request", req.method);
   try {
     const token = (req.headers.get("Authorization") || "").replace("Bearer ", "").trim();
     if (!token) return json({ error: "Not authenticated" }, 401);
@@ -169,6 +170,7 @@ serve(async (req) => {
       results.push(r);
     }
 
+    console.log("send-form-invite results", JSON.stringify(results));
     return json({ success: true, results });
   } catch (e) {
     console.error(e);
