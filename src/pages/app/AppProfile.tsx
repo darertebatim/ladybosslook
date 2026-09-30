@@ -299,7 +299,7 @@ const AppProfile = () => {
         <div className="relative rounded-3xl bg-card-warm shadow-card-warm p-4">
           {/* Edit profile pen */}
           <button
-            onClick={() => setIsEditing(true)}
+            onClick={() => setEditSheetOpen(true)}
             aria-label={t('profile.editProfile')}
             className="absolute top-3 right-3 h-9 w-9 rounded-full bg-bg-warm flex items-center justify-center shadow-ios active:scale-90 transition-transform"
           >
@@ -397,23 +397,13 @@ const AppProfile = () => {
           <StatPill label={t('profile.credits')} value={creditBalance} icon={Wallet} />
         </div>
 
-        {/* Edit Profile / Settings buttons */}
-        <div className="flex gap-2">
-          {!isEditing ? (
-            <Button className="flex-1 rounded-full h-12 bg-[hsl(var(--brand-primary))] text-white shadow-ios border-0 active:bg-[hsl(var(--brand-primary-dark))]" onClick={() => setIsEditing(true)}>
-              <Pencil className="mr-2 h-4 w-4" />{t('profile.editProfile')}
-            </Button>
-          ) : (
-            <>
-              <Button variant="ghost" className="flex-1 rounded-full h-12 bg-card-warm shadow-card-warm text-[hsl(var(--fg-warm))]" onClick={handleCancelEdit} disabled={isSaving}>
-                <X className="mr-2 h-4 w-4" />{t('profile.cancel')}
-              </Button>
-              <Button className="flex-1 rounded-full h-12 bg-[hsl(var(--brand-primary))] text-white shadow-ios border-0 active:bg-[hsl(var(--brand-primary-dark))]" onClick={handleSaveProfile} disabled={isSaving}>
-                <Check className="mr-2 h-4 w-4" />{isSaving ? t('profile.saving') : t('profile.save')}
-              </Button>
-            </>
-          )}
-        </div>
+        {/* Edit Profile button */}
+        <Button
+          className="w-full rounded-full h-12 bg-[hsl(var(--brand-primary))] text-white shadow-ios border-0 active:bg-[hsl(var(--brand-primary-dark))]"
+          onClick={() => setEditSheetOpen(true)}
+        >
+          <Pencil className="mr-2 h-4 w-4" />{t('profile.editProfile')}
+        </Button>
 
         {/* Subscription Card */}
         <SubscriptionCard />
@@ -421,171 +411,34 @@ const AppProfile = () => {
         {/* Profile Info Card */}
         <Card className="rounded-2xl shadow-card-warm border-0 bg-card-warm">
           <CardContent className="space-y-3 pt-4">
-            {isEditing ? (
-              <>
-                {/* Full Name */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">{t('profile.fields.fullName')}</Label>
-                  <Input value={editedFields.full_name} onChange={e => setEditedFields(prev => ({ ...prev, full_name: e.target.value }))} placeholder={t('profile.placeholders.fullName')} />
-                </div>
-                {/* Phone */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">{t('profile.fields.phone')}</Label>
-                  <Input value={editedFields.phone} onChange={e => setEditedFields(prev => ({ ...prev, phone: e.target.value }))} placeholder={t('profile.placeholders.phone')} />
-                </div>
-                {/* Date of Birth */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">{t('profile.fields.dob')}</Label>
-                  <div className="flex gap-2">
-                    <select
-                      className="flex h-10 flex-1 rounded-md border border-input bg-background px-2 py-2 text-sm"
-                      value={editedFields.date_of_birth ? (editedFields.date_of_birth.getMonth() + 1).toString() : ''}
-                      onChange={e => {
-                        const month = parseInt(e.target.value);
-                        if (!month) { setEditedFields(prev => ({ ...prev, date_of_birth: null })); return; }
-                        const current = editedFields.date_of_birth || new Date(2000, 0, 1);
-                        setEditedFields(prev => ({ ...prev, date_of_birth: new Date(current.getFullYear(), month - 1, current.getDate()) }));
-                      }}
-                    >
-                      <option value="">{t('profile.fields.month')}</option>
-                      {Array.from({ length: 12 }, (_, i) => (
-                        <option key={i + 1} value={i + 1}>{format(new Date(2000, i, 1), 'MMM')}</option>
-                      ))}
-                    </select>
-                    <select
-                      className="flex h-10 w-[70px] rounded-md border border-input bg-background px-2 py-2 text-sm"
-                      value={editedFields.date_of_birth ? editedFields.date_of_birth.getDate().toString() : ''}
-                      onChange={e => {
-                        const day = parseInt(e.target.value);
-                        if (!day) return;
-                        const current = editedFields.date_of_birth || new Date(2000, 0, 1);
-                        setEditedFields(prev => ({ ...prev, date_of_birth: new Date(current.getFullYear(), current.getMonth(), day) }));
-                      }}
-                    >
-                      <option value="">{t('profile.fields.day')}</option>
-                      {Array.from({ length: 31 }, (_, i) => (
-                        <option key={i + 1} value={i + 1}>{i + 1}</option>
-                      ))}
-                    </select>
-                    <select
-                      className="flex h-10 w-[90px] rounded-md border border-input bg-background px-2 py-2 text-sm"
-                      value={editedFields.date_of_birth ? editedFields.date_of_birth.getFullYear().toString() : ''}
-                      onChange={e => {
-                        const year = parseInt(e.target.value);
-                        if (!year) return;
-                        const current = editedFields.date_of_birth || new Date(2000, 0, 1);
-                        setEditedFields(prev => ({ ...prev, date_of_birth: new Date(year, current.getMonth(), current.getDate()) }));
-                      }}
-                    >
-                      <option value="">{t('profile.fields.year')}</option>
-                      {Array.from({ length: 100 }, (_, i) => {
-                        const year = new Date().getFullYear() - i;
-                        return <option key={year} value={year}>{year}</option>;
-                      })}
-                    </select>
-                  </div>
-                </div>
-                {/* Gender */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">{t('profile.fields.gender')}</Label>
-                  <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={editedFields.gender} onChange={e => setEditedFields(prev => ({ ...prev, gender: e.target.value }))}>
-                    {GENDER_OPTIONS.map(o => <option key={o.value} value={o.value}>{t(o.labelKey)}</option>)}
-                  </select>
-                </div>
-                {/* City */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">{t('profile.fields.city')}</Label>
-                  <Input value={editedFields.city} onChange={e => setEditedFields(prev => ({ ...prev, city: e.target.value }))} placeholder={t('profile.placeholders.city')} />
-                </div>
-                {/* Country */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">{t('profile.fields.country')}</Label>
-                  <Input value={editedFields.country} onChange={e => setEditedFields(prev => ({ ...prev, country: e.target.value }))} placeholder={t('profile.placeholders.country')} />
-                </div>
-                {/* Occupation */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">{t('profile.fields.occupation')}</Label>
-                  <Input value={editedFields.occupation} onChange={e => setEditedFields(prev => ({ ...prev, occupation: e.target.value }))} placeholder={t('profile.placeholders.occupation')} />
-                </div>
-                {/* Relationship Status */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">{t('profile.fields.relationship')}</Label>
-                  <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={editedFields.relationship_status} onChange={e => setEditedFields(prev => ({ ...prev, relationship_status: e.target.value }))}>
-                    {RELATIONSHIP_OPTIONS.map(o => <option key={o.value} value={o.value}>{t(o.labelKey)}</option>)}
-                  </select>
-                </div>
-                {/* Language */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">{t('profile.fields.secondLanguage')}</Label>
-                  <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={editedFields.preferred_language} onChange={e => setEditedFields(prev => ({ ...prev, preferred_language: e.target.value }))}>
-                    {LANGUAGE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.labelKey ? t(o.labelKey) : o.label}</option>)}
-                  </select>
-                </div>
-                {/* Goals */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">{t('profile.fields.goals')}</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {GOAL_OPTIONS.map(goal => (
-                      <button
-                        key={goal}
-                        type="button"
-                        onClick={() => toggleGoal(goal)}
-                        className={cn(
-                          'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
-                          editedFields.goals.includes(goal) ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-                        )}
-                      >
-                        {t(`profile.goalsList.${goal}`, goal)}
-                      </button>
+            <>
+              <InfoRow icon={Mail} value={p?.email || user?.email} label={t('profile.fields.email')} />
+              <InfoRow icon={User} value={p?.full_name} label={t('profile.fields.name')} />
+              <InfoRow icon={Phone} value={p?.phone} label={t('profile.fields.phone')} />
+              <InfoRow icon={CalendarIcon} value={p?.date_of_birth ? format(new Date(p.date_of_birth), 'PPP') : undefined} label={t('profile.fields.dob')} />
+              <InfoRow icon={User} value={genderLabel && genderLabel !== t('profile.gender.preferNot') ? genderLabel : undefined} label={t('profile.fields.gender')} />
+              <InfoRow icon={MapPin} value={[p?.city, p?.country].filter(Boolean).join(', ') || undefined} label={t('profile.fields.location')} />
+              <InfoRow icon={Briefcase} value={p?.occupation} label={t('profile.fields.occupation')} />
+              <InfoRow icon={Heart} value={relationshipLabel && relationshipLabel !== t('profile.relationship.preferNot') ? relationshipLabel : undefined} label={t('profile.fields.relationship')} />
+              <InfoRow icon={Globe} value={languageLabel && languageLabel !== t('profile.language.notSet') ? languageLabel : undefined} label={t('profile.fields.secondLanguage')} />
+              <InfoRow icon={Globe} value={p?.timezone || undefined} label={t('profile.fields.timezone')} />
+              {p?.goals && p.goals.length > 0 && (
+                <div className="p-2.5 bg-muted/30 rounded-lg">
+                  <p className="text-[10px] text-muted-foreground mb-1.5">{t('profile.fields.goals')}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {p.goals.map((g: string) => (
+                      <Badge key={g} variant="secondary" className="text-xs">{t(`profile.goalsList.${g}`, g)}</Badge>
                     ))}
                   </div>
                 </div>
-                {/* Bio */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">{t('profile.fields.bio')}</Label>
-                  <Textarea value={editedFields.bio} onChange={e => setEditedFields(prev => ({ ...prev, bio: e.target.value }))} placeholder={t('profile.placeholders.bio')} rows={3} />
-                </div>
-                {/* Instagram */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">{t('profile.fields.instagram')}</Label>
-                  <Input value={editedFields.social_instagram} onChange={e => setEditedFields(prev => ({ ...prev, social_instagram: e.target.value }))} placeholder={t('profile.placeholders.username')} />
-                </div>
-                {/* Telegram */}
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">{t('profile.fields.telegram')}</Label>
-                  <Input value={editedFields.social_telegram} onChange={e => setEditedFields(prev => ({ ...prev, social_telegram: e.target.value }))} placeholder={t('profile.placeholders.username')} />
-                </div>
-              </>
-            ) : (
-              <>
-                <InfoRow icon={Mail} value={p?.email || user?.email} label={t('profile.fields.email')} />
-                <InfoRow icon={User} value={p?.full_name} label={t('profile.fields.name')} />
-                <InfoRow icon={Phone} value={p?.phone} label={t('profile.fields.phone')} />
-                <InfoRow icon={CalendarIcon} value={p?.date_of_birth ? format(new Date(p.date_of_birth), 'PPP') : undefined} label={t('profile.fields.dob')} />
-                <InfoRow icon={User} value={genderLabel && genderLabel !== t('profile.gender.preferNot') ? genderLabel : undefined} label={t('profile.fields.gender')} />
-                <InfoRow icon={MapPin} value={[p?.city, p?.country].filter(Boolean).join(', ') || undefined} label={t('profile.fields.location')} />
-                <InfoRow icon={Briefcase} value={p?.occupation} label={t('profile.fields.occupation')} />
-                <InfoRow icon={Heart} value={relationshipLabel && relationshipLabel !== t('profile.relationship.preferNot') ? relationshipLabel : undefined} label={t('profile.fields.relationship')} />
-                <InfoRow icon={Globe} value={languageLabel && languageLabel !== t('profile.language.notSet') ? languageLabel : undefined} label={t('profile.fields.secondLanguage')} />
-                <InfoRow icon={Globe} value={p?.timezone || undefined} label={t('profile.fields.timezone')} />
-                {p?.goals && p.goals.length > 0 && (
-                  <div className="p-2.5 bg-muted/30 rounded-lg">
-                    <p className="text-[10px] text-muted-foreground mb-1.5">{t('profile.fields.goals')}</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {p.goals.map((g: string) => (
-                        <Badge key={g} variant="secondary" className="text-xs">{t(`profile.goalsList.${g}`, g)}</Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                <InfoRow icon={Instagram} value={p?.social_instagram ? `@${p.social_instagram.replace('@', '')}` : undefined} label={t('profile.fields.instagram')} />
-                <InfoRow icon={Send} value={p?.social_telegram ? `@${p.social_telegram.replace('@', '')}` : undefined} label={t('profile.fields.telegram')} />
+              )}
+              <InfoRow icon={Instagram} value={p?.social_instagram ? `@${p.social_instagram.replace('@', '')}` : undefined} label={t('profile.fields.instagram')} />
+              <InfoRow icon={Send} value={p?.social_telegram ? `@${p.social_telegram.replace('@', '')}` : undefined} label={t('profile.fields.telegram')} />
 
-                {!p?.full_name && !p?.phone && !p?.bio && (
-                  <p className="text-sm text-muted-foreground p-2 text-center">{t('profile.tapEditHint')}</p>
-                )}
-              </>
-            )}
+              {!p?.full_name && !p?.phone && !p?.bio && (
+                <p className="text-sm text-muted-foreground p-2 text-center">{t('profile.tapEditHint')}</p>
+              )}
+            </>
           </CardContent>
         </Card>
 
