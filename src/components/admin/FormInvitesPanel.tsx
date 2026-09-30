@@ -121,8 +121,11 @@ export function FormInvitesPanel({ formKey, programSlug, submissionTable }: Prop
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <p className="text-sm text-muted-foreground">
-          Active students who haven't submitted yet. They get an in-app message with a form button, plus an email
-          with a one-time sign-in link that opens the form in their own account.
+          {scope === 'pending'
+            ? "Active students who haven't submitted yet."
+            : 'All active students, including those who already submitted.'}{' '}
+          They get an in-app message with a form button, plus an email with a one-time sign-in link that opens the
+          form in their own account.
         </p>
         <div className="ml-auto flex gap-2">
           <Button size="sm" variant="ghost" onClick={load} disabled={loading}>
