@@ -392,7 +392,7 @@ export function ProfileAnalysisManager() {
           <DialogHeader>
             <DialogTitle>Send analysis video</DialogTitle>
             <DialogDescription>
-              Paste the Google Drive link — it goes to {videoTarget?.user_id ? profiles[videoTarget.user_id]?.full_name || 'this student' : 'this student'}'s in-app chat with a watch button.
+              Paste the Google Drive link — it goes to {videoTarget?.user_id ? profiles[videoTarget.user_id]?.full_name || 'this student' : 'this student'}'s in-app chat as a tappable link.
               Make sure the Drive file is shared as "Anyone with the link can view".
             </DialogDescription>
           </DialogHeader>
