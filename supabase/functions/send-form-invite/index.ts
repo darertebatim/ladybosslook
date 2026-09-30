@@ -181,34 +181,18 @@ serve(async (req) => {
           .update({ last_message_at: new Date().toISOString(), unread_count_user: unread + 1 })
           .eq("id", convId);
         r.chat = true;
-        admin.functions
-          .invoke("send-chat-notification", {
+        // Push notification (awaited so a failure surfaces in results/logs)
+        try {
+          await admin.functions.invoke("send-chat-notification", {
             body: { conversationId: convId, messageContent: form.chatTitle, senderType: "admin", senderId: adminId },
-          })
-          .catch((e) => console.error("notify failed", e));
-
-        // 2) Email with one-time sign-in link
-        if (resend && email) {
-          const { data: link, error: lErr } = await admin.auth.admin.generateLink({
-            type: "magiclink",
-            email,
-            options: { redirectTo: formUrl },
           });
-          if (!lErr && link?.properties?.action_link) {
-            const { error: sErr } = await resend.emails.send({
-              from: "Ladyboss Academy <hi@ladybosslook.com>",
-              to: [email],
-              subject: lang === "fa" ? "📝 فرم تحلیل پیج اینستاگرام شما — ورود با یک کلیک" : "📝 Your Instagram analysis form — one-tap sign in",
-              html: buildHtml(lang, link.properties.action_link, form),
-            });
-            r.email = !sErr;
-            if (sErr) console.error("resend", sErr);
-          }
+        } catch (e) {
+          console.error("notify failed", userId, e);
         }
 
         await admin
           .from("form_invites")
-          .update({ channels: [r.chat ? "chat" : null, r.email ? "email" : null].filter(Boolean) })
+          .update({ channels: ["chat"] })
           .eq("id", inviteId);
       } catch (e) {
         console.error("invite failed", userId, e);
