@@ -197,9 +197,12 @@ export function MyLearningCard() {
         <PathProfileQuickCard variant="inset" className="mt-4" />
         <p className="mt-5 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
           {enrollment.course_name}
-          {round?.round_name ? ` · ${round.round_name}` : ''}
-          {isSelfPaced ? ' · Self-paced' : ''}
         </p>
+        {(round?.round_name || isSelfPaced) && (
+          <p className="mt-0.5 text-[11px] font-medium leading-tight text-fg-warm/60 line-clamp-1">
+            {round?.round_name ? `${round.round_name}${isSelfPaced ? ' · Self-paced' : ''}` : 'Self-paced'}
+          </p>
+        )}
       </div>
 
       {/* Continue where you left off */}
