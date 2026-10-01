@@ -1916,16 +1916,16 @@ const AppCourseDetail = () => {
                                 {nextSession.duration_minutes || 90} min
                               </p>
                             </div>
-                            <span
+                            <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleAddSingleSession(nextSession);
                               }}
                               className={cn(
-                                "shrink-0 inline-flex items-center justify-center h-9 w-9 rounded-full",
+                                "shrink-0 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-xs font-semibold shadow-ios transition-all active:scale-95",
                                 isSessionSynced(nextSession.id)
-                                  ? "text-green-600 dark:text-green-400"
-                                  : "text-muted-foreground",
+                                  ? "bg-white text-green-600"
+                                  : "bg-brand text-white",
                                 addingSessionId === nextSession.id && "opacity-50",
                               )}
                             >
@@ -1936,7 +1936,14 @@ const AppCourseDetail = () => {
                               ) : (
                                 <CalendarPlus className="h-4 w-4" />
                               )}
-                            </span>
+                              <span>
+                                {addingSessionId === nextSession.id
+                                  ? "Syncing"
+                                  : isSessionSynced(nextSession.id)
+                                    ? "Synced"
+                                    : "Sync"}
+                              </span>
+                            </button>
                           </button>
                         </CardContent>
                       </Card>
@@ -2070,14 +2077,29 @@ const AppCourseDetail = () => {
                               }
                             }}
                           >
-                            {rp.playlist_type === "video" ? (
-                              <Video className="h-5 w-5 mr-3 shrink-0" />
+                            {rp.playlist?.cover_image_url ? (
+                              <img
+                                src={rp.playlist.cover_image_url}
+                                alt=""
+                                className="h-12 w-12 shrink-0 rounded-xl object-cover"
+                              />
                             ) : (
-                              <Music className="h-5 w-5 mr-3 shrink-0" />
+                              <div className="h-12 w-12 shrink-0 rounded-xl bg-peach flex items-center justify-center">
+                                {rp.playlist_type === "video" ? (
+                                  <Video className="h-5 w-5 text-brand" />
+                                ) : (
+                                  <Music className="h-5 w-5 text-brand" />
+                                )}
+                              </div>
                             )}
-                            <span className="truncate">
-                              {rp.playlist_type === "video" ? "Watch playlist" : "Listen playlist"}: {rp.playlist?.name}
-                            </span>
+                            <div className="flex-1 min-w-0 text-left">
+                              <p className="text-sm font-semibold truncate">
+                                {rp.playlist?.name}
+                              </p>
+                              <p className="text-xs text-fg-warm/70">
+                                {rp.playlist_type === "video" ? "Watch playlist" : "Listen playlist"}
+                              </p>
+                            </div>
                           </Button>
                         ))}
 
