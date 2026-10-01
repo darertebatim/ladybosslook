@@ -2183,7 +2183,7 @@ const AppCourseDetail = () => {
                             className="w-full h-auto px-4 py-3 relative tour-community-btn bg-gradient-orange text-white shadow-ios rounded-2xl border-0 justify-start"
                             onClick={() =>
                               navigate(
-                                `/app/channels?channel=${roundChannel.id}`,
+                                `/app/channels/${roundChannel.slug}`,
                               )
                             }
                           >
