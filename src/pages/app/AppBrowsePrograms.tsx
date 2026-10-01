@@ -277,7 +277,7 @@ const AppBrowsePrograms = () => {
   );
   const doorTags = useMemo(() => {
     const tags = allTags.filter((tg) => tg.is_active !== false && tg.dimension_id === doorDimensionId);
-    const topicOrder = ['selfcare', 'financial', 'business', 'immigrant', 'productivity', 'emotion'];
+    const topicOrder = ['business', 'selfcare', 'productivity', 'immigrant', 'financial', 'emotion'];
     const orderMap = new Map(topicOrder.map((slug, idx) => [slug, idx]));
     return tags.sort((a, b) => {
       const orderA = orderMap.get(a.slug ?? '');
@@ -564,6 +564,16 @@ const AppBrowsePrograms = () => {
             {/* Door topic pills */}
             {doorTags.length > 0 && (
               <div className="flex gap-2 overflow-x-auto py-1 mt-1.5 scrollbar-hide">
+                <button
+                  onClick={() => { haptic.selection(); setSelectedDoorTagId(null); }}
+                  className={cn(
+                    "shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95",
+                    !selectedDoorTagId ? "bg-fg-warm text-white shadow-ios" : "bg-card-warm text-fg-warm-muted"
+                  )}
+                >
+                  <span>✨</span>
+                  <span>{t('browseProgramsPage.all')}</span>
+                </button>
                 {doorTags.map((tag) => {
                   const active = selectedDoorTagId === tag.id;
                   return (
