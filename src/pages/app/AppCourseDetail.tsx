@@ -95,6 +95,7 @@ import {
 import { SessionReminderSheet } from "@/components/app/SessionReminderSheet";
 import { DesktopAccessSheet } from "@/components/app/DesktopAccessSheet";
 import { Monitor } from "lucide-react";
+import { RoundVideoPlayer } from "@/components/app/RoundVideoPlayer";
 import { scheduleUrgentAlarm } from "@/lib/taskAlarm";
 import {
   scheduleTaskReminder,
@@ -1797,58 +1798,17 @@ const AppCourseDetail = () => {
                 </div>
               ) : (
                 <>
-                  {/* Show round video if available, otherwise show program video */}
-                  {(round?.video_url || program?.video_url) &&
-                    (() => {
-                      let embedUrl =
-                        round?.video_url || program?.video_url || "";
-
-                      // Convert YouTube URLs to embed format
-                      if (embedUrl.includes("youtube.com/watch")) {
-                        embedUrl = embedUrl.replace("watch?v=", "embed/");
-                      } else if (embedUrl.includes("youtu.be/")) {
-                        embedUrl = embedUrl.replace(
-                          "youtu.be/",
-                          "youtube.com/embed/",
-                        );
+                  {(round?.video_url || program?.video_url) && (
+                    <RoundVideoPlayer
+                      url={(round?.video_url || program?.video_url) as string}
+                      posterUrl={
+                        program?.cover_image_url ||
+                        (program ? programImages[program.slug] : null) ||
+                        null
                       }
+                    />
+                  )}
 
-                      // Convert Vimeo URLs to embed format
-                      if (
-                        embedUrl.includes("vimeo.com/") &&
-                        !embedUrl.includes("/video/")
-                      ) {
-                        embedUrl = embedUrl.replace(
-                          "vimeo.com/",
-                          "player.vimeo.com/video/",
-                        );
-                      }
-
-                      return (
-                        <Card>
-                          <CardContent className="p-0">
-                            <div className="aspect-video rounded-md overflow-hidden bg-muted">
-                              {embedUrl.includes("youtube") ||
-                              embedUrl.includes("vimeo") ? (
-                                <iframe
-                                  src={embedUrl}
-                                  title="Course video"
-                                  className="w-full h-full border-0"
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                  allowFullScreen
-                                />
-                              ) : (
-                                <video
-                                  src={embedUrl}
-                                  controls
-                                  className="w-full h-full object-cover"
-                                />
-                              )}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      );
-                     })()}
 
                   {/* Program Cover - shown at the top when there is no video */}
                   {!(round?.video_url || program?.video_url) &&
