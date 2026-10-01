@@ -2061,9 +2061,10 @@ const AppCourseDetail = () => {
                                 <GraduationCap className="h-5 w-5 text-brand" />
                               </div>
                             )}
-                            <span className="min-w-0 flex-1 text-left">
+                            <div className="flex-1 min-w-0 text-left">
                               <span className="block text-sm font-semibold truncate">Course: {roundCourse?.title || "Course Lessons"}</span>
-                            </span>
+                              <span className="block text-xs text-fg-warm/70">Start on-demand course materials</span>
+                            </div>
                           </Button>
                         )}
 
