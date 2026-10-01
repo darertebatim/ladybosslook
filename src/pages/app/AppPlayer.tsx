@@ -447,14 +447,11 @@ export default function AppPlayer() {
         ref={listenScrollRef}
         className="flex-1 overflow-y-auto overscroll-contain relative"
       >
-        <div
-          className="relative"
-          style={{ paddingTop: "env(safe-area-inset-top)" }}
-        >
+        <div className="relative">
           {/* Header — only the title row sticks to top */}
           <div
-            className="sticky z-20 px-4 pt-3 pb-2 backdrop-blur-xl"
-            style={{ top: "env(safe-area-inset-top)", background: "rgba(255,248,243,0.78)", boxShadow: "0 1px 0 rgba(245,220,200,0.5)" }}
+            className="sticky top-0 z-20 px-4 pb-2 backdrop-blur-xl"
+            style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)", background: "rgba(255,248,243,0.78)", boxShadow: "0 1px 0 rgba(245,220,200,0.5)" }}
           >
             <div className="min-h-[44px] grid grid-cols-[auto_1fr_auto] items-center">
               {showSearch ? (
