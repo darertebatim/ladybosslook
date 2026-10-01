@@ -71,8 +71,26 @@ export default function AppChannelDetail() {
   
   const { data: channels, isLoading: channelsLoading } = useChannels();
   
-  // Find channel by slug
-  const selectedChannel = channels?.find(c => c.slug === slug);
+  // Find channel by slug in the visible list
+  const listedChannel = channels?.find(c => c.slug === slug);
+
+  // Fallback: direct fetch by slug (e.g. instructor-scoped channels opened
+  // via a direct link from a round page won't appear in the filtered list)
+  const { data: directChannel, isLoading: directLoading } = useQuery({
+    queryKey: ['feed-channel-by-slug', slug],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('feed_channels')
+        .select('*')
+        .eq('slug', slug!)
+        .maybeSingle();
+      if (error) throw error;
+      return data as FeedChannel | null;
+    },
+    enabled: !!slug && !channelsLoading && !!channels && !listedChannel,
+  });
+
+  const selectedChannel = listedChannel || directChannel || undefined;
   const selectedChannelId = selectedChannel?.id;
   
   const { data: posts, isLoading: postsLoading } = useFeedPosts(selectedChannelId || undefined);
