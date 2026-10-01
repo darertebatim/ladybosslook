@@ -73,6 +73,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
     deposit_price: 0,
     duration: '',
     delivery_method: 'on-demand',
+    is_featured: false,
     subscription_duration: '',
     subscription_interval: 'month' as string,
     subscription_interval_count: 1 as number,
@@ -192,6 +193,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       deposit_price: 0,
       duration: '',
       delivery_method: 'on-demand',
+      is_featured: false,
       subscription_duration: '',
       subscription_interval: 'month',
       subscription_interval_count: 1,
@@ -319,6 +321,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       deposit_price: (program as any).deposit_price || 0,
       duration: program.duration || '',
       delivery_method: program.delivery_method || 'on-demand',
+      is_featured: !!(program as any).is_featured,
       subscription_duration: (program as any).subscription_duration || '',
       subscription_interval: (program as any).subscription_interval || 'month',
       subscription_interval_count: (program as any).subscription_interval_count ?? 1,
@@ -674,6 +677,14 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                     </SelectContent>
                   </Select>
                 </div>
+
+                <label className="flex items-start gap-2 rounded-lg border p-3 cursor-pointer md:col-span-2">
+                  <input type="checkbox" className="mt-1 h-4 w-4" checked={!!formData.is_featured} onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })} />
+                  <span>
+                    <span className="block text-sm font-medium">⭐ Featured in Academy</span>
+                    <span className="block text-xs text-muted-foreground">Can appear as the Academy hero. Pick several — each student sees the one that best fits their door (tags), language and enrollment.</span>
+                  </span>
+                </label>
 
                 <div className="space-y-2">
                   <Label htmlFor="duration">Duration</Label>
@@ -1492,6 +1503,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                         <span>{program.duration || 'N/A'}</span>
                         <span>•</span>
                         <span>{program.delivery_method === 'live-online' ? 'Live Online' : 'On-Demand'}</span>
+                        {(program as any).is_featured && <span>⭐ Featured</span>}
                       </div>
                       <div className="flex items-center gap-4">
                         {!!program.original_price && (
