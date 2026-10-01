@@ -148,7 +148,7 @@ export const ShieldEarnedSheet = ({
           {/* Dismiss */}
           <button
             onClick={handleClose}
-            className="absolute top-3 right-3 text-black/30 active:text-black/60 transition-colors p-2 -m-2"
+            className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/60 text-foreground shadow-ios backdrop-blur-sm transition-opacity active:opacity-60"
             aria-label="Close"
           >
             <X className="h-4 w-4" />

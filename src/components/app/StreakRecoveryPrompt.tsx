@@ -60,10 +60,10 @@ export const StreakRecoveryPrompt = ({
         {/* Dismiss */}
         <button
           onClick={handleDismiss}
-          className="absolute top-4 right-4 text-white/60 active:text-white transition-colors p-2 -m-2"
+          className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white shadow-ios backdrop-blur-sm transition-opacity active:opacity-60"
           aria-label="Dismiss"
         >
-          <X className="h-5 w-5" />
+          <X className="h-4 w-4" />
         </button>
 
         {/* Icon */}

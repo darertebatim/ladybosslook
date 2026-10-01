@@ -67,8 +67,8 @@ export const RoutinePlayerSummary = memo(function RoutinePlayerSummary({
         className="flex items-center justify-between px-4 pt-3 pb-2"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}
       >
-        <button onClick={onClose} className="p-2 active:opacity-70">
-          <X className="w-5 h-5 text-foreground" />
+        <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-white/60 shadow-ios backdrop-blur-sm transition-opacity active:opacity-60">
+          <X className="w-4 h-4 text-foreground" />
         </button>
         <button
           onClick={() => { haptic.light(); handleShare(); }}

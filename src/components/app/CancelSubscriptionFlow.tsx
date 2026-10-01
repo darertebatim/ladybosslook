@@ -181,8 +181,8 @@ function RetentionStep({
     <div className="h-full flex flex-col bg-[#F4ECFE] dark:bg-background">
       {/* Close button */}
       <div className="shrink-0 flex items-center px-4 pt-4 pb-2">
-        <button onClick={onClose} className="p-1">
-          <X className="h-5 w-5" />
+        <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-white/60 shadow-ios backdrop-blur-sm transition-opacity active:opacity-60">
+          <X className="h-4 w-4" />
         </button>
       </div>
 

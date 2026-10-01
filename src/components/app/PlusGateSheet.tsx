@@ -25,9 +25,9 @@ export function PlusGateSheet({
         {/* Close button */}
         <button
           onClick={() => onOpenChange(false)}
-          className="absolute top-4 right-4 p-1.5 rounded-full bg-muted/80 active:bg-muted transition-colors"
+          className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/60 shadow-ios backdrop-blur-sm transition-opacity active:opacity-60"
         >
-          <X className="h-4 w-4 text-muted-foreground" />
+          <X className="h-4 w-4 text-foreground" />
         </button>
 
         <div className="flex flex-col items-center text-center">
