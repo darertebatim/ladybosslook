@@ -31,6 +31,7 @@ import {
 import { SEOHead } from "@/components/SEOHead";
 import { HostBadges } from "@/components/app/HostBadges";
 import { PersianFlag } from "@/components/ui/PersianFlag";
+import { haptic } from "@/lib/haptics";
 
 const LANG_FLAGS: Record<string, string> = {
   all: "🌐",
@@ -1891,34 +1892,48 @@ const AppCourseDetail = () => {
                                 {nextSession.duration_minutes || 90} min
                               </p>
                             </div>
-                            <span
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleAddSingleSession(nextSession);
-                              }}
-                              className={cn(
-                                "shrink-0 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-xs font-semibold shadow-ios transition-all active:scale-95",
-                                isSessionSynced(nextSession.id)
-                                  ? "bg-white text-green-600"
-                                  : "bg-brand text-white",
-                                addingSessionId === nextSession.id && "opacity-50",
-                              )}
-                            >
-                              {addingSessionId === nextSession.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : isSessionSynced(nextSession.id) ? (
-                                <CheckCircle2 className="h-4 w-4" />
-                              ) : (
-                                <CalendarPlus className="h-4 w-4" />
-                              )}
-                              <span>
-                                {addingSessionId === nextSession.id
-                                  ? "Syncing"
-                                  : isSessionSynced(nextSession.id)
-                                    ? "Synced"
-                                    : "Sync"}
+                            {isSessionSynced(nextSession.id) && round.google_meet_link ? (
+                              <span
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  haptic.light();
+                                  window.open(round.google_meet_link!, "_blank");
+                                }}
+                                className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-xs font-semibold bg-fg-warm text-white shadow-ios transition-all active:scale-95"
+                              >
+                                <Video className="h-4 w-4" />
+                                <span>Go live</span>
                               </span>
-                            </span>
+                            ) : (
+                              <span
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAddSingleSession(nextSession);
+                                }}
+                                className={cn(
+                                  "shrink-0 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-xs font-semibold shadow-ios transition-all active:scale-95",
+                                  isSessionSynced(nextSession.id)
+                                    ? "bg-white text-green-600"
+                                    : "bg-brand text-white",
+                                  addingSessionId === nextSession.id && "opacity-50",
+                                )}
+                              >
+                                {addingSessionId === nextSession.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : isSessionSynced(nextSession.id) ? (
+                                  <CheckCircle2 className="h-4 w-4" />
+                                ) : (
+                                  <CalendarPlus className="h-4 w-4" />
+                                )}
+                                <span>
+                                  {addingSessionId === nextSession.id
+                                    ? "Syncing"
+                                    : isSessionSynced(nextSession.id)
+                                      ? "Synced"
+                                      : "Sync"}
+                                </span>
+                              </span>
+                            )}
                           </button>
                         </CardContent>
                       </Card>
