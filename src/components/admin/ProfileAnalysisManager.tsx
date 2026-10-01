@@ -352,7 +352,7 @@ export function ProfileAnalysisManager() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => navigate(`/admin/support?userId=${r.user_id}`)}
+                        onClick={() => window.open(`/admin/support?userId=${r.user_id}`, '_blank', 'noopener')}
                       >
                         <MessageSquare className="w-4 h-4 mr-1" />
                         Message in app
