@@ -1994,32 +1994,6 @@ const AppCourseDetail = () => {
                           </Button>
                         )}
 
-                        {/* 2. Community Channel - Most used */}
-                        {roundChannel && (
-                          <Button
-                            size="lg"
-                            className="w-full h-auto px-4 py-3 relative tour-community-btn bg-brand text-white shadow-ios rounded-2xl border-0 justify-start"
-                            onClick={() =>
-                              navigate(
-                                `/app/channels?channel=${roundChannel.id}`,
-                              )
-                            }
-                          >
-                            <MessageCircle className="h-5 w-5 mr-3 shrink-0" />
-                            <span className="truncate">Visit Community: {roundChannel.name}</span>
-                            {channelUnreadCount && channelUnreadCount > 0 && (
-                              <Badge
-                                variant="destructive"
-                                className="absolute -top-2 -right-2 h-5 min-w-5 px-1.5 flex items-center justify-center text-xs"
-                              >
-                                {channelUnreadCount > 99
-                                  ? "99+"
-                                  : channelUnreadCount}
-                              </Badge>
-                            )}
-                          </Button>
-                        )}
-
                         {/* 1b. Course lessons (Learn player) */}
                         {roundCourseId && !directCourses.some((course) => course.id === roundCourseId) && (
                           <Button
