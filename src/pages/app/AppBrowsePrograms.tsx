@@ -1,6 +1,6 @@
 import { useMemo, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, X, GraduationCap, ChevronLeft, ChevronRight, CheckCircle2, BookOpen, Users, UserCheck, Headphones, Video, Calendar, Sparkles, Dumbbell, Waves, Heart, Lock } from 'lucide-react';
+import { Search, X, GraduationCap, ChevronLeft, ChevronRight, CheckCircle2, BookOpen, Users, UserCheck, Headphones, Video, Calendar, Sparkles, Dumbbell, Waves, Heart, Lock, MessageCircle } from 'lucide-react';
 import { usePrograms } from '@/hooks/usePrograms';
 import { useEnrollments } from '@/hooks/useAppData';
 import { useQuery } from '@tanstack/react-query';
