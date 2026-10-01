@@ -717,10 +717,26 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
                             <CalendarDays className="h-4 w-4 text-primary" />
                           </div>
                         )}
+                        {channelByRoundId[round.id] && (
+                          <div title={`Channel: ${channelByRoundId[round.id].name}`}>
+                            <MessageSquare className="h-4 w-4 text-primary" />
+                          </div>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setChannelRound(round);
+                            setSelectedChannelId("");
+                          }}
+                          title={channelByRoundId[round.id] ? "Manage Channel" : "Create / Link Channel"}
+                        >
+                          <MessageSquare className={`h-4 w-4 ${channelByRoundId[round.id] ? 'text-primary' : ''}`} />
+                        </Button>
                         <Button
                           variant="outline"
                           size="sm"
@@ -729,6 +745,7 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
                         >
                           <ListChecks className="h-4 w-4" />
                         </Button>
+
                         <Button
                           variant="outline"
                           size="sm"
