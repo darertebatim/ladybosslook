@@ -91,7 +91,7 @@ export function PathProfileQuickCard({
           className={`block font-bold truncate ${inset ? 'text-[12.5px]' : 'text-[14px]'}`}
           style={{ color: O.fg }}
         >
-          My Profile{firstName ? ` — ${firstName}` : ''}
+          My Profile
         </span>
         <span
           className={`block truncate ${inset ? 'text-[10.5px] mt-0' : 'text-[11px] mt-0.5'}`}
@@ -99,6 +99,12 @@ export function PathProfileQuickCard({
         >
           {user.email || profile?.email || ''}
         </span>
+      </span>
+      <span
+        className={`shrink-0 flex items-center gap-1 ${inset ? 'text-[10.5px]' : 'text-[11.5px]'} font-semibold`}
+        style={{ color: O.fgMuted }}
+      >
+        View & edit
       </span>
       <ChevronRight className={`${inset ? 'w-3.5 h-3.5' : 'w-4 h-4'} shrink-0`} style={{ color: O.fgMuted }} />
     </button>
