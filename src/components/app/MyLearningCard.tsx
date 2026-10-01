@@ -399,19 +399,8 @@ export function MyLearningCard() {
             <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-brand ring-2 ring-mint" />
           </span>
           <span className="min-w-0 flex-1">
-            <span className="flex items-baseline justify-between gap-2">
-              <span className="min-w-0 truncate text-[12.5px] font-extrabold leading-tight text-fg-warm">
-                New in {roundChannel.name}
-              </span>
-              <span className="flex-shrink-0 text-[10.5px] font-semibold text-fg-warm-muted">
-                {communityPreview
-                  ? (() => {
-                      const ts = channelUnreadCount?.latest;
-                      void ts;
-                      return '';
-                    })()
-                  : ''}
-              </span>
+            <span className="block truncate text-[12.5px] font-extrabold leading-tight text-fg-warm">
+              New in {roundChannel.name}
             </span>
             {communityPreview && (
               <span className="mt-0.5 block truncate text-[11.5px] leading-tight text-fg-warm-muted">
