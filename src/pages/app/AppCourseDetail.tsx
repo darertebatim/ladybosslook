@@ -95,6 +95,7 @@ import {
 import { SessionReminderSheet } from "@/components/app/SessionReminderSheet";
 import { DesktopAccessSheet } from "@/components/app/DesktopAccessSheet";
 import { Monitor } from "lucide-react";
+import { RoundVideoPlayer } from "@/components/app/RoundVideoPlayer";
 import { scheduleUrgentAlarm } from "@/lib/taskAlarm";
 import {
   scheduleTaskReminder,
