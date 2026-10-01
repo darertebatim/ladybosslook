@@ -115,7 +115,7 @@ export const useUnseenContent = (): UnseenContentState => {
       .subscribe();
 
     const viewsChannel = supabase
-      .channel('unseen-views')
+      .channel(`unseen-views-${uid}`)
       .on(
         'postgres_changes',
         {
