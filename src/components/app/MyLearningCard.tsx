@@ -101,8 +101,9 @@ export function MyLearningCard() {
       if (!roundChannel?.id || !user?.id) return 0;
       const { data: allPosts } = await supabase
         .from('feed_posts')
-        .select('id, content, created_at')
+        .select('id, content, created_at, author_id')
         .eq('channel_id', roundChannel.id)
+        .neq('author_id', user.id)
         .order('created_at', { ascending: false });
       if (!allPosts || allPosts.length === 0) return 0;
       const { data: readPostIds } = await supabase
@@ -117,6 +118,10 @@ export function MyLearningCard() {
         latest: unread[0]?.content ?? '',
       };
     },
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
+    refetchInterval: 60_000,
     enabled: !!roundChannel?.id && !!user?.id,
   }) as { data?: { count: number; latest: string } | undefined };
 
