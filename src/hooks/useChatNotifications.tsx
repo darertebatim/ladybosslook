@@ -78,7 +78,7 @@ export const useChatNotifications = () => {
 
     // Subscribe to new messages
     const channel = supabase
-      .channel('chat-notifications')
+      .channel(`chat-notifications-${Math.random().toString(36).slice(2, 10)}`)
       .on(
         'postgres_changes',
         {
