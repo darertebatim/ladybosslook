@@ -481,11 +481,49 @@ const AppBrowsePrograms = () => {
           </div>
 
         <div className="p-4 pb-safe space-y-6">
+          {/* Featured spotlight */}
+          {spotlight && (
+            <button
+              onClick={() => { haptic.light(); openProgram(spotlight.slug); }}
+              className="w-full text-left rounded-3xl overflow-hidden shadow-ios active:scale-[0.99] transition-all"
+            >
+              <div className="relative">
+                <div className="aspect-[16/10] w-full bg-peach">
+                  {spotlight.image ? (
+                    <CachedImage src={spotlight.image} alt={spotlight.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <GraduationCap className="h-10 w-10 text-brand/40" />
+                    </div>
+                  )}
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-4">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-brand px-2.5 py-1 text-[10px] font-bold text-white">
+                    <Sparkles className="h-3 w-3" />
+                    {LIVE_TYPES.includes(spotlight.type)
+                      ? (isFa ? 'دوره زنده پیش رو' : 'Next live cohort')
+                      : (isFa ? 'پیشنهاد ویژه' : 'Featured')}
+                  </span>
+                  <h2 className="mt-2 text-lg font-bold text-white leading-snug line-clamp-2">{spotlight.title}</h2>
+                  <div className="mt-1 flex items-center gap-2 text-[11px] text-white/85">
+                    {LIVE_TYPES.includes(spotlight.type)
+                      ? <><Calendar className="h-3.5 w-3.5" /> {isFa ? 'جلسات زنده + انجمن اختصاصی' : 'Live sessions + community'}</>
+                      : <><Video className="h-3.5 w-3.5" /> {isFa ? 'دسترسی فوری' : 'Instant access'}</>}
+                  </div>
+                  <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-white px-3.5 py-2 text-[12px] font-bold text-fg-warm">
+                    {isFa ? 'مشاهده برنامه' : 'Explore program'} <ChevronRight className="h-3.5 w-3.5" />
+                  </span>
+                </div>
+              </div>
+            </button>
+          )}
+
           {/* Enrolled Programs */}
-          {enrolledPrograms.length > 0 && selectedType === 'all' && !searchQuery && (
+          {enrolledPrograms.length > 0 && showCurated && (
             <div className="space-y-3">
-              <h2 className="text-xs font-semibold text-fg-warm-muted uppercase tracking-wider">
-                {t('browseProgramsPage.yourPrograms')}
+              <h2 className="text-[13px] font-bold text-fg-warm px-0.5">
+                ✓ {t('browseProgramsPage.yourPrograms')}
               </h2>
               <div className="space-y-3">
                 {enrolledPrograms.map((program: any) => (
@@ -496,61 +534,126 @@ const AppBrowsePrograms = () => {
                     image={program.image}
                     type={program.type}
                     language={program.language}
-                    isFree={!program._isWaitlist && (program.isFree || program.priceAmount === 0)}
+                    isFree={isFreeProgram(program)}
                     isEnrolled={true}
                     isWaitlist={false}
-                    onClick={() => navigate(`/app/programs/${program.slug}`, { state: { from: location.pathname } })}
+                    onClick={() => openProgram(program.slug)}
                   />
                 ))}
               </div>
             </div>
           )}
 
-          {/* All / Not Enrolled Programs */}
-          <div className="space-y-3">
-            <h2 className="text-xs font-semibold text-fg-warm-muted uppercase tracking-wider">
-              {searchQuery ? t('browseProgramsPage.results') : selectedType === 'all' ? t('browseProgramsPage.allPrograms') : availableTypes.find(f => f.value === selectedType)?.label || t('browseProgramsPage.programs')}
-            </h2>
+          {/* Curated shelves */}
+          {showCurated ? (
+            <>
+              {liveShelf.length > 0 && (
+                <Shelf emoji="🔥" title={isFa ? 'دوره‌های زنده و اسپرینت‌ها' : 'Live cohorts & sprints'}>
+                  {liveShelf.map((p: any) => (
+                    <ShelfCard
+                      key={p.slug}
+                      title={p.title}
+                      image={p.image}
+                      type={p.type}
+                      badge={p._isWaitlist ? (isFa ? 'لیست انتظار' : 'Waitlist') : (isFa ? 'زنده' : 'Live')}
+                      badgeTone={p._isWaitlist ? 'card' : 'brand'}
+                      onClick={() => openProgram(p.slug)}
+                    />
+                  ))}
+                </Shelf>
+              )}
 
-            {notEnrolledPrograms.length === 0 && enrolledPrograms.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-peach flex items-center justify-center">
-                  <GraduationCap className="w-7 h-7 text-brand/50" />
+              {selfPacedShelf.length > 0 && (
+                <Shelf emoji="⚡" title={isFa ? 'دوره‌های آماده و مسترکلاس‌ها' : 'Self-paced masterclasses'}>
+                  {selfPacedShelf.map((p: any) => (
+                    <ShelfCard
+                      key={p.slug}
+                      title={p.title}
+                      image={p.image}
+                      type={p.type}
+                      badge={isFa ? 'دسترسی فوری' : 'Instant'}
+                      onClick={() => openProgram(p.slug)}
+                    />
+                  ))}
+                </Shelf>
+              )}
+
+              {freeShelf.length > 0 && (
+                <Shelf emoji="🎟️" title={isFa ? 'وبینارها و کارگاه‌های رایگان' : 'Free workshops & webinars'}>
+                  {freeShelf.map((p: any) => (
+                    <ShelfCard
+                      key={p.slug}
+                      title={p.title}
+                      image={p.image}
+                      type={p.type}
+                      badge={t('browseProgramsPage.free')}
+                      badgeTone="mint"
+                      onClick={() => openProgram(p.slug)}
+                    />
+                  ))}
+                </Shelf>
+              )}
+
+              {notEnrolledPrograms.length === 0 && enrolledPrograms.length === 0 && (
+                <div className="text-center py-16">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-peach flex items-center justify-center">
+                    <GraduationCap className="w-7 h-7 text-brand/50" />
+                  </div>
+                  <p className="text-fg-warm-muted text-sm">{t('browseProgramsPage.noPrograms')}</p>
                 </div>
-                <p className="text-fg-warm-muted text-sm">
-                  {searchQuery ? t('browseProgramsPage.noMatch', { query: searchQuery }) : t('browseProgramsPage.noPrograms')}
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {notEnrolledPrograms.map((program: any) => (
-                  <AcademyProgramCard
-                    key={program.slug}
-                    title={program.title}
-                    slug={program.slug}
-                    image={program.image}
-                    type={program.type}
-                    language={program.language}
-                    isFree={!program._isWaitlist && (program.isFree || program.priceAmount === 0)}
-                    isEnrolled={false}
-                    isWaitlist={program._isWaitlist}
-                    onClick={() => navigate(`/app/programs/${program.slug}`, { state: { from: location.pathname } })}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* CTA to support chat */}
-            <div className="pt-4 pb-2">
-              <p className="text-sm text-fg-warm-muted">{t('browseProgramsPage.tellUsWant')}</p>
-              <button
-                onClick={() => navigate('/app/chat?draft=' + encodeURIComponent(t('browseProgramsPage.chatDraft')))}
-                className="text-sm text-brand font-semibold flex items-center gap-1 mt-1 active:opacity-70"
-              >
-                {t('browseProgramsPage.tellUsCta')} <ChevronRight className="h-4 w-4" />
-              </button>
+              )}
+            </>
+          ) : (
+            <div className="space-y-3">
+              <h2 className="text-xs font-semibold text-fg-warm-muted uppercase tracking-wider">
+                {searchQuery ? t('browseProgramsPage.results') : availableTypes.find(f => f.value === selectedType)?.label || t('browseProgramsPage.programs')}
+              </h2>
+              {filtered.length === 0 ? (
+                <div className="text-center py-16">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-peach flex items-center justify-center">
+                    <GraduationCap className="w-7 h-7 text-brand/50" />
+                  </div>
+                  <p className="text-fg-warm-muted text-sm">
+                    {searchQuery ? t('browseProgramsPage.noMatch', { query: searchQuery }) : t('browseProgramsPage.noPrograms')}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {filtered.map((program: any) => (
+                    <AcademyProgramCard
+                      key={program.slug}
+                      title={program.title}
+                      slug={program.slug}
+                      image={program.image}
+                      type={program.type}
+                      language={program.language}
+                      isFree={isFreeProgram(program)}
+                      isEnrolled={isEnrolled(program.slug)}
+                      isWaitlist={program._isWaitlist && !isEnrolled(program.slug)}
+                      onClick={() => openProgram(program.slug)}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
+          )}
+
+          {/* Concierge card */}
+          <button
+            onClick={() => { haptic.light(); navigate('/app/chat?draft=' + encodeURIComponent(t('browseProgramsPage.chatDraft'))); }}
+            className="w-full text-left rounded-2xl bg-card-warm shadow-ios p-4 flex items-center gap-3 active:scale-[0.99] transition-all"
+          >
+            <div className="h-10 w-10 rounded-full bg-peach flex items-center justify-center shrink-0">
+              <MessageCircle className="h-5 w-5 text-brand" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-bold text-fg-warm">
+                {isFa ? 'دنبال موضوع خاص یا مشاوره خصوصی هستید؟' : 'Looking for a specific topic or private mentorship?'}
+              </p>
+              <p className="text-[11.5px] text-fg-warm-muted mt-0.5">{t('browseProgramsPage.tellUsCta')}</p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-brand shrink-0" />
+          </button>
           </div>
         </div>
       </div>
