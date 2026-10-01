@@ -35,6 +35,7 @@ export default function AppChannelDetail() {
   const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack('/app/channels');
   const { user } = useAuth();
   
   const bottomRef = useRef<HTMLDivElement>(null);
