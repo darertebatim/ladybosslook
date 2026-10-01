@@ -9,7 +9,6 @@ import {
   GraduationCap,
   CheckCircle2,
   ChevronRight,
-  Compass,
 } from "lucide-react";
 import { format } from "date-fns";
 import { haptic } from "@/lib/haptics";
