@@ -308,7 +308,8 @@ export default {
 				'urgency': 'var(--shadow-urgency)',
 				'cta': 'var(--shadow-cta)',
 				'card-warm': 'var(--shadow-card-warm)',
-				'ios': 'var(--shadow-ios)'
+				'ios': 'var(--shadow-ios)',
+				'ios-raised': 'var(--shadow-ios-raised)'
 			}
 		}
 	},
