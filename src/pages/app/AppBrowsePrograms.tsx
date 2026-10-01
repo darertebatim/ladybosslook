@@ -519,29 +519,29 @@ const AppBrowsePrograms = () => {
             </button>
           )}
 
-          {/* Enrolled Programs */}
+          {/* Your Programs — single card into My Programs */}
           {enrolledPrograms.length > 0 && showCurated && (
-            <div className="space-y-3">
-              <h2 className="text-[13px] font-bold text-fg-warm px-0.5">
-                ✓ {t('browseProgramsPage.yourPrograms')}
-              </h2>
-              <div className="space-y-3">
-                {enrolledPrograms.map((program: any) => (
-                  <AcademyProgramCard
-                    key={program.slug}
-                    title={program.title}
-                    slug={program.slug}
-                    image={program.image}
-                    type={program.type}
-                    language={program.language}
-                    isFree={isFreeProgram(program)}
-                    isEnrolled={true}
-                    isWaitlist={false}
-                    onClick={() => openProgram(program.slug)}
-                  />
-                ))}
+            <button
+              onClick={() => { haptic.light(); navigate('/app/myprograms'); }}
+              className="w-full text-left rounded-2xl bg-card-warm shadow-card-warm p-3.5 flex items-center gap-3 active:scale-[0.98] transition-all"
+            >
+              <div className="h-11 w-11 rounded-full bg-mint flex items-center justify-center shrink-0">
+                <CheckCircle2 className="h-5 w-5 text-fg-warm" />
               </div>
-            </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13.5px] font-bold text-fg-warm">
+                  {t('browseProgramsPage.yourPrograms')}
+                </p>
+                <p className="text-[11.5px] text-fg-warm-muted mt-0.5">
+                  {enrolledPrograms.length}{' '}
+                  {isFa
+                    ? (enrolledPrograms.length === 1 ? 'برنامه فعال' : 'برنامه فعال')
+                    : (enrolledPrograms.length === 1 ? 'active program' : 'active programs')}
+                  {' · '}{isFa ? 'مشاهده در برنامه‌های من' : 'view in My Programs'}
+                </p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-brand shrink-0" />
+            </button>
           )}
 
           {/* Curated shelves */}
