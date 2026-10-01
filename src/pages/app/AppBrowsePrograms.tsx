@@ -350,6 +350,35 @@ const AppBrowsePrograms = () => {
     return filtered.filter((p: any) => !isEnrolled(p.slug));
   }, [filtered, enrollments]);
 
+  // Curated view shows only when browsing without search / type filter
+  const showCurated = selectedType === 'all' && !searchQuery.trim();
+
+  const isFreeProgram = (p: any) => !p._isWaitlist && (p.isFree || p.priceAmount === 0 || p.is_free_on_ios);
+
+  const liveShelf = useMemo(
+    () => notEnrolledPrograms.filter((p: any) => LIVE_TYPES.includes(p.type)),
+    [notEnrolledPrograms]
+  );
+  const freeShelf = useMemo(
+    () => notEnrolledPrograms.filter((p: any) => !LIVE_TYPES.includes(p.type) && (isFreeProgram(p) || p.type === 'webinar')),
+    [notEnrolledPrograms]
+  );
+  const selfPacedShelf = useMemo(
+    () => notEnrolledPrograms.filter((p: any) =>
+      !LIVE_TYPES.includes(p.type) && !freeShelf.includes(p)
+    ),
+    [notEnrolledPrograms, freeShelf]
+  );
+
+  const spotlight = useMemo(() => {
+    if (!showCurated) return null;
+    return liveShelf[0] || notEnrolledPrograms[0] || null;
+  }, [showCurated, liveShelf, notEnrolledPrograms]);
+
+  const openProgram = (slug: string) =>
+    navigate(`/app/programs/${slug}`, { state: { from: location.pathname } });
+
+
   if (isLoading) {
     return (
       <div className="flex flex-col h-full overflow-hidden bg-background">
