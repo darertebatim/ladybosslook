@@ -133,6 +133,31 @@ export function RichTextEditor({ value, onChange, placeholder, className, imageB
           color: hsl(var(--muted-foreground));
           font-style: normal;
         }
+        .ql-container .ql-tooltip {
+          left: 0.5rem !important;
+          right: 0.5rem;
+          width: auto;
+          max-width: calc(100% - 1rem);
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 0.375rem;
+          white-space: normal;
+          direction: ltr;
+        }
+        .ql-container .ql-tooltip a {
+          flex: 1 1 12rem;
+          min-width: 0;
+          max-width: none;
+          overflow-wrap: anywhere;
+          white-space: normal;
+        }
+        .ql-container .ql-tooltip.ql-editing input[type='text'] {
+          display: block;
+          flex: 1 1 14rem;
+          min-width: 0;
+          width: auto;
+        }
         .ql-snow .ql-stroke {
           stroke: hsl(var(--foreground));
         }
