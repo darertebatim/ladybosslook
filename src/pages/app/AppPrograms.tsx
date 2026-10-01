@@ -249,13 +249,13 @@ const AppCourses = () => {
             </p>
             <p className="mt-1 text-xs text-[hsl(var(--fg-warm-muted))] leading-relaxed">
               {i18n.language === "fa"
-                ? "حساب دیگری دارید یا با ایمیل دیگری خرید کردید؟ در پروفایلم آن را ادغام کنید تا دوره‌ها و سوابق شما به این حساب منتقل شود."
-                : "Have another account or paid with a different email? Merge it in My Profile to bring your programs, purchases, and progress into this account."}
+                ? "حساب دیگری دارید یا با ایمیل دیگری خرید کردید؟ در پروفایلم آن را ادغام کنید تا دوره‌ها و سوابق شما به این حساب منتقل شود. "
+                : "Have another account or paid with a different email? Merge it in My Profile to bring your programs, purchases, and progress into this account. "}
+              <span className="inline-flex items-center gap-0.5 whitespace-nowrap text-[11px] font-bold text-[hsl(var(--brand-primary))] align-baseline">
+                {i18n.language === "fa" ? "ادغام حساب‌ها" : "Merge accounts"}
+                <ChevronRight className="inline h-3 w-3 rtl:rotate-180" />
+              </span>
             </p>
-            <span className="mt-1 flex items-center gap-0.5 text-[11px] font-bold text-[hsl(var(--brand-primary))]">
-              {i18n.language === "fa" ? "ادغام حساب‌ها" : "Merge accounts"}
-              <ChevronRight className="h-3 w-3 rtl:rotate-180" />
-            </span>
           </Link>
 
           {/* Active Rounds Section */}
