@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Search, X, Clock, Globe, Crown, ChevronRight, Headset, GraduationCap } from "lucide-react";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
