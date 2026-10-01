@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
-import { Search, X, Clock, Globe, Crown, ChevronRight, Headset } from "lucide-react";
+import { Search, X, Clock, Globe, Crown, ChevronRight, Headset, GraduationCap } from "lucide-react";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import { PlaylistCard } from "@/components/audio/PlaylistCard";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -505,6 +505,28 @@ export default function AppPlayer() {
 
           {/* Scrolls away with content */}
           <div className="px-4 pb-2">
+            {/* Academy quick link */}
+            <button
+              onClick={() => {
+                haptic.light();
+                navigate('/app/academy');
+              }}
+              className="w-full flex items-center gap-2.5 rounded-2xl bg-card-warm shadow-ios px-3 py-2.5 mb-2 active:scale-[0.98] transition-transform text-left"
+            >
+              <div className="h-8 w-8 rounded-xl bg-peach flex items-center justify-center shrink-0">
+                <GraduationCap className="h-4 w-4 text-brand" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-semibold text-fg-warm leading-tight">
+                  {t("player.title") === "پخش‌کننده" ? "آکادمی ریلو" : "Rilo Academy"}
+                </p>
+                <p className="text-[11px] text-fg-warm-muted leading-tight">
+                  {t("player.title") === "پخش‌کننده" ? "دوره‌ها و وبینارهای برنامه" : "Courses, webinars & live programs"}
+                </p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-fg-warm-muted rtl:rotate-180 shrink-0" />
+            </button>
+
             {/* Category pills */}
             <div className="tour-player-categories flex gap-2 overflow-x-auto pb-1 mt-2 scrollbar-hide">
               {availableCategories.map((cat) => {
