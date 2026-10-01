@@ -383,7 +383,10 @@ export function HomeMenu() {
             <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
               {t("menu.account")}
             </h3>
-            {renderPills(accountItems)}
+            <div className="space-y-2">
+              {wideAccountItems.map(renderWideButton)}
+              {renderPills(pillAccountItems)}
+            </div>
           </section>
 
           {/* Sign Out + Dark Mode */}
