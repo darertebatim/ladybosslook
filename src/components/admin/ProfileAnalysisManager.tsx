@@ -51,7 +51,6 @@ const waLink = (phone?: string | null) => {
 };
 
 export function ProfileAnalysisManager() {
-  const navigate = useNavigate();
   const [requests, setRequests] = useState<AnalysisRequest[]>([]);
   const [profiles, setProfiles] = useState<Record<string, ProfileInfo>>({});
   const [whatsapps, setWhatsapps] = useState<Record<string, string | null>>({});
