@@ -561,6 +561,27 @@ const AppBrowsePrograms = () => {
                 </PopoverContent>
               </Popover>
             </div>
+            {/* Door topic pills */}
+            {doorTags.length > 0 && (
+              <div className="flex gap-2 overflow-x-auto py-1 mt-1.5 scrollbar-hide">
+                {doorTags.map((tag) => {
+                  const active = selectedDoorTagId === tag.id;
+                  return (
+                    <button
+                      key={tag.id}
+                      onClick={() => { haptic.selection(); setSelectedDoorTagId(active ? null : tag.id); }}
+                      className={cn(
+                        "shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95",
+                        active ? "bg-fg-warm text-white shadow-ios" : "bg-card-warm text-fg-warm-muted"
+                      )}
+                    >
+                      {tag.emoji && <span>{tag.emoji}</span>}
+                      <span>{tag.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
         <div className="p-4 pb-safe space-y-6">
