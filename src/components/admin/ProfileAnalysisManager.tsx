@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Loader2, ExternalLink, RefreshCw, Instagram, MessageCircle, MessageSquare, Video } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import {
   Dialog,
@@ -52,7 +51,6 @@ const waLink = (phone?: string | null) => {
 };
 
 export function ProfileAnalysisManager() {
-  const navigate = useNavigate();
   const [requests, setRequests] = useState<AnalysisRequest[]>([]);
   const [profiles, setProfiles] = useState<Record<string, ProfileInfo>>({});
   const [whatsapps, setWhatsapps] = useState<Record<string, string | null>>({});
@@ -352,7 +350,7 @@ export function ProfileAnalysisManager() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => navigate(`/admin/support?userId=${r.user_id}`)}
+                        onClick={() => window.open(`/admin/support?userId=${r.user_id}`, '_blank', 'noopener')}
                       >
                         <MessageSquare className="w-4 h-4 mr-1" />
                         Message in app
