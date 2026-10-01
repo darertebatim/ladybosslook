@@ -10,6 +10,7 @@ import {
   LayoutGrid,
 } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
+import { PathProfileQuickCard } from '@/components/app/PathProfileQuickCard';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useFirstName } from '@/hooks/useFirstName';
