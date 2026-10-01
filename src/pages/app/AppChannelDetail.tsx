@@ -254,7 +254,7 @@ export default function AppChannelDetail() {
         <div className="px-3 pt-2 pb-3 flex items-center gap-3 min-h-[52px]">
           <IOSIconButton
             size="sm"
-            onClick={() => navigate('/app/channels')}
+            onClick={goBack}
             aria-label="Back"
           >
             <ChevronLeft className="h-5 w-5" />
