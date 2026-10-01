@@ -28,9 +28,11 @@ export const useUnreadChat = (inboxType: 'support' | 'coach' = 'support') => {
 
     fetchUnreadCount();
 
-    // Subscribe to real-time changes on user's conversations
+    // Subscribe to real-time changes on user's conversations.
+    // Unique channel name per hook instance: supabase reuses channels by topic,
+    // so a shared name would add .on() callbacks after subscribe() and throw.
     const channel = supabase
-      .channel(`unread-chat-count-${inboxType}`)
+      .channel(`unread-chat-count-${inboxType}-${Math.random().toString(36).slice(2, 10)}`)
       .on(
         'postgres_changes',
         {
