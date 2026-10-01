@@ -198,11 +198,6 @@ export function MyLearningCard() {
         <p className="mt-5 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
           {enrollment.course_name}
         </p>
-        {(round?.round_name || isSelfPaced) && (
-          <p className="mt-0.5 text-[11px] font-medium leading-tight text-fg-warm/60 line-clamp-1">
-            {round?.round_name ? `${round.round_name}${isSelfPaced ? ' · Self-paced' : ''}` : 'Self-paced'}
-          </p>
-        )}
       </div>
 
       {/* Continue where you left off */}
@@ -289,7 +284,17 @@ export function MyLearningCard() {
               style={{ width: `${percent}%` }}
             />
           </div>
+          {(round?.round_name || isSelfPaced) && (
+            <p className="mt-1.5 text-[11px] font-medium leading-tight text-fg-warm/60 line-clamp-1">
+              {round?.round_name ? `${round.round_name}${isSelfPaced ? ' · Self-paced' : ''}` : 'Self-paced'}
+            </p>
+          )}
         </div>
+      )}
+      {(totalLessons === 0 && (round?.round_name || isSelfPaced)) && (
+        <p className="px-4 pt-3 text-[11px] font-medium leading-tight text-fg-warm/60 line-clamp-1">
+          {round?.round_name ? `${round.round_name}${isSelfPaced ? ' · Self-paced' : ''}` : 'Self-paced'}
+        </p>
       )}
 
 
