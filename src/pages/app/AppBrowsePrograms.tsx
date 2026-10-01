@@ -465,7 +465,7 @@ const AppBrowsePrograms = () => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col h-full overflow-hidden bg-background">
+      <div className="flex flex-col h-full overflow-hidden" style={{ background: "#FFF8F3" }}>
         <div style={{ paddingTop: 'env(safe-area-inset-top)' }}>
           <div className="h-12 flex items-center px-4"><Skeleton className="h-6 w-32" /></div>
           <div className="px-4 pb-3 flex gap-2">
@@ -482,13 +482,13 @@ const AppBrowsePrograms = () => {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-background">
+    <div className="flex flex-col h-full overflow-hidden" style={{ background: "#FFF8F3" }}>
       <SEOHead title={t('browseProgramsPage.seoTitle')} description={t('browseProgramsPage.seoDesc')} />
 
       <div ref={academyScrollRef} className="flex-1 overflow-y-auto overscroll-contain">
         <div className="relative" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
           {/* Header */}
-          <div className="sticky z-20 px-4 pt-3 pb-2 bg-background" style={{ top: 'env(safe-area-inset-top)' }}>
+          <div className="sticky z-20 px-4 pt-3 pb-2" style={{ top: 'env(safe-area-inset-top)', background: "#FFF8F3" }}>
           {/* Title bar */}
           <div className="min-h-[44px] grid grid-cols-[auto_1fr_auto] items-center">
             {showSearch ? (
