@@ -547,6 +547,22 @@ const AppBrowsePrograms = () => {
           {/* Curated shelves */}
           {showCurated ? (
             <>
+              {freeShelf.length > 0 && (
+                <Shelf emoji="🎟️" title={isFa ? 'وبینارها و کارگاه‌های رایگان' : 'Free workshops & webinars'}>
+                  {freeShelf.map((p: any) => (
+                    <ShelfCard
+                      key={p.slug}
+                      title={p.title}
+                      image={p.image}
+                      type={p.type}
+                      badge={t('browseProgramsPage.free')}
+                      badgeTone="mint"
+                      onClick={() => openProgram(p.slug)}
+                    />
+                  ))}
+                </Shelf>
+              )}
+
               {liveShelf.length > 0 && (
                 <Shelf emoji="🔥" title={isFa ? 'دوره‌های زنده و اسپرینت‌ها' : 'Live cohorts & sprints'}>
                   {liveShelf.map((p: any) => (
@@ -578,21 +594,6 @@ const AppBrowsePrograms = () => {
                 </Shelf>
               )}
 
-              {freeShelf.length > 0 && (
-                <Shelf emoji="🎟️" title={isFa ? 'وبینارها و کارگاه‌های رایگان' : 'Free workshops & webinars'}>
-                  {freeShelf.map((p: any) => (
-                    <ShelfCard
-                      key={p.slug}
-                      title={p.title}
-                      image={p.image}
-                      type={p.type}
-                      badge={t('browseProgramsPage.free')}
-                      badgeTone="mint"
-                      onClick={() => openProgram(p.slug)}
-                    />
-                  ))}
-                </Shelf>
-              )}
 
               {notEnrolledPrograms.length === 0 && enrolledPrograms.length === 0 && (
                 <div className="text-center py-16">
