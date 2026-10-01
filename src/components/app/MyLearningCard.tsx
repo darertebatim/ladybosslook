@@ -189,8 +189,8 @@ export function MyLearningCard() {
           </div>
         </div>
         {/* Profile peek — between the welcome and the program name */}
-        <PathProfileQuickCard variant="inset" className="mt-2.5" />
-        <p className="mt-3.5 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
+        <PathProfileQuickCard variant="inset" className="mt-4" />
+        <p className="mt-5 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
           {enrollment.course_name}
           {round?.round_name ? ` · ${round.round_name}` : ''}
           {isSelfPaced ? ' · Self-paced' : ''}
@@ -384,6 +384,45 @@ export function MyLearningCard() {
         >
           <Headset className="h-4 w-4" />
           Questions about the program? Chat with support
+        </Link>
+      )}
+
+      {/* Community — new messages in the round's channel */}
+      {roundChannel && !!channelUnreadCount?.count && (
+        <Link
+          to={`/app/channels/${roundChannel.slug}`}
+          onClick={() => haptic.light()}
+          className="mx-3 mb-3.5 mt-3 flex items-center gap-2.5 rounded-2xl bg-mint px-3 py-2.5 active:scale-[0.98] transition-transform"
+        >
+          <span className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-card-warm">
+            <MessageCircle className="h-4 w-4 text-brand" />
+            <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-brand ring-2 ring-mint" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="flex items-baseline justify-between gap-2">
+              <span className="min-w-0 truncate text-[12.5px] font-extrabold leading-tight text-fg-warm">
+                New in {roundChannel.name}
+              </span>
+              <span className="flex-shrink-0 text-[10.5px] font-semibold text-fg-warm-muted">
+                {communityPreview
+                  ? (() => {
+                      const ts = channelUnreadCount?.latest;
+                      void ts;
+                      return '';
+                    })()
+                  : ''}
+              </span>
+            </span>
+            {communityPreview && (
+              <span className="mt-0.5 block truncate text-[11.5px] leading-tight text-fg-warm-muted">
+                {communityPreview}
+              </span>
+            )}
+          </span>
+          <span className="flex h-5 min-w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand px-1.5 text-[11px] font-bold text-white">
+            {channelUnreadCount!.count > 99 ? '99+' : channelUnreadCount!.count}
+          </span>
+          <ChevronRight className="h-4 w-4 flex-shrink-0 text-fg-warm-muted" />
         </Link>
       )}
 
