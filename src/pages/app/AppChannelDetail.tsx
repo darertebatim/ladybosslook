@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { IOSIconButton } from '@/components/app/ui/IOSIconButton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
-import { useChannels, useFeedPosts, useMarkPostRead, FeedPost } from '@/hooks/useFeed';
+import { useChannels, useFeedPosts, useMarkPostRead, FeedPost, FeedChannel } from '@/hooks/useFeed';
+import { useQuery } from '@tanstack/react-query';
 import { useFeedRealtime } from '@/hooks/useFeedRealtime';
 import { FeedMessage } from '@/components/feed/FeedMessage';
 import { ChannelChatInput } from '@/components/feed/ChannelChatInput';
@@ -71,8 +72,26 @@ export default function AppChannelDetail() {
   
   const { data: channels, isLoading: channelsLoading } = useChannels();
   
-  // Find channel by slug
-  const selectedChannel = channels?.find(c => c.slug === slug);
+  // Find channel by slug in the visible list
+  const listedChannel = channels?.find(c => c.slug === slug);
+
+  // Fallback: direct fetch by slug (e.g. instructor-scoped channels opened
+  // via a direct link from a round page won't appear in the filtered list)
+  const { data: directChannel, isLoading: directLoading } = useQuery({
+    queryKey: ['feed-channel-by-slug', slug],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('feed_channels')
+        .select('*')
+        .eq('slug', slug!)
+        .maybeSingle();
+      if (error) throw error;
+      return data as FeedChannel | null;
+    },
+    enabled: !!slug && !channelsLoading && !!channels && !listedChannel,
+  });
+
+  const selectedChannel = listedChannel || directChannel || undefined;
   const selectedChannelId = selectedChannel?.id;
   
   const { data: posts, isLoading: postsLoading } = useFeedPosts(selectedChannelId || undefined);
@@ -217,7 +236,7 @@ export default function AppChannelDetail() {
   const Icon = selectedChannel ? CHANNEL_ICONS[selectedChannel.type] || Megaphone : Megaphone;
   const isGroupChat = selectedChannel?.allow_comments ?? false;
 
-  if (channelsLoading) {
+  if (channelsLoading || directLoading) {
     return (
       <div className="flex items-center justify-center h-full">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
