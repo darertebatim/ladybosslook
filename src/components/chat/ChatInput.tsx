@@ -29,6 +29,7 @@ interface ChatInputProps {
   onFocus?: () => void;
   onBlur?: () => void;
   initialMessage?: string;
+  keepFocusWhileSending?: boolean;
 }
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -39,7 +40,7 @@ const ALLOWED_TYPES = [
   'audio/webm', 'audio/mp4', 'audio/mpeg', 'audio/ogg'
 ];
 
-export function ChatInput({ onSend, disabled, placeholder = "Type a message...", uploading, onFocus, onBlur, initialMessage }: ChatInputProps) {
+export function ChatInput({ onSend, disabled, placeholder = "Type a message...", uploading, onFocus, onBlur, initialMessage, keepFocusWhileSending = false }: ChatInputProps) {
   const [message, setMessage] = useState(initialMessage || "");
   const [attachment, setAttachment] = useState<Attachment | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -682,7 +683,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Type a message...",
             onFocus={() => { onFocus?.(); keyboardScrollFocus(); }}
             onBlur={onBlur}
             placeholder={placeholder}
-            disabled={disabled || uploading || isRecording}
+            disabled={(!keepFocusWhileSending && (disabled || uploading)) || isRecording}
             className="min-h-[32px] max-h-24 resize-none text-[15px] leading-[22px] bg-transparent border-0 focus-visible:ring-0 p-0 py-1"
             rows={1}
           />

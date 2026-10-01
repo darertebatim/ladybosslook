@@ -560,6 +560,7 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
             onSend={handleSendMessage}
             disabled={sending}
             uploading={uploading}
+            keepFocusWhileSending
             placeholder="Type a reply..."
           />
         </div>
