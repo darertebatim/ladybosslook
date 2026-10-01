@@ -2095,18 +2095,18 @@ const AppCourseDetail = () => {
                         ))}
 
                         {/* 4-6b. Compact utility buttons - 2 column grid */}
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-2 gap-2">
                           {/* Access Google Drive - Resources */}
                           {round.google_drive_link && (
                             <Button
                               size="lg"
-                              className="w-full h-auto px-3 py-3 tour-drive-btn bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
+                              className="w-full h-auto px-2 py-2.5 tour-drive-btn bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-center gap-1.5"
                               onClick={() =>
                                 window.open(round.google_drive_link!, "_blank")
                               }
                             >
-                              <FolderOpen className="h-5 w-5 mr-2 shrink-0" />
-                              <span className="truncate text-[13px]">Access Google Drive</span>
+                              <FolderOpen className="h-4 w-4 shrink-0" />
+                              <span className="truncate text-xs font-medium">Access Google Drive</span>
                             </Button>
                           )}
 
@@ -2114,11 +2114,11 @@ const AppCourseDetail = () => {
                           {(round as any).in_app_support_enabled && (
                             <Button
                               size="lg"
-                              className="w-full h-auto px-3 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
+                              className="w-full h-auto px-2 py-2.5 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-center gap-1.5"
                               onClick={() => navigate("/app/chat")}
                             >
-                              <HelpCircle className="h-5 w-5 mr-2 shrink-0" />
-                              <span className="truncate text-[13px]">In-App Support Chat</span>
+                              <HelpCircle className="h-4 w-4 shrink-0" />
+                              <span className="truncate text-xs font-medium">In-App Support Chat</span>
                             </Button>
                           )}
 
@@ -2126,11 +2126,11 @@ const AppCourseDetail = () => {
                           {(round as any).support_link_url && (
                             <Button
                               size="lg"
-                              className="w-full h-auto px-3 py-3 tour-support-btn bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
+                              className="w-full h-auto px-2 py-2.5 tour-support-btn bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-center gap-1.5"
                               onClick={handleContactSupport}
                             >
-                              <MessageCircle className="h-5 w-5 mr-2 shrink-0" />
-                              <span className="truncate text-[13px]">{(round as any).support_link_label ||
+                              <MessageCircle className="h-4 w-4 shrink-0" />
+                              <span className="truncate text-xs font-medium">{(round as any).support_link_label ||
                                 "Contact Support"}</span>
                             </Button>
                           )}
@@ -2139,11 +2139,11 @@ const AppCourseDetail = () => {
                           {(round as any).desktop_link_enabled && (
                             <Button
                               size="lg"
-                              className="w-full h-auto px-3 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
+                              className="w-full h-auto px-2 py-2.5 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-center gap-1.5"
                               onClick={() => setShowDesktopSheet(true)}
                             >
-                              <Monitor className="h-5 w-5 mr-2 shrink-0" />
-                              <span className="truncate text-[13px]">Use on desktop</span>
+                              <Monitor className="h-4 w-4 shrink-0" />
+                              <span className="truncate text-xs font-medium">Use on desktop</span>
                             </Button>
                           )}
                         </div>
