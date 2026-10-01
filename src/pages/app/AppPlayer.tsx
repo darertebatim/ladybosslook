@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
-import { Search, X, Clock, Globe, Crown, ChevronRight, Headset } from "lucide-react";
+import { Search, X, Clock, Globe, Crown, ChevronRight, Headset, GraduationCap } from "lucide-react";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import { PlaylistCard } from "@/components/audio/PlaylistCard";
 import { Skeleton } from "@/components/ui/skeleton";
