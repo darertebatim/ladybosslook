@@ -291,7 +291,7 @@ export function MyLearningCard() {
       )}
       {totalLessons === 0 && (
         <>
-          <p className="px-4 pt-3 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
+          <p className="px-4 pt-4 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
             {enrollment.course_name}
           </p>
           <p className="px-4 mt-0.5 text-[11px] font-medium leading-tight text-fg-warm/60 line-clamp-1">
