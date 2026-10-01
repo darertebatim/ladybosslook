@@ -15,6 +15,7 @@ import { format, isToday, isYesterday, differenceInMinutes } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useGoBack } from '@/hooks/useGoBack';
 
 interface PostGroup {
   dateLabel: string;
@@ -34,6 +35,7 @@ export default function AppChannelDetail() {
   const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack('/app/channels');
   const { user } = useAuth();
   
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -252,7 +254,7 @@ export default function AppChannelDetail() {
         <div className="px-3 pt-2 pb-3 flex items-center gap-3 min-h-[52px]">
           <IOSIconButton
             size="sm"
-            onClick={() => navigate('/app/channels')}
+            onClick={goBack}
             aria-label="Back"
           >
             <ChevronLeft className="h-5 w-5" />

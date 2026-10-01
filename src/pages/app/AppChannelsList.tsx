@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, Megaphone, Users, GraduationCap, MessageSquare, ChevronRight, Headset } from 'lucide-react';
+import { Loader2, Megaphone, Users, GraduationCap, MessageSquare, ChevronRight, ChevronLeft, Headset } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,7 @@ import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
+import { useGoBack } from '@/hooks/useGoBack';
 import feedbackIllustration from '@/assets/feedback-illustration.png';
 import { HubPortalCard } from '@/components/hub/HubPortalCard';
 import { isSupportChatBlockedForRegion } from '@/lib/regionRestrictions';
@@ -64,6 +65,7 @@ function formatLastMessageTime(date: Date, t: (k: string) => string): string {
 
 export default function AppChannelsList() {
   const navigate = useNavigate();
+  const goBack = useGoBack('/app');
   const { t } = useTranslation();
   const { canAccessAdminPage, user } = useAuth();
   const { data: channels, isLoading: channelsLoading } = useChannels();
@@ -126,7 +128,14 @@ export default function AppChannelsList() {
         className="sticky top-0 z-30 bg-white/35 dark:bg-black/20 backdrop-blur-xl rounded-b-2xl shadow-[0_2px_10px_rgba(0,0,0,0.06)]"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="px-4 pt-3 pb-3 flex items-center justify-between min-h-[52px]">
+        <div className="px-4 pt-3 pb-3 flex items-center gap-2 min-h-[52px]">
+          <IOSIconButton
+            size="sm"
+            onClick={goBack}
+            aria-label="Back"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </IOSIconButton>
           <h1 className="text-2xl font-bold text-fg-warm">{t('chats.title')}</h1>
           {/* Actions: Add to routines + Admin */}
           <div className="flex items-center gap-2">
