@@ -96,9 +96,10 @@ export const useUnseenContent = (): UnseenContentState => {
 
     if (!user?.id) return;
 
-    // Subscribe to real-time changes
+    // Subscribe to real-time changes (unique names: supabase reuses channels by topic)
+    const uid = Math.random().toString(36).slice(2, 10);
     const enrollmentsChannel = supabase
-      .channel('unseen-enrollments')
+      .channel(`unseen-enrollments-${uid}`)
       .on(
         'postgres_changes',
         {

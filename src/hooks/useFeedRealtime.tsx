@@ -19,7 +19,7 @@ export function useFeedRealtime(channelId?: string) {
 
     // Single consolidated channel for all feed-related changes (better performance)
     const feedChannel = supabase
-      .channel('feed-combined-realtime')
+      .channel(`feed-combined-realtime-${Math.random().toString(36).slice(2, 10)}`)
       .on(
         'postgres_changes',
         {
