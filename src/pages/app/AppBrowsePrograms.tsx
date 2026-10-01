@@ -425,7 +425,7 @@ const AppBrowsePrograms = () => {
   }, [filtered, enrollments]);
 
   // Curated view shows only when browsing without search / type filter
-  const showCurated = selectedType === 'all' && !searchQuery.trim();
+  const showCurated = selectedType === 'all' && !selectedDoorTagId && !searchQuery.trim();
 
   const isFreeProgram = (p: any) => !p._isWaitlist && (p.isFree || p.priceAmount === 0 || p.is_free_on_ios);
 
