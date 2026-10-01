@@ -158,8 +158,10 @@ const AppStore = () => {
         ios_product_id: undefined,
         _isWaitlist: true,
       }));
-    return [...markedFree, ...waitlistOnly];
-  }, [freePrograms, waitlistPrograms, waitlistSlugs]);
+    // Hide programs the user is already enrolled in — Academy lives in /app/academy
+    const enrolledSlugs = new Set(enrollments as string[]);
+    return [...markedFree, ...waitlistOnly].filter((p) => !enrolledSlugs.has(p.slug));
+  }, [freePrograms, waitlistPrograms, waitlistSlugs, enrollments]);
 
   // Fetch reflections, breathing, and audio playlists for explore sections
   const { data: reflections } = useReflections();
