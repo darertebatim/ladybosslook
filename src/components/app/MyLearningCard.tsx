@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { format, isToday } from 'date-fns';
 import {
   GraduationCap,
@@ -8,9 +9,11 @@ import {
   ChevronRight,
   Headset,
   LayoutGrid,
+  MessageCircle,
 } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { PathProfileQuickCard } from '@/components/app/PathProfileQuickCard';
+import { supabase } from '@/integrations/supabase/client';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useFirstName } from '@/hooks/useFirstName';
@@ -74,6 +77,49 @@ export function MyLearningCard() {
   }, [enrollmentId]);
 
   const firstName = useFirstName();
+
+  // Round's linked community channel + unread posts
+  const roundId = enrollment?.program_rounds?.id;
+  const { data: roundChannel } = useQuery({
+    queryKey: ['my-learning-round-channel', roundId],
+    queryFn: async () => {
+      if (!roundId) return null;
+      const { data, error } = await supabase
+        .from('feed_channels')
+        .select('id, name, slug')
+        .eq('round_id', roundId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!roundId,
+  });
+
+  const { data: channelUnreadCount } = useQuery({
+    queryKey: ['my-learning-channel-unread', roundChannel?.id, user?.id],
+    queryFn: async () => {
+      if (!roundChannel?.id || !user?.id) return 0;
+      const { data: allPosts } = await supabase
+        .from('feed_posts')
+        .select('id, content, created_at')
+        .eq('channel_id', roundChannel.id)
+        .order('created_at', { ascending: false });
+      if (!allPosts || allPosts.length === 0) return 0;
+      const { data: readPostIds } = await supabase
+        .from('feed_post_reads')
+        .select('post_id')
+        .eq('user_id', user.id)
+        .in('post_id', allPosts.map((p) => p.id));
+      const readSet = new Set(readPostIds?.map((r) => r.post_id) || []);
+      return allPosts.filter((p) => !readSet.has(p.id)).length;
+    },
+    enabled: !!roundChannel?.id && !!user?.id,
+  });
+
+  const communityPreview = (() => {
+    const raw = (roundChannel as any)?.__preview ?? '';
+    return raw;
+  })();
 
   if (!hasProgram || !enrollment) return null;
 
