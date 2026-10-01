@@ -1982,7 +1982,7 @@ const AppCourseDetail = () => {
 
                   {/* Quick Actions - Only show if enrollment has a round */}
                   {round && (
-                    <Card className="tour-quick-actions rounded-2xl border-0 shadow-ios bg-card-warm">
+                    <Card className="tour-quick-actions rounded-2xl border-0 shadow-ios-raised bg-card-warm">
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-fg-warm">
                           <Calendar className="h-5 w-5" />
@@ -1990,7 +1990,21 @@ const AppCourseDetail = () => {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
-                        {/* 1. Community Channel - Most used */}
+                        {/* 1. Join Google Meet - Time-sensitive (only when first session is on Meet) */}
+                        {round.google_meet_link && (round as any).first_session_is_google_meet !== false && (
+                          <Button
+                            size="lg"
+                            className="w-full h-auto px-4 py-3 tour-meet-btn bg-fg-warm text-white shadow-ios rounded-2xl border-0 justify-start"
+                            onClick={() =>
+                              window.open(round.google_meet_link!, "_blank")
+                            }
+                          >
+                            <Video className="h-5 w-5 mr-3 shrink-0" />
+                            <span className="truncate">Join Google Meet</span>
+                          </Button>
+                        )}
+
+                        {/* 2. Community Channel - Most used */}
                         {roundChannel && (
                           <Button
                             size="lg"
@@ -2035,20 +2049,6 @@ const AppCourseDetail = () => {
                             <span className="min-w-0 flex-1 text-left">
                               <span className="block text-sm font-semibold truncate">Course: {roundCourse?.title || "Course Lessons"}</span>
                             </span>
-                          </Button>
-                        )}
-
-                        {/* 2. Join Google Meet - Time-sensitive (only when first session is on Meet) */}
-                        {round.google_meet_link && (round as any).first_session_is_google_meet !== false && (
-                          <Button
-                            size="lg"
-                            className="w-full h-auto px-4 py-3 tour-meet-btn bg-fg-warm text-white shadow-ios rounded-2xl border-0 justify-start"
-                            onClick={() =>
-                              window.open(round.google_meet_link!, "_blank")
-                            }
-                          >
-                            <Video className="h-5 w-5 mr-3 shrink-0" />
-                            <span className="truncate">Join Google Meet</span>
                           </Button>
                         )}
 
@@ -2117,7 +2117,19 @@ const AppCourseDetail = () => {
                           </Button>
                         )}
 
-                        {/* 5. Contact Support - When needed */}
+                        {/* 5. In-App Support Chat - optional per round */}
+                        {(round as any).in_app_support_enabled && (
+                          <Button
+                            size="lg"
+                            className="w-full h-auto px-4 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
+                            onClick={() => navigate("/app/chat")}
+                          >
+                            <HelpCircle className="h-5 w-5 mr-3 shrink-0" />
+                            <span className="truncate">In-App Support Chat</span>
+                          </Button>
+                        )}
+
+                        {/* 6. Contact Support - When needed */}
                         {(round as any).support_link_url && (
                           <Button
                             size="lg"
@@ -2127,18 +2139,6 @@ const AppCourseDetail = () => {
                             <MessageCircle className="h-5 w-5 mr-3 shrink-0" />
                             <span className="truncate">{(round as any).support_link_label ||
                               "Contact Support"}</span>
-                          </Button>
-                        )}
-
-                        {/* 6. In-App Support Chat - optional per round */}
-                        {(round as any).in_app_support_enabled && (
-                          <Button
-                            size="lg"
-                            className="w-full h-auto px-4 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
-                            onClick={() => navigate("/app/chat")}
-                          >
-                            <HelpCircle className="h-5 w-5 mr-3 shrink-0" />
-                            <span className="truncate">In-App Support Chat</span>
                           </Button>
                         )}
 
