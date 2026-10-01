@@ -391,13 +391,14 @@ const AppBrowsePrograms = () => {
 
   const isFreeProgram = (p: any) => !p._isWaitlist && (p.isFree || p.priceAmount === 0 || p.is_free_on_ios);
 
-  const liveShelf = useMemo(
-    () => notEnrolledPrograms.filter((p: any) => isLiveProgram(p)),
+  // Free takes priority: a free live webinar belongs in the Free shelf, not Live
+  const freeShelf = useMemo(
+    () => notEnrolledPrograms.filter((p: any) => isFreeProgram(p) || p.type === 'webinar'),
     [notEnrolledPrograms]
   );
-  const freeShelf = useMemo(
-    () => notEnrolledPrograms.filter((p: any) => !isLiveProgram(p) && (isFreeProgram(p) || p.type === 'webinar')),
-    [notEnrolledPrograms]
+  const liveShelf = useMemo(
+    () => notEnrolledPrograms.filter((p: any) => isLiveProgram(p) && !freeShelf.includes(p)),
+    [notEnrolledPrograms, freeShelf]
   );
   const selfPacedShelf = useMemo(
     () => notEnrolledPrograms.filter((p: any) =>
