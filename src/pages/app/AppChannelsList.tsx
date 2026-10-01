@@ -65,6 +65,7 @@ function formatLastMessageTime(date: Date, t: (k: string) => string): string {
 
 export default function AppChannelsList() {
   const navigate = useNavigate();
+  const goBack = useGoBack('/app');
   const { t } = useTranslation();
   const { canAccessAdminPage, user } = useAuth();
   const { data: channels, isLoading: channelsLoading } = useChannels();
