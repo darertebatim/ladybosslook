@@ -1975,7 +1975,7 @@ const AppCourseDetail = () => {
 
                   {/* Quick Actions - Only show if enrollment has a round */}
                   {round && (
-                    <Card className="tour-quick-actions rounded-2xl border-0 shadow-ios bg-[hsl(var(--tint-peach))]">
+                    <Card className="tour-quick-actions rounded-2xl border-0 shadow-ios bg-card-warm">
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-fg-warm">
                           <Calendar className="h-5 w-5" />
@@ -2013,13 +2013,21 @@ const AppCourseDetail = () => {
                         {roundCourseId && !directCourses.some((course) => course.id === roundCourseId) && (
                           <Button
                             size="lg"
-                            className="w-full h-auto px-4 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
+                            className="w-full h-auto p-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start gap-3"
                             onClick={() => navigate(`/app/learn/${roundCourseId}`, {
                               state: { from: location.pathname },
                             })}
                           >
-                            <GraduationCap className="h-5 w-5 mr-3 shrink-0" />
-                            <span className="truncate">Course: {roundCourse?.title || "Course Lessons"}</span>
+                            {roundCourse?.coverImageUrl ? (
+                              <img src={roundCourse.coverImageUrl} alt="" className="h-12 w-12 shrink-0 rounded-xl object-cover" />
+                            ) : (
+                              <div className="h-12 w-12 shrink-0 rounded-xl bg-peach flex items-center justify-center">
+                                <GraduationCap className="h-5 w-5 text-brand" />
+                              </div>
+                            )}
+                            <span className="min-w-0 flex-1 text-left">
+                              <span className="block text-sm font-semibold truncate">Course: {roundCourse?.title || "Course Lessons"}</span>
+                            </span>
                           </Button>
                         )}
 
@@ -2042,7 +2050,7 @@ const AppCourseDetail = () => {
                           <Button
                             key={rp.id}
                             size="lg"
-                            className={`w-full h-auto px-4 py-3 ${idx === 0 ? "tour-playlist-btn " : ""}bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start`}
+                            className={`w-full h-auto p-3 ${idx === 0 ? "tour-playlist-btn " : ""}bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start gap-3`}
                             onClick={() => {
                               const isMainAudio =
                                 rp.playlist_type === "audio" &&
