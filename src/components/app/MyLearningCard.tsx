@@ -266,7 +266,7 @@ export function MyLearningCard() {
 
       {/* Progress */}
       {totalLessons > 0 && (
-        <div className="px-4 pt-4">
+        <div className="px-4 pt-3">
           <div className="mb-1.5 flex justify-between text-[11.5px] font-semibold">
             <span className="text-fg-warm">
               {completedCount} of {totalLessons} lessons done
@@ -281,7 +281,7 @@ export function MyLearningCard() {
               style={{ width: `${percent}%` }}
             />
           </div>
-          <p className="mt-3.5 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
+          <p className="mt-2 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
             {enrollment.course_name}
           </p>
           <p className="mt-0.5 text-[11px] font-medium leading-tight text-fg-warm/60 line-clamp-1">
@@ -291,7 +291,7 @@ export function MyLearningCard() {
       )}
       {totalLessons === 0 && (
         <>
-          <p className="px-4 pt-4 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
+          <p className="px-4 pt-3 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
             {enrollment.course_name}
           </p>
           <p className="px-4 mt-0.5 text-[11px] font-medium leading-tight text-fg-warm/60 line-clamp-1">
