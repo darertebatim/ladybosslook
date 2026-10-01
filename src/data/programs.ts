@@ -35,6 +35,7 @@ export interface Program {
   subscriptionDuration?: string;
   subscriptionFullPaymentDiscount?: number;
   deliveryMethod?: string;
+  isFeatured?: boolean;
   stripe_payment_link?: string;
   ios_product_id?: string;
   android_product_id?: string;

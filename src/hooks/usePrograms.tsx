@@ -51,6 +51,7 @@ export const usePrograms = () => {
         subscriptionDuration: dbProgram.subscription_duration || undefined,
         subscriptionFullPaymentDiscount: dbProgram.subscription_full_payment_discount || undefined,
         deliveryMethod: dbProgram.delivery_method || undefined,
+        isFeatured: !!dbProgram.is_featured,
         stripe_payment_link: dbProgram.stripe_payment_link || undefined,
         ios_product_id: dbProgram.ios_product_id || undefined,
         android_product_id: dbProgram.android_product_id || undefined,

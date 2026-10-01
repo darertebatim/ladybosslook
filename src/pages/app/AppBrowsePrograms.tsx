@@ -225,6 +225,40 @@ const AppBrowsePrograms = () => {
   const location = useLocation();
   const { programs, isLoading } = usePrograms();
   const { data: enrollments = [] } = useEnrollments();
+  // User's door tags (primary weighted higher) → program ids matching them
+  const { data: doorScores = {} } = useQuery<Record<string, number>>({
+    queryKey: ['academy-door-scores'],
+    staleTime: 10 * 60 * 1000,
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return {};
+      const { data: rows } = await supabase.from('onboarding_answers')
+        .select('step_id, answer').eq('user_id', user.id).eq('flow_id', 'rilo-doors');
+      const weight: Record<string, number> = {};
+      for (const r of rows ?? []) {
+        const step = String((r as any).step_id || '');
+        const w = step === 'rd-door-primary' ? 3 : step.startsWith('rd-sharp') ? 1 : 0;
+        if (!w) continue;
+        const raw = (r as any).answer;
+        for (const v of (Array.isArray(raw) ? raw : [raw])) {
+          const slug = String(v ?? '').trim();
+          if (slug && slug !== 'unknown') weight[slug] = Math.max(weight[slug] || 0, w);
+        }
+      }
+      const slugs = Object.keys(weight);
+      if (!slugs.length) return {};
+      const { data: tags } = await supabase.from('tags').select('id, slug').in('slug', slugs);
+      const tagW: Record<string, number> = {};
+      for (const t of tags ?? []) tagW[t.id] = weight[t.slug] || 0;
+      const tagIds = Object.keys(tagW);
+      if (!tagIds.length) return {};
+      const { data: links } = await supabase.from('content_tags')
+        .select('content_id, tag_id').eq('content_type', 'program').in('tag_id', tagIds);
+      const scores: Record<string, number> = {};
+      for (const l of links ?? []) scores[l.content_id] = (scores[l.content_id] || 0) + (tagW[l.tag_id] || 0);
+      return scores;
+    },
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [selectedType, setSelectedType] = useState('all');
@@ -374,8 +408,16 @@ const AppBrowsePrograms = () => {
 
   const spotlight = useMemo(() => {
     if (!showCurated) return null;
+    const featured = notEnrolledPrograms.filter((p: any) => p.isFeatured);
+    if (featured.length) {
+      // Best door-tag match wins; ties keep language-sorted order, live first
+      return [...featured].sort((a: any, b: any) =>
+        ((doorScores[b.id] || 0) - (doorScores[a.id] || 0)) ||
+        (Number(isLiveProgram(b)) - Number(isLiveProgram(a)))
+      )[0];
+    }
     return liveShelf[0] || notEnrolledPrograms[0] || null;
-  }, [showCurated, liveShelf, notEnrolledPrograms]);
+  }, [showCurated, liveShelf, notEnrolledPrograms, doorScores]);
 
   const openProgram = (slug: string) =>
     navigate(`/app/programs/${slug}`, { state: { from: location.pathname } });

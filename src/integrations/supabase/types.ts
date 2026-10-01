@@ -5179,6 +5179,7 @@ export type Database = {
           id: string
           ios_product_id: string | null
           is_active: boolean | null
+          is_featured: boolean
           is_free_on_ios: boolean | null
           is_one_on_one: boolean
           language: string
@@ -5235,6 +5236,7 @@ export type Database = {
           id?: string
           ios_product_id?: string | null
           is_active?: boolean | null
+          is_featured?: boolean
           is_free_on_ios?: boolean | null
           is_one_on_one?: boolean
           language?: string
@@ -5291,6 +5293,7 @@ export type Database = {
           id?: string
           ios_product_id?: string | null
           is_active?: boolean | null
+          is_featured?: boolean
           is_free_on_ios?: boolean | null
           is_one_on_one?: boolean
           language?: string
