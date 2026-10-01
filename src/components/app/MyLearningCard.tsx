@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { format, isToday } from 'date-fns';
 import {
   GraduationCap,
@@ -8,9 +9,11 @@ import {
   ChevronRight,
   Headset,
   LayoutGrid,
+  MessageCircle,
 } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
 import { PathProfileQuickCard } from '@/components/app/PathProfileQuickCard';
+import { supabase } from '@/integrations/supabase/client';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useFirstName } from '@/hooks/useFirstName';
@@ -75,6 +78,56 @@ export function MyLearningCard() {
 
   const firstName = useFirstName();
 
+  // Round's linked community channel + unread posts
+  const roundId = enrollment?.program_rounds?.id;
+  const { data: roundChannel } = useQuery({
+    queryKey: ['my-learning-round-channel', roundId],
+    queryFn: async () => {
+      if (!roundId) return null;
+      const { data, error } = await supabase
+        .from('feed_channels')
+        .select('id, name, slug')
+        .eq('round_id', roundId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!roundId,
+  });
+
+  const { data: channelUnreadCount } = useQuery({
+    queryKey: ['my-learning-channel-unread', roundChannel?.id, user?.id],
+    queryFn: async () => {
+      if (!roundChannel?.id || !user?.id) return 0;
+      const { data: allPosts } = await supabase
+        .from('feed_posts')
+        .select('id, content, created_at')
+        .eq('channel_id', roundChannel.id)
+        .order('created_at', { ascending: false });
+      if (!allPosts || allPosts.length === 0) return 0;
+      const { data: readPostIds } = await supabase
+        .from('feed_post_reads')
+        .select('post_id')
+        .eq('user_id', user.id)
+        .in('post_id', allPosts.map((p) => p.id));
+      const readSet = new Set(readPostIds?.map((r) => r.post_id) || []);
+      const unread = allPosts.filter((p) => !readSet.has(p.id));
+      return {
+        count: unread.length,
+        latest: unread[0]?.content ?? '',
+      };
+    },
+    enabled: !!roundChannel?.id && !!user?.id,
+  }) as { data?: { count: number; latest: string } | undefined };
+
+  const communityPreview = (() => {
+    const raw = channelUnreadCount?.latest ?? '';
+    return raw
+      .replace(/LINK_BUTTON:\S+?:([^\n]+)/g, '$1')
+      .replace(/\s+/g, ' ')
+      .trim();
+  })();
+
   if (!hasProgram || !enrollment) return null;
 
   const round = enrollment.program_rounds;
@@ -136,8 +189,8 @@ export function MyLearningCard() {
           </div>
         </div>
         {/* Profile peek — between the welcome and the program name */}
-        <PathProfileQuickCard variant="inset" className="mt-2.5" />
-        <p className="mt-3.5 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
+        <PathProfileQuickCard variant="inset" className="mt-4" />
+        <p className="mt-5 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
           {enrollment.course_name}
           {round?.round_name ? ` · ${round.round_name}` : ''}
           {isSelfPaced ? ' · Self-paced' : ''}
@@ -331,6 +384,34 @@ export function MyLearningCard() {
         >
           <Headset className="h-4 w-4" />
           Questions about the program? Chat with support
+        </Link>
+      )}
+
+      {/* Community — new messages in the round's channel */}
+      {roundChannel && !!channelUnreadCount?.count && (
+        <Link
+          to={`/app/channels/${roundChannel.slug}`}
+          onClick={() => haptic.light()}
+          className="mx-3 mb-3.5 mt-3 flex items-center gap-2.5 rounded-2xl bg-mint px-3 py-2.5 active:scale-[0.98] transition-transform"
+        >
+          <span className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-card-warm">
+            <MessageCircle className="h-4 w-4 text-brand" />
+            <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-brand ring-2 ring-mint" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[12.5px] font-extrabold leading-tight text-fg-warm">
+              New in {roundChannel.name}
+            </span>
+            {communityPreview && (
+              <span className="mt-0.5 block truncate text-[11.5px] leading-tight text-fg-warm-muted">
+                {communityPreview}
+              </span>
+            )}
+          </span>
+          <span className="flex h-5 min-w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand px-1.5 text-[11px] font-bold text-white">
+            {channelUnreadCount!.count > 99 ? '99+' : channelUnreadCount!.count}
+          </span>
+          <ChevronRight className="h-4 w-4 flex-shrink-0 text-fg-warm-muted" />
         </Link>
       )}
 
