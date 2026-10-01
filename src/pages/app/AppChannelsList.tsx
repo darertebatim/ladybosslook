@@ -23,6 +23,7 @@ import { useAddRoutinePlan, RoutinePlanTask } from '@/hooks/useRoutinePlans';
 import { RoutinePreviewSheet, EditedTask } from '@/components/app/RoutinePreviewSheet';
 import { haptic } from '@/lib/haptics';
 import { toast } from 'sonner';
+import { useGoBack } from '@/hooks/useGoBack';
 import feedbackIllustration from '@/assets/feedback-illustration.png';
 import { HubPortalCard } from '@/components/hub/HubPortalCard';
 import { isSupportChatBlockedForRegion } from '@/lib/regionRestrictions';
