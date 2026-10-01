@@ -9,7 +9,6 @@ import {
   GraduationCap,
   CheckCircle2,
   ChevronRight,
-  Compass,
 } from "lucide-react";
 import { format } from "date-fns";
 import { haptic } from "@/lib/haptics";
@@ -358,60 +357,83 @@ const AppCourses = () => {
             </div>
           )}
 
-          {/* Inline Browse Programs Section — peach band that scrolls with the page */}
+          {/* Academy — hero banner + quick carousel */}
           {browsePrograms.length > 0 && (
-            <section className="mt-2 rounded-3xl bg-[hsl(var(--tint-peach))] px-4 py-4 space-y-3 shadow-ios">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Compass className="h-4 w-4 text-brand" />
-                  <h2 className="text-base font-semibold text-fg-warm">
-                    {t("programs.browsePrograms")}
-                  </h2>
-                  <Badge
-                    variant="secondary"
-                    className="h-4 px-1.5 text-[10px] bg-white/80 text-fg-warm border-0"
+            <section className="mt-2 overflow-hidden rounded-3xl bg-card-warm shadow-ios">
+              {/* Hero header */}
+              <div className="relative bg-gradient-orange px-4 pb-5 pt-4 text-white">
+                <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-white/15" />
+                <div className="pointer-events-none absolute -bottom-12 -left-6 h-24 w-24 rounded-full bg-white/10" />
+                <div className="relative">
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
+                      <GraduationCap className="h-4 w-4 text-white" />
+                    </span>
+                    <h2 className="text-lg font-bold leading-none text-white">
+                      {i18n.language === "fa" ? "آکادمی" : "Academy"}
+                    </h2>
+                    <Badge
+                      variant="secondary"
+                      className="h-5 border-0 bg-white/25 px-2 text-[10px] font-semibold text-white"
+                    >
+                      {browsePrograms.length}
+                    </Badge>
+                  </div>
+                  <p className="mt-2 max-w-[90%] text-[12.5px] font-medium leading-snug text-white/90">
+                    {i18n.language === "fa"
+                      ? "دوره‌های جامع، مسترکلاس‌ها و برنامه‌های تخصصی برای رشد گام‌به‌گام شما"
+                      : "Guided masterclasses, intensive sprints and self-paced toolkits."}
+                  </p>
+                  <Link
+                    to="/app/academy"
+                    onClick={() => haptic.light()}
+                    className="mt-3 inline-flex items-center gap-1 rounded-full bg-white px-3.5 py-2 text-[12.5px] font-semibold text-brand shadow-ios active:scale-[0.98] transition-transform"
                   >
-                    {browsePrograms.length}
-                  </Badge>
+                    {i18n.language === "fa"
+                      ? "مشاهده همه برنامه‌ها"
+                      : "Browse all programs"}
+                    <ChevronRight className="h-3.5 w-3.5 rtl:rotate-180" />
+                  </Link>
                 </div>
-                <Link
-                  to="/app/academy"
-                  className="text-xs text-brand font-medium flex items-center gap-0.5"
-                >
-                  {t("programs.viewAll")}
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </Link>
               </div>
 
-              <Carousel opts={{ align: "start", loop: false }} className="w-full">
-                <CarouselContent className="-ml-2">
-                  {browsePrograms.map((program) => (
-                    <CarouselItem
-                      key={program.slug}
-                      className="pl-2 basis-[130px]"
-                    >
-                      <Link to={`/app/programs/${program.slug}`} className="block active:scale-[0.98] transition-transform">
-                        <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-ios">
-                          <img
-                            src={program.image}
-                            alt={program.title}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                          <div className="absolute bottom-0 left-0 right-0 p-2">
-                            <p className="text-[11px] font-semibold text-white line-clamp-2 leading-tight">
-                              {program.title}
-                            </p>
+              {/* Quick carousel */}
+              <div className="py-4">
+                <Carousel opts={{ align: "start", loop: false }} className="w-full">
+                  <CarouselContent className="-ml-2 pl-4 pr-4">
+                    {browsePrograms.map((program) => (
+                      <CarouselItem
+                        key={program.slug}
+                        className="pl-2 basis-[150px]"
+                      >
+                        <Link
+                          to={`/app/programs/${program.slug}`}
+                          onClick={() => haptic.light()}
+                          className="block active:scale-[0.98] transition-transform"
+                        >
+                          <div className="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-ios">
+                            <img
+                              src={program.image}
+                              alt={program.title}
+                              className="h-full w-full object-cover"
+                              loading="lazy"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+                            <div className="absolute inset-x-0 bottom-0 p-2.5">
+                              <p className="line-clamp-2 text-[11.5px] font-semibold leading-tight text-white">
+                                {program.title}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-              </Carousel>
+                        </Link>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                </Carousel>
+              </div>
             </section>
           )}
+
 
           {/* Tab bar clearance */}
           <div className="h-24" />
