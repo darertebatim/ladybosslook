@@ -29,7 +29,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Calendar, Plus, Trash2, Edit, Video, FolderOpen, CalendarDays, ListChecks, Copy, Pause, FastForward } from "lucide-react";
+import { Calendar, Plus, Trash2, Edit, Video, FolderOpen, CalendarDays, ListChecks, Copy, Pause, FastForward, MessageSquare, Link2, Unlink } from "lucide-react";
 import { SessionsManager } from "./SessionsManager";
 import { RoundPlaylistsManager } from "./RoundPlaylistsManager";
 import { RoundCoursesManager } from "./RoundCoursesManager";
@@ -102,6 +102,11 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
   const [dripAdjustmentDays, setDripAdjustmentDays] = useState<string>('7');
   
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'program' | 'round'>('newest');
+
+  // Channel management dialog state
+  const [channelRound, setChannelRound] = useState<ProgramRound | null>(null);
+  const [selectedChannelId, setSelectedChannelId] = useState<string>("");
+
   
   const [formData, setFormData] = useState<RoundFormData>({
     program_slug: "",
@@ -170,6 +175,89 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
       return data as ProgramRound[];
     },
   });
+
+  // Fetch chat channels (to show/link round channels)
+  const { data: channels } = useQuery({
+    queryKey: ["admin-round-feed-channels"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("feed_channels")
+        .select("id, name, slug, type, round_id, program_slug, is_archived")
+        .order("name");
+      if (error) throw error;
+      return data as Array<{
+        id: string;
+        name: string;
+        slug: string;
+        type: string;
+        round_id: string | null;
+        program_slug: string | null;
+        is_archived: boolean;
+      }>;
+    },
+  });
+
+  const channelByRoundId = useMemo(() => {
+    const map: Record<string, { id: string; name: string; slug: string; is_archived: boolean }> = {};
+    (channels || []).forEach((c) => {
+      if (c.round_id) map[c.round_id] = { id: c.id, name: c.name, slug: c.slug, is_archived: c.is_archived };
+    });
+    return map;
+  }, [channels]);
+
+  // Create a channel for an existing round
+  const createRoundChannelMutation = useMutation({
+    mutationFn: async (round: ProgramRound) => {
+      const programTitle = programs?.find(p => p.slug === round.program_slug)?.title || round.program_slug;
+      const baseSlug = `${round.program_slug}-round-${round.round_number}`.toLowerCase().replace(/\s+/g, '-');
+      let slug = baseSlug;
+      if ((channels || []).some(c => c.slug === slug)) {
+        slug = `${baseSlug}-${Date.now().toString().slice(-4)}`;
+      }
+      const { error } = await supabase.from("feed_channels").insert({
+        name: `${programTitle} - ${round.round_name}`,
+        slug,
+        type: 'round',
+        program_slug: round.program_slug,
+        round_id: round.id,
+        allow_reactions: true,
+        allow_comments: true,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-round-feed-channels"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-feed-channels"] });
+      queryClient.invalidateQueries({ queryKey: ["feed-channels"] });
+      toast.success("Channel created and linked to this round");
+      setChannelRound(null);
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  // Link / unlink an existing channel to a round
+  const linkChannelMutation = useMutation({
+    mutationFn: async ({ channelId, round }: { channelId: string; round: ProgramRound | null }) => {
+      const { error } = await supabase
+        .from("feed_channels")
+        .update(
+          round
+            ? { round_id: round.id, program_slug: round.program_slug, type: 'round' }
+            : { round_id: null, type: 'general' }
+        )
+        .eq("id", channelId);
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-round-feed-channels"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-feed-channels"] });
+      queryClient.invalidateQueries({ queryKey: ["feed-channels"] });
+      toast.success(vars.round ? "Channel linked to this round" : "Channel unlinked");
+      setChannelRound(null);
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
 
   const sortedRounds = useMemo(() => {
     if (!rounds) return [];
@@ -629,10 +717,26 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
                             <CalendarDays className="h-4 w-4 text-primary" />
                           </div>
                         )}
+                        {channelByRoundId[round.id] && (
+                          <div title={`Channel: ${channelByRoundId[round.id].name}`}>
+                            <MessageSquare className="h-4 w-4 text-primary" />
+                          </div>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setChannelRound(round);
+                            setSelectedChannelId("");
+                          }}
+                          title={channelByRoundId[round.id] ? "Manage Channel" : "Create / Link Channel"}
+                        >
+                          <MessageSquare className={`h-4 w-4 ${channelByRoundId[round.id] ? 'text-primary' : ''}`} />
+                        </Button>
                         <Button
                           variant="outline"
                           size="sm"
@@ -641,6 +745,7 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
                         >
                           <ListChecks className="h-4 w-4" />
                         </Button>
+
                         <Button
                           variant="outline"
                           size="sm"
@@ -677,6 +782,93 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
           )}
         </CardContent>
       </Card>
+
+      {/* Round Channel Dialog */}
+      <Dialog open={!!channelRound} onOpenChange={(open) => { if (!open) setChannelRound(null); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5" />
+              Round Channel
+            </DialogTitle>
+            <DialogDescription>
+              {channelRound
+                ? `${programs?.find(p => p.slug === channelRound.program_slug)?.title || channelRound.program_slug} · ${channelRound.round_name}`
+                : ""}
+            </DialogDescription>
+          </DialogHeader>
+
+          {channelRound && channelByRoundId[channelRound.id] ? (
+            <div className="space-y-4">
+              <div className="rounded-lg border p-3">
+                <p className="font-medium">{channelByRoundId[channelRound.id].name}</p>
+                <p className="text-sm text-muted-foreground">
+                  /{channelByRoundId[channelRound.id].slug}
+                  {channelByRoundId[channelRound.id].is_archived ? " · archived" : " · active"}
+                </p>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Students in this round see a “Visit Community” button on their round page.
+              </p>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    linkChannelMutation.mutate({ channelId: channelByRoundId[channelRound.id].id, round: null })
+                  }
+                  disabled={linkChannelMutation.isPending}
+                >
+                  <Unlink className="h-4 w-4 mr-2" />
+                  Unlink channel
+                </Button>
+              </DialogFooter>
+            </div>
+          ) : channelRound ? (
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <Label>Create a new channel</Label>
+                <p className="text-sm text-muted-foreground">
+                  Creates “{(programs?.find(p => p.slug === channelRound.program_slug)?.title || channelRound.program_slug)} - {channelRound.round_name}” and links it to this round.
+                </p>
+                <Button
+                  onClick={() => createRoundChannelMutation.mutate(channelRound)}
+                  disabled={createRoundChannelMutation.isPending}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create channel
+                </Button>
+              </div>
+
+              <div className="border-t pt-4 space-y-2">
+                <Label>Or link an existing channel</Label>
+                <Select value={selectedChannelId} onValueChange={setSelectedChannelId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a channel" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(channels || [])
+                      .filter((c) => !c.round_id && !c.is_archived)
+                      .map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  disabled={!selectedChannelId || linkChannelMutation.isPending}
+                  onClick={() => linkChannelMutation.mutate({ channelId: selectedChannelId, round: channelRound })}
+                >
+                  <Link2 className="h-4 w-4 mr-2" />
+                  Link channel
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
+
 
       {/* Create/Edit Round Dialog */}
       <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
