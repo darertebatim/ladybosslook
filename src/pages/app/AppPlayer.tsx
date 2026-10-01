@@ -516,7 +516,7 @@ export default function AppPlayer() {
               style={{
                 touchAction: 'pan-y',
                 background:
-                  'linear-gradient(120deg, #1a1f3d 0%, #3d2a5c 45%, #6b3d7a 100%)',
+                  'linear-gradient(120deg, #F5A623 0%, #EE7431 45%, #E1572B 100%)',
               }}
             >
               {/* Shimmer */}
@@ -528,36 +528,36 @@ export default function AppPlayer() {
                 className="pointer-events-none absolute inset-y-0 w-1/3"
                 style={{
                   background:
-                    'linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%)',
+                    'linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
                 }}
               />
               {/* Glow blob */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute -top-8 -right-8 h-32 w-32 rounded-full opacity-60 blur-2xl"
-                style={{ background: 'radial-gradient(circle, #FFB37A 0%, transparent 70%)' }}
+                className="pointer-events-none absolute -top-8 -right-8 h-32 w-32 rounded-full opacity-70 blur-2xl"
+                style={{ background: 'radial-gradient(circle, #FFE3B8 0%, transparent 70%)' }}
               />
 
               <div className="relative flex items-center gap-3 p-3.5">
                 <div
                   className="h-11 w-11 rounded-xl flex items-center justify-center shrink-0"
                   style={{
-                    background: 'linear-gradient(135deg, #FFD27A 0%, #FF8A5C 100%)',
-                    boxShadow: '0 6px 16px -6px rgba(255,138,92,0.7)',
+                    background: 'linear-gradient(135deg, #7C2D12 0%, #5B1E0C 100%)',
+                    boxShadow: '0 6px 16px -6px rgba(92,29,12,0.6)',
                   }}
                 >
-                  <GraduationCap className="h-5 w-5 text-[#1a1f3d]" strokeWidth={2.4} />
+                  <GraduationCap className="h-5 w-5 text-[#FFD27A]" strokeWidth={2.4} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-white font-bold text-[14px] leading-tight">
                     {t("player.title") === "پخش‌کننده" ? "آکادمی ریلو" : "Rilo Academy"}
                   </p>
-                  <p className="text-white/70 text-[12px] leading-tight mt-0.5">
+                  <p className="text-white/85 text-[12px] leading-tight mt-0.5">
                     {t("player.title") === "پخش‌کننده" ? "دوره‌ها، وبینارها و برنامه‌های زنده" : "Courses, webinars & live programs"}
                   </p>
                 </div>
-                <div className="shrink-0 h-7 px-2.5 rounded-full bg-white/15 backdrop-blur flex items-center gap-1">
-                  <GraduationCap className="h-3 w-3 text-[#FFD27A]" />
+                <div className="shrink-0 h-7 px-2.5 rounded-full bg-white/20 backdrop-blur flex items-center gap-1">
+                  <GraduationCap className="h-3 w-3 text-white" />
                   <span className="text-white text-[11px] font-bold tracking-wide">
                     {t("player.title") === "پخش‌کننده" ? "آکادمی" : "ACADEMY"}
                   </span>
