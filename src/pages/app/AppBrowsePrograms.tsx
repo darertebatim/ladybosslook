@@ -331,7 +331,7 @@ const AppBrowsePrograms = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('program_catalog')
-        .select('slug, title, type, cover_image_url, description, language')
+        .select('slug, title, type, cover_image_url, description, language, delivery_method')
         .eq('show_in_app_waitlist', true)
         .eq('is_active', true) as any;
       if (error) throw error;
