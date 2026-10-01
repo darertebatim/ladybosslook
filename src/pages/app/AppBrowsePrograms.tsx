@@ -16,6 +16,9 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
 import { useScrollRestore } from '@/hooks/useScrollRestore';
 import { useUserPreferredLanguage, preferredLanguageSorter } from '@/hooks/useUserPreferredLanguage';
+import { useTagDimensions } from '@/hooks/useTagDimensions';
+import { useAllTags } from '@/hooks/useTags';
+import { useContentTagsByType } from '@/hooks/useContentTags';
 import { useTranslation } from 'react-i18next';
 import { IOSIconButton } from '@/components/app/ui/IOSIconButton';
 
@@ -262,6 +265,37 @@ const AppBrowsePrograms = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [selectedType, setSelectedType] = useState('all');
+  const [selectedDoorTagId, setSelectedDoorTagId] = useState<string | null>(null);
+
+  // Door topic pills — same "Door" tag dimension as the Player page, applied to programs
+  const { data: tagDimensions = [] } = useTagDimensions();
+  const { data: allTags = [] } = useAllTags();
+  const { data: programTagLinks = [] } = useContentTagsByType('program' as any);
+  const doorDimensionId = useMemo(
+    () => tagDimensions.find((d) => d.slug === 'door')?.id ?? null,
+    [tagDimensions],
+  );
+  const doorTags = useMemo(() => {
+    const tags = allTags.filter((tg) => tg.is_active !== false && tg.dimension_id === doorDimensionId);
+    const topicOrder = ['selfcare', 'financial', 'business', 'immigrant', 'productivity', 'emotion'];
+    const orderMap = new Map(topicOrder.map((slug, idx) => [slug, idx]));
+    return tags.sort((a, b) => {
+      const orderA = orderMap.get(a.slug ?? '');
+      const orderB = orderMap.get(b.slug ?? '');
+      if (orderA != null && orderB != null) return orderA - orderB;
+      if (orderA != null) return -1;
+      if (orderB != null) return 1;
+      return (a.sort_order ?? 0) - (b.sort_order ?? 0);
+    });
+  }, [allTags, doorDimensionId]);
+  const programIdsByDoorTag = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const link of programTagLinks as any[]) {
+      if (!map.has(link.tag_id)) map.set(link.tag_id, new Set());
+      map.get(link.tag_id)!.add(link.content_id);
+    }
+    return map;
+  }, [programTagLinks]);
   const { scrollRef: academyScrollRef } = useScrollRestore('academy_scroll', { autoSave: true });
   const [preferredLanguage, setPreferredLanguage] = useState(() => {
     return localStorage.getItem('academy-language') || 'all';
@@ -364,6 +398,10 @@ const AppBrowsePrograms = () => {
     if (selectedType !== 'all') {
       result = result.filter((p: any) => p.type === selectedType);
     }
+    if (selectedDoorTagId) {
+      const ids = programIdsByDoorTag.get(selectedDoorTagId);
+      result = result.filter((p: any) => ids?.has(p.id));
+    }
     if (preferredLanguage !== 'all') {
       result = result.filter((p: any) => p.language === preferredLanguage);
     }
@@ -376,7 +414,7 @@ const AppBrowsePrograms = () => {
     // Sort by user's preferred language
     result = [...result].sort(preferredLanguageSorter(userLang));
     return result;
-  }, [allPrograms, searchQuery, selectedType, preferredLanguage, userLang]);
+  }, [allPrograms, searchQuery, selectedType, selectedDoorTagId, programIdsByDoorTag, preferredLanguage, userLang]);
 
   const enrolledPrograms = useMemo(() => {
     return filtered.filter((p: any) => isEnrolled(p.slug));
@@ -387,7 +425,7 @@ const AppBrowsePrograms = () => {
   }, [filtered, enrollments]);
 
   // Curated view shows only when browsing without search / type filter
-  const showCurated = selectedType === 'all' && !searchQuery.trim();
+  const showCurated = selectedType === 'all' && !selectedDoorTagId && !searchQuery.trim();
 
   const isFreeProgram = (p: any) => !p._isWaitlist && (p.isFree || p.priceAmount === 0 || p.is_free_on_ios);
 
@@ -523,6 +561,27 @@ const AppBrowsePrograms = () => {
                 </PopoverContent>
               </Popover>
             </div>
+            {/* Door topic pills */}
+            {doorTags.length > 0 && (
+              <div className="flex gap-2 overflow-x-auto py-1 mt-1.5 scrollbar-hide">
+                {doorTags.map((tag) => {
+                  const active = selectedDoorTagId === tag.id;
+                  return (
+                    <button
+                      key={tag.id}
+                      onClick={() => { haptic.selection(); setSelectedDoorTagId(active ? null : tag.id); }}
+                      className={cn(
+                        "shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95",
+                        active ? "bg-fg-warm text-white shadow-ios" : "bg-card-warm text-fg-warm-muted"
+                      )}
+                    >
+                      {tag.emoji && <span>{tag.emoji}</span>}
+                      <span>{tag.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
         <div className="p-4 pb-safe space-y-6">
