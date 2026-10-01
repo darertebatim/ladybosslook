@@ -111,14 +111,21 @@ export function MyLearningCard() {
         .eq('user_id', user.id)
         .in('post_id', allPosts.map((p) => p.id));
       const readSet = new Set(readPostIds?.map((r) => r.post_id) || []);
-      return allPosts.filter((p) => !readSet.has(p.id)).length;
+      const unread = allPosts.filter((p) => !readSet.has(p.id));
+      return {
+        count: unread.length,
+        latest: unread[0]?.content ?? '',
+      };
     },
     enabled: !!roundChannel?.id && !!user?.id,
-  });
+  }) as { data?: { count: number; latest: string } | undefined };
 
   const communityPreview = (() => {
-    const raw = (roundChannel as any)?.__preview ?? '';
-    return raw;
+    const raw = channelUnreadCount?.latest ?? '';
+    return raw
+      .replace(/LINK_BUTTON:\S+?:([^\n]+)/g, '$1')
+      .replace(/\s+/g, ' ')
+      .trim();
   })();
 
   if (!hasProgram || !enrollment) return null;
