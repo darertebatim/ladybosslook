@@ -182,7 +182,7 @@ const ShelfCard = ({ title, image, type, badge, badgeTone = 'card', onClick }: S
       onClick={() => { haptic.light(); onClick?.(); }}
       className="shrink-0 w-[152px] text-left rounded-2xl overflow-hidden bg-card-warm shadow-ios transition-all active:scale-[0.97]"
     >
-      <div className="relative w-full aspect-[4/5] bg-peach">
+      <div className="relative w-full aspect-square bg-peach">
         {image ? (
           <CachedImage src={image} alt={title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
         ) : (
