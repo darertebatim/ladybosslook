@@ -363,6 +363,7 @@ const AppBrowsePrograms = () => {
           image: p.cover_image_url || '',
           type: p.type,
           language: p.language,
+          deliveryMethod: p.delivery_method || undefined,
           isFree: false,
           priceAmount: 999,
           is_free_on_ios: false,
