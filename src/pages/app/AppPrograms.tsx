@@ -15,6 +15,7 @@ import { format } from "date-fns";
 import { haptic } from "@/lib/haptics";
 import { SEOHead } from "@/components/SEOHead";
 import { PageHeader } from "@/components/app/ui/PageHeader";
+import { PathProfileQuickCard } from "@/components/app/PathProfileQuickCard";
 import { useUnseenContentContext } from "@/contexts/UnseenContentContext";
 import { CoursesSkeleton } from "@/components/app/skeletons";
 import { usePrograms } from "@/hooks/usePrograms";
@@ -208,6 +209,9 @@ const AppCourses = () => {
       {/* Scroll container */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="container max-w-4xl py-4 px-4 space-y-6 pb-safe">
+          {/* Profile peek — one-row shortcut into My Profile */}
+          <PathProfileQuickCard />
+
           {/* Next live session */}
           {upcoming && (
             <Link
