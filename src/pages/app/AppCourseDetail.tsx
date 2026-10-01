@@ -1922,10 +1922,10 @@ const AppCourseDetail = () => {
                                 handleAddSingleSession(nextSession);
                               }}
                               className={cn(
-                                "shrink-0 inline-flex items-center justify-center h-9 w-9 rounded-full",
+                                "shrink-0 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-xs font-semibold shadow-ios transition-all active:scale-95",
                                 isSessionSynced(nextSession.id)
-                                  ? "text-green-600 dark:text-green-400"
-                                  : "text-muted-foreground",
+                                  ? "bg-white text-green-600"
+                                  : "bg-brand text-white",
                                 addingSessionId === nextSession.id && "opacity-50",
                               )}
                             >
@@ -1936,6 +1936,13 @@ const AppCourseDetail = () => {
                               ) : (
                                 <CalendarPlus className="h-4 w-4" />
                               )}
+                              <span>
+                                {addingSessionId === nextSession.id
+                                  ? "Syncing"
+                                  : isSessionSynced(nextSession.id)
+                                    ? "Synced"
+                                    : "Sync"}
+                              </span>
                             </span>
                           </button>
                         </CardContent>
@@ -1975,7 +1982,7 @@ const AppCourseDetail = () => {
 
                   {/* Quick Actions - Only show if enrollment has a round */}
                   {round && (
-                    <Card className="tour-quick-actions rounded-2xl border-0 shadow-ios bg-[hsl(var(--tint-peach))]">
+                    <Card className="tour-quick-actions rounded-2xl border-0 shadow-ios bg-card-warm">
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-fg-warm">
                           <Calendar className="h-5 w-5" />
@@ -2013,13 +2020,21 @@ const AppCourseDetail = () => {
                         {roundCourseId && !directCourses.some((course) => course.id === roundCourseId) && (
                           <Button
                             size="lg"
-                            className="w-full h-auto px-4 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
+                            className="w-full h-auto p-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start gap-3"
                             onClick={() => navigate(`/app/learn/${roundCourseId}`, {
                               state: { from: location.pathname },
                             })}
                           >
-                            <GraduationCap className="h-5 w-5 mr-3 shrink-0" />
-                            <span className="truncate">Course: {roundCourse?.title || "Course Lessons"}</span>
+                            {roundCourse?.coverImageUrl ? (
+                              <img src={roundCourse.coverImageUrl} alt="" className="h-12 w-12 shrink-0 rounded-xl object-cover" />
+                            ) : (
+                              <div className="h-12 w-12 shrink-0 rounded-xl bg-peach flex items-center justify-center">
+                                <GraduationCap className="h-5 w-5 text-brand" />
+                              </div>
+                            )}
+                            <span className="min-w-0 flex-1 text-left">
+                              <span className="block text-sm font-semibold truncate">Course: {roundCourse?.title || "Course Lessons"}</span>
+                            </span>
                           </Button>
                         )}
 
@@ -2042,7 +2057,7 @@ const AppCourseDetail = () => {
                           <Button
                             key={rp.id}
                             size="lg"
-                            className={`w-full h-auto px-4 py-3 ${idx === 0 ? "tour-playlist-btn " : ""}bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start`}
+                            className={`w-full h-auto p-3 ${idx === 0 ? "tour-playlist-btn " : ""}bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start gap-3`}
                             onClick={() => {
                               const isMainAudio =
                                 rp.playlist_type === "audio" &&
@@ -2062,14 +2077,29 @@ const AppCourseDetail = () => {
                               }
                             }}
                           >
-                            {rp.playlist_type === "video" ? (
-                              <Video className="h-5 w-5 mr-3 shrink-0" />
+                            {rp.playlist?.cover_image_url ? (
+                              <img
+                                src={rp.playlist.cover_image_url}
+                                alt=""
+                                className="h-12 w-12 shrink-0 rounded-xl object-cover"
+                              />
                             ) : (
-                              <Music className="h-5 w-5 mr-3 shrink-0" />
+                              <div className="h-12 w-12 shrink-0 rounded-xl bg-peach flex items-center justify-center">
+                                {rp.playlist_type === "video" ? (
+                                  <Video className="h-5 w-5 text-brand" />
+                                ) : (
+                                  <Music className="h-5 w-5 text-brand" />
+                                )}
+                              </div>
                             )}
-                            <span className="truncate">
-                              {rp.playlist_type === "video" ? "Watch playlist" : "Listen playlist"}: {rp.playlist?.name}
-                            </span>
+                            <div className="flex-1 min-w-0 text-left">
+                              <p className="text-sm font-semibold truncate">
+                                {rp.playlist?.name}
+                              </p>
+                              <p className="text-xs text-fg-warm/70">
+                                {rp.playlist_type === "video" ? "Watch playlist" : "Listen playlist"}
+                              </p>
+                            </div>
                           </Button>
                         ))}
 
