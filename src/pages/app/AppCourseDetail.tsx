@@ -31,6 +31,7 @@ import {
 import { SEOHead } from "@/components/SEOHead";
 import { HostBadges } from "@/components/app/HostBadges";
 import { PersianFlag } from "@/components/ui/PersianFlag";
+import { haptic } from "@/lib/haptics";
 
 const LANG_FLAGS: Record<string, string> = {
   all: "🌐",
