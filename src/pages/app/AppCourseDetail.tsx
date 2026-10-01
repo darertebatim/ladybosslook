@@ -1507,76 +1507,6 @@ const AppCourseDetail = () => {
                             )}
                           </div>
 
-                          {/* Program Description */}
-                          {program.description && (
-                            <div
-                              className="text-muted-foreground whitespace-pre-wrap leading-relaxed [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-foreground [&_h2]:mt-4 [&_h2]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-foreground [&_h3]:mt-3 [&_h3]:mb-1 [&_strong]:text-foreground"
-                              dangerouslySetInnerHTML={{
-                                __html: sanitizeDescription(program.description),
-                              }}
-                            />
-                          )}
-
-                          {/* Active Round Details — shown for programs with auto-enrollment */}
-                          {autoEnrollRound && (
-                            <div className="rounded-2xl bg-[hsl(var(--tint-peach))] shadow-ios p-4 space-y-3">
-                              <div className="flex items-center gap-2">
-                                <Calendar className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
-                                <p className="text-sm font-semibold text-fg-warm">
-                                  {autoEnrollRound.round_name || "Upcoming Round"}
-                                </p>
-                              </div>
-                              <div className="space-y-1">
-                                {(() => {
-                                  const sessionDateStr =
-                                    autoEnrollRound.first_session_date ||
-                                    autoEnrollRound.start_date;
-                                  if (!sessionDateStr) return null;
-                                  const sessionDate = sessionDateStr.includes("T")
-                                    ? new Date(sessionDateStr)
-                                    : new Date(sessionDateStr + "T00:00:00");
-                                  if (isNaN(sessionDate.getTime())) return null;
-                                  return (
-                                    <>
-                                      <p className="text-sm text-fg-warm-muted">
-                                        Starts{" "}
-                                        <span className="font-medium text-fg-warm">
-                                          {format(sessionDate, "EEEE, MMMM d, yyyy")}
-                                        </span>
-                                      </p>
-                                      {sessionDateStr.includes("T") &&
-                                        format(sessionDate, "h:mm a") !== "12:00 AM" && (
-                                          <p className="text-sm text-fg-warm-muted">
-                                            Time{" "}
-                                            <span className="font-medium text-fg-warm">
-                                              {formatSessionTime(sessionDate)}
-                                            </span>
-                                          </p>
-                                        )}
-                                    </>
-                                  );
-                                })()}
-                                {autoEnrollRound.first_session_duration ? (
-                                  <p className="text-sm text-fg-warm-muted">
-                                    Duration{" "}
-                                    <span className="font-medium text-fg-warm">
-                                      {autoEnrollRound.first_session_duration} min
-                                    </span>
-                                  </p>
-                                ) : null}
-                                {autoEnrollRound.google_meet_link ? (
-                                  <p className="text-sm text-fg-warm-muted">
-                                    Meeting on{" "}
-                                    <span className="inline-flex items-center gap-1 font-medium text-fg-warm">
-                                      <Video className="h-3.5 w-3.5" />
-                                      Google Meet
-                                    </span>
-                                  </p>
-                                ) : null}
-                              </div>
-                            </div>
-                          )}
-
                           {/* Purchase / Enrollment Section */}
                           <div>
                             {/* Waitlist program - show_in_app_waitlist takes priority */}
@@ -1738,6 +1668,76 @@ const AppCourseDetail = () => {
                                 </p>
                               )}
                           </div>
+                          {/* Program Description */}
+                          {program.description && (
+                            <div
+                              className="text-muted-foreground whitespace-pre-wrap leading-relaxed [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-foreground [&_h2]:mt-4 [&_h2]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-foreground [&_h3]:mt-3 [&_h3]:mb-1 [&_strong]:text-foreground"
+                              dangerouslySetInnerHTML={{
+                                __html: sanitizeDescription(program.description),
+                              }}
+                            />
+                          )}
+
+                          {/* Active Round Details — shown for programs with auto-enrollment */}
+                          {autoEnrollRound && (
+                            <div className="rounded-2xl bg-[hsl(var(--tint-peach))] shadow-ios p-4 space-y-3">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
+                                <p className="text-sm font-semibold text-fg-warm">
+                                  {autoEnrollRound.round_name || "Upcoming Round"}
+                                </p>
+                              </div>
+                              <div className="space-y-1">
+                                {(() => {
+                                  const sessionDateStr =
+                                    autoEnrollRound.first_session_date ||
+                                    autoEnrollRound.start_date;
+                                  if (!sessionDateStr) return null;
+                                  const sessionDate = sessionDateStr.includes("T")
+                                    ? new Date(sessionDateStr)
+                                    : new Date(sessionDateStr + "T00:00:00");
+                                  if (isNaN(sessionDate.getTime())) return null;
+                                  return (
+                                    <>
+                                      <p className="text-sm text-fg-warm-muted">
+                                        Starts{" "}
+                                        <span className="font-medium text-fg-warm">
+                                          {format(sessionDate, "EEEE, MMMM d, yyyy")}
+                                        </span>
+                                      </p>
+                                      {sessionDateStr.includes("T") &&
+                                        format(sessionDate, "h:mm a") !== "12:00 AM" && (
+                                          <p className="text-sm text-fg-warm-muted">
+                                            Time{" "}
+                                            <span className="font-medium text-fg-warm">
+                                              {formatSessionTime(sessionDate)}
+                                            </span>
+                                          </p>
+                                        )}
+                                    </>
+                                  );
+                                })()}
+                                {autoEnrollRound.first_session_duration ? (
+                                  <p className="text-sm text-fg-warm-muted">
+                                    Duration{" "}
+                                    <span className="font-medium text-fg-warm">
+                                      {autoEnrollRound.first_session_duration} min
+                                    </span>
+                                  </p>
+                                ) : null}
+                                {autoEnrollRound.google_meet_link ? (
+                                  <p className="text-sm text-fg-warm-muted">
+                                    Meeting on{" "}
+                                    <span className="inline-flex items-center gap-1 font-medium text-fg-warm">
+                                      <Video className="h-3.5 w-3.5" />
+                                      Google Meet
+                                    </span>
+                                  </p>
+                                ) : null}
+                              </div>
+                            </div>
+                          )}
+
 
                           {/* What's Included */}
                           {program.features &&
