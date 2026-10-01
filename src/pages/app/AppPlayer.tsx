@@ -432,7 +432,16 @@ export default function AppPlayer() {
   }
 
   return (
-    <div className="relative flex flex-col h-full overflow-hidden" style={{ background: "#FFF8F3" }}>
+    <div className="relative flex flex-col h-full overflow-hidden" style={{ background: "linear-gradient(180deg, #FFF4ED 0%, #FFFFFF 50%, #FFF4ED 100%)" }}>
+      {/* Soft warm halo behind the header */}
+      <div
+        aria-hidden
+        className="absolute top-12 -right-16 w-56 h-56 rounded-full opacity-50 pointer-events-none z-0"
+        style={{
+          background: "radial-gradient(circle, #FFD2A1 0%, transparent 70%)",
+          filter: "blur(20px)",
+        }}
+      />
       {/* Single scroll container */}
       <div
         ref={listenScrollRef}
@@ -444,8 +453,8 @@ export default function AppPlayer() {
         >
           {/* Header — only the title row sticks to top */}
           <div
-            className="sticky z-20 px-4 pt-3 pb-2"
-            style={{ top: "env(safe-area-inset-top)", background: "#FFF8F3" }}
+            className="sticky z-20 px-4 pt-3 pb-2 backdrop-blur-xl"
+            style={{ top: "env(safe-area-inset-top)", background: "rgba(255,248,243,0.78)", boxShadow: "0 1px 0 rgba(245,220,200,0.5)" }}
           >
             <div className="min-h-[44px] grid grid-cols-[auto_1fr_auto] items-center">
               {showSearch ? (
