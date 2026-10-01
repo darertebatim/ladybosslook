@@ -32,6 +32,7 @@ import { HomeBanner } from "@/components/app/HomeBanner";
 import { HomeMenu } from "@/components/app/HomeMenu";
 import { useProgramEventsForDate } from "@/hooks/usePlannerProgramEvents";
 import { StackedEventDeck } from "@/components/app/StackedEventDeck";
+import { PathProfileQuickCard } from "@/components/app/PathProfileQuickCard";
 
 import { getLocalDateStr } from "@/lib/localDate";
 import { parseISO } from "date-fns";
@@ -572,6 +573,11 @@ export default function AppMyRiloPath() {
               sees the same card with a personalized free starting point */}
           <div className="px-4 pt-2">
             {hasLearningProgram ? <MyLearningCard /> : <StartHereCard />}
+          </div>
+
+          {/* Quick profile peek — one-row shortcut into My Profile */}
+          <div className="px-4 pt-2">
+            <PathProfileQuickCard />
           </div>
 
           {/* Today's Program Events — stacked deck above the date greeting */}
