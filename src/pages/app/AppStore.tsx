@@ -324,7 +324,7 @@ const AppStore = () => {
   const comingSoonTools = getVisibleComingSoon();
 
   return (
-    <div className="h-full min-h-0 overflow-hidden flex flex-col bg-background">
+    <div className="h-full min-h-0 overflow-hidden flex flex-col" style={{ background: "#FFF8F3" }}>
       <SEOHead
         title="Explore - Rilo"
         description="Explore tools, audio experiences, and educational programs"
