@@ -86,13 +86,13 @@ export default function AppPlayer() {
       const tags = allTags.filter(
         (t) => t.is_active !== false && t.dimension_id === doorDimensionId,
       );
-      // Custom Player topic order: Financial 2nd, Business 3rd, Emotional Health last
+      // Custom topic order: Business first, Financial after Immigrant, Emotional Health last
       const topicOrder = [
-        "selfcare",
-        "financial",
         "business",
-        "immigrant",
+        "selfcare",
         "productivity",
+        "immigrant",
+        "financial",
         "emotion",
       ];
       const orderMap = new Map(topicOrder.map((slug, idx) => [slug, idx]));
