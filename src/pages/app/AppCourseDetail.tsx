@@ -1848,7 +1848,22 @@ const AppCourseDetail = () => {
                           </CardContent>
                         </Card>
                       );
-                    })()}
+                     })()}
+
+                  {/* Program Cover - shown at the top when there is no video */}
+                  {!(round?.video_url || program?.video_url) &&
+                    program &&
+                    (program.cover_image_url || programImages[program.slug]) && (
+                      <Card className="overflow-hidden rounded-2xl border-0 shadow-ios-raised bg-card-warm">
+                        <div className="relative h-64 overflow-hidden">
+                          <img
+                            src={program.cover_image_url || programImages[program.slug]}
+                            alt={program.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </Card>
+                    )}
 
                   {round?.important_message && (
                     <Alert
