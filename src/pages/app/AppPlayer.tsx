@@ -432,7 +432,7 @@ export default function AppPlayer() {
   }
 
   return (
-    <div className="relative flex flex-col h-full overflow-hidden bg-background">
+    <div className="relative flex flex-col h-full overflow-hidden" style={{ background: "#FFF8F3" }}>
       {/* Single scroll container */}
       <div
         ref={listenScrollRef}
@@ -444,8 +444,8 @@ export default function AppPlayer() {
         >
           {/* Header — only the title row sticks to top */}
           <div
-            className="sticky z-20 px-4 pt-3 pb-2 bg-background"
-            style={{ top: "env(safe-area-inset-top)" }}
+            className="sticky z-20 px-4 pt-3 pb-2"
+            style={{ top: "env(safe-area-inset-top)", background: "#FFF8F3" }}
           >
             <div className="min-h-[44px] grid grid-cols-[auto_1fr_auto] items-center">
               {showSearch ? (
