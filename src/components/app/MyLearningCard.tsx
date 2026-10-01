@@ -281,23 +281,35 @@ export function MyLearningCard() {
               style={{ width: `${percent}%` }}
             />
           </div>
-          <p className="mt-2 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
+          <Link
+            to={programPath}
+            state={{ from: location.pathname }}
+            onClick={() => haptic.light()}
+            className="mt-3 block active:opacity-70"
+          >
+            <p className="text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
+              {enrollment.course_name}
+            </p>
+            <p className="mt-0.5 text-[11px] font-medium leading-tight text-fg-warm/60 line-clamp-1">
+              {round?.round_name ? `${round.round_name}${isSelfPaced ? ' · Self-paced' : ''}` : 'Self-paced'}
+            </p>
+          </Link>
+        </div>
+      )}
+      {totalLessons === 0 && (
+        <Link
+          to={programPath}
+          state={{ from: location.pathname }}
+          onClick={() => haptic.light()}
+          className="mt-3 block px-4 active:opacity-70"
+        >
+          <p className="text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
             {enrollment.course_name}
           </p>
           <p className="mt-0.5 text-[11px] font-medium leading-tight text-fg-warm/60 line-clamp-1">
             {round?.round_name ? `${round.round_name}${isSelfPaced ? ' · Self-paced' : ''}` : 'Self-paced'}
           </p>
-        </div>
-      )}
-      {totalLessons === 0 && (
-        <>
-          <p className="px-4 pt-3 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
-            {enrollment.course_name}
-          </p>
-          <p className="px-4 mt-0.5 text-[11px] font-medium leading-tight text-fg-warm/60 line-clamp-1">
-            {round?.round_name ? `${round.round_name}${isSelfPaced ? ' · Self-paced' : ''}` : 'Self-paced'}
-          </p>
-        </>
+        </Link>
       )}
 
 
