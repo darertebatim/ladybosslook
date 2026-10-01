@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { MessageCircle, Search } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useLayoutEffect } from "react";
 import {
   conversationEmail,
   conversationName,
@@ -30,6 +30,13 @@ export function ChatConversationList({
   const [search, setSearch] = useState("");
   const [selectedProgram, setSelectedProgram] = useState<string>("all");
   const [unreadOnly, setUnreadOnly] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+  const savedScrollTop = useRef(0);
+
+  // Incoming replies can reorder rows; keep the agent's place in the inbox.
+  useLayoutEffect(() => {
+    if (listRef.current) listRef.current.scrollTop = savedScrollTop.current;
+  }, [conversations]);
 
   const totalUnread = useMemo(
     () => conversations.filter(c => c.unread_count_admin > 0).length,
@@ -111,7 +118,11 @@ export function ChatConversationList({
       )}
 
       {/* Conversation List */}
-      <div className="flex-1 overflow-y-auto">
+      <div
+        ref={listRef}
+        onScroll={(event) => { savedScrollTop.current = event.currentTarget.scrollTop; }}
+        className="flex-1 min-h-0 overflow-y-auto [overflow-anchor:none]"
+      >
         {loading ? (
           <div className="p-4 text-center text-muted-foreground">Loading...</div>
         ) : filteredConversations.length === 0 ? (
