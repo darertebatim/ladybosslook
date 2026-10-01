@@ -266,7 +266,7 @@ export function MyLearningCard() {
 
       {/* Progress */}
       {totalLessons > 0 && (
-        <div className="px-4 pt-3">
+        <div className="px-4 pt-4">
           <div className="mb-1.5 flex justify-between text-[11.5px] font-semibold">
             <span className="text-fg-warm">
               {completedCount} of {totalLessons} lessons done
