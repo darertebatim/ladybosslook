@@ -137,7 +137,7 @@ export function MyLearningCard() {
         </div>
         {/* Profile peek — between the welcome and the program name */}
         <PathProfileQuickCard variant="inset" className="mt-2.5" />
-        <p className="mt-2.5 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
+        <p className="mt-3.5 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
           {enrollment.course_name}
           {round?.round_name ? ` · ${round.round_name}` : ''}
           {isSelfPaced ? ' · Self-paced' : ''}
