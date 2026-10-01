@@ -489,8 +489,8 @@ const AppBrowsePrograms = () => {
               onClick={() => { haptic.light(); openProgram(spotlight.slug); }}
               className="w-full text-left rounded-3xl overflow-hidden shadow-ios active:scale-[0.99] transition-all"
             >
-              <div className="relative">
-                <div className="aspect-[16/10] w-full bg-peach">
+              <div className="bg-card-warm">
+                <div className="relative aspect-[16/9] w-full bg-peach">
                   {spotlight.image ? (
                     <CachedImage src={spotlight.image} alt={spotlight.title} className="w-full h-full object-cover" />
                   ) : (
@@ -498,22 +498,21 @@ const AppBrowsePrograms = () => {
                       <GraduationCap className="h-10 w-10 text-brand/40" />
                     </div>
                   )}
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-4">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-brand px-2.5 py-1 text-[10px] font-bold text-white">
+                  <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-brand px-2.5 py-1 text-[10px] font-bold text-white shadow-ios">
                     <Sparkles className="h-3 w-3" />
                     {isLiveProgram(spotlight)
                       ? (isFa ? 'دوره زنده پیش رو' : 'Next live cohort')
                       : (isFa ? 'پیشنهاد ویژه' : 'Featured')}
                   </span>
-                  <h2 className="mt-2 text-lg font-bold text-white leading-snug line-clamp-2">{spotlight.title}</h2>
-                  <div className="mt-1 flex items-center gap-2 text-[11px] text-white/85">
+                </div>
+                <div className="p-4">
+                  <h2 className="text-[17px] font-bold text-fg-warm leading-snug line-clamp-2">{spotlight.title}</h2>
+                  <div className="mt-1.5 flex items-center gap-1.5 text-[12px] text-fg-warm/70">
                     {isLiveProgram(spotlight)
-                      ? <><Calendar className="h-3.5 w-3.5" /> {isFa ? 'جلسات زنده + انجمن اختصاصی' : 'Live sessions + community'}</>
-                      : <><Video className="h-3.5 w-3.5" /> {isFa ? 'دسترسی فوری' : 'Instant access'}</>}
+                      ? <><Calendar className="h-3.5 w-3.5 text-brand" /> {isFa ? 'جلسات زنده + انجمن اختصاصی' : 'Live sessions + community'}</>
+                      : <><Video className="h-3.5 w-3.5 text-brand" /> {isFa ? 'دسترسی فوری' : 'Instant access'}</>}
                   </div>
-                  <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-white px-3.5 py-2 text-[12px] font-bold text-fg-warm">
+                  <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-gradient-orange px-4 py-2 text-[12px] font-bold text-white shadow-ios">
                     {isFa ? 'مشاهده برنامه' : 'Explore program'} <ChevronRight className="h-3.5 w-3.5" />
                   </span>
                 </div>
