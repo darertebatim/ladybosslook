@@ -213,7 +213,9 @@ const Shelf = ({ title, emoji, children }: { title: string; emoji: string; child
   </div>
 );
 
-const LIVE_TYPES = ['group-coaching', 'event', '1o1-session'];
+// Live vs on-demand is decided by the program's delivery method (set in Admin → Programs),
+// not by its type — a course can be live too.
+const isLiveProgram = (p: any) => p.deliveryMethod === 'live-online';
 
 // --- Main Page ---
 const AppBrowsePrograms = () => {
@@ -356,16 +358,16 @@ const AppBrowsePrograms = () => {
   const isFreeProgram = (p: any) => !p._isWaitlist && (p.isFree || p.priceAmount === 0 || p.is_free_on_ios);
 
   const liveShelf = useMemo(
-    () => notEnrolledPrograms.filter((p: any) => LIVE_TYPES.includes(p.type)),
+    () => notEnrolledPrograms.filter((p: any) => isLiveProgram(p)),
     [notEnrolledPrograms]
   );
   const freeShelf = useMemo(
-    () => notEnrolledPrograms.filter((p: any) => !LIVE_TYPES.includes(p.type) && (isFreeProgram(p) || p.type === 'webinar')),
+    () => notEnrolledPrograms.filter((p: any) => !isLiveProgram(p) && (isFreeProgram(p) || p.type === 'webinar')),
     [notEnrolledPrograms]
   );
   const selfPacedShelf = useMemo(
     () => notEnrolledPrograms.filter((p: any) =>
-      !LIVE_TYPES.includes(p.type) && !freeShelf.includes(p)
+      !isLiveProgram(p) && !freeShelf.includes(p)
     ),
     [notEnrolledPrograms, freeShelf]
   );
@@ -501,13 +503,13 @@ const AppBrowsePrograms = () => {
                 <div className="absolute inset-x-0 bottom-0 p-4">
                   <span className="inline-flex items-center gap-1 rounded-full bg-brand px-2.5 py-1 text-[10px] font-bold text-white">
                     <Sparkles className="h-3 w-3" />
-                    {LIVE_TYPES.includes(spotlight.type)
+                    {isLiveProgram(spotlight)
                       ? (isFa ? 'دوره زنده پیش رو' : 'Next live cohort')
                       : (isFa ? 'پیشنهاد ویژه' : 'Featured')}
                   </span>
                   <h2 className="mt-2 text-lg font-bold text-white leading-snug line-clamp-2">{spotlight.title}</h2>
                   <div className="mt-1 flex items-center gap-2 text-[11px] text-white/85">
-                    {LIVE_TYPES.includes(spotlight.type)
+                    {isLiveProgram(spotlight)
                       ? <><Calendar className="h-3.5 w-3.5" /> {isFa ? 'جلسات زنده + انجمن اختصاصی' : 'Live sessions + community'}</>
                       : <><Video className="h-3.5 w-3.5" /> {isFa ? 'دسترسی فوری' : 'Instant access'}</>}
                   </div>
