@@ -7,7 +7,7 @@ import { ChatInput } from "@/components/chat/ChatInput";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Loader2, User, Mail, Calendar, BookOpen, Phone, CheckCircle2, RotateCcw, Link2, ShoppingBag } from "lucide-react";
+import { Loader2, User, Mail, Calendar, BookOpen, Phone, CheckCircle2, RotateCcw, Link2, ShoppingBag, ChevronDown } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
 import { CannedRepliesManager, CannedRepliesPicker } from "./support/CannedReplies";
 import { MessageButtonsEditor } from "./support/MessageButtonsEditor";
@@ -48,7 +48,8 @@ interface ChatPanelProps {
 export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
   const { user } = useAuth();
   const { toast } = useToast();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesScrollRef = useRef<HTMLDivElement>(null);
+  const [showJumpToBottom, setShowJumpToBottom] = useState(false);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [userContext, setUserContext] = useState<UserContext | null>(null);
@@ -70,6 +71,8 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
 
     const fetchData = async () => {
       setLoading(true);
+      setMessages([]);
+      setShowJumpToBottom(false);
       setButtons([]);
       setShowButtons(false);
       try {
@@ -142,10 +145,25 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
     };
   }, [conversation?.id]);
 
-  // Auto-scroll
+  const scrollToLatest = (behavior: ScrollBehavior = 'auto') => {
+    const container = messagesScrollRef.current;
+    if (!container) return;
+    container.scrollTo({ top: container.scrollHeight, behavior });
+    setShowJumpToBottom(false);
+  };
+
+  const handleMessagesScroll = () => {
+    const container = messagesScrollRef.current;
+    if (!container) return;
+    setShowJumpToBottom(container.scrollHeight - container.scrollTop - container.clientHeight > 40);
+  };
+
+  // Scroll only the transcript, never the conversation list or the outer page.
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (loading || !conversation || messages.length === 0) return;
+    const frame = requestAnimationFrame(() => scrollToLatest());
+    return () => cancelAnimationFrame(frame);
+  }, [conversation?.id, loading, messages]);
 
   const uploadAttachment = async (file: File): Promise<string | null> => {
     if (!user || !conversation) return null;
@@ -411,7 +429,7 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
   return (
     <div className="flex h-full">
       {/* Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
         {/* Header - hidden on mobile since parent has header */}
         <div className="hidden lg:flex items-center justify-between p-3 border-b bg-muted/30">
           <div className="min-w-0">
@@ -449,8 +467,11 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
         </div>
 
         {/* Messages */}
+        <div className="relative flex-1 min-h-0">
         <div
-          className="flex-1 overflow-y-auto overscroll-contain p-4"
+          ref={messagesScrollRef}
+          onScroll={handleMessagesScroll}
+          className="h-full overflow-y-auto overscroll-contain p-4"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {loading ? (
@@ -491,9 +512,21 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
                   </div>
                 );
               })}
-              <div ref={messagesEndRef} />
             </>
           )}
+        </div>
+        {showJumpToBottom && !loading && (
+          <Button
+            type="button"
+            size="icon"
+            onClick={() => scrollToLatest('smooth')}
+            aria-label="Jump to latest message"
+            title="Jump to latest message"
+            className="absolute bottom-3 right-4 z-10 h-10 w-10 rounded-full shadow-ios"
+          >
+            <ChevronDown className="h-5 w-5" />
+          </Button>
+        )}
         </div>
 
         {/* Composer tools */}
