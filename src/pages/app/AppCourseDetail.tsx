@@ -1972,7 +1972,7 @@ const AppCourseDetail = () => {
 
                   {/* Quick Actions - Only show if enrollment has a round */}
                   {round && (
-                    <Card className="tour-quick-actions rounded-2xl border-0 shadow-ios bg-card-warm">
+                    <Card className="tour-quick-actions rounded-2xl border-0 !shadow-ios bg-card-warm">
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-fg-warm">
                           <Calendar className="h-5 w-5" />
