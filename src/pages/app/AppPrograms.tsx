@@ -249,8 +249,8 @@ const AppCourses = () => {
             </p>
             <p className="mt-1 text-xs text-[hsl(var(--fg-warm-muted))] leading-relaxed">
               {i18n.language === "fa"
-                ? "حساب دیگری دارید یا با ایمیل دیگری خرید کردید؟ آن را متصل کنید تا دوره‌ها و سوابق شما به این حساب منتقل شود."
-                : "Have another account or paid with a different email? Link it here to merge your programs, purchases, and progress into this account."}
+                ? "حساب دیگری دارید یا با ایمیل دیگری خرید کردید؟ در پروفایلم آن را ادغام کنید تا دوره‌ها و سوابق شما به این حساب منتقل شود."
+                : "Have another account or paid with a different email? Merge it in My Profile to bring your programs, purchases, and progress into this account."}
             </p>
             <span className="mt-1 flex items-center gap-0.5 text-[11px] font-bold text-[hsl(var(--brand-primary))]">
               {i18n.language === "fa" ? "ادغام حساب‌ها" : "Merge accounts"}
