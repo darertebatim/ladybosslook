@@ -128,7 +128,14 @@ export default function AppChannelsList() {
         className="sticky top-0 z-30 bg-white/35 dark:bg-black/20 backdrop-blur-xl rounded-b-2xl shadow-[0_2px_10px_rgba(0,0,0,0.06)]"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="px-4 pt-3 pb-3 flex items-center justify-between min-h-[52px]">
+        <div className="px-4 pt-3 pb-3 flex items-center gap-2 min-h-[52px]">
+          <IOSIconButton
+            size="sm"
+            onClick={goBack}
+            aria-label="Back"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </IOSIconButton>
           <h1 className="text-2xl font-bold text-fg-warm">{t('chats.title')}</h1>
           {/* Actions: Add to routines + Admin */}
           <div className="flex items-center gap-2">
