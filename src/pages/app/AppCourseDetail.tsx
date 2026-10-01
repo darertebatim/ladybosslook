@@ -2094,56 +2094,59 @@ const AppCourseDetail = () => {
                           </Button>
                         ))}
 
-                        {/* 4. Access Google Drive - Resources */}
-                        {round.google_drive_link && (
-                          <Button
-                            size="lg"
-                            className="w-full h-auto px-4 py-3 tour-drive-btn bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
-                            onClick={() =>
-                              window.open(round.google_drive_link!, "_blank")
-                            }
-                          >
-                            <FolderOpen className="h-5 w-5 mr-3 shrink-0" />
-                            <span className="truncate">Access Google Drive</span>
-                          </Button>
-                        )}
+                        {/* 4-6b. Compact utility buttons - 2 column grid */}
+                        <div className="grid grid-cols-2 gap-3">
+                          {/* Access Google Drive - Resources */}
+                          {round.google_drive_link && (
+                            <Button
+                              size="lg"
+                              className="w-full h-auto px-3 py-3 tour-drive-btn bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
+                              onClick={() =>
+                                window.open(round.google_drive_link!, "_blank")
+                              }
+                            >
+                              <FolderOpen className="h-5 w-5 mr-2 shrink-0" />
+                              <span className="truncate text-[13px]">Access Google Drive</span>
+                            </Button>
+                          )}
 
-                        {/* 5. In-App Support Chat - optional per round */}
-                        {(round as any).in_app_support_enabled && (
-                          <Button
-                            size="lg"
-                            className="w-full h-auto px-4 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
-                            onClick={() => navigate("/app/chat")}
-                          >
-                            <HelpCircle className="h-5 w-5 mr-3 shrink-0" />
-                            <span className="truncate">In-App Support Chat</span>
-                          </Button>
-                        )}
+                          {/* In-App Support Chat - optional per round */}
+                          {(round as any).in_app_support_enabled && (
+                            <Button
+                              size="lg"
+                              className="w-full h-auto px-3 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
+                              onClick={() => navigate("/app/chat")}
+                            >
+                              <HelpCircle className="h-5 w-5 mr-2 shrink-0" />
+                              <span className="truncate text-[13px]">In-App Support Chat</span>
+                            </Button>
+                          )}
 
-                        {/* 6. Contact Support - When needed */}
-                        {(round as any).support_link_url && (
-                          <Button
-                            size="lg"
-                            className="w-full h-auto px-4 py-3 tour-support-btn bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
-                            onClick={handleContactSupport}
-                          >
-                            <MessageCircle className="h-5 w-5 mr-3 shrink-0" />
-                            <span className="truncate">{(round as any).support_link_label ||
-                              "Contact Support"}</span>
-                          </Button>
-                        )}
+                          {/* Contact Support - When needed */}
+                          {(round as any).support_link_url && (
+                            <Button
+                              size="lg"
+                              className="w-full h-auto px-3 py-3 tour-support-btn bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
+                              onClick={handleContactSupport}
+                            >
+                              <MessageCircle className="h-5 w-5 mr-2 shrink-0" />
+                              <span className="truncate text-[13px]">{(round as any).support_link_label ||
+                                "Contact Support"}</span>
+                            </Button>
+                          )}
 
-                        {/* 6b. Use on desktop - optional per round */}
-                        {(round as any).desktop_link_enabled && (
-                          <Button
-                            size="lg"
-                            className="w-full h-auto px-4 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
-                            onClick={() => setShowDesktopSheet(true)}
-                          >
-                            <Monitor className="h-5 w-5 mr-3 shrink-0" />
-                            <span className="truncate">Use on desktop</span>
-                          </Button>
-                        )}
+                          {/* Use on desktop - optional per round */}
+                          {(round as any).desktop_link_enabled && (
+                            <Button
+                              size="lg"
+                              className="w-full h-auto px-3 py-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start"
+                              onClick={() => setShowDesktopSheet(true)}
+                            >
+                              <Monitor className="h-5 w-5 mr-2 shrink-0" />
+                              <span className="truncate text-[13px]">Use on desktop</span>
+                            </Button>
+                          )}
+                        </div>
 
                         {/* 7. Sync All Sessions to Calendar */}
                         {dbSessions && dbSessions.length > 1 && (
