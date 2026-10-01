@@ -213,7 +213,9 @@ const Shelf = ({ title, emoji, children }: { title: string; emoji: string; child
   </div>
 );
 
-const LIVE_TYPES = ['group-coaching', 'event', '1o1-session'];
+// Live vs on-demand is decided by the program's delivery method (set in Admin → Programs),
+// not by its type — a course can be live too.
+const isLiveProgram = (p: any) => p.deliveryMethod === 'live-online';
 
 // --- Main Page ---
 const AppBrowsePrograms = () => {
