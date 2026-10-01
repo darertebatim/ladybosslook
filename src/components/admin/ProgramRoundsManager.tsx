@@ -783,6 +783,93 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
         </CardContent>
       </Card>
 
+      {/* Round Channel Dialog */}
+      <Dialog open={!!channelRound} onOpenChange={(open) => { if (!open) setChannelRound(null); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5" />
+              Round Channel
+            </DialogTitle>
+            <DialogDescription>
+              {channelRound
+                ? `${programs?.find(p => p.slug === channelRound.program_slug)?.title || channelRound.program_slug} · ${channelRound.round_name}`
+                : ""}
+            </DialogDescription>
+          </DialogHeader>
+
+          {channelRound && channelByRoundId[channelRound.id] ? (
+            <div className="space-y-4">
+              <div className="rounded-lg border p-3">
+                <p className="font-medium">{channelByRoundId[channelRound.id].name}</p>
+                <p className="text-sm text-muted-foreground">
+                  /{channelByRoundId[channelRound.id].slug}
+                  {channelByRoundId[channelRound.id].is_archived ? " · archived" : " · active"}
+                </p>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Students in this round see a “Visit Community” button on their round page.
+              </p>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    linkChannelMutation.mutate({ channelId: channelByRoundId[channelRound.id].id, round: null })
+                  }
+                  disabled={linkChannelMutation.isPending}
+                >
+                  <Unlink className="h-4 w-4 mr-2" />
+                  Unlink channel
+                </Button>
+              </DialogFooter>
+            </div>
+          ) : channelRound ? (
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <Label>Create a new channel</Label>
+                <p className="text-sm text-muted-foreground">
+                  Creates “{(programs?.find(p => p.slug === channelRound.program_slug)?.title || channelRound.program_slug)} - {channelRound.round_name}” and links it to this round.
+                </p>
+                <Button
+                  onClick={() => createRoundChannelMutation.mutate(channelRound)}
+                  disabled={createRoundChannelMutation.isPending}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create channel
+                </Button>
+              </div>
+
+              <div className="border-t pt-4 space-y-2">
+                <Label>Or link an existing channel</Label>
+                <Select value={selectedChannelId} onValueChange={setSelectedChannelId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a channel" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(channels || [])
+                      .filter((c) => !c.round_id && !c.is_archived)
+                      .map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  disabled={!selectedChannelId || linkChannelMutation.isPending}
+                  onClick={() => linkChannelMutation.mutate({ channelId: selectedChannelId, round: channelRound })}
+                >
+                  <Link2 className="h-4 w-4 mr-2" />
+                  Link channel
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
+
+
       {/* Create/Edit Round Dialog */}
       <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
