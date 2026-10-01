@@ -2106,7 +2106,7 @@ const AppCourseDetail = () => {
                               }
                             >
                               <FolderOpen className="h-4 w-4 shrink-0" />
-                              <span className="truncate text-xs font-medium">Access Google Drive</span>
+                              <span className="truncate text-xs font-medium">Google Drive</span>
                             </Button>
                           )}
 
@@ -2118,7 +2118,7 @@ const AppCourseDetail = () => {
                               onClick={() => navigate("/app/chat")}
                             >
                               <HelpCircle className="h-4 w-4 shrink-0" />
-                              <span className="truncate text-xs font-medium">In-App Support Chat</span>
+                              <span className="truncate text-xs font-medium">Support Chat</span>
                             </Button>
                           )}
 
