@@ -155,9 +155,70 @@ const AcademyProgramCard = ({ title, slug, image, type, language, isFree, isEnro
   );
 };
 
+// --- Poster card for horizontal shelves ---
+interface ShelfCardProps {
+  title: string;
+  image?: string;
+  type?: string;
+  badge?: string | null;
+  badgeTone?: 'mint' | 'brand' | 'card';
+  onClick?: () => void;
+}
+
+const ShelfCard = ({ title, image, type, badge, badgeTone = 'card', onClick }: ShelfCardProps) => {
+  const { t } = useTranslation();
+  const TypeIcon = (type && TYPE_ICONS[type]) || Sparkles;
+  const typeLabel = type && TYPE_LABEL_KEYS[type] ? t(TYPE_LABEL_KEYS[type]) : null;
+  const toneClass =
+    badgeTone === 'mint' ? 'bg-mint text-fg-warm'
+    : badgeTone === 'brand' ? 'bg-brand text-white'
+    : 'bg-card text-brand';
+
+  return (
+    <button
+      onClick={() => { haptic.light(); onClick?.(); }}
+      className="shrink-0 w-[152px] text-left rounded-2xl overflow-hidden bg-card-warm shadow-ios transition-all active:scale-[0.97]"
+    >
+      <div className="relative w-full aspect-[4/5] bg-peach">
+        {image ? (
+          <CachedImage src={image} alt={title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <TypeIcon className="h-8 w-8 text-brand/50" />
+          </div>
+        )}
+        {badge && (
+          <span className={cn("absolute top-2 left-2 text-[9px] font-bold px-2 py-0.5 rounded-full shadow-ios", toneClass)}>
+            {badge}
+          </span>
+        )}
+      </div>
+      <div className="p-2.5">
+        <h3 className="font-bold text-[12.5px] text-fg-warm line-clamp-2 leading-snug">{title}</h3>
+        {typeLabel && <p className="text-[10.5px] text-fg-warm-muted mt-0.5 capitalize">{typeLabel}</p>}
+      </div>
+    </button>
+  );
+};
+
+// --- Horizontal shelf wrapper ---
+const Shelf = ({ title, emoji, children }: { title: string; emoji: string; children: React.ReactNode }) => (
+  <div className="space-y-2.5">
+    <h2 className="text-[13px] font-bold text-fg-warm flex items-center gap-1.5 px-0.5">
+      <span>{emoji}</span> {title}
+    </h2>
+    <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-1">
+      {children}
+    </div>
+  </div>
+);
+
+const LIVE_TYPES = ['group-coaching', 'event', '1o1-session'];
+
 // --- Main Page ---
 const AppBrowsePrograms = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isFa = i18n.language === 'fa';
   const navigate = useNavigate();
   const location = useLocation();
   const { programs, isLoading } = usePrograms();
