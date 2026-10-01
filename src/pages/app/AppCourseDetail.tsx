@@ -1916,7 +1916,7 @@ const AppCourseDetail = () => {
                                 {nextSession.duration_minutes || 90} min
                               </p>
                             </div>
-                            <button
+                            <span
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleAddSingleSession(nextSession);
@@ -1943,7 +1943,7 @@ const AppCourseDetail = () => {
                                     ? "Synced"
                                     : "Sync"}
                               </span>
-                            </button>
+                            </span>
                           </button>
                         </CardContent>
                       </Card>
