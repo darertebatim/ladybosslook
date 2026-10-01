@@ -143,7 +143,7 @@ const SheetDescription = React.forwardRef<
 SheetDescription.displayName = SheetPrimitive.Description.displayName
 
 const sheetCloseButtonClasses =
-  "absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/60 text-foreground shadow-ios backdrop-blur-sm transition-opacity active:opacity-60";
+  "absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/[0.06] text-foreground shadow-ios backdrop-blur-sm transition-opacity active:opacity-60 dark:bg-white/10";
 
 /** iOS-style frosted close button for sheets. */
 const SheetCloseButton = React.forwardRef<

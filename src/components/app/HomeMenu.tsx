@@ -240,6 +240,29 @@ export function HomeMenu() {
     </div>
   );
 
+  // My Programs + My Profile render as wide, stacked buttons
+  const wideAccountItems = accountItems.filter((i) =>
+    ["programs", "profile"].includes(i.id),
+  );
+  const pillAccountItems = accountItems.filter(
+    (i) => !["programs", "profile"].includes(i.id),
+  );
+
+  const renderWideButton = (item: NavItem) => (
+    <button
+      key={item.id}
+      onClick={() => handleNavClick(item.route)}
+      className={cn(
+        "w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-full",
+        "text-[13px] font-semibold transition-all active:scale-[0.98]",
+        item.color,
+      )}
+    >
+      {item.icon}
+      <span>{item.label ?? t(`menu.items.${item.nameKey}`)}</span>
+    </button>
+  );
+
   const renderToolGrid = (items: NavItem[]) => (
     <div className="grid grid-cols-4 gap-2">
       {items.map((item) => {
@@ -360,7 +383,10 @@ export function HomeMenu() {
             <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
               {t("menu.account")}
             </h3>
-            {renderPills(accountItems)}
+            <div className="space-y-2">
+              {wideAccountItems.map(renderWideButton)}
+              {renderPills(pillAccountItems)}
+            </div>
           </section>
 
           {/* Sign Out + Dark Mode */}
