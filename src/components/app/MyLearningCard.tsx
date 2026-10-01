@@ -281,7 +281,7 @@ export function MyLearningCard() {
               style={{ width: `${percent}%` }}
             />
           </div>
-          <p className="mt-2 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
+          <p className="mt-3.5 text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
             {enrollment.course_name}
           </p>
           <p className="mt-0.5 text-[11px] font-medium leading-tight text-fg-warm/60 line-clamp-1">
