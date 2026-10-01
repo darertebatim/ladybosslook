@@ -76,10 +76,10 @@ export function PathProfileQuickCard() {
       )}
       <span className="flex-1 min-w-0">
         <span className="block text-[14px] font-bold truncate" style={{ color: O.fg }}>
-          {firstName ? `Hi, ${firstName} 👋` : 'My Profile'}
+          My Profile{firstName ? ` — ${firstName}` : ''}
         </span>
-        <span className="block text-[11px] mt-0.5" style={{ color: O.fgMuted }}>
-          Your space — progress, settings & accounts
+        <span className="block text-[11px] mt-0.5 truncate" style={{ color: O.fgMuted }}>
+          {user.email || profile?.email || ''}
         </span>
       </span>
       <ChevronRight className="w-4 h-4 shrink-0" style={{ color: O.fgMuted }} />
