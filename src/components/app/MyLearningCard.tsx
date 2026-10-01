@@ -206,9 +206,6 @@ export function MyLearningCard() {
       {courseId && nextLesson && (
         <div className="mx-3 mt-1 overflow-hidden rounded-2xl border border-border-warm bg-card-warm">
           <div className="relative flex min-h-[88px] items-center gap-3 bg-gradient-orange px-4 py-3">
-            {course?.cover_image_url && (
-              <img src={course.cover_image_url} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />
-            )}
             <GraduationCap className="relative h-7 w-7 flex-shrink-0 text-white" />
             <p className="relative min-w-0 flex-1 text-[15px] font-extrabold leading-snug text-white line-clamp-2">
               {course?.title || enrollment.course_name}
