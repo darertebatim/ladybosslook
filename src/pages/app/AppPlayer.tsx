@@ -562,7 +562,7 @@ export default function AppPlayer() {
                     {t("player.title") === "پخش‌کننده" ? "آکادمی ریلو" : "Rilo Academy"}
                   </p>
                   <p className="text-white/85 text-[12px] leading-tight mt-0.5">
-                    {t("player.title") === "پخش‌کننده" ? "دوره‌ها، وبینارها و برنامه‌های زنده" : "Courses, webinars & live programs"}
+                    {t("player.title") === "پخش‌کننده" ? "دوره‌ها و وبینارها" : "Courses & webinars"}
                   </p>
                 </div>
                 <div className="shrink-0 h-7 px-2.5 rounded-full bg-white/20 backdrop-blur flex items-center gap-1">
