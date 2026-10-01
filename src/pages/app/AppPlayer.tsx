@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Search, X, Clock, Globe, Crown, ChevronRight, Headset, GraduationCap } from "lucide-react";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
@@ -511,20 +512,57 @@ export default function AppPlayer() {
                 haptic.light();
                 navigate('/app/academy');
               }}
-              className="w-full flex items-center gap-2.5 rounded-2xl bg-card-warm shadow-ios px-3 py-2.5 mb-2 active:scale-[0.98] transition-transform text-left"
+              className="relative w-full overflow-hidden rounded-2xl text-left active:scale-[0.98] transition-transform shadow-ios mt-2"
+              style={{
+                touchAction: 'pan-y',
+                background:
+                  'linear-gradient(120deg, #1a1f3d 0%, #3d2a5c 45%, #6b3d7a 100%)',
+              }}
             >
-              <div className="h-8 w-8 rounded-xl bg-peach flex items-center justify-center shrink-0">
-                <GraduationCap className="h-4 w-4 text-brand" />
+              {/* Shimmer */}
+              <motion.div
+                aria-hidden
+                initial={{ x: '-120%' }}
+                animate={{ x: '220%' }}
+                transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 1.6, ease: 'easeInOut' }}
+                className="pointer-events-none absolute inset-y-0 w-1/3"
+                style={{
+                  background:
+                    'linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%)',
+                }}
+              />
+              {/* Glow blob */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -top-8 -right-8 h-32 w-32 rounded-full opacity-60 blur-2xl"
+                style={{ background: 'radial-gradient(circle, #FFB37A 0%, transparent 70%)' }}
+              />
+
+              <div className="relative flex items-center gap-3 p-3.5">
+                <div
+                  className="h-11 w-11 rounded-xl flex items-center justify-center shrink-0"
+                  style={{
+                    background: 'linear-gradient(135deg, #FFD27A 0%, #FF8A5C 100%)',
+                    boxShadow: '0 6px 16px -6px rgba(255,138,92,0.7)',
+                  }}
+                >
+                  <GraduationCap className="h-5 w-5 text-[#1a1f3d]" strokeWidth={2.4} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-bold text-[14px] leading-tight">
+                    {t("player.title") === "پخش‌کننده" ? "آکادمی ریلو" : "Rilo Academy"}
+                  </p>
+                  <p className="text-white/70 text-[12px] leading-tight mt-0.5">
+                    {t("player.title") === "پخش‌کننده" ? "دوره‌ها، وبینارها و برنامه‌های زنده" : "Courses, webinars & live programs"}
+                  </p>
+                </div>
+                <div className="shrink-0 h-7 px-2.5 rounded-full bg-white/15 backdrop-blur flex items-center gap-1">
+                  <GraduationCap className="h-3 w-3 text-[#FFD27A]" />
+                  <span className="text-white text-[11px] font-bold tracking-wide">
+                    {t("player.title") === "پخش‌کننده" ? "آکادمی" : "ACADEMY"}
+                  </span>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-semibold text-fg-warm leading-tight">
-                  {t("player.title") === "پخش‌کننده" ? "آکادمی ریلو" : "Rilo Academy"}
-                </p>
-                <p className="text-[11px] text-fg-warm-muted leading-tight">
-                  {t("player.title") === "پخش‌کننده" ? "دوره‌ها و وبینارهای برنامه" : "Courses, webinars & live programs"}
-                </p>
-              </div>
-              <ChevronRight className="h-4 w-4 text-fg-warm-muted rtl:rotate-180 shrink-0" />
             </button>
 
             {/* Category pills */}
