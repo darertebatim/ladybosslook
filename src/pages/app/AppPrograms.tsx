@@ -411,7 +411,7 @@ const AppCourses = () => {
                           onClick={() => haptic.light()}
                           className="block active:scale-[0.98] transition-transform"
                         >
-                          <div className="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-ios">
+                          <div className="relative aspect-square overflow-hidden rounded-2xl shadow-ios">
                             <img
                               src={program.image}
                               alt={program.title}
