@@ -16,10 +16,17 @@ const O = {
 };
 
 /**
- * Slim one-row profile peek on the Path page, above today's events.
- * Tap opens the profile page.
+ * Slim one-row profile peek. Tap opens the profile page.
+ * variant "floating" — standalone white card (Path page).
+ * variant "inset" — compact row nested inside the My Learning card.
  */
-export function PathProfileQuickCard() {
+export function PathProfileQuickCard({
+  variant = 'floating',
+  className = '',
+}: {
+  variant?: 'floating' | 'inset';
+  className?: string;
+}) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const name = useProfileDisplayName();
@@ -42,6 +49,7 @@ export function PathProfileQuickCard() {
 
   const firstName = (name || '').split(' ')[0];
   const initials = (firstName?.[0] || profile?.email?.[0] || '?').toUpperCase();
+  const inset = variant === 'inset';
 
   return (
     <button
@@ -50,20 +58,24 @@ export function PathProfileQuickCard() {
         haptic.light();
         navigate('/app/myprofile');
       }}
-      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-left shadow-ios active:scale-[0.99] transition-transform"
-      style={{ background: '#FFFFFF', border: `1px solid ${O.border}` }}
+      className={`w-full flex items-center gap-3 text-left transition-transform active:scale-[0.99] ${
+        inset
+          ? `rounded-xl bg-peach/70 px-2.5 py-2 ${className}`
+          : `px-3 py-2.5 rounded-2xl shadow-ios ${className}`
+      }`}
+      style={inset ? undefined : { background: '#FFFFFF', border: `1px solid ${O.border}` }}
       aria-label="Open my profile"
     >
       {profile?.avatar_url ? (
         <img
           src={profile.avatar_url}
           alt=""
-          className="w-11 h-11 rounded-full object-cover shrink-0"
+          className={`${inset ? 'w-8 h-8' : 'w-11 h-11'} rounded-full object-cover shrink-0`}
           style={{ border: `2px solid ${O.peachMid}` }}
         />
       ) : (
         <span
-          className="w-11 h-11 rounded-full flex items-center justify-center text-[15px] font-bold shrink-0"
+          className={`${inset ? 'w-8 h-8 text-[12px]' : 'w-11 h-11 text-[15px]'} rounded-full flex items-center justify-center font-bold shrink-0`}
           style={{
             background: `linear-gradient(135deg, ${O.peach}, ${O.peachMid})`,
             color: O.fg,
@@ -75,14 +87,20 @@ export function PathProfileQuickCard() {
         </span>
       )}
       <span className="flex-1 min-w-0">
-        <span className="block text-[14px] font-bold truncate" style={{ color: O.fg }}>
+        <span
+          className={`block font-bold truncate ${inset ? 'text-[12.5px]' : 'text-[14px]'}`}
+          style={{ color: O.fg }}
+        >
           My Profile{firstName ? ` — ${firstName}` : ''}
         </span>
-        <span className="block text-[11px] mt-0.5 truncate" style={{ color: O.fgMuted }}>
+        <span
+          className={`block truncate ${inset ? 'text-[10.5px] mt-0' : 'text-[11px] mt-0.5'}`}
+          style={{ color: O.fgMuted }}
+        >
           {user.email || profile?.email || ''}
         </span>
       </span>
-      <ChevronRight className="w-4 h-4 shrink-0" style={{ color: O.fgMuted }} />
+      <ChevronRight className={`${inset ? 'w-3.5 h-3.5' : 'w-4 h-4'} shrink-0`} style={{ color: O.fgMuted }} />
     </button>
   );
 }

@@ -10,6 +10,7 @@ import {
   LayoutGrid,
 } from 'lucide-react';
 import { haptic } from '@/lib/haptics';
+import { PathProfileQuickCard } from '@/components/app/PathProfileQuickCard';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useFirstName } from '@/hooks/useFirstName';
@@ -118,25 +119,29 @@ export function MyLearningCard() {
   return (
     <div className="mb-4 overflow-hidden rounded-3xl border border-border-warm bg-gradient-to-b from-peach/50 to-card-warm shadow-card-warm">
       {/* Greeting */}
-      <div className="flex items-start justify-between gap-3 p-4 pb-2">
-        <div className="min-w-0">
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand">
-            {isNew ? "You're in 🎉" : 'My Learning'}
-          </p>
-          <h3 className="mt-1 text-[17px] font-bold leading-tight text-fg-warm line-clamp-2">
-            {isNew
-              ? `Welcome to ${enrollment.course_name}${firstName ? `, ${firstName}` : ''}`
-              : `Welcome back${firstName ? `, ${firstName}` : ''}`}
-          </h3>
-          <p className="mt-0.5 text-xs text-fg-warm-muted line-clamp-1">
-            {enrollment.course_name}
-            {round?.round_name ? ` · ${round.round_name}` : ''}
-            {isSelfPaced ? ' · Self-paced' : ''}
-          </p>
+      <div className="p-4 pb-2">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand">
+              {isNew ? "You're in 🎉" : 'My Learning'}
+            </p>
+            <h3 className="mt-1 text-[17px] font-bold leading-tight text-fg-warm line-clamp-2">
+              {isNew
+                ? `Welcome to ${enrollment.course_name}${firstName ? `, ${firstName}` : ''}`
+                : `Welcome back${firstName ? `, ${firstName}` : ''}`}
+            </h3>
+          </div>
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-orange shadow-ios">
+            <GraduationCap className="h-5 w-5 text-white" />
+          </div>
         </div>
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-orange shadow-ios">
-          <GraduationCap className="h-5 w-5 text-white" />
-        </div>
+        {/* Profile peek — between the welcome and the program name */}
+        <PathProfileQuickCard variant="inset" className="mt-2.5" />
+        <p className="mt-2.5 text-xs text-fg-warm-muted line-clamp-1">
+          {enrollment.course_name}
+          {round?.round_name ? ` · ${round.round_name}` : ''}
+          {isSelfPaced ? ' · Self-paced' : ''}
+        </p>
       </div>
 
       {/* Continue where you left off */}
