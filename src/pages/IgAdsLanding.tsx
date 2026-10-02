@@ -7,7 +7,7 @@ import { ArrowDown, ChevronLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
-import { formatLADateTime, formatLocalDateTime } from "@/lib/sixtrapsCalendar";
+import { formatLocalDateTime } from "@/lib/sixtrapsCalendar";
 import { trackWebinarLead } from "@/lib/metaCapi";
 import { isIranTimezone, getDeviceTimezone } from "@/lib/regionRestrictions";
 import { useWaitlistLeadCampaigns, useSlotChoiceLeadCampaigns } from "@/hooks/useLeadCampaignStatus";
@@ -350,7 +350,7 @@ export default function IgAdsLanding() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (submitting) return;
-    const parsed = schema.safeParse({ name, city, email });
+    const parsed = schema.safeParse({ name, email });
     if (!parsed.success) {
       const errs: Record<string, string> = {};
       parsed.error.errors.forEach((er) => {
@@ -365,7 +365,6 @@ export default function IgAdsLanding() {
       const { error } = await (supabase as any).from("form_submissions").insert({
         name: parsed.data.name,
         email: parsed.data.email.toLowerCase(),
-        city: parsed.data.city,
         phone: "",
         source: "igads_registration",
         round_id: roundId,
