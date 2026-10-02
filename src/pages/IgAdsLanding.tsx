@@ -441,7 +441,7 @@ export default function IgAdsLanding() {
               <img
                 src={cover}
                 alt="وبینار جذب مشتری با اینستاگرام ادز"
-                className="h-auto w-full object-cover"
+                className="h-28 w-full object-cover object-top sm:h-32"
               />
             </div>
           )}
