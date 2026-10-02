@@ -207,42 +207,63 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
 
     setSending(key);
     try {
-      const { data, error } = await supabase.functions.invoke('send-sixtraps-reminder', {
-        body:
-          mode === 'test'
+      const effectiveOnlyUnsent = nextSession
+        ? onlyUnsentNext
+        : timeChange
+          ? false
+          : joinNow
+            ? onlyUnsentJoinNow
+            : morningOf
+              ? onlyUnsentMorning
+              : onlyUnsent;
+      const body =
+        mode === 'test'
+          ? {
+              campaign: campaignKey,
+              testEmail: testEmail.trim(),
+              roundId: nextSession || roundChoice === 'auto' ? undefined : roundChoice,
+              joinNow,
+              nextSession,
+              morningOf,
+              timeChange,
+            }
+          : nextSession
             ? {
                 campaign: campaignKey,
-                testEmail: testEmail.trim(),
-                roundId: nextSession || roundChoice === 'auto' ? undefined : roundChoice,
+                nextSession: true,
+                audienceRoundId: nextAudienceRound === 'all' ? undefined : nextAudienceRound,
+                onlyUnsent: onlyUnsentNext,
+              }
+            : {
+                campaign: campaignKey,
+                roundId: roundChoice === 'auto' ? undefined : roundChoice,
+                onlyUnsent: effectiveOnlyUnsent,
                 joinNow,
-                nextSession,
                 morningOf,
                 timeChange,
-              }
-            : nextSession
-              ? {
-                  campaign: campaignKey,
-                  nextSession: true,
-                  audienceRoundId: nextAudienceRound === 'all' ? undefined : nextAudienceRound,
-                  onlyUnsent: onlyUnsentNext,
-                }
-              : {
-                  campaign: campaignKey,
-                  roundId: roundChoice === 'auto' ? undefined : roundChoice,
-                  onlyUnsent: timeChange
-                    ? false
-                    : joinNow
-                      ? onlyUnsentJoinNow
-                      : morningOf
-                        ? onlyUnsentMorning
-                        : onlyUnsent,
-                  joinNow,
-                  morningOf,
-                  timeChange,
-                },
-      });
-      if (error) throw error;
-      toast.success(`Sent ${(data as any)?.sent ?? 0} · failed ${(data as any)?.failed ?? 0}`);
+              };
+
+      // Large sends are split into batches of 50 so the edge function never
+      // hits its time limit. Each batch marks its recipients as sent, so the
+      // next call automatically picks up where the previous one stopped.
+      // (Only possible when "only unsent" is on — otherwise every batch would
+      // re-send to the same people.)
+      const BATCH = 50;
+      const canBatch = mode === 'all' && effectiveOnlyUnsent;
+      let totalSent = 0;
+      let totalFailed = 0;
+      do {
+        const { data, error } = await supabase.functions.invoke('send-sixtraps-reminder', {
+          body: canBatch ? { ...body, batchLimit: BATCH } : body,
+        });
+        if (error) throw error;
+        const sent = (data as any)?.sent ?? 0;
+        const failed = (data as any)?.failed ?? 0;
+        totalSent += sent;
+        totalFailed += failed;
+        if (!canBatch || sent + failed < BATCH) break;
+      } while (true);
+      toast.success(`Sent ${totalSent} · failed ${totalFailed}`);
       refetch();
     } catch (e: any) {
       toast.error(e?.message || 'Failed to send');
