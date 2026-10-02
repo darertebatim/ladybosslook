@@ -566,7 +566,7 @@ export default function IgAdsLanding() {
             ref={formRef}
             onSubmit={handleSubmit}
             dir="ltr"
-            className="mt-8 space-y-4 scroll-mt-4 rounded-2xl border-2 border-rose-200 bg-white p-5 shadow-sm text-left"
+            className="mt-2 space-y-4 scroll-mt-4 rounded-2xl border-2 border-rose-200 bg-white p-5 shadow-sm text-left"
           >
             <div className="flex items-center justify-center gap-2 whitespace-nowrap">
               <h2 className="text-base font-semibold text-neutral-900">
