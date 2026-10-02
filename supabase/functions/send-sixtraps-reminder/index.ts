@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { buildUnsubUrl, unsubHeaders, appendUnsubFooter, fetchUnsubscribed } from "../_shared/unsubscribe.ts";
 
@@ -560,10 +560,18 @@ serve(async (req) => {
     // Require an admin caller
     const authHeader = req.headers.get("Authorization") || "";
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData } = await supabase.auth.getUser(token);
-    const userId = userData?.user?.id;
+    let userId: string | undefined;
+    const { data: userData, error: userErr } = await supabase.auth.getUser(token);
+    userId = userData?.user?.id;
     if (!userId) {
-      console.warn("unauthorized caller");
+      // Fallback: verify via JWT claims (works with asymmetric signing keys)
+      try {
+        const { data: claims } = await (supabase.auth as any).getClaims(token);
+        userId = claims?.claims?.sub;
+      } catch (_) { /* ignore */ }
+    }
+    if (!userId) {
+      console.warn("unauthorized caller", userErr?.message, "hasToken", token.length > 20);
       return new Response(JSON.stringify({ error: "unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
