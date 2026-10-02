@@ -547,6 +547,7 @@ serve(async (req) => {
   }
 
   try {
+    console.log("send-sixtraps-reminder request", req.method);
     if (!RESEND_API_KEY) {
       return new Response(JSON.stringify({ error: "RESEND_API_KEY missing" }), {
         status: 500,
@@ -562,6 +563,7 @@ serve(async (req) => {
     const { data: userData } = await supabase.auth.getUser(token);
     const userId = userData?.user?.id;
     if (!userId) {
+      console.warn("unauthorized caller");
       return new Response(JSON.stringify({ error: "unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -572,6 +574,7 @@ serve(async (req) => {
       _role: "admin",
     });
     if (!isAdmin) {
+      console.warn("forbidden caller", userId);
       return new Response(JSON.stringify({ error: "forbidden" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -587,6 +590,7 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    console.log("body", JSON.stringify({ ...body, testEmail: body?.testEmail ? "set" : undefined }));
     const PROGRAM_SLUG = c.programSlug;
     const SOURCES = c.sources;
 
@@ -688,6 +692,7 @@ serve(async (req) => {
             .filter((r: any) => !(joinNow || morningOf) || new Date(r.first_session_date).getTime() <= soon)
             .map((r: any) => r.id);
           if (!ids.length) {
+            console.warn("no_upcoming_round", [...roundMap.keys()]);
             return new Response(JSON.stringify({ error: "no_upcoming_round" }), {
               status: 400,
               headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -752,6 +757,7 @@ serve(async (req) => {
       recipients = recipients.slice(0, batchLimit);
     }
 
+    console.log("recipients", recipients.length);
     let sent = 0;
     let failed = 0;
 

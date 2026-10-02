@@ -256,7 +256,20 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
         const { data, error } = await supabase.functions.invoke('send-sixtraps-reminder', {
           body: canBatch ? { ...body, batchLimit: BATCH } : body,
         });
-        if (error) throw error;
+        if (error) {
+          let detail = error.message;
+          try {
+            const ctx = (error as any).context;
+            if (ctx && typeof ctx.json === 'function') {
+              const j = await ctx.json();
+              detail = `${ctx.status ?? ''} ${j?.error || j?.message || JSON.stringify(j)}`.trim();
+            }
+          } catch {
+            /* keep default message */
+          }
+          if (totalSent > 0) detail = `${detail} (already sent ${totalSent})`;
+          throw new Error(detail);
+        }
         const sent = (data as any)?.sent ?? 0;
         const failed = (data as any)?.failed ?? 0;
         totalSent += sent;
