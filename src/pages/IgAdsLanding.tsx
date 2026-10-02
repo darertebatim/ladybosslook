@@ -548,7 +548,7 @@ export default function IgAdsLanding() {
                     تغییر زمان جلسه
                   </button>
                 )}
-                <div className="flex flex-col items-center gap-1 pt-1 text-sm font-semibold text-emerald-700">
+                <div className="flex flex-col items-center gap-1 text-sm font-semibold text-emerald-700">
                   <span>برای دریافت لینک وبینار، فرم زیر را پر کنید</span>
                   <span dir="ltr" className="text-xs font-medium text-emerald-600">Fill out the form below to receive the webinar link</span>
                   <ArrowDown className="h-5 w-5 animate-bounce" />
@@ -566,7 +566,7 @@ export default function IgAdsLanding() {
             ref={formRef}
             onSubmit={handleSubmit}
             dir="ltr"
-            className="mt-8 space-y-4 scroll-mt-4 rounded-2xl border-2 border-rose-200 bg-white p-5 shadow-sm text-left"
+            className="mt-2 space-y-4 scroll-mt-4 rounded-2xl border-2 border-rose-200 bg-white p-5 shadow-sm text-left"
           >
             <div className="flex items-center justify-center gap-2 whitespace-nowrap">
               <h2 className="text-base font-semibold text-neutral-900">
