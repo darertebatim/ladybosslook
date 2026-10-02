@@ -398,7 +398,6 @@ export default function IgAdsLanding() {
             email: parsed.data.email.toLowerCase(),
             roundId,
             name: parsed.data.name,
-            city: parsed.data.city,
           }),
         );
       } catch {}
@@ -409,7 +408,6 @@ export default function IgAdsLanding() {
           email: parsed.data.email.toLowerCase(),
           roundId,
           name: parsed.data.name,
-          city: parsed.data.city,
         },
       });
 
