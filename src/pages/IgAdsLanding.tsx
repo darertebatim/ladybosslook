@@ -366,6 +366,7 @@ export default function IgAdsLanding() {
         name: parsed.data.name,
         email: parsed.data.email.toLowerCase(),
         phone: "",
+        city: "",
         source: "igads_registration",
         round_id: roundId,
       });
