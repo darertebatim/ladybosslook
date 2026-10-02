@@ -681,7 +681,12 @@ serve(async (req) => {
         if (onlyUnsent) query = query.is("next_session_sent_at", null);
       } else {
         if (autoMode) {
-          const ids = [...roundMap.keys()];
+          // "Starting now" / morning-of only target rounds happening today
+          // (within the next 12h), never future rounds.
+          const soon = Date.now() + 12 * 60 * 60 * 1000;
+          const ids = [...roundMap.values()]
+            .filter((r: any) => !(joinNow || morningOf) || new Date(r.first_session_date).getTime() <= soon)
+            .map((r: any) => r.id);
           if (!ids.length) {
             return new Response(JSON.stringify({ error: "no_upcoming_round" }), {
               status: 400,
