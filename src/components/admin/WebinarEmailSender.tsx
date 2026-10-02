@@ -253,6 +253,12 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
       let totalSent = 0;
       let totalFailed = 0;
       do {
+        // Make sure we send a fresh login token (stale tabs caused "unauthorized")
+        const { data: sess } = await supabase.auth.getSession();
+        const expiresAt = sess.session?.expires_at ?? 0;
+        if (!sess.session || expiresAt * 1000 < Date.now() + 60_000) {
+          await supabase.auth.refreshSession();
+        }
         const { data, error } = await supabase.functions.invoke('send-sixtraps-reminder', {
           body: canBatch ? { ...body, batchLimit: BATCH } : body,
         });
