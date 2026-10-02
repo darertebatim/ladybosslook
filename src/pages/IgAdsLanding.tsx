@@ -568,11 +568,11 @@ export default function IgAdsLanding() {
             dir="ltr"
             className="mt-8 space-y-4 scroll-mt-4 rounded-2xl border-2 border-rose-200 bg-white p-5 shadow-sm text-left"
           >
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              <h2 className="text-center text-lg font-semibold text-neutral-900">
+            <div className="flex items-center justify-center gap-2 whitespace-nowrap">
+              <h2 className="text-base font-semibold text-neutral-900">
                 🎁 Free Registration 🎁
               </h2>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-[11px] font-bold text-rose-600">
+              <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2.5 py-1 text-[10px] font-bold text-rose-600">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
