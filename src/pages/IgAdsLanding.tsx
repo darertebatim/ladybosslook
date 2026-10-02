@@ -533,9 +533,6 @@ export default function IgAdsLanding() {
               </div>
             ) : laLabel && (
               <div className="mx-auto flex flex-col items-center gap-2">
-                <div dir="ltr" className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 text-sm font-medium text-white">
-                  📅 LA time: {laLabel}
-                </div>
                 {webinar && <WebinarCountdown startUtc={webinar.startUtc} />}
                 {localLabel && (
                   <div dir="ltr" className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-center text-base font-bold text-white shadow-sm whitespace-pre-line">
@@ -571,7 +568,10 @@ export default function IgAdsLanding() {
             dir="ltr"
             className="mt-8 space-y-4 scroll-mt-4 rounded-2xl border-2 border-rose-200 bg-white p-5 shadow-sm text-left"
           >
-            <div className="flex justify-center">
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <h2 className="text-center text-lg font-semibold text-neutral-900">
+                🎁 Free Registration 🎁
+              </h2>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-[11px] font-bold text-rose-600">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
@@ -580,14 +580,7 @@ export default function IgAdsLanding() {
                 🔥 Free seats are limited
               </span>
             </div>
-            <h2 className="text-center text-lg font-semibold text-neutral-900">
-              🎁 Free Registration 🎁
-            </h2>
-            {webinar && (
-              <p className="text-center text-xs font-semibold text-neutral-600">
-                ⏳ Registration closes in <FormCountdown startUtc={webinar.startUtc} />
-              </p>
-            )}
+
 
             <div>
               <label className="mb-1 block text-sm font-medium text-neutral-800">
@@ -604,24 +597,6 @@ export default function IgAdsLanding() {
               />
               {errors.name && (
                 <p className="mt-1 text-xs text-rose-600">{errors.name}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-neutral-800">
-                City
-              </label>
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                maxLength={100}
-                className="min-h-[48px] w-full rounded-xl border border-neutral-300 bg-white px-4 text-base text-neutral-900 outline-none focus:border-rose-500"
-                placeholder="e.g. Los Angeles"
-                dir="ltr"
-              />
-              {errors.city && (
-                <p className="mt-1 text-xs text-rose-600">{errors.city}</p>
               )}
             </div>
 
@@ -657,9 +632,6 @@ export default function IgAdsLanding() {
 
             <p className="text-center text-[11px] leading-5 text-neutral-500">
               By registering, the webinar link and reminders will be sent to your email.
-            </p>
-            <p className="text-center text-[11px] leading-5 text-neutral-500" dir="ltr">
-              Sender: <strong>hi@ladybosslook.com</strong> (Ali Lotfi - Ladyboss Academy). Please check your spam folder.
             </p>
           </form>
           )}
