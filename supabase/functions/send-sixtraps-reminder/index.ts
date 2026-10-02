@@ -563,12 +563,32 @@ serve(async (req) => {
     let userId: string | undefined;
     const { data: userData, error: userErr } = await supabase.auth.getUser(token);
     userId = userData?.user?.id;
-    if (!userId) {
-      // Fallback: verify via JWT claims (works with asymmetric signing keys)
+    if (!userId && token.split(".").length === 3) {
+      // Fallback for "session_not_found": the JWT itself is still signed and
+      // unexpired. Let PostgREST verify the signature/expiry by making a
+      // request with the caller's token; only then trust its `sub` claim.
       try {
-        const { data: claims } = await (supabase.auth as any).getClaims(token);
-        userId = claims?.claims?.sub;
-      } catch (_) { /* ignore */ }
+        const payload = JSON.parse(
+          atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")),
+        );
+        const sub = String(payload?.sub || "");
+        const notExpired = Number(payload?.exp || 0) * 1000 > Date.now();
+        if (sub && notExpired) {
+          const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+          const userClient = createClient(supabaseUrl, anonKey, {
+            global: { headers: { Authorization: `Bearer ${token}` } },
+            auth: { persistSession: false, autoRefreshToken: false },
+          });
+          const { error: verifyErr } = await userClient.rpc("has_role", {
+            _user_id: sub,
+            _role: "admin",
+          });
+          if (!verifyErr) userId = sub;
+          else console.warn("token verify failed", verifyErr.message);
+        }
+      } catch (e) {
+        console.warn("token decode failed", String(e));
+      }
     }
     if (!userId) {
       console.warn("unauthorized caller", userErr?.message, "hasToken", token.length > 20);
