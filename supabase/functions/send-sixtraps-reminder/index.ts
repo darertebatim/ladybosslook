@@ -738,6 +738,15 @@ serve(async (req) => {
       }
     }
 
+    // Optional batching: large sends are split into chunks by the caller so
+    // the function never hits the wall-clock limit. Sent rows are marked with
+    // their *_sent_at timestamps, so each batch naturally picks up the next
+    // unsent recipients.
+    const batchLimit = Math.min(Math.max(Number(body?.batchLimit) || 0, 0), 100);
+    if (!testEmail && batchLimit > 0 && recipients.length > batchLimit) {
+      recipients = recipients.slice(0, batchLimit);
+    }
+
     let sent = 0;
     let failed = 0;
 
