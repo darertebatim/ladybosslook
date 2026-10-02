@@ -19,7 +19,6 @@ const PROGRAM_SLUG = "igadsfree";
 
 const schema = z.object({
   name: z.string().trim().min(2, "نام را کامل وارد کنید").max(100),
-  city: z.string().trim().min(2, "شهر را وارد کنید").max(100),
   email: z.string().trim().email("ایمیل معتبر نیست").max(255),
 });
 
@@ -165,32 +164,6 @@ function MiniCountdown({ startUtc }: { startUtc: Date }) {
   );
 }
 
-/** English "registration closes in" countdown shown inside the form box. */
-function FormCountdown({ startUtc }: { startUtc: Date }) {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
-  }, []);
-
-  const diff = startUtc.getTime() - now;
-  if (diff <= 0) {
-    return <span className="font-bold text-rose-600">Registration is closing</span>;
-  }
-
-  const days = Math.floor(diff / 86400000);
-  const hours = Math.floor((diff % 86400000) / 3600000);
-  const minutes = Math.floor((diff % 3600000) / 60000);
-  const seconds = Math.floor((diff % 60000) / 1000);
-  const clock = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-
-  return (
-    <span dir="ltr" className="tabular-nums">
-      {days > 0 ? `${days}d ` : ""}
-      {clock}
-    </span>
-  );
-}
 
 export default function IgAdsLanding() {
   const navigate = useNavigate();
@@ -200,7 +173,6 @@ export default function IgAdsLanding() {
   const { toast } = useToast();
   const blockedRegion = useMemo(() => isIranTimezone(), []);
   const [name, setName] = useState("");
-  const [city, setCity] = useState("");
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -346,10 +318,6 @@ export default function IgAdsLanding() {
   }, [roundParam, letUserPick, slotLoading]);
 
 
-  const laLabel = useMemo(
-    () => (webinar ? formatLADateTime(webinar.startUtc) : ""),
-    [webinar],
-  );
   const localLabel = useMemo(
     () => (webinar ? formatLocalDateTime(webinar.startUtc) : ""),
     [webinar],
