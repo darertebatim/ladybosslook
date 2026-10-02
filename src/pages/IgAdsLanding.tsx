@@ -531,7 +531,7 @@ export default function IgAdsLanding() {
                   })}
                 </div>
               </div>
-            ) : laLabel && (
+            ) : (
               <div className="mx-auto flex flex-col items-center gap-2">
                 {webinar && <WebinarCountdown startUtc={webinar.startUtc} />}
                 {localLabel && (
