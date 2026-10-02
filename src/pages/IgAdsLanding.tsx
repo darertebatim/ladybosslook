@@ -627,7 +627,7 @@ export default function IgAdsLanding() {
             </button>
 
             <p className="text-center text-[11px] font-semibold leading-5 text-rose-600">
-              🔒 Seats are limited — this is the last free live session. No recording will be shared.
+              🔒 Seats are limited. No recording will be shared.
             </p>
 
             <p className="text-center text-[11px] leading-5 text-neutral-500">
