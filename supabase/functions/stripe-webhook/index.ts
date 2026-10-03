@@ -771,8 +771,31 @@ serve(async (req) => {
       console.log('[WEBHOOK] Subscription ended:', subscription.id, 'Status:', subscription.status);
 
       const programSlug = subscription.metadata?.program || null;
-      
-      if (programSlug) {
+
+      // Time-bound installment plans (auto_cancel_after_months set): if every
+      // scheduled installment was paid, the student keeps lifetime access.
+      // Ongoing subscriptions (no auto-cancel) still revoke access below.
+      let installmentsCompleted = false;
+      const requiredInstallments = parseInt(subscription.metadata?.auto_cancel_after_months || '0');
+      if (programSlug && requiredInstallments > 0) {
+        try {
+          const invoices = await stripe.invoices.list({ subscription: subscription.id, status: 'paid', limit: 100 });
+          const paidCount = invoices.data.filter((inv) => (inv.amount_paid || 0) > 0).length;
+          installmentsCompleted = paidCount >= requiredInstallments;
+          console.log('[WEBHOOK] Installment plan check:', subscription.id, 'paid', paidCount, 'of', requiredInstallments);
+        } catch (err: any) {
+          console.error('[WEBHOOK] Error counting paid installments:', err.message);
+        }
+      }
+
+      if (programSlug && installmentsCompleted) {
+        const { error: subErr } = await supabase
+          .from('user_subscriptions')
+          .update({ status: 'completed', expires_at: null })
+          .eq('stripe_subscription_id', subscription.id);
+        if (subErr) console.error('[WEBHOOK] Error marking installment plan completed:', subErr);
+        console.log('[WEBHOOK] All installments paid — lifetime access kept for program:', programSlug);
+      } else if (programSlug) {
         // Get customer email from Stripe
         const customerId = typeof subscription.customer === 'string' 
           ? subscription.customer 
