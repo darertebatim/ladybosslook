@@ -269,3 +269,6 @@ verify_jwt = false
 
 [functions.calendly-setup-webhook]
 verify_jwt = false
+
+[functions.calendly-booking]
+verify_jwt = false

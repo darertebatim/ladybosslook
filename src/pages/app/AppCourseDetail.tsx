@@ -330,11 +330,17 @@ const AppCourseDetail = () => {
     },
   });
 
-  const { data: myBookings = [] } = useQuery({
+  const { data: myBookings = [], isLoading: bookingsLoading, refetch: refetchBookings } = useQuery({
     queryKey: ["my-1on1-bookings", slug, user?.id],
     enabled: !!slug && !!user?.id,
     refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
     queryFn: async () => {
+      // Sync straight from Calendly first (falls back to saved bookings if that fails)
+      const { data: synced } = await supabase.functions.invoke("calendly-booking", {
+        body: { action: "sync", programSlug: slug },
+      });
+      if (synced?.bookings) return synced.bookings as any[];
       const { data } = await (supabase as any)
         .from("one_on_one_bookings")
         .select("id, start_time, end_time, join_url, reschedule_url")
@@ -344,6 +350,28 @@ const AppCourseDetail = () => {
       return (data || []) as any[];
     },
   });
+  const [bookingLinkLoading, setBookingLinkLoading] = useState(false);
+  const openSingleUseBooking = async () => {
+    // Open the tab synchronously so iOS doesn't block it, then point it at the link
+    const win = window.open("", "_blank");
+    setBookingLinkLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("calendly-booking", {
+        body: { action: "link", programSlug: slug },
+      });
+      if (error || !data?.url) {
+        win?.close();
+        let reason = "";
+        try { reason = (await (error as any)?.context?.json())?.error; } catch { /* ignore */ }
+        toast.error(reason === "limit_reached" ? "You've used all your 1-on-1 meetings" : "Couldn't open booking. Please try again.");
+        refetchBookings();
+        return;
+      }
+      if (win) win.location.href = data.url; else window.location.href = data.url;
+    } finally {
+      setBookingLinkLoading(false);
+    }
+  };
 
   const { data: program } = useQuery({
     queryKey: ["program", slug],
@@ -2093,7 +2121,7 @@ const AppCourseDetail = () => {
                             const next = myBookings
                               .filter((b: any) => b.start_time && new Date(b.end_time || b.start_time).getTime() > now)
                               .sort((a: any, b: any) => +new Date(a.start_time) - +new Date(b.start_time))[0];
-                            const canBook = used < included;
+                            const canBook = !bookingsLoading && used < included;
                             return (
                               <>
                                 {next && (
@@ -2122,19 +2150,9 @@ const AppCourseDetail = () => {
                                 {canBook && (
                                   <Button
                                     size="lg"
+                                    disabled={bookingLinkLoading}
                                     className="w-full h-auto py-3 px-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start gap-3"
-                                    onClick={() =>
-                                      window.open(
-                                        buildBookingUrl(
-                                          (program as any).booking_url,
-                                          (user?.user_metadata as any)?.full_name,
-                                          user?.email,
-                                          (program as any).slug,
-                                          user?.id,
-                                        ),
-                                        "_blank",
-                                      )
-                                    }
+                                    onClick={openSingleUseBooking}
                                   >
                                     <span className="h-10 w-10 rounded-xl bg-brand/10 text-brand flex items-center justify-center shrink-0">
                                       <CalendarPlus className="h-5 w-5" />
