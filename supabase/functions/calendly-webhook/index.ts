@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { notifyNewBookings } from "../_shared/one-on-one-chat.ts";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/calendly";
 
@@ -108,5 +109,6 @@ Deno.serve(async (req) => {
     console.error("upsert failed", error);
     return json({ error: error.message }, 500);
   }
+  await notifyNewBookings(admin, userId);
   return json({ ok: true, userId, programSlug });
 });

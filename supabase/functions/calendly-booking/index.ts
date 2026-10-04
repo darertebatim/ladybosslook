@@ -3,6 +3,7 @@
 // action "link": returns a single-use booking link, only if the student has meetings left.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { notifyNewBookings } from "../_shared/one-on-one-chat.ts";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/calendly";
 const json = (b: unknown, status = 200) =>
@@ -82,6 +83,8 @@ Deno.serve(async (req) => {
         }
       }
     }
+
+    await notifyNewBookings(admin, user.id);
 
     const { data: bookings } = await admin.from("one_on_one_bookings")
       .select("id, start_time, end_time, join_url, reschedule_url, status")
