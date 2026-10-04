@@ -776,22 +776,61 @@ serve(async (req) => {
       }
     }
 
-    // Optional batching: large sends are split into chunks by the caller so
-    // the function never hits the wall-clock limit. Sent rows are marked with
-    // their *_sent_at timestamps, so each batch naturally picks up the next
-    // unsent recipients.
-    const batchLimit = Math.min(Math.max(Number(body?.batchLimit) || 0, 0), 100);
+    // Batching: large sends are split into chunks so a single request never
+    // runs long enough for the browser/gateway to give up (which made the
+    // admin retry and double-send). Enforced server-side even if an older
+    // admin page doesn't ask for it. Sent rows are marked with their
+    // *_sent_at timestamps, so each batch picks up the next unsent people.
+    const sentCol: string | null = nextSession
+      ? "next_session_sent_at"
+      : joinNow
+        ? "join_now_sent_at"
+        : morningOf
+          ? "morning_sent_at"
+          : !timeChange
+            ? "reminder_sent_at"
+            : null;
+    const useClaim = !testEmail && onlyUnsent && !!sentCol;
+    const requestedBatch = Math.min(Math.max(Number(body?.batchLimit) || 0, 0), 100);
+    const batchLimit = useClaim ? requestedBatch || 40 : requestedBatch;
+    const totalEligible = recipients.length;
     if (!testEmail && batchLimit > 0 && recipients.length > batchLimit) {
       recipients = recipients.slice(0, batchLimit);
     }
 
-    console.log("recipients", recipients.length);
+    console.log("recipients", recipients.length, "of", totalEligible);
     let sent = 0;
     let failed = 0;
+    let skipped = 0;
+    let processed = 0;
+    const startedAt = Date.now();
+    const TIME_BUDGET_MS = 45_000;
 
     for (const r of recipients) {
+      if (Date.now() - startedAt > TIME_BUDGET_MS) break;
+      processed++;
       const rRound = (r.roundId && roundMap.get(r.roundId)) || round;
       const rRoundId = rRound?.id || targetRoundId;
+
+      // Claim this person before sending so two overlapping sends (e.g. a
+      // retry while the first is still running) can never email them twice.
+      let claimedIds: string[] = [];
+      if (useClaim && sentCol) {
+        const { data: claimed, error: claimErr } = await supabase
+          .from("form_submissions")
+          .update({ [sentCol]: new Date().toISOString() })
+          .eq("email", r.email)
+          .in("source", SOURCES)
+          .is(sentCol, null)
+          .select("id");
+        if (claimErr) console.warn("claim failed", r.email, claimErr.message);
+        claimedIds = (claimed || []).map((x: any) => x.id);
+        if (!claimErr && !claimedIds.length) {
+          skipped++;
+          continue;
+        }
+      }
+
       const { meetUrl, startUtc, gcalUrl } = contentFor(rRound);
       const html = timeChange
         ? buildTimeChangeHtml(c, r.name, startUtc, gcalUrl, supportUrl)
