@@ -260,6 +260,10 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       const { audio_playlist_id: featuredAudio, ...rawFields } = formData;
       const programFields = {
         ...rawFields,
+        // 1-on-1 is a single merged setting: the checkbox drives both the
+        // auto-created private round and the Calendly booking surfaces.
+        includes_one_on_one: !!formData.is_one_on_one,
+        default_session_count: formData.is_one_on_one ? (formData.one_on_one_count || 1) : formData.default_session_count,
         booking_url: bookingUrl || null,
         booking_note: (formData.booking_note || '').trim() || null,
       };
@@ -376,8 +380,8 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       show_in_app_waitlist: (program as any).show_in_app_waitlist || false,
       is_one_on_one: (program as any).is_one_on_one || false,
       default_session_count: (program as any).default_session_count || 0,
-      includes_one_on_one: (program as any).includes_one_on_one || false,
-      one_on_one_count: (program as any).one_on_one_count || 1,
+      includes_one_on_one: (program as any).is_one_on_one || (program as any).includes_one_on_one || false,
+      one_on_one_count: (program as any).one_on_one_count || (program as any).default_session_count || 1,
       booking_url: (program as any).booking_url || '',
       booking_note: (program as any).booking_note || '',
       auto_create_feed_channel:
@@ -1352,67 +1356,28 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                     id="is_one_on_one"
                     checked={formData.is_one_on_one}
                     onCheckedChange={(checked) =>
-                      setFormData({ ...formData, is_one_on_one: checked as boolean })
+                      setFormData({ ...formData, is_one_on_one: checked as boolean, includes_one_on_one: checked as boolean })
                     }
                   />
                   <Label htmlFor="is_one_on_one" className="text-sm font-normal cursor-pointer">
-                    👤 1:1 Service (auto-creates a private round per purchase)
+                    👤 1-on-1 meetings (students book via Calendly)
                   </Label>
                 </div>
                 {formData.is_one_on_one && (
-                  <div className="pl-6 space-y-2">
-                    <Label htmlFor="default_session_count" className="text-sm">
-                      Sessions included per purchase
-                    </Label>
-                    <Input
-                      id="default_session_count"
-                      type="number"
-                      min={1}
-                      placeholder="e.g. 4"
-                      value={formData.default_session_count || ''}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          default_session_count: parseInt(e.target.value) || 0,
-                        })
-                      }
-                      className="max-w-[200px]"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Each purchase auto-creates a personal round for the client. Admins schedule sessions and reuse a single recurring Meet link from the 1:1 Clients tab.
-                    </p>
-                  </div>
-                )}
-
-                <div className="flex items-center space-x-2 border-t pt-3">
-                  <Checkbox
-                    id="includes_one_on_one"
-                    checked={formData.includes_one_on_one}
-                    onCheckedChange={(checked) =>
-                      setFormData({ ...formData, includes_one_on_one: checked as boolean })
-                    }
-                  />
-                  <Label htmlFor="includes_one_on_one" className="text-sm font-normal cursor-pointer">
-                    📅 Includes 1-on-1 meeting (students book via Calendly)
-                  </Label>
-                </div>
-                {(formData.includes_one_on_one || formData.is_one_on_one) && (
                   <div className="pl-6 space-y-3">
-                    {formData.includes_one_on_one && (
-                      <div className="space-y-1">
-                        <Label htmlFor="one_on_one_count" className="text-sm">Meetings included</Label>
-                        <Input
-                          id="one_on_one_count"
-                          type="number"
-                          min={1}
-                          value={formData.one_on_one_count || 1}
-                          onChange={(e) =>
-                            setFormData({ ...formData, one_on_one_count: parseInt(e.target.value) || 1 })
-                          }
-                          className="max-w-[200px]"
-                        />
-                      </div>
-                    )}
+                    <div className="space-y-1">
+                      <Label htmlFor="one_on_one_count" className="text-sm">Meetings included per purchase</Label>
+                      <Input
+                        id="one_on_one_count"
+                        type="number"
+                        min={1}
+                        value={formData.one_on_one_count || 1}
+                        onChange={(e) =>
+                          setFormData({ ...formData, one_on_one_count: parseInt(e.target.value) || 1 })
+                        }
+                        className="max-w-[200px]"
+                      />
+                    </div>
                     <div className="space-y-1">
                       <Label htmlFor="booking_url" className="text-sm">Calendly booking link</Label>
                       <Input
@@ -1432,6 +1397,9 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                         onChange={(e) => setFormData({ ...formData, booking_note: e.target.value })}
                       />
                     </div>
+                    <p className="text-xs text-muted-foreground">
+                      Each purchase auto-creates a personal round for the client, and the student books their meeting times through your Calendly link (shown after payment, in the confirmation email, and on their program page).
+                    </p>
                   </div>
                 )}
 
