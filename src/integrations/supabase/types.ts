@@ -5166,6 +5166,8 @@ export type Database = {
           balance_monthly_count: number | null
           balance_monthly_price: number | null
           balance_monthly_stripe_price_id: string | null
+          booking_note: string | null
+          booking_url: string | null
           cover_image_url: string | null
           created_at: string | null
           default_session_count: number | null
@@ -5177,6 +5179,7 @@ export type Database = {
           features: Json | null
           full_payment_stripe_price_id: string | null
           id: string
+          includes_one_on_one: boolean
           ios_product_id: string | null
           is_active: boolean | null
           is_featured: boolean
@@ -5186,6 +5189,7 @@ export type Database = {
           mailchimp_program_name: string | null
           mailchimp_tags: Json | null
           monthly_original_price: number | null
+          one_on_one_count: number
           original_price: number | null
           payment_type: string
           price_amount: number
@@ -5223,6 +5227,8 @@ export type Database = {
           balance_monthly_count?: number | null
           balance_monthly_price?: number | null
           balance_monthly_stripe_price_id?: string | null
+          booking_note?: string | null
+          booking_url?: string | null
           cover_image_url?: string | null
           created_at?: string | null
           default_session_count?: number | null
@@ -5234,6 +5240,7 @@ export type Database = {
           features?: Json | null
           full_payment_stripe_price_id?: string | null
           id?: string
+          includes_one_on_one?: boolean
           ios_product_id?: string | null
           is_active?: boolean | null
           is_featured?: boolean
@@ -5243,6 +5250,7 @@ export type Database = {
           mailchimp_program_name?: string | null
           mailchimp_tags?: Json | null
           monthly_original_price?: number | null
+          one_on_one_count?: number
           original_price?: number | null
           payment_type: string
           price_amount?: number
@@ -5280,6 +5288,8 @@ export type Database = {
           balance_monthly_count?: number | null
           balance_monthly_price?: number | null
           balance_monthly_stripe_price_id?: string | null
+          booking_note?: string | null
+          booking_url?: string | null
           cover_image_url?: string | null
           created_at?: string | null
           default_session_count?: number | null
@@ -5291,6 +5301,7 @@ export type Database = {
           features?: Json | null
           full_payment_stripe_price_id?: string | null
           id?: string
+          includes_one_on_one?: boolean
           ios_product_id?: string | null
           is_active?: boolean | null
           is_featured?: boolean
@@ -5300,6 +5311,7 @@ export type Database = {
           mailchimp_program_name?: string | null
           mailchimp_tags?: Json | null
           monthly_original_price?: number | null
+          one_on_one_count?: number
           original_price?: number | null
           payment_type?: string
           price_amount?: number
