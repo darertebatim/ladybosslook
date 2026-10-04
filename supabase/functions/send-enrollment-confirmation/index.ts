@@ -108,6 +108,8 @@ function renderEmail(opts: {
   downloadUrl: string;
   openInAppUrl: string;
   webUrl: string;
+  bookingUrl?: string | null;
+  bookingNote?: string | null;
 }): { subject: string; html: string } {
   const { lang, name, program, host, languageLabel, round, order, downloadUrl, openInAppUrl, webUrl } = opts;
   const isFa = lang === "fa";
@@ -311,7 +313,16 @@ function renderEmail(opts: {
         <a href="${APP_STORE_URL}" style="display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:10px 16px;border-radius:10px;font-size:14px;margin:0 4px 8px;">${t.appStore}</a>
         <a href="${PLAY_STORE_URL}" style="display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:10px 16px;border-radius:10px;font-size:14px;margin:0 4px 8px;">${t.playStore}</a>`;
 
-  const accessHtml = `
+  const bookingHtml = opts.bookingUrl
+    ? `
+    <div style="background:#fff7ed;border:2px solid #fdba74;border-radius:16px;padding:20px 16px;margin:20px 0;text-align:center;">
+      <h2 style="margin:0 0 8px;font-size:17px;color:#9a3412;">${lang === "fa" ? "جلسه ۱ به ۱ خود را رزرو کنید" : "Book your 1-on-1 meeting"}</h2>
+      ${opts.bookingNote ? `<p dir="auto" style="margin:0 0 14px;font-size:14px;line-height:1.7;color:#374151;">${escapeHtml(opts.bookingNote)}</p>` : ""}
+      <a href="${escapeHtml(opts.bookingUrl)}" style="display:inline-block;background:#ea580c;color:#fff;text-decoration:none;padding:14px 28px;border-radius:12px;font-size:16px;font-weight:700;">رزرو وقت جلسه / Book your session</a>
+    </div>`
+    : "";
+
+  const accessHtml = bookingHtml + `
     <div style="text-align:center;margin:20px 0 8px;">
       <a href="${escapeHtml(openInAppUrl)}" style="display:inline-block;background:#ea580c;color:#fff;text-decoration:none;padding:12px 22px;border-radius:12px;font-size:15px;font-weight:600;margin:0 4px 10px;">${t.openInApp}</a>
       <br>
@@ -430,7 +441,7 @@ serve(async (req) => {
     // Load program
     const { data: program } = await supabase
       .from("program_catalog")
-      .select("slug, title, description, cover_image_url, language")
+      .select("slug, title, description, cover_image_url, language, booking_url, booking_note, includes_one_on_one, is_one_on_one")
       .eq("slug", programSlug)
       .maybeSingle();
     if (!program) {
@@ -573,6 +584,10 @@ serve(async (req) => {
       downloadUrl,
       openInAppUrl,
       webUrl,
+      bookingUrl: (program as any).booking_url && ((program as any).includes_one_on_one || (program as any).is_one_on_one)
+        ? (() => { try { const u = new URL((program as any).booking_url); u.searchParams.set("name", name); u.searchParams.set("email", email); return u.toString(); } catch { return (program as any).booking_url; } })()
+        : null,
+      bookingNote: (program as any).booking_note ?? null,
     });
 
     if (previewOnly) {

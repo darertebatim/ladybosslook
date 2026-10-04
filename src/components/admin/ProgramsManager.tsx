@@ -112,6 +112,10 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
     show_in_app_waitlist: false,
     is_one_on_one: false,
     default_session_count: 0,
+    includes_one_on_one: false,
+    one_on_one_count: 1,
+    booking_url: '',
+    booking_note: '',
     auto_create_feed_channel: true,
     restricted_regions: [] as string[],
   });
@@ -228,6 +232,10 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       show_in_app_waitlist: false,
       is_one_on_one: false,
       default_session_count: 0,
+      includes_one_on_one: false,
+      one_on_one_count: 1,
+      booking_url: '',
+      booking_note: '',
       auto_create_feed_channel: true,
       restricted_regions: [],
     });
@@ -241,9 +249,20 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const bookingUrl = (formData.booking_url || '').trim();
+    if (bookingUrl && !/^https:\/\/(www\.)?calendly\.com\//i.test(bookingUrl)) {
+      toast({ title: 'Invalid booking link', description: 'Calendly link must start with https://calendly.com/', variant: 'destructive' });
+      return;
+    }
+
     try {
       const slug = formData.slug.trim();
-      const { audio_playlist_id: featuredAudio, ...programFields } = formData;
+      const { audio_playlist_id: featuredAudio, ...rawFields } = formData;
+      const programFields = {
+        ...rawFields,
+        booking_url: bookingUrl || null,
+        booking_note: (formData.booking_note || '').trim() || null,
+      };
       const links = [...contentLinks];
       if (editingId) {
         const { error } = await supabase
@@ -357,6 +376,10 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       show_in_app_waitlist: (program as any).show_in_app_waitlist || false,
       is_one_on_one: (program as any).is_one_on_one || false,
       default_session_count: (program as any).default_session_count || 0,
+      includes_one_on_one: (program as any).includes_one_on_one || false,
+      one_on_one_count: (program as any).one_on_one_count || 1,
+      booking_url: (program as any).booking_url || '',
+      booking_note: (program as any).booking_note || '',
       auto_create_feed_channel:
         (program as any).auto_create_feed_channel ?? true,
       restricted_regions: Array.isArray((program as any).restricted_regions)
@@ -1363,6 +1386,57 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
 
                 <div className="flex items-center space-x-2 border-t pt-3">
                   <Checkbox
+                    id="includes_one_on_one"
+                    checked={formData.includes_one_on_one}
+                    onCheckedChange={(checked) =>
+                      setFormData({ ...formData, includes_one_on_one: checked as boolean })
+                    }
+                  />
+                  <Label htmlFor="includes_one_on_one" className="text-sm font-normal cursor-pointer">
+                    📅 Includes 1-on-1 meeting (students book via Calendly)
+                  </Label>
+                </div>
+                {(formData.includes_one_on_one || formData.is_one_on_one) && (
+                  <div className="pl-6 space-y-3">
+                    {formData.includes_one_on_one && (
+                      <div className="space-y-1">
+                        <Label htmlFor="one_on_one_count" className="text-sm">Meetings included</Label>
+                        <Input
+                          id="one_on_one_count"
+                          type="number"
+                          min={1}
+                          value={formData.one_on_one_count || 1}
+                          onChange={(e) =>
+                            setFormData({ ...formData, one_on_one_count: parseInt(e.target.value) || 1 })
+                          }
+                          className="max-w-[200px]"
+                        />
+                      </div>
+                    )}
+                    <div className="space-y-1">
+                      <Label htmlFor="booking_url" className="text-sm">Calendly booking link</Label>
+                      <Input
+                        id="booking_url"
+                        placeholder="https://calendly.com/your-name/1on1"
+                        value={formData.booking_url}
+                        onChange={(e) => setFormData({ ...formData, booking_url: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="booking_note" className="text-sm">Booking note (optional, shown to student)</Label>
+                      <Input
+                        id="booking_note"
+                        dir="auto"
+                        placeholder="۳۰ دقیقه با علی لطفی"
+                        value={formData.booking_note}
+                        onChange={(e) => setFormData({ ...formData, booking_note: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center space-x-2 border-t pt-3">
+                  <Checkbox
                     id="auto_create_feed_channel"
                     checked={formData.auto_create_feed_channel ?? true}
                     disabled={formData.is_one_on_one}
@@ -1504,6 +1578,9 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                         <span>•</span>
                         <span>{program.delivery_method === 'live-online' ? 'Live Online' : 'On-Demand'}</span>
                         {(program as any).is_featured && <span>⭐ Featured</span>}
+                        {((program as any).includes_one_on_one || (program as any).is_one_on_one) && (
+                          <span className="rounded bg-muted px-1.5 py-0.5 text-xs font-medium">1:1{(program as any).booking_url ? ' · Calendly' : ''}</span>
+                        )}
                       </div>
                       <div className="flex items-center gap-4">
                         {!!program.original_price && (

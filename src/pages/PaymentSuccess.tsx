@@ -11,6 +11,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 import riloAppIcon from '@/assets/rilo-app-icon.png';
 import { ONELINK_BASE_URL } from '@/lib/appsflyer';
+import { buildBookingUrl } from '@/lib/booking';
 
 /**
  * Smart link: AppsFlyer OneLink opens the Rilo app if installed,
@@ -222,6 +223,20 @@ export default function PaymentSuccess() {
     },
   });
 
+  const { data: bookingInfo } = useQuery({
+    queryKey: ['payment-success-booking', roundSlug],
+    enabled: !!roundSlug,
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .from('program_catalog')
+        .select('booking_url, booking_note, includes_one_on_one, is_one_on_one')
+        .eq('slug', roundSlug!)
+        .maybeSingle();
+      if (!data?.booking_url || !(data.includes_one_on_one || data.is_one_on_one)) return null;
+      return data as { booking_url: string; booking_note: string | null };
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]">
@@ -299,6 +314,27 @@ export default function PaymentSuccess() {
                 : 'Open Rilo, go to My Program, and start it.'}
             </p>
           </div>
+
+          {bookingInfo?.booking_url && (
+            <div className="mt-7 bg-white/75 backdrop-blur rounded-3xl p-5 shadow-[0_20px_50px_-20px_rgba(240,138,62,0.45)] border border-white">
+              <div className="flex items-center gap-2 mb-2">
+                <Calendar className="h-4 w-4 text-[#F08A3E]" />
+                <h2 className="text-[15px] font-bold text-[#1a1f3d]">Book your 1-on-1 meeting</h2>
+              </div>
+              <p dir="auto" className="text-[13px] text-[#1a1f3d]/70 mb-4">
+                {bookingInfo.booking_note || 'Pick a time that works for you — your calendar invite and meeting link arrive by email.'}
+              </p>
+              <a
+                href={buildBookingUrl(bookingInfo.booking_url, orderDetails?.customer_name || orderDetails?.name, orderDetails?.email)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full h-[52px] rounded-2xl text-white font-semibold text-[15px] active:opacity-80 transition-opacity bg-[#F08A3E] flex items-center justify-center gap-2"
+              >
+                <Calendar className="h-4 w-4" />
+                رزرو وقت جلسه / Book your session
+              </a>
+            </div>
+          )}
 
           {/* Primary CTA — Open the app */}
           <div className="mt-7 bg-white/75 backdrop-blur rounded-3xl p-5 shadow-[0_20px_50px_-20px_rgba(138,92,240,0.4)] border border-white">
