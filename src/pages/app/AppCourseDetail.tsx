@@ -2068,6 +2068,35 @@ const AppCourseDetail = () => {
                           </Button>
                         ))}
 
+                        {/* Book 1-on-1 meeting (Calendly) */}
+                        {(program as any)?.booking_url &&
+                          ((program as any)?.includes_one_on_one || (program as any)?.is_one_on_one) && (
+                            <Button
+                              size="lg"
+                              className="w-full h-auto py-3 px-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start gap-3"
+                              onClick={() =>
+                                window.open(
+                                  buildBookingUrl(
+                                    (program as any).booking_url,
+                                    (user?.user_metadata as any)?.full_name,
+                                    user?.email,
+                                  ),
+                                  "_blank",
+                                )
+                              }
+                            >
+                              <span className="h-10 w-10 rounded-xl bg-brand/10 text-brand flex items-center justify-center shrink-0">
+                                <CalendarPlus className="h-5 w-5" />
+                              </span>
+                              <div className="flex-1 min-w-0 text-left">
+                                <p className="text-sm font-semibold truncate">Book 1-on-1 meeting</p>
+                                <p dir="auto" className="text-xs text-fg-warm/70 truncate">
+                                  {(program as any).booking_note || "Pick or reschedule your time"}
+                                </p>
+                              </div>
+                            </Button>
+                          )}
+
                         {/* 4-6b. Compact utility buttons - 2 column grid */}
                         <div className="grid grid-cols-2 gap-2">
                           {/* Access Google Drive - Resources */}
