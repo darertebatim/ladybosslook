@@ -325,7 +325,7 @@ export default function PaymentSuccess() {
                 {bookingInfo.booking_note || 'Pick a time that works for you — your calendar invite and meeting link arrive by email.'}
               </p>
               <a
-                href={buildBookingUrl(bookingInfo.booking_url, orderDetails?.customer_name || orderDetails?.name, orderDetails?.email)}
+                href={buildBookingUrl(bookingInfo.booking_url, orderDetails?.customer_name || orderDetails?.name, orderDetails?.email, programSlug)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full h-[52px] rounded-2xl text-white font-semibold text-[15px] active:opacity-80 transition-opacity bg-[#F08A3E] flex items-center justify-center gap-2"

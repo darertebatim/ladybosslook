@@ -1412,6 +1412,8 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                         onChange={(e) => setFormData({ ...formData, booking_note: e.target.value })}
                       />
                     </div>
+                    <OneOnOneBookingsPanel programSlug={formData.slug} included={formData.one_on_one_count || 1} />
+
                   </div>
                 )}
 
