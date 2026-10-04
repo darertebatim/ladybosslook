@@ -78,6 +78,10 @@ export async function postSupportMessage(admin: any, userId: string, content: st
 
 /** Sent right after enrollment in a program with 1-on-1 meetings. */
 export async function sendBookingInvite(admin: any, userId: string, slug: string, programTitle: string) {
+  // Only once per student + program
+  const { data: prior } = await admin
+    .from("form_invites").select("id").eq("user_id", userId).eq("form_key", `oneonone:${slug}`).limit(1).maybeSingle();
+  if (prior) return false;
   const link = await createOneOnOneLink(admin, userId, slug);
   const content =
     `📅 رزرو جلسه ۱ به ۱ شما\n\n` +
