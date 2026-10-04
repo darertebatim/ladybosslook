@@ -860,6 +860,12 @@ serve(async (req) => {
 
       if (error) {
         failed++;
+        if (claimedIds.length && sentCol) {
+          await supabase
+            .from("form_submissions")
+            .update({ [sentCol]: null })
+            .in("id", claimedIds);
+        }
         console.error("resend error", r.email, error);
         await supabase.from("email_logs").insert({
           recipient_email: r.email,
@@ -916,7 +922,14 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ ok: true, total: recipients.length, sent, failed }),
+      JSON.stringify({
+        ok: true,
+        total: recipients.length,
+        sent,
+        failed,
+        skipped,
+        remaining: Math.max(totalEligible - processed, 0),
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
