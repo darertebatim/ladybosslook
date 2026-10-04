@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { sendEnrollmentEmail } from "../_shared/send-enrollment-email.ts";
 import { checkProgramRegionBlocks } from "../_shared/region-restriction.ts";
 import { resolveAutoEnrollRoundId } from "../_shared/auto-enroll-round.ts";
+import { sendBookingInvite } from "../_shared/one-on-one-chat.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -160,6 +161,13 @@ serve(async (req) => {
         userId: user.id,
         programSlug: prog.slug,
       });
+      try {
+        const { data: bk } = await supabase.from('program_catalog')
+          .select('title, includes_one_on_one, booking_url').eq('slug', prog.slug).maybeSingle();
+        if (bk?.includes_one_on_one && bk?.booking_url) {
+          await sendBookingInvite(supabase, user.id, prog.slug, bk.title || prog.slug);
+        }
+      } catch (e) { log('1on1 invite failed', { e: String(e) }); }
     }
 
     log('done', { enrolled, skipped });

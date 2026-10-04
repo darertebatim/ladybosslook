@@ -4462,6 +4462,7 @@ export type Database = {
           calendly_event_uri: string | null
           calendly_invitee_uri: string
           cancel_url: string | null
+          chat_notified_at: string | null
           created_at: string
           end_time: string | null
           event_name: string | null
@@ -4481,6 +4482,7 @@ export type Database = {
           calendly_event_uri?: string | null
           calendly_invitee_uri: string
           cancel_url?: string | null
+          chat_notified_at?: string | null
           created_at?: string
           end_time?: string | null
           event_name?: string | null
@@ -4500,6 +4502,7 @@ export type Database = {
           calendly_event_uri?: string | null
           calendly_invitee_uri?: string
           cancel_url?: string | null
+          chat_notified_at?: string | null
           created_at?: string
           end_time?: string | null
           event_name?: string | null

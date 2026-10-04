@@ -1,3 +1,4 @@
+import { sendBookingInvite } from "./one-on-one-chat.ts";
 // Shared helper: send a welcome support-chat message after a purchase / enrollment.
 // Used by stripe-webhook, revenuecat-webhook, and admin-create-enrollment.
 //
@@ -130,6 +131,18 @@ export async function sendPurchaseWelcomeMessage(
         last_message_at: new Date().toISOString(),
       })
       .eq("id", conversation.id);
+
+    // Programs with 1-on-1 meetings: follow up with a personal booking link
+    if (!PLUS_SLUGS.has(programSlug)) {
+      const { data: prog } = await supabase
+        .from("program_catalog")
+        .select("includes_one_on_one, booking_url")
+        .eq("slug", programSlug)
+        .maybeSingle();
+      if (prog?.includes_one_on_one && prog?.booking_url) {
+        await sendBookingInvite(supabase, userId, programSlug, title);
+      }
+    }
 
     console.log("[WELCOME] ✓ Sent welcome message for", programSlug, "to user", userId);
   } catch (err: any) {

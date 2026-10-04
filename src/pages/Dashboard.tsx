@@ -31,6 +31,7 @@ const QUICK_LINKS = [
   { to: '/app/path', label: 'My Rilo Path', description: 'Your next steps', icon: RouteIcon },
   { to: '/app/player', label: 'Listen', description: 'Audio programs and playlists', icon: Headphones },
   { to: '/app/tools', label: 'Tools', description: 'Planner, journal, focus and more', icon: Compass },
+  { to: '/dashboard/one-on-one', label: '1-on-1 meetings', description: 'Book and join your private meetings', icon: CalendarDays },
   { to: '/dashboard/chat', label: 'Support', description: 'Chat with our team', icon: MessageCircle },
 ];
 

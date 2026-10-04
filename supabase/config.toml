@@ -272,3 +272,6 @@ verify_jwt = false
 
 [functions.calendly-booking]
 verify_jwt = false
+
+[functions.one-on-one-link]
+verify_jwt = false
