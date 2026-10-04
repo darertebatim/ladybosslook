@@ -260,6 +260,10 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       const { audio_playlist_id: featuredAudio, ...rawFields } = formData;
       const programFields = {
         ...rawFields,
+        // 1-on-1 is a single merged setting: the checkbox drives both the
+        // auto-created private round and the Calendly booking surfaces.
+        includes_one_on_one: !!formData.is_one_on_one,
+        default_session_count: formData.is_one_on_one ? (formData.one_on_one_count || 1) : formData.default_session_count,
         booking_url: bookingUrl || null,
         booking_note: (formData.booking_note || '').trim() || null,
       };
