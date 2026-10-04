@@ -260,9 +260,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       const { audio_playlist_id: featuredAudio, ...rawFields } = formData;
       const programFields = {
         ...rawFields,
-        // 1-on-1 is a single merged setting: the checkbox drives both the
-        // auto-created private round and the Calendly booking surfaces.
-        includes_one_on_one: !!formData.is_one_on_one,
+        // Pure 1:1 services keep the session count in sync with the meetings count.
         default_session_count: formData.is_one_on_one ? (formData.one_on_one_count || 1) : formData.default_session_count,
         booking_url: bookingUrl || null,
         booking_note: (formData.booking_note || '').trim() || null,
@@ -380,7 +378,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       show_in_app_waitlist: (program as any).show_in_app_waitlist || false,
       is_one_on_one: (program as any).is_one_on_one || false,
       default_session_count: (program as any).default_session_count || 0,
-      includes_one_on_one: (program as any).is_one_on_one || (program as any).includes_one_on_one || false,
+      includes_one_on_one: (program as any).includes_one_on_one || (program as any).is_one_on_one || false,
       one_on_one_count: (program as any).one_on_one_count || (program as any).default_session_count || 1,
       booking_url: (program as any).booking_url || '',
       booking_note: (program as any).booking_note || '',
@@ -1353,18 +1351,35 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
 
                 <div className="flex items-center space-x-2 border-t pt-3">
                   <Checkbox
-                    id="is_one_on_one"
-                    checked={formData.is_one_on_one}
+                    id="includes_one_on_one"
+                    checked={formData.includes_one_on_one}
                     onCheckedChange={(checked) =>
-                      setFormData({ ...formData, is_one_on_one: checked as boolean, includes_one_on_one: checked as boolean })
+                      setFormData({ ...formData, includes_one_on_one: checked as boolean, is_one_on_one: checked ? formData.is_one_on_one : false })
                     }
                   />
-                  <Label htmlFor="is_one_on_one" className="text-sm font-normal cursor-pointer">
-                    👤 1-on-1 meetings (students book via Calendly)
+                  <Label htmlFor="includes_one_on_one" className="text-sm font-normal cursor-pointer">
+                    👤 Includes 1-on-1 meetings (students book via Calendly)
                   </Label>
                 </div>
-                {formData.is_one_on_one && (
+                {formData.includes_one_on_one && (
                   <div className="pl-6 space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="is_one_on_one"
+                        checked={formData.is_one_on_one}
+                        onCheckedChange={(checked) =>
+                          setFormData({ ...formData, is_one_on_one: checked as boolean })
+                        }
+                      />
+                      <Label htmlFor="is_one_on_one" className="text-sm font-normal cursor-pointer">
+                        Pure 1:1 service — auto-create a private round per purchase
+                      </Label>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {formData.is_one_on_one
+                        ? 'Each buyer gets their own private round (no shared group, no chat channel).'
+                        : 'Students stay in the shared group round; the 1-on-1 meetings are a bonus they book via Calendly.'}
+                    </p>
                     <div className="space-y-1">
                       <Label htmlFor="one_on_one_count" className="text-sm">Meetings included per purchase</Label>
                       <Input
@@ -1397,9 +1412,6 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                         onChange={(e) => setFormData({ ...formData, booking_note: e.target.value })}
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Each purchase auto-creates a personal round for the client, and the student books their meeting times through your Calendly link (shown after payment, in the confirmation email, and on their program page).
-                    </p>
                   </div>
                 )}
 
