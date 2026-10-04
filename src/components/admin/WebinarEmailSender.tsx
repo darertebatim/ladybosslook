@@ -280,7 +280,9 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
         const failed = (data as any)?.failed ?? 0;
         totalSent += sent;
         totalFailed += failed;
-        if (!canBatch || sent + failed < BATCH) break;
+        const remaining = (data as any)?.remaining;
+        if (!canBatch) break;
+        if (typeof remaining === 'number' ? remaining <= 0 : sent + failed < BATCH) break;
       } while (true);
       toast.success(`Sent ${totalSent} · failed ${totalFailed}`);
       refetch();
