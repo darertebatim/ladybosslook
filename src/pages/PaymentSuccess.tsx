@@ -237,6 +237,53 @@ export default function PaymentSuccess() {
     },
   });
 
+  const { data: authUser } = useQuery({
+    queryKey: ['payment-success-auth-user'],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data } = await supabase.auth.getUser();
+      return data.user;
+    },
+  });
+
+  const [bookingLinkLoading, setBookingLinkLoading] = useState(false);
+  const openBooking = async () => {
+    // Signed in: open a one-time booking link (stops working after one booking,
+    // and only issued if the student still has meetings left).
+    if (authUser && roundSlug) {
+      const win = window.open('', '_blank');
+      setBookingLinkLoading(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('calendly-booking', {
+          body: { action: 'link', programSlug: roundSlug },
+        });
+        if (error || !data?.url) {
+          win?.close();
+          let reason = '';
+          try { reason = (await (error as any)?.context?.json())?.error; } catch { /* ignore */ }
+          toast({
+            title: reason === 'limit_reached' ? "You've used all your 1-on-1 meetings" : "Couldn't open booking",
+            description: reason === 'limit_reached' ? undefined : 'Please try again from your program page.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        if (win) win.location.href = data.url; else window.location.href = data.url;
+        return;
+      } finally {
+        setBookingLinkLoading(false);
+      }
+    }
+    // Not signed in (e.g. guest checkout): fall back to the plain pre-filled link
+    if (bookingInfo?.booking_url) {
+      window.open(
+        buildBookingUrl(bookingInfo.booking_url, orderDetails?.customer_name || orderDetails?.name, orderDetails?.email, roundSlug || undefined),
+        '_blank',
+        'noopener,noreferrer',
+      );
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#FFF1E0] via-[#FFE8F0] to-[#F0E6FF]">
