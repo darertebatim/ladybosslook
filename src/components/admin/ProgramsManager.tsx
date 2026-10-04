@@ -380,8 +380,8 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       show_in_app_waitlist: (program as any).show_in_app_waitlist || false,
       is_one_on_one: (program as any).is_one_on_one || false,
       default_session_count: (program as any).default_session_count || 0,
-      includes_one_on_one: (program as any).includes_one_on_one || false,
-      one_on_one_count: (program as any).one_on_one_count || 1,
+      includes_one_on_one: (program as any).is_one_on_one || (program as any).includes_one_on_one || false,
+      one_on_one_count: (program as any).one_on_one_count || (program as any).default_session_count || 1,
       booking_url: (program as any).booking_url || '',
       booking_note: (program as any).booking_note || '',
       auto_create_feed_channel:
