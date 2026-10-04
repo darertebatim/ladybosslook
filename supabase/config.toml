@@ -263,3 +263,9 @@ verify_jwt = true
 
 [functions.user-link-email]
 verify_jwt = false
+
+[functions.calendly-webhook]
+verify_jwt = false
+
+[functions.calendly-setup-webhook]
+verify_jwt = false
