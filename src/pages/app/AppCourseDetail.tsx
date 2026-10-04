@@ -69,6 +69,7 @@ import { programImages } from "@/data/programs";
 import { IAPPlanPicker } from "@/components/app/IAPPlanPicker";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
+import { buildBookingUrl } from "@/lib/booking";
 import { useRoundCourse } from "@/hooks/useLearn";
 import { useInvalidateAllEnrollmentData } from "@/hooks/useAppData";
 import { shouldShowEnrollmentReminder } from "@/hooks/useNotificationReminder";
