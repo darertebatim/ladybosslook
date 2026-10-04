@@ -330,6 +330,21 @@ const AppCourseDetail = () => {
     },
   });
 
+  const { data: myBookings = [] } = useQuery({
+    queryKey: ["my-1on1-bookings", slug, user?.id],
+    enabled: !!slug && !!user?.id,
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .from("one_on_one_bookings")
+        .select("id, start_time, end_time, join_url, reschedule_url")
+        .eq("user_id", user!.id)
+        .eq("program_slug", slug)
+        .eq("status", "active");
+      return (data || []) as any[];
+    },
+  });
+
   const { data: program } = useQuery({
     queryKey: ["program", slug],
     queryFn: async () => {
