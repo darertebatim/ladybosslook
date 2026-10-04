@@ -330,6 +330,21 @@ const AppCourseDetail = () => {
     },
   });
 
+  const { data: myBookings = [] } = useQuery({
+    queryKey: ["my-1on1-bookings", slug, user?.id],
+    enabled: !!slug && !!user?.id,
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .from("one_on_one_bookings")
+        .select("id, start_time, end_time, join_url, reschedule_url")
+        .eq("user_id", user!.id)
+        .eq("program_slug", slug)
+        .eq("status", "active");
+      return (data || []) as any[];
+    },
+  });
+
   const { data: program } = useQuery({
     queryKey: ["program", slug],
     queryFn: async () => {
@@ -2071,32 +2086,73 @@ const AppCourseDetail = () => {
 
                         {/* Book 1-on-1 meeting (Calendly) */}
                         {(program as any)?.booking_url &&
-                          ((program as any)?.includes_one_on_one || (program as any)?.is_one_on_one) && (
-                            <Button
-                              size="lg"
-                              className="w-full h-auto py-3 px-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start gap-3"
-                              onClick={() =>
-                                window.open(
-                                  buildBookingUrl(
-                                    (program as any).booking_url,
-                                    (user?.user_metadata as any)?.full_name,
-                                    user?.email,
-                                  ),
-                                  "_blank",
-                                )
-                              }
-                            >
-                              <span className="h-10 w-10 rounded-xl bg-brand/10 text-brand flex items-center justify-center shrink-0">
-                                <CalendarPlus className="h-5 w-5" />
-                              </span>
-                              <div className="flex-1 min-w-0 text-left">
-                                <p className="text-sm font-semibold truncate">Book 1-on-1 meeting</p>
-                                <p dir="auto" className="text-xs text-fg-warm/70 truncate">
-                                  {(program as any).booking_note || "Pick or reschedule your time"}
-                                </p>
-                              </div>
-                            </Button>
-                          )}
+                          ((program as any)?.includes_one_on_one || (program as any)?.is_one_on_one) && (() => {
+                            const included = (program as any).one_on_one_count || 1;
+                            const used = myBookings.length;
+                            const now = Date.now();
+                            const next = myBookings
+                              .filter((b: any) => b.start_time && new Date(b.end_time || b.start_time).getTime() > now)
+                              .sort((a: any, b: any) => +new Date(a.start_time) - +new Date(b.start_time))[0];
+                            const canBook = used < included;
+                            return (
+                              <>
+                                {next && (
+                                  <div className="w-full rounded-2xl bg-white shadow-ios p-3 flex items-center gap-3">
+                                    <span className="h-10 w-10 rounded-xl bg-mint text-fg-warm flex items-center justify-center shrink-0">
+                                      <CalendarPlus className="h-5 w-5" />
+                                    </span>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-semibold truncate">Your 1-on-1 meeting</p>
+                                      <p className="text-xs text-fg-warm/70 truncate">
+                                        {new Date(next.start_time).toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                                      </p>
+                                      {next.reschedule_url && (
+                                        <button className="text-xs text-brand font-medium mt-0.5" onClick={() => window.open(next.reschedule_url, "_blank")}>
+                                          Reschedule or cancel
+                                        </button>
+                                      )}
+                                    </div>
+                                    {next.join_url && (
+                                      <Button size="sm" className="rounded-full bg-fg-warm text-warm shrink-0" onClick={() => window.open(next.join_url, "_blank")}>
+                                        Join
+                                      </Button>
+                                    )}
+                                  </div>
+                                )}
+                                {canBook && (
+                                  <Button
+                                    size="lg"
+                                    className="w-full h-auto py-3 px-3 bg-white text-fg-warm shadow-ios rounded-2xl border-0 justify-start gap-3"
+                                    onClick={() =>
+                                      window.open(
+                                        buildBookingUrl(
+                                          (program as any).booking_url,
+                                          (user?.user_metadata as any)?.full_name,
+                                          user?.email,
+                                          (program as any).slug,
+                                          user?.id,
+                                        ),
+                                        "_blank",
+                                      )
+                                    }
+                                  >
+                                    <span className="h-10 w-10 rounded-xl bg-brand/10 text-brand flex items-center justify-center shrink-0">
+                                      <CalendarPlus className="h-5 w-5" />
+                                    </span>
+                                    <div className="flex-1 min-w-0 text-left">
+                                      <p className="text-sm font-semibold truncate">Book 1-on-1 meeting</p>
+                                      <p dir="auto" className="text-xs text-fg-warm/70 truncate">
+                                        {included > 1 ? `${used} of ${included} meetings used` : (program as any).booking_note || "Pick a time that works for you"}
+                                      </p>
+                                    </div>
+                                  </Button>
+                                )}
+                                {!canBook && !next && (
+                                  <p className="text-xs text-fg-warm/70 text-center">All {included} 1-on-1 meetings used</p>
+                                )}
+                              </>
+                            );
+                          })()}
 
                         {/* 4-6b. Compact utility buttons - 2 column grid */}
                         <div className="grid grid-cols-2 gap-2">

@@ -4457,6 +4457,66 @@ export type Database = {
         }
         Relationships: []
       }
+      one_on_one_bookings: {
+        Row: {
+          calendly_event_uri: string | null
+          calendly_invitee_uri: string
+          cancel_url: string | null
+          created_at: string
+          end_time: string | null
+          event_name: string | null
+          event_type_uri: string | null
+          id: string
+          invitee_email: string
+          invitee_name: string | null
+          join_url: string | null
+          program_slug: string | null
+          reschedule_url: string | null
+          start_time: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          calendly_event_uri?: string | null
+          calendly_invitee_uri: string
+          cancel_url?: string | null
+          created_at?: string
+          end_time?: string | null
+          event_name?: string | null
+          event_type_uri?: string | null
+          id?: string
+          invitee_email: string
+          invitee_name?: string | null
+          join_url?: string | null
+          program_slug?: string | null
+          reschedule_url?: string | null
+          start_time?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          calendly_event_uri?: string | null
+          calendly_invitee_uri?: string
+          cancel_url?: string | null
+          created_at?: string
+          end_time?: string | null
+          event_name?: string | null
+          event_type_uri?: string | null
+          id?: string
+          invitee_email?: string
+          invitee_name?: string | null
+          join_url?: string | null
+          program_slug?: string | null
+          reschedule_url?: string | null
+          start_time?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           amount: number
