@@ -371,15 +371,15 @@ export default function PaymentSuccess() {
               <p dir="auto" className="text-[13px] text-[#1a1f3d]/70 mb-4">
                 {bookingInfo.booking_note || 'Pick a time that works for you — your calendar invite and meeting link arrive by email.'}
               </p>
-              <a
-                href={buildBookingUrl(bookingInfo.booking_url, orderDetails?.customer_name || orderDetails?.name, orderDetails?.email, programSlug)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full h-[52px] rounded-2xl text-white font-semibold text-[15px] active:opacity-80 transition-opacity bg-[#F08A3E] flex items-center justify-center gap-2"
+              <button
+                type="button"
+                onClick={openBooking}
+                disabled={bookingLinkLoading}
+                className="w-full h-[52px] rounded-2xl text-white font-semibold text-[15px] active:opacity-80 transition-opacity bg-[#F08A3E] flex items-center justify-center gap-2 disabled:opacity-60"
               >
-                <Calendar className="h-4 w-4" />
+                {bookingLinkLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Calendar className="h-4 w-4" />}
                 رزرو وقت جلسه / Book your session
-              </a>
+              </button>
             </div>
           )}
 
