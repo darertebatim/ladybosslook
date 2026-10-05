@@ -20,58 +20,49 @@ function fmt(d: Date, tz: string, opts: Intl.DateTimeFormatOptions) {
 }
 const gcalStamp = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
-Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-  try {
-    const auth = req.headers.get("Authorization") || "";
-    const url = Deno.env.get("SUPABASE_URL")!;
-    const userClient = createClient(url, Deno.env.get("SUPABASE_ANON_KEY")!, {
-      global: { headers: { Authorization: auth } }, auth: { persistSession: false },
-    });
-    const { data: { user } } = await userClient.auth.getUser();
-    if (!user) return json({ error: "Unauthorized" }, 401);
-    const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-    const { conversationId, timezone } = await req.json().catch(() => ({}));
-    const { data: conv } = await admin.from("chat_conversations")
+async function processConv(admin: any, conversationId: string, userId: string, userEmail: string | undefined, timezone: string, bulk: boolean, onlyRound?: string): Promise<any> {
+        const { data: conv } = await admin.from("chat_conversations")
       .select("id, user_id, unread_count_user").eq("id", conversationId).maybeSingle();
-    if (!conv || conv.user_id !== user.id) return json({ sent: false });
+    if (!conv || conv.user_id !== userId) return ({ sent: false });
 
     // Latest user message must be the webinar request
     const { data: last } = await admin.from("chat_messages").select("content")
       .eq("conversation_id", conv.id).eq("sender_type", "user")
+      .ilike("content", bulk ? `%${TRIGGER}%` : "%")
       .order("created_at", { ascending: false }).limit(1).maybeSingle();
-    if (!last?.content?.includes(TRIGGER)) return json({ sent: false });
+    if (!last?.content?.includes(TRIGGER)) return ({ sent: false });
 
     // Don't reply twice within 6 hours
     const since = new Date(Date.now() - 6 * 3600_000).toISOString();
     const { data: prior } = await admin.from("chat_messages").select("id")
       .eq("conversation_id", conv.id).eq("sender_type", "admin")
-      .ilike("content", "%جای شما در جلسه زنده رزرو است%").gte("created_at", since).limit(1).maybeSingle();
-    if (prior) return json({ sent: false, reason: "duplicate" });
+      .ilike("content", "%جای شما در جلسه زنده رزرو است%").gte("created_at", bulk ? "2000-01-01" : since).limit(1).maybeSingle();
+    if (prior) return ({ sent: false, reason: "duplicate" });
 
     // Find their registration (by message email, account email, or merged emails)
     const emails = new Set<string>();
     const m = last.content.match(/ایمیل:\s*(\S+@\S+)/);
     if (m) emails.add(m[1].toLowerCase().trim());
-    if (user.email) emails.add(user.email.toLowerCase());
-    const { data: aliases } = await admin.from("account_email_aliases").select("email").eq("user_id", user.id);
+    if (userEmail) emails.add(userEmail.toLowerCase());
+    const { data: aliases } = await admin.from("account_email_aliases").select("email").eq("user_id", userId);
     (aliases || []).forEach((a: any) => a.email && emails.add(a.email.toLowerCase()));
 
     const { data: reg } = await admin.from("form_submissions").select("name, round_id")
       .in("email", [...emails]).eq("source", "igads_registration")
       .order("created_at", { ascending: false }).limit(1).maybeSingle();
-    if (!reg?.round_id) return json({ sent: false, reason: "no_registration" });
+    if (!reg?.round_id) return ({ sent: false, reason: "no_registration" });
+    if (onlyRound && reg.round_id !== onlyRound) return ({ sent: false, reason: "other_round" });
 
     const { data: round } = await admin.from("program_rounds")
       .select("first_session_date, first_session_duration, google_meet_link").eq("id", reg.round_id).maybeSingle();
-    if (!round?.first_session_date) return json({ sent: false, reason: "no_round" });
+    if (!round?.first_session_date) return ({ sent: false, reason: "no_round" });
     const start = new Date(round.first_session_date);
-    if (start.getTime() + 3 * 3600_000 < Date.now()) return json({ sent: false, reason: "past" });
+    if (start.getTime() + 3 * 3600_000 < Date.now()) return ({ sent: false, reason: "past" });
 
     let tz = typeof timezone === "string" && timezone ? timezone : "";
     if (!tz) {
-      const { data: s } = await admin.from("journal_reminder_settings").select("timezone").eq("user_id", user.id).maybeSingle();
+      const { data: s } = await admin.from("journal_reminder_settings").select("timezone").eq("user_id", userId).maybeSingle();
       tz = s?.timezone || "America/Los_Angeles";
     }
     const weekdayEn = fmt(start, tz, { weekday: "long" });
@@ -103,7 +94,7 @@ Deno.serve(async (req) => {
     ];
 
     const { data: sender } = await admin.from("user_roles").select("user_id").eq("role", "admin").limit(1).maybeSingle();
-    if (!sender) return json({ sent: false });
+    if (!sender) return ({ sent: false });
     const { error } = await admin.from("chat_messages").insert({
       conversation_id: conv.id, sender_id: sender.user_id, sender_type: "admin", content, buttons, is_read: false,
     });
@@ -116,7 +107,43 @@ Deno.serve(async (req) => {
         body: { conversationId: conv.id, messageContent: "✅ جزئیات وبینار شما", senderType: "admin", senderId: sender.user_id },
       });
     } catch (_) { /* ignore */ }
-    return json({ sent: true });
+}
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  try {
+    const auth = req.headers.get("Authorization") || "";
+    const url = Deno.env.get("SUPABASE_URL")!;
+    const userClient = createClient(url, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: auth } }, auth: { persistSession: false },
+    });
+    const { data: { user } } = await userClient.auth.getUser();
+    if (!user) return json({ error: "Unauthorized" }, 401);
+    const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const body = await req.json().catch(() => ({}));
+
+    if (body.bulk) {
+      const { data: role } = await admin.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle();
+      if (!role) return json({ error: "Admin only" }, 403);
+      const roundId = typeof body.roundId === "string" ? body.roundId : "";
+      if (!roundId) return json({ error: "roundId required" }, 400);
+      const { data: msgs } = await admin.from("chat_messages").select("conversation_id")
+        .eq("sender_type", "user").ilike("content", `%${TRIGGER}%`);
+      const ids = [...new Set((msgs || []).map((m: any) => m.conversation_id))];
+      const results: Record<string, number> = {};
+      for (const cid of ids) {
+        const { data: c } = await admin.from("chat_conversations").select("user_id").eq("id", cid).maybeSingle();
+        if (!c) continue;
+        const { data: u } = await admin.auth.admin.getUserById(c.user_id);
+        const r = await processConv(admin, cid as string, c.user_id, u?.user?.email, "", true, roundId);
+        const k = r.sent ? "sent" : (r.reason || "skipped");
+        results[k] = (results[k] || 0) + 1;
+      }
+      return json({ total: ids.length, results });
+    }
+
+    const r = await processConv(admin, body.conversationId, user.id, user.email, body.timezone || "", false);
+    return json(r);
   } catch (e) {
     console.error("[webinar-auto-reply]", e);
     return json({ error: String(e) }, 500);

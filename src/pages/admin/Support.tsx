@@ -254,6 +254,23 @@ export default function Support() {
           <p className="text-muted-foreground">Manage customer support conversations</p>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={async () => {
+              const { data: r } = await (supabase as any)
+                .from("program_rounds").select("id, round_name")
+                .eq("program_slug", "igadsfree").gt("first_session_date", new Date().toISOString())
+                .order("first_session_date", { ascending: false }).limit(1).maybeSingle();
+              if (!r) { alert("No upcoming webinar round"); return; }
+              if (!confirm(`Send webinar details to everyone who asked in chat and is registered for "${r.round_name}"?`)) return;
+              const { data, error } = await supabase.functions.invoke("webinar-auto-reply", { body: { bulk: true, roundId: r.id } });
+              alert(error ? `Failed: ${error.message}` : `Done: ${JSON.stringify(data?.results || {})}`);
+              fetchConversations();
+            }}
+          >
+            Send webinar details
+          </Button>
           <NewMessageDialog inboxType={inboxType} onSent={fetchConversations} />
           <Tabs value={inboxType} onValueChange={(v) => setInboxType(v as 'support' | 'coach')}>
             <TabsList>
