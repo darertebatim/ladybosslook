@@ -143,13 +143,18 @@ Deno.serve(async (req) => {
         .eq("sender_type", "user").ilike("content", `%${TRIGGER}%`);
       const ids = [...new Set((msgs || []).map((m: any) => m.conversation_id))];
       const results: Record<string, number> = {};
-      for (const cid of ids) {
+      const one = async (cid: string) => {
         const { data: c } = await admin.from("chat_conversations").select("user_id").eq("id", cid).maybeSingle();
-        if (!c) continue;
+        if (!c) return;
         const { data: u } = await admin.auth.admin.getUserById(c.user_id);
-        const r = await processConv(admin, cid as string, c.user_id, u?.user?.email, "", true, roundId);
+        const r = await processConv(admin, cid, c.user_id, u?.user?.email, "", true, roundId);
         const k = r.sent ? "sent" : (r.reason || "skipped");
         results[k] = (results[k] || 0) + 1;
+      };
+      for (let i = 0; i < ids.length; i += 15) {
+        await Promise.all(ids.slice(i, i + 15).map((cid) => one(cid as string).catch((e) => {
+          console.error("bulk item failed", cid, e); results.error = (results.error || 0) + 1;
+        })));
       }
       return json({ total: ids.length, results });
     }
