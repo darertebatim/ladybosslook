@@ -37,7 +37,7 @@ async function processConv(admin: any, conversationId: string, userId: string, u
     const since = new Date(Date.now() - 6 * 3600_000).toISOString();
     const { data: prior } = await admin.from("chat_messages").select("id")
       .eq("conversation_id", conv.id).eq("sender_type", "admin")
-      .ilike("content", "%جای شما در جلسه زنده رزرو است%").gte("created_at", bulk ? "2000-01-01" : since).limit(1).maybeSingle();
+      .ilike("content", bulk ? "%یک فرصت دوباره دارید%" : "%جای شما در جلسه زنده رزرو است%").gte("created_at", bulk ? "2000-01-01" : since).limit(1).maybeSingle();
     if (prior) return ({ sent: false, reason: "duplicate" });
 
     // Find their registration (by message email, account email, or merged emails)
@@ -51,11 +51,11 @@ async function processConv(admin: any, conversationId: string, userId: string, u
     const { data: reg } = await admin.from("form_submissions").select("name, round_id")
       .in("email", [...emails]).eq("source", "igads_registration")
       .order("created_at", { ascending: false }).limit(1).maybeSingle();
-    if (!reg?.round_id) return ({ sent: false, reason: "no_registration" });
-    if (onlyRound && reg.round_id !== onlyRound) return ({ sent: false, reason: "other_round" });
+    const roundId = bulk ? onlyRound : reg?.round_id;
+    if (!roundId) return ({ sent: false, reason: "no_registration" });
 
     const { data: round } = await admin.from("program_rounds")
-      .select("first_session_date, first_session_duration, google_meet_link").eq("id", reg.round_id).maybeSingle();
+      .select("first_session_date, first_session_duration, google_meet_link").eq("id", roundId).maybeSingle();
     if (!round?.first_session_date) return ({ sent: false, reason: "no_round" });
     const start = new Date(round.first_session_date);
     if (start.getTime() + 3 * 3600_000 < Date.now()) return ({ sent: false, reason: "past" });
@@ -69,11 +69,21 @@ async function processConv(admin: any, conversationId: string, userId: string, u
     const date = fmt(start, tz, { month: "long", day: "numeric" });
     const time = fmt(start, tz, { hour: "numeric", minute: "2-digit" });
     const city = tz.split("/").pop()!.replace(/_/g, " ");
-    const name = (reg.name || "").trim() || "دوست";
+    const name = (reg?.name || "").trim() || "دوست";
     const duration = round.first_session_duration || 120;
+    const registerUrl = `https://ladybosslook.com/l/igadsfree?round=${roundId}`;
 
-    const content =
-      `سلام ${name} عزیز، وقت بخیر 🌷\n\n` +
+    const content = bulk
+      ? `سلام ${name} عزیز، وقت بخیر 🌷\n\n` +
+        `اگر وبینار رایگان «جذب مشتری با تبلیغات اینستاگرام» را از دست دادید، یک فرصت دوباره دارید! 🎁\n\n` +
+        `📅 جلسه بعدی به وقت شما:\n` +
+        `• روز: ${FA_DAYS[weekdayEn] || weekdayEn}، ${date}\n` +
+        `• ساعت محلی شما: ${time} (${city})\n` +
+        `• مدت جلسه: ${duration} دقیقه — لایو در Google Meet\n\n` +
+        `برای رزرو جای خود، از دکمه زیر ثبت‌نام کنید:\n${registerUrl}\n\n` +
+        `📱 برای دریافت یادآوری‌ها، اپلیکیشن Rilo را نصب کنید:\n${APP_LINK}\n\n` +
+        `منتظر دیدن شما در لایو هستیم 💛`
+      : `سلام ${name} عزیز، وقت بخیر 🌷\n\n` +
       `ثبت‌نام شما در وبینار رایگان «جذب مشتری با تبلیغات اینستاگرام» تایید شد و جای شما در جلسه زنده رزرو است.\n\n` +
       `📅 زمان برگزاری به وقت شما:\n` +
       `• روز: ${FA_DAYS[weekdayEn] || weekdayEn}، ${date}\n` +
@@ -88,9 +98,11 @@ async function processConv(admin: any, conversationId: string, userId: string, u
       "وبینار جذب مشتری با اینستاگرام ادز",
     )}&dates=${gcalStamp(start)}/${gcalStamp(end)}`;
     const buttons = [
-      { label: "📱 دانلود اپلیکیشن Rilo", url: APP_LINK },
+      bulk ? { label: "✍️ ثبت‌نام در جلسه بعدی", url: registerUrl } : { label: "📱 دانلود اپلیکیشن Rilo", url: APP_LINK },
       { label: "📅 افزودن به Google Calendar", url: gcal },
-      { label: "🎬 ویدیوی پیش‌نیاز وبینار", url: `https://ladybosslook.com/l/igadsfree/thankyou?round=${reg.round_id}` },
+      bulk
+        ? { label: "📱 دانلود اپلیکیشن Rilo", url: APP_LINK }
+        : { label: "🎬 ویدیوی پیش‌نیاز وبینار", url: `https://ladybosslook.com/l/igadsfree/thankyou?round=${roundId}` },
     ];
 
     const { data: sender } = await admin.from("user_roles").select("user_id").eq("role", "admin").limit(1).maybeSingle();
@@ -131,13 +143,18 @@ Deno.serve(async (req) => {
         .eq("sender_type", "user").ilike("content", `%${TRIGGER}%`);
       const ids = [...new Set((msgs || []).map((m: any) => m.conversation_id))];
       const results: Record<string, number> = {};
-      for (const cid of ids) {
+      const one = async (cid: string) => {
         const { data: c } = await admin.from("chat_conversations").select("user_id").eq("id", cid).maybeSingle();
-        if (!c) continue;
+        if (!c) return;
         const { data: u } = await admin.auth.admin.getUserById(c.user_id);
-        const r = await processConv(admin, cid as string, c.user_id, u?.user?.email, "", true, roundId);
+        const r = await processConv(admin, cid, c.user_id, u?.user?.email, "", true, roundId);
         const k = r.sent ? "sent" : (r.reason || "skipped");
         results[k] = (results[k] || 0) + 1;
+      };
+      for (let i = 0; i < ids.length; i += 15) {
+        await Promise.all(ids.slice(i, i + 15).map((cid) => one(cid as string).catch((e) => {
+          console.error("bulk item failed", cid, e); results.error = (results.error || 0) + 1;
+        })));
       }
       return json({ total: ids.length, results });
     }
