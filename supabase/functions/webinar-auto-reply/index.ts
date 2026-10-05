@@ -37,7 +37,7 @@ async function processConv(admin: any, conversationId: string, userId: string, u
     const since = new Date(Date.now() - 6 * 3600_000).toISOString();
     const { data: prior } = await admin.from("chat_messages").select("id")
       .eq("conversation_id", conv.id).eq("sender_type", "admin")
-      .ilike("content", "%جای شما در جلسه زنده رزرو است%").gte("created_at", bulk ? "2000-01-01" : since).limit(1).maybeSingle();
+      .ilike("content", bulk ? "%یک فرصت دوباره دارید%" : "%جای شما در جلسه زنده رزرو است%").gte("created_at", bulk ? "2000-01-01" : since).limit(1).maybeSingle();
     if (prior) return ({ sent: false, reason: "duplicate" });
 
     // Find their registration (by message email, account email, or merged emails)
