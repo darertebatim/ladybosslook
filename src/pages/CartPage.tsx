@@ -256,8 +256,9 @@ const CartPage = () => {
                 {/* Trust & reassurance */}
                 <div className="grid gap-2 text-xs text-muted-foreground pt-1">
                   {totalCents > 0 && (
-                    <p className="flex items-center justify-center gap-2">
-                      <Lock className="w-3.5 h-3.5" /> Secure payment powered by Stripe
+                    <p className="flex items-center justify-center gap-1.5 font-medium text-foreground/75">
+                      <Lock className="w-3.5 h-3.5 text-foreground/60" /> Secure payment via
+                      <span className="text-[13px] font-extrabold tracking-tight" style={{ color: '#635BFF' }}>Stripe</span>
                     </p>
                   )}
                   <p className="flex items-center justify-center gap-2">
