@@ -23,8 +23,8 @@ export default {
 			'persian': ['Vazirmatn', 'Inter', 'sans-serif'],
 			'farsi': ['Vazirmatn', 'sans-serif'],
 			'display': ['Playfair Display', 'serif'],
-			'body': ['Inter', 'sans-serif'],
-			'app': ['Nunito', 'sans-serif'],
+		'body': ['Inter', 'Vazirmatn', 'sans-serif'],
+		'app': ['Nunito', 'Vazirmatn', 'sans-serif'],
 		},
 			colors: {
 				border: 'hsl(var(--border))',
