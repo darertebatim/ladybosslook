@@ -263,7 +263,7 @@ export default function Support() {
                 .eq("program_slug", "igadsfree").gt("first_session_date", new Date().toISOString())
                 .order("first_session_date", { ascending: false }).limit(1).maybeSingle();
               if (!r) { alert("No upcoming webinar round"); return; }
-              if (!confirm(`Send webinar details to everyone who asked in chat and is registered for "${r.round_name}"?`)) return;
+              if (!confirm(`Invite everyone who asked for webinar details in chat to "${r.round_name}"?`)) return;
               const { data, error } = await supabase.functions.invoke("webinar-auto-reply", { body: { bulk: true, roundId: r.id } });
               alert(error ? `Failed: ${error.message}` : `Done: ${JSON.stringify(data?.results || {})}`);
               fetchConversations();
