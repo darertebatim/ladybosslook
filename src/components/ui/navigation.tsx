@@ -8,10 +8,9 @@ import { authUrlFor } from '@/lib/authRedirect';
 import riloLogo from '@/assets/rilo-app-icon.png';
 
 const NAV_ITEMS = [
-  { label: 'Home', href: '#home' },
+  { label: 'Home', href: '/' },
   { label: 'About', href: '/about' },
   { label: 'Programs', href: '/programs' },
-  { label: 'Training Video', href: '/asac' },
 ];
 
 const Logo = () => (
