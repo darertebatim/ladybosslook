@@ -311,7 +311,7 @@ const ProgramPage = () => {
       <div className="min-h-screen flex flex-col bg-background">
         <Navigation />
 
-        <main className="flex-grow pt-14 lg:pt-20">
+        <main className="flex-grow pt-20 lg:pt-24">
           {/* Back link + badges row */}
           <div className="container mx-auto px-4 py-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
