@@ -230,10 +230,11 @@ html.native-app [data-scroll-container="true"] {
 
     /* Typography Scale */
     --font-display: 'Playfair Display', serif;
-    --font-body: 'Inter', "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+    --font-body: 'Inter', 'Vazirmatn', "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
     /* Emoji fallbacks appended so native emoji always render even when our
-       Fluent Emoji CDN is unreachable (e.g. offline on iPhone). */
-    --font-app: 'Inter', "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+       Fluent Emoji CDN is unreachable (e.g. offline on iPhone).
+       Vazirmatn sits after Inter so Farsi text renders in our font. */
+    --font-app: 'Inter', 'Vazirmatn', "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
     --font-farsi: 'Vazirmatn', sans-serif;
 
     /* Animation */
