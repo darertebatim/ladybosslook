@@ -99,7 +99,7 @@ Deno.serve(async (req) => {
     const buttons = [
       { label: "📱 دانلود اپلیکیشن Rilo", url: APP_LINK },
       { label: "📅 افزودن به Google Calendar", url: gcal },
-      { label: "🎬 ویدیوی پیش‌نیاز وبینار", url: `https://ladybosslook.com/thankyou-igads?round=${reg.round_id}` },
+      { label: "🎬 ویدیوی پیش‌نیاز وبینار", url: `https://ladybosslook.com/l/igadsfree/thankyou?round=${reg.round_id}` },
     ];
 
     const { data: sender } = await admin.from("user_roles").select("user_id").eq("role", "admin").limit(1).maybeSingle();

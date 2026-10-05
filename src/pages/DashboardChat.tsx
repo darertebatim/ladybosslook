@@ -199,6 +199,15 @@ export default function DashboardChat() {
       } catch (e) {
         console.error("notify failed", e);
       }
+
+      // Webinar sign-ups asking for details get an automatic reply with their session info.
+      if (messageContent.includes("در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام")) {
+        let tz = "";
+        try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch { /* ignore */ }
+        supabase.functions
+          .invoke("webinar-auto-reply", { body: { conversationId, timezone: tz } })
+          .catch((e) => console.error("auto-reply failed", e));
+      }
     } catch (e) {
       console.error(e);
       toast({ title: "Error", description: "Message could not be sent.", variant: "destructive" });
