@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Navigate, Link, useNavigate } from 'react-router-dom';
 import { supabase, browserTimezone } from '@/integrations/supabase/client';
-import { Loader2, Check, MessageCircle, ShoppingCart, Clock, ArrowLeft, Calendar, Video, ShieldCheck } from 'lucide-react';
+import { Loader2, Check, MessageCircle, ShoppingCart, Clock, ArrowLeft, Calendar, Video, ShieldCheck, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Navigation from '@/components/ui/navigation';
