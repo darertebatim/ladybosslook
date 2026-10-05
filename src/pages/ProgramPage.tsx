@@ -569,10 +569,11 @@ const ProgramPage = () => {
                         <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
                         <span className="text-xs font-semibold text-primary">30-day money-back guarantee</span>
                       </div>
-                      <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                        <Check className="w-3.5 h-3.5 text-primary" />
-                        <span>Instant access after purchase</span>
-                      </div>
+                      <p className="flex items-center justify-center gap-1.5 text-xs font-medium text-foreground/75">
+                        <Lock className="w-3.5 h-3.5 text-foreground/60" />
+                        Secure payment via
+                        <span className="text-[13px] font-extrabold tracking-tight" style={{ color: '#635BFF' }}>Stripe</span>
+                      </p>
                       <Link
                         to={`/dashboard/chat?draft=${encodeURIComponent(
                           `Hi, I have a question about the ${program.title} program.`
@@ -581,7 +582,10 @@ const ProgramPage = () => {
                       >
                         <MessageCircle size={16} /> Questions? Chat with support
                       </Link>
-                      <p className="text-xs text-muted-foreground">Secure payment via Stripe</p>
+                      <div className="flex items-center justify-center gap-2 text-xs font-medium text-foreground/75">
+                        <Check className="w-3.5 h-3.5 text-primary" />
+                        <span>Instant access after purchase</span>
+                      </div>
                     </div>
                   </Card>
                 </div>
