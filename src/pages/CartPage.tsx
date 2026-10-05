@@ -267,6 +267,11 @@ const CartPage = () => {
                   <p className="flex items-center justify-center gap-2">
                     <Smartphone className="w-3.5 h-3.5" /> Open the Rilo app → My Programs to start
                   </p>
+                  <p className="flex items-center justify-center gap-2 text-[11px]">
+                    <Link to="/terms" className="underline underline-offset-2">Terms & Refund Policy</Link>
+                    <span aria-hidden>·</span>
+                    <Link to="/privacy" className="underline underline-offset-2">Privacy Policy</Link>
+                  </p>
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 text-sm">

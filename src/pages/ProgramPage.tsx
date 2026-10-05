@@ -586,6 +586,11 @@ const ProgramPage = () => {
                         <Check className="w-3.5 h-3.5 text-primary" />
                         <span>Instant access after purchase</span>
                       </div>
+                      <div className="flex items-center justify-center gap-2 pt-1 text-[11px] text-muted-foreground">
+                        <RLink to="/terms" className="underline underline-offset-2 active:text-primary">Terms & Refund Policy</RLink>
+                        <span aria-hidden>·</span>
+                        <RLink to="/privacy" className="underline underline-offset-2 active:text-primary">Privacy Policy</RLink>
+                      </div>
                     </div>
                   </Card>
                 </div>
@@ -628,19 +633,15 @@ const ProgramPage = () => {
           </div>
         </div>
 
-        {/* Spacer for mobile sticky bar */}
-        <div className="h-16 lg:hidden" />
-
         <footer className="bg-card border-t border-border mt-4 lg:mt-8">
-          <div className="container mx-auto px-4 py-4 lg:px-6 lg:py-6">
+          <div className="container mx-auto px-4 pt-4 pb-28 lg:px-6 lg:py-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-3">
               <p className="text-xs lg:text-sm text-muted-foreground text-center md:text-left">
                 © 2024 LadyBoss Academy. All rights reserved. Empowering women worldwide.
               </p>
               <div className="flex flex-wrap justify-center gap-x-4 lg:gap-x-6 gap-y-1.5 text-xs lg:text-sm">
+                <RLink to="/terms" className="text-muted-foreground hover:text-primary transition-colors">Terms & Refund Policy</RLink>
                 <RLink to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</RLink>
-                <RLink to="/terms#refunds" className="text-muted-foreground hover:text-primary transition-colors">Refund Policy</RLink>
-                <RLink to="/terms" className="text-muted-foreground hover:text-primary transition-colors">Terms of Use</RLink>
               </div>
             </div>
           </div>
