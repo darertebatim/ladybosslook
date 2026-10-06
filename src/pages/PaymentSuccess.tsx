@@ -183,7 +183,17 @@ export default function PaymentSuccess() {
     });
   };
 
-  const productName: string = orderDetails?.product_name || 'Rilo Plus';
+  // Older cart orders stored the program slug as the product name; resolve it to the real title.
+  const rawProductName: string = orderDetails?.product_name || '';
+  const { data: slugAsProduct } = useQuery({
+    queryKey: ['payment-success-slug-title', rawProductName],
+    enabled: !!rawProductName && !orderDetails?.program_slug && /^[a-z0-9-]+$/i.test(rawProductName),
+    queryFn: async () => {
+      const { data } = await supabase.from('program_catalog').select('slug, title').eq('slug', rawProductName).maybeSingle();
+      return data || null;
+    },
+  });
+  const productName: string = slugAsProduct?.title || rawProductName || 'Rilo Plus';
   const isPlus = /plus|simora-plus/i.test(productName) || /simora-plus/i.test(orderDetails?.program_slug || '');
   const isAnnual = /annual|year/i.test(productName) || /annual/i.test(orderDetails?.program_slug || '');
   const planLabel = isPlus ? (isAnnual ? 'Annual membership' : 'Monthly membership') : 'One-time purchase';
@@ -195,10 +205,11 @@ export default function PaymentSuccess() {
   // Resolve slug(s) to look up round details
   const roundSlug = useMemo(() => {
     if (orderDetails?.program_slug) return orderDetails.program_slug as string;
+    if (slugAsProduct?.slug) return slugAsProduct.slug;
     if (programSlug) return programSlug;
     if (programsParam) return programsParam.split(',')[0]?.trim() || null;
     return null;
-  }, [orderDetails?.program_slug, programSlug, programsParam]);
+  }, [orderDetails?.program_slug, slugAsProduct?.slug, programSlug, programsParam]);
 
   const { data: roundInfo } = useQuery({
     queryKey: ['payment-success-round', roundSlug],
