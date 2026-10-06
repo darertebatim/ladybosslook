@@ -205,6 +205,16 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
     return map;
   }, [channels]);
 
+  const channelForRound = (r: ProgramRound | null | undefined) => {
+    if (!r) return undefined;
+    const sharedId = (r as any).community_channel_id as string | null;
+    if (sharedId) {
+      const c = (channels || []).find((x) => x.id === sharedId);
+      if (c) return { id: c.id, name: c.name, slug: c.slug, is_archived: c.is_archived };
+    }
+    return channelByRoundId[r.id];
+  };
+
   // Create a channel for an existing round
   const createRoundChannelMutation = useMutation({
     mutationFn: async (round: ProgramRound) => {
@@ -235,23 +245,28 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
     onError: (error: Error) => toast.error(error.message),
   });
 
-  // Link / unlink an existing channel to a round
+  // Link / unlink a channel to a round. Existing channels are shared via
+  // program_rounds.community_channel_id so one channel can serve many rounds.
   const linkChannelMutation = useMutation({
-    mutationFn: async ({ channelId, round }: { channelId: string; round: ProgramRound | null }) => {
-      const { error } = await supabase
-        .from("feed_channels")
-        .update(
-          round
-            ? { round_id: round.id, program_slug: round.program_slug, type: 'round' }
-            : { round_id: null, type: 'general' }
-        )
-        .eq("id", channelId);
+    mutationFn: async ({ channelId, round, unlinkRound }: { channelId: string; round: ProgramRound | null; unlinkRound?: ProgramRound }) => {
+      if (round) {
+        const { error } = await (supabase as any).from("program_rounds").update({ community_channel_id: channelId }).eq("id", round.id);
+        if (error) throw error;
+        return;
+      }
+      if (unlinkRound && (unlinkRound as any).community_channel_id === channelId) {
+        const { error } = await (supabase as any).from("program_rounds").update({ community_channel_id: null }).eq("id", unlinkRound.id);
+        if (error) throw error;
+        return;
+      }
+      const { error } = await supabase.from("feed_channels").update({ round_id: null, type: 'general' }).eq("id", channelId);
       if (error) throw error;
     },
     onSuccess: (_d, vars) => {
       queryClient.invalidateQueries({ queryKey: ["admin-round-feed-channels"] });
       queryClient.invalidateQueries({ queryKey: ["admin-feed-channels"] });
       queryClient.invalidateQueries({ queryKey: ["feed-channels"] });
+      queryClient.invalidateQueries();
       toast.success(vars.round ? "Channel linked to this round" : "Channel unlinked");
       setChannelRound(null);
     },
@@ -717,8 +732,8 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
                             <CalendarDays className="h-4 w-4 text-primary" />
                           </div>
                         )}
-                        {channelByRoundId[round.id] && (
-                          <div title={`Channel: ${channelByRoundId[round.id].name}`}>
+                        {channelForRound(round) && (
+                          <div title={`Channel: ${channelForRound(round).name}`}>
                             <MessageSquare className="h-4 w-4 text-primary" />
                           </div>
                         )}
@@ -733,9 +748,9 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
                             setChannelRound(round);
                             setSelectedChannelId("");
                           }}
-                          title={channelByRoundId[round.id] ? "Manage Channel" : "Create / Link Channel"}
+                          title={channelForRound(round) ? "Manage Channel" : "Create / Link Channel"}
                         >
-                          <MessageSquare className={`h-4 w-4 ${channelByRoundId[round.id] ? 'text-primary' : ''}`} />
+                          <MessageSquare className={`h-4 w-4 ${channelForRound(round) ? 'text-primary' : ''}`} />
                         </Button>
                         <Button
                           variant="outline"
@@ -798,13 +813,13 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
             </DialogDescription>
           </DialogHeader>
 
-          {channelRound && channelByRoundId[channelRound.id] ? (
+          {channelRound && channelForRound(channelRound) ? (
             <div className="space-y-4">
               <div className="rounded-lg border p-3">
-                <p className="font-medium">{channelByRoundId[channelRound.id].name}</p>
+                <p className="font-medium">{channelForRound(channelRound)!.name}</p>
                 <p className="text-sm text-muted-foreground">
-                  /{channelByRoundId[channelRound.id].slug}
-                  {channelByRoundId[channelRound.id].is_archived ? " · archived" : " · active"}
+                  /{channelForRound(channelRound)!.slug}
+                  {channelForRound(channelRound)!.is_archived ? " · archived" : " · active"}
                 </p>
               </div>
               <p className="text-sm text-muted-foreground">
@@ -814,7 +829,7 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
                 <Button
                   variant="outline"
                   onClick={() =>
-                    linkChannelMutation.mutate({ channelId: channelByRoundId[channelRound.id].id, round: null })
+                    linkChannelMutation.mutate({ channelId: channelForRound(channelRound)!.id, round: null, unlinkRound: channelRound })
                   }
                   disabled={linkChannelMutation.isPending}
                 >
@@ -847,7 +862,7 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
                   </SelectTrigger>
                   <SelectContent>
                     {(channels || [])
-                      .filter((c) => !c.round_id && !c.is_archived)
+                      .filter((c) => !c.is_archived)
                       .map((c) => (
                         <SelectItem key={c.id} value={c.id}>
                           {c.name}
