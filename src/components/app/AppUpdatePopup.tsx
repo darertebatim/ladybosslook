@@ -28,6 +28,8 @@ interface UpdatePopupConfig {
   platform?: 'ios' | 'android'; // required target platform
 }
 
+import { useQueuedPopup, POPUP_PRIORITY } from '@/contexts/PopupQueueContext';
+
 export function AppUpdatePopup() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
@@ -96,10 +98,12 @@ export function AppUpdatePopup() {
     if (config) localStorage.setItem(DISMISSED_KEY, config.id);
   };
 
+  const canShow = useQueuedPopup('app-update', POPUP_PRIORITY.update, open);
+
   if (!config) return null;
 
   return (
-    <AlertDialog open={open} onOpenChange={handleDismiss}>
+    <AlertDialog open={canShow} onOpenChange={handleDismiss}>
       <AlertDialogContent className="max-w-[300px] p-0 rounded-3xl border-0 shadow-2xl overflow-hidden bg-gradient-to-b from-background to-muted/30">
         <AlertDialogHeader className="pt-6 pb-4 px-5">
           <div className="flex justify-center mb-4">

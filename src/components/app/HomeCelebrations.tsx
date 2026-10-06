@@ -34,6 +34,8 @@ import { SOFT_REVIEW_EVENT } from "@/lib/appReview";
 import { Capacitor } from "@capacitor/core";
 import type { UserTask, TaskTemplate } from "@/hooks/useTaskPlanner";
 import type { BadgeLevel } from "@/hooks/useWeeklyTaskCompletion";
+import { useQueuedPopup, POPUP_PRIORITY } from '@/contexts/PopupQueueContext';
+
 
 interface HomeCelebrationsProps {
   // Paywall
