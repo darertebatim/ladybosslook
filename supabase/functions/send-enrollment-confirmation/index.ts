@@ -13,7 +13,9 @@ const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=com.ladybosslook.academy";
 const WEB_BASE = "https://ladybosslook.com";
 const RILO_MANUAL_URL =
-  "https://ladybosslook.com/__l5e/assets-v1/e907c87e-7fed-48fd-8ea8-8ba1ec4add43/Rilo_Manual.pdf";
+  "https://youtu.be/-k0NUlMozyU";
+const RILO_MANUAL_THUMBNAIL_URL =
+  "https://i.ytimg.com/vi/-k0NUlMozyU/hqdefault.jpg";
 
 
 const corsHeaders = {
@@ -150,9 +152,9 @@ function renderEmail(opts: {
         hostLabel: "مدرس",
         langLabel: "زبان",
         stepsTitle: "چطور شروع کنم؟",
-        manual: "مشاهده راهنمای اپلیکیشن 📘",
-        manualTitle: "📘 راهنمای کامل اپلیکیشن Rilo",
-        manualText: "همه چیزهایی که برای شروع نیاز داری داخل این راهنماست — حتماً یک نگاهی بهش بنداز!",
+        manual: "▶ تماشای راهنمای ویدیویی ریلو",
+        manualTitle: "🎬 راهنمای ویدیویی اپلیکیشن Rilo",
+        manualText: "برای آشنایی با ریلو و شروع استفاده از اپلیکیشن، این ویدیو را تماشا کن!",
       }
 
     : {
@@ -188,9 +190,9 @@ function renderEmail(opts: {
         hostLabel: "Host",
         langLabel: "Language",
         stepsTitle: "How to access your program",
-        manual: "View the app guide 📘",
-        manualTitle: "📘 The complete Rilo app guide",
-        manualText: "Everything you need to get started is in this guide — make sure to check it out!",
+        manual: "▶ Watch the Rilo video guide",
+        manualTitle: "🎬 Rilo app video guide",
+        manualText: "Watch this video to get to know Rilo and start using the app!",
       };
 
 
@@ -331,6 +333,9 @@ function renderEmail(opts: {
     <div style="background:#ffffff;border:2px solid #fdba74;border-radius:16px;padding:20px 16px;margin:20px 0;text-align:center;">
       <h2 style="margin:0 0 8px;font-size:17px;color:#9a3412;">${t.manualTitle}</h2>
       <p dir="auto" style="margin:0 0 14px;font-size:14px;line-height:1.7;color:#374151;">${t.manualText}</p>
+      <a href="${RILO_MANUAL_URL}" style="display:block;text-decoration:none;margin:0 0 16px;">
+        <img src="${RILO_MANUAL_THUMBNAIL_URL}" alt="${t.manualTitle}" width="480" style="display:block;width:100%;max-width:480px;height:auto;margin:0 auto;border:0;border-radius:12px;" />
+      </a>
       <a href="${RILO_MANUAL_URL}" style="display:inline-block;background:#ea580c;color:#fff;text-decoration:none;padding:14px 28px;border-radius:12px;font-size:16px;font-weight:700;">${t.manual}</a>
     </div>`;
 
