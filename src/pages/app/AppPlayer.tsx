@@ -171,6 +171,7 @@ export default function AppPlayer() {
 
   const userLang = useUserPreferredLanguage();
   const [showLangPopup, setShowLangPopup] = useState(false);
+  const langPopupCanShow = useQueuedPopup("language-pref", POPUP_PRIORITY.language, showLangPopup);
   const [showLangHint, setShowLangHint] = useState(false);
 
   useEffect(() => {
