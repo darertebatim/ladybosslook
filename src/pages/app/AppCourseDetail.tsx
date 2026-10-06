@@ -534,6 +534,11 @@ const AppCourseDetail = () => {
     queryFn: async () => {
       if (!round?.id) return null;
 
+      const { data: rr } = await (supabase as any).from("program_rounds").select("community_channel_id").eq("id", round.id).maybeSingle();
+      if (rr?.community_channel_id) {
+        const { data: shared } = await supabase.from("feed_channels").select("id, name, slug").eq("id", rr.community_channel_id).maybeSingle();
+        if (shared) return shared;
+      }
       const { data, error } = await supabase
         .from("feed_channels")
         .select("id, name, slug")
