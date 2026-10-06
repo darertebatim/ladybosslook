@@ -1,3 +1,4 @@
+import { useQueuedPopup, POPUP_PRIORITY } from '@/contexts/PopupQueueContext';
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from "react-router-dom";
@@ -977,7 +978,7 @@ export default function AppPlayer() {
       </div>
       <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
       <LanguagePreferencePopup
-        open={showLangPopup}
+        open={langPopupCanShow}
         onClose={() => {
           setShowLangPopup(false);
           if (shouldShowLanguageSettingsHint()) {

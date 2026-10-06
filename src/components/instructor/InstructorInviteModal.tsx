@@ -1,3 +1,4 @@
+import { useQueuedPopup, POPUP_PRIORITY } from '@/contexts/PopupQueueContext';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
@@ -165,7 +166,8 @@ export function InstructorInviteModal() {
   const { pendingInvite, accept, decline } = useInstructorOnboarding(user?.id);
   const [busy, setBusy] = useState(false);
 
-  if (!pendingInvite) return null;
+  const canShow = useQueuedPopup('instructor-invite', POPUP_PRIORITY.instructor, !!pendingInvite);
+  if (!pendingInvite || !canShow) return null;
 
   const handleAccept = async () => {
     if (busy) return;
