@@ -5,6 +5,7 @@ import { useClaimPendingDedication } from '@/hooks/useClaimPendingDedication';
 import { useClaimPendingPlaylistGift } from '@/hooks/useClaimPendingPlaylistGift';
 import { useSupportDeepLink } from '@/hooks/useSupportDeepLink';
 import { GlobalCelebrationHost } from '@/components/app/GlobalCelebrationHost';
+import { PopupQueueProvider } from '@/contexts/PopupQueueContext';
 import { useApertureAdminLockSync } from '@/aperture/hooks/useApertureAdminLockSync';
 
 function DedicationClaimer() {
@@ -22,6 +23,7 @@ function DedicationClaimer() {
  */
 export function AppProvidersLayout() {
   return (
+    <PopupQueueProvider>
     <AudioPlayerProvider>
       <RoutinePlayerProvider>
         <DedicationClaimer />
@@ -29,5 +31,6 @@ export function AppProvidersLayout() {
         <GlobalCelebrationHost />
       </RoutinePlayerProvider>
     </AudioPlayerProvider>
+    </PopupQueueProvider>
   );
 }

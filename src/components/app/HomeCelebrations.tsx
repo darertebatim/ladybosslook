@@ -34,6 +34,8 @@ import { SOFT_REVIEW_EVENT } from "@/lib/appReview";
 import { Capacitor } from "@capacitor/core";
 import type { UserTask, TaskTemplate } from "@/hooks/useTaskPlanner";
 import type { BadgeLevel } from "@/hooks/useWeeklyTaskCompletion";
+import { useQueuedPopup, POPUP_PRIORITY } from '@/contexts/PopupQueueContext';
+
 
 interface HomeCelebrationsProps {
   // Paywall
@@ -322,6 +324,18 @@ export const HomeCelebrations = memo(function HomeCelebrations(
     return () => window.removeEventListener("requestPushNudge", handler);
   }, [userId, needsAttention]);
 
+  const C = POPUP_PRIORITY.celebration;
+  const qStreak = useQueuedPopup("h-streak", C, showStreakModal);
+  const qGold = useQueuedPopup("h-gold", C, showGoldStreakCelebration);
+  const qGoalDone = useQueuedPopup("h-goal-done", C, showStreakGoalCompletion);
+  const qPushFlow = useQueuedPopup("h-push-flow", POPUP_PRIORITY.push, !!userId && showNotificationFlow);
+  const qRecovery = useQueuedPopup("h-recovery", C, showRecoveryPrompt);
+  const qChallenge = useQueuedPopup("h-challenge", C, showChallengeDayCelebration);
+  const qRoutineEnded = useQueuedPopup("h-routine-ended", C, !!showRoutineEnded);
+  const qReturning = useQueuedPopup("h-returning-push", POPUP_PRIORITY.push, showReturningSheet);
+  const qTaskNudge = useQueuedPopup("h-task-nudge", POPUP_PRIORITY.push, taskNudge.open);
+  const qReview = useQueuedPopup("h-review", POPUP_PRIORITY.review, showIOSSoftReview);
+
   return (
     <OverlayPortal>
       <PaywallSheet open={showPaywall} onOpenChange={setShowPaywall} />
@@ -359,7 +373,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(
       />
 
       <StreakCelebration
-        open={showStreakModal}
+        open={qStreak}
         onClose={() => {
           setShowStreakModal(false);
           setIsFirstActionCelebration(false);
@@ -438,7 +452,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(
       />
 
       <GoldStreakCelebration
-        open={showGoldStreakCelebration}
+        open={qGold}
         onClose={() => setShowGoldStreakCelebration(false)}
         currentGoldStreak={goldStreakData?.currentGoldStreak || 1}
         goldDatesThisWeek={goldDatesThisWeek}
@@ -469,7 +483,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(
       )}
 
       <StreakGoalCompletionCelebration
-        open={showStreakGoalCompletion}
+        open={qGoalDone}
         streakGoal={streak?.streak_goal || 7}
         currentStreak={streak?.current_streak || 0}
         onClose={() => setShowStreakGoalCompletion(false)}
@@ -480,7 +494,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(
         }}
       />
 
-      {userId && showNotificationFlow && (
+      {userId && qPushFlow && (
         <PushNotificationOnboarding
           userId={userId}
           onComplete={() => setShowNotificationFlow(false)}
@@ -489,7 +503,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(
       )}
 
       <StreakRecoveryPrompt
-        open={showRecoveryPrompt}
+        open={qRecovery}
         previousStreak={streak?.longest_streak || 0}
         onRecover={() => {
           const prev = streak?.longest_streak || 0;
@@ -518,7 +532,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(
       <ShieldEarnedDetector longestStreak={streak?.longest_streak || 0} />
 
       <ChallengeDayCelebration
-        open={showChallengeDayCelebration}
+        open={qChallenge}
         onClose={closeChallengeDayCelebration}
         challengeTitle={challengeDayCelebration?.challengeTitle || ""}
         challengeEmoji={challengeDayCelebration?.challengeEmoji || "✨"}
@@ -528,7 +542,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(
       />
 
       <RoutineEndedCelebration
-        open={!!showRoutineEnded}
+        open={qRoutineEnded}
         onClose={() => closeRoutineEnded?.()}
         routineTitle={routineEndedData?.routineTitle || ""}
         routineEmoji={routineEndedData?.routineEmoji || "✨"}
@@ -559,7 +573,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(
         <>
           <ReturningUserPushSheet
             userId={userId}
-            open={showReturningSheet}
+            open={qReturning}
             onClose={() => setShowReturningSheet(false)}
             consecutiveDays={
               streak?.current_streak ?? streak?.currentStreak ?? 3
@@ -567,7 +581,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(
           />
           <TaskCompletionPushNudge
             userId={userId}
-            open={taskNudge.open}
+            open={qTaskNudge}
             onClose={() => setTaskNudge({ open: false })}
             streakDay={taskNudge.streakDay}
             streakGoal={taskNudge.streakGoal}
@@ -576,7 +590,7 @@ export const HomeCelebrations = memo(function HomeCelebrations(
       )}
 
       <SoftReviewPrompt
-        isOpen={showIOSSoftReview}
+        isOpen={qReview}
         onClose={() => setShowIOSSoftReview(false)}
         trigger={softReviewTrigger}
         onAccept={async () => {

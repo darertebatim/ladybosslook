@@ -1,3 +1,4 @@
+import { useQueuedPopup, POPUP_PRIORITY } from '@/contexts/PopupQueueContext';
 // AppHome - Main home page component
 import { useState, useMemo, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
@@ -81,6 +82,7 @@ const AppHome = () => {
   // bottom sheet first (planner visible behind) instead of jumping straight
   // into a full-screen onboarding, so users understand the context.
   const [showPlannerIntroSheet, setShowPlannerIntroSheet] = useState(false);
+  const plannerIntroCanShow = useQueuedPopup('planner-intro', POPUP_PRIORITY.intro, showPlannerIntroSheet);
   useEffect(() => {
     const seen = localStorage.getItem('simora_onboarding_completed_what-is-rilo') === 'true';
     const dismissed = localStorage.getItem('simora_onboarding_planner_intro_dismissed') === 'true';
@@ -1445,7 +1447,7 @@ const AppHome = () => {
         {/* First-visit planner intro — 75% bottom sheet so users see the
             planner behind it instead of a full-screen takeover. */}
         <PlannerIntroSheet
-          isOpen={showPlannerIntroSheet}
+          isOpen={plannerIntroCanShow}
           onStart={handlePlannerIntroStart}
           onSkip={handlePlannerIntroSkip}
         />

@@ -1,3 +1,4 @@
+import { useQueuedPopup, POPUP_PRIORITY } from '@/contexts/PopupQueueContext';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -265,10 +266,11 @@ export function InstructorWelcomeSheet() {
     }
   };
 
+  const canShow = useQueuedPopup('instructor-welcome', POPUP_PRIORITY.instructor, !!instructor && open);
   if (!instructor) return null;
 
   return (
-    <Sheet open={open} onOpenChange={(v) => { if (!v) dismiss(); }}>
+    <Sheet open={canShow} onOpenChange={(v) => { if (!v) dismiss(); }}>
       <SheetContent
         side="bottom"
         className="rounded-t-3xl border-t-0 px-6 pt-8 pb-10 max-h-[88vh]"

@@ -1,3 +1,4 @@
+import { useQueuedPopup, POPUP_PRIORITY } from '@/contexts/PopupQueueContext';
 import { useEffect, useState } from 'react';
 import { ShieldEarnedSheet } from './ShieldEarnedSheet';
 import { getEarnedShields, getShieldMilestonesUpTo } from '@/lib/recoveryShields';
@@ -31,11 +32,12 @@ export const ShieldEarnedDetector = ({ longestStreak }: ShieldEarnedDetectorProp
     }
   }, [longestStreak]);
 
+  const canShow = useQueuedPopup('shield-earned', POPUP_PRIORITY.celebration, !!active);
   if (!active) return null;
 
   return (
     <ShieldEarnedSheet
-      open={!!active}
+      open={canShow}
       milestoneDay={active.day}
       totalShields={active.total ?? getEarnedShields(longestStreak)}
       onClose={() => setActive(null)}

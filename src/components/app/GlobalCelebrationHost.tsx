@@ -51,6 +51,8 @@ function saveCelebratedLevel(dateKey: string, level: string) {
   }
 }
 
+import { useQueuedPopup, POPUP_PRIORITY } from '@/contexts/PopupQueueContext';
+
 export function GlobalCelebrationHost() {
   const { user } = useAuth();
   const { pathname } = useLocation();
@@ -182,6 +184,11 @@ export function GlobalCelebrationHost() {
   }, [allowedRoute, active]);
 
   const close = () => setActive(null);
+  const C = POPUP_PRIORITY.celebration;
+  const qStreak = useQueuedPopup('g-streak', C, allowedRoute && active?.kind === 'first-action');
+  const qBadge = useQueuedPopup('g-badge', C, allowedRoute && active?.kind === 'badge');
+  const qGold = useQueuedPopup('g-gold', C, allowedRoute && active?.kind === 'gold-streak');
+  const qChallenge = useQueuedPopup('g-challenge', C, allowedRoute && showChallengeDay && !!challengeDayData);
 
   if (!user) return null;
 
@@ -190,7 +197,7 @@ export function GlobalCelebrationHost() {
       {/* First-action streak */}
       <OverlayPortal>
         <StreakCelebration
-          open={allowedRoute && active?.kind === 'first-action'}
+          open={qStreak}
           onClose={close}
           isFirstAction
           currentStreak={
@@ -201,7 +208,7 @@ export function GlobalCelebrationHost() {
 
       {/* Badge (silver / almost gold / gold) */}
       <BadgeCelebration
-        type={allowedRoute && active?.kind === 'badge' ? active.type : null}
+        type={qBadge && active?.kind === 'badge' ? active.type : null}
         onClose={close}
         onGoldCollected={() => {
           // Mirror AppHome behavior: update server gold streak after gold collect
@@ -214,7 +221,7 @@ export function GlobalCelebrationHost() {
       {/* Gold streak */}
       <OverlayPortal>
         <GoldStreakCelebration
-          open={allowedRoute && active?.kind === 'gold-streak'}
+          open={qGold}
           onClose={close}
           currentGoldStreak={
             active?.kind === 'gold-streak' ? active.currentGoldStreak : 0
@@ -228,7 +235,7 @@ export function GlobalCelebrationHost() {
       {/* Challenge day */}
       <OverlayPortal>
         <ChallengeDayCelebration
-          open={allowedRoute && showChallengeDay && !!challengeDayData}
+          open={qChallenge}
           onClose={closeChallengeDay}
           challengeTitle={challengeDayData?.challengeTitle || ''}
           challengeEmoji={challengeDayData?.challengeEmoji || '✨'}
