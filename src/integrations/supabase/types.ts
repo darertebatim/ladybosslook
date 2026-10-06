@@ -5486,6 +5486,7 @@ export type Database = {
         Row: {
           audio_playlist_id: string | null
           auto_create_feed_channel: boolean
+          community_channel_id: string | null
           created_at: string
           desktop_link_enabled: boolean
           drip_offset_days: number
@@ -5518,6 +5519,7 @@ export type Database = {
         Insert: {
           audio_playlist_id?: string | null
           auto_create_feed_channel?: boolean
+          community_channel_id?: string | null
           created_at?: string
           desktop_link_enabled?: boolean
           drip_offset_days?: number
@@ -5550,6 +5552,7 @@ export type Database = {
         Update: {
           audio_playlist_id?: string | null
           auto_create_feed_channel?: boolean
+          community_channel_id?: string | null
           created_at?: string
           desktop_link_enabled?: boolean
           drip_offset_days?: number
@@ -5585,6 +5588,13 @@ export type Database = {
             columns: ["audio_playlist_id"]
             isOneToOne: false
             referencedRelation: "audio_playlists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "program_rounds_community_channel_id_fkey"
+            columns: ["community_channel_id"]
+            isOneToOne: false
+            referencedRelation: "feed_channels"
             referencedColumns: ["id"]
           },
           {
