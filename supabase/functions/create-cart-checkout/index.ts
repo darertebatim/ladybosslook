@@ -93,6 +93,7 @@ serve(async (req) => {
     // Build line items from cart
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
     const programSlugs: string[] = [];
+    const programTitles: string[] = [];
     const freePrograms: { slug: string; title: string }[] = [];
 
     for (const item of cartItems) {
@@ -174,6 +175,7 @@ serve(async (req) => {
 
 
       programSlugs.push(item.program_slug);
+      programTitles.push(program.title);
     }
 
     // Enroll free programs directly (no Stripe needed)
@@ -217,7 +219,8 @@ serve(async (req) => {
         cart_checkout: 'true',
         user_id: user.id,
         program_slugs: programSlugs.join(','),
-        product_name: programSlugs.length === 1 ? programSlugs[0] : `Cart (${programSlugs.length} programs)`,
+        product_name: programSlugs.length === 1 ? programTitles[0] : `Cart (${programSlugs.length} programs)`,
+        ...(programSlugs.length === 1 ? { program_slug: programSlugs[0] } : {}),
         ...(buyerTimezone ? { buyer_timezone: buyerTimezone } : {}),
       },
     });
