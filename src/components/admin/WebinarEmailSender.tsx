@@ -228,7 +228,6 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
                 onlyUnsent: effectiveOnlyUnsent,
                 joinNow,
                 morningOf,
-                timeChange,
               };
 
       // Large sends are split into batches of 50 so the edge function never
