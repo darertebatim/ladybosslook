@@ -15,15 +15,16 @@ import { MetaCrmEvents } from '@/components/admin/MetaCrmEvents';
 import { LeadEmailCampaign } from '@/components/admin/LeadEmailCampaign';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 
-const igads = LEAD_CAMPAIGNS.find((c) => c.key === 'igads')!;
-const aliagads = LEAD_CAMPAIGNS.find((c) => c.key === 'aliagads')!;
-const customerVideo = LEAD_CAMPAIGNS.find((c) => c.key === 'customerwithigads')!;
+const igads = LEAD_CAMPAIGNS.find((c) => c.key === 'igads');
+const aliagads = LEAD_CAMPAIGNS.find((c) => c.key === 'aliagads');
+const customerVideo = LEAD_CAMPAIGNS.find((c) => c.key === 'customerwithigads');
+const igthree = LEAD_CAMPAIGNS.find((c) => c.key === 'igthree');
 
 export default function LeadCenter() {
   const [tab, setTab] = useState('campaigns');
   const { inactive } = useInactiveLeadCampaigns();
   const show = (key: string) => !inactive.includes(key);
-  const campaignTabKeys = ['sixtraps', 'smartinsta', 'igads', 'aliagads', 'customerwithigads'];
+  const campaignTabKeys = ['sixtraps', 'smartinsta', 'igads', 'aliagads', 'customerwithigads', 'igthree'];
   const visibleCampaignTabs = campaignTabKeys.filter(show).length;
   const colCount = 5 + visibleCampaignTabs;
 
@@ -31,6 +32,8 @@ export default function LeadCenter() {
     if (campaignTabKeys.includes(tab) && !show(tab)) setTab('campaigns');
   }, [inactive, tab]);
 
+
+  if (!igads || !aliagads || !customerVideo || !igthree) return null;
 
   return (
     <div className="space-y-6">
@@ -57,6 +60,7 @@ export default function LeadCenter() {
           {show('customerwithigads') && (
             <TabsTrigger value="customerwithigads">IG Video</TabsTrigger>
           )}
+          {show('igthree') && <TabsTrigger value="igthree">IG Three</TabsTrigger>}
           <TabsTrigger value="marketing">Email Marketing</TabsTrigger>
           <TabsTrigger value="opens">Email Opens</TabsTrigger>
           <TabsTrigger value="crm">Meta CRM</TabsTrigger>
@@ -128,6 +132,11 @@ export default function LeadCenter() {
         </TabsContent>
 
 
+
+        <TabsContent value="igthree" className="space-y-6">
+          <WebinarEmailEngagement campaignKey="igthree" sources={[igthree.regSource]} />
+          <GenericWebinarSignups campaign={igthree} />
+        </TabsContent>
 
         <TabsContent value="marketing" className="space-y-6">
           <LeadEmailCampaign />

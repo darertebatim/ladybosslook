@@ -18,6 +18,16 @@ export interface LeadCampaign {
 
 export const LEAD_CAMPAIGNS: LeadCampaign[] = [
   {
+    key: 'igthree',
+    label: 'IG Three (video)',
+    programSlug: 'customerwithigads',
+    landingPath: '/l/igthree',
+    thankYouPath: '/l/igthree',
+    regSource: 'igthree_waitlist',
+    extraSources: [],
+    metaEvent: 'IGThreeLead',
+  },
+  {
     key: 'sixtraps',
     label: '6 Instagram Traps',
     labelFa: 'وبینار ۶ تله اینستاگرام',
