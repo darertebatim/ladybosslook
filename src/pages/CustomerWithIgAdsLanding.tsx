@@ -3,8 +3,39 @@ import { Helmet } from "react-helmet-async";
 import { Play, Sparkles } from "lucide-react";
 import coverAsset from "@/assets/customerwithigads-cover.png.asset.json";
 import igthreeCoverAsset from "@/assets/igthree-thumbnail.jpg.asset.json";
+import assertiveCoverAsset from "@/assets/assertive-cover.jpg.asset.json";
 import WebinarWaitlistBox from "@/components/WebinarWaitlistBox";
 import { trackCustomLead, trackLead } from "@/lib/metaPixel";
+
+interface VideoVariant {
+  title: string;
+  subtitle: string;
+  description: string;
+  cover: string;
+}
+
+const VARIANTS: Record<string, VideoVariant> = {
+  Fre2PCAuZW0: {
+    title: "سه پیشفرض برای جذب مشتری از اینستاگرام در امریکا و کانادا",
+    subtitle: "مخصوص بیزینس‌های آمریکا و کانادا — با علی لطفی",
+    description: "سه پیشفرض برای جذب مشتری از اینستاگرام در امریکا و کانادا — با علی لطفی.",
+    cover: igthreeCoverAsset.url,
+  },
+  GcZQl7TGk48: {
+    title: "بیان اسرتیو برای خانم های مهاجر ( Assertive Expression ) ۲۰۲۶",
+    subtitle: "مخصوص خانم‌های مهاجر — با رازی لیدی‌باس",
+    description: "بیان اسرتیو برای خانم‌های مهاجر — با رازی لیدی‌باس.",
+    cover: assertiveCoverAsset.url,
+  },
+};
+
+const DEFAULT_VARIANT: VideoVariant = {
+  title: "بهترین روش جذب مشتری از اینستاگرام",
+  subtitle: "مخصوص بیزینس‌های آمریکا و کانادا — با علی لطفی",
+  description:
+    "ببینید چرا بیزینس شما آن‌طور که باید از اینستاگرام مشتری نمی‌گیرد — و بیزینس‌های موفق فارسی‌زبان چطور بیش از ظرفیت‌شان مشتری می‌گیرند.",
+  cover: coverAsset.url,
+};
 
 export default function CustomerWithIgAdsLanding({
   videoId = "kMcRNW0_44o",
@@ -12,13 +43,8 @@ export default function CustomerWithIgAdsLanding({
   metaEvent = "CustomerWithIgAdsLead",
 }: { videoId?: string; source?: string; metaEvent?: string } = {}) {
   const [playing, setPlaying] = useState(false);
-  const isIgThree = videoId === "Fre2PCAuZW0";
-  const title = isIgThree
-    ? "سه پیشفرض برای جذب مشتری از اینستاگرام در امریکا و کانادا"
-    : "بهترین روش جذب مشتری از اینستاگرام";
-  const description = isIgThree
-    ? "سه پیشفرض برای جذب مشتری از اینستاگرام در امریکا و کانادا — با علی لطفی."
-    : "ببینید چرا بیزینس شما آن‌طور که باید از اینستاگرام مشتری نمی‌گیرد — و بیزینس‌های موفق فارسی‌زبان چطور بیش از ظرفیت‌شان مشتری می‌گیرند.";
+  const variant = VARIANTS[videoId] ?? DEFAULT_VARIANT;
+  const { title, subtitle, description, cover } = variant;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-white">
@@ -40,7 +66,7 @@ export default function CustomerWithIgAdsLanding({
             {title}
           </h1>
           <p className="mt-2 text-sm leading-7 text-neutral-600">
-            مخصوص بیزینس‌های آمریکا و کانادا — با علی لطفی
+            {subtitle}
           </p>
         </div>
 
@@ -62,7 +88,7 @@ export default function CustomerWithIgAdsLanding({
                 aria-label="پخش ویدیو"
               >
                 <img
-                  src={isIgThree ? igthreeCoverAsset.url : coverAsset.url}
+                  src={cover}
                   alt={title}
                   className="h-full w-full object-cover"
                 />

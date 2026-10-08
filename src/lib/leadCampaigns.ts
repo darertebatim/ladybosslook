@@ -28,6 +28,17 @@ export const LEAD_CAMPAIGNS: LeadCampaign[] = [
     metaEvent: 'IGThreeLead',
   },
   {
+    key: 'assertive',
+    label: 'Assertive Expression (video)',
+    labelFa: 'ویدیو بیان اسرتیو برای خانم‌های مهاجر',
+    programSlug: 'customerwithigads',
+    landingPath: '/l/assertive',
+    thankYouPath: '/l/assertive',
+    regSource: 'assertive_waitlist',
+    extraSources: [],
+    metaEvent: 'AssertiveLead',
+  },
+  {
     key: 'sixtraps',
     label: '6 Instagram Traps',
     labelFa: 'وبینار ۶ تله اینستاگرام',

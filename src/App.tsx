@@ -598,6 +598,7 @@ const App = () => (
                   {!isNativeApp() && <Route path="/l/igads/gifts" element={<IgAdsGifts />} />}
                   {!isNativeApp() && <Route path="/l/customerwithigads" element={<CustomerWithIgAdsLanding />} />}
                   <Route path="/l/igthree" element={<CustomerWithIgAdsLanding videoId="Fre2PCAuZW0" source="igthree_waitlist" metaEvent="IGThreeLead" />} />
+                  <Route path="/l/assertive" element={<CustomerWithIgAdsLanding videoId="GcZQl7TGk48" source="assertive_waitlist" metaEvent="AssertiveLead" />} />
                   {!isNativeApp() && <Route path="/smartinstaframework" element={<SmartInstaLanding />} />}
                   {!isNativeApp() && <Route path="/thankyousmartinstaframework" element={<ThankYouSmartInsta />} />}
                   {!isNativeApp() && <Route path="/giftsalilotfivip" element={<GiftsAliLotfiVip />} />}

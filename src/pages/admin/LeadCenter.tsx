@@ -19,12 +19,13 @@ const igads = LEAD_CAMPAIGNS.find((c) => c.key === 'igads');
 const aliagads = LEAD_CAMPAIGNS.find((c) => c.key === 'aliagads');
 const customerVideo = LEAD_CAMPAIGNS.find((c) => c.key === 'customerwithigads');
 const igthree = LEAD_CAMPAIGNS.find((c) => c.key === 'igthree');
+const assertive = LEAD_CAMPAIGNS.find((c) => c.key === 'assertive');
 
 export default function LeadCenter() {
   const [tab, setTab] = useState('campaigns');
   const { inactive } = useInactiveLeadCampaigns();
   const show = (key: string) => !inactive.includes(key);
-  const campaignTabKeys = ['sixtraps', 'smartinsta', 'igads', 'aliagads', 'customerwithigads', 'igthree'];
+  const campaignTabKeys = ['sixtraps', 'smartinsta', 'igads', 'aliagads', 'customerwithigads', 'igthree', 'assertive'];
   const visibleCampaignTabs = campaignTabKeys.filter(show).length;
   const colCount = 5 + visibleCampaignTabs;
 
@@ -33,7 +34,7 @@ export default function LeadCenter() {
   }, [inactive, tab]);
 
 
-  if (!igads || !aliagads || !customerVideo || !igthree) return null;
+  if (!igads || !aliagads || !customerVideo || !igthree || !assertive) return null;
 
   return (
     <div className="space-y-6">
@@ -61,6 +62,7 @@ export default function LeadCenter() {
             <TabsTrigger value="customerwithigads">IG Video</TabsTrigger>
           )}
           {show('igthree') && <TabsTrigger value="igthree">IG Three</TabsTrigger>}
+          {show('assertive') && <TabsTrigger value="assertive">Assertive</TabsTrigger>}
           <TabsTrigger value="marketing">Email Marketing</TabsTrigger>
           <TabsTrigger value="opens">Email Opens</TabsTrigger>
           <TabsTrigger value="crm">Meta CRM</TabsTrigger>
@@ -136,6 +138,11 @@ export default function LeadCenter() {
         <TabsContent value="igthree" className="space-y-6">
           <WebinarEmailEngagement campaignKey="igthree" sources={[igthree.regSource]} />
           <GenericWebinarSignups campaign={igthree} />
+        </TabsContent>
+
+        <TabsContent value="assertive" className="space-y-6">
+          <WebinarEmailEngagement campaignKey="assertive" sources={[assertive.regSource]} />
+          <GenericWebinarSignups campaign={assertive} />
         </TabsContent>
 
         <TabsContent value="marketing" className="space-y-6">
