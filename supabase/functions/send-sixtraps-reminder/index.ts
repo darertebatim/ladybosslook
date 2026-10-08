@@ -862,6 +862,7 @@ serve(async (req) => {
                 : c.subjects.reminder,
         html: appendUnsubFooter(html, unsubUrl),
         headers: unsubHeaders(unsubUrl),
+        tags: [{ name: "campaign", value: campaignKey }],
       });
 
       if (error) {
