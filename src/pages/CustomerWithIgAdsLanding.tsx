@@ -66,7 +66,7 @@ export default function CustomerWithIgAdsLanding({
             {title}
           </h1>
           <p className="mt-2 text-sm leading-7 text-neutral-600">
-            مخصوص بیزینس‌های آمریکا و کانادا — با علی لطفی
+            {subtitle}
           </p>
         </div>
 
@@ -88,7 +88,7 @@ export default function CustomerWithIgAdsLanding({
                 aria-label="پخش ویدیو"
               >
                 <img
-                  src={isIgThree ? igthreeCoverAsset.url : coverAsset.url}
+                  src={cover}
                   alt={title}
                   className="h-full w-full object-cover"
                 />
