@@ -389,7 +389,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?:
             email: parsed.data.email.toLowerCase(),
             programSlug: PROGRAM_SLUG,
             prereqUrl: "https://ladybosslook.com/l/igadsfree/thankyou",
-            sources: ["igads_registration", "preigads_interest"],
+            sources: isAli ? [regSource] : [regSource, "preigads_interest"],
             ...(roundId ? { roundId } : {}),
           },
         })
@@ -397,7 +397,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?:
 
       try {
         localStorage.setItem(
-          "igads_registration",
+          regSource,
           JSON.stringify({
             email: parsed.data.email.toLowerCase(),
             roundId,
@@ -562,7 +562,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?:
           </section>
 
           {!blockedRegion && waitlistMode && (
-            <WebinarWaitlistBox source="igads_waitlist" />
+            <WebinarWaitlistBox source={waitlistSource} />
           )}
 
           {!blockedRegion && !waitlistMode && !needsRoundChoice && (
