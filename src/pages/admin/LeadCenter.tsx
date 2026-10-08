@@ -16,13 +16,14 @@ import { LeadEmailCampaign } from '@/components/admin/LeadEmailCampaign';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 
 const igads = LEAD_CAMPAIGNS.find((c) => c.key === 'igads')!;
+const aliagads = LEAD_CAMPAIGNS.find((c) => c.key === 'aliagads')!;
 const customerVideo = LEAD_CAMPAIGNS.find((c) => c.key === 'customerwithigads')!;
 
 export default function LeadCenter() {
   const [tab, setTab] = useState('campaigns');
   const { inactive } = useInactiveLeadCampaigns();
   const show = (key: string) => !inactive.includes(key);
-  const campaignTabKeys = ['sixtraps', 'smartinsta', 'igads', 'customerwithigads'];
+  const campaignTabKeys = ['sixtraps', 'smartinsta', 'igads', 'aliagads', 'customerwithigads'];
   const visibleCampaignTabs = campaignTabKeys.filter(show).length;
   const colCount = 5 + visibleCampaignTabs;
 
@@ -52,6 +53,7 @@ export default function LeadCenter() {
           {show('sixtraps') && <TabsTrigger value="sixtraps">6 Traps</TabsTrigger>}
           {show('smartinsta') && <TabsTrigger value="smartinsta">Smart IG</TabsTrigger>}
           {show('igads') && <TabsTrigger value="igads">IG Ads</TabsTrigger>}
+          {show('aliagads') && <TabsTrigger value="aliagads">IG Ads (Ali)</TabsTrigger>}
           {show('customerwithigads') && (
             <TabsTrigger value="customerwithigads">IG Video</TabsTrigger>
           )}
@@ -97,6 +99,24 @@ export default function LeadCenter() {
             sources={[igads.regSource, ...igads.extraSources]}
           />
           <GenericWebinarSignups campaign={igads} />
+        </TabsContent>
+
+        <TabsContent value="aliagads" className="space-y-6">
+          <WebinarRoundBreakdown
+            programSlug={aliagads.programSlug}
+            sources={[aliagads.regSource, ...aliagads.extraSources]}
+          />
+          <WebinarEmailSender
+            campaignKey="aliagads"
+            programSlug={aliagads.programSlug}
+            sources={[aliagads.regSource, ...aliagads.extraSources]}
+            signupPath={aliagads.landingPath}
+          />
+          <WebinarEmailEngagement
+            campaignKey="aliagads"
+            sources={[aliagads.regSource, ...aliagads.extraSources]}
+          />
+          <GenericWebinarSignups campaign={aliagads} />
         </TabsContent>
 
         <TabsContent value="customerwithigads" className="space-y-6">
