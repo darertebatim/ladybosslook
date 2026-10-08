@@ -200,13 +200,11 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
     try {
       const effectiveOnlyUnsent = nextSession
         ? onlyUnsentNext
-        : timeChange
-          ? false
-          : joinNow
-            ? onlyUnsentJoinNow
-            : morningOf
-              ? onlyUnsentMorning
-              : onlyUnsent;
+        : joinNow
+          ? onlyUnsentJoinNow
+          : morningOf
+            ? onlyUnsentMorning
+            : onlyUnsent;
       const body =
         mode === 'test'
           ? {
@@ -216,7 +214,6 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
               joinNow,
               nextSession,
               morningOf,
-              timeChange,
             }
           : nextSession
             ? {
