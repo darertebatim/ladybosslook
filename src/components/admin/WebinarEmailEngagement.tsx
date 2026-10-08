@@ -18,6 +18,7 @@ interface EventRow {
   recipient: string | null;
   subject: string | null;
   occurred_at: string;
+  tags: Record<string, string> | null;
 }
 
 const RANGES = [
@@ -52,7 +53,7 @@ async function fetchEvents(days: number): Promise<EventRow[]> {
   for (let page = 0; page < 30; page++) {
     const { data, error } = await supabase
       .from('email_delivery_events')
-      .select('event_type, recipient, subject, occurred_at')
+      .select('event_type, recipient, subject, occurred_at, tags')
       .gte('occurred_at', since)
       .order('occurred_at', { ascending: false })
       .range(page * 1000, page * 1000 + 999);
@@ -93,7 +94,15 @@ export function WebinarEmailEngagement({ campaignKey, sources }: Props) {
 
     for (const e of events ?? []) {
       const who = (e.recipient || '').toLowerCase();
-      if (!who || (audience && !audience.has(who))) continue;
+      if (!who) continue;
+      // New emails carry a campaign tag — match it exactly. Older untagged
+      // events fall back to matching the campaign's signup list.
+      const tag = e.tags?.campaign;
+      if (tag) {
+        if (tag !== campaignKey) continue;
+      } else if (audience && !audience.has(who)) {
+        continue;
+      }
       const subject = e.subject || '(no subject)';
       let agg = map.get(subject);
       if (!agg) {
