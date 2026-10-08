@@ -55,6 +55,18 @@ export const LEAD_CAMPAIGNS: LeadCampaign[] = [
     confirmationFunction: 'send-sixtraps-confirmation',
   },
   {
+    key: 'aliagads',
+    label: 'Instagram Ads (Ali)',
+    labelFa: 'وبینار اینستاگرام ادز (علی)',
+    programSlug: 'igadsfree',
+    landingPath: '/l/aliagads',
+    thankYouPath: '/l/aliagads/thankyou',
+    regSource: 'aliagads_registration',
+    extraSources: ['aliagads_waitlist'],
+    metaEvent: 'IGAdsFreeLead',
+    confirmationFunction: 'send-sixtraps-confirmation',
+  },
+  {
     key: 'customerwithigads',
     label: 'Customers with Instagram (video)',
     labelFa: 'ویدیو بهترین روش جذب مشتری از اینستاگرام',

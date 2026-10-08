@@ -388,7 +388,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?:
             name: parsed.data.name,
             email: parsed.data.email.toLowerCase(),
             programSlug: PROGRAM_SLUG,
-            prereqUrl: "https://ladybosslook.com/l/igadsfree/thankyou",
+            prereqUrl: `https://ladybosslook.com${basePath}/thankyou`,
             sources: isAli ? [regSource] : [regSource, "preigads_interest"],
             ...(roundId ? { roundId } : {}),
           },
