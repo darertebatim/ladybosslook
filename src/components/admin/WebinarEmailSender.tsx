@@ -39,8 +39,6 @@ type SendKey =
   | 'next-all'
   | 'morning-test'
   | 'morning-all'
-  | 'time-test'
-  | 'time-all'
   | null;
 
 interface Props {
