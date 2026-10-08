@@ -438,6 +438,7 @@ serve(async (req) => {
             : "یادآوری: وبینار فریم‌ورک اینستاگرام هوشمند + ویدیو پیش‌نیاز 🎬",
         html: appendUnsubFooter(html, unsubUrl),
         headers: unsubHeaders(unsubUrl),
+        tags: [{ name: "campaign", value: "smartinsta" }],
       });
 
       if (error) {

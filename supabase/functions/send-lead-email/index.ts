@@ -357,6 +357,7 @@ const handler = async (req: Request): Promise<Response> => {
           unsubscribeUrl,
         }),
         reply_to: SENDER_EMAIL,
+        tags: [{ name: "campaign", value: "marketing" }],
         headers: {
           "List-Unsubscribe": `<${unsubscribeUrl}>`,
           "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
