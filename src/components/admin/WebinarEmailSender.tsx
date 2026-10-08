@@ -92,16 +92,22 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
     staleTime: 0,
     refetchOnMount: 'always',
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('form_submissions')
-        .select(
-          'email, round_id, reminder_sent_at, join_now_sent_at, next_session_sent_at, morning_sent_at, meta',
-        )
-        .in('source', sources)
-        .order('submitted_at', { ascending: false })
-        .limit(5000);
-      if (error) throw error;
-      return (data || []) as unknown as Row[];
+      const all: Row[] = [];
+      for (let from = 0; ; from += 1000) {
+        const { data, error } = await supabase
+          .from('form_submissions')
+          .select(
+            'email, round_id, reminder_sent_at, join_now_sent_at, next_session_sent_at, morning_sent_at, meta',
+          )
+          .in('source', sources)
+          .order('submitted_at', { ascending: false })
+          .order('id', { ascending: true })
+          .range(from, from + 999);
+        if (error) throw error;
+        all.push(...((data || []) as unknown as Row[]));
+        if (!data || data.length < 1000) break;
+      }
+      return all;
     },
   });
 
