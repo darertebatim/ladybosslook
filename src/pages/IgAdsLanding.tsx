@@ -165,7 +165,7 @@ function MiniCountdown({ startUtc }: { startUtc: Date }) {
 }
 
 
-export default function IgAdsLanding() {
+export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?: string } = {}) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const roundParam = searchParams.get("round");
@@ -403,7 +403,7 @@ export default function IgAdsLanding() {
         );
       } catch {}
 
-      navigate(`/l/igadsfree/thankyou${roundId ? `?round=${roundId}` : ""}`, {
+      navigate(`${basePath}/thankyou${roundId ? `?round=${roundId}` : ""}`, {
         state: {
           igAdsRegistrationCompleted: true,
           email: parsed.data.email.toLowerCase(),
