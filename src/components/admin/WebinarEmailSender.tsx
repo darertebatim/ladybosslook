@@ -165,41 +165,34 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
     joinNow = false,
     nextSession = false,
     morningOf = false,
-    timeChange = false,
   ) {
-    const key = (timeChange
-      ? `time-${mode}`
-      : nextSession
-        ? `next-${mode}`
-        : joinNow
-          ? `join-${mode}`
-          : morningOf
-            ? `morning-${mode}`
-            : mode) as SendKey;
+    const key = (nextSession
+      ? `next-${mode}`
+      : joinNow
+        ? `join-${mode}`
+        : morningOf
+          ? `morning-${mode}`
+          : mode) as SendKey;
 
     if (mode === 'test' && !testEmail.trim()) {
       toast.error('Enter a test email first');
       return;
     }
     if (mode === 'all') {
-      const count = timeChange
-        ? timeChangeTargetCount
-        : nextSession
-          ? nextSessionTargetCount
-          : morningOf
-            ? morningTargetCount
-            : joinNow
-              ? joinNowTargetCount
-              : targetCount;
-      const what = timeChange
-        ? '"session time changed" email'
-        : nextSession
-          ? '"next session" invite'
-          : morningOf
-            ? '"morning of webinar" email'
-            : joinNow
-              ? '"starting now" email'
-              : 'reminder email';
+      const count = nextSession
+        ? nextSessionTargetCount
+        : morningOf
+          ? morningTargetCount
+          : joinNow
+            ? joinNowTargetCount
+            : targetCount;
+      const what = nextSession
+        ? '"next session" invite'
+        : morningOf
+          ? '"morning of webinar" email'
+          : joinNow
+            ? '"starting now" email'
+            : 'reminder email';
       if (!window.confirm(`Send the ${what} to ${count} signup(s)?`)) return;
     }
 
