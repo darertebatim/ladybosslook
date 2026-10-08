@@ -1,2 +1,1 @@
 - Resolve direct program courses and audio/video playlists alongside round content in learner views, deduplicating by content ID; program enrollment must unlock directly attached content even without a round.
-- Program duplication uses the existing create form, copies settings, linked content, hosts and tags, and never copies rounds or enrollments; this keeps new programs independent.
