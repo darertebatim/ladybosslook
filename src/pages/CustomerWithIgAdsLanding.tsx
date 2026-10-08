@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Play, Sparkles } from "lucide-react";
 import coverAsset from "@/assets/customerwithigads-cover.png.asset.json";
+import igthreeCoverAsset from "@/assets/igthree-thumbnail.jpg.asset.json";
 import WebinarWaitlistBox from "@/components/WebinarWaitlistBox";
 import { trackCustomLead, trackLead } from "@/lib/metaPixel";
 
@@ -11,14 +12,21 @@ export default function CustomerWithIgAdsLanding({
   metaEvent = "CustomerWithIgAdsLead",
 }: { videoId?: string; source?: string; metaEvent?: string } = {}) {
   const [playing, setPlaying] = useState(false);
+  const isIgThree = videoId === "Fre2PCAuZW0";
+  const title = isIgThree
+    ? "سه پیشفرض برای جذب مشتری از اینستاگرام در امریکا و کانادا"
+    : "بهترین روش جذب مشتری از اینستاگرام";
+  const description = isIgThree
+    ? "سه پیشفرض برای جذب مشتری از اینستاگرام در امریکا و کانادا — با علی لطفی."
+    : "ببینید چرا بیزینس شما آن‌طور که باید از اینستاگرام مشتری نمی‌گیرد — و بیزینس‌های موفق فارسی‌زبان چطور بیش از ظرفیت‌شان مشتری می‌گیرند.";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-white">
       <Helmet>
-        <title>بهترین روش جذب مشتری از اینستاگرام | Rilo</title>
+        <title>{title} | Rilo</title>
         <meta
           name="description"
-          content="ویدیو آموزشی رایگان: بهترین روش جذب مشتری از اینستاگرام، مخصوص بیزینس‌های آمریکا و کانادا."
+          content={`ویدیو آموزشی رایگان: ${title}.`}
         />
       </Helmet>
 
@@ -29,7 +37,7 @@ export default function CustomerWithIgAdsLanding({
             ویدیو رایگان — تماشای فوری
           </span>
           <h1 className="mt-3 text-2xl font-extrabold leading-9 text-neutral-900 sm:text-3xl">
-            بهترین روش جذب مشتری از اینستاگرام
+            {title}
           </h1>
           <p className="mt-2 text-sm leading-7 text-neutral-600">
             مخصوص بیزینس‌های آمریکا و کانادا — با علی لطفی
@@ -42,7 +50,7 @@ export default function CustomerWithIgAdsLanding({
               <iframe
                 className="absolute inset-0 h-full w-full"
                 src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
-                title="بهترین روش جذب مشتری از اینستاگرام"
+                title={title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
@@ -54,8 +62,8 @@ export default function CustomerWithIgAdsLanding({
                 aria-label="پخش ویدیو"
               >
                 <img
-                  src={coverAsset.url}
-                  alt="بهترین روش جذب مشتری از اینستاگرام"
+                  src={isIgThree ? igthreeCoverAsset.url : coverAsset.url}
+                  alt={title}
                   className="h-full w-full object-cover"
                 />
                 <span className="absolute inset-0 bg-black/10 transition group-active:bg-black/25" />
@@ -68,7 +76,7 @@ export default function CustomerWithIgAdsLanding({
         </section>
 
         <p className="mt-3 text-center text-xs leading-6 text-neutral-500">
-          ببینید چرا بیزینس شما آن‌طور که باید از اینستاگرام مشتری نمی‌گیرد — و بیزینس‌های موفق فارسی‌زبان چطور بیش از ظرفیت‌شان مشتری می‌گیرند.
+          {description}
         </p>
 
         <div className="mt-8 flex items-center gap-3">
