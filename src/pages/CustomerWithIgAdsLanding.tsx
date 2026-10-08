@@ -5,9 +5,11 @@ import coverAsset from "@/assets/customerwithigads-cover.png.asset.json";
 import WebinarWaitlistBox from "@/components/WebinarWaitlistBox";
 import { trackCustomLead, trackLead } from "@/lib/metaPixel";
 
-const YT_ID = "kMcRNW0_44o";
-
-export default function CustomerWithIgAdsLanding() {
+export default function CustomerWithIgAdsLanding({
+  videoId = "kMcRNW0_44o",
+  source = "customerwithigads_waitlist",
+  metaEvent = "CustomerWithIgAdsLead",
+}: { videoId?: string; source?: string; metaEvent?: string } = {}) {
   const [playing, setPlaying] = useState(false);
 
   return (
@@ -39,7 +41,7 @@ export default function CustomerWithIgAdsLanding() {
             {playing ? (
               <iframe
                 className="absolute inset-0 h-full w-full"
-                src={`https://www.youtube.com/embed/${YT_ID}?autoplay=1&rel=0&modestbranding=1`}
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
                 title="بهترین روش جذب مشتری از اینستاگرام"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -87,11 +89,11 @@ export default function CustomerWithIgAdsLanding() {
 
         <div onClickCapture={() => { /* noop */ }}>
           <WebinarWaitlistBox
-            source="customerwithigads_waitlist"
+            source={source}
             title="لیست انتظار دوره بعدی"
             onSuccess={() => {
-              trackLead({ content_name: "customerwithigads_waitlist" });
-              trackCustomLead("CustomerWithIgAdsLead");
+              trackLead({ content_name: source });
+              trackCustomLead(metaEvent);
             }}
           />
         </div>

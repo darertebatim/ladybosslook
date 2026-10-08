@@ -1,1 +1,2 @@
 - Resolve direct program courses and audio/video playlists alongside round content in learner views, deduplicating by content ID; program enrollment must unlock directly attached content even without a round.
+- Duplicate video campaigns share a configurable landing page with separate signup sources and Meta events to preserve layout consistency without mixing leads.
