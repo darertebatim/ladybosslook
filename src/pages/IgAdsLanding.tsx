@@ -166,6 +166,9 @@ function MiniCountdown({ startUtc }: { startUtc: Date }) {
 
 
 export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?: string } = {}) {
+  const isAli = basePath === "/l/aliagads";
+  const regSource = isAli ? "aliagads_registration" : "igads_registration";
+  const waitlistSource = isAli ? "aliagads_waitlist" : "igads_waitlist";
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const roundParam = searchParams.get("round");
@@ -367,7 +370,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?:
         email: parsed.data.email.toLowerCase(),
         phone: "",
         city: "",
-        source: "igads_registration",
+        source: regSource,
         round_id: roundId,
       });
       if (error) throw error;
