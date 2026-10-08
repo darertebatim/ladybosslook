@@ -54,6 +54,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [duplicateSourceId, setDuplicateSourceId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [tagsProgram, setTagsProgram] = useState<ProgramCatalog | null>(null);
   const [tagsSelection, setTagsSelection] = useState<string[]>([]);
@@ -241,6 +242,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       restricted_regions: [],
     });
     setEditingId(null);
+    setDuplicateSourceId(null);
     setShowForm(false);
     setHosts([]);
     setContentLinks([]);
@@ -275,11 +277,20 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
 
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        const { data: createdProgram, error } = await supabase
           .from('program_catalog')
-          .insert([{ ...programFields, slug, audio_playlist_id: featuredAudio }] as any);
+          .insert([{ ...programFields, slug, audio_playlist_id: featuredAudio }] as any)
+          .select('id')
+          .single();
 
         if (error) throw error;
+        if (duplicateSourceId && createdProgram) {
+          await saveProgramTags.mutateAsync({
+            contentType: 'program',
+            contentId: createdProgram.id,
+            tagIds: programTagLinks.filter((link) => link.content_id === duplicateSourceId).map((link) => link.tag_id),
+          });
+        }
       }
 
       const { data: savedLinks, error: readError } = await supabase.from('program_content_links')
@@ -320,7 +331,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
     }
   };
 
-  const handleEdit = async (program: ProgramCatalog) => {
+  const handleEdit = async (program: ProgramCatalog, duplicate = false) => {
     const { data: existingLinks, error: linksError } = await supabase
       .from('program_content_links')
       .select('content_type, content_id')
@@ -332,9 +343,14 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
     }
     setContentLinks((existingLinks || []).filter((link) => !(link.content_type === 'audio' && link.content_id === (program as any).audio_playlist_id)) as { content_type: 'audio' | 'video' | 'course'; content_id: string }[]);
     setContentSelection({ type: 'audio', id: '' });
+    let copySlug = `${program.slug}-copy`;
+    let suffix = 2;
+    while (programs.some((existing) => existing.slug === copySlug)) {
+      copySlug = `${program.slug}-copy-${suffix++}`;
+    }
     setFormData({
-      slug: program.slug,
-      title: program.title,
+      slug: duplicate ? copySlug : program.slug,
+      title: duplicate ? `${program.title} (Copy)` : program.title,
       type: program.type,
       payment_type: program.payment_type,
       price_amount: program.price_amount,
@@ -394,8 +410,10 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
     } catch {
       setHosts([]);
     }
-    setEditingId(program.id);
+    setEditingId(duplicate ? null : program.id);
+    setDuplicateSourceId(duplicate ? program.id : null);
     setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id: string) => {
@@ -431,15 +449,6 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
     toast({
       title: 'Copied!',
       description: 'Product page link copied to clipboard',
-    });
-  };
-
-  const copyPaymentLink = (slug: string) => {
-    const link = `https://ladybosslook.com/${slug}pay`;
-    navigator.clipboard.writeText(link);
-    toast({
-      title: 'Copied!',
-      description: 'Payment link copied to clipboard',
     });
   };
 
@@ -1617,8 +1626,9 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      onClick={() => copyPaymentLink(program.slug)}
-                      title="Copy Payment Link"
+                      onClick={() => handleEdit(program, true)}
+                      title="Duplicate Program"
+                      aria-label={`Duplicate ${program.title}`}
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
