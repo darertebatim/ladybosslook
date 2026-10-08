@@ -706,8 +706,7 @@ serve(async (req) => {
       let query = supabase
         .from("form_submissions")
         .select("email, name, round_id")
-        .in("source", SOURCES)
-        .limit(5000);
+        .in("source", SOURCES);
       if (nextSession) {
         if (audienceRoundId) query = query.eq("round_id", audienceRoundId);
         if (onlyUnsent) query = query.is("next_session_sent_at", null);
@@ -740,8 +739,15 @@ serve(async (req) => {
               : query.is("reminder_sent_at", null);
         }
       }
-      const { data: rows, error } = await query;
-      if (error) throw error;
+      // Page through results — the API caps each request at 1000 rows.
+      query = query.order("id", { ascending: true });
+      const rows: any[] = [];
+      for (let from = 0; ; from += 1000) {
+        const { data: page, error } = await query.range(from, from + 999);
+        if (error) throw error;
+        rows.push(...(page || []));
+        if (!page || page.length < 1000) break;
+      }
       const seen = new Set<string>();
       for (const r of rows || []) {
         const em = String(r.email || "").trim().toLowerCase();
