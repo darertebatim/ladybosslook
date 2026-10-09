@@ -21,7 +21,7 @@ function fmt(d: Date, tz: string, opts: Intl.DateTimeFormatOptions) {
 const gcalStamp = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
 
-async function processConv(admin: any, conversationId: string, userId: string, userEmail: string | undefined, timezone: string, bulk: boolean, onlyRound?: string): Promise<any> {
+async function processConv(admin: any, conversationId: string, userId: string, userEmail: string | undefined, timezone: string, bulk: boolean, onlyRound?: string, sinceMs = 6 * 3600_000): Promise<any> {
         const { data: conv } = await admin.from("chat_conversations")
       .select("id, user_id, unread_count_user").eq("id", conversationId).maybeSingle();
     if (!conv || conv.user_id !== userId) return ({ sent: false });
@@ -34,7 +34,7 @@ async function processConv(admin: any, conversationId: string, userId: string, u
     if (!last?.content?.includes(TRIGGER)) return ({ sent: false });
 
     // Don't reply twice within 6 hours
-    const since = new Date(Date.now() - 6 * 3600_000).toISOString();
+    const since = new Date(Date.now() - sinceMs).toISOString();
     const { data: prior } = await admin.from("chat_messages").select("id")
       .eq("conversation_id", conv.id).eq("sender_type", "admin")
       .ilike("content", bulk ? "%یک فرصت دوباره دارید%" : "%جای شما در جلسه زنده رزرو است%").gte("created_at", bulk ? "2000-01-01" : since).limit(1).maybeSingle();
@@ -145,6 +145,27 @@ Deno.serve(async (req) => {
     if (!user) return json({ error: "Unauthorized" }, 401);
     const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const body = await req.json().catch(() => ({}));
+
+    if (body.backfill) {
+      const { data: role } = await admin.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle();
+      if (!role) return json({ error: "Admin only" }, 403);
+      const win = 4 * 86400_000;
+      const { data: msgs } = await admin.from("chat_messages").select("conversation_id")
+        .eq("sender_type", "user").ilike("content", `%${TRIGGER}%`).gte("created_at", new Date(Date.now() - win).toISOString());
+      const ids = [...new Set((msgs || []).map((m: any) => m.conversation_id))];
+      const results: Record<string, number> = {};
+      for (const cid of ids) {
+        try {
+          const { data: c } = await admin.from("chat_conversations").select("user_id").eq("id", cid).maybeSingle();
+          if (!c) continue;
+          const { data: u } = await admin.auth.admin.getUserById(c.user_id);
+          const r = await processConv(admin, cid as string, c.user_id, u?.user?.email, "", false, undefined, win);
+          const k = r.sent ? "sent" : (r.reason || "skipped");
+          results[k] = (results[k] || 0) + 1;
+        } catch (e) { console.error("backfill", cid, e); results.error = (results.error || 0) + 1; }
+      }
+      return json({ total: ids.length, results });
+    }
 
     if (body.bulk) {
       const { data: role } = await admin.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle();
