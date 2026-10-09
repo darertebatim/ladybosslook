@@ -192,6 +192,8 @@ Deno.serve(async (req) => {
       return json({ total: ids.length, results });
     }
 
+    const { data: setting } = await admin.from("app_settings").select("value").eq("key", "automation_webinar_details_enabled").maybeSingle();
+    if (setting?.value === "false") return json({ sent: false, reason: "disabled" });
     const r = await processConv(admin, body.conversationId, user.id, user.email, body.timezone || "", false);
     return json(r);
   } catch (e) {
