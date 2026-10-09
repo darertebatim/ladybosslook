@@ -1,0 +1,2 @@
+ALTER TABLE public.chat_messages ADD COLUMN IF NOT EXISTS automation_key text;
+CREATE INDEX IF NOT EXISTS idx_chat_messages_automation_key ON public.chat_messages(automation_key, created_at DESC) WHERE automation_key IS NOT NULL;
