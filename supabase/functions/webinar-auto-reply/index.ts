@@ -21,7 +21,7 @@ function fmt(d: Date, tz: string, opts: Intl.DateTimeFormatOptions) {
 const gcalStamp = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
 
-async function processConv(admin: any, conversationId: string, userId: string, userEmail: string | undefined, timezone: string, bulk: boolean, onlyRound?: string): Promise<any> {
+async function processConv(admin: any, conversationId: string, userId: string, userEmail: string | undefined, timezone: string, bulk: boolean, onlyRound?: string, sinceMs = 6 * 3600_000): Promise<any> {
         const { data: conv } = await admin.from("chat_conversations")
       .select("id, user_id, unread_count_user").eq("id", conversationId).maybeSingle();
     if (!conv || conv.user_id !== userId) return ({ sent: false });
@@ -34,7 +34,7 @@ async function processConv(admin: any, conversationId: string, userId: string, u
     if (!last?.content?.includes(TRIGGER)) return ({ sent: false });
 
     // Don't reply twice within 6 hours
-    const since = new Date(Date.now() - 6 * 3600_000).toISOString();
+    const since = new Date(Date.now() - sinceMs).toISOString();
     const { data: prior } = await admin.from("chat_messages").select("id")
       .eq("conversation_id", conv.id).eq("sender_type", "admin")
       .ilike("content", bulk ? "%یک فرصت دوباره دارید%" : "%جای شما در جلسه زنده رزرو است%").gte("created_at", bulk ? "2000-01-01" : since).limit(1).maybeSingle();
@@ -48,17 +48,26 @@ async function processConv(admin: any, conversationId: string, userId: string, u
     const { data: aliases } = await admin.from("account_email_aliases").select("email").eq("user_id", userId);
     (aliases || []).forEach((a: any) => a.email && emails.add(a.email.toLowerCase()));
 
-    const { data: reg } = await admin.from("form_submissions").select("name, round_id")
-      .in("email", [...emails]).eq("source", "igads_registration")
-      .order("created_at", { ascending: false }).limit(1).maybeSingle();
-    const roundId = bulk ? onlyRound : reg?.round_id;
-    if (!roundId) return ({ sent: false, reason: "no_registration" });
-
-    const { data: round } = await admin.from("program_rounds")
-      .select("first_session_date, first_session_duration, google_meet_link").eq("id", roundId).maybeSingle();
-    if (!round?.first_session_date) return ({ sent: false, reason: "no_round" });
+    const { data: reg } = emails.size ? await admin.from("form_submissions").select("name, round_id")
+      .in("email", [...emails]).in("source", ["igads_registration", "aliagads_registration"])
+      .order("submitted_at", { ascending: false }).limit(1).maybeSingle() : { data: null };
+    const loadRound = async (id: string) => (await admin.from("program_rounds")
+      .select("id, first_session_date, first_session_duration").eq("id", id).maybeSingle()).data;
+    const isUpcoming = (r: any) => r?.first_session_date && new Date(r.first_session_date).getTime() + 3 * 3600_000 > Date.now();
+    let round: any = null;
+    const preferred = bulk ? onlyRound : reg?.round_id;
+    if (preferred) round = await loadRound(preferred);
+    if (!isUpcoming(round)) {
+      // Fall back to the next upcoming webinar session
+      const { data: next } = await admin.from("program_rounds")
+        .select("id, first_session_date, first_session_duration").eq("program_slug", "igadsfree")
+        .gt("first_session_date", new Date(Date.now() - 3 * 3600_000).toISOString())
+        .order("first_session_date", { ascending: true }).limit(1).maybeSingle();
+      round = next;
+    }
+    if (!isUpcoming(round)) return ({ sent: false, reason: "no_round" });
+    const roundId = round.id;
     const start = new Date(round.first_session_date);
-    if (start.getTime() + 3 * 3600_000 < Date.now()) return ({ sent: false, reason: "past" });
 
     let tz = typeof timezone === "string" && timezone ? timezone : "";
     if (!tz) {
@@ -69,7 +78,8 @@ async function processConv(admin: any, conversationId: string, userId: string, u
     const date = fmt(start, tz, { month: "long", day: "numeric" });
     const time = fmt(start, tz, { hour: "numeric", minute: "2-digit" });
     const city = tz.split("/").pop()!.replace(/_/g, " ");
-    const name = (reg?.name || "").trim() || "دوست";
+    const msgName = last.content.match(/نام:\s*([^\n]+)/)?.[1]?.trim();
+    const name = (reg?.name || "").trim() || msgName || "دوست";
     const duration = round.first_session_duration || 120;
     const registerUrl = `https://ladybosslook.com/l/igadsfree?round=${roundId}`;
 
@@ -109,6 +119,7 @@ async function processConv(admin: any, conversationId: string, userId: string, u
     if (!sender) return ({ sent: false });
     const { error } = await admin.from("chat_messages").insert({
       conversation_id: conv.id, sender_id: sender.user_id, sender_type: "admin", content, buttons, is_read: false,
+      automation_key: bulk ? "webinar_missed_bulk" : "webinar_details",
     });
     if (error) throw error;
     await admin.from("chat_conversations").update({
@@ -119,6 +130,7 @@ async function processConv(admin: any, conversationId: string, userId: string, u
         body: { conversationId: conv.id, messageContent: "✅ جزئیات وبینار شما", senderType: "admin", senderId: sender.user_id },
       });
     } catch (_) { /* ignore */ }
+    return ({ sent: true });
 }
 
 Deno.serve(async (req) => {
@@ -133,6 +145,27 @@ Deno.serve(async (req) => {
     if (!user) return json({ error: "Unauthorized" }, 401);
     const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const body = await req.json().catch(() => ({}));
+
+    if (body.backfill) {
+      const { data: role } = await admin.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle();
+      if (!role) return json({ error: "Admin only" }, 403);
+      const win = 4 * 86400_000;
+      const { data: msgs } = await admin.from("chat_messages").select("conversation_id")
+        .eq("sender_type", "user").ilike("content", `%${TRIGGER}%`).gte("created_at", new Date(Date.now() - win).toISOString());
+      const ids = [...new Set((msgs || []).map((m: any) => m.conversation_id))];
+      const results: Record<string, number> = {};
+      for (const cid of ids) {
+        try {
+          const { data: c } = await admin.from("chat_conversations").select("user_id").eq("id", cid).maybeSingle();
+          if (!c) continue;
+          const { data: u } = await admin.auth.admin.getUserById(c.user_id);
+          const r = await processConv(admin, cid as string, c.user_id, u?.user?.email, "", false, undefined, win);
+          const k = r.sent ? "sent" : (r.reason || "skipped");
+          results[k] = (results[k] || 0) + 1;
+        } catch (e) { console.error("backfill", cid, e); results.error = (results.error || 0) + 1; }
+      }
+      return json({ total: ids.length, results });
+    }
 
     if (body.bulk) {
       const { data: role } = await admin.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle();

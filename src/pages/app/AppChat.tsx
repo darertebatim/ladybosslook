@@ -279,6 +279,13 @@ export default function AppChat() {
           senderId: user.id
         }
       });
+      if (messageContent.includes('در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام')) {
+        let tz = '';
+        try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch { /* ignore */ }
+        supabase.functions
+          .invoke('webinar-auto-reply', { body: { conversationId, timezone: tz } })
+          .catch((e) => console.error('auto-reply failed', e));
+      }
     } catch (error) {
       console.error('Error sending notification:', error);
     }

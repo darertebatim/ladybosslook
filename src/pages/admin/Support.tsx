@@ -12,6 +12,7 @@ import {
   type SupportStatusFilter,
 } from "@/components/admin/support/SupportFilterBar";
 import { NewMessageDialog } from "@/components/admin/support/NewMessageDialog";
+import { AutomatedMessagesPanel } from "@/components/admin/support/AutomatedMessagesPanel";
 import {
   conversationEmail,
   conversationMatchesProgram,
@@ -96,6 +97,14 @@ export default function Support() {
       setSearchParams(searchParams, { replace: true });
     })();
   }, [targetUserId, conversations, loading, inboxType]);
+
+  const [showAuto, setShowAuto] = useState(false);
+  const openConversationById = (id: string) => {
+    const conv = conversations.find(c => c.id === id);
+    setShowAuto(false);
+    setInboxType('support');
+    if (conv) handleSelectConversation(conv);
+  };
 
   const programCounts = useMemo(() => {
     const map = new Map<string, number>();
@@ -254,28 +263,15 @@ export default function Support() {
           <p className="text-muted-foreground">Manage customer support conversations</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={async () => {
-              const { data: r } = await (supabase as any)
-                .from("program_rounds").select("id, round_name")
-                .eq("program_slug", "igadsfree").gt("first_session_date", new Date().toISOString())
-                .order("first_session_date", { ascending: false }).limit(1).maybeSingle();
-              if (!r) { alert("No upcoming webinar round"); return; }
-              if (!confirm(`Invite everyone who asked for webinar details in chat to "${r.round_name}"?`)) return;
-              const { data, error } = await supabase.functions.invoke("webinar-auto-reply", { body: { bulk: true, roundId: r.id } });
-              alert(error ? `Failed: ${error.message}` : `Done: ${JSON.stringify(data?.results || {})}`);
-              fetchConversations();
-            }}
-          >
-            Send webinar details
-          </Button>
           <NewMessageDialog inboxType={inboxType} onSent={fetchConversations} />
-          <Tabs value={inboxType} onValueChange={(v) => setInboxType(v as 'support' | 'coach')}>
+          <Tabs value={showAuto ? 'auto' : inboxType} onValueChange={(v) => {
+            if (v === 'auto') { setShowAuto(true); return; }
+            setShowAuto(false); setInboxType(v as 'support' | 'coach');
+          }}>
             <TabsList>
               <TabsTrigger value="support">Support</TabsTrigger>
               <TabsTrigger value="coach">Coach</TabsTrigger>
+              <TabsTrigger value="auto">Automated</TabsTrigger>
             </TabsList>
           </Tabs>
           <Button variant="outline" size="sm" onClick={() => setMobileMode(true)} className="gap-2">
@@ -285,6 +281,11 @@ export default function Support() {
         </div>
       </div>
 
+      {showAuto ? (
+        <div className="flex-1 min-h-0 border rounded-lg overflow-hidden bg-background">
+          <AutomatedMessagesPanel onOpenConversation={openConversationById} />
+        </div>
+      ) : (<>
       {filterBar}
 
       <div className="flex flex-1 min-h-0 border rounded-lg overflow-hidden bg-background">
@@ -301,6 +302,7 @@ export default function Support() {
           <ChatPanel conversation={selectedConversation} onStatusChange={fetchConversations} />
         </div>
       </div>
+      </>)}
     </div>
   );
 }

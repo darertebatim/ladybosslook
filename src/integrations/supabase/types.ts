@@ -2525,6 +2525,7 @@ export type Database = {
           attachment_size: number | null
           attachment_type: string | null
           attachment_url: string | null
+          automation_key: string | null
           broadcast_id: string | null
           buttons: Json | null
           content: string
@@ -2541,6 +2542,7 @@ export type Database = {
           attachment_size?: number | null
           attachment_type?: string | null
           attachment_url?: string | null
+          automation_key?: string | null
           broadcast_id?: string | null
           buttons?: Json | null
           content: string
@@ -2557,6 +2559,7 @@ export type Database = {
           attachment_size?: number | null
           attachment_type?: string | null
           attachment_url?: string | null
+          automation_key?: string | null
           broadcast_id?: string | null
           buttons?: Json | null
           content?: string
