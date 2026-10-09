@@ -48,17 +48,26 @@ async function processConv(admin: any, conversationId: string, userId: string, u
     const { data: aliases } = await admin.from("account_email_aliases").select("email").eq("user_id", userId);
     (aliases || []).forEach((a: any) => a.email && emails.add(a.email.toLowerCase()));
 
-    const { data: reg } = await admin.from("form_submissions").select("name, round_id")
-      .in("email", [...emails]).eq("source", "igads_registration")
-      .order("created_at", { ascending: false }).limit(1).maybeSingle();
-    const roundId = bulk ? onlyRound : reg?.round_id;
-    if (!roundId) return ({ sent: false, reason: "no_registration" });
-
-    const { data: round } = await admin.from("program_rounds")
-      .select("first_session_date, first_session_duration, google_meet_link").eq("id", roundId).maybeSingle();
-    if (!round?.first_session_date) return ({ sent: false, reason: "no_round" });
+    const { data: reg } = emails.size ? await admin.from("form_submissions").select("name, round_id")
+      .in("email", [...emails]).in("source", ["igads_registration", "aliagads_registration"])
+      .order("submitted_at", { ascending: false }).limit(1).maybeSingle() : { data: null };
+    const loadRound = async (id: string) => (await admin.from("program_rounds")
+      .select("id, first_session_date, first_session_duration").eq("id", id).maybeSingle()).data;
+    const isUpcoming = (r: any) => r?.first_session_date && new Date(r.first_session_date).getTime() + 3 * 3600_000 > Date.now();
+    let round: any = null;
+    const preferred = bulk ? onlyRound : reg?.round_id;
+    if (preferred) round = await loadRound(preferred);
+    if (!isUpcoming(round)) {
+      // Fall back to the next upcoming webinar session
+      const { data: next } = await admin.from("program_rounds")
+        .select("id, first_session_date, first_session_duration").eq("program_slug", "igadsfree")
+        .gt("first_session_date", new Date(Date.now() - 3 * 3600_000).toISOString())
+        .order("first_session_date", { ascending: true }).limit(1).maybeSingle();
+      round = next;
+    }
+    if (!isUpcoming(round)) return ({ sent: false, reason: "no_round" });
+    const roundId = round.id;
     const start = new Date(round.first_session_date);
-    if (start.getTime() + 3 * 3600_000 < Date.now()) return ({ sent: false, reason: "past" });
 
     let tz = typeof timezone === "string" && timezone ? timezone : "";
     if (!tz) {
@@ -69,7 +78,8 @@ async function processConv(admin: any, conversationId: string, userId: string, u
     const date = fmt(start, tz, { month: "long", day: "numeric" });
     const time = fmt(start, tz, { hour: "numeric", minute: "2-digit" });
     const city = tz.split("/").pop()!.replace(/_/g, " ");
-    const name = (reg?.name || "").trim() || "دوست";
+    const msgName = last.content.match(/نام:\s*([^\n]+)/)?.[1]?.trim();
+    const name = (reg?.name || "").trim() || msgName || "دوست";
     const duration = round.first_session_duration || 120;
     const registerUrl = `https://ladybosslook.com/l/igadsfree?round=${roundId}`;
 
@@ -109,6 +119,7 @@ async function processConv(admin: any, conversationId: string, userId: string, u
     if (!sender) return ({ sent: false });
     const { error } = await admin.from("chat_messages").insert({
       conversation_id: conv.id, sender_id: sender.user_id, sender_type: "admin", content, buttons, is_read: false,
+      automation_key: bulk ? "webinar_missed_bulk" : "webinar_details",
     });
     if (error) throw error;
     await admin.from("chat_conversations").update({
@@ -119,6 +130,7 @@ async function processConv(admin: any, conversationId: string, userId: string, u
         body: { conversationId: conv.id, messageContent: "✅ جزئیات وبینار شما", senderType: "admin", senderId: sender.user_id },
       });
     } catch (_) { /* ignore */ }
+    return ({ sent: true });
 }
 
 Deno.serve(async (req) => {
