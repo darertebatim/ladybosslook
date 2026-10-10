@@ -147,6 +147,7 @@ export default function AppChat() {
             .from('chat_conversations')
             .update({ unread_count_user: 0 })
             .eq('id', existing.id);
+          await supabase.rpc('mark_conversation_read' as any, { _conversation_id: existing.id });
         }
       } catch (error: any) {
         console.error('Error fetching conversation:', error);
@@ -192,12 +193,21 @@ export default function AppChat() {
           const newMessage = payload.new as Message;
           setMessages(prev => [...prev, newMessage]);
           // Mark as read if from admin
-          if (newMessage.sender_type === 'admin') {
+          if (newMessage.sender_type !== 'user') {
             supabase
               .from('chat_conversations')
               .update({ unread_count_user: 0 })
               .eq('id', conversation.id);
+            supabase.rpc('mark_conversation_read' as any, { _conversation_id: conversation.id });
           }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'chat_messages', filter: `conversation_id=eq.${conversation.id}` },
+        (payload) => {
+          const upd = payload.new as Message;
+          setMessages(prev => prev.map(m => (m.id === upd.id ? { ...m, ...upd } : m)));
         }
       )
       .subscribe();
