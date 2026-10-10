@@ -40,16 +40,18 @@ export function SendLinkCard({ userId, onInsert }: Props) {
     setBusy(mode);
     try {
       const url = await makeLink();
+      // Isolate Latin text (program title, URL) so it renders correctly inside RTL Farsi sentences
+      const iso = (s: string) => `⁦${s}⁩`;
       if (mode === "copy") {
         await navigator.clipboard.writeText(url);
         toast({ title: "Link copied", description: "Works for 30 days and signs the student in automatically." });
       } else if (tab === "program") {
         onInsert(
-          `برای مشاهده و ثبت‌نام در برنامه «${program!.title}» روی لینک زیر بزنید 👇\n${url}\nبدون نیاز به ورود دوباره، مستقیم وارد حساب خودتان می‌شوید.`,
+          `برای مشاهده و ثبت‌نام در برنامه «${iso(program!.title)}» روی لینک زیر بزنید 👇\n${iso(url)}\nبدون نیاز به ورود دوباره، مستقیم وارد حساب خودتان می‌شوید.`,
         );
       } else {
         onInsert(
-          `لطفاً ${form.titleFa} را از طریق لینک زیر پر کنید 👇\n${url}\nبدون نیاز به ورود دوباره، مستقیم وارد حساب خودتان می‌شوید.`,
+          `لطفاً ${form.titleFa} را از طریق لینک زیر پر کنید 👇\n${iso(url)}\nبدون نیاز به ورود دوباره، مستقیم وارد حساب خودتان می‌شوید.`,
         );
       }
     } catch (e: any) {
