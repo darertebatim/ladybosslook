@@ -122,8 +122,9 @@ async function processConv(admin: any, conversationId: string, userId: string, u
       automation_key: bulk ? "webinar_missed_bulk" : "webinar_details",
     });
     if (error) throw error;
+    // Automated reply acts like staff read and answered the chat: no unread badge.
     await admin.from("chat_conversations").update({
-      last_message_at: new Date().toISOString(), unread_count_user: (conv.unread_count_user || 0) + 1,
+      last_message_at: new Date().toISOString(), unread_count_user: 0,
     }).eq("id", conv.id);
     try {
       await admin.functions.invoke("send-chat-notification", {
