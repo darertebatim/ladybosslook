@@ -92,8 +92,8 @@ export function ChatMessage({
   isLastInGroup = true,
   showTimestamp = true,
   buttons
-  const attachmentUrl = useChatAttachmentUrl(rawAttachmentUrl);
 }: ChatMessageProps) {
+  const attachmentUrl = useChatAttachmentUrl(rawAttachmentUrl);
   const isImage = attachmentType?.startsWith('image/');
   const isAudio = attachmentType?.startsWith('audio/');
   const { text, linkUrl, linkText } = parseMessageContent(content);
