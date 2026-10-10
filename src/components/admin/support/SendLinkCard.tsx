@@ -6,7 +6,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Copy, Link2, MessageSquarePlus, Loader2 } from "lucide-react";
-import type { MessageButton } from "./supportData";
 
 const FORMS = [
   { key: "profileanalyze", label: "Instagram profile analysis", path: "/dashboard/forms/profileanalyze", titleFa: "فرم تحلیل پیج اینستاگرام" },
