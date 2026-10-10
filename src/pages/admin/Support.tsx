@@ -5,6 +5,7 @@ import { ChatConversationList } from "@/components/admin/ChatConversationList";
 import { ChatPanel } from "@/components/admin/ChatPanel";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Monitor, Smartphone, ArrowLeft } from "lucide-react";
 import {
   SupportFilterBar,
@@ -289,7 +290,8 @@ export default function Support() {
       {filterBar}
 
       <div className="flex flex-1 min-h-0 border rounded-lg overflow-hidden bg-background">
-        <div className="w-80 shrink-0">
+        <ResizablePanelGroup direction="horizontal" autoSaveId="simora_support_columns">
+        <ResizablePanel id="users" order={1} defaultSize={28} minSize={18} maxSize={45} className="min-w-0">
           <ChatConversationList
             conversations={visibleConversations}
             selectedId={selectedConversation?.id || null}
@@ -297,10 +299,12 @@ export default function Support() {
             loading={loading}
             showFilters={false}
           />
-        </div>
-        <div className="flex-1 min-w-0">
-          <ChatPanel conversation={selectedConversation} onStatusChange={fetchConversations} />
-        </div>
+        </ResizablePanel>
+        <ResizableHandle withHandle aria-label="Resize users and chat" title="Drag to resize users and chat" className="w-2 bg-muted/40 active:bg-primary/20" />
+        <ResizablePanel id="conversation" order={2} defaultSize={72} minSize={55} className="min-w-0">
+          <ChatPanel conversation={selectedConversation} onStatusChange={fetchConversations} resizableDesktop />
+        </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
       </>)}
     </div>

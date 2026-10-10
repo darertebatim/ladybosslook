@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ChatMessage } from "@/components/chat/ChatMessage";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { Button } from "@/components/ui/button";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Loader2, User, Mail, Calendar, BookOpen, Phone, CheckCircle2, RotateCcw, Link2, ShoppingBag, ChevronDown } from "lucide-react";
@@ -43,9 +44,10 @@ interface UserContext {
 interface ChatPanelProps {
   conversation: SupportConversation | null;
   onStatusChange?: () => void;
+  resizableDesktop?: boolean;
 }
 
-export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
+export function ChatPanel({ conversation, onStatusChange, resizableDesktop = false }: ChatPanelProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const messagesScrollRef = useRef<HTMLDivElement>(null);
@@ -60,6 +62,14 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
   const [showButtons, setShowButtons] = useState(false);
   const [composerSeed, setComposerSeed] = useState("");
   const [seedKey, setSeedKey] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia('(min-width: 1024px)').matches);
+
+  useEffect(() => {
+    const query = window.matchMedia('(min-width: 1024px)');
+    const update = () => setIsDesktop(query.matches);
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
 
   // Fetch messages when conversation changes
   useEffect(() => {
@@ -438,10 +448,8 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
     );
   }
 
-  return (
-    <div className="flex h-full">
-      {/* Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-0">
+  const chatArea = (
+      <div className="h-full flex-1 flex flex-col min-w-0 min-h-0">
         {/* Header - hidden on mobile since parent has header */}
         <div className="hidden lg:flex items-center justify-between p-3 border-b bg-muted/30">
           <div className="min-w-0">
@@ -577,7 +585,28 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
           />
         </div>
       </div>
+  );
 
+  if (resizableDesktop && isDesktop) {
+    return (
+      <ResizablePanelGroup direction="horizontal" autoSaveId="simora_support_chat_info_columns">
+        <ResizablePanel id="chat" order={1} defaultSize={62} minSize={40} className="min-w-0">
+          {chatArea}
+        </ResizablePanel>
+        <ResizableHandle withHandle aria-label="Resize chat and user info" title="Drag to resize chat and user info" className="w-2 bg-muted/40 active:bg-primary/20" />
+        <ResizablePanel id="user-info" order={2} defaultSize={38} minSize={22} maxSize={60} className="min-w-0">
+          <div className="h-full bg-muted/20 p-3 overflow-y-auto">
+            <h3 className="font-semibold text-sm mb-3">User Info</h3>
+            <UserInfoContent />
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    );
+  }
+
+  return (
+    <div className="flex h-full">
+      {chatArea}
       {/* User Context Panel - Desktop Only */}
       <div className="w-64 border-l bg-muted/20 p-3 overflow-y-auto hidden lg:block">
         <h3 className="font-semibold text-sm mb-3">User Info</h3>
