@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useBilingualText } from "@/components/ui/BilingualText";
 import { smartOpenUrl } from "@/lib/navigation-utils";
 import { RichText } from "@/components/feed/RichText";
+import { useChatAttachmentUrl } from "@/hooks/useChatAttachmentUrl";
 
 interface ChatMessageProps {
   content: string;
@@ -80,7 +81,7 @@ export function ChatMessage({
   createdAt, 
   isRead, 
   isCurrentUser,
-  attachmentUrl,
+  attachmentUrl: rawAttachmentUrl,
   attachmentName,
   attachmentType,
   isBroadcast,
@@ -91,6 +92,7 @@ export function ChatMessage({
   isLastInGroup = true,
   showTimestamp = true,
   buttons
+  const attachmentUrl = useChatAttachmentUrl(rawAttachmentUrl);
 }: ChatMessageProps) {
   const isImage = attachmentType?.startsWith('image/');
   const isAudio = attachmentType?.startsWith('audio/');
