@@ -13,6 +13,7 @@ import { format, isToday, isYesterday } from "date-fns";
 import { CannedRepliesManager, CannedRepliesPicker } from "./support/CannedReplies";
 import { MessageButtonsEditor } from "./support/MessageButtonsEditor";
 import { InternalNotes } from "./support/InternalNotes";
+import { SendLinkCard } from "./support/SendLinkCard";
 import {
   conversationEmail,
   conversationName,
@@ -431,6 +432,9 @@ export function ChatPanel({ conversation, onStatusChange, resizableDesktop = fal
           </div>
         </div>
       )}
+
+      {/* Send sign-in links */}
+      {conversation && <SendLinkCard userId={conversation.user_id} onInsert={insertCanned} />}
 
       {/* Internal notes */}
       {conversation && <InternalNotes conversationId={conversation.id} />}
