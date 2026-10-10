@@ -45,13 +45,11 @@ export function SendLinkCard({ userId, onInsert }: Props) {
         toast({ title: "Link copied", description: "Works for 30 days and signs the student in automatically." });
       } else if (tab === "program") {
         onInsert(
-          `برای مشاهده و ثبت‌نام در برنامه «${program!.title}» روی دکمه زیر بزنید 👇\nبدون نیاز به ورود دوباره، مستقیم وارد حساب خودتان می‌شوید.`,
-          [{ label: "مشاهده و ثبت‌نام", url }],
+          `برای مشاهده و ثبت‌نام در برنامه «${program!.title}» روی لینک زیر بزنید 👇\n${url}\nبدون نیاز به ورود دوباره، مستقیم وارد حساب خودتان می‌شوید.`,
         );
       } else {
         onInsert(
-          `لطفاً ${form.titleFa} را از طریق دکمه زیر پر کنید 👇\nبدون نیاز به ورود دوباره، مستقیم وارد حساب خودتان می‌شوید.`,
-          [{ label: "باز کردن فرم", url }],
+          `لطفاً ${form.titleFa} را از طریق لینک زیر پر کنید 👇\n${url}\nبدون نیاز به ورود دوباره، مستقیم وارد حساب خودتان می‌شوید.`,
         );
       }
     } catch (e: any) {
