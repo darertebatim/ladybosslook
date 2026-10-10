@@ -25,8 +25,8 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const u = url.searchParams.get("u") || "";
     const p = url.searchParams.get("p") || "/";
-    const e = url.searchParams.get("e") || "0";
-    const s = url.searchParams.get("s") || "";
+    const e = (url.searchParams.get("e") || "0").replace(/[^0-9]/g, "");
+    const s = (url.searchParams.get("s") || "").replace(/[^A-Za-z0-9_-]/g, "");
     const safePath = PATH_RE.test(p) ? p : "/";
     const target = `${WEB_BASE}${safePath}`;
     const redirect = (to: string) => new Response(null, { status: 302, headers: { Location: to } });
