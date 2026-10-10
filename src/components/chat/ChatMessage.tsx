@@ -437,9 +437,9 @@ export function ChatMessage({
               {format(new Date(createdAt), 'h:mm a')}
             </span>
             {isCurrentUser && (
-              <span className="text-primary-foreground/60">
+              <span className={isRead ? "text-sky-500" : "text-primary-foreground/60"}>
                 {isRead ? (
-                  <CheckCheck className="h-3.5 w-3.5" />
+                  <CheckCheck className="h-3.5 w-3.5" strokeWidth={2.75} />
                 ) : (
                   <Check className="h-3.5 w-3.5" />
                 )}

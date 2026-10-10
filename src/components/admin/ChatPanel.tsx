@@ -89,6 +89,7 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
           .from('chat_conversations')
           .update({ unread_count_admin: 0 })
           .eq('id', conversation.id);
+        await supabase.rpc('mark_conversation_read' as any, { _conversation_id: conversation.id });
 
         const [enrollmentsRes, ordersRes] = await Promise.all([
           supabase
@@ -136,6 +137,17 @@ export function ChatPanel({ conversation, onStatusChange }: ChatPanelProps) {
         (payload) => {
           const incoming = payload.new as Message;
           setMessages(prev => (prev.some(m => m.id === incoming.id) ? prev : [...prev, incoming]));
+          if (incoming.sender_type === 'user') {
+            supabase.rpc('mark_conversation_read' as any, { _conversation_id: conversation.id });
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'chat_messages', filter: `conversation_id=eq.${conversation.id}` },
+        (payload) => {
+          const upd = payload.new as Message;
+          setMessages(prev => prev.map(m => (m.id === upd.id ? { ...m, ...upd } : m)));
         }
       )
       .subscribe();
