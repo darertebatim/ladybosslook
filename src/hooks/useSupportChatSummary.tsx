@@ -28,6 +28,8 @@ export function useSupportChatSummary(inboxType: 'support' | 'coach' = 'support'
         .select('id, unread_count_user')
         .in('user_id', await getFamilyIds(user.id))
         .eq('inbox_type', inboxType)
+        .order('created_at', { ascending: true })
+        .limit(1)
         .maybeSingle();
 
       if (convError || !conversation) {
