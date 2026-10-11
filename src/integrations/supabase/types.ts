@@ -8462,6 +8462,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      account_family_ids: { Args: { _uid: string }; Returns: string[] }
       admin_get_user_activity: {
         Args: { _ids: string[] }
         Returns: {
@@ -8631,6 +8632,7 @@ export type Database = {
       publish_due_scheduled_posts: { Args: never; Returns: Json }
       redeem_aperture_invite: { Args: { p_code: string }; Returns: Json }
       regenerate_my_friend_code: { Args: never; Returns: string }
+      sync_account_family: { Args: { _uid: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"
