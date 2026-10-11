@@ -1,3 +1,4 @@
+import { getFamilyIds } from '@/lib/accountFamily';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -17,8 +18,10 @@ export const useUnreadChat = (inboxType: 'support' | 'coach' = 'support') => {
       const { data, error } = await supabase
         .from('chat_conversations')
         .select('unread_count_user')
-        .eq('user_id', user.id)
+        .in('user_id', await getFamilyIds(user.id))
         .eq('inbox_type', inboxType)
+        .order('created_at', { ascending: true })
+        .limit(1)
         .maybeSingle();
       
       if (!error && data) {

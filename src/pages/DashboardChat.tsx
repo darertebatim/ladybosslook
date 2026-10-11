@@ -1,3 +1,4 @@
+import { getFamilyIds } from '@/lib/accountFamily';
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useGoBack } from "@/hooks/useGoBack";
@@ -70,7 +71,7 @@ export default function DashboardChat() {
         const { data: existing, error } = await supabase
           .from("chat_conversations")
           .select("*")
-          .eq("user_id", user.id)
+          .in('user_id', await getFamilyIds(user.id))
           .eq("inbox_type", "support")
           .order("created_at", { ascending: false })
           .limit(1)

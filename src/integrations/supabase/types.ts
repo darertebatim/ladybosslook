@@ -8621,6 +8621,7 @@ export type Database = {
         Args: { _conversation_id: string }
         Returns: undefined
       }
+      my_family_user_ids: { Args: never; Returns: string[] }
       provision_daily_reset_for_user: {
         Args: { p_user_id: string }
         Returns: undefined
