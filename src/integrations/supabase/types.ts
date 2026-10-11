@@ -8512,6 +8512,7 @@ export type Database = {
       claim_dedication: { Args: { t: string }; Returns: Json }
       claim_playlist_gift: { Args: { t: string }; Returns: Json }
       create_playlist_gift: { Args: { p_playlist_id: string }; Returns: Json }
+      family_primary_of: { Args: { _uid: string }; Returns: string }
       find_profile_by_code: {
         Args: { _code: string }
         Returns: {
@@ -8620,6 +8621,10 @@ export type Database = {
       mark_conversation_read: {
         Args: { _conversation_id: string }
         Returns: undefined
+      }
+      move_personal_data: {
+        Args: { _from: string; _to: string }
+        Returns: Json
       }
       my_family_user_ids: { Args: never; Returns: string[] }
       provision_daily_reset_for_user: {
