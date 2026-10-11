@@ -23,6 +23,24 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Linked emails share one account: if this login is a secondary email,
+// swap the session to the student's main account (checked once per login).
+const familyChecked = new Set<string>();
+async function switchToFamilyPrimary(userId: string) {
+  if (familyChecked.has(userId) || !getIsOnline()) return;
+  familyChecked.add(userId);
+  try {
+    const { data } = await supabase.functions.invoke('family-primary-session');
+    if (data?.switch && data.token_hash) {
+      const { error } = await supabase.auth.verifyOtp({ token_hash: data.token_hash, type: 'magiclink' });
+      if (error) console.warn('[Auth] family switch failed', error);
+    }
+  } catch (e) {
+    familyChecked.delete(userId);
+    console.warn('[Auth] family check failed', e);
+  }
+}
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -112,6 +130,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // Defer async role check to avoid deadlock
           setTimeout(() => {
             checkUserRole(session.user.id);
+            switchToFamilyPrimary(session.user.id);
           }, 0);
         } else {
           setIsAdmin(false);
