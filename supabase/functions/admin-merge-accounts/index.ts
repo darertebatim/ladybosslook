@@ -253,6 +253,10 @@ serve(async (req) => {
       .delete()
       .eq('email', (primaryProfile.email || '').toLowerCase())
 
+    // Unified family: give every linked login the same programs & subscriptions
+    const { error: syncError } = await supabaseAdmin.rpc('sync_account_family', { _uid: primaryUserId })
+    if (syncError) console.error('Family sync error:', syncError)
+
     // Log the merge action
     console.log(`Account merge completed: ${mergedEmail} -> ${primaryProfile.email}`)
     console.log(`Orders: ${mergedOrders}, Enrollments: ${mergedEnrollments}`)
