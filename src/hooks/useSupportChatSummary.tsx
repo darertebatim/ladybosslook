@@ -1,3 +1,4 @@
+import { getFamilyIds } from '@/lib/accountFamily';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -25,7 +26,7 @@ export function useSupportChatSummary(inboxType: 'support' | 'coach' = 'support'
       const { data: conversation, error: convError } = await supabase
         .from('chat_conversations')
         .select('id, unread_count_user')
-        .eq('user_id', user.id)
+        .in('user_id', await getFamilyIds(user.id))
         .eq('inbox_type', inboxType)
         .maybeSingle();
 
