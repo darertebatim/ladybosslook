@@ -26,12 +26,12 @@ const GIFTS: GiftItem[] = [
     isDownload: true,
   },
   {
-    id: "instagram",
-    icon: "📸",
-    title: "صفحه اینستاگرام استاد لطفی",
-    description: "محتوای روزانه، نکات طلایی و آخرین اخبار کسب‌وکار اینستاگرامی را دنبال کنید.",
-    actionLabel: "مشاهده صفحه اینستاگرام",
-    href: "https://instagram.com/alilotfivip",
+    id: "acquisition-program",
+    icon: "🎯",
+    title: "دوره جذب مشتری با اینستاگرام ادز",
+    description: "یک سیستم عملی برای جذب مشتری جدید با اینستاگرام ادز بسازید.",
+    actionLabel: "مشاهده دوره و ثبت‌نام",
+    href: "https://ladybosslook.com/casigads",
   },
   {
     id: "meta-ads-setup",
@@ -41,6 +41,22 @@ const GIFTS: GiftItem[] = [
     actionLabel: "دانلود PDF",
     href: metaSetupAsset.url,
     isDownload: true,
+  },
+  {
+    id: "instagram",
+    icon: "📸",
+    title: "صفحه اینستاگرام استاد لطفی",
+    description: "محتوای روزانه، نکات طلایی و آخرین اخبار کسب‌وکار اینستاگرامی را دنبال کنید.",
+    actionLabel: "مشاهده صفحه اینستاگرام",
+    href: "https://instagram.com/alilotfivip",
+  },
+  {
+    id: "ads-manager",
+    icon: "📊",
+    title: "صفحه Ads Manager",
+    description: "پنل رسمی تبلیغات متا برای ساخت و مدیریت تبلیغات.",
+    actionLabel: "ورود به Ads Manager",
+    href: "https://adsmanager.facebook.com/",
   },
   {
     id: "ads-library",
@@ -57,7 +73,7 @@ export default function GiftsAliLotfiVip() {
     <>
       <SEOHead
         title="هدایای استاد لطفی VIP | Rilo"
-        description="دسترسی سریع به هدایا و لینک‌های کاربردی استاد لطفی: اینستاگرام، آموزش متا ادز، کتابخانه تبلیغات، پروفایل اعتمادساز و ویدیوی جلسه."
+        description="دسترسی سریع به هدایا و لینک‌های کاربردی استاد لطفی: چک‌لیست‌های تبلیغات، دوره جذب مشتری با اینستاگرام ادز، اینستاگرام، Ads Manager و کتابخانه تبلیغات متا."
         locale="fa_IR"
       />
       <main
