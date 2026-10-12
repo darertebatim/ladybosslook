@@ -365,7 +365,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { title, content, targetType, targetCourse, targetRoundId, sendPush, sendEmail, linkUrl, linkText, excludeUserIds, excludeProgramSlugs, audience, audiencePresetId }: BroadcastRequest = await req.json();
 
-    console.log('📢 Broadcast request:', { title, targetType, targetCourse, targetRoundId, sendPush, __maskEmail(sendEmail), linkUrl, excludeUserIds: excludeUserIds?.length, excludeProgramSlugs, audiencePresetId });
+    console.log('📢 Broadcast request:', { title, targetType, targetCourse, targetRoundId, sendPush, sendEmail, linkUrl, excludeUserIds: excludeUserIds?.length, excludeProgramSlugs, audiencePresetId });
 
     if (!title || !content) {
       return new Response(

@@ -308,7 +308,7 @@ const handler = async (req: Request): Promise<Response> => {
       const failedEmails = emailResults
         .filter(r => r.status === 'rejected')
         .map((r: any) => r.reason);
-      console.log(`   ⚠️  Failed emails:`, failedEmails);
+      console.log(`   ⚠️  Failed emails:`, failedEmails.length);
     }
     
     console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
