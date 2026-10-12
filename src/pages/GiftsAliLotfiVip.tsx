@@ -1,8 +1,8 @@
 import { ExternalLink, Download, Play } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
-import workbookAsset from "@/assets/build-trustworthy-instagram-profile-workbook.pdf.asset.json";
 import checklistAsset from "@/assets/ads-lost-checklist.pdf.asset.json";
+import metaSetupAsset from "@/assets/meta-ads-manager-setup-checklist.pdf.asset.json";
 
 interface GiftItem {
   id: string;
@@ -44,12 +44,12 @@ const GIFTS: GiftItem[] = [
   },
   {
     id: "meta-ads-setup",
-    icon: "🎬",
-    title: "ستاپ متا ادز بدون نیاز به لپ‌تاپ",
-    description: "آموزش گام‌به‌گام راه‌اندازی تبلیغات متا فقط با گوشی موبایل.",
-    actionLabel: "تماشای ویدیو",
-    href: "https://www.youtube.com/watch?v=NkO8I7PauT0&t=17s",
-    isVideo: true,
+    icon: "🛠️",
+    title: "چک لیست ستاپ کردن ادز منیجر برای شروع",
+    description: "چک‌لیست قدم‌به‌قدم راه‌اندازی Ads Manager برای شروع تبلیغات متا.",
+    actionLabel: "دانلود PDF",
+    href: metaSetupAsset.url,
+    isDownload: true,
   },
   {
     id: "ads-library",
