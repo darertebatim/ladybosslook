@@ -178,8 +178,6 @@ serve(async (req) => {
           JSON.stringify({ 
             error: 'duplicate_detected',
             message: 'You have a recent payment attempt for this program. Please wait a few minutes before trying again.',
-            existingOrderId: recentOrder.id,
-            status: recentOrder.status
           }),
           { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
