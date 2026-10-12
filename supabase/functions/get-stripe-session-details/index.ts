@@ -1,3 +1,4 @@
+import { isInternalOrAdmin, deny } from "../_shared/caller-auth.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from 'https://esm.sh/stripe@14.21.0';
 
@@ -12,6 +13,8 @@ serve(async (req) => {
   }
 
   try {
+    if (!(await isInternalOrAdmin(req))) return deny(corsHeaders);
+
     const { sessionId } = await req.json();
 
     if (!sessionId) {
