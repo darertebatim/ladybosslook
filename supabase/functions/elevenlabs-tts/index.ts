@@ -1,3 +1,4 @@
+import { isInternalOrAdmin, getCallerId, deny } from "../_shared/caller-auth.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -11,6 +12,8 @@ serve(async (req) => {
   }
 
   try {
+    if (!(await getCallerId(req))) return deny(corsHeaders);
+
     const ELEVENLABS_API_KEY = Deno.env.get('ELEVENLABS_API_KEY');
     if (!ELEVENLABS_API_KEY) {
       return new Response(JSON.stringify({ error: 'ELEVENLABS_API_KEY not configured' }), {

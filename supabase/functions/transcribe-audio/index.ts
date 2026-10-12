@@ -1,3 +1,4 @@
+import { isInternalOrAdmin, getCallerId, deny } from "../_shared/caller-auth.ts";
 // Transcribes a short audio clip to text using the Lovable AI Gateway (Gemini).
 // Input: { audio: string (base64, no data: prefix), mimeType?: string, language?: string }
 // Output: { text: string }
@@ -14,6 +15,8 @@ Deno.serve(async (req) => {
   }
 
   try {
+    if (!(await getCallerId(req))) return deny(corsHeaders);
+
     const { audio, mimeType, language } = await req.json();
     if (!audio || typeof audio !== 'string') {
       return new Response(JSON.stringify({ error: 'Missing audio' }), {
