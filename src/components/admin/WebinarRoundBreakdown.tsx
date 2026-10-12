@@ -19,12 +19,15 @@ interface RoundRow {
 
 interface Props {
   programSlug: string;
+  /** Separate routing record key (defaults to programSlug). */
+  routingKey?: string;
   sources: string[];
 }
 
 const tzLabel = (tz: string) => tz.replace('America/', '').replace(/_/g, ' ');
 
-export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
+export function WebinarRoundBreakdown({ programSlug, sources, routingKey }: Props) {
+  const routingSlug = routingKey || programSlug;
   const queryClient = useQueryClient();
 
   const {
@@ -68,8 +71,8 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
   });
 
   const { data: routing, isLoading: routingLoading } = useQuery({
-    queryKey: ['webinar-round-routing', programSlug],
-    queryFn: () => getWebinarRoundRouting(programSlug),
+    queryKey: ['webinar-round-routing', routingSlug],
+    queryFn: () => getWebinarRoundRouting(routingSlug),
   });
 
   const [draftEast, setDraftEast] = useState<number | ''>('');
@@ -82,7 +85,7 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
     mutationFn: async (payload: { east: number; west: number; europe: number | null }) => {
       const { error } = await (supabase as any).from('webinar_round_routing').upsert(
         {
-          program_slug: programSlug,
+          program_slug: routingSlug,
           east_round_number: payload.east,
           west_round_number: payload.west,
           europe_round_number: payload.europe,
@@ -92,7 +95,7 @@ export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['webinar-round-routing', programSlug] });
+      queryClient.invalidateQueries({ queryKey: ['webinar-round-routing', routingSlug] });
     },
   });
 

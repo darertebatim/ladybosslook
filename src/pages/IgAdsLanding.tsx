@@ -13,7 +13,7 @@ import { isIranTimezone, getDeviceTimezone } from "@/lib/regionRestrictions";
 import { useWaitlistLeadCampaigns, useSlotChoiceLeadCampaigns } from "@/hooks/useLeadCampaignStatus";
 import WebinarWaitlistBox from "@/components/WebinarWaitlistBox";
 
-const ROUND_ASSIGNMENT_STORAGE_KEY = "igadsfree_round_assignment";
+
 
 const PROGRAM_SLUG = "igadsfree";
 
@@ -167,6 +167,8 @@ function MiniCountdown({ startUtc }: { startUtc: Date }) {
 
 export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?: string } = {}) {
   const isAli = basePath === "/l/aliagads";
+  const routingKey = isAli ? "aliagads" : PROGRAM_SLUG;
+  const roundStorageKey = isAli ? "aliagads_round_assignment" : "igadsfree_round_assignment";
   const regSource = isAli ? "aliagads_registration" : "igads_registration";
   const waitlistSource = isAli ? "aliagads_waitlist" : "igads_waitlist";
   const navigate = useNavigate();
@@ -255,11 +257,11 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?:
       let effectiveRoundParam = roundParam;
       if (!effectiveRoundParam) {
         try {
-          const saved = localStorage.getItem(ROUND_ASSIGNMENT_STORAGE_KEY);
+          const saved = localStorage.getItem(roundStorageKey);
           if (saved) {
             const parsed = JSON.parse(saved);
             if (parsed.roundNumber) {
-              const routing = await getWebinarRoundRouting(PROGRAM_SLUG);
+              const routing = await getWebinarRoundRouting(routingKey);
               const current = [
                 routing?.east_round_number,
                 routing?.west_round_number,
@@ -268,7 +270,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?:
               if (current.includes(Number(parsed.roundNumber))) {
                 effectiveRoundParam = String(parsed.roundNumber);
               } else {
-                localStorage.removeItem(ROUND_ASSIGNMENT_STORAGE_KEY);
+                localStorage.removeItem(roundStorageKey);
               }
             }
           }
@@ -277,7 +279,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?:
 
       // 3. If still no pinned round, use device timezone to auto-assign.
       const timezone = !effectiveRoundParam ? getDeviceTimezone() : null;
-      const round = await resolveWebinarRound(PROGRAM_SLUG, effectiveRoundParam, timezone);
+      const round = await resolveWebinarRound(PROGRAM_SLUG, effectiveRoundParam, timezone, routingKey);
 
       if (round?.id) {
         setRoundId(round.id);
@@ -331,7 +333,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?:
     if (round.round_number) {
       try {
         localStorage.setItem(
-          ROUND_ASSIGNMENT_STORAGE_KEY,
+          roundStorageKey,
           JSON.stringify({ roundNumber: round.round_number, assignedAt: Date.now() }),
         );
       } catch {}
