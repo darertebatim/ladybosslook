@@ -1,3 +1,4 @@
+import { isInternalOrAdmin, getCallerId, deny } from "../_shared/caller-auth.ts";
 // Extracts structured tasks from a free-form weekly plan using Lovable AI Gateway.
 // Input: { text: string, today: string (YYYY-MM-DD in user TZ), timezone?: string }
 // Output: { tasks: Array<{ title, emoji, kind, date?, time?, duration_minutes?, recurrence? }> }
@@ -67,6 +68,8 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
+    if (!(await getCallerId(req))) return deny(corsHeaders);
+
     const { text, today, timezone } = await req.json();
     if (!text || typeof text !== 'string' || text.trim().length < 2) {
       return new Response(JSON.stringify({ error: 'text is required' }), {

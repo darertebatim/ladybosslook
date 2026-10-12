@@ -4,6 +4,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { sendPurchaseWelcomeMessage } from "../_shared/send-purchase-welcome.ts";
 import { sendEnrollmentEmail } from "../_shared/send-enrollment-email.ts";
 import { resolveAutoEnrollRoundId } from "../_shared/auto-enroll-round.ts";
+const __maskEmail = (e: unknown) => { const s = String(e ?? ''); const [u, d] = s.split('@'); return d ? `${u.slice(0, 2)}***@${d}` : (s ? '***' : ''); };
+
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,7 +14,7 @@ const corsHeaders = {
 
 // Helper to find or create user by email
 async function findOrCreateUser(supabase: any, email: string, name: string): Promise<string | null> {
-  console.log('[WEBHOOK] Finding or creating user for email:', email);
+  console.log('[WEBHOOK] Finding or creating user for email:', __maskEmail(email));
   
   // First, check if user exists in profiles
   const { data: existingProfile } = await supabase
@@ -134,7 +136,7 @@ async function applyAutoEnrollment(supabase: any, userId: string, programSlug: s
 
 // Helper to trigger Mailchimp subscription
 async function triggerMailchimpSubscription(supabase: any, orderData: any, programSlug: string | null): Promise<void> {
-  console.log('[WEBHOOK] Triggering Mailchimp subscription for:', orderData.email);
+  console.log('[WEBHOOK] Triggering Mailchimp subscription for:', __maskEmail(orderData.email));
   
   try {
     let mailchimpProgramName = "General Purchase";
@@ -298,7 +300,7 @@ serve(async (req) => {
       const programSlug = session.metadata?.program_slug || session.metadata?.program || null;
       const paymentType = session.metadata?.payment_type || session.mode;
       
-      console.log('[WEBHOOK] Customer email:', customerEmail, 'Product:', productName, 'Program slug:', programSlug);
+      console.log('[WEBHOOK] Customer email:', __maskEmail(customerEmail), 'Product:', productName, 'Program slug:', programSlug);
       
       // Check if order already exists
       const { data: existingOrder } = await supabase
@@ -341,7 +343,7 @@ serve(async (req) => {
             if (aliasError) {
               console.error('[WEBHOOK] Error recording payment email alias:', aliasError);
             } else {
-              console.log('[WEBHOOK] Payment email merged as alias:', payEmail, '->', accountEmail);
+              console.log('[WEBHOOK] Payment email merged as alias:', __maskEmail(payEmail), '->', __maskEmail(accountEmail));
             }
           }
         }

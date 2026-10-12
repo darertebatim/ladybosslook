@@ -1,3 +1,4 @@
+import { isInternalOrAdmin, deny } from "../_shared/caller-auth.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
 const corsHeaders = {
@@ -35,6 +36,8 @@ serve(async (req) => {
   }
 
   try {
+    if (!(await isInternalOrAdmin(req))) return deny(corsHeaders);
+
     // Rate limiting check
     const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0] || 
                      req.headers.get('x-real-ip') || 

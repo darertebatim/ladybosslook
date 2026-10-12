@@ -126,7 +126,10 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const isInternal = token === (Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '');
+    const { data: { user }, error: authError } = isInternal
+      ? { data: { user: { id: 'internal' } as any }, error: null }
+      : await supabase.auth.getUser(token);
 
     if (authError || !user) {
       return new Response(
@@ -148,6 +151,25 @@ const handler = async (req: Request): Promise<Response> => {
         JSON.stringify({ error: 'Conversation not found' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 404 }
       );
+    }
+
+    // Caller may only notify within conversations they belong to
+    if (!isInternal) {
+      if (senderType === 'user') {
+        const { data: fam } = await supabase.rpc('account_family_ids', { _uid: user.id });
+        const ids = new Set<string>([user.id, ...((fam as any[]) || []).map((r: any) => typeof r === 'string' ? r : r?.account_family_ids).filter(Boolean)]);
+        if (!ids.has(conversation.user_id)) {
+          return new Response(JSON.stringify({ error: 'Forbidden' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 });
+        }
+      } else {
+        const [{ data: isAdmin }, { data: canSupport }] = await Promise.all([
+          supabase.rpc('has_role', { _user_id: user.id, _role: 'admin' }),
+          supabase.rpc('can_access_admin_page', { _user_id: user.id, _page_slug: 'support' }),
+        ]);
+        if (!isAdmin && !canSupport) {
+          return new Response(JSON.stringify({ error: 'Forbidden' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 });
+        }
+      }
     }
 
     // Determine who to notify

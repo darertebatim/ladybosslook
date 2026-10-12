@@ -3,6 +3,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.56.0';
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { create } from 'https://deno.land/x/djwt@v3.0.2/mod.ts';
 import { buildUnsubUrl, unsubHeaders, appendUnsubFooter, fetchUnsubscribed } from "../_shared/unsubscribe.ts";
+const __maskEmail = (e: unknown) => { const s = String(e ?? ''); const [u, d] = s.split('@'); return d ? `${u.slice(0, 2)}***@${d}` : (s ? '***' : ''); };
+
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -701,10 +703,10 @@ const handler = async (req: Request): Promise<Response> => {
 
             if (result.data?.id) {
               emailsSent++;
-              console.log(`✅ Email sent to ${profile.email}`);
+              console.log(`✅ Email sent to ${__maskEmail(profile.email)}`);
             }
           } catch (err: any) {
-            console.error(`❌ Email error for ${profile.email}:`, err);
+            console.error(`❌ Email error for ${__maskEmail(profile.email)}:`, err);
           }
         }
 

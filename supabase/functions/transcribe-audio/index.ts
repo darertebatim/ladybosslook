@@ -1,3 +1,4 @@
+import { isInternalOrAdmin, getCallerId, deny } from "../_shared/caller-auth.ts";
 // Transcribes a short audio clip to text using the Lovable AI Gateway (Gemini).
 // Input: { audio: string (base64, no data: prefix), mimeType?: string, language?: string }
 // Output: { text: string }
@@ -14,6 +15,8 @@ Deno.serve(async (req) => {
   }
 
   try {
+    if (!(await getCallerId(req))) return deny(corsHeaders);
+
     const { audio, mimeType, language } = await req.json();
     if (!audio || typeof audio !== 'string') {
       return new Response(JSON.stringify({ error: 'Missing audio' }), {
@@ -35,7 +38,8 @@ Deno.serve(async (req) => {
     // through the Lovable AI Gateway's OpenAI-compat endpoint.
     const dataUrl = `data:${mt};base64,${audio}`;
 
-    const langHint = language ? ` The speaker is likely speaking ${language}.` : '';
+    const safeLang = typeof language === 'string' && /^[A-Za-z\- ]{2,30}$/.test(language) ? language : '';
+    const langHint = safeLang ? ` The speaker is likely speaking ${safeLang}.` : '';
     const systemPrompt = `You are a precise speech-to-text transcriber. Transcribe the audio verbatim.${langHint} Only output the transcript text, no commentary, no quotes, no formatting.`;
 
     const body = {

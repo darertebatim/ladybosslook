@@ -3,6 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders, AI_GATEWAY, DEFAULT_MODEL, CHAT_MODEL, LITE_MODEL, logAiUsage, computeUsdCost } from "../_shared/aperture-cors.ts";
 import { logApertureEvent } from "../_shared/aperture-events.ts";
 import { getAllowedBuckets } from "../_shared/aperture-buckets.ts";
+const __safeRoles = (arr: any[]) => (Array.isArray(arr) ? arr : []).filter((m: any) => m && (m.role === 'user' || m.role === 'assistant')).map((m: any) => ({ role: m.role, content: m.content }));
+
 
 /**
  * aperture-chat
@@ -147,7 +149,7 @@ serve(async (req) => {
     if (!escape && lastUser?.role === "user") {
       await supabase.from("aperture_messages").insert({
         chat_id: chatId, user_id: user.id, role: "user", content: lastUser.content,
-        attachments: Array.isArray(attachments) ? attachments : [],
+        attachments: Array.isArray(attachments) ? attachments.filter((a: any) => typeof a?.storage_path === "string" && a.storage_path.startsWith(`${user.id}/`)) : [],
       });
       await logApertureEvent(supabase, user.id, "chat_message_user", {
         content: String(lastUser.content ?? ""),
@@ -215,13 +217,14 @@ serve(async (req) => {
     // previous assistant turn. The model behaves better if we add a tiny
     // user-side cue at the end so it knows whose turn it is.
     let outboundMessages: any[] = escape
-      ? [...messages, { role: "user", content: escape.kind === "skip" ? "[skip]" : "[i don't know]" }]
-      : messages;
+      ? [...__safeRoles(messages), { role: "user", content: escape.kind === "skip" ? "[skip]" : "[i don't know]" }]
+      : __safeRoles(messages);
 
     // If the latest user turn included image attachments, rewrite it as a
     // multimodal content array so the model can see the screenshots/photos.
     const imageAtts = Array.isArray(attachments)
-      ? attachments.filter((a: any) => typeof a?.mime === "string" && a.mime.startsWith("image/"))
+      ? attachments.filter((a: any) => typeof a?.mime === "string" && a.mime.startsWith("image/")
+          && typeof a?.storage_path === "string" && a.storage_path.startsWith(`${user.id}/`) && !a.storage_path.includes(".."))
       : [];
     if (!escape && imageAtts.length > 0 && outboundMessages.length > 0) {
       const lastIdx = outboundMessages.length - 1;

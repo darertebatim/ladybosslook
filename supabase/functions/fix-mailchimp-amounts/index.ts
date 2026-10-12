@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const __maskEmail = (e: unknown) => { const s = String(e ?? ''); const [u, d] = s.split('@'); return d ? `${u.slice(0, 2)}***@${d}` : (s ? '***' : ''); };
+
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -95,7 +97,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Update each member in Mailchimp
     for (const order of orders) {
       try {
-        console.log(`Updating ${order.email}...`);
+        console.log(`Updating ${__maskEmail(order.email)}...`);
         
         // Create MD5 hash of email
         const crypto = await import("https://deno.land/std@0.190.0/crypto/mod.ts");
@@ -121,7 +123,7 @@ const handler = async (req: Request): Promise<Response> => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log(`✓ Updated ${order.email} successfully`);
+          console.log(`✓ Updated ${__maskEmail(order.email)} successfully`);
           results.push({
             email: order.email,
             success: true,
@@ -129,7 +131,7 @@ const handler = async (req: Request): Promise<Response> => {
           });
         } else {
           const errorData = await response.json();
-          console.error(`✗ Failed to update ${order.email}:`, errorData);
+          console.error(`✗ Failed to update ${__maskEmail(order.email)}:`, errorData);
           results.push({
             email: order.email,
             success: false,
@@ -137,7 +139,7 @@ const handler = async (req: Request): Promise<Response> => {
           });
         }
       } catch (error: any) {
-        console.error(`✗ Error updating ${order.email}:`, error);
+        console.error(`✗ Error updating ${__maskEmail(order.email)}:`, error);
         results.push({
           email: order.email,
           success: false,

@@ -1,3 +1,4 @@
+import { isInternalOrAdmin, getCallerId, deny } from "../_shared/caller-auth.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -12,6 +13,8 @@ Deno.serve(async (req) => {
   }
 
   try {
+    if (!(await isInternalOrAdmin(req))) return deny(corsHeaders);
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);

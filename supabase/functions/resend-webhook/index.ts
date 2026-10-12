@@ -54,11 +54,17 @@ Deno.serve(async (req) => {
     const raw = await req.text();
     const secret = Deno.env.get("RESEND_WEBHOOK_SECRET");
 
-    if (secret) {
+    if (!secret) {
+      return new Response(JSON.stringify({ error: "webhook not configured" }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    {
       const id = req.headers.get("svix-id") ?? "";
       const ts = req.headers.get("svix-timestamp") ?? "";
       const sig = req.headers.get("svix-signature") ?? "";
-      const ok = id && ts && sig && (await verifySvix(secret, id, ts, sig, raw));
+      const fresh = Math.abs(Date.now() / 1000 - Number(ts)) < 600;
+      const ok = id && ts && sig && fresh && (await verifySvix(secret, id, ts, sig, raw));
       if (!ok) {
         console.error("[RESEND-WEBHOOK] invalid signature");
         return new Response(JSON.stringify({ error: "invalid signature" }), {
