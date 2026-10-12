@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const __safeRoles = (arr: any[]) => (Array.isArray(arr) ? arr : []).filter((m: any) => m && (m.role === 'user' || m.role === 'assistant')).map((m: any) => ({ role: m.role, content: m.content }));
+
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -69,7 +71,7 @@ serve(async (req) => {
 
     const aiMessages: Message[] = [
       { role: "system", content: systemPrompt },
-      ...messages,
+      ...__safeRoles(messages),
     ];
 
     const streamResponse = await fetch(AI_GATEWAY, {

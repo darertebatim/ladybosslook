@@ -211,7 +211,7 @@ serve(async (req) => {
   <body dir="rtl" style="direction:rtl;text-align:right;margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
     <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;">
       <h1 style="margin:0 0 12px;font-size:22px;line-height:1.4;">
-        سلام ${name} عزیز 👋
+        سلام ${String(name ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" } as Record<string,string>)[c])} عزیز 👋
       </h1>
       <p style="margin:0 0 12px;font-size:13px;color:#e11d48;font-weight:bold;">
         این وبینار مخصوص صاحبان کسب‌وکار در آمریکا و کانادا است

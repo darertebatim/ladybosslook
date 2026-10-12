@@ -38,7 +38,8 @@ Deno.serve(async (req) => {
     // through the Lovable AI Gateway's OpenAI-compat endpoint.
     const dataUrl = `data:${mt};base64,${audio}`;
 
-    const langHint = language ? ` The speaker is likely speaking ${language}.` : '';
+    const safeLang = typeof language === 'string' && /^[A-Za-z\- ]{2,30}$/.test(language) ? language : '';
+    const langHint = safeLang ? ` The speaker is likely speaking ${safeLang}.` : '';
     const systemPrompt = `You are a precise speech-to-text transcriber. Transcribe the audio verbatim.${langHint} Only output the transcript text, no commentary, no quotes, no formatting.`;
 
     const body = {

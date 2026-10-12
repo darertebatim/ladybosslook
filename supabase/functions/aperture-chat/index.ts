@@ -3,6 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders, AI_GATEWAY, DEFAULT_MODEL, CHAT_MODEL, LITE_MODEL, logAiUsage, computeUsdCost } from "../_shared/aperture-cors.ts";
 import { logApertureEvent } from "../_shared/aperture-events.ts";
 import { getAllowedBuckets } from "../_shared/aperture-buckets.ts";
+const __safeRoles = (arr: any[]) => (Array.isArray(arr) ? arr : []).filter((m: any) => m && (m.role === 'user' || m.role === 'assistant')).map((m: any) => ({ role: m.role, content: m.content }));
+
 
 /**
  * aperture-chat
@@ -215,8 +217,8 @@ serve(async (req) => {
     // previous assistant turn. The model behaves better if we add a tiny
     // user-side cue at the end so it knows whose turn it is.
     let outboundMessages: any[] = escape
-      ? [...messages, { role: "user", content: escape.kind === "skip" ? "[skip]" : "[i don't know]" }]
-      : messages;
+      ? [...__safeRoles(messages), { role: "user", content: escape.kind === "skip" ? "[skip]" : "[i don't know]" }]
+      : __safeRoles(messages);
 
     // If the latest user turn included image attachments, rewrite it as a
     // multimodal content array so the model can see the screenshots/photos.
