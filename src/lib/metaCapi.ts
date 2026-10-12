@@ -64,3 +64,11 @@ export function trackWebinarLead(params: {
   void sendCapi("Lead", leadId, { email, firstName: name, phone, customData });
   void sendCapi(customEvent, customId, { email, firstName: name, phone, customData });
 }
+
+/** Live webinar attendee (claimed the in-session gift). Pixel + CAPI, deduplicated. */
+export function trackLiveAttendee(params: { email?: string; contentName: string }) {
+  const customData = { content_name: params.contentName, content_category: "webinar_live" };
+  const id = newEventId();
+  trackCustomLead("LiveAttendee", customData, id);
+  void sendCapi("LiveAttendee", id, { email: params.email, customData });
+}
