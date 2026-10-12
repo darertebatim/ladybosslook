@@ -93,7 +93,7 @@ serve(async (req) => {
     // Build AI messages — convert image messages to multimodal format
     const aiMessages: Message[] = [
       { role: "system", content: systemPrompt },
-      ...messages.map((m: any) => {
+      ...(Array.isArray(messages) ? messages : []).filter((m: any) => m && (m.role === 'user' || m.role === 'assistant')).map((m: any) => {
         if (m.image && m.role === "user") {
           // Convert to multimodal content array for Gemini
           const parts: any[] = [];
