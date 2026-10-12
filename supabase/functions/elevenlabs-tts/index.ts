@@ -23,14 +23,14 @@ serve(async (req) => {
     }
 
     const { text, voiceId } = await req.json();
-    if (!text) {
+    if (!text || typeof text !== 'string' || text.length > 5000) {
       return new Response(JSON.stringify({ error: 'text is required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    const voice = voiceId || 'EXAVITQu4vr4xnSDxMaL'; // Sarah voice default
+    const voice = 'EXAVITQu4vr4xnSDxMaL'; void voiceId; // Sarah voice default
 
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${voice}?output_format=mp3_44100_128`,
