@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const __maskEmail = (e: unknown) => { const s = String(e ?? ''); const [u, d] = s.split('@'); return d ? `${u.slice(0, 2)}***@${d}` : (s ? '***' : ''); };
+
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -213,7 +215,7 @@ const handler = async (req: Request): Promise<Response> => {
           html: htmlContent,
         });
 
-        console.log(`Email sent to ${email}:`, emailResponse);
+        console.log(`Email sent to ${__maskEmail(email)}:`, emailResponse);
 
         // Log to email_logs
         await supabase.from("email_logs").insert({
@@ -225,7 +227,7 @@ const handler = async (req: Request): Promise<Response> => {
         results.sent++;
         results.emails.push(email);
       } catch (emailError: any) {
-        console.error(`Failed to send email to ${email}:`, emailError);
+        console.error(`Failed to send email to ${__maskEmail(email)}:`, emailError);
         
         // Log failure
         await supabase.from("email_logs").insert({

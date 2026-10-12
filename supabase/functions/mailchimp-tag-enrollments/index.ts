@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { createHash } from "node:crypto";
+const __maskEmail = (e: unknown) => { const s = String(e ?? ''); const [u, d] = s.split('@'); return d ? `${u.slice(0, 2)}***@${d}` : (s ? '***' : ''); };
+
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -273,7 +275,7 @@ serve(async (req) => {
           failed++;
         }
       } catch (err: any) {
-        console.error(`Error processing ${email}:`, err);
+        console.error(`Error processing ${__maskEmail(email)}:`, err);
         failed++;
       }
     }

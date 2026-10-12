@@ -2,6 +2,8 @@ import { isInternalOrAdmin, getCallerId, deny } from "../_shared/caller-auth.ts"
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+const __maskEmail = (e: unknown) => { const s = String(e ?? ''); const [u, d] = s.split('@'); return d ? `${u.slice(0, 2)}***@${d}` : (s ? '***' : ''); };
+
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -82,7 +84,7 @@ serve(async (req) => {
           const latestCharge: any = paymentIntent.latest_charge;
           (paymentIntent as any).amount_refunded = latestCharge?.amount_refunded ?? 0;
           if (onlyIds) debug.push({ id: order.stripe_session_id, pi: piId, status: paymentIntent.status, charge: latestCharge?.id, refunded: latestCharge?.amount_refunded });
-          if (isInvoice) console.log(`[HANDLE-REFUNDS] INVOICE ${order.stripe_session_id} ${order.email} pi=${piId} refunded=${latestCharge?.amount_refunded}`);
+          if (isInvoice) console.log(`[HANDLE-REFUNDS] INVOICE ${order.stripe_session_id} ${__maskEmail(order.email)} pi=${piId} refunded=${latestCharge?.amount_refunded}`);
           
           
           console.log(`[HANDLE-REFUNDS] Checking order ${order.id}, PI status: ${paymentIntent.status}, amount_refunded: ${paymentIntent.amount_received || 0}`);
@@ -102,7 +104,7 @@ serve(async (req) => {
           }
 
           if (isFullRefund) {
-            console.log(`[HANDLE-REFUNDS] Found refunded order: ${order.id}, email: ${order.email}`);
+            console.log(`[HANDLE-REFUNDS] Found refunded order: ${order.id}, email: ${__maskEmail(order.email)}`);
             refundedOrders.push(order);
 
             // Update order status
@@ -152,7 +154,7 @@ serve(async (req) => {
                     }),
                   }
                 );
-                console.log(`[HANDLE-REFUNDS] Removed Mailchimp tag for ${order.email}`);
+                console.log(`[HANDLE-REFUNDS] Removed Mailchimp tag for ${__maskEmail(order.email)}`);
               }
             } catch (mailchimpError: any) {
               console.error('[HANDLE-REFUNDS] Mailchimp error:', mailchimpError);

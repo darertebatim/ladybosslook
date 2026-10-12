@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+const __maskEmail = (e: unknown) => { const s = String(e ?? ''); const [u, d] = s.split('@'); return d ? `${u.slice(0, 2)}***@${d}` : (s ? '***' : ''); };
+
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -553,7 +555,7 @@ serve(async (req) => {
       .maybeSingle();
 
     if (existing) {
-      console.log("[ENROLL-EMAIL] already sent for", email, programSlug);
+      console.log("[ENROLL-EMAIL] already sent for", __maskEmail(email), programSlug);
       return new Response(JSON.stringify({ ok: true, skipped: "already_sent" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

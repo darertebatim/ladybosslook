@@ -3,6 +3,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.56.0';
 import { sendPurchaseWelcomeMessage } from "../_shared/send-purchase-welcome.ts";
 import { sendEnrollmentEmail } from "../_shared/send-enrollment-email.ts";
 import { resolveAutoEnrollRoundId } from "../_shared/auto-enroll-round.ts";
+const __maskEmail = (e: unknown) => { const s = String(e ?? ''); const [u, d] = s.split('@'); return d ? `${u.slice(0, 2)}***@${d}` : (s ? '***' : ''); };
+
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -87,7 +89,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log(`Admin ${user.id} ${createUserOnly ? 'creating user' : 'creating enrollment'} for ${email}${courseName ? ` in ${courseName}` : ''}`);
+    console.log(`Admin ${user.id} ${createUserOnly ? 'creating user' : 'creating enrollment'} for ${__maskEmail(email)}${courseName ? ` in ${courseName}` : ''}`);
 
     let userId: string = '';
 
@@ -109,7 +111,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // If not found in the limited list, try to create user and handle duplicate error
     if (!existingAuthUser) {
-      console.log(`Attempting to create or find user: ${email}`);
+      console.log(`Attempting to create or find user: ${__maskEmail(email)}`);
       const { data: userData, error: userError } = await supabase.auth.admin.createUser({
         email: email,
         email_confirm: true,
@@ -122,7 +124,7 @@ const handler = async (req: Request): Promise<Response> => {
       if (userError) {
         // Check if error is because user already exists
         if (userError.message.includes('already been registered')) {
-          console.log(`User already exists, looking up by email: ${email}`);
+          console.log(`User already exists, looking up by email: ${__maskEmail(email)}`);
           // User exists but wasn't in our initial list - need to find them
           // List more users or search through pages
           let page = 1;
@@ -372,7 +374,7 @@ const handler = async (req: Request): Promise<Response> => {
           const programTags = Array.isArray(program.mailchimp_tags) ? program.mailchimp_tags : [];
           const allTags = [baseTag, ...programTags.filter((t: string) => t !== baseTag)];
           
-          console.log(`Applying Mailchimp tags for ${email}: ${allTags.join(', ')}`);
+          console.log(`Applying Mailchimp tags for ${__maskEmail(email)}: ${allTags.join(', ')}`);
           
           const MAILCHIMP_API_KEY = Deno.env.get('MAILCHIMP_API_KEY');
           const MAILCHIMP_SERVER_PREFIX = Deno.env.get('MAILCHIMP_SERVER_PREFIX') || 'us8';

@@ -2,6 +2,8 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { buildUnsubUrl, fetchUnsubscribed } from "../_shared/unsubscribe.ts";
+const __maskEmail = (e: unknown) => { const s = String(e ?? ''); const [u, d] = s.split('@'); return d ? `${u.slice(0, 2)}***@${d}` : (s ? '***' : ''); };
+
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -159,7 +161,7 @@ const handler = async (req: Request): Promise<Response> => {
           .from('account_email_aliases').select('email').in('primary_user_id', userIds);
         userEmails.push(...(aliases || []).map((a: any) => a.email));
         console.log(`✅ [${requestId}] Retrieved ${userEmails.length} valid emails`);
-        console.log(`📧 [${requestId}] Email list:`, userEmails);
+        console.log(`📧 [${requestId}] Email list:`, userEmails.length);
       } else {
         console.log(`⚠️  [${requestId}] No active enrollments found for this course`);
       }
@@ -180,7 +182,7 @@ const handler = async (req: Request): Promise<Response> => {
       const { data: aliases } = await supabase.from('account_email_aliases').select('email');
       userEmails.push(...(aliases || []).map((a: any) => a.email));
       console.log(`✅ [${requestId}] Retrieved ${userEmails.length} total user emails`);
-      console.log(`📧 [${requestId}] Email list:`, userEmails);
+      console.log(`📧 [${requestId}] Email list:`, userEmails.length);
     }
     userEmails = [...new Set(userEmails.map((e) => String(e).trim().toLowerCase()).filter(Boolean))];
 
@@ -211,7 +213,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send emails and track results
     const emailResults = await Promise.allSettled(
       userEmails.map(async (email) => {
-        console.log(`📤 [${requestId}] Sending to: ${email}`);
+        console.log(`📤 [${requestId}] Sending to: ${__maskEmail(email)}`);
         
         try {
           const isRtl = /[؀-ۿ]/.test(message + title);
@@ -267,7 +269,7 @@ const handler = async (req: Request): Promise<Response> => {
             html,
           });
           
-          console.log(`✅ [${requestId}] Email sent to ${email}:`, result);
+          console.log(`✅ [${requestId}] Email sent to ${__maskEmail(email)}:`, result);
           
           // Log to email_logs table
           await supabase.from('email_logs').insert({
@@ -279,7 +281,7 @@ const handler = async (req: Request): Promise<Response> => {
           
           return { email, success: true, result };
         } catch (error: any) {
-          console.error(`❌ [${requestId}] Failed to send to ${email}:`, error);
+          console.error(`❌ [${requestId}] Failed to send to ${__maskEmail(email)}:`, error);
           
           // Log failure to email_logs table
           await supabase.from('email_logs').insert({
