@@ -258,6 +258,7 @@ export async function resolveWebinarRound(
   programSlug: string,
   roundParam?: string | null,
   timezone?: string | null,
+  routingKey?: string,
 ): Promise<WebinarRoundRow | null> {
   const base = () =>
     (supabase as any).from("program_rounds").select(SELECT).eq("program_slug", programSlug);
@@ -276,7 +277,7 @@ export async function resolveWebinarRound(
 
   // 2. Timezone-based assignment (only when no pinned round and timezone is known)
   if (timezone) {
-    const routing = await getWebinarRoundRouting(programSlug);
+    const routing = await getWebinarRoundRouting(routingKey || programSlug);
     const rawSide = inferWebinarSideFromTimezone(timezone);
     const { east, west, europe } = routingOrFallback(routing);
     // Europe only applies when a Europe round is configured; otherwise those
