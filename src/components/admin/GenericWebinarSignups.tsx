@@ -1,3 +1,4 @@
+import { csvCell } from '@/lib/csvSafe';
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -98,7 +99,7 @@ export function GenericWebinarSignups({ campaign }: { campaign: LeadCampaign }) 
       .map((r) => {
         const round = rounds?.find((x) => x.id === r.round_id)?.round_name || '';
         return [r.email, r.name || '', r.city || '', r.source || '', round, r.submitted_at]
-          .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+          .map((v) => csvCell(v))
           .join(',');
       })
       .join('\n');
