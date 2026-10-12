@@ -34,15 +34,6 @@ const GIFTS: GiftItem[] = [
     href: "https://instagram.com/alilotfivip",
   },
   {
-    id: "trust-profile",
-    icon: "📄",
-    title: "پروفایل اعتمادساز",
-    description: "راهنمای عملی برای ساختن بیو و پروفایلی که مخاطب را به خرید متقاعد می‌کند.",
-    actionLabel: "دانلود PDF",
-    href: workbookAsset.url,
-    isDownload: true,
-  },
-  {
     id: "meta-ads-setup",
     icon: "🛠️",
     title: "چک لیست ستاپ کردن ادز منیجر برای شروع",
