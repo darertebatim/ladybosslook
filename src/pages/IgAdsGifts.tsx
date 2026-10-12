@@ -5,6 +5,7 @@ import { ArrowDown, Gift } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
+import { trackLiveAttendee } from "@/lib/metaCapi";
 
 const schema = z.object({
   email: z.string().trim().email("ایمیل معتبر نیست").max(255),
@@ -28,6 +29,7 @@ export default function IgAdsGifts() {
     }
     setError("");
     setSubmitting(true);
+    trackLiveAttendee({ email: parsed.data.email.toLowerCase(), contentName: "IG Ads Webinar Live" });
 
     try {
       // Saves the email with a server timestamp and sends the gift email.
