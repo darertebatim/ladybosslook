@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+const __safeOrigin = (o: string | null) => { const d = 'https://ladybosslook.com'; if (!o) return d; try { const u = new URL(o); const h = u.hostname; if ((u.protocol === 'https:' && (h === 'ladybosslook.com' || h === 'www.ladybosslook.com' || h.endsWith('.lovable.app'))) || (u.protocol === 'http:' && h === 'localhost')) return u.origin; } catch { /* ignore */ } return d; };
+
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -241,7 +243,7 @@ serve(async (req) => {
     });
 
     // Build success/cancel URLs
-    const origin = req.headers.get("origin") || 'https://ladybosslook.com';
+    const origin = __safeOrigin(req.headers.get("origin"));
     const successUrl = program === 'bilingual-power-class' 
       ? `${origin}/thankone?session_id={CHECKOUT_SESSION_ID}`
       : `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`;

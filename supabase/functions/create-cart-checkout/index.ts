@@ -2,6 +2,8 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { checkProgramRegionBlocks } from "../_shared/region-restriction.ts";
+const __safeOrigin = (o: string | null) => { const d = 'https://ladybosslook.com'; if (!o) return d; try { const u = new URL(o); const h = u.hostname; if ((u.protocol === 'https:' && (h === 'ladybosslook.com' || h === 'www.ladybosslook.com' || h.endsWith('.lovable.app'))) || (u.protocol === 'http:' && h === 'localhost')) return u.origin; } catch { /* ignore */ } return d; };
+
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -193,7 +195,7 @@ serve(async (req) => {
 
     // If only free items — skip Stripe entirely
     if (lineItems.length === 0) {
-      const origin = req.headers.get('origin') || 'https://ladybosslook.com';
+      const origin = __safeOrigin(req.headers.get('origin'));
       const freeSlugsParam = freePrograms.map(p => p.slug).join(',');
       return new Response(JSON.stringify({
         url: `${origin}/payment-success?free=1${freeSlugsParam ? `&programs=${encodeURIComponent(freeSlugsParam)}` : ''}`,
@@ -204,7 +206,7 @@ serve(async (req) => {
       });
     }
 
-    const origin = req.headers.get('origin') || 'https://ladybosslook.com';
+    const origin = __safeOrigin(req.headers.get('origin'));
 
     const session = await stripe.checkout.sessions.create({
       line_items: lineItems,
