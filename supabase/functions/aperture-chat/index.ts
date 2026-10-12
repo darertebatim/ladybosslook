@@ -149,7 +149,7 @@ serve(async (req) => {
     if (!escape && lastUser?.role === "user") {
       await supabase.from("aperture_messages").insert({
         chat_id: chatId, user_id: user.id, role: "user", content: lastUser.content,
-        attachments: Array.isArray(attachments) ? attachments : [],
+        attachments: Array.isArray(attachments) ? attachments.filter((a: any) => typeof a?.storage_path === "string" && a.storage_path.startsWith(`${user.id}/`)) : [],
       });
       await logApertureEvent(supabase, user.id, "chat_message_user", {
         content: String(lastUser.content ?? ""),
@@ -223,7 +223,8 @@ serve(async (req) => {
     // If the latest user turn included image attachments, rewrite it as a
     // multimodal content array so the model can see the screenshots/photos.
     const imageAtts = Array.isArray(attachments)
-      ? attachments.filter((a: any) => typeof a?.mime === "string" && a.mime.startsWith("image/"))
+      ? attachments.filter((a: any) => typeof a?.mime === "string" && a.mime.startsWith("image/")
+          && typeof a?.storage_path === "string" && a.storage_path.startsWith(`${user.id}/`) && !a.storage_path.includes(".."))
       : [];
     if (!escape && imageAtts.length > 0 && outboundMessages.length > 0) {
       const lastIdx = outboundMessages.length - 1;
