@@ -19,12 +19,15 @@ interface RoundRow {
 
 interface Props {
   programSlug: string;
+  /** Separate routing record key (defaults to programSlug). */
+  routingKey?: string;
   sources: string[];
 }
 
 const tzLabel = (tz: string) => tz.replace('America/', '').replace(/_/g, ' ');
 
-export function WebinarRoundBreakdown({ programSlug, sources }: Props) {
+export function WebinarRoundBreakdown({ programSlug, sources, routingKey }: Props) {
+  const routingSlug = routingKey || programSlug;
   const queryClient = useQueryClient();
 
   const {
