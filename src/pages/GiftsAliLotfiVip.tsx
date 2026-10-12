@@ -36,8 +36,8 @@ const GIFTS: GiftItem[] = [
   {
     id: "meta-ads-setup",
     icon: "🛠️",
-    title: "چک لیست ستاپ کردن ادز منیجر برای شروع",
-    description: "چک‌لیست قدم‌به‌قدم راه‌اندازی Ads Manager برای شروع تبلیغات متا.",
+    title: "چک لیست ستاپ کردن ادز منیجر",
+    description: "چک‌لیست قدم‌به‌قدم راه‌اندازی Ads Manager.",
     actionLabel: "دانلود PDF",
     href: metaSetupAsset.url,
     isDownload: true,
