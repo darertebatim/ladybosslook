@@ -2,6 +2,7 @@ import { ExternalLink, Download, Play } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import workbookAsset from "@/assets/build-trustworthy-instagram-profile-workbook.pdf.asset.json";
+import checklistAsset from "@/assets/ads-lost-checklist.pdf.asset.json";
 
 interface GiftItem {
   id: string;
@@ -15,6 +16,15 @@ interface GiftItem {
 }
 
 const GIFTS: GiftItem[] = [
+  {
+    id: "ads-lost-checklist",
+    icon: "📋",
+    title: "چک لیست شکست تبلیغات اینستاگرامی",
+    description: "۶ اشتباه که باعث میشود تبلیغات شکست بخورد",
+    actionLabel: "دانلود PDF",
+    href: checklistAsset.url,
+    isDownload: true,
+  },
   {
     id: "instagram",
     icon: "📸",
