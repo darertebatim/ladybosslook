@@ -8639,6 +8639,7 @@ export type Database = {
       redeem_aperture_invite: { Args: { p_code: string }; Returns: Json }
       regenerate_my_friend_code: { Args: never; Returns: string }
       sync_account_family: { Args: { _uid: string }; Returns: undefined }
+      verify_cron_secret: { Args: { _token: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
