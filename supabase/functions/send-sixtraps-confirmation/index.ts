@@ -165,6 +165,7 @@ serve(async (req) => {
         .update({ round_id: round.id })
         .eq("email", email)
         .is("round_id", null)
+        .gte("submitted_at", new Date(Date.now() - 30 * 60 * 1000).toISOString())
         .in("source", sources);
     }
 
