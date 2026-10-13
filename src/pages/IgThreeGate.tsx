@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { z } from "zod";
-import { Play } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 import coverAsset from "@/assets/igthree-thumbnail.jpg.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { trackWebinarLead } from "@/lib/metaCapi";
@@ -45,6 +45,7 @@ export default function IgThreeGate() {
       if (dbError) throw dbError;
       trackWebinarLead({ customEvent: "IGThreeLead", contentName: "igthree_video", email: clean });
       try { localStorage.setItem(IGTHREE_EMAIL_KEY, clean); } catch { /* ignore */ }
+      supabase.functions.invoke("send-igthree-video", { body: { email: clean } }).catch(() => {});
       navigate("/l/igthree/watch");
     } catch (err) {
       console.error("igthree gate error", err);
@@ -80,15 +81,15 @@ export default function IgThreeGate() {
           aria-label="برای تماشا ایمیل خود را وارد کنید"
         >
           <img src={coverAsset.url} alt={TITLE} className="aspect-video max-h-[34svh] w-full object-cover" />
-          <span className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 shadow-xl">
-            <Play className="h-6 w-6 translate-x-0.5 fill-rose-500 text-rose-500" />
-          </span>
         </button>
 
         <form onSubmit={handleSubmit} className="space-y-2.5">
           <p className="text-center text-sm font-bold text-neutral-900">
             ایمیل خود را وارد کنید تا ویدیو همین الان باز شود
           </p>
+          <div className="flex justify-center" aria-hidden="true">
+            <ArrowDown className="h-7 w-7 animate-bounce text-rose-500" />
+          </div>
           <input
             ref={inputRef}
             type="email"
@@ -110,15 +111,6 @@ export default function IgThreeGate() {
             {submitting ? "در حال باز کردن..." : "تماشای ویدیو"}
           </button>
           <p className="text-center text-[11px] text-neutral-500">رایگان — ویدیو بلافاصله باز می‌شود</p>
-          {returning && (
-            <button
-              type="button"
-              onClick={() => navigate("/l/igthree/watch")}
-              className="w-full pt-1 text-center text-xs font-semibold text-rose-600 underline underline-offset-4"
-            >
-              قبلاً ایمیل داده‌اید؟ تماشای ویدیو
-            </button>
-          )}
         </form>
       </main>
     </div>
