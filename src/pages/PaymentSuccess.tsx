@@ -12,6 +12,7 @@ import { useInvalidateAllEnrollmentData } from '@/hooks/useAppData';
 import riloAppIcon from '@/assets/rilo-app-icon.png';
 import { ONELINK_BASE_URL } from '@/lib/appsflyer';
 import { buildBookingUrl } from '@/lib/booking';
+import { PaymentSuccessVideo } from '@/components/PaymentSuccessVideo';
 
 /**
  * Smart link: AppsFlyer OneLink opens the Rilo app if installed,
@@ -215,7 +216,8 @@ export default function PaymentSuccess() {
     queryKey: ['payment-success-round', roundSlug],
     enabled: !!roundSlug,
     queryFn: async () => {
-      const slug = roundSlug!;
+      const slug = roundSlug;
+      if (!slug) return null;
       const { data: autoEnroll } = await (supabase as any)
         .from('program_auto_enrollment')
         .select('round_id, program_rounds!program_auto_enrollment_round_id_fkey(*)')
@@ -234,19 +236,23 @@ export default function PaymentSuccess() {
     },
   });
 
-  const { data: bookingInfo } = useQuery({
-    queryKey: ['payment-success-booking', roundSlug],
+  const { data: successSettings } = useQuery({
+    queryKey: ['payment-success-settings', roundSlug],
     enabled: !!roundSlug,
     queryFn: async () => {
-      const { data } = await (supabase as any)
+      if (!roundSlug) return null;
+      const { data, error } = await supabase
         .from('program_catalog')
-        .select('booking_url, booking_note, includes_one_on_one, is_one_on_one')
-        .eq('slug', roundSlug!)
+        .select('booking_url, booking_note, includes_one_on_one, is_one_on_one, show_booking_on_success, success_video_url')
+        .eq('slug', roundSlug)
         .maybeSingle();
-      if (!data?.booking_url || !(data.includes_one_on_one || data.is_one_on_one)) return null;
-      return data as { booking_url: string; booking_note: string | null };
+      if (error) throw error;
+      return data;
     },
   });
+  const bookingInfo = successSettings?.show_booking_on_success !== false
+    && (successSettings?.includes_one_on_one || successSettings?.is_one_on_one)
+    && successSettings?.booking_url ? successSettings : null;
 
   const { data: authUser } = useQuery({
     queryKey: ['payment-success-auth-user'],
@@ -372,6 +378,10 @@ export default function PaymentSuccess() {
                 : 'Open Rilo, go to My Program, and start it.'}
             </p>
           </div>
+
+          {successSettings?.success_video_url && (
+            <PaymentSuccessVideo url={successSettings.success_video_url} />
+          )}
 
           {bookingInfo?.booking_url && (
             <div className="mt-7 bg-white/75 backdrop-blur rounded-3xl p-5 shadow-[0_20px_50px_-20px_rgba(240,138,62,0.45)] border border-white">
