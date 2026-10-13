@@ -1,3 +1,4 @@
+import { trackCalendarClick } from "@/lib/trackCalendarClick";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useLocation, useSearchParams } from "react-router-dom";
@@ -292,6 +293,7 @@ export default function ThankYouIgAds() {
               <div className="grid grid-cols-2 gap-2">
                 <a
                   href={buildGoogleCalendarUrl(event)}
+                  onClick={() => trackCalendarClick("google", { email: registeredEmail, roundId: roundParam || registeredRoundId })}
                   target="_blank"
                   rel="noreferrer"
                   className="flex min-h-[44px] items-center justify-center rounded-xl bg-neutral-900 px-2 text-xs font-semibold text-white shadow-sm transition active:scale-[0.98]"
@@ -300,7 +302,7 @@ export default function ThankYouIgAds() {
                 </a>
                 <button
                   type="button"
-                  onClick={() => downloadIcs(event, "igads-webinar.ics")}
+                  onClick={() => { trackCalendarClick("apple", { email: registeredEmail, roundId: roundParam || registeredRoundId }); downloadIcs(event, "igads-webinar.ics"); }}
                   className="flex min-h-[44px] items-center justify-center rounded-xl border border-neutral-300 bg-white px-2 text-xs font-semibold text-neutral-900 shadow-sm transition active:scale-[0.98]"
                 >
                   افزودن به Apple Calendar

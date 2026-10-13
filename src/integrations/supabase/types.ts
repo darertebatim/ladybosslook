@@ -8400,6 +8400,33 @@ export type Database = {
           },
         ]
       }
+      webinar_calendar_clicks: {
+        Row: {
+          calendar: string
+          created_at: string
+          email: string | null
+          id: string
+          page: string
+          round_id: string | null
+        }
+        Insert: {
+          calendar: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          page: string
+          round_id?: string | null
+        }
+        Update: {
+          calendar?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          page?: string
+          round_id?: string | null
+        }
+        Relationships: []
+      }
       webinar_round_routing: {
         Row: {
           created_at: string

@@ -1,3 +1,4 @@
+import { trackCalendarClick } from "@/lib/trackCalendarClick";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { resolveWebinarRound } from "@/lib/webinarRounds";
@@ -144,6 +145,7 @@ export default function ThankYouSixTraps() {
               <div className="grid grid-cols-2 gap-3">
                 <a
                   href={buildGoogleCalendarUrl(event)}
+                  onClick={() => trackCalendarClick("google", { email: registeredEmail, roundId: roundParam || registeredRoundId })}
                   target="_blank"
                   rel="noreferrer"
                   className="flex min-h-[52px] items-center justify-center rounded-xl bg-neutral-900 px-3 text-sm font-semibold text-white shadow-sm transition active:scale-[0.98]"
@@ -152,7 +154,7 @@ export default function ThankYouSixTraps() {
                 </a>
                 <button
                   type="button"
-                  onClick={() => downloadIcs(event, "sixtraps.ics")}
+                  onClick={() => { trackCalendarClick("apple", { email: registeredEmail, roundId: roundParam || registeredRoundId }); downloadIcs(event, "sixtraps.ics"); }}
                   className="flex min-h-[52px] items-center justify-center rounded-xl border border-neutral-300 bg-white px-3 text-sm font-semibold text-neutral-900 shadow-sm transition active:scale-[0.98]"
                 >
                   افزودن به Apple Calendar
