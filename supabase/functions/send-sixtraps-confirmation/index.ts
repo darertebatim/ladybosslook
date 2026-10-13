@@ -1,3 +1,4 @@
+import { trackedCalUrl } from "../_shared/calendar-track.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "https://esm.sh/resend@2.0.0";
@@ -256,7 +257,7 @@ serve(async (req) => {
       ${
         gcalUrl
           ? `<p style="text-align:center;margin:20px 0;">
-               <a href="${gcalUrl}" style="display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:12px 20px;border-radius:10px;font-size:14px;">
+               <a href="${trackedCalUrl(gcalUrl, "email:sixtraps-confirm", round?.id, email)}" style="display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:12px 20px;border-radius:10px;font-size:14px;">
                  افزودن به Google Calendar
                </a>
              </p>`

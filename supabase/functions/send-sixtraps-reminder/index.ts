@@ -1,3 +1,4 @@
+import { trackedCalUrl } from "../_shared/calendar-track.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
@@ -902,7 +903,8 @@ serve(async (req) => {
         }
       }
 
-      const { meetUrl, startUtc, gcalUrl } = contentFor(rRound);
+      const { meetUrl, startUtc, gcalUrl: rawGcal } = contentFor(rRound);
+      const gcalUrl = trackedCalUrl(rawGcal, `email:${campaignKey}`, rRoundId, r.email);
       const html = timeChange
         ? buildTimeChangeHtml(c, r.name, startUtc, gcalUrl, supportUrl)
         : nextSession
