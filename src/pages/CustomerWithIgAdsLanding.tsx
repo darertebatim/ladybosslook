@@ -6,6 +6,7 @@ import igthreeCoverAsset from "@/assets/igthree-thumbnail.jpg.asset.json";
 import assertiveCoverAsset from "@/assets/assertive-cover.jpg.asset.json";
 import WebinarWaitlistBox from "@/components/WebinarWaitlistBox";
 import { trackCustomLead, trackLead } from "@/lib/metaPixel";
+import { trackWebinarLead } from "@/lib/metaCapi";
 
 interface VideoVariant {
   title: string;
@@ -56,12 +57,14 @@ export default function CustomerWithIgAdsLanding({
   const handleSuccess = () => {
     trackLead({ content_name: source });
     trackCustomLead(metaEvent);
-    if (gateVideo) {
-      try { localStorage.setItem(gateKey, "1"); } catch { /* ignore */ }
-      setUnlocked(true);
-      setPlaying(true);
-      setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50);
-    }
+  };
+
+  const handleGateSuccess = ({ name, email }: { name: string; email: string }) => {
+    trackWebinarLead({ customEvent: metaEvent, contentName: source, email, name });
+    try { localStorage.setItem(gateKey, "1"); } catch { /* ignore */ }
+    setUnlocked(true);
+    setPlaying(true);
+    setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50);
   };
 
   const focusForm = () => {
@@ -137,7 +140,10 @@ export default function CustomerWithIgAdsLanding({
             <WebinarWaitlistBox
               source={source}
               title="مشاهده فوری ویدیو"
-              onSuccess={handleSuccess}
+              description="نام و ایمیل خود را وارد کنید تا ویدیو همین الان برایتان باز شود."
+              buttonLabel="نمایش ویدیو"
+              hideWhenDone
+              onSuccess={handleGateSuccess}
             />
           </div>
         ) : (
@@ -146,7 +152,30 @@ export default function CustomerWithIgAdsLanding({
               {description}
             </p>
 
-            {!gateVideo && (
+            {gateVideo ? (
+              <>
+                <div className="mt-8 flex items-center gap-3">
+                  <div className="h-px flex-1 bg-neutral-200" />
+                  <span className="h-2 w-2 rounded-full bg-rose-400" />
+                  <div className="h-px flex-1 bg-neutral-200" />
+                </div>
+                <div className="mt-6 rounded-2xl border border-dashed border-orange-300 bg-orange-50/60 p-4 text-center">
+                  <p className="inline-flex items-center gap-1.5 text-sm font-bold text-orange-800">
+                    <Sparkles className="h-4 w-4" />
+                    ظرفیت دوره بعدی محدود است
+                  </p>
+                  <p className="mt-1 text-xs leading-6 text-orange-900/80">
+                    بعد از دیدن ویدیو، اگر می‌خواهید قبل از همه از تاریخ شروع و تخفیف ویژه دوره باخبر شوید، در لیست انتظار ثبت‌نام کنید.
+                  </p>
+                </div>
+                <WebinarWaitlistBox
+                  source={`${source.replace(/_waitlist$/, "")}_program_waitlist`}
+                  title="لیست انتظار دوره بعدی"
+                  description="ایمیل خود را وارد کنید تا اولین نفری باشید که از تاریخ شروع و تخفیف ویژه دوره باخبر می‌شود."
+                  successText="در لیست انتظار دوره قرار گرفتید. به محض باز شدن ثبت‌نام، برایتان ایمیل می‌فرستیم."
+                />
+              </>
+            ) : (
               <>
                 <div className="mt-8 flex items-center gap-3">
                   <div className="h-px flex-1 bg-neutral-200" />
