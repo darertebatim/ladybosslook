@@ -5261,6 +5261,7 @@ export type Database = {
           price_amount: number
           requires_subscription: boolean
           restricted_regions: string[]
+          show_booking_on_success: boolean
           show_in_app_waitlist: boolean
           slug: string
           stripe_payment_link: string | null
@@ -5271,6 +5272,7 @@ export type Database = {
           subscription_full_payment_price: number | null
           subscription_interval: string | null
           subscription_interval_count: number | null
+          success_video_url: string | null
           title: string
           trial_days: number | null
           type: string
@@ -5322,6 +5324,7 @@ export type Database = {
           price_amount?: number
           requires_subscription?: boolean
           restricted_regions?: string[]
+          show_booking_on_success?: boolean
           show_in_app_waitlist?: boolean
           slug: string
           stripe_payment_link?: string | null
@@ -5332,6 +5335,7 @@ export type Database = {
           subscription_full_payment_price?: number | null
           subscription_interval?: string | null
           subscription_interval_count?: number | null
+          success_video_url?: string | null
           title: string
           trial_days?: number | null
           type: string
@@ -5383,6 +5387,7 @@ export type Database = {
           price_amount?: number
           requires_subscription?: boolean
           restricted_regions?: string[]
+          show_booking_on_success?: boolean
           show_in_app_waitlist?: boolean
           slug?: string
           stripe_payment_link?: string | null
@@ -5393,6 +5398,7 @@ export type Database = {
           subscription_full_payment_price?: number | null
           subscription_interval?: string | null
           subscription_interval_count?: number | null
+          success_video_url?: string | null
           title?: string
           trial_days?: number | null
           type?: string

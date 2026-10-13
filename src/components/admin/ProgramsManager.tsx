@@ -19,6 +19,7 @@ import { RichTextEditor } from './RichTextEditor';
 import { TagPicker } from '@/components/admin/TagPicker';
 import { useContentTagsByType, useSaveContentTags } from '@/hooks/useContentTags';
 import { programImages } from '@/data/programs';
+import { resolveSuccessVideo } from '@/components/PaymentSuccessVideo';
 
 interface ProgramCatalog {
   id: string;
@@ -47,6 +48,8 @@ interface ProgramCatalog {
   is_one_on_one?: boolean;
   default_session_count?: number | null;
   auto_create_feed_channel?: boolean;
+  show_booking_on_success?: boolean;
+  success_video_url?: string | null;
 }
 
 export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string) => void } = {}) {
@@ -117,6 +120,8 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
     one_on_one_count: 1,
     booking_url: '',
     booking_note: '',
+    show_booking_on_success: true,
+    success_video_url: '',
     auto_create_feed_channel: true,
     restricted_regions: [] as string[],
   });
@@ -237,6 +242,8 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       one_on_one_count: 1,
       booking_url: '',
       booking_note: '',
+      show_booking_on_success: true,
+      success_video_url: '',
       auto_create_feed_channel: true,
       restricted_regions: [],
     });
@@ -251,6 +258,11 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
     e.preventDefault();
 
     const bookingUrl = (formData.booking_url || '').trim();
+    const successVideoUrl = formData.success_video_url.trim();
+    if (successVideoUrl && !resolveSuccessVideo(successVideoUrl)) {
+      toast({ title: 'Invalid success video', description: 'Use an HTTPS YouTube, Vimeo, Google Drive, or direct video file link.', variant: 'destructive' });
+      return;
+    }
     if (bookingUrl && !/^https:\/\/(www\.)?calendly\.com\//i.test(bookingUrl)) {
       toast({ title: 'Invalid booking link', description: 'Calendly link must start with https://calendly.com/', variant: 'destructive' });
       return;
@@ -265,6 +277,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
         default_session_count: formData.is_one_on_one ? (formData.one_on_one_count || 1) : formData.default_session_count,
         booking_url: bookingUrl || null,
         booking_note: (formData.booking_note || '').trim() || null,
+        success_video_url: successVideoUrl || null,
       };
       const links = [...contentLinks];
       if (editingId) {
@@ -383,6 +396,8 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       one_on_one_count: (program as any).one_on_one_count || (program as any).default_session_count || 1,
       booking_url: (program as any).booking_url || '',
       booking_note: (program as any).booking_note || '',
+      show_booking_on_success: program.show_booking_on_success ?? true,
+      success_video_url: program.success_video_url || '',
       auto_create_feed_channel:
         (program as any).auto_create_feed_channel ?? true,
       restricted_regions: Array.isArray((program as any).restricted_regions)
@@ -1334,6 +1349,20 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
               </div>
 
               {/* Platform Availability Section */}
+              <div className="space-y-3 border-t pt-4">
+                <Label className="text-base font-semibold">Payment success page</Label>
+                <div className="space-y-1">
+                  <Label htmlFor="success_video_url">Welcome / guide video (optional)</Label>
+                  <Input
+                    id="success_video_url"
+                    type="url"
+                    value={formData.success_video_url}
+                    onChange={(e) => setFormData({ ...formData, success_video_url: e.target.value })}
+                    placeholder="https://youtu.be/..."
+                  />
+                  <p className="text-xs text-muted-foreground">Separate from the promotional video. Leave blank to show no video after payment.</p>
+                </div>
+              </div>
               <div className="space-y-4 border-t pt-4">
                 <Label className="text-base font-semibold">Platform Availability</Label>
 
@@ -1414,6 +1443,15 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                       />
                     </div>
                     <OneOnOneBookingsPanel programSlug={formData.slug} included={formData.one_on_one_count || 1} />
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="show_booking_on_success"
+                        checked={formData.show_booking_on_success}
+                        onCheckedChange={(checked) => setFormData({ ...formData, show_booking_on_success: checked === true })}
+                      />
+                      <Label htmlFor="show_booking_on_success" className="text-sm font-normal cursor-pointer">Show 1-on-1 booking box on payment success page</Label>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Hiding this box keeps the included meetings and booking links in the app and emails unchanged.</p>
 
                   </div>
                 )}
