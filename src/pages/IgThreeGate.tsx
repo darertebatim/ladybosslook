@@ -20,11 +20,8 @@ export default function IgThreeGate() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    try {
-      if (localStorage.getItem(IGTHREE_EMAIL_KEY)) navigate("/l/igthree/watch", { replace: true });
-    } catch { /* ignore */ }
-  }, [navigate]);
+  // Returning visitors get a shortcut link below the form instead of an
+  // automatic redirect, so the cover page is always reachable.
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
