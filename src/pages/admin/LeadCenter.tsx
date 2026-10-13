@@ -3,6 +3,7 @@ import { useInactiveLeadCampaigns } from '@/hooks/useLeadCampaignStatus';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LeadCampaignDirectory } from '@/components/admin/LeadCampaignDirectory';
 import { WebinarStats } from '@/components/admin/WebinarStats';
+import { CalendarClickStats } from '@/components/admin/CalendarClickStats';
 import { SixTrapsSignups } from '@/components/admin/SixTrapsSignups';
 import { SmartInstaSignups } from '@/components/admin/SmartInstaSignups';
 import { GenericWebinarSignups } from '@/components/admin/GenericWebinarSignups';
@@ -73,6 +74,7 @@ export default function LeadCenter() {
         </TabsContent>
 
         <TabsContent value="stats" className="space-y-6">
+          <CalendarClickStats />
           <WebinarStats />
         </TabsContent>
 
