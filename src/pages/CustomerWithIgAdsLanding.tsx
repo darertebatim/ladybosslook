@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Play, Sparkles } from "lucide-react";
+import { Lock, Play, Sparkles } from "lucide-react";
 import coverAsset from "@/assets/customerwithigads-cover.png.asset.json";
 import igthreeCoverAsset from "@/assets/igthree-thumbnail.jpg.asset.json";
 import assertiveCoverAsset from "@/assets/assertive-cover.jpg.asset.json";
@@ -41,10 +41,34 @@ export default function CustomerWithIgAdsLanding({
   videoId = "kMcRNW0_44o",
   source = "customerwithigads_waitlist",
   metaEvent = "CustomerWithIgAdsLead",
-}: { videoId?: string; source?: string; metaEvent?: string } = {}) {
+  gateVideo = false,
+}: { videoId?: string; source?: string; metaEvent?: string; gateVideo?: boolean } = {}) {
+  const gateKey = `video_gate_unlocked_${videoId}`;
+  const [unlocked, setUnlocked] = useState(() => {
+    if (!gateVideo) return true;
+    try { return localStorage.getItem(gateKey) === "1"; } catch { return false; }
+  });
   const [playing, setPlaying] = useState(false);
   const variant = VARIANTS[videoId] ?? DEFAULT_VARIANT;
   const { title, subtitle, description, cover } = variant;
+  const locked = gateVideo && !unlocked;
+
+  const handleSuccess = () => {
+    trackLead({ content_name: source });
+    trackCustomLead(metaEvent);
+    if (gateVideo) {
+      try { localStorage.setItem(gateKey, "1"); } catch { /* ignore */ }
+      setUnlocked(true);
+      setPlaying(true);
+      setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50);
+    }
+  };
+
+  const focusForm = () => {
+    const el = document.getElementById("video-gate-form");
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => (el?.querySelector("input") as HTMLInputElement | null)?.focus(), 400);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-white">
@@ -72,10 +96,10 @@ export default function CustomerWithIgAdsLanding({
 
         <section className="mt-6 overflow-hidden rounded-2xl border border-orange-200 bg-black shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
           <div className="relative aspect-video w-full">
-            {playing ? (
+            {playing && !locked ? (
               <iframe
                 className="absolute inset-0 h-full w-full"
-                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
                 title={title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -83,9 +107,9 @@ export default function CustomerWithIgAdsLanding({
             ) : (
               <button
                 type="button"
-                onClick={() => setPlaying(true)}
+                onClick={() => (locked ? focusForm() : setPlaying(true))}
                 className="group absolute inset-0 h-full w-full"
-                aria-label="پخش ویدیو"
+                aria-label={locked ? "برای تماشا ایمیل خود را وارد کنید" : "پخش ویدیو"}
               >
                 <img
                   src={cover}
@@ -94,43 +118,61 @@ export default function CustomerWithIgAdsLanding({
                 />
                 <span className="absolute inset-0 bg-black/10 transition group-active:bg-black/25" />
                 <span className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 shadow-xl transition group-active:scale-95">
-                  <Play className="h-7 w-7 translate-x-0.5 fill-rose-500 text-rose-500" />
+                  {locked ? (
+                    <Lock className="h-7 w-7 text-rose-500" />
+                  ) : (
+                    <Play className="h-7 w-7 translate-x-0.5 fill-rose-500 text-rose-500" />
+                  )}
                 </span>
               </button>
             )}
           </div>
         </section>
 
-        <p className="mt-3 text-center text-xs leading-6 text-neutral-500">
-          {description}
-        </p>
+        {locked ? (
+          <div id="video-gate-form" className="mt-5">
+            <p className="text-center text-sm font-bold leading-7 text-neutral-900">
+              برای تماشای رایگان و فوری ویدیو، ایمیل خود را وارد کنید
+            </p>
+            <WebinarWaitlistBox
+              source={source}
+              title="مشاهده فوری ویدیو"
+              onSuccess={handleSuccess}
+            />
+          </div>
+        ) : (
+          <>
+            <p className="mt-3 text-center text-xs leading-6 text-neutral-500">
+              {description}
+            </p>
 
-        <div className="mt-8 flex items-center gap-3">
-          <div className="h-px flex-1 bg-neutral-200" />
-          <span className="h-2 w-2 rounded-full bg-rose-400" />
-          <div className="h-px flex-1 bg-neutral-200" />
-        </div>
+            {!gateVideo && (
+              <>
+                <div className="mt-8 flex items-center gap-3">
+                  <div className="h-px flex-1 bg-neutral-200" />
+                  <span className="h-2 w-2 rounded-full bg-rose-400" />
+                  <div className="h-px flex-1 bg-neutral-200" />
+                </div>
 
-        <div className="mt-6 rounded-2xl border border-dashed border-orange-300 bg-orange-50/60 p-4 text-center">
-          <p className="inline-flex items-center gap-1.5 text-sm font-bold text-orange-800">
-            <Sparkles className="h-4 w-4" />
-            ظرفیت دوره بعدی محدود است
-          </p>
-          <p className="mt-1 text-xs leading-6 text-orange-900/80">
-            نام و ایمیل خود را ثبت کنید تا قبل از همه، از تاریخ شروع و تخفیف ویژه دوره باخبر شوید.
-          </p>
-        </div>
+                <div className="mt-6 rounded-2xl border border-dashed border-orange-300 bg-orange-50/60 p-4 text-center">
+                  <p className="inline-flex items-center gap-1.5 text-sm font-bold text-orange-800">
+                    <Sparkles className="h-4 w-4" />
+                    ظرفیت دوره بعدی محدود است
+                  </p>
+                  <p className="mt-1 text-xs leading-6 text-orange-900/80">
+                    نام و ایمیل خود را ثبت کنید تا قبل از همه، از تاریخ شروع و تخفیف ویژه دوره باخبر شوید.
+                  </p>
+                </div>
 
-        <div onClickCapture={() => { /* noop */ }}>
-          <WebinarWaitlistBox
-            source={source}
-            title="لیست انتظار دوره بعدی"
-            onSuccess={() => {
-              trackLead({ content_name: source });
-              trackCustomLead(metaEvent);
-            }}
-          />
-        </div>
+                <WebinarWaitlistBox
+                  source={source}
+                  title="لیست انتظار دوره بعدی"
+                  onSuccess={handleSuccess}
+                />
+              </>
+            )}
+          </>
+        )}
       </main>
     </div>
   );
