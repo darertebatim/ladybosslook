@@ -244,6 +244,8 @@ const ThankYouSixTraps = lazy(() => import("@/pages/ThankYouSixTraps"));
 const IgAdsLanding = lazy(() => import("@/pages/IgAdsLanding"));
 const ThankYouIgAds = lazy(() => import("@/pages/ThankYouIgAds"));
 const IgAdsGifts = lazy(() => import("@/pages/IgAdsGifts"));
+const IgThreeGate = lazy(() => import("@/pages/IgThreeGate"));
+const IgThreeWatch = lazy(() => import("@/pages/IgThreeWatch"));
 const CustomerWithIgAdsLanding = lazy(() => import("@/pages/CustomerWithIgAdsLanding"));
 const SmartInstaLanding = lazy(() => import("@/pages/SmartInstaLanding"));
 const ThankYouSmartInsta = lazy(() => import("@/pages/ThankYouSmartInsta"));
@@ -597,7 +599,8 @@ const App = () => (
                   {!isNativeApp() && <Route path="/l/aliagads/thankyou" element={<ThankYouIgAds />} />}
                   {!isNativeApp() && <Route path="/l/igads/gifts" element={<IgAdsGifts />} />}
                   {!isNativeApp() && <Route path="/l/customerwithigads" element={<CustomerWithIgAdsLanding />} />}
-                  <Route path="/l/igthree" element={<CustomerWithIgAdsLanding videoId="Fre2PCAuZW0" source="igthree_waitlist" metaEvent="IGThreeLead" gateVideo />} />
+                  <Route path="/l/igthree" element={<IgThreeGate />} />
+                  <Route path="/l/igthree/watch" element={<IgThreeWatch />} />
                   <Route path="/l/assertive" element={<CustomerWithIgAdsLanding videoId="GcZQl7TGk48" source="assertive_waitlist" metaEvent="AssertiveLead" />} />
                   {!isNativeApp() && <Route path="/smartinstaframework" element={<SmartInstaLanding />} />}
                   {!isNativeApp() && <Route path="/thankyousmartinstaframework" element={<ThankYouSmartInsta />} />}
