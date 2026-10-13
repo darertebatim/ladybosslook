@@ -72,7 +72,10 @@ export function calculateCampaignRoundMetrics(
     });
     const round = gift.round_id ? rounds.find((r) => r.id === gift.round_id) : candidates.length === 1 ? candidates[0] : undefined;
     if (!round) continue;
-    const signup = latestRegistration(email, round.id, gift.submitted_at);
+    const signup = latestRegistration(email, round.id, gift.submitted_at) || registrations
+      .filter((s) => normalizeEmail(s.email) === email && s.submitted_at && s.submitted_at <= gift.submitted_at &&
+        campaigns.some((c) => c.regSource === s.source && c.programSlug === round.program_slug))
+      .sort((a, b) => (b.submitted_at || '').localeCompare(a.submitted_at || ''))[0];
     const c = campaigns.find((campaign) => campaign.regSource === signup?.source);
     if (c) buckets[metricKey(c.key, round.id)]?.attendees.add(email);
   }
