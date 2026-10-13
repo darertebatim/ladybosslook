@@ -68,7 +68,8 @@ export function calculateCampaignRoundMetrics(
     const candidates = rounds.filter((r) => {
       if (r.program_slug !== 'igadsfree' || !r.first_session_date) return false;
       const start = Date.parse(r.first_session_date);
-      return at >= start && at <= start + (r.first_session_duration ?? 90) * 60_000;
+      // Fixed 2-hour window from the live start, so late gift sign-ups still count.
+      return at >= start && at <= start + 120 * 60_000;
     });
     const round = gift.round_id ? rounds.find((r) => r.id === gift.round_id) : candidates.length === 1 ? candidates[0] : undefined;
     if (!round) continue;
