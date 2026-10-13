@@ -10,7 +10,13 @@ interface Props {
   /** Farsi title shown above the form */
   title?: string;
   /** Called after a successful submission (tracking, etc.) */
-  onSuccess?: () => void;
+  onSuccess?: (data: { name: string; email: string }) => void;
+  description?: string;
+  buttonLabel?: string;
+  successTitle?: string;
+  successText?: string;
+  /** Hide the success card (parent handles the next step) */
+  hideWhenDone?: boolean;
 }
 
 const schema = z.object({
@@ -18,7 +24,7 @@ const schema = z.object({
   email: z.string().trim().email("ایمیل معتبر نیست").max(255),
 });
 
-export default function WebinarWaitlistBox({ source, title, onSuccess }: Props) {
+export default function WebinarWaitlistBox({ source, title, onSuccess, description, buttonLabel, successTitle, successText, hideWhenDone }: Props) {
   const { toast } = useToast();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -53,7 +59,7 @@ export default function WebinarWaitlistBox({ source, title, onSuccess }: Props) 
       });
       if (error) throw error;
       setDone(true);
-      onSuccess?.();
+      onSuccess?.({ name: parsed.data.name, email: parsed.data.email.toLowerCase() });
     } catch (err) {
       console.error("waitlist submit error", err);
       toast({
@@ -67,14 +73,15 @@ export default function WebinarWaitlistBox({ source, title, onSuccess }: Props) 
   }
 
   if (done) {
+    if (hideWhenDone) return null;
     return (
       <section className="mt-8 rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-white">
           <Check className="h-6 w-6" />
         </div>
-        <p className="mt-3 text-base font-bold text-emerald-800">ثبت شد ✅</p>
+        <p className="mt-3 text-base font-bold text-emerald-800">{successTitle || "ثبت شد ✅"}</p>
         <p className="mt-1 text-sm leading-6 text-emerald-700">
-          به محض اعلام تاریخ جلسه بعدی، لینک ثبت‌نام را برای شما ایمیل می‌کنیم.
+          {successText || "به محض اعلام تاریخ جلسه بعدی، لینک ثبت‌نام را برای شما ایمیل می‌کنیم."}
         </p>
       </section>
     );
@@ -90,8 +97,8 @@ export default function WebinarWaitlistBox({ source, title, onSuccess }: Props) 
           {title || "در حال حاضر جلسه‌ زنده‌ای برگزار نمی‌شود"}
         </h2>
         <p className="mt-2 text-sm leading-6 text-neutral-600">
-          ایمیل خود را وارد کنید تا به لیست انتظار اضافه شوید؛ اولین نفری باشید که از تاریخ
-          وبینار بعدی باخبر می‌شود.
+          {description ||
+            "ایمیل خود را وارد کنید تا به لیست انتظار اضافه شوید؛ اولین نفری باشید که از تاریخ وبینار بعدی باخبر می‌شود."}
         </p>
       </div>
 
@@ -129,7 +136,7 @@ export default function WebinarWaitlistBox({ source, title, onSuccess }: Props) 
           disabled={submitting}
           className="min-h-[52px] w-full rounded-xl bg-gradient-to-l from-rose-500 to-amber-500 text-base font-bold text-white shadow-md transition active:scale-[0.98] disabled:opacity-60"
         >
-          {submitting ? "در حال ثبت..." : "مرا در لیست انتظار قرار بده"}
+          {submitting ? "در حال ثبت..." : buttonLabel || "مرا در لیست انتظار قرار بده"}
         </button>
       </form>
     </section>
