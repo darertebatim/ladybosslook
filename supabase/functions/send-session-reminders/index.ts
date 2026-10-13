@@ -79,27 +79,45 @@ Deno.serve(async (req) => {
 
       // Check if we already created a reminder for this session at this interval
       const reminderKey = `session_${session.id}_${reminderType}`;
+      const dedupeKey = `sent_reminder_${reminderKey}`;
       const { data: existingPost } = await supabase
         .from('feed_posts')
         .select('id')
         .eq('action_data->>reminderKey', reminderKey)
-        .single();
+        .maybeSingle();
+      const { data: existingMarker } = await supabase
+        .from('app_settings')
+        .select('id')
+        .eq('key', dedupeKey)
+        .maybeSingle();
 
-      if (existingPost) {
+      if (existingPost || existingMarker) {
         console.log(`Reminder already exists for ${reminderKey}`);
         continue;
       }
+
+      // Mark as sent first (prevents duplicate pushes when no feed post is made)
+      await supabase.from('app_settings').insert({
+        key: dedupeKey,
+        value: new Date().toISOString(),
+        description: 'Session reminder dedupe marker',
+      });
 
       // Get the round's channel
       const { data: roundChannel } = await supabase
         .from('feed_channels')
         .select('id')
         .eq('round_id', round.id)
-        .single();
+        .maybeSingle();
 
-      if (!roundChannel) {
-        console.log(`No channel found for round ${round.id}`);
-        continue;
+      // Shared channel = linked to more than one round → push only, no feed post
+      let isSharedChannel = false;
+      if (roundChannel) {
+        const { count } = await supabase
+          .from('program_rounds')
+          .select('id', { count: 'exact', head: true })
+          .eq('community_channel_id', roundChannel.id);
+        isSharedChannel = (count || 0) > 1;
       }
 
       // Get admin user for author
@@ -131,29 +149,31 @@ Deno.serve(async (req) => {
         ? `"${session.title}" starts at ${timeStr}. Get ready to join!`
         : `Don't forget: "${session.title}" is scheduled for ${dateStr} at ${timeStr}.`;
 
-      // Create feed post
-      const { error: postError } = await supabase.from('feed_posts').insert({
-        channel_id: roundChannel.id,
-        author_id: adminUser?.user_id || null,
-        post_type: 'session_reminder',
-        title,
-        content,
-        action_type: meetingUrl ? 'join_session' : 'none',
-        action_data: { 
-          meetingUrl,
-          sessionId: session.id,
-          label: 'Join Session',
-          reminderKey,
-        },
-        is_system: true,
-        send_push: true,
-      });
+      if (roundChannel && !isSharedChannel) {
+        const { error: postError } = await supabase.from('feed_posts').insert({
+          channel_id: roundChannel.id,
+          author_id: adminUser?.user_id || null,
+          post_type: 'session_reminder',
+          title,
+          content,
+          action_type: meetingUrl ? 'join_session' : 'none',
+          action_data: { 
+            meetingUrl,
+            sessionId: session.id,
+            label: 'Join Session',
+            reminderKey,
+          },
+          is_system: true,
+          send_push: true,
+        });
 
-      if (postError) {
-        console.error('Error creating feed post:', postError);
+        if (postError) {
+          console.error('Error creating feed post:', postError);
+        } else {
+          postsCreated++;
+        }
       } else {
-        postsCreated++;
-        console.log(`Created ${reminderType} reminder post for session "${session.title}"`);
+        console.log(`Skipping feed post (shared or no channel) for round ${round.id}`);
       }
 
       // Send push notifications to enrolled users
