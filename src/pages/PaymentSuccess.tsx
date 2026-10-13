@@ -441,6 +441,10 @@ export default function PaymentSuccess() {
             )}
           </div>
 
+          {successSettings?.success_video_url && (
+            <PaymentSuccessVideo url={successSettings.success_video_url} />
+          )}
+
           {/* Round details */}
           {roundInfo && (() => {
             const sessionDateStr = roundInfo.first_session_date || roundInfo.start_date;
