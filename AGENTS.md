@@ -1,3 +1,4 @@
 - Resolve direct program courses and audio/video playlists alongside round content in learner views, deduplicating by content ID; program enrollment must unlock directly attached content even without a round.
 - Duplicate video campaigns share a configurable landing page with separate signup sources and Meta events to preserve layout consistency without mixing leads.
 - Desktop Support uses the shared resizable-panel primitives with browser-saved widths; ChatPanel opts in so mobile chat layouts stay unchanged.
+- Campaign round reporting uses paginated internal records and unique emails; shared gift-page attendance is attributed by live-session time and registration source so campaigns sharing a round do not double-count attendees.
