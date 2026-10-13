@@ -1,5 +1,6 @@
 - [x] Hide start dates for self-paced programs in Path and program details.
-- [ ] Add per-program payment-success booking-box visibility and a separate optional success video.
+- [x] Add per-program payment-success booking-box visibility and a separate optional success video; verify both visibility states and video rendering in public previews.
+- [ ] Verify saving payment-success settings through Admin with a real account — blocked by external unmanaged authenticated preview access.
 - [x] Duplicate the IG Video page at /l/igthree with the supplied video and a separate Lead Center tab.
 - [x] Show directly attached program playlists in the same titled learning layout as round playlists.
 - [ ] Verify the enrolled self-paced program and playlist flow in the app — blocked by unavailable authenticated preview access.
