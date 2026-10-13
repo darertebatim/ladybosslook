@@ -8,6 +8,7 @@ import { Copy, ExternalLink, Link2, Mail, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
 import { LEAD_CAMPAIGNS, ALL_LEAD_SOURCES } from '@/lib/leadCampaigns';
+import { calculateCampaignRoundMetrics, type MetricCalendarClick } from '@/lib/campaignRoundMetrics';
 import {
   useInactiveLeadCampaigns,
   useSetLeadCampaignActive,
@@ -30,6 +31,7 @@ interface RoundRow {
   round_name: string | null;
   round_number: number | null;
   first_session_date: string | null;
+  first_session_duration: number | null;
   status: string | null;
 }
 
@@ -38,7 +40,7 @@ function origin() {
 }
 
 export function LeadCampaignDirectory() {
-  const { data: submissions, isLoading } = useQuery({
+  const { data: submissions, isLoading, isError: submissionsError } = useQuery({
     queryKey: ['lead-center-submissions'],
     staleTime: 60_000,
     queryFn: async () => {
@@ -48,7 +50,8 @@ export function LeadCampaignDirectory() {
         const { data, error } = await supabase
           .from('form_submissions')
           .select('email, source, submitted_at, round_id')
-          .in('source', ALL_LEAD_SOURCES)
+          .in('source', [...ALL_LEAD_SOURCES, 'igads_gifts'])
+          .order('id')
           .range(from, from + 999);
         if (error) throw error;
         all.push(...((data as SubRow[]) || []));
@@ -59,17 +62,40 @@ export function LeadCampaignDirectory() {
     },
   });
 
-  const { data: rounds } = useQuery({
+  const { data: rounds, isLoading: roundsLoading, isError: roundsError } = useQuery({
     queryKey: ['lead-center-rounds'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('program_rounds')
-        .select('id, program_slug, round_name, round_number, first_session_date, status')
+        .select('id, program_slug, round_name, round_number, first_session_date, first_session_duration, status')
         .order('first_session_date', { ascending: true });
       if (error) throw error;
       return (data as RoundRow[]) || [];
     },
   });
+
+  const { data: calendarClicks, isLoading: calendarLoading, isError: calendarError } = useQuery({
+    queryKey: ['lead-center-round-calendar-clicks'],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const all: MetricCalendarClick[] = [];
+      for (let from = 0; ; from += 1000) {
+        const { data, error } = await supabase.from('webinar_calendar_clicks')
+          .select('id, email, page, round_id, created_at').neq('page', 'email:test')
+          .order('id').range(from, from + 999);
+        if (error) throw error;
+        all.push(...(data || []));
+        if (!data || data.length < 1000) break;
+      }
+      return all;
+    },
+  });
+
+  const roundMetrics = useMemo(() => calculateCampaignRoundMetrics(
+    LEAD_CAMPAIGNS, rounds || [], submissions || [], calendarClicks || [],
+  ), [rounds, submissions, calendarClicks]);
+  const metricsLoading = isLoading || roundsLoading || calendarLoading;
+  const metricsError = submissionsError || roundsError || calendarError;
 
   const copy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -140,6 +166,7 @@ export function LeadCampaignDirectory() {
   return (
     <div className="space-y-6">
       {isLoading && <p className="text-sm text-muted-foreground">Loading campaigns…</p>}
+      {metricsError && <p role="alert" className="text-sm text-destructive">Round counts could not be loaded. Please try again.</p>}
       {[...cards]
         .sort((a, b) => Number(inactive.includes(a.c.key)) - Number(inactive.includes(b.c.key)))
         .map(({ c, total, last7, extras, programRounds, nextRound }) => {
@@ -250,8 +277,14 @@ export function LeadCampaignDirectory() {
                   {programRounds.map((r) => {
                     const pinned = `${landing}?round=${r.round_number ?? r.id}`;
                     const isNext = nextRound?.id === r.id;
+                    const metrics = roundMetrics[`${c.key}:${r.id}`];
+                    const counts = [
+                      { label: 'Sign-ups', value: metrics?.signups, title: 'Unique registered emails for this campaign and round' },
+                      { label: 'Calendar adds', value: metrics?.calendar, title: 'Unique emails that tapped a calendar link; anonymous taps count separately. Saving is not confirmed.' },
+                      { label: 'Live attendees', value: metrics?.attendees, title: 'Unique gift signups during the live session, matched by email to this campaign. Not total viewers.' },
+                    ];
                     return (
-                      <div key={r.id} className="flex flex-wrap items-center gap-2">
+                      <div key={r.id} className="flex flex-wrap items-center gap-2 border-b py-2 last:border-0">
                         <span className="font-medium">
                           {r.round_name || `Round ${r.round_number ?? '?'}`}
                         </span>
@@ -271,6 +304,14 @@ export function LeadCampaignDirectory() {
                             {r.status}
                           </Badge>
                         )}
+                        <div className="ml-auto grid grid-cols-3 gap-3 text-center" aria-label={`${r.round_name || 'Round'} counts`}>
+                          {counts.map(({ label, value, title }) => (
+                            <div key={label} title={title} className="min-w-[64px]">
+                              <span className="block font-semibold tabular-nums">{metricsLoading ? '…' : metricsError ? '—' : (value ?? 0).toLocaleString()}</span>
+                              <span className="block text-[10px] text-muted-foreground">{label}</span>
+                            </div>
+                          ))}
+                        </div>
                         <Button
                           size="sm"
                           variant="ghost"

@@ -5,3 +5,5 @@
 - [x] Let admins attach courses and video playlists directly to programs and show them to enrolled students on program pages.
 - [x] Unlock directly attached course lessons and audio/video playlists for active program enrollments.
 - [ ] Verify the program content editor and enrolled student playback end to end — blocked by unavailable authenticated preview access.
+- [x] Add campaign round sign-up, calendar-tap, and gift-based live attendee counts; verify attribution against existing data.
+- [ ] Verify campaign round counts in the signed-in admin page — blocked by unavailable authenticated preview access.
