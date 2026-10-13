@@ -93,6 +93,16 @@ export function GenericWebinarSignups({ campaign }: { campaign: LeadCampaign }) 
     });
   }, [rows, search, roundFilter]);
 
+  const sourceCounts = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const r of rows || []) {
+      const key = r.source || 'unknown';
+      if (!map.has(key)) map.set(key, new Set());
+      map.get(key)!.add((r.email || '').toLowerCase().trim());
+    }
+    return [...map.entries()].map(([source, emails]) => ({ source, count: emails.size }));
+  }, [rows]);
+
   const exportCsv = () => {
     const header = 'email,name,city,source,round,submitted_at\n';
     const body = filtered
