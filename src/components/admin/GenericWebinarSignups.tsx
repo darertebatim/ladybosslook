@@ -128,6 +128,11 @@ export function GenericWebinarSignups({ campaign }: { campaign: LeadCampaign }) 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <CardTitle>{campaign.label} signups</CardTitle>
           <div className="flex items-center gap-2">
+            {sourceCounts.map(({ source, count }) => (
+              <Badge key={source} variant="outline" title={`Unique emails with source ${source}`}>
+                {source}: {count}
+              </Badge>
+            ))}
             <Badge variant="secondary">{filtered.length} rows</Badge>
             <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
               <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
