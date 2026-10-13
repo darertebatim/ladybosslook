@@ -1,3 +1,4 @@
+import { trackCalendarClick } from "@/lib/trackCalendarClick";
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -158,14 +159,14 @@ const ThankFreeLive = () => {
                   {/* Calendar Buttons */}
                   <div className="space-y-2">
                     <Button 
-                      onClick={() => window.open(generateGoogleCalendarUrl(webinarEvent), '_blank')}
+                      onClick={() => trackCalendarClick("google") || window.open(generateGoogleCalendarUrl(webinarEvent), '_blank')}
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm py-2 px-3 h-auto font-farsi"
                     >
                       <Calendar className="w-4 h-4 mr-2" />
                       افزودن به Google Calendar
                     </Button>
                     <Button 
-                      onClick={() => downloadICSFile(webinarEvent, 'webinar-event.ics')}
+                      onClick={() => trackCalendarClick("apple") || downloadICSFile(webinarEvent, 'webinar-event.ics')}
                       className="w-full bg-gray-600 hover:bg-gray-700 text-white text-xs md:text-sm py-2 px-3 h-auto font-farsi"
                     >
                       <Download className="w-4 h-4 mr-2" />
