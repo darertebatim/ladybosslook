@@ -129,22 +129,16 @@ export default function LeadCenter() {
         </TabsContent>
 
         <TabsContent value="customerwithigads" className="space-y-6">
-          <WebinarEmailEngagement
-            campaignKey="customerwithigads"
-            sources={[customerVideo.regSource]}
-          />
           <GenericWebinarSignups campaign={customerVideo} />
         </TabsContent>
 
 
 
         <TabsContent value="igthree" className="space-y-6">
-          <WebinarEmailEngagement campaignKey="igthree" sources={[igthree.regSource]} />
           <GenericWebinarSignups campaign={igthree} />
         </TabsContent>
 
         <TabsContent value="assertive" className="space-y-6">
-          <WebinarEmailEngagement campaignKey="assertive" sources={[assertive.regSource]} />
           <GenericWebinarSignups campaign={assertive} />
         </TabsContent>
 

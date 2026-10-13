@@ -93,6 +93,16 @@ export function GenericWebinarSignups({ campaign }: { campaign: LeadCampaign }) 
     });
   }, [rows, search, roundFilter]);
 
+  const sourceCounts = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const r of rows || []) {
+      const key = r.source || 'unknown';
+      if (!map.has(key)) map.set(key, new Set());
+      map.get(key)!.add((r.email || '').toLowerCase().trim());
+    }
+    return [...map.entries()].map(([source, emails]) => ({ source, count: emails.size }));
+  }, [rows]);
+
   const exportCsv = () => {
     const header = 'email,name,city,source,round,submitted_at\n';
     const body = filtered
@@ -118,6 +128,11 @@ export function GenericWebinarSignups({ campaign }: { campaign: LeadCampaign }) 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <CardTitle>{campaign.label} signups</CardTitle>
           <div className="flex items-center gap-2">
+            {sourceCounts.map(({ source, count }) => (
+              <Badge key={source} variant="outline" title={`Unique emails with source ${source}`}>
+                {source}: {count}
+              </Badge>
+            ))}
             <Badge variant="secondary">{filtered.length} rows</Badge>
             <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
               <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
