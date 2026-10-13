@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { OneOnOneBookingsPanel } from "@/components/admin/OneOnOneBookingsPanel";
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -1442,7 +1441,6 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                         onChange={(e) => setFormData({ ...formData, booking_note: e.target.value })}
                       />
                     </div>
-                    <OneOnOneBookingsPanel programSlug={formData.slug} included={formData.one_on_one_count || 1} />
                     <div className="flex items-center gap-2">
                       <Checkbox
                         id="show_booking_on_success"

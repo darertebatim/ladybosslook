@@ -16,6 +16,8 @@ import {
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { SessionsManager } from '@/components/admin/SessionsManager';
 import { useToast } from '@/hooks/use-toast';
+import { OneOnOneBookingsPanel } from '@/components/admin/OneOnOneBookingsPanel';
+
 import { User, Video, Calendar, Save } from 'lucide-react';
 
 interface OneOnOneRound {
@@ -151,12 +153,15 @@ export default function OneOnOneClientsManager() {
 
   if (!rounds || rounds.length === 0) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center text-muted-foreground">
-          No 1:1 clients yet. Mark a program as a 1:1 Service in the Program Catalog
-          to start auto-provisioning client rounds on enrollment.
-        </CardContent>
-      </Card>
+      <div className="space-y-4">
+        <OneOnOneBookingsPanel className="rounded-xl border bg-card p-4 space-y-2" />
+        <Card>
+          <CardContent className="py-12 text-center text-muted-foreground">
+            No 1:1 clients yet. Mark a program as a 1:1 Service in the Program Catalog
+            to start auto-provisioning client rounds on enrollment.
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
@@ -166,6 +171,8 @@ export default function OneOnOneClientsManager() {
         Each row is one client's private round. Set the instructor and a recurring Google
         Meet link (reused for every session with this client), then schedule sessions.
       </p>
+
+      <OneOnOneBookingsPanel className="rounded-xl border bg-card p-4 space-y-2" />
 
       {rounds.map((r) => {
         const profile = profiles?.find((p: any) => p.id === r.owner_user_id);
