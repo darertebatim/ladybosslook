@@ -1,3 +1,4 @@
+import { trackedCalUrl } from "../_shared/calendar-track.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "https://esm.sh/resend@2.0.0";
@@ -428,7 +429,7 @@ serve(async (req) => {
         ? buildNextSessionHtml(r.name, startUtc, supportUrl)
         : joinNow
           ? buildJoinNowHtml(r.name, meetUrl, supportUrl)
-          : buildHtml(r.name, startUtc, meetUrl, gcalUrl, supportUrl);
+          : buildHtml(r.name, startUtc, meetUrl, trackedCalUrl(gcalUrl, "email:smartinsta-reminder", targetRoundId, r.email), supportUrl);
       const unsubUrl = await buildUnsubUrl(r.email);
       const { data: sendData, error } = await resend.emails.send({
         from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>",
