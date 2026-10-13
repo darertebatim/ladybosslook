@@ -146,7 +146,7 @@ export default function ThankYouIgAds() {
       const round = await resolveWebinarRound(PROGRAM_SLUG, roundParam || registeredRoundId);
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
-        .select("title, video_url")
+        .select("title")
         .eq("slug", PROGRAM_SLUG)
         .maybeSingle();
 
