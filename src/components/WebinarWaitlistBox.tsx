@@ -17,6 +17,7 @@ interface Props {
   successText?: string;
   /** Hide the success card (parent handles the next step) */
   hideWhenDone?: boolean;
+  initialEmail?: string;
 }
 
 const schema = z.object({
@@ -24,10 +25,10 @@ const schema = z.object({
   email: z.string().trim().email("ایمیل معتبر نیست").max(255),
 });
 
-export default function WebinarWaitlistBox({ source, title, onSuccess, description, buttonLabel, successTitle, successText, hideWhenDone }: Props) {
+export default function WebinarWaitlistBox({ source, title, onSuccess, description, buttonLabel, successTitle, successText, hideWhenDone, initialEmail }: Props) {
   const { toast } = useToast();
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initialEmail || "");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);

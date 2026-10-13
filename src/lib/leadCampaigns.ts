@@ -22,9 +22,9 @@ export const LEAD_CAMPAIGNS: LeadCampaign[] = [
     label: 'IG Three (video)',
     programSlug: 'customerwithigads',
     landingPath: '/l/igthree',
-    thankYouPath: '/l/igthree',
-    regSource: 'igthree_waitlist',
-    extraSources: [],
+    thankYouPath: '/l/igthree/watch',
+    regSource: 'igthree_video',
+    extraSources: ['igthree_waitlist', 'igthree_program_waitlist'],
     metaEvent: 'IGThreeLead',
   },
   {
