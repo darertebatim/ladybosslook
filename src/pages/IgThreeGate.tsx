@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { z } from "zod";
@@ -19,6 +19,9 @@ export default function IgThreeGate() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [returning] = useState(() => {
+    try { return Boolean(localStorage.getItem(IGTHREE_EMAIL_KEY)); } catch { return false; }
+  });
 
   // Returning visitors get a shortcut link below the form instead of an
   // automatic redirect, so the cover page is always reachable.
@@ -107,6 +110,15 @@ export default function IgThreeGate() {
             {submitting ? "در حال باز کردن..." : "تماشای ویدیو"}
           </button>
           <p className="text-center text-[11px] text-neutral-500">رایگان — ویدیو بلافاصله باز می‌شود</p>
+          {returning && (
+            <button
+              type="button"
+              onClick={() => navigate("/l/igthree/watch")}
+              className="w-full pt-1 text-center text-xs font-semibold text-rose-600 underline underline-offset-4"
+            >
+              قبلاً ایمیل داده‌اید؟ تماشای ویدیو
+            </button>
+          )}
         </form>
       </main>
     </div>
