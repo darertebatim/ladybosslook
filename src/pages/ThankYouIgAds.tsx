@@ -75,11 +75,9 @@ function CountdownToWebinar({ targetDate }: { targetDate: Date }) {
   );
 }
 
-function youtubeId(url: string | null | undefined): string {
-  if (!url) return "";
-  const m = url.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{6,})/);
-  return m?.[1] || "";
-}
+// Thank-you video is a fixed campaign video (pOxk1JnTtxs) shared by
+// /l/igadsfree/thankyou and /l/aliagads/thankyou — not round-specific.
+export const THANKYOU_VIDEO_ID = "pOxk1JnTtxs";
 
 export default function ThankYouIgAds() {
   const location = useLocation();
@@ -148,11 +146,11 @@ export default function ThankYouIgAds() {
       const round = await resolveWebinarRound(PROGRAM_SLUG, roundParam || registeredRoundId);
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
-        .select("title, video_url")
+        .select("title")
         .eq("slug", PROGRAM_SLUG)
         .maybeSingle();
 
-      setVideoId(youtubeId(round?.video_url || prog?.video_url));
+      setVideoId(THANKYOU_VIDEO_ID);
 
       if (round?.first_session_date) {
         setWebinar({
