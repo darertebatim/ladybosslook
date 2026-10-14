@@ -1032,6 +1032,7 @@ export default function LearnCourses() {
 
       {/* Lesson Dialog */}
       <LessonEditorDialog
+        key={`${lessonDialog.lesson?.id ?? 'new'}-${lessonDialog.moduleId ?? ''}-${lessonDialog.open ? 'open' : 'closed'}`}
         open={lessonDialog.open}
         onOpenChange={(o) => setLessonDialog((s) => ({ ...s, open: o }))}
         moduleId={lessonDialog.moduleId}

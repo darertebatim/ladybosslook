@@ -97,6 +97,24 @@ export function LessonEditorDialog({ open, onOpenChange, moduleId, lesson, nextS
   useEffect(() => {
     if (!open) return;
     if (lesson) {
+      // Always load the latest saved copy of this exact lesson so nothing
+      // from a previously opened lesson can leak into this form.
+      supabase.from('learn_lessons').select('*').eq('id', lesson.id).maybeSingle().then(({ data }) => {
+        if (!data) return;
+        const l: any = data;
+        setForm({
+          title: l.title || '', description: l.description || '', content_html: l.content_html || '',
+          lesson_type: l.lesson_type || 'video', video_id: l.video_id || '', audio_id: l.audio_id || '',
+          reading_id: l.reading_id || '', media_label: '', pdf_url: l.pdf_url || '',
+          link_url: l.link_url || '', link_label: l.link_label || '', session_url: l.session_url || '',
+          session_at: l.session_at ? toLocalInput(l.session_at) : '',
+          duration_minutes: l.duration_seconds ? String(Math.round(l.duration_seconds / 60)) : '',
+          is_published: l.is_published !== false, is_free_preview: !!l.is_free_preview,
+          drip_days: l.drip_days != null ? String(l.drip_days) : '',
+          drip_date: l.drip_date ? String(l.drip_date).slice(0, 10) : '',
+          attachments: Array.isArray(l.attachments) ? l.attachments : [],
+        });
+      });
       setForm({
         title: lesson.title || '',
         description: lesson.description || '',
