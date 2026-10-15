@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RefreshCw, Users, Clock, Globe, Save } from 'lucide-react';
+import { useSlotChoiceLeadCampaigns, useSetLeadCampaignSlotChoice } from '@/hooks/useLeadCampaignStatus';
+import { toast } from 'sonner';
 import { timezonesForRoundNumber, getWebinarRoundRouting, WebinarRoundRouting } from '@/lib/webinarRounds';
 
 interface RoundRow {
@@ -22,11 +24,15 @@ interface Props {
   /** Separate routing record key (defaults to programSlug). */
   routingKey?: string;
   sources: string[];
+  /** Lead campaign key (used for the "visitor picks" mode). */
+  campaignKey?: string;
 }
+
+type Mode = 'single' | 'timezone' | 'pick';
 
 const tzLabel = (tz: string) => tz.replace('America/', '').replace(/_/g, ' ');
 
-export function WebinarRoundBreakdown({ programSlug, sources, routingKey }: Props) {
+export function WebinarRoundBreakdown({ programSlug, sources, routingKey, campaignKey }: Props) {
   const routingSlug = routingKey || programSlug;
   const queryClient = useQueryClient();
 
@@ -81,6 +87,48 @@ export function WebinarRoundBreakdown({ programSlug, sources, routingKey }: Prop
 
   const activeRounds = (rounds || []).filter((r) => r.status === 'active');
 
+  const { slotChoice } = useSlotChoiceLeadCampaigns();
+  const setSlotChoice = useSetLeadCampaignSlotChoice();
+  const currentLocked = routing?.locked_round_number ?? null;
+  const savedMode: Mode =
+    currentLocked !== null ? 'single' : campaignKey && slotChoice.includes(campaignKey) ? 'pick' : 'timezone';
+  const [draftMode, setDraftMode] = useState<Mode | null>(null);
+  const mode = draftMode ?? savedMode;
+  const [draftLocked, setDraftLocked] = useState<number | ''>('');
+  const lockedValue = draftLocked !== '' ? draftLocked : currentLocked ?? '';
+
+  const saveMode = useMutation({
+    mutationFn: async (next: Mode) => {
+      const fallback = Number(lockedValue || routing?.east_round_number || activeRounds[0]?.round_number || 0);
+      const { error } = await (supabase as any).from('webinar_round_routing').upsert(
+        {
+          program_slug: routingSlug,
+          east_round_number: routing?.east_round_number ?? fallback,
+          west_round_number: routing?.west_round_number ?? fallback,
+          europe_round_number: routing?.europe_round_number ?? null,
+          locked_round_number: next === 'single' ? Number(lockedValue) : null,
+        },
+        { onConflict: 'program_slug' },
+      );
+      if (error) throw error;
+      if (campaignKey) {
+        const has = slotChoice.includes(campaignKey);
+        if (next === 'pick' && !has) await setSlotChoice.mutateAsync({ keys: [...slotChoice, campaignKey] });
+        if (next !== 'pick' && has) await setSlotChoice.mutateAsync({ keys: slotChoice.filter((k) => k !== campaignKey) });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['webinar-round-routing', routingSlug] });
+      setDraftMode(null);
+      setDraftLocked('');
+      toast.success('Round mode saved');
+    },
+    onError: () => toast.error('Failed to save round mode'),
+  });
+
+  const modeChanged =
+    mode !== savedMode || (mode === 'single' && lockedValue !== '' && lockedValue !== currentLocked);
+
   const saveRouting = useMutation({
     mutationFn: async (payload: { east: number; west: number; europe: number | null }) => {
       const { error } = await (supabase as any).from('webinar_round_routing').upsert(
@@ -89,6 +137,7 @@ export function WebinarRoundBreakdown({ programSlug, sources, routingKey }: Prop
           east_round_number: payload.east,
           west_round_number: payload.west,
           europe_round_number: payload.europe,
+          locked_round_number: null,
         },
         { onConflict: 'program_slug' },
       );
@@ -161,6 +210,55 @@ export function WebinarRoundBreakdown({ programSlug, sources, routingKey }: Prop
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
+        <div className="rounded-xl border p-4 space-y-3">
+          <p className="text-sm font-medium">How visitors get a round</p>
+          <div className="grid gap-2 sm:grid-cols-3">
+            {([
+              ['single', 'Single round', 'Everyone gets one locked round'],
+              ['timezone', 'Timezone split', 'East / West / Europe routing'],
+              ['pick', 'Visitor picks', 'Visitor chooses a session'],
+            ] as const).map(([m, title, desc]) => (
+              <Button
+                key={m}
+                type="button"
+                variant={mode === m ? 'default' : 'outline'}
+                className="h-auto flex-col items-start py-2 text-left"
+                disabled={m === 'pick' && !campaignKey}
+                onClick={() => setDraftMode(m)}
+              >
+                <span className="text-sm font-semibold">{title}</span>
+                <span className="text-xs font-normal opacity-80">{desc}</span>
+              </Button>
+            ))}
+          </div>
+          {mode === 'single' && (
+            <div className="space-y-1.5">
+              <label className="text-xs text-muted-foreground">Locked round for every visitor</label>
+              <Select value={String(lockedValue)} onValueChange={(v) => setDraftLocked(Number(v))}>
+                <SelectTrigger className="w-full sm:w-96">
+                  <SelectValue placeholder="Pick a round" />
+                </SelectTrigger>
+                <SelectContent>
+                  {activeRounds.map((r) => (
+                    <SelectItem key={`lock-${r.id}`} value={String(r.round_number ?? '')}>
+                      Round {r.round_number ?? '?'} — {r.round_name || 'Untitled'}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          <Button
+            size="sm"
+            disabled={!modeChanged || saveMode.isPending || (mode === 'single' && lockedValue === '')}
+            onClick={() => saveMode.mutate(mode)}
+          >
+            <Save className="mr-1.5 h-4 w-4" />
+            {saveMode.isPending ? 'Saving…' : 'Save mode'}
+          </Button>
+        </div>
+
+        {mode === 'timezone' && (
         <div className="rounded-xl border p-4 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm font-medium">Timezone routing</p>
@@ -252,6 +350,7 @@ export function WebinarRoundBreakdown({ programSlug, sources, routingKey }: Prop
             )}
           </div>
         </div>
+        )}
 
         {activeRounds.length === 0 && (
           <p className="text-sm text-muted-foreground">No active rounds for “{programSlug}”.</p>
@@ -263,6 +362,7 @@ export function WebinarRoundBreakdown({ programSlug, sources, routingKey }: Prop
             const isEast = r.round_number === currentEast;
             const isWest = r.round_number === currentWest;
             const isEurope = currentEurope !== null && r.round_number === currentEurope;
+            const isLockedRound = savedMode === 'single' && r.round_number === currentLocked;
             return (
               <div key={r.id} className="rounded-xl border p-4 space-y-2">
                 <div className="flex items-start justify-between gap-2">
@@ -292,7 +392,11 @@ export function WebinarRoundBreakdown({ programSlug, sources, routingKey }: Prop
                 <div className="text-xs text-muted-foreground">
                   <p className="flex items-center gap-1 font-medium text-foreground">
                     <Globe className="h-3 w-3" />
-                    {isEast
+                    {savedMode === 'single'
+                      ? isLockedRound ? 'Locked — every visitor' : 'Not shown on this page'
+                      : savedMode === 'pick'
+                        ? 'Visitor can pick'
+                      : isEast
                       ? 'East / Central timezones'
                       : isWest
                         ? 'West timezones'
@@ -300,7 +404,7 @@ export function WebinarRoundBreakdown({ programSlug, sources, routingKey }: Prop
                           ? 'Europe / Middle East timezones'
                           : 'No automatic timezone routing'}
                   </p>
-                  {zones.length > 0 && (
+                  {savedMode === 'timezone' && zones.length > 0 && (
                     <p className="mt-1 leading-relaxed">
                       {zones.slice(0, 8).map(tzLabel).join(' · ')}
                       {zones.length > 8 ? ` · +${zones.length - 8} more` : ''}
