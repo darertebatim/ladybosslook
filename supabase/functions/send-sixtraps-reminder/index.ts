@@ -686,7 +686,7 @@ serve(async (req) => {
     }
     console.log("body", JSON.stringify({ ...body, testEmail: body?.testEmail ? "set" : undefined }));
     const PROGRAM_SLUG = c.programSlug;
-    const SOURCES = c.sources;
+    let SOURCES = c.sources;
 
     const testEmail = String(body?.testEmail || "").trim().toLowerCase();
     const requestedRoundId = String(body?.roundId || "").trim();
@@ -700,6 +700,13 @@ serve(async (req) => {
     const audienceRoundId = nextSession
       ? String(body?.audienceRoundId || "").trim()
       : "";
+    // Round-scoped sends reach everyone in that round, including people who
+    // signed up through another landing page of the same program.
+    if (!(nextSession && !audienceRoundId)) {
+      SOURCES = [...new Set(Object.values(CAMPAIGNS)
+        .filter((x) => x.programSlug === PROGRAM_SLUG)
+        .flatMap((x) => x.sources))];
+    }
 
     // Round resolution: explicit -> auto-enrollment round -> earliest active
     const roundCols =

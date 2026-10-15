@@ -62,6 +62,16 @@ export function LeadCampaignDirectory() {
     },
   });
 
+  const { data: lockedRounds } = useQuery({
+    queryKey: ['lead-center-locked-rounds'],
+    queryFn: async () => {
+      const { data } = await (supabase.from('webinar_round_routing').select('program_slug, locked_round_number') as any);
+      const map: Record<string, number> = {};
+      for (const r of (data || []) as any[]) if (r.locked_round_number != null) map[r.program_slug] = r.locked_round_number;
+      return map;
+    },
+  });
+
   const { data: rounds, isLoading: roundsLoading, isError: roundsError } = useQuery({
     queryKey: ['lead-center-rounds'],
     queryFn: async () => {
@@ -152,7 +162,16 @@ export function LeadCampaignDirectory() {
       const extras = (submissions || []).filter((s) =>
         c.extraSources.includes(s.source || '')
       ).length;
-      const programRounds = (rounds || []).filter((r) => r.program_slug === c.programSlug);
+      // Only list rounds that belong to this campaign: its locked round, or
+      // rounds where this campaign actually has sign-ups. Avoids showing the
+      // same shared program rounds under every campaign card.
+      const routingSlug = c.key === 'aliagads' ? 'aliagads' : c.programSlug;
+      const locked = lockedRounds?.[routingSlug];
+      const programRounds = (rounds || []).filter(
+        (r) =>
+          r.program_slug === c.programSlug &&
+          (r.round_number === locked || (roundMetrics[`${c.key}:${r.id}`]?.signups ?? 0) > 0),
+      );
       const nextRound = programRounds.find(
         (r) =>
           r.status === 'active' &&
@@ -161,7 +180,7 @@ export function LeadCampaignDirectory() {
       );
       return { c, total: uniq.size, last7: last7.size, extras, programRounds, nextRound };
     });
-  }, [submissions, rounds]);
+  }, [submissions, rounds, lockedRounds, roundMetrics]);
 
   return (
     <div className="space-y-6">
@@ -187,16 +206,6 @@ export function LeadCampaignDirectory() {
                 <Badge variant="outline">{last7} last 7d</Badge>
                 {extras > 0 && <Badge variant="outline">{extras} extra sources</Badge>}
                 <div className="ml-auto flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">
-                      {slotChoice.includes(c.key) ? 'Visitor picks session' : 'Timezone routing'}
-                    </span>
-                    <Switch
-                      checked={slotChoice.includes(c.key)}
-                      disabled={setSlotChoice.isPending}
-                      onCheckedChange={(v) => toggleSlotChoice(c.key, v)}
-                    />
-                  </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">
                       {waitlist.includes(c.key) ? 'Waitlist mode' : 'Waitlist off'}
