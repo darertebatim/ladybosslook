@@ -192,7 +192,7 @@ export function WebinarRoundBreakdown({ programSlug, sources, routingKey, campai
     <Card>
       <CardHeader className="pb-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <CardTitle className="text-base">Signups per round (timezone routing)</CardTitle>
+          <CardTitle className="text-base">Signups per round</CardTitle>
           <div className="flex items-center gap-2">
             <Badge variant="secondary">{totalUnique} unique signups</Badge>
             <Button
