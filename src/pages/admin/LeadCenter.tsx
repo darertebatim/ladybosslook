@@ -21,6 +21,9 @@ const aliagads = LEAD_CAMPAIGNS.find((c) => c.key === 'aliagads');
 const customerVideo = LEAD_CAMPAIGNS.find((c) => c.key === 'customerwithigads');
 const igthree = LEAD_CAMPAIGNS.find((c) => c.key === 'igthree');
 const assertive = LEAD_CAMPAIGNS.find((c) => c.key === 'assertive');
+// Both IG Ads landing pages share one program, so round views and round emails
+// include everyone in the round no matter which page they signed up on.
+const igAdsRoundSources = [igads, aliagads].flatMap((c) => (c ? [c.regSource, ...c.extraSources] : []));
 
 export default function LeadCenter() {
   const [tab, setTab] = useState('campaigns');
@@ -95,12 +98,12 @@ export default function LeadCenter() {
           <WebinarRoundBreakdown
             programSlug={igads.programSlug}
             campaignKey="igads"
-            sources={[igads.regSource, ...igads.extraSources]}
+            sources={igAdsRoundSources}
           />
           <WebinarEmailSender
             campaignKey="igads"
             programSlug={igads.programSlug}
-            sources={[igads.regSource, ...igads.extraSources]}
+            sources={igAdsRoundSources}
             signupPath={igads.landingPath}
           />
           <WebinarEmailEngagement
@@ -115,12 +118,12 @@ export default function LeadCenter() {
             programSlug={aliagads.programSlug}
             routingKey="aliagads"
             campaignKey="aliagads"
-            sources={[aliagads.regSource, ...aliagads.extraSources]}
+            sources={igAdsRoundSources}
           />
           <WebinarEmailSender
             campaignKey="aliagads"
             programSlug={aliagads.programSlug}
-            sources={[aliagads.regSource, ...aliagads.extraSources]}
+            sources={igAdsRoundSources}
             signupPath={aliagads.landingPath}
           />
           <WebinarEmailEngagement
