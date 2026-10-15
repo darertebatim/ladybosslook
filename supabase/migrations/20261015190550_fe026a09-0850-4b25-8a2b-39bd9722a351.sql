@@ -1,0 +1,1 @@
+ALTER TABLE public.webinar_round_routing ADD COLUMN IF NOT EXISTS locked_round_number integer;
