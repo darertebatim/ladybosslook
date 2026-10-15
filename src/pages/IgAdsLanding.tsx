@@ -168,6 +168,7 @@ function MiniCountdown({ startUtc }: { startUtc: Date }) {
 export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?: string } = {}) {
   const isAli = basePath === "/l/aliagads";
   const routingKey = isAli ? "aliagads" : PROGRAM_SLUG;
+  const campaignKey = isAli ? "aliagads" : "igads";
   const roundStorageKey = isAli ? "aliagads_round_assignment" : "igadsfree_round_assignment";
   const regSource = isAli ? "aliagads_registration" : "igads_registration";
   const waitlistSource = isAli ? "aliagads_waitlist" : "igads_waitlist";
@@ -195,9 +196,9 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?:
   const [roundOptions, setRoundOptions] = useState<WebinarRoundRow[]>([]);
   const [noUpcomingWebinar, setNoUpcomingWebinar] = useState(false);
   const { waitlist } = useWaitlistLeadCampaigns();
-  const waitlistMode = waitlist.includes("igads") || noUpcomingWebinar;
+  const waitlistMode = waitlist.includes(campaignKey) || noUpcomingWebinar;
   const { slotChoice, isLoading: slotLoading } = useSlotChoiceLeadCampaigns();
-  const letUserPick = slotChoice.includes("igads");
+  const letUserPick = slotChoice.includes(campaignKey);
 
   // Recommend the session that fits the visitor's timezone side
   // (East = earlier UTC start, West = later UTC start).
@@ -227,9 +228,14 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?:
   useEffect(() => {
     if (slotLoading) return;
     (async () => {
+      // Single-round mode: every visitor is locked into one round (a ?round= link still wins).
+      const lockRouting = await getWebinarRoundRouting(routingKey);
+      const lockedRound = lockRouting?.locked_round_number ?? null;
+      const isLocked = lockedRound !== null && !roundParam;
+
       // Slot-choice mode: visitors pick their own session (timezone routing stays
       // available, it's just bypassed while this mode is on).
-      if (letUserPick && !roundParam) {
+      if (!isLocked && letUserPick && !roundParam) {
         const { data: progA } = await (supabase as any)
           .from("program_catalog")
           .select("title, cover_image_url")
@@ -254,7 +260,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?:
       // 2. Otherwise restore a previously saved assignment — but only if it
       //    still matches the current East/West routing, so admin routing
       //    changes always reach returning visitors.
-      let effectiveRoundParam = roundParam;
+      let effectiveRoundParam = roundParam || (isLocked ? String(lockedRound) : null);
       if (!effectiveRoundParam) {
         try {
           const saved = localStorage.getItem(roundStorageKey);
@@ -306,6 +312,9 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?:
           durationMinutes: round!.first_session_duration || 120,
           meetUrl: round!.google_meet_link || "",
         });
+      } else if (isLocked) {
+        // Locked round is over/closed — never offer other rounds; show the waitlist.
+        setNoUpcomingWebinar(true);
       } else {
         // No upcoming session for this visitor — offer the other active rounds,
         // and fall back to the waitlist when nothing is scheduled at all.

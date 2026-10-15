@@ -17,6 +17,8 @@ export interface WebinarRoundRouting {
   east_round_number: number;
   west_round_number: number;
   europe_round_number: number | null;
+  /** When set, every visitor on this landing page gets this one round. */
+  locked_round_number: number | null;
 }
 
 const SELECT =
@@ -168,7 +170,7 @@ export async function getWebinarRoundRouting(
 ): Promise<WebinarRoundRouting | null> {
   const { data, error } = await (supabase as any)
     .from("webinar_round_routing")
-    .select("program_slug, east_round_number, west_round_number, europe_round_number")
+    .select("program_slug, east_round_number, west_round_number, europe_round_number, locked_round_number")
     .eq("program_slug", programSlug)
     .maybeSingle();
   if (error || !data) return null;
@@ -180,6 +182,10 @@ export async function getWebinarRoundRouting(
       data.europe_round_number === null || data.europe_round_number === undefined
         ? null
         : Number(data.europe_round_number),
+    locked_round_number:
+      data.locked_round_number === null || data.locked_round_number === undefined
+        ? null
+        : Number(data.locked_round_number),
   };
 }
 
