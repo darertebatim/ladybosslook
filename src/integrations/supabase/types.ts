@@ -8439,6 +8439,7 @@ export type Database = {
           east_round_number: number
           europe_round_number: number | null
           id: string
+          locked_round_number: number | null
           program_slug: string
           updated_at: string
           west_round_number: number
@@ -8448,6 +8449,7 @@ export type Database = {
           east_round_number?: number
           europe_round_number?: number | null
           id?: string
+          locked_round_number?: number | null
           program_slug: string
           updated_at?: string
           west_round_number?: number
@@ -8457,6 +8459,7 @@ export type Database = {
           east_round_number?: number
           europe_round_number?: number | null
           id?: string
+          locked_round_number?: number | null
           program_slug?: string
           updated_at?: string
           west_round_number?: number
