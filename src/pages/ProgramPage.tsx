@@ -389,7 +389,7 @@ const ProgramPage = () => {
                 )}
 
                 {/* Active Round Details */}
-                {autoEnrollRound && (
+                {showRoundDetails && (
                   <div className="rounded-xl bg-[hsl(var(--tint-peach,25_100%_96%))] border border-primary/10 shadow-sm p-4 space-y-2">
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-primary" />
