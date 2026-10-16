@@ -324,6 +324,22 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const total = recipients.length;
+
+    // Keep the email text so admins can view/copy it later from any device.
+    if (!body.testEmail && !(Number(body.offset) > 0) && subject) {
+      const { error: saveErr } = await supabase.from("email_campaign_contents").upsert(
+        {
+          subject,
+          preheader: String(body.preheader || "").slice(0, 160),
+          message,
+          buttons,
+          rtl: !!body.rtl,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "subject" },
+      );
+      if (saveErr) console.error("content save failed:", saveErr.message);
+    }
     const offset = Math.max(0, Number(body.offset) || 0);
     const limit = Math.min(Math.max(1, Number(body.limit) || total || 1), 1000);
     const slice = body.testEmail ? recipients : recipients.slice(offset, offset + limit);

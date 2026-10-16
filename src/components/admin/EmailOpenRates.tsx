@@ -188,6 +188,19 @@ export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => v
     return { rows, totals, peopleBySubject: people };
   }, [data]);
 
+  const { data: savedContent } = useQuery({
+    queryKey: ['email-campaign-content', detail],
+    enabled: !!detail,
+    queryFn: async () => {
+      const { data } = await (supabase as any)
+        .from('email_campaign_contents')
+        .select('message')
+        .eq('subject', (detail || '').trim())
+        .maybeSingle();
+      return (data as { message?: string } | null) ?? null;
+    },
+  });
+
   const detailPeople = useMemo(() => {
     const list = [...(peopleBySubject.get(detail || '')?.values() ?? [])];
     const q = search.trim().toLowerCase();
@@ -403,7 +416,8 @@ export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => v
           </DialogHeader>
           {(() => {
             const draft = detail ? readDraftFor(detail) : null;
-            const bodyText = draft?.message ? htmlToText(draft.message) : '';
+            const raw = savedContent?.message || draft?.message || '';
+            const bodyText = raw ? htmlToText(raw) : '';
             return (
               <div className="space-y-3">
                 <div className="rounded-lg border p-3 space-y-2">
