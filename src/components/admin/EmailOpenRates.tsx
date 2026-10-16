@@ -444,7 +444,7 @@ export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => v
                     </p>
                   ) : (
                     <p className="text-xs text-muted-foreground">
-                      The text isn't saved for this email (only emails written in Email Marketing on this computer are saved).
+                      The text isn't saved for this older email. Emails sent from now on are saved automatically.
                     </p>
                   )}
                 </div>
