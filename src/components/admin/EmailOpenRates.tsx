@@ -19,9 +19,33 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Download, Eye, Loader2, MailOpen, RefreshCw, Send, Target } from 'lucide-react';
+import { Copy, Download, Eye, Loader2, MailOpen, RefreshCw, Send, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import { RESEND_HANDOFF_KEY, RETARGET_HANDOFF_KEY } from '@/components/admin/LeadEmailCampaign';
+
+function readDraftFor(subject: string): { message?: string } | null {
+  try {
+    const all = JSON.parse(localStorage.getItem('lead_email_drafts') || '{}');
+    return all[subject.trim()] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function htmlToText(html: string): string {
+  const div = document.createElement('div');
+  div.innerHTML = html.replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n\n');
+  return (div.textContent || '').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+async function copyText(text: string, msg: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast.success(msg);
+  } catch {
+    toast.error('Could not copy');
+  }
+}
 
 type EventRow = {
   event_type: string;
@@ -373,10 +397,46 @@ export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => v
       </CardContent>
 
       <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-base leading-snug">{detail}</DialogTitle>
+            <DialogTitle className="text-base leading-snug">Email details</DialogTitle>
           </DialogHeader>
+          {(() => {
+            const draft = detail ? readDraftFor(detail) : null;
+            const bodyText = draft?.message ? htmlToText(draft.message) : '';
+            return (
+              <div className="space-y-3">
+                <div className="rounded-lg border p-3 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs text-muted-foreground">Title</span>
+                    <Button size="sm" variant="outline" onClick={() => copyText(detail || '', 'Title copied')}>
+                      <Copy className="mr-1 h-4 w-4" /> Copy title
+                    </Button>
+                  </div>
+                  <p dir="auto" className="text-sm font-medium select-text">{detail}</p>
+                </div>
+                <div className="rounded-lg border p-3 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs text-muted-foreground">Email text</span>
+                    {bodyText && (
+                      <Button size="sm" variant="outline" onClick={() => copyText(bodyText, 'Email text copied')}>
+                        <Copy className="mr-1 h-4 w-4" /> Copy email
+                      </Button>
+                    )}
+                  </div>
+                  {bodyText ? (
+                    <p dir="auto" className="text-sm whitespace-pre-wrap max-h-60 overflow-y-auto select-text">
+                      {bodyText}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      The text isn't saved for this email (only emails written in Email Marketing on this computer are saved).
+                    </p>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
           <div className="flex flex-wrap items-center gap-2">
             <Input
               value={search}
@@ -387,6 +447,13 @@ export function EmailOpenRates({ onResend }: { onResend?: (subject: string) => v
             <Badge variant="secondary">{detailPeople.length} people</Badge>
             <Button size="sm" variant="outline" onClick={downloadCsv}>
               <Download className="mr-1 h-4 w-4" /> Download CSV
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => copyText(detailPeople.map((p) => p.email).join('\n'), `${detailPeople.length} emails copied`)}
+            >
+              <Copy className="mr-1 h-4 w-4" /> Copy emails
             </Button>
             {detail && <RetargetMenu subject={detail} />}
           </div>
