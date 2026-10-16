@@ -34,6 +34,8 @@ interface Body {
   excludeSources?: string[];
   programs?: string[];
   excludePrograms?: string[];
+  rounds?: string[];
+  excludeRounds?: string[];
   rtl?: boolean;
   testEmail?: string;
   preheader?: string;
@@ -201,6 +203,42 @@ async function collectProgramEmails(supabase: any, slugs: string[]): Promise<Set
   return set;
 }
 
+/** Everyone in the given rounds: webinar sign-ups (form_submissions) and enrolled students. */
+async function collectRoundEmails(supabase: any, roundIds: string[]): Promise<Set<string>> {
+  const set = new Set<string>();
+  if (!roundIds.length) return set;
+  for (let page = 0; page < 30; page++) {
+    const { data, error } = await supabase
+      .from("form_submissions").select("email").in("round_id", roundIds)
+      .range(page * 1000, page * 1000 + 999);
+    if (error) throw error;
+    for (const r of data || []) {
+      const e = String(r.email || "").trim().toLowerCase();
+      if (e.includes("@")) set.add(e);
+    }
+    if (!data || data.length < 1000) break;
+  }
+  const userIds = new Set<string>();
+  for (let page = 0; page < 30; page++) {
+    const { data, error } = await supabase
+      .from("course_enrollments").select("user_id").in("round_id", roundIds)
+      .range(page * 1000, page * 1000 + 999);
+    if (error) throw error;
+    for (const r of data || []) if (r.user_id) userIds.add(r.user_id);
+    if (!data || data.length < 1000) break;
+  }
+  const ids = Array.from(userIds);
+  for (let i = 0; i < ids.length; i += 500) {
+    const { data, error } = await supabase.from("profiles").select("email").in("id", ids.slice(i, i + 500));
+    if (error) throw error;
+    for (const r of data || []) {
+      const e = String(r.email || "").trim().toLowerCase();
+      if (e.includes("@")) set.add(e);
+    }
+  }
+  return set;
+}
+
 async function collectUnsubscribed(supabase: any): Promise<Set<string>> {
   const set = new Set<string>();
   for (let page = 0; page < 30; page++) {
@@ -304,11 +342,14 @@ const handler = async (req: Request): Promise<Response> => {
     } else {
       const sources = (body.sources || []).map(String).filter(Boolean);
       const programs = (body.programs || []).map(String).filter(Boolean);
-      if (!sources.length && !programs.length) throw new Error("Pick at least one audience");
+      const rounds = (body.rounds || []).map(String).filter(Boolean);
+      if (!sources.length && !programs.length && !rounds.length) throw new Error("Pick at least one audience");
       const include = await collectEmails(supabase, sources);
       for (const e of await collectProgramEmails(supabase, programs)) include.add(e);
+      for (const e of await collectRoundEmails(supabase, rounds)) include.add(e);
       const exclude = await collectEmails(supabase, (body.excludeSources || []).map(String).filter(Boolean));
       for (const e of await collectProgramEmails(supabase, (body.excludePrograms || []).map(String).filter(Boolean))) exclude.add(e);
+      for (const e of await collectRoundEmails(supabase, (body.excludeRounds || []).map(String).filter(Boolean))) exclude.add(e);
       for (const e of await collectUnsubscribed(supabase)) exclude.add(e);
       const skipSubject = String(body.skipSubject || "").trim();
       if (skipSubject) {
