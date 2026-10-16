@@ -4566,11 +4566,14 @@ export type Database = {
           currency: string | null
           email: string
           id: string
+          manual_payment_notes: string | null
           name: string
+          payment_reference: string | null
           payment_type: string | null
           phone: string | null
           product_name: string
           program_slug: string | null
+          recorded_by: string | null
           refund_amount: number | null
           refunded: boolean | null
           refunded_at: string | null
@@ -4590,11 +4593,14 @@ export type Database = {
           currency?: string | null
           email: string
           id?: string
+          manual_payment_notes?: string | null
           name: string
+          payment_reference?: string | null
           payment_type?: string | null
           phone?: string | null
           product_name: string
           program_slug?: string | null
+          recorded_by?: string | null
           refund_amount?: number | null
           refunded?: boolean | null
           refunded_at?: string | null
@@ -4614,11 +4620,14 @@ export type Database = {
           currency?: string | null
           email?: string
           id?: string
+          manual_payment_notes?: string | null
           name?: string
+          payment_reference?: string | null
           payment_type?: string | null
           phone?: string | null
           product_name?: string
           program_slug?: string | null
+          recorded_by?: string | null
           refund_amount?: number | null
           refunded?: boolean | null
           refunded_at?: string | null
@@ -8705,6 +8714,24 @@ export type Database = {
         Returns: Json
       }
       publish_due_scheduled_posts: { Args: never; Returns: Json }
+      record_manual_payment: {
+        Args: {
+          p_amount: number
+          p_currency: string
+          p_email: string
+          p_enroll?: boolean
+          p_method: string
+          p_name: string
+          p_notes?: string
+          p_paid_at: string
+          p_payment_id: string
+          p_product_name: string
+          p_program_slug: string
+          p_reference?: string
+          p_round_id?: string
+        }
+        Returns: string
+      }
       redeem_aperture_invite: { Args: { p_code: string }; Returns: Json }
       regenerate_my_friend_code: { Args: never; Returns: string }
       sync_account_family: { Args: { _uid: string }; Returns: undefined }
