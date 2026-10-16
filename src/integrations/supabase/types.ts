@@ -2824,6 +2824,39 @@ export type Database = {
         }
         Relationships: []
       }
+      email_campaign_contents: {
+        Row: {
+          buttons: Json
+          created_at: string
+          id: string
+          message: string | null
+          preheader: string | null
+          rtl: boolean
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          buttons?: Json
+          created_at?: string
+          id?: string
+          message?: string | null
+          preheader?: string | null
+          rtl?: boolean
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          buttons?: Json
+          created_at?: string
+          id?: string
+          message?: string | null
+          preheader?: string | null
+          rtl?: boolean
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_delivery_events: {
         Row: {
           created_at: string
