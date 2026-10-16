@@ -228,6 +228,13 @@ const ProgramPage = () => {
   const isSubscription = program.payment_type === 'subscription';
   const hasFullOption = isSubscription && !!program.subscription_full_payment_price && program.subscription_full_payment_price > 0;
   const displayPrice = isDeposit && program.deposit_price ? program.deposit_price : program.price_amount;
+  // Hide the round/schedule card for on-demand, 1-on-1 and self-paced programs — they have no live cohort start date.
+  const deliveryMethod = (program as any).delivery_method as string | undefined;
+  const showRoundDetails = !!autoEnrollRound
+    && deliveryMethod !== 'on-demand'
+    && program.type !== '1o1-session'
+    && !(autoEnrollRound as any).is_self_paced
+    && !(/^default$/i.test(autoEnrollRound.round_name || '') && (!autoEnrollRound.first_session_date || autoEnrollRound.first_session_date.startsWith('202')));
   const inCart = isInCart(program.slug);
   const enrolled = isEnrolled(program.slug);
   const isFarsi = program.language === 'persian' || program.language === 'farsi';
@@ -382,7 +389,7 @@ const ProgramPage = () => {
                 )}
 
                 {/* Active Round Details */}
-                {autoEnrollRound && (
+                {showRoundDetails && (
                   <div className="rounded-xl bg-[hsl(var(--tint-peach,25_100%_96%))] border border-primary/10 shadow-sm p-4 space-y-2">
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-primary" />
