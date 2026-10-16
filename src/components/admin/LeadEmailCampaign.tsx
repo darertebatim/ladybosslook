@@ -30,7 +30,7 @@ interface ButtonRow {
 interface Option {
   value: string; // "lead:key" | "prog:slug"
   label: string;
-  group: 'Lead lists' | 'Programs';
+  group: 'Lead lists' | 'Programs' | 'Rounds';
 }
 
 const CHUNK = 100;
@@ -180,6 +180,41 @@ async function fetchEmails(sources: string[]): Promise<Set<string>> {
       if (e.includes('@')) set.add(e);
     }
     if (!data || data.length < 1000) break;
+  }
+  return set;
+}
+
+async function fetchRoundEmails(roundIds: string[]): Promise<Set<string>> {
+  const set = new Set<string>();
+  if (!roundIds.length) return set;
+  for (let page = 0; page < 30; page++) {
+    const { data, error } = await supabase
+      .from('form_submissions').select('email').in('round_id', roundIds)
+      .range(page * 1000, page * 1000 + 999);
+    if (error) throw error;
+    for (const r of data || []) {
+      const e = String((r as any).email || '').trim().toLowerCase();
+      if (e.includes('@')) set.add(e);
+    }
+    if (!data || data.length < 1000) break;
+  }
+  const userIds = new Set<string>();
+  for (let page = 0; page < 30; page++) {
+    const { data, error } = await supabase
+      .from('course_enrollments').select('user_id').in('round_id', roundIds)
+      .range(page * 1000, page * 1000 + 999);
+    if (error) throw error;
+    for (const r of data || []) if ((r as any).user_id) userIds.add(String((r as any).user_id));
+    if (!data || data.length < 1000) break;
+  }
+  const ids = Array.from(userIds);
+  for (let i = 0; i < ids.length; i += 500) {
+    const { data, error } = await supabase.from('profiles').select('email').in('id', ids.slice(i, i + 500));
+    if (error) throw error;
+    for (const r of data || []) {
+      const e = String((r as any).email || '').trim().toLowerCase();
+      if (e.includes('@')) set.add(e);
+    }
   }
   return set;
 }
@@ -351,6 +386,24 @@ export function LeadEmailCampaign() {
     },
   });
 
+  const { data: rounds = [] } = useQuery({
+    queryKey: ['lead-email-rounds'],
+    queryFn: async () => {
+      const slugs = Array.from(new Set(LEAD_CAMPAIGNS.map((c) => c.programSlug).filter(Boolean)));
+      const { data, error } = await supabase
+        .from('program_rounds')
+        .select('id, round_name, round_number, status, program_slug, start_date')
+        .in('program_slug', slugs)
+        .order('start_date', { ascending: false });
+      if (error) throw error;
+      return (data || []) as { id: string; round_name: string | null; round_number: number | null; status: string | null; program_slug: string }[];
+    },
+  });
+  const activeRoundIds = useMemo(
+    () => rounds.filter((r) => r.status === 'active').map((r) => r.id),
+    [rounds],
+  );
+
   const options: Option[] = useMemo(
     () => [
       ...LEAD_CAMPAIGNS.map((c) => ({
@@ -363,8 +416,18 @@ export function LeadEmailCampaign() {
         label: p.title,
         group: 'Programs' as const,
       })),
+      {
+        value: 'round:__active__',
+        label: `All active rounds (${activeRoundIds.length})`,
+        group: 'Rounds' as const,
+      },
+      ...rounds.map((r) => ({
+        value: `round:${r.id}`,
+        label: `#${r.round_number ?? '?'} — ${r.round_name || 'Untitled'}${r.status === 'active' ? ' (active)' : ''}`,
+        group: 'Rounds' as const,
+      })),
     ],
-    [programs],
+    [programs, rounds, activeRoundIds],
   );
 
   const split = (sel: string[]) => {
@@ -374,11 +437,16 @@ export function LeadEmailCampaign() {
       c.regSource,
       ...c.extraSources,
     ]);
-    return { sources, slugs };
+    const roundIds = new Set<string>();
+    for (const v of sel.filter((v) => v.startsWith('round:')).map((v) => v.slice(6))) {
+      if (v === '__active__') activeRoundIds.forEach((id) => roundIds.add(id));
+      else roundIds.add(v);
+    }
+    return { sources, slugs, rounds: Array.from(roundIds) };
   };
 
-  const inc = useMemo(() => split(includeSel), [includeSel]);
-  const exc = useMemo(() => split(excludeSel), [excludeSel]);
+  const inc = useMemo(() => split(includeSel), [includeSel, activeRoundIds]);
+  const exc = useMemo(() => split(excludeSel), [excludeSel, activeRoundIds]);
 
   // Keep a copy of every email we write, so it can be re-opened / re-sent later.
   useEffect(() => {
@@ -405,12 +473,14 @@ export function LeadEmailCampaign() {
 
   const { data: audienceCount, isFetching, refetch } = useQuery({
     queryKey: ['lead-email-audience', inc, exc, skipAlreadySent ? subject.trim() : ''],
-    enabled: !retarget && (inc.sources.length > 0 || inc.slugs.length > 0),
+    enabled: !retarget && (inc.sources.length > 0 || inc.slugs.length > 0 || inc.rounds.length > 0),
     queryFn: async () => {
       const set = await fetchEmails(inc.sources);
       for (const e of await fetchProgramEmails(inc.slugs)) set.add(e);
+      for (const e of await fetchRoundEmails(inc.rounds)) set.add(e);
       const out = await fetchEmails(exc.sources);
       for (const e of await fetchProgramEmails(exc.slugs)) out.add(e);
+      for (const e of await fetchRoundEmails(exc.rounds)) out.add(e);
       for (const e of await fetchUnsubscribed()) out.add(e);
       if (skipAlreadySent && subject.trim()) {
         for (const e of await fetchAlreadySent(subject.trim())) out.add(e);
@@ -435,6 +505,8 @@ export function LeadEmailCampaign() {
     excludeSources: exc.sources,
     programs: inc.slugs,
     excludePrograms: exc.slugs,
+    rounds: inc.rounds,
+    excludeRounds: exc.rounds,
     skipSubject: skipAlreadySent ? subject.trim() : '',
   });
 
@@ -462,7 +534,7 @@ export function LeadEmailCampaign() {
       return;
     }
 
-    if (!retarget && !inc.sources.length && !inc.slugs.length) {
+    if (!retarget && !inc.sources.length && !inc.slugs.length && !inc.rounds.length) {
       toast.error('Pick at least one audience');
       return;
     }
@@ -483,6 +555,7 @@ export function LeadEmailCampaign() {
             emails: chunk,
             sources: [],
             programs: [],
+            rounds: [],
             skipSubject: '',
           })) as any;
           sent += d?.sent ?? 0;
@@ -564,7 +637,7 @@ export function LeadEmailCampaign() {
               <Label className="text-sm">Send to</Label>
               <div className="mt-2">
                 <AudiencePicker
-                  placeholder="Pick lead lists or programs"
+                  placeholder="Pick lead lists, programs or rounds"
                   options={options}
                   selected={includeSel}
                   onChange={setIncludeSel}
@@ -576,7 +649,7 @@ export function LeadEmailCampaign() {
               <Label className="text-sm">Don't send to</Label>
               <div className="mt-2">
                 <AudiencePicker
-                  placeholder="Pick lists or programs to skip"
+                  placeholder="Pick lists, programs or rounds to skip"
                   options={options}
                   selected={excludeSel}
                   onChange={setExcludeSel}
