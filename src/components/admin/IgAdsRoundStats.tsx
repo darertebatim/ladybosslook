@@ -153,7 +153,7 @@ export function IgAdsRoundStats() {
         return { calendar: acc.calendar + (v?.calendar || 0), attendees: acc.attendees + (v?.attendees || 0) };
       }, { calendar: 0, attendees: 0 });
       return {
-        id: r.id, roundNumber: r.round_number as number | null, name: r.round_name || `Round ${r.round_number ?? '?'}`, date: r.first_session_date, status: r.status,
+        id: r.id, roundNumber: r.round_number as number | null, locked: false, name: r.round_name || `Round ${r.round_number ?? '?'}`, date: r.first_session_date, status: r.status,
         signups: people.size, calendar: m.calendar as number | null, showups: m.attendees, opens,
         spend: spendReport ? spend[r.id] ?? 0 : null, enrollments: acqEnrolled[r.id] || 0, revenue: revenue[r.id] || 0,
       };
@@ -164,11 +164,11 @@ export function IgAdsRoundStats() {
     const merged = dynamic.map((row) => {
       const s = row.roundNumber != null ? staticByNumber.get(row.roundNumber) : undefined;
       if (!s) return row;
-      return { ...row, name: s.name, date: s.date, signups: s.signups, calendar: s.calendar, showups: s.showups, opens: s.opens, spend: s.spend, enrollments: s.enrollments, revenue: s.revenue };
+      return { ...row, locked: true, name: s.name, date: s.date, signups: s.signups, calendar: s.calendar, showups: s.showups, opens: s.opens, spend: s.spend, enrollments: s.enrollments, revenue: s.revenue };
     });
     const covered = new Set(merged.map((row) => row.roundNumber).filter((n): n is number => n != null));
     const missing = STATIC_ROUND_STATS.filter((s) => !covered.has(s.roundNumber)).map((s) => ({
-      id: `static-${s.roundNumber}`, roundNumber: s.roundNumber as number | null, name: s.name, date: s.date, status: 'static',
+      id: `static-${s.roundNumber}`, roundNumber: s.roundNumber as number | null, locked: true, name: s.name, date: s.date, status: 'static',
       signups: s.signups, calendar: s.calendar, showups: s.showups, opens: s.opens,
       spend: s.spend as number | null, enrollments: s.enrollments, revenue: s.revenue,
     }));
@@ -176,11 +176,40 @@ export function IgAdsRoundStats() {
   }, [rounds, subs, clicks, events, acqEnrollments, orders, spendReport]);
 
   const money = (v: number | null) => (v === null ? '—' : `$${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}`);
+  const money2 = (v: number | null) => (v === null || !isFinite(v) ? '—' : `$${v.toFixed(2)}`);
   const pct = (v: number | null) => (v === null ? '—' : `${v}%`);
+  const cplOf = (r: { spend: number | null; signups: number }) => (r.spend !== null && r.signups > 0 ? r.spend / r.signups : null);
+  const roasOf = (r: { spend: number | null; revenue: number }) => (r.spend !== null && r.spend > 0 ? r.revenue / r.spend : null);
+  const roas = (v: number | null) => (v === null || !isFinite(v) ? '—' : `${v.toFixed(1)}x`);
+
+  type Row = (typeof rows)[number];
+  const summarize = (label: string, list: Row[]) => {
+    const signups = list.reduce((a, r) => a + r.signups, 0);
+    const spendVals = list.map((r) => r.spend).filter((v): v is number => v !== null);
+    const spend = spendVals.length ? spendVals.reduce((a, b) => a + b, 0) : null;
+    const revenue = list.reduce((a, r) => a + r.revenue, 0);
+    const openVals = list.map((r) => averageOpenRate(r.opens)).filter((v): v is number => v !== null);
+    return {
+      label,
+      signups,
+      calendar: list.reduce((a, r) => a + (r.calendar ?? 0), 0),
+      showups: list.reduce((a, r) => a + r.showups, 0),
+      open: openVals.length ? Math.round(openVals.reduce((a, b) => a + b, 0) / openVals.length) : null,
+      spend, revenue,
+      sales: list.reduce((a, r) => a + r.enrollments, 0),
+      cpl: spend !== null && signups > 0 ? spend / signups : null,
+      roas: spend !== null && spend > 0 ? revenue / spend : null,
+    };
+  };
+  const twoWeeksAgo = Date.now() - 14 * 86_400_000;
+  const summaryRows = [
+    summarize('Average (all rounds)', rows),
+    summarize('Last 2 weeks', rows.filter((r) => r.date && Date.parse(r.date) >= twoWeeksAgo)),
+  ];
 
   const exportCsv = () => {
-    const head = ['Round', 'Date', 'Sign-ups', 'Calendar adds', 'Show-ups', 'Avg email open %', 'Ad spend', 'Acquisition enrollments', 'Acquisition revenue'];
-    const lines = rows.map((r) => [r.name, r.date || '', r.signups, r.calendar ?? '', r.showups, averageOpenRate(r.opens) ?? '', r.spend ?? '', r.enrollments, r.revenue]);
+    const head = ['Round', 'Date', 'Sign-ups', 'Calendar adds', 'Show-ups', 'Avg email open %', 'Ad spend', 'Cost / Lead', 'ROAS', 'Acq. Sales', 'Acq. Revenue'];
+    const lines = rows.map((r) => [r.name, r.date || '', r.signups, r.calendar ?? '', r.showups, averageOpenRate(r.opens) ?? '', r.spend ?? '', cplOf(r)?.toFixed(2) ?? '', roasOf(r)?.toFixed(2) ?? '', r.enrollments, r.revenue]);
     const csv = [head, ...lines].map((l) => l.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
@@ -194,7 +223,7 @@ export function IgAdsRoundStats() {
         <div>
           <CardTitle>IG Ads Rounds (both pages)</CardTitle>
           <p className="text-sm text-muted-foreground">
-            IG Ads + IG Ads (Ali) combined. Finished rounds (13–22) show frozen verified numbers; current and future rounds calculate live. Avg email open = average of the 4 automated emails (opened ÷ delivered among this round's sign-ups). Ad spend = webinar ad sets, split by landing page. Acquisition enrollments / revenue = people who joined or bought the Acquisition program within 14 days after their round.
+            IG Ads + IG Ads (Ali) combined. Rounds marked Locked show frozen verified numbers (13–22); all other rounds calculate live. Avg email open = average of the 4 automated emails (opened ÷ delivered among this round's sign-ups). Ad spend = webinar ad sets, split by landing page. Cost / Lead = spend ÷ sign-ups. ROAS = revenue ÷ spend. Acq. Sales / Revenue = people who joined or bought the Acquisition program within 14 days after their round.
           </p>
           {spendError && <p className="text-xs text-destructive">Ad spend could not load: {(spendError as Error).message}</p>}
         </div>
@@ -215,18 +244,23 @@ export function IgAdsRoundStats() {
                 <TableHead className="text-right">Show-ups</TableHead>
                 <TableHead className="text-right">Avg email open</TableHead>
                 <TableHead className="text-right">Ad spend</TableHead>
-                <TableHead className="text-right">Acq. enrollments</TableHead>
-                <TableHead className="text-right">Acq. revenue</TableHead>
+                <TableHead className="text-right">Cost / Lead</TableHead>
+                <TableHead className="text-right">ROAS</TableHead>
+                <TableHead className="text-right">Acq. Sales</TableHead>
+                <TableHead className="text-right">Acq. Revenue</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map((r) => (
                 <TableRow key={r.id}>
                   <TableCell>
-                    <p className="font-medium">{r.name}</p>
+                    <p className="font-medium">
+                      {r.name}
+                      {r.locked && <span className="ml-1.5 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">Locked</span>}
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       {r.date ? new Date(r.date).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—'}
-                      {r.status && r.status !== 'active' ? ` · ${r.status}` : ''}
+                      {r.status && r.status !== 'active' && r.status !== 'static' ? ` · ${r.status}` : ''}
                     </p>
                   </TableCell>
                   <TableCell className="text-right font-semibold tabular-nums">{r.signups}</TableCell>
@@ -234,8 +268,24 @@ export function IgAdsRoundStats() {
                   <TableCell className="text-right tabular-nums">{r.showups}</TableCell>
                   <TableCell className="text-right tabular-nums">{pct(averageOpenRate(r.opens))}</TableCell>
                   <TableCell className="text-right tabular-nums">{money(r.spend)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{money2(cplOf(r))}</TableCell>
+                  <TableCell className="text-right tabular-nums">{roas(roasOf(r))}</TableCell>
                   <TableCell className="text-right tabular-nums">{r.enrollments}</TableCell>
                   <TableCell className="text-right font-semibold tabular-nums">{money(r.revenue)}</TableCell>
+                </TableRow>
+              ))}
+              {summaryRows.map((s) => (
+                <TableRow key={s.label} className="bg-muted/50 font-medium">
+                  <TableCell className="font-semibold">{s.label}</TableCell>
+                  <TableCell className="text-right tabular-nums">{s.signups}</TableCell>
+                  <TableCell className="text-right tabular-nums">{s.calendar}</TableCell>
+                  <TableCell className="text-right tabular-nums">{s.showups}</TableCell>
+                  <TableCell className="text-right tabular-nums">{pct(s.open)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{money(s.spend)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{money2(s.cpl)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{roas(s.roas)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{s.sales}</TableCell>
+                  <TableCell className="text-right font-semibold tabular-nums">{money(s.revenue)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
