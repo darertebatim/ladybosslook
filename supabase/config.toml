@@ -276,3 +276,6 @@ verify_jwt = false
 
 [functions.calendar-click]
 verify_jwt = false
+
+[functions.meta-ad-expenses]
+verify_jwt = true

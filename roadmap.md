@@ -1,3 +1,5 @@
+- [x] Add an Expenses tab to Admin Payments with actual Meta advertising costs, date filters and CSV export; verified credential path and expense calculations.
+- [ ] Verify Expenses in the signed-in admin page — blocked by external unmanaged authenticated preview access.
 - [x] Fix manual-payment linked-account lookup permissions without widening account access; confirmed deployed lookup uses existing admin-readable tables.
 - [x] Let manual payments select existing enrollments and add optional payment recording to Enroll User.
 - [x] Add manual payment recording from user profiles and Payments, with optional program enrollment; leave Azadeh's payment for the user to enter.
