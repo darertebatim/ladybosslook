@@ -32,13 +32,14 @@ const FROM = "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>";
 const SUPPORT_URL =
   "https://ladyboss.onelink.me/lt6v?af_xp=custom&pid=email_support&c=webinar_day&deep_link_value=support&af_web_dp=https%3A%2F%2Fladybosslook.com%2Fdashboard%2Fchat";
 
-type Kind = "morning" | "start" | "reminder";
+type Kind = "morning" | "start" | "reminder" | "onehour";
 
 // Subjects keep the prefixes that src/lib/igAdsRoundStats.ts uses to classify
 // automated emails for open-rate stats. Copy matches the proven manual
 // campaigns sent on 2026-10-17.
 const SUBJECTS: Record<Kind, string> = {
-  morning: "امروز: جذب مشتری واقعی با تبلیغات اینستاگرام 🌷",
+  morning: "امروز: جذب مشتری واقعی — ۳ دروغ بزرگ اینستاگرام در آمریکا و کانادا 🌷",
+  onehour: "۱ ساعت تا شروع: وبینار جذب مشتری با اینستاگرام ادز (بدون نیاز به دوربین) ⏳",
   start: "وبینار در حال شروع است — همین حالا وارد شوید 🚀",
   reminder: "یادآوری وبینار اینستاگرام ادز + ویدیوی پیش‌نیاز 🌷",
 };
@@ -528,6 +529,16 @@ Deno.serve(async (req) => {
         .lte("first_session_date", new Date(now + 45 * 60_000).toISOString());
       if (e2) throw e2;
       for (const r of startRounds || []) rounds.push({ round: r, kind: "start" });
+
+      // One hour before: sessions starting 45–105 min from now (hourly cron).
+      const { data: hourRounds, error: e4 } = await supabase
+        .from("program_rounds")
+        .select(roundCols)
+        .eq("program_slug", "igadsfree")
+        .gte("first_session_date", new Date(now + 45 * 60_000).toISOString())
+        .lte("first_session_date", new Date(now + 105 * 60_000).toISOString());
+      if (e4) throw e4;
+      for (const r of hourRounds || []) rounds.push({ round: r, kind: "onehour" });
 
       // Reminder: any future session (per-signup 2–3h window filter applies).
       const { data: reminderRounds, error: e3 } = await supabase
