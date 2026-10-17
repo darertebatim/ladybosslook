@@ -1,0 +1,1 @@
+DO $change$ DECLARE j record; BEGIN SELECT jobid INTO j FROM cron.job WHERE jobname = 'send-webinar-day-emails-hourly' AND active; IF NOT FOUND THEN RAISE EXCEPTION 'Webinar hourly schedule missing'; END IF; PERFORM cron.alter_job(j.jobid, schedule := '0 * * * *'); END $change$;
