@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getLocalDateStr } from '@/lib/localDate';
-import { manualPaymentMethods, paymentAmountInCents } from '@/lib/manualPayment';
+import { manualPaymentMethods, paymentAmountInCents, shouldEnrollForPayment } from '@/lib/manualPayment';
 import { toast } from 'sonner';
 
 type Customer = { email: string; full_name: string | null };
@@ -83,8 +83,8 @@ export function ManualPaymentDialog({ customer, enrollments = [], initialProgram
         p_program_slug: program === 'custom' ? null : program,
         p_product_name: productName.trim(), p_amount: cents, p_currency: currency,
         p_method: method, p_paid_at: paidAt.toISOString(), p_notes: notes.trim(),
-        p_reference: reference.trim(), p_enroll: !enrollmentId && enroll && program !== 'custom',
-        p_round_id: !enrollmentId && enroll && program !== 'custom' && !selectedProgram?.is_one_on_one && round !== 'auto' ? round : null,
+        p_reference: reference.trim(), p_enroll: shouldEnrollForPayment(enrollmentId, enroll, program),
+        p_round_id: shouldEnrollForPayment(enrollmentId, enroll, program) && !selectedProgram?.is_one_on_one && round !== 'auto' ? round : null,
       });
       if (error) throw error;
       setOpen(false);
