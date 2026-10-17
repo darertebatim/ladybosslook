@@ -111,6 +111,48 @@ export function attributeRevenue(
  * Enrollments per round: unique people who enrolled in the Acquisition program,
  * attributed to their most recent round (within `days` after its live session).
  */
+
+/** One locked, hand-verified benchmark row for a finished round. */
+export interface StaticRoundStat {
+  roundNumber: number;
+  name: string;
+  /** ISO timestamp of the live session start. */
+  date: string;
+  signups: number;
+  /** null = calendar-click tracking did not exist yet for this round. */
+  calendar: number | null;
+  showups: number;
+  opens: Partial<Record<AutoEmailKind, number>>;
+  spend: number;
+  enrollments: number;
+  revenue: number;
+}
+
+/**
+ * Verified benchmark numbers for finished rounds (through Oct 16, 2026).
+ * These are frozen on purpose: the live allocation formula misattributes spend
+ * when rounds share session days, so past rounds render from this snapshot and
+ * only current/future rounds are calculated dynamically.
+ */
+export const STATIC_ROUND_STATS: StaticRoundStat[] = [
+  { roundNumber: 22, name: 'Round 22 (West)', date: '2026-10-17T01:00:00Z', signups: 38, calendar: 15, showups: 8, opens: { signup: 45, reminder: 50, morning: 48, start: 47 }, spend: 81.2, enrollments: 0, revenue: 0 },
+  { roundNumber: 21, name: 'Round 21 (East)', date: '2026-10-16T22:00:00Z', signups: 114, calendar: 48, showups: 20, opens: { signup: 49, reminder: 56, morning: 54, start: 52 }, spend: 240.5, enrollments: 0, revenue: 0 },
+  { roundNumber: 20, name: 'Round 20 (Morning)', date: '2026-10-16T18:00:00Z', signups: 264, calendar: 93, showups: 38, opens: { signup: 44, reminder: 59, morning: 46, start: 49 }, spend: 542.3, enrollments: 2, revenue: 336 },
+  { roundNumber: 19, name: 'Round 19 (Ali IG Ads)', date: '2026-10-15T01:00:00Z', signups: 258, calendar: 33, showups: 38, opens: { signup: 61, reminder: 50, morning: 54, start: 52 }, spend: 540.19, enrollments: 10, revenue: 1386 },
+  { roundNumber: 18, name: 'Round 18 (West)', date: '2026-10-13T01:00:00Z', signups: 78, calendar: null, showups: 10, opens: { signup: 67, reminder: 68, morning: 39, start: 55 }, spend: 102.92, enrollments: 3, revenue: 454 },
+  { roundNumber: 17, name: 'Round 17 (East)', date: '2026-10-11T18:00:00Z', signups: 202, calendar: null, showups: 25, opens: { signup: 70, reminder: 72, morning: 42, start: 58 }, spend: 246.19, enrollments: 6, revenue: 906 },
+  { roundNumber: 16, name: 'Round 16 (Morning)', date: '2026-10-08T18:00:00Z', signups: 307, calendar: null, showups: 28, opens: { signup: 68, reminder: 65, morning: 44, start: 48 }, spend: 553.2, enrollments: 5, revenue: 1308 },
+  { roundNumber: 15, name: 'Round 15 (Morning)', date: '2026-10-04T18:00:00Z', signups: 237, calendar: null, showups: 18, opens: { signup: 73, reminder: 68, morning: 45, start: 47 }, spend: 350.15, enrollments: 9, revenue: 2141 },
+  { roundNumber: 14, name: 'Round 14 (Morning)', date: '2026-10-01T18:00:00Z', signups: 252, calendar: null, showups: 25, opens: { signup: 71, reminder: 66, morning: 46, start: 50 }, spend: 365.41, enrollments: 6, revenue: 1427 },
+  { roundNumber: 13, name: 'Round 13 (Morning)', date: '2026-09-27T18:00:00Z', signups: 369, calendar: null, showups: 20, opens: { signup: 74, reminder: 70, morning: 48, start: 51 }, spend: 424.59, enrollments: 7, revenue: 1571 },
+];
+
+/** Average of the available per-email open rates (ignores missing kinds). */
+export function averageOpenRate(opens: Partial<Record<AutoEmailKind, number | null>>): number | null {
+  const vals = (Object.values(opens) as (number | null | undefined)[]).filter((v): v is number => typeof v === 'number');
+  return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : null;
+}
+
 export function attributeEnrollments(
   rounds: SaleRound[],
   signupRoundsByEmail: Record<string, string[]>,
