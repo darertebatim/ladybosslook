@@ -1,3 +1,5 @@
+- [x] Add manual payment recording from user profiles and Payments, with optional program enrollment; leave Azadeh's payment for the user to enter.
+- [ ] Verify recording a manual payment while signed in as an admin — blocked by unavailable signed-in preview access.
 - [x] Hide start dates for self-paced programs in Path and program details.
 - [x] Add per-program payment-success booking-box visibility and a separate optional success video; verify both visibility states and video rendering in public previews.
 - [ ] Verify saving payment-success settings through Admin with a real account — blocked by external unmanaged authenticated preview access.

@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { ManualPaymentDialog } from '@/components/admin/ManualPaymentDialog';
+import { paymentMethodLabel } from '@/lib/manualPayment';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -218,7 +220,7 @@ export function LeadsManager() {
       // Get payment info (city/country) from the most recent paid order
       let paymentInfo: { city: string | null; country: string | null } | null = null;
       if (orders && orders.length > 0) {
-        const mostRecentOrder = orders.find(o => o.status === 'paid' && o.stripe_session_id);
+        const mostRecentOrder = orders.find(o => o.status === 'paid' && o.stripe_session_id && !o.stripe_session_id.startsWith('manual_'));
         if (mostRecentOrder?.stripe_session_id) {
           try {
             const { data: sessionDetails } = await supabase.functions.invoke('get-stripe-session-details', {
@@ -807,7 +809,8 @@ export function LeadsManager() {
                       <User className="h-4 w-4" />
                       User Profile
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap justify-end">
+                      <ManualPaymentDialog customer={searchResults.profile} onSaved={handleSearch} />
                       <Dialog open={isEnrollDialogOpen} onOpenChange={setIsEnrollDialogOpen}>
                         <DialogTrigger asChild>
                           <Button variant="outline" size="sm">
@@ -1363,7 +1366,7 @@ export function LeadsManager() {
                               <DollarSign className="h-4 w-4 text-muted-foreground" />
                               <p className="text-sm text-muted-foreground">
                                 {formatCurrency(order.amount, order.currency)}
-                                {order.payment_type && ` • ${order.payment_type}`}
+                                {order.payment_type && ` • ${paymentMethodLabel(order.payment_type)}`}
                               </p>
                             </div>
                             <div className="flex items-center gap-2">

@@ -1,0 +1,3 @@
+ALTER FUNCTION public.record_manual_payment(uuid,text,text,text,text,integer,text,text,timestamptz,text,text,boolean,uuid) SECURITY INVOKER;
+GRANT INSERT ON public.orders TO authenticated;
+CREATE POLICY "Admins can record manual paid orders" ON public.orders FOR INSERT TO authenticated WITH CHECK (public.has_role(auth.uid(), 'admin') AND recorded_by = auth.uid() AND status = 'paid' AND payment_type IN ('zelle','interac','wire_transfer','cash','paypal','other') AND stripe_session_id LIKE 'manual_%');
