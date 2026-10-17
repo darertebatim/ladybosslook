@@ -180,8 +180,8 @@ export function IgAdsRoundStats() {
   const pct = (v: number | null) => (v === null ? '—' : `${v}%`);
 
   const exportCsv = () => {
-    const head = ['Round', 'Date', 'Sign-ups', 'Calendar adds', 'Show-ups', 'Sign-up email open %', 'Reminder open %', 'Morning open %', 'Start now open %', 'Ad spend', 'Acquisition enrollments', 'Acquisition revenue'];
-    const lines = rows.map((r) => [r.name, r.date || '', r.signups, r.calendar, r.showups, ...KINDS.map((k) => r.opens[k] ?? ''), r.spend ?? '', r.enrollments, r.revenue]);
+    const head = ['Round', 'Date', 'Sign-ups', 'Calendar adds', 'Show-ups', 'Avg email open %', 'Ad spend', 'Acquisition enrollments', 'Acquisition revenue'];
+    const lines = rows.map((r) => [r.name, r.date || '', r.signups, r.calendar ?? '', r.showups, averageOpenRate(r.opens) ?? '', r.spend ?? '', r.enrollments, r.revenue]);
     const csv = [head, ...lines].map((l) => l.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
@@ -214,10 +214,7 @@ export function IgAdsRoundStats() {
                 <TableHead className="text-right">Sign-ups</TableHead>
                 <TableHead className="text-right">Calendar</TableHead>
                 <TableHead className="text-right">Show-ups</TableHead>
-                <TableHead className="text-right">Sign-up email</TableHead>
-                <TableHead className="text-right">Reminder</TableHead>
-                <TableHead className="text-right">Morning</TableHead>
-                <TableHead className="text-right">Start now</TableHead>
+                <TableHead className="text-right">Avg email open</TableHead>
                 <TableHead className="text-right">Ad spend</TableHead>
                 <TableHead className="text-right">Acq. enrollments</TableHead>
                 <TableHead className="text-right">Acq. revenue</TableHead>
@@ -234,9 +231,9 @@ export function IgAdsRoundStats() {
                     </p>
                   </TableCell>
                   <TableCell className="text-right font-semibold tabular-nums">{r.signups}</TableCell>
-                  <TableCell className="text-right tabular-nums">{r.calendar}</TableCell>
+                  <TableCell className="text-right tabular-nums">{r.calendar ?? '—'}</TableCell>
                   <TableCell className="text-right tabular-nums">{r.showups}</TableCell>
-                  {KINDS.map((k) => <TableCell key={k} className="text-right tabular-nums">{pct(r.opens[k])}</TableCell>)}
+                  <TableCell className="text-right tabular-nums">{pct(averageOpenRate(r.opens))}</TableCell>
                   <TableCell className="text-right tabular-nums">{money(r.spend)}</TableCell>
                   <TableCell className="text-right tabular-nums">{r.enrollments}</TableCell>
                   <TableCell className="text-right font-semibold tabular-nums">{money(r.revenue)}</TableCell>
