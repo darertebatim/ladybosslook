@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { z } from "zod";
-import { Play } from "lucide-react";
+import { ArrowDown, Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { trackWebinarLead } from "@/lib/metaCapi";
 import { getDeviceTimezone } from "@/lib/regionRestrictions";
@@ -135,11 +135,16 @@ export default function StartAdsLanding() {
           <h1 className="mt-2 text-xl font-extrabold leading-snug text-neutral-900">
             {'«'}{title}{'» \n— رایگان برای شما'}
           </h1>
-          <p className="mt-1 text-sm font-bold text-rose-600">▶ ویدیو را ببینید و جایگاه رایگان خود را رزرو کنید</p>
+          <p className="mt-1 text-sm font-bold text-rose-600">ویدیو را ببینید و جایگاه رایگان خود را رزرو کنید</p>
+          {vid && (
+            <div aria-hidden="true" className="mt-1 flex justify-center">
+              <ArrowDown className="h-4 w-4 animate-bounce text-rose-500" strokeWidth={3} />
+            </div>
+          )}
         </div>
 
         {vid && (
-          <div className="mt-3 overflow-hidden rounded-2xl bg-black shadow-ios">
+          <div className="mt-1 overflow-hidden rounded-2xl bg-black shadow-ios">
             <div className="relative aspect-video">
               {playing ? (
                 <iframe
