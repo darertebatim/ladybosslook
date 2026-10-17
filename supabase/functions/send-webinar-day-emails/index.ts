@@ -32,10 +32,11 @@ const SUPPORT_URL =
 type Kind = "morning" | "start";
 
 // Subjects keep the prefixes that src/lib/igAdsRoundStats.ts uses to classify
-// automated emails for open-rate stats.
+// automated emails for open-rate stats. Copy matches the proven manual
+// campaigns sent on 2026-10-17.
 const SUBJECTS: Record<Kind, string> = {
-  morning: "امروز: جذب مشتری با اینستاگرام ادز — وبینار امروزه 🌅",
-  start: "وبینار در حال شروع است — همین حالا وارد شو 🔴",
+  morning: "امروز: جذب مشتری واقعی با تبلیغات اینستاگرام 🌷",
+  start: "وبینار در حال شروع است — همین حالا وارد شوید 🚀",
 };
 
 function tzParts(d: Date, tz: string): { hour: number; date: string } {
