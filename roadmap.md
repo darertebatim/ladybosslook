@@ -1,3 +1,4 @@
+- [ ] Add public Acquisition Standard/VIP tiers and an unlisted early-price page, preserving verified pricing through checkout.
 - [x] Add an Expenses tab to Admin Payments with actual Meta advertising costs, date filters and CSV export; verified credential path and expense calculations.
 - [ ] Verify Expenses in the signed-in admin page — blocked by external unmanaged authenticated preview access.
 - [x] Fix manual-payment linked-account lookup permissions without widening account access; confirmed deployed lookup uses existing admin-readable tables.
