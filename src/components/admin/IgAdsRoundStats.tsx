@@ -176,11 +176,40 @@ export function IgAdsRoundStats() {
   }, [rounds, subs, clicks, events, acqEnrollments, orders, spendReport]);
 
   const money = (v: number | null) => (v === null ? '—' : `$${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}`);
+  const money2 = (v: number | null) => (v === null || !isFinite(v) ? '—' : `$${v.toFixed(2)}`);
   const pct = (v: number | null) => (v === null ? '—' : `${v}%`);
+  const cplOf = (r: { spend: number | null; signups: number }) => (r.spend !== null && r.signups > 0 ? r.spend / r.signups : null);
+  const roasOf = (r: { spend: number | null; revenue: number }) => (r.spend !== null && r.spend > 0 ? r.revenue / r.spend : null);
+  const roas = (v: number | null) => (v === null || !isFinite(v) ? '—' : `${v.toFixed(1)}x`);
+
+  type Row = (typeof rows)[number];
+  const summarize = (label: string, list: Row[]) => {
+    const signups = list.reduce((a, r) => a + r.signups, 0);
+    const spendVals = list.map((r) => r.spend).filter((v): v is number => v !== null);
+    const spend = spendVals.length ? spendVals.reduce((a, b) => a + b, 0) : null;
+    const revenue = list.reduce((a, r) => a + r.revenue, 0);
+    const openVals = list.map((r) => averageOpenRate(r.opens)).filter((v): v is number => v !== null);
+    return {
+      label,
+      signups,
+      calendar: list.reduce((a, r) => a + (r.calendar ?? 0), 0),
+      showups: list.reduce((a, r) => a + r.showups, 0),
+      open: openVals.length ? Math.round(openVals.reduce((a, b) => a + b, 0) / openVals.length) : null,
+      spend, revenue,
+      sales: list.reduce((a, r) => a + r.enrollments, 0),
+      cpl: spend !== null && signups > 0 ? spend / signups : null,
+      roas: spend !== null && spend > 0 ? revenue / spend : null,
+    };
+  };
+  const twoWeeksAgo = Date.now() - 14 * 86_400_000;
+  const summaryRows = [
+    summarize('Average (all rounds)', rows),
+    summarize('Last 2 weeks', rows.filter((r) => r.date && Date.parse(r.date) >= twoWeeksAgo)),
+  ];
 
   const exportCsv = () => {
-    const head = ['Round', 'Date', 'Sign-ups', 'Calendar adds', 'Show-ups', 'Avg email open %', 'Ad spend', 'Acquisition enrollments', 'Acquisition revenue'];
-    const lines = rows.map((r) => [r.name, r.date || '', r.signups, r.calendar ?? '', r.showups, averageOpenRate(r.opens) ?? '', r.spend ?? '', r.enrollments, r.revenue]);
+    const head = ['Round', 'Date', 'Sign-ups', 'Calendar adds', 'Show-ups', 'Avg email open %', 'Ad spend', 'Cost / Lead', 'ROAS', 'Acq. Sales', 'Acq. Revenue'];
+    const lines = rows.map((r) => [r.name, r.date || '', r.signups, r.calendar ?? '', r.showups, averageOpenRate(r.opens) ?? '', r.spend ?? '', cplOf(r)?.toFixed(2) ?? '', roasOf(r)?.toFixed(2) ?? '', r.enrollments, r.revenue]);
     const csv = [head, ...lines].map((l) => l.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
@@ -215,8 +244,10 @@ export function IgAdsRoundStats() {
                 <TableHead className="text-right">Show-ups</TableHead>
                 <TableHead className="text-right">Avg email open</TableHead>
                 <TableHead className="text-right">Ad spend</TableHead>
-                <TableHead className="text-right">Acq. enrollments</TableHead>
-                <TableHead className="text-right">Acq. revenue</TableHead>
+                <TableHead className="text-right">Cost / Lead</TableHead>
+                <TableHead className="text-right">ROAS</TableHead>
+                <TableHead className="text-right">Acq. Sales</TableHead>
+                <TableHead className="text-right">Acq. Revenue</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
