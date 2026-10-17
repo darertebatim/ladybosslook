@@ -112,7 +112,10 @@ import { useTranslation } from "react-i18next";
 // mixed English/Farsi paragraphs pick their own direction instead of the
 // whole description being forced one way.
 function sanitizeDescription(html: string): string {
-  const sanitized = DOMPurify.sanitize(html);
+  const sanitized = DOMPurify.sanitize(html)
+    // "Add to Cart" markers from the program description editor are web-page
+    // only — the app detail view has its own enroll UI, so drop the markers.
+    .replace(/<div[^>]*rilo-cart-btn[^>]*>[\s\S]*?<\/div>/gi, '');
   return sanitized.replace(
     /<(p|div|h[1-6]|li|blockquote|pre)(?![^>]*?\sdir=)([^>]*)>/gi,
     '<$1 dir="auto"$2>'
