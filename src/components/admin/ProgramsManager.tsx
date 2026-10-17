@@ -280,6 +280,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
         booking_url: bookingUrl || null,
         booking_note: (formData.booking_note || '').trim() || null,
         success_video_url: successVideoUrl || null,
+        price_presets: normalizePresets(formData.price_presets),
       };
       const links = [...contentLinks];
       if (editingId) {
