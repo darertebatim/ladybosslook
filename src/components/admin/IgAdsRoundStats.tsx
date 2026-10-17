@@ -194,8 +194,8 @@ export function IgAdsRoundStats() {
                 <TableHead className="text-right">Morning</TableHead>
                 <TableHead className="text-right">Start now</TableHead>
                 <TableHead className="text-right">Ad spend</TableHead>
-                <TableHead className="text-right">Enrollments</TableHead>
-                <TableHead className="text-right">Acquisition sold</TableHead>
+                <TableHead className="text-right">Acq. enrollments</TableHead>
+                <TableHead className="text-right">Acq. revenue</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -214,7 +214,7 @@ export function IgAdsRoundStats() {
                   {KINDS.map((k) => <TableCell key={k} className="text-right tabular-nums">{pct(r.opens[k])}</TableCell>)}
                   <TableCell className="text-right tabular-nums">{money(r.spend)}</TableCell>
                   <TableCell className="text-right tabular-nums">{r.enrollments}</TableCell>
-                  <TableCell className="text-right font-semibold tabular-nums">{r.sales}</TableCell>
+                  <TableCell className="text-right font-semibold tabular-nums">{money(r.revenue)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
