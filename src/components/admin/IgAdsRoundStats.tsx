@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Download } from 'lucide-react';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 import { calculateCampaignRoundMetrics } from '@/lib/campaignRoundMetrics';
-import { allocateRoundSpend, attributeSales, autoEmailKind, type AutoEmailKind } from '@/lib/igAdsRoundStats';
+import { allocateRoundSpend, attributeEnrollments, attributeRevenue, autoEmailKind, type AutoEmailKind } from '@/lib/igAdsRoundStats';
 import { getLocalDateStr } from '@/lib/localDate';
 
 const campaigns = LEAD_CAMPAIGNS.filter((c) => c.key === 'igads' || c.key === 'aliagads');
@@ -63,18 +63,25 @@ export function IgAdsRoundStats() {
     },
   });
 
-  const roundIds = rounds.map((r) => r.id);
-  const { data: enrollments = [] } = useQuery({
-    queryKey: ['igads-stats-enrollments', roundIds.join(',')],
-    enabled: roundIds.length > 0,
-    queryFn: () => pageAll<any>((from) => supabase.from('course_enrollments')
-      .select('user_id, round_id').in('round_id', roundIds).range(from, from + 999)),
+  const { data: acqEnrollments = [] } = useQuery({
+    queryKey: ['igads-stats-acq-enrollments'],
+    queryFn: async () => {
+      const rows = await pageAll<any>((from) => supabase.from('course_enrollments')
+        .select('user_id, created_at').eq('program_slug', 'casigads').order('created_at').range(from, from + 999));
+      const ids = [...new Set(rows.map((r) => r.user_id))];
+      const emails: Record<string, string> = {};
+      for (let i = 0; i < ids.length; i += 200) {
+        const { data } = await supabase.from('profiles').select('id, email').in('id', ids.slice(i, i + 200));
+        for (const p of data || []) if (p.email) emails[p.id] = p.email;
+      }
+      return rows.map((r) => ({ email: emails[r.user_id] || '', created_at: r.created_at })).filter((r) => r.email);
+    },
   });
 
   const { data: orders = [] } = useQuery({
     queryKey: ['igads-stats-orders'],
     queryFn: () => pageAll<any>((from) => supabase.from('orders')
-      .select('email, created_at').eq('program_slug', 'casigads')
+      .select('email, created_at, amount, usd_amount').eq('program_slug', 'casigads')
       .in('status', ['completed', 'paid', 'partially_refunded']).order('created_at').range(from, from + 999)),
   });
 
