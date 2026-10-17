@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { PricePresets, normalizePresets, type PricePreset } from './PricePresets';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -100,6 +101,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
     stripe_product_id: '',
     stripe_price_id: '',
     full_payment_stripe_price_id: '',
+    price_presets: [] as PricePreset[],
     // Stripe price IDs for deposit-type programs
     deposit_stripe_price_id: '',
     balance_full_stripe_price_id: '',
@@ -224,6 +226,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       stripe_product_id: '',
       stripe_price_id: '',
       full_payment_stripe_price_id: '',
+      price_presets: [] as PricePreset[],
       deposit_stripe_price_id: '',
       balance_full_stripe_price_id: '',
       balance_monthly_stripe_price_id: '',
@@ -377,6 +380,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       stripe_product_id: (program as any).stripe_product_id || '',
       stripe_price_id: (program as any).stripe_price_id || '',
       full_payment_stripe_price_id: (program as any).full_payment_stripe_price_id || '',
+      price_presets: normalizePresets((program as any).price_presets),
       deposit_stripe_price_id: (program as any).deposit_stripe_price_id || '',
       balance_full_stripe_price_id: (program as any).balance_full_stripe_price_id || '',
       balance_monthly_stripe_price_id: (program as any).balance_monthly_stripe_price_id || '',
@@ -1223,6 +1227,16 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                         For one-time payments. Find in Stripe Dashboard → Products
                       </p>
                     </div>
+
+                    {formData.payment_type === 'one-time' && (
+                      <PricePresets
+                        presets={formData.price_presets}
+                        activePrice={formData.price_amount}
+                        activePriceId={formData.stripe_price_id}
+                        onChange={(price_presets) => setFormData({ ...formData, price_presets })}
+                        onApply={(p) => setFormData({ ...formData, price_amount: p.price_amount, stripe_price_id: p.stripe_price_id })}
+                      />
+                    )}
 
                     {formData.payment_type === 'one-time' && (
                       <div className="space-y-2">

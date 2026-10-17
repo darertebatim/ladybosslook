@@ -5304,6 +5304,7 @@ export type Database = {
           original_price: number | null
           payment_type: string
           price_amount: number
+          price_presets: Json
           requires_subscription: boolean
           restricted_regions: string[]
           show_booking_on_success: boolean
@@ -5367,6 +5368,7 @@ export type Database = {
           original_price?: number | null
           payment_type: string
           price_amount?: number
+          price_presets?: Json
           requires_subscription?: boolean
           restricted_regions?: string[]
           show_booking_on_success?: boolean
@@ -5430,6 +5432,7 @@ export type Database = {
           original_price?: number | null
           payment_type?: string
           price_amount?: number
+          price_presets?: Json
           requires_subscription?: boolean
           restricted_regions?: string[]
           show_booking_on_success?: boolean
