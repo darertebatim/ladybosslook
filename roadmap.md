@@ -1,3 +1,5 @@
+- [x] Add public Acquisition Standard/VIP tiers and an unlisted early-price page; verified all three selections reach the cart on phone/desktop, price-validation tests pass, checkout deployed.
+- [ ] Verify Acquisition offers through authenticated Stripe checkout — blocked by external unmanaged authenticated preview access.
 - [x] Add an Expenses tab to Admin Payments with actual Meta advertising costs, date filters and CSV export; verified credential path and expense calculations.
 - [ ] Verify Expenses in the signed-in admin page — blocked by external unmanaged authenticated preview access.
 - [x] Fix manual-payment linked-account lookup permissions without widening account access; confirmed deployed lookup uses existing admin-readable tables.

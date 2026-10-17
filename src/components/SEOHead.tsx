@@ -7,6 +7,7 @@ interface SEOHeadProps {
   url?: string;
   type?: string;
   locale?: string;
+  noIndex?: boolean;
 }
 
 export const SEOHead = ({
@@ -15,7 +16,8 @@ export const SEOHead = ({
   image = "",
   url = typeof window !== 'undefined' ? window.location.href : '',
   type = "website",
-  locale = "en_US"
+  locale = "en_US",
+  noIndex = false
 }: SEOHeadProps) => {
   return (
     <Helmet>
@@ -38,7 +40,7 @@ export const SEOHead = ({
       <meta name="twitter:image" content={image} />
       
       {/* Additional Meta Tags */}
-      <meta name="robots" content="index, follow" />
+      <meta name="robots" content={noIndex ? 'noindex, nofollow' : 'index, follow'} />
       <link rel="canonical" href={url} />
     </Helmet>
   );

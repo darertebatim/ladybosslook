@@ -724,6 +724,7 @@ const App = () => (
                   <Route path="/fnpbonus" element={<Redirect to="https://mnukhzjcvbwpvktxqlej.supabase.co/storage/v1/object/public/documents/fnpbonus.pdf" />} />
                   
                   {/* Dynamic program routes - must be before catch-all */}
+                  <Route path="/casigads/early" element={<ProgramPage programSlug="casigads" earlyOffer />} />
                   {!isNativeApp() && <Route path="/:slug" element={<ProgramPage />} />}
                   
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
