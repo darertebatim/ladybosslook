@@ -17,6 +17,7 @@ import { PersianFlag } from '@/components/ui/PersianFlag';
 import { Link as RLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { resolveAutoEnrollRoundId } from '@/lib/autoEnrollRound';
+import { normalizePresets } from '@/components/admin/PricePresets';
 
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
@@ -89,12 +90,13 @@ const convertToEmbedUrl = (url: string): string => {
 };
 
 const ProgramPage = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug, tierSlug } = useParams<{ slug: string; tierSlug?: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { addToCart, isInCart, isAdding, enrollFree, isEnrollingFree } = useCart();
   const { isEnrolled } = useMyEnrollments();
-  const [program, setProgram] = useState<ProgramData | null>(null);
+  const [baseProgram, setProgram] = useState<ProgramData | null>(null);
+  const [selectedTierId, setSelectedTierId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [isPaymentRedirect, setIsPaymentRedirect] = useState(false);
@@ -179,6 +181,29 @@ const ProgramPage = () => {
     },
   });
 
+  // Price tiers (Standard vs VIP) and reserved-price sub-links (/:slug/:tierSlug)
+  const allPresets = normalizePresets((baseProgram as any)?.price_presets).filter((p) => p.price_amount > 0);
+  const isOneTime = baseProgram?.payment_type === 'one-time';
+  const reservedTier = isOneTime && tierSlug ? allPresets.find((p) => p.slug && p.slug === tierSlug.toLowerCase()) || null : null;
+  const publicTiers = isOneTime ? allPresets.filter((p) => p.show_as_tier) : [];
+  const tierOptions = publicTiers.length >= 2
+    ? (reservedTier && !publicTiers.some((t) => t.id === reservedTier.id) ? [reservedTier, ...publicTiers] : publicTiers)
+    : [];
+  const activeTier = tierOptions.find((t) => t.id === selectedTierId) || reservedTier || (tierOptions.length ? tierOptions[0] : null);
+  const program: ProgramData | null = baseProgram && activeTier
+    ? { ...baseProgram, price_amount: activeTier.price_amount, original_price: activeTier.original_price || baseProgram.original_price }
+    : baseProgram;
+  const tierNotFound = !!tierSlug && !!baseProgram && !reservedTier;
+
+  useEffect(() => {
+    if (!baseProgram || !activeTier) return;
+    if (new URLSearchParams(window.location.search).get('buy') === '1' && !sessionStorage.getItem('tier-buy-' + activeTier.id)) {
+      sessionStorage.setItem('tier-buy-' + activeTier.id, '1');
+      handleAddToCart();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [baseProgram?.id, activeTier?.id]);
+
   const handleAddToCart = () => {
     // Signed-out visitors: useCart remembers the item and resumes it after sign-in.
     if (!program) return;
@@ -192,6 +217,7 @@ const ProgramPage = () => {
       price_amount: program.price_amount,
       payment_type: program.payment_type,
       deposit_price: program.deposit_price,
+      payment_option: activeTier ? `tier:${activeTier.id}` : null,
     });
   };
 
@@ -221,7 +247,7 @@ const ProgramPage = () => {
     );
   }
 
-  if (paymentError || notFound || !program) return <Navigate to="/404" replace />;
+  if (paymentError || notFound || tierNotFound || !program) return <Navigate to="/404" replace />;
 
   const isDeposit = program.payment_type === 'deposit';
   const isFree = program.payment_type === 'free' || program.price_amount === 0;
@@ -440,6 +466,45 @@ const ProgramPage = () => {
               <div className="lg:col-span-1 lg:sticky lg:top-24 lg:self-start">
                 <Card className="p-4 lg:p-6 space-y-4 lg:space-y-5 border-2">
                     {/* Price */}
+                    {tierOptions.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-muted-foreground">Choose your option</p>
+                        {tierOptions.map((t) => {
+                          const on = activeTier?.id === t.id;
+                          return (
+                            <button key={t.id} type="button" onClick={() => setSelectedTierId(t.id)}
+                              className={`relative w-full text-left rounded-xl border-2 p-3 transition-all ${on ? 'border-primary bg-primary/5' : 'border-border'}`}>
+                              {t.badge && (
+                                <span className="absolute -top-2 right-2 bg-primary text-primary-foreground text-[10px] font-semibold px-2 py-0.5 rounded-full">{t.badge}</span>
+                              )}
+                              <div className="flex items-baseline justify-between gap-2">
+                                <span dir="auto" className="font-semibold text-sm">{t.label || 'Option'}</span>
+                                <span className="flex items-baseline gap-1.5">
+                                  {!!t.original_price && t.original_price > t.price_amount && (
+                                    <span className="text-muted-foreground line-through text-sm">${(t.original_price / 100).toFixed(0)}</span>
+                                  )}
+                                  <span className="text-xl font-bold">${(t.price_amount / 100).toFixed(0)}</span>
+                                </span>
+                              </div>
+                              {!!t.perks?.length && (
+                                <ul className="mt-2 space-y-1">
+                                  {t.perks.map((perk, i) => (
+                                    <li key={i} dir="auto" className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                                      <Check className="h-3.5 w-3.5 mt-0.5 shrink-0 text-primary" /> {perk}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                    {reservedTier && tierOptions.length === 0 && (
+                      <div dir="auto" className="rounded-lg bg-primary/10 text-primary text-xs font-semibold px-3 py-2">
+                        Special price reserved for you{reservedTier.label ? `: ${reservedTier.label}` : ''}
+                      </div>
+                    )}
                     {hasFullOption ? (
                       <div className="space-y-2">
                         {!!program.original_price && program.original_price > 0 && (
