@@ -42,27 +42,64 @@ export function allocateRoundSpend(rounds: SpendRound[], dailySpend: Record<stri
 export interface SaleRound { id: string; first_session_date: string | null }
 
 /**
- * Attribute each buyer to the most recent round they signed up for whose live session
- * started before the purchase and no more than `days` earlier. Counts unique buyers.
+ * Attribute an event (purchase, enrollment) to the most recent round the person
+ * signed up for whose live session started before the event and no more than
+ * `days` earlier. Returns the round id or null.
  */
-export function attributeSales(
+export function attributeToRound(
   rounds: SaleRound[],
   signupRoundsByEmail: Record<string, string[]>,
-  orders: { email: string; created_at: string }[],
+  email: string,
+  at: number,
   days = 14,
-): Record<string, number> {
-  const sets: Record<string, Set<string>> = {};
+): string | null {
   const start = (id: string) => {
     const d = rounds.find((r) => r.id === id)?.first_session_date;
     return d ? Date.parse(d) : NaN;
   };
+  return (signupRoundsByEmail[email.trim().toLowerCase()] || [])
+    .filter((id) => start(id) <= at && at - start(id) <= days * 86_400_000)
+    .sort((a, b) => start(b) - start(a))[0] || null;
+}
+
+export interface OrderRow { email: string; created_at: string; amount: number | null; usd_amount: number | null }
+
+/**
+ * Revenue per round: each order is attributed to the buyer's most recent round
+ * (within `days` after its live session) and its amount is summed there.
+ * Amounts are in cents; usd_amount (cents) is preferred when present.
+ */
+export function attributeRevenue(
+  rounds: SaleRound[],
+  signupRoundsByEmail: Record<string, string[]>,
+  orders: OrderRow[],
+  days = 14,
+): Record<string, number> {
+  const revenue: Record<string, number> = {};
   for (const o of orders) {
-    const email = o.email.trim().toLowerCase();
-    const at = Date.parse(o.created_at);
-    const best = (signupRoundsByEmail[email] || [])
-      .filter((id) => start(id) <= at && at - start(id) <= days * 86_400_000)
-      .sort((a, b) => start(b) - start(a))[0];
-    if (best) (sets[best] ||= new Set()).add(email);
+    const roundId = attributeToRound(rounds, signupRoundsByEmail, o.email, Date.parse(o.created_at), days);
+    if (!roundId) continue;
+    const cents = o.usd_amount ?? o.amount ?? 0;
+    revenue[roundId] = (revenue[roundId] || 0) + cents / 100;
+  }
+  return Object.fromEntries(Object.entries(revenue).map(([k, v]) => [k, Math.round(v * 100) / 100]));
+}
+
+/**
+ * Enrollments per round: unique people who enrolled in the Acquisition program,
+ * attributed to their most recent round (within `days` after its live session).
+ */
+export function attributeEnrollments(
+  rounds: SaleRound[],
+  signupRoundsByEmail: Record<string, string[]>,
+  enrollments: { email: string; created_at: string }[],
+  days = 14,
+): Record<string, number> {
+  const sets: Record<string, Set<string>> = {};
+  for (const e of enrollments) {
+    const email = e.email.trim().toLowerCase();
+    const roundId = attributeToRound(rounds, signupRoundsByEmail, email, Date.parse(e.created_at), days);
+    if (roundId) (sets[roundId] ||= new Set()).add(email);
   }
   return Object.fromEntries(Object.entries(sets).map(([k, v]) => [k, v.size]));
 }
