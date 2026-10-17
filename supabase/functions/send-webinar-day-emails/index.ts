@@ -391,6 +391,19 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
     });
   }
 
+  if (kind === "reminder" && !testEmail) {
+    // Only signups from 2–3 hours ago, and only when the session is still
+    // more than 6 hours away (closer signups rely on morning/start emails).
+    if (sessionStart.getTime() - now.getTime() < 6 * 3600_000) {
+      return { round: round.round_name, kind, recipients: 0, sent: 0, failed: 0 };
+    }
+    registrants = registrants.filter((r) => {
+      if (!r.created_at) return false;
+      const age = now.getTime() - new Date(r.created_at).getTime();
+      return age >= 2 * 3600_000 && age < 3 * 3600_000;
+    });
+  }
+
   let sent = 0;
   let failed = 0;
   const batchSize = 100;
