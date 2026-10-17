@@ -359,14 +359,18 @@ async function collectRegistrants(roundId: string): Promise<Registrant[]> {
   return [...map.values()];
 }
 
-/** Everyone who already received (sent or delivered) an email with this subject. */
-async function collectAlreadySent(subject: string): Promise<Set<string>> {
+/** Everyone who already received (sent or delivered) this kind of email for this round.
+ * Scoped per round (people who re-register for a later round still get it) and by
+ * kind rather than subject (editing a subject never causes repeat sends). */
+async function collectAlreadySent(kind: Kind, roundKey: string): Promise<Set<string>> {
   const set = new Set<string>();
   for (let page = 0; page < 40; page++) {
     const { data, error } = await supabase
       .from("email_delivery_events")
       .select("recipient")
-      .eq("subject", subject)
+      .eq("tags->>campaign", "webinar_day")
+      .eq("tags->>kind", kind)
+      .eq("tags->>round", roundKey)
       .in("event_type", ["sent", "delivered"])
       .range(page * 1000, page * 1000 + 999);
     if (error) throw error;
@@ -416,7 +420,7 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
   if (!testEmail) {
     const [unsub, alreadySent] = await Promise.all([
       fetchUnsubscribed(supabase, registrants.map((r) => r.email)),
-      collectAlreadySent(subject),
+      collectAlreadySent(kind, String(round.round_number ?? round.id)),
     ]);
     registrants = registrants.filter((r) => !unsub.has(r.email) && !alreadySent.has(r.email));
   }
