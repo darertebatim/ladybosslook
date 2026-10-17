@@ -155,8 +155,8 @@ export function IgAdsRoundStats() {
   const pct = (v: number | null) => (v === null ? '—' : `${v}%`);
 
   const exportCsv = () => {
-    const head = ['Round', 'Date', 'Sign-ups', 'Calendar adds', 'Show-ups', 'Sign-up email open %', 'Reminder open %', 'Morning open %', 'Start now open %', 'Ad spend', 'Enrollments', 'Acquisition sold'];
-    const lines = rows.map((r) => [r.name, r.date || '', r.signups, r.calendar, r.showups, ...KINDS.map((k) => r.opens[k] ?? ''), r.spend ?? '', r.enrollments, r.sales]);
+    const head = ['Round', 'Date', 'Sign-ups', 'Calendar adds', 'Show-ups', 'Sign-up email open %', 'Reminder open %', 'Morning open %', 'Start now open %', 'Ad spend', 'Acquisition enrollments', 'Acquisition revenue'];
+    const lines = rows.map((r) => [r.name, r.date || '', r.signups, r.calendar, r.showups, ...KINDS.map((k) => r.opens[k] ?? ''), r.spend ?? '', r.enrollments, r.revenue]);
     const csv = [head, ...lines].map((l) => l.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
@@ -170,7 +170,7 @@ export function IgAdsRoundStats() {
         <div>
           <CardTitle>IG Ads Rounds (both pages)</CardTitle>
           <p className="text-sm text-muted-foreground">
-            IG Ads + IG Ads (Ali) combined. Open rates = opened ÷ delivered among this round's sign-ups. Ad spend = webinar campaigns from the day after the previous session up to this session. Acquisition sold = unique buyers within 14 days after their round.
+            IG Ads + IG Ads (Ali) combined. Open rates = opened ÷ delivered among this round's sign-ups. Ad spend = webinar campaigns from the day after the previous session up to this session. Acquisition enrollments / revenue = people who joined or bought the Acquisition program within 14 days after their round.
           </p>
           {spendError && <p className="text-xs text-destructive">Ad spend could not load: {(spendError as Error).message}</p>}
         </div>
