@@ -16,6 +16,7 @@ import { WebinarRoundBreakdown } from '@/components/admin/WebinarRoundBreakdown'
 
 import { MetaCrmEvents } from '@/components/admin/MetaCrmEvents';
 import { LeadEmailCampaign } from '@/components/admin/LeadEmailCampaign';
+import { StartAdsEmailAutomation } from '@/components/admin/StartAdsEmailAutomation';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 
 const igads = LEAD_CAMPAIGNS.find((c) => c.key === 'igads');
@@ -154,6 +155,7 @@ export default function LeadCenter() {
         </TabsContent>
 
         <TabsContent value="startads" className="space-y-6">
+          <StartAdsEmailAutomation />
           <WebinarRoundBreakdown
             programSlug={startads.programSlug}
             campaignKey="startads"
