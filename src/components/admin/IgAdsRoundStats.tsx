@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Download } from 'lucide-react';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 import { calculateCampaignRoundMetrics } from '@/lib/campaignRoundMetrics';
-import { allocateRoundSpend, attributeEnrollments, attributeRevenue, autoEmailKind, type AutoEmailKind } from '@/lib/igAdsRoundStats';
+import { adSetPage, allocateRoundSpend, attributeEnrollments, attributeRevenue, autoEmailKind, type AdPage, type AutoEmailKind, type DailySpendRow } from '@/lib/igAdsRoundStats';
 import { getLocalDateStr } from '@/lib/localDate';
 
 const campaigns = LEAD_CAMPAIGNS.filter((c) => c.key === 'igads' || c.key === 'aliagads');
@@ -67,14 +67,14 @@ export function IgAdsRoundStats() {
     queryKey: ['igads-stats-acq-enrollments'],
     queryFn: async () => {
       const rows = await pageAll<any>((from) => supabase.from('course_enrollments')
-        .select('user_id, created_at').eq('program_slug', 'casigads').order('created_at').range(from, from + 999));
+        .select('user_id, enrolled_at').eq('program_slug', 'casigads').order('enrolled_at').range(from, from + 999));
       const ids = [...new Set(rows.map((r) => r.user_id))];
       const emails: Record<string, string> = {};
       for (let i = 0; i < ids.length; i += 200) {
         const { data } = await supabase.from('profiles').select('id, email').in('id', ids.slice(i, i + 200));
         for (const p of data || []) if (p.email) emails[p.id] = p.email;
       }
-      return rows.map((r) => ({ email: emails[r.user_id] || '', created_at: r.created_at })).filter((r) => r.email);
+      return rows.map((r) => ({ email: emails[r.user_id] || '', created_at: r.enrolled_at })).filter((r) => r.email);
     },
   });
 
@@ -96,10 +96,10 @@ export function IgAdsRoundStats() {
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      const daily: Record<string, number> = {};
+      const daily: DailySpendRow[] = [];
       for (const row of data.campaigns || []) {
         if (!/webinar/i.test(row.campaign_name || '')) continue;
-        daily[row.date_start] = (daily[row.date_start] || 0) + Number(row.spend || 0);
+        daily.push({ date: row.date_start, spend: Number(row.spend || 0), page: adSetPage(row.adset_name, row.campaign_name) });
       }
       return daily;
     },
