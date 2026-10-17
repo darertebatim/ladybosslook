@@ -133,11 +133,11 @@ export default function StartAdsLanding() {
             پیشنهاد یک‌باره — فقط ۵۰ نفر
           </span>
           <h1 className="mt-4 text-2xl font-extrabold leading-snug text-neutral-900">
-            جلسه اول دوره ۳ هفته‌ای «{title}» — رایگان برای شما
+            {' «'}{title}{'»\n — رایگان برای شما'}
           </h1>
           <p className="mt-3 text-sm leading-7 text-neutral-700">
             این وبینار رایگان معمولی نیست؛ جلسه اول دوره جذب مشتری با اینستاگرام ادز است که برای ۵۰ نفر از
-            جامعه ما رایگان باز شده. با علی لطفی.
+            جامعه ما رایگان باز شده.
           </p>
         </div>
 
