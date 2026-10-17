@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Fragment } from 'react';
 import { useParams, Navigate, Link, useNavigate } from 'react-router-dom';
 import { supabase, browserTimezone } from '@/integrations/supabase/client';
 import { Loader2, Check, MessageCircle, ShoppingCart, Clock, ArrowLeft, Calendar, Video, ShieldCheck, Lock } from 'lucide-react';
@@ -339,7 +339,7 @@ const ProgramPage = () => {
     <>
       <SEOHead
         title={`${program.title} | Ladyboss Academy`}
-        description={program.description ? program.description.replace(/<[^>]*>/g, '').slice(0, 155) : `Learn about ${program.title}`}
+        description={program.description ? program.description.replace(/<div[^>]*rilo-cart-btn[^>]*>[\s\S]*?<\/div>/gi, '').replace(/<[^>]*>/g, '').slice(0, 155) : `Learn about ${program.title}`}
       />
       <div className="min-h-screen flex flex-col bg-background">
         <Navigation />
@@ -688,14 +688,27 @@ const ProgramPage = () => {
             </div>
           </section>
 
-          {/* Description — below enroll section */}
+          {/* Description — below enroll section; "Add to Cart" markers become real cart buttons */}
           {program.description && (
             <section className="container mx-auto px-4 pb-8 lg:pb-16">
-              <div
-                dir="auto"
-                className={`prose prose-base lg:prose-lg prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground max-w-none ${isFarsi ? 'font-farsi' : ''}`}
-                dangerouslySetInnerHTML={{ __html: sanitizeDescription(program.description) }}
-              />
+              {sanitizeDescription(program.description)
+                .split(/<div[^>]*rilo-cart-btn[^>]*>[\s\S]*?<\/div>/gi)
+                .map((part, i, arr) => (
+                  <Fragment key={i}>
+                    {part.trim() && (
+                      <div
+                        dir="auto"
+                        className={`prose prose-base lg:prose-lg prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground max-w-none ${isFarsi ? 'font-farsi' : ''}`}
+                        dangerouslySetInnerHTML={{ __html: part }}
+                      />
+                    )}
+                    {i < arr.length - 1 && (
+                      <div className="my-6 max-w-md mx-auto lg:mx-0">
+                        <EnrollButton size="default" className="w-full" />
+                      </div>
+                    )}
+                  </Fragment>
+                ))}
             </section>
           )}
         </main>

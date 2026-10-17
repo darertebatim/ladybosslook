@@ -4,6 +4,26 @@ import 'react-quill/dist/quill.snow.css';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+// Register a custom block blot so an "Add to Cart" button can be placed inside
+// program descriptions. Stored as <div class="rilo-cart-btn">…</div> in HTML;
+// ProgramPage converts the marker into a real cart button on the public page.
+const QuillInstance = ReactQuill.Quill as any;
+if (QuillInstance && !QuillInstance.imports?.['formats/cartbutton']) {
+  const BlockEmbed = QuillInstance.import('blots/block/embed');
+  class CartButtonBlot extends BlockEmbed {
+    static create() {
+      const node = super.create() as HTMLElement;
+      node.setAttribute('contenteditable', 'false');
+      node.innerHTML = '<span class="rilo-cart-btn-label">🛒 Add to Cart button</span>';
+      return node;
+    }
+  }
+  CartButtonBlot.blotName = 'cartbutton';
+  CartButtonBlot.tagName = 'div';
+  CartButtonBlot.className = 'rilo-cart-btn';
+  QuillInstance.register(CartButtonBlot);
+}
+
 interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
@@ -73,27 +93,37 @@ export function RichTextEditor({ value, onChange, placeholder, className, imageB
     };
   }, [imageBucket]);
 
+  const cartButtonHandler = useCallback(() => {
+    const quill = quillRef.current?.getEditor();
+    if (!quill) return;
+    const range = quill.getSelection(true);
+    quill.insertEmbed(range.index, 'cartbutton', '', 'user');
+    quill.setSelection(range.index + 1, 0);
+  }, []);
+
   const modules = useMemo(() => ({
     toolbar: {
       container: [
         [{ 'header': [1, 2, 3, false] }],
         ['bold', 'italic', 'underline'],
         [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        ['link', 'image'],
+        ['link', 'image', 'addtocart'],
         ['clean']
       ],
       handlers: {
         image: imageHandler,
+        addtocart: cartButtonHandler,
       },
     },
-  }), [imageHandler]);
+  }), [imageHandler, cartButtonHandler]);
 
   const formats = [
     'header',
     'bold', 'italic', 'underline',
     'list', 'bullet',
     'link',
-    'image'
+    'image',
+    'cartbutton'
   ];
 
   return (
@@ -181,6 +211,24 @@ export function RichTextEditor({ value, onChange, placeholder, className, imageB
         .ql-toolbar button:focus .ql-fill,
         .ql-toolbar button.ql-active .ql-fill {
           fill: hsl(var(--primary));
+        }
+        .ql-toolbar button.ql-addtocart::after {
+          content: 'Add to Cart';
+          font-size: 12px;
+          font-weight: 600;
+        }
+        .ql-editor .rilo-cart-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0.75rem 0;
+          padding: 0.6rem 1.25rem;
+          border-radius: 9999px;
+          background: hsl(var(--primary));
+          color: hsl(var(--primary-foreground));
+          font-weight: 700;
+          font-size: 0.875rem;
+          cursor: default;
         }
       `}</style>
     </div>
