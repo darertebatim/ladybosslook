@@ -1,4 +1,5 @@
 import { trackedCalUrl } from "../_shared/calendar-track.ts";
+import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "https://esm.sh/resend@2.0.0";
@@ -16,12 +17,6 @@ const resend = new Resend(RESEND_API_KEY);
 // simply reply to the email.
 const SUPPORT_URL =
   "https://ladyboss.onelink.me/lt6v?af_xp=custom&pid=email_support&c=lead_email&deep_link_value=support&af_web_dp=https%3A%2F%2Fladybosslook.com%2Fdashboard%2Fchat";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-timezone",
-};
 
 const DEFAULT_PROGRAM_SLUG = "instagram6traps";
 const DEFAULT_PREREQ_VIDEO_URL = "https://ladybosslook.com/thankyousixtraps";
@@ -242,27 +237,40 @@ serve(async (req) => {
           : ""
       }
 
-      <div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:16px;margin:16px 0;">
-        <p style="margin:0 0 8px;font-size:15px;line-height:1.9;font-weight:bold;">🎬 ویدیوی ۵ دقیقه‌ای پیش‌نیاز</p>
-        <p style="margin:0 0 12px;font-size:14px;line-height:1.9;">
-          قبل از وبینار حتماً این ویدیوی کوتاه رو ببینید تا بیشترین نتیجه رو از جلسه بگیرید.
-        </p>
-        <p style="text-align:center;margin:0;">
-          <a href="${PREREQ_VIDEO_URL}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
-            مشاهده جزئیات وبینار و ویدیو
-          </a>
-        </p>
-      </div>
-
       ${
         gcalUrl
           ? `<p style="text-align:center;margin:20px 0;">
-               <a href="${trackedCalUrl(gcalUrl, "email:sixtraps-confirm", round?.id, email)}" style="display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:12px 20px;border-radius:10px;font-size:14px;">
-                 افزودن به Google Calendar
+               <a href="${trackedCalUrl(gcalUrl, "email:sixtraps-confirm", round?.id, email)}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:14px 22px;border-radius:10px;font-size:15px;font-weight:bold;">
+                 افزودن وبینار به تقویم
                </a>
              </p>`
           : ""
       }
+
+      <div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:16px;margin:16px 0;">
+        <p style="margin:0 0 8px;font-size:15px;line-height:1.9;font-weight:bold;">🎥 قبل از وبینار، این ویدیوی ۵ دقیقه‌ای را ببینید</p>
+        <p style="margin:0 0 12px;font-size:14px;line-height:1.9;">
+          اگر پیج دارید اما مشتری کافی از آن نمی‌گیرید، قبل از هزینه‌کردن برای تبلیغات باید بدانید از کجا شروع کنید.
+        </p>
+        <p style="margin:0 0 16px;font-size:14px;line-height:1.9;">
+          این ویدیوی کوتاه، مقدمهٔ وبینار است. همین حالا ببینیدش و یک سؤال دربارهٔ جذب مشتری برای بیزینس خودتان یادداشت کنید؛ با همان سؤال وارد جلسه شوید تا آموزش‌ها را به شرایط واقعی کسب‌وکارتان وصل کنید.
+        </p>
+        <p style="text-align:center;margin:0;">
+          <a href="${PREREQ_VIDEO_URL}" style="display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
+            تماشای ویدیوی ۵ دقیقه‌ای پیش‌نیاز
+          </a>
+        </p>
+      </div>
+
+      <p style="margin:20px 0 12px;font-size:14px;line-height:1.9;">
+        مشتری بیشتر، فقط عدد بالاتر روی فروش نیست. می‌تواند یعنی وقت کمتری برای پیدا کردن سفارش بعدی، فرصت بیشتر برای انجام کاری که در آن مهارت دارید، و آرامش بیشتر برای برنامه‌ریزی کسب‌وکارتان.
+      </p>
+      <p style="margin:0 0 12px;font-size:14px;line-height:1.9;">
+        هدف این وبینار، بیشتر شدن فالوئر و لایک نیست؛ می‌خواهیم روشن‌تر ببینید چطور می‌شود با تبلیغات اینستاگرام، به آدم‌هایی رسید که واقعاً به محصول یا خدمت شما نیاز دارند.
+      </p>
+      <p style="margin:0 0 16px;font-size:14px;line-height:1.9;font-weight:bold;">
+        این ${durationMinutes} دقیقه را برای کسب‌وکارتان کنار بگذارید—با سؤال خودتان بیایید و ببینید قدم بعدی شما برای جذب مشتری چیست.
+      </p>
 
       <p style="margin:16px 0;font-size:14px;line-height:1.8;">
         اگر سوالی داشتی، از چت اپ ریلو با ما در تماس باش (یا همین ایمیل را جواب بده):
@@ -271,8 +279,9 @@ serve(async (req) => {
       </p>
 
       <p style="margin:24px 0 0;font-size:13px;color:#6b7280;line-height:1.8;">
-        منتظر دیدنت هستیم!<br>
-        علی لطفی
+        می‌بینمت،<br>
+        علی لطفی<br>
+        آکادمی لیدی‌باس
       </p>
     </div>
   </body>
