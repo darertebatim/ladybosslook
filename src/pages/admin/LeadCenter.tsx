@@ -79,8 +79,8 @@ export default function LeadCenter() {
         </TabsContent>
 
         <TabsContent value="stats" className="space-y-6">
-          <IgAdsRoundStats />
           <WebinarAutomationLog />
+          <IgAdsRoundStats />
           <CalendarClickStats />
           <WebinarStats />
         </TabsContent>
