@@ -1233,6 +1233,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                         presets={formData.price_presets}
                         activePrice={formData.price_amount}
                         activePriceId={formData.stripe_price_id}
+                        programSlug={formData.slug.trim()}
                         onChange={(price_presets) => setFormData({ ...formData, price_presets })}
                         onApply={(p) => setFormData({ ...formData, price_amount: p.price_amount, stripe_price_id: p.stripe_price_id })}
                       />
