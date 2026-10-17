@@ -383,6 +383,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?:
         city: "",
         source: regSource,
         round_id: roundId,
+        timezone: getDeviceTimezone(),
       });
       if (error) throw error;
 
