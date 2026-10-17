@@ -93,27 +93,37 @@ export function RichTextEditor({ value, onChange, placeholder, className, imageB
     };
   }, [imageBucket]);
 
+  const cartButtonHandler = useCallback(() => {
+    const quill = quillRef.current?.getEditor();
+    if (!quill) return;
+    const range = quill.getSelection(true);
+    quill.insertEmbed(range.index, 'cartbutton', '', 'user');
+    quill.setSelection(range.index + 1, 0);
+  }, []);
+
   const modules = useMemo(() => ({
     toolbar: {
       container: [
         [{ 'header': [1, 2, 3, false] }],
         ['bold', 'italic', 'underline'],
         [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        ['link', 'image'],
+        ['link', 'image', 'addtocart'],
         ['clean']
       ],
       handlers: {
         image: imageHandler,
+        addtocart: cartButtonHandler,
       },
     },
-  }), [imageHandler]);
+  }), [imageHandler, cartButtonHandler]);
 
   const formats = [
     'header',
     'bold', 'italic', 'underline',
     'list', 'bullet',
     'link',
-    'image'
+    'image',
+    'cartbutton'
   ];
 
   return (
