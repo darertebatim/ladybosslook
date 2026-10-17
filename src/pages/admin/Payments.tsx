@@ -2,6 +2,8 @@ import { StripePaymentsViewer } from '@/components/admin/StripePaymentsViewer';
 import { StripeSyncButton } from '@/components/admin/StripeSyncButton';
 import { ManualPaymentDialog } from '@/components/admin/ManualPaymentDialog';
 import { useState } from 'react';
+import { MetaAdExpenses } from '@/components/admin/MetaAdExpenses';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function Payments() {
   const [refreshKey, setRefreshKey] = useState(0);
@@ -14,8 +16,19 @@ export default function Payments() {
         </div>
         <ManualPaymentDialog onSaved={() => setRefreshKey(value => value + 1)} />
       </div>
-      <StripeSyncButton />
-      <StripePaymentsViewer refreshKey={refreshKey} />
+      <Tabs defaultValue="payments">
+        <TabsList>
+          <TabsTrigger value="payments">Payments</TabsTrigger>
+          <TabsTrigger value="expenses">Expenses</TabsTrigger>
+        </TabsList>
+        <TabsContent value="payments" className="space-y-6 pt-4">
+          <StripeSyncButton />
+          <StripePaymentsViewer refreshKey={refreshKey} />
+        </TabsContent>
+        <TabsContent value="expenses" className="pt-4">
+          <MetaAdExpenses />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
