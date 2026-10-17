@@ -102,7 +102,7 @@ serve(async (req) => {
       // Fetch current price from catalog
       const { data: program } = await supabase
         .from('program_catalog')
-        .select('title, price_amount, deposit_price, payment_type, stripe_product_id, stripe_price_id, is_active')
+        .select('title, price_amount, deposit_price, payment_type, stripe_product_id, stripe_price_id, is_active, price_presets')
         .eq('slug', item.program_slug)
         .eq('is_active', true)
         .single();
@@ -110,6 +110,21 @@ serve(async (req) => {
       if (!program) {
         console.log('[CART-CHECKOUT] Skipping inactive program:', item.program_slug);
         continue;
+      }
+
+      // Price tier / reserved price chosen on the program page (stored as "tier:<id>").
+      // Price is always looked up from the catalog, never trusted from the client.
+      const opt = String((item as any).payment_option || '');
+      let tierLabel = '';
+      if (opt.startsWith('tier:') && program.payment_type === 'one-time') {
+        const tierId = opt.slice(5);
+        const tier = (Array.isArray((program as any).price_presets) ? (program as any).price_presets : [])
+          .find((p: any) => p && String(p.id) === tierId);
+        if (tier && Number(tier.price_amount) > 0) {
+          (program as any).price_amount = Number(tier.price_amount);
+          (program as any).stripe_price_id = tier.stripe_price_id || null;
+          tierLabel = String(tier.label || '');
+        }
       }
 
       const isDeposit = program.payment_type === 'deposit';
@@ -121,7 +136,7 @@ serve(async (req) => {
         continue;
       }
 
-      const productName = isDeposit ? `${program.title} (Deposit)` : program.title;
+      const productName = isDeposit ? `${program.title} (Deposit)` : (tierLabel ? `${program.title} — ${tierLabel}` : program.title);
 
       let resolvedPriceId: string | null = null;
       // Preferred: explicit stored stripe_price_id; fallback: product default price.
