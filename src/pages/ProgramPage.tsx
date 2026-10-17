@@ -416,8 +416,7 @@ const ProgramPage = () => {
 
               </div>
 
-
-              {/* Right: Sticky pricing card — placed after round details on mobile, sticky on desktop */}
+              {/* Right: Sticky pricing card with round details directly beneath it */}
               <div className="lg:col-span-1 lg:sticky lg:top-24 lg:self-start">
                 <Card className="p-4 lg:p-6 space-y-4 lg:space-y-5 border-2">
                     {/* Price */}
