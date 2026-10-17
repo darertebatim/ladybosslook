@@ -121,7 +121,8 @@ export interface StaticRoundStat {
   signups: number;
   /** null = calendar-click tracking did not exist yet for this round. */
   calendar: number | null;
-  showups: number;
+  /** null = no show-up (gift page) data exists for this round. */
+  showups: number | null;
   opens: Partial<Record<AutoEmailKind, number>>;
   spend: number;
   enrollments: number;
@@ -135,6 +136,9 @@ export interface StaticRoundStat {
  * only current/future rounds are calculated dynamically.
  */
 export const STATIC_ROUND_STATS: StaticRoundStat[] = [
+  { roundNumber: 12, name: 'Round 12 (West)', date: '2026-09-25T21:00:00Z', signups: 143, calendar: null, showups: null, opens: {}, spend: 177.53, enrollments: 3, revenue: 575.54 },
+  { roundNumber: 11, name: 'Round 11 (East)', date: '2026-09-25T18:00:00Z', signups: 191, calendar: null, showups: null, opens: {}, spend: 237.15, enrollments: 7, revenue: 475.21 },
+  { roundNumber: 9, name: 'Round 9 (Last Chance)', date: '2026-09-20T18:00:00Z', signups: 150, calendar: null, showups: null, opens: {}, spend: 117.04, enrollments: 5, revenue: 675.3 },
   { roundNumber: 22, name: 'Round 22 (West)', date: '2026-10-17T01:00:00Z', signups: 38, calendar: 15, showups: 8, opens: { signup: 45, reminder: 50, morning: 48, start: 47 }, spend: 81.2, enrollments: 0, revenue: 0 },
   { roundNumber: 21, name: 'Round 21 (East)', date: '2026-10-16T22:00:00Z', signups: 114, calendar: 48, showups: 20, opens: { signup: 49, reminder: 56, morning: 54, start: 52 }, spend: 240.5, enrollments: 0, revenue: 0 },
   { roundNumber: 20, name: 'Round 20 (Morning)', date: '2026-10-16T18:00:00Z', signups: 264, calendar: 93, showups: 38, opens: { signup: 44, reminder: 59, morning: 46, start: 49 }, spend: 542.3, enrollments: 2, revenue: 336 },
