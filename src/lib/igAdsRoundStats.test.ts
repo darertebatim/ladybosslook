@@ -13,7 +13,8 @@ test('Static snapshot covers rounds 9–22 with the verified Round 20 numbers', 
   const r20 = STATIC_ROUND_STATS.find((s) => s.roundNumber === 20)!;
   assert.equal(r20.signups, 264);
   assert.equal(r20.spend, 542.3);
-  assert.equal(r20.revenue, 336);
+  assert.equal(r20.enrollments, 5);
+  assert.equal(r20.revenue, 869.38);
 });
 
 test('Automated email subjects map to the four webinar emails', () => {
