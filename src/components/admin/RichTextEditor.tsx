@@ -4,6 +4,26 @@ import 'react-quill/dist/quill.snow.css';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+// Register a custom block blot so an "Add to Cart" button can be placed inside
+// program descriptions. Stored as <div class="rilo-cart-btn">…</div> in HTML;
+// ProgramPage converts the marker into a real cart button on the public page.
+const QuillInstance = ReactQuill.Quill as any;
+if (QuillInstance && !QuillInstance.imports?.['formats/cartbutton']) {
+  const BlockEmbed = QuillInstance.import('blots/block/embed');
+  class CartButtonBlot extends BlockEmbed {
+    static create() {
+      const node = super.create() as HTMLElement;
+      node.setAttribute('contenteditable', 'false');
+      node.innerHTML = '<span class="rilo-cart-btn-label">🛒 Add to Cart button</span>';
+      return node;
+    }
+  }
+  CartButtonBlot.blotName = 'cartbutton';
+  CartButtonBlot.tagName = 'div';
+  CartButtonBlot.className = 'rilo-cart-btn';
+  QuillInstance.register(CartButtonBlot);
+}
+
 interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
