@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { webinarSendAt } from '../../../supabase/functions/_shared/webinar-timing';
+import { morningIn, webinarSendAt } from '../../../supabase/functions/_shared/webinar-timing';
 
 type Kind = 'reminder' | 'morning' | 'onehour' | 'start';
 const KINDS: { key: Kind; label: string }[] = [
@@ -13,18 +13,6 @@ const KINDS: { key: Kind; label: string }[] = [
   { key: 'start', label: 'Starting now' },
 ];
 const TEST_EMAIL = 'darertebatim@gmail.com';
-
-/** 9:00–9:59 AM run on the session day in a timezone, as a real instant. */
-function morningIn(session: Date, tz: string): Date | null {
-  const day = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(session);
-  for (let h = -48; h <= 0; h++) {
-    const t = new Date(session.getTime() + h * 3600_000);
-    t.setUTCMinutes(20, 0, 0);
-    const parts = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', hourCycle: 'h23' }).format(t);
-    if (Number(parts) === 9 && new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(t) === day) return t;
-  }
-  return null;
-}
 
 const fmt = (d: Date | null) =>
   d
@@ -177,7 +165,7 @@ export function WebinarAutomationLog() {
             </div>
           )}
           <p className="mt-2 text-xs text-muted-foreground">
-            Times shown in your local time. 1-hour and Starting-now emails are scheduled exactly 60 minutes before and at session start; inbox delivery may take a few moments. Reminder goes to each person 2–3 hours after signup (skipped within 6 hours of the session). Morning goes during the 9 AM hour in each person's timezone; East/West are examples.
+            Times shown in your local time. 1-hour and Starting-now emails are scheduled exactly 60 minutes before and at session start; inbox delivery may take a few moments. Reminder goes to each person 2–3 hours after signup (skipped within 6 hours of the session). Eastern and Pacific morning sends are at 9:00 AM; other timezones use the first hourly send during their local 9 AM hour.
           </p>
         </div>
 

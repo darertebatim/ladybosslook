@@ -1,8 +1,19 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { webinarSendAt, webinarSendIsDue } from './webinar-timing.ts';
+import { morningIn, webinarSendAt, webinarSendIsDue } from './webinar-timing.ts';
 
 const session = '2026-10-19T23:00:00Z';
+test('Eastern morning sends at exactly 9 AM, displayed as 6 AM Pacific, not 6:20', () => {
+  assert.equal(morningIn(new Date(session), 'America/New_York')?.toISOString(), '2026-10-19T13:00:00.000Z');
+});
+test('Pacific morning sends at exactly 9 AM, not 9:20', () => {
+  assert.equal(morningIn(new Date(session), 'America/Los_Angeles')?.toISOString(), '2026-10-19T16:00:00.000Z');
+});
+test('morning schedule respects winter daylight-saving changes', () => {
+  const winter = new Date('2026-11-09T23:00:00Z');
+  assert.equal(morningIn(winter, 'America/New_York')?.toISOString(), '2026-11-09T14:00:00.000Z');
+  assert.equal(morningIn(winter, 'America/Los_Angeles')?.toISOString(), '2026-11-09T17:00:00.000Z');
+});
 test('one-hour email is exactly 60 minutes before Round 23, never 40 minutes early', () => {
   assert.equal(webinarSendAt(session, 'onehour').toISOString(), '2026-10-19T22:00:00.000Z');
   assert.equal(webinarSendIsDue(session, 'onehour', Date.parse('2026-10-19T21:20:00Z')), false);
