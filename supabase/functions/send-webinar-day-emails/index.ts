@@ -1,13 +1,13 @@
 // Sends the "Morning of the webinar" and "Starting now" emails for IG Ads
 // webinar rounds (program_slug = igadsfree, both /l/igadsfree and /l/aliagads
-// signups). Runs hourly via pg_cron.
+// signups). Morning/reminder run hourly; onehour/start use per-round exact-time jobs.
 //
-// - morning: sent at ~8:00 AM in each registrant's own timezone on the session
+// - morning: sent in the 9 AM hour in each registrant's own timezone on the session
 //   day. Timezone comes from form_submissions.timezone (captured at signup);
 //   older signups fall back to the round side (West rounds → Pacific, others →
 //   Eastern).
-// - start: sent when the live session is about to begin (within the next
-//   ~45 min), includes the join link.
+// - start: dispatched at session start, never before it.
+// - onehour: dispatched exactly 60 minutes before session start.
 // - reminder: sent 2–3 hours after each signup (prerequisite video + add to
 //   calendar). Skipped when the session starts within the next 6 hours —
 //   those people get the morning/start emails instead.
@@ -15,6 +15,7 @@
 // Manual mode (admin): { "round_id": "...", "kind": "morning" | "start" |
 //   "reminder", "testEmail": "you@x.com" }
 import { isInternalOrAdmin, deny, escapeHtml } from "../_shared/caller-auth.ts";
+import { webinarSendIsDue } from "../_shared/webinar-timing.ts";
 import { buildUnsubUrl, unsubHeaders, appendUnsubFooter, fetchUnsubscribed } from "../_shared/unsubscribe.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -23,9 +24,9 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-timezone, x-cron-secret",
 };
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
-const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") || "";
+const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 const MONITOR_EMAIL = "darertebatim@gmail.com";
@@ -432,6 +433,11 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
   const sessionStart = new Date(round.first_session_date);
   const now = new Date();
 
+  if (!testEmail && (kind === "onehour" || kind === "start") &&
+      !webinarSendIsDue(round.first_session_date, kind, now.getTime())) {
+    return { round: round.round_name, kind, recipients: 0, sent: 0, failed: 0, skipped: "Outside exact send time" };
+  }
+
   let registrants: Registrant[] = testEmail
     ? [{ email: testEmail.toLowerCase(), name: "دوست عزیز", timezone: null, created_at: null }]
     : await collectRegistrants(round.id);
@@ -536,6 +542,12 @@ Deno.serve(async (req) => {
     if (!RESEND_API_KEY) throw new Error("Email service not configured");
 
     const body = await req.json().catch(() => ({}));
+    if ((body.kind && !["morning", "start", "reminder", "onehour"].includes(body.kind)) ||
+        (body.round_id && (typeof body.round_id !== "string" || !/^[0-9a-f-]{36}$/i.test(body.round_id))) ||
+        (body.testEmail && (typeof body.testEmail !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.testEmail))) ||
+        (!!body.round_id !== !!body.kind)) {
+      return new Response(JSON.stringify({ error: "Invalid round, email kind or test address" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
     const now = Date.now();
     const roundCols = "id, round_name, round_number, first_session_date, google_meet_link";
 
@@ -546,6 +558,7 @@ Deno.serve(async (req) => {
         .from("program_rounds")
         .select(roundCols)
         .eq("id", body.round_id)
+        .eq("program_slug", "igadsfree")
         .single();
       if (error || !data) throw new Error("Round not found");
       rounds = [{ round: data, kind: body.kind as Kind }];
@@ -560,25 +573,7 @@ Deno.serve(async (req) => {
       if (e1) throw e1;
       for (const r of morningRounds || []) rounds.push({ round: r, kind: "morning" });
 
-      // Start: sessions beginning within the next 45 min (or just started).
-      const { data: startRounds, error: e2 } = await supabase
-        .from("program_rounds")
-        .select(roundCols)
-        .eq("program_slug", "igadsfree")
-        .gte("first_session_date", new Date(now - 15 * 60_000).toISOString())
-        .lte("first_session_date", new Date(now + 45 * 60_000).toISOString());
-      if (e2) throw e2;
-      for (const r of startRounds || []) rounds.push({ round: r, kind: "start" });
-
-      // One hour before: sessions starting 45–105 min from now (hourly cron).
-      const { data: hourRounds, error: e4 } = await supabase
-        .from("program_rounds")
-        .select(roundCols)
-        .eq("program_slug", "igadsfree")
-        .gte("first_session_date", new Date(now + 45 * 60_000).toISOString())
-        .lte("first_session_date", new Date(now + 105 * 60_000).toISOString());
-      if (e4) throw e4;
-      for (const r of hourRounds || []) rounds.push({ round: r, kind: "onehour" });
+      // Time-critical emails are invoked by round-specific jobs, not hourly polling.
 
       // Reminder: any future session (per-signup 2–3h window filter applies).
       const { data: reminderRounds, error: e3 } = await supabase
