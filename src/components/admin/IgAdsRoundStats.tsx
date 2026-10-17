@@ -109,15 +109,24 @@ export function IgAdsRoundStats() {
     const metrics = calculateCampaignRoundMetrics(campaigns, rounds, subs, clicks);
     const signupSets: Record<string, Set<string>> = {};
     const roundsByEmail: Record<string, string[]> = {};
+    const roundPages: Record<string, AdPage[]> = {};
+    const signupsByPage: Record<string, Partial<Record<AdPage, number>>> = {};
+    const pageOfSource = (source: string): AdPage => (source.startsWith('aliagads') ? 'aliagads' : 'igads');
     for (const s of subs) {
       if (!regSources.includes(s.source) || !s.round_id) continue;
       const e = norm(s.email);
       if (!e) continue;
-      (signupSets[s.round_id] ||= new Set()).add(e);
+      const page = pageOfSource(s.source);
+      if (!(roundPages[s.round_id] ||= []).includes(page)) roundPages[s.round_id].push(page);
+      if (!(signupSets[s.round_id] ||= new Set()).has(e)) {
+        signupSets[s.round_id].add(e);
+        signupsByPage[s.round_id] ||= {};
+        signupsByPage[s.round_id][page] = (signupsByPage[s.round_id][page] || 0) + 1;
+      }
       (roundsByEmail[e] ||= []).includes(s.round_id) || roundsByEmail[e].push(s.round_id);
     }
     const spend = spendReport
-      ? allocateRoundSpend(rounds.map((r) => ({ id: r.id, first_session_date: r.first_session_date, signups: signupSets[r.id]?.size || 0 })), spendReport)
+      ? allocateRoundSpend(rounds.map((r) => ({ id: r.id, first_session_date: r.first_session_date, signups: signupSets[r.id]?.size || 0 })), spendReport, roundPages, signupsByPage)
       : {};
     const revenue = attributeRevenue(rounds, roundsByEmail, orders);
     const acqEnrolled = attributeEnrollments(rounds, roundsByEmail, acqEnrollments);
