@@ -210,7 +210,10 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
     : await collectRegistrants(round.id);
 
   if (!testEmail) {
-    const [unsub, alreadySent] = await Promise.all([fetchUnsubscribed(supabase), collectAlreadySent(subject)]);
+    const [unsub, alreadySent] = await Promise.all([
+      fetchUnsubscribed(supabase, registrants.map((r) => r.email)),
+      collectAlreadySent(subject),
+    ]);
     registrants = registrants.filter((r) => !unsub.has(r.email) && !alreadySent.has(r.email));
   }
 
