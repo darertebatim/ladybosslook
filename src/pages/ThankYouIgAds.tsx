@@ -93,7 +93,7 @@ export default function ThankYouIgAds() {
       return null;
     }
   }, []);
-  const registeredEmail = ((location.state as any)?.email || stored?.email) as string | undefined;
+  const registeredEmail = ((location.state as any)?.email || searchParams.get("email") || stored?.email) as string | undefined;
   const registeredRoundId = ((location.state as any)?.roundId || stored?.roundId) as string | undefined;
   const [fallbackDetails, setFallbackDetails] = useState<{ name?: string; city?: string }>({});
   const registeredName = (((location.state as any)?.name || stored?.name || fallbackDetails.name) as string | undefined);
