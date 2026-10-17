@@ -136,19 +136,19 @@ export interface StaticRoundStat {
  * only current/future rounds are calculated dynamically.
  */
 export const STATIC_ROUND_STATS: StaticRoundStat[] = [
-  { roundNumber: 12, name: 'Round 12 (West)', date: '2026-09-25T21:00:00Z', signups: 143, calendar: null, showups: null, opens: {}, spend: 177.53, enrollments: 3, revenue: 575.54 },
-  { roundNumber: 11, name: 'Round 11 (East)', date: '2026-09-25T18:00:00Z', signups: 191, calendar: null, showups: null, opens: {}, spend: 237.15, enrollments: 7, revenue: 475.21 },
-  { roundNumber: 9, name: 'Round 9 (Last Chance)', date: '2026-09-20T18:00:00Z', signups: 150, calendar: null, showups: null, opens: {}, spend: 117.04, enrollments: 5, revenue: 675.3 },
+  { roundNumber: 12, name: 'Round 12 (West)', date: '2026-09-25T21:00:00Z', signups: 143, calendar: null, showups: null, opens: {}, spend: 177.53, enrollments: 3, revenue: 417.81 },
+  { roundNumber: 11, name: 'Round 11 (East)', date: '2026-09-25T18:00:00Z', signups: 191, calendar: null, showups: null, opens: {}, spend: 237.15, enrollments: 5, revenue: 754.12 },
+  { roundNumber: 9, name: 'Round 9 (Last Chance)', date: '2026-09-20T18:00:00Z', signups: 150, calendar: null, showups: null, opens: {}, spend: 117.04, enrollments: 4, revenue: 675.3 },
   { roundNumber: 22, name: 'Round 22 (West)', date: '2026-10-17T01:00:00Z', signups: 38, calendar: 15, showups: 8, opens: { signup: 45, reminder: 50, morning: 48, start: 47 }, spend: 81.2, enrollments: 0, revenue: 0 },
   { roundNumber: 21, name: 'Round 21 (East)', date: '2026-10-16T22:00:00Z', signups: 114, calendar: 48, showups: 20, opens: { signup: 49, reminder: 56, morning: 54, start: 52 }, spend: 240.5, enrollments: 0, revenue: 0 },
-  { roundNumber: 20, name: 'Round 20 (Morning)', date: '2026-10-16T18:00:00Z', signups: 264, calendar: 93, showups: 38, opens: { signup: 44, reminder: 59, morning: 46, start: 49 }, spend: 542.3, enrollments: 2, revenue: 336 },
-  { roundNumber: 19, name: 'Round 19 (Ali IG Ads)', date: '2026-10-15T01:00:00Z', signups: 258, calendar: 33, showups: 38, opens: { signup: 61, reminder: 50, morning: 54, start: 52 }, spend: 540.19, enrollments: 10, revenue: 1386 },
-  { roundNumber: 18, name: 'Round 18 (West)', date: '2026-10-13T01:00:00Z', signups: 78, calendar: null, showups: 10, opens: { signup: 67, reminder: 68, morning: 39, start: 55 }, spend: 102.92, enrollments: 3, revenue: 454 },
-  { roundNumber: 17, name: 'Round 17 (East)', date: '2026-10-11T18:00:00Z', signups: 202, calendar: null, showups: 25, opens: { signup: 70, reminder: 72, morning: 42, start: 58 }, spend: 246.19, enrollments: 6, revenue: 906 },
-  { roundNumber: 16, name: 'Round 16 (Morning)', date: '2026-10-08T18:00:00Z', signups: 307, calendar: null, showups: 28, opens: { signup: 68, reminder: 65, morning: 44, start: 48 }, spend: 553.2, enrollments: 5, revenue: 1308 },
-  { roundNumber: 15, name: 'Round 15 (Morning)', date: '2026-10-04T18:00:00Z', signups: 237, calendar: null, showups: 18, opens: { signup: 73, reminder: 68, morning: 45, start: 47 }, spend: 350.15, enrollments: 9, revenue: 2141 },
-  { roundNumber: 14, name: 'Round 14 (Morning)', date: '2026-10-01T18:00:00Z', signups: 252, calendar: null, showups: 25, opens: { signup: 71, reminder: 66, morning: 46, start: 50 }, spend: 365.41, enrollments: 6, revenue: 1427 },
-  { roundNumber: 13, name: 'Round 13 (Morning)', date: '2026-09-27T18:00:00Z', signups: 369, calendar: null, showups: 20, opens: { signup: 74, reminder: 70, morning: 48, start: 51 }, spend: 424.59, enrollments: 7, revenue: 1571 },
+  { roundNumber: 20, name: 'Round 20 (Morning)', date: '2026-10-16T18:00:00Z', signups: 264, calendar: 93, showups: 38, opens: { signup: 44, reminder: 59, morning: 46, start: 49 }, spend: 542.3, enrollments: 5, revenue: 869.38 },
+  { roundNumber: 19, name: 'Round 19 (Ali IG Ads)', date: '2026-10-15T01:00:00Z', signups: 258, calendar: 33, showups: 38, opens: { signup: 61, reminder: 50, morning: 54, start: 52 }, spend: 540.19, enrollments: 10, revenue: 1385.7 },
+  { roundNumber: 18, name: 'Round 18 (West)', date: '2026-10-13T01:00:00Z', signups: 78, calendar: null, showups: 10, opens: { signup: 67, reminder: 68, morning: 39, start: 55 }, spend: 102.92, enrollments: 6, revenue: 946.61 },
+  { roundNumber: 17, name: 'Round 17 (East)', date: '2026-10-11T18:00:00Z', signups: 202, calendar: null, showups: 25, opens: { signup: 70, reminder: 72, morning: 42, start: 58 }, spend: 246.19, enrollments: 3, revenue: 413.76 },
+  { roundNumber: 16, name: 'Round 16 (Morning)', date: '2026-10-08T18:00:00Z', signups: 307, calendar: null, showups: 28, opens: { signup: 68, reminder: 65, morning: 44, start: 48 }, spend: 553.2, enrollments: 4, revenue: 1099.8 },
+  { roundNumber: 15, name: 'Round 15 (Morning)', date: '2026-10-04T18:00:00Z', signups: 237, calendar: null, showups: 18, opens: { signup: 73, reminder: 68, morning: 45, start: 47 }, spend: 350.15, enrollments: 8, revenue: 1843.83 },
+  { roundNumber: 14, name: 'Round 14 (Morning)', date: '2026-10-01T18:00:00Z', signups: 252, calendar: null, showups: 25, opens: { signup: 71, reminder: 66, morning: 46, start: 50 }, spend: 365.41, enrollments: 5, revenue: 1130.16 },
+  { roundNumber: 13, name: 'Round 13 (Morning)', date: '2026-09-27T18:00:00Z', signups: 369, calendar: null, showups: 20, opens: { signup: 74, reminder: 70, morning: 48, start: 51 }, spend: 424.59, enrollments: 12, revenue: 1570.73 },
 ];
 
 /** Average of the available per-email open rates (ignores missing kinds). */
