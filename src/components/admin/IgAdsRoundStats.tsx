@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Download } from 'lucide-react';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 import { calculateCampaignRoundMetrics } from '@/lib/campaignRoundMetrics';
-import { adSetPage, allocateRoundSpend, attributeEnrollments, attributeRevenue, autoEmailKind, type AdPage, type AutoEmailKind, type DailySpendRow } from '@/lib/igAdsRoundStats';
+import { adSetPage, allocateRoundSpend, attributeEnrollments, attributeRevenue, autoEmailKind, averageOpenRate, STATIC_ROUND_STATS, type AdPage, type AutoEmailKind, type DailySpendRow } from '@/lib/igAdsRoundStats';
 import { getLocalDateStr } from '@/lib/localDate';
 
 const campaigns = LEAD_CAMPAIGNS.filter((c) => c.key === 'igads' || c.key === 'aliagads');
@@ -131,7 +131,7 @@ export function IgAdsRoundStats() {
     const revenue = attributeRevenue(rounds, roundsByEmail, orders);
     const acqEnrolled = attributeEnrollments(rounds, roundsByEmail, acqEnrollments);
 
-    return rounds.map((r) => {
+    const dynamic = rounds.map((r) => {
       const people = signupSets[r.id] || new Set<string>();
       const start = r.first_session_date ? Date.parse(r.first_session_date) : NaN;
       const opens = {} as Record<AutoEmailKind, number | null>;
@@ -154,18 +154,34 @@ export function IgAdsRoundStats() {
       }, { calendar: 0, attendees: 0 });
       return {
         id: r.id, name: r.round_name || `Round ${r.round_number ?? '?'}`, date: r.first_session_date, status: r.status,
-        signups: people.size, calendar: m.calendar, showups: m.attendees, opens,
+        signups: people.size, calendar: m.calendar as number | null, showups: m.attendees, opens,
         spend: spendReport ? spend[r.id] ?? 0 : null, enrollments: acqEnrolled[r.id] || 0, revenue: revenue[r.id] || 0,
       };
     });
+    // Finished rounds render from the frozen verified snapshot; only rounds not
+    // in the snapshot (current/future) use the live calculation.
+    const staticByNumber = new Map(STATIC_ROUND_STATS.map((s) => [s.roundNumber, s]));
+    const merged = dynamic.map((row) => {
+      const num = Number((row.name.match(/(\d+)/) || [])[1]);
+      const s = staticByNumber.get(num);
+      if (!s) return row;
+      return { ...row, name: s.name, date: s.date, signups: s.signups, calendar: s.calendar, showups: s.showups, opens: s.opens, spend: s.spend, enrollments: s.enrollments, revenue: s.revenue };
+    });
+    const covered = new Set(merged.map((row) => Number((row.name.match(/(\d+)/) || [])[1])));
+    const missing = STATIC_ROUND_STATS.filter((s) => !covered.has(s.roundNumber)).map((s) => ({
+      id: `static-${s.roundNumber}`, name: s.name, date: s.date, status: 'static',
+      signups: s.signups, calendar: s.calendar, showups: s.showups, opens: s.opens,
+      spend: s.spend as number | null, enrollments: s.enrollments, revenue: s.revenue,
+    }));
+    return [...merged, ...missing].sort((a, b) => Date.parse(b.date || '') - Date.parse(a.date || ''));
   }, [rounds, subs, clicks, events, acqEnrollments, orders, spendReport]);
 
   const money = (v: number | null) => (v === null ? '—' : `$${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}`);
   const pct = (v: number | null) => (v === null ? '—' : `${v}%`);
 
   const exportCsv = () => {
-    const head = ['Round', 'Date', 'Sign-ups', 'Calendar adds', 'Show-ups', 'Sign-up email open %', 'Reminder open %', 'Morning open %', 'Start now open %', 'Ad spend', 'Acquisition enrollments', 'Acquisition revenue'];
-    const lines = rows.map((r) => [r.name, r.date || '', r.signups, r.calendar, r.showups, ...KINDS.map((k) => r.opens[k] ?? ''), r.spend ?? '', r.enrollments, r.revenue]);
+    const head = ['Round', 'Date', 'Sign-ups', 'Calendar adds', 'Show-ups', 'Avg email open %', 'Ad spend', 'Acquisition enrollments', 'Acquisition revenue'];
+    const lines = rows.map((r) => [r.name, r.date || '', r.signups, r.calendar ?? '', r.showups, averageOpenRate(r.opens) ?? '', r.spend ?? '', r.enrollments, r.revenue]);
     const csv = [head, ...lines].map((l) => l.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
@@ -179,7 +195,7 @@ export function IgAdsRoundStats() {
         <div>
           <CardTitle>IG Ads Rounds (both pages)</CardTitle>
           <p className="text-sm text-muted-foreground">
-            IG Ads + IG Ads (Ali) combined. Open rates = opened ÷ delivered among this round's sign-ups. Ad spend = webinar ad sets, split by landing page (Ali link vs main link), each day's spend going to the round that page was promoting. Acquisition enrollments / revenue = people who joined or bought the Acquisition program within 14 days after their round.
+            IG Ads + IG Ads (Ali) combined. Finished rounds (13–22) show frozen verified numbers; current and future rounds calculate live. Avg email open = average of the 4 automated emails (opened ÷ delivered among this round's sign-ups). Ad spend = webinar ad sets, split by landing page. Acquisition enrollments / revenue = people who joined or bought the Acquisition program within 14 days after their round.
           </p>
           {spendError && <p className="text-xs text-destructive">Ad spend could not load: {(spendError as Error).message}</p>}
         </div>
@@ -198,10 +214,7 @@ export function IgAdsRoundStats() {
                 <TableHead className="text-right">Sign-ups</TableHead>
                 <TableHead className="text-right">Calendar</TableHead>
                 <TableHead className="text-right">Show-ups</TableHead>
-                <TableHead className="text-right">Sign-up email</TableHead>
-                <TableHead className="text-right">Reminder</TableHead>
-                <TableHead className="text-right">Morning</TableHead>
-                <TableHead className="text-right">Start now</TableHead>
+                <TableHead className="text-right">Avg email open</TableHead>
                 <TableHead className="text-right">Ad spend</TableHead>
                 <TableHead className="text-right">Acq. enrollments</TableHead>
                 <TableHead className="text-right">Acq. revenue</TableHead>
@@ -218,9 +231,9 @@ export function IgAdsRoundStats() {
                     </p>
                   </TableCell>
                   <TableCell className="text-right font-semibold tabular-nums">{r.signups}</TableCell>
-                  <TableCell className="text-right tabular-nums">{r.calendar}</TableCell>
+                  <TableCell className="text-right tabular-nums">{r.calendar ?? '—'}</TableCell>
                   <TableCell className="text-right tabular-nums">{r.showups}</TableCell>
-                  {KINDS.map((k) => <TableCell key={k} className="text-right tabular-nums">{pct(r.opens[k])}</TableCell>)}
+                  <TableCell className="text-right tabular-nums">{pct(averageOpenRate(r.opens))}</TableCell>
                   <TableCell className="text-right tabular-nums">{money(r.spend)}</TableCell>
                   <TableCell className="text-right tabular-nums">{r.enrollments}</TableCell>
                   <TableCell className="text-right font-semibold tabular-nums">{money(r.revenue)}</TableCell>
