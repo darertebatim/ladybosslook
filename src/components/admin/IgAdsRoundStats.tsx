@@ -199,7 +199,7 @@ export function IgAdsRoundStats() {
       open: openVals.length ? Math.round(openVals.reduce((a, b) => a + b, 0) / openVals.length) : null,
       spend, revenue,
       sales: list.reduce((a, r) => a + r.enrollments, 0),
-      cpl: spend !== null && signups > 0 ? spend / signups : null,
+      cpl: spend !== null && spendSignups > 0 ? spend / spendSignups : null,
       roas: spend !== null && spend > 0 ? revenue / spend : null,
     };
   };
