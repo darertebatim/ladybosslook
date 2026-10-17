@@ -26,9 +26,9 @@ Deno.serve(async (req) => {
     });
     if (permissionError || !allowed) return json({ error: 'You do not have access to payments.' }, 403);
 
-    const { since, until } = await req.json();
+    const { since, until, daily } = await req.json();
     if (!validDateRange(since, until)) return json({ error: 'Choose a valid start and end date.' }, 400);
-    const key = `${since}|${until}`;
+    const key = `${since}|${until}|${daily ? 'daily' : 'total'}`;
     const saved = cache.get(key);
     if (saved && saved.expires > Date.now()) return json(saved.data);
 
@@ -56,7 +56,7 @@ Deno.serve(async (req) => {
     do {
       const page = await read(`act_${ACCOUNT_ID}/insights`, {
         fields: 'campaign_id,campaign_name,spend,date_start,date_stop', level: 'campaign',
-        time_range: JSON.stringify({ since, until }), limit: '500', ...(after ? { after } : {}),
+        time_range: JSON.stringify({ since, until }), limit: '500', ...(daily ? { time_increment: '1' } : {}), ...(after ? { after } : {}),
       });
       campaigns.push(...(page.data ?? []));
       const next = page.paging?.next ? page.paging?.cursors?.after : undefined;
