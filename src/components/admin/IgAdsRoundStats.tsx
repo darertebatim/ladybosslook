@@ -193,7 +193,7 @@ export function IgAdsRoundStats() {
       label,
       signups,
       calendar: list.reduce((a, r) => a + (r.calendar ?? 0), 0),
-      showups: list.reduce((a, r) => a + r.showups, 0),
+      showups: list.reduce((a, r) => a + (r.showups ?? 0), 0),
       open: openVals.length ? Math.round(openVals.reduce((a, b) => a + b, 0) / openVals.length) : null,
       spend, revenue,
       sales: list.reduce((a, r) => a + r.enrollments, 0),
@@ -265,7 +265,7 @@ export function IgAdsRoundStats() {
                   </TableCell>
                   <TableCell className="text-right font-semibold tabular-nums">{r.signups}</TableCell>
                   <TableCell className="text-right tabular-nums">{r.calendar ?? '—'}</TableCell>
-                  <TableCell className="text-right tabular-nums">{r.showups}</TableCell>
+                  <TableCell className="text-right tabular-nums">{r.showups ?? '—'}</TableCell>
                   <TableCell className="text-right tabular-nums">{pct(averageOpenRate(r.opens))}</TableCell>
                   <TableCell className="text-right tabular-nums">{money(r.spend)}</TableCell>
                   <TableCell className="text-right tabular-nums">{money2(cplOf(r))}</TableCell>

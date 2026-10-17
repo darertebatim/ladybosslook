@@ -8,8 +8,8 @@ test('Average open rate averages available kinds and ignores missing ones', () =
   assert.equal(averageOpenRate({}), null);
 });
 
-test('Static snapshot covers rounds 13–22 with the verified Round 20 numbers', () => {
-  assert.deepEqual(STATIC_ROUND_STATS.map((s) => s.roundNumber).sort((a, b) => a - b), [13, 14, 15, 16, 17, 18, 19, 20, 21, 22]);
+test('Static snapshot covers rounds 9–22 with the verified Round 20 numbers', () => {
+  assert.deepEqual(STATIC_ROUND_STATS.map((s) => s.roundNumber).sort((a, b) => a - b), [9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]);
   const r20 = STATIC_ROUND_STATS.find((s) => s.roundNumber === 20)!;
   assert.equal(r20.signups, 264);
   assert.equal(r20.spend, 542.3);
