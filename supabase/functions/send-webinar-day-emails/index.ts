@@ -297,20 +297,22 @@ function buildHtml(kind: Kind, name: string, round: any, tz: string, email: stri
 </html>`;
 }
 
-interface Registrant { email: string; name: string; timezone: string | null }
+interface Registrant { email: string; name: string; timezone: string | null; created_at: string | null }
 
 async function collectRegistrants(roundId: string): Promise<Registrant[]> {
   const map = new Map<string, Registrant>();
   for (let page = 0; page < 10; page++) {
     const { data, error } = await supabase
       .from("form_submissions")
-      .select("email, name, timezone")
+      .select("email, name, timezone, created_at")
       .eq("round_id", roundId)
       .range(page * 1000, page * 1000 + 999);
     if (error) throw error;
     for (const r of data || []) {
       const e = String(r.email || "").trim().toLowerCase();
-      if (e && !map.has(e)) map.set(e, { email: e, name: String(r.name || "دوست عزیز"), timezone: r.timezone || null });
+      if (e && !map.has(e)) {
+        map.set(e, { email: e, name: String(r.name || "دوست عزیز"), timezone: r.timezone || null, created_at: r.created_at || null });
+      }
     }
     if (!data || data.length < 1000) break;
   }
