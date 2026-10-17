@@ -223,7 +223,7 @@ export function IgAdsRoundStats() {
         <div>
           <CardTitle>IG Ads Rounds (both pages)</CardTitle>
           <p className="text-sm text-muted-foreground">
-            IG Ads + IG Ads (Ali) combined. Finished rounds (13–22) show frozen verified numbers; current and future rounds calculate live. Avg email open = average of the 4 automated emails (opened ÷ delivered among this round's sign-ups). Ad spend = webinar ad sets, split by landing page. Acquisition enrollments / revenue = people who joined or bought the Acquisition program within 14 days after their round.
+            IG Ads + IG Ads (Ali) combined. Rounds marked Locked show frozen verified numbers (13–22); all other rounds calculate live. Avg email open = average of the 4 automated emails (opened ÷ delivered among this round's sign-ups). Ad spend = webinar ad sets, split by landing page. Cost / Lead = spend ÷ sign-ups. ROAS = revenue ÷ spend. Acq. Sales / Revenue = people who joined or bought the Acquisition program within 14 days after their round.
           </p>
           {spendError && <p className="text-xs text-destructive">Ad spend could not load: {(spendError as Error).message}</p>}
         </div>
