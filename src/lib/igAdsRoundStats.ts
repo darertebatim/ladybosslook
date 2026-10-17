@@ -14,28 +14,48 @@ const laDate = (iso: string) =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Los_Angeles' }).format(new Date(iso));
 
 export interface SpendRound { id: string; first_session_date: string | null; signups: number }
+export type AdPage = 'igads' | 'aliagads';
+export interface DailySpendRow { date: string; spend: number; page: AdPage }
+
+/** Classify an ad set by the landing page its ads link to (Ali link vs main IG Ads link). */
+export function adSetPage(adsetName: string | null, campaignName: string | null): AdPage {
+  return /ali/i.test(`${adsetName || ''} ${campaignName || ''}`) ? 'aliagads' : 'igads';
+}
 
 /**
- * Ad spend per round: each round gets the spend from the day after the previous
- * session day up to its own session day (ad account time). Rounds on the same day
- * split that window by their share of sign-ups.
+ * Ad spend per round, split by landing page. Each page's daily spend goes to the
+ * next session that page was promoting on that day (the first session on or after
+ * the spend day, among rounds that page actually collected sign-ups for — plus
+ * rounds with no sign-ups yet, so freshly locked rounds still receive spend).
+ * Same-day rounds within one page split by that page's share of sign-ups.
  */
-export function allocateRoundSpend(rounds: SpendRound[], dailySpend: Record<string, number>): Record<string, number> {
-  const dated = rounds.filter((r) => r.first_session_date).map((r) => ({ ...r, day: laDate(r.first_session_date!) }));
-  const days = [...new Set(dated.map((r) => r.day))].sort();
+export function allocateRoundSpend(
+  rounds: SpendRound[],
+  dailyRows: DailySpendRow[],
+  roundPages: Record<string, AdPage[]>,
+): Record<string, number> {
   const result: Record<string, number> = {};
-  days.forEach((day, i) => {
-    const prev = i > 0 ? days[i - 1] : '';
-    const windowSpend = Object.entries(dailySpend)
-      .filter(([d]) => d > prev && d <= day)
-      .reduce((sum, [, v]) => sum + v, 0);
-    const group = dated.filter((r) => r.day === day);
-    const totalSignups = group.reduce((s, r) => s + r.signups, 0);
-    for (const r of group) {
-      const share = totalSignups > 0 ? r.signups / totalSignups : 1 / group.length;
-      result[r.id] = Math.round(windowSpend * share * 100) / 100;
+  const dated = rounds.filter((r) => r.first_session_date).map((r) => ({ ...r, day: laDate(r.first_session_date!) }));
+  for (const page of ['igads', 'aliagads'] as AdPage[]) {
+    const pageRows = dailyRows.filter((r) => r.page === page && r.spend > 0);
+    if (!pageRows.length) continue;
+    // Rounds this page promotes: rounds with sign-ups from this page, or none yet.
+    const candidates = dated
+      .filter((r) => !roundPages[r.id] || roundPages[r.id].length === 0 || roundPages[r.id].includes(page))
+      .sort((a, b) => a.day.localeCompare(b.day));
+    if (!candidates.length) continue;
+    const sessionDays = [...new Set(candidates.map((r) => r.day))];
+    for (const row of pageRows) {
+      const day = sessionDays.find((d) => d >= row.date) || sessionDays[sessionDays.length - 1];
+      if (row.date > sessionDays[sessionDays.length - 1]) continue; // spend after the last session
+      const group = candidates.filter((r) => r.day === day);
+      const totalSignups = group.reduce((s, r) => s + r.signups, 0);
+      for (const r of group) {
+        const share = totalSignups > 0 ? r.signups / totalSignups : 1 / group.length;
+        result[r.id] = Math.round(((result[r.id] || 0) + row.spend * share) * 100) / 100;
+      }
     }
-  });
+  }
   return result;
 }
 
