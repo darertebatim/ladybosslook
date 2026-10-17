@@ -212,6 +212,24 @@ export function RichTextEditor({ value, onChange, placeholder, className, imageB
         .ql-toolbar button.ql-active .ql-fill {
           fill: hsl(var(--primary));
         }
+        .ql-toolbar button.ql-addtocart::after {
+          content: 'Add to Cart';
+          font-size: 12px;
+          font-weight: 600;
+        }
+        .ql-editor .rilo-cart-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0.75rem 0;
+          padding: 0.6rem 1.25rem;
+          border-radius: 9999px;
+          background: hsl(var(--primary));
+          color: hsl(var(--primary-foreground));
+          font-weight: 700;
+          font-size: 0.875rem;
+          cursor: default;
+        }
       `}</style>
     </div>
   );
