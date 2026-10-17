@@ -417,7 +417,7 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
           from: FROM,
           to: [r.email],
           subject,
-          html: appendUnsubFooter(buildHtml(kind, r.name, round, tz, unsubscribeUrl), unsubscribeUrl),
+          html: appendUnsubFooter(buildHtml(kind, r.name, round, tz, r.email), unsubscribeUrl),
           reply_to: "support@ladybosslook.com",
           tags: [
             { name: "campaign", value: "webinar_day" },
@@ -489,6 +489,16 @@ Deno.serve(async (req) => {
         .lte("first_session_date", new Date(now + 45 * 60_000).toISOString());
       if (e2) throw e2;
       for (const r of startRounds || []) rounds.push({ round: r, kind: "start" });
+
+      // Reminder: any future session (per-signup 2–3h window filter applies).
+      const { data: reminderRounds, error: e3 } = await supabase
+        .from("program_rounds")
+        .select(roundCols)
+        .eq("program_slug", "igadsfree")
+        .gte("first_session_date", new Date(now + 6 * 3600_000).toISOString())
+        .lte("first_session_date", new Date(now + 14 * 24 * 3600_000).toISOString());
+      if (e3) throw e3;
+      for (const r of reminderRounds || []) rounds.push({ round: r, kind: "reminder" });
     }
 
     const results = [];
