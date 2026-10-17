@@ -445,12 +445,12 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
   }
 
   if (kind === "morning" && !testEmail) {
-    // Only recipients whose local time is 8:00–8:59 AM on the session day.
+    // Only recipients whose local time is 9:00–9:59 AM on the session day.
     registrants = registrants.filter((r) => {
       const tz = registrantTz(r.timezone, round.round_name || "");
       const nowLocal = tzParts(now, tz);
       const sessionLocal = tzParts(sessionStart, tz);
-      return nowLocal.hour === 8 && nowLocal.date === sessionLocal.date;
+      return nowLocal.hour === 9 && nowLocal.date === sessionLocal.date;
     });
   }
 
