@@ -8,9 +8,12 @@
 //   Eastern).
 // - start: sent when the live session is about to begin (within the next
 //   ~45 min), includes the join link.
+// - reminder: sent 2–3 hours after each signup (prerequisite video + add to
+//   calendar). Skipped when the session starts within the next 6 hours —
+//   those people get the morning/start emails instead.
 //
-// Manual mode (admin): { "round_id": "...", "kind": "morning" | "start",
-//   "testEmail": "you@x.com" }
+// Manual mode (admin): { "round_id": "...", "kind": "morning" | "start" |
+//   "reminder", "testEmail": "you@x.com" }
 import { isInternalOrAdmin, deny, escapeHtml } from "../_shared/caller-auth.ts";
 import { buildUnsubUrl, unsubHeaders, appendUnsubFooter, fetchUnsubscribed } from "../_shared/unsubscribe.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -29,7 +32,7 @@ const FROM = "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>";
 const SUPPORT_URL =
   "https://ladyboss.onelink.me/lt6v?af_xp=custom&pid=email_support&c=webinar_day&deep_link_value=support&af_web_dp=https%3A%2F%2Fladybosslook.com%2Fdashboard%2Fchat";
 
-type Kind = "morning" | "start";
+type Kind = "morning" | "start" | "reminder";
 
 // Subjects keep the prefixes that src/lib/igAdsRoundStats.ts uses to classify
 // automated emails for open-rate stats. Copy matches the proven manual
@@ -37,6 +40,7 @@ type Kind = "morning" | "start";
 const SUBJECTS: Record<Kind, string> = {
   morning: "امروز: جذب مشتری واقعی با تبلیغات اینستاگرام 🌷",
   start: "وبینار در حال شروع است — همین حالا وارد شوید 🚀",
+  reminder: "یادآوری وبینار اینستاگرام ادز + ویدیوی پیش‌نیاز 🌷",
 };
 
 function tzParts(d: Date, tz: string): { hour: number; date: string } {
