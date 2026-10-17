@@ -185,8 +185,10 @@ export function IgAdsRoundStats() {
   type Row = (typeof rows)[number];
   const summarize = (label: string, list: Row[]) => {
     const signups = list.reduce((a, r) => a + r.signups, 0);
-    const spendVals = list.map((r) => r.spend).filter((v): v is number => v !== null);
+    const withSpend = list.filter((r) => r.spend !== null && r.spend > 0);
+    const spendVals = withSpend.map((r) => r.spend as number);
     const spend = spendVals.length ? spendVals.reduce((a, b) => a + b, 0) : null;
+    const spendSignups = withSpend.reduce((a, r) => a + r.signups, 0);
     const revenue = list.reduce((a, r) => a + r.revenue, 0);
     const openVals = list.map((r) => averageOpenRate(r.opens)).filter((v): v is number => v !== null);
     return {
@@ -197,7 +199,7 @@ export function IgAdsRoundStats() {
       open: openVals.length ? Math.round(openVals.reduce((a, b) => a + b, 0) / openVals.length) : null,
       spend, revenue,
       sales: list.reduce((a, r) => a + r.enrollments, 0),
-      cpl: spend !== null && signups > 0 ? spend / signups : null,
+      cpl: spend !== null && spendSignups > 0 ? spend / spendSignups : null,
       roas: spend !== null && spend > 0 ? revenue / spend : null,
     };
   };
