@@ -55,7 +55,8 @@ Deno.serve(async (req) => {
     let after: string | undefined;
     do {
       const page = await read(`act_${ACCOUNT_ID}/insights`, {
-        fields: 'campaign_id,campaign_name,spend,date_start,date_stop', level: 'campaign',
+        fields: daily ? 'campaign_id,campaign_name,adset_id,adset_name,spend,date_start,date_stop' : 'campaign_id,campaign_name,spend,date_start,date_stop',
+        level: daily ? 'adset' : 'campaign',
         time_range: JSON.stringify({ since, until }), limit: '500', ...(daily ? { time_increment: '1' } : {}), ...(after ? { after } : {}),
       });
       campaigns.push(...(page.data ?? []));
