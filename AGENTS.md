@@ -3,5 +3,5 @@
 - Desktop Support uses the shared resizable-panel primitives with browser-saved widths; ChatPanel opts in so mobile chat layouts stay unchanged.
 - Campaign round reporting uses paginated internal records and unique emails; shared gift-page attendance is attributed by live-session time and registration source so campaigns sharing a round do not double-count attendees.
 - Payment-success presentation settings live on program_catalog independently of promotional videos and meeting entitlements, so hiding post-payment UI never changes booking access elsewhere.
-- Manual payments use one shared admin dialog and an idempotent, security-invoker transactional RPC so payment recording and optional enrollment succeed together under existing account access rules.
+- Manual payments use one shared admin dialog and an idempotent, security-invoker transactional RPC; resolve linked accounts through RLS-protected tables rather than service-only helpers so admin recording works without widening account access.
 - Payments recorded against existing enrollments must not modify enrollment or round assignments; the enrollment form records its optional payment only after the existing enrollment service succeeds and reports partial failures explicitly.
