@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Download } from 'lucide-react';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 import { calculateCampaignRoundMetrics } from '@/lib/campaignRoundMetrics';
-import { adSetPage, allocateRoundSpend, attributeEnrollments, attributeRevenue, autoEmailKind, type AdPage, type AutoEmailKind, type DailySpendRow } from '@/lib/igAdsRoundStats';
+import { adSetPage, allocateRoundSpend, attributeEnrollments, attributeRevenue, autoEmailKind, averageOpenRate, STATIC_ROUND_STATS, type AdPage, type AutoEmailKind, type DailySpendRow } from '@/lib/igAdsRoundStats';
 import { getLocalDateStr } from '@/lib/localDate';
 
 const campaigns = LEAD_CAMPAIGNS.filter((c) => c.key === 'igads' || c.key === 'aliagads');
