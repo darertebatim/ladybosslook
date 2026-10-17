@@ -1,6 +1,20 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { adSetPage, allocateRoundSpend, attributeEnrollments, attributeRevenue, autoEmailKind } from './igAdsRoundStats';
+import { adSetPage, allocateRoundSpend, attributeEnrollments, attributeRevenue, autoEmailKind, averageOpenRate, STATIC_ROUND_STATS } from './igAdsRoundStats';
+
+test('Average open rate averages available kinds and ignores missing ones', () => {
+  assert.equal(averageOpenRate({ signup: 44, reminder: 59, morning: 46, start: 49 }), 50);
+  assert.equal(averageOpenRate({ signup: 40, start: 60 }), 50);
+  assert.equal(averageOpenRate({}), null);
+});
+
+test('Static snapshot covers rounds 13–22 with the verified Round 20 numbers', () => {
+  assert.deepEqual(STATIC_ROUND_STATS.map((s) => s.roundNumber).sort((a, b) => a - b), [13, 14, 15, 16, 17, 18, 19, 20, 21, 22]);
+  const r20 = STATIC_ROUND_STATS.find((s) => s.roundNumber === 20)!;
+  assert.equal(r20.signups, 264);
+  assert.equal(r20.spend, 542.3);
+  assert.equal(r20.revenue, 336);
+});
 
 test('Automated email subjects map to the four webinar emails', () => {
   assert.equal(autoEmailKind('تایید ثبت‌نام: Instagram Ads'), 'signup');
