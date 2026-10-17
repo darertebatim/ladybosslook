@@ -157,8 +157,8 @@ export function WebinarAutomationLog() {
                     <th className="py-2 pr-3">Round</th>
                     <th className="py-2 pr-3">Session</th>
                     <th className="py-2 pr-3">Signups</th>
-                    <th className="py-2 pr-3">Morning (East 8 AM)</th>
-                    <th className="py-2 pr-3">Morning (West 8 AM)</th>
+                    <th className="py-2 pr-3">Morning (East 9 AM)</th>
+                    <th className="py-2 pr-3">Morning (West 9 AM)</th>
                     <th className="py-2 pr-3">1 hour before</th>
                     <th className="py-2 pr-3">Starting now</th>
                   </tr>
@@ -183,7 +183,7 @@ export function WebinarAutomationLog() {
             </div>
           )}
           <p className="mt-2 text-xs text-muted-foreground">
-            Times shown in your local time. Reminder goes to each person 2–3 hours after they sign up (skipped if the session is less than 6 hours away). Morning goes at 8 AM in each person's own timezone; East/West are shown as examples.
+            Times shown in your local time. Reminder goes to each person 2–3 hours after they sign up (skipped if the session is less than 6 hours away). Morning goes at 9 AM in each person's own timezone; East/West are shown as examples.
           </p>
         </div>
 
