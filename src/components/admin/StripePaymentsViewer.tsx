@@ -1,4 +1,5 @@
 import { csvCell } from '@/lib/csvSafe';
+import { paymentMethodLabel } from '@/lib/manualPayment';
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -33,9 +34,12 @@ interface Order {
   user_id: string | null;
   usd_amount: number | null;
   usd_exchange_rate: number | null;
+  payment_type: string | null;
+  manual_payment_notes: string | null;
+  payment_reference: string | null;
 }
 
-export const StripePaymentsViewer = () => {
+export const StripePaymentsViewer = ({ refreshKey = 0 }: { refreshKey?: number }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +55,7 @@ export const StripePaymentsViewer = () => {
   useEffect(() => {
     fetchOrders();
     fetchPrograms();
-  }, []);
+  }, [refreshKey]);
 
   useEffect(() => {
     filterOrders();
@@ -60,13 +64,15 @@ export const StripePaymentsViewer = () => {
 
   const fetchOrders = async () => {
     try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setOrders(data || []);
+      const allOrders: Order[] = [];
+      for (let from = 0; ; from += 1000) {
+        const { data, error } = await supabase.from('orders').select('*')
+          .order('created_at', { ascending: false }).order('id').range(from, from + 999);
+        if (error) throw error;
+        allOrders.push(...(data || []));
+        if (!data || data.length < 1000) break;
+      }
+      setOrders(allOrders);
     } catch (error) {
       console.error('Error fetching orders:', error);
       toast.error('Failed to load payments');
@@ -295,7 +301,10 @@ export const StripePaymentsViewer = () => {
       'Card Address State',
       'Card Address Country',
       'Customer Email',
-      'Customer Phone'
+      'Customer Phone',
+      'Payment Method',
+      'Payment Reference',
+      'Notes'
     ];
 
     const csvData = filteredOrders.map(order => [
@@ -307,7 +316,10 @@ export const StripePaymentsViewer = () => {
       order.billing_state || '',
       order.billing_country || '',
       order.email,
-      order.phone || ''
+      order.phone || '',
+      paymentMethodLabel(order.payment_type),
+      order.payment_reference || '',
+      order.manual_payment_notes || ''
     ]);
 
     const csvContent = [
@@ -625,7 +637,7 @@ export const StripePaymentsViewer = () => {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Stripe Payments</CardTitle>
+          <CardTitle>Payments</CardTitle>
           <CardDescription>View and export all payment transactions</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -662,12 +674,13 @@ export const StripePaymentsViewer = () => {
                   <TableHead>Location</TableHead>
                   <TableHead className="text-right">Amount</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Method / Reference</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredOrders.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                       No payments found
                     </TableCell>
                   </TableRow>
@@ -752,7 +765,13 @@ export const StripePaymentsViewer = () => {
                             </Badge>
                           )}
                         </TableCell>
-
+                        <TableCell className="max-w-[220px]">
+                          <Badge variant={order.stripe_session_id?.startsWith('manual_') ? 'outline' : 'secondary'}>
+                            {order.stripe_session_id?.startsWith('manual_') ? paymentMethodLabel(order.payment_type) : 'Stripe'}
+                          </Badge>
+                          {order.payment_reference && <p className="text-xs mt-1 break-words">{order.payment_reference}</p>}
+                          {order.manual_payment_notes && <p className="text-xs text-muted-foreground mt-1 break-words">{order.manual_payment_notes}</p>}
+                        </TableCell>
                       </TableRow>
                     );
                   })

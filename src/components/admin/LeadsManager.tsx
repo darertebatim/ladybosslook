@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { ManualPaymentDialog } from '@/components/admin/ManualPaymentDialog';
+import { paymentMethodLabel } from '@/lib/manualPayment';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -807,7 +809,8 @@ export function LeadsManager() {
                       <User className="h-4 w-4" />
                       User Profile
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap justify-end">
+                      <ManualPaymentDialog customer={searchResults.profile} onSaved={handleSearch} />
                       <Dialog open={isEnrollDialogOpen} onOpenChange={setIsEnrollDialogOpen}>
                         <DialogTrigger asChild>
                           <Button variant="outline" size="sm">
@@ -1363,7 +1366,7 @@ export function LeadsManager() {
                               <DollarSign className="h-4 w-4 text-muted-foreground" />
                               <p className="text-sm text-muted-foreground">
                                 {formatCurrency(order.amount, order.currency)}
-                                {order.payment_type && ` • ${order.payment_type}`}
+                                {order.payment_type && ` • ${paymentMethodLabel(order.payment_type)}`}
                               </p>
                             </div>
                             <div className="flex items-center gap-2">
