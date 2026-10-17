@@ -104,9 +104,46 @@ function fmtZoneShort(d: Date, tz: string): string {
   }
 }
 
+const FA_WEEKDAYS = ["یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه", "شنبه"];
+
+function faWeekday(d: Date, tz: string): string {
+  try {
+    const wd = new Intl.DateTimeFormat("en-US", { timeZone: tz, weekday: "long" }).format(d);
+    const idx = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].indexOf(wd);
+    return idx >= 0 ? FA_WEEKDAYS[idx] : "";
+  } catch {
+    return "";
+  }
+}
+
+function icsDate(d: Date): string {
+  return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+}
+
+/** Tracked Google Calendar link (clicks counted via the calendar-click function). */
+function calendarClickUrl(round: any, email: string): string {
+  const start = new Date(round.first_session_date);
+  const end = new Date(start.getTime() + 90 * 60_000);
+  const meet: string = round.google_meet_link || "";
+  const details =
+    `ویدیوی پیش‌نیاز: https://ladybosslook.com/l/igadsfree/thankyou\n` +
+    `لینک ورود: ${meet}\n` +
+    `پشتیبانی: ${SUPPORT_URL}`;
+  const gcal =
+    "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+    `&text=${encodeURIComponent("Instagram Ads وبینار جذب مشتری با اینستاگرام ادز")}` +
+    `&dates=${icsDate(start)}/${icsDate(end)}` +
+    `&details=${encodeURIComponent(details)}` +
+    `&location=${encodeURIComponent(meet)}`;
+  return (
+    `${supabaseUrl}/functions/v1/calendar-click?to=${encodeURIComponent(gcal)}` +
+    `&p=email:igads&r=${round.id}&e=${encodeURIComponent(email)}`
+  );
+}
+
 // Exact copy of the proven manual campaigns (sent 2026-10-17), with the
 // session time table and join link generated per round.
-function buildHtml(kind: Kind, name: string, round: any, tz: string, unsubscribeUrl: string): string {
+function buildHtml(kind: Kind, name: string, round: any, tz: string, email: string): string {
   const start = new Date(round.first_session_date);
   const meetUrl: string = round.google_meet_link || "";
   const p = (text: string) =>
