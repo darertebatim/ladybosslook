@@ -244,6 +244,8 @@ const ThankYouSixTraps = lazy(() => import("@/pages/ThankYouSixTraps"));
 const IgAdsLanding = lazy(() => import("@/pages/IgAdsLanding"));
 const ThankYouIgAds = lazy(() => import("@/pages/ThankYouIgAds"));
 const IgAdsGifts = lazy(() => import("@/pages/IgAdsGifts"));
+const StartAdsLanding = lazy(() => import("@/pages/StartAdsLanding"));
+const StartAdsThankYou = lazy(() => import("@/pages/StartAdsThankYou"));
 const IgThreeGate = lazy(() => import("@/pages/IgThreeGate"));
 const IgThreeWatch = lazy(() => import("@/pages/IgThreeWatch"));
 const FarewellPage = lazy(() => import("@/pages/FarewellPage"));
@@ -600,6 +602,8 @@ const App = () => (
                   {!isNativeApp() && <Route path="/l/aliagads/thankyou" element={<ThankYouIgAds />} />}
                   {!isNativeApp() && <Route path="/l/igads/gifts" element={<IgAdsGifts />} />}
                   {!isNativeApp() && <Route path="/l/customerwithigads" element={<CustomerWithIgAdsLanding />} />}
+                  <Route path="/l/startads" element={<StartAdsLanding />} />
+                  <Route path="/l/startads/thankyou" element={<StartAdsThankYou />} />
                   <Route path="/l/igthree" element={<IgThreeGate />} />
                   <Route path="/l/igthree/watch" element={<IgThreeWatch />} />
                   <Route path="/l/farewell" element={<FarewellPage />} />

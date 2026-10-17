@@ -18,6 +18,18 @@ export interface LeadCampaign {
 
 export const LEAD_CAMPAIGNS: LeadCampaign[] = [
   {
+    key: 'startads',
+    label: 'Start Ads (Session 1 free)',
+    labelFa: 'شروع تبلیغات اینستاگرامی — جلسه اول رایگان',
+    programSlug: 'startads',
+    landingPath: '/l/startads',
+    thankYouPath: '/l/startads/thankyou',
+    regSource: 'startads_registration',
+    extraSources: ['startads_waitlist'],
+    metaEvent: 'StartAdsLead',
+    confirmationFunction: 'send-sixtraps-confirmation',
+  },
+  {
     key: 'igthree',
     label: 'IG Three (video)',
     programSlug: 'customerwithigads',
