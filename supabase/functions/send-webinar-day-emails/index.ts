@@ -365,7 +365,16 @@ async function collectRegistrants(roundId: string): Promise<Registrant[]> {
     }
     if (!data || data.length < 1000) break;
   }
-  return [...map.values()];
+  // Extra emails added from a thank-you page belong to the round's own landing
+  // page: use whichever registration page this (locked) round mostly came from.
+  const list = [...map.values()];
+  const ali = list.filter((r) => String(r.source || "").startsWith("aliagads")).length;
+  const main = list.filter((r) => r.source === "igads_registration").length;
+  const roundDefault = ali > main ? "aliagads_registration" : "igads_registration";
+  for (const r of list) {
+    if (r.source !== "igads_registration" && !String(r.source || "").startsWith("aliagads")) r.source = roundDefault;
+  }
+  return list;
 }
 
 /** Everyone who already received (sent or delivered) this kind of email for this round.
