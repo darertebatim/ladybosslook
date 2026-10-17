@@ -254,10 +254,13 @@ export function IgAdsRoundStats() {
               {rows.map((r) => (
                 <TableRow key={r.id}>
                   <TableCell>
-                    <p className="font-medium">{r.name}</p>
+                    <p className="font-medium">
+                      {r.name}
+                      {r.locked && <span className="ml-1.5 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">Locked</span>}
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       {r.date ? new Date(r.date).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—'}
-                      {r.status && r.status !== 'active' ? ` · ${r.status}` : ''}
+                      {r.status && r.status !== 'active' && r.status !== 'static' ? ` · ${r.status}` : ''}
                     </p>
                   </TableCell>
                   <TableCell className="text-right font-semibold tabular-nums">{r.signups}</TableCell>
@@ -265,8 +268,24 @@ export function IgAdsRoundStats() {
                   <TableCell className="text-right tabular-nums">{r.showups}</TableCell>
                   <TableCell className="text-right tabular-nums">{pct(averageOpenRate(r.opens))}</TableCell>
                   <TableCell className="text-right tabular-nums">{money(r.spend)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{money2(cplOf(r))}</TableCell>
+                  <TableCell className="text-right tabular-nums">{roas(roasOf(r))}</TableCell>
                   <TableCell className="text-right tabular-nums">{r.enrollments}</TableCell>
                   <TableCell className="text-right font-semibold tabular-nums">{money(r.revenue)}</TableCell>
+                </TableRow>
+              ))}
+              {summaryRows.map((s) => (
+                <TableRow key={s.label} className="bg-muted/50 font-medium">
+                  <TableCell className="font-semibold">{s.label}</TableCell>
+                  <TableCell className="text-right tabular-nums">{s.signups}</TableCell>
+                  <TableCell className="text-right tabular-nums">{s.calendar}</TableCell>
+                  <TableCell className="text-right tabular-nums">{s.showups}</TableCell>
+                  <TableCell className="text-right tabular-nums">{pct(s.open)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{money(s.spend)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{money2(s.cpl)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{roas(s.roas)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{s.sales}</TableCell>
+                  <TableCell className="text-right font-semibold tabular-nums">{money(s.revenue)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
