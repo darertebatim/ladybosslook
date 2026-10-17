@@ -16,3 +16,7 @@ export function paymentMethodLabel(method: string | null | undefined): string {
     ? manualPaymentMethods[method as keyof typeof manualPaymentMethods]
     : method || 'Stripe';
 }
+
+export function shouldEnrollForPayment(enrollmentId: string, enroll: boolean, program: string): boolean {
+  return !enrollmentId && enroll && program !== 'custom';
+}

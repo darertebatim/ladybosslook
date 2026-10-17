@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { paymentAmountInCents, paymentMethodLabel } from './manualPayment';
+import { paymentAmountInCents, paymentMethodLabel, shouldEnrollForPayment } from './manualPayment';
 
 test('manual amounts are stored in cents without rounding away decimals', () => {
   assert.equal(paymentAmountInCents('1200'), 120000);
@@ -15,4 +15,9 @@ test('zero, negative and over-precision payments are rejected', () => {
 test('Zelle and Interac records retain their method labels', () => {
   assert.equal(paymentMethodLabel('zelle'), 'Zelle');
   assert.equal(paymentMethodLabel('interac'), 'Interac e-Transfer');
+});
+test('recording payment for a previous enrollment never re-enrolls or changes its round', () => {
+  assert.equal(shouldEnrollForPayment('existing-mentoring-enrollment', true, 'weeklymentoring'), false);
+  assert.equal(shouldEnrollForPayment('', true, 'weeklymentoring'), true);
+  assert.equal(shouldEnrollForPayment('', false, 'weeklymentoring'), false);
 });

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { ManualPaymentDialog } from '@/components/admin/ManualPaymentDialog';
-import { paymentMethodLabel } from '@/lib/manualPayment';
+import { paymentMethodLabel, manualPaymentMethods, paymentAmountInCents } from '@/lib/manualPayment';
+import { getLocalDateStr } from '@/lib/localDate';
+import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -90,6 +92,12 @@ interface ProgramRound {
 }
 
 export function LeadsManager() {
+  const { isAdmin } = useAuth();
+  const [enrollPaymentMethod, setEnrollPaymentMethod] = useState('none');
+  const [enrollPaymentAmount, setEnrollPaymentAmount] = useState('');
+  const [enrollPaymentCurrency, setEnrollPaymentCurrency] = useState('usd');
+  const [enrollPaymentDate, setEnrollPaymentDate] = useState(getLocalDateStr());
+  const [enrollPaymentId, setEnrollPaymentId] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<UserLead | null>(null);
   const [isSearching, setIsSearching] = useState(false);
@@ -384,8 +392,15 @@ export function LeadsManager() {
     }
 
     setIsEnrolling(true);
+    let enrollmentSaved = false;
     try {
       const selectedProgram = programs.find(p => p.title === selectedCourse);
+      const recordPayment = isAdmin && enrollPaymentMethod !== 'none';
+      const cents = recordPayment ? paymentAmountInCents(enrollPaymentAmount) : 0;
+      const paidAt = new Date(`${enrollPaymentDate}T12:00:00`);
+      if (recordPayment && (!selectedProgram?.slug || Number.isNaN(paidAt.getTime()) || enrollPaymentDate > getLocalDateStr())) {
+        throw new Error('Choose a valid program and payment date on or before today');
+      }
       
       const { data, error } = await supabase.functions.invoke('admin-create-enrollment', {
         body: {
@@ -399,16 +414,28 @@ export function LeadsManager() {
       });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      enrollmentSaved = true;
+      if (recordPayment) {
+        const { error: paymentError } = await supabase.rpc('record_manual_payment', {
+          p_payment_id: enrollPaymentId, p_email: searchResults.profile.email,
+          p_name: searchResults.profile.full_name || '', p_program_slug: selectedProgram.slug,
+          p_product_name: selectedCourse, p_amount: cents, p_currency: enrollPaymentCurrency,
+          p_method: enrollPaymentMethod, p_paid_at: paidAt.toISOString(), p_enroll: false,
+        });
+        if (paymentError) throw paymentError;
+      }
 
       toast({
         title: 'Success!',
-        description: data.message || 'User enrolled successfully',
+        description: recordPayment ? 'User enrolled and payment recorded' : data.message || 'User enrolled successfully',
       });
 
       setIsEnrollDialogOpen(false);
       setSelectedCourse('');
       setSelectedEnrollRound('');
       setEnrollExpiresAt(undefined);
+      setEnrollPaymentMethod('none'); setEnrollPaymentAmount('');
       
       // Refresh search results to show new enrollment
       handleSearch();
@@ -416,7 +443,7 @@ export function LeadsManager() {
       console.error('Error enrolling user:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Failed to enroll user',
+        description: enrollmentSaved ? `Enrollment saved, but payment was not recorded: ${error.message}. Retry to record the payment.` : error.message || 'Failed to enroll user',
         variant: 'destructive',
       });
     } finally {
@@ -810,15 +837,22 @@ export function LeadsManager() {
                       User Profile
                     </div>
                     <div className="flex gap-2 flex-wrap justify-end">
-                      <ManualPaymentDialog customer={searchResults.profile} onSaved={handleSearch} />
-                      <Dialog open={isEnrollDialogOpen} onOpenChange={setIsEnrollDialogOpen}>
+                      <ManualPaymentDialog customer={searchResults.profile} enrollments={searchResults.enrollments} onSaved={handleSearch} />
+                      <Dialog open={isEnrollDialogOpen} onOpenChange={next => {
+                        if (isEnrolling) return;
+                        if (next) {
+                          setEnrollPaymentMethod('none'); setEnrollPaymentAmount(''); setEnrollPaymentCurrency('usd');
+                          setEnrollPaymentDate(getLocalDateStr()); setEnrollPaymentId(crypto.randomUUID());
+                        }
+                        setIsEnrollDialogOpen(next);
+                      }}>
                         <DialogTrigger asChild>
                           <Button variant="outline" size="sm">
                             <UserPlus className="h-4 w-4 mr-2" />
                             Enroll in Course
                           </Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="max-h-[90dvh] overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle>Enroll User in Course</DialogTitle>
                             <DialogDescription>
@@ -830,7 +864,7 @@ export function LeadsManager() {
                               <Label htmlFor="enroll-course">Select Course *</Label>
                               <Select
                                 value={selectedCourse}
-                                onValueChange={setSelectedCourse}
+                                onValueChange={value => { setSelectedCourse(value); setSelectedEnrollRound(''); }}
                                 disabled={isEnrolling || programsLoading}
                               >
                                 <SelectTrigger id="enroll-course">
@@ -868,6 +902,13 @@ export function LeadsManager() {
                               </div>
                             )}
 
+                            {isAdmin && <div className="space-y-3">
+                              <div className="space-y-2"><Label htmlFor="enroll-payment-method">Payment method</Label><Select value={enrollPaymentMethod} onValueChange={setEnrollPaymentMethod} disabled={isEnrolling}><SelectTrigger id="enroll-payment-method"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="none">No payment to record</SelectItem>{Object.entries(manualPaymentMethods).map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectContent></Select></div>
+                              {enrollPaymentMethod !== 'none' && <>
+                                <div className="grid grid-cols-2 gap-3"><div className="space-y-2"><Label htmlFor="enroll-payment-amount">Amount</Label><Input id="enroll-payment-amount" inputMode="decimal" placeholder="0.00" value={enrollPaymentAmount} disabled={isEnrolling} onChange={e => setEnrollPaymentAmount(e.target.value)} /></div><div className="space-y-2"><Label htmlFor="enroll-payment-currency">Currency</Label><Select value={enrollPaymentCurrency} onValueChange={setEnrollPaymentCurrency} disabled={isEnrolling}><SelectTrigger id="enroll-payment-currency"><SelectValue /></SelectTrigger><SelectContent>{['usd','cad','eur','gbp'].map(c => <SelectItem key={c} value={c}>{c.toUpperCase()}</SelectItem>)}</SelectContent></Select></div></div>
+                                <div className="space-y-2"><Label htmlFor="enroll-payment-date">Payment date</Label><Input id="enroll-payment-date" type="date" max={getLocalDateStr()} value={enrollPaymentDate} disabled={isEnrolling} onChange={e => setEnrollPaymentDate(e.target.value)} /></div>
+                              </>}
+                            </div>}
                             {/* Expiration date picker for subscription programs */}
                             <div className="space-y-2">
                               <Label>Expiration Date</Label>
@@ -963,7 +1004,7 @@ export function LeadsManager() {
                               onClick={handleEnrollUser}
                               disabled={isEnrolling || !selectedCourse}
                             >
-                              {isEnrolling ? 'Enrolling...' : 'Enroll User'}
+                              {isEnrolling ? 'Saving...' : enrollPaymentMethod !== 'none' ? 'Enroll & Record Payment' : 'Enroll User'}
                             </Button>
                           </DialogFooter>
                         </DialogContent>
