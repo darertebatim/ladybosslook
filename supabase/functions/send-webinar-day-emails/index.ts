@@ -370,7 +370,7 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
   const now = new Date();
 
   let registrants: Registrant[] = testEmail
-    ? [{ email: testEmail.toLowerCase(), name: "دوست عزیز", timezone: null }]
+    ? [{ email: testEmail.toLowerCase(), name: "دوست عزیز", timezone: null, created_at: null }]
     : await collectRegistrants(round.id);
 
   if (!testEmail) {
