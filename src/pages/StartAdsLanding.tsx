@@ -126,23 +126,20 @@ export default function StartAdsLanding() {
         <title>{title} — جلسه اول رایگان | Rilo</title>
         <meta name="description" content="جلسه اول دوره ۳ هفته‌ای جذب مشتری با اینستاگرام ادز — رایگان فقط برای ۵۰ نفر." />
       </Helmet>
-      <main dir="rtl" className="mx-auto w-full max-w-xl px-4 pb-16 pt-8 font-farsi">
+      <main dir="rtl" className="mx-auto w-full max-w-xl px-4 pb-6 pt-4 font-farsi">
         <div className="text-center">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500 px-3 py-1 text-[11px] font-bold text-white shadow-sm">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
             پیشنهاد یک‌باره — فقط ۵۰ نفر
           </span>
-          <h1 className="mt-4 text-2xl font-extrabold leading-snug text-neutral-900">
-            {' «'}{title}{'»\n — رایگان برای شما'}
+          <h1 className="mt-2 text-xl font-extrabold leading-snug text-neutral-900">
+            {' «'}{title}{'»\n — رایگان برای شما'}
           </h1>
-          <p className="mt-3 text-sm leading-7 text-neutral-700">
-            این وبینار رایگان معمولی نیست؛ جلسه اول دوره جذب مشتری با اینستاگرام ادز است که برای ۵۰ نفر از
-            جامعه ما رایگان باز شده.
-          </p>
+          <p className="mt-1 text-sm font-bold text-rose-600">▶ ویدیو را ببینید و جایگاه رایگان خود را رزرو کنید</p>
         </div>
 
         {vid && (
-          <div className="mt-6 overflow-hidden rounded-2xl bg-black shadow-ios">
+          <div className="mt-3 overflow-hidden rounded-2xl bg-black shadow-ios">
             <div className="relative aspect-video">
               {playing ? (
                 <iframe
@@ -155,8 +152,8 @@ export default function StartAdsLanding() {
               ) : (
                 <button onClick={() => setPlaying(true)} className="absolute inset-0 h-full w-full" aria-label="پخش ویدیو">
                   <img src={`https://i.ytimg.com/vi/${vid}/hqdefault.jpg`} alt="" className="h-full w-full object-cover" />
-                  <span className="absolute inset-0 m-auto flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-ios">
-                    <Play className="h-7 w-7 fill-rose-500 text-rose-500" />
+                  <span className="absolute inset-0 m-auto flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-ios">
+                    <Play className="h-6 w-6 fill-rose-500 text-rose-500" />
                   </span>
                 </button>
               )}
@@ -165,39 +162,39 @@ export default function StartAdsLanding() {
         )}
 
         {loaded && round?.first_session_date && (
-          <div className="mt-6 rounded-2xl bg-white p-4 text-center shadow-ios">
-            <p className="text-xs font-bold text-rose-600">زمان جلسه اول (به وقت شما)</p>
-            <p dir="ltr" className="mt-1 text-base font-extrabold text-neutral-900">
+          <div className="mt-3 rounded-2xl border border-orange-200 bg-orange-50 px-3 py-2 text-center">
+            <p className="text-[11px] font-bold text-rose-600">زمان جلسه اول (به وقت شما) · آنلاین در گوگل میت · {round.first_session_duration || 90} دقیقه</p>
+            <p dir="ltr" className="mt-0.5 whitespace-pre-line text-sm font-extrabold leading-5 text-neutral-900">
               {formatLocalDateTime(new Date(round.first_session_date))}
             </p>
-            <p className="mt-1 text-xs text-neutral-600">آنلاین در گوگل میت · {round.first_session_duration || 90} دقیقه</p>
           </div>
         )}
 
-        <form onSubmit={submit} className="mt-6 space-y-3 rounded-2xl bg-white p-5 shadow-ios">
-          <p className="text-center text-base font-extrabold text-neutral-900">
+        <form onSubmit={submit} className="mt-3 space-y-2 rounded-2xl border border-neutral-200 bg-white p-3 shadow-ios">
+          <p className="text-center text-sm font-extrabold text-neutral-900">
             {loaded && !round ? "ثبت‌نام بسته شد — در لیست انتظار جلسه بعد باشید" : "رزرو ۱ جایگاه از ۵۰ جایگاه رایگان"}
           </p>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="نام شما"
-            className="h-12 w-full rounded-xl border border-neutral-200 px-4 text-sm"
+            placeholder="Name"
+            dir="ltr"
+            className="h-11 w-full rounded-xl border border-neutral-200 px-4 text-sm"
           />
           {errors.name && <p className="text-xs text-rose-600">{errors.name}</p>}
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="ایمیل شما"
+            placeholder="Email"
             type="email"
             dir="ltr"
-            className="h-12 w-full rounded-xl border border-neutral-200 px-4 text-sm"
+            className="h-11 w-full rounded-xl border border-neutral-200 px-4 text-sm"
           />
           {errors.email && <p className="text-xs text-rose-600">{errors.email}</p>}
           <button
             type="submit"
             disabled={submitting || !loaded}
-            className="h-12 w-full rounded-xl bg-rose-500 text-sm font-extrabold text-white active:scale-[0.98] disabled:opacity-60"
+            className="h-11 w-full rounded-xl bg-rose-500 text-sm font-extrabold text-white active:scale-[0.98] disabled:opacity-60"
           >
             {submitting ? "در حال ثبت..." : loaded && !round ? "عضویت در لیست انتظار" : "رزرو جایگاه رایگان من"}
           </button>
