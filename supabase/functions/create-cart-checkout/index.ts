@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { checkProgramRegionBlocks } from "../_shared/region-restriction.ts";
+import { resolveCartOffer, priceMatchesOffer, offerLabel } from "../_shared/acquisition-offers.ts";
 const __safeOrigin = (o: string | null) => { const d = 'https://ladybosslook.com'; if (!o) return d; try { const u = new URL(o); const h = u.hostname; if ((u.protocol === 'https:' && (h === 'ladybosslook.com' || h === 'www.ladybosslook.com' || h.endsWith('.lovable.app'))) || (u.protocol === 'http:' && h === 'localhost')) return u.origin; } catch { /* ignore */ } return d; };
 
 
@@ -16,9 +17,11 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')!;
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
+    if (!supabaseUrl || !supabaseKey || !stripeKey || !anonKey) throw new Error('Checkout is not configured');
 
     // Get auth user
     const authHeader = req.headers.get('Authorization');
@@ -29,7 +32,7 @@ serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
-    const anonClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!);
+    const anonClient = createClient(supabaseUrl, anonKey);
     
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: authError } = await anonClient.auth.getUser(token);
@@ -96,13 +99,14 @@ serve(async (req) => {
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
     const programSlugs: string[] = [];
     const programTitles: string[] = [];
+    const purchaseOffers: Record<string, string> = {};
     const freePrograms: { slug: string; title: string }[] = [];
 
     for (const item of cartItems) {
       // Fetch current price from catalog
       const { data: program } = await supabase
         .from('program_catalog')
-        .select('title, price_amount, deposit_price, payment_type, stripe_product_id, stripe_price_id, is_active')
+        .select('title, price_amount, deposit_price, payment_type, stripe_product_id, stripe_price_id, price_presets, is_active')
         .eq('slug', item.program_slug)
         .eq('is_active', true)
         .single();
@@ -112,8 +116,10 @@ serve(async (req) => {
         continue;
       }
 
+      const selectedOffer = resolveCartOffer(item.program_slug, program.price_presets, item.payment_option);
+      if (selectedOffer && program.payment_type !== 'one-time') throw new Error('This purchase offer is unavailable');
       const isDeposit = program.payment_type === 'deposit';
-      const chargeAmount = isDeposit && program.deposit_price ? program.deposit_price : program.price_amount;
+      const chargeAmount = selectedOffer?.amount ?? (isDeposit && program.deposit_price ? program.deposit_price : program.price_amount);
       const isFree = program.payment_type === 'free' || chargeAmount === 0;
 
       if (isFree) {
@@ -121,11 +127,21 @@ serve(async (req) => {
         continue;
       }
 
-      const productName = isDeposit ? `${program.title} (Deposit)` : program.title;
+      const productName = selectedOffer ? `${program.title} — ${offerLabel(selectedOffer.key)}`
+        : isDeposit ? `${program.title} (Deposit)` : program.title;
 
       let resolvedPriceId: string | null = null;
+      if (selectedOffer) {
+        const offerPrice = await stripe.prices.retrieve(selectedOffer.stripePriceId);
+        const productId = typeof offerPrice.product === 'string' ? offerPrice.product : offerPrice.product.id;
+        if (!priceMatchesOffer(offerPrice, selectedOffer) || (program.stripe_product_id && productId !== program.stripe_product_id)) {
+          throw new Error('The selected offer price needs to be updated. Please contact support.');
+        }
+        resolvedPriceId = offerPrice.id;
+        purchaseOffers[item.program_slug] = selectedOffer.key;
+      }
       // Preferred: explicit stored stripe_price_id; fallback: product default price.
-      if ((program as any).stripe_price_id && !isDeposit) {
+      if (!resolvedPriceId && program.stripe_price_id && !isDeposit) {
         try {
           const storedPrice = await stripe.prices.retrieve((program as any).stripe_price_id);
           if (storedPrice.active && !storedPrice.recurring) {
@@ -177,7 +193,7 @@ serve(async (req) => {
 
 
       programSlugs.push(item.program_slug);
-      programTitles.push(program.title);
+      programTitles.push(productName);
     }
 
     // Enroll free programs directly (no Stripe needed)
@@ -221,6 +237,7 @@ serve(async (req) => {
         cart_checkout: 'true',
         user_id: user.id,
         program_slugs: programSlugs.join(','),
+        ...(Object.keys(purchaseOffers).length > 0 ? { purchase_offers: JSON.stringify(purchaseOffers) } : {}),
         product_name: programSlugs.length === 1 ? programTitles[0] : `Cart (${programSlugs.length} programs)`,
         ...(programSlugs.length === 1 ? { program_slug: programSlugs[0] } : {}),
         ...(buyerTimezone ? { buyer_timezone: buyerTimezone } : {}),

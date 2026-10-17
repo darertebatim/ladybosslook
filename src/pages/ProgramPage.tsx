@@ -17,6 +17,8 @@ import { PersianFlag } from '@/components/ui/PersianFlag';
 import { Link as RLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { resolveAutoEnrollRoundId } from '@/lib/autoEnrollRound';
+import { AcquisitionOfferPicker } from '@/components/AcquisitionOfferPicker';
+import { acquisitionOffer, offerLabel, type AcquisitionOfferKey } from '../../supabase/functions/_shared/acquisition-offers';
 
 const LANG_FLAGS: Record<string, string> = {
   all: '🌐',
@@ -76,6 +78,7 @@ interface ProgramData {
   subscription_interval_count: number | null;
   subscription_full_payment_price: number | null;
   language?: string | null;
+  price_presets?: unknown;
 }
 
 const convertToEmbedUrl = (url: string): string => {
@@ -88,8 +91,9 @@ const convertToEmbedUrl = (url: string): string => {
   return url;
 };
 
-const ProgramPage = () => {
-  const { slug } = useParams<{ slug: string }>();
+const ProgramPage = ({ programSlug, earlyOffer = false }: { programSlug?: string; earlyOffer?: boolean }) => {
+  const { slug: routeSlug } = useParams<{ slug: string }>();
+  const slug = programSlug || routeSlug;
   const navigate = useNavigate();
   const { user } = useAuth();
   const { addToCart, isInCart, isAdding, enrollFree, isEnrollingFree } = useCart();
@@ -101,6 +105,15 @@ const ProgramPage = () => {
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'full'>('monthly');
   const [checkingOut, setCheckingOut] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState<AcquisitionOfferKey>(earlyOffer ? 'early' : 'standard');
+  const hasAcquisitionOffers = program?.slug === 'casigads' && program.payment_type === 'one-time';
+  const currentOffer = hasAcquisitionOffers
+    ? acquisitionOffer(program.slug, program.price_presets, earlyOffer ? 'early' : selectedOffer)
+    : null;
+
+  useEffect(() => {
+    setSelectedOffer(earlyOffer ? 'early' : 'standard');
+  }, [earlyOffer, slug]);
 
   useEffect(() => {
     const fetchProgram = async () => {
@@ -182,6 +195,17 @@ const ProgramPage = () => {
   const handleAddToCart = () => {
     // Signed-out visitors: useCart remembers the item and resumes it after sign-in.
     if (!program) return;
+    if (hasAcquisitionOffers) {
+      if (!currentOffer) return;
+      addToCart({
+        slug: program.slug,
+        title: `${program.title} — ${offerLabel(currentOffer.key)}`,
+        price_amount: currentOffer.amount,
+        payment_type: 'one-time',
+        payment_option: `offer:${currentOffer.key}`,
+      });
+      return;
+    }
     if (program.payment_type === 'free' || program.price_amount === 0) {
       enrollFree(program.slug);
       return;
@@ -227,7 +251,7 @@ const ProgramPage = () => {
   const isFree = program.payment_type === 'free' || program.price_amount === 0;
   const isSubscription = program.payment_type === 'subscription';
   const hasFullOption = isSubscription && !!program.subscription_full_payment_price && program.subscription_full_payment_price > 0;
-  const displayPrice = isDeposit && program.deposit_price ? program.deposit_price : program.price_amount;
+  const displayPrice = currentOffer?.amount ?? (isDeposit && program.deposit_price ? program.deposit_price : program.price_amount);
   // Hide the round/schedule card for on-demand, 1-on-1 and self-paced programs — they have no live cohort start date.
   const deliveryMethod = (program as any).delivery_method as string | undefined;
   const showRoundDetails = !!autoEnrollRound
@@ -261,6 +285,15 @@ const ProgramPage = () => {
             <Check size={18} /> You're Enrolled — Open in App
           </Button>
         </Link>
+      );
+    }
+    if (hasAcquisitionOffers) {
+      return (
+        <Button className={cn('w-full min-h-11 gap-2 font-farsi', className)} size={size}
+          onClick={handleAddToCart} disabled={isAdding || !currentOffer}>
+          <ShoppingCart size={18} />
+          {isAdding ? 'در حال افزودن…' : currentOffer ? `ثبت‌نام ${currentOffer.key === 'vip' ? 'VIP' : 'Standard'} — $${(currentOffer.amount / 100).toFixed(0)}` : 'این پیشنهاد در دسترس نیست'}
+        </Button>
       );
     }
     if (hasFullOption) {
@@ -440,7 +473,10 @@ const ProgramPage = () => {
               <div className="lg:col-span-1 lg:sticky lg:top-24 lg:self-start">
                 <Card className="p-4 lg:p-6 space-y-4 lg:space-y-5 border-2">
                     {/* Price */}
-                    {hasFullOption ? (
+                    {hasAcquisitionOffers ? (
+                      <AcquisitionOfferPicker presets={program.price_presets} selected={earlyOffer ? 'early' : selectedOffer}
+                        early={earlyOffer} onSelect={setSelectedOffer} />
+                    ) : hasFullOption ? (
                       <div className="space-y-2">
                         {!!program.original_price && program.original_price > 0 && (
                           <div className="text-red-500 line-through decoration-red-500/40 text-sm font-medium">
