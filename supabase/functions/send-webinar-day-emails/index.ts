@@ -122,12 +122,12 @@ function icsDate(d: Date): string {
 }
 
 /** Tracked Google Calendar link (clicks counted via the calendar-click function). */
-function calendarClickUrl(round: any, email: string): string {
+function calendarClickUrl(round: any, email: string, tyUrl: string): string {
   const start = new Date(round.first_session_date);
   const end = new Date(start.getTime() + 90 * 60_000);
   const meet: string = round.google_meet_link || "";
   const details =
-    `ویدیوی پیش‌نیاز: https://ladybosslook.com/l/igadsfree/thankyou\n` +
+    `ویدیوی پیش‌نیاز: ${tyUrl}\n` +
     `لینک ورود: ${meet}\n` +
     `پشتیبانی: ${SUPPORT_URL}`;
   const gcal =
@@ -144,7 +144,7 @@ function calendarClickUrl(round: any, email: string): string {
 
 // Exact copy of the proven manual campaigns (sent 2026-10-17), with the
 // session time table and join link generated per round.
-function buildHtml(kind: Kind, name: string, round: any, tz: string, email: string): string {
+function buildHtml(kind: Kind, name: string, round: any, tz: string, email: string, tyUrl: string): string {
   const start = new Date(round.first_session_date);
   const meetUrl: string = round.google_meet_link || "";
   const p = (text: string) =>
@@ -189,7 +189,7 @@ function buildHtml(kind: Kind, name: string, round: any, tz: string, email: stri
         <p style="margin:0 0 8px;font-size:15px;font-weight:bold;">🎬 مقدمهٔ جلسه را از الان ببینید (۵ دقیقه)</p>
         ${p("در این ویدیوی کوتاه می‌گویم در جلسه دقیقاً چه چیزهایی می‌بینید و این جلسه برای چه کسی مناسب است. با دیدنش، مقدمه‌چینی را جلوتر تمام کرده‌اید و با یک سوال مشخص دربارهٔ بیزینس خودتان وارد جلسه می‌شوید.")}
         <p style="text-align:center;margin:12px 0 4px;">
-          <a href="https://ladybosslook.com/l/igadsfree/thankyou" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
+          <a href="${escapeHtml(tyUrl)}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
             دیدن ویدیوی ۵ دقیقه‌ای
           </a>
         </p>
@@ -199,7 +199,7 @@ function buildHtml(kind: Kind, name: string, round: any, tz: string, email: stri
         جلسه را همین حالا به تقویم‌تان اضافه کنید تا جای‌تان از دست نرود 👇
       </p>
       <p style="text-align:center;margin:16px 0;">
-        <a href="${calendarClickUrl(round, email)}" style="display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
+        <a href="${calendarClickUrl(round, email, tyUrl)}" style="display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
           افزودن به تقویم
         </a>
       </p>
@@ -337,21 +337,30 @@ function buildHtml(kind: Kind, name: string, round: any, tz: string, email: stri
 </html>`;
 }
 
-interface Registrant { email: string; name: string; timezone: string | null; created_at: string | null }
+interface Registrant { email: string; name: string; timezone: string | null; created_at: string | null; source?: string | null }
+
+/** Each signup's own landing-page thank-you page, pinned to this round and person. */
+function thankYouUrl(round: any, email: string, source?: string | null): string {
+  const base = String(source || "").startsWith("aliagads")
+    ? "https://ladybosslook.com/l/aliagads/thankyou"
+    : "https://ladybosslook.com/l/igadsfree/thankyou";
+  return `${base}?round=${encodeURIComponent(round.id)}&email=${encodeURIComponent(email)}`;
+}
 
 async function collectRegistrants(roundId: string): Promise<Registrant[]> {
   const map = new Map<string, Registrant>();
   for (let page = 0; page < 10; page++) {
     const { data, error } = await supabase
       .from("form_submissions")
-      .select("email, name, timezone, created_at")
+      .select("email, name, timezone, created_at, source")
       .eq("round_id", roundId)
+      .order("created_at", { ascending: true })
       .range(page * 1000, page * 1000 + 999);
     if (error) throw error;
     for (const r of data || []) {
       const e = String(r.email || "").trim().toLowerCase();
       if (e && !map.has(e)) {
-        map.set(e, { email: e, name: String(r.name || "دوست عزیز"), timezone: r.timezone || null, created_at: r.created_at || null });
+        map.set(e, { email: e, name: String(r.name || "دوست عزیز"), timezone: r.timezone || null, created_at: r.created_at || null, source: r.source || null });
       }
     }
     if (!data || data.length < 1000) break;
@@ -461,7 +470,7 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
           from: FROM,
           to: [r.email],
           subject,
-          html: appendUnsubFooter(buildHtml(kind, r.name, round, tz, r.email), unsubscribeUrl),
+          html: appendUnsubFooter(buildHtml(kind, r.name, round, tz, r.email, thankYouUrl(round, r.email, r.source)), unsubscribeUrl),
           reply_to: "support@ladybosslook.com",
           tags: [
             { name: "campaign", value: "webinar_day" },
