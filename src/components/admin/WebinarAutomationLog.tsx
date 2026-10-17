@@ -21,14 +21,14 @@ function runIn(session: Date, fromMin: number, toMin: number): Date | null {
   return t.getTime() <= session.getTime() + toMin * 60_000 ? t : null;
 }
 
-/** 8:00–8:59 AM run on the session day in a timezone, as a real instant. */
+/** 9:00–9:59 AM run on the session day in a timezone, as a real instant. */
 function morningIn(session: Date, tz: string): Date | null {
   const day = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(session);
   for (let h = -48; h <= 0; h++) {
     const t = new Date(session.getTime() + h * 3600_000);
     t.setUTCMinutes(20, 0, 0);
     const parts = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', hourCycle: 'h23' }).format(t);
-    if (Number(parts) === 8 && new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(t) === day) return t;
+    if (Number(parts) === 9 && new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(t) === day) return t;
   }
   return null;
 }

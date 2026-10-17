@@ -550,7 +550,7 @@ Deno.serve(async (req) => {
       if (error || !data) throw new Error("Round not found");
       rounds = [{ round: data, kind: body.kind as Kind }];
     } else {
-      // Morning: sessions in the next 36h (per-recipient local-8AM filter applies).
+      // Morning: sessions in the next 36h (per-recipient local-9AM filter applies).
       const { data: morningRounds, error: e1 } = await supabase
         .from("program_rounds")
         .select(roundCols)
