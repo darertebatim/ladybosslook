@@ -725,6 +725,7 @@ const App = () => (
                   
                   {/* Dynamic program routes - must be before catch-all */}
                   {!isNativeApp() && <Route path="/:slug" element={<ProgramPage />} />}
+                  {!isNativeApp() && <Route path="/:slug/:tierSlug" element={<ProgramPage />} />}
                   
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
