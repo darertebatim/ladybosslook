@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { allocateRoundSpend, attributeEnrollments, attributeRevenue, autoEmailKind } from './igAdsRoundStats';
+import { adSetPage, allocateRoundSpend, attributeEnrollments, attributeRevenue, autoEmailKind } from './igAdsRoundStats';
 
 test('Automated email subjects map to the four webinar emails', () => {
   assert.equal(autoEmailKind('تایید ثبت‌نام: Instagram Ads'), 'signup');
@@ -17,9 +17,36 @@ test('Ad spend goes to the next session and same-day rounds split by sign-ups', 
       { id: 'b', first_session_date: '2026-10-14T18:00:00Z', signups: 30 },
       { id: 'c', first_session_date: '2026-10-14T23:00:00Z', signups: 10 },
     ],
-    { '2026-10-09': 50, '2026-10-10': 50, '2026-10-12': 100, '2026-10-14': 100 },
+    [
+      { date: '2026-10-09', spend: 50, page: 'igads' },
+      { date: '2026-10-10', spend: 50, page: 'igads' },
+      { date: '2026-10-12', spend: 100, page: 'igads' },
+      { date: '2026-10-14', spend: 100, page: 'igads' },
+    ],
+    {},
   );
   assert.deepEqual(spend, { a: 100, b: 150, c: 50 });
+});
+
+test('Ad spend splits by landing page: Ali ad sets fund the rounds Ali promoted', () => {
+  const spend = allocateRoundSpend(
+    [
+      { id: 'morning', first_session_date: '2026-10-20T18:00:00Z', signups: 50 },
+      { id: 'evening', first_session_date: '2026-10-19T23:00:00Z', signups: 40 },
+    ],
+    [
+      { date: '2026-10-17', spend: 100, page: 'igads' },
+      { date: '2026-10-17', spend: 60, page: 'aliagads' },
+      { date: '2026-10-18', spend: 80, page: 'aliagads' },
+    ],
+    { morning: ['igads'], evening: ['aliagads'] },
+  );
+  assert.deepEqual(spend, { morning: 100, evening: 140 });
+});
+
+test('Ad set names classify into the two landing pages', () => {
+  assert.equal(adSetPage('IG Ads - Ali - Broad', 'Webinar'), 'aliagads');
+  assert.equal(adSetPage('Generic Canada+USA', 'Webinar leads'), 'igads');
 });
 
 test('Acquisition revenue sums orders attributed to the latest round within 14 days', () => {
