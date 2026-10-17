@@ -131,7 +131,7 @@ export function IgAdsRoundStats() {
     const revenue = attributeRevenue(rounds, roundsByEmail, orders);
     const acqEnrolled = attributeEnrollments(rounds, roundsByEmail, acqEnrollments);
 
-    return rounds.map((r) => {
+    const dynamic = rounds.map((r) => {
       const people = signupSets[r.id] || new Set<string>();
       const start = r.first_session_date ? Date.parse(r.first_session_date) : NaN;
       const opens = {} as Record<AutoEmailKind, number | null>;
@@ -154,10 +154,26 @@ export function IgAdsRoundStats() {
       }, { calendar: 0, attendees: 0 });
       return {
         id: r.id, name: r.round_name || `Round ${r.round_number ?? '?'}`, date: r.first_session_date, status: r.status,
-        signups: people.size, calendar: m.calendar, showups: m.attendees, opens,
+        signups: people.size, calendar: m.calendar as number | null, showups: m.attendees, opens,
         spend: spendReport ? spend[r.id] ?? 0 : null, enrollments: acqEnrolled[r.id] || 0, revenue: revenue[r.id] || 0,
       };
     });
+    // Finished rounds render from the frozen verified snapshot; only rounds not
+    // in the snapshot (current/future) use the live calculation.
+    const staticByNumber = new Map(STATIC_ROUND_STATS.map((s) => [s.roundNumber, s]));
+    const merged = dynamic.map((row) => {
+      const num = Number((row.name.match(/(\d+)/) || [])[1]);
+      const s = staticByNumber.get(num);
+      if (!s) return row;
+      return { ...row, name: s.name, date: s.date, signups: s.signups, calendar: s.calendar, showups: s.showups, opens: s.opens, spend: s.spend, enrollments: s.enrollments, revenue: s.revenue };
+    });
+    const covered = new Set(merged.map((row) => Number((row.name.match(/(\d+)/) || [])[1])));
+    const missing = STATIC_ROUND_STATS.filter((s) => !covered.has(s.roundNumber)).map((s) => ({
+      id: `static-${s.roundNumber}`, name: s.name, date: s.date, status: 'static',
+      signups: s.signups, calendar: s.calendar, showups: s.showups, opens: s.opens,
+      spend: s.spend as number | null, enrollments: s.enrollments, revenue: s.revenue,
+    }));
+    return [...merged, ...missing].sort((a, b) => Date.parse(b.date || '') - Date.parse(a.date || ''));
   }, [rounds, subs, clicks, events, acqEnrollments, orders, spendReport]);
 
   const money = (v: number | null) => (v === null ? '—' : `$${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}`);
