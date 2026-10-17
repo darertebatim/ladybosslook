@@ -28,6 +28,7 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+const MONITOR_EMAIL = "darertebatim@gmail.com";
 const FROM = "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>";
 const SUPPORT_URL =
   "https://ladyboss.onelink.me/lt6v?af_xp=custom&pid=email_support&c=webinar_day&deep_link_value=support&af_web_dp=https%3A%2F%2Fladybosslook.com%2Fdashboard%2Fchat";
@@ -504,6 +505,23 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
       if (logErr) console.error("log insert failed:", logErr.message);
     }
     if (i + batchSize < registrants.length) await new Promise((r) => setTimeout(r, 600));
+  }
+
+  // Monitor copy: one copy to the admin inbox whenever a real send goes out.
+  if (!testEmail && sent > 0) {
+    const sample = registrants[0];
+    const tz = registrantTz(sample.timezone, round.round_name || "");
+    await sendBatch([{
+      from: FROM,
+      to: [MONITOR_EMAIL],
+      subject: `[کپی ارسال خودکار — راند ${round.round_number ?? ""} — ${sent} نفر] ${subject}`,
+      html: buildHtml(kind, sample.name, round, tz, sample.email, thankYouUrl(round, sample.email, sample.source)),
+      tags: [
+        { name: "campaign", value: "webinar_day_monitor" },
+        { name: "kind", value: kind },
+        { name: "round", value: String(round.round_number ?? round.id) },
+      ],
+    }]).catch((e) => console.error("monitor copy failed", e));
   }
 
   console.log(`${kind} email for round ${round.round_name}: sent=${sent} failed=${failed} of ${registrants.length}`);

@@ -5,6 +5,7 @@ import { LeadCampaignDirectory } from '@/components/admin/LeadCampaignDirectory'
 import { WebinarStats } from '@/components/admin/WebinarStats';
 import { CalendarClickStats } from '@/components/admin/CalendarClickStats';
 import { IgAdsRoundStats } from '@/components/admin/IgAdsRoundStats';
+import { WebinarAutomationLog } from '@/components/admin/WebinarAutomationLog';
 import { SixTrapsSignups } from '@/components/admin/SixTrapsSignups';
 import { SmartInstaSignups } from '@/components/admin/SmartInstaSignups';
 import { GenericWebinarSignups } from '@/components/admin/GenericWebinarSignups';
@@ -79,6 +80,7 @@ export default function LeadCenter() {
 
         <TabsContent value="stats" className="space-y-6">
           <IgAdsRoundStats />
+          <WebinarAutomationLog />
           <CalendarClickStats />
           <WebinarStats />
         </TabsContent>
