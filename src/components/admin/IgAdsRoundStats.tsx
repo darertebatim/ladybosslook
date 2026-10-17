@@ -119,9 +119,8 @@ export function IgAdsRoundStats() {
     const spend = spendReport
       ? allocateRoundSpend(rounds.map((r) => ({ id: r.id, first_session_date: r.first_session_date, signups: signupSets[r.id]?.size || 0 })), spendReport)
       : {};
-    const sales = attributeSales(rounds, roundsByEmail, orders);
-    const enrolled: Record<string, Set<string>> = {};
-    for (const e of enrollments) (enrolled[e.round_id] ||= new Set()).add(e.user_id);
+    const revenue = attributeRevenue(rounds, roundsByEmail, orders);
+    const acqEnrolled = attributeEnrollments(rounds, roundsByEmail, acqEnrollments);
 
     return rounds.map((r) => {
       const people = signupSets[r.id] || new Set<string>();
