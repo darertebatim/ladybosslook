@@ -174,8 +174,59 @@ function buildHtml(kind: Kind, name: string, round: any, tz: string, email: stri
         <br>روی کامپیوتر هستی؟ <a href="https://ladybosslook.com/dashboard/chat" style="color:#EA5B2B;">چت پشتیبانی در داشبورد</a> — یا همین ایمیل را جواب بده.
       </p>`;
 
+  const reminderInner = `
+    <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;">
+      <h1 style="margin:0 0 14px;font-size:20px;line-height:1.6;">
+        سلام دوست عزیز، میخوام مطمئن بشم وبینار اینستاگرام ادز رو از دست نمیدین 🌷
+      </h1>
+
+      ${p(`${faWeekday(start, tz)} فقط <strong>یک ساعت</strong> از وقت‌تان را بگذارید — نه برای تماشای یک ویدیو، برای جلوگیری از هدر رفتن بودجه تبلیغات‌تان.`)}
+      ${p("هر روزی که کمپین تبلیغ‌تان درست تنظیم نشده باشد، بودجه‌تان بی‌صدا می‌سوزد: کلیک می‌گیرید، بازدید می‌گیرید… اما مشتری واقعی نمی‌آید.")}
+      ${p("در این یک ساعت زنده، قدم‌به‌قدم روی صفحه نشان می‌دهم دقیقاً پول‌تان کجا هدر می‌رود و چطور کمپینی بسازید که مشتری واقعی می‌آورد — همان کاری که بیزینس‌های موفق ایرانی در آمریکا و کانادا انجام می‌دهند.")}
+      ${p("ویدیوی ۵ دقیقه‌ای پیش‌نیاز را قبل از جلسه ببینید تا با ذهنی آماده وارد شوید و <strong>۱۰ برابر بیشتر</strong> از جلسه بگیرید.")}
+      <p style="text-align:center;margin:16px 0;">
+        <a href="https://ladybosslook.com/l/igadsfree/thankyou" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
+          دیدن ویدیوی ۵ دقیقه‌ای — قبل از جلسه
+        </a>
+      </p>
+
+      <p style="margin:18px 0 10px;font-size:15px;line-height:1.9;">
+        جلسه را همین حالا به تقویم‌تان اضافه کنید تا جای‌تان از دست نرود 👇
+      </p>
+      <p style="text-align:center;margin:16px 0;">
+               <a href="${calendarClickUrl(round, email)}" style="display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
+                 افزودن به تقویم
+               </a>
+             </p>
+
+      <div style="border:2px dashed #fda4af;background:#fff1f2;border-radius:14px;padding:12px 16px;margin:18px 0;">
+               <p style="margin:0;font-size:14px;line-height:1.9;font-weight:bold;color:#be123c;">🔥 این آخرین جلسه رایگان این آموزش است — جلسه ضبط نمی‌شود و ظرفیت اتاق زنده محدود است.</p>
+             </div>
+
+
+      <div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:12px;margin:20px 0;">
+               <p style="margin:0 0 8px;font-size:14px;font-weight:bold;">⏰ ساعت جلسه در شهرهای مختلف</p>
+               <table style="width:100%;border-collapse:collapse;">${zoneRows}</table>
+             </div>
+
+      <p style="margin:14px 0;font-size:14px;"><strong>🔗 لینک ورود:</strong><br>
+               <a href="${escapeHtml(meetUrl)}" style="color:#e11d48;word-break:break-all;">${escapeHtml(meetUrl)}</a></p>
+
+      <p style="margin:20px 0 0;font-size:16px;line-height:1.9;font-weight:bold;">
+        🌷🌷 منتظرتون هستم
+      </p>
+
+      <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
+        سوالی داشتی؟ <a href="${SUPPORT_URL}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
+        <br>روی کامپیوتر هستی؟ <a href="https://ladybosslook.com/dashboard/chat" style="color:#EA5B2B;">چت پشتیبانی در داشبورد</a> — یا همین ایمیل را جواب بده.
+        <br><br>علی لطفی
+      </p>
+    </div>`;
+
   const inner =
-    kind === "morning"
+    kind === "reminder"
+      ? reminderInner
+      : kind === "morning"
       ? `
     <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;">
       ${p("سلام دوست عزیز،")}
