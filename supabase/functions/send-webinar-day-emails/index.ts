@@ -78,60 +78,129 @@ function registrantTz(stored: string | null, roundName: string): string {
   return /west/i.test(roundName) ? "America/Los_Angeles" : "America/New_York";
 }
 
+const CITY_ZONES: { label: string; tz: string }[] = [
+  { label: "Los Angeles / Vancouver", tz: "America/Los_Angeles" },
+  { label: "New York / Toronto", tz: "America/New_York" },
+  { label: "Chicago / Texas", tz: "America/Chicago" },
+  { label: "Sydney", tz: "Australia/Sydney" },
+];
+
+function fmtZoneShort(d: Date, tz: string): string {
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      timeZone: tz,
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(d);
+  } catch {
+    return d.toISOString();
+  }
+}
+
+// Exact copy of the proven manual campaigns (sent 2026-10-17), with the
+// session time table and join link generated per round.
 function buildHtml(kind: Kind, name: string, round: any, tz: string, unsubscribeUrl: string): string {
   const start = new Date(round.first_session_date);
   const meetUrl: string = round.google_meet_link || "";
-  const when = fmtLocal(start, tz);
-  const btn = (label: string, url: string, bg = "#EA5B2B") =>
-    `<tr><td align="center" style="padding:6px 0;"><a href="${escapeHtml(url)}" style="display:inline-block;background:${bg};color:#ffffff;text-decoration:none;font-weight:700;font-size:16px;padding:14px 28px;border-radius:12px;">${escapeHtml(label)}</a></td></tr>`;
   const p = (text: string) =>
-    `<p style="margin:0 0 16px;font-size:16px;line-height:1.9;color:#333;text-align:right;">${text}</p>`;
+    `<p dir="rtl" style="margin:0 0 12px;font-size:15px;line-height:2;text-align:right;direction:rtl;">${text}</p>`;
 
-  const body =
+  const zoneRows = CITY_ZONES.map(
+    (z) => `
+        <tr>
+          <td style="padding:6px 10px;font-size:13px;border-bottom:1px solid #fde68a;">${z.label}</td>
+          <td style="padding:6px 10px;font-size:13px;border-bottom:1px solid #fde68a;" dir="ltr"><strong>${fmtZoneShort(start, z.tz)}</strong></td>
+        </tr>`,
+  ).join("");
+
+  const meetBlock = meetUrl
+    ? `<p style="text-align:center;margin:20px 0;">
+               <a href="${escapeHtml(meetUrl)}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:16px 32px;border-radius:12px;font-size:17px;font-weight:bold;">
+                 ورود به وبینار رایگان
+               </a>
+             </p>
+             <p style="text-align:center;margin:0 0 8px;font-size:13px;">
+               <a href="${escapeHtml(meetUrl)}" style="color:#e11d48;word-break:break-all;" dir="ltr">${escapeHtml(meetUrl)}</a>
+             </p>`
+    : "";
+
+  const supportFooter = `
+      <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
+        سوالی داشتی؟ <a href="${SUPPORT_URL}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
+        <br>روی کامپیوتر هستی؟ <a href="https://ladybosslook.com/dashboard/chat" style="color:#EA5B2B;">چت پشتیبانی در داشبورد</a> — یا همین ایمیل را جواب بده.
+      </p>`;
+
+  const inner =
     kind === "morning"
-      ? [
-          p(`سلام ${escapeHtml(name)} عزیز 👋`),
-          p("فقط چند ساعت مونده! وبینار رایگان <b>«جذب مشتری با اینستاگرام ادز»</b> امروز برگزار می‌شه."),
-          p(`🕐 <b>زمان جلسه به وقت شما:</b><br><span dir="ltr">${escapeHtml(when)}</span>`),
-          p("لینک ورود رو همین ایمیل داری — سر ساعت کلیک کن و وارد شو. پیشنهاد ویژه‌ای هم برای شرکت‌کنندگان لایو در نظر گرفتیم که فقط تا ۲۴ ساعت بعد از وبینار فعاله."),
-          p("اگر سؤالی داری، همین ایمیل رو جواب بده یا توی چت اپ ریلو پیام بده."),
-        ]
-      : [
-          p(`سلام ${escapeHtml(name)} عزیز 👋`),
-          p("<b>وبینار «جذب مشتری با اینستاگرام ادز» همین الان داره شروع می‌شه!</b>"),
-          p("روی دکمه زیر کلیک کن و مستقیم وارد جلسه شو:"),
-        ];
+      ? `
+    <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;">
+      ${p("سلام دوست عزیز،")}
+      ${p("ممکن است تا حالا چند بار در اینستاگرام تبلیغ (Ads) اجرا کرده باشید،<br>بودجه گذاشته باشید،<br>حتی کلیک و بازدید گرفته باشید…")}
+      ${p("اما در نهایت مشتری واقعی و فروشی که انتظارش را داشتید، اتفاق نیفتاده.")}
+      ${p("<strong>مشکل معمولاً بودجه کم نیست.</strong>")}
+      ${p("بیشتر بیزینس‌های ایرانی در آمریکا و کانادا، بدون اینکه بدانند، بودجه‌شان را جایی هدر می‌دهند:")}
+      <ul style="margin:0 0 14px;padding:0 20px 0 0;font-size:15px;line-height:2;">
+        <li>چرا تبلیغ کلیک می‌گیرد اما مشتری نمی‌آورد؟</li>
+        <li>کدام نوع کمپین برای بیزینس شما درست است؟</li>
+        <li>چه بودجه‌ای برای شروع منطقی است؟</li>
+        <li>و چطور بفهمید تبلیغ‌تان دارد جواب می‌دهد یا نه؟</li>
+      </ul>
+      ${p("<strong>امروز در وبینار رایگان:</strong>")}
+      ${p("«جذب مشتری با تبلیغات اینستاگرام»")}
+      ${p("قدم‌به‌قدم نشان می‌دهم چطور یک کمپین درست بسازید تا:")}
+      <ul style="margin:0 0 14px;padding:0 20px 0 0;font-size:15px;line-height:2;">
+        <li>مشتری واقعی جذب کنید، نه فقط لایک و بازدید</li>
+        <li>از هدر رفتن بودجه جلوگیری کنید</li>
+        <li>درآمد بیزینس‌تان را بالا ببرید</li>
+      </ul>
+      ${p("این وبینار درباره ترفندهای زودگذر نیست؛ درباره ساختن یک سیستم تبلیغاتی است که برای بیزینس شما مشتری می‌آورد.")}
 
-  const buttons =
-    kind === "start" && meetUrl
-      ? btn("ورود به وبینار 🔴", meetUrl, "#dc2626")
-      : meetUrl
-        ? btn("لینک ورود به وبینار 🎥", meetUrl)
-        : "";
+      <div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:12px;margin:20px 0;">
+               <p style="margin:0 0 8px;font-size:14px;font-weight:bold;">⏰ زمان برگزاری: امروز</p>
+               <table style="width:100%;border-collapse:collapse;">${zoneRows}</table>
+             </div>
 
-  return `<!DOCTYPE html>
-<html dir="rtl">
-  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-  <body dir="rtl" style="direction:rtl;text-align:right;margin:0;padding:0;background:#f6f6f7;font-family:Tahoma, Arial, sans-serif;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f6f6f7;padding:24px 12px;">
-      <tr><td align="center">
-        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
-          <tr><td style="padding:28px 28px 8px;" dir="rtl">
-            <h1 style="margin:0 0 18px;font-size:22px;line-height:1.5;color:#111;text-align:right;">${escapeHtml(SUBJECTS[kind])}</h1>
-            ${body.join("\n            ")}
-          </td></tr>
-          <tr><td style="padding:8px 28px 24px;"><table width="100%" cellpadding="0" cellspacing="0">
-            ${buttons}
-            ${btn("گفتگو با پشتیبانی در اپ ریلو 💬", SUPPORT_URL, "#111827")}
-          </table></td></tr>
-          <tr><td style="padding:4px 28px 24px;" dir="rtl">
-            <div style="font-size:15px;line-height:1.8;color:#444;text-align:right;">
-              منتظر دیدنت هستیم!<br>علی لطفی<br>Rilo App (Ladybosslook LLC.)
-            </div>
-          </td></tr>
-        </table>
-      </td></tr>
-    </table>
+      ${p("برای ورود به وبینار روی لینک زیر بزنید:")}
+      ${meetBlock}
+
+      ${p("امروز منتظرتان هستم،<br><strong>علی لطفی</strong>")}
+      ${supportFooter}
+    </div>`
+      : `
+    <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;text-align:center;">
+      <h1 style="margin:0 0 14px;font-size:22px;line-height:1.6;">
+        سلام دوست عزیز 🌷 وبینار در حال شروع است
+      </h1>
+      <p style="margin:0 0 18px;font-size:16px;line-height:1.9;">
+        همین حالا وارد شوید 👇
+      </p>
+      ${
+        meetUrl
+          ? `<p style="margin:18px 0;">
+               <a href="${escapeHtml(meetUrl)}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:16px 32px;border-radius:12px;font-size:18px;font-weight:bold;">
+                 ورود به وبینار
+               </a>
+             </p>
+             <p style="margin:8px 0 0;font-size:13px;">
+               <a href="${escapeHtml(meetUrl)}" style="color:#e11d48;word-break:break-all;">${escapeHtml(meetUrl)}</a>
+             </p>`
+          : ""
+      }
+      <p style="margin:22px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
+        مشکلی داشتی؟ <a href="${SUPPORT_URL}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
+        <br>روی کامپیوتر هستی؟ <a href="https://ladybosslook.com/dashboard/chat" style="color:#EA5B2B;">چت پشتیبانی در داشبورد</a> — یا همین ایمیل را جواب بده.
+        <br><br>علی لطفی
+      </p>
+    </div>`;
+
+  return `
+<!doctype html>
+<html dir="rtl" lang="fa">
+  <body dir="rtl" style="direction:rtl;text-align:right;margin:0;padding:0;background:#fff7ed;font-family:Tahoma,Arial,sans-serif;color:#111827;">
+    ${inner}
   </body>
 </html>`;
 }
