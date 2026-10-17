@@ -8736,6 +8736,10 @@ export type Database = {
         Returns: string
       }
       redeem_aperture_invite: { Args: { p_code: string }; Returns: Json }
+      refresh_webinar_exact_email_jobs: {
+        Args: { p_round_id: string }
+        Returns: undefined
+      }
       regenerate_my_friend_code: { Args: never; Returns: string }
       sync_account_family: { Args: { _uid: string }; Returns: undefined }
       verify_cron_secret: { Args: { _token: string }; Returns: boolean }
