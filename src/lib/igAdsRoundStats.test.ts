@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { allocateRoundSpend, attributeSales, autoEmailKind } from './igAdsRoundStats';
+import { allocateRoundSpend, attributeEnrollments, attributeRevenue, autoEmailKind } from './igAdsRoundStats';
 
 test('Automated email subjects map to the four webinar emails', () => {
   assert.equal(autoEmailKind('تایید ثبت‌نام: Instagram Ads'), 'signup');
@@ -22,8 +22,24 @@ test('Ad spend goes to the next session and same-day rounds split by sign-ups', 
   assert.deepEqual(spend, { a: 100, b: 150, c: 50 });
 });
 
-test('Acquisition sales count once, for the latest attended round within 14 days', () => {
-  const sales = attributeSales(
+test('Acquisition revenue sums orders attributed to the latest round within 14 days', () => {
+  const revenue = attributeRevenue(
+    [
+      { id: 'r1', first_session_date: '2026-10-01T18:00:00Z' },
+      { id: 'r2', first_session_date: '2026-10-10T18:00:00Z' },
+    ],
+    { 'x@a.com': ['r1', 'r2'], 'y@a.com': ['r1'] },
+    [
+      { email: 'X@a.com', created_at: '2026-10-10T19:00:00Z', amount: 19700, usd_amount: null },
+      { email: 'x@a.com', created_at: '2026-10-11T19:00:00Z', amount: 19700, usd_amount: 19700 },
+      { email: 'y@a.com', created_at: '2026-10-30T19:00:00Z', amount: 19700, usd_amount: null },
+    ],
+  );
+  assert.deepEqual(revenue, { r2: 394 });
+});
+
+test('Acquisition enrollments count unique people per round within 14 days', () => {
+  const enrollments = attributeEnrollments(
     [
       { id: 'r1', first_session_date: '2026-10-01T18:00:00Z' },
       { id: 'r2', first_session_date: '2026-10-10T18:00:00Z' },
@@ -32,8 +48,8 @@ test('Acquisition sales count once, for the latest attended round within 14 days
     [
       { email: 'X@a.com', created_at: '2026-10-10T19:00:00Z' },
       { email: 'x@a.com', created_at: '2026-10-11T19:00:00Z' },
-      { email: 'y@a.com', created_at: '2026-10-30T19:00:00Z' },
+      { email: 'y@a.com', created_at: '2026-10-12T19:00:00Z' },
     ],
   );
-  assert.deepEqual(sales, { r2: 1 });
+  assert.deepEqual(enrollments, { r1: 1, r2: 1 });
 });
