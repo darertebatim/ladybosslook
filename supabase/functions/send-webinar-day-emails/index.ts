@@ -223,44 +223,82 @@ function buildHtml(kind: Kind, name: string, round: any, tz: string, email: stri
       </p>
     </div>`;
 
+  const signoff = `<br><br><strong>علی لطفی</strong><br><span dir="ltr">Rilo App - Ladybosslook llc</span>`;
+
+  const morningInner = `
+    <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;">
+      ${p("سلام دوست عزیز 🌅")}
+      ${p("امروز همان روزی است که قرار است نگاهمان به اینستاگرام و جذب مشتری را از پایه بازبینی کنیم.")}
+      ${p("اگر از بیشتر صاحبان بیزینس بپرسید: «هفتهٔ بعد دقیقاً چند مشتری جدید داری؟»، صادقانه می‌گویند: «بستگی دارد کی معرفی کند یا کی تصادفی پیدایمان کند.»")}
+      ${p("اما تکیه کردن فقط به دهان‌به‌دهان، بیزینس ساختن نیست؛ <strong>شانس‌آزمایی است.</strong> یک کسب‌وکار پایدار در آمریکا یا کانادا باید بتواند اندازه بگیرد که هر دلار تبلیغ چند پیام و تماس برایش می‌آورد.")}
+
+      <p style="margin:20px 0 10px;font-size:16px;font-weight:bold;">🚫 ۳ دروغ بزرگی که درباره اینستاگرام به ما گفته‌اند:</p>
+      ${p("<strong>۱. «باید هر روز پست و ریلز بذاری تا دیده بشی!»</strong><br>حقیقت: شما صاحب بیزینس هستید، نه اینفلوئنسر تمام‌وقت. یک سیستم تبلیغاتی درست، بدون تولید محتوای شبانه‌روزی، شما را به مشتری‌های درست نشان می‌دهد.")}
+      ${p("<strong>۲. «اول باید چند هزار فالوور داشته باشی تا بتونی بفروشی!»</strong><br>حقیقت: فالووری که در شهر شما زندگی نمی‌کند، از سالن، کلینیک یا خدمات شما خرید نمی‌کند. چیزی که لازم دارید مشتری‌های محلی است، نه عدد فالوور.")}
+      ${p("<strong>۳. «تبلیغات متا خیلی گرونه و فقط به درد برندهای بزرگ می‌خوره!»</strong><br>حقیقت: اگر ندانید چطور تنظیمش کنید، بله، بودجه‌تان می‌سوزد. اما با بودجهٔ کوچک روزانه هم می‌شود در محدودهٔ خودتان تست را شروع کرد.")}
+
+      <div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:12px 16px;margin:20px 0;">
+        <p style="margin:0 0 8px;font-size:15px;font-weight:bold;">🔍 یک تمرین ۲ دقیقه‌ای برای امروز:</p>
+        ${p("اینستاگرام بیزینس‌تان را باز کنید و به این ۳ عدد نگاه کنید:")}
+        <ul style="margin:0 0 10px;padding:0 20px 0 0;font-size:15px;line-height:2;">
+          <li>آخرین پست شما چند درصد مخاطبش از شهر خودتان بوده؟</li>
+          <li>در ۳۰ روز گذشته، چند نفر مستقیماً از اینستاگرام با شما تماس گرفتند یا وقت رزرو کردند؟</li>
+          <li>هزینهٔ جذب هر مشتری جدید تا الان برای شما چقدر تمام شده؟</li>
+        </ul>
+        ${p("اگر این اعداد را نمی‌دانید یا از آنها راضی نیستید، امروز در جلسهٔ زنده دقیقاً همین‌ها را روی میز می‌گذاریم.")}
+      </div>
+
+      <div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:12px;margin:20px 0;">
+        <p style="margin:0 0 8px;font-size:14px;font-weight:bold;">⏰ زمان برگزاری: امروز</p>
+        <table style="width:100%;border-collapse:collapse;">${zoneRows}</table>
+      </div>
+
+      ${meetBlock}
+
+      <p style="margin:16px 0 8px;font-size:15px;font-weight:bold;">📌 چند نکته مهم:</p>
+      <ul style="margin:0 0 14px;padding:0 20px 0 0;font-size:15px;line-height:2;">
+        <li>دوربین و میکروفون شما خاموش است؛ با خیال راحت و در هر شرایطی شرکت کنید.</li>
+        <li>جلسه ضبط نمی‌شود و ظرفیت اتاق محدود است؛ ۵ تا ۱۰ دقیقه زودتر وارد شوید.</li>
+        <li>چک‌لیست کاربردی تبلیغات در طول همین جلسه به حاضرین زنده داده می‌شود.</li>
+      </ul>
+      ${p("این جلسه را به عنوان یک تصمیم کاری برای آیندهٔ بیزینس‌تان در تقویم خالی بگذارید. امروز می‌بینمتان.")}
+      <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
+        سوالی داشتی؟ <a href="${SUPPORT_URL}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
+        <br>روی کامپیوتر هستی؟ <a href="https://ladybosslook.com/dashboard/chat" style="color:#EA5B2B;">چت پشتیبانی در داشبورد</a> — یا همین ایمیل را جواب بده.
+        ${signoff}
+      </p>
+    </div>`;
+
+  const oneHourInner = `
+    <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;">
+      ${p("سلام دوست عزیز ⏳")}
+      ${p("دقیقاً <strong>۱ ساعت دیگر</strong> وبینار زندهٔ «جذب مشتری واقعی با اینستاگرام ادز» شروع می‌شود.")}
+      ${p("اگر درگیر کار، رفت‌وآمد یا کارهای خانه هستید، فقط این ۳ مورد را بدانید:")}
+      ${p("<strong>۱. دوربین و میکروفون شما خاموش است.</strong><br>نیازی به آماده شدن نیست. با لپ‌تاپ یا حتی گوشی و یک هندزفری وارد شوید و راحت گوش کنید.")}
+      ${p("<strong>۲. بازپخش یا رکورد ارسال نمی‌شود.</strong><br>جلسه کاملاً زنده است و همه‌چیز روی صفحه و داخل ادز منیجر نشان داده می‌شود؛ تنها فرصت دیدنش همین جلسهٔ زنده است.")}
+      ${p("<strong>۳. هدیهٔ حاضرین زنده.</strong><br>«چک‌لیست قدم‌به‌قدم ستاپ ادز منیجر» در طول همین جلسه به شرکت‌کنندگان حاضر داده می‌شود.")}
+
+      <div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:12px;margin:20px 0;">
+        <p style="margin:0 0 8px;font-size:14px;font-weight:bold;">⏰ ساعت شروع در شهرهای مختلف</p>
+        <table style="width:100%;border-collapse:collapse;">${zoneRows}</table>
+      </div>
+
+      ${meetBlock}
+      ${p("پیشنهاد می‌کنم ۵ تا ۱۰ دقیقه زودتر روی لینک بزنید تا ظرفیت اتاق پر نشود.")}
+      ${p("یک فنجان چای یا قهوه بریزید و دفترچه‌تان را بردارید؛ ۱ ساعت دیگر می‌بینمتان!")}
+      <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
+        سوالی داشتی؟ <a href="${SUPPORT_URL}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
+        ${signoff}
+      </p>
+    </div>`;
+
   const inner =
     kind === "reminder"
       ? reminderInner
       : kind === "morning"
-      ? `
-    <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;">
-      ${p("سلام دوست عزیز،")}
-      ${p("ممکن است تا حالا چند بار در اینستاگرام تبلیغ (Ads) اجرا کرده باشید،<br>بودجه گذاشته باشید،<br>حتی کلیک و بازدید گرفته باشید…")}
-      ${p("اما در نهایت مشتری واقعی و فروشی که انتظارش را داشتید، اتفاق نیفتاده.")}
-      ${p("<strong>مشکل معمولاً بودجه کم نیست.</strong>")}
-      ${p("بیشتر بیزینس‌های ایرانی در آمریکا و کانادا، بدون اینکه بدانند، بودجه‌شان را جایی هدر می‌دهند:")}
-      <ul style="margin:0 0 14px;padding:0 20px 0 0;font-size:15px;line-height:2;">
-        <li>چرا تبلیغ کلیک می‌گیرد اما مشتری نمی‌آورد؟</li>
-        <li>کدام نوع کمپین برای بیزینس شما درست است؟</li>
-        <li>چه بودجه‌ای برای شروع منطقی است؟</li>
-        <li>و چطور بفهمید تبلیغ‌تان دارد جواب می‌دهد یا نه؟</li>
-      </ul>
-      ${p("<strong>امروز در وبینار رایگان:</strong>")}
-      ${p("«جذب مشتری با تبلیغات اینستاگرام»")}
-      ${p("قدم‌به‌قدم نشان می‌دهم چطور یک کمپین درست بسازید تا:")}
-      <ul style="margin:0 0 14px;padding:0 20px 0 0;font-size:15px;line-height:2;">
-        <li>مشتری واقعی جذب کنید، نه فقط لایک و بازدید</li>
-        <li>از هدر رفتن بودجه جلوگیری کنید</li>
-        <li>درآمد بیزینس‌تان را بالا ببرید</li>
-      </ul>
-      ${p("این وبینار درباره ترفندهای زودگذر نیست؛ درباره ساختن یک سیستم تبلیغاتی است که برای بیزینس شما مشتری می‌آورد.")}
-
-      <div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:12px;margin:20px 0;">
-               <p style="margin:0 0 8px;font-size:14px;font-weight:bold;">⏰ زمان برگزاری: امروز</p>
-               <table style="width:100%;border-collapse:collapse;">${zoneRows}</table>
-             </div>
-
-      ${p("برای ورود به وبینار روی لینک زیر بزنید:")}
-      ${meetBlock}
-
-      ${p("امروز منتظرتان هستم،<br><strong>علی لطفی</strong>")}
-      ${supportFooter}
-    </div>`
+      ? morningInner
+      : kind === "onehour"
+      ? oneHourInner
       : `
     <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;text-align:center;">
       <h1 style="margin:0 0 14px;font-size:22px;line-height:1.6;">
@@ -284,7 +322,7 @@ function buildHtml(kind: Kind, name: string, round: any, tz: string, email: stri
       <p style="margin:22px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
         مشکلی داشتی؟ <a href="${SUPPORT_URL}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
         <br>روی کامپیوتر هستی؟ <a href="https://ladybosslook.com/dashboard/chat" style="color:#EA5B2B;">چت پشتیبانی در داشبورد</a> — یا همین ایمیل را جواب بده.
-        <br><br>علی لطفی
+        ${signoff}
       </p>
     </div>`;
 
