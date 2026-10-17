@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { CalendarPlus, CalendarDays, Video, CheckCircle2 } from "lucide-react";
 import { loadStartAds, youtubeId, type StartAdsRound } from "@/pages/StartAdsLanding";
-import { formatLocalDateTime } from "@/lib/sixtrapsCalendar";
-import { downloadIcs } from "@/lib/sixtrapsCalendar";
+import { formatLocalDateTime, downloadIcs } from "@/lib/sixtrapsCalendar";
 import { trackCalendarClick } from "@/lib/trackCalendarClick";
 
 function gcalUrl(title: string, r: StartAdsRound) {
@@ -55,15 +55,27 @@ export default function StartAdsThankYou() {
         <title>ثبت‌نام شما انجام شد | Rilo</title>
       </Helmet>
       <main dir="rtl" className="mx-auto w-full max-w-xl px-4 pb-16 pt-8 font-farsi">
-        <h1 className="text-center text-2xl font-extrabold text-neutral-900">
-          {waitlist ? "در لیست انتظار هستید 🌷" : "جایگاه شما رزرو شد 🌷"}
-        </h1>
+        <div className="flex flex-col items-center text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
+            <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+          </span>
+          <h1 className="mt-3 text-2xl font-extrabold text-neutral-900">
+            {waitlist ? "در لیست انتظار هستید 🌷" : "جایگاه شما رزرو شد 🌷"}
+          </h1>
+          {!waitlist && (
+            <p className="mt-1 text-sm text-neutral-600">دو قدم تا جلسه اول — هر دو را همین حالا انجام دهید</p>
+          )}
+        </div>
+
         {!waitlist && round?.first_session_date && (
           <>
             {vid && (
-              <div className="mt-5">
-                <p className="mb-2 text-center text-sm font-bold text-neutral-900">قبل از جلسه این ویدیو را ببینید</p>
-                <div className="relative aspect-video overflow-hidden rounded-2xl bg-black shadow-ios">
+              <div className="mt-5 rounded-2xl border border-neutral-200 bg-white p-3 shadow-ios">
+                <p className="mb-2 flex items-center justify-center gap-1.5 text-center text-sm font-extrabold text-neutral-900">
+                  <Video className="h-4 w-4 text-rose-500" />
+                  قدم اول: قبل از جلسه این ویدیو را ببینید
+                </p>
+                <div className="relative aspect-video overflow-hidden rounded-xl bg-black">
                   <iframe
                     className="absolute inset-0 h-full w-full"
                     src={`https://www.youtube.com/embed/${vid}?rel=0`}
@@ -74,33 +86,42 @@ export default function StartAdsThankYou() {
                 </div>
               </div>
             )}
-            <div className="mt-5 rounded-2xl bg-white p-4 text-center shadow-ios">
-              <p className="text-xs font-bold text-rose-600">جلسه اول «{title}»</p>
-              <p dir="ltr" className="mt-1 text-base font-extrabold text-neutral-900">
+
+            <div className="mt-4 rounded-2xl border border-neutral-200 bg-white p-4 text-center shadow-ios">
+              <p className="flex items-center justify-center gap-1.5 text-sm font-extrabold text-neutral-900">
+                <CalendarDays className="h-4 w-4 text-rose-500" />
+                قدم دوم: جلسه را به تقویم خود اضافه کنید
+              </p>
+              <p className="mt-2 text-xs font-bold text-rose-600">جلسه اول «{title}» · {round.first_session_duration || 90} دقیقه · آنلاین</p>
+              <p dir="ltr" className="mt-1 whitespace-pre-line text-sm font-extrabold leading-6 text-neutral-900">
                 {formatLocalDateTime(new Date(round.first_session_date))}
               </p>
-              <a
-                href={gcalUrl(title, round)}
-                target="_blank"
-                rel="noreferrer"
-                onClick={() => trackCalendarClick("google", { email, roundId: round.id, page: "/l/startads/thankyou" })}
-                className="mt-4 flex h-12 items-center justify-center rounded-xl bg-rose-500 text-sm font-extrabold text-white active:scale-[0.98]"
-              >
-                افزودن به تقویم گوگل
-              </a>
-              <button
-                type="button"
-                onClick={addToApple}
-                className="mt-2 flex h-12 w-full items-center justify-center rounded-xl bg-neutral-100 text-sm font-bold text-neutral-900 active:scale-[0.98]"
-              >
-                افزودن به تقویم اپل
-              </button>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <a
+                  href={gcalUrl(title, round)}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => trackCalendarClick("google", { email, roundId: round.id, page: "/l/startads/thankyou" })}
+                  className="flex h-12 items-center justify-center gap-1.5 rounded-xl bg-rose-500 text-[13px] font-extrabold text-white active:scale-[0.98]"
+                >
+                  <CalendarPlus className="h-4 w-4" />
+                  تقویم گوگل
+                </a>
+                <button
+                  type="button"
+                  onClick={addToApple}
+                  className="flex h-12 items-center justify-center gap-1.5 rounded-xl bg-neutral-900 text-[13px] font-extrabold text-white active:scale-[0.98]"
+                >
+                  <CalendarPlus className="h-4 w-4" />
+                  تقویم اپل
+                </button>
+              </div>
               {round.google_meet_link && (
                 <a
                   href={round.google_meet_link}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-2 flex h-12 items-center justify-center rounded-xl bg-neutral-900 text-sm font-bold text-white active:scale-[0.98]"
+                  className="mt-2 flex h-12 items-center justify-center rounded-xl bg-neutral-100 text-sm font-bold text-neutral-900 active:scale-[0.98]"
                 >
                   لینک ورود به جلسه (گوگل میت)
                 </a>

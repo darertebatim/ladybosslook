@@ -133,9 +133,12 @@ export default function StartAdsLanding() {
             پیشنهاد یک‌باره — فقط ۵۰ نفر
           </span>
           <h1 className="mt-2 text-xl font-extrabold leading-snug text-neutral-900">
-            {'«'}{title}{'» \n— رایگان برای شما'}
+            «{title}»
+            <br />
+            — رایگان برای شما
           </h1>
           <p className="mt-1 text-sm font-bold text-rose-600">ویدیو را ببینید و جایگاه رایگان خود را رزرو کنید</p>
+          <p className="mt-0.5 text-[11px] font-bold text-neutral-500">با علی لطفی · موسس Rilo</p>
           {vid && (
             <div aria-hidden="true" className="mt-1 flex justify-center">
               <ArrowDown className="h-4 w-4 animate-bounce text-rose-500" strokeWidth={3} />
