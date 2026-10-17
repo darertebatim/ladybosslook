@@ -133,7 +133,7 @@ export default function StartAdsLanding() {
             پیشنهاد یک‌باره — فقط ۵۰ نفر
           </span>
           <h1 className="mt-2 text-xl font-extrabold leading-snug text-neutral-900">
-            {'«'}{title}{'»\n — رایگان برای شما'}
+            {'«'}{title}{'» \n— رایگان برای شما'}
           </h1>
           <p className="mt-1 text-sm font-bold text-rose-600">▶ ویدیو را ببینید و جایگاه رایگان خود را رزرو کنید</p>
         </div>
