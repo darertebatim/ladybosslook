@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Download } from 'lucide-react';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 import { calculateCampaignRoundMetrics } from '@/lib/campaignRoundMetrics';
-import { allocateRoundSpend, attributeEnrollments, attributeRevenue, autoEmailKind, type AutoEmailKind } from '@/lib/igAdsRoundStats';
+import { adSetPage, allocateRoundSpend, attributeEnrollments, attributeRevenue, autoEmailKind, type AdPage, type AutoEmailKind, type DailySpendRow } from '@/lib/igAdsRoundStats';
 import { getLocalDateStr } from '@/lib/localDate';
 
 const campaigns = LEAD_CAMPAIGNS.filter((c) => c.key === 'igads' || c.key === 'aliagads');
@@ -67,14 +67,14 @@ export function IgAdsRoundStats() {
     queryKey: ['igads-stats-acq-enrollments'],
     queryFn: async () => {
       const rows = await pageAll<any>((from) => supabase.from('course_enrollments')
-        .select('user_id, created_at').eq('program_slug', 'casigads').order('created_at').range(from, from + 999));
+        .select('user_id, enrolled_at').eq('program_slug', 'casigads').order('enrolled_at').range(from, from + 999));
       const ids = [...new Set(rows.map((r) => r.user_id))];
       const emails: Record<string, string> = {};
       for (let i = 0; i < ids.length; i += 200) {
         const { data } = await supabase.from('profiles').select('id, email').in('id', ids.slice(i, i + 200));
         for (const p of data || []) if (p.email) emails[p.id] = p.email;
       }
-      return rows.map((r) => ({ email: emails[r.user_id] || '', created_at: r.created_at })).filter((r) => r.email);
+      return rows.map((r) => ({ email: emails[r.user_id] || '', created_at: r.enrolled_at })).filter((r) => r.email);
     },
   });
 
@@ -96,10 +96,10 @@ export function IgAdsRoundStats() {
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      const daily: Record<string, number> = {};
+      const daily: DailySpendRow[] = [];
       for (const row of data.campaigns || []) {
         if (!/webinar/i.test(row.campaign_name || '')) continue;
-        daily[row.date_start] = (daily[row.date_start] || 0) + Number(row.spend || 0);
+        daily.push({ date: row.date_start, spend: Number(row.spend || 0), page: adSetPage(row.adset_name, row.campaign_name) });
       }
       return daily;
     },
@@ -109,15 +109,24 @@ export function IgAdsRoundStats() {
     const metrics = calculateCampaignRoundMetrics(campaigns, rounds, subs, clicks);
     const signupSets: Record<string, Set<string>> = {};
     const roundsByEmail: Record<string, string[]> = {};
+    const roundPages: Record<string, AdPage[]> = {};
+    const signupsByPage: Record<string, Partial<Record<AdPage, number>>> = {};
+    const pageOfSource = (source: string): AdPage => (source.startsWith('aliagads') ? 'aliagads' : 'igads');
     for (const s of subs) {
       if (!regSources.includes(s.source) || !s.round_id) continue;
       const e = norm(s.email);
       if (!e) continue;
-      (signupSets[s.round_id] ||= new Set()).add(e);
+      const page = pageOfSource(s.source);
+      if (!(roundPages[s.round_id] ||= []).includes(page)) roundPages[s.round_id].push(page);
+      if (!(signupSets[s.round_id] ||= new Set()).has(e)) {
+        signupSets[s.round_id].add(e);
+        signupsByPage[s.round_id] ||= {};
+        signupsByPage[s.round_id][page] = (signupsByPage[s.round_id][page] || 0) + 1;
+      }
       (roundsByEmail[e] ||= []).includes(s.round_id) || roundsByEmail[e].push(s.round_id);
     }
     const spend = spendReport
-      ? allocateRoundSpend(rounds.map((r) => ({ id: r.id, first_session_date: r.first_session_date, signups: signupSets[r.id]?.size || 0 })), spendReport)
+      ? allocateRoundSpend(rounds.map((r) => ({ id: r.id, first_session_date: r.first_session_date, signups: signupSets[r.id]?.size || 0 })), spendReport, roundPages, signupsByPage)
       : {};
     const revenue = attributeRevenue(rounds, roundsByEmail, orders);
     const acqEnrolled = attributeEnrollments(rounds, roundsByEmail, acqEnrollments);
@@ -170,7 +179,7 @@ export function IgAdsRoundStats() {
         <div>
           <CardTitle>IG Ads Rounds (both pages)</CardTitle>
           <p className="text-sm text-muted-foreground">
-            IG Ads + IG Ads (Ali) combined. Open rates = opened ÷ delivered among this round's sign-ups. Ad spend = webinar campaigns from the day after the previous session up to this session. Acquisition enrollments / revenue = people who joined or bought the Acquisition program within 14 days after their round.
+            IG Ads + IG Ads (Ali) combined. Open rates = opened ÷ delivered among this round's sign-ups. Ad spend = webinar ad sets, split by landing page (Ali link vs main link), each day's spend going to the round that page was promoting. Acquisition enrollments / revenue = people who joined or bought the Acquisition program within 14 days after their round.
           </p>
           {spendError && <p className="text-xs text-destructive">Ad spend could not load: {(spendError as Error).message}</p>}
         </div>
