@@ -13,12 +13,40 @@ const KINDS: { key: Kind; label: string }[] = [
 ];
 const TEST_EMAIL = 'darertebatim@gmail.com';
 
+/** The automation runs hourly at minute :20. Returns the first run time inside [from, to] (ms offsets from session start). */
+function runIn(session: Date, fromMin: number, toMin: number): Date | null {
+  const t = new Date(session.getTime() + fromMin * 60_000);
+  t.setUTCSeconds(0, 0);
+  while (t.getUTCMinutes() !== 20) t.setTime(t.getTime() + 60_000);
+  return t.getTime() <= session.getTime() + toMin * 60_000 ? t : null;
+}
+
+/** 8:00–8:59 AM run on the session day in a timezone, as a real instant. */
+function morningIn(session: Date, tz: string): Date | null {
+  const day = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(session);
+  for (let h = -48; h <= 0; h++) {
+    const t = new Date(session.getTime() + h * 3600_000);
+    t.setUTCMinutes(20, 0, 0);
+    const parts = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', hourCycle: 'h23' }).format(t);
+    if (Number(parts) === 8 && new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(t) === day) return t;
+  }
+  return null;
+}
+
+const fmt = (d: Date | null) =>
+  d
+    ? d.toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+    : '—';
+
+interface Upcoming { id: string; round_number: number | null; first_session_date: string; signups: number }
+
 interface Row { round: string; kind: string; sent: number; delivered: number; opened: number; bounced: number; last: string }
 
 export function WebinarAutomationLog() {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [nextRound, setNextRound] = useState<{ id: string; round_number: number | null } | null>(null);
+  const [upcoming, setUpcoming] = useState<Upcoming[]>([]);
   const [sending, setSending] = useState<string | null>(null);
 
   useEffect(() => {
@@ -64,6 +92,23 @@ export function WebinarAutomationLog() {
         .limit(1)
         .maybeSingle();
       setNextRound(r ?? null);
+      const { data: ups } = await (supabase as any)
+        .from('program_rounds')
+        .select('id, round_number, first_session_date')
+        .eq('program_slug', 'igadsfree')
+        .gt('first_session_date', new Date(Date.now() - 15 * 60_000).toISOString())
+        .lte('first_session_date', new Date(Date.now() + 14 * 24 * 3600_000).toISOString())
+        .order('first_session_date', { ascending: true });
+      const withCounts: Upcoming[] = await Promise.all(
+        (ups || []).map(async (u: any) => {
+          const { count } = await (supabase as any)
+            .from('form_submissions')
+            .select('id', { count: 'exact', head: true })
+            .eq('round_id', u.id);
+          return { ...u, signups: count ?? 0 };
+        }),
+      );
+      setUpcoming(withCounts);
       setLoading(false);
     })();
   }, []);
@@ -100,6 +145,49 @@ export function WebinarAutomationLog() {
             </Button>
           ))}
         </div>
+        <div>
+          <p className="mb-2 text-sm font-semibold">Scheduled (upcoming rounds)</p>
+          {upcoming.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{loading ? 'Loading…' : 'No upcoming rounds in the next 14 days.'}</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-muted-foreground">
+                    <th className="py-2 pr-3">Round</th>
+                    <th className="py-2 pr-3">Session</th>
+                    <th className="py-2 pr-3">Signups</th>
+                    <th className="py-2 pr-3">Morning (East 8 AM)</th>
+                    <th className="py-2 pr-3">Morning (West 8 AM)</th>
+                    <th className="py-2 pr-3">1 hour before</th>
+                    <th className="py-2 pr-3">Starting now</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {upcoming.map((u) => {
+                    const s = new Date(u.first_session_date);
+                    return (
+                      <tr key={u.id} className="border-b">
+                        <td className="py-2 pr-3">{u.round_number}</td>
+                        <td className="py-2 pr-3">{fmt(s)}</td>
+                        <td className="py-2 pr-3">{u.signups}</td>
+                        <td className="py-2 pr-3">{fmt(morningIn(s, 'America/New_York'))}</td>
+                        <td className="py-2 pr-3">{fmt(morningIn(s, 'America/Los_Angeles'))}</td>
+                        <td className="py-2 pr-3">{fmt(runIn(s, -105, -45))}</td>
+                        <td className="py-2 pr-3">{fmt(runIn(s, -45, 15))}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <p className="mt-2 text-xs text-muted-foreground">
+            Times shown in your local time. Reminder goes to each person 2–3 hours after they sign up (skipped if the session is less than 6 hours away). Morning goes at 8 AM in each person's own timezone; East/West are shown as examples.
+          </p>
+        </div>
+
+        <p className="text-sm font-semibold">Sent</p>
         {loading ? (
           <p className="text-sm text-muted-foreground">Loading…</p>
         ) : rows.length === 0 ? (
