@@ -146,10 +146,10 @@ export function IgAdsRoundStats() {
       return {
         id: r.id, name: r.round_name || `Round ${r.round_number ?? '?'}`, date: r.first_session_date, status: r.status,
         signups: people.size, calendar: m.calendar, showups: m.attendees, opens,
-        spend: spendReport ? spend[r.id] ?? 0 : null, enrollments: enrolled[r.id]?.size || 0, sales: sales[r.id] || 0,
+        spend: spendReport ? spend[r.id] ?? 0 : null, enrollments: acqEnrolled[r.id] || 0, revenue: revenue[r.id] || 0,
       };
     });
-  }, [rounds, subs, clicks, events, enrollments, orders, spendReport]);
+  }, [rounds, subs, clicks, events, acqEnrollments, orders, spendReport]);
 
   const money = (v: number | null) => (v === null ? '—' : `$${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}`);
   const pct = (v: number | null) => (v === null ? '—' : `${v}%`);
