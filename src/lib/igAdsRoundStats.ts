@@ -33,6 +33,7 @@ export function allocateRoundSpend(
   rounds: SpendRound[],
   dailyRows: DailySpendRow[],
   roundPages: Record<string, AdPage[]>,
+  signupsByPage: Record<string, Partial<Record<AdPage, number>>> = {},
 ): Record<string, number> {
   const result: Record<string, number> = {};
   const dated = rounds.filter((r) => r.first_session_date).map((r) => ({ ...r, day: laDate(r.first_session_date!) }));
@@ -49,9 +50,10 @@ export function allocateRoundSpend(
       const day = sessionDays.find((d) => d >= row.date) || sessionDays[sessionDays.length - 1];
       if (row.date > sessionDays[sessionDays.length - 1]) continue; // spend after the last session
       const group = candidates.filter((r) => r.day === day);
-      const totalSignups = group.reduce((s, r) => s + r.signups, 0);
+      const pageSignups = (r: SpendRound) => signupsByPage[r.id]?.[page] ?? r.signups;
+      const totalSignups = group.reduce((s, r) => s + pageSignups(r), 0);
       for (const r of group) {
-        const share = totalSignups > 0 ? r.signups / totalSignups : 1 / group.length;
+        const share = totalSignups > 0 ? pageSignups(r) / totalSignups : 1 / group.length;
         result[r.id] = Math.round(((result[r.id] || 0) + row.spend * share) * 100) / 100;
       }
     }
