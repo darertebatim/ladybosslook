@@ -153,7 +153,7 @@ export function IgAdsRoundStats() {
         return { calendar: acc.calendar + (v?.calendar || 0), attendees: acc.attendees + (v?.attendees || 0) };
       }, { calendar: 0, attendees: 0 });
       return {
-        id: r.id, name: r.round_name || `Round ${r.round_number ?? '?'}`, date: r.first_session_date, status: r.status,
+        id: r.id, roundNumber: r.round_number as number | null, name: r.round_name || `Round ${r.round_number ?? '?'}`, date: r.first_session_date, status: r.status,
         signups: people.size, calendar: m.calendar as number | null, showups: m.attendees, opens,
         spend: spendReport ? spend[r.id] ?? 0 : null, enrollments: acqEnrolled[r.id] || 0, revenue: revenue[r.id] || 0,
       };
@@ -162,14 +162,13 @@ export function IgAdsRoundStats() {
     // in the snapshot (current/future) use the live calculation.
     const staticByNumber = new Map(STATIC_ROUND_STATS.map((s) => [s.roundNumber, s]));
     const merged = dynamic.map((row) => {
-      const num = Number((row.name.match(/(\d+)/) || [])[1]);
-      const s = staticByNumber.get(num);
+      const s = row.roundNumber != null ? staticByNumber.get(row.roundNumber) : undefined;
       if (!s) return row;
       return { ...row, name: s.name, date: s.date, signups: s.signups, calendar: s.calendar, showups: s.showups, opens: s.opens, spend: s.spend, enrollments: s.enrollments, revenue: s.revenue };
     });
-    const covered = new Set(merged.map((row) => Number((row.name.match(/(\d+)/) || [])[1])));
+    const covered = new Set(merged.map((row) => row.roundNumber).filter((n): n is number => n != null));
     const missing = STATIC_ROUND_STATS.filter((s) => !covered.has(s.roundNumber)).map((s) => ({
-      id: `static-${s.roundNumber}`, name: s.name, date: s.date, status: 'static',
+      id: `static-${s.roundNumber}`, roundNumber: s.roundNumber as number | null, name: s.name, date: s.date, status: 'static',
       signups: s.signups, calendar: s.calendar, showups: s.showups, opens: s.opens,
       spend: s.spend as number | null, enrollments: s.enrollments, revenue: s.revenue,
     }));
