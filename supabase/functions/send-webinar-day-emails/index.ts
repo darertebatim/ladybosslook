@@ -8,9 +8,12 @@
 //   Eastern).
 // - start: sent when the live session is about to begin (within the next
 //   ~45 min), includes the join link.
+// - reminder: sent 2–3 hours after each signup (prerequisite video + add to
+//   calendar). Skipped when the session starts within the next 6 hours —
+//   those people get the morning/start emails instead.
 //
-// Manual mode (admin): { "round_id": "...", "kind": "morning" | "start",
-//   "testEmail": "you@x.com" }
+// Manual mode (admin): { "round_id": "...", "kind": "morning" | "start" |
+//   "reminder", "testEmail": "you@x.com" }
 import { isInternalOrAdmin, deny, escapeHtml } from "../_shared/caller-auth.ts";
 import { buildUnsubUrl, unsubHeaders, appendUnsubFooter, fetchUnsubscribed } from "../_shared/unsubscribe.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -29,7 +32,7 @@ const FROM = "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>";
 const SUPPORT_URL =
   "https://ladyboss.onelink.me/lt6v?af_xp=custom&pid=email_support&c=webinar_day&deep_link_value=support&af_web_dp=https%3A%2F%2Fladybosslook.com%2Fdashboard%2Fchat";
 
-type Kind = "morning" | "start";
+type Kind = "morning" | "start" | "reminder";
 
 // Subjects keep the prefixes that src/lib/igAdsRoundStats.ts uses to classify
 // automated emails for open-rate stats. Copy matches the proven manual
@@ -37,6 +40,7 @@ type Kind = "morning" | "start";
 const SUBJECTS: Record<Kind, string> = {
   morning: "امروز: جذب مشتری واقعی با تبلیغات اینستاگرام 🌷",
   start: "وبینار در حال شروع است — همین حالا وارد شوید 🚀",
+  reminder: "یادآوری وبینار اینستاگرام ادز + ویدیوی پیش‌نیاز 🌷",
 };
 
 function tzParts(d: Date, tz: string): { hour: number; date: string } {
@@ -100,9 +104,46 @@ function fmtZoneShort(d: Date, tz: string): string {
   }
 }
 
+const FA_WEEKDAYS = ["یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه", "شنبه"];
+
+function faWeekday(d: Date, tz: string): string {
+  try {
+    const wd = new Intl.DateTimeFormat("en-US", { timeZone: tz, weekday: "long" }).format(d);
+    const idx = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].indexOf(wd);
+    return idx >= 0 ? FA_WEEKDAYS[idx] : "";
+  } catch {
+    return "";
+  }
+}
+
+function icsDate(d: Date): string {
+  return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+}
+
+/** Tracked Google Calendar link (clicks counted via the calendar-click function). */
+function calendarClickUrl(round: any, email: string): string {
+  const start = new Date(round.first_session_date);
+  const end = new Date(start.getTime() + 90 * 60_000);
+  const meet: string = round.google_meet_link || "";
+  const details =
+    `ویدیوی پیش‌نیاز: https://ladybosslook.com/l/igadsfree/thankyou\n` +
+    `لینک ورود: ${meet}\n` +
+    `پشتیبانی: ${SUPPORT_URL}`;
+  const gcal =
+    "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+    `&text=${encodeURIComponent("Instagram Ads وبینار جذب مشتری با اینستاگرام ادز")}` +
+    `&dates=${icsDate(start)}/${icsDate(end)}` +
+    `&details=${encodeURIComponent(details)}` +
+    `&location=${encodeURIComponent(meet)}`;
+  return (
+    `${supabaseUrl}/functions/v1/calendar-click?to=${encodeURIComponent(gcal)}` +
+    `&p=email:igads&r=${round.id}&e=${encodeURIComponent(email)}`
+  );
+}
+
 // Exact copy of the proven manual campaigns (sent 2026-10-17), with the
 // session time table and join link generated per round.
-function buildHtml(kind: Kind, name: string, round: any, tz: string, unsubscribeUrl: string): string {
+function buildHtml(kind: Kind, name: string, round: any, tz: string, email: string): string {
   const start = new Date(round.first_session_date);
   const meetUrl: string = round.google_meet_link || "";
   const p = (text: string) =>
@@ -133,8 +174,59 @@ function buildHtml(kind: Kind, name: string, round: any, tz: string, unsubscribe
         <br>روی کامپیوتر هستی؟ <a href="https://ladybosslook.com/dashboard/chat" style="color:#EA5B2B;">چت پشتیبانی در داشبورد</a> — یا همین ایمیل را جواب بده.
       </p>`;
 
+  const reminderInner = `
+    <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;">
+      <h1 style="margin:0 0 14px;font-size:20px;line-height:1.6;">
+        سلام دوست عزیز، میخوام مطمئن بشم وبینار اینستاگرام ادز رو از دست نمیدین 🌷
+      </h1>
+
+      ${p(`${faWeekday(start, tz)} فقط <strong>یک ساعت</strong> از وقت‌تان را بگذارید — نه برای تماشای یک ویدیو، برای جلوگیری از هدر رفتن بودجه تبلیغات‌تان.`)}
+      ${p("هر روزی که کمپین تبلیغ‌تان درست تنظیم نشده باشد، بودجه‌تان بی‌صدا می‌سوزد: کلیک می‌گیرید، بازدید می‌گیرید… اما مشتری واقعی نمی‌آید.")}
+      ${p("در این یک ساعت زنده، قدم‌به‌قدم روی صفحه نشان می‌دهم دقیقاً پول‌تان کجا هدر می‌رود و چطور کمپینی بسازید که مشتری واقعی می‌آورد — همان کاری که بیزینس‌های موفق ایرانی در آمریکا و کانادا انجام می‌دهند.")}
+      ${p("ویدیوی ۵ دقیقه‌ای پیش‌نیاز را قبل از جلسه ببینید تا با ذهنی آماده وارد شوید و <strong>۱۰ برابر بیشتر</strong> از جلسه بگیرید.")}
+      <p style="text-align:center;margin:16px 0;">
+        <a href="https://ladybosslook.com/l/igadsfree/thankyou" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
+          دیدن ویدیوی ۵ دقیقه‌ای — قبل از جلسه
+        </a>
+      </p>
+
+      <p style="margin:18px 0 10px;font-size:15px;line-height:1.9;">
+        جلسه را همین حالا به تقویم‌تان اضافه کنید تا جای‌تان از دست نرود 👇
+      </p>
+      <p style="text-align:center;margin:16px 0;">
+               <a href="${calendarClickUrl(round, email)}" style="display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-size:15px;">
+                 افزودن به تقویم
+               </a>
+             </p>
+
+      <div style="border:2px dashed #fda4af;background:#fff1f2;border-radius:14px;padding:12px 16px;margin:18px 0;">
+               <p style="margin:0;font-size:14px;line-height:1.9;font-weight:bold;color:#be123c;">🔥 این آخرین جلسه رایگان این آموزش است — جلسه ضبط نمی‌شود و ظرفیت اتاق زنده محدود است.</p>
+             </div>
+
+
+      <div style="background:#ffffff;border:1px solid #fde68a;border-radius:14px;padding:12px;margin:20px 0;">
+               <p style="margin:0 0 8px;font-size:14px;font-weight:bold;">⏰ ساعت جلسه در شهرهای مختلف</p>
+               <table style="width:100%;border-collapse:collapse;">${zoneRows}</table>
+             </div>
+
+      <p style="margin:14px 0;font-size:14px;"><strong>🔗 لینک ورود:</strong><br>
+               <a href="${escapeHtml(meetUrl)}" style="color:#e11d48;word-break:break-all;">${escapeHtml(meetUrl)}</a></p>
+
+      <p style="margin:20px 0 0;font-size:16px;line-height:1.9;font-weight:bold;">
+        🌷🌷 منتظرتون هستم
+      </p>
+
+      <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
+        سوالی داشتی؟ <a href="${SUPPORT_URL}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
+        <br>روی کامپیوتر هستی؟ <a href="https://ladybosslook.com/dashboard/chat" style="color:#EA5B2B;">چت پشتیبانی در داشبورد</a> — یا همین ایمیل را جواب بده.
+        <br><br>علی لطفی
+      </p>
+    </div>`;
+
   const inner =
-    kind === "morning"
+    kind === "reminder"
+      ? reminderInner
+      : kind === "morning"
       ? `
     <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;">
       ${p("سلام دوست عزیز،")}
@@ -205,20 +297,22 @@ function buildHtml(kind: Kind, name: string, round: any, tz: string, unsubscribe
 </html>`;
 }
 
-interface Registrant { email: string; name: string; timezone: string | null }
+interface Registrant { email: string; name: string; timezone: string | null; created_at: string | null }
 
 async function collectRegistrants(roundId: string): Promise<Registrant[]> {
   const map = new Map<string, Registrant>();
   for (let page = 0; page < 10; page++) {
     const { data, error } = await supabase
       .from("form_submissions")
-      .select("email, name, timezone")
+      .select("email, name, timezone, created_at")
       .eq("round_id", roundId)
       .range(page * 1000, page * 1000 + 999);
     if (error) throw error;
     for (const r of data || []) {
       const e = String(r.email || "").trim().toLowerCase();
-      if (e && !map.has(e)) map.set(e, { email: e, name: String(r.name || "دوست عزیز"), timezone: r.timezone || null });
+      if (e && !map.has(e)) {
+        map.set(e, { email: e, name: String(r.name || "دوست عزیز"), timezone: r.timezone || null, created_at: r.created_at || null });
+      }
     }
     if (!data || data.length < 1000) break;
   }
@@ -276,7 +370,7 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
   const now = new Date();
 
   let registrants: Registrant[] = testEmail
-    ? [{ email: testEmail.toLowerCase(), name: "دوست عزیز", timezone: null }]
+    ? [{ email: testEmail.toLowerCase(), name: "دوست عزیز", timezone: null, created_at: null }]
     : await collectRegistrants(round.id);
 
   if (!testEmail) {
@@ -297,6 +391,19 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
     });
   }
 
+  if (kind === "reminder" && !testEmail) {
+    // Only signups from 2–3 hours ago, and only when the session is still
+    // more than 6 hours away (closer signups rely on morning/start emails).
+    if (sessionStart.getTime() - now.getTime() < 6 * 3600_000) {
+      return { round: round.round_name, kind, recipients: 0, sent: 0, failed: 0 };
+    }
+    registrants = registrants.filter((r) => {
+      if (!r.created_at) return false;
+      const age = now.getTime() - new Date(r.created_at).getTime();
+      return age >= 2 * 3600_000 && age < 3 * 3600_000;
+    });
+  }
+
   let sent = 0;
   let failed = 0;
   const batchSize = 100;
@@ -310,7 +417,7 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
           from: FROM,
           to: [r.email],
           subject,
-          html: appendUnsubFooter(buildHtml(kind, r.name, round, tz, unsubscribeUrl), unsubscribeUrl),
+          html: appendUnsubFooter(buildHtml(kind, r.name, round, tz, r.email), unsubscribeUrl),
           reply_to: "support@ladybosslook.com",
           tags: [
             { name: "campaign", value: "webinar_day" },
@@ -382,6 +489,16 @@ Deno.serve(async (req) => {
         .lte("first_session_date", new Date(now + 45 * 60_000).toISOString());
       if (e2) throw e2;
       for (const r of startRounds || []) rounds.push({ round: r, kind: "start" });
+
+      // Reminder: any future session (per-signup 2–3h window filter applies).
+      const { data: reminderRounds, error: e3 } = await supabase
+        .from("program_rounds")
+        .select(roundCols)
+        .eq("program_slug", "igadsfree")
+        .gte("first_session_date", new Date(now + 6 * 3600_000).toISOString())
+        .lte("first_session_date", new Date(now + 14 * 24 * 3600_000).toISOString());
+      if (e3) throw e3;
+      for (const r of reminderRounds || []) rounds.push({ round: r, kind: "reminder" });
     }
 
     const results = [];
