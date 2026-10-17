@@ -346,6 +346,7 @@ const ProgramPage = ({ programSlug, earlyOffer = false }: { programSlug?: string
     <>
       <SEOHead
         title={`${program.title} | Ladyboss Academy`}
+        noIndex={earlyOffer}
         description={program.description ? program.description.replace(/<[^>]*>/g, '').slice(0, 155) : `Learn about ${program.title}`}
       />
       <div className="min-h-screen flex flex-col bg-background">
