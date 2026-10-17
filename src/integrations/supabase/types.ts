@@ -3508,6 +3508,7 @@ export type Database = {
           round_id: string | null
           source: string | null
           submitted_at: string
+          timezone: string | null
           user_agent: string | null
         }
         Insert: {
@@ -3531,6 +3532,7 @@ export type Database = {
           round_id?: string | null
           source?: string | null
           submitted_at?: string
+          timezone?: string | null
           user_agent?: string | null
         }
         Update: {
@@ -3554,6 +3556,7 @@ export type Database = {
           round_id?: string | null
           source?: string | null
           submitted_at?: string
+          timezone?: string | null
           user_agent?: string | null
         }
         Relationships: []
