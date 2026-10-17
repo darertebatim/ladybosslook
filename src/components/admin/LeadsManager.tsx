@@ -220,7 +220,7 @@ export function LeadsManager() {
       // Get payment info (city/country) from the most recent paid order
       let paymentInfo: { city: string | null; country: string | null } | null = null;
       if (orders && orders.length > 0) {
-        const mostRecentOrder = orders.find(o => o.status === 'paid' && o.stripe_session_id);
+        const mostRecentOrder = orders.find(o => o.status === 'paid' && o.stripe_session_id && !o.stripe_session_id.startsWith('manual_'));
         if (mostRecentOrder?.stripe_session_id) {
           try {
             const { data: sessionDetails } = await supabase.functions.invoke('get-stripe-session-details', {
