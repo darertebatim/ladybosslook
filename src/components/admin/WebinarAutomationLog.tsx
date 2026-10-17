@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { webinarSendAt } from '../../../supabase/functions/_shared/webinar-timing';
 
 type Kind = 'reminder' | 'morning' | 'onehour' | 'start';
 const KINDS: { key: Kind; label: string }[] = [
@@ -12,14 +13,6 @@ const KINDS: { key: Kind; label: string }[] = [
   { key: 'start', label: 'Starting now' },
 ];
 const TEST_EMAIL = 'darertebatim@gmail.com';
-
-/** The automation runs hourly at minute :20. Returns the first run time inside [from, to] (ms offsets from session start). */
-function runIn(session: Date, fromMin: number, toMin: number): Date | null {
-  const t = new Date(session.getTime() + fromMin * 60_000);
-  t.setUTCSeconds(0, 0);
-  while (t.getUTCMinutes() !== 20) t.setTime(t.getTime() + 60_000);
-  return t.getTime() <= session.getTime() + toMin * 60_000 ? t : null;
-}
 
 /** 9:00–9:59 AM run on the session day in a timezone, as a real instant. */
 function morningIn(session: Date, tz: string): Date | null {
@@ -70,7 +63,8 @@ export function WebinarAutomationLog() {
         const kind = String(e.tags?.kind ?? '');
         const k = `${round}|${kind}`;
         if (!map.has(k)) map.set(k, { sent: new Set(), delivered: new Set(), opened: new Set(), bounced: new Set(), last: '', round, kind });
-        const g = map.get(k)!;
+        const g = map.get(k);
+        if (!g) continue;
         const r = String(e.recipient || '').toLowerCase();
         if (e.event_type === 'sent') g.sent.add(r);
         if (e.event_type === 'delivered') g.delivered.add(r);
@@ -173,8 +167,8 @@ export function WebinarAutomationLog() {
                         <td className="py-2 pr-3">{u.signups}</td>
                         <td className="py-2 pr-3">{fmt(morningIn(s, 'America/New_York'))}</td>
                         <td className="py-2 pr-3">{fmt(morningIn(s, 'America/Los_Angeles'))}</td>
-                        <td className="py-2 pr-3">{fmt(runIn(s, -105, -45))}</td>
-                        <td className="py-2 pr-3">{fmt(runIn(s, -45, 15))}</td>
+                        <td className="py-2 pr-3">{fmt(webinarSendAt(s, 'onehour'))}</td>
+                        <td className="py-2 pr-3">{fmt(webinarSendAt(s, 'start'))}</td>
                       </tr>
                     );
                   })}
@@ -183,7 +177,7 @@ export function WebinarAutomationLog() {
             </div>
           )}
           <p className="mt-2 text-xs text-muted-foreground">
-            Times shown in your local time. Reminder goes to each person 2–3 hours after they sign up (skipped if the session is less than 6 hours away). Morning goes at 9 AM in each person's own timezone; East/West are shown as examples.
+            Times shown in your local time. 1-hour and Starting-now emails are scheduled exactly 60 minutes before and at session start; inbox delivery may take a few moments. Reminder goes to each person 2–3 hours after signup (skipped within 6 hours of the session). Morning goes during the 9 AM hour in each person's timezone; East/West are examples.
           </p>
         </div>
 
