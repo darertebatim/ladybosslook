@@ -40,6 +40,7 @@ interface AudienceFilter {
   target_instructor_ids?: string[];
   include_forms?: string[];
   exclude_forms?: string[];
+  include_user_ids?: string[];
 }
 
 /** Resolve a saved-audience filter to a Set of allowed user_ids, or null if no rule. */
@@ -82,7 +83,8 @@ async function resolveAudienceUserIds(
     (audience.include_update_status?.length ?? 0) > 0 ||
     (audience.target_instructor_ids?.length ?? 0) > 0 ||
     (audience.include_forms?.length ?? 0) > 0 ||
-    (audience.exclude_forms?.length ?? 0) > 0;
+    (audience.exclude_forms?.length ?? 0) > 0 ||
+    (audience.include_user_ids?.length ?? 0) > 0;
   if (!hasAnyRule) return null;
 
   let candidates: Set<string>;
@@ -102,6 +104,11 @@ async function resolveAudienceUserIds(
       if (!data || data.length < PAGE) break;
       from += PAGE;
     }
+  }
+
+  if ((audience.include_user_ids?.length ?? 0) > 0) {
+    const picked = new Set(audience.include_user_ids!);
+    candidates = new Set([...candidates].filter((id) => picked.has(id)));
   }
 
   if ((audience.include_programs?.length ?? 0) > 0) {

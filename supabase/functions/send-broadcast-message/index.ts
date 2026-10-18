@@ -43,6 +43,7 @@ interface AudienceFilter {
   target_instructor_ids?: string[];
   include_forms?: string[];
   exclude_forms?: string[];
+  include_user_ids?: string[];
 }
 
 /**
@@ -90,7 +91,8 @@ async function resolveAudienceUserIds(
     (audience.include_update_status?.length ?? 0) > 0 ||
     (audience.target_instructor_ids?.length ?? 0) > 0 ||
     (audience.include_forms?.length ?? 0) > 0 ||
-    (audience.exclude_forms?.length ?? 0) > 0;
+    (audience.exclude_forms?.length ?? 0) > 0 ||
+    (audience.include_user_ids?.length ?? 0) > 0;
   if (!hasAnyRule) return null;
 
   // Start from "all profiles", then narrow.
@@ -117,6 +119,12 @@ async function resolveAudienceUserIds(
       if (!data || data.length < PAGE) break;
       from += PAGE;
     }
+  }
+
+  // include_user_ids (hand-picked people)
+  if ((audience.include_user_ids?.length ?? 0) > 0) {
+    const picked = new Set(audience.include_user_ids!);
+    candidates = new Set([...candidates].filter((id) => picked.has(id)));
   }
 
   // include_programs (must be in at least one)

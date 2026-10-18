@@ -1889,6 +1889,7 @@ export type Database = {
           include_programs: string[]
           include_tools: string[]
           include_update_status: string[]
+          include_user_ids: string[]
           name: string
           target_instructor_ids: string[]
           target_languages: string[]
@@ -1911,6 +1912,7 @@ export type Database = {
           include_programs?: string[]
           include_tools?: string[]
           include_update_status?: string[]
+          include_user_ids?: string[]
           name: string
           target_instructor_ids?: string[]
           target_languages?: string[]
@@ -1933,6 +1935,7 @@ export type Database = {
           include_programs?: string[]
           include_tools?: string[]
           include_update_status?: string[]
+          include_user_ids?: string[]
           name?: string
           target_instructor_ids?: string[]
           target_languages?: string[]

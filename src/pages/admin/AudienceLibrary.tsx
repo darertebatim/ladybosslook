@@ -122,6 +122,7 @@ export default function AudienceLibrary() {
     if (p.target_instructor_ids.length) parts.push(`👩‍🏫 ${p.target_instructor_ids.length} instructors`);
     if (p.include_forms?.length) parts.push(`📝 filled ${p.include_forms.length} form(s)`);
     if (p.exclude_forms?.length) parts.push(`🚫 not filled ${p.exclude_forms.length} form(s)`);
+    if ((p as any).include_user_ids?.length) parts.push(`👤 ${(p as any).include_user_ids.length} people`);
     if (p.include_update_status.length) parts.push(`📱 ${p.include_update_status.join(', ')}`);
     return parts.join(' · ') || 'Empty audience';
   };
