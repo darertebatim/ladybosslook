@@ -82,7 +82,7 @@ export function MetaAudienceExport() {
               className="cursor-pointer select-none px-3 py-1"
               onClick={() => toggle(c.key)}
             >
-              {c.label ?? c.key}
+              {c.label}
             </Badge>
           ))}
         </div>
