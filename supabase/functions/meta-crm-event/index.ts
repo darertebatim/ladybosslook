@@ -8,7 +8,7 @@ const PIXEL_ID = '755747250681175';
 const API_VERSION = 'v21.0';
 const LEAD_EVENT_SOURCE = 'Ladyboss Academy';
 const MAX_BATCH = 200;
-const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
+const NINETY_DAYS_MS = 7 * 24 * 60 * 60 * 1000 - 60 * 60 * 1000; // Meta CAPI rejects events older than 7 days
 
 const STAGES: Record<string, string> = {
   attended: 'WebinarAttended',

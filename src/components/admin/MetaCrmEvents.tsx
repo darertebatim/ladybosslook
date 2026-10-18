@@ -103,7 +103,7 @@ export function MetaCrmEvents() {
           <div className="flex flex-wrap gap-2">
             <Button onClick={runSync} disabled={syncing}>
               <Send className="mr-2 h-4 w-4" />
-              {syncing ? 'Sending…' : 'Sync purchases & email engagement (last 90 days)'}
+              {syncing ? 'Sending…' : 'Sync purchases & email engagement (last 7 days)'}
             </Button>
             <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
               <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
