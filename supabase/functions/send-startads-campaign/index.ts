@@ -33,22 +33,49 @@ const TARGET_SOURCES = [
   "smartinsta_registration",
 ];
 
-type Kind = "invite" | "focus" | "urgency";
-const KINDS: Kind[] = ["invite", "focus", "urgency"];
+type Kind = "invite" | "focus" | "urgency" | "proof" | "freedom";
+const KINDS: Kind[] = ["invite", "focus", "urgency", "proof", "freedom"];
+// Kinds sent to people who already registered for Start Ads (show-up nurture).
+const REGISTRANT_KINDS: Kind[] = ["proof", "freedom"];
+const WA = (text: string) => `https://wa.me/16265028538?text=${encodeURIComponent(text)}`;
 const SUBJECTS: Record<Kind, string> = {
   invite: "یک دعوت خصوصی (فقط ۵۰ نفر از بچه‌های اینستاگرام) 🎁",
   focus: "محصول یا خدمتت عالیه، ولی مشتری جدید کجاست؟ 🤔",
   urgency: "بازار آخر سال نزدیکه (چرا جلسه اول رو براتون رایگان کردم؟) 🛍️",
+  proof: "چرا متا ادز قابل‌اعتمادترین شیر آب مشتریه؟ (با اعداد واقعی) 📊",
+  freedom: "چرخه خطرناکی که خیلی از ما توش گیر کردیم... (و راه نجات) 🔄",
 };
 const PREVIEWS: Record<Kind, string> = {
   invite: "جلسه اول برنامه ۳ هفته‌ای رو رایگان گذاشتم براتون...",
   focus: "چرا بیشتر تبلیغ‌ها دیده نمیشن و توی جلسه اول دقیقاً روی چی کار می‌کنیم؟",
   urgency: "فقط روی پست گذاشتن و شانس نمیشه حساب کرد؛ چرا این آخرین فرصت امساله؟",
+  proof: "مقایسه با گوگل ادز، آمار واقعی کاربران و یک مثال ساده برای بیزینس‌های محلی.",
+  freedom: "چرا نبود مشتری پیوسته، انرژی، سود و آرامش زندگیت رو می‌بلعه؟",
 };
 
 type Registrant = { email: string; name: string };
 
-async function collectRecipients(): Promise<Registrant[]> {
+async function collectRegistrants(): Promise<Registrant[]> {
+  const map = new Map<string, Registrant>();
+  for (let page = 0; page < 20; page++) {
+    const { data, error } = await supabase
+      .from("form_submissions")
+      .select("email, name")
+      .eq("source", "startads_registration")
+      .range(page * 1000, page * 1000 + 999);
+    if (error) throw error;
+    for (const r of data || []) {
+      const e = String(r.email || "").trim().toLowerCase();
+      if (!e || map.has(e)) continue;
+      map.set(e, { email: e, name: String(r.name || "دوست عزیز").trim() || "دوست عزیز" });
+    }
+    if (!data || data.length < 1000) break;
+  }
+  return [...map.values()];
+}
+
+async function collectRecipients(kind: Kind): Promise<Registrant[]> {
+  if (REGISTRANT_KINDS.includes(kind)) return collectRegistrants();
   const map = new Map<string, Registrant>();
   for (let page = 0; page < 40; page++) {
     const { data, error } = await supabase
@@ -129,7 +156,49 @@ const SESSION_BOX = `<div style="background:#fff7ed;border:1px solid #fed7aa;bor
   ⚠️ جلسه ${R("ضبط نمیشه")} و فقط لایو برگزار میشه.
 </div>`;
 
+const WA_BTN = (label: string, text: string) => `<div style="text-align:center;margin:8px 0 4px;">
+        <a href="${WA(text)}" style="display:inline-block;background:#16a34a;color:#ffffff;text-decoration:none;font-weight:bold;font-size:17px;padding:14px 30px;border-radius:999px;">${label}</a>
+      </div>`;
+const SIGN = `<p style="margin:20px 0 0;">ارادتمند،<br/><strong>علی لطفی</strong><br/>Rilo App — Ladybosslook LLC</p>`;
+
 function bodyFor(kind: Kind, name: string): string {
+  if (kind === "proof") {
+    return [
+      P(`سلام ${name} عزیز، 👋`),
+      P(`مستقیم میرم سر اصل مطلب. خیلی‌ها تبلیغات رو یک هزینه یا ریسک مبهم می‌بینن؛ اما بیزینس‌های موفق آمریکا و کانادا تبلیغات اینستاگرام رو یک ${R("شیر آب قابل‌کنترل مشتری")} می‌بینن: مشتری بیشتر خواستی، بازش می‌کنی؛ سرت شلوغ شد، می‌بندیش. 🚰`),
+      P(`<strong>۱. مشتری‌هات کجان؟</strong><br/>اینستاگرام بیش از ${R("۲ میلیارد کاربر فعال ماهانه")} داره و مردم آمریکا و کانادا هر روز به‌طور میانگین حدود ۳۰ دقیقه توش هستن. مشتری محلی تو هم بینشونه. 📱`),
+      P(`<strong>۲. چرا بیش از ۱۰ میلیون بیزینس روی متا تبلیغ می‌کنن؟</strong><br/>چون متا رفتار، علاقه و موقعیت مخاطب رو می‌شناسه و می‌تونه پیامت رو دقیقاً جلوی آدم‌های منطقه خودت بذاره. 🎯`),
+      P(`<strong>۳. پس Google Ads چی؟</strong><br/>گوگل عالیه، اما فقط کسانی رو می‌گیره که همین الان دارن اسم خدمتت رو سرچ می‌کنن، و هزینه هر کلیک برای خیلی از کلمات بیزینسی در آمریکا و کانادا ${R("گاهی ۱۵ تا ۵۰ دلار")} میشه. 💸<br/>متا ادز ${R("تقاضا می‌سازه")}: پیشنهادت رو جلوی آدم‌هایی می‌بره که هنوز سرچ نکردن، ولی نیاز و توان خرید دارن، معمولاً با هزینه خیلی کمتر.`),
+      P(`<strong>یک مثال ساده:</strong><br/>فرض کن یک بیزینس خدماتی محلی با بودجه روزانه ${R("۱۵ دلار")} در شعاع ۱۵ مایلی تبلیغ کنه. اگر از هر چند ده نفری که پیام میدن، چند نفر مشتری بشن، درآمد همون چند مشتری می‌تونه چند برابر کل بودجه تبلیغ رو برگردونه. این همون سیستمیه که می‌خوایم قدم‌به‌قدم بسازیم. 📈`, 20),
+      `<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px 14px;margin:0 0 14px;">✅ <strong>یک قدم عملی قبل از شنبه:</strong><br/>لینک پیج اینستاگرامت رو در واتس‌اپ برام بفرست. شخصاً چکش می‌کنم و بهت میگم برای شروع تبلیغات آماده‌ست یا چه چیزهایی رو باید قبلش مرتب کنی.</div>`,
+      WA_BTN("📲 ارسال لینک اینستاگرام در واتس‌اپ", "سلام علی عزیز، این لینک پیج منه برای جلسه شنبه:"),
+      SESSION_BOX,
+      SIGN,
+    ].join("\n");
+  }
+  if (kind === "freedom") {
+    return [
+      P(`سلام ${name} عزیز، 👋`),
+      P(`می‌خوام یک چرخه تلخ ولی خیلی واقعی رو برات تعریف کنم که خیلی از بیزینس‌های خدماتی و تک‌نفره در مهاجرت تجربه‌ش می‌کنن: 🔄`),
+      P(`<strong>۱. مشتری کم میشه.</strong> اجاره، هزینه‌ها و خرج زندگی سر جاشه، ولی ورودی مشتری قطره‌چکانی شده. 😟`),
+      P(`<strong>۲. تخفیف میدی و ${R("سودت رو می‌سوزونی")}.</strong> فقط برای اینکه مشتری بیاد، قیمت رو پایین میاری. مشتری میاد، ولی سودی که باید برای رشدت بمونه دود میشه. 💸`),
+      P(`<strong>۳. بیشتر هاسل می‌کنی.</strong> حالا باید دو برابر کار کنی تا فقط به درآمد ماه قبل برگردی.`),
+      P(`<strong>۴. باز هم بیشتر هاسل می‌کنی.</strong> چون سود نداری، نمی‌تونی کسی رو استخدام کنی. پاسخگویی، اجرا، تحویل کار و حساب‌وکتاب همه با خودته.`),
+      P(`<strong>۵. و آخر ماه...</strong> خسته‌ای، انرژیت تموم شده، و دوباره از اول نگرانی که ماه بعد مشتری از کجا میاد. 😮‍💨`),
+      P(`این چرخه یک ریشه داره: ${R("نبود یک سیستم قابل‌پیش‌بینی برای جذب مشتری.")}`),
+      P(`وقتی تبلیغات اینستاگرام رو اصولی یاد بگیری، بازی عوض میشه:<br/>
+⏱️ <strong>وقتت برمی‌گرده:</strong> دیگه لازم نیست کل روز دنبال مشتری بدوی؛ تبلیغت در پس‌زمینه برات لید میاره.<br/>
+💰 <strong>سودت حفظ میشه:</strong> وقتی تقاضا داری، مجبور به تخفیف نیستی و قیمت واقعی کارت رو می‌گیری.<br/>
+👥 <strong>می‌تونی تیم بسازی:</strong> سود بیشتر یعنی توان استخدام و تقسیم کار.<br/>
+😌 <strong>آرامش و کنترل:</strong> می‌دونی چقدر خرج کنی تا چند مشتری بیاد، و کنترل بیزینست دست خودته.`),
+      P(`توی جلسه اول (شنبه ساعت ۹:۳۰ صبح لس‌آنجلس) می‌خوایم همین چرخه رو متوقف کنیم و پایه‌های سیستم جذب مشتری تو رو بچینیم. ✨`, 20),
+      `<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px 14px;margin:0 0 14px;">❓ <strong>یک سوال ساده:</strong><br/>برای اینکه خیالت از هزینه‌ها و درآمد ماهانه راحت باشه، ${R("ماهانه چند مشتری جدید")} نیاز داری؟ این عدد رو در واتس‌اپ برام بفرست تا بهت بگم چه بودجه و ساختار تبلیغی واقع‌بینانه‌ست.</div>`,
+      WA_BTN("📲 ارسال پیام به علی در واتس‌اپ", "سلام علی عزیز، من برای بیزینسم ماهانه این تعداد مشتری جدید نیاز دارم:"),
+      SESSION_BOX,
+      `<p style="margin:16px 0 0;">شنبه در جلسه اول منتظرتم! 🌷</p>`,
+      SIGN,
+    ].join("\n");
+  }
   if (kind === "focus") {
     return [
       P(`سلام ${name} عزیز، 👋`),
@@ -234,7 +303,7 @@ Deno.serve(async (req) => {
 
     let recipients: Registrant[] = testEmail
       ? [{ email: testEmail, name: "دوست عزیز" }]
-      : await collectRecipients();
+      : await collectRecipients(kind);
 
     if (!testEmail) {
       const [unsub, alreadySent] = await Promise.all([
