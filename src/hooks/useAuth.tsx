@@ -49,41 +49,57 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [adminPages, setAdminPages] = useState<string[]>([]);
   const [roleCheckComplete, setRoleCheckComplete] = useState(false);
 
+  const adminCacheKey = (userId: string) => `simora_admin_access_${userId}`;
+  const readAdminCache = (userId: string): { isAdmin: boolean; pages: string[] } | null => {
+    try {
+      const raw = localStorage.getItem(adminCacheKey(userId));
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+  };
+  const restoreFromCache = (userId: string): boolean => {
+    const cached = readAdminCache(userId);
+    if (!cached) return false;
+    setIsAdmin(!!cached.isAdmin);
+    setAdminPages(Array.isArray(cached.pages) ? cached.pages : []);
+    return true;
+  };
+
   const checkUserRole = async (userId: string) => {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
-        .single();
-      
+        .maybeSingle();
+      if (error) throw error;
+
       const userIsAdmin = data?.role === 'admin';
-      setIsAdmin(userIsAdmin);
-      
-      // If not admin, fetch their specific page permissions
+      let pages: string[] = [];
       if (!userIsAdmin) {
-        await fetchAdminPermissions(userId);
-      } else {
+        const { data: perms, error: permErr } = await supabase
+          .from('user_admin_permissions')
+          .select('page_slug')
+          .eq('user_id', userId);
+        if (permErr) throw permErr;
+        pages = perms?.map(p => p.page_slug) || [];
+      }
+      setIsAdmin(userIsAdmin);
+      setAdminPages(pages);
+      try {
+        if (userIsAdmin || pages.length > 0) {
+          localStorage.setItem(adminCacheKey(userId), JSON.stringify({ isAdmin: userIsAdmin, pages }));
+        } else {
+          localStorage.removeItem(adminCacheKey(userId));
+        }
+      } catch { /* ignore */ }
+    } catch {
+      // Network failure (e.g. offline): keep last known permissions instead of revoking
+      if (!restoreFromCache(userId)) {
+        setIsAdmin(false);
         setAdminPages([]);
       }
-    } catch {
-      setIsAdmin(false);
-      setAdminPages([]);
     } finally {
       setRoleCheckComplete(true);
-    }
-  };
-
-  const fetchAdminPermissions = async (userId: string) => {
-    try {
-      const { data } = await supabase
-        .from('user_admin_permissions')
-        .select('page_slug')
-        .eq('user_id', userId);
-      
-      setAdminPages(data?.map(p => p.page_slug) || []);
-    } catch {
-      setAdminPages([]);
     }
   };
 
