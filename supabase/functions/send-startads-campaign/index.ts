@@ -33,8 +33,18 @@ const TARGET_SOURCES = [
   "smartinsta_registration",
 ];
 
-const SUBJECT = "یک دعوت خصوصی (فقط ۵۰ نفر از بچه‌های اینستاگرام) 🎁";
-const PREVIEW_TEXT = "جلسه اول برنامه ۳ هفته‌ای رو رایگان گذاشتم براتون...";
+type Kind = "invite" | "focus" | "urgency";
+const KINDS: Kind[] = ["invite", "focus", "urgency"];
+const SUBJECTS: Record<Kind, string> = {
+  invite: "یک دعوت خصوصی (فقط ۵۰ نفر از بچه‌های اینستاگرام) 🎁",
+  focus: "محصول یا خدمتت عالیه، ولی مشتری جدید کجاست؟ 🤔",
+  urgency: "بازار آخر سال نزدیکه (چرا جلسه اول رو براتون رایگان کردم؟) 🛍️",
+};
+const PREVIEWS: Record<Kind, string> = {
+  invite: "جلسه اول برنامه ۳ هفته‌ای رو رایگان گذاشتم براتون...",
+  focus: "چرا بیشتر تبلیغ‌ها دیده نمیشن و توی جلسه اول دقیقاً روی چی کار می‌کنیم؟",
+  urgency: "فقط روی پست گذاشتن و شانس نمیشه حساب کرد؛ چرا این آخرین فرصت امساله؟",
+};
 
 type Registrant = { email: string; name: string };
 
@@ -80,25 +90,68 @@ async function collectAlreadySent(kind: string): Promise<Set<string>> {
 const R = (t: string) =>
   `<strong style="color:#dc2626;">${t}</strong>`;
 
-function buildHtml(name: string): string {
+const P = (t: string, mb = 12) => `<p style="margin:0 0 ${mb}px;">${t}</p>`;
+const CTA = (label: string) => `<div style="text-align:center;margin:8px 0 4px;">
+        <a href="${LANDING_URL}" style="display:inline-block;background:#e11d48;color:#ffffff;text-decoration:none;font-weight:bold;font-size:17px;padding:14px 34px;border-radius:999px;">${label}</a>
+      </div>`;
+const SESSION_BOX = `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px 14px;margin:18px 0 0;font-size:14px;line-height:1.9;">
+  📅 <strong>زمان جلسه اول:</strong> شنبه ۲۴ اکتبر — ۹:۳۰ صبح لس‌آنجلس (PDT) / ۱۲:۳۰ ظهر نیویورک و تورنتو (EDT)<br/>
+  ⚠️ جلسه ${R("ضبط نمیشه")} و فقط لایو برگزار میشه.
+</div>`;
+
+function bodyFor(kind: Kind, name: string): string {
+  if (kind === "focus") {
+    return [
+      P(`سلام ${name} عزیز، 👋`),
+      P(`احتمالاً برات پیش اومده که یک پست رو با دکمه Boost تبلیغ کردی، چند تا لایک و شاید یکی دو تا پیام گرفتی، ولی آخرش هیچ ${R("مشتری واقعی")} یا فروشی ازش درنیومد. 😕`),
+      P(`خیلی‌ها فکر می‌کنن مشکل از بودجه کم یا الگوریتم اینستاگرامه. ولی واقعیت اینه: وقتی کسی در آمریکا یا کانادا برای اولین بار تبلیغ تو رو می‌بینه، هنوز هیچ دلیلی نداره که بهت اعتماد کنه.`),
+      P(`راه انداختن کمپین و کار با Ads Manager کاریه که در طول ${R("دوره ۳ هفته‌ای")} قدم‌به‌قدم با هم انجام میدیم.`),
+      P(`اما توی <strong>جلسه اول (شنبه ۲۴ اکتبر)</strong> از یک جای اساسی‌تر شروع می‌کنیم: ${R("شفاف کردن پیامی که به مشتری میدی")} 🎯`),
+      P(`توی این جلسه ۹۰ دقیقه‌ای لایو مشخص می‌کنیم:<br/>
+۱. از بین خدماتت، دقیقاً <strong>کدوم پیشنهاد</strong> شانس جذب مشتری جدید در بازار محلی رو داره.<br/>
+۲. چه زاویه‌ای رو توی معرفی بگی که مخاطب ارزش کارت رو بفهمه و به جای رد شدن، بهت پیام بده.<br/>
+۳. چه اشتباهاتی باعث میشه آدم‌ها قیمت بپرسن و غیبشون بزنه! 👻`),
+      P(`جایگاه‌های ${R("رایگان")} ۵۰ نفره داره پر میشه. اگر بیزینس فعال در آمریکا یا کانادا داری، جلسه اول مهمون مایی: ✨`, 20),
+      CTA("🎬 دیدن ویدیو و رزرو جایگاه رایگان"),
+      SESSION_BOX,
+    ].join("\n");
+  }
+  if (kind === "urgency") {
+    return [
+      P(`سلام ${name} عزیز، 👋`),
+      P(`مستقیم میرم سر اصل مطلب: ${R("بازار آخر سال")} در آمریکا و کانادا نزدیکه. 🛍️`),
+      P(`اگر تا الان پست گذاشتی، استوری رفتی یا دکمه Boost رو زدی و فقط چند تا لایک یا کلیک گرون نصیبت شده، خودت خوب می‌دونی که برای بازار آخر سال ${R("فقط روی پست گذاشتن و شانس آوردن نمیشه حساب کرد.")}`),
+      P(`اگر می‌خوای از خریدهای آخر سال سهم واقعی داشته باشی، سیستم جذب مشتریت باید <strong>قبل از شروع شلوغی‌ها</strong> ستاپ شده باشه. ⏰`),
+      P(`برای همین این ${R("آخرین دوره امسال")} برای بیزینس‌های ایرانی آمریکا و کاناداست.`),
+      P(`این دوره پولیه؛ اما چون آخرین سری قبل از بازار آخر ساله، تصمیم گرفتم 👈 <strong>جلسه اول رو برای ${R("فقط ۵۰ نفر رایگان")} باز بذارم</strong> تا تو هم قبل از آخر سال بتونی ازش استفاده کنی. 🎁`),
+      P(`جلسه اول وبینار تئوری نیست؛ یک کلاس واقعی و تعاملی با پرسش‌وپاسخه. برای همین ظرفیت رو زیر ۵۰ نفر نگه داشتیم تا حق کسی ضایع نشه.`),
+      P(`به محض اینکه ظرفیت پر بشه، صفحه ثبت‌نام بسته میشه: ⏳`, 20),
+      CTA("🎟️ رزرو جایگاه رایگان جلسه اول"),
+      SESSION_BOX,
+    ].join("\n");
+  }
+  return [
+    P(`سلام ${name} عزیز، 👋`),
+    P(`تصمیم گرفتم جلسه اول دوره جذب مشتری رو ${R("رایگان")} براتون باز کنم... 🎁`),
+    P(`توی ویدیوی کوتاهی که گذاشتم مستقیم گفتم: بیشتر بیزینس‌های کوچیک توی آمریکا و کانادا مشکل محصول ندارن — مشکلشون اینه که ${R("مشتری بعدی")} رو نمی‌دونن از کجا میاد. 📉`),
+    P(`شنبه، جلسه اول برنامه ۳ هفته‌ای «شروع تبلیغات اینستاگرامی» برگزار میشه و من ${R("فقط ۵۰ جایگاه رایگان")} برای بچه‌هایی که قبلاً توی وبینارهای اینستاگرام ثبت‌نام کردن کنار گذاشتم. ✨`),
+    P(`اول ویدیو رو ببین، بعد اگر حس کردی این مسیر برای توئه، جایگاهت رو رزرو کن — قبل از اینکه ۵۰ صندلی پر بشه. ⏳`, 20),
+    CTA("🎬 دیدن ویدیو و رزرو جایگاه رایگان"),
+    `<p style="margin:18px 0 0;text-align:center;font-size:13px;color:#64748b;">ظرفیت محدود · بدون ضبط · شنبه به وقت محلی تو 📅</p>`,
+  ].join("\n");
+}
+
+function buildHtml(kind: Kind, name: string): string {
   return `<!DOCTYPE html>
 <html dir="rtl" lang="fa">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#f8fafc;font-family:Tahoma,Arial,sans-serif;">
-<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">${PREVIEW_TEXT}</div>
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">${PREVIEWS[kind]}</div>
 <div style="max-width:560px;margin:0 auto;padding:16px;">
   <div style="background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0;">
     <img src="${HEADER_IMAGE}" alt="جلسه اول رایگان — جذب مشتری و تبلیغات اینستاگرامی" width="560" style="display:block;width:100%;height:auto;" />
     <div style="padding:24px 22px 28px;color:#1e293b;font-size:15px;line-height:2;">
-      <p style="margin:0 0 12px;">سلام ${name} عزیز، 👋</p>
-      <p style="margin:0 0 12px;">تصمیم گرفتم جلسه اول دوره جذب مشتری رو ${R("رایگان")} براتون باز کنم... 🎁</p>
-      <p style="margin:0 0 12px;">توی ویدیوی کوتاهی که گذاشتم مستقیم گفتم: بیشتر بیزینس‌های کوچیک توی آمریکا و کانادا مشکل محصول ندارن — مشکلشون اینه که ${R("مشتری بعدی")} رو نمی‌دونن از کجا میاد. 📉</p>
-      <p style="margin:0 0 12px;">شنبه، جلسه اول برنامه ۳ هفته‌ای «شروع تبلیغات اینستاگرامی» برگزار میشه و من ${R("فقط ۵۰ جایگاه رایگان")} برای بچه‌هایی که قبلاً توی وبینارهای اینستاگرام ثبت‌نام کردن کنار گذاشتم. ✨</p>
-      <p style="margin:0 0 20px;">اول ویدیو رو ببین، بعد اگر حس کردی این مسیر برای توئه، جایگاهت رو رزرو کن — قبل از اینکه ۵۰ صندلی پر بشه. ⏳</p>
-      <div style="text-align:center;margin:8px 0 4px;">
-        <a href="${LANDING_URL}" style="display:inline-block;background:#e11d48;color:#ffffff;text-decoration:none;font-weight:bold;font-size:17px;padding:14px 34px;border-radius:999px;">🎬 دیدن ویدیو و رزرو جایگاه رایگان</a>
-      </div>
-      <p style="margin:18px 0 0;text-align:center;font-size:13px;color:#64748b;">ظرفیت محدود · بدون ضبط · شنبه به وقت محلی تو 📅</p>
+      ${bodyFor(kind, name)}
       <p style="margin:24px 0 0;">می‌بینمت، 🌷<br/>علی لطفی<br/><span style="color:#64748b;font-size:13px;">Rilo App — Ladybosslook llc</span></p>
     </div>
   </div>
@@ -140,8 +193,8 @@ Deno.serve(async (req) => {
     if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY missing");
 
     const body = await req.json().catch(() => ({}));
-    const kind = String(body?.kind || "invite");
-    if (kind !== "invite") {
+    const kind = String(body?.kind || "invite") as Kind;
+    if (!KINDS.includes(kind)) {
       return new Response(JSON.stringify({ error: "unknown kind" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -178,8 +231,8 @@ Deno.serve(async (req) => {
           return {
             from: FROM,
             to: [r.email],
-            subject: SUBJECT,
-            html: appendUnsubFooter(buildHtml(r.name), unsubscribeUrl),
+            subject: SUBJECTS[kind],
+            html: appendUnsubFooter(buildHtml(kind, r.name), unsubscribeUrl),
             reply_to: "support@ladybosslook.com",
             tags: [
               { name: "campaign", value: "startads_launch" },
@@ -209,8 +262,8 @@ Deno.serve(async (req) => {
       await sendBatch([{
         from: FROM,
         to: [MONITOR_EMAIL],
-        subject: `[کپی ارسال کمپین StartAds — ${sent} نفر] ${SUBJECT}`,
-        html: buildHtml(recipients[0]?.name || "دوست عزیز"),
+        subject: `[کپی ارسال کمپین StartAds — ${sent} نفر] ${SUBJECTS[kind]}`,
+        html: buildHtml(kind, recipients[0]?.name || "دوست عزیز"),
         tags: [
           { name: "campaign", value: "startads_launch_monitor" },
           { name: "kind", value: kind },
