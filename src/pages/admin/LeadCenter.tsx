@@ -19,6 +19,7 @@ import { LeadEmailCampaign } from '@/components/admin/LeadEmailCampaign';
 import { StartAdsEmailAutomation } from '@/components/admin/StartAdsEmailAutomation';
 import { StartAdsShowUpEmails } from '@/components/admin/StartAdsShowUpEmails';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
+import { MetaAudienceExport } from '@/components/admin/MetaAudienceExport';
 
 const igads = LEAD_CAMPAIGNS.find((c) => c.key === 'igads');
 const aliagads = LEAD_CAMPAIGNS.find((c) => c.key === 'aliagads');
@@ -54,6 +55,9 @@ export default function LeadCenter() {
           signups and email performance.
         </p>
       </div>
+
+      <MetaAudienceExport />
+
 
       <Tabs value={tab} onValueChange={setTab}>
 
