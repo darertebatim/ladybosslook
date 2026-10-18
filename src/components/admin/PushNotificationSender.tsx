@@ -427,6 +427,7 @@ function NotificationForm({ environment }: NotificationFormProps) {
               target_instructor_ids: preset.target_instructor_ids ?? [],
               include_forms: preset.include_forms ?? [],
               exclude_forms: preset.exclude_forms ?? [],
+              include_user_ids: (preset as any).include_user_ids ?? [],
             });
             setAudiencePresetId(preset.id);
           }}
