@@ -1,0 +1,1 @@
+ALTER TABLE public.audience_presets ADD COLUMN IF NOT EXISTS include_user_ids uuid[] NOT NULL DEFAULT '{}'::uuid[];
