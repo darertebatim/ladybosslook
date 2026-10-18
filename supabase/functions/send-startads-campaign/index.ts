@@ -64,6 +64,25 @@ async function collectRecipients(): Promise<Registrant[]> {
     }
     if (!data || data.length < 1000) break;
   }
+  // Skip people already signed up for an upcoming webinar round (any program
+  // except startads) — they are in their own active round's email flow.
+  const { data: upRounds } = await supabase
+    .from("program_rounds")
+    .select("id")
+    .neq("program_slug", "startads")
+    .gt("first_session_date", new Date().toISOString());
+  const upIds = (upRounds || []).map((r: any) => r.id);
+  if (upIds.length) {
+    for (let page = 0; page < 20; page++) {
+      const { data } = await supabase
+        .from("form_submissions")
+        .select("email")
+        .in("round_id", upIds)
+        .range(page * 1000, page * 1000 + 999);
+      for (const r of data || []) map.delete(String(r.email || "").trim().toLowerCase());
+      if (!data || data.length < 1000) break;
+    }
+  }
   return [...map.values()];
 }
 
