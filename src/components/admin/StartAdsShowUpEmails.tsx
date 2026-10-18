@@ -7,13 +7,15 @@ import { toast } from 'sonner';
 import { Loader2, Mail, CalendarClock } from 'lucide-react';
 
 const TEST_EMAIL = 'darertebatim@gmail.com';
-type Kind = 'confirm' | 'reminder' | 'morning' | 'onehour' | 'start';
+type Kind = 'confirm' | 'reminder' | 'morning' | 'onehour' | 'start' | 'after3h' | 'after24h';
 const EMAILS: { kind: Kind; title: string; when: string }[] = [
   { kind: 'confirm', title: '0. Confirmation', when: 'Right at signup' },
   { kind: 'reminder', title: '1. Reminder', when: '2–3h after signup' },
   { kind: 'morning', title: '2. Morning of', when: '9 AM their local time' },
   { kind: 'onehour', title: '3. One hour before', when: '60 min before start' },
   { kind: 'start', title: '4. Starting now', when: 'At start time' },
+  { kind: 'after3h', title: '5. Follow-up', when: '3h after start' },
+  { kind: 'after24h', title: '6. Follow-up', when: '24h after start' },
 ];
 
 interface Round { id: string; round_number: number | null; first_session_date: string }
@@ -29,7 +31,7 @@ export function StartAdsShowUpEmails() {
         .from('program_rounds')
         .select('id, round_number, first_session_date')
         .eq('program_slug', 'startads')
-        .gt('first_session_date', new Date(Date.now() - 3 * 3600_000).toISOString())
+        .gt('first_session_date', new Date(Date.now() - 30 * 3600_000).toISOString())
         .order('first_session_date', { ascending: true })
         .limit(1)
         .maybeSingle();

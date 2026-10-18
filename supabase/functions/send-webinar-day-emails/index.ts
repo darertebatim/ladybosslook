@@ -40,7 +40,8 @@ const FROM = "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>";
 const SUPPORT_URL =
   "https://ladyboss.onelink.me/lt6v?af_xp=custom&pid=email_support&c=webinar_day&deep_link_value=support&af_web_dp=https%3A%2F%2Fladybosslook.com%2Fdashboard%2Fchat";
 
-type Kind = "morning" | "start" | "reminder" | "onehour";
+type Kind = "morning" | "start" | "reminder" | "onehour" | "after3h" | "after24h";
+const FOLLOWUP_HOURS: Record<string, number> = { after3h: 3, after24h: 24 };
 
 // Subjects keep the prefixes that src/lib/igAdsRoundStats.ts uses to classify
 // automated emails for open-rate stats. Copy matches the proven manual
@@ -50,6 +51,8 @@ const SUBJECTS: Record<Kind, string> = {
   onehour: "۱ ساعت تا شروع: وبینار جذب مشتری با اینستاگرام ادز (بدون نیاز به دوربین) ⏳",
   start: "وبینار در حال شروع است — همین حالا وارد شوید 🚀",
   reminder: "یادآوری وبینار اینستاگرام ادز + ویدیوی پیش‌نیاز 🌷",
+  after3h: "",
+  after24h: "",
 };
 
 function tzParts(d: Date, tz: string): { hour: number; date: string } {
@@ -462,6 +465,22 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
     registrants = registrants.filter((r) => !unsub.has(r.email) && !alreadySent.has(r.email));
   }
 
+  if (kind in FOLLOWUP_HOURS) {
+    if (!isStartAds(round)) return { round: round.round_name, kind, recipients: 0, sent: 0, failed: 0, skipped: "Start Ads only" };
+    if (!testEmail) {
+      const since = now.getTime() - sessionStart.getTime();
+      const h = FOLLOWUP_HOURS[kind];
+      if (since < h * 3600_000 || since >= (h + 6) * 3600_000) {
+        return { round: round.round_name, kind, recipients: 0, sent: 0, failed: 0, skipped: "Outside follow-up window" };
+      }
+      const buyers = new Set<string>();
+      const { data: orders } = await supabase.from("orders").select("email")
+        .eq("program_slug", "startads").in("status", ["completed", "paid", "partially_refunded"]).limit(5000);
+      for (const o of orders || []) buyers.add(String(o.email || "").trim().toLowerCase());
+      registrants = registrants.filter((r) => !buyers.has(r.email));
+    }
+  }
+
   if (kind === "morning" && !testEmail) {
     // Only recipients whose local time is 9:00–9:59 AM on the session day.
     registrants = registrants.filter((r) => {
@@ -554,7 +573,7 @@ Deno.serve(async (req) => {
     if (!RESEND_API_KEY) throw new Error("Email service not configured");
 
     const body = await req.json().catch(() => ({}));
-    if ((body.kind && !["morning", "start", "reminder", "onehour"].includes(body.kind)) ||
+    if ((body.kind && !["morning", "start", "reminder", "onehour", "after3h", "after24h"].includes(body.kind)) ||
         (body.round_id && (typeof body.round_id !== "string" || !/^[0-9a-f-]{36}$/i.test(body.round_id))) ||
         (body.testEmail && (typeof body.testEmail !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.testEmail))) ||
         (!!body.round_id !== !!body.kind)) {
@@ -596,6 +615,19 @@ Deno.serve(async (req) => {
         .lte("first_session_date", new Date(now + 14 * 24 * 3600_000).toISOString());
       if (e3) throw e3;
       for (const r of reminderRounds || []) rounds.push({ round: r, kind: "reminder" });
+
+      // Start Ads after-session follow-ups (3h and 24h after start; dedupe keeps it to one each).
+      const { data: pastRounds, error: e4 } = await supabase
+        .from("program_rounds")
+        .select(roundCols)
+        .eq("program_slug", "startads")
+        .lte("first_session_date", new Date(now - 3 * 3600_000).toISOString())
+        .gte("first_session_date", new Date(now - 30 * 3600_000).toISOString());
+      if (e4) throw e4;
+      for (const r of pastRounds || []) {
+        rounds.push({ round: r, kind: "after3h" });
+        rounds.push({ round: r, kind: "after24h" });
+      }
     }
 
     const results = [];
