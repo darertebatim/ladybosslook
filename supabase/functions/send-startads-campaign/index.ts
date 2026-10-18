@@ -83,6 +83,17 @@ async function collectRecipients(): Promise<Registrant[]> {
       if (!data || data.length < 1000) break;
     }
   }
+  // Skip anyone who already registered for Start Ads itself — they're in the
+  // webinar-day email flow already and shouldn't get reactivation emails.
+  for (let page = 0; page < 20; page++) {
+    const { data } = await supabase
+      .from("form_submissions")
+      .select("email")
+      .eq("source", "startads_registration")
+      .range(page * 1000, page * 1000 + 999);
+    for (const r of data || []) map.delete(String(r.email || "").trim().toLowerCase());
+    if (!data || data.length < 1000) break;
+  }
   return [...map.values()];
 }
 
