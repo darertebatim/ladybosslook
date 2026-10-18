@@ -26,6 +26,7 @@ export interface AudiencePayload {
   target_instructor_ids: string[];
   include_forms?: string[];
   exclude_forms?: string[];
+  include_user_ids?: string[];
 }
 
 export interface Preset extends AudiencePayload {
