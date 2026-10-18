@@ -6,12 +6,14 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Loader2, Mail, Send, RefreshCw } from 'lucide-react';
 
-type Kind = 'invite' | 'focus' | 'urgency';
+type Kind = 'invite' | 'focus' | 'urgency' | 'proof' | 'freedom';
 
 const EMAILS: { kind: Kind; title: string; when: string; subject: string }[] = [
   { kind: 'invite', title: 'Email 1 — Invitation', when: 'Sunday evening', subject: 'یک دعوت خصوصی (فقط ۵۰ نفر از بچه‌های اینستاگرام) 🎁' },
   { kind: 'focus', title: 'Email 2 — Real Session 1 focus', when: 'Monday afternoon', subject: 'محصول یا خدمتت عالیه، ولی مشتری جدید کجاست؟ 🤔' },
   { kind: 'urgency', title: 'Email 3 — Holiday market / last call', when: 'Wednesday morning', subject: 'بازار آخر سال نزدیکه (چرا جلسه اول رو براتون رایگان کردم؟) 🛍️' },
+  { kind: 'proof', title: 'Signups 1 — Why Meta Ads works (WhatsApp: IG link)', when: 'Registrants · Tuesday', subject: 'چرا متا ادز قابل‌اعتمادترین شیر آب مشتریه؟ (با اعداد واقعی) 📊' },
+  { kind: 'freedom', title: 'Signups 2 — Escape the hustle cycle (WhatsApp: client goal)', when: 'Registrants · Wednesday', subject: 'چرخه خطرناکی که خیلی از ما توش گیر کردیم... (و راه نجات) 🔄' },
 ];
 
 const TEST_EMAIL = 'darertebatim@gmail.com';
