@@ -367,9 +367,9 @@ async function collectRegistrants(roundId: string, startAds = false): Promise<Re
   for (let page = 0; page < 10; page++) {
     const { data, error } = await supabase
       .from("form_submissions")
-      .select("email, name, timezone, created_at, source")
+      .select("email, name, timezone, created_at:submitted_at, source")
       .eq("round_id", roundId)
-      .order("created_at", { ascending: true })
+      .order("submitted_at", { ascending: true })
       .range(page * 1000, page * 1000 + 999);
     if (error) throw error;
     for (const r of data || []) {
