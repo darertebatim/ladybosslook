@@ -634,7 +634,7 @@ Deno.serve(async (req) => {
 
     const results = [];
     for (const { round, kind } of rounds) {
-      results.push(await processRound(round, kind, body.testEmail));
+      results.push(await processRound(round, kind, body.testEmail, body.catchup === true && !!body.round_id));
     }
 
     return new Response(JSON.stringify({ success: true, results }), {
