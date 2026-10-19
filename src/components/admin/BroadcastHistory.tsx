@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Megaphone, Users, Bell, Mail, Loader2, Link as LinkIcon, Trash2 } from 'lucide-react';
+import { Megaphone, Users, Bell, Mail, Loader2, Link as LinkIcon, Trash2, Copy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
-interface Broadcast {
+export interface Broadcast {
   id: string;
   title: string | null;
   content: string;
@@ -32,7 +32,7 @@ interface Broadcast {
   created_at: string;
 }
 
-export function BroadcastHistory() {
+export function BroadcastHistory({ onCopy }: { onCopy?: (broadcast: Broadcast) => void }) {
   const queryClient = useQueryClient();
   
   const { data: broadcasts, isLoading } = useQuery({
@@ -159,6 +159,18 @@ export function BroadcastHistory() {
                   <span className="text-xs text-muted-foreground whitespace-nowrap">
                     {format(new Date(broadcast.created_at), 'MMM d, h:mm a')}
                   </span>
+                  {onCopy && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-10 w-10 shrink-0 text-muted-foreground active:text-primary"
+                      title="Copy to send form"
+                      aria-label="Copy broadcast to send form"
+                      onClick={() => onCopy(broadcast)}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  )}
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button 

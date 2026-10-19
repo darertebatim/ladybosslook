@@ -7,3 +7,4 @@
 - Payments recorded against existing enrollments must not modify enrollment or round assignments; the enrollment form records its optional payment only after the existing enrollment service succeeds and reports partial failures explicitly.
 - Advertising expenses are read-only Meta Insights reports through the server-side connector gateway, protected by Payments page permission and cached for 15 minutes; report spend separately from billing charges and taxes.
 - Time-critical webinar emails use self-removing per-round cron jobs refreshed by round changes, with shared due-time logic for the sender and schedule display; hourly polling must not dispatch them early.
+- Communications owns broadcast-copy drafts and remounts the composer for each copy; preserve message/link/delivery options but reset all targeting so a new audience must be selected.
