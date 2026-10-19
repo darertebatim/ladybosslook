@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, GraduationCap, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft, Sparkles, Palette, FlaskConical, Smartphone, Image, Video, FileText, BookOpen, Brain, BarChart3, UserPlus, Library, Route as RouteIcon, Tags, TagsIcon, Aperture, Magnet, Presentation, ClipboardList } from 'lucide-react';
+import { LayoutDashboard, Users, GraduationCap, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft, Sparkles, Palette, FlaskConical, Smartphone, Image, Video, FileText, BookOpen, Brain, BarChart3, UserPlus, Library, Route as RouteIcon, Tags, TagsIcon, Aperture, Magnet, Presentation, ClipboardList, Clapperboard, ChevronDown } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,15 +7,14 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const menuItems = [
   { title: 'Overview', url: '/admin', icon: LayoutDashboard, end: true, pageSlug: 'overview' },
   { title: 'Analytics', url: '/admin/analytics', icon: BarChart3, pageSlug: 'overview' },
   { title: 'Users', url: '/admin/users', icon: Users, pageSlug: 'users' },
   { title: 'Enrollment', url: '/admin/enrollment', icon: GraduationCap, pageSlug: 'enrollment' },
-  { title: 'Instructors', url: '/admin/instructors', icon: UserPlus, pageSlug: 'users' },
-  { title: 'Audio', url: '/admin/audio', icon: Music, pageSlug: 'audio' },
-  { title: 'Video', url: '/admin/video', icon: Video, pageSlug: 'audio' },
   { title: 'Channels', url: '/admin/channels', icon: Newspaper, pageSlug: 'community' },
   { title: 'Communications', url: '/admin/communications', icon: Send, pageSlug: 'communications' },
   { title: 'Lead Center', url: '/admin/leads', icon: Magnet, pageSlug: 'communications' },
@@ -23,16 +22,12 @@ const menuItems = [
   { title: 'Banners', url: '/admin/banners', icon: Image, pageSlug: 'communications' },
   { title: 'Audiences', url: '/admin/audiences', icon: Library, pageSlug: 'communications' },
   { title: 'Programs', url: '/admin/programs', icon: UserCog, pageSlug: 'programs' },
-  { title: 'Courses', url: '/admin/learn', icon: Presentation, pageSlug: 'programs' },
   { title: 'Forms', url: '/admin/forms', icon: ClipboardList, pageSlug: 'programs' },
   { title: 'Payments', url: '/admin/payments', icon: CreditCard, pageSlug: 'payments' },
   { title: 'Subscriptions', url: '/admin/subscriptions', icon: Sparkles, pageSlug: 'payments' },
   { title: 'Support', url: '/admin/support', icon: MessageCircle, pageSlug: 'support' },
   { title: 'Tools', url: '/admin/tools', icon: Wrench, pageSlug: 'tools' },
   { title: 'Onboarding', url: '/admin/onboarding', icon: FlaskConical, pageSlug: 'tools' },
-  { title: 'Documents', url: '/admin/documents', icon: FileText, pageSlug: 'system' },
-  { title: 'Reading', url: '/admin/read', icon: BookOpen, pageSlug: 'tools' },
-  { title: 'Quizzes', url: '/admin/quizzes', icon: Brain, pageSlug: 'tools' },
   { title: 'My Rilo Engine', url: '/admin/my-rilo', icon: RouteIcon, pageSlug: 'tools' },
   { title: 'Content Tagging', url: '/admin/tags/content', icon: TagsIcon, pageSlug: 'tools' },
   
@@ -40,6 +35,16 @@ const menuItems = [
   { title: 'App Test', url: '/admin/app', icon: Smartphone, pageSlug: 'system' },
   { title: 'System', url: '/admin/system', icon: Shield, pageSlug: 'system' },
   { title: 'RiloBiz', url: '/admin/aperture', icon: Aperture, pageSlug: 'system' },
+];
+
+const mediaItems = [
+  { title: 'Instructors', url: '/admin/instructors', icon: UserPlus, pageSlug: 'users' },
+  { title: 'Audio', url: '/admin/audio', icon: Music, pageSlug: 'audio' },
+  { title: 'Video', url: '/admin/video', icon: Video, pageSlug: 'audio' },
+  { title: 'Courses', url: '/admin/learn', icon: Presentation, pageSlug: 'programs' },
+  { title: 'Documents', url: '/admin/documents', icon: FileText, pageSlug: 'system' },
+  { title: 'Reading', url: '/admin/read', icon: BookOpen, pageSlug: 'tools' },
+  { title: 'Quizzes', url: '/admin/quizzes', icon: Brain, pageSlug: 'tools' },
 ];
 
 interface AdminNavProps {
@@ -51,6 +56,10 @@ export function AdminNav({ collapsed, onToggleCollapse }: AdminNavProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { canAccessAdminPage } = useAuth();
+  const location = useLocation();
+  const visibleMedia = mediaItems.filter(item => canAccessAdminPage(item.pageSlug));
+  const mediaActive = visibleMedia.some(i => location.pathname.startsWith(i.url));
+  const [mediaOpen, setMediaOpen] = useState(mediaActive);
 
   const handleSignOut = async () => {
     try {
@@ -96,8 +105,8 @@ export function AdminNav({ collapsed, onToggleCollapse }: AdminNavProps) {
       {/* Menu items */}
       <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5">
         {visibleMenuItems.map((item) => (
+          <div key={item.title}>
           <NavLink
-            key={item.title}
             to={item.url}
             end={item.end}
             className={({ isActive }) =>
@@ -112,6 +121,44 @@ export function AdminNav({ collapsed, onToggleCollapse }: AdminNavProps) {
             <item.icon className="h-4 w-4 shrink-0" />
             {!collapsed && <span className="truncate">{item.title}</span>}
           </NavLink>
+          {item.title === 'Enrollment' && visibleMedia.length > 0 && (
+            <div>
+              <button
+                type="button"
+                onClick={() => setMediaOpen(o => !o)}
+                title={collapsed ? 'Media' : undefined}
+                className={cn(
+                  "w-full flex items-center gap-2.5 rounded-md text-sm font-medium transition-colors hover:bg-muted",
+                  collapsed ? "justify-center px-2 py-2" : "px-3 py-2",
+                  mediaActive ? 'text-primary' : 'text-muted-foreground'
+                )}
+              >
+                <Clapperboard className="h-4 w-4 shrink-0" />
+                {!collapsed && <span className="truncate flex-1 text-left">Media</span>}
+                {!collapsed && <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", mediaOpen && "rotate-180")} />}
+              </button>
+              {mediaOpen && (
+                <div className={cn("space-y-0.5", !collapsed && "ml-3 border-l pl-1")}>
+                  {visibleMedia.map((m) => (
+                    <NavLink
+                      key={m.title}
+                      to={m.url}
+                      title={collapsed ? m.title : undefined}
+                      className={({ isActive }) => cn(
+                        "flex items-center gap-2.5 rounded-md text-sm font-medium transition-colors hover:bg-muted",
+                        collapsed ? "justify-center px-2 py-2" : "px-3 py-1.5",
+                        isActive ? 'bg-muted text-primary' : 'text-muted-foreground'
+                      )}
+                    >
+                      <m.icon className="h-4 w-4 shrink-0" />
+                      {!collapsed && <span className="truncate">{m.title}</span>}
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          </div>
         ))}
       </nav>
 
