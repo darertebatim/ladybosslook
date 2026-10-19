@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft, Sparkles, Palette, FlaskConical, Smartphone, Image, Video, FileText, BookOpen, Brain, BarChart3, UserPlus, Library, Route as RouteIcon, Tags, TagsIcon, Aperture, Magnet, Presentation, ClipboardList, Clapperboard, ChevronDown, Settings as SettingsIcon } from 'lucide-react';
+import { LayoutDashboard, Users, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft, Sparkles, Palette, FlaskConical, Smartphone, Video, FileText, BookOpen, Brain, BarChart3, UserPlus, Route as RouteIcon, TagsIcon, Aperture, Magnet, Presentation, ClipboardList, Clapperboard, ChevronDown, Settings as SettingsIcon } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,20 +25,16 @@ const menuItems: NavItem[] = [
   { title: 'Channels', url: '/admin/channels', icon: Newspaper, pageSlug: 'community' },
   { title: 'Communications', url: '/admin/communications', icon: Send, pageSlug: 'communications' },
   { title: 'Lead Center', url: '/admin/leads', icon: Magnet, pageSlug: 'communications' },
-  { title: 'Push', url: '/admin/pn', icon: Bell, pageSlug: 'communications' },
-  { title: 'Banners', url: '/admin/banners', icon: Image, pageSlug: 'communications' },
-  { title: 'Audiences', url: '/admin/audiences', icon: Library, pageSlug: 'communications' },
   { title: 'Programs', url: '/admin/programs', icon: UserCog, pageSlug: 'programs' },
   { title: 'Forms', url: '/admin/forms', icon: ClipboardList, pageSlug: 'programs' },
   { title: 'Payments', url: '/admin/payments', icon: CreditCard, pageSlug: 'payments' },
-  { title: 'Subscriptions', url: '/admin/subscriptions', icon: Sparkles, pageSlug: 'payments' },
   { title: 'Support', url: '/admin/support', icon: MessageCircle, pageSlug: 'support' },
-  { title: 'Tools', url: '/admin/tools', icon: Wrench, pageSlug: 'tools' },
   { title: 'System', url: '/admin/system', icon: Shield, pageSlug: 'system' },
   { title: 'RiloBiz', url: '/admin/aperture', icon: Aperture, pageSlug: 'system' },
 ];
 
 const mediaItems: NavItem[] = [
+  { title: 'Tools', url: '/admin/tools', icon: Wrench, pageSlug: 'tools' },
   { title: 'Instructors', url: '/admin/instructors', icon: UserPlus, pageSlug: 'users' },
   { title: 'Audio', url: '/admin/audio', icon: Music, pageSlug: 'audio' },
   { title: 'Video', url: '/admin/video', icon: Video, pageSlug: 'audio' },
@@ -49,6 +45,8 @@ const mediaItems: NavItem[] = [
 ];
 
 const settingsItems: NavItem[] = [
+  { title: 'Push', url: '/admin/pn', icon: Bell, pageSlug: 'communications' },
+  { title: 'Subscriptions', url: '/admin/subscriptions', icon: Sparkles, pageSlug: 'payments' },
   { title: 'Onboarding', url: '/admin/onboarding', icon: FlaskConical, pageSlug: 'tools' },
   { title: 'My Rilo Engine', url: '/admin/my-rilo', icon: RouteIcon, pageSlug: 'tools' },
   { title: 'Content Tagging', url: '/admin/tags/content', icon: TagsIcon, pageSlug: 'tools' },
