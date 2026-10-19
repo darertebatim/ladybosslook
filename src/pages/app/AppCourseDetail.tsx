@@ -499,6 +499,7 @@ const AppCourseDetail = () => {
     getUnsyncedCount,
     getCalendarEventId,
     getAllCalendarEventIds,
+    syncState: calendarSyncState,
   } = useCalendarSyncTracking(round?.id);
 
   // Program event reminder settings hook - manages reminder settings for program events (sessions & content) as planner tasks
@@ -730,6 +731,15 @@ const AppCourseDetail = () => {
     [dbSessions],
   );
 
+  // Fingerprint of the current schedule: changes when a session is added, moved, renamed or removed
+  const sessionsSignature = useMemo(
+    () =>
+      (dbSessions || [])
+        .map((s: any) => `${s.id}|${s.session_date}|${s.duration_minutes}|${s.title}|${s.meeting_link || ""}`)
+        .join(";"),
+    [dbSessions],
+  );
+
   // Check if there are unsynced sessions using the tracking hook
   useEffect(() => {
     if (!round?.id || !dbSessions || dbSessions.length === 0) {
@@ -901,7 +911,7 @@ const AppCourseDetail = () => {
               calEventIdMap[sid] = result.calendarEventIds[i]!;
             }
           });
-          markAllSessionsSynced(sessionIds, calEventIdMap);
+          markAllSessionsSynced(sessionIds, calEventIdMap, sessionsSignature);
           setHasNewSessions(false);
         } else if (result.error === "Calendar permission denied") {
           toast.error(t('courseDetailPage.allowCalendarAccess'));
@@ -957,12 +967,51 @@ const AppCourseDetail = () => {
             calEventIdMap[sid] = result.calendarEventIds[i]!;
           }
         });
-        markAllSessionsSynced(sessionIds, calEventIdMap);
+        markAllSessionsSynced(sessionIds, calEventIdMap, sessionsSignature);
       }
     } catch (error) {
       console.error("Auto-sync calendar error:", error);
     }
   };
+
+  // Auto-reconcile: if this round was synced before and the schedule changed in admin,
+  // silently remove the old calendar events and re-add the current sessions.
+  const reconcilingRef = useRef(false);
+  useEffect(() => {
+    if (!enrollment || !round?.id || !dbSessions || !program) return;
+    if (!isNativeApp() || !isCalendarAvailable()) return;
+    const storedIds = Object.values(calendarSyncState.calendarEventIds || {}).filter(Boolean);
+    if (storedIds.length === 0) return; // user never synced (or legacy sync without IDs)
+    if (calendarSyncState.signature === sessionsSignature) return;
+    if (reconcilingRef.current) return;
+    reconcilingRef.current = true;
+    (async () => {
+      try {
+        const { checkCalendarPermission } = await import("@/lib/calendarIntegration");
+        if ((await checkCalendarPermission()) !== "granted") return;
+        const events = generateAllSessionEvents();
+        const ids = dbSessions.map((s) => s.id);
+        if (events.length === 0 || ids.length === 0) {
+          await deleteCalendarEventsById(storedIds);
+          markAllSessionsSynced([], {}, sessionsSignature);
+          return;
+        }
+        const result = await addMultipleEventsToCalendar(events, storedIds);
+        const map: Record<string, string> = {};
+        ids.forEach((sid, i) => {
+          if (result.calendarEventIds[i]) map[sid] = result.calendarEventIds[i]!;
+        });
+        markAllSessionsSynced(ids, map, sessionsSignature);
+        setHasNewSessions(false);
+        if (result.success) toast.success(t('courseDetailPage.sessionAddedShort'));
+      } catch (e) {
+        console.error("Calendar auto-reconcile error:", e);
+      } finally {
+        reconcilingRef.current = false;
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enrollment, round?.id, sessionsSignature, calendarSyncState.signature, calendarSyncState.calendarEventIds]);
 
   const handleContactSupport = () => {
     window.open("https://ladybosslook.com/dashboard/chat", "_blank");
