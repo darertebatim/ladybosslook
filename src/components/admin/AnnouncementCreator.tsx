@@ -14,6 +14,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
 import { AudiencePresetPicker, EMPTY_AUDIENCE, type AudiencePayload } from './AudiencePresetPicker';
 import type { Broadcast } from './BroadcastHistory';
+import { hasBroadcastTarget } from '@/lib/broadcastTarget';
 
 interface Program {
   id: string;
@@ -164,7 +165,7 @@ export function AnnouncementCreator({ draft }: { draft?: Broadcast }) {
   };
 
   const handleSubmit = async () => {
-    if (!targetCourse && !audiencePresetId) {
+    if (!hasBroadcastTarget(targetCourse, audiencePresetId)) {
       toast({ title: "Choose a target audience", variant: "destructive" });
       return;
     }
@@ -572,7 +573,7 @@ export function AnnouncementCreator({ draft }: { draft?: Broadcast }) {
             <Eye className="mr-2 h-4 w-4" />
             {previewing ? 'Counting…' : 'Preview recipients'}
           </Button>
-          <Button onClick={handleSubmit} disabled={loading || (!targetCourse && !audiencePresetId)} className="flex-1">
+          <Button onClick={handleSubmit} disabled={loading || !hasBroadcastTarget(targetCourse, audiencePresetId)} className="flex-1">
             <Megaphone className="mr-2 h-4 w-4" />
             {loading ? 'Sending...' : 'Send Broadcast'}
           </Button>
