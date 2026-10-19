@@ -56,6 +56,11 @@ const settingsItems: NavItem[] = [
   { title: 'App Test', url: '/admin/app', icon: Smartphone, pageSlug: 'system' },
 ];
 
+interface AdminNavProps {
+  collapsed: boolean;
+  onToggleCollapse: () => void;
+}
+
 function UmbrellaGroup({
   label,
   icon: Icon,
