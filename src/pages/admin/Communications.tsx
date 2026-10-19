@@ -12,6 +12,11 @@ import { EmailOpenRates } from '@/components/admin/EmailOpenRates';
 import { MetaCrmEvents } from '@/components/admin/MetaCrmEvents';
 import { LeadEmailCampaign } from '@/components/admin/LeadEmailCampaign';
 import { MetaAudienceExport } from '@/components/admin/MetaAudienceExport';
+import { PromoBannerManager } from '@/components/admin/PromoBannerManager';
+import { BoxBannerManager } from '@/components/admin/BoxBannerManager';
+import { SpecialBannersArchive } from '@/components/admin/SpecialBannersArchive';
+import AudienceLibrary from '@/pages/admin/AudienceLibrary';
+
 
 
 export default function Communications() {
@@ -33,7 +38,7 @@ export default function Communications() {
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="grid w-full grid-cols-9">
+        <TabsList className="grid w-full grid-cols-11">
           <TabsTrigger value="updates">Updates</TabsTrigger>
           <TabsTrigger value="broadcasts">Broadcasts</TabsTrigger>
           <TabsTrigger value="push">Push Only</TabsTrigger>
@@ -43,6 +48,8 @@ export default function Communications() {
           <TabsTrigger value="marketing">Email Marketing</TabsTrigger>
           <TabsTrigger value="opens">Email Opens</TabsTrigger>
           <TabsTrigger value="crm">Meta CRM</TabsTrigger>
+          <TabsTrigger value="banners">Banners</TabsTrigger>
+          <TabsTrigger value="audiences">Audiences</TabsTrigger>
         </TabsList>
 
         <TabsContent value="updates" className="space-y-6">
@@ -83,6 +90,29 @@ export default function Communications() {
         <TabsContent value="crm" className="space-y-6">
           <MetaAudienceExport />
           <MetaCrmEvents />
+        </TabsContent>
+
+        <TabsContent value="banners" className="space-y-6">
+          <Tabs defaultValue="promo">
+            <TabsList>
+              <TabsTrigger value="promo">Promo Banners</TabsTrigger>
+              <TabsTrigger value="box">Box Banners</TabsTrigger>
+              <TabsTrigger value="special">Special Banners</TabsTrigger>
+            </TabsList>
+            <TabsContent value="promo" className="space-y-6">
+              <PromoBannerManager />
+            </TabsContent>
+            <TabsContent value="box" className="space-y-6">
+              <BoxBannerManager />
+            </TabsContent>
+            <TabsContent value="special" className="space-y-6">
+              <SpecialBannersArchive />
+            </TabsContent>
+          </Tabs>
+        </TabsContent>
+
+        <TabsContent value="audiences" className="space-y-6">
+          <AudienceLibrary />
         </TabsContent>
       </Tabs>
 
