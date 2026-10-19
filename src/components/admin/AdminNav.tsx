@@ -206,7 +206,7 @@ export function AdminNav({ collapsed, onToggleCollapse }: AdminNavProps) {
                 onToggle={() => setMediaOpen((o) => !o)}
               />
             )}
-            {item.title === 'Tools' && visibleSettings.length > 0 && (
+            {item.title === 'Payments' && visibleSettings.length > 0 && (
               <UmbrellaGroup
                 label="Rilo Settings"
                 icon={SettingsIcon}
