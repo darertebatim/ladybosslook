@@ -442,7 +442,7 @@ async function sendBatch(payload: any[]): Promise<{ ids: (string | null)[] } | n
   return null;
 }
 
-async function processRound(round: any, kind: Kind, testEmail?: string) {
+async function processRound(round: any, kind: Kind, testEmail?: string, catchup = false) {
   const subject = isStartAds(round) ? STARTADS_SUBJECTS[kind] : SUBJECTS[kind];
   const roundKey = roundKeyOf(round);
   const sessionStart = new Date(round.first_session_date);
