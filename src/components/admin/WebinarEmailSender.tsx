@@ -28,6 +28,7 @@ interface RoundRow {
   round_name: string | null;
   first_session_date: string | null;
   status: string | null;
+  round_number: number | null;
 }
 
 type SendKey =
@@ -65,7 +66,7 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
     queryFn: async () => {
       const { data, error } = await supabase
         .from('program_rounds')
-        .select('id, round_name, first_session_date, status')
+        .select('id, round_name, round_number, first_session_date, status')
         .eq('program_slug', programSlug)
         .order('first_session_date', { ascending: true });
       if (error) throw error;
@@ -111,6 +112,68 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
 
   const rows = data || [];
   const effectiveRoundId = roundChoice === 'auto' ? autoRoundId : roundChoice;
+  const selectedRound = rounds?.find((r) => r.id === effectiveRoundId) || null;
+  const roundKey = selectedRound
+    ? String(selectedRound.round_number ?? selectedRound.id)
+    : null;
+
+  // Real delivery log for the selected round (automatic + manual sends).
+  const { data: deliveryLog, refetch: refetchLog } = useQuery({
+    queryKey: ['webinar-round-delivery-log', roundKey],
+    enabled: !!roundKey,
+    staleTime: 0,
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const out: { recipient: string; event_type: string; occurred_at: string; tags: any }[] = [];
+      for (let from = 0; from < 40000; from += 1000) {
+        const { data, error } = await supabase
+          .from('email_delivery_events')
+          .select('recipient, event_type, occurred_at, tags')
+          .in('tags->>campaign', ['webinar_day', 'live_followup'])
+          .eq('tags->>round', roundKey!)
+          .range(from, from + 999);
+        if (error) throw error;
+        out.push(...((data || []) as any[]));
+        if (!data || data.length < 1000) break;
+      }
+      return out;
+    },
+  });
+
+  const KIND_LABELS: { kind: string; campaign: string; label: string }[] = [
+    { kind: 'reminder', campaign: 'webinar_day', label: 'Reminder (video + calendar)' },
+    { kind: 'morning', campaign: 'webinar_day', label: 'Morning of the webinar' },
+    { kind: 'onehour', campaign: 'webinar_day', label: '1 hour before' },
+    { kind: 'start', campaign: 'webinar_day', label: 'Starting now' },
+    { kind: '3h', campaign: 'live_followup', label: 'Follow-up +3h' },
+    { kind: '24h', campaign: 'live_followup', label: 'Follow-up +24h' },
+  ];
+
+  const kindStats = (kind: string, campaign: string) => {
+    const evs = (deliveryLog || []).filter(
+      (e) => e.tags?.kind === kind && e.tags?.campaign === campaign,
+    );
+    const uniq = (types: string[]) =>
+      new Set(
+        evs
+          .filter((e) => types.includes(e.event_type))
+          .map((e) => String(e.recipient || '').toLowerCase()),
+      );
+    const sentSet = uniq(['sent', 'delivered']);
+    const last = evs
+      .filter((e) => e.event_type === 'sent')
+      .map((e) => e.occurred_at)
+      .sort()
+      .pop();
+    return {
+      sentSet,
+      sent: sentSet.size,
+      delivered: uniq(['delivered']).size,
+      opened: uniq(['opened']).size,
+      failed: uniq(['bounced', 'suppressed', 'failed']).size,
+      last,
+    };
+  };
 
   const roundLabel = (id: string | null) => {
     if (!id) return '—';
@@ -128,26 +191,34 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
   const uniqueEmails = (list: Row[]) =>
     new Set(list.map((r) => String(r.email || '').trim().toLowerCase()).filter(Boolean)).size;
 
+  const reminderSent = kindStats('reminder', 'webinar_day').sentSet;
+  const morningSent = kindStats('morning', 'webinar_day').sentSet;
+  const startSent = kindStats('start', 'webinar_day').sentSet;
+  const inSet = (s: Set<string>, r: Row) => s.has(String(r.email || '').trim().toLowerCase());
+
   const targetCount = uniqueEmails(
     rows.filter(
       (r) =>
         (!effectiveRoundId || r.round_id === effectiveRoundId) &&
-        (!onlyUnsent || !r.reminder_sent_at),
+        (!onlyUnsent || (!r.reminder_sent_at && !inSet(reminderSent, r))),
     ),
   );
   const joinNowTargetCount = uniqueEmails(
     rows.filter(
       (r) =>
         (!effectiveRoundId || r.round_id === effectiveRoundId) &&
-        (!onlyUnsentJoinNow || !r.join_now_sent_at),
+        (!onlyUnsentJoinNow || (!r.join_now_sent_at && !inSet(startSent, r))),
     ),
   );
   const morningTargetCount = uniqueEmails(
     rows.filter(
       (r) =>
         (!effectiveRoundId || r.round_id === effectiveRoundId) &&
-        (!onlyUnsentMorning || !r.morning_sent_at),
+        (!onlyUnsentMorning || (!r.morning_sent_at && !inSet(morningSent, r))),
     ),
+  );
+  const roundSignupCount = uniqueEmails(
+    rows.filter((r) => !effectiveRoundId || r.round_id === effectiveRoundId),
   );
   const nextSessionTargetCount = uniqueEmails(
     rows.filter(
@@ -271,6 +342,7 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
       } while (true);
       toast.success(`Sent ${totalSent} · failed ${totalFailed}`);
       refetch();
+      refetchLog();
     } catch (e: any) {
       toast.error(e?.message || 'Failed to send');
     } finally {
@@ -285,17 +357,23 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
       <Send className="mr-1 h-4 w-4" />
     );
 
+  const fmt = (iso?: string) =>
+    iso
+      ? new Date(iso).toLocaleString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+        })
+      : '';
+
   return (
     <div className="space-y-4">
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Reminder email (prerequisite video + calendar)</CardTitle>
+          <CardTitle className="text-base">Round email status</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-sm text-muted-foreground">
-            Sends the Farsi reminder with the prerequisite video link, an add-to-calendar button, and
-            session times for Los Angeles/Vancouver, New York/Toronto, Chicago/Texas and Sydney.
-          </p>
           <div className="flex flex-wrap items-center gap-3">
             <Select value={roundChoice} onValueChange={setRoundChoice}>
               <SelectTrigger className="w-72">
@@ -312,6 +390,50 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
                 ))}
               </SelectContent>
             </Select>
+            <span className="text-sm text-muted-foreground">{roundSignupCount} signups in this round</span>
+          </div>
+          <div className="divide-y rounded-md border">
+            {KIND_LABELS.map(({ kind, campaign, label }) => {
+              const s = kindStats(kind, campaign);
+              return (
+                <div key={kind} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
+                  <span className="font-medium">{label}</span>
+                  {s.sent > 0 ? (
+                    <span className="text-foreground">
+                      ✅ Sent to {s.sent} · delivered {s.delivered} · opened {s.opened}
+                      {s.failed ? ` · failed ${s.failed}` : ''}
+                      <span className="text-muted-foreground"> — {fmt(s.last)}</span>
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">Not sent yet (automatic)</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            From the real delivery log. Refreshes every minute. Manual sends below only go to people not
+            in this log.
+          </p>
+        </CardContent>
+      </Card>
+
+      <details className="rounded-lg border bg-card">
+        <summary className="cursor-pointer px-4 py-3 text-sm font-medium">
+          Manual send / recovery (only if an automatic email failed)
+        </summary>
+        <div className="space-y-4 p-4 pt-0">
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Reminder email (prerequisite video + calendar)</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Sends the Farsi reminder with the prerequisite video link, an add-to-calendar button, and
+            session times for Los Angeles/Vancouver, New York/Toronto, Chicago/Texas and Sydney.
+            Uses the round selected above.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
             <label className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
@@ -457,6 +579,8 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
           </div>
         </CardContent>
       </Card>
+        </div>
+      </details>
     </div>
   );
 }
