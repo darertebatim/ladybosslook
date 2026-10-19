@@ -6,6 +6,8 @@ interface CalendarSyncState {
   lastSyncedSessionCount: number;
   /** Maps session ID → native calendar event ID for delete/update support */
   calendarEventIds: Record<string, string>;
+  /** Fingerprint of the session schedule at last full sync (detects moves/removals) */
+  signature?: string | null;
 }
 
 interface StoredSyncState {
@@ -13,6 +15,7 @@ interface StoredSyncState {
   syncedSessionIds: string[];
   lastSyncedSessionCount: number;
   calendarEventIds?: Record<string, string>;
+  signature?: string | null;
 }
 
 /**
@@ -43,6 +46,7 @@ export function useCalendarSyncTracking(roundId: string | undefined) {
           syncedSessionIds: new Set(parsed.syncedSessionIds || []),
           lastSyncedSessionCount: parsed.lastSyncedSessionCount || 0,
           calendarEventIds: parsed.calendarEventIds || {},
+          signature: parsed.signature ?? null,
         });
       }
     } catch (error) {
@@ -60,6 +64,7 @@ export function useCalendarSyncTracking(roundId: string | undefined) {
         syncedSessionIds: Array.from(newState.syncedSessionIds),
         lastSyncedSessionCount: newState.lastSyncedSessionCount,
         calendarEventIds: newState.calendarEventIds,
+        signature: newState.signature ?? null,
       };
       localStorage.setItem(storageKey, JSON.stringify(toStore));
     } catch (error) {
@@ -94,7 +99,8 @@ export function useCalendarSyncTracking(roundId: string | undefined) {
   // Mark all sessions as synced (bulk sync) with their calendar event IDs
   const markAllSessionsSynced = useCallback((
     sessionIds: string[],
-    calendarEventIdMap?: Record<string, string>
+    calendarEventIdMap?: Record<string, string>,
+    signature?: string
   ) => {
     if (!storageKey) return;
     
@@ -103,6 +109,7 @@ export function useCalendarSyncTracking(roundId: string | undefined) {
       syncedSessionIds: new Set(sessionIds),
       lastSyncedSessionCount: sessionIds.length,
       calendarEventIds: calendarEventIdMap || {},
+      signature: signature ?? null,
     };
     
     setSyncState(newState);

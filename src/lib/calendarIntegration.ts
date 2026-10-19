@@ -108,7 +108,7 @@ export async function addEventToCalendar(event: CalendarEvent): Promise<{ succes
     });
     
     // The plugin returns { result: string } where result is the event ID
-    const calendarEventId = (result as any)?.result ?? undefined;
+    const calendarEventId = (result as any)?.id ?? (result as any)?.result ?? undefined;
     console.log('[Calendar] Event created:', calendarEventId);
     return { success: true, calendarEventId };
   } catch (error: any) {
