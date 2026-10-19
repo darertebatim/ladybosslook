@@ -111,6 +111,68 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
 
   const rows = data || [];
   const effectiveRoundId = roundChoice === 'auto' ? autoRoundId : roundChoice;
+  const selectedRound = rounds?.find((r) => r.id === effectiveRoundId) || null;
+  const roundKey = selectedRound
+    ? String(selectedRound.round_number ?? selectedRound.id)
+    : null;
+
+  // Real delivery log for the selected round (automatic + manual sends).
+  const { data: deliveryLog, refetch: refetchLog } = useQuery({
+    queryKey: ['webinar-round-delivery-log', roundKey],
+    enabled: !!roundKey,
+    staleTime: 0,
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const out: { recipient: string; event_type: string; occurred_at: string; tags: any }[] = [];
+      for (let from = 0; from < 40000; from += 1000) {
+        const { data, error } = await supabase
+          .from('email_delivery_events')
+          .select('recipient, event_type, occurred_at, tags')
+          .in('tags->>campaign', ['webinar_day', 'live_followup'])
+          .eq('tags->>round', roundKey!)
+          .range(from, from + 999);
+        if (error) throw error;
+        out.push(...((data || []) as any[]));
+        if (!data || data.length < 1000) break;
+      }
+      return out;
+    },
+  });
+
+  const KIND_LABELS: { kind: string; campaign: string; label: string }[] = [
+    { kind: 'reminder', campaign: 'webinar_day', label: 'Reminder (video + calendar)' },
+    { kind: 'morning', campaign: 'webinar_day', label: 'Morning of the webinar' },
+    { kind: 'onehour', campaign: 'webinar_day', label: '1 hour before' },
+    { kind: 'start', campaign: 'webinar_day', label: 'Starting now' },
+    { kind: '3h', campaign: 'live_followup', label: 'Follow-up +3h' },
+    { kind: '24h', campaign: 'live_followup', label: 'Follow-up +24h' },
+  ];
+
+  const kindStats = (kind: string, campaign: string) => {
+    const evs = (deliveryLog || []).filter(
+      (e) => e.tags?.kind === kind && e.tags?.campaign === campaign,
+    );
+    const uniq = (types: string[]) =>
+      new Set(
+        evs
+          .filter((e) => types.includes(e.event_type))
+          .map((e) => String(e.recipient || '').toLowerCase()),
+      );
+    const sentSet = uniq(['sent', 'delivered']);
+    const last = evs
+      .filter((e) => e.event_type === 'sent')
+      .map((e) => e.occurred_at)
+      .sort()
+      .pop();
+    return {
+      sentSet,
+      sent: sentSet.size,
+      delivered: uniq(['delivered']).size,
+      opened: uniq(['opened']).size,
+      failed: uniq(['bounced', 'suppressed', 'failed']).size,
+      last,
+    };
+  };
 
   const roundLabel = (id: string | null) => {
     if (!id) return '—';
@@ -128,26 +190,34 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
   const uniqueEmails = (list: Row[]) =>
     new Set(list.map((r) => String(r.email || '').trim().toLowerCase()).filter(Boolean)).size;
 
+  const reminderSent = kindStats('reminder', 'webinar_day').sentSet;
+  const morningSent = kindStats('morning', 'webinar_day').sentSet;
+  const startSent = kindStats('start', 'webinar_day').sentSet;
+  const inSet = (s: Set<string>, r: Row) => s.has(String(r.email || '').trim().toLowerCase());
+
   const targetCount = uniqueEmails(
     rows.filter(
       (r) =>
         (!effectiveRoundId || r.round_id === effectiveRoundId) &&
-        (!onlyUnsent || !r.reminder_sent_at),
+        (!onlyUnsent || (!r.reminder_sent_at && !inSet(reminderSent, r))),
     ),
   );
   const joinNowTargetCount = uniqueEmails(
     rows.filter(
       (r) =>
         (!effectiveRoundId || r.round_id === effectiveRoundId) &&
-        (!onlyUnsentJoinNow || !r.join_now_sent_at),
+        (!onlyUnsentJoinNow || (!r.join_now_sent_at && !inSet(startSent, r))),
     ),
   );
   const morningTargetCount = uniqueEmails(
     rows.filter(
       (r) =>
         (!effectiveRoundId || r.round_id === effectiveRoundId) &&
-        (!onlyUnsentMorning || !r.morning_sent_at),
+        (!onlyUnsentMorning || (!r.morning_sent_at && !inSet(morningSent, r))),
     ),
+  );
+  const roundSignupCount = uniqueEmails(
+    rows.filter((r) => !effectiveRoundId || r.round_id === effectiveRoundId),
   );
   const nextSessionTargetCount = uniqueEmails(
     rows.filter(
