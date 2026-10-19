@@ -28,6 +28,7 @@ interface RoundRow {
   round_name: string | null;
   first_session_date: string | null;
   status: string | null;
+  round_number: number | null;
 }
 
 type SendKey =
@@ -65,7 +66,7 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
     queryFn: async () => {
       const { data, error } = await supabase
         .from('program_rounds')
-        .select('id, round_name, first_session_date, status')
+        .select('id, round_name, round_number, first_session_date, status')
         .eq('program_slug', programSlug)
         .order('first_session_date', { ascending: true });
       if (error) throw error;
@@ -341,6 +342,7 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
       } while (true);
       toast.success(`Sent ${totalSent} · failed ${totalFailed}`);
       refetch();
+      refetchLog();
     } catch (e: any) {
       toast.error(e?.message || 'Failed to send');
     } finally {
