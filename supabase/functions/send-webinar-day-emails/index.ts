@@ -367,9 +367,9 @@ async function collectRegistrants(roundId: string, startAds = false): Promise<Re
   for (let page = 0; page < 10; page++) {
     const { data, error } = await supabase
       .from("form_submissions")
-      .select("email, name, timezone, created_at, source")
+      .select("email, name, timezone, created_at:submitted_at, source")
       .eq("round_id", roundId)
-      .order("created_at", { ascending: true })
+      .order("submitted_at", { ascending: true })
       .range(page * 1000, page * 1000 + 999);
     if (error) throw error;
     for (const r of data || []) {
@@ -442,7 +442,7 @@ async function sendBatch(payload: any[]): Promise<{ ids: (string | null)[] } | n
   return null;
 }
 
-async function processRound(round: any, kind: Kind, testEmail?: string) {
+async function processRound(round: any, kind: Kind, testEmail?: string, catchup = false) {
   const subject = isStartAds(round) ? STARTADS_SUBJECTS[kind] : SUBJECTS[kind];
   const roundKey = roundKeyOf(round);
   const sessionStart = new Date(round.first_session_date);
@@ -487,6 +487,8 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
       const tz = registrantTz(r.timezone, round.round_name || "");
       const nowLocal = tzParts(now, tz);
       const sessionLocal = tzParts(sessionStart, tz);
+      // Catch-up: anyone whose local 9 AM has already passed today (deduped by already-sent).
+      if (catchup) return nowLocal.hour >= 9 && nowLocal.date === sessionLocal.date && now < sessionStart;
       return nowLocal.hour === 9 && nowLocal.date === sessionLocal.date;
     });
   }
@@ -632,7 +634,7 @@ Deno.serve(async (req) => {
 
     const results = [];
     for (const { round, kind } of rounds) {
-      results.push(await processRound(round, kind, body.testEmail));
+      results.push(await processRound(round, kind, body.testEmail, body.catchup === true && !!body.round_id));
     }
 
     return new Response(JSON.stringify({ success: true, results }), {
