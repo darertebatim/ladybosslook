@@ -95,6 +95,7 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
   // Notify students dialog state
   const [showNotifyDialog, setShowNotifyDialog] = useState(false);
   const lastSavedRoundRef = useRef<{ id: string; program_slug: string } | null>(null);
+  const duplicateSourceRef = useRef<string | null>(null);
   
   // Drip adjustment dialog state
   const [adjustingDripRound, setAdjustingDripRound] = useState<ProgramRound | null>(null);
@@ -478,6 +479,7 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
   });
 
   const resetForm = () => {
+    duplicateSourceRef.current = null;
     setFormData({
       program_slug: "",
       round_name: "",
