@@ -13,6 +13,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { Badge } from '@/components/ui/badge';
 import { AudiencePresetPicker, EMPTY_AUDIENCE, type AudiencePayload } from './AudiencePresetPicker';
+import type { Broadcast } from './BroadcastHistory';
 
 interface Program {
   id: string;
@@ -40,16 +41,16 @@ const IN_APP_LINKS = [
   { value: 'custom', label: '✏️ Custom URL...' },
 ];
 
-export function AnnouncementCreator() {
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
-  const [targetCourse, setTargetCourse] = useState<string>('all');
+export function AnnouncementCreator({ draft }: { draft?: Broadcast }) {
+  const [title, setTitle] = useState(draft?.title ?? '');
+  const [message, setMessage] = useState(draft?.content ?? '');
+  const [targetCourse, setTargetCourse] = useState<string>(draft ? '' : 'all');
   const [targetRoundId, setTargetRoundId] = useState<string>('all');
-  const [sendPush, setSendPush] = useState(true);
-  const [sendEmail, setSendEmail] = useState(false);
-  const [linkType, setLinkType] = useState('none');
-  const [customLinkUrl, setCustomLinkUrl] = useState('');
-  const [linkText, setLinkText] = useState('');
+  const [sendPush, setSendPush] = useState(draft?.send_push ?? true);
+  const [sendEmail, setSendEmail] = useState(draft?.send_email ?? false);
+  const [linkType, setLinkType] = useState(draft?.link_url ? 'custom' : 'none');
+  const [customLinkUrl, setCustomLinkUrl] = useState(draft?.link_url ?? '');
+  const [linkText, setLinkText] = useState(draft?.link_text ?? '');
   const [loading, setLoading] = useState(false);
   const [programs, setPrograms] = useState<Program[]>([]);
   
@@ -110,7 +111,7 @@ export function AnnouncementCreator() {
       if (error) throw error;
       return data;
     },
-    enabled: targetCourse !== "all",
+    enabled: !!targetCourse && targetCourse !== "all",
   });
 
   // Search users for exclusion
@@ -163,6 +164,10 @@ export function AnnouncementCreator() {
   };
 
   const handleSubmit = async () => {
+    if (!targetCourse && !audiencePresetId) {
+      toast({ title: "Choose a target audience", variant: "destructive" });
+      return;
+    }
     if (!title.trim() || !message.trim()) {
       toast({ title: "Error", description: "Please fill in title and message", variant: "destructive" });
       return;
@@ -179,7 +184,7 @@ export function AnnouncementCreator() {
       let targetType: 'all' | 'course' | 'round' = 'all';
       if (targetRoundId !== 'all' && targetRoundId) {
         targetType = 'round';
-      } else if (targetCourse !== 'all') {
+      } else if (targetCourse && targetCourse !== 'all') {
         targetType = 'course';
       }
 
@@ -188,7 +193,7 @@ export function AnnouncementCreator() {
           title: title.trim(),
           content: message.trim(),
           targetType,
-          targetCourse: targetCourse !== 'all' ? targetCourse : undefined,
+          targetCourse: targetCourse && targetCourse !== 'all' ? targetCourse : undefined,
           targetRoundId: targetRoundId !== 'all' ? targetRoundId : undefined,
           sendPush,
           sendEmail,
@@ -567,7 +572,7 @@ export function AnnouncementCreator() {
             <Eye className="mr-2 h-4 w-4" />
             {previewing ? 'Counting…' : 'Preview recipients'}
           </Button>
-          <Button onClick={handleSubmit} disabled={loading} className="flex-1">
+          <Button onClick={handleSubmit} disabled={loading || (!targetCourse && !audiencePresetId)} className="flex-1">
             <Megaphone className="mr-2 h-4 w-4" />
             {loading ? 'Sending...' : 'Send Broadcast'}
           </Button>
