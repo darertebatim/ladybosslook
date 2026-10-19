@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, GraduationCap, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft, Sparkles, Palette, FlaskConical, Smartphone, Image, Video, FileText, BookOpen, Brain, BarChart3, UserPlus, Library, Route as RouteIcon, Tags, TagsIcon, Aperture, Magnet, Presentation, ClipboardList, Clapperboard, ChevronDown } from 'lucide-react';
+import { LayoutDashboard, Users, Music, Send, UserCog, CreditCard, Shield, LogOut, MessageCircle, Newspaper, Wrench, Bell, PanelLeftClose, PanelLeft, Sparkles, Palette, FlaskConical, Smartphone, Image, Video, FileText, BookOpen, Brain, BarChart3, UserPlus, Library, Route as RouteIcon, Tags, TagsIcon, Aperture, Magnet, Presentation, ClipboardList, Clapperboard, ChevronDown } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,7 +14,6 @@ const menuItems = [
   { title: 'Overview', url: '/admin', icon: LayoutDashboard, end: true, pageSlug: 'overview' },
   { title: 'Analytics', url: '/admin/analytics', icon: BarChart3, pageSlug: 'overview' },
   { title: 'Users', url: '/admin/users', icon: Users, pageSlug: 'users' },
-  { title: 'Enrollment', url: '/admin/enrollment', icon: GraduationCap, pageSlug: 'enrollment' },
   { title: 'Channels', url: '/admin/channels', icon: Newspaper, pageSlug: 'community' },
   { title: 'Communications', url: '/admin/communications', icon: Send, pageSlug: 'communications' },
   { title: 'Lead Center', url: '/admin/leads', icon: Magnet, pageSlug: 'communications' },
