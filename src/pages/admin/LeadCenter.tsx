@@ -9,17 +9,13 @@ import { WebinarAutomationLog } from '@/components/admin/WebinarAutomationLog';
 import { SixTrapsSignups } from '@/components/admin/SixTrapsSignups';
 import { SmartInstaSignups } from '@/components/admin/SmartInstaSignups';
 import { GenericWebinarSignups } from '@/components/admin/GenericWebinarSignups';
-import { EmailOpenRates } from '@/components/admin/EmailOpenRates';
 import { WebinarEmailSender } from '@/components/admin/WebinarEmailSender';
 import { WebinarEmailEngagement } from '@/components/admin/WebinarEmailEngagement';
 import { WebinarRoundBreakdown } from '@/components/admin/WebinarRoundBreakdown';
 
-import { MetaCrmEvents } from '@/components/admin/MetaCrmEvents';
-import { LeadEmailCampaign } from '@/components/admin/LeadEmailCampaign';
 import { StartAdsEmailAutomation } from '@/components/admin/StartAdsEmailAutomation';
 import { StartAdsShowUpEmails } from '@/components/admin/StartAdsShowUpEmails';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
-import { MetaAudienceExport } from '@/components/admin/MetaAudienceExport';
 
 const igads = LEAD_CAMPAIGNS.find((c) => c.key === 'igads');
 const aliagads = LEAD_CAMPAIGNS.find((c) => c.key === 'aliagads');
@@ -37,7 +33,7 @@ export default function LeadCenter() {
   const show = (key: string) => !inactive.includes(key);
   const campaignTabKeys = ['sixtraps', 'smartinsta', 'igads', 'aliagads', 'customerwithigads', 'igthree', 'assertive', 'startads'];
   const visibleCampaignTabs = campaignTabKeys.filter(show).length;
-  const colCount = 5 + visibleCampaignTabs;
+  const colCount = 2 + visibleCampaignTabs;
 
   useEffect(() => {
     if (campaignTabKeys.includes(tab) && !show(tab)) setTab('campaigns');
@@ -76,9 +72,6 @@ export default function LeadCenter() {
           {show('igthree') && <TabsTrigger value="igthree">IG Three</TabsTrigger>}
           {show('assertive') && <TabsTrigger value="assertive">Assertive</TabsTrigger>}
           {show('startads') && <TabsTrigger value="startads">Start Ads</TabsTrigger>}
-          <TabsTrigger value="marketing">Email Marketing</TabsTrigger>
-          <TabsTrigger value="opens">Email Opens</TabsTrigger>
-          <TabsTrigger value="crm">Meta CRM</TabsTrigger>
         </TabsList>
 
         <TabsContent value="campaigns" className="space-y-6">
@@ -169,18 +162,6 @@ export default function LeadCenter() {
           <GenericWebinarSignups campaign={startads} />
         </TabsContent>
 
-        <TabsContent value="marketing" className="space-y-6">
-          <LeadEmailCampaign />
-        </TabsContent>
-
-        <TabsContent value="opens" className="space-y-6">
-          <EmailOpenRates onResend={() => setTab('marketing')} />
-        </TabsContent>
-
-        <TabsContent value="crm" className="space-y-6">
-          <MetaAudienceExport />
-          <MetaCrmEvents />
-        </TabsContent>
       </Tabs>
     </div>
   );
