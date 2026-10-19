@@ -8,11 +8,16 @@ import { MailchimpTagManager } from '@/components/admin/MailchimpTagManager';
 import { EmailGenerator } from '@/components/admin/EmailGenerator';
 import { UpdateNotificationSender } from '@/components/admin/UpdateNotificationSender';
 import { AppReviewKPIPanel } from '@/components/admin/AppReviewKPIPanel';
+import { EmailOpenRates } from '@/components/admin/EmailOpenRates';
+import { MetaCrmEvents } from '@/components/admin/MetaCrmEvents';
+import { LeadEmailCampaign } from '@/components/admin/LeadEmailCampaign';
+import { MetaAudienceExport } from '@/components/admin/MetaAudienceExport';
 
 
 export default function Communications() {
   const [broadcastDraft, setBroadcastDraft] = useState<Broadcast>();
   const [draftRevision, setDraftRevision] = useState(0);
+  const [tab, setTab] = useState('updates');
   const composerRef = useRef<HTMLDivElement>(null);
 
   const copyBroadcast = (broadcast: Broadcast) => {
@@ -27,14 +32,17 @@ export default function Communications() {
         <p className="text-muted-foreground">Manage broadcasts, push notifications, and Mailchimp</p>
       </div>
 
-      <Tabs defaultValue="updates">
-        <TabsList className="grid w-full grid-cols-6">
+      <Tabs value={tab} onValueChange={setTab}>
+        <TabsList className="grid w-full grid-cols-9">
           <TabsTrigger value="updates">Updates</TabsTrigger>
           <TabsTrigger value="broadcasts">Broadcasts</TabsTrigger>
           <TabsTrigger value="push">Push Only</TabsTrigger>
           <TabsTrigger value="reviews">Reviews</TabsTrigger>
           <TabsTrigger value="email-gen">Email Gen</TabsTrigger>
           <TabsTrigger value="mailchimp">Mailchimp</TabsTrigger>
+          <TabsTrigger value="marketing">Email Marketing</TabsTrigger>
+          <TabsTrigger value="opens">Email Opens</TabsTrigger>
+          <TabsTrigger value="crm">Meta CRM</TabsTrigger>
         </TabsList>
 
         <TabsContent value="updates" className="space-y-6">
@@ -63,6 +71,18 @@ export default function Communications() {
 
         <TabsContent value="mailchimp" className="space-y-6">
           <MailchimpTagManager />
+        </TabsContent>
+        <TabsContent value="marketing" className="space-y-6">
+          <LeadEmailCampaign />
+        </TabsContent>
+
+        <TabsContent value="opens" className="space-y-6">
+          <EmailOpenRates onResend={() => setTab('marketing')} />
+        </TabsContent>
+
+        <TabsContent value="crm" className="space-y-6">
+          <MetaAudienceExport />
+          <MetaCrmEvents />
         </TabsContent>
       </Tabs>
 
