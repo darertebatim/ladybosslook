@@ -487,6 +487,8 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
       const tz = registrantTz(r.timezone, round.round_name || "");
       const nowLocal = tzParts(now, tz);
       const sessionLocal = tzParts(sessionStart, tz);
+      // Catch-up: anyone whose local 9 AM has already passed today (deduped by already-sent).
+      if (catchup) return nowLocal.hour >= 9 && nowLocal.date === sessionLocal.date && now < sessionStart;
       return nowLocal.hour === 9 && nowLocal.date === sessionLocal.date;
     });
   }
