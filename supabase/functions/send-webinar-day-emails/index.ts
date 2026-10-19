@@ -502,6 +502,8 @@ async function processRound(round: any, kind: Kind, testEmail?: string, catchup 
     registrants = registrants.filter((r) => {
       if (!r.created_at) return false;
       const age = now.getTime() - new Date(r.created_at).getTime();
+      // Catch-up: everyone registered 2h+ ago (already-sent are deduped below).
+      if (catchup) return age >= 2 * 3600_000;
       return age >= 2 * 3600_000 && age < 3 * 3600_000;
     });
   }
