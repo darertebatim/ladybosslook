@@ -361,6 +361,26 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
             allow_comments: true,
           });
         }
+
+        // Copy attached playlists & courses when duplicating
+        const sourceId = duplicateSourceRef.current;
+        if (newRound && sourceId) {
+          const [{ data: pls }, { data: crs }] = await Promise.all([
+            supabase.from("program_round_playlists").select("*").eq("round_id", sourceId),
+            supabase.from("learn_course_rounds").select("*").eq("round_id", sourceId),
+          ]);
+          const strip = (r: any) => { const { id, created_at, updated_at, round_id, ...rest } = r; return { ...rest, round_id: newRound.id }; };
+          if (pls?.length) {
+            const { error: e1 } = await supabase.from("program_round_playlists").insert(pls.map(strip) as any);
+            if (e1) toast.error("Playlists not copied: " + e1.message);
+          }
+          if (crs?.length) {
+            const { error: e2 } = await supabase.from("learn_course_rounds").insert(crs.map(strip) as any);
+            if (e2) toast.error("Courses not copied: " + e2.message);
+          }
+          if (pls?.length || crs?.length) toast.success(`Copied ${pls?.length || 0} playlists and ${crs?.length || 0} courses`);
+          queryClient.invalidateQueries();
+        }
       }
     },
     onSuccess: (_data, variables) => {
@@ -566,6 +586,7 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
       desktop_link_enabled: (round as any).desktop_link_enabled ?? false,
     });
     setEditingId(null); // This is a new round, not editing
+    duplicateSourceRef.current = round.id;
     setIsFormDialogOpen(true);
     toast.info("Round duplicated - update the name and dates, then save");
   };
