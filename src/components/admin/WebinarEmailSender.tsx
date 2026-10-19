@@ -357,17 +357,23 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
       <Send className="mr-1 h-4 w-4" />
     );
 
+  const fmt = (iso?: string) =>
+    iso
+      ? new Date(iso).toLocaleString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+        })
+      : '';
+
   return (
     <div className="space-y-4">
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Reminder email (prerequisite video + calendar)</CardTitle>
+          <CardTitle className="text-base">Round email status</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-sm text-muted-foreground">
-            Sends the Farsi reminder with the prerequisite video link, an add-to-calendar button, and
-            session times for Los Angeles/Vancouver, New York/Toronto, Chicago/Texas and Sydney.
-          </p>
           <div className="flex flex-wrap items-center gap-3">
             <Select value={roundChoice} onValueChange={setRoundChoice}>
               <SelectTrigger className="w-72">
@@ -384,6 +390,50 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
                 ))}
               </SelectContent>
             </Select>
+            <span className="text-sm text-muted-foreground">{roundSignupCount} signups in this round</span>
+          </div>
+          <div className="divide-y rounded-md border">
+            {KIND_LABELS.map(({ kind, campaign, label }) => {
+              const s = kindStats(kind, campaign);
+              return (
+                <div key={kind} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
+                  <span className="font-medium">{label}</span>
+                  {s.sent > 0 ? (
+                    <span className="text-foreground">
+                      ✅ Sent to {s.sent} · delivered {s.delivered} · opened {s.opened}
+                      {s.failed ? ` · failed ${s.failed}` : ''}
+                      <span className="text-muted-foreground"> — {fmt(s.last)}</span>
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">Not sent yet (automatic)</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            From the real delivery log. Refreshes every minute. Manual sends below only go to people not
+            in this log.
+          </p>
+        </CardContent>
+      </Card>
+
+      <details className="rounded-lg border bg-card">
+        <summary className="cursor-pointer px-4 py-3 text-sm font-medium">
+          Manual send / recovery (only if an automatic email failed)
+        </summary>
+        <div className="space-y-4 p-4 pt-0">
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Reminder email (prerequisite video + calendar)</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Sends the Farsi reminder with the prerequisite video link, an add-to-calendar button, and
+            session times for Los Angeles/Vancouver, New York/Toronto, Chicago/Texas and Sydney.
+            Uses the round selected above.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
             <label className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
