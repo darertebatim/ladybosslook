@@ -579,6 +579,8 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
           </div>
         </CardContent>
       </Card>
+        </div>
+      </details>
     </div>
   );
 }
