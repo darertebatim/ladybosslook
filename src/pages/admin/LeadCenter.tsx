@@ -56,7 +56,6 @@ export default function LeadCenter() {
         </p>
       </div>
 
-      <MetaAudienceExport />
 
 
       <Tabs value={tab} onValueChange={setTab}>
@@ -179,6 +178,7 @@ export default function LeadCenter() {
         </TabsContent>
 
         <TabsContent value="crm" className="space-y-6">
+          <MetaAudienceExport />
           <MetaCrmEvents />
         </TabsContent>
       </Tabs>
