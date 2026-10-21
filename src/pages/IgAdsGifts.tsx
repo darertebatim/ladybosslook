@@ -6,12 +6,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
 import { trackLiveAttendee } from "@/lib/metaCapi";
+import type { DedicatedWebinar } from "@/lib/dedicatedWebinars";
 
 const schema = z.object({
   email: z.string().trim().email("ایمیل معتبر نیست").max(255),
 });
 
-export default function IgAdsGifts() {
+export default function IgAdsGifts({ campaign }: { campaign?: DedicatedWebinar }) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
@@ -29,12 +30,12 @@ export default function IgAdsGifts() {
     }
     setError("");
     setSubmitting(true);
-    trackLiveAttendee({ email: parsed.data.email.toLowerCase(), contentName: "IG Ads Webinar Live" });
+    trackLiveAttendee({ email: parsed.data.email.toLowerCase(), contentName: campaign?.liveContentName ?? "IG Ads Webinar Live" });
 
     try {
       // Saves the email with a server timestamp and sends the gift email.
       const { error: fnError } = await supabase.functions.invoke("send-igads-gifts", {
-        body: { email: parsed.data.email.toLowerCase() },
+        body: { email: parsed.data.email.toLowerCase(), campaign: campaign?.slug },
       });
 
       if (fnError) {
@@ -42,7 +43,7 @@ export default function IgAdsGifts() {
         console.warn("igads gifts submission error", fnError);
       }
 
-      navigate("/giftsalilotfivip", { replace: true });
+      navigate(campaign ? `${campaign.basePath}/giftsvip` : "/giftsalilotfivip", { replace: true });
     } catch (err) {
       console.error("gifts submit error", err);
       toast({
@@ -57,7 +58,7 @@ export default function IgAdsGifts() {
   return (
     <>
       <SEOHead
-        title="هدایای ویژه وبینار اینستاگرام ادز | Rilo"
+        title={campaign ? `هدایای ویژه ${campaign.defaultTitle} | Rilo` : "هدایای ویژه وبینار اینستاگرام ادز | Rilo"}
         description="دریافت هدایا و منابع ویژه استاد لطفی پس از وبینار جذب مشتری با اینستاگرام ادز."
         locale="fa_IR"
       />

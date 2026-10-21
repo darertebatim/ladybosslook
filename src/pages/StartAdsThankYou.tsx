@@ -1,4 +1,5 @@
-import { TrackedIframe } from "@/components/TrackedIframe";
+import { TrackedIframe, TrackedVideo } from "@/components/TrackedIframe";
+import { STARTADS_WEBINAR, type DedicatedWebinar } from "@/lib/dedicatedWebinars";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -21,23 +22,24 @@ function gcalUrl(title: string, r: StartAdsRound) {
   return `https://calendar.google.com/calendar/render?${p}`;
 }
 
-export default function StartAdsThankYou() {
+export default function StartAdsThankYou({ campaign = STARTADS_WEBINAR }: { campaign?: DedicatedWebinar }) {
   const [params] = useSearchParams();
   const waitlist = params.get("waitlist") === "1";
   const email = params.get("email");
   const [data, setData] = useState<{ prog: any; round: StartAdsRound | null } | null>(null);
 
   useEffect(() => {
-    loadStartAds().then(setData);
-  }, []);
+    loadStartAds(campaign.slug).then(setData);
+  }, [campaign.slug]);
 
   const round = data?.round;
-  const title = data?.prog?.title || "شروع تبلیغات اینستاگرامی";
+  const title = data?.prog?.title || campaign.defaultTitle;
   const vid = youtubeId(round?.video_url);
+  const directVideo = !vid && round?.video_url ? round.video_url : null;
 
   const addToApple = () => {
     if (!round?.first_session_date) return;
-    trackCalendarClick("apple", { email, roundId: round.id, page: "/l/startads/thankyou" });
+    trackCalendarClick("apple", { email, roundId: round.id, page: `${campaign.basePath}/thankyou` });
     downloadIcs(
       {
         title,
@@ -46,7 +48,7 @@ export default function StartAdsThankYou() {
         durationMinutes: round.first_session_duration || 90,
         location: round.google_meet_link || "",
       },
-      "startads.ics",
+      campaign.icsName,
     );
   };
 
@@ -70,20 +72,24 @@ export default function StartAdsThankYou() {
 
         {!waitlist && round?.first_session_date && (
           <>
-            {vid && (
+            {(vid || directVideo) && (
               <div className="mt-5 rounded-2xl border border-neutral-200 bg-white p-3 shadow-ios">
                 <p className="mb-2 flex items-center justify-center gap-1.5 text-center text-sm font-extrabold text-neutral-900">
                   <Video className="h-4 w-4 text-rose-500" />
                   قدم اول: قبل از جلسه این ویدیو را ببینید
                 </p>
                 <div className="relative aspect-video overflow-hidden rounded-xl bg-black">
-                  <TrackedIframe
-                    className="absolute inset-0 h-full w-full"
-                    src={`https://www.youtube.com/embed/${vid}?rel=0`}
-                    allow="encrypted-media"
-                    allowFullScreen
-                    title="ویدیو پیش‌نیاز"
-                  />
+                  {vid ? (
+                    <TrackedIframe
+                      className="absolute inset-0 h-full w-full"
+                      src={`https://www.youtube.com/embed/${vid}?rel=0`}
+                      allow="encrypted-media"
+                      allowFullScreen
+                      title="ویدیو پیش‌نیاز"
+                    />
+                  ) : (
+                    <TrackedVideo src={directVideo!} title="ویدیو پیش‌نیاز" controls playsInline preload="metadata" className="absolute inset-0 h-full w-full" />
+                  )}
                 </div>
               </div>
             )}
@@ -102,7 +108,7 @@ export default function StartAdsThankYou() {
                   href={gcalUrl(title, round)}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={() => trackCalendarClick("google", { email, roundId: round.id, page: "/l/startads/thankyou" })}
+                  onClick={() => trackCalendarClick("google", { email, roundId: round.id, page: `${campaign.basePath}/thankyou` })}
                   className="flex h-12 items-center justify-center gap-1.5 rounded-xl bg-rose-500 text-[13px] font-extrabold text-white active:scale-[0.98]"
                 >
                   <CalendarPlus className="h-4 w-4" />

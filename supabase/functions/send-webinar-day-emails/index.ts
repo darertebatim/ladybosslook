@@ -19,11 +19,18 @@ import { webinarSendIsDue } from "../_shared/webinar-timing.ts";
 import { buildUnsubUrl, unsubHeaders, appendUnsubFooter, fetchUnsubscribed } from "../_shared/unsubscribe.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { buildStartAdsHtml, STARTADS_SUBJECTS, startAdsThankYouUrl } from "../_shared/startads-emails.ts";
+import { buildPowerFreeHtml, POWERFREE_SUBJECTS, powerFreeThankYouUrl } from "../_shared/powerfree-emails.ts";
 
-const PROGRAMS = ["igadsfree", "startads"];
-const isStartAds = (round: any) => round?.program_slug === "startads";
-/** Tag/dedupe key per round; Start Ads round numbers are prefixed so they never collide with IG Ads rounds. */
-const roundKeyOf = (round: any) => isStartAds(round) ? `startads-${round.round_number ?? round.id}` : String(round.round_number ?? round.id);
+/** Dedicated-round campaigns (own email set, follow-ups, no IG Ads source routing). */
+const DEDICATED: Record<string, { build: typeof buildStartAdsHtml; subjects: typeof STARTADS_SUBJECTS; tyUrl: typeof startAdsThankYouUrl; calTitle: string; from: string }> = {
+  startads: { build: buildStartAdsHtml, subjects: STARTADS_SUBJECTS, tyUrl: startAdsThankYouUrl, calTitle: "جلسه اول شروع تبلیغات اینستاگرامی (رایگان)", from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>" },
+  powerfree: { build: buildPowerFreeHtml, subjects: POWERFREE_SUBJECTS, tyUrl: powerFreeThankYouUrl, calTitle: "وبینار رایگان قدرت دو زبانه", from: "Razie Ladyboss <hi@ladybosslook.com>" },
+};
+const PROGRAMS = ["igadsfree", ...Object.keys(DEDICATED)];
+const dedicatedOf = (round: any) => DEDICATED[round?.program_slug];
+const isStartAds = (round: any) => !!dedicatedOf(round);
+/** Tag/dedupe key per round; dedicated campaigns prefix round numbers so they never collide with IG Ads rounds. */
+const roundKeyOf = (round: any) => isStartAds(round) ? `${round.program_slug}-${round.round_number ?? round.id}` : String(round.round_number ?? round.id);
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -143,7 +150,7 @@ function calendarClickUrl(round: any, email: string, tyUrl: string): string {
     `پشتیبانی: ${SUPPORT_URL}`;
   const gcal =
     "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-    `&text=${encodeURIComponent(isStartAds(round) ? "جلسه اول شروع تبلیغات اینستاگرامی (رایگان)" : "Instagram Ads وبینار جذب مشتری با اینستاگرام ادز")}` +
+    `&text=${encodeURIComponent(isStartAds(round) ? dedicatedOf(round).calTitle : "Instagram Ads وبینار جذب مشتری با اینستاگرام ادز")}` +
     `&dates=${icsDate(start)}/${icsDate(end)}` +
     `&details=${encodeURIComponent(details)}` +
     `&location=${encodeURIComponent(meet)}`;
@@ -157,7 +164,7 @@ function calendarClickUrl(round: any, email: string, tyUrl: string): string {
 // session time table and join link generated per round.
 function buildHtml(kind: Kind, name: string, round: any, tz: string, email: string, tyUrl: string): string {
   if (isStartAds(round)) {
-    return buildStartAdsHtml({ kind, name, sessionStart: new Date(round.first_session_date), meetUrl: round.google_meet_link || "", thankYouUrl: tyUrl, calendarUrl: calendarClickUrl(round, email, tyUrl) });
+    return dedicatedOf(round).build({ kind, name, sessionStart: new Date(round.first_session_date), meetUrl: round.google_meet_link || "", thankYouUrl: tyUrl, calendarUrl: calendarClickUrl(round, email, tyUrl) });
   }
   const start = new Date(round.first_session_date);
   const meetUrl: string = round.google_meet_link || "";
@@ -355,7 +362,7 @@ interface Registrant { email: string; name: string; timezone: string | null; cre
 
 /** Each signup's own landing-page thank-you page, pinned to this round and person. */
 function thankYouUrl(round: any, email: string, source?: string | null): string {
-  if (isStartAds(round)) return startAdsThankYouUrl(round.round_number, email);
+  if (isStartAds(round)) return dedicatedOf(round).tyUrl(round.round_number, email);
   const base = String(source || "").startsWith("aliagads")
     ? "https://ladybosslook.com/l/aliagads/thankyou"
     : "https://ladybosslook.com/l/igadsfree/thankyou";
@@ -443,7 +450,7 @@ async function sendBatch(payload: any[]): Promise<{ ids: (string | null)[] } | n
 }
 
 async function processRound(round: any, kind: Kind, testEmail?: string, catchup = false) {
-  const subject = isStartAds(round) ? STARTADS_SUBJECTS[kind] : SUBJECTS[kind];
+  const subject = isStartAds(round) ? dedicatedOf(round).subjects[kind] : SUBJECTS[kind];
   const roundKey = roundKeyOf(round);
   const sessionStart = new Date(round.first_session_date);
   const now = new Date();
@@ -475,7 +482,7 @@ async function processRound(round: any, kind: Kind, testEmail?: string, catchup 
       }
       const buyers = new Set<string>();
       const { data: orders } = await supabase.from("orders").select("email")
-        .eq("program_slug", "startads").in("status", ["completed", "paid", "partially_refunded"]).limit(5000);
+        .eq("program_slug", round.program_slug).in("status", ["completed", "paid", "partially_refunded"]).limit(5000);
       for (const o of orders || []) buyers.add(String(o.email || "").trim().toLowerCase());
       registrants = registrants.filter((r) => !buyers.has(r.email));
     }
@@ -518,7 +525,7 @@ async function processRound(round: any, kind: Kind, testEmail?: string, catchup 
         const tz = registrantTz(r.timezone, round.round_name || "");
         const unsubscribeUrl = await buildUnsubUrl(r.email);
         return {
-          from: FROM,
+          from: dedicatedOf(round)?.from ?? FROM,
           to: [r.email],
           subject,
           html: appendUnsubFooter(buildHtml(kind, r.name, round, tz, r.email, thankYouUrl(round, r.email, r.source)), unsubscribeUrl),
@@ -624,7 +631,7 @@ Deno.serve(async (req) => {
       const { data: pastRounds, error: e4 } = await supabase
         .from("program_rounds")
         .select(roundCols)
-        .eq("program_slug", "startads")
+        .in("program_slug", Object.keys(DEDICATED))
         .lte("first_session_date", new Date(now - 3 * 3600_000).toISOString())
         .gte("first_session_date", new Date(now - 30 * 3600_000).toISOString());
       if (e4) throw e4;

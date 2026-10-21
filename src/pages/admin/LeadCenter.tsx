@@ -23,6 +23,7 @@ const customerVideo = LEAD_CAMPAIGNS.find((c) => c.key === 'customerwithigads');
 const igthree = LEAD_CAMPAIGNS.find((c) => c.key === 'igthree');
 const assertive = LEAD_CAMPAIGNS.find((c) => c.key === 'assertive');
 const startads = LEAD_CAMPAIGNS.find((c) => c.key === 'startads');
+const powerfree = LEAD_CAMPAIGNS.find((c) => c.key === 'powerfree');
 // Both IG Ads landing pages share one program, so round views and round emails
 // include everyone in the round no matter which page they signed up on.
 const igAdsRoundSources = [igads, aliagads].flatMap((c) => (c ? [c.regSource, ...c.extraSources] : []));
@@ -31,7 +32,7 @@ export default function LeadCenter() {
   const [tab, setTab] = useState('campaigns');
   const { inactive } = useInactiveLeadCampaigns();
   const show = (key: string) => !inactive.includes(key);
-  const campaignTabKeys = ['sixtraps', 'smartinsta', 'igads', 'aliagads', 'customerwithigads', 'igthree', 'assertive', 'startads'];
+  const campaignTabKeys = ['sixtraps', 'smartinsta', 'igads', 'aliagads', 'customerwithigads', 'igthree', 'assertive', 'startads', 'powerfree'];
   const visibleCampaignTabs = campaignTabKeys.filter(show).length;
   const colCount = 2 + visibleCampaignTabs;
 
@@ -40,7 +41,7 @@ export default function LeadCenter() {
   }, [inactive, tab]);
 
 
-  if (!igads || !aliagads || !customerVideo || !igthree || !assertive || !startads) return null;
+  if (!igads || !aliagads || !customerVideo || !igthree || !assertive || !startads || !powerfree) return null;
 
   return (
     <div className="space-y-6">
@@ -72,6 +73,7 @@ export default function LeadCenter() {
           {show('igthree') && <TabsTrigger value="igthree">IG Three</TabsTrigger>}
           {show('assertive') && <TabsTrigger value="assertive">Assertive</TabsTrigger>}
           {show('startads') && <TabsTrigger value="startads">Start Ads</TabsTrigger>}
+          {show('powerfree') && <TabsTrigger value="powerfree">PowerFree</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="campaigns" className="space-y-6">
@@ -160,6 +162,16 @@ export default function LeadCenter() {
             sources={[startads.regSource, ...startads.extraSources]}
           />
           <GenericWebinarSignups campaign={startads} />
+        </TabsContent>
+
+        <TabsContent value="powerfree" className="space-y-6">
+          <StartAdsShowUpEmails programSlug="powerfree" label="PowerFree" basePath="/r/powerfree" source={powerfree.regSource} />
+          <WebinarRoundBreakdown
+            programSlug={powerfree.programSlug}
+            campaignKey="powerfree"
+            sources={[powerfree.regSource, ...powerfree.extraSources]}
+          />
+          <GenericWebinarSignups campaign={powerfree} />
         </TabsContent>
 
       </Tabs>
