@@ -440,7 +440,7 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
           {registeredEmail && (
             <WebinarAddEmailBox
               originalEmail={registeredEmail}
-              source={campaign?.slug ?? "igads"}
+              source={campaign?.slug === "powerfree" ? "powerfree" : "igads"}
               roundId={registeredRoundId}
             />
           )}
