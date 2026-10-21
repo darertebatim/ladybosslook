@@ -1,3 +1,4 @@
+import { useVideoWatchTracking } from "@/lib/videoTracking";
 import { TrackedIframe } from "@/components/TrackedIframe";
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
@@ -49,6 +50,7 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
   const [videoPlaybackSeconds, setVideoPlaybackSeconds] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  useVideoWatchTracking(videoRef, { url, title, enabled: isOpen && detectVideoType(url) === 'direct' });
 
   const videoType = detectVideoType(url);
   const vertical = isVerticalOverride ?? isVerticalVideo(url);
