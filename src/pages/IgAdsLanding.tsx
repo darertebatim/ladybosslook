@@ -12,6 +12,7 @@ import { trackWebinarLead } from "@/lib/metaCapi";
 import { isIranTimezone, getDeviceTimezone } from "@/lib/regionRestrictions";
 import { useWaitlistLeadCampaigns, useSlotChoiceLeadCampaigns } from "@/hooks/useLeadCampaignStatus";
 import WebinarWaitlistBox from "@/components/WebinarWaitlistBox";
+import type { DedicatedWebinar } from "@/lib/dedicatedWebinars";
 
 
 
@@ -165,13 +166,17 @@ function MiniCountdown({ startUtc }: { startUtc: Date }) {
 }
 
 
-export default function IgAdsLanding({ basePath = "/l/igadsfree" }: { basePath?: string } = {}) {
-  const isAli = basePath === "/l/aliagads";
-  const routingKey = isAli ? "aliagads" : PROGRAM_SLUG;
-  const campaignKey = isAli ? "aliagads" : "igads";
-  const roundStorageKey = isAli ? "aliagads_round_assignment" : "igadsfree_round_assignment";
-  const regSource = isAli ? "aliagads_registration" : "igads_registration";
-  const waitlistSource = isAli ? "aliagads_waitlist" : "igads_waitlist";
+export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { basePath?: string; campaign?: DedicatedWebinar } = {}) {
+  const isAli = !campaign && basePath === "/l/aliagads";
+  const slug = campaign?.slug ?? PROGRAM_SLUG;
+  const routingKey = campaign ? campaign.slug : isAli ? "aliagads" : PROGRAM_SLUG;
+  const campaignKey = campaign ? campaign.slug : isAli ? "aliagads" : "igads";
+  const roundStorageKey = campaign ? `${campaign.slug}_round_assignment` : isAli ? "aliagads_round_assignment" : "igadsfree_round_assignment";
+  const regSource = campaign?.regSource ?? (isAli ? "aliagads_registration" : "igads_registration");
+  const waitlistSource = campaign?.waitlistSource ?? (isAli ? "aliagads_waitlist" : "igads_waitlist");
+  const metaEvent = campaign?.metaEvent ?? "IGAdsFreeLead";
+  const metaContentName = campaign?.metaContentName ?? "Instagram Ads Webinar Registration";
+  const defaultTitle = campaign?.defaultTitle ?? "وبینار جذب مشتری با اینستاگرام ادز";
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const roundParam = searchParams.get("round");
