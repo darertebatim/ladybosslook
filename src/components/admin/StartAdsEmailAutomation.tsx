@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { useTestEmailAddress, isValidEmail } from '@/hooks/useTestEmailAddress';
 import { toast } from 'sonner';
 import { Loader2, Mail, Send, RefreshCw } from 'lucide-react';
 
@@ -35,6 +37,7 @@ export function StartAdsEmailAutomation() {
   const [stats, setStats] = useState<Record<string, Stats>>({});
   const [busy, setBusy] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [testEmail, setTestEmail] = useTestEmailAddress();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -58,17 +61,18 @@ export function StartAdsEmailAutomation() {
 
   const run = async (kind: Kind, mode: 'test' | 'live') => {
     const s = stats[kind];
+    if (mode === 'test' && !isValidEmail(testEmail)) { toast.error('Enter a valid test email'); return; }
     if (mode === 'live' && !window.confirm(`Send this email to ${s?.remaining ?? 'all'} people now? Each person gets it only once.`)) return;
     setBusy(`${kind}-${mode}`);
     const { data, error } = await supabase.functions.invoke('send-startads-campaign', {
-      body: mode === 'test' ? { kind, test_email: TEST_EMAIL } : { kind },
+      body: mode === 'test' ? { kind, test_email: testEmail.trim().toLowerCase() } : { kind },
     });
     setBusy(null);
     if (error || data?.error) {
       toast.error(`Send failed: ${data?.error || error?.message}`);
       return;
     }
-    toast.success(mode === 'test' ? `Test sent to ${TEST_EMAIL}` : `Sent to ${data?.sent ?? 0} people`);
+    toast.success(mode === 'test' ? `Test sent to ${testEmail.trim()}` : `Sent to ${data?.sent ?? 0} people`);
     load();
   };
 
@@ -83,6 +87,10 @@ export function StartAdsEmailAutomation() {
         </Button>
       </CardHeader>
       <CardContent className="space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm text-foreground">Send tests to:</span>
+          <Input type="email" value={testEmail} onChange={(e) => setTestEmail(e.target.value)} placeholder="you@example.com" className="h-9 max-w-xs" dir="ltr" />
+        </div>
         {EMAILS.map(({ kind, title, when, subject }) => {
           const s = stats[kind];
           return (
@@ -101,7 +109,7 @@ export function StartAdsEmailAutomation() {
               <div className="flex flex-wrap gap-2">
                 <Button size="sm" variant="outline" onClick={() => run(kind, 'test')} disabled={!!busy}>
                   {busy === `${kind}-test` ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
-                  Send test to me
+                  Send test
                 </Button>
                 <Button size="sm" onClick={() => run(kind, 'live')} disabled={!!busy || !s?.remaining}>
                   {busy === `${kind}-live` ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
