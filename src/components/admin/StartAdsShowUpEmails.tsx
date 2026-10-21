@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { useTestEmailAddress, isValidEmail } from '@/hooks/useTestEmailAddress';
 import { Loader2, Mail, CalendarClock } from 'lucide-react';
 
-type Kind = 'confirm' | 'reminder' | 'morning' | 'onehour' | 'start' | 'after3h' | 'after24h';
+type Kind = 'confirm' | 'reminder' | 'morning' | 'onehour' | 'start' | 'after3h' | 'after24h' | 'nurture1' | 'nurture2';
 const EMAILS: { kind: Kind; title: string; when: string }[] = [
   { kind: 'confirm', title: '0. Confirmation', when: 'Right at signup' },
   { kind: 'reminder', title: '1. Reminder', when: '2–3h after signup' },
@@ -17,6 +17,10 @@ const EMAILS: { kind: Kind; title: string; when: string }[] = [
   { kind: 'start', title: '4. Starting now', when: 'At start time' },
   { kind: 'after3h', title: '5. Follow-up', when: '3h after start' },
   { kind: 'after24h', title: '6. Follow-up', when: '24h after start' },
+];
+const POWERFREE_EXTRA: { kind: Kind; title: string; when: string }[] = [
+  { kind: 'nurture1', title: 'Signups 1 — Suitcase story (reply email)', when: 'Day after signup' },
+  { kind: 'nurture2', title: 'Signups 2 — Tomorrow: 6-month decision (reply email)', when: 'Day before webinar' },
 ];
 
 interface Round { id: string; round_number: number | null; first_session_date: string }
@@ -94,7 +98,7 @@ export function StartAdsShowUpEmails({ programSlug = 'startads', label = 'Start 
           <span className="text-sm text-muted-foreground">Send tests to:</span>
           <Input type="email" dir="ltr" value={testTo} onChange={(e) => setTestTo(e.target.value)} className="h-9 max-w-xs" placeholder="you@example.com" />
         </div>
-        {EMAILS.map(({ kind, title, when }) => (
+        {(programSlug === 'powerfree' ? [...EMAILS, ...POWERFREE_EXTRA] : EMAILS).map(({ kind, title, when }) => (
           <div key={kind} className="flex flex-wrap items-center gap-2 rounded-lg border p-3">
             <span className="text-sm font-medium">{title}</span>
             <Badge variant="secondary">{when}</Badge>
