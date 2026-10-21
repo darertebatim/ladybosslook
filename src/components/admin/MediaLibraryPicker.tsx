@@ -114,9 +114,10 @@ export function MediaLibraryPicker({ kind, onPick, triggerLabel, variant = 'outl
             ) : (
               <div className="space-y-2 pb-6">
                 {filtered.map((it: any) => (
-                  <button
+                  <Button
                     key={it.id}
                     type="button"
+                    variant="ghost"
                     onClick={() => {
                       onPick({
                         id: it.id,
@@ -126,7 +127,7 @@ export function MediaLibraryPicker({ kind, onPick, triggerLabel, variant = 'outl
                       });
                       setOpen(false);
                     }}
-                    className="w-full text-left flex items-center gap-3 p-2 rounded-lg border hover:bg-muted transition-colors"
+                    className="h-auto min-h-12 w-full justify-start text-left gap-3 p-2 rounded-lg border border-border active:bg-muted transition-colors whitespace-normal"
                   >
                     {it.cover_image_url ? (
                       <img src={it.cover_image_url} alt="" className="w-12 h-12 rounded object-cover shrink-0" />
@@ -141,7 +142,7 @@ export function MediaLibraryPicker({ kind, onPick, triggerLabel, variant = 'outl
                         <div className="text-xs text-muted-foreground truncate">{it.category}</div>
                       )}
                     </div>
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}
