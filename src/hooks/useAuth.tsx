@@ -125,7 +125,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setRoleCheckComplete(true);
         setLoading(false);
       }
-    }, 5000);
+    }, 12000);
 
     // Set up auth state listener FIRST (must be synchronous callback)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(

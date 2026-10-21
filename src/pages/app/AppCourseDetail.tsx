@@ -1,4 +1,10 @@
 import { TrackedIframe, TrackedVideo } from "@/components/TrackedIframe";
+import { Browser } from "@capacitor/browser";
+import { Capacitor } from "@capacitor/core";
+const openExternal = (url: string) => {
+  if (Capacitor.isNativePlatform()) { Browser.open({ url }).catch(() => window.open(url, "_blank")); }
+  else window.open(url, "_blank");
+};
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -1298,9 +1304,13 @@ const AppCourseDetail = () => {
   const nextSession = getNextUpcomingSession();
 
   // Helper to determine if a session is in the past
-  const isSessionPast = (sessionDate: string) => {
-    return new Date(sessionDate) < new Date();
+  // A session stays "live" (not past) for its duration + 30 min buffer,
+  // so the join button doesn't vanish the moment class starts.
+  const isSessionPast = (sessionDate: string, durationMinutes?: number | null) => {
+    const end = new Date(sessionDate).getTime() + ((durationMinutes || 90) + 30) * 60000;
+    return end < Date.now();
   };
+  const isSessionLive = (sessionDate: string) => new Date(sessionDate).getTime() <= Date.now();
 
   // Helper to determine if a session is today
   const isSessionToday = (sessionDate: string) => {
@@ -1947,7 +1957,7 @@ const AppCourseDetail = () => {
                   {/* Next Session Card - shown at the top for quick visibility */}
                   {(() => {
                      const nextSession = !round?.is_self_paced && dbSessions?.find(
-                      (s) => !isSessionPast(s.session_date),
+                      (s) => !isSessionPast(s.session_date, s.duration_minutes),
                     );
                     if (!nextSession) return null;
                     const nextDate = new Date(nextSession.session_date);
@@ -1958,9 +1968,13 @@ const AppCourseDetail = () => {
                           <div className="flex items-center gap-2 mb-3 text-fg-warm">
                             <Clock className="h-4 w-4" />
                             <span className="text-sm font-semibold">
-                              Next session
+                              {isSessionLive(nextSession.session_date) ? "Live now" : "Next session"}
                             </span>
-                            {isTodayNext && (
+                            {isSessionLive(nextSession.session_date) ? (
+                              <Badge className="ml-auto bg-destructive text-white border-0 shadow-ios animate-pulse">
+                                ● در حال برگزاری
+                              </Badge>
+                            ) : isTodayNext && (
                               <Badge className="ml-auto bg-brand text-white border-0 shadow-ios">
                                 Today
                               </Badge>
@@ -1974,7 +1988,7 @@ const AppCourseDetail = () => {
                             }`}
                             onClick={() =>
                               round.google_meet_link
-                                ? window.open(round.google_meet_link, "_blank")
+                                ? openExternal(round.google_meet_link!)
                                 : navigate(`/app/programs/${slug}`)
                             }
                           >
@@ -1995,12 +2009,12 @@ const AppCourseDetail = () => {
                                 {nextSession.duration_minutes || 90} min
                               </p>
                             </div>
-                            {isSessionSynced(nextSession.id) && round.google_meet_link ? (
+                            {(isSessionSynced(nextSession.id) || isSessionLive(nextSession.session_date)) && round.google_meet_link ? (
                               <span
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   haptic.light();
-                                  window.open(round.google_meet_link!, "_blank");
+                                  openExternal(round.google_meet_link!);
                                 }}
                                 className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-xs font-semibold bg-fg-warm text-white shadow-ios transition-all active:scale-95"
                               >
@@ -2089,7 +2103,7 @@ const AppCourseDetail = () => {
                             size="lg"
                             className="w-full h-auto px-4 py-3 tour-meet-btn bg-fg-warm text-white shadow-ios rounded-2xl border-0 justify-start"
                             onClick={() =>
-                              window.open(round.google_meet_link!, "_blank")
+                              openExternal(round.google_meet_link!)
                             }
                           >
                             <Video className="h-5 w-5 mr-3 shrink-0" />
@@ -2200,7 +2214,7 @@ const AppCourseDetail = () => {
                                       )}
                                     </div>
                                     {next.join_url && (
-                                      <Button size="sm" className="rounded-full bg-fg-warm text-warm shrink-0" onClick={() => window.open(next.join_url, "_blank")}>
+                                      <Button size="sm" className="rounded-full bg-fg-warm text-warm shrink-0" onClick={() => openExternal(next.join_url)}>
                                         Join
                                       </Button>
                                     )}
@@ -2331,7 +2345,7 @@ const AppCourseDetail = () => {
                             size="lg"
                             className="w-full h-auto px-4 py-3 tour-meet-btn bg-fg-warm text-white shadow-ios rounded-2xl border-0 justify-start"
                             onClick={() =>
-                              window.open(round.google_meet_link!, "_blank")
+                              openExternal(round.google_meet_link!)
                             }
                           >
                             <Video className="h-5 w-5 mr-3 shrink-0" />
@@ -2394,7 +2408,7 @@ const AppCourseDetail = () => {
                         <div className="space-y-3">
                           {dbSessions.map((session, index) => {
                             const sessionDate = new Date(session.session_date);
-                            const isPast = isSessionPast(session.session_date);
+                            const isPast = isSessionPast(session.session_date, session.duration_minutes);
                             const isToday = isSessionToday(
                               session.session_date,
                             );
@@ -2461,7 +2475,7 @@ const AppCourseDetail = () => {
                                       // Add tour class only to the first non-past session
                                       index ===
                                         dbSessions.findIndex(
-                                          (s) => !isSessionPast(s.session_date),
+                                          (s) => !isSessionPast(s.session_date, s.duration_minutes),
                                         ) && "tour-session-calendar-icon",
                                     )}
                                     onClick={() =>
