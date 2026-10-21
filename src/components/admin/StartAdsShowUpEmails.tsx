@@ -98,7 +98,7 @@ export function StartAdsShowUpEmails({ programSlug = 'startads', label = 'Start 
           <span className="text-sm text-muted-foreground">Send tests to:</span>
           <Input type="email" dir="ltr" value={testTo} onChange={(e) => setTestTo(e.target.value)} className="h-9 max-w-xs" placeholder="you@example.com" />
         </div>
-        {EMAILS.map(({ kind, title, when }) => (
+        {(programSlug === 'powerfree' ? [...EMAILS, ...POWERFREE_EXTRA] : EMAILS).map(({ kind, title, when }) => (
           <div key={kind} className="flex flex-wrap items-center gap-2 rounded-lg border p-3">
             <span className="text-sm font-medium">{title}</span>
             <Badge variant="secondary">{when}</Badge>
