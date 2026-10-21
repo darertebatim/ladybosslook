@@ -188,7 +188,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [cover, setCover] = useState<string>("");
-  const [programTitle, setProgramTitle] = useState<string>("وبینار جذب مشتری با اینستاگرام ادز");
+  const [programTitle, setProgramTitle] = useState<string>(defaultTitle);
   const [webinar, setWebinar] = useState<{
     title: string;
     startUtc: Date;
@@ -244,12 +244,12 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
         const { data: progA } = await (supabase as any)
           .from("program_catalog")
           .select("title, cover_image_url")
-          .eq("slug", PROGRAM_SLUG)
+          .eq("slug", slug)
           .maybeSingle();
         if (progA?.title) setProgramTitle(progA.title);
         if (progA?.cover_image_url) setCover(progA.cover_image_url);
 
-        const upcoming = (await listActiveWebinarRounds(PROGRAM_SLUG)).filter(
+        const upcoming = (await listActiveWebinarRounds(slug)).filter(
           (r) => r.first_session_date && new Date(r.first_session_date).getTime() > Date.now(),
         );
         if (upcoming.length) {
@@ -290,7 +290,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
 
       // 3. If still no pinned round, use device timezone to auto-assign.
       const timezone = !effectiveRoundParam ? getDeviceTimezone() : null;
-      const round = await resolveWebinarRound(PROGRAM_SLUG, effectiveRoundParam, timezone, routingKey);
+      const round = await resolveWebinarRound(slug, effectiveRoundParam, timezone, routingKey);
 
       if (round?.id) {
         setRoundId(round.id);
@@ -300,7 +300,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
         .select("title, cover_image_url")
-        .eq("slug", PROGRAM_SLUG)
+        .eq("slug", slug)
         .maybeSingle();
 
       if (prog?.title) setProgramTitle(prog.title);
@@ -323,7 +323,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
       } else {
         // No upcoming session for this visitor — offer the other active rounds,
         // and fall back to the waitlist when nothing is scheduled at all.
-        const rounds = (await listActiveWebinarRounds(PROGRAM_SLUG)).filter(
+        const rounds = (await listActiveWebinarRounds(slug)).filter(
           (r) => r.first_session_date && new Date(r.first_session_date).getTime() > Date.now(),
         ).sort((a, b) => new Date(a.first_session_date!).getTime() - new Date(b.first_session_date!).getTime());
         if (rounds.length && !effectiveRoundParam) {
@@ -393,8 +393,8 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
       if (error) throw error;
 
       trackWebinarLead({
-        customEvent: "IGAdsFreeLead",
-        contentName: "Instagram Ads Webinar Registration",
+        customEvent: metaEvent,
+        contentName: metaContentName,
         email: parsed.data.email.toLowerCase(),
         name: parsed.data.name,
       });
@@ -404,9 +404,9 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
           body: {
             name: parsed.data.name,
             email: parsed.data.email.toLowerCase(),
-            programSlug: PROGRAM_SLUG,
+            programSlug: slug,
             prereqUrl: `https://ladybosslook.com${basePath}/thankyou`,
-            sources: isAli ? [regSource] : [regSource, "preigads_interest"],
+            sources: campaign || isAli ? [regSource] : [regSource, "preigads_interest"],
             ...(roundId ? { roundId } : {}),
           },
         })
@@ -447,8 +447,8 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
   return (
     <>
       <SEOHead
-        title="وبینار رایگان جذب مشتری با اینستاگرام ادز"
-        description="در این وبینار رایگان یاد می‌گیرید چطور با تبلیغات اینستاگرام (Instagram Ads) مشتری واقعی جذب کنید."
+        title={campaign ? `${defaultTitle} | Rilo` : "وبینار رایگان جذب مشتری با اینستاگرام ادز"}
+        description={campaign ? `ثبت‌نام رایگان در ${defaultTitle}.` : "در این وبینار رایگان یاد می‌گیرید چطور با تبلیغات اینستاگرام (Instagram Ads) مشتری واقعی جذب کنید."}
         locale="fa_IR"
       />
       <div
@@ -469,9 +469,11 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
 
           <section className="mt-6 space-y-3 text-center">
             <h1 className="text-2xl font-bold leading-tight text-neutral-900">
-              🎁وبینار رایگان: جذب مشتری
-              با اینستاگرام ادز
+              🎁{campaign ? programTitle : "وبینار رایگان: جذب مشتری با اینستاگرام ادز"}
             </h1>
+            {campaign && (
+              <p className="text-[11px] font-bold text-neutral-500">{campaign.hostLine}</p>
+            )}
             {blockedRegion ? (
               <div className="mx-auto rounded-2xl border border-rose-200 bg-rose-50 p-4">
                 <p className="text-sm font-bold leading-7 text-rose-700">
