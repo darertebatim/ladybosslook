@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { useTestEmailAddress, isValidEmail } from '@/hooks/useTestEmailAddress';
 import { morningIn, webinarSendAt } from '../../../supabase/functions/_shared/webinar-timing';
 
 type Kind = 'reminder' | 'morning' | 'onehour' | 'start';
@@ -12,7 +14,7 @@ const KINDS: { key: Kind; label: string }[] = [
   { key: 'onehour', label: '1 hour before' },
   { key: 'start', label: 'Starting now' },
 ];
-const TEST_EMAIL = 'darertebatim@gmail.com';
+const MONITOR_EMAIL = 'darertebatim@gmail.com';
 
 const fmt = (d: Date | null) =>
   d
@@ -29,6 +31,7 @@ export function WebinarAutomationLog() {
   const [nextRound, setNextRound] = useState<{ id: string; round_number: number | null } | null>(null);
   const [upcoming, setUpcoming] = useState<Upcoming[]>([]);
   const [sending, setSending] = useState<string | null>(null);
+  const [testTo, setTestTo] = useTestEmailAddress();
 
   useEffect(() => {
     (async () => {
@@ -97,6 +100,8 @@ export function WebinarAutomationLog() {
 
   const sendTest = async (kind: Kind) => {
     if (!nextRound) return;
+    if (!isValidEmail(testTo)) { toast.error('Enter a valid test email'); return; }
+    const TEST_EMAIL = testTo.trim().toLowerCase();
     setSending(kind);
     const { error } = await supabase.functions.invoke('send-webinar-day-emails', {
       body: { round_id: nextRound.id, kind, testEmail: TEST_EMAIL },
@@ -113,14 +118,15 @@ export function WebinarAutomationLog() {
       <CardHeader>
         <CardTitle>Webinar email automation — send log</CardTitle>
         <p className="text-sm text-muted-foreground">
-          Every automatic Reminder, Morning, 1-hour and Starting-now send (last 21 days). A copy of each send also goes to {TEST_EMAIL}.
+          Every automatic Reminder, Morning, 1-hour and Starting-now send (last 21 days). A copy of each send also goes to {MONITOR_EMAIL}.
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm text-muted-foreground">
-            Send test to {TEST_EMAIL}{nextRound ? ` (round ${nextRound.round_number})` : ''}:
+            Send test{nextRound ? ` (round ${nextRound.round_number})` : ''} to:
           </span>
+          <Input type="email" dir="ltr" value={testTo} onChange={(e) => setTestTo(e.target.value)} className="h-9 max-w-xs" placeholder="you@example.com" />
           {KINDS.map((k) => (
             <Button key={k.key} size="sm" variant="outline" disabled={!nextRound || !!sending} onClick={() => sendTest(k.key)}>
               {sending === k.key ? 'Sending…' : k.label}
