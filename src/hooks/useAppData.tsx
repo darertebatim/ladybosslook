@@ -271,7 +271,7 @@ async function fetchCoursesData(userId: string): Promise<CoursesDataExtended> {
       .from('program_sessions')
       .select('round_id, session_date')
       .in('round_id', roundIds)
-      .gt('session_date', new Date().toISOString())
+      .gt('session_date', new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString())
       .order('session_date', { ascending: true });
     
     // Build map with first (soonest) session per round
