@@ -1,3 +1,4 @@
+import { TrackedIframe, TrackedVideo } from "@/components/TrackedIframe";
 import { useState, useMemo, useCallback } from 'react';
 import { AddToRoutineHandHint, useAddToRoutineHint } from '@/components/app/AddToRoutineHandHint';
 import { supabase } from '@/integrations/supabase/client';
@@ -334,7 +335,7 @@ export default function AppInspireDetail() {
           return (
             <div className="px-4 pt-4">
               {video.type === 'mp4' ? (
-                <video
+                <TrackedVideo
                   src={video.src}
                   controls
                   playsInline
@@ -343,7 +344,7 @@ export default function AppInspireDetail() {
                 />
               ) : (
                 <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
-                  <iframe
+                  <TrackedIframe
                     src={video.src}
                     className="absolute inset-0 w-full h-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

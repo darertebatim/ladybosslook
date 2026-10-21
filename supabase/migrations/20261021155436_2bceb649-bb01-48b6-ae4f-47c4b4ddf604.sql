@@ -1,0 +1,1 @@
+DELETE FROM public.video_watch_sessions WHERE session_key = 'test-lovable-1';

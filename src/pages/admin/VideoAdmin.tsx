@@ -2,7 +2,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VideoPlaylistManager } from '@/components/admin/VideoPlaylistManager';
 import { VideoManager } from '@/components/admin/VideoManager';
 import { MediaCategoryManager } from '@/components/admin/MediaCategoryManager';
-import { Video, Tag } from 'lucide-react';
+import { Video, Tag, Eye } from 'lucide-react';
+import { VideoWatchReport } from '@/components/admin/VideoWatchReport';
 
 export default function VideoAdmin() {
   return (
@@ -22,11 +23,19 @@ export default function VideoAdmin() {
             <Tag className="h-4 w-4" />
             Categories
           </TabsTrigger>
+          <TabsTrigger value="views" className="flex items-center gap-2">
+            <Eye className="h-4 w-4" />
+            Who Watched
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="content">
           <VideoPlaylistManager />
           <VideoManager />
+        </TabsContent>
+
+        <TabsContent value="views">
+          <VideoWatchReport />
         </TabsContent>
 
         <TabsContent value="categories">

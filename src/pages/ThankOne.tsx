@@ -1,3 +1,4 @@
+import { TrackedIframe } from "@/components/TrackedIframe";
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -143,7 +144,7 @@ const ThankOne = () => {
                 <div className="aspect-video rounded-lg mb-3 md:mb-4 flex items-center justify-center" 
                      style={{ background: 'hsl(var(--bg-navy-dark))' }}>
                   {videoLink ? (
-                    <iframe 
+                    <TrackedIframe 
                       src={videoLink} 
                       className="w-full h-full rounded-lg" 
                       allowFullScreen 

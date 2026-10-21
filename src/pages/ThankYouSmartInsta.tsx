@@ -1,3 +1,4 @@
+import { TrackedIframe } from "@/components/TrackedIframe";
 import { trackCalendarClick } from "@/lib/trackCalendarClick";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
@@ -139,7 +140,7 @@ export default function ThankYouSmartInsta() {
 
           {/* YouTube embed */}
           <div className="mt-6 aspect-video overflow-hidden rounded-2xl shadow-md">
-            <iframe
+            <TrackedIframe
               className="h-full w-full"
               src={`https://www.youtube.com/embed/${youtubeId}`}
               title="پیام علی لطفی"

@@ -1,3 +1,4 @@
+import { TrackedIframe, TrackedVideo } from "@/components/TrackedIframe";
 import { useEffect, useState, Fragment } from 'react';
 import { useParams, Navigate, Link, useNavigate } from 'react-router-dom';
 import { supabase, browserTimezone } from '@/integrations/supabase/client';
@@ -405,11 +406,11 @@ const ProgramPage = () => {
                 {program.video_url && (
                   <div className="aspect-[16/10] lg:aspect-video rounded-xl lg:rounded-2xl overflow-hidden bg-muted">
                     {program.video_url.includes('youtube') || program.video_url.includes('youtu.be') ? (
-                      <iframe src={convertToEmbedUrl(program.video_url)} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title={program.title} />
+                      <TrackedIframe src={convertToEmbedUrl(program.video_url)} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title={program.title} />
                     ) : program.video_url.includes('vimeo') ? (
-                      <iframe src={convertToEmbedUrl(program.video_url)} className="w-full h-full" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen title={program.title} />
+                      <TrackedIframe src={convertToEmbedUrl(program.video_url)} className="w-full h-full" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen title={program.title} />
                     ) : (
-                      <video src={program.video_url} controls className="w-full h-full object-cover" />
+                      <TrackedVideo src={program.video_url} controls className="w-full h-full object-cover" />
                     )}
                   </div>
                 )}

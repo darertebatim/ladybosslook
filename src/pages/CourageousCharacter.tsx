@@ -1,3 +1,4 @@
+import { TrackedIframe } from "@/components/TrackedIframe";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SEOHead } from '@/components/SEOHead';
@@ -299,7 +300,7 @@ const CourageousWorkshop = () => {
               <div className="relative bg-gradient-to-r from-luxury-charcoal via-luxury-accent to-luxury-charcoal border border-luxury-silver/30 rounded-lg p-2 sm:p-3 shadow-luxury-glow">
                 <div className="relative">
                   <div className="aspect-video w-full max-w-3xl mx-auto rounded-lg overflow-hidden">
-                    <iframe
+                    <TrackedIframe
                       width="100%"
                       height="100%"
                       src="https://www.youtube.com/embed/kJeq6T9swJs"
@@ -308,7 +309,7 @@ const CourageousWorkshop = () => {
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                       className="w-full h-full"
-                    ></iframe>
+                    ></TrackedIframe>
                   </div>
                 </div>
               </div>

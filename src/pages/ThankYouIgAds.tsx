@@ -1,3 +1,4 @@
+import { TrackedIframe } from "@/components/TrackedIframe";
 import { trackCalendarClick } from "@/lib/trackCalendarClick";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowDown, ArrowUp } from "lucide-react";
@@ -225,7 +226,7 @@ export default function ThankYouIgAds() {
               </div>
               <div className="relative aspect-video overflow-hidden rounded-xl shadow-md">
                 {videoPlaying ? (
-                  <iframe
+                  <TrackedIframe
                     className="h-full w-full"
                     src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
                     title="پیام علی لطفی"

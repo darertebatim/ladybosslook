@@ -1,3 +1,4 @@
+import { TrackedIframe, TrackedVideo } from "@/components/TrackedIframe";
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -365,14 +366,14 @@ export default function AppFeedPost() {
           {post.video_url && (
             <div className="aspect-video rounded-xl overflow-hidden bg-muted mt-3">
               {post.video_url.includes('youtube') || post.video_url.includes('youtu.be') ? (
-                <iframe
+                <TrackedIframe
                   src={getYouTubeEmbedUrl(post.video_url)}
                   className="w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
               ) : (
-                <video 
+                <TrackedVideo 
                   src={post.video_url} 
                   controls 
                   className="w-full h-full object-contain"
