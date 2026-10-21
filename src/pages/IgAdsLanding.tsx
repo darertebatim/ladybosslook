@@ -3,10 +3,12 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { resolveWebinarRound, listActiveWebinarRounds, getWebinarRoundRouting, inferWebinarSideFromTimezone, type WebinarRoundRow } from "@/lib/webinarRounds";
 
 import { z } from "zod";
-import { ArrowDown, ChevronLeft } from "lucide-react";
+import { ArrowDown, ChevronLeft, Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SEOHead } from "@/components/SEOHead";
+import { TrackedIframe, TrackedVideo } from "@/components/TrackedIframe";
+import { youtubeId } from "@/pages/StartAdsLanding";
 import { formatLocalDateTime } from "@/lib/sixtrapsCalendar";
 import { trackWebinarLead } from "@/lib/metaCapi";
 import { isIranTimezone, getDeviceTimezone } from "@/lib/regionRestrictions";
@@ -188,6 +190,8 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [cover, setCover] = useState<string>("");
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [playing, setPlaying] = useState(false);
   const [programTitle, setProgramTitle] = useState<string>(defaultTitle);
   const [webinar, setWebinar] = useState<{
     title: string;
@@ -243,11 +247,12 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
       if (!isLocked && letUserPick && !roundParam) {
         const { data: progA } = await (supabase as any)
           .from("program_catalog")
-          .select("title, cover_image_url")
+          .select("title, video_url, cover_image_url")
           .eq("slug", slug)
           .maybeSingle();
         if (progA?.title) setProgramTitle(progA.title);
         if (progA?.cover_image_url) setCover(progA.cover_image_url);
+        if (progA?.video_url) setVideoUrl(progA.video_url);
 
         const upcoming = (await listActiveWebinarRounds(slug)).filter(
           (r) => r.first_session_date && new Date(r.first_session_date).getTime() > Date.now(),
@@ -299,12 +304,13 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
 
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
-        .select("title, cover_image_url")
+        .select("title, video_url, cover_image_url")
         .eq("slug", slug)
         .maybeSingle();
 
       if (prog?.title) setProgramTitle(prog.title);
       if (prog?.cover_image_url) setCover(prog.cover_image_url);
+      setVideoUrl(prog?.video_url ?? null);
 
       const isUpcoming =
         !!round?.first_session_date &&
@@ -341,6 +347,8 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
     () => (webinar ? formatLocalDateTime(webinar.startUtc) : ""),
     [webinar],
   );
+  const vid = useMemo(() => youtubeId(videoUrl ?? undefined), [videoUrl]);
+  const directVideo = !vid && videoUrl ? videoUrl : null;
 
   function selectRound(round: WebinarRoundRow) {
     if (!round.id) return;
@@ -457,7 +465,46 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
         className="min-h-screen bg-gradient-to-b from-rose-50 via-white to-amber-50 font-farsi"
       >
         <main className="mx-auto w-full max-w-md px-4 pb-16 pt-6">
-          {cover && (
+          {cover && (vid || directVideo) ? (
+            <div className="overflow-hidden rounded-3xl bg-black shadow-lg">
+              <div className="relative aspect-video w-full">
+                {vid ? (
+                  playing ? (
+                    <TrackedIframe
+                      className="absolute inset-0 h-full w-full"
+                      src={`https://www.youtube.com/embed/${vid}?autoplay=1&rel=0`}
+                      allow="autoplay; encrypted-media"
+                      allowFullScreen
+                      title={programTitle}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setPlaying(true)}
+                      aria-label="پخش ویدیو"
+                      className="group absolute inset-0 h-full w-full"
+                    >
+                      <img src={cover} alt={programTitle} className="h-full w-full object-cover" />
+                      <span className="absolute inset-0 bg-black/10 transition group-active:bg-black/25" />
+                      <span className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 shadow-xl transition group-active:scale-95">
+                        <Play className="h-6 w-6 translate-x-0.5 fill-rose-500 text-rose-500" />
+                      </span>
+                    </button>
+                  )
+                ) : (
+                  <TrackedVideo
+                    src={directVideo!}
+                    title={programTitle}
+                    poster={cover}
+                    controls
+                    playsInline
+                    preload="metadata"
+                    className="absolute inset-0 h-full w-full"
+                  />
+                )}
+              </div>
+            </div>
+          ) : cover ? (
             <div className="overflow-hidden rounded-3xl shadow-lg">
               <img
                 src={cover}
@@ -465,7 +512,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
                 className="h-28 w-full object-cover object-top sm:h-32"
               />
             </div>
-          )}
+          ) : null}
 
           <section className="mt-6 space-y-3 text-center">
             <h1 className="text-2xl font-bold leading-tight text-neutral-900">
