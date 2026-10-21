@@ -468,8 +468,8 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
           {cover && (vid || directVideo) ? (
             <div className="overflow-hidden rounded-3xl bg-black shadow-lg">
               <div className="relative aspect-video w-full">
-                {vid ? (
-                  playing ? (
+                {playing ? (
+                  vid ? (
                     <TrackedIframe
                       className="absolute inset-0 h-full w-full"
                       src={`https://www.youtube.com/embed/${vid}?autoplay=1&rel=0`}
@@ -478,29 +478,29 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
                       title={programTitle}
                     />
                   ) : (
-                    <button
-                      type="button"
-                      onClick={() => setPlaying(true)}
-                      aria-label="پخش ویدیو"
-                      className="group absolute inset-0 h-full w-full"
-                    >
-                      <img src={cover} alt={programTitle} className="h-full w-full object-cover" />
-                      <span className="absolute inset-0 bg-black/10 transition group-active:bg-black/25" />
-                      <span className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 shadow-xl transition group-active:scale-95">
-                        <Play className="h-6 w-6 translate-x-0.5 fill-rose-500 text-rose-500" />
-                      </span>
-                    </button>
+                    <TrackedVideo
+                      src={directVideo!}
+                      title={programTitle}
+                      controls
+                      autoPlay
+                      playsInline
+                      preload="metadata"
+                      className="absolute inset-0 h-full w-full"
+                    />
                   )
                 ) : (
-                  <TrackedVideo
-                    src={directVideo!}
-                    title={programTitle}
-                    poster={cover}
-                    controls
-                    playsInline
-                    preload="metadata"
-                    className="absolute inset-0 h-full w-full"
-                  />
+                  <button
+                    type="button"
+                    onClick={() => setPlaying(true)}
+                    aria-label="پخش ویدیو"
+                    className="group absolute inset-0 h-full w-full"
+                  >
+                    <img src={cover} alt={programTitle} className="h-full w-full object-cover" />
+                    <span className="absolute inset-0 bg-black/10 transition group-active:bg-black/25" />
+                    <span className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 shadow-xl transition group-active:scale-95">
+                      <Play className="h-6 w-6 translate-x-0.5 fill-rose-500 text-rose-500" />
+                    </span>
+                  </button>
                 )}
               </div>
             </div>
