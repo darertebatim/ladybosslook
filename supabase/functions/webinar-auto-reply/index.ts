@@ -9,6 +9,24 @@ const json = (b: unknown, s = 200) =>
 
 const TRIGGER = "در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام";
 const APP_LINK = "https://ladyboss.onelink.me/lt6v?pid=webinar&c=igads_support";
+
+// Per-campaign settings for the thank-you page "send details" auto-reply.
+interface Campaign { trigger: string; sources: string[]; slug: string; title: string; calTitle: string; thankyou: string; register: string; defaultDuration: number; signoff: string }
+const CAMPAIGNS: Campaign[] = [
+  {
+    trigger: TRIGGER, sources: ["igads_registration", "aliagads_registration"], slug: "igadsfree",
+    title: "جذب مشتری با تبلیغات اینستاگرام", calTitle: "وبینار جذب مشتری با اینستاگرام ادز",
+    thankyou: "https://ladybosslook.com/l/igadsfree/thankyou", register: "https://ladybosslook.com/l/igadsfree",
+    defaultDuration: 120, signoff: "منتظر دیدن شما در لایو هستیم 💛",
+  },
+  {
+    trigger: "در وبینار رایگان قدرت دو زبانه ثبت‌نام کرده‌ام", sources: ["powerfree_registration"], slug: "powerfree",
+    title: "قدرت دو زبانه", calTitle: "وبینار رایگان قدرت دو زبانه",
+    thankyou: "https://ladybosslook.com/r/powerfree/thankyou", register: "https://ladybosslook.com/r/powerfree",
+    defaultDuration: 90,
+    signoff: "یادت باشه: جلسه فقط زنده‌ست و هدیه تست قدرت درونی فقط برای حاضرین لایوه 🎁\n\nمنتظرت هستم 💛\nراضیه لیدی‌باس",
+  },
+];
 const FA_DAYS: Record<string, string> = {
   Sunday: "یکشنبه", Monday: "دوشنبه", Tuesday: "سه‌شنبه", Wednesday: "چهارشنبه",
   Thursday: "پنجشنبه", Friday: "جمعه", Saturday: "شنبه",
