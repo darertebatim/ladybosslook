@@ -2,7 +2,7 @@
 // Follow-up happens on WhatsApp, so every email points there instead of in-app support.
 
 export type PowerFreeKind = "confirm" | "reminder" | "morning" | "onehour" | "start" | "after3h" | "after24h";
-const PROGRAM_URL = "https://ladybosslook.com/r/powerfree";
+const PROGRAM_URL = "https://ladybosslook.com/ewc"; // کوچینگ زن قوی follow-up destination
 const WA_JOIN_TEXT = "سلام راضیه جان، بعد از وبینار قدرت دو زبانه درباره قدم بعدی سوال داشتم:\n";
 
 export const WHATSAPP_NUMBER = "19495723730";
