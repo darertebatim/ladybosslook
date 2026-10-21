@@ -43,6 +43,5 @@ export const POWERFREE_WEBINAR: DedicatedWebinar = {
   defaultTitle: "وبینار رایگان قدرت دو زبانه",
   hostLine: "با راضیه لیدی‌باس",
   icsName: "powerfree.ics",
-  whatsappNumber: "19495723730",
   senderName: "Razie Ladyboss - Ladyboss Academy",
 };
