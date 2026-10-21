@@ -2,20 +2,20 @@
 // Follow-up happens on WhatsApp, so every email points there instead of in-app support.
 
 export type PowerFreeKind = "confirm" | "reminder" | "morning" | "onehour" | "start" | "after3h" | "after24h";
-const PROGRAM_URL = "https://ladybosslook.com/powerfree";
+const PROGRAM_URL = "https://ladybosslook.com/r/powerfree";
 const WA_JOIN_TEXT = "سلام راضیه جان، در مورد ادامه دوره ۳ هفته‌ای جذب مشتری سوال داشتم:\n";
 
 export const WHATSAPP_NUMBER = "16265028538";
 export const waLink = (text: string) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 const WA_IG_TEXT = "سلام راضیه جان، این پیج اینستاگرام من برای جلسه اوله:\n";
-const WA_HELP_TEXT = "سلام، برای جلسه اول شروع تبلیغات سوال داشتم:\n";
+const WA_HELP_TEXT = "سلام، برای جلسه اول قدرت دو زبانه سوال داشتم:\n";
 
 export const POWERFREE_SUBJECTS: Record<PowerFreeKind, string> = {
-  confirm: "تایید ثبت‌نام: جلسه اول «شروع تبلیغات اینستاگرامی» (رایگان) 🌷",
-  reminder: "یادآوری جلسه اول شروع تبلیغات + ویدیوی پیش‌نیاز 🎬",
-  morning: "امروز: جلسه اول شروع تبلیغات اینستاگرامی (ساعت و لینک ورود) 🌅",
-  onehour: "۱ ساعت تا شروع جلسه اول شروع تبلیغات ⏳",
-  start: "جلسه اول شروع تبلیغات در حال شروع است — همین حالا وارد شوید 🚀",
+  confirm: "تایید ثبت‌نام: جلسه اول «قدرت دو زبانه» (رایگان) 🌷",
+  reminder: "یادآوری جلسه اول قدرت دو زبانه + ویدیوی پیش‌نیاز 🎬",
+  morning: "امروز: جلسه اول قدرت دو زبانه (ساعت و لینک ورود) 🌅",
+  onehour: "۱ ساعت تا شروع جلسه اول قدرت دو زبانه ⏳",
+  start: "جلسه اول قدرت دو زبانه در حال شروع است — همین حالا وارد شوید 🚀",
   after3h: "بعد از جلسه اول: قدم بعدی برای جذب مشتری قبل از بازار آخر سال 🚀",
   after24h: "سوال صادقانه: مشتری بعدی‌ات از کجا میاد؟ 🤔",
 };
@@ -78,7 +78,7 @@ export function buildPowerFreeHtml(i: PowerFreeEmailInput): string {
   if (i.kind === "confirm") {
     body = `
       <h1 style="margin:0 0 12px;font-size:21px;line-height:1.6;">سلام ${name} عزیز 👋 جایگاهت رزرو شد 🌷</h1>
-      ${p(`جایگاه ${RED("رایگان")} تو در <strong>جلسه اول برنامه ۳ هفته‌ای جذب مشتری و شروع تبلیغات اینستاگرامی</strong> ثبت شد.`)}
+      ${p(`جایگاه ${RED("رایگان")} تو در <strong>جلسه اول برنامه ۳ هفته‌ای جذب مشتری و قدرت دو زبانه</strong> ثبت شد.`)}
       ${p("دو قدم کوچیک مونده تا جلسه:")}
       <div style="background:#fff;border:1px solid #fde68a;border-radius:14px;padding:12px 16px;margin:16px 0;">
         <p style="margin:0 0 8px;font-size:15px;font-weight:bold;">🎬 قدم اول: ویدیوی پیش‌نیاز رو ببین</p>
@@ -108,7 +108,7 @@ export function buildPowerFreeHtml(i: PowerFreeEmailInput): string {
   } else if (i.kind === "morning") {
     body = `
       ${p(`سلام ${name} عزیز 🌅`)}
-      ${p(`${RED("امروز")} جلسه اول «شروع تبلیغات اینستاگرامی» برگزار میشه.`)}
+      ${p(`${RED("امروز")} جلسه اول «قدرت دو زبانه» برگزار میشه.`)}
       ${p("بازار آخر سال در آمریکا و کانادا نزدیکه 🛍️ و امروز قراره پایه سیستم جذب مشتری‌ت رو قبل از شلوغی بازار بچینیم: اینکه با کدوم پیشنهاد شروع کنی و چه پیامی باعث میشه مشتری محلی به‌جای اسکرول کردن، بهت پیام بده.")}
       ${p("اگر از بیشتر صاحبان بیزینس بپرسی: «هفتهٔ بعد دقیقاً چند مشتری جدید داری؟»، صادقانه میگن: «بستگی داره کی معرفی کنه یا کی تصادفی پیدامون کنه.»")}
       ${p(`اما تکیه کردن فقط به دهان‌به‌دهان، بیزینس ساختن نیست؛ ${RED("شانس‌آزماییه.")}`)}
@@ -141,7 +141,7 @@ export function buildPowerFreeHtml(i: PowerFreeEmailInput): string {
   } else if (i.kind === "onehour") {
     body = `
       ${p(`سلام ${name} عزیز ⏳`)}
-      ${p(`دقیقاً ${RED("۱ ساعت دیگه")} جلسه اول «شروع تبلیغات اینستاگرامی» شروع میشه.`)}
+      ${p(`دقیقاً ${RED("۱ ساعت دیگه")} جلسه اول «قدرت دو زبانه» شروع میشه.`)}
       ${p("<strong>۱. بازپخش نداره.</strong> جلسه کاملاً زنده است و ضبط نمی‌شه.")}
       ${p("<strong>۲. زودتر بیا.</strong> ۵ دقیقه زودتر روی لینک بزن؛ ظرفیت اتاق محدوده.")}
       ${p("<strong>۳. با سوالت بیا.</strong> یک سوال مشخص درباره جذب مشتری برای بیزینس خودت یادداشت کن.")}
