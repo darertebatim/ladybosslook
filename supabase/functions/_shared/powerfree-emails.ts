@@ -1,7 +1,7 @@
 // PowerFree (Razie Ladyboss) webinar show-up emails — duplicated from Start Ads; copy to be customized.
 // Support happens by replying to the email (or in-app chat), like the IG Ads free webinar emails.
 
-export type PowerFreeKind = "confirm" | "reminder" | "morning" | "onehour" | "start" | "after3h" | "after24h";
+export type PowerFreeKind = "confirm" | "reminder" | "morning" | "onehour" | "start" | "after3h" | "after24h" | "nurture1" | "nurture2";
 const PROGRAM_URL = "https://ladybosslook.com/ewc"; // کوچینگ زن قوی follow-up destination
 
 const CHAT_URL = "https://ladybosslook.com/dashboard/chat";
@@ -14,6 +14,8 @@ export const POWERFREE_SUBJECTS: Record<PowerFreeKind, string> = {
   start: "وبینار قدرت دو زبانه شروع شد — همین حالا وارد شو 🚀",
   after3h: "بعد از وبینار: قدم بعدی به سمت قدرت ۱۰ برابری 💫",
   after24h: "خانم رئیس، یک سال دیگه رو منتظر نمون 🤍",
+  nurture1: "وقتی با یک چمدون اومدی، چی جا موند؟ 🧳🤍",
+  nurture2: "فردا روز ماست خانم رئیس ⏳ (یک تصمیم برای ۶ ماه آینده)",
 };
 
 const esc = (s: string) =>
@@ -157,6 +159,38 @@ export function buildPowerFreeHtml(i: PowerFreeEmailInput): string {
       ${p(`خانم‌هایی که با من مسیر رو شروع کردن، در کمتر از یک سال ارتباطات تازه ساختن، ارتقای شغلی گرفتن، مشتری‌های بیشتری پیدا کردن و به آرامش رسیدن. ${RED("تو هم می‌تونی تغییر کنی")} — قولش رو بهت میدم.`)}
       ${btn(PROGRAM_URL, "✨ شروع مسیر قدرت ۱۰ برابری")}
       ${p("اگر مطمئن نیستی این مسیر برای تو هست یا نه، <strong>همین ایمیل رو جواب بده</strong> تا با هم صحبت کنیم.")}
+      ${help}`;
+  } else if (i.kind === "nurture1") {
+    body = `
+      ${p(`سلام ${name} عزیز 🌷`)}
+      ${p("دیروز که در وبینار <strong>«قدرت دو زبانه»</strong> ثبت‌نام کردی، داشتم به این فکر می‌کردم که چند نفر از ما روزی که سوار هواپیما شدیم، فقط وسایلمون توی چمدون نبود؛ یک دنیا اعتبار، شغل، موقعیت اجتماعی، ارتباطات و احترامی که سال‌ها براش زحمت کشیده بودیم هم پشت سرمون جا موند. 🧳")}
+      ${p("مهاجرت شجاعت خیلی بزرگی می‌خواد، اما سال‌های اولش می‌تونه فرساینده باشه. وقتی حس می‌کنی زبانت روان نیست یا ارتباطاتت محدوده، اعتماد به نفس خیلی زود افت می‌کنه. تا جایی که یک روز جلوی آینه می‌پرسی: «اون خانم قدرتمند و مستقلی که بودم کجاست؟»")}
+      ${p(`می‌خوام صمیمانه بهت بگم: ${RED("اون خانم رئیس هنوز همون‌جاست.")} فقط زیر بار جابه‌جایی و زبان جدید پنهان شده. قدرت دو زبانه یعنی بتونی نفوذ کلام، اعتبار و جایگاهت رو در جامعه جدید دوباره پس بگیری.`)}
+      <div style="background:#fff7ed;border:2px solid #fdba74;border-radius:14px;padding:14px 16px;margin:18px 0;">
+        <p style="margin:0 0 8px;font-size:15px;font-weight:bold;">✉️ یک سوال از ته دل</p>
+        ${p("وقتی به این روزهات نگاه می‌کنی، <strong>بزرگ‌ترین چالشت در ارتباطات یا اعتماد به نفس چیه؟</strong><br>کافیه <strong>همین ایمیل رو جواب بدی</strong> و چند خط برام بنویسی. ایمیل‌ها رو خودم می‌خونم.")}
+      </div>
+      ${cal}
+      ${zoneTable}
+      ${noRec}
+      ${help}`;
+  } else if (i.kind === "nurture2") {
+    body = `
+      ${p(`سلام ${name} عزیز 🌷`)}
+      ${p(`${RED("فردا")} وبینار ۹۰ دقیقه‌ای <strong>«قدرت دو زبانه»</strong> رو زنده برگزار می‌کنیم.`)}
+      ${p("در مهاجرت خیلی آسونه که یک سال، دو سال یا پنج سال بگذره و مدام بگیم: «صبر کنم زبانم عالی بشه… صبر کنم بچه‌ها بزرگ بشن… بعداً یک فکری می‌کنم.» اما فرصت‌ها منتظر ما نمی‌مونن.")}
+      ${p(`چیزهایی رو که در ۲۰ سال در کشور خودت ساخته بودی، با یک ${RED("قدرت ۱۰ برابری")} می‌تونی در چند سال جبران کنی: ارتباطات قوی، شغل و درآمد بهتر، و حس غرور به خودت.`)}
+      <p style="margin:20px 0 10px;font-size:16px;font-weight:bold;">📌 فردا روی این‌ها کار می‌کنیم:</p>
+      ${p("<strong>۱. چرخه سکوت در مهاجرت:</strong> چرا خیلی‌ها سال‌ها بعد از مهاجرت هنوز در جمع‌ها ساکت می‌مونن و چطور شکستش بدیم.")}
+      ${p("<strong>۲. نقشه راه ۶ ماهه:</strong> چطور قدم‌به‌قدم اعتماد به نفس، استقلال مالی و نفوذ کلامت رو بازسازی کنی.")}
+      ${p("<strong>۳. تست زنده قدرت درونی:</strong> یک تست اختصاصی می‌گیریم و PDF تحلیلش رو هدیه می‌گیری 🎁")}
+      <div style="background:#fff7ed;border:2px solid #fdba74;border-radius:14px;padding:14px 16px;margin:18px 0;">
+        <p style="margin:0 0 8px;font-size:15px;font-weight:bold;">🎯 یک کار قبل از فردا</p>
+        ${p("اگر ۶ ماه دیگه به بالاترین سطح اعتماد به نفس و ارتباطاتت برسی، <strong>اولین چیزی که در زندگیت تغییر می‌کنه چیه؟</strong><br><strong>همین ایمیل رو جواب بده</strong> و هدفت رو بنویس تا فردا روش تمرکز کنیم.")}
+      </div>
+      ${zoneTable}
+      ${noRec}
+      ${p("لینک ورود قبل از شروع به ایمیلت میاد. فردا می‌بینمت خانم رئیس 🌷")}
       ${help}`;
   } else {
     body = `
