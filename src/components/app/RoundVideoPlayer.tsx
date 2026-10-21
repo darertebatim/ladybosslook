@@ -1,3 +1,4 @@
+import { TrackedIframe, TrackedVideo } from "@/components/TrackedIframe";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -44,7 +45,7 @@ export function RoundVideoPlayer({ url, title, posterUrl }: RoundVideoPlayerProp
         <div className="relative aspect-video overflow-hidden bg-black">
           {playing || (!poster && !isDirect) ? (
             isDirect ? (
-              <video
+              <TrackedVideo
                 src={url}
                 controls
                 autoPlay={playing}
@@ -53,7 +54,7 @@ export function RoundVideoPlayer({ url, title, posterUrl }: RoundVideoPlayerProp
                 className="h-full w-full object-contain"
               />
             ) : (
-              <iframe
+              <TrackedIframe
                 src={embedUrl || url}
                 title={title || "Video"}
                 className="h-full w-full border-0"

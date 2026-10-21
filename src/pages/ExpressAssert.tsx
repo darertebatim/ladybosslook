@@ -1,3 +1,4 @@
+import { TrackedIframe } from "@/components/TrackedIframe";
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -265,7 +266,7 @@ const ExpressAssert = () => {
         <div className="max-w-5xl mx-auto px-2 sm:px-0">
           <Card className="overflow-hidden bg-gradient-card border-border shadow-medium">
             <div className="aspect-video relative">
-              <iframe
+              <TrackedIframe
                 width="100%"
                 height="100%"
                 src="https://www.youtube.com/embed/OI8Fivvpl1c?rel=0&modestbranding=1"
@@ -275,7 +276,7 @@ const ExpressAssert = () => {
                 referrerPolicy="strict-origin-when-cross-origin"
                 allowFullScreen
                 className="absolute inset-0 w-full h-full rounded-lg"
-              ></iframe>
+              ></TrackedIframe>
             </div>
           </Card>
         </div>

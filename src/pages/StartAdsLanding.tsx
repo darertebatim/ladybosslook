@@ -1,3 +1,4 @@
+import { TrackedIframe } from "@/components/TrackedIframe";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -150,7 +151,7 @@ export default function StartAdsLanding() {
           <div className="mt-1 overflow-hidden rounded-2xl bg-black shadow-ios">
             <div className="relative aspect-video">
               {playing ? (
-                <iframe
+                <TrackedIframe
                   className="absolute inset-0 h-full w-full"
                   src={`https://www.youtube.com/embed/${vid}?autoplay=1&rel=0`}
                   allow="autoplay; encrypted-media"

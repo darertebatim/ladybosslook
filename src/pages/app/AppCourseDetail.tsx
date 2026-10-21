@@ -1,3 +1,4 @@
+import { TrackedIframe, TrackedVideo } from "@/components/TrackedIframe";
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -1538,7 +1539,7 @@ const AppCourseDetail = () => {
                               embedUrl.includes("vimeo")
                             ) {
                               return (
-                                <iframe
+                                <TrackedIframe
                                   src={embedUrl}
                                   title={`${program.title} video`}
                                   className="w-full h-full border-0"
@@ -1548,7 +1549,7 @@ const AppCourseDetail = () => {
                               );
                             }
                             return (
-                              <video
+                              <TrackedVideo
                                 src={embedUrl}
                                 controls
                                 className="w-full h-full object-cover"

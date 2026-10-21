@@ -1,3 +1,4 @@
+import { TrackedIframe } from "@/components/TrackedIframe";
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -228,7 +229,7 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
             ? "aspect-[9/16] max-h-[75vh] w-auto mx-auto rounded-xl overflow-hidden"
             : "aspect-video w-full rounded-xl overflow-hidden"
           }>
-            <iframe
+            <TrackedIframe
               src={embedUrl}
               title={title || 'Video'}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -255,7 +256,7 @@ export function AppVideoPlayer({ isOpen, onClose, url, title, description, isVer
               </div>
             )}
             <div className="aspect-[9/16] max-h-[75vh] w-auto mx-auto rounded-xl overflow-hidden bg-black">
-              <iframe
+              <TrackedIframe
                 src={embedUrl}
                 title={title || 'Instagram'}
                 allowFullScreen

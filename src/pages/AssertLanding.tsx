@@ -1,3 +1,4 @@
+import { TrackedIframe } from "@/components/TrackedIframe";
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -156,7 +157,7 @@ const AssertLanding = () => {
               
               <div className="mb-4 sm:mb-6 max-w-xs sm:max-w-sm mx-auto">
                 <div className="relative aspect-video w-full rounded-xl shadow-lg overflow-hidden">
-                  <iframe
+                  <TrackedIframe
                     src="https://www.youtube.com/embed/56ScEQbWpqI"
                     title="Assertive Expression Training"
                     className="absolute top-0 left-0 w-full h-full"

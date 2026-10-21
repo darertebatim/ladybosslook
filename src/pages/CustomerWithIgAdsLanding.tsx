@@ -1,3 +1,4 @@
+import { TrackedIframe } from "@/components/TrackedIframe";
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Play, Sparkles } from "lucide-react";
@@ -76,7 +77,7 @@ export default function CustomerWithIgAdsLanding({
         <section className="mt-6 overflow-hidden rounded-2xl border border-orange-200 bg-black shadow-[0_10px_30px_rgba(0,0,0,0.12)]">
           <div className="relative aspect-video w-full">
             {playing ? (
-              <iframe
+              <TrackedIframe
                 className="absolute inset-0 h-full w-full"
                 src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
                 title={title}

@@ -1,3 +1,4 @@
+import { TrackedIframe, TrackedVideo } from "@/components/TrackedIframe";
 import { useState } from 'react';
 import { detectVideoType, extractYouTubeId, getVideoThumbnail, getVideoEmbedUrl } from '@/lib/videoUtils';
 
@@ -33,9 +34,9 @@ export function PaymentSuccessVideo({ url }: { url: string }) {
       <div className="aspect-video w-full overflow-hidden rounded-lg bg-card shadow-ios">
         {playing || !thumbnail ? (
           video.type === 'direct' ? (
-            <video src={video.url} controls playsInline preload="metadata" autoPlay={playing} className="h-full w-full" aria-label="Program welcome video" />
+            <TrackedVideo src={video.url} controls playsInline preload="metadata" autoPlay={playing} className="h-full w-full" aria-label="Program welcome video" />
           ) : (
-            <iframe src={video.url} title="Program welcome video" className="h-full w-full border-0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowFullScreen />
+            <TrackedIframe src={video.url} title="Program welcome video" className="h-full w-full border-0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowFullScreen />
           )
         ) : (
           <button

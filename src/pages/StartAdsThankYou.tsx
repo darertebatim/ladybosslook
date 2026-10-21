@@ -1,3 +1,4 @@
+import { TrackedIframe } from "@/components/TrackedIframe";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -76,7 +77,7 @@ export default function StartAdsThankYou() {
                   قدم اول: قبل از جلسه این ویدیو را ببینید
                 </p>
                 <div className="relative aspect-video overflow-hidden rounded-xl bg-black">
-                  <iframe
+                  <TrackedIframe
                     className="absolute inset-0 h-full w-full"
                     src={`https://www.youtube.com/embed/${vid}?rel=0`}
                     allow="encrypted-media"

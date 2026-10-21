@@ -1,3 +1,4 @@
+import { TrackedIframe, TrackedVideo } from "@/components/TrackedIframe";
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Play, Pause, ExternalLink, Loader2, Headphones, FileText, RotateCcw, RotateCw } from 'lucide-react';
@@ -61,7 +62,7 @@ export function LessonVideo({
   if (type === 'direct') {
     return (
       <div className={frameClass}>
-        <video
+        <TrackedVideo
           src={url}
           poster={poster || undefined}
           controls
@@ -89,7 +90,7 @@ export function LessonVideo({
   return (
     <div className={frameClass}>
       {started ? (
-        <iframe
+        <TrackedIframe
           src={embedUrl}
           title={title || 'Video'}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
@@ -266,7 +267,7 @@ export function LessonPdf({ url, title }: { url: string; title?: string }) {
   return (
     <div className="space-y-2">
       <div className="w-full h-[65vh] min-h-[380px] rounded-2xl overflow-hidden bg-background">
-        <iframe
+        <TrackedIframe
           src={src}
           title={title || 'PDF'}
           className="w-full h-full border-0"

@@ -1,3 +1,4 @@
+import { TrackedVideo } from "@/components/TrackedIframe";
 import { useState, useMemo, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -217,7 +218,7 @@ export default function AppWatch() {
     <div className="flex flex-col h-full overflow-hidden" style={{ background: '#132240' }}>
       {/* Hero Video Background - behind the header */}
       <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 h-[420px] overflow-hidden" style={{ transform: `translateY(${-scrollY * 0.4}px)` }}>
-        <video
+        <TrackedVideo
           autoPlay
           muted
           loop
