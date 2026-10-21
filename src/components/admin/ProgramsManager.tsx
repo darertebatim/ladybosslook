@@ -20,6 +20,7 @@ import { TagPicker } from '@/components/admin/TagPicker';
 import { useContentTagsByType, useSaveContentTags } from '@/hooks/useContentTags';
 import { programImages } from '@/data/programs';
 import { resolveSuccessVideo } from '@/components/PaymentSuccessVideo';
+import { MediaLibraryPicker } from '@/components/admin/MediaLibraryPicker';
 
 interface ProgramCatalog {
   id: string;
@@ -1196,11 +1197,16 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
 
               <div className="space-y-2">
                 <Label htmlFor="video_url">Video URL (Optional)</Label>
+                <MediaLibraryPicker
+                  kind="video"
+                  triggerLabel="Choose from Media Library"
+                  onPick={(video) => setFormData((prev) => ({ ...prev, video_url: video.file_url }))}
+                />
                 <Input
                   id="video_url"
                   value={formData.video_url}
                   onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
-                  placeholder="https://youtube.com/watch?v=... or Vimeo URL"
+                  placeholder="YouTube, Vimeo, or direct video URL"
                 />
                 <p className="text-xs text-muted-foreground">
                   Promotional or intro video for this program
@@ -1368,12 +1374,17 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                 <Label className="text-base font-semibold">Payment success page</Label>
                 <div className="space-y-1">
                   <Label htmlFor="success_video_url">Welcome / guide video (optional)</Label>
+                  <MediaLibraryPicker
+                    kind="video"
+                    triggerLabel="Choose from Media Library"
+                    onPick={(video) => setFormData((prev) => ({ ...prev, success_video_url: video.file_url }))}
+                  />
                   <Input
                     id="success_video_url"
                     type="url"
                     value={formData.success_video_url}
                     onChange={(e) => setFormData({ ...formData, success_video_url: e.target.value })}
-                    placeholder="https://youtu.be/..."
+                    placeholder="YouTube, Vimeo, or direct video URL"
                   />
                   <p className="text-xs text-muted-foreground">Separate from the promotional video. Leave blank to show no video after payment.</p>
                 </div>

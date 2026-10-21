@@ -36,6 +36,7 @@ import { RoundCoursesManager } from "./RoundCoursesManager";
 import { format } from "date-fns";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { Textarea } from "@/components/ui/textarea";
+import { MediaLibraryPicker } from "@/components/admin/MediaLibraryPicker";
 
 interface ProgramRound {
   id: string;
@@ -1147,13 +1148,18 @@ export const ProgramRoundsManager = ({ filterSlug, onClearFilter }: { filterSlug
             </div>
 
             <div className="space-y-2 mt-4">
-              <Label htmlFor="video_url">Video URL (YouTube, Vimeo, etc.)</Label>
+              <Label htmlFor="video_url">Video URL (Optional)</Label>
+              <MediaLibraryPicker
+                kind="video"
+                triggerLabel="Choose from Media Library"
+                onPick={(video) => setFormData((prev) => ({ ...prev, video_url: video.file_url }))}
+              />
               <Input
                 id="video_url"
                 type="url"
                 value={formData.video_url}
                 onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
-                placeholder="https://www.youtube.com/watch?v=..."
+                placeholder="YouTube, Vimeo, or direct video URL"
               />
               <p className="text-xs text-muted-foreground">Add a video to display above the important message</p>
             </div>

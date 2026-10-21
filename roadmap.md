@@ -15,3 +15,6 @@
 - [ ] Verify the program content editor and enrolled student playback end to end — blocked by unavailable authenticated preview access.
 - [x] Add campaign round sign-up, calendar-tap, and gift-based live attendee counts; verify attribution against existing data.
 - [ ] Verify campaign round counts in the signed-in admin page — blocked by unavailable authenticated preview access.
+- [x] Add Media Library selection to program intro, payment-success guide, and round video fields while retaining manual URLs.
+- [ ] Verify saving Media Library selections in signed-in Admin — blocked by external unmanaged authenticated preview access.
+- [ ] Confirm current video viewing tracking capabilities and iOS update requirements.
