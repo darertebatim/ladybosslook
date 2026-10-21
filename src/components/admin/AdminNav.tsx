@@ -20,7 +20,6 @@ interface NavItem {
 
 const menuItems: NavItem[] = [
   { title: 'Overview', url: '/admin', icon: LayoutDashboard, end: true, pageSlug: 'overview' },
-  { title: 'Analytics', url: '/admin/analytics', icon: BarChart3, pageSlug: 'overview' },
   { title: 'Users', url: '/admin/users', icon: Users, pageSlug: 'users' },
   { title: 'Channels', url: '/admin/channels', icon: Newspaper, pageSlug: 'community' },
   { title: 'Communications', url: '/admin/communications', icon: Send, pageSlug: 'communications' },
@@ -29,7 +28,6 @@ const menuItems: NavItem[] = [
   { title: 'Forms', url: '/admin/forms', icon: ClipboardList, pageSlug: 'programs' },
   { title: 'Payments', url: '/admin/payments', icon: CreditCard, pageSlug: 'payments' },
   { title: 'Support', url: '/admin/support', icon: MessageCircle, pageSlug: 'support' },
-  { title: 'System', url: '/admin/system', icon: Shield, pageSlug: 'system' },
   { title: 'RiloBiz', url: '/admin/aperture', icon: Aperture, pageSlug: 'system' },
 ];
 
@@ -45,6 +43,8 @@ const mediaItems: NavItem[] = [
 ];
 
 const settingsItems: NavItem[] = [
+  { title: 'Analytics', url: '/admin/analytics', icon: BarChart3, pageSlug: 'overview' },
+  { title: 'System', url: '/admin/system', icon: Shield, pageSlug: 'system' },
   { title: 'Push', url: '/admin/pn', icon: Bell, pageSlug: 'communications' },
   { title: 'Subscriptions', url: '/admin/subscriptions', icon: Sparkles, pageSlug: 'payments' },
   { title: 'Onboarding', url: '/admin/onboarding', icon: FlaskConical, pageSlug: 'tools' },
