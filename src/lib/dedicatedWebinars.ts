@@ -11,6 +11,10 @@ export interface DedicatedWebinar {
   defaultTitle: string;
   hostLine: string;
   icsName: string;
+  /** Dedicated WhatsApp support number (digits only, no +). */
+  whatsappNumber?: string;
+  /** Display name used in email/page sender lines. */
+  senderName?: string;
 }
 
 export const STARTADS_WEBINAR: DedicatedWebinar = {
@@ -39,4 +43,6 @@ export const POWERFREE_WEBINAR: DedicatedWebinar = {
   defaultTitle: "وبینار رایگان قدرت دو زبانه",
   hostLine: "با راضیه لیدی‌باس",
   icsName: "powerfree.ics",
+  whatsappNumber: "19495723730",
+  senderName: "Razie Ladyboss - Ladyboss Academy",
 };
