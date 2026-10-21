@@ -47,7 +47,8 @@ const FROM = "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>";
 const SUPPORT_URL =
   "https://ladyboss.onelink.me/lt6v?af_xp=custom&pid=email_support&c=webinar_day&deep_link_value=support&af_web_dp=https%3A%2F%2Fladybosslook.com%2Fdashboard%2Fchat";
 
-type Kind = "morning" | "start" | "reminder" | "onehour" | "after3h" | "after24h";
+type Kind = "morning" | "start" | "reminder" | "onehour" | "after3h" | "after24h" | "nurture1" | "nurture2";
+const NURTURE_ONLY = ["powerfree"];
 const FOLLOWUP_HOURS: Record<string, number> = { after3h: 3, after24h: 24 };
 
 // Subjects keep the prefixes that src/lib/igAdsRoundStats.ts uses to classify
@@ -60,6 +61,8 @@ const SUBJECTS: Record<Kind, string> = {
   reminder: "یادآوری وبینار اینستاگرام ادز + ویدیوی پیش‌نیاز 🌷",
   after3h: "",
   after24h: "",
+  nurture1: "",
+  nurture2: "",
 };
 
 function tzParts(d: Date, tz: string): { hour: number; date: string } {
@@ -164,7 +167,7 @@ function calendarClickUrl(round: any, email: string, tyUrl: string): string {
 // session time table and join link generated per round.
 function buildHtml(kind: Kind, name: string, round: any, tz: string, email: string, tyUrl: string): string {
   if (isStartAds(round)) {
-    return dedicatedOf(round).build({ kind, name, sessionStart: new Date(round.first_session_date), meetUrl: round.google_meet_link || "", thankYouUrl: tyUrl, calendarUrl: calendarClickUrl(round, email, tyUrl) });
+    return dedicatedOf(round).build({ kind: kind as any, name, sessionStart: new Date(round.first_session_date), meetUrl: round.google_meet_link || "", thankYouUrl: tyUrl, calendarUrl: calendarClickUrl(round, email, tyUrl) });
   }
   const start = new Date(round.first_session_date);
   const meetUrl: string = round.google_meet_link || "";
@@ -450,7 +453,10 @@ async function sendBatch(payload: any[]): Promise<{ ids: (string | null)[] } | n
 }
 
 async function processRound(round: any, kind: Kind, testEmail?: string, catchup = false) {
-  const subject = isStartAds(round) ? dedicatedOf(round).subjects[kind] : SUBJECTS[kind];
+  const subject = isStartAds(round) ? (dedicatedOf(round).subjects as any)[kind] : SUBJECTS[kind];
+  if ((kind === "nurture1" || kind === "nurture2") && !NURTURE_ONLY.includes(round.program_slug)) {
+    return { round: round.round_name, kind, recipients: 0, sent: 0, failed: 0, skipped: "PowerFree only" };
+  }
   const roundKey = roundKeyOf(round);
   const sessionStart = new Date(round.first_session_date);
   const now = new Date();
@@ -513,6 +519,27 @@ async function processRound(round: any, kind: Kind, testEmail?: string, catchup 
       if (catchup) return age >= 2 * 3600_000;
       return age >= 2 * 3600_000 && age < 3 * 3600_000;
     });
+  }
+
+  if (kind === "nurture1" && !testEmail) {
+    // Day after signup (24–30h), only if the session is still 18h+ away.
+    if (sessionStart.getTime() - now.getTime() < 18 * 3600_000) {
+      return { round: round.round_name, kind, recipients: 0, sent: 0, failed: 0, skipped: "Session too close" };
+    }
+    registrants = registrants.filter((r) => {
+      if (!r.created_at) return false;
+      const age = now.getTime() - new Date(r.created_at).getTime();
+      return age >= 24 * 3600_000 && age < 30 * 3600_000;
+    });
+  }
+
+  if (kind === "nurture2" && !testEmail) {
+    // Day before: session 20–28h away; skip people who signed up in the last 12h.
+    const until = sessionStart.getTime() - now.getTime();
+    if (until < 20 * 3600_000 || until > 28 * 3600_000) {
+      return { round: round.round_name, kind, recipients: 0, sent: 0, failed: 0, skipped: "Outside day-before window" };
+    }
+    registrants = registrants.filter((r) => !r.created_at || now.getTime() - new Date(r.created_at).getTime() >= 12 * 3600_000);
   }
 
   let sent = 0;
@@ -584,7 +611,7 @@ Deno.serve(async (req) => {
     if (!RESEND_API_KEY) throw new Error("Email service not configured");
 
     const body = await req.json().catch(() => ({}));
-    if ((body.kind && !["morning", "start", "reminder", "onehour", "after3h", "after24h"].includes(body.kind)) ||
+    if ((body.kind && !["morning", "start", "reminder", "onehour", "after3h", "after24h", "nurture1", "nurture2"].includes(body.kind)) ||
         (body.round_id && (typeof body.round_id !== "string" || !/^[0-9a-f-]{36}$/i.test(body.round_id))) ||
         (body.testEmail && (typeof body.testEmail !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.testEmail))) ||
         (!!body.round_id !== !!body.kind)) {
@@ -625,7 +652,13 @@ Deno.serve(async (req) => {
         .gte("first_session_date", new Date(now + 6 * 3600_000).toISOString())
         .lte("first_session_date", new Date(now + 14 * 24 * 3600_000).toISOString());
       if (e3) throw e3;
-      for (const r of reminderRounds || []) rounds.push({ round: r, kind: "reminder" });
+      for (const r of reminderRounds || []) {
+        rounds.push({ round: r, kind: "reminder" });
+        if (NURTURE_ONLY.includes(r.program_slug)) {
+          rounds.push({ round: r, kind: "nurture1" });
+          rounds.push({ round: r, kind: "nurture2" });
+        }
+      }
 
       // Start Ads after-session follow-ups (3h and 24h after start; dedupe keeps it to one each).
       const { data: pastRounds, error: e4 } = await supabase
