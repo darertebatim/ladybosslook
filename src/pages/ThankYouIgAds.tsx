@@ -193,8 +193,8 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
   return (
     <>
       <SEOHead
-        title="ثبت‌نام شما ثبت شد | وبینار اینستاگرام ادز"
-        description="ثبت‌نام شما در وبینار رایگان جذب مشتری با اینستاگرام ادز با موفقیت ثبت شد."
+        title={campaign ? `ثبت‌نام شما ثبت شد | ${defaultTitle}` : "ثبت‌نام شما ثبت شد | وبینار اینستاگرام ادز"}
+        description={campaign ? `ثبت‌نام شما در ${defaultTitle} با موفقیت ثبت شد.` : "ثبت‌نام شما در وبینار رایگان جذب مشتری با اینستاگرام ادز با موفقیت ثبت شد."}
         locale="fa_IR"
       />
       <div
@@ -310,7 +310,7 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
                 </a>
                 <button
                   type="button"
-                  onClick={() => { trackCalendarClick("apple", { email: registeredEmail, roundId: roundParam || registeredRoundId }); downloadIcs(event, "igads-webinar.ics"); }}
+                  onClick={() => { trackCalendarClick("apple", { email: registeredEmail, roundId: roundParam || registeredRoundId }); downloadIcs(event, campaign?.icsName ?? "igads-webinar.ics"); }}
                   className="flex min-h-[44px] items-center justify-center rounded-xl border border-neutral-300 bg-white px-2 text-xs font-semibold text-neutral-900 shadow-sm transition active:scale-[0.98]"
                 >
                   افزودن به Apple Calendar
@@ -350,19 +350,34 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
                 لینک ورود فقط به ایمیل ثبت‌نام‌شده ارسال می‌شود — همین حالا جزئیات را دریافت کنید
               </p>
               <a
-                href={`/dashboard/chat?draft=${encodeURIComponent(
-                  [
-                    "سلام، در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.",
-                    registeredName && `نام: ${registeredName}`,
-                    registeredCity && `شهر: ${registeredCity}`,
-                    registeredEmail && `ایمیل: ${registeredEmail}`,
-                  ]
-                    .filter(Boolean)
-                    .join("\n"),
-                )}`}
+                href={
+                  campaign?.whatsappNumber
+                    ? `https://wa.me/${campaign.whatsappNumber}?text=${encodeURIComponent(
+                        [
+                          `سلام، در ${defaultTitle} ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.`,
+                          registeredName && `نام: ${registeredName}`,
+                          registeredCity && `شهر: ${registeredCity}`,
+                          registeredEmail && `ایمیل: ${registeredEmail}`,
+                        ]
+                          .filter(Boolean)
+                          .join("\n"),
+                      )}`
+                    : `/dashboard/chat?draft=${encodeURIComponent(
+                        [
+                          "سلام، در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.",
+                          registeredName && `نام: ${registeredName}`,
+                          registeredCity && `شهر: ${registeredCity}`,
+                          registeredEmail && `ایمیل: ${registeredEmail}`,
+                        ]
+                          .filter(Boolean)
+                          .join("\n"),
+                      )}`
+                }
+                target={campaign?.whatsappNumber ? "_blank" : undefined}
+                rel={campaign?.whatsappNumber ? "noreferrer" : undefined}
                 className="mt-1.5 flex min-h-[44px] w-full items-center justify-center rounded-xl bg-emerald-500 px-4 text-sm font-bold text-white shadow-md transition active:scale-[0.98]"
               >
-                ارسال جزئیات به پشتیبانی
+                {campaign?.whatsappNumber ? "ارسال جزئیات در واتساپ" : "ارسال جزئیات به پشتیبانی"}
               </a>
               {registeredEmail && (
                 <>
@@ -417,7 +432,7 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
                 </div>
               </div>
               <p className="mt-2 text-[11px] leading-snug text-neutral-500" dir="ltr">
-                Sender: <strong>hi@ladybosslook.com</strong> (Ali Lotfi - Ladyboss Academy). Please check your spam folder.
+                Sender: <strong>hi@ladybosslook.com</strong> ({campaign?.senderName ?? "Ali Lotfi - Ladyboss Academy"}). Please check your spam folder.
               </p>
             </section>
           )}
@@ -425,7 +440,7 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
           {registeredEmail && (
             <WebinarAddEmailBox
               originalEmail={registeredEmail}
-              source="igads"
+              source={campaign?.slug ?? "igads"}
               roundId={registeredRoundId}
             />
           )}
