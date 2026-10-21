@@ -1,14 +1,10 @@
 // PowerFree (Razie Ladyboss) webinar show-up emails — duplicated from Start Ads; copy to be customized.
-// Follow-up happens on WhatsApp, so every email points there instead of in-app support.
+// Support happens by replying to the email (or in-app chat), like the IG Ads free webinar emails.
 
 export type PowerFreeKind = "confirm" | "reminder" | "morning" | "onehour" | "start" | "after3h" | "after24h";
 const PROGRAM_URL = "https://ladybosslook.com/ewc"; // کوچینگ زن قوی follow-up destination
-const WA_JOIN_TEXT = "سلام راضیه جان، بعد از وبینار قدرت دو زبانه درباره قدم بعدی سوال داشتم:\n";
 
-export const WHATSAPP_NUMBER = "19495723730";
-export const waLink = (text: string) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-const WA_IG_TEXT = "سلام راضیه جان، برای وبینار قدرت دو زبانه ثبت‌نام کردم. اسم و ایمیلم:\n";
-const WA_HELP_TEXT = "سلام، برای وبینار قدرت دو زبانه سوال داشتم:\n";
+const CHAT_URL = "https://ladybosslook.com/dashboard/chat";
 
 export const POWERFREE_SUBJECTS: Record<PowerFreeKind, string> = {
   confirm: "خانم رئیس، صندلی‌ات در وبینار «قدرت دو زبانه» رزرو شد 🌷",
@@ -61,14 +57,13 @@ export function buildPowerFreeHtml(i: PowerFreeEmailInput): string {
     ? `${btn(i.meetUrl, "ورود به جلسه اول")}<p style="text-align:center;margin:0 0 8px;font-size:13px;"><a dir="ltr" href="${esc(i.meetUrl)}" style="color:#e11d48;word-break:break-all;">${esc(i.meetUrl)}</a></p>`
     : "";
   const waBox = `
-    <div style="background:#ecfdf5;border:2px solid #25D366;border-radius:14px;padding:14px 16px;margin:18px 0;">
-      <p style="margin:0 0 8px;font-size:15px;font-weight:bold;">📲 قدم دوم: جزئیاتت رو برای پشتیبانی بفرست</p>
-      ${p("اسم و ایمیلت رو در واتساپ برامون بفرست تا حضورت <strong>قطعی</strong> بشه و هر سوالی داشتی مستقیم با ما در ارتباط باشی.")}
-      ${btn(waLink(WA_IG_TEXT), "💬 ارسال جزئیات در واتساپ", "#25D366")}
+    <div style="background:#fff7ed;border:2px solid #fdba74;border-radius:14px;padding:14px 16px;margin:18px 0;">
+      <p style="margin:0 0 8px;font-size:15px;font-weight:bold;">✉️ قدم دوم: جزئیاتت رو برای پشتیبانی بفرست</p>
+      ${p("کافیه <strong>همین ایمیل رو جواب بدی</strong> و اسم و شهرت رو بنویسی تا حضورت <strong>قطعی</strong> بشه و هر سوالی داشتی مستقیم با ما در ارتباط باشی.")}
     </div>`;
   const help = `
     <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
-      سوالی داشتی یا لینک باز نشد؟ <a href="${waLink(WA_HELP_TEXT)}" style="color:#16a34a;font-weight:bold;">در واتساپ پیام بده 💬</a>
+      سوالی داشتی یا لینک باز نشد؟ <strong>همین ایمیل رو جواب بده</strong> یا در <a href="${CHAT_URL}" style="color:#EA5B2B;font-weight:bold;">چت اپ ریلو</a> پیام بده 💬
       <br><br><strong>راضیه لیدی‌باس</strong><br><span dir="ltr">Rilo App - Ladybosslook llc</span>
     </p>`;
   const cal = `${p("جلسه رو همین حالا به تقویمت اضافه کن تا یادت نره 👇")}${btn(i.calendarUrl, "📅 افزودن به تقویم", "#111827")}`;
@@ -152,8 +147,7 @@ export function buildPowerFreeHtml(i: PowerFreeEmailInput): string {
       ${p(`اما دونستن نقشه راه کافی نیست. ${RED("قدم برداشتن")} روی اون نقشه‌ست که در کمتر از ۶ ماه تفاوت می‌سازه.`)}
       ${p("اگر آماده‌ای قدم بعدی رو با من برداری، جزئیاتش اینجاست 👇")}
       ${btn(PROGRAM_URL, "💫 دیدن قدم بعدی")}
-      ${p("سوالی داری یا نمی‌دونی از کجا شروع کنی؟ مستقیم در واتساپ بپرس 👇")}
-      ${btn(waLink(WA_JOIN_TEXT), "💬 سوال در واتساپ", "#25D366")}
+      ${p("سوالی داری یا نمی‌دونی از کجا شروع کنی؟ <strong>همین ایمیل رو جواب بده</strong> — خودم جواب میدم.")}
       ${help}`;
   } else if (i.kind === "after24h") {
     body = `
@@ -162,8 +156,7 @@ export function buildPowerFreeHtml(i: PowerFreeEmailInput): string {
       ${p("تو کار بزرگی کردی: همه چیز رو پشت سر گذاشتی تا زندگی بهتری بسازی. حیفه که یک سال دیگه هم با انرژی کم و اعتماد به نفس کم‌رنگ بگذره.")}
       ${p(`خانم‌هایی که با من مسیر رو شروع کردن، در کمتر از یک سال ارتباطات تازه ساختن، ارتقای شغلی گرفتن، مشتری‌های بیشتری پیدا کردن و به آرامش رسیدن. ${RED("تو هم می‌تونی تغییر کنی")} — قولش رو بهت میدم.`)}
       ${btn(PROGRAM_URL, "✨ شروع مسیر قدرت ۱۰ برابری")}
-      ${p("اگر مطمئن نیستی این مسیر برای تو هست یا نه، در واتساپ پیام بده تا با هم صحبت کنیم 👇")}
-      ${btn(waLink(WA_JOIN_TEXT), "💬 صحبت در واتساپ", "#25D366")}
+      ${p("اگر مطمئن نیستی این مسیر برای تو هست یا نه، <strong>همین ایمیل رو جواب بده</strong> تا با هم صحبت کنیم.")}
       ${help}`;
   } else {
     body = `

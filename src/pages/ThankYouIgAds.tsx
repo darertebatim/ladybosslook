@@ -364,7 +364,7 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
                       )}`
                     : `/dashboard/chat?draft=${encodeURIComponent(
                         [
-                          "سلام، در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.",
+                          campaign ? `سلام، در ${defaultTitle} ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.` : "سلام، در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.",
                           registeredName && `نام: ${registeredName}`,
                           registeredCity && `شهر: ${registeredCity}`,
                           registeredEmail && `ایمیل: ${registeredEmail}`,
