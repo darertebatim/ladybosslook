@@ -246,6 +246,7 @@ const ThankYouIgAds = lazy(() => import("@/pages/ThankYouIgAds"));
 const IgAdsGifts = lazy(() => import("@/pages/IgAdsGifts"));
 const StartAdsLanding = lazy(() => import("@/pages/StartAdsLanding"));
 const StartAdsThankYou = lazy(() => import("@/pages/StartAdsThankYou"));
+import { POWERFREE_WEBINAR } from "@/lib/dedicatedWebinars";
 const IgThreeGate = lazy(() => import("@/pages/IgThreeGate"));
 const IgThreeWatch = lazy(() => import("@/pages/IgThreeWatch"));
 const FarewellPage = lazy(() => import("@/pages/FarewellPage"));
@@ -604,6 +605,10 @@ const App = () => (
                   {!isNativeApp() && <Route path="/l/customerwithigads" element={<CustomerWithIgAdsLanding />} />}
                   <Route path="/l/startads" element={<StartAdsLanding />} />
                   <Route path="/l/startads/thankyou" element={<StartAdsThankYou />} />
+                  <Route path="/r/powerfree" element={<StartAdsLanding campaign={POWERFREE_WEBINAR} />} />
+                  <Route path="/r/powerfree/thankyou" element={<StartAdsThankYou campaign={POWERFREE_WEBINAR} />} />
+                  {!isNativeApp() && <Route path="/r/powerfree/gifts" element={<IgAdsGifts campaign={POWERFREE_WEBINAR} />} />}
+                  {!isNativeApp() && <Route path="/r/powerfree/giftsvip" element={<GiftsAliLotfiVip />} />}
                   <Route path="/l/igthree" element={<IgThreeGate />} />
                   <Route path="/l/igthree/watch" element={<IgThreeWatch />} />
                   <Route path="/l/farewell" element={<FarewellPage />} />

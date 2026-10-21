@@ -1,4 +1,5 @@
-import { TrackedIframe } from "@/components/TrackedIframe";
+import { TrackedIframe, TrackedVideo } from "@/components/TrackedIframe";
+import { STARTADS_WEBINAR, type DedicatedWebinar } from "@/lib/dedicatedWebinars";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -32,7 +33,7 @@ export interface StartAdsRound {
   video_url: string | null;
 }
 
-export async function loadStartAds() {
+export async function loadStartAds(STARTADS_SLUG = STARTADS_WEBINAR.slug) {
   const [{ data: prog }, { data: rounds }] = await Promise.all([
     (supabase as any).from("program_catalog").select("title, video_url, cover_image_url").eq("slug", STARTADS_SLUG).maybeSingle(),
     (supabase as any)
@@ -48,7 +49,7 @@ export async function loadStartAds() {
   return { prog, round: upcoming || null };
 }
 
-export default function StartAdsLanding() {
+export default function StartAdsLanding({ campaign = STARTADS_WEBINAR }: { campaign?: DedicatedWebinar }) {
   const navigate = useNavigate();
   const [prog, setProg] = useState<any>(null);
   const [round, setRound] = useState<StartAdsRound | null>(null);
@@ -60,15 +61,16 @@ export default function StartAdsLanding() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    loadStartAds().then(({ prog, round }) => {
+    loadStartAds(campaign.slug).then(({ prog, round }) => {
       setProg(prog);
       setRound(round);
       setLoaded(true);
     });
-  }, []);
+  }, [campaign.slug]);
 
   const vid = youtubeId(prog?.video_url);
-  const title = prog?.title || "شروع تبلیغات اینستاگرامی";
+  const directVideo = !vid && prog?.video_url ? (prog.video_url as string) : null;
+  const title = prog?.title || campaign.defaultTitle;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -89,30 +91,30 @@ export default function StartAdsLanding() {
         email: em,
         phone: "",
         city: "",
-        source: round ? STARTADS_SOURCE : "startads_waitlist",
+        source: round ? campaign.regSource : campaign.waitlistSource,
         round_id: round?.id ?? null,
         timezone: getDeviceTimezone(),
       });
       if (error) throw error;
-      trackWebinarLead({ customEvent: "StartAdsLead", contentName: "StartAds Session 1 Registration", email: em, name: parsed.data.name });
+      trackWebinarLead({ customEvent: campaign.metaEvent, contentName: campaign.metaContentName, email: em, name: parsed.data.name });
       if (round) {
         supabase.functions
           .invoke("send-sixtraps-confirmation", {
             body: {
               name: parsed.data.name,
               email: em,
-              programSlug: STARTADS_SLUG,
-              prereqUrl: `https://ladybosslook.com/l/startads/thankyou?round=${round.round_number}&email=${encodeURIComponent(em)}`,
-              sources: [STARTADS_SOURCE],
+              programSlug: campaign.slug,
+              prereqUrl: `https://ladybosslook.com${campaign.basePath}/thankyou?round=${round.round_number}&email=${encodeURIComponent(em)}`,
+              sources: [campaign.regSource],
               roundId: round.id,
             },
           })
           .catch((err) => console.error("confirmation email error", err));
       }
       try {
-        localStorage.setItem(STARTADS_SOURCE, JSON.stringify({ email: em, name: parsed.data.name, roundId: round?.id }));
+        localStorage.setItem(campaign.regSource, JSON.stringify({ email: em, name: parsed.data.name, roundId: round?.id }));
       } catch {}
-      navigate(`/l/startads/thankyou${round ? `?round=${round.round_number}` : "?waitlist=1"}`);
+      navigate(`${campaign.basePath}/thankyou${round ? `?round=${round.round_number}` : "?waitlist=1"}`);
     } catch (err) {
       console.error(err);
       setErrors({ email: "ثبت‌نام انجام نشد، دوباره تلاش کنید" });
@@ -139,8 +141,8 @@ export default function StartAdsLanding() {
             — رایگان برای شما
           </h1>
           <p className="mt-1 text-sm font-bold text-rose-600">ویدیو را ببینید و جایگاه رایگان خود را رزرو کنید</p>
-          <p className="mt-0.5 text-[11px] font-bold text-neutral-500">با علی لطفی · موسس Rilo</p>
-          {vid && (
+          <p className="mt-0.5 text-[11px] font-bold text-neutral-500">{campaign.hostLine}</p>
+          {(vid || directVideo) && (
             <div aria-hidden="true" className="mt-1 flex justify-center">
               <ArrowDown className="h-4 w-4 animate-bounce text-rose-500" strokeWidth={3} />
             </div>
@@ -167,6 +169,12 @@ export default function StartAdsLanding() {
                 </button>
               )}
             </div>
+          </div>
+        )}
+
+        {directVideo && (
+          <div className="mt-1 overflow-hidden rounded-2xl bg-black shadow-ios">
+            <TrackedVideo src={directVideo} title={title} controls playsInline preload="metadata" className="aspect-video w-full" />
           </div>
         )}
 
