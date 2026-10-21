@@ -189,12 +189,16 @@ export default function DashboardChat() {
         setMessages((prev) => (prev.some((m) => m.id === sent.id) ? prev : [...prev, sent]));
       }
 
+      const isWebinarSignup =
+        messageContent.includes("در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام") ||
+        messageContent.includes("در وبینار رایگان قدرت دو زبانه ثبت‌نام کرده‌ام");
+
       // Give people a moment to see their own message land before promoting the app.
-      // Shown at most once every 7 days (not once forever).
+      // Shown at most once every 7 days, but always for webinar sign-up messages.
       let shouldPromote = true;
       try {
         const last = Number(localStorage.getItem("rilo_chat_app_promo_last") || 0);
-        shouldPromote = !last || Date.now() - last > 7 * 24 * 60 * 60 * 1000;
+        shouldPromote = isWebinarSignup || !last || Date.now() - last > 7 * 24 * 60 * 60 * 1000;
         if (shouldPromote) localStorage.setItem("rilo_chat_app_promo_last", String(Date.now()));
       } catch {
         shouldPromote = true;
@@ -212,7 +216,7 @@ export default function DashboardChat() {
       }
 
       // Webinar sign-ups asking for details get an automatic reply with their session info.
-      if (messageContent.includes("در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام")) {
+      if (isWebinarSignup) {
         let tz = "";
         try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch { /* ignore */ }
         supabase.functions

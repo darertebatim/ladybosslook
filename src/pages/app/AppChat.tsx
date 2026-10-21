@@ -290,7 +290,7 @@ export default function AppChat() {
           senderId: user.id
         }
       });
-      if (messageContent.includes('در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام')) {
+      if (messageContent.includes('در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام') || messageContent.includes('در وبینار رایگان قدرت دو زبانه ثبت‌نام کرده‌ام')) {
         let tz = '';
         try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch { /* ignore */ }
         supabase.functions
