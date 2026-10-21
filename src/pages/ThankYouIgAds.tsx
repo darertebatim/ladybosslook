@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { SEOHead } from "@/components/SEOHead";
 import { trackCompleteRegistration } from "@/lib/metaPixel";
 import WebinarAddEmailBox from "@/components/WebinarAddEmailBox";
+import type { DedicatedWebinar } from "@/lib/dedicatedWebinars";
+import { youtubeId } from "@/pages/StartAdsLanding";
 import {
   buildGoogleCalendarUrl,
   downloadIcs,
@@ -80,14 +82,17 @@ function CountdownToWebinar({ targetDate }: { targetDate: Date }) {
 // /l/igadsfree/thankyou and /l/aliagads/thankyou — not round-specific.
 export const THANKYOU_VIDEO_ID = "pOxk1JnTtxs";
 
-export default function ThankYouIgAds() {
+export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebinar } = {}) {
+  const slug = campaign?.slug ?? PROGRAM_SLUG;
+  const regSourceKey = campaign?.regSource ?? "igads_registration";
+  const defaultTitle = campaign?.defaultTitle ?? "وبینار جذب مشتری با اینستاگرام ادز";
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const roundParam = searchParams.get("round");
 
   const stored = useMemo(() => {
     try {
-      return JSON.parse(localStorage.getItem("igads_registration") || "null") as
+      return JSON.parse(localStorage.getItem(regSourceKey) || "null") as
         | { email?: string; roundId?: string; name?: string; city?: string }
         | null;
     } catch {
@@ -114,7 +119,7 @@ export default function ThankYouIgAds() {
 
     const timer = window.setTimeout(() => {
       trackCompleteRegistration({
-        content_name: "Instagram Ads Webinar Registration",
+        content_name: campaign?.metaContentName ?? "Instagram Ads Webinar Registration",
         content_category: "webinar",
         status: true,
         value: 0,
@@ -134,7 +139,7 @@ export default function ThankYouIgAds() {
     if (!registeredEmail || (hasName && hasCity)) return;
     supabase.functions
       .invoke("lookup-webinar-registration", {
-        body: { email: registeredEmail, source: "igads_registration" },
+        body: { email: registeredEmail, source: regSourceKey },
       })
       .then(({ data }) => {
         if (data?.found) setFallbackDetails({ name: data.name, city: data.city });
@@ -144,22 +149,26 @@ export default function ThankYouIgAds() {
 
   useEffect(() => {
     (async () => {
-      const round = await resolveWebinarRound(PROGRAM_SLUG, roundParam || registeredRoundId);
+      const round = await resolveWebinarRound(slug, roundParam || registeredRoundId);
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
         .select("title")
-        .eq("slug", PROGRAM_SLUG)
+        .eq("slug", slug)
         .maybeSingle();
 
-      setVideoId(THANKYOU_VIDEO_ID);
+      // Dedicated campaigns use the thank-you video set on the round;
+      // the IG Ads pages keep their fixed campaign video.
+      setVideoId(campaign ? youtubeId(round?.video_url) ?? "" : THANKYOU_VIDEO_ID);
 
       if (round?.first_session_date) {
         setWebinar({
-          title: prog?.title || "وبینار جذب مشتری با اینستاگرام ادز",
+          title: prog?.title || defaultTitle,
           startUtc: new Date(round.first_session_date),
           durationMinutes: round.first_session_duration || 120,
           meetUrl: round.google_meet_link || "",
-          supportUrl: "https://ladybosslook.com/dashboard/chat",
+          supportUrl: campaign?.whatsappNumber
+            ? `https://wa.me/${campaign.whatsappNumber}`
+            : "https://ladybosslook.com/dashboard/chat",
         });
       }
     })();
