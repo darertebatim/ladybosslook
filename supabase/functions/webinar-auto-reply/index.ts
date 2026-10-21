@@ -9,6 +9,24 @@ const json = (b: unknown, s = 200) =>
 
 const TRIGGER = "در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام";
 const APP_LINK = "https://ladyboss.onelink.me/lt6v?pid=webinar&c=igads_support";
+
+// Per-campaign settings for the thank-you page "send details" auto-reply.
+interface Campaign { trigger: string; sources: string[]; slug: string; title: string; calTitle: string; thankyou: string; register: string; defaultDuration: number; signoff: string }
+const CAMPAIGNS: Campaign[] = [
+  {
+    trigger: TRIGGER, sources: ["igads_registration", "aliagads_registration"], slug: "igadsfree",
+    title: "جذب مشتری با تبلیغات اینستاگرام", calTitle: "وبینار جذب مشتری با اینستاگرام ادز",
+    thankyou: "https://ladybosslook.com/l/igadsfree/thankyou", register: "https://ladybosslook.com/l/igadsfree",
+    defaultDuration: 120, signoff: "منتظر دیدن شما در لایو هستیم 💛",
+  },
+  {
+    trigger: "در وبینار رایگان قدرت دو زبانه ثبت‌نام کرده‌ام", sources: ["powerfree_registration"], slug: "powerfree",
+    title: "قدرت دو زبانه", calTitle: "وبینار رایگان قدرت دو زبانه",
+    thankyou: "https://ladybosslook.com/r/powerfree/thankyou", register: "https://ladybosslook.com/r/powerfree",
+    defaultDuration: 90,
+    signoff: "یادت باشه: جلسه فقط زنده‌ست و هدیه تست قدرت درونی فقط برای حاضرین لایوه 🎁\n\nمنتظرت هستم 💛\nراضیه لیدی‌باس",
+  },
+];
 const FA_DAYS: Record<string, string> = {
   Sunday: "یکشنبه", Monday: "دوشنبه", Tuesday: "سه‌شنبه", Wednesday: "چهارشنبه",
   Thursday: "پنجشنبه", Friday: "جمعه", Saturday: "شنبه",
@@ -31,7 +49,8 @@ async function processConv(admin: any, conversationId: string, userId: string, u
       .eq("conversation_id", conv.id).eq("sender_type", "user")
       .ilike("content", bulk ? `%${TRIGGER}%` : "%")
       .order("created_at", { ascending: false }).limit(1).maybeSingle();
-    if (!last?.content?.includes(TRIGGER)) return ({ sent: false });
+    const c = CAMPAIGNS.find((x) => last?.content?.includes(x.trigger));
+    if (!c || (bulk && c.slug !== "igadsfree")) return ({ sent: false });
 
     // Don't reply twice within 6 hours
     const since = new Date(Date.now() - sinceMs).toISOString();
@@ -49,7 +68,7 @@ async function processConv(admin: any, conversationId: string, userId: string, u
     (aliases || []).forEach((a: any) => a.email && emails.add(a.email.toLowerCase()));
 
     const { data: reg } = emails.size ? await admin.from("form_submissions").select("name, round_id")
-      .in("email", [...emails]).in("source", ["igads_registration", "aliagads_registration"])
+      .in("email", [...emails]).in("source", c.sources)
       .order("submitted_at", { ascending: false }).limit(1).maybeSingle() : { data: null };
     const loadRound = async (id: string) => (await admin.from("program_rounds")
       .select("id, first_session_date, first_session_duration").eq("id", id).maybeSingle()).data;
@@ -60,7 +79,7 @@ async function processConv(admin: any, conversationId: string, userId: string, u
     if (!isUpcoming(round)) {
       // Fall back to the next upcoming webinar session
       const { data: next } = await admin.from("program_rounds")
-        .select("id, first_session_date, first_session_duration").eq("program_slug", "igadsfree")
+        .select("id, first_session_date, first_session_duration").eq("program_slug", c.slug)
         .gt("first_session_date", new Date(Date.now() - 3 * 3600_000).toISOString())
         .order("first_session_date", { ascending: true }).limit(1).maybeSingle();
       round = next;
@@ -80,8 +99,8 @@ async function processConv(admin: any, conversationId: string, userId: string, u
     const city = tz.split("/").pop()!.replace(/_/g, " ");
     const msgName = last.content.match(/نام:\s*([^\n]+)/)?.[1]?.trim();
     const name = (reg?.name || "").trim() || msgName || "دوست";
-    const duration = round.first_session_duration || 120;
-    const registerUrl = `https://ladybosslook.com/l/igadsfree?round=${roundId}`;
+    const duration = round.first_session_duration || c.defaultDuration;
+    const registerUrl = `${c.register}?round=${roundId}`;
 
     const content = bulk
       ? `سلام ${name} عزیز، وقت بخیر 🌷\n\n` +
@@ -94,25 +113,23 @@ async function processConv(admin: any, conversationId: string, userId: string, u
         `📱 برای دریافت یادآوری‌ها، اپلیکیشن Rilo را نصب کنید:\n${APP_LINK}\n\n` +
         `منتظر دیدن شما در لایو هستیم 💛`
       : `سلام ${name} عزیز، وقت بخیر 🌷\n\n` +
-      `ثبت‌نام شما در وبینار رایگان «جذب مشتری با تبلیغات اینستاگرام» تایید شد و جای شما در جلسه زنده رزرو است.\n\n` +
+      `ثبت‌نام شما در وبینار رایگان «${c.title}» تایید شد و جای شما در جلسه زنده رزرو است.\n\n` +
       `📅 زمان برگزاری به وقت شما:\n` +
       `• روز: ${FA_DAYS[weekdayEn] || weekdayEn}، ${date}\n` +
       `• ساعت محلی شما: ${time} (${city})\n` +
       `• مدت جلسه: ${duration} دقیقه — لایو در Google Meet\n\n` +
       `🔗 لینک ورود به جلسه، نیم ساعت قبل از شروع به ایمیل شما ارسال می‌شود (پوشه اسپم را هم چک کنید).\n\n` +
       `📱 برای دریافت یادآوری‌ها و پیام‌های جلسه، حتماً اپلیکیشن Rilo را نصب کنید:\n${APP_LINK}\n\n` +
-      `منتظر دیدن شما در لایو هستیم 💛`;
+      c.signoff;
 
     const end = new Date(start.getTime() + duration * 60_000);
-    const gcal = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-      "وبینار جذب مشتری با اینستاگرام ادز",
-    )}&dates=${gcalStamp(start)}/${gcalStamp(end)}`;
+    const gcal = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(c.calTitle)}&dates=${gcalStamp(start)}/${gcalStamp(end)}`;
     const buttons = [
       bulk ? { label: "✍️ ثبت‌نام در جلسه بعدی", url: registerUrl } : { label: "📱 دانلود اپلیکیشن Rilo", url: APP_LINK },
       { label: "📅 افزودن به Google Calendar", url: gcal },
       bulk
         ? { label: "📱 دانلود اپلیکیشن Rilo", url: APP_LINK }
-        : { label: "🎬 ویدیوی پیش‌نیاز وبینار", url: `https://ladybosslook.com/l/igadsfree/thankyou?round=${roundId}` },
+        : { label: "🎬 ویدیوی پیش‌نیاز وبینار", url: `${c.thankyou}?round=${roundId}` },
     ];
 
     const { data: sender } = await admin.from("user_roles").select("user_id").eq("role", "admin").limit(1).maybeSingle();
