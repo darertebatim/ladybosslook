@@ -605,8 +605,8 @@ const App = () => (
                   {!isNativeApp() && <Route path="/l/customerwithigads" element={<CustomerWithIgAdsLanding />} />}
                   <Route path="/l/startads" element={<StartAdsLanding />} />
                   <Route path="/l/startads/thankyou" element={<StartAdsThankYou />} />
-                  <Route path="/r/powerfree" element={<StartAdsLanding campaign={POWERFREE_WEBINAR} />} />
-                  <Route path="/r/powerfree/thankyou" element={<StartAdsThankYou campaign={POWERFREE_WEBINAR} />} />
+                  <Route path="/r/powerfree" element={<IgAdsLanding basePath="/r/powerfree" campaign={POWERFREE_WEBINAR} />} />
+                  <Route path="/r/powerfree/thankyou" element={<ThankYouIgAds campaign={POWERFREE_WEBINAR} />} />
                   {!isNativeApp() && <Route path="/r/powerfree/gifts" element={<IgAdsGifts campaign={POWERFREE_WEBINAR} />} />}
                   {!isNativeApp() && <Route path="/r/powerfree/giftsvip" element={<GiftsAliLotfiVip />} />}
                   <Route path="/l/igthree" element={<IgThreeGate />} />

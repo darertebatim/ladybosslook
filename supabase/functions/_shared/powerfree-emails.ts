@@ -5,7 +5,7 @@ export type PowerFreeKind = "confirm" | "reminder" | "morning" | "onehour" | "st
 const PROGRAM_URL = "https://ladybosslook.com/r/powerfree";
 const WA_JOIN_TEXT = "سلام راضیه جان، در مورد ادامه دوره ۳ هفته‌ای جذب مشتری سوال داشتم:\n";
 
-export const WHATSAPP_NUMBER = "16265028538";
+export const WHATSAPP_NUMBER = "19495723730";
 export const waLink = (text: string) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 const WA_IG_TEXT = "سلام راضیه جان، این پیج اینستاگرام من برای جلسه اوله:\n";
 const WA_HELP_TEXT = "سلام، برای وبینار قدرت دو زبانه سوال داشتم:\n";

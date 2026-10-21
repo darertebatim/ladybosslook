@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { SEOHead } from "@/components/SEOHead";
 import { trackCompleteRegistration } from "@/lib/metaPixel";
 import WebinarAddEmailBox from "@/components/WebinarAddEmailBox";
+import type { DedicatedWebinar } from "@/lib/dedicatedWebinars";
+import { youtubeId } from "@/pages/StartAdsLanding";
 import {
   buildGoogleCalendarUrl,
   downloadIcs,
@@ -80,14 +82,17 @@ function CountdownToWebinar({ targetDate }: { targetDate: Date }) {
 // /l/igadsfree/thankyou and /l/aliagads/thankyou — not round-specific.
 export const THANKYOU_VIDEO_ID = "pOxk1JnTtxs";
 
-export default function ThankYouIgAds() {
+export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebinar } = {}) {
+  const slug = campaign?.slug ?? PROGRAM_SLUG;
+  const regSourceKey = campaign?.regSource ?? "igads_registration";
+  const defaultTitle = campaign?.defaultTitle ?? "وبینار جذب مشتری با اینستاگرام ادز";
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const roundParam = searchParams.get("round");
 
   const stored = useMemo(() => {
     try {
-      return JSON.parse(localStorage.getItem("igads_registration") || "null") as
+      return JSON.parse(localStorage.getItem(regSourceKey) || "null") as
         | { email?: string; roundId?: string; name?: string; city?: string }
         | null;
     } catch {
@@ -114,7 +119,7 @@ export default function ThankYouIgAds() {
 
     const timer = window.setTimeout(() => {
       trackCompleteRegistration({
-        content_name: "Instagram Ads Webinar Registration",
+        content_name: campaign?.metaContentName ?? "Instagram Ads Webinar Registration",
         content_category: "webinar",
         status: true,
         value: 0,
@@ -134,7 +139,7 @@ export default function ThankYouIgAds() {
     if (!registeredEmail || (hasName && hasCity)) return;
     supabase.functions
       .invoke("lookup-webinar-registration", {
-        body: { email: registeredEmail, source: "igads_registration" },
+        body: { email: registeredEmail, source: regSourceKey },
       })
       .then(({ data }) => {
         if (data?.found) setFallbackDetails({ name: data.name, city: data.city });
@@ -144,22 +149,26 @@ export default function ThankYouIgAds() {
 
   useEffect(() => {
     (async () => {
-      const round = await resolveWebinarRound(PROGRAM_SLUG, roundParam || registeredRoundId);
+      const round = await resolveWebinarRound(slug, roundParam || registeredRoundId);
       const { data: prog } = await (supabase as any)
         .from("program_catalog")
         .select("title")
-        .eq("slug", PROGRAM_SLUG)
+        .eq("slug", slug)
         .maybeSingle();
 
-      setVideoId(THANKYOU_VIDEO_ID);
+      // Dedicated campaigns use the thank-you video set on the round;
+      // the IG Ads pages keep their fixed campaign video.
+      setVideoId(campaign ? youtubeId(round?.video_url) ?? "" : THANKYOU_VIDEO_ID);
 
       if (round?.first_session_date) {
         setWebinar({
-          title: prog?.title || "وبینار جذب مشتری با اینستاگرام ادز",
+          title: prog?.title || defaultTitle,
           startUtc: new Date(round.first_session_date),
           durationMinutes: round.first_session_duration || 120,
           meetUrl: round.google_meet_link || "",
-          supportUrl: "https://ladybosslook.com/dashboard/chat",
+          supportUrl: campaign?.whatsappNumber
+            ? `https://wa.me/${campaign.whatsappNumber}`
+            : "https://ladybosslook.com/dashboard/chat",
         });
       }
     })();
@@ -184,8 +193,8 @@ export default function ThankYouIgAds() {
   return (
     <>
       <SEOHead
-        title="ثبت‌نام شما ثبت شد | وبینار اینستاگرام ادز"
-        description="ثبت‌نام شما در وبینار رایگان جذب مشتری با اینستاگرام ادز با موفقیت ثبت شد."
+        title={campaign ? `ثبت‌نام شما ثبت شد | ${defaultTitle}` : "ثبت‌نام شما ثبت شد | وبینار اینستاگرام ادز"}
+        description={campaign ? `ثبت‌نام شما در ${defaultTitle} با موفقیت ثبت شد.` : "ثبت‌نام شما در وبینار رایگان جذب مشتری با اینستاگرام ادز با موفقیت ثبت شد."}
         locale="fa_IR"
       />
       <div
@@ -301,7 +310,7 @@ export default function ThankYouIgAds() {
                 </a>
                 <button
                   type="button"
-                  onClick={() => { trackCalendarClick("apple", { email: registeredEmail, roundId: roundParam || registeredRoundId }); downloadIcs(event, "igads-webinar.ics"); }}
+                  onClick={() => { trackCalendarClick("apple", { email: registeredEmail, roundId: roundParam || registeredRoundId }); downloadIcs(event, campaign?.icsName ?? "igads-webinar.ics"); }}
                   className="flex min-h-[44px] items-center justify-center rounded-xl border border-neutral-300 bg-white px-2 text-xs font-semibold text-neutral-900 shadow-sm transition active:scale-[0.98]"
                 >
                   افزودن به Apple Calendar
@@ -341,19 +350,34 @@ export default function ThankYouIgAds() {
                 لینک ورود فقط به ایمیل ثبت‌نام‌شده ارسال می‌شود — همین حالا جزئیات را دریافت کنید
               </p>
               <a
-                href={`/dashboard/chat?draft=${encodeURIComponent(
-                  [
-                    "سلام، در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.",
-                    registeredName && `نام: ${registeredName}`,
-                    registeredCity && `شهر: ${registeredCity}`,
-                    registeredEmail && `ایمیل: ${registeredEmail}`,
-                  ]
-                    .filter(Boolean)
-                    .join("\n"),
-                )}`}
+                href={
+                  campaign?.whatsappNumber
+                    ? `https://wa.me/${campaign.whatsappNumber}?text=${encodeURIComponent(
+                        [
+                          `سلام، در ${defaultTitle} ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.`,
+                          registeredName && `نام: ${registeredName}`,
+                          registeredCity && `شهر: ${registeredCity}`,
+                          registeredEmail && `ایمیل: ${registeredEmail}`,
+                        ]
+                          .filter(Boolean)
+                          .join("\n"),
+                      )}`
+                    : `/dashboard/chat?draft=${encodeURIComponent(
+                        [
+                          "سلام، در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.",
+                          registeredName && `نام: ${registeredName}`,
+                          registeredCity && `شهر: ${registeredCity}`,
+                          registeredEmail && `ایمیل: ${registeredEmail}`,
+                        ]
+                          .filter(Boolean)
+                          .join("\n"),
+                      )}`
+                }
+                target={campaign?.whatsappNumber ? "_blank" : undefined}
+                rel={campaign?.whatsappNumber ? "noreferrer" : undefined}
                 className="mt-1.5 flex min-h-[44px] w-full items-center justify-center rounded-xl bg-emerald-500 px-4 text-sm font-bold text-white shadow-md transition active:scale-[0.98]"
               >
-                ارسال جزئیات به پشتیبانی
+                {campaign?.whatsappNumber ? "ارسال جزئیات در واتساپ" : "ارسال جزئیات به پشتیبانی"}
               </a>
               {registeredEmail && (
                 <>
@@ -408,7 +432,7 @@ export default function ThankYouIgAds() {
                 </div>
               </div>
               <p className="mt-2 text-[11px] leading-snug text-neutral-500" dir="ltr">
-                Sender: <strong>hi@ladybosslook.com</strong> (Ali Lotfi - Ladyboss Academy). Please check your spam folder.
+                Sender: <strong>hi@ladybosslook.com</strong> ({campaign?.senderName ?? "Ali Lotfi - Ladyboss Academy"}). Please check your spam folder.
               </p>
             </section>
           )}
@@ -416,7 +440,7 @@ export default function ThankYouIgAds() {
           {registeredEmail && (
             <WebinarAddEmailBox
               originalEmail={registeredEmail}
-              source="igads"
+              source={campaign?.slug === "powerfree" ? "powerfree" : "igads"}
               roundId={registeredRoundId}
             />
           )}
