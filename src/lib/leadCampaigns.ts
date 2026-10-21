@@ -18,6 +18,18 @@ export interface LeadCampaign {
 
 export const LEAD_CAMPAIGNS: LeadCampaign[] = [
   {
+    key: 'powerfree',
+    label: 'PowerFree (Razie)',
+    labelFa: 'وبینار رایگان قدرت دو زبانه',
+    programSlug: 'powerfree',
+    landingPath: '/r/powerfree',
+    thankYouPath: '/r/powerfree/thankyou',
+    regSource: 'powerfree_registration',
+    extraSources: ['powerfree_waitlist'],
+    metaEvent: 'PowerFreeLead',
+    confirmationFunction: 'send-sixtraps-confirmation',
+  },
+  {
     key: 'startads',
     label: 'Start Ads (Session 1 free)',
     labelFa: 'شروع تبلیغات اینستاگرامی — جلسه اول رایگان',
