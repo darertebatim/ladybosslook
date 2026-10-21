@@ -8457,6 +8457,69 @@ export type Database = {
           },
         ]
       }
+      video_watch_sessions: {
+        Row: {
+          completed: boolean
+          context: string | null
+          created_at: string
+          duration_seconds: number | null
+          email: string | null
+          id: string
+          max_position_seconds: number
+          page_path: string | null
+          percent_watched: number
+          platform: string
+          seconds_watched: number
+          session_key: string
+          source: string
+          updated_at: string
+          user_id: string | null
+          video_key: string
+          video_title: string | null
+          video_url: string | null
+        }
+        Insert: {
+          completed?: boolean
+          context?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          email?: string | null
+          id?: string
+          max_position_seconds?: number
+          page_path?: string | null
+          percent_watched?: number
+          platform?: string
+          seconds_watched?: number
+          session_key: string
+          source?: string
+          updated_at?: string
+          user_id?: string | null
+          video_key: string
+          video_title?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          completed?: boolean
+          context?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          email?: string | null
+          id?: string
+          max_position_seconds?: number
+          page_path?: string | null
+          percent_watched?: number
+          platform?: string
+          seconds_watched?: number
+          session_key?: string
+          source?: string
+          updated_at?: string
+          user_id?: string | null
+          video_key?: string
+          video_title?: string | null
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       webinar_calendar_clicks: {
         Row: {
           calendar: string
@@ -8748,6 +8811,23 @@ export type Database = {
       }
       regenerate_my_friend_code: { Args: never; Returns: string }
       sync_account_family: { Args: { _uid: string }; Returns: undefined }
+      track_video_watch: {
+        Args: {
+          p_context: string
+          p_duration: number
+          p_email: string
+          p_page_path: string
+          p_platform: string
+          p_position: number
+          p_seconds_watched: number
+          p_session_key: string
+          p_source: string
+          p_video_key: string
+          p_video_title: string
+          p_video_url: string
+        }
+        Returns: undefined
+      }
       verify_cron_secret: { Args: { _token: string }; Returns: boolean }
     }
     Enums: {
