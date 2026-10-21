@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { useTestEmailAddress, isValidEmail } from '@/hooks/useTestEmailAddress';
 import { Loader2, Mail, CalendarClock } from 'lucide-react';
 
-const TEST_EMAIL = 'darertebatim@gmail.com';
 type Kind = 'confirm' | 'reminder' | 'morning' | 'onehour' | 'start' | 'after3h' | 'after24h';
 const EMAILS: { kind: Kind; title: string; when: string }[] = [
   { kind: 'confirm', title: '0. Confirmation', when: 'Right at signup' },
@@ -24,6 +25,7 @@ export function StartAdsShowUpEmails({ programSlug = 'startads', label = 'Start 
   const [round, setRound] = useState<Round | null>(null);
   const [sent, setSent] = useState<Record<string, number>>({});
   const [busy, setBusy] = useState<Kind | null>(null);
+  const [testTo, setTestTo] = useTestEmailAddress();
 
   useEffect(() => {
     (async () => {
@@ -52,6 +54,8 @@ export function StartAdsShowUpEmails({ programSlug = 'startads', label = 'Start 
 
   const test = async (kind: Kind) => {
     if (!round) return;
+    if (!isValidEmail(testTo)) { toast.error('Enter a valid test email'); return; }
+    const TEST_EMAIL = testTo.trim().toLowerCase();
     setBusy(kind);
     const { error } =
       kind === 'confirm'
@@ -81,11 +85,15 @@ export function StartAdsShowUpEmails({ programSlug = 'startads', label = 'Start 
         </CardTitle>
         <p className="text-sm text-muted-foreground">
           {round
-            ? `Round ${round.round_number} · ${new Date(round.first_session_date).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}. Sent automatically; follow-up goes to WhatsApp (+1 626 502 8538).`
+            ? `Round ${round.round_number} · ${new Date(round.first_session_date).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}. Sent automatically.`
             : `No upcoming ${label} round.`}
         </p>
       </CardHeader>
       <CardContent className="space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm text-muted-foreground">Send tests to:</span>
+          <Input type="email" dir="ltr" value={testTo} onChange={(e) => setTestTo(e.target.value)} className="h-9 max-w-xs" placeholder="you@example.com" />
+        </div>
         {EMAILS.map(({ kind, title, when }) => (
           <div key={kind} className="flex flex-wrap items-center gap-2 rounded-lg border p-3">
             <span className="text-sm font-medium">{title}</span>
@@ -93,7 +101,7 @@ export function StartAdsShowUpEmails({ programSlug = 'startads', label = 'Start 
             {kind !== 'confirm' && <span className="text-xs text-foreground">Sent: <b>{sent[kind] ?? 0}</b></span>}
             <Button size="sm" variant="outline" className="ms-auto" onClick={() => test(kind)} disabled={!round || !!busy}>
               {busy === kind ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
-              Send test to me
+              Send test
             </Button>
           </div>
         ))}
