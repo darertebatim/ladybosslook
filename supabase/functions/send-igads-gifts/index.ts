@@ -39,7 +39,10 @@ async function unsubToken(email: string): Promise<string> {
     .slice(0, 32);
 }
 
-function buildHtml(unsubscribeUrl: string): string {
+function buildHtml(unsubscribeUrl: string, isPower = false): string {
+  const GIFTS = isPower ? "https://ladybosslook.com/r/powerfree/giftsvip" : GIFTS_URL;
+  const TOPIC = isPower ? "قدرت دو زبانه" : "جذب مشتری با اینستاگرام ادز";
+  const SIGN = isPower ? "راضیه لیدی‌باس" : "استاد علی لطفی";
   const btn = (label: string, url: string, bg: string) =>
     `<tr><td align="center" style="padding:6px 0;"><a href="${esc(url)}" style="display:inline-block;background:${bg};color:#ffffff;text-decoration:none;font-weight:700;font-size:16px;padding:14px 28px;border-radius:12px;">${esc(label)}</a></td></tr>`;
 
@@ -47,26 +50,26 @@ function buildHtml(unsubscribeUrl: string): string {
 <html dir="rtl">
   <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
   <body dir="rtl" style="direction:rtl;text-align:right;margin:0;padding:0;background:#f6f6f7;font-family:Tahoma, 'Iranian Sans', Arial, sans-serif;">
-    <span style="display:none;font-size:0;line-height:0;opacity:0;">هدایای ویژه وبینار اینستاگرام ادز</span>
+    <span style="display:none;font-size:0;line-height:0;opacity:0;">هدایای ویژه وبینار ${TOPIC}</span>
     <table width="100%" cellpadding="0" cellspacing="0" style="background:#f6f6f7;padding:24px 12px;">
       <tr><td align="center">
         <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
           <tr><td style="padding:28px 28px 8px;" dir="rtl">
             <h1 style="margin:0 0 18px;font-size:22px;line-height:1.5;color:#111;text-align:right;">🎁 هدایای ویژه وبینار</h1>
             <p style="margin:0 0 16px;font-size:16px;line-height:1.9;color:#333;text-align:right;">
-              ممنون که در وبینار «جذب مشتری با اینستاگرام ادز» همراه ما بودید! همان‌طور که قول داده بودیم، هدایای ویژه شما آماده است.
+              ممنون که در وبینار «${TOPIC}» همراه ما بودید! همان‌طور که قول داده بودیم، هدایای ویژه شما آماده است.
             </p>
             <p style="margin:0 0 16px;font-size:16px;line-height:1.9;color:#333;text-align:right;">
               برای دریافت هدایا روی دکمه زیر بزنید. اگر هم سؤالی داشتید، از طریق چت اپ ریلو در خدمت شما هستیم (یا همین ایمیل را جواب بدهید).
             </p>
           </td></tr>
           <tr><td style="padding:8px 28px 24px;"><table width="100%" cellpadding="0" cellspacing="0">
-            ${btn("دریافت هدایا 🎁", GIFTS_URL, "#EA5B2B")}
+            ${btn("دریافت هدایا 🎁", GIFTS, "#EA5B2B")}
             ${btn("گفتگو در اپ ریلو 💬", SUPPORT_URL, "#EA5B2B")}
           </table></td></tr>
           <tr><td style="padding:4px 28px 24px;" dir="rtl">
             <div style="font-size:15px;line-height:1.8;color:#444;text-align:right;">
-              با احترام،<br>استاد علی لطفی<br>Rilo App (Ladybosslook LLC.)
+              با احترام،<br>${SIGN}<br>Rilo App (Ladybosslook LLC.)
             </div>
           </td></tr>
           <tr><td style="padding:16px 28px 28px;border-top:1px solid #eee;text-align:center;color:#8a8a8a;font-size:12px;line-height:1.7;">
@@ -86,7 +89,8 @@ serve(async (req) => {
   }
 
   try {
-    const { email } = await req.json();
+    const { email, campaign } = await req.json();
+    const isPower = campaign === "powerfree";
     const clean = typeof email === "string" ? email.trim().toLowerCase() : "";
     if (!clean || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean) || clean.length > 255) {
       return new Response(JSON.stringify({ error: "Invalid email" }), {
@@ -101,7 +105,7 @@ serve(async (req) => {
       email: clean,
       city: "",
       phone: "",
-      source: "igads_gifts",
+      source: isPower ? "powerfree_gifts" : "igads_gifts",
     });
     if (dbError) {
       console.warn("igads gifts insert error", dbError);
@@ -118,10 +122,10 @@ serve(async (req) => {
     if (!unsub) {
       const unsubscribeUrl = `https://ladybosslook.com/unsubscribe?e=${encodeURIComponent(clean)}&t=${await unsubToken(clean)}`;
       const { error: sendError } = await resend.emails.send({
-        from: "Ali Lotfi <support@ladybosslook.com>",
+        from: isPower ? "Razie Ladyboss <support@ladybosslook.com>" : "Ali Lotfi <support@ladybosslook.com>",
         to: [clean],
-        subject: "🎁 هدایای ویژه وبینار اینستاگرام ادز",
-        html: buildHtml(unsubscribeUrl),
+        subject: isPower ? "🎁 هدایای ویژه وبینار قدرت دو زبانه" : "🎁 هدایای ویژه وبینار اینستاگرام ادز",
+        html: buildHtml(unsubscribeUrl, isPower),
         headers: {
           "List-Unsubscribe": `<${unsubscribeUrl}>`,
           "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",

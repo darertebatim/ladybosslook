@@ -4,6 +4,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { buildStartAdsHtml, STARTADS_SUBJECTS } from "../_shared/startads-emails.ts";
+import { buildPowerFreeHtml, POWERFREE_SUBJECTS } from "../_shared/powerfree-emails.ts";
 import { buildUnsubUrl, unsubHeaders, appendUnsubFooter, fetchUnsubscribed } from "../_shared/unsubscribe.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
@@ -288,22 +289,27 @@ serve(async (req) => {
   </body>
 </html>`;
 
-    const isStartAds = programSlug === "startads" && !!startUtc;
+    const dedicated = programSlug === "powerfree"
+      ? { build: buildPowerFreeHtml, subject: POWERFREE_SUBJECTS.confirm, from: "Razie Ladyboss <hi@ladybosslook.com>" }
+      : programSlug === "startads"
+      ? { build: buildStartAdsHtml, subject: STARTADS_SUBJECTS.confirm, from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>" }
+      : null;
+    const isStartAds = !!dedicated && !!startUtc;
     const finalHtml = isStartAds
-      ? buildStartAdsHtml({
+      ? dedicated!.build({
           kind: "confirm",
           name,
           sessionStart: startUtc!,
           meetUrl,
           thankYouUrl: PREREQ_VIDEO_URL,
-          calendarUrl: trackedCalUrl(gcalUrl, "email:startads-confirm", round?.id, email),
+          calendarUrl: trackedCalUrl(gcalUrl, `email:${programSlug}-confirm`, round?.id, email),
         })
       : html;
     const unsubUrl = await buildUnsubUrl(email);
     const { data: sendData, error } = await resend.emails.send({
-      from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>",
+      from: isStartAds ? dedicated!.from : "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>",
       to: [email],
-      subject: isStartAds ? STARTADS_SUBJECTS.confirm : `تایید ثبت‌نام: ${title}`,
+      subject: isStartAds ? dedicated!.subject : `تایید ثبت‌نام: ${title}`,
       html: appendUnsubFooter(finalHtml, unsubUrl),
       headers: unsubHeaders(unsubUrl),
     });
