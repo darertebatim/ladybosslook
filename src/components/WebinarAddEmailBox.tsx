@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface Props {
   originalEmail: string;
-  source: "sixtraps" | "smartinsta" | "igads";
+  source: "sixtraps" | "smartinsta" | "igads" | "powerfree";
   roundId?: string | null;
 }
 
@@ -38,6 +38,16 @@ const SOURCE_MAP: Record<
       programSlug: "igadsfree",
       prereqUrl: "https://ladybosslook.com/l/igadsfree/pre",
       sources: ["igads_registration", "preigads_interest"],
+    },
+  },
+  powerfree: {
+    registration: "powerfree_registration",
+    additional: "powerfree_additional_email",
+    functionName: "send-sixtraps-confirmation",
+    extraBody: {
+      programSlug: "powerfree",
+      prereqUrl: "https://ladybosslook.com/r/powerfree/thankyou",
+      sources: ["powerfree_registration"],
     },
   },
 };
