@@ -8,6 +8,53 @@ import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 import { csvCell } from '@/lib/csvSafe';
 import { buildMetaAudienceRows } from '@/lib/metaAudienceCsv';
 
+const BUYER_PROGRAMS = [
+  { key: 'buyers:casigads', slug: 'casigads', label: 'Customer Acquisition (buyers & students)' },
+  { key: 'buyers:smartig', slug: 'smartig', label: 'Smart IG (buyers & students)' },
+];
+
+type Person = { email: string | null; name: string | null; city: string | null };
+
+async function fetchProgramPeople(slug: string): Promise<Person[]> {
+  const out: Person[] = [];
+  let from = 0;
+  while (true) {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('email, name')
+      .eq('program_slug', slug)
+      .in('status', ['paid', 'completed', 'partially_refunded'])
+      .range(from, from + 999);
+    if (error) throw error;
+    out.push(...(data || []).map((o: any) => ({ email: o.email, name: o.name, city: null })));
+    if (!data || data.length < 1000) break;
+    from += 1000;
+  }
+  const ids: string[] = [];
+  from = 0;
+  while (true) {
+    const { data, error } = await supabase
+      .from('course_enrollments')
+      .select('user_id')
+      .eq('program_slug', slug)
+      .range(from, from + 999);
+    if (error) throw error;
+    ids.push(...(data || []).map((e: any) => e.user_id).filter(Boolean));
+    if (!data || data.length < 1000) break;
+    from += 1000;
+  }
+  const unique = [...new Set(ids)];
+  for (let i = 0; i < unique.length; i += 200) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('email, full_name, city')
+      .in('id', unique.slice(i, i + 200));
+    if (error) throw error;
+    out.unshift(...(data || []).map((p: any) => ({ email: p.email, name: p.full_name, city: p.city })));
+  }
+  return out;
+}
+
 export function MetaAudienceExport() {
   const [selected, setSelected] = useState<string[]>(LEAD_CAMPAIGNS.map((c) => c.key));
   const [loading, setLoading] = useState(false);
@@ -28,9 +75,12 @@ export function MetaAudienceExport() {
         c.regSource,
         ...c.extraSources,
       ]);
-      const all: { email: string | null; name: string | null; city: string | null }[] = [];
+      const all: Person[] = [];
+      for (const p of BUYER_PROGRAMS) {
+        if (selected.includes(p.key)) all.push(...(await fetchProgramPeople(p.slug)));
+      }
       let from = 0;
-      while (true) {
+      while (sources.length) {
         const { data, error } = await supabase
           .from('form_submissions')
           .select('email, name, city')
@@ -85,6 +135,21 @@ export function MetaAudienceExport() {
               {c.label}
             </Badge>
           ))}
+        </div>
+        <div className="space-y-2">
+          <p className="text-sm font-medium">Program buyers & students</p>
+          <div className="flex flex-wrap gap-2">
+            {BUYER_PROGRAMS.map((p) => (
+              <Badge
+                key={p.key}
+                variant={selected.includes(p.key) ? 'default' : 'outline'}
+                className="cursor-pointer select-none px-3 py-1"
+                onClick={() => toggle(p.key)}
+              >
+                {p.label}
+              </Badge>
+            ))}
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Button onClick={prepare} disabled={loading || selected.length === 0} variant="outline">
