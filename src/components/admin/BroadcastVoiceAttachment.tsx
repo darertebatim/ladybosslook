@@ -20,8 +20,12 @@ interface Props {
   disabled?: boolean;
 }
 
+// AAC-in-MP4 first: it plays on every iPhone. Voice-only bitrate keeps files small
+// (~0.25 MB per minute instead of several MB).
+const VOICE_BITRATE = 32000;
+
 function pickMime(): string {
-  return ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus']
+  return ['audio/mp4;codecs=mp4a.40.2', 'audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus']
     .find((mime) => MediaRecorder.isTypeSupported(mime)) || '';
 }
 
@@ -129,11 +133,13 @@ export function BroadcastVoiceAttachment({ value, onChange, onBusyChange, disabl
       if (typeof MediaRecorder === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
         throw new Error('Recording is unavailable in this browser. Please upload an audio file.');
       }
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+      });
       if (!mountedRef.current) { stream.getTracks().forEach((track) => track.stop()); return; }
       streamRef.current = stream;
       const mime = pickMime();
-      const recorder = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+      const recorder = new MediaRecorder(stream, { ...(mime ? { mimeType: mime } : {}), audioBitsPerSecond: VOICE_BITRATE });
       const chunks: Blob[] = [];
       recorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data); };
       recorder.onstop = () => {
