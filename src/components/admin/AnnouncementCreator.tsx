@@ -57,6 +57,21 @@ export function AnnouncementCreator({ draft }: { draft?: Broadcast }) {
   const [voice, setVoice] = useState<VoiceAttachment | null>(null);
   const [voiceBusy, setVoiceBusy] = useState(false);
   const [voiceRevision, setVoiceRevision] = useState(0);
+
+  // Copying a broadcast also brings its voice note along.
+  useEffect(() => {
+    if (!draft?.id) return;
+    let alive = true;
+    supabase.from('chat_messages')
+      .select('attachment_url, attachment_name, attachment_type, attachment_size')
+      .eq('broadcast_id', draft.id).not('attachment_url', 'is', null).limit(1).maybeSingle()
+      .then(({ data }) => {
+        if (!alive || !data?.attachment_url) return;
+        setVoice({ url: data.attachment_url, name: data.attachment_name || 'voice-message.mp3', type: data.attachment_type || 'audio/mpeg', size: data.attachment_size || 0 });
+        setVoiceRevision((r) => r + 1);
+      });
+    return () => { alive = false; };
+  }, [draft?.id]);
   const [programs, setPrograms] = useState<Program[]>([]);
   
   // Exclusion state
