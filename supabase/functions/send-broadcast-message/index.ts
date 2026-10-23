@@ -561,22 +561,34 @@ const handler = async (req: Request): Promise<Response> => {
         }
         if (!conversation) continue;
 
-        const { error: msgError } = await supabase
-          .from('chat_messages')
-          .insert({
+        // Voice goes in its own plain message right after the broadcast text, so every
+        // app version shows the broadcast card and a normal playable voice bubble.
+        const now = Date.now();
+        const rows: Record<string, unknown>[] = [{
+          conversation_id: conversation.id,
+          sender_id: user.id,
+          sender_type: 'admin',
+          content: chatContent,
+          is_broadcast: true,
+          broadcast_id: broadcast.id,
+          created_at: new Date(now).toISOString(),
+        }];
+        if (attachment?.url && /^https:\/\//.test(attachment.url)) {
+          rows.push({
             conversation_id: conversation.id,
             sender_id: user.id,
             sender_type: 'admin',
-            content: chatContent,
-            is_broadcast: true,
+            content: '',
+            is_broadcast: false,
             broadcast_id: broadcast.id,
-            ...(attachment?.url && /^https:\/\//.test(attachment.url) ? {
-              attachment_url: attachment.url,
-              attachment_name: attachment.name || 'voice-message',
-              attachment_type: attachment.type || 'audio/mpeg',
-              attachment_size: attachment.size || null,
-            } : {}),
+            created_at: new Date(now + 1000).toISOString(),
+            attachment_url: attachment.url,
+            attachment_name: attachment.name || 'voice-message',
+            attachment_type: attachment.type || 'audio/mpeg',
+            attachment_size: attachment.size || null,
           });
+        }
+        const { error: msgError } = await supabase.from('chat_messages').insert(rows);
 
         if (msgError) {
           console.error(`❌ Error sending message to ${userId}:`, msgError);
