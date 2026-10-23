@@ -5,6 +5,7 @@ import { Slider } from '@/components/ui/slider';
 import { Mic, Square, Upload, X, Loader2, Play, Pause, Check, RotateCcw, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useChatAttachmentUrl } from '@/hooks/useChatAttachmentUrl';
+import { encodeVoiceMp3 } from '@/lib/encodeVoiceMp3';
 
 export interface VoiceAttachment {
   url: string;
@@ -93,14 +94,23 @@ export function BroadcastVoiceAttachment({ value, onChange, onBusyChange, disabl
     try {
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (authError || !user) throw new Error('Please sign in again, then retry. Your recording is still here.');
-      const ext = file.name.split('.').pop() || 'm4a';
-      const path = `${user.id}/broadcast-${crypto.randomUUID()}.${ext}`;
-      const { error } = await supabase.storage.from('chat-attachments').upload(path, file, { contentType: file.type });
+      // Always send MP3: recordings from Chrome are Opus-in-MP4, which iPhones can't play.
+      let toSend = file;
+      if (!/^audio\/(mpeg|mp3)$/.test(file.type.split(';')[0])) {
+        try {
+          toSend = await encodeVoiceMp3(file, file.name);
+        } catch {
+          throw new Error('Could not convert this audio to MP3. Please upload an MP3 file instead.');
+        }
+      }
+      if (!mountedRef.current || version !== versionRef.current) return;
+      const path = `${user.id}/broadcast-${crypto.randomUUID()}.mp3`;
+      const { error } = await supabase.storage.from('chat-attachments').upload(path, toSend, { contentType: 'audio/mpeg' });
       if (error) throw error;
       if (!mountedRef.current || version !== versionRef.current) return;
       const { data } = supabase.storage.from('chat-attachments').getPublicUrl(path);
       // Persist the existing stable URL format; resolve signed URLs only for playback.
-      onChange({ url: data.publicUrl, name: file.name, type: file.type.split(';')[0] || 'audio/mpeg', size: file.size });
+      onChange({ url: data.publicUrl, name: toSend.name, type: 'audio/mpeg', size: toSend.size });
     } catch (error: unknown) {
       if (mountedRef.current && version === versionRef.current) {
         setUploadError(error instanceof Error ? error.message : 'Upload failed. Your audio is saved here; please retry.');
