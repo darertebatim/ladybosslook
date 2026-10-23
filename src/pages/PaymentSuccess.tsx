@@ -13,6 +13,7 @@ import riloAppIcon from '@/assets/rilo-app-icon.png';
 import { ONELINK_BASE_URL } from '@/lib/appsflyer';
 import { buildBookingUrl } from '@/lib/booking';
 import { PaymentSuccessVideo } from '@/components/PaymentSuccessVideo';
+import { trackPurchase } from '@/lib/metaPixel';
 
 /**
  * Smart link: AppsFlyer OneLink opens the Rilo app if installed,
@@ -138,6 +139,25 @@ export default function PaymentSuccess() {
         if (data?.success && data?.paymentStatus === 'paid') {
           setPaymentVerified(true);
           setOrderDetails(data.orderDetails);
+
+          // Meta Pixel Purchase — same event id as the server event so Meta dedupes
+          try {
+            const key = `meta_purchase_${sessionId}`;
+            const cents = Number(data.orderDetails?.amount ?? 0);
+            if (cents > 0 && !localStorage.getItem(key)) {
+              trackPurchase(
+                {
+                  value: cents / 100,
+                  currency: 'USD',
+                  content_name: data.orderDetails?.program_name || data.orderDetails?.product_name,
+                  content_ids: data.orderDetails?.program_slug ? [data.orderDetails.program_slug] : undefined,
+                  content_type: 'product',
+                },
+                `purchase_${sessionId}`,
+              );
+              localStorage.setItem(key, '1');
+            }
+          } catch { /* no-op */ }
           
           // Invalidate all enrollment caches so user sees their new access immediately
           invalidateAllEnrollmentData();
