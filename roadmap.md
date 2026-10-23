@@ -19,3 +19,5 @@
 - [ ] Verify saving Media Library selections in signed-in Admin — blocked by external unmanaged authenticated preview access.
 - [x] Confirm viewing tracking is not currently recorded by these players; media playback uses existing direct-URL support, while new tracking would require updated iOS player code.- [x] Duplicate Start Ads as PowerFree (/r/powerfree): landing, thank-you, gift page, confirmation + show-up emails, Lead Center tab.
 - [ ] Customize PowerFree email copy, landing text, gifts page and WhatsApp number — waiting on user.
+
+- [ ] Fix broadcast voice preview, recording cleanup, upload retry and clearer playback controls; verify recording and playback.
