@@ -56,6 +56,7 @@ export function AnnouncementCreator({ draft }: { draft?: Broadcast }) {
   const [loading, setLoading] = useState(false);
   const [voice, setVoice] = useState<VoiceAttachment | null>(null);
   const [voiceBusy, setVoiceBusy] = useState(false);
+  const [voiceRevision, setVoiceRevision] = useState(0);
   const [programs, setPrograms] = useState<Program[]>([]);
   
   // Exclusion state
@@ -229,6 +230,8 @@ export function AnnouncementCreator({ draft }: { draft?: Broadcast }) {
 
       // Reset form
       setVoice(null);
+      setVoiceBusy(false);
+      setVoiceRevision((revision) => revision + 1);
       setTitle('');
       setMessage('');
       setTargetCourse('all');
@@ -274,7 +277,7 @@ export function AnnouncementCreator({ draft }: { draft?: Broadcast }) {
           <Textarea placeholder="Your message to all users..." value={message} onChange={(e) => setMessage(e.target.value)} rows={4} />
         </div>
 
-        <BroadcastVoiceAttachment value={voice} onChange={setVoice} onBusyChange={setVoiceBusy} disabled={loading} />
+        <BroadcastVoiceAttachment key={voiceRevision} value={voice} onChange={setVoice} onBusyChange={setVoiceBusy} disabled={loading} />
 
         {/* Link Button Section */}
         <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
