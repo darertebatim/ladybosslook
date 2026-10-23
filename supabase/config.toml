@@ -282,6 +282,3 @@ verify_jwt = false
 
 [functions.meta-ad-expenses]
 verify_jwt = true
-
-[functions.repair-broadcast-voice]
-verify_jwt = false
