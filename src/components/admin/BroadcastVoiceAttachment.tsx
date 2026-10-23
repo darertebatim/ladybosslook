@@ -21,7 +21,7 @@ interface Props {
   disabled?: boolean;
 }
 
-// AAC-in-MP4 first: it plays on every iPhone. Voice-only bitrate keeps files small
+// Recordings are converted to MP3 before upload (see encodeVoiceMp3). Low bitrate keeps files small
 // (~0.25 MB per minute instead of several MB).
 const VOICE_BITRATE = 32000;
 
