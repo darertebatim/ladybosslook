@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { AudiencePresetPicker, EMPTY_AUDIENCE, type AudiencePayload } from './AudiencePresetPicker';
 import type { Broadcast } from './BroadcastHistory';
 import { hasBroadcastTarget } from '@/lib/broadcastTarget';
+import { BroadcastVoiceAttachment, type VoiceAttachment } from './BroadcastVoiceAttachment';
 
 interface Program {
   id: string;
@@ -53,6 +54,7 @@ export function AnnouncementCreator({ draft }: { draft?: Broadcast }) {
   const [customLinkUrl, setCustomLinkUrl] = useState(draft?.link_url ?? '');
   const [linkText, setLinkText] = useState(draft?.link_text ?? '');
   const [loading, setLoading] = useState(false);
+  const [voice, setVoice] = useState<VoiceAttachment | null>(null);
   const [programs, setPrograms] = useState<Program[]>([]);
   
   // Exclusion state
@@ -199,6 +201,7 @@ export function AnnouncementCreator({ draft }: { draft?: Broadcast }) {
           sendPush,
           sendEmail,
           linkUrl: linkUrl.trim() || undefined,
+          attachment: voice ?? undefined,
           linkText: linkText.trim() || undefined,
           excludeUserIds: excludedUsers.length > 0 ? excludedUsers.map(u => u.id) : undefined,
           excludeProgramSlugs: excludedPrograms.length > 0 ? excludedPrograms : undefined,
@@ -264,6 +267,8 @@ export function AnnouncementCreator({ draft }: { draft?: Broadcast }) {
           <Label>Message</Label>
           <Textarea placeholder="Your message to all users..." value={message} onChange={(e) => setMessage(e.target.value)} rows={4} />
         </div>
+
+        <BroadcastVoiceAttachment value={voice} onChange={setVoice} />
 
         {/* Link Button Section */}
         <div className="border rounded-lg p-4 space-y-3 bg-muted/30">

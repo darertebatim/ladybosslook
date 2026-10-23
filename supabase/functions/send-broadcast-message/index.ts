@@ -20,6 +20,7 @@ interface BroadcastRequest {
   sendPush: boolean;
   sendEmail: boolean;
   linkUrl?: string;
+  attachment?: { url: string; name: string; type: string; size: number } | null;
   linkText?: string;
   excludeUserIds?: string[];
   excludeProgramSlugs?: string[];
