@@ -372,7 +372,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { title, content, targetType, targetCourse, targetRoundId, sendPush, sendEmail, linkUrl, linkText, excludeUserIds, excludeProgramSlugs, audience, audiencePresetId }: BroadcastRequest = await req.json();
+    const { title, content, targetType, targetCourse, targetRoundId, sendPush, sendEmail, linkUrl, linkText, attachment, excludeUserIds, excludeProgramSlugs, audience, audiencePresetId }: BroadcastRequest = await req.json();
 
     console.log('📢 Broadcast request:', { title, targetType, targetCourse, targetRoundId, sendPush, sendEmail, linkUrl, excludeUserIds: excludeUserIds?.length, excludeProgramSlugs, audiencePresetId });
 
@@ -570,6 +570,12 @@ const handler = async (req: Request): Promise<Response> => {
             content: chatContent,
             is_broadcast: true,
             broadcast_id: broadcast.id,
+            ...(attachment?.url && /^https:\/\//.test(attachment.url) ? {
+              attachment_url: attachment.url,
+              attachment_name: attachment.name || 'voice-message',
+              attachment_type: attachment.type || 'audio/mpeg',
+              attachment_size: attachment.size || null,
+            } : {}),
           });
 
         if (msgError) {
