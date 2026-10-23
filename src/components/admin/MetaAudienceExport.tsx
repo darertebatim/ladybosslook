@@ -92,6 +92,45 @@ export function MetaAudienceExport() {
         if (!data || data.length < 1000) break;
         from += 1000;
       }
+      // Include merged-account emails: when a collected email is an alias (or the
+      // primary of one), also add the counterpart address so the person matches
+      // under either email in Meta.
+      try {
+        const { data: aliases } = await supabase
+          .from('account_email_aliases')
+          .select('email, primary_user_id');
+        if (aliases && aliases.length) {
+          const ids = [...new Set(aliases.map((a: any) => a.primary_user_id).filter(Boolean))] as string[];
+          const profMap = new Map<string, { email: string | null; full_name: string | null; city: string | null }>();
+          for (let i = 0; i < ids.length; i += 200) {
+            const { data: profs, error } = await supabase
+              .from('profiles')
+              .select('id, email, full_name, city')
+              .in('id', ids.slice(i, i + 200));
+            if (error) throw error;
+            (profs || []).forEach((p: any) => profMap.set(p.id, p));
+          }
+          const collected = new Set(
+            all.map((p) => (p.email || '').trim().toLowerCase()).filter(Boolean),
+          );
+          for (const a of aliases) {
+            const aliasEmail = (a.email || '').trim().toLowerCase();
+            const prof = profMap.get(a.primary_user_id);
+            const primaryEmail = (prof?.email || '').trim().toLowerCase();
+            if (!aliasEmail || !primaryEmail || aliasEmail === primaryEmail) continue;
+            if (collected.has(aliasEmail) && !collected.has(primaryEmail)) {
+              all.push({ email: primaryEmail, name: prof?.full_name || null, city: prof?.city || null });
+              collected.add(primaryEmail);
+            }
+            if (collected.has(primaryEmail) && !collected.has(aliasEmail)) {
+              all.push({ email: aliasEmail, name: prof?.full_name || null, city: prof?.city || null });
+              collected.add(aliasEmail);
+            }
+          }
+        }
+      } catch (aliasErr) {
+        console.warn('Alias expansion skipped:', aliasErr);
+      }
       const rows = buildMetaAudienceRows(all);
       const header = 'email,fn,ln,ct\n';
       const body = rows.map((r) => [r.email, r.fn, r.ln, r.ct].map((v) => csvCell(v)).join(',')).join('\n');
