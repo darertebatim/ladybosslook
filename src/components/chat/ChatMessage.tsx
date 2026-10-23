@@ -381,8 +381,8 @@ export function ChatMessage({
           </div>
         )}
 
-        {/* Text Content - hide for voice messages */}
-        {displayText && !isAudio && (
+        {/* Text Content - hide placeholder text on personal voice notes, keep broadcast captions */}
+        {displayText && (!isAudio || isBroadcast) && (
           <div className="px-3.5 py-2">
             <RichText
               content={displayText}
