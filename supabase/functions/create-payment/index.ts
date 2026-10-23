@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { sendMetaEvent } from '../_shared/meta-capi.ts';
 const __safeOrigin = (o: string | null) => { const d = 'https://ladybosslook.com'; if (!o) return d; try { const u = new URL(o); const h = u.hostname; if ((u.protocol === 'https:' && (h === 'ladybosslook.com' || h === 'www.ladybosslook.com' || h.endsWith('.lovable.app'))) || (u.protocol === 'http:' && h === 'localhost')) return u.origin; } catch { /* ignore */ } return d; };
 
 
@@ -500,6 +501,30 @@ serve(async (req) => {
     }
 
     logStep("Stripe checkout session created", { sessionId: session.id, mode: session.mode });
+
+    // Meta: server-side InitiateCheckout (covers every checkout button) + store
+    // browser context on the session so the webhook's Purchase event matches.
+    try {
+      const ua = (req.headers.get('user-agent') || '').slice(0, 450);
+      const ip = (req.headers.get('x-forwarded-for') || '').split(',')[0].trim();
+      const pageUrl = (req.headers.get('referer') || __safeOrigin(req.headers.get('origin'))).slice(0, 450);
+      await stripe.checkout.sessions.update(session.id, {
+        metadata: { ...(session.metadata || {}), meta_ua: ua, meta_ip: ip, meta_url: pageUrl },
+      }).catch(() => null);
+      await sendMetaEvent({
+        eventName: 'InitiateCheckout',
+        eventId: `ic_${session.id}`,
+        sourceUrl: pageUrl,
+        userAgent: ua,
+        ip,
+        email: (email as string) || null,
+        externalId: authUserId || null,
+        value: (session.amount_total ?? 0) / 100,
+        currency: session.currency || 'usd',
+        contentName: productName,
+        contentId: program,
+      });
+    } catch (_) { /* never block checkout */ }
 
     // Return session URL directly
     return new Response(JSON.stringify({ 

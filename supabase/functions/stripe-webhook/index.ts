@@ -4,6 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { sendPurchaseWelcomeMessage } from "../_shared/send-purchase-welcome.ts";
 import { sendEnrollmentEmail } from "../_shared/send-enrollment-email.ts";
 import { resolveAutoEnrollRoundId } from "../_shared/auto-enroll-round.ts";
+import { sendMetaEvent } from "../_shared/meta-capi.ts";
 const __maskEmail = (e: unknown) => { const s = String(e ?? ''); const [u, d] = s.split('@'); return d ? `${u.slice(0, 2)}***@${d}` : (s ? '***' : ''); };
 
 
@@ -429,6 +430,25 @@ serve(async (req) => {
       }
 
       console.log('[WEBHOOK] Order created successfully for session:', session.id, 'user_id:', userId);
+
+      // Meta CAPI Purchase (deduped with browser pixel via event_id)
+      if (amount > 0) {
+        await sendMetaEvent({
+          eventName: 'Purchase',
+          eventId: `purchase_${session.id}`,
+          eventTime: session.created || undefined,
+          sourceUrl: session.metadata?.meta_url || null,
+          userAgent: session.metadata?.meta_ua || null,
+          ip: session.metadata?.meta_ip || null,
+          email: customerEmail || null,
+          phone: customerPhone,
+          externalId: userId,
+          value: amount / 100,
+          currency: session.currency || 'usd',
+          contentName: productName,
+          contentId: programSlug,
+        });
+      }
 
       // Apply auto-enrollment if we have a user and program
       if (userId && programSlug) {
