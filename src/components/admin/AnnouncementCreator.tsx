@@ -55,6 +55,8 @@ export function AnnouncementCreator({ draft }: { draft?: Broadcast }) {
   const [linkText, setLinkText] = useState(draft?.link_text ?? '');
   const [loading, setLoading] = useState(false);
   const [voice, setVoice] = useState<VoiceAttachment | null>(null);
+  const [voiceBusy, setVoiceBusy] = useState(false);
+  const [voiceRevision, setVoiceRevision] = useState(0);
   const [programs, setPrograms] = useState<Program[]>([]);
   
   // Exclusion state
@@ -167,6 +169,10 @@ export function AnnouncementCreator({ draft }: { draft?: Broadcast }) {
   };
 
   const handleSubmit = async () => {
+    if (voiceBusy) {
+      toast({ title: "Finish attaching your voice message first", variant: "destructive" });
+      return;
+    }
     if (!hasBroadcastTarget(targetCourse, audiencePresetId)) {
       toast({ title: "Choose a target audience", variant: "destructive" });
       return;
@@ -223,6 +229,9 @@ export function AnnouncementCreator({ draft }: { draft?: Broadcast }) {
       queryClient.invalidateQueries({ queryKey: ['broadcast-history'] });
 
       // Reset form
+      setVoice(null);
+      setVoiceBusy(false);
+      setVoiceRevision((revision) => revision + 1);
       setTitle('');
       setMessage('');
       setTargetCourse('all');
@@ -268,7 +277,7 @@ export function AnnouncementCreator({ draft }: { draft?: Broadcast }) {
           <Textarea placeholder="Your message to all users..." value={message} onChange={(e) => setMessage(e.target.value)} rows={4} />
         </div>
 
-        <BroadcastVoiceAttachment value={voice} onChange={setVoice} />
+        <BroadcastVoiceAttachment key={voiceRevision} value={voice} onChange={setVoice} onBusyChange={setVoiceBusy} disabled={loading} />
 
         {/* Link Button Section */}
         <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
@@ -578,7 +587,7 @@ export function AnnouncementCreator({ draft }: { draft?: Broadcast }) {
             <Eye className="mr-2 h-4 w-4" />
             {previewing ? 'Counting…' : 'Preview recipients'}
           </Button>
-          <Button onClick={handleSubmit} disabled={loading || !hasBroadcastTarget(targetCourse, audiencePresetId)} className="flex-1">
+          <Button onClick={handleSubmit} disabled={loading || voiceBusy || !hasBroadcastTarget(targetCourse, audiencePresetId)} className="flex-1">
             <Megaphone className="mr-2 h-4 w-4" />
             {loading ? 'Sending...' : 'Send Broadcast'}
           </Button>
