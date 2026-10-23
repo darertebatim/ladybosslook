@@ -12,3 +12,4 @@
 - Dedicated-round webinars (Start Ads, PowerFree) share one landing/thank-you/gift page set configured in src/lib/dedicatedWebinars.ts and one email engine keyed by program slug in send-webinar-day-emails; add new campaigns there rather than copying pages.
 
 - Broadcast audio previews use local object URLs while uploading and signed URLs for stored private attachments; persist stable attachment identifiers and block sending until the recording is uploaded so previews do not rely on public bucket access.
+- Broadcast voice notes are re-encoded to MP3 in the browser before upload (`encodeVoiceMp3`), because Chrome's "audio/mp4" recordings contain Opus, which iPhones cannot play.
