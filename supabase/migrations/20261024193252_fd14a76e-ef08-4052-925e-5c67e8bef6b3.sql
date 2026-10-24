@@ -1,0 +1,2 @@
+GRANT UPDATE ON public.cart_items TO authenticated;
+CREATE POLICY "Users can update their own cart items" ON public.cart_items FOR UPDATE TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
