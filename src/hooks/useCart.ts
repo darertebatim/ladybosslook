@@ -85,7 +85,7 @@ export const useCart = () => {
       if (!user) {
         // Guest: keep them in the flow — the cart page shows the item plus an
         // inline sign-in step, and the item is added automatically afterwards.
-        localStorage.setItem(PENDING_CART_KEY, JSON.stringify(program));
+        try { localStorage.setItem(PENDING_CART_KEY, JSON.stringify(program)); } catch { /* storage blocked */ }
         navigate('/cart');
         throw new Error('Sign in required');
       }
@@ -98,7 +98,12 @@ export const useCart = () => {
         deposit_price: program.deposit_price ?? null,
         payment_option: program.payment_option ?? null,
       }, { onConflict: 'user_id,program_slug' });
-      if (error) throw error;
+      if (error) {
+        // If it's already in the cart, treat as success and continue to cart.
+        const { data: existing } = await supabase.from('cart_items')
+          .select('id').eq('user_id', user.id).eq('program_slug', program.slug).maybeSingle();
+        if (!existing) throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart-items'] });
