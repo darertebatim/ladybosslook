@@ -508,7 +508,6 @@ const App = () => (
                   <Route path="/unsubscribe" element={<Unsubscribe />} />
                   <Route path="/d/:token" element={<PublicDedication />} />
                   <Route path="/g/:token" element={<PublicPlaylistGift />} />
-                  <Route path="/header-preview" element={<HeaderPreviewTmp />} />
 
                   {/* RiloBiz (internal: Aperture) — standalone product surface, isolated tokens */}
                   <Route path="/aperture/*" element={<ApertureRouter />} />
