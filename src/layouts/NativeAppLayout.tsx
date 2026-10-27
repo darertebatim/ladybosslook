@@ -204,6 +204,8 @@ const NativeAppLayout = () => {
 
 
   const hasFloatingNav = !isDesktopShell && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen;
+  // These pages already reserve space at the end of their own scroll content.
+  const hasPageNavClearance = ['/app/path', '/app/home', '/app/projects'].includes(location.pathname);
 
   // AI Planner FAB vertical offset: sits above nav; rises when mini players appear
   const showAudioMini = !!currentTrack && !isOnPlayerPage && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen;
@@ -225,7 +227,7 @@ const NativeAppLayout = () => {
         data-scroll-container="true"
         className={cn(
           "flex-1 min-h-0 overflow-x-hidden overscroll-contain",
-          hasFloatingNav && !isOnPlayerPage && "app-main-floating-nav",
+          hasFloatingNav && !isOnPlayerPage && !hasPageNavClearance && "app-main-floating-nav",
           isDesktopShell && !isOnChatPage && !isFullScreenTool && "pl-[224px]",
           (isOnPlayerPage || isOwnScrollPage) ? "overflow-hidden" : "overflow-y-auto"
         )}
