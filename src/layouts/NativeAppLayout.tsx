@@ -198,7 +198,7 @@ const NativeAppLayout = () => {
     { path: '/app/player', icon: Headphones, label: t('nav.player'), tourClass: 'tour-nav-listen' },
     { path: '/app/tools', icon: Compass, label: t('nav.tools'), tourClass: 'tour-nav-explore' },
     { path: '/app/myprograms', icon: GraduationCap, label: t('nav.myPrograms'), tourClass: 'tour-nav-programs' },
-    { path: '/app/chat', icon: MessageCircle, label: t('nav.support'), tourClass: 'tour-nav-support' },
+    { path: '/app/chat', icon: Headset, label: t('nav.support'), tourClass: 'tour-nav-support' },
   ];
 
 
