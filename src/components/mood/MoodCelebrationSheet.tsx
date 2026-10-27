@@ -131,7 +131,7 @@ export function MoodCelebrationSheet({
         onInteractOutside={(e) => { e.preventDefault(); handleDone(); }}
         onEscapeKeyDown={(e) => { e.preventDefault(); handleDone(); }}
         className={cn(
-          "rounded-t-3xl border-0 px-5 pt-8 pb-6",
+          "app-theme rounded-t-3xl border-0 px-5 pt-8 pb-6",
           moodData.bgColor
         )}
         style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}
@@ -161,13 +161,13 @@ export function MoodCelebrationSheet({
           </h2>
         </div>
 
-        {/* 2×2 Cards with illustrations */}
-        {/* Maybe later + Share — moved above cards */}
-        <div className="flex gap-2 mb-4">
+        {/* Quick actions below the main button */}
+        {/* Share (secondary) + Back to Home (main) */}
+        <div className="flex items-center gap-2 mb-4">
           <Button
             variant="ghost"
             onClick={() => { haptic.light(); handleShare(); }}
-            className="h-11 px-4 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm"
+            className="h-12 w-12 flex-shrink-0 rounded-full bg-white text-black active:bg-white/90 text-sm font-semibold shadow-sm"
             aria-label={t('moodPage.celebration.shareAria')}
           >
             <Share2 className="w-4 h-4" />
@@ -175,14 +175,15 @@ export function MoodCelebrationSheet({
           <Button
             variant="ghost"
             onClick={handleDone}
-            className="flex-1 h-11 rounded-full bg-white text-black hover:bg-white/90 text-sm font-semibold shadow-sm flex items-center justify-center gap-2"
+            className="flex-1 h-12 rounded-full bg-gradient-orange text-white shadow-ios active:scale-[0.98] transition-transform text-base font-bold flex items-center justify-center gap-2"
           >
             <FluentEmoji emoji={hasActivePlayer ? '▶️' : '🏠'} size={18} />
             <span>{hasActivePlayer ? t('moodPage.celebration.continueRoutine') : t('moodPage.celebration.backToHomePlanner')}</span>
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        {/* 4 cards in one row */}
+        <div className="grid grid-cols-4 gap-2">
           {ACTIONS.map((action) => {
             const label = t(action.labelKey);
             return (
@@ -190,7 +191,7 @@ export function MoodCelebrationSheet({
               key={action.labelKey}
               onClick={() => handleAction(action)}
               className={cn(
-                "flex flex-col items-center rounded-2xl p-3 pt-4",
+                "flex flex-col items-center rounded-2xl px-1 pt-3 pb-2.5",
                 "bg-background/90 backdrop-blur-sm",
                 "active:scale-[0.96] transition-all",
               )}
@@ -198,9 +199,9 @@ export function MoodCelebrationSheet({
               <img 
                 src={action.image} 
                 alt={label}
-                className="w-24 h-24 object-contain mb-2"
+                className="w-14 h-14 object-contain mb-1.5"
               />
-              <span className="text-sm font-semibold text-foreground text-center leading-tight">
+              <span className="text-[11px] font-semibold text-foreground text-center leading-tight">
                 {label}
               </span>
             </button>
