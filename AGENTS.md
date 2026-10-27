@@ -14,3 +14,4 @@
 - Broadcast audio previews use local object URLs while uploading and signed URLs for stored private attachments; persist stable attachment identifiers and block sending until the recording is uploaded so previews do not rely on public bucket access.
 - Broadcast voice notes are re-encoded to MP3 in the browser before upload (`encodeVoiceMp3`), because Chrome's "audio/mp4" recordings contain Opus, which iPhones cannot play.
 - Main app pages reuse `PageHeader` with its `menu` / `stats` flags (burger + support headset left, centered title, trophy-streak pill right) via the shared `SupportNavButton` and `PresenceStatsPill`, instead of hand-rolling header bars; those widgets self-fetch, so pages stay thin.
+- Floating bottom navigation clearance belongs inside page scroll content via `app-main-floating-nav`, not on the outer layout, so page backgrounds extend behind the tabs.

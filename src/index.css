@@ -67,6 +67,17 @@ html.native-app [data-scroll-container="true"] {
   animation: slide-up-page-enter 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Keep page backgrounds behind the floating tabs. Clearance belongs inside
+   the page's scrolling content, never on the outer layout. */
+.app-main-floating-nav > :not(.overflow-hidden) {
+  min-height: 100%;
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+}
+
+.app-main-floating-nav > .overflow-hidden > .overflow-y-auto {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+}
+
 .slide-up-page--closing {
   animation: slide-up-page-exit 320ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
