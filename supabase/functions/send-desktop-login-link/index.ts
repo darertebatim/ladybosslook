@@ -91,7 +91,7 @@ serve(async (req) => {
     const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: { headers: { Authorization: `Bearer ${token}` } },
     });
-    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    const { data: userData, error: userErr } = await userClient.auth.getUser(token);
     const user = userData?.user;
     if (userErr || !user?.email) {
       return new Response(JSON.stringify({ error: "Not authenticated" }), {
@@ -106,6 +106,8 @@ serve(async (req) => {
     const programName =
       typeof body.programName === "string" ? body.programName.slice(0, 120) : "";
     const lang: "fa" | "en" = body.lang === "fa" ? "fa" : "en";
+    const extraRaw = typeof body.extraEmail === "string" ? body.extraEmail.trim().toLowerCase() : "";
+    const extraEmail = extraRaw && extraRaw.length <= 255 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(extraRaw) ? extraRaw : "";
 
     const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
       auth: { persistSession: false },
@@ -137,7 +139,7 @@ serve(async (req) => {
     const { data: aliasRows } = await admin
       .from("account_email_aliases").select("email").eq("primary_user_id", user.id);
     const recipients = [...new Set(
-      [user.email, ...(aliasRows || []).map((a: any) => a.email)]
+      [user.email, extraEmail, ...(aliasRows || []).map((a: any) => a.email)]
         .map((e) => String(e || "").trim().toLowerCase()).filter(Boolean),
     )];
 
