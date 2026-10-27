@@ -210,6 +210,7 @@ const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
 const PublicDedication = lazy(() => import("@/pages/PublicDedication"));
 const Unsubscribe = lazy(() => import("@/pages/Unsubscribe"));
 const PublicPlaylistGift = lazy(() => import("@/pages/PublicPlaylistGift"));
+const HeaderPreviewTmp = lazy(() => import("@/pages/HeaderPreviewTmp"));
 const BusinessIdeas = lazy(() => import("@/pages/BusinessIdeas"));
 const RathusAssessment = lazy(() => import("@/pages/RathusAssessment"));
 const BusinessGrowthAccelerator = lazy(() => import("@/pages/BusinessGrowthAccelerator"));
@@ -508,6 +509,7 @@ const App = () => (
                   <Route path="/unsubscribe" element={<Unsubscribe />} />
                   <Route path="/d/:token" element={<PublicDedication />} />
                   <Route path="/g/:token" element={<PublicPlaylistGift />} />
+                  <Route path="/header-preview" element={<HeaderPreviewTmp />} />
 
                   {/* RiloBiz (internal: Aperture) — standalone product surface, isolated tokens */}
                   <Route path="/aperture/*" element={<ApertureRouter />} />
