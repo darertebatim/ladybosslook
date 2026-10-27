@@ -2,7 +2,7 @@ import { PageHeader } from "@/components/app/ui/PageHeader";
 
 export default function HeaderPreviewTmp() {
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="app-theme min-h-screen bg-background">
       <PageHeader
         title="My Programs"
         menu
