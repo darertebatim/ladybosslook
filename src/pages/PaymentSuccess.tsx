@@ -423,11 +423,11 @@ export default function PaymentSuccess() {
             <h1 className="mt-2 text-[28px] leading-[1.15] font-bold text-[#1a1f3d]">
               {isPlus ? "Welcome to Rilo Plus" : `Welcome to ${productName}`}
             </h1>
-            <p className="mt-3 text-[15px] text-[#1a1f3d]/70 max-w-md mx-auto">
-              {isPlus
-                ? 'Every tool, sound, and guided session — unlocked. Open the Rilo app to start.'
-                : 'Open Rilo, go to My Program, and start it.'}
-            </p>
+            {isPlus && (
+              <p className="mt-3 text-[15px] text-[#1a1f3d]/70 max-w-md mx-auto">
+                Every tool, sound, and guided session — unlocked. Open the Rilo app to start.
+              </p>
+            )}
           </div>
 
           <StepCountBadge count={stepCount} />
