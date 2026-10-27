@@ -124,6 +124,8 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
     booking_note: '',
     show_booking_on_success: true,
     success_video_url: '',
+    whatsapp_support_number: '',
+    show_whatsapp_on_success: false,
     auto_create_feed_channel: true,
     restricted_regions: [] as string[],
   });
@@ -247,6 +249,8 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       booking_note: '',
       show_booking_on_success: true,
       success_video_url: '',
+      whatsapp_support_number: '',
+      show_whatsapp_on_success: false,
       auto_create_feed_channel: true,
       restricted_regions: [],
     });
@@ -281,6 +285,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
         booking_url: bookingUrl || null,
         booking_note: (formData.booking_note || '').trim() || null,
         success_video_url: successVideoUrl || null,
+        whatsapp_support_number: (formData.whatsapp_support_number || '').trim() || null,
         price_presets: normalizePresets(formData.price_presets),
       };
       const links = [...contentLinks];
@@ -403,6 +408,8 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       booking_note: (program as any).booking_note || '',
       show_booking_on_success: program.show_booking_on_success ?? true,
       success_video_url: program.success_video_url || '',
+      whatsapp_support_number: (program as any).whatsapp_support_number || '',
+      show_whatsapp_on_success: (program as any).show_whatsapp_on_success ?? false,
       auto_create_feed_channel:
         (program as any).auto_create_feed_channel ?? true,
       restricted_regions: Array.isArray((program as any).restricted_regions)
@@ -1388,6 +1395,24 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                   />
                   <p className="text-xs text-muted-foreground">Separate from the promotional video. Leave blank to show no video after payment.</p>
                 </div>
+                <div className="space-y-1">
+                  <Label htmlFor="whatsapp_support_number">WhatsApp support number</Label>
+                  <Input
+                    id="whatsapp_support_number"
+                    value={formData.whatsapp_support_number}
+                    onChange={(e) => setFormData({ ...formData, whatsapp_support_number: e.target.value })}
+                    placeholder="+1 949 572 3730"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="show_whatsapp_on_success"
+                    checked={formData.show_whatsapp_on_success}
+                    onCheckedChange={(checked) => setFormData({ ...formData, show_whatsapp_on_success: checked === true })}
+                  />
+                  <Label htmlFor="show_whatsapp_on_success" className="text-sm font-normal cursor-pointer">Show WhatsApp button on payment success page</Label>
+                </div>
+                <p className="text-xs text-muted-foreground">Buyers send a ready message with the email and phone they used at checkout.</p>
               </div>
               <div className="space-y-4 border-t pt-4">
                 <Label className="text-base font-semibold">Platform Availability</Label>
