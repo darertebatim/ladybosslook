@@ -30,6 +30,7 @@ export function DesktopAccessSheet({
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [extraEmail, setExtraEmail] = useState('');
   const [aliasEmails, setAliasEmails] = useState<string[]>([]);
 
   useEffect(() => {
@@ -44,9 +45,10 @@ export function DesktopAccessSheet({
   const allEmails = Array.from(
     new Set([user?.email, ...aliasEmails].filter(Boolean).map((e) => String(e).toLowerCase())),
   );
+  const hasRelay = allEmails.some((e) => e.endsWith('privaterelay.appleid.com'));
   const emailList = (
     <div className="mt-2 flex flex-wrap justify-center gap-1.5">
-      {allEmails.map((e) => (
+      {[...allEmails, ...(sent && extraEmail.trim() ? [extraEmail.trim().toLowerCase()] : [])].filter((e, i, a) => a.indexOf(e) === i).map((e) => (
         <span key={e} className="rounded-full bg-card-warm px-2.5 py-1 text-xs text-fg-warm shadow-ios break-all">
           {e}
         </span>
@@ -65,7 +67,7 @@ export function DesktopAccessSheet({
     setSending(true);
     try {
       const { data, error } = await supabase.functions.invoke('send-desktop-login-link', {
-        body: { redirectPath, programName, lang },
+        body: { redirectPath, programName, lang, extraEmail: extraEmail.trim() || undefined },
       });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
@@ -144,6 +146,21 @@ export function DesktopAccessSheet({
                 {emailList}
               </div>
             )}
+            <div className="pt-1">
+              <p className="mb-1.5 text-center text-xs text-fg-warm-muted">
+                {hasRelay ? "Your account uses Apple's hidden email. Add the email you check on your computer:" : 'Want it at another email too? (optional)'}
+              </p>
+              <input
+                type="email"
+                inputMode="email"
+                autoCapitalize="none"
+                autoCorrect="off"
+                value={extraEmail}
+                onChange={(e) => setExtraEmail(e.target.value)}
+                placeholder="you@gmail.com"
+                className="h-12 w-full rounded-2xl border-0 bg-card-warm px-4 text-base text-fg-warm shadow-ios outline-none"
+              />
+            </div>
           </div>
         )}
 
