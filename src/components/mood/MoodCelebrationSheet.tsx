@@ -163,21 +163,21 @@ export function MoodCelebrationSheet({
 
         {/* Quick actions below the main button */}
         {/* Share (secondary) + Back to Home (main) */}
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2.5 mb-4">
           <Button
             variant="ghost"
             onClick={() => { haptic.light(); handleShare(); }}
-            className="h-12 w-12 flex-shrink-0 rounded-full bg-white text-black active:bg-white/90 text-sm font-semibold shadow-sm"
+            className="h-14 w-14 flex-shrink-0 rounded-full bg-white text-black active:bg-white/90 text-sm font-semibold shadow-ios"
             aria-label={t('moodPage.celebration.shareAria')}
           >
-            <Share2 className="w-4 h-4" />
+            <Share2 className="w-5 h-5" />
           </Button>
           <Button
             variant="ghost"
             onClick={handleDone}
-            className="flex-1 h-12 rounded-full bg-gradient-orange text-white shadow-ios active:scale-[0.98] transition-transform text-base font-bold flex items-center justify-center gap-2"
+            className="flex-1 h-16 rounded-full bg-gradient-orange text-white shadow-ios active:scale-[0.98] transition-transform text-lg font-bold flex items-center justify-center gap-2.5"
           >
-            <FluentEmoji emoji={hasActivePlayer ? '▶️' : '🏠'} size={18} />
+            <FluentEmoji emoji={hasActivePlayer ? '▶️' : '🏠'} size={22} />
             <span>{hasActivePlayer ? t('moodPage.celebration.continueRoutine') : t('moodPage.celebration.backToHomePlanner')}</span>
           </Button>
         </div>
