@@ -44,6 +44,7 @@ const appPresenceImport = import("@/pages/app/AppPresence");
 
 const AppHome = lazy(() => appHomeImport);
 const AppStore = lazy(() => appStoreImport);
+const TmpToolsCheck = lazy(() => import("@/pages/TmpToolsCheck")); /* TMP-CHECK */
 const AppInspire = lazy(() => appInspireImport);
 const AppPlayer = lazy(() => appPlayerImport);
 const AppChannelsList = lazy(() => appChannelsListImport);
@@ -496,6 +497,10 @@ const App = () => (
               <Suspense fallback={<PageLoader />}>
                 <Routes>
                   <Route path="/" element={<Index />} />
+                  {/* TMP-CHECK */}
+                  <Route path="/tmp-nav-check" element={<AppLayout />}>
+                    <Route index element={<TmpToolsCheck />} />
+                  </Route>
                   <Route path="/programs" element={<Programs />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/appmarketing" element={<Rilo />} />
