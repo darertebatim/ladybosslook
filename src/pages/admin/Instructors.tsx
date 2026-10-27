@@ -31,8 +31,19 @@ interface Instructor {
   default_channel_ids: string[];
   plus_trial_days: number;
   is_active: boolean;
+  doors: string[] | null;
   created_at: string;
 }
+
+const DOOR_OPTIONS = [
+  { key: 'business', label: 'Business' },
+  { key: 'financial', label: 'Finance' },
+  { key: 'emotion', label: 'Emotions' },
+  { key: 'immigrant', label: 'Immigrant life' },
+  { key: 'selfcare', label: 'Self-care' },
+  { key: 'productivity', label: 'Productivity' },
+  { key: 'exploring', label: 'Exploring' },
+];
 
 const emptyForm = {
   slug: '',
@@ -45,6 +56,7 @@ const emptyForm = {
   default_channel_ids: [] as string[],
   plus_trial_days: 7,
   is_active: true,
+  doors: [] as string[],
 };
 
 export default function Instructors() {
@@ -106,6 +118,7 @@ export default function Instructors() {
       default_channel_ids: ins.default_channel_ids || [],
       plus_trial_days: ins.plus_trial_days,
       is_active: ins.is_active,
+      doors: ins.doors || [],
     });
     setOpen(true);
   };
@@ -127,6 +140,7 @@ export default function Instructors() {
       default_channel_ids: form.default_channel_ids,
       plus_trial_days: Number(form.plus_trial_days) || 0,
       is_active: form.is_active,
+      doors: form.doors,
     };
 
     const { data: savedRow, error } = editing
@@ -408,6 +422,29 @@ export default function Instructors() {
                   onChange={(e) => setForm({ ...form, plus_trial_days: Number(e.target.value) })}
                   className="mt-1"
                 />
+              </div>
+            </section>
+
+            <Separator />
+
+            <section className="space-y-2">
+              <Label>Path doors</Label>
+              <p className="text-xs text-muted-foreground">Students in this host's programs get a Path flavored by these doors and this host's playlists.</p>
+              <div className="flex flex-wrap gap-2">
+                {DOOR_OPTIONS.map((d) => {
+                  const on = form.doors.includes(d.key);
+                  return (
+                    <Button
+                      key={d.key}
+                      type="button"
+                      size="sm"
+                      variant={on ? 'default' : 'outline'}
+                      onClick={() => setForm({ ...form, doors: on ? form.doors.filter((x) => x !== d.key) : [...form.doors, d.key] })}
+                    >
+                      {d.label}
+                    </Button>
+                  );
+                })}
               </div>
             </section>
 
