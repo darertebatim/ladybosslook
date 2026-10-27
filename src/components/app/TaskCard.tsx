@@ -209,7 +209,7 @@ export const TaskCard = memo(function TaskCard({
     // Water tasks: navigate to the dedicated water tracking page
     if (isWater) {
       haptic.light();
-      navigate('/app/water', { state: { from: window.location.pathname.startsWith('/app/home') ? 'planner' : window.location.pathname } });
+      navigate('/app/water', { state: { from: window.location.pathname } });
       return;
     }
     
