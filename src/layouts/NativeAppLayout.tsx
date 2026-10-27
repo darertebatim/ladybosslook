@@ -230,7 +230,7 @@ const NativeAppLayout = () => {
         style={{
           paddingBottom: isDesktopShell
             ? 0
-            : (isOnChatPage || isFullScreenTool || isKeyboardOpen || isOnPlayerPage) ? 0 : TAB_BAR_CONTENT_HEIGHT + 8,
+            : (isOnChatPage || isFullScreenTool || isKeyboardOpen || isOnPlayerPage || location.pathname === '/app/path') ? 0 : TAB_BAR_CONTENT_HEIGHT + 8,
           WebkitOverflowScrolling: (isOnPlayerPage || isOwnScrollPage) ? 'auto' : 'touch',
           touchAction: 'pan-y',
         }}
