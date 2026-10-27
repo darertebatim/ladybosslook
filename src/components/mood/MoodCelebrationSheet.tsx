@@ -161,7 +161,7 @@ export function MoodCelebrationSheet({
           </h2>
         </div>
 
-        {/* 2×2 Cards with illustrations */}
+        {/* Quick actions below the main button */}
         {/* Share (secondary) + Back to Home (main) */}
         <div className="flex items-center gap-2 mb-4">
           <Button
