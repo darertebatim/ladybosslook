@@ -195,7 +195,6 @@ const AppCourses = () => {
 
       <PageHeader title={t("programs.myPrograms")} menu stats />
 
-
       {/* Scroll container */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <div className="container max-w-4xl py-4 px-4 space-y-6 pb-safe">
