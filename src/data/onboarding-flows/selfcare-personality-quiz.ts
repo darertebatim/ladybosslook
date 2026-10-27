@@ -278,13 +278,13 @@ export const selfcarePersonalityQuizFlow: OnboardingFlow = {
       id: 'scp-focus',
       type: 'scp-focus',
       title: 'Where to focus',
-      buttonLabel: 'See Suggested Goals →',
+      buttonLabel: 'See my picks →',
     },
     {
       id: 'scp-tasks',
       type: 'scp-tasks',
-      title: 'Suggested Goals for You',
-      buttonLabel: 'Add to My Rilo Self Care',
+      title: 'Picked for you',
+      buttonLabel: 'Continue',
     },
     {
       id: 'scp-push-permission',

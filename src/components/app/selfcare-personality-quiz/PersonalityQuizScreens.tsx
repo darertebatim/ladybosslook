@@ -15,7 +15,7 @@ import {
   type FinalResult,
   type Cluster,
 } from '@/utils/selfcare-personality-scoring';
-import { SelfCareSuggestionsStep } from '@/components/app/selfcare-quiz/SelfCareSuggestionsStep';
+import { ScpPicksScreen } from './ScpPicksScreen';
 import { SelfCareRiloCelebrationStep } from '@/components/app/selfcare-quiz/SelfCareRiloCelebrationStep';
 import { SelfCarePushPermissionStep } from '@/components/app/selfcare-quiz/SelfCarePushPermissionStep';
 import { AmbientGlow } from '@/components/app/selfcare-quiz/visuals/AmbientGlow';
@@ -823,14 +823,7 @@ export function SelfCarePersonalityQuizScreen(props: BaseProps) {
     case 'scp-reveal':               return <ScpRevealScreen {...props} />;
     case 'scp-focus':                return <ScpFocusScreen {...props} />;
     case 'scp-tasks':
-      return (
-        <SelfCareSuggestionsStep
-          step={props.step}
-          onNext={props.onNext}
-          onAnswer={props.onAnswer}
-          answers={props.answers}
-        />
-      );
+      return <ScpPicksScreen step={props.step} onNext={props.onNext} answers={props.answers} />;
     case 'scp-celebration':
       return (
         <SelfCareRiloCelebrationStep
