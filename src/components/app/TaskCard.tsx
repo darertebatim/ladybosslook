@@ -1,4 +1,4 @@
-import { useState, useEffect, memo, useCallback } from 'react';
+import { useState, useEffect, memo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, Plus, Play, Droplets, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -43,6 +43,10 @@ interface TaskCardProps {
   onOpenGoalInput?: (task: UserTask) => void;
   onOpenTimer?: (task: UserTask) => void;
   onOpenWaterTracking?: (task: UserTask) => void;
+  /** Pro tasks: tapping anywhere on the card opens the tool (Path view). */
+  tapOpensTool?: boolean;
+  /** Long-press handler, e.g. to open edit/remove options. */
+  onLongPress?: (task: UserTask) => void;
 }
 
 export const TaskCard = memo(function TaskCard({
@@ -57,10 +61,14 @@ export const TaskCard = memo(function TaskCard({
   onOpenGoalInput,
   onOpenTimer,
   onOpenWaterTracking,
+  tapOpensTool,
+  onLongPress,
 }: TaskCardProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressFired = useRef(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [floatingPlusKey, setFloatingPlusKey] = useState(0);
   const [showFloatingPlus, setShowFloatingPlus] = useState(false);
@@ -416,10 +424,33 @@ export const TaskCard = memo(function TaskCard({
       navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: window.location.pathname } });
     };
 
+    const startPress = () => {
+      if (!onLongPress) return;
+      longPressFired.current = false;
+      if (pressTimer.current) clearTimeout(pressTimer.current);
+      pressTimer.current = setTimeout(() => {
+        longPressFired.current = true;
+        haptic.medium();
+        onLongPress(task);
+      }, 500);
+    };
+    const cancelPress = () => {
+      if (pressTimer.current) { clearTimeout(pressTimer.current); pressTimer.current = null; }
+    };
+
     return (
       <>
         <div
-          onClick={handleCardClick}
+          onClick={(e) => {
+            if (longPressFired.current) { longPressFired.current = false; return; }
+            if (tapOpensTool) handleProCircleClick(e); else handleCardClick();
+          }}
+          onPointerDown={startPress}
+          onPointerUp={cancelPress}
+          onPointerLeave={cancelPress}
+          onPointerCancel={cancelPress}
+          onContextMenu={onLongPress ? (e) => e.preventDefault() : undefined}
+          style={onLongPress ? { WebkitTouchCallout: 'none', userSelect: 'none' } : undefined}
           className={cn(
             'rounded-3xl pl-3 pr-4 py-5 transition-all duration-200 cursor-pointer active:scale-[0.98]',
             cardSurfaceClass,
