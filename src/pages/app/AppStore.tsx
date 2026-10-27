@@ -7,6 +7,7 @@ import {
   X,
   Loader2,
   ChevronRight,
+  ClipboardList,
   Crown,
   Sparkles,
   CheckCircle2,
@@ -416,6 +417,32 @@ const AppStore = () => {
                 <h2 className="text-base font-bold text-fg-warm mb-2 px-1">
                   {t("toolsPage.allTools")}
                 </h2>
+
+                {/* Planner — promoted entry above all tools */}
+                {!searchQuery && (
+                  <Link
+                    to="/app/home"
+                    onClick={() => haptic.medium()}
+                    className="flex items-center gap-3 px-4 py-3 mb-2 rounded-2xl shadow-ios active:scale-[0.98] transition-transform bg-gradient-to-br from-[hsl(var(--brand-primary-light))] to-[hsl(var(--brand-primary))]"
+                  >
+                    <div className="h-10 w-10 rounded-xl bg-white/25 flex items-center justify-center shrink-0">
+                      <ClipboardList
+                        className="h-5 w-5 text-white"
+                        strokeWidth={2.2}
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[15px] font-bold text-white leading-tight">
+                        {t("menu.items.planner")}
+                      </div>
+                      <div className="text-[11px] text-white/85 mt-0.5 leading-tight">
+                        {t("toolsPage.plannerSubtitle")}
+                      </div>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-white/80 shrink-0" />
+                  </Link>
+                )}
+
 
                 {/* First row: wellness tools except trackers (5 static buttons) */}
                 {!searchQuery && (
