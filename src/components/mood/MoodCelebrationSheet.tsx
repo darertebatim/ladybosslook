@@ -182,7 +182,8 @@ export function MoodCelebrationSheet({
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        {/* 4 cards in one row */}
+        <div className="grid grid-cols-4 gap-2">
           {ACTIONS.map((action) => {
             const label = t(action.labelKey);
             return (
@@ -190,7 +191,7 @@ export function MoodCelebrationSheet({
               key={action.labelKey}
               onClick={() => handleAction(action)}
               className={cn(
-                "flex flex-col items-center rounded-2xl p-3 pt-4",
+                "flex flex-col items-center rounded-2xl px-1 pt-3 pb-2.5",
                 "bg-background/90 backdrop-blur-sm",
                 "active:scale-[0.96] transition-all",
               )}
@@ -198,9 +199,9 @@ export function MoodCelebrationSheet({
               <img 
                 src={action.image} 
                 alt={label}
-                className="w-24 h-24 object-contain mb-2"
+                className="w-14 h-14 object-contain mb-1.5"
               />
-              <span className="text-sm font-semibold text-foreground text-center leading-tight">
+              <span className="text-[11px] font-semibold text-foreground text-center leading-tight">
                 {label}
               </span>
             </button>
