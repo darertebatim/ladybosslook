@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { Sparkles, Loader2, Smartphone, Mail, MessageCircle, CheckCircle2, Calendar, Video } from 'lucide-react';
+import { Sparkles, Loader2, Smartphone, Mail, MessageCircle, CheckCircle2, Calendar, Video, Apple, Play } from 'lucide-react';
 import { format } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -457,7 +457,7 @@ export default function PaymentSuccess() {
             <div className="flex items-center gap-2.5 mb-3">
               <StepNumber n={stepNo('app')} tone="violet" />
               <Smartphone className="h-4 w-4 text-[#F08A3E]" />
-              <h2 className="text-[15px] font-bold text-[#1a1f3d]">Open Rilo to start</h2>
+              <h2 className="text-[15px] font-bold text-[#1a1f3d]">Open Rilo App to start</h2>
             </div>
 
             <p className="text-[13px] text-[#1a1f3d]/70 mb-4">
@@ -472,8 +472,8 @@ export default function PaymentSuccess() {
               rel="noopener noreferrer"
               className="w-full h-[56px] rounded-2xl text-white font-semibold text-[16px] active:opacity-80 transition-opacity bg-gradient-to-r from-[#F08A3E] via-[#EC4899] to-[#8A5CF0] shadow-[0_12px_30px_-8px_rgba(138,92,240,0.55)] flex items-center justify-center gap-2"
             >
-              <Sparkles className="h-4 w-4" />
-              Open Rilo
+              <StoreIcon className="h-[18px] w-[18px]" />
+              {openRiloLabel}
             </a>
 
             {platform === 'desktop' && (
