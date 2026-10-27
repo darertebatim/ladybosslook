@@ -412,6 +412,9 @@ export default function PaymentSuccess() {
             </p>
           </div>
 
+          {successSettings?.success_video_url && (
+            <PaymentSuccessVideo url={successSettings.success_video_url} />
+          )}
 
           {bookingInfo?.booking_url && (
             <div className="mt-7 bg-white/75 backdrop-blur rounded-3xl p-5 shadow-[0_20px_50px_-20px_rgba(240,138,62,0.45)] border border-white">
@@ -493,11 +496,6 @@ export default function PaymentSuccess() {
                 ارسال پیام در واتس‌اپ / WhatsApp
               </a>
             </div>
-          )}
-
-
-          {successSettings?.success_video_url && (
-            <PaymentSuccessVideo url={successSettings.success_video_url} />
           )}
 
           {/* Round details */}
