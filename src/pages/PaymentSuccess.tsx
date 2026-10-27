@@ -13,6 +13,7 @@ import riloAppIcon from '@/assets/rilo-app-icon.png';
 import { ONELINK_BASE_URL } from '@/lib/appsflyer';
 import { buildBookingUrl } from '@/lib/booking';
 import { PaymentSuccessVideo } from '@/components/PaymentSuccessVideo';
+import { StepCountBadge, StepNumber } from '@/components/PaymentSuccessStep';
 import { trackPurchase } from '@/lib/metaPixel';
 
 /**
@@ -287,6 +288,17 @@ export default function PaymentSuccess() {
     return `https://wa.me/${digits}?text=${encodeURIComponent(lines)}`;
   })();
 
+  // Steps shown on this page, in display order — only the ones that actually render.
+  const stepKeys = [
+    successSettings?.success_video_url ? 'video' : null,
+    bookingInfo?.booking_url ? 'booking' : null,
+    'app',
+    whatsappHref ? 'whatsapp' : null,
+  ].filter(Boolean) as string[];
+  const stepCount = stepKeys.length;
+  const stepNo = (key: string) => stepKeys.indexOf(key) + 1;
+
+
   const { data: authUser } = useQuery({
     queryKey: ['payment-success-auth-user'],
     staleTime: 60_000,
@@ -412,13 +424,16 @@ export default function PaymentSuccess() {
             </p>
           </div>
 
+          <StepCountBadge count={stepCount} />
+
           {successSettings?.success_video_url && (
-            <PaymentSuccessVideo url={successSettings.success_video_url} />
+            <PaymentSuccessVideo url={successSettings.success_video_url} stepNumber={stepNo('video')} />
           )}
 
           {bookingInfo?.booking_url && (
             <div className="mt-7 bg-white/75 backdrop-blur rounded-3xl p-5 shadow-[0_20px_50px_-20px_rgba(240,138,62,0.45)] border border-white">
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2.5 mb-2">
+                <StepNumber n={stepNo('booking')} tone="orange" />
                 <Calendar className="h-4 w-4 text-[#F08A3E]" />
                 <h2 className="text-[15px] font-bold text-[#1a1f3d]">Book your 1-on-1 meeting</h2>
               </div>
@@ -439,7 +454,8 @@ export default function PaymentSuccess() {
 
           {/* Primary CTA — Open the app */}
           <div className="mt-7 bg-white/75 backdrop-blur rounded-3xl p-5 shadow-[0_20px_50px_-20px_rgba(138,92,240,0.4)] border border-white">
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2.5 mb-3">
+              <StepNumber n={stepNo('app')} tone="violet" />
               <Smartphone className="h-4 w-4 text-[#F08A3E]" />
               <h2 className="text-[15px] font-bold text-[#1a1f3d]">Open Rilo to start</h2>
             </div>
@@ -479,7 +495,8 @@ export default function PaymentSuccess() {
 
           {whatsappHref && (
             <div className="mt-7 bg-white/75 backdrop-blur rounded-3xl p-5 shadow-[0_20px_50px_-20px_rgba(37,211,102,0.45)] border border-white">
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2.5 mb-2">
+                <StepNumber n={stepNo('whatsapp')} tone="green" />
                 <MessageCircle className="h-4 w-4 text-[#25D366]" />
                 <h2 className="text-[15px] font-bold text-[#1a1f3d]">Message us on WhatsApp</h2>
               </div>

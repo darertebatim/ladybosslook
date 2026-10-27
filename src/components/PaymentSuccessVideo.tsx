@@ -2,6 +2,7 @@ import { TrackedIframe, TrackedVideo } from "@/components/TrackedIframe";
 import { useState } from 'react';
 import { detectVideoType, extractYouTubeId, getVideoThumbnail, getVideoEmbedUrl } from '@/lib/videoUtils';
 import { Video } from 'lucide-react';
+import { StepNumber } from '@/components/PaymentSuccessStep';
 
 export function resolveSuccessVideo(rawUrl: string): { type: 'direct' | 'embed'; url: string } | null {
   try {
@@ -19,7 +20,7 @@ export function resolveSuccessVideo(rawUrl: string): { type: 'direct' | 'embed';
   }
 }
 
-export function PaymentSuccessVideo({ url }: { url: string }) {
+export function PaymentSuccessVideo({ url, stepNumber }: { url: string; stepNumber?: number }) {
   const [playing, setPlaying] = useState(false);
 
   const video = resolveSuccessVideo(url);
@@ -31,7 +32,8 @@ export function PaymentSuccessVideo({ url }: { url: string }) {
 
   return (
     <section className="mt-7 bg-white/75 backdrop-blur rounded-3xl p-5 shadow-[0_20px_50px_-20px_rgba(138,92,240,0.4)] border border-white" aria-label="Program welcome video">
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex items-center gap-2.5 mb-2">
+        {stepNumber != null && <StepNumber n={stepNumber} tone="brand" />}
         <Video className="h-4 w-4 text-[#F08A3E]" />
         <h2 className="text-[15px] font-bold text-[#1a1f3d]">Getting started</h2>
       </div>
