@@ -188,12 +188,12 @@ export function useTodayPath() {
         const v = Array.isArray(row.answer) ? row.answer : row.answer != null ? [row.answer] : [];
         doorAnswers[row.step_id] = v.map((x: any) => String(x));
       }
-      const doorPrimary = (doorAnswers["rd-door-primary"]?.[0] ?? null) as DoorKey | null;
+      let doorPrimary = (doorAnswers["rd-door-primary"]?.[0] ?? null) as DoorKey | null;
       const emotionKeys = (doorAnswers["rd-sharp-emotion"] ?? []).filter((k) => k && k !== "unknown");
       const immigrantKeys = (doorAnswers["rd-sharp-immigrant"] ?? []).filter((k) => k && k !== "unknown");
       const financialKeys = (doorAnswers["rd-sharp-financial"] ?? []).filter((k) => k && k !== "unknown");
       const businessKeys = (doorAnswers["rd-sharp-business"] ?? []).filter((k) => k && k !== "unknown");
-      const hasDoorContext = !!doorPrimary;
+      let hasDoorContext = !!doorPrimary;
       const plannerOnboardingDone =
         ((plannerOnbRes.data ?? []) as any[]).length > 0 ||
         (typeof localStorage !== "undefined" &&
