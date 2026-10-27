@@ -44,7 +44,6 @@ const appPresenceImport = import("@/pages/app/AppPresence");
 
 const AppHome = lazy(() => appHomeImport);
 const AppStore = lazy(() => appStoreImport);
-const TmpToolsCheck = lazy(() => import("@/pages/TmpToolsCheck")); /* TMP-CHECK */
 const AppInspire = lazy(() => appInspireImport);
 const AppPlayer = lazy(() => appPlayerImport);
 const AppChannelsList = lazy(() => appChannelsListImport);
@@ -628,10 +627,6 @@ const App = () => (
                   
                   {/* All /app/* routes wrapped with Audio + Focus player providers */}
                   <Route element={<AppProvidersLayout />}>
-                    {/* TMP-CHECK */}
-                    <Route path="/tmp-nav-check" element={<AppLayout />}>
-                      <Route index element={<TmpToolsCheck />} />
-                    </Route>
                     {/* Full-screen pages - Outside of AppLayout so no tab bar */}
                     <Route path="/app/journal/new" element={<JournalNewRedirect />} />
                     <Route path="/app/journal/:entryId" element={<JournalEntryRedirect />} />
