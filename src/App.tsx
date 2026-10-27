@@ -210,7 +210,6 @@ const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
 const PublicDedication = lazy(() => import("@/pages/PublicDedication"));
 const Unsubscribe = lazy(() => import("@/pages/Unsubscribe"));
 const PublicPlaylistGift = lazy(() => import("@/pages/PublicPlaylistGift"));
-const HeaderPreviewTmp = lazy(() => import("@/pages/HeaderPreviewTmp"));
 const BusinessIdeas = lazy(() => import("@/pages/BusinessIdeas"));
 const RathusAssessment = lazy(() => import("@/pages/RathusAssessment"));
 const BusinessGrowthAccelerator = lazy(() => import("@/pages/BusinessGrowthAccelerator"));
