@@ -305,61 +305,6 @@ const AppCourses = () => {
             </div>
           )}
 
-          {/* Completed Rounds Section */}
-          {completedRounds.length > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h2 className="text-base font-semibold flex items-center gap-2 text-fg-warm-muted">
-                  <CheckCircle2 className="h-4 w-4" />
-                  {t("programs.completed")}
-                </h2>
-                <Badge className="text-xs bg-fg-warm/8 text-fg-warm-muted border-0">
-                  {completedRounds.length}
-                </Badge>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                {completedRounds.map((enrollment) => {
-                  const props = getCardProps(enrollment);
-                  return (
-                    <EnrolledProgramCard
-                      key={enrollment.id}
-                      enrollment={enrollment}
-                      isCompleted
-                      nextSessionDate={props.nextSessionDate}
-                      nextContent={props.nextContent}
-                      hasNotification={props.hasNotification}
-                      onMarkViewed={props.onMarkViewed}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Empty state if no programs at all */}
-          {totalPrograms === 0 && browsePrograms.length === 0 && (
-            <div className="text-center py-12">
-              <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground mb-4">
-                {t("programs.noProgramsAvailable")}
-              </p>
-            </div>
-          )}
-
-          {/* Empty enrolled state with browse below */}
-          {totalPrograms === 0 && browsePrograms.length > 0 && (
-            <div className="text-center py-8 mb-4">
-              <GraduationCap className="h-10 w-10 mx-auto mb-2 text-muted-foreground opacity-50" />
-              <p className="text-sm text-muted-foreground">
-                {t("programs.noProgramsEnrolled")}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {t("programs.browseEnrollHint")}
-              </p>
-            </div>
-          )}
-
           {/* Academy — hero banner + quick carousel */}
           {browsePrograms.length > 0 && (
             <section className="mt-2 overflow-hidden rounded-3xl bg-card-warm shadow-ios">
@@ -435,6 +380,61 @@ const AppCourses = () => {
                 </Carousel>
               </div>
             </section>
+          )}
+
+          {/* Completed Rounds Section */}
+          {completedRounds.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-base font-semibold flex items-center gap-2 text-fg-warm-muted">
+                  <CheckCircle2 className="h-4 w-4" />
+                  {t("programs.completed")}
+                </h2>
+                <Badge className="text-xs bg-fg-warm/8 text-fg-warm-muted border-0">
+                  {completedRounds.length}
+                </Badge>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                {completedRounds.map((enrollment) => {
+                  const props = getCardProps(enrollment);
+                  return (
+                    <EnrolledProgramCard
+                      key={enrollment.id}
+                      enrollment={enrollment}
+                      isCompleted
+                      nextSessionDate={props.nextSessionDate}
+                      nextContent={props.nextContent}
+                      hasNotification={props.hasNotification}
+                      onMarkViewed={props.onMarkViewed}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Empty state if no programs at all */}
+          {totalPrograms === 0 && browsePrograms.length === 0 && (
+            <div className="text-center py-12">
+              <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground mb-4">
+                {t("programs.noProgramsAvailable")}
+              </p>
+            </div>
+          )}
+
+          {/* Empty enrolled state with browse below */}
+          {totalPrograms === 0 && browsePrograms.length > 0 && (
+            <div className="text-center py-8 mb-4">
+              <GraduationCap className="h-10 w-10 mx-auto mb-2 text-muted-foreground opacity-50" />
+              <p className="text-sm text-muted-foreground">
+                {t("programs.noProgramsEnrolled")}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {t("programs.browseEnrollHint")}
+              </p>
+            </div>
           )}
 
 
