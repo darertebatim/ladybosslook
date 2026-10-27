@@ -85,34 +85,35 @@ export const EnrolledProgramCard = memo(function EnrolledProgramCard({
         }}
         className="block active:opacity-90 transition-opacity"
       >
-        {/* Gradient header */}
+        {/* Gradient header — slim bar */}
         <div
           className={cn(
-            'relative h-24 flex items-center justify-center bg-gradient-orange',
+            'relative h-12 flex items-center justify-center bg-gradient-orange',
             isCompleted && 'opacity-80',
           )}
         >
-          <GraduationCap className="h-9 w-9 text-white" />
+          <GraduationCap className="h-5 w-5 text-white" />
 
           {/* Status pill */}
           <span
             className={cn(
-              'absolute top-3 left-3 inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold shadow-ios capitalize',
+              'absolute top-1/2 -translate-y-1/2 left-2.5 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold shadow-ios capitalize',
               isCompleted ? 'bg-white/95 text-fg-warm-muted' : 'bg-white/95 text-brand',
             )}
           >
-            {isCompleted && <CheckCircle2 className="h-3.5 w-3.5" />}
+            {isCompleted && <CheckCircle2 className="h-3 w-3" />}
             {statusLabel}
           </span>
 
           {/* Updated pill */}
           {hasNotification && !isCompleted && (
-            <span className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1 text-[11px] font-semibold text-brand shadow-ios">
+            <span className="absolute top-1/2 -translate-y-1/2 right-2.5 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-0.5 text-[10px] font-semibold text-brand shadow-ios">
               <Sparkles className="h-3 w-3" />
               Updated
             </span>
           )}
         </div>
+
 
         {/* Body */}
         <div className="p-4 space-y-2">
