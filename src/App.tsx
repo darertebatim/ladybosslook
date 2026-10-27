@@ -627,6 +627,7 @@ const App = () => (
                   
                   {/* All /app/* routes wrapped with Audio + Focus player providers */}
                   <Route element={<AppProvidersLayout />}>
+                    <Route path="/tmp-mood-sheet" element={<TmpMoodSheetCheck />} />
                     {/* Full-screen pages - Outside of AppLayout so no tab bar */}
                     <Route path="/app/journal/new" element={<JournalNewRedirect />} />
                     <Route path="/app/journal/:entryId" element={<JournalEntryRedirect />} />
