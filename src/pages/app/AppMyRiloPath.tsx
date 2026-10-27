@@ -522,8 +522,8 @@ export default function AppMyRiloPath() {
               )}
             </button>
           </div>
-          <div className="text-center text-[15px] font-bold tracking-tight" style={{ color: O.fg }}>
-            Path (My Rilo)
+          <div className="text-center text-2xl font-bold tracking-tight truncate" style={{ color: O.fg }}>
+            Path
           </div>
           <button
             type="button"
