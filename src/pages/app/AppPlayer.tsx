@@ -41,6 +41,7 @@ import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
 import { HomeMenu } from "@/components/app/HomeMenu";
 import { useMediaCategories } from "@/hooks/useMediaCategories";
 import { useQuery } from "@tanstack/react-query";
+import { useMyProgramCourses } from "@/hooks/useMyProgramCourses";
 import { supabase } from "@/integrations/supabase/client";
 import { CachedImage } from "@/components/ui/CachedImage";
 import { useAllTags } from "@/hooks/useTags";
@@ -328,6 +329,10 @@ export default function AppPlayer() {
   // Section split (default view only): My Playlists → others → completed
   const showSections =
     progressFilter === "all" && selectedCategory === "all" && !searchQuery;
+  const { data: myCourses = [] } = useMyProgramCourses();
+  const visibleCourses = showSections
+    ? myCourses.filter((c) => c.lessonCount === 0 || c.completedLessons < c.lessonCount)
+    : [];
   const myPlaylists = showSections
     ? filteredPlaylists.filter(
         (p) => isFollowingPlaylist(p) && playlistProgress(p) < 100,
@@ -735,7 +740,7 @@ export default function AppPlayer() {
           </div>
 
           {/* My Playlists — followed + program/round playlists, still in progress */}
-          {showSections && myPlaylists.length > 0 && (
+          {showSections && (myPlaylists.length > 0 || visibleCourses.length > 0) && (
             <div className="px-4 pt-4 space-y-2">
               <div className="flex items-center gap-2">
                 <FluentEmoji emoji="⭐" size={16} />
@@ -744,6 +749,26 @@ export default function AppPlayer() {
                 </h2>
               </div>
               <div className="flex flex-col gap-3">
+                {visibleCourses.map((c) => (
+                  <PlaylistCard
+                    key={`course-${c.id}`}
+                    id={c.id}
+                    name={c.title}
+                    description={c.description ?? undefined}
+                    coverImageUrl={c.cover_image_url ?? undefined}
+                    category="course"
+                    categoryLabel={t("player.courseLabel", "Course")}
+                    language={c.language ?? undefined}
+                    isFree={false}
+                    isLocked={false}
+                    trackCount={c.lessonCount}
+                    completedTracks={c.completedLessons}
+                    totalDuration={c.totalDuration}
+                    isFollowing
+                    href={`/app/learn/${c.id}`}
+                    hostContentType="course"
+                  />
+                ))}
                 {myPlaylists.map(renderCard)}
               </div>
             </div>
