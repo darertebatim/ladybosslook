@@ -443,8 +443,13 @@ export default function PaymentSuccess() {
                 <Calendar className="h-4 w-4 text-[#F08A3E]" />
                 <h2 className="text-[15px] font-bold text-[#1a1f3d]">Book your 1-on-1 meeting</h2>
               </div>
-              <p dir="auto" className="text-[13px] text-[#1a1f3d]/70 mb-4">
-                {bookingInfo.booking_note || 'Pick a time that works for you — your calendar invite and meeting link arrive by email.'}
+              {bookingInfo.booking_note && (
+                <p dir="auto" className="text-[13px] font-semibold text-[#1a1f3d] mb-1.5">
+                  {bookingInfo.booking_note}
+                </p>
+              )}
+              <p className="text-[13px] text-[#1a1f3d]/70 mb-4">
+                Pick a time that works for you — your calendar invite and meeting link arrive by email.
               </p>
               <button
                 type="button"
