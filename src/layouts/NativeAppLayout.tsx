@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { haptic } from '@/lib/haptics';
-import { Home, MessageCircle, Compass, Music, Flame, CalendarPlus, Play, Sparkles, Route, ClipboardList, Headphones, GraduationCap } from 'lucide-react';
+import { Home, MessageCircle, Compass, Music, Flame, CalendarPlus, Play, Sparkles, Route, ClipboardList, Headphones, Headset, GraduationCap } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, LayoutGroup } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
@@ -198,7 +198,7 @@ const NativeAppLayout = () => {
     { path: '/app/player', icon: Headphones, label: t('nav.player'), tourClass: 'tour-nav-listen' },
     { path: '/app/tools', icon: Compass, label: t('nav.tools'), tourClass: 'tour-nav-explore' },
     { path: '/app/myprograms', icon: GraduationCap, label: t('nav.myPrograms'), tourClass: 'tour-nav-programs' },
-    { path: '/app/chat', icon: MessageCircle, label: t('nav.support'), tourClass: 'tour-nav-support' },
+    { path: '/app/chat', icon: Headset, label: t('nav.support'), tourClass: 'tour-nav-support' },
   ];
 
 
