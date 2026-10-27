@@ -263,11 +263,11 @@ export default function PaymentSuccess() {
       if (!roundSlug) return null;
       const { data, error } = await supabase
         .from('program_catalog')
-        .select('booking_url, booking_note, includes_one_on_one, is_one_on_one, show_booking_on_success, success_video_url, whatsapp_support_number, show_whatsapp_on_success' as any)
+        .select('booking_url, booking_note, includes_one_on_one, is_one_on_one, show_booking_on_success, success_video_url, whatsapp_support_number, show_whatsapp_on_success')
         .eq('slug', roundSlug)
         .maybeSingle();
       if (error) throw error;
-      return data;
+      return data as any;
     },
   });
   const bookingInfo = successSettings?.show_booking_on_success !== false
