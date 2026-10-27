@@ -705,7 +705,7 @@ export default function AppMyRiloPath() {
             <HomeBanner location="my_rilo_bottom" className="py-2" />
           </div>
 
-          <div className="pb-8" />
+          <div style={{ height: 'calc(96px + env(safe-area-inset-bottom, 0px))' }} />
         </div>
       </div>
 
