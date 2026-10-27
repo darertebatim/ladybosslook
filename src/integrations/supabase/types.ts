@@ -5312,6 +5312,7 @@ export type Database = {
           restricted_regions: string[]
           show_booking_on_success: boolean
           show_in_app_waitlist: boolean
+          show_whatsapp_on_success: boolean
           slug: string
           stripe_payment_link: string | null
           stripe_price_id: string | null
@@ -5327,6 +5328,7 @@ export type Database = {
           type: string
           updated_at: string | null
           video_url: string | null
+          whatsapp_support_number: string | null
         }
         Insert: {
           android_product_id?: string | null
@@ -5376,6 +5378,7 @@ export type Database = {
           restricted_regions?: string[]
           show_booking_on_success?: boolean
           show_in_app_waitlist?: boolean
+          show_whatsapp_on_success?: boolean
           slug: string
           stripe_payment_link?: string | null
           stripe_price_id?: string | null
@@ -5391,6 +5394,7 @@ export type Database = {
           type: string
           updated_at?: string | null
           video_url?: string | null
+          whatsapp_support_number?: string | null
         }
         Update: {
           android_product_id?: string | null
@@ -5440,6 +5444,7 @@ export type Database = {
           restricted_regions?: string[]
           show_booking_on_success?: boolean
           show_in_app_waitlist?: boolean
+          show_whatsapp_on_success?: boolean
           slug?: string
           stripe_payment_link?: string | null
           stripe_price_id?: string | null
@@ -5455,6 +5460,7 @@ export type Database = {
           type?: string
           updated_at?: string | null
           video_url?: string | null
+          whatsapp_support_number?: string | null
         }
         Relationships: [
           {

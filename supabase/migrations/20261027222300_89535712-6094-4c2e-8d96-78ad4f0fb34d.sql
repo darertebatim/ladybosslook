@@ -1,0 +1,1 @@
+ALTER TABLE public.program_catalog ADD COLUMN IF NOT EXISTS whatsapp_support_number text, ADD COLUMN IF NOT EXISTS show_whatsapp_on_success boolean NOT NULL DEFAULT false;

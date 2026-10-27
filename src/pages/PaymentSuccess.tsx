@@ -263,16 +263,29 @@ export default function PaymentSuccess() {
       if (!roundSlug) return null;
       const { data, error } = await supabase
         .from('program_catalog')
-        .select('booking_url, booking_note, includes_one_on_one, is_one_on_one, show_booking_on_success, success_video_url')
+        .select('booking_url, booking_note, includes_one_on_one, is_one_on_one, show_booking_on_success, success_video_url, whatsapp_support_number, show_whatsapp_on_success')
         .eq('slug', roundSlug)
         .maybeSingle();
       if (error) throw error;
-      return data;
+      return data as any;
     },
   });
   const bookingInfo = successSettings?.show_booking_on_success !== false
     && (successSettings?.includes_one_on_one || successSettings?.is_one_on_one)
     && successSettings?.booking_url ? successSettings : null;
+
+  const whatsappHref = (() => {
+    const s = successSettings as any;
+    const digits = String(s?.whatsapp_support_number || '').replace(/\D/g, '');
+    if (!s?.show_whatsapp_on_success || !digits) return null;
+    const lines = [
+      `سلام، من ${orderDetails?.product_name || 'برنامه'} را خریدم.`,
+      orderDetails?.name ? `نام: ${orderDetails.name}` : null,
+      orderDetails?.email ? `ایمیل: ${orderDetails.email}` : null,
+      orderDetails?.phone ? `شماره: ${orderDetails.phone}` : null,
+    ].filter(Boolean).join('\n');
+    return `https://wa.me/${digits}?text=${encodeURIComponent(lines)}`;
+  })();
 
   const { data: authUser } = useQuery({
     queryKey: ['payment-success-auth-user'],
@@ -460,6 +473,28 @@ export default function PaymentSuccess() {
               </div>
             )}
           </div>
+
+          {whatsappHref && (
+            <div className="mt-7 bg-white/75 backdrop-blur rounded-3xl p-5 shadow-[0_20px_50px_-20px_rgba(37,211,102,0.45)] border border-white">
+              <div className="flex items-center gap-2 mb-2">
+                <MessageCircle className="h-4 w-4 text-[#25D366]" />
+                <h2 className="text-[15px] font-bold text-[#1a1f3d]">Message us on WhatsApp</h2>
+              </div>
+              <p dir="rtl" className="text-[13px] text-[#1a1f3d]/70 mb-4">
+                با یک لمس، پیام آماده با ایمیل و شماره‌ی شما برای پشتیبانی واتس‌اپ ارسال می‌شود.
+              </p>
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full h-[52px] rounded-2xl text-white font-semibold text-[15px] active:opacity-80 transition-opacity bg-[#25D366] flex items-center justify-center gap-2"
+              >
+                <MessageCircle className="h-4 w-4" />
+                ارسال پیام در واتس‌اپ / WhatsApp
+              </a>
+            </div>
+          )}
+
 
           {successSettings?.success_video_url && (
             <PaymentSuccessVideo url={successSettings.success_video_url} />
