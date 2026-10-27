@@ -241,7 +241,7 @@ export const TaskDetailModal = ({
                   onClick={() => {
                     haptic.light();
                     if (isWater) {
-                      navigate('/app/water', { state: { from: window.location.pathname.startsWith('/app/home') ? 'planner' : window.location.pathname } });
+                      navigate('/app/water', { state: { from: window.location.pathname } });
                     } else {
                       onOpenGoalInput?.(task);
                     }
