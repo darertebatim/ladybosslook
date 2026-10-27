@@ -16,7 +16,7 @@ const mk = (id: string, name: string, round: string, status: string) => ({
 
 export default function TmpCardCheck() {
   return (
-    <div className="min-h-screen bg-background p-4 space-y-3">
+    <div className="app-theme min-h-screen bg-background p-4 space-y-3">
       <EnrolledProgramCard
         enrollment={mk("1", "Costumer Acquisition جذب مشتری", "Customer Acquisition 3", "active")}
         hasNotification
