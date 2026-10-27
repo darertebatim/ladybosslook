@@ -31,10 +31,13 @@ export function PaymentSuccessVideo({ url }: { url: string }) {
 
   return (
     <section className="mt-7 bg-white/75 backdrop-blur rounded-3xl p-5 shadow-[0_20px_50px_-20px_rgba(138,92,240,0.4)] border border-white" aria-label="Program welcome video">
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-2 mb-2">
         <Video className="h-4 w-4 text-[#F08A3E]" />
-        <h2 className="text-[15px] font-bold text-[#1a1f3d]">ویدیوی راهنمای شروع / Getting started</h2>
+        <h2 className="text-[15px] font-bold text-[#1a1f3d]">Getting started</h2>
       </div>
+      <p className="text-[13px] text-[#1a1f3d]/70 mb-4">
+        Watch this short video to see exactly what happens next and how to get the most from your program.
+      </p>
       <div className="aspect-video w-full overflow-hidden rounded-2xl bg-[#1a1f3d]/5">
         {playing || !thumbnail ? (
           video.type === 'direct' ? (
