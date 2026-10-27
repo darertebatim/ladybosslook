@@ -480,8 +480,8 @@ export default function PaymentSuccess() {
                 <MessageCircle className="h-4 w-4 text-[#25D366]" />
                 <h2 className="text-[15px] font-bold text-[#1a1f3d]">Message us on WhatsApp</h2>
               </div>
-              <p dir="rtl" className="text-[13px] text-[#1a1f3d]/70 mb-4">
-                با یک لمس، پیام آماده با ایمیل و شماره‌ی شما برای پشتیبانی واتس‌اپ ارسال می‌شود.
+              <p className="text-[13px] text-[#1a1f3d]/70 mb-4">
+                One tap opens WhatsApp with a ready message that includes the email and phone number you used at checkout.
               </p>
               <a
                 href={whatsappHref}
