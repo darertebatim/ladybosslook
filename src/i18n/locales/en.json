@@ -796,6 +796,8 @@
   "nav": {
     "home": "Planner",
     "myRilo": "Path",
+    "myPrograms": "Programs",
+    "support": "Support",
     "tools": "Tools",
     "player": "Player",
     "aiPlanner": "Open AI Planner"
