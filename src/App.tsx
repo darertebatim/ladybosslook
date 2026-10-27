@@ -41,7 +41,6 @@ const appInspireImport = import("@/pages/app/AppInspire");
 const appPlayerImport = import("@/pages/app/AppPlayer");
 const appChannelsListImport = import("@/pages/app/AppChannelsList");
 const appPresenceImport = import("@/pages/app/AppPresence");
-const tmpMoodSheetImport = import("@/pages/TmpMoodSheetCheck");
 
 const AppHome = lazy(() => appHomeImport);
 const AppStore = lazy(() => appStoreImport);
@@ -629,7 +628,6 @@ const App = () => (
                   
                   {/* All /app/* routes wrapped with Audio + Focus player providers */}
                   <Route element={<AppProvidersLayout />}>
-                    <Route path="/tmp-mood-sheet" element={<TmpMoodSheetCheck />} />
                     {/* Full-screen pages - Outside of AppLayout so no tab bar */}
                     <Route path="/app/journal/new" element={<JournalNewRedirect />} />
                     <Route path="/app/journal/:entryId" element={<JournalEntryRedirect />} />
