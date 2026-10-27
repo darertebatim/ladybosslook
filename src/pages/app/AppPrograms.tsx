@@ -50,7 +50,7 @@ const AppCourses = () => {
   if (isLoading) {
     return (
       <>
-        <PageHeader title={t("programs.myPrograms")} back />
+        <PageHeader title={t("programs.myPrograms")} menu stats />
         <CoursesSkeleton />
       </>
     );
@@ -195,10 +195,11 @@ const AppCourses = () => {
 
       <PageHeader
         title={t("programs.myPrograms")}
-        back
+        menu
+        stats
         subRow={
           totalPrograms > 0 ? (
-            <p className="text-xs text-fg-warm-muted">
+            <p className="text-xs text-center text-fg-warm-muted">
               {t("programs.enrolledCount", { count: totalPrograms })}
             </p>
           ) : undefined
