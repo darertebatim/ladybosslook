@@ -52,6 +52,9 @@ interface PlaylistCardProps {
   totalDuration: number;
   isFollowing?: boolean;
   categoryLabel?: string;
+  /** Overrides the destination (e.g. program courses). */
+  href?: string;
+  hostContentType?: string;
 }
 
 export const PlaylistCard = memo(function PlaylistCard({
@@ -70,6 +73,8 @@ export const PlaylistCard = memo(function PlaylistCard({
   totalDuration,
   isFollowing,
   categoryLabel,
+  href,
+  hostContentType = 'playlist',
 }: PlaylistCardProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -85,6 +90,7 @@ export const PlaylistCard = memo(function PlaylistCard({
 
   const handleClick = () => {
     haptic.light();
+    if (href) return navigate(href, { state: { from } });
     if (isFree) return navigate(`/app/player/playlist/${id}`, { state: { from } });
     if (requiresSubscription) return navigate(`/app/player/playlist/${id}`, { state: { from } });
     if (isLocked && programSlug) return navigate(`/app/course/${programSlug}`, { state: { from } });
@@ -151,7 +157,7 @@ export const PlaylistCard = memo(function PlaylistCard({
           </h3>
 
           <HostBadges
-            contentType="playlist"
+            contentType={hostContentType as any}
             contentId={id}
             size="sm"
             prefix="with"
