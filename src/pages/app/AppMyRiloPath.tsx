@@ -32,6 +32,7 @@ import { HomeBanner } from "@/components/app/HomeBanner";
 import { HomeMenu } from "@/components/app/HomeMenu";
 import { useProgramEventsForDate } from "@/hooks/usePlannerProgramEvents";
 import { StackedEventDeck } from "@/components/app/StackedEventDeck";
+import { TodayToolTasks } from "@/components/path/TodayToolTasks";
 
 import { getLocalDateStr } from "@/lib/localDate";
 import { parseISO } from "date-fns";
@@ -578,6 +579,9 @@ export default function AppMyRiloPath() {
           {programEvents.length > 0 && (
             <StackedEventDeck events={programEvents} date={todayDate} />
           )}
+
+          {/* Daily Habits — today's tool tasks from the planner */}
+          <TodayToolTasks date={todayDate} />
 
 
           {/* Hero greeting */}
