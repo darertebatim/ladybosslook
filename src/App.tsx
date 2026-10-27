@@ -497,10 +497,6 @@ const App = () => (
               <Suspense fallback={<PageLoader />}>
                 <Routes>
                   <Route path="/" element={<Index />} />
-                  {/* TMP-CHECK */}
-                  <Route path="/tmp-nav-check" element={<AppLayout />}>
-                    <Route index element={<TmpToolsCheck />} />
-                  </Route>
                   <Route path="/programs" element={<Programs />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/appmarketing" element={<Rilo />} />
@@ -632,6 +628,10 @@ const App = () => (
                   
                   {/* All /app/* routes wrapped with Audio + Focus player providers */}
                   <Route element={<AppProvidersLayout />}>
+                    {/* TMP-CHECK */}
+                    <Route path="/tmp-nav-check" element={<AppLayout />}>
+                      <Route index element={<TmpToolsCheck />} />
+                    </Route>
                     {/* Full-screen pages - Outside of AppLayout so no tab bar */}
                     <Route path="/app/journal/new" element={<JournalNewRedirect />} />
                     <Route path="/app/journal/:entryId" element={<JournalEntryRedirect />} />
