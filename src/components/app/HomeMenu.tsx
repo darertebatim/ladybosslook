@@ -4,6 +4,7 @@ import { useProfileDisplayName } from "@/hooks/useFirstName";
 import {
   Menu,
   LayoutGrid,
+  ClipboardList,
   Headset,
   BookOpen,
   Wind,
@@ -58,6 +59,13 @@ const navPages: NavItem[] = [
 ];
 
 const toolItems: NavItem[] = [
+  {
+    id: "planner",
+    nameKey: "planner",
+    icon: <ClipboardList className="h-4 w-4" />,
+    route: "/app/home",
+    color: "text-emerald-600 bg-emerald-100",
+  },
   {
     id: "reflections",
     nameKey: "reflections",
