@@ -131,7 +131,7 @@ export function MoodCelebrationSheet({
         onInteractOutside={(e) => { e.preventDefault(); handleDone(); }}
         onEscapeKeyDown={(e) => { e.preventDefault(); handleDone(); }}
         className={cn(
-          "rounded-t-3xl border-0 px-5 pt-8 pb-6",
+          "app-theme rounded-t-3xl border-0 px-5 pt-8 pb-6",
           moodData.bgColor
         )}
         style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}
