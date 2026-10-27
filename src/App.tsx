@@ -48,7 +48,6 @@ const AppInspire = lazy(() => appInspireImport);
 const AppPlayer = lazy(() => appPlayerImport);
 const AppChannelsList = lazy(() => appChannelsListImport);
 const AppPresence = lazy(() => appPresenceImport);
-const TmpMoodSheetCheck = lazy(() => tmpMoodSheetImport);
 const AppPrograms = lazy(() => import("@/pages/app/AppPrograms"));
 // AppStore eagerly imported above
 const AppBrowsePrograms = lazy(() => import("@/pages/app/AppBrowsePrograms"));
