@@ -241,7 +241,7 @@ export const TaskDetailModal = ({
                   onClick={() => {
                     haptic.light();
                     if (isWater) {
-                      navigate('/app/water', { state: { from: 'planner' } });
+                      navigate('/app/water', { state: { from: window.location.pathname.startsWith('/app/home') ? 'planner' : window.location.pathname } });
                     } else {
                       onOpenGoalInput?.(task);
                     }
@@ -330,7 +330,7 @@ export const TaskDetailModal = ({
               <Button
                 onClick={() => {
                   onClose();
-                  navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: '/app/home' } });
+                  navigate(getProTaskNavigationPath(proLinkType!, proLinkValue), { state: { from: window.location.pathname } });
                 }}
                 className={cn('w-full gap-2 h-10 rounded-xl text-sm', proConfig.buttonClass)}
               >
