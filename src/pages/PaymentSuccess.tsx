@@ -298,6 +298,12 @@ export default function PaymentSuccess() {
   const stepCount = stepKeys.length;
   const stepNo = (key: string) => stepKeys.indexOf(key) + 1;
 
+  // The OneLink opens Rilo if it's installed, otherwise the matching store.
+  const storeName = platform === 'ios' ? 'the App Store' : platform === 'android' ? 'Google Play' : null;
+  const openRiloLabel = storeName ? `Open Rilo App on ${storeName}` : 'Open Rilo App';
+  const StoreIcon = platform === 'ios' ? Apple : platform === 'android' ? Play : Sparkles;
+
+
 
   const { data: authUser } = useQuery({
     queryKey: ['payment-success-auth-user'],
