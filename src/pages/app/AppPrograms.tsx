@@ -50,7 +50,7 @@ const AppCourses = () => {
   if (isLoading) {
     return (
       <>
-        <PageHeader title={t("programs.myPrograms")} back />
+        <PageHeader title={t("programs.myPrograms")} menu stats />
         <CoursesSkeleton />
       </>
     );
@@ -194,15 +194,18 @@ const AppCourses = () => {
       />
 
       <PageHeader
-        title={t("programs.myPrograms")}
-        back
-        subRow={
-          totalPrograms > 0 ? (
-            <p className="text-xs text-fg-warm-muted">
-              {t("programs.enrolledCount", { count: totalPrograms })}
-            </p>
-          ) : undefined
+        title={
+          <span className="flex flex-col items-center leading-tight">
+            <span>{t("programs.myPrograms")}</span>
+            {totalPrograms > 0 && (
+              <span className="mt-0.5 text-[11px] font-medium text-fg-warm-muted">
+                {t("programs.enrolledCount", { count: totalPrograms })}
+              </span>
+            )}
+          </span>
         }
+        menu
+        stats
       />
 
       {/* Scroll container */}
