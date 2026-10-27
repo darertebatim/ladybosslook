@@ -270,6 +270,8 @@ import CalendarRedirect from "@/components/CalendarRedirect";
 import Redirect from "@/components/Redirect";
 import Index from "@/pages/Index";
 import Overview from "@/pages/admin/Overview";
+import TmpCardCheck from "@/pages/TmpCardCheck";
+
 
 class ChunkLoadErrorBoundary extends React.Component<
   { children: React.ReactNode },
@@ -618,6 +620,8 @@ const App = () => (
                   {!isNativeApp() && <Route path="/giftsalilotfivip" element={<GiftsAliLotfiVip />} />}
                   {!isNativeApp() && <Route path="/iqmoney" element={<IQMoneyWorkshop />} />}
                   <Route path="/rathus" element={<RathusAssessment />} />
+                  <Route path="/tmp-card-check" element={<TmpCardCheck />} />
+
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                   <Route path="/dashboard/chat" element={<ProtectedRoute><DashboardChat /></ProtectedRoute>} />
                   <Route path="/dashboard/forms/profileanalyze" element={<ProtectedRoute><ProfileAnalyzeForm /></ProtectedRoute>} />
