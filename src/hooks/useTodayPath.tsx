@@ -188,12 +188,12 @@ export function useTodayPath() {
         const v = Array.isArray(row.answer) ? row.answer : row.answer != null ? [row.answer] : [];
         doorAnswers[row.step_id] = v.map((x: any) => String(x));
       }
-      const doorPrimary = (doorAnswers["rd-door-primary"]?.[0] ?? null) as DoorKey | null;
+      let doorPrimary = (doorAnswers["rd-door-primary"]?.[0] ?? null) as DoorKey | null;
       const emotionKeys = (doorAnswers["rd-sharp-emotion"] ?? []).filter((k) => k && k !== "unknown");
       const immigrantKeys = (doorAnswers["rd-sharp-immigrant"] ?? []).filter((k) => k && k !== "unknown");
       const financialKeys = (doorAnswers["rd-sharp-financial"] ?? []).filter((k) => k && k !== "unknown");
       const businessKeys = (doorAnswers["rd-sharp-business"] ?? []).filter((k) => k && k !== "unknown");
-      const hasDoorContext = !!doorPrimary;
+      let hasDoorContext = !!doorPrimary;
       const plannerOnboardingDone =
         ((plannerOnbRes.data ?? []) as any[]).length > 0 ||
         (typeof localStorage !== "undefined" &&
@@ -332,6 +332,85 @@ export function useTodayPath() {
       ) {
         doorSecondaryAudioOverride =
           accessiblePlaylists.find((p) => /wellness\s*planning/i.test(p.name)) ?? null;
+      }
+
+      // ── Student host override ─────────────────────────────────────────
+      // Students in a host's program get that host's playlists as the
+      // featured pick. Latest active enrollment wins when two hosts apply.
+      // Playlists already attached to their programs are excluded so the
+      // Path introduces new host content.
+      try {
+        const { data: enrolls } = await supabase
+          .from("course_enrollments")
+          .select("program_slug, round_id, enrolled_at")
+          .eq("user_id", userId)
+          .eq("status", "active")
+          .order("enrolled_at", { ascending: false })
+          .limit(20);
+        const enrollRows = (enrolls ?? []) as Array<{ program_slug: string | null; round_id: string | null }>;
+        if (enrollRows.length > 0) {
+          const roundIds = enrollRows.map((e) => e.round_id).filter(Boolean) as string[];
+          const slugs = enrollRows.map((e) => e.program_slug).filter(Boolean) as string[];
+          const [roundsRes, progRes, roundPlRes, linkRes, instRes] = await Promise.all([
+            roundIds.length
+              ? supabase.from("program_rounds").select("id, instructor_id").in("id", roundIds)
+              : Promise.resolve({ data: [] as any[] }),
+            slugs.length
+              ? supabase.from("program_catalog" as any).select("id, slug, audio_playlist_id").in("slug", slugs)
+              : Promise.resolve({ data: [] as any[] }),
+            roundIds.length
+              ? supabase.from("program_round_playlists").select("playlist_id").in("round_id", roundIds)
+              : Promise.resolve({ data: [] as any[] }),
+            slugs.length
+              ? supabase.from("program_content_links").select("content_id, content_type").in("program_slug", slugs)
+              : Promise.resolve({ data: [] as any[] }),
+            supabase.from("instructors").select("id, doors").eq("is_active", true),
+          ]);
+          const progs = (progRes.data ?? []) as any[];
+          const progIds = progs.map((p) => p.id);
+          const progHostRes = progIds.length
+            ? await (supabase as any).from("content_hosts").select("content_id, host_id, sort_order")
+                .eq("content_type", "program").in("content_id", progIds).order("sort_order")
+            : { data: [] };
+          const roundHost = new Map(((roundsRes.data ?? []) as any[]).map((r) => [r.id, r.instructor_id]));
+          const progHost = new Map<string, string>();
+          for (const r of (progHostRes.data ?? []) as any[]) if (!progHost.has(r.content_id)) progHost.set(r.content_id, r.host_id);
+          const progBySlug = new Map(progs.map((p) => [p.slug, p]));
+          let hostId: string | null = null;
+          for (const e of enrollRows) {
+            hostId = (e.round_id && roundHost.get(e.round_id)) ||
+              (e.program_slug && progHost.get(progBySlug.get(e.program_slug)?.id)) || null;
+            if (hostId) break;
+          }
+          if (hostId) {
+            const inst = ((instRes.data ?? []) as any[]).find((i) => i.id === hostId);
+            const hostDoors: string[] = inst?.doors ?? [];
+            if (hostDoors.length && (!doorPrimary || !hostDoors.includes(doorPrimary))) {
+              doorPrimary = hostDoors[0] as DoorKey;
+              hasDoorContext = true;
+            }
+            const owned = new Set<string>([
+              ...progs.map((p) => p.audio_playlist_id).filter(Boolean),
+              ...((roundPlRes.data ?? []) as any[]).map((r) => r.playlist_id),
+              ...((linkRes.data ?? []) as any[])
+                .filter((l) => /playlist/i.test(l.content_type ?? ""))
+                .map((l) => l.content_id),
+            ]);
+            const { data: hostPl } = await (supabase as any).from("content_hosts")
+              .select("content_id").eq("content_type", "playlist").eq("host_id", hostId);
+            const hostIds = new Set(((hostPl ?? []) as any[]).map((r) => r.content_id));
+            const pool = accessiblePlaylists.filter((p) => hostIds.has(p.id) && !owned.has(p.id));
+            const langPool = preferredLanguage ? pool.filter((p) => p.language === preferredLanguage) : [];
+            const finalPool = langPool.length ? langPool : pool;
+            if (finalPool.length) {
+              const seed = [...today].reduce((a, c) => a + c.charCodeAt(0), 0);
+              doorAudioOverride = finalPool[seed % finalPool.length];
+              doorSecondaryAudioOverride = finalPool.length > 1 ? finalPool[(seed + 1) % finalPool.length] : null;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("[path] host override failed", err);
       }
 
       // ── Continuity signals from audio_progress ────────────────────────

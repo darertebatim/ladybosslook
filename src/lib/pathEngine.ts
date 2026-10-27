@@ -285,9 +285,6 @@ function signatureStepForDoor(door: DoorKey, inputs: PathInputs): PathStep | nul
         ? buildResetStep(inputs)
         : selfcareQuizStep();
     case "productivity":
-      return inputs.plannerOnboardingDone
-        ? browseRoutinesStep()
-        : plannerIntroStep();
     case "immigrant":
     case "emotion":
     case "financial":
@@ -323,8 +320,6 @@ function deeperStepForDoor(
       // Booster = quiz teaser if not yet done, else a door-flavored Check In.
       return inputs.hasQuizResult ? buildResetStep(inputs) : selfcareQuizStep();
     case "productivity":
-      // Booster = planner onboarding if not done, else "pick a routine".
-      return inputs.plannerOnboardingDone ? browseRoutinesStep() : plannerIntroStep();
     case "immigrant":
     case "emotion":
     case "financial":
@@ -432,8 +427,6 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
         startHref: "/app/home",
         tint: tintForRoutine(firstRoutine.color, 0), skippable: true,
       });
-    } else {
-      steps.push(browseRoutinesStep());
     }
     // Deeper step from the user's door — keeps the thread alive (spec slot #3).
     const primaryDeeper = primary
@@ -446,22 +439,10 @@ export function buildDoorPath(inputs: PathInputs): PathStep[] {
     steps.push(buildResetStep(inputs));
   }
 
-  // ── Always present on Day 1: Browse routines (pick your first) ─────
-  if (day === 0 && !steps.some((s) => s.id === "routine:pick_first")) {
-    steps.push(browseRoutinesStep());
-  }
-
-  // ── Always-on teasers: quiz + planner onboarding when missing ──────
-  const doors = new Set<DoorKey | null>([primary]);
-  const hasSelfcareDoor = doors.has("selfcare");
-  const hasProductivityDoor = doors.has("productivity");
+  // ── Always-on teaser: self-care quiz when missing ──────
+  const hasSelfcareDoor = primary === "selfcare";
   if (!hasSelfcareDoor && !inputs.hasPersonalityResult && !steps.some((s) => s.id === "quiz_pick:onboarding")) {
     steps.push(selfcareQuizStep());
-  }
-  // Planner onboarding teaser is intentionally deferred to Day 2+ so Day 1
-  // isn't overwhelming (matches admin spec: "moved to Day 2").
-  if (day >= 1 && !hasProductivityDoor && !inputs.plannerOnboardingDone && !steps.some((s) => s.id === "quiz_pick:planner_intro")) {
-    steps.push(plannerIntroStep());
   }
 
   // Secondary audio as a low-commitment extra (Day 1 only — keeps Day 2+ focused).
@@ -872,7 +853,8 @@ function buildPoolCandidates(inputs: PathInputs): PoolCandidate[] {
       slot: "browse_routines",
       priority: 80,
       // Surface only after the primary signature is acknowledged (Day 2+).
-      eligible: inputs.activeRoutines.length === 0 && completed.has("primary_signature"),
+      // Planner/routine teasers are retired — never surfaced on Path.
+      eligible: false,
       derivedDone: inputs.activeRoutines.length > 0,
       build: () => tag(browseRoutinesStep(), "browse_routines"),
     },
@@ -915,7 +897,7 @@ function buildPoolCandidates(inputs: PathInputs): PoolCandidate[] {
     {
       slot: "planner_intro",
       priority: 55,
-      eligible: !hasProductivityDoor && !inputs.plannerOnboardingDone,
+      eligible: false,
       derivedDone: !!inputs.plannerOnboardingDone,
       build: () => tag(plannerIntroStep(), "planner_intro"),
     },

@@ -3886,6 +3886,7 @@ export type Database = {
           default_program_slug: string | null
           default_routine_ids: string[]
           display_name: string
+          doors: string[]
           id: string
           is_active: boolean
           photo_url: string | null
@@ -3901,6 +3902,7 @@ export type Database = {
           default_program_slug?: string | null
           default_routine_ids?: string[]
           display_name: string
+          doors?: string[]
           id?: string
           is_active?: boolean
           photo_url?: string | null
@@ -3916,6 +3918,7 @@ export type Database = {
           default_program_slug?: string | null
           default_routine_ids?: string[]
           display_name?: string
+          doors?: string[]
           id?: string
           is_active?: boolean
           photo_url?: string | null
