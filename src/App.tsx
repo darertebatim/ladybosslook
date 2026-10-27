@@ -41,6 +41,7 @@ const appInspireImport = import("@/pages/app/AppInspire");
 const appPlayerImport = import("@/pages/app/AppPlayer");
 const appChannelsListImport = import("@/pages/app/AppChannelsList");
 const appPresenceImport = import("@/pages/app/AppPresence");
+const tmpMoodSheetImport = import("@/pages/TmpMoodSheetCheck");
 
 const AppHome = lazy(() => appHomeImport);
 const AppStore = lazy(() => appStoreImport);
