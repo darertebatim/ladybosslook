@@ -163,26 +163,26 @@ export function MoodCelebrationSheet({
 
         {/* Quick actions below the main button */}
         {/* Share (secondary) + Back to Home (main) */}
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2.5 mb-4">
           <Button
             variant="ghost"
             onClick={() => { haptic.light(); handleShare(); }}
-            className="h-12 w-12 flex-shrink-0 rounded-full bg-white text-black active:bg-white/90 text-sm font-semibold shadow-sm"
+            className="h-14 w-14 flex-shrink-0 rounded-full bg-white text-black active:bg-white/90 text-sm font-semibold shadow-ios"
             aria-label={t('moodPage.celebration.shareAria')}
           >
-            <Share2 className="w-4 h-4" />
+            <Share2 className="w-5 h-5" />
           </Button>
           <Button
             variant="ghost"
             onClick={handleDone}
-            className="flex-1 h-12 rounded-full bg-gradient-orange text-white shadow-ios active:scale-[0.98] transition-transform text-base font-bold flex items-center justify-center gap-2"
+            className="flex-1 h-16 rounded-full bg-gradient-orange text-white shadow-ios active:scale-[0.98] transition-transform text-lg font-bold flex items-center justify-center gap-2.5"
           >
-            <FluentEmoji emoji={hasActivePlayer ? '▶️' : '🏠'} size={18} />
+            <FluentEmoji emoji={hasActivePlayer ? '▶️' : '🏠'} size={22} />
             <span>{hasActivePlayer ? t('moodPage.celebration.continueRoutine') : t('moodPage.celebration.backToHomePlanner')}</span>
           </Button>
         </div>
 
-        {/* 4 cards in one row */}
+        {/* 4 cards in one row, equal height */}
         <div className="grid grid-cols-4 gap-2">
           {ACTIONS.map((action) => {
             const label = t(action.labelKey);
@@ -191,17 +191,17 @@ export function MoodCelebrationSheet({
               key={action.labelKey}
               onClick={() => handleAction(action)}
               className={cn(
-                "flex flex-col items-center rounded-2xl px-1 pt-3 pb-2.5",
+                "flex flex-col items-center justify-between h-[96px] rounded-2xl px-1 pt-3 pb-2",
                 "bg-background/90 backdrop-blur-sm",
                 "active:scale-[0.96] transition-all",
               )}
             >
-              <img 
-                src={action.image} 
+              <img
+                src={action.image}
                 alt={label}
-                className="w-14 h-14 object-contain mb-1.5"
+                className="w-12 h-12 object-contain"
               />
-              <span className="text-[11px] font-semibold text-foreground text-center leading-tight">
+              <span className="text-[11px] font-semibold text-foreground text-center leading-tight line-clamp-2">
                 {label}
               </span>
             </button>
