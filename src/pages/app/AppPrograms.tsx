@@ -194,16 +194,18 @@ const AppCourses = () => {
       />
 
       <PageHeader
-        title={t("programs.myPrograms")}
+        title={
+          <span className="flex flex-col items-center leading-tight">
+            <span>{t("programs.myPrograms")}</span>
+            {totalPrograms > 0 && (
+              <span className="mt-0.5 text-[11px] font-medium text-fg-warm-muted">
+                {t("programs.enrolledCount", { count: totalPrograms })}
+              </span>
+            )}
+          </span>
+        }
         menu
         stats
-        subRow={
-          totalPrograms > 0 ? (
-            <p className="text-xs text-center text-fg-warm-muted">
-              {t("programs.enrolledCount", { count: totalPrograms })}
-            </p>
-          ) : undefined
-        }
       />
 
       {/* Scroll container */}

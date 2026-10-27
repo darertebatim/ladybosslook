@@ -4,12 +4,16 @@ export default function HeaderPreviewTmp() {
   return (
     <div className="app-theme min-h-screen bg-background">
       <PageHeader
-        title="My Programs"
+        title={
+          <span className="flex flex-col items-center leading-tight">
+            <span>My Programs</span>
+            <span className="mt-0.5 text-[11px] font-medium text-fg-warm-muted">
+              32 enrolled
+            </span>
+          </span>
+        }
         menu
         stats
-        subRow={
-          <p className="text-xs text-center text-fg-warm-muted">32 enrolled</p>
-        }
       />
       <div className="p-4 text-sm text-fg-warm-muted">header preview</div>
     </div>
