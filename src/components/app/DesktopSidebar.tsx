@@ -18,7 +18,7 @@ const NAV_ITEMS: NavItem[] = [
   { path: "/app/path", label: "My Rilo Path", icon: RouteIcon },
   { path: "/app/home", label: "Today", icon: ClipboardList },
   { path: "/app/player", label: "Listen", icon: Headphones, match: "/app/player" },
-  { path: "/app/tools", label: "Tools", icon: Compass },
+  { path: "/app/tools", label: "Explore", icon: Compass },
 ];
 
 function NavGroup({ items, pathname }: { items: NavItem[]; pathname: string }) {
