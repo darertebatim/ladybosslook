@@ -138,6 +138,31 @@ export function MyLearningCard() {
       .trim();
   })();
 
+  // Once the course is finished, the first attached audio playlist takes over —
+  // track its own progress instead of the finished lesson count.
+  const courseFinished = !courseId || !nextLesson;
+  const takeoverPlaylistId = courseFinished ? audioPlaylists[0]?.id : undefined;
+  const { data: playlistProgress } = useQuery({
+    queryKey: ['my-learning-playlist-progress', takeoverPlaylistId, user?.id],
+    enabled: !!takeoverPlaylistId && !!user?.id,
+    queryFn: async () => {
+      const { data: items, error } = await supabase
+        .from('audio_playlist_items')
+        .select('audio_id')
+        .eq('playlist_id', takeoverPlaylistId!);
+      if (error) throw error;
+      const ids = (items || []).map((i) => i.audio_id);
+      if (ids.length === 0) return { done: 0, total: 0 };
+      const { data: prog } = await supabase
+        .from('audio_progress')
+        .select('audio_id')
+        .eq('user_id', user!.id)
+        .eq('completed', true)
+        .in('audio_id', ids);
+      return { done: new Set((prog || []).map((p) => p.audio_id)).size, total: ids.length };
+    },
+  });
+
   if (!hasProgram || !enrollment) return null;
 
   const round = enrollment.program_rounds;
