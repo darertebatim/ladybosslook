@@ -58,10 +58,10 @@ export function PathProfileQuickCard({
         haptic.light();
         navigate('/app/myprofile');
       }}
-      className={`w-full flex items-center gap-3 text-left transition-transform active:scale-[0.99] ${
+      className={`flex items-center gap-3 text-left transition-transform active:scale-[0.99] ${
         inset
-          ? `rounded-xl bg-peach/70 px-2.5 py-2 ${className}`
-          : `px-3 py-2.5 rounded-2xl shadow-ios ${className}`
+          ? `w-[calc(100%+0.5rem)] rounded-2xl bg-peach px-3 py-2.5 ${className}`
+          : `w-full px-3 py-2.5 rounded-2xl shadow-ios ${className}`
       }`}
       style={inset ? undefined : { background: '#FFFFFF', border: `1px solid ${O.border}` }}
       aria-label="Open my profile"
