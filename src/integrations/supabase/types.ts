@@ -8117,6 +8117,30 @@ export type Database = {
           },
         ]
       }
+      user_synced_state: {
+        Row: {
+          created_at: string
+          key: string
+          updated_at: string
+          user_id: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          key: string
+          updated_at?: string
+          user_id: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          key?: string
+          updated_at?: string
+          user_id?: string
+          value?: string
+        }
+        Relationships: []
+      }
       user_tags: {
         Row: {
           color: string | null
