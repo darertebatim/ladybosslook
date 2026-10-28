@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Lock, ChevronRight, Crown, Check } from "lucide-react";
+import { Lock, ChevronRight, Crown, Check, Video } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { haptic } from '@/lib/haptics';
 import { FluentEmoji } from '@/components/ui/FluentEmoji';
@@ -55,6 +55,7 @@ interface PlaylistCardProps {
   /** Overrides the destination (e.g. program courses). */
   href?: string;
   hostContentType?: string;
+  mediaType?: 'audio' | 'video';
 }
 
 export const PlaylistCard = memo(function PlaylistCard({
@@ -75,6 +76,7 @@ export const PlaylistCard = memo(function PlaylistCard({
   categoryLabel,
   href,
   hostContentType = 'playlist',
+  mediaType = 'audio',
 }: PlaylistCardProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -147,6 +149,7 @@ export const PlaylistCard = memo(function PlaylistCard({
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 text-[12px] text-fg-warm-muted">
+            {mediaType === 'video' && <span className="inline-flex items-center gap-1"><Video className="h-3.5 w-3.5" />Video<span>·</span></span>}
             {category && <span className="font-medium capitalize">{categoryLabel || category}</span>}
             {category && totalDuration > 0 && <span>·</span>}
             {totalDuration > 0 && <span>{formatDuration(totalDuration)}</span>}

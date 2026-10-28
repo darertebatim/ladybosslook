@@ -10,6 +10,7 @@ import { PlaylistCard } from "@/components/audio/PlaylistCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isNativeApp } from "@/lib/platform";
 import { usePlayerData } from "@/hooks/useAppData";
+import { useVideoPlayerData } from "@/hooks/useVideoPlayerData";
 import { cn } from "@/lib/utils";
 import { PromoBanner } from "@/components/app/PromoBanner";
 import { HomeBanner } from "@/components/app/HomeBanner";
@@ -75,6 +76,11 @@ export default function AppPlayer() {
   const hasPlusAccess = isSubscribed;
   const [preferredLanguage, setPreferredLanguage] = useState("all");
   const { categories: dbCategories } = useMediaCategories("audio");
+  const { categories: videoCategories } = useMediaCategories("video");
+  const libraryCategories = useMemo(
+    () => [...new Map([...dbCategories, ...videoCategories].map((c) => [c.slug, c])).values()],
+    [dbCategories, videoCategories],
+  );
   // Topic chips on the Player are driven by the "Door" tag dimension (4 Doors)
   // from the unified tag schema, applied to playlists via content_tags.
   const { data: tagDimensions = [] } = useTagDimensions();
@@ -114,7 +120,7 @@ export default function AppPlayer() {
     const map = new Map<string, Set<string>>();
     for (const link of playlistContentTagLinks) {
       if (!map.has(link.tag_id)) map.set(link.tag_id, new Set());
-      map.get(link.tag_id)!.add(link.content_id);
+      map.get(link.tag_id)?.add(link.content_id);
     }
     return map;
   }, [playlistContentTagLinks]);
@@ -122,11 +128,11 @@ export default function AppPlayer() {
     const map: Record<string, { name: string; emoji?: string }> = {
       all: { name: t("player.categories.all"), emoji: "✨" },
     };
-    for (const c of dbCategories as any[]) {
+    for (const c of libraryCategories) {
       map[c.slug] = { name: c.label, emoji: c.emoji };
     }
     return map;
-  }, [dbCategories, t]);
+  }, [libraryCategories, t]);
 
   const handleLanguageChange = useCallback((lang: string) => {
     setPreferredLanguage(lang);
@@ -148,8 +154,29 @@ export default function AppPlayer() {
     }
   }, [searchParams, categoryConfig]);
 
-  const { playlists, playlistItems, progressData, enrollments, savedPlaylistIds, isLoading } =
-    usePlayerData();
+  const audioData = usePlayerData();
+  const videoData = useVideoPlayerData();
+  const { enrollments, savedPlaylistIds } = audioData;
+  const isLoading = audioData.isLoading || videoData.isLoading;
+  // Normalize video metadata once so both media types use every existing section/filter.
+  const playlists = useMemo(() => [
+    ...audioData.playlists.map((p) => ({ ...p, mediaType: 'audio' as const })),
+    ...videoData.playlists.map((p) => ({ ...p, mediaType: 'video' as const })),
+  ], [audioData.playlists, videoData.playlists]);
+  const playlistItems = useMemo(() => [
+    ...audioData.playlistItems,
+    ...videoData.items.map((item) => ({
+      playlist_id: item.playlist_id,
+      audio_id: item.video_id,
+      audio_content: item.video_content ? {
+        ...item.video_content, cover_image_url: item.video_content.thumbnail_url,
+      } : null,
+    })),
+  ], [audioData.playlistItems, videoData.items]);
+  const progressData = useMemo(() => [
+    ...audioData.progressData,
+    ...videoData.progress.map((p) => ({ ...p, audio_id: p.video_id, last_played_at: p.last_watched_at })),
+  ], [audioData.progressData, videoData.progress]);
 
   // Hot Tracks — individually featured audio tracks shown above All Playlists
   const { data: hotTracks = [] } = useQuery({
@@ -284,8 +311,8 @@ export default function AppPlayer() {
   };
 
   const categoryOrder = useMemo(
-    () => ["all", ...(dbCategories as any[]).map((c) => c.slug)],
-    [dbCategories],
+    () => ["all", ...libraryCategories.map((c) => c.slug)],
+    [libraryCategories],
   );
   const availableCategoriesSet = new Set(
     playlists
@@ -317,6 +344,7 @@ export default function AppPlayer() {
       })
       ?.filter(filterPlaylistBySearch)
       ?.filter(filterPlaylistByProgress)
+      ?.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
       ?.sort(preferredLanguageSorter(userLang)) || [];
 
   const playlistProgress = (playlist: any) => {
@@ -389,7 +417,7 @@ export default function AppPlayer() {
     const stats = getPlaylistStats(playlist.id);
     return (
       <PlaylistCard
-        key={playlist.id}
+        key={`${playlist.mediaType}-${playlist.id}`}
         id={playlist.id}
         name={playlist.name}
         description={playlist.description}
@@ -406,6 +434,10 @@ export default function AppPlayer() {
         totalDuration={stats.totalDuration}
         isFollowing={isFollowingPlaylist(playlist)}
         categoryLabel={categoryConfig[playlist.category]?.name}
+        mediaType={playlist.mediaType}
+        hostContentType={playlist.mediaType === 'video' ? 'video_playlist' : 'playlist'}
+        href={playlist.mediaType === 'video' && !isPlaylistLocked(playlist)
+          ? `/app/watch/playlist/${playlist.id}` : undefined}
       />
     );
   };
