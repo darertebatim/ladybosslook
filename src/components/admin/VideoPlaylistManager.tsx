@@ -21,8 +21,11 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { HostPicker, HostAssignment, loadContentHosts, saveContentHosts } from "./HostPicker";
+import { PlaylistTagPicker } from "./PlaylistTagPicker";
+import { useSaveContentTags } from "@/hooks/useContentTags";
 
-type PlaylistLanguage = 'american' | 'persian' | 'turkish' | 'spanish';
+type PlaylistLanguage = 'all' | 'american' | 'persian' | 'turkish' | 'spanish';
 
 interface PlaylistFormData {
   name: string;
@@ -61,9 +64,13 @@ interface FormProps {
   onGenerateCover: () => void;
   onImproveDescription: () => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
+  hosts: HostAssignment[];
+  setHosts: (hosts: HostAssignment[]) => void;
+  tagIds: string[];
+  setTagIds: (ids: string[]) => void;
 }
 
-const PlaylistForm = ({ formData, setFormData, onSubmit, onCancel, isSubmitting, submitLabel, programs, isUploadingCover, isGeneratingCover, isImprovingDescription, onUploadCover, onRemoveCover, onGenerateCover, onImproveDescription, fileInputRef }: FormProps) => (
+const PlaylistForm = ({ formData, setFormData, onSubmit, onCancel, isSubmitting, submitLabel, programs, isUploadingCover, isGeneratingCover, isImprovingDescription, onUploadCover, onRemoveCover, onGenerateCover, onImproveDescription, fileInputRef, hosts, setHosts, tagIds, setTagIds }: FormProps) => (
   <form onSubmit={onSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
     <div>
       <Label>Playlist Name *</Label>
@@ -135,7 +142,7 @@ const PlaylistForm = ({ formData, setFormData, onSubmit, onCancel, isSubmitting,
     </div>
     <div className="flex items-center space-x-2">
       <Switch checked={formData.requires_subscription} onCheckedChange={(c) => setFormData({ ...formData, requires_subscription: c })} />
-      <Label>Requires Simora Plus (Plus plan)</Label>
+      <Label>Requires Rilo Plus (Plus plan)</Label>
     </div>
     <div className="flex items-center space-x-2">
       <Switch checked={formData.available_on_mobile} onCheckedChange={(c) => setFormData({ ...formData, available_on_mobile: c })} />
@@ -161,6 +168,9 @@ const PlaylistForm = ({ formData, setFormData, onSubmit, onCancel, isSubmitting,
       <Input type="number" value={formData.sort_order} onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })} />
     </div>
 
+    <HostPicker value={hosts} onChange={setHosts} />
+    <PlaylistTagPicker value={tagIds} onChange={setTagIds} />
+
     <div className="flex justify-end gap-2 pt-2 sticky bottom-0 bg-background">
       <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
       <Button type="submit" disabled={isSubmitting}>
@@ -185,6 +195,19 @@ export const VideoPlaylistManager = () => {
   const editFileRef = useRef<HTMLInputElement>(null);
   const [createForm, setCreateForm] = useState<PlaylistFormData>({ ...defaultFormData });
   const [editForm, setEditForm] = useState<PlaylistFormData>({ ...defaultFormData });
+  const [createHosts, setCreateHosts] = useState<HostAssignment[]>([]);
+  const [editHosts, setEditHosts] = useState<HostAssignment[]>([]);
+  const [createTagIds, setCreateTagIds] = useState<string[]>([]);
+  const [editTagIds, setEditTagIds] = useState<string[]>([]);
+  const [isLoadingAssignments, setIsLoadingAssignments] = useState(false);
+  const saveTagLinks = useSaveContentTags();
+  const invalidateVideoPlaylists = () => {
+    queryClient.invalidateQueries({ queryKey: ['video-playlists-admin'] });
+    queryClient.invalidateQueries({ queryKey: ['video-playlists-app'] });
+    queryClient.invalidateQueries({ queryKey: ['video-playlist'] });
+    queryClient.invalidateQueries({ queryKey: ['content-hosts', 'playlist'] });
+    queryClient.invalidateQueries({ queryKey: ['playlist-tag-chips'] });
+  };
 
   const { data: playlists } = useQuery({
     queryKey: ['video-playlists-admin'],
@@ -255,21 +278,37 @@ export const VideoPlaylistManager = () => {
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from('video_playlists').insert({
+      const { data: created, error } = await supabase.from('video_playlists').insert({
         name: createForm.name, description: createForm.description,
         category: createForm.category, program_slug: createForm.program_slug || null,
         is_free: createForm.is_free, requires_subscription: createForm.requires_subscription,
         available_on_mobile: createForm.available_on_mobile, sort_order: createForm.sort_order,
         display_mode: createForm.display_mode, cover_image_url: createForm.cover_image_url || null,
         language: createForm.language,
-      });
+      }).select('id').single();
       if (error) throw error;
+      if (!created) throw new Error('Playlist could not be created');
+      try {
+        await saveContentHosts('playlist', created.id, createHosts);
+        await saveTagLinks.mutateAsync({ contentType: 'playlist', contentId: created.id, tagIds: createTagIds });
+      } catch (error) {
+        setEditingPlaylist({ id: created.id });
+        setEditForm({ ...createForm });
+        setEditHosts([...createHosts]);
+        setEditTagIds([...createTagIds]);
+        setIsCreateOpen(false);
+        setIsEditOpen(true);
+        invalidateVideoPlaylists();
+        throw new Error('Playlist created, but hosts or tags could not be saved. Retry using Update.');
+      }
     },
     onSuccess: () => {
       toast.success('Playlist created');
-      queryClient.invalidateQueries({ queryKey: ['video-playlists-admin'] });
+      invalidateVideoPlaylists();
       setIsCreateOpen(false);
       setCreateForm({ ...defaultFormData });
+      setCreateHosts([]);
+      setCreateTagIds([]);
     },
     onError: (e: any) => toast.error(e.message || 'Failed'),
   });
@@ -278,10 +317,17 @@ export const VideoPlaylistManager = () => {
     mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
       const { error } = await supabase.from('video_playlists').update(updates).eq('id', id);
       if (error) throw error;
+      try {
+        await saveContentHosts('playlist', id, editHosts);
+        await saveTagLinks.mutateAsync({ contentType: 'playlist', contentId: id, tagIds: editTagIds });
+      } catch (error) {
+        invalidateVideoPlaylists();
+        throw new Error('Playlist details saved, but hosts or tags could not be saved. Retry using Update.');
+      }
     },
     onSuccess: () => {
       toast.success('Playlist updated');
-      queryClient.invalidateQueries({ queryKey: ['video-playlists-admin'] });
+      invalidateVideoPlaylists();
       setIsEditOpen(false);
     },
     onError: (e: any) => toast.error(e.message || 'Failed'),
@@ -305,7 +351,17 @@ export const VideoPlaylistManager = () => {
     onError: (e: any) => toast.error(e.message || 'Failed'),
   });
 
-  const handleEdit = (p: any) => {
+  const handleEdit = async (p: any) => {
+    if (isLoadingAssignments) return;
+    setIsLoadingAssignments(true);
+    try {
+      const [hosts, tagsResult] = await Promise.all([
+        loadContentHosts('playlist', p.id),
+        supabase.from('content_tags').select('tag_id').eq('content_type', 'playlist').eq('content_id', p.id),
+      ]);
+      if (tagsResult.error) throw tagsResult.error;
+      setEditHosts(hosts);
+      setEditTagIds((tagsResult.data || []).map((link) => link.tag_id));
     setEditingPlaylist(p);
     setEditForm({
       name: p.name, description: p.description || '', program_slug: p.program_slug || '',
@@ -315,6 +371,11 @@ export const VideoPlaylistManager = () => {
       cover_image_url: p.cover_image_url || '', language: p.language || 'american',
     });
     setIsEditOpen(true);
+    } catch (error) {
+      toast.error('Could not load playlist hosts and tags. Please try again.');
+    } finally {
+      setIsLoadingAssignments(false);
+    }
   };
 
   return (
@@ -359,7 +420,7 @@ export const VideoPlaylistManager = () => {
                     <Button variant="ghost" size="icon" onClick={() => { setSelectedPlaylist(p); setIsTracksOpen(true); }} title="Manage Videos">
                       <List className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleEdit(p)} title="Edit">
+                    <Button variant="ghost" size="icon" onClick={() => handleEdit(p)} title="Edit" disabled={isLoadingAssignments}>
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => toggleHiddenMutation.mutate({ id: p.id, isHidden: p.is_hidden })} title={p.is_hidden ? 'Show' : 'Hide'}>
@@ -395,6 +456,8 @@ export const VideoPlaylistManager = () => {
             onGenerateCover={() => handleGenerateCover(false)}
             onImproveDescription={() => handleImproveDescription(false)}
             fileInputRef={createFileRef}
+            hosts={createHosts} setHosts={setCreateHosts}
+            tagIds={createTagIds} setTagIds={setCreateTagIds}
           />
         </DialogContent>
       </Dialog>
@@ -429,6 +492,8 @@ export const VideoPlaylistManager = () => {
             onGenerateCover={() => handleGenerateCover(true)}
             onImproveDescription={() => handleImproveDescription(true)}
             fileInputRef={editFileRef}
+            hosts={editHosts} setHosts={setEditHosts}
+            tagIds={editTagIds} setTagIds={setEditTagIds}
           />
         </DialogContent>
       </Dialog>

@@ -24,6 +24,8 @@ import { useTranslation } from "react-i18next";
 import { useShareContent } from "@/hooks/useShareContent";
 import { PromoBanner } from "@/components/app/PromoBanner";
 import { HomeBanner } from "@/components/app/HomeBanner";
+import { HostBadges } from "@/components/app/HostBadges";
+import { PlaylistTagChips } from "@/components/app/PlaylistTagChips";
 
 export default function AppVideoPlaylistDetail() {
   const { playlistId } = useParams();
@@ -226,7 +228,9 @@ export default function AppVideoPlaylistDetail() {
         <div className="px-4 mt-4 space-y-4 pb-safe">
           <div>
             <h1 className="text-2xl font-bold text-fg-warm">{playlist?.name}</h1>
+            {playlist && <HostBadges contentType="playlist" contentId={playlist.id} size="md" className="mt-2" />}
             {playlist?.description && <p className="text-sm text-fg-warm-muted mt-1">{playlist.description}</p>}
+            {playlist && <div className="mt-2"><PlaylistTagChips playlistId={playlist.id} /></div>}
           </div>
 
           {/* Progress */}

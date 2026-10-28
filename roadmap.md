@@ -22,3 +22,5 @@
 
 - [x] Fix broadcast voice preview, recording cleanup, upload retry and clearer playback controls; verified actual microphone recording, playback, removal and phone layout.
 - [ ] Verify broadcast voice upload and playback in a student's chat — blocked by external unmanaged signed-in preview access.
+- [x] Add shared host assignment and dimension-grouped tags to video playlist create/edit forms and learner displays.
+- [ ] Verify video playlist host/tag saving with an admin account — blocked by external unmanaged authenticated preview access.

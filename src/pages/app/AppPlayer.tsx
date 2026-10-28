@@ -435,7 +435,7 @@ export default function AppPlayer() {
         isFollowing={isFollowingPlaylist(playlist)}
         categoryLabel={categoryConfig[playlist.category]?.name}
         mediaType={playlist.mediaType}
-        hostContentType={playlist.mediaType === 'video' ? 'video_playlist' : 'playlist'}
+        hostContentType="playlist"
         href={playlist.mediaType === 'video' && !isPlaylistLocked(playlist)
           ? `/app/watch/playlist/${playlist.id}` : undefined}
       />
