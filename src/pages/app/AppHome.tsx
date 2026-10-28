@@ -1,3 +1,4 @@
+import { whenSyncedStorageReady } from '@/lib/syncedStorage';
 import { useQueuedPopup, POPUP_PRIORITY } from '@/contexts/PopupQueueContext';
 // AppHome - Main home page component
 import { useState, useMemo, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
