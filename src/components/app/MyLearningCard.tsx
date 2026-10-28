@@ -161,16 +161,17 @@ export function MyLearningCard() {
         : null;
   const courseTo = courseId ? `/app/learn/${courseId}` : null;
 
-  // Hero fallback for rounds without a course but with playlists
+  // Playlist hero: rounds without a course, or once every unlocked lesson is done
+  const courseDone = !courseId || !nextLesson;
   const heroPlaylist =
-    !courseId && audioPlaylists.length > 0
+    courseDone && audioPlaylists.length > 0
       ? {
           to: `/app/player/playlist/${audioPlaylists[0].id}`,
           title: audioPlaylists[0].name,
           cover: audioPlaylists[0].cover_image_url,
           label: 'Continue listening',
         }
-      : !courseId && videoPlaylists.length > 0
+      : courseDone && videoPlaylists.length > 0
         ? {
             to: `/app/watch/playlist/${videoPlaylists[0].id}`,
             title: videoPlaylists[0].name,
@@ -253,7 +254,7 @@ export function MyLearningCard() {
           </div>
           <div className="p-3.5">
           <p className="mb-2.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-fg-warm-muted">
-            Start here
+            {courseId ? 'Course complete · Up next' : 'Start here'}
           </p>
 
           <Link
