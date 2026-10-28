@@ -718,7 +718,20 @@ export function useTodayPath() {
         (p) => !p.category || !EDU_CATEGORIES.has(p.category),
       );
 
-      if (continuePick) {
+      if (programHeroPick) {
+        // Enrolled program (or the host's next one after completion) always
+        // leads the Path — even over an in-progress "continue listening" pick.
+        const pl = programHeroPick;
+        featuredAudio = {
+          kind: "playlist",
+          id: pl.id,
+          title: pl.name || "Your program",
+          category: pl.category,
+          coverEmoji: null,
+          coverImageUrl: (pl as any).cover_image_url ?? null,
+          mode: "default",
+        };
+      } else if (continuePick) {
         const pl = accessibleById.get(continuePick.playlistId)!;
         featuredAudio = {
           kind: "playlist",
