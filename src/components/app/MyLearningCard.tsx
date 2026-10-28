@@ -300,16 +300,18 @@ export function MyLearningCard() {
         <div className="px-4 pt-3">
           <div className="mb-1.5 flex justify-between text-[11.5px] font-semibold">
             <span className="text-fg-warm">
-              {completedCount} of {totalLessons} lessons done
+              {showPlaylistProgress
+                ? `${playlistProgress!.done} of ${playlistProgress!.total} tracks listened`
+                : `${completedCount} of ${totalLessons} lessons done`}
             </span>
-            {waitingCount > 0 && (
+            {!showPlaylistProgress && waitingCount > 0 && (
               <span className="text-fg-warm-muted">{waitingCount} unlocked &amp; waiting</span>
             )}
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-peach">
             <div
               className="h-full rounded-full bg-gradient-orange transition-[width] duration-700"
-              style={{ width: `${percent}%` }}
+              style={{ width: `${shownPercent}%` }}
             />
           </div>
           <Link
