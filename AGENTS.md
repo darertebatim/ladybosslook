@@ -15,3 +15,4 @@
 - Broadcast voice notes are re-encoded to MP3 in the browser before upload (`encodeVoiceMp3`), because Chrome's "audio/mp4" recordings contain Opus, which iPhones cannot play.
 - Main app pages reuse `PageHeader` with its `menu` / `stats` flags (burger + support headset left, centered title, trophy-streak pill right) via the shared `SupportNavButton` and `PresenceStatsPill`, instead of hand-rolling header bars; those widgets self-fetch, so pages stay thin.
 - Floating bottom navigation clearance belongs inside page scroll content via `app-main-floating-nav`, not on the outer layout, so page backgrounds extend behind the tabs.
+- Onboarding completion flags and today's Path snapshot sync to `user_synced_state` via `src/lib/syncedStorage.ts` (allow-listed localStorage prefixes); readers that gate on them must await `whenSyncedStorageReady()` so progress follows the account across devices.
