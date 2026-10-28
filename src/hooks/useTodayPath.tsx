@@ -974,7 +974,7 @@ export function useTodayPath() {
         ...skipTomorrowToday,
       ]);
 
-      const isDayOne = activeRoutines.length === 0 && !hasQuizResult;
+      const isDayOne = (routinesRes.data ?? []).length === 0 && !hasQuizResult;
 
       // Spec: users who skipped Rilo Doors are treated as the "Exploring" door
       // so they still get the door-aware Day 1–3 path (curated tour + teasers)
