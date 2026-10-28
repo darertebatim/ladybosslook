@@ -68,7 +68,7 @@ export function markStepTapped(stepId: string, day: string = getLocalDateStr()) 
  * and completion marking are still applied on top.
  */
 const planStorageKey = (userId: string, day: string) =>
-  `simora_path_plan_v2_${userId}_${day}`;
+  `simora_path_plan_v3_${userId}_${day}`;
 
 function readFrozenPlan(userId: string, day: string): PathStep[] | null {
   try {
@@ -298,6 +298,10 @@ export function useTodayPath() {
       // routines), but we still want to surface a productivity-themed playlist
       // — "Wellness Planning" — in the SECONDARY slot.
       let doorSecondaryAudioOverride: typeof accessiblePlaylists[number] | null = null;
+      // Enrolled-program hero. Beats continue/smart-next picks so students
+      // always see their program first; hands off to the host's next program
+      // once every lesson of the current one is finished.
+      let programHeroPick: typeof accessiblePlaylists[number] | null = null;
       if (hasDoorContext && doorPrimary === "emotion" && emotionKeys.length > 0) {
         // Picker keys ARE tag slugs (see RiloDoorsScreens · EMOTION_TOP5/REST).
         const wantedSlugs = new Set<string>(emotionKeys);
@@ -391,8 +395,43 @@ export function useTodayPath() {
           ]);
           // Program first: enrolled program playlists lead the Path so the
           // student keeps momentum. Enrollment unlocks them, so use all rows.
-          const programPick = allPlaylists.find((p) => owned.has(p.id)) ?? null;
-          if (programPick) doorAudioOverride = programPick;
+          // A program playlist counts as finished when EVERY track in it has
+          // a completed audio_progress row — finished programs hand the hero
+          // off to the host's next program instead of resurfacing forever.
+          const ownedIds = [...owned].filter((id) => allPlaylists.some((p) => p.id === id));
+          const finishedOwned = new Set<string>();
+          if (ownedIds.length > 0) {
+            const { data: ownedItems } = await supabase
+              .from("audio_playlist_items")
+              .select("playlist_id, audio_id")
+              .in("playlist_id", ownedIds);
+            const itemsByPl = new Map<string, string[]>();
+            const ownedAudioIds = new Set<string>();
+            for (const it of (ownedItems ?? []) as Array<{ playlist_id: string; audio_id: string }>) {
+              const arr = itemsByPl.get(it.playlist_id) ?? [];
+              arr.push(it.audio_id);
+              itemsByPl.set(it.playlist_id, arr);
+              ownedAudioIds.add(it.audio_id);
+            }
+            let completedAudio = new Set<string>();
+            if (ownedAudioIds.size > 0) {
+              const { data: ownedProg } = await supabase
+                .from("audio_progress")
+                .select("audio_id")
+                .eq("user_id", userId)
+                .eq("completed", true)
+                .in("audio_id", [...ownedAudioIds]);
+              completedAudio = new Set(((ownedProg ?? []) as any[]).map((r) => r.audio_id));
+            }
+            for (const [plId, audioIds] of itemsByPl) {
+              if (audioIds.length > 0 && audioIds.every((a) => completedAudio.has(a))) {
+                finishedOwned.add(plId);
+              }
+            }
+          }
+          const programPick =
+            allPlaylists.find((p) => owned.has(p.id) && !finishedOwned.has(p.id)) ?? null;
+          if (programPick) programHeroPick = programPick;
           if (hostId) {
             const inst = ((instRes.data ?? []) as any[]).find((i) => i.id === hostId);
             const hostDoors: string[] = inst?.doors ?? [];
@@ -407,15 +446,39 @@ export function useTodayPath() {
             const pool = accessiblePlaylists.filter((p) => hostIds.has(p.id) && !owned.has(p.id));
             const langPool = preferredLanguage ? pool.filter((p) => p.language === preferredLanguage) : [];
             const finalPool = langPool.length ? langPool : pool;
-            if (finalPool.length) {
-              const seed = [...today].reduce((a, c) => a + c.charCodeAt(0), 0);
-              const discovery = finalPool[seed % finalPool.length];
-              if (programPick) {
-                doorSecondaryAudioOverride = discovery;
-              } else {
-                doorAudioOverride = discovery;
-                doorSecondaryAudioOverride = finalPool.length > 1 ? finalPool[(seed + 1) % finalPool.length] : null;
+            const daySeed = [...today].reduce((a, c) => a + c.charCodeAt(0), 0);
+            const discovery = finalPool.length ? finalPool[daySeed % finalPool.length] : null;
+            // Completion handoff: every enrolled program playlist finished →
+            // promote the host's NEXT program (one the student isn't enrolled
+            // in) to the hero so they move on instead of stalling.
+            let nextProgramPick: typeof allPlaylists[number] | null = null;
+            if (!programPick && owned.size > 0) {
+              const { data: hostProgs } = await (supabase as any).from("content_hosts")
+                .select("content_id").eq("content_type", "program").eq("host_id", hostId);
+              const enrolledProgIds = new Set(progs.map((p) => p.id));
+              const nextProgIds = ((hostProgs ?? []) as any[])
+                .map((r) => r.content_id)
+                .filter((id: string) => !enrolledProgIds.has(id));
+              if (nextProgIds.length > 0) {
+                const { data: nextProgs } = await (supabase as any)
+                  .from("program_catalog")
+                  .select("id, audio_playlist_id")
+                  .in("id", nextProgIds);
+                const nextPlId = ((nextProgs ?? []) as any[])
+                  .map((p) => p.audio_playlist_id)
+                  .find(Boolean);
+                if (nextPlId) nextProgramPick = allPlaylists.find((p) => p.id === nextPlId) ?? null;
               }
+            }
+            if (nextProgramPick) {
+              programHeroPick = nextProgramPick;
+              if (discovery) doorSecondaryAudioOverride = discovery;
+            } else if (programPick) {
+              if (discovery) doorSecondaryAudioOverride = discovery;
+            } else if (discovery) {
+              doorAudioOverride = discovery;
+              doorSecondaryAudioOverride =
+                finalPool.length > 1 ? finalPool[(daySeed + 1) % finalPool.length] : null;
             }
           }
         }
@@ -655,7 +718,20 @@ export function useTodayPath() {
         (p) => !p.category || !EDU_CATEGORIES.has(p.category),
       );
 
-      if (continuePick) {
+      if (programHeroPick) {
+        // Enrolled program (or the host's next one after completion) always
+        // leads the Path — even over an in-progress "continue listening" pick.
+        const pl = programHeroPick;
+        featuredAudio = {
+          kind: "playlist",
+          id: pl.id,
+          title: pl.name || "Your program",
+          category: pl.category,
+          coverEmoji: null,
+          coverImageUrl: (pl as any).cover_image_url ?? null,
+          mode: "default",
+        };
+      } else if (continuePick) {
         const pl = accessibleById.get(continuePick.playlistId)!;
         featuredAudio = {
           kind: "playlist",
