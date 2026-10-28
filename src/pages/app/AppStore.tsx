@@ -418,29 +418,64 @@ const AppStore = () => {
                   {t("toolsPage.allTools")}
                 </h2>
 
-                {/* Planner — promoted entry above all tools */}
+                {/* Rilo Academy — promoted banner above all tools */}
                 {!searchQuery && (
-                  <Link
-                    to="/app/home"
-                    onClick={() => haptic.medium()}
-                    className="flex items-center gap-3 px-4 py-3 mb-2 rounded-2xl shadow-ios active:scale-[0.98] transition-transform bg-gradient-to-br from-[hsl(var(--brand-primary-light))] to-[hsl(var(--brand-primary))]"
+                  <button
+                    onClick={() => {
+                      haptic.light();
+                      navigate('/app/academy');
+                    }}
+                    className="relative w-full overflow-hidden rounded-2xl text-left active:scale-[0.98] transition-transform shadow-ios mb-2"
+                    style={{
+                      touchAction: 'pan-y',
+                      background:
+                        'linear-gradient(120deg, #F5A623 0%, #EE7431 45%, #E1572B 100%)',
+                    }}
                   >
-                    <div className="h-10 w-10 rounded-xl bg-white/25 flex items-center justify-center shrink-0">
-                      <ClipboardList
-                        className="h-5 w-5 text-white"
-                        strokeWidth={2.2}
-                      />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[15px] font-bold text-white leading-tight">
-                        {t("menu.items.planner")}
+                    {/* Shimmer */}
+                    <motion.div
+                      aria-hidden
+                      initial={{ x: '-120%' }}
+                      animate={{ x: '220%' }}
+                      transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 1.6, ease: 'easeInOut' }}
+                      className="pointer-events-none absolute inset-y-0 w-1/3"
+                      style={{
+                        background:
+                          'linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
+                      }}
+                    />
+                    {/* Glow blob */}
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute -top-8 -right-8 h-32 w-32 rounded-full opacity-70 blur-2xl"
+                      style={{ background: 'radial-gradient(circle, #FFE3B8 0%, transparent 70%)' }}
+                    />
+                    <div className="relative flex items-center gap-3 p-3.5">
+                      <div
+                        className="h-11 w-11 rounded-xl flex items-center justify-center shrink-0"
+                        style={{
+                          background: 'linear-gradient(135deg, #7C2D12 0%, #5B1E0C 100%)',
+                          boxShadow: '0 6px 16px -6px rgba(92,29,12,0.6)',
+                        }}
+                      >
+                        <GraduationCap className="h-5 w-5 text-[#FFD27A]" strokeWidth={2.4} />
                       </div>
-                      <div className="text-[11px] text-white/85 mt-0.5 leading-tight">
-                        {t("toolsPage.plannerSubtitle")}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-bold text-[14px] leading-tight">
+                          {t("player.title") === "پخش‌کننده" ? "آکادمی ریلو" : "Rilo Academy"}
+                        </p>
+                        <p className="text-white/85 text-[12px] leading-tight mt-0.5">
+                          {t("player.title") === "پخش‌کننده" ? "دوره‌ها و وبینارها" : "Courses & webinars"}
+                        </p>
+                      </div>
+                      <div className="shrink-0 h-7 px-2.5 rounded-full bg-white/20 backdrop-blur flex items-center gap-1">
+                        <GraduationCap className="h-3 w-3 text-white" />
+                        <span className="text-white text-[11px] font-bold tracking-wide">
+                          {t("player.title") === "پخش‌کننده" ? "آکادمی" : "ACADEMY"}
+                        </span>
                       </div>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-white/80 shrink-0" />
-                  </Link>
+                  </button>
                 )}
 
 
