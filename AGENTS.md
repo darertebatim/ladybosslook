@@ -17,3 +17,4 @@
 - Floating bottom navigation clearance belongs inside page scroll content via `app-main-floating-nav`, not on the outer layout, so page backgrounds extend behind the tabs.
 - Onboarding completion flags and today's Path snapshot sync to `user_synced_state` via `src/lib/syncedStorage.ts` (allow-listed localStorage prefixes); readers that gate on them must await `whenSyncedStorageReady()` so progress follows the account across devices.
 - Player merges audio and video playlists into the same browsing sections and filters, reusing PlaylistCard with media-specific destinations and host tags; video progress queries are account-scoped to avoid mixing users' progress.
+- Audio and video playlist editors share HostPicker and PlaylistTagPicker; both store assignments with content_type='playlist' keyed by playlist UUID, matching the existing schema and shared learner displays.

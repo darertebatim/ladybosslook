@@ -189,11 +189,12 @@ export async function saveContentHosts(
   hosts: HostAssignment[],
 ) {
   // Wipe existing
-  await (supabase as any)
+  const { error: deleteError } = await (supabase as any)
     .from('content_hosts')
     .delete()
     .eq('content_type', contentType)
     .eq('content_id', contentId);
+  if (deleteError) throw deleteError;
 
   if (!hosts.length) return;
 
