@@ -88,7 +88,7 @@ function writeFrozenPlan(userId: string, day: string, steps: PathStep[]) {
     const stripped = steps.map(({ done, ...rest }: any) => rest);
     localStorage.setItem(planStorageKey(userId, day), JSON.stringify(stripped));
     // Purge previous days' plan snapshots to avoid unbounded growth.
-    const prefix = `simora_path_plan_${userId}_`;
+    const prefix = `simora_path_plan_`;
     for (let i = localStorage.length - 1; i >= 0; i--) {
       const k = localStorage.key(i);
       if (k && k.startsWith(prefix) && k !== planStorageKey(userId, day)) {
