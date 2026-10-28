@@ -72,7 +72,7 @@ export function markStepTapped(stepId: string, day: string = getLocalDateStr()) 
 // rebuilds today's Path immediately instead of serving the morning snapshot.
 let enrollFingerprint = "none";
 const planStorageKey = (userId: string, day: string) =>
-  `simora_path_plan_v4_${userId}_${day}_${enrollFingerprint}`;
+  `simora_path_plan_v5_${userId}_${day}_${enrollFingerprint}`;
 
 function readFrozenPlan(userId: string, day: string): PathStep[] | null {
   try {
@@ -407,7 +407,7 @@ export function useTodayPath() {
           // A program playlist counts as finished when EVERY track in it has
           // a completed audio_progress row — finished programs hand the hero
           // off to the host's next program instead of resurfacing forever.
-          const ownedIds = [...owned].filter((id) => allPlaylists.some((p) => p.id === id));
+          const ownedIds = [...owned];
           const finishedOwned = new Set<string>();
           if (ownedIds.length > 0) {
             const { data: ownedItems } = await supabase
