@@ -84,11 +84,16 @@ const AppHome = () => {
   const [showPlannerIntroSheet, setShowPlannerIntroSheet] = useState(false);
   const plannerIntroCanShow = useQueuedPopup('planner-intro', POPUP_PRIORITY.intro, showPlannerIntroSheet);
   useEffect(() => {
-    const seen = localStorage.getItem('simora_onboarding_completed_what-is-rilo') === 'true';
-    const dismissed = localStorage.getItem('simora_onboarding_planner_intro_dismissed') === 'true';
-    if (!seen && !dismissed) {
-      setShowPlannerIntroSheet(true);
-    }
+    let cancelled = false;
+    whenSyncedStorageReady().then(() => {
+      if (cancelled) return;
+      const seen = localStorage.getItem('simora_onboarding_completed_what-is-rilo') === 'true';
+      const dismissed = localStorage.getItem('simora_onboarding_planner_intro_dismissed') === 'true';
+      if (!seen && !dismissed) {
+        setShowPlannerIntroSheet(true);
+      }
+    });
+    return () => { cancelled = true; };
   }, []);
   const handlePlannerIntroStart = useCallback(() => {
     localStorage.setItem('simora_onboarding_planner_intro_dismissed', 'true');
