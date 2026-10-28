@@ -199,7 +199,7 @@ export function MyLearningCard() {
           </div>
         </div>
         {/* Profile peek — between the welcome and the program name */}
-        <PathProfileQuickCard variant="inset" className="mt-4" />
+        <PathProfileQuickCard variant="inset" className="-mx-1 mt-4" />
       </div>
 
       {/* Continue where you left off */}
@@ -290,7 +290,7 @@ export function MyLearningCard() {
             to={programPath}
             state={{ from: location.pathname }}
             onClick={() => haptic.light()}
-            className="mt-3 flex items-center gap-2 rounded-2xl bg-peach px-3.5 py-2.5 active:opacity-80"
+            className="-mx-1 mt-3 flex items-center gap-2 rounded-2xl bg-peach px-3.5 py-2.5 active:opacity-80"
           >
             <span className="min-w-0 flex-1"><p className="text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
               {enrollment.course_name}
@@ -306,7 +306,7 @@ export function MyLearningCard() {
           to={programPath}
           state={{ from: location.pathname }}
           onClick={() => haptic.light()}
-          className="mx-4 mt-3 flex items-center gap-2 rounded-2xl bg-peach px-3.5 py-2.5 active:opacity-80"
+          className="mx-3 mt-3 flex items-center gap-2 rounded-2xl bg-peach px-3.5 py-2.5 active:opacity-80"
         >
           <span className="min-w-0 flex-1"><p className="text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
             {enrollment.course_name}
