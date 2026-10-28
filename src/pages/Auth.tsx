@@ -1,3 +1,4 @@
+import { whenSyncedStorageReady } from '@/lib/syncedStorage';
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -68,14 +69,20 @@ export default function Auth() {
   // Redirect if already authenticated, or to onboarding if not seen yet
   useEffect(() => {
     if (user) {
-      const hasSeenDoors = localStorage.getItem('simora_onboarding_completed_rilo-doors') === 'true';
-      // First sign-in/up: show "Rilo Doors" onboarding once — but never when the
-      // person came from a website page; they must land back where they started.
-      if (!hasSeenDoors && !hasCustomRedirect) {
-        navigate('/app/onboarding/rilo-doors', { replace: true });
-      } else {
-        navigate(redirectPath, { replace: true });
-      }
+      let cancelled = false;
+      // Wait for server-synced onboarding flags so another device's progress counts.
+      whenSyncedStorageReady().then(() => {
+        if (cancelled) return;
+        const hasSeenDoors = localStorage.getItem('simora_onboarding_completed_rilo-doors') === 'true';
+        // First sign-in/up: show "Rilo Doors" onboarding once — but never when the
+        // person came from a website page; they must land back where they started.
+        if (!hasSeenDoors && !hasCustomRedirect) {
+          navigate('/app/onboarding/rilo-doors', { replace: true });
+        } else {
+          navigate(redirectPath, { replace: true });
+        }
+      });
+      return () => { cancelled = true; };
     }
   }, [user, authLoading, navigate, redirectPath, hasCustomRedirect]);
 

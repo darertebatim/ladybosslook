@@ -8,6 +8,9 @@ import { logBuildInfo } from './lib/buildInfo';
 import { initAppsFlyer, logAppsFlyerEvent } from './lib/appsflyer';
 import { captureInstructorFromUrl } from './hooks/useInstructorOnboarding';
 import './i18n';
+import { installSyncedStorage } from './lib/syncedStorage';
+
+installSyncedStorage();
 
 // Global error handler to catch any uncaught errors
 window.onerror = (message, source, lineno, colno, error) => {

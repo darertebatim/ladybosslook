@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { endOfDay, startOfDay } from "date-fns";
+import { whenSyncedStorageReady } from "@/lib/syncedStorage";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { getLocalDateStr } from "@/lib/localDate";
@@ -116,6 +117,8 @@ export function useTodayPath() {
     staleTime: 30_000,
     queryFn: async () => {
       const userId = user!.id;
+      // Pull onboarding flags + today's plan from the server first (cross-device).
+      await whenSyncedStorageReady();
 
       // Fire all source queries in parallel.
       const [moodRes, quizRes, routinesRes, dismissalsRes, streakRes, actionsRes, doorAnsRes, plannerOnbRes] = await Promise.all([
