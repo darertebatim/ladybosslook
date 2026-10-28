@@ -7,12 +7,13 @@ import {
   X,
   Loader2,
   ChevronRight,
-  ClipboardList,
   Crown,
   Sparkles,
   CheckCircle2,
   Headset,
+  GraduationCap,
 } from "lucide-react";
+import { motion } from "framer-motion";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
