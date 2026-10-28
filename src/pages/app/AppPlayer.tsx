@@ -344,6 +344,7 @@ export default function AppPlayer() {
       })
       ?.filter(filterPlaylistBySearch)
       ?.filter(filterPlaylistByProgress)
+      ?.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
       ?.sort(preferredLanguageSorter(userLang)) || [];
 
   const playlistProgress = (playlist: any) => {

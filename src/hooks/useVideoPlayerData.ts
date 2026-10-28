@@ -15,7 +15,7 @@ export function useVideoPlayerData() {
     },
   });
   const items = useQuery({
-    queryKey: ['video-playlist-items-app'],
+    queryKey: ['player-video-playlist-items'],
     queryFn: async () => {
       const { data, error } = await supabase.from('video_playlist_items')
         .select('playlist_id, video_id, video_content(id, duration_seconds, thumbnail_url)')
