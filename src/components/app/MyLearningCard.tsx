@@ -290,14 +290,14 @@ export function MyLearningCard() {
             to={programPath}
             state={{ from: location.pathname }}
             onClick={() => haptic.light()}
-            className="mt-3 block active:opacity-70"
+            className="mt-3 flex items-center gap-2 rounded-2xl bg-peach px-3.5 py-2.5 active:opacity-80"
           >
-            <p className="text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
+            <span className="min-w-0 flex-1"><p className="text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
               {enrollment.course_name}
             </p>
             <p className="mt-0.5 text-[11px] font-medium leading-tight text-fg-warm/60 line-clamp-1">
               {round?.round_name ? `${round.round_name}${isSelfPaced ? ' · Self-paced' : ''}` : 'Self-paced'}
-            </p>
+            </p></span><ChevronRight className="h-4 w-4 flex-shrink-0 text-fg-warm-muted" />
           </Link>
         </div>
       )}
@@ -306,14 +306,14 @@ export function MyLearningCard() {
           to={programPath}
           state={{ from: location.pathname }}
           onClick={() => haptic.light()}
-          className="mt-3 block px-4 active:opacity-70"
+          className="mx-4 mt-3 flex items-center gap-2 rounded-2xl bg-peach px-3.5 py-2.5 active:opacity-80"
         >
-          <p className="text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
+          <span className="min-w-0 flex-1"><p className="text-[13.5px] font-semibold leading-tight text-fg-warm line-clamp-1">
             {enrollment.course_name}
           </p>
           <p className="mt-0.5 text-[11px] font-medium leading-tight text-fg-warm/60 line-clamp-1">
             {round?.round_name ? `${round.round_name}${isSelfPaced ? ' · Self-paced' : ''}` : 'Self-paced'}
-          </p>
+          </p></span><ChevronRight className="h-4 w-4 flex-shrink-0 text-fg-warm-muted" />
         </Link>
       )}
 
