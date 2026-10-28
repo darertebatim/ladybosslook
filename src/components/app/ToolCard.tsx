@@ -11,14 +11,14 @@ import { useTodayMood } from '@/hooks/useMoodLogs';
 import { usePeach } from '@/lib/peachPalette';
 import { 
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
-  Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, 
-  GraduationCap, User, HeartHandshake, CalendarPlus, Clock, Headphones, Plus, Wand2, Play, Flame, LucideIcon
+   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle, 
+  GraduationCap, User, HeartHandshake, CalendarPlus, Clock, Headphones, Plus, Wand2, Play, Flame, ClipboardList, LucideIcon
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
   BookOpen, Wind, Droplets, Sparkles, Brain, Dumbbell, Waves,
   Bot, Trophy, Smile, Heart, Timer, Palette, PenLine, ClipboardCheck, Target, Circle,
-  GraduationCap, User, HeartHandshake, CalendarPlus, Clock, Headphones, Plus, Wand2, Play, Flame
+  GraduationCap, User, HeartHandshake, CalendarPlus, Clock, Headphones, Plus, Wand2, Play, Flame, ClipboardList
 };
 
 // Tools that require simora+ subscription
