@@ -185,7 +185,7 @@ export default function LearnCourses() {
   const [cForm, setCForm] = useState({
     title: '', subtitle: '', description: '', intro_note: '', language: '',
     cover_image_url: '', is_published: false, sequential_lessons: false, sort_order: 0,
-    is_free: false, requires_subscription: false, available_on_mobile: true,
+    is_free: false, requires_subscription: false, available_on_mobile: true, show_on_player: false,
   });
   const [cRounds, setCRounds] = useState<string[]>([]);
   const [cProgram, setCProgram] = useState<string | null>(null);
@@ -240,6 +240,7 @@ export default function LearnCourses() {
         is_free: cForm.is_free,
         requires_subscription: cForm.requires_subscription,
         available_on_mobile: cForm.available_on_mobile,
+        show_on_player: cForm.show_on_player,
       };
       let courseId = courseDialog.course?.id;
       if (courseId) {
@@ -440,6 +441,7 @@ export default function LearnCourses() {
       is_free: (course as any)?.is_free ?? false,
       requires_subscription: (course as any)?.requires_subscription ?? false,
       available_on_mobile: (course as any)?.available_on_mobile ?? true,
+      show_on_player: (course as any)?.show_on_player ?? false,
     });
     const roundIds = course?.rounds.map((r) => r.round_id) || [];
     setCRounds(roundIds);
@@ -886,6 +888,13 @@ export default function LearnCourses() {
                 <p className="text-xs text-muted-foreground">Turn off to hide it from the Learn page in the app.</p>
               </div>
               <Switch checked={cForm.available_on_mobile} onCheckedChange={(v) => setCForm({ ...cForm, available_on_mobile: v })} />
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <Label>Show on Player</Label>
+                <p className="text-xs text-muted-foreground">List this course on the Player page for everyone (use with Free or Rilo Plus). Program students always see their courses there.</p>
+              </div>
+              <Switch checked={cForm.show_on_player} onCheckedChange={(v) => setCForm({ ...cForm, show_on_player: v })} />
             </div>
             <div className="space-y-2">
               <Label>Access — pick a program, then its rounds</Label>

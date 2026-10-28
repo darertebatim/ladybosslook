@@ -11,6 +11,10 @@ export interface MyProgramCourse {
   lessonCount: number;
   completedLessons: number;
   totalDuration: number;
+  /** 'program' = reached via enrollment, 'shared' = listed on Player via show_on_player */
+  source: 'program' | 'shared';
+  isFree: boolean;
+  requiresSubscription: boolean;
 }
 
 /**
@@ -32,8 +36,6 @@ export function useMyProgramCourses() {
       if (error) throw error;
       const slugs = [...new Set((enr || []).map((e) => e.program_slug).filter(Boolean))] as string[];
       const roundIds = [...new Set((enr || []).map((e) => e.round_id).filter(Boolean))] as string[];
-      if (!slugs.length && !roundIds.length) return [];
-
       const [roundRes, linkRes] = await Promise.all([
         roundIds.length
           ? supabase.from('learn_course_rounds').select('course_id').in('round_id', roundIds)
@@ -42,17 +44,21 @@ export function useMyProgramCourses() {
           ? supabase.from('program_content_links').select('content_id').eq('content_type', 'course').in('program_slug', slugs)
           : Promise.resolve({ data: [], error: null } as any),
       ]);
+      const { data: shared } = await supabase.from('learn_courses').select('id')
+        .eq('show_on_player', true).eq('is_published', true);
       if (roundRes.error) throw roundRes.error;
       if (linkRes.error) throw linkRes.error;
       const ids = [...new Set([
         ...(roundRes.data || []).map((r: any) => r.course_id),
         ...(linkRes.data || []).map((r: any) => r.content_id),
       ].filter(Boolean))] as string[];
+      const programIds = new Set(ids);
+      for (const r of (shared || []) as any[]) if (!programIds.has(r.id)) ids.push(r.id);
       if (!ids.length) return [];
 
       const [{ data: courses, error: cErr }, { data: modules, error: mErr }] = await Promise.all([
         supabase.from('learn_courses')
-          .select('id, title, description, cover_image_url, language, sort_order')
+          .select('id, title, description, cover_image_url, language, sort_order, is_free, requires_subscription')
           .in('id', ids).eq('is_published', true).order('sort_order'),
         supabase.from('learn_modules').select('id, course_id').in('course_id', ids).eq('is_published', true),
       ]);
@@ -85,6 +91,9 @@ export function useMyProgramCourses() {
         lessonCount: stats[c.id]?.n || 0,
         completedLessons: stats[c.id]?.c || 0,
         totalDuration: stats[c.id]?.d || 0,
+        source: programIds.has(c.id) ? 'program' : 'shared',
+        isFree: !!(c as any).is_free,
+        requiresSubscription: !!(c as any).requires_subscription,
       }));
     },
   });

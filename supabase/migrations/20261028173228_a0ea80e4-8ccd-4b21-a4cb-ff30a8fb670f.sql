@@ -1,0 +1,1 @@
+ALTER TABLE public.learn_courses ADD COLUMN IF NOT EXISTS show_on_player boolean NOT NULL DEFAULT false;

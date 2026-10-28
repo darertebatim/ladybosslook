@@ -359,8 +359,29 @@ export default function AppPlayer() {
     progressFilter === "all" && selectedCategory === "all" && !searchQuery;
   const { data: myCourses = [] } = useMyProgramCourses();
   const visibleCourses = showSections
-    ? myCourses.filter((c) => c.lessonCount === 0 || c.completedLessons < c.lessonCount)
+    ? myCourses.filter((c) => c.source === 'program' && (c.lessonCount === 0 || c.completedLessons < c.lessonCount))
     : [];
+  const renderCourseCard = (c: (typeof myCourses)[number]) => (
+                  <PlaylistCard
+                    key={`course-${c.id}`}
+                    id={c.id}
+                    name={c.title}
+                    description={c.description ?? undefined}
+                    coverImageUrl={c.cover_image_url ?? undefined}
+                    category="course"
+                    categoryLabel={t("player.courseLabel", "Course")}
+                    language={c.language ?? undefined}
+                    isFree={c.isFree}
+                    isLocked={false}
+                    trackCount={c.lessonCount}
+                    completedTracks={c.completedLessons}
+                    totalDuration={c.totalDuration}
+                    isFollowing={c.source === 'program'}
+                    href={`/app/learn/${c.id}`}
+                    hostContentType="course"
+                  />
+  );
+  const sharedCourses = showSections ? myCourses.filter((c) => c.source === 'shared') : [];
   const myPlaylists = showSections
     ? filteredPlaylists.filter(
         (p) => isFollowingPlaylist(p) && playlistProgress(p) < 100,
@@ -781,28 +802,22 @@ export default function AppPlayer() {
                 </h2>
               </div>
               <div className="flex flex-col gap-3">
-                {visibleCourses.map((c) => (
-                  <PlaylistCard
-                    key={`course-${c.id}`}
-                    id={c.id}
-                    name={c.title}
-                    description={c.description ?? undefined}
-                    coverImageUrl={c.cover_image_url ?? undefined}
-                    category="course"
-                    categoryLabel={t("player.courseLabel", "Course")}
-                    language={c.language ?? undefined}
-                    isFree={false}
-                    isLocked={false}
-                    trackCount={c.lessonCount}
-                    completedTracks={c.completedLessons}
-                    totalDuration={c.totalDuration}
-                    isFollowing
-                    href={`/app/learn/${c.id}`}
-                    hostContentType="course"
-                  />
-                ))}
+                {visibleCourses.map(renderCourseCard)}
                 {myPlaylists.map(renderCard)}
               </div>
+            </div>
+          )}
+
+          {/* Courses shared on Player (free / Plus) */}
+          {sharedCourses.length > 0 && (
+            <div className="px-4 pt-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <FluentEmoji emoji="🎓" size={16} />
+                <h2 className="text-[11px] font-bold text-fg-warm-muted uppercase tracking-[0.12em]">
+                  {t("player.coursesSection", "Courses")}
+                </h2>
+              </div>
+              <div className="flex flex-col gap-3">{sharedCourses.map(renderCourseCard)}</div>
             </div>
           )}
 
