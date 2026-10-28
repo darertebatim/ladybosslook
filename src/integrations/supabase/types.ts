@@ -4070,6 +4070,7 @@ export type Database = {
           language: string | null
           requires_subscription: boolean
           sequential_lessons: boolean
+          show_on_player: boolean
           sort_order: number
           subtitle: string | null
           title: string
@@ -4087,6 +4088,7 @@ export type Database = {
           language?: string | null
           requires_subscription?: boolean
           sequential_lessons?: boolean
+          show_on_player?: boolean
           sort_order?: number
           subtitle?: string | null
           title: string
@@ -4104,6 +4106,7 @@ export type Database = {
           language?: string | null
           requires_subscription?: boolean
           sequential_lessons?: boolean
+          show_on_player?: boolean
           sort_order?: number
           subtitle?: string | null
           title?: string
