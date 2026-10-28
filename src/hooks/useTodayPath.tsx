@@ -372,7 +372,7 @@ export function useTodayPath() {
               ? supabase.from("program_catalog" as any).select("id, slug, audio_playlist_id").in("slug", slugs)
               : Promise.resolve({ data: [] as any[] }),
             roundIds.length
-              ? supabase.from("program_round_playlists").select("playlist_id").in("round_id", roundIds)
+              ? supabase.from("program_round_playlists").select("round_id, playlist_id").in("round_id", roundIds)
               : Promise.resolve({ data: [] as any[] }),
             slugs.length
               ? supabase.from("program_content_links").select("content_id, content_type").in("program_slug", slugs)
@@ -438,8 +438,30 @@ export function useTodayPath() {
               }
             }
           }
-          const programPick =
-            allPlaylists.find((p) => owned.has(p.id) && !finishedOwned.has(p.id)) ?? null;
+          // Newest enrollment first: the program the student just joined leads.
+          const orderedOwned: string[] = [];
+          const roundPl = (roundPlRes.data ?? []) as any[];
+          for (const e of enrollRows) {
+            const pl = e.program_slug ? progBySlug.get(e.program_slug)?.audio_playlist_id : null;
+            if (pl) orderedOwned.push(pl);
+            for (const r of roundPl) if (r.round_id === e.round_id) orderedOwned.push(r.playlist_id);
+          }
+          // Program playlists may be outside the first 60 catalog rows or not
+          // listed on mobile — enrollment unlocks them, so fetch directly.
+          const missing = [...new Set(orderedOwned)].filter((id) => !allPlaylists.some((p) => p.id === id));
+          if (missing.length) {
+            const { data: extra } = await supabase
+              .from("audio_playlists")
+              .select("id, name, category, cover_image_url, language, requires_subscription, tracks_standalone")
+              .in("id", missing);
+            allPlaylists.push(...((extra ?? []) as any[]));
+          }
+          let programPick: typeof allPlaylists[number] | null = null;
+          for (const id of orderedOwned) {
+            if (finishedOwned.has(id)) continue;
+            const pl = allPlaylists.find((p) => p.id === id);
+            if (pl) { programPick = pl; break; }
+          }
           if (programPick) programHeroPick = programPick;
           if (hostId) {
             const inst = ((instRes.data ?? []) as any[]).find((i) => i.id === hostId);
@@ -708,8 +730,8 @@ export function useTodayPath() {
       const useTrack = (preferTrack || trackByRotation) && hotTracks.length > 0;
 
       type FeaturedAudio =
-        | { kind: "track"; id: string; title: string; category: string | null; coverEmoji: string | null; coverImageUrl: string | null; mode?: "continue" | "smart_next" | "default"; resumeAudioId?: string | null }
-        | { kind: "playlist"; id: string; title: string; category: string | null; coverEmoji: string | null; coverImageUrl: string | null; mode?: "continue" | "smart_next" | "default"; resumeAudioId?: string | null };
+        | { kind: "track"; id: string; title: string; category: string | null; coverEmoji: string | null; coverImageUrl: string | null; mode?: "continue" | "smart_next" | "default"; resumeAudioId?: string | null; programLabel?: string | null }
+        | { kind: "playlist"; id: string; title: string; category: string | null; coverEmoji: string | null; coverImageUrl: string | null; mode?: "continue" | "smart_next" | "default"; resumeAudioId?: string | null; programLabel?: string | null };
       let featuredAudio: FeaturedAudio | null = null;
       type SecondaryAudio =
         | { kind: "track"; id: string; title: string; category: string | null; coverEmoji: string | null; coverImageUrl: string | null }
@@ -739,6 +761,7 @@ export function useTodayPath() {
           coverEmoji: null,
           coverImageUrl: (pl as any).cover_image_url ?? null,
           mode: "default",
+          programLabel: "Your program",
         };
       } else if (continuePick) {
         const pl = accessibleById.get(continuePick.playlistId)!;

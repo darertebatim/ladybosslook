@@ -137,6 +137,8 @@ export interface PathInputs {
     mode?: "continue" | "smart_next" | "default";
     /** If set, navigate to this specific track (used for Continue to resume). */
     resumeAudioId?: string | null;
+    /** Set when this is the student's enrolled program — overrides door kickers. */
+    programLabel?: string | null;
   } | null;
   /** Secondary audio (non-educational): a playlist or standalone track. */
   secondaryAudio?: {
@@ -255,7 +257,7 @@ function plannerIntroStep(): PathStep {
 function audioToStep(a: NonNullable<PathInputs["featuredAudio"]>, opts?: { kicker?: string; tint?: PathStep["tint"] }): PathStep {
   const isTrack = a.kind === "track";
   const mode = a.mode ?? "default";
-  const kicker = opts?.kicker ?? (mode === "continue"
+  const kicker = a.programLabel ?? opts?.kicker ?? (mode === "continue"
     ? a.category ? `Continue · ${a.category}` : "Continue listening"
     : mode === "smart_next"
       ? a.category ? `More like this · ${a.category}` : "Picked for you next"
@@ -537,7 +539,7 @@ export function buildStandardPath(inputs: PathInputs): PathStep[] {
     const a = inputs.featuredAudio;
     const isTrack = a.kind === "track";
     const mode = a.mode ?? "default";
-    const kicker =
+    const kicker = a.programLabel ? a.programLabel :
       mode === "continue"
         ? a.category ? `Continue · ${a.category}` : "Continue listening"
         : mode === "smart_next"
