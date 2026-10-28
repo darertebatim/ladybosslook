@@ -68,8 +68,11 @@ export function markStepTapped(stepId: string, day: string = getLocalDateStr()) 
  * playlist that mutates as they listen. Same-day swaps, snoozes, dismissals,
  * and completion marking are still applied on top.
  */
+// Enrollment fingerprint is part of the key so a new/removed enrollment
+// rebuilds today's Path immediately instead of serving the morning snapshot.
+let enrollFingerprint = "none";
 const planStorageKey = (userId: string, day: string) =>
-  `simora_path_plan_v3_${userId}_${day}`;
+  `simora_path_plan_v4_${userId}_${day}_${enrollFingerprint}`;
 
 function readFrozenPlan(userId: string, day: string): PathStep[] | null {
   try {
@@ -354,7 +357,10 @@ export function useTodayPath() {
           .eq("status", "active")
           .order("enrolled_at", { ascending: false })
           .limit(20);
-        const enrollRows = (enrolls ?? []) as Array<{ program_slug: string | null; round_id: string | null }>;
+        const enrollRows = (enrolls ?? []) as Array<{ program_slug: string | null; round_id: string | null; enrolled_at?: string | null }>;
+        enrollFingerprint = enrollRows.length
+          ? `${enrollRows.length}-${String(enrollRows[0].enrolled_at ?? "").replace(/\D/g, "").slice(0, 14)}`
+          : "none";
         if (enrollRows.length > 0) {
           const roundIds = enrollRows.map((e) => e.round_id).filter(Boolean) as string[];
           const slugs = enrollRows.map((e) => e.program_slug).filter(Boolean) as string[];
@@ -907,7 +913,8 @@ export function useTodayPath() {
       const hasQuizResult = !!quizGapsRaw && quizGapsRaw.length > 0;
       const quizTopCategory = topGap;
 
-      const activeRoutines = (routinesRes.data ?? []).map((r: any) => ({
+      // Planner/routine cards are no longer part of Path.
+      const activeRoutines = ([] as any[]).map((r: any) => ({
         routineId: r.routine_id as string,
         title: (r.title as string) || "Routine",
         emoji: (r.emoji as string | null) ?? null,
@@ -967,7 +974,7 @@ export function useTodayPath() {
         ...skipTomorrowToday,
       ]);
 
-      const isDayOne = activeRoutines.length === 0 && !hasQuizResult;
+      const isDayOne = (routinesRes.data ?? []).length === 0 && !hasQuizResult;
 
       // Spec: users who skipped Rilo Doors are treated as the "Exploring" door
       // so they still get the door-aware Day 1–3 path (curated tour + teasers)

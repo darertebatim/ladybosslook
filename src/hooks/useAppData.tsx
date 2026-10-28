@@ -43,6 +43,8 @@ export function useInvalidateAllEnrollmentData() {
       queryClient.invalidateQueries({ queryKey: ['courses-data', user.id] });
       // Legacy key used by some components
       queryClient.invalidateQueries({ queryKey: ['user-enrollments'] });
+      // Rebuild today's Path right away for the new program.
+      queryClient.invalidateQueries({ queryKey: ['today-path', user.id] });
     }
   }, [queryClient, user?.id]);
 }
