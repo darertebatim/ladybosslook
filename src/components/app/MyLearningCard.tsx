@@ -138,11 +138,40 @@ export function MyLearningCard() {
       .trim();
   })();
 
+  // Once the course is finished, the first attached audio playlist takes over —
+  // track its own progress instead of the finished lesson count.
+  const courseFinished = !courseId || !nextLesson;
+  const takeoverPlaylistId = courseFinished ? audioPlaylists[0]?.id : undefined;
+  const { data: playlistProgress } = useQuery({
+    queryKey: ['my-learning-playlist-progress', takeoverPlaylistId, user?.id],
+    enabled: !!takeoverPlaylistId && !!user?.id,
+    queryFn: async () => {
+      const { data: items, error } = await supabase
+        .from('audio_playlist_items')
+        .select('audio_id')
+        .eq('playlist_id', takeoverPlaylistId!);
+      if (error) throw error;
+      const ids = (items || []).map((i) => i.audio_id);
+      if (ids.length === 0) return { done: 0, total: 0 };
+      const { data: prog } = await supabase
+        .from('audio_progress')
+        .select('audio_id')
+        .eq('user_id', user!.id)
+        .eq('completed', true)
+        .in('audio_id', ids);
+      return { done: new Set((prog || []).map((p) => p.audio_id)).size, total: ids.length };
+    },
+  });
+
   if (!hasProgram || !enrollment) return null;
 
   const round = enrollment.program_rounds;
   const programPath = `/app/programs/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`;
   const percent = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+  const showPlaylistProgress = !!takeoverPlaylistId && !!playlistProgress && playlistProgress.total > 0;
+  const shownPercent = showPlaylistProgress
+    ? Math.round((playlistProgress!.done / playlistProgress!.total) * 100)
+    : percent;
 
   const sessionDate = !isSelfPaced ? nextSessionDate || round?.first_session_date || null : null;
 
@@ -275,16 +304,18 @@ export function MyLearningCard() {
         <div className="px-4 pt-3">
           <div className="mb-1.5 flex justify-between text-[11.5px] font-semibold">
             <span className="text-fg-warm">
-              {completedCount} of {totalLessons} lessons done
+              {showPlaylistProgress
+                ? `${playlistProgress!.done} of ${playlistProgress!.total} tracks listened`
+                : `${completedCount} of ${totalLessons} lessons done`}
             </span>
-            {waitingCount > 0 && (
+            {!showPlaylistProgress && waitingCount > 0 && (
               <span className="text-fg-warm-muted">{waitingCount} unlocked &amp; waiting</span>
             )}
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-peach">
             <div
               className="h-full rounded-full bg-gradient-orange transition-[width] duration-700"
-              style={{ width: `${percent}%` }}
+              style={{ width: `${shownPercent}%` }}
             />
           </div>
           <Link
