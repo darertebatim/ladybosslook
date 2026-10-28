@@ -13,6 +13,16 @@ export interface ToolConfig {
 
 export const wellnessTools: ToolConfig[] = [
   {
+    id: 'planner',
+    name: 'Planner',
+    icon: 'ClipboardList',
+    emoji: '🗒️',
+    bgColor: 'bg-peach',
+    iconColor: 'text-orange-600',
+    route: '/app/home',
+    description: 'Plan your day',
+  },
+  {
     id: 'self-care',
     name: 'Self-Care Goals',
     icon: 'Heart',
@@ -21,16 +31,6 @@ export const wellnessTools: ToolConfig[] = [
     iconColor: 'text-emerald-600',
     route: '/app/tasksbank',
     description: 'Self-care habits',
-  },
-  {
-    id: 'routines',
-    name: 'Routines Templates',
-    icon: 'CalendarPlus',
-    emoji: '📋',
-    bgColor: 'bg-mint',
-    iconColor: 'text-emerald-600',
-    route: '/app/routines',
-    description: 'Daily routines',
   },
   {
     id: 'reflections',
