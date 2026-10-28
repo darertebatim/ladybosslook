@@ -168,6 +168,10 @@ export function MyLearningCard() {
   const round = enrollment.program_rounds;
   const programPath = `/app/programs/${enrollment.program_slug}${round?.id ? `/${round.id}` : ''}`;
   const percent = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+  const showPlaylistProgress = !!takeoverPlaylistId && !!playlistProgress && playlistProgress.total > 0;
+  const shownPercent = showPlaylistProgress
+    ? Math.round((playlistProgress!.done / playlistProgress!.total) * 100)
+    : percent;
 
   const sessionDate = !isSelfPaced ? nextSessionDate || round?.first_session_date || null : null;
 
