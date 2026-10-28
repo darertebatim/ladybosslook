@@ -68,7 +68,7 @@ export function markStepTapped(stepId: string, day: string = getLocalDateStr()) 
  * and completion marking are still applied on top.
  */
 const planStorageKey = (userId: string, day: string) =>
-  `simora_path_plan_${userId}_${day}`;
+  `simora_path_plan_v2_${userId}_${day}`;
 
 function readFrozenPlan(userId: string, day: string): PathStep[] | null {
   try {
@@ -382,6 +382,17 @@ export function useTodayPath() {
               (e.program_slug && progHost.get(progBySlug.get(e.program_slug)?.id)) || null;
             if (hostId) break;
           }
+          const owned = new Set<string>([
+            ...progs.map((p) => p.audio_playlist_id).filter(Boolean),
+            ...((roundPlRes.data ?? []) as any[]).map((r) => r.playlist_id),
+            ...((linkRes.data ?? []) as any[])
+              .filter((l) => /playlist|audio/i.test(l.content_type ?? ""))
+              .map((l) => l.content_id),
+          ]);
+          // Program first: enrolled program playlists lead the Path so the
+          // student keeps momentum. Enrollment unlocks them, so use all rows.
+          const programPick = allPlaylists.find((p) => owned.has(p.id)) ?? null;
+          if (programPick) doorAudioOverride = programPick;
           if (hostId) {
             const inst = ((instRes.data ?? []) as any[]).find((i) => i.id === hostId);
             const hostDoors: string[] = inst?.doors ?? [];
@@ -389,13 +400,7 @@ export function useTodayPath() {
               doorPrimary = hostDoors[0] as DoorKey;
               hasDoorContext = true;
             }
-            const owned = new Set<string>([
-              ...progs.map((p) => p.audio_playlist_id).filter(Boolean),
-              ...((roundPlRes.data ?? []) as any[]).map((r) => r.playlist_id),
-              ...((linkRes.data ?? []) as any[])
-                .filter((l) => /playlist/i.test(l.content_type ?? ""))
-                .map((l) => l.content_id),
-            ]);
+            // Host discovery second: other playlists by the same host.
             const { data: hostPl } = await (supabase as any).from("content_hosts")
               .select("content_id").eq("content_type", "playlist").eq("host_id", hostId);
             const hostIds = new Set(((hostPl ?? []) as any[]).map((r) => r.content_id));
@@ -404,8 +409,13 @@ export function useTodayPath() {
             const finalPool = langPool.length ? langPool : pool;
             if (finalPool.length) {
               const seed = [...today].reduce((a, c) => a + c.charCodeAt(0), 0);
-              doorAudioOverride = finalPool[seed % finalPool.length];
-              doorSecondaryAudioOverride = finalPool.length > 1 ? finalPool[(seed + 1) % finalPool.length] : null;
+              const discovery = finalPool[seed % finalPool.length];
+              if (programPick) {
+                doorSecondaryAudioOverride = discovery;
+              } else {
+                doorAudioOverride = discovery;
+                doorSecondaryAudioOverride = finalPool.length > 1 ? finalPool[(seed + 1) % finalPool.length] : null;
+              }
             }
           }
         }
