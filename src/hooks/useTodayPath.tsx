@@ -68,7 +68,7 @@ export function markStepTapped(stepId: string, day: string = getLocalDateStr()) 
  * and completion marking are still applied on top.
  */
 const planStorageKey = (userId: string, day: string) =>
-  `simora_path_plan_v2_${userId}_${day}`;
+  `simora_path_plan_v3_${userId}_${day}`;
 
 function readFrozenPlan(userId: string, day: string): PathStep[] | null {
   try {
@@ -298,6 +298,10 @@ export function useTodayPath() {
       // routines), but we still want to surface a productivity-themed playlist
       // — "Wellness Planning" — in the SECONDARY slot.
       let doorSecondaryAudioOverride: typeof accessiblePlaylists[number] | null = null;
+      // Enrolled-program hero. Beats continue/smart-next picks so students
+      // always see their program first; hands off to the host's next program
+      // once every lesson of the current one is finished.
+      let programHeroPick: typeof accessiblePlaylists[number] | null = null;
       if (hasDoorContext && doorPrimary === "emotion" && emotionKeys.length > 0) {
         // Picker keys ARE tag slugs (see RiloDoorsScreens · EMOTION_TOP5/REST).
         const wantedSlugs = new Set<string>(emotionKeys);
