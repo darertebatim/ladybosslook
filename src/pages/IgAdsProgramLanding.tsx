@@ -329,7 +329,7 @@ export default function IgAdsProgramLanding() {
       {/* Curriculum */}
       <section className="bg-muted/50 px-4 py-8">
         <div className="mx-auto max-w-md">
-          <SectionTitle eyebrow="فرمول سه‌مرحله‌ای تبلیغ موفق" title="در ۳ هفته، سیستم جذب مشتری بیزینست رو می‌سازی" sub="هر هفته یک جلسه لایو ۲ ساعته؛ بین جلسه‌ها روی بیزینس خودت اجرا می‌کنی، با پشتیبانی ما." />
+          <SectionTitle eyebrow="دوره ۳ هفته‌ای جذب مشتری با تبلیغات اینستاگرامی" title="در ۳ هفته، سیستم جذب مشتری بیزینست رو می‌سازی" sub="هر هفته یک جلسه لایو ۲ ساعته؛ بین جلسه‌ها روی بیزینس خودت اجرا می‌کنی، با پشتیبانی ما." />
           <div className="space-y-3">
             {WEEKS.map((w) => (
               <div key={w.n} className="rounded-2xl bg-card p-4 shadow-ios">
