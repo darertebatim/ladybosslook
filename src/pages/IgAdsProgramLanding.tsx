@@ -35,6 +35,37 @@ function useProgramPrice() {
   return price;
 }
 
+const CURRENCY_NOTE = "قیمت‌ها به دلار آمریکا (USD) است؛ اگر از کانادا با کارت کانادایی پرداخت کنی، بانکت مبلغ رو به دلار کانادا تبدیل می‌کنه.";
+
+type Session = { date: string; pt: string; et: string };
+
+/** Next upcoming round's 3 weekly live sessions, shown in Pacific and Eastern time. */
+function useNextRoundSchedule() {
+  const [sessions, setSessions] = useState<Session[]>([]);
+  useEffect(() => {
+    supabase
+      .from("program_rounds")
+      .select("first_session_date")
+      .eq("program_slug", PROGRAM_SLUG)
+      .gt("first_session_date", new Date().toISOString())
+      .order("first_session_date", { ascending: true })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!data?.first_session_date) return;
+        const first = new Date(data.first_session_date).getTime();
+        const d = (tz: string) => new Intl.DateTimeFormat("fa-IR", { timeZone: tz, weekday: "long", day: "numeric", month: "long" });
+        const t = (tz: string) => new Intl.DateTimeFormat("fa-IR", { timeZone: tz, hour: "numeric", minute: "2-digit" });
+        setSessions([0, 1, 2].map((w) => {
+          const at = new Date(first + w * 7 * 86400000);
+          return { date: d("America/Los_Angeles").format(at), pt: t("America/Los_Angeles").format(at), et: t("America/New_York").format(at) };
+        }));
+      });
+  }, []);
+  return sessions;
+}
+
+
 function CTA({ onClick, loading, price, was, className = "" }: { onClick: () => void; loading: boolean; price: number; was: number; className?: string }) {
   return (
     <Button
@@ -75,7 +106,7 @@ const SITUATIONS = [
 ];
 
 const MISTAKES = [
-  { icon: BarChart3, title: "ردیابی نتایج", body: "پیتزافروشی که فکر می‌کرد هر مشتری ۱۰ دلار براش گرون تموم میشه و تبلیغ رو خاموش کرد. با محاسبه درست، هزینه جذب هر مشتری به ۴ دلار رسید." },
+  { icon: BarChart3, title: "ردیابی نتایج", body: "پیتزافروشی که فکر می‌کرد هر مشتری ۱۰ دلار براش گرون تموم میشه و تبلیغ رو خاموش کرد. وقتی خرید تکراری و ارزش هر مشتری رو حساب کرد و تبلیغش رو بهتر کرد، هزینه جذب هر مشتری به ۴ دلار رسید." },
   { icon: Megaphone, title: "بوست کردن پست", body: "بوست یعنی کنترل نداشتن. نتیجه‌اش لایک و ویوی پرت است. کسایی که مشتری می‌گیرن از Ads Manager استفاده می‌کنن." },
   { icon: Target, title: "مخاطب هدف اشتباه", body: "فقط سن و جنسیت و شهر کافی نیست. Custom Audience و Lookalike کمک می‌کنن تبلیغت مدام به آدم‌های درست‌تر برسه." },
   { icon: Wallet, title: "تنظیمات کمپین", body: "رستورانی که شش ماه روزی ۸۰۰ دلار خرج کرد، در حالی که چندتا از تنظیمات اصلی کمپینش اصلاً مناسب بیزینسش نبود." },
@@ -143,6 +174,7 @@ const FAQ = [
 
 export default function IgAdsProgramLanding() {
   const price = useProgramPrice();
+  const schedule = useNextRoundSchedule();
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [showSticky, setShowSticky] = useState(false);
@@ -202,7 +234,7 @@ export default function IgAdsProgramLanding() {
           </span>
 
           <span className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-            <Clock className="h-3.5 w-3.5" /> آموزش رایگان · ۵۰ دقیقه
+            <Clock className="h-3.5 w-3.5" /> دوره ۳ هفته‌ای · ۳ جلسه لایو آنلاین
           </span>
           <h1 className="mt-3 text-[28px] font-black leading-[1.6] text-foreground">
             نقشه راه جذب <span className="text-primary">مشتری‌های جدید</span> با تبلیغات اینستاگرامی
@@ -255,8 +287,24 @@ export default function IgAdsProgramLanding() {
             })}
           </div>
 
+          {schedule.length > 0 && (
+            <div className="mt-4 rounded-3xl bg-card p-4 text-right shadow-ios">
+              <p className="flex items-center gap-1.5 text-sm font-extrabold"><Calendar className="h-4 w-4 text-primary" /> زمان جلسه‌های لایو دوره بعد</p>
+              <div className="mt-2 space-y-2">
+                {schedule.map((s, i) => (
+                  <div key={i} className="rounded-2xl bg-secondary px-3 py-2">
+                    <p className="text-sm font-bold">جلسه {fa(i + 1)} — {s.date}</p>
+                    <p className="text-xs leading-6 text-muted-foreground">ساعت {s.pt} به وقت لس‌آنجلس/ونکوور · {s.et} به وقت نیویورک/تورنتو</p>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-2 text-xs leading-6 text-muted-foreground">جلسه‌ها آنلاین در گوگل میت برگزار میشن و ضبط هر جلسه روز بعد در اپ در دسترسه.</p>
+            </div>
+          )}
+
           <div className="mt-6">
             <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
+            <p className="mt-2 text-xs text-muted-foreground">{CURRENCY_NOTE}</p>
             <p className="mt-3 flex items-center justify-center gap-1.5 text-sm text-muted-foreground">
               <Shield className="h-4 w-4 text-success" /> ۳۰ روز ضمانت بازگشت کامل وجه، بدون هیچ سؤالی
             </p>
@@ -285,23 +333,57 @@ export default function IgAdsProgramLanding() {
         </div>
       </section>
 
-      {/* 6 mistakes */}
+      {/* Curriculum (what you'll build) — placed before the mistakes so the program is tangible early */}
       <section className="bg-muted/50 px-4 py-8">
         <div className="mx-auto max-w-md">
-          <SectionTitle eyebrow="چک‌لیست شکست تبلیغات" title="۶ اشتباهی که دلیل ۹۰٪ شکست تبلیغات اینستاگرامی است" sub="با همین چک‌لیست، تبلیغات خودمون و شاگردهامون رو بررسی می‌کنیم." />
+          <SectionTitle eyebrow="دوره ۳ هفته‌ای جذب مشتری با تبلیغات اینستاگرامی" title="در ۳ هفته، سیستم جذب مشتری بیزینست رو می‌سازی" sub="هر هفته یک جلسه لایو ۲ ساعته؛ بین جلسه‌ها روی بیزینس خودت اجرا می‌کنی، با پشتیبانی ما." />
           <div className="space-y-3">
-            {MISTAKES.map((m, i) => (
-              <div key={i} className="rounded-2xl bg-card p-4 shadow-ios">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-destructive/10">
-                    <m.icon className="h-5 w-5 text-destructive" />
-                  </span>
-                  <div>
-                    <p className="text-xs font-bold text-muted-foreground">اشتباه {fa(i + 1)}</p>
-                    <h3 className="text-lg font-extrabold">{m.title}</h3>
-                  </div>
+            {WEEKS.map((w, i) => (
+              <div key={w.n} className="rounded-2xl bg-card p-4 shadow-ios">
+                <div className="flex items-center justify-between">
+                  <span className="rounded-full bg-primary px-3 py-1 text-sm font-bold text-primary-foreground">هفته {fa(w.n)}</span>
+                  <w.icon className="h-6 w-6 text-primary" />
                 </div>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">{m.body}</p>
+                <h3 className="mt-3 text-lg font-extrabold">{w.title}</h3>
+                {schedule[i] && (
+                  <p className="mt-1 flex items-center gap-1.5 text-xs font-bold text-primary"><Calendar className="h-3.5 w-3.5" /> لایو: {schedule[i].date}</p>
+                )}
+                <ul className="mt-3 space-y-2">
+                  {w.items.map((it) => (
+                    <li key={it} className="flex items-start gap-2 text-sm leading-7 text-muted-foreground">
+                      <Check className="mt-1.5 h-4 w-4 shrink-0 text-success" /> {it}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 rounded-3xl bg-card p-5 shadow-ios">
+            <h3 className="mb-2 font-extrabold">کمکی که در این ۳ هفته می‌گیری</h3>
+            {STACK.map((s) => (
+              <div key={s.title} className="flex items-start gap-3 py-2">
+                <s.icon className="mt-1 h-5 w-5 shrink-0 text-primary" />
+                <p className="text-sm font-bold leading-7">{s.title}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 6 mistakes */}
+      <section className="px-4 py-8">
+        <div className="mx-auto max-w-md">
+          <SectionTitle eyebrow="چک‌لیست شکست تبلیغات" title="۶ اشتباهی که دلیل ۹۰٪ شکست تبلیغات اینستاگرامی است" sub="همون اشتباه‌هایی که توی ویدیو گفتیم — در دوره، کمپین خودت رو با این چک‌لیست بررسی می‌کنیم." />
+          <div className="space-y-2">
+            {MISTAKES.map((m, i) => (
+              <div key={i} className="rounded-2xl bg-card p-3.5 shadow-ios">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-destructive/10">
+                    <m.icon className="h-4 w-4 text-destructive" />
+                  </span>
+                  <h3 className="font-extrabold">{fa(i + 1)}. {m.title}</h3>
+                </div>
+                <p className="mt-2 text-sm leading-7 text-muted-foreground">{m.body}</p>
               </div>
             ))}
           </div>
@@ -309,7 +391,7 @@ export default function IgAdsProgramLanding() {
       </section>
 
       {/* IKEA */}
-      <section className="px-4 py-8">
+      <section className="bg-muted/50 px-4 py-8">
         <div className="mx-auto grid max-w-md gap-6">
           <div>
             <p className="mb-2 text-sm font-bold text-primary">متد آیکیا</p>
@@ -324,31 +406,6 @@ export default function IgAdsProgramLanding() {
               <div key={i} className="flex items-start gap-3 py-3">
                 <Check className="mt-1 h-5 w-5 shrink-0 text-success" />
                 <p className="font-bold leading-8">{t}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Curriculum */}
-      <section className="bg-muted/50 px-4 py-8">
-        <div className="mx-auto max-w-md">
-          <SectionTitle eyebrow="دوره ۳ هفته‌ای جذب مشتری با تبلیغات اینستاگرامی" title="در ۳ هفته، سیستم جذب مشتری بیزینست رو می‌سازی" sub="هر هفته یک جلسه لایو ۲ ساعته؛ بین جلسه‌ها روی بیزینس خودت اجرا می‌کنی، با پشتیبانی ما." />
-          <div className="space-y-3">
-            {WEEKS.map((w) => (
-              <div key={w.n} className="rounded-2xl bg-card p-4 shadow-ios">
-                <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-primary px-3 py-1 text-sm font-bold text-primary-foreground">هفته {fa(w.n)}</span>
-                  <w.icon className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="mt-3 text-lg font-extrabold">{w.title}</h3>
-                <ul className="mt-3 space-y-2">
-                  {w.items.map((it) => (
-                    <li key={it} className="flex items-start gap-2 text-sm leading-7 text-muted-foreground">
-                      <Check className="mt-1.5 h-4 w-4 shrink-0 text-success" /> {it}
-                    </li>
-                  ))}
-                </ul>
               </div>
             ))}
           </div>
@@ -480,10 +537,11 @@ export default function IgAdsProgramLanding() {
 
           <div className="mt-6 rounded-3xl bg-foreground p-6 text-center text-background shadow-ios">
             <p className="text-sm font-bold opacity-80">شهریه اصلی</p>
-            <p className="text-2xl font-bold line-through opacity-60">{fa(price.was)} دلار</p>
+            <p className="text-2xl font-bold line-through opacity-60">{fa(price.was)} دلار آمریکا</p>
             <p className="mt-3 text-sm font-bold">سهم شما امروز</p>
-            <p className="text-5xl font-black text-primary">{fa(price.now)}<span className="text-2xl"> دلار</span></p>
+            <p className="text-5xl font-black text-primary">{fa(price.now)}<span className="text-2xl"> دلار آمریکا</span></p>
             {discount > 0 && <p className="mt-2 inline-block rounded-full bg-primary px-4 py-1 text-sm font-bold text-primary-foreground">{fa(discount)}٪ تخفیف رونمایی</p>}
+            <p className="mt-3 text-xs leading-6 opacity-80">{CURRENCY_NOTE}</p>
             <div className="mt-6">
               <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
             </div>
