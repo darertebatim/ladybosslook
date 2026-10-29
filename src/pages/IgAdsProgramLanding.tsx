@@ -39,21 +39,37 @@ const CURRENCY_NOTE = "قیمت‌ها به دلار آمریکا (USD) است؛
 
 type Session = { date: string; pt: string; et: string };
 
-/** Next upcoming round's 3 weekly live sessions, shown in Pacific and Eastern time. */
+/** 3 weekly live sessions of the round buyers are auto-enrolled into (fallback: next upcoming round). */
 function useNextRoundSchedule() {
   const [sessions, setSessions] = useState<Session[]>([]);
   useEffect(() => {
-    supabase
-      .from("program_rounds")
-      .select("first_session_date")
-      .eq("program_slug", PROGRAM_SLUG)
-      .gt("first_session_date", new Date().toISOString())
-      .order("first_session_date", { ascending: true })
-      .limit(1)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (!data?.first_session_date) return;
-        const first = new Date(data.first_session_date).getTime();
+    (async () => {
+      let firstDate: string | null = null;
+      const { data: auto } = await supabase
+        .from("program_auto_enrollment")
+        .select("round_id")
+        .eq("program_slug", PROGRAM_SLUG)
+        .maybeSingle();
+      if (auto?.round_id) {
+        const { data: r } = await supabase.from("program_rounds").select("first_session_date").eq("id", auto.round_id).maybeSingle();
+        firstDate = r?.first_session_date ?? null;
+      }
+      if (!firstDate) {
+        const { data: r } = await supabase
+          .from("program_rounds")
+          .select("first_session_date")
+          .eq("program_slug", PROGRAM_SLUG)
+          .gt("first_session_date", new Date().toISOString())
+          .order("first_session_date", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+        firstDate = r?.first_session_date ?? null;
+      }
+      return firstDate;
+    })()
+      .then((firstDate) => {
+        if (!firstDate) return;
+        const first = new Date(firstDate).getTime();
         const d = (tz: string) => new Intl.DateTimeFormat("fa-IR-u-ca-gregory", { timeZone: tz, weekday: "long", day: "numeric", month: "long" });
         const t = (tz: string) => new Intl.DateTimeFormat("fa-IR", { timeZone: tz, hour: "numeric", minute: "2-digit" });
         setSessions([0, 1, 2].map((w) => {
@@ -229,21 +245,24 @@ export default function IgAdsProgramLanding() {
       {/* Hero */}
       <section className="bg-gradient-to-b from-secondary via-background to-background px-4 pb-10 pt-10">
         <div className="mx-auto max-w-md text-center">
-          <span className="inline-flex items-center gap-2 rounded-full bg-card px-4 py-1.5 text-sm font-bold text-foreground shadow-ios">
-            <Award className="h-4 w-4 text-primary" /> آکادمی رایلو · با علی لطفی
-          </span>
+          <div className="flex flex-nowrap items-center justify-center gap-2">
+            <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-card px-3 py-1.5 text-xs font-bold text-foreground shadow-ios">
+              <Award className="h-3.5 w-3.5 text-primary" /> آکادمی رایلو · علی لطفی
+            </span>
+            <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary">
+              <Clock className="h-3.5 w-3.5" /> دوره ۳ هفته‌ای · ۳ لایو
+            </span>
+          </div>
 
-          <span className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-            <Clock className="h-3.5 w-3.5" /> دوره ۳ هفته‌ای · ۳ جلسه لایو آنلاین
-          </span>
-          <h1 className="mt-3 text-[28px] font-black leading-[1.6] text-foreground">
+          <div className="mt-5 rounded-3xl bg-card p-4 shadow-ios">
+          <h1 className="text-[26px] font-black leading-[1.6] text-foreground">
             نقشه راه جذب <span className="text-primary">مشتری‌های جدید</span> با تبلیغات اینستاگرامی
           </h1>
-          <p className="mx-auto mt-3 max-w-md text-base leading-8 text-muted-foreground">
+          <p className="mx-auto mt-2 max-w-md text-[15px] leading-8 text-foreground/80">
             در این ویدیوی ۵۰ دقیقه‌ای، قدم‌به‌قدم می‌بینی چطور برای بیزینست در آمریکا و کانادا مشتری پایدار بسازی — بدون ریلز روزانه و بدون هزینه سنگین آژانس.
           </p>
 
-          <div className="mt-5 overflow-hidden rounded-3xl bg-foreground shadow-ios">
+          <div className="mt-4 overflow-hidden rounded-3xl bg-foreground shadow-ios">
             <div className="relative aspect-video w-full">
               {playing ? (
                 <div className="absolute inset-0 overflow-hidden">
@@ -267,7 +286,8 @@ export default function IgAdsProgramLanding() {
               )}
             </div>
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">🔊 صدای ویدیو را روشن کنید — این ویدیو کل نقشه راه را توضیح می‌دهد</p>
+          <p className="mt-2 text-xs text-foreground/70">🔊 صدای ویدیو را روشن کنید — این ویدیو کل نقشه راه را توضیح می‌دهد</p>
+          </div>
 
           <div className="mt-6 rounded-3xl bg-primary/10 px-4 py-3">
             <p className="text-xs font-bold text-primary">برنامه‌ای که در ویدیو معرفی شد</p>
@@ -287,28 +307,31 @@ export default function IgAdsProgramLanding() {
             })}
           </div>
 
+          <div className="mt-6">
+            <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
+            <p className="mt-2 text-xs leading-6 text-foreground/80">{CURRENCY_NOTE}</p>
+            <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success/15 px-4 py-2 text-sm font-extrabold text-success">
+              <Shield className="h-4 w-4" /> ۳۰ روز ضمانت بازگشت کامل وجه، بدون هیچ سؤالی
+            </span>
+          </div>
+
           {schedule.length > 0 && (
-            <div className="mt-4 rounded-3xl bg-card p-4 text-right shadow-ios">
-              <p className="flex items-center gap-1.5 text-sm font-extrabold"><Calendar className="h-4 w-4 text-primary" /> زمان جلسه‌های لایو دوره بعد</p>
-              <div className="mt-2 space-y-2">
+            <div className="mt-6 rounded-3xl bg-card p-4 text-right shadow-ios">
+              <p className="flex items-center gap-1.5 text-base font-extrabold text-foreground"><Calendar className="h-5 w-5 text-primary" /> زمان جلسه‌های لایو دوره بعد</p>
+              <div className="mt-3 space-y-2">
                 {schedule.map((s, i) => (
-                  <div key={i} className="rounded-2xl bg-secondary px-3 py-2">
-                    <p className="text-sm font-bold">جلسه {fa(i + 1)} — {s.date}</p>
-                    <p className="text-xs leading-6 text-muted-foreground">ساعت {s.pt} به وقت لس‌آنجلس/ونکوور · {s.et} به وقت نیویورک/تورنتو</p>
+                  <div key={i} className="rounded-2xl bg-secondary px-3 py-2.5">
+                    <p className="text-sm font-extrabold text-foreground">جلسه {fa(i + 1)} — {s.date}</p>
+                    <div className="mt-1.5 flex flex-wrap gap-1.5 text-xs font-bold">
+                      <span className="rounded-full bg-card px-2.5 py-1 text-foreground">🇺🇸🇨🇦 غرب: <span className="text-primary">{s.pt}</span></span>
+                      <span className="rounded-full bg-card px-2.5 py-1 text-foreground">🇺🇸🇨🇦 شرق: <span className="text-primary">{s.et}</span></span>
+                    </div>
                   </div>
                 ))}
               </div>
-              <p className="mt-2 text-xs leading-6 text-muted-foreground">جلسه‌ها آنلاین در گوگل میت برگزار میشن و ضبط هر جلسه روز بعد در اپ در دسترسه.</p>
+              <p className="mt-3 text-xs leading-6 text-foreground/80">غرب = لس‌آنجلس/ونکوور · شرق = نیویورک/تورنتو. جلسه‌ها آنلاین در گوگل میت برگزار میشن و ضبط هر جلسه روز بعد در اپ در دسترسه.</p>
             </div>
           )}
-
-          <div className="mt-6">
-            <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
-            <p className="mt-2 text-xs text-muted-foreground">{CURRENCY_NOTE}</p>
-            <p className="mt-3 flex items-center justify-center gap-1.5 text-sm text-muted-foreground">
-              <Shield className="h-4 w-4 text-success" /> ۳۰ روز ضمانت بازگشت کامل وجه، بدون هیچ سؤالی
-            </p>
-          </div>
         </div>
       </section>
 
