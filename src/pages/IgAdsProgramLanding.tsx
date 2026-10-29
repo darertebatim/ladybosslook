@@ -11,6 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { TrackedIframe } from "@/components/TrackedIframe";
 import { supabase, browserTimezone } from "@/integrations/supabase/client";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
+import vslCover from "@/assets/igads-vsl-cover.png.asset.json";
 
 const PROGRAM_SLUG = "casigads";
 const VSL_ID = "VwTKgHp8APw";
@@ -34,7 +35,7 @@ function useProgramPrice() {
   return price;
 }
 
-function CTA({ onClick, loading, price, className = "" }: { onClick: () => void; loading: boolean; price: number; className?: string }) {
+function CTA({ onClick, loading, price, was, className = "" }: { onClick: () => void; loading: boolean; price: number; was: number; className?: string }) {
   return (
     <Button
       data-main-cta
@@ -44,7 +45,15 @@ function CTA({ onClick, loading, price, className = "" }: { onClick: () => void;
       className={`h-14 w-full rounded-2xl text-base font-extrabold shadow-ios active:scale-[0.98] ${className}`}
     >
       {loading ? <Loader2 className="ml-2 h-5 w-5 animate-spin" /> : <Rocket className="ml-2 h-5 w-5" />}
-      {loading ? "در حال انتقال به پرداخت..." : `همین الان ثبت‌نام کن — ${fa(price)} دلار`}
+      {loading ? (
+        "در حال انتقال به پرداخت..."
+      ) : (
+        <span className="flex items-center gap-2">
+          همین الان ثبت‌نام کن —
+          {was > price && <span className="text-sm font-bold line-through opacity-70">{fa(was)}</span>}
+          <span>{fa(price)} دلار</span>
+        </span>
+      )}
     </Button>
   );
 }
@@ -191,14 +200,8 @@ export default function IgAdsProgramLanding() {
           <span className="inline-flex items-center gap-2 rounded-full bg-card px-4 py-1.5 text-sm font-bold text-foreground shadow-ios">
             <Award className="h-4 w-4 text-primary" /> آکادمی رایلو · با علی لطفی
           </span>
-          <h1 className="mt-5 text-[28px] font-black leading-[1.6] text-foreground">
-            نقشه راه جذب <span className="text-primary">مشتری‌های جدید</span> با تبلیغات اینستاگرامی
-          </h1>
-          <p className="mx-auto mt-4 max-w-md text-base leading-8 text-muted-foreground">
-            یک روش مشخص و قابل‌حساب برای پر کردن ظرفیت خالی بیزینست — بدون ریلز روزانه و بدون هزینه‌های سنگین آژانس.
-          </p>
 
-          <div className="mt-8 overflow-hidden rounded-3xl bg-foreground shadow-ios">
+          <div className="mt-5 overflow-hidden rounded-3xl bg-foreground shadow-ios">
             <div className="relative aspect-video w-full">
               {playing ? (
                 <TrackedIframe
@@ -210,7 +213,7 @@ export default function IgAdsProgramLanding() {
                 />
               ) : (
                 <button type="button" onClick={() => setPlaying(true)} className="absolute inset-0 h-full w-full" aria-label="پخش ویدیو">
-                  <img src={`https://i.ytimg.com/vi/${VSL_ID}/maxresdefault.jpg`} alt="" className="h-full w-full object-cover" />
+                  <img src={vslCover.url} alt="نقشه راه جذب مشتری با تبلیغات اینستاگرامی" className="h-full w-full object-cover" />
                   <span className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-primary shadow-ios transition active:scale-95">
                     <Play className="h-9 w-9 translate-x-0.5 fill-primary-foreground text-primary-foreground" />
                   </span>
@@ -219,6 +222,16 @@ export default function IgAdsProgramLanding() {
             </div>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">🔊 صدای ویدیو را روشن کنید — این ویدیو کل نقشه راه را توضیح می‌دهد</p>
+
+          <span className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+            <Clock className="h-3.5 w-3.5" /> آموزش رایگان · ۵۰ دقیقه
+          </span>
+          <h1 className="mt-3 text-[28px] font-black leading-[1.6] text-foreground">
+            نقشه راه جذب <span className="text-primary">مشتری‌های جدید</span> با تبلیغات اینستاگرامی
+          </h1>
+          <p className="mx-auto mt-3 max-w-md text-base leading-8 text-muted-foreground">
+            در این ویدیوی ۵۰ دقیقه‌ای، قدم‌به‌قدم می‌بینی چطور برای بیزینست در آمریکا و کانادا مشتری پایدار بسازی — بدون ریلز روزانه و بدون هزینه سنگین آژانس.
+          </p>
 
           <div className="mt-5 grid grid-cols-2 gap-2 text-sm font-bold">
             {[
@@ -234,7 +247,7 @@ export default function IgAdsProgramLanding() {
           </div>
 
           <div className="mt-6">
-            <CTA onClick={checkout} loading={loading} price={price.now} />
+            <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
             <p className="mt-3 flex items-center justify-center gap-1.5 text-sm text-muted-foreground">
               <Shield className="h-4 w-4 text-success" /> ۳۰ روز ضمانت بازگشت کامل وجه، بدون هیچ سؤالی
             </p>
@@ -463,7 +476,7 @@ export default function IgAdsProgramLanding() {
             <p className="text-5xl font-black text-primary">{fa(price.now)}<span className="text-2xl"> دلار</span></p>
             {discount > 0 && <p className="mt-2 inline-block rounded-full bg-primary px-4 py-1 text-sm font-bold text-primary-foreground">{fa(discount)}٪ تخفیف رونمایی</p>}
             <div className="mt-6">
-              <CTA onClick={checkout} loading={loading} price={price.now} />
+              <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
             </div>
             <p className="mt-3 text-xs opacity-70">هزینه اجرای تبلیغات جداست و به بودجه‌ای که خودت انتخاب می‌کنی بستگی داره.</p>
           </div>
@@ -505,7 +518,7 @@ export default function IgAdsProgramLanding() {
             یا می‌تونی از روشی استفاده کنی که برای بیش از ۲۰۰ بیزینس جواب داده، با پشتیبانی کنارت، و در کمتر از یک ماه سیستم جذب مشتری خودت رو راه بندازی.
           </p>
           <div className="mt-8">
-            <CTA onClick={checkout} loading={loading} price={price.now} />
+            <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
           </div>
           <p className="mt-3 text-sm text-muted-foreground">۳۰ روز ضمانت بازگشت وجه · پرداخت امن با Stripe</p>
         </div>
