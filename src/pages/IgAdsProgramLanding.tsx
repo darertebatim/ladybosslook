@@ -11,6 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { TrackedIframe } from "@/components/TrackedIframe";
 import { supabase, browserTimezone } from "@/integrations/supabase/client";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
+import vslCover from "@/assets/igads-vsl-cover.png.asset.json";
 
 const PROGRAM_SLUG = "casigads";
 const VSL_ID = "VwTKgHp8APw";
@@ -34,7 +35,7 @@ function useProgramPrice() {
   return price;
 }
 
-function CTA({ onClick, loading, price, className = "" }: { onClick: () => void; loading: boolean; price: number; className?: string }) {
+function CTA({ onClick, loading, price, was, className = "" }: { onClick: () => void; loading: boolean; price: number; was: number; className?: string }) {
   return (
     <Button
       data-main-cta
@@ -44,7 +45,15 @@ function CTA({ onClick, loading, price, className = "" }: { onClick: () => void;
       className={`h-14 w-full rounded-2xl text-base font-extrabold shadow-ios active:scale-[0.98] ${className}`}
     >
       {loading ? <Loader2 className="ml-2 h-5 w-5 animate-spin" /> : <Rocket className="ml-2 h-5 w-5" />}
-      {loading ? "در حال انتقال به پرداخت..." : `همین الان ثبت‌نام کن — ${fa(price)} دلار`}
+      {loading ? (
+        "در حال انتقال به پرداخت..."
+      ) : (
+        <span className="flex items-center gap-2">
+          همین الان ثبت‌نام کن —
+          {was > price && <span className="text-sm font-bold line-through opacity-70">{fa(was)}</span>}
+          <span>{fa(price)} دلار</span>
+        </span>
+      )}
     </Button>
   );
 }
