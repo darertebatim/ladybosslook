@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { toast } from "sonner";
 import {
   Check, X, Shield, Play, Video, BookOpen, MessageCircle, Calendar, Target,
-  PenLine, Megaphone, TrendingUp, Gift, Sparkles, Clock, Users, Award, Loader2,
+  PenLine, Megaphone, TrendingUp, Gift, Sparkles, Clock, Users, Loader2,
   BarChart3, Rocket, Wallet, Repeat,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
