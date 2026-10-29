@@ -245,14 +245,6 @@ export default function IgAdsProgramLanding() {
       {/* Hero */}
       <section className="bg-gradient-to-b from-secondary via-background to-background px-4 pb-10 pt-4">
         <div className="mx-auto max-w-md text-center">
-          <div className="flex flex-nowrap items-center justify-center gap-2">
-            <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-card px-3 py-1.5 text-xs font-bold text-foreground shadow-ios">
-              <Award className="h-3.5 w-3.5 text-primary" /> آکادمی رایلو · علی لطفی
-            </span>
-            <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary">
-              <Clock className="h-3.5 w-3.5" /> دوره ۳ هفته‌ای · ۳ لایو
-            </span>
-          </div>
 
           <div className="mt-3 rounded-3xl bg-card p-4 shadow-ios">
           <h1 className="text-[26px] font-black leading-[1.6] text-foreground">
