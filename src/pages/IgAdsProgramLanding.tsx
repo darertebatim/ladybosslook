@@ -259,7 +259,7 @@ export default function IgAdsProgramLanding() {
             نقشه راه جذب <span className="text-primary">مشتری‌های جدید</span> با تبلیغات اینستاگرامی
           </h1>
           <p className="mx-auto mt-2 whitespace-nowrap text-[13px] font-bold leading-6 text-foreground/80">
-            ۵۰ دقیقه آموزش قدم‌به‌قدم برای مشتری پایدار — بدون ریلز روزانه و بدون آژانس
+            ۵۰ دقیقه آموزش قدم‌به‌قدم جذب مشتری پایدار
           </p>
 
           <div className="mt-4 overflow-hidden rounded-3xl bg-foreground shadow-ios">
@@ -287,6 +287,7 @@ export default function IgAdsProgramLanding() {
             </div>
           </div>
           <p className="mt-2 text-xs text-foreground/70">🔊 صدای ویدیو را روشن کنید — این ویدیو کل نقشه راه را توضیح می‌دهد</p>
+          <p className="mx-auto mt-2 inline-flex whitespace-nowrap rounded-full bg-secondary px-3 py-1 text-[12px] font-extrabold text-foreground">بدون ریلز روزانه · بدون هزینه آژانس</p>
           </div>
 
           <div className="mt-6 rounded-3xl bg-primary/10 px-4 py-4">
