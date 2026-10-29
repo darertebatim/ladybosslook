@@ -1,3 +1,4 @@
+import { isSupportChatBlockedForRegion } from '@/lib/regionRestrictions';
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProfileDisplayName } from "@/hooks/useFirstName";
@@ -360,6 +361,7 @@ export function HomeMenu() {
           {/* Go to RiloBiz — hidden temporarily */}
 
           {/* Support */}
+          {!isSupportChatBlockedForRegion() && (
           <section>
             <button
               onClick={() => handleNavClick("/app/chat")}
@@ -373,6 +375,7 @@ export function HomeMenu() {
               <span>{t("menu.items.support")}</span>
             </button>
           </section>
+          )}
 
           {/* Tools — icon grid */}
           <section>

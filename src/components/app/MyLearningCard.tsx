@@ -1,3 +1,4 @@
+import { isSupportChatBlockedForRegion } from '@/lib/regionRestrictions';
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -403,7 +404,7 @@ export function MyLearningCard() {
 
 
       {/* Support */}
-      {supportUnread > 0 && supportSummary?.lastMessage ? (
+      {isSupportChatBlockedForRegion() ? null : supportUnread > 0 && supportSummary?.lastMessage ? (
         <Link
           to="/app/chat"
           onClick={() => haptic.light()}
