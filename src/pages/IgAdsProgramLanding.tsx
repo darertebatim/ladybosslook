@@ -89,15 +89,15 @@ function CTA({ onClick, loading, price, was, className = "" }: { onClick: () => 
       size="lg"
       onClick={onClick}
       disabled={loading}
-      className={`h-14 w-full rounded-2xl text-base font-extrabold shadow-ios active:scale-[0.98] ${className}`}
+      className={`h-14 w-full rounded-2xl px-3 text-[15px] font-extrabold shadow-ios active:scale-[0.98] ${className}`}
     >
-      {loading ? <Loader2 className="ml-2 h-5 w-5 animate-spin" /> : <Rocket className="ml-2 h-5 w-5" />}
+      {loading ? <Loader2 className="ml-1.5 h-4 w-4 animate-spin" /> : <Rocket className="ml-1.5 h-4 w-4" />}
       {loading ? (
         "در حال انتقال به پرداخت..."
       ) : (
-        <span className="flex items-center gap-2">
+        <span className="flex items-center gap-1.5">
           همین الان ثبت‌نام کن —
-          {was > price && <span className="text-sm font-bold line-through opacity-70">{fa(was)}</span>}
+          {was > price && <span className="text-xs font-bold line-through opacity-70">{fa(was)}</span>}
           <span>{fa(price)} دلار</span>
         </span>
       )}
