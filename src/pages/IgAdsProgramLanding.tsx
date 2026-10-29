@@ -37,6 +37,7 @@ function useProgramPrice() {
 function CTA({ onClick, loading, price, className = "" }: { onClick: () => void; loading: boolean; price: number; className?: string }) {
   return (
     <Button
+      data-main-cta
       size="lg"
       onClick={onClick}
       disabled={loading}
@@ -139,7 +140,13 @@ export default function IgAdsProgramLanding() {
   const discount = price.was > price.now ? Math.round((1 - price.now / price.was) * 100) : 0;
 
   useEffect(() => {
-    const onScroll = () => setShowSticky(window.scrollY > 700);
+    const onScroll = () => {
+      const ctaVisible = Array.from(document.querySelectorAll("[data-main-cta]")).some((el) => {
+        const r = el.getBoundingClientRect();
+        return r.top < window.innerHeight && r.bottom > 0;
+      });
+      setShowSticky(window.scrollY > 700 && !ctaVisible);
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
