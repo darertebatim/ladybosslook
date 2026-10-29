@@ -258,8 +258,8 @@ export default function IgAdsProgramLanding() {
           <h1 className="text-[26px] font-black leading-[1.6] text-foreground">
             نقشه راه جذب <span className="text-primary">مشتری‌های جدید</span> با تبلیغات اینستاگرامی
           </h1>
-          <p className="mx-auto mt-2 max-w-md text-[15px] leading-8 text-foreground/80">
-            در این ویدیوی ۵۰ دقیقه‌ای، قدم‌به‌قدم می‌بینی چطور برای بیزینست در آمریکا و کانادا مشتری پایدار بسازی — بدون ریلز روزانه و بدون هزینه سنگین آژانس.
+          <p className="mx-auto mt-2 whitespace-nowrap text-[13px] font-bold leading-6 text-foreground/80">
+            ۵۰ دقیقه آموزش قدم‌به‌قدم برای مشتری پایدار — بدون ریلز روزانه و بدون آژانس
           </p>
 
           <div className="mt-4 overflow-hidden rounded-3xl bg-foreground shadow-ios">
@@ -289,9 +289,16 @@ export default function IgAdsProgramLanding() {
           <p className="mt-2 text-xs text-foreground/70">🔊 صدای ویدیو را روشن کنید — این ویدیو کل نقشه راه را توضیح می‌دهد</p>
           </div>
 
-          <div className="mt-6 rounded-3xl bg-primary/10 px-4 py-3">
+          <div className="mt-6 rounded-3xl bg-primary/10 px-4 py-4">
             <p className="text-xs font-bold text-primary">برنامه‌ای که در ویدیو معرفی شد</p>
             <p className="mt-1 text-lg font-black leading-7 text-foreground">دوره ۳ هفته‌ای جذب مشتری با تبلیغات اینستاگرامی</p>
+            <div className="mt-4">
+              <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
+              <p className="mt-2 text-xs leading-6 text-foreground/80">{CURRENCY_NOTE}</p>
+              <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-success/15 px-4 py-2 text-sm font-extrabold text-success">
+                <Shield className="h-4 w-4" /> ۳۰ روز ضمانت بازگشت کامل وجه، بدون هیچ سؤالی
+              </span>
+            </div>
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-2 text-sm font-bold">
@@ -307,13 +314,6 @@ export default function IgAdsProgramLanding() {
             })}
           </div>
 
-          <div className="mt-6">
-            <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
-            <p className="mt-2 text-xs leading-6 text-foreground/80">{CURRENCY_NOTE}</p>
-            <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success/15 px-4 py-2 text-sm font-extrabold text-success">
-              <Shield className="h-4 w-4" /> ۳۰ روز ضمانت بازگشت کامل وجه، بدون هیچ سؤالی
-            </span>
-          </div>
 
           {schedule.length > 0 && (
             <div className="mt-6 rounded-3xl bg-card p-4 text-right shadow-ios">
