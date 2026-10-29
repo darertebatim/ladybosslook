@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Clock, Globe, Crown, ChevronRight, Headset, GraduationCap } from "lucide-react";
+import { Clock, Globe, Crown, ChevronRight, GraduationCap } from "lucide-react";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import { PlaylistCard } from "@/components/audio/PlaylistCard";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -38,8 +38,7 @@ import {
   shouldShowLanguageSettingsHint,
 } from "@/components/app/LanguageSettingsHintPopup";
 import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
-import { PresenceStatsPill } from "@/components/app/ui/PresenceStatsPill";
-import { HomeMenu } from "@/components/app/HomeMenu";
+import { PageHeader } from "@/components/app/ui/PageHeader";
 import { useMediaCategories } from "@/hooks/useMediaCategories";
 import { useQuery } from "@tanstack/react-query";
 import { useMyProgramCourses } from "@/hooks/useMyProgramCourses";
@@ -465,11 +464,8 @@ export default function AppPlayer() {
   if (isLoading) {
     return (
       <div className="flex flex-col h-full overflow-hidden bg-background">
-        <div
-          className="px-4 pt-4 space-y-3"
-          style={{ paddingTop: "calc(env(safe-area-inset-top) + 1rem)" }}
-        >
-          <Skeleton className="h-8 w-24" />
+        <PageHeader title={t("player.title")} menu stats />
+        <div className="px-4 pt-4 space-y-3">
           <div className="flex gap-2">
             {[...Array(4)].map((_, i) => (
               <Skeleton key={i} className="h-7 w-16 rounded-full" />
@@ -501,40 +497,13 @@ export default function AppPlayer() {
           filter: "blur(20px)",
         }}
       />
+      <PageHeader title={t("player.title")} menu stats />
       {/* Single scroll container */}
       <div
         ref={listenScrollRef}
         className="flex-1 overflow-y-auto overscroll-contain relative"
       >
         <div className="relative">
-          {/* Header — only the title row sticks to top */}
-          <div
-            className="sticky top-0 z-20 px-4 pb-2 backdrop-blur-xl"
-            style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)", background: "rgba(255,248,243,0.78)", boxShadow: "0 1px 0 rgba(245,220,200,0.5)" }}
-          >
-            <div className="min-h-[44px] grid grid-cols-[auto_1fr_auto] items-center">
-              <div className="flex items-center gap-1 -ml-1">
-                <HomeMenu />
-                <button
-                  onClick={() => {
-                    haptic.light();
-                    navigate('/app/chat');
-                  }}
-                  className="p-2 -ml-1 active:scale-95 transition-transform"
-                  aria-label="Support"
-                >
-                  <Headset className="h-5 w-5 text-fg-warm" />
-                </button>
-              </div>
-              <h1 className="text-center text-2xl font-bold text-fg-warm tracking-tight">
-                {t("player.title")}
-              </h1>
-              <div className="flex items-center justify-end gap-2">
-                <PresenceStatsPill />
-              </div>
-            </div>
-          </div>
-
           {/* Scrolls away with content */}
           <div className="px-4 pb-2">
             {/* Academy quick link */}

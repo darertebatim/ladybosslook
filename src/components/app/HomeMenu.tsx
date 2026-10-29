@@ -36,6 +36,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { PushPermissionDot } from "@/components/app/PushPermissionDot";
 import { useTranslation } from "react-i18next";
 import { useNewHomeData } from "@/hooks/useNewHomeData";
+import { Button } from "@/components/ui/button";
 // language change moved to Settings page
 interface NavItem {
   id: string;
@@ -305,13 +306,16 @@ export function HomeMenu() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <button
-          className="relative p-2 -ml-2 text-foreground hover:text-foreground transition-colors"
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t("menu.title")}
+          className="relative h-11 w-11 shrink-0 text-fg-warm bg-transparent active:bg-transparent active:scale-95 transition-transform [&_svg]:size-5"
           onClick={() => haptic.light()}
         >
           <Menu className="h-5 w-5" />
           <PushPermissionDot className="top-1.5 right-1.5" />
-        </button>
+        </Button>
       </SheetTrigger>
       <SheetContent
         side="left"

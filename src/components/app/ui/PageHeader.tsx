@@ -60,28 +60,28 @@ export function PageHeader({
 
   const surface =
     variant === "dark"
-      ? "bg-black/20 backdrop-blur-xl text-white shadow-[0_2px_10px_rgba(0,0,0,0.18)]"
-      : "bg-white/35 dark:bg-black/20 backdrop-blur-xl text-[hsl(var(--fg-warm))] shadow-[0_2px_10px_rgba(0,0,0,0.06)]";
+      ? "bg-foreground/20 backdrop-blur-xl text-background shadow-ios"
+      : "bg-bg-warm/95 backdrop-blur-xl text-fg-warm shadow-ios";
 
   return (
     <header
       className={cn(
         sticky ? "sticky top-0 z-30" : "",
-        "px-4 pt-safe pb-3 rounded-b-2xl",
+        "shrink-0 px-4 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-3",
         surface,
         className
       )}
     >
       {menu ? (
-        <div className="grid grid-cols-[auto_1fr_auto] items-center min-h-[44px]">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 min-h-[44px]">
           {/* Left: Menu + Support */}
-          <div className="justify-self-start flex items-center gap-1 -ml-1 tour-menu-button">
+          <div className="justify-self-start flex items-center gap-0 -ml-1 tour-menu-button">
             <HomeMenu />
             <SupportNavButton variant={variant} />
           </div>
 
           {/* Center: Title */}
-          <h1 className="justify-self-center text-center text-lg font-bold leading-tight truncate px-2">
+          <h1 className="justify-self-center min-w-0 max-w-full text-center text-2xl font-bold leading-tight tracking-normal break-words">
             {title}
           </h1>
 
