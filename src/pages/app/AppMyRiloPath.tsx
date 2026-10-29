@@ -4,7 +4,7 @@ import { MyLearningCard } from "@/components/app/MyLearningCard";
 import { useMyLearning } from "@/hooks/useMyLearning";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight, Headset, Award, Compass, GraduationCap } from "lucide-react";
+import { Play, Flame, Sparkles, Check, ChevronLeft, ChevronRight, Compass, GraduationCap } from "lucide-react";
 import { SEOHead } from "@/components/SEOHead";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import {
@@ -17,7 +17,6 @@ import {
 } from "@/hooks/useTodayPath";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { useUnreadChat } from "@/hooks/useUnreadChat";
 import { useGoBack } from "@/hooks/useGoBack";
 import type { PathStep } from "@/lib/pathEngine";
 import { SwapSheet } from "@/components/path/SwapSheet";
@@ -29,7 +28,8 @@ import {
 } from "@/hooks/useMyRiloPathTrophies";
 import { PromoBanner } from "@/components/app/PromoBanner";
 import { HomeBanner } from "@/components/app/HomeBanner";
-import { HomeMenu } from "@/components/app/HomeMenu";
+import { PageHeader } from "@/components/app/ui/PageHeader";
+import { PresenceStatsPill } from "@/components/app/ui/PresenceStatsPill";
 import { useProgramEventsForDate } from "@/hooks/usePlannerProgramEvents";
 import { StackedEventDeck } from "@/components/app/StackedEventDeck";
 import { TodayToolTasks } from "@/components/path/TodayToolTasks";
@@ -379,7 +379,6 @@ export default function AppMyRiloPath() {
   const goBack = useGoBack("/app/home");
   const { hasProgram: hasLearningProgram } = useMyLearning();
   const { user } = useAuth();
-  const { unreadCount: supportUnread } = useUnreadChat();
   const { data, isLoading } = useTodayPath();
   const skip = useSkipPathStep();
   const snooze = useSnoozePathStep();
@@ -492,75 +491,11 @@ export default function AppMyRiloPath() {
           }}
         />
 
-        {/* Header */}
-        <div
-          className="shrink-0 z-30 px-5 pb-3 grid grid-cols-[auto_1fr_auto] items-center backdrop-blur-xl"
-          style={{
-            background: "rgba(255,248,243,0.78)",
-            boxShadow: "0 1px 0 rgba(245,220,200,0.5)",
-            paddingTop: "calc(env(safe-area-inset-top, 0px) + 12px)",
-          }}
-        >
-          <div className="flex items-center gap-1 -ml-1" style={{ color: O.fg }}>
-            <HomeMenu />
-            <button
-              onClick={() => {
-                haptic.light();
-                navigate('/app/chat');
-              }}
-              className="relative p-2 -ml-1 active:scale-95 transition-transform"
-              style={{ color: O.fg }}
-              aria-label="Support"
-            >
-              <Headset className="h-5 w-5" />
-              {supportUnread > 0 && (
-                <span
-                  className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full"
-                  style={{ background: "#EF4444", boxShadow: "0 0 0 2px rgba(255,248,243,0.95)" }}
-                  aria-hidden="true"
-                />
-              )}
-            </button>
-          </div>
-          <div className="text-center text-2xl font-bold tracking-tight truncate" style={{ color: O.fg }}>
-            Path
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              haptic.light();
-              navigate("/app/presence");
-            }}
-            className="flex items-center p-0.5 rounded-full active:scale-95 transition-transform"
-            style={{
-              background: "#FFFFFF",
-              border: `1px solid ${O.border}`,
-              boxShadow: "0 2px 8px rgba(235,94,51,0.18)",
-            }}
-            aria-label={`Trophies: ${trophyCount} · Streak: ${streak} days · open Presence`}
-          >
-            <span
-              className="flex items-center gap-1 pl-2 pr-2.5 py-0.5"
-              style={{ color: O.primary }}
-            >
-              <Award className="w-4 h-4" strokeWidth={2.25} />
-              <span className="text-[13px] font-bold" style={{ color: O.fg }}>
-                {trophyCount}
-              </span>
-            </span>
-            <span
-              className="flex items-center gap-1 pl-2 pr-2.5 py-1 rounded-full"
-              style={{
-                background: `linear-gradient(135deg, ${O.primaryL}, ${O.primary})`,
-                color: "#fff",
-                boxShadow: "0 2px 8px rgba(235,94,51,0.35)",
-              }}
-            >
-              <Flame className="w-3.5 h-3.5 fill-current" />
-              <span className="text-[13px] font-bold">{streak}</span>
-            </span>
-          </button>
-        </div>
+        <PageHeader
+          title="Path"
+          menu
+          right={<PresenceStatsPill trophies={trophyCount} streak={streak} />}
+        />
 
         <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
           {/* Top banners (admin-curated) — under header, above date */}
