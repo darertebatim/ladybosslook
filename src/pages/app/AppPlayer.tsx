@@ -514,59 +514,25 @@ export default function AppPlayer() {
             style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)", background: "rgba(255,248,243,0.78)", boxShadow: "0 1px 0 rgba(245,220,200,0.5)" }}
           >
             <div className="min-h-[44px] grid grid-cols-[auto_1fr_auto] items-center">
-              {showSearch ? (
-                <div className="flex-1 flex items-center gap-2 col-span-3">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-fg-warm-muted" />
-                    <Input
-                      placeholder={t("player.searchPlaceholder")}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-9 h-9 bg-card border-0 text-fg-warm placeholder:text-fg-warm-muted focus-visible:ring-0 shadow-ios rounded-full"
-                      autoFocus
-                    />
-                  </div>
-                  <IOSIconButton
-                    size="sm"
-                    onClick={() => {
-                      setShowSearch(false);
-                      setSearchQuery("");
-                    }}
-                    aria-label={t("player.closeSearchAria")}
-                  >
-                    <X className="h-5 w-5 text-fg-warm" />
-                  </IOSIconButton>
-                </div>
-              ) : (
-                <>
-                  <div className="flex items-center gap-1 -ml-1">
-                    <HomeMenu />
-                    <button
-                      onClick={() => {
-                        haptic.light();
-                        navigate('/app/chat');
-                      }}
-                      className="p-2 -ml-1 active:scale-95 transition-transform"
-                      aria-label="Support"
-                    >
-                      <Headset className="h-5 w-5 text-fg-warm" />
-                    </button>
-                  </div>
-                  <h1 className="text-center text-2xl font-bold text-fg-warm tracking-tight">
-                    {t("player.title")}
-                  </h1>
-                  <div className="flex items-center justify-end gap-2">
-                    <IOSIconButton
-                      size="sm"
-                      onClick={() => setShowSearch(true)}
-                      className="tour-player-search"
-                      aria-label={t("player.searchAria")}
-                    >
-                      <Search className="h-4 w-4 text-brand" />
-                    </IOSIconButton>
-                  </div>
-                </>
-              )}
+              <div className="flex items-center gap-1 -ml-1">
+                <HomeMenu />
+                <button
+                  onClick={() => {
+                    haptic.light();
+                    navigate('/app/chat');
+                  }}
+                  className="p-2 -ml-1 active:scale-95 transition-transform"
+                  aria-label="Support"
+                >
+                  <Headset className="h-5 w-5 text-fg-warm" />
+                </button>
+              </div>
+              <h1 className="text-center text-2xl font-bold text-fg-warm tracking-tight">
+                {t("player.title")}
+              </h1>
+              <div className="flex items-center justify-end gap-2">
+                <PresenceStatsPill />
+              </div>
             </div>
           </div>
 

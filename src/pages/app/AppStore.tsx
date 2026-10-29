@@ -338,57 +338,25 @@ const AppStore = () => {
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
         <div className="grid grid-cols-[auto_1fr_auto] items-center px-4 pt-3 pb-3 min-h-[52px]">
-          {showSearch ? (
-            <div className="flex-1 flex items-center gap-2 col-span-3">
-              <Input
-                type="text"
-                placeholder={t("toolsPage.searchPlaceholder")}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 h-10 bg-white/90 dark:bg-black/30 border-0 rounded-full shadow-ios focus-visible:ring-0"
-                autoFocus
-              />
-              <IOSIconButton
-                size="sm"
-                onClick={() => {
-                  setShowSearch(false);
-                  setSearchQuery("");
-                }}
-                aria-label={t("toolsPage.closeSearchAria")}
-              >
-                <X className="h-5 w-5" />
-              </IOSIconButton>
-            </div>
-          ) : (
-            <>
-              <div className="flex items-center gap-1 -ml-1">
-                <HomeMenu />
-                <button
-                  onClick={() => {
-                    haptic.light();
-                    navigate('/app/chat');
-                  }}
-                  className="p-2 -ml-1 active:scale-95 transition-transform"
-                  aria-label="Support"
-                >
-                  <Headset className="h-5 w-5 text-fg-warm" />
-                </button>
-              </div>
-              <h1 className="text-center text-2xl font-bold text-fg-warm">
-                {t("toolsPage.title")}
-              </h1>
-              <div className="flex items-center justify-end gap-2">
-                <IOSIconButton
-                  size="sm"
-                  onClick={() => setShowSearch(true)}
-                  className="tour-search-button"
-                  aria-label={t("toolsPage.searchAria")}
-                >
-                  <Search className="h-5 w-5" />
-                </IOSIconButton>
-              </div>
-            </>
-          )}
+          <div className="flex items-center gap-1 -ml-1">
+            <HomeMenu />
+            <button
+              onClick={() => {
+                haptic.light();
+                navigate('/app/chat');
+              }}
+              className="p-2 -ml-1 active:scale-95 transition-transform"
+              aria-label="Support"
+            >
+              <Headset className="h-5 w-5 text-fg-warm" />
+            </button>
+          </div>
+          <h1 className="text-center text-2xl font-bold text-fg-warm">
+            {t("toolsPage.title")}
+          </h1>
+          <div className="flex items-center justify-end gap-2">
+            <PresenceStatsPill />
+          </div>
         </div>
       </header>
 
