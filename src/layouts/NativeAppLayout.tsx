@@ -1,3 +1,4 @@
+import { isSupportChatBlockedForRegion } from '@/lib/regionRestrictions';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { haptic } from '@/lib/haptics';
 import { Home, MessageCircle, Compass, Music, Flame, CalendarPlus, Play, Sparkles, Route, Headphones, Headset, GraduationCap } from 'lucide-react';
@@ -200,7 +201,7 @@ const NativeAppLayout = () => {
     { path: '/app/tools', icon: Compass, label: t('nav.tools'), tourClass: 'tour-nav-explore' },
     { path: '/app/player', icon: Headphones, label: t('nav.player'), tourClass: 'tour-nav-listen' },
     { path: '/app/chat', icon: Headset, label: t('nav.support'), tourClass: 'tour-nav-support' },
-  ];
+  ].filter((item) => item.path !== '/app/chat' || !isSupportChatBlockedForRegion());
 
 
   const hasFloatingNav = !isDesktopShell && !isOnChatPage && !isFullScreenTool && !isKeyboardOpen;

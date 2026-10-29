@@ -1,3 +1,4 @@
+import { isSupportChatBlockedForRegion } from '@/lib/regionRestrictions';
 import { useNavigate } from "react-router-dom";
 import { Headset } from "lucide-react";
 import { haptic } from "@/lib/haptics";
@@ -12,7 +13,12 @@ import { Button } from "@/components/ui/button";
  * Kept as its own component so the unread-chat realtime subscription only
  * exists on pages that actually render it.
  */
-export function SupportNavButton({ variant = "light" }: { variant?: "light" | "dark" }) {
+export function SupportNavButton(props: { variant?: "light" | "dark" }) {
+  if (isSupportChatBlockedForRegion()) return null;
+  return <SupportNavButtonInner {...props} />;
+}
+
+function SupportNavButtonInner({ variant = "light" }: { variant?: "light" | "dark" }) {
   const navigate = useNavigate();
   const { unreadCount } = useUnreadChat("support");
 
