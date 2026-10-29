@@ -243,7 +243,7 @@ export default function IgAdsProgramLanding() {
       </div>
 
       {/* Hero */}
-      <section className="bg-gradient-to-b from-secondary via-background to-background px-4 pb-10 pt-10">
+      <section className="bg-gradient-to-b from-secondary via-background to-background px-4 pb-10 pt-4">
         <div className="mx-auto max-w-md text-center">
           <div className="flex flex-nowrap items-center justify-center gap-2">
             <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-card px-3 py-1.5 text-xs font-bold text-foreground shadow-ios">
@@ -254,7 +254,7 @@ export default function IgAdsProgramLanding() {
             </span>
           </div>
 
-          <div className="mt-5 rounded-3xl bg-card p-4 shadow-ios">
+          <div className="mt-3 rounded-3xl bg-card p-4 shadow-ios">
           <h1 className="text-[26px] font-black leading-[1.6] text-foreground">
             نقشه راه جذب <span className="text-primary">مشتری‌های جدید</span> با تبلیغات اینستاگرامی
           </h1>
@@ -286,11 +286,13 @@ export default function IgAdsProgramLanding() {
               )}
             </div>
           </div>
-          <p className="mt-2 text-xs text-foreground/70">🔊 صدای ویدیو را روشن کنید — این ویدیو کل نقشه راه را توضیح می‌دهد</p>
-          <p className="mx-auto mt-2 inline-flex whitespace-nowrap rounded-full bg-secondary px-3 py-1 text-[12px] font-extrabold text-foreground">بدون ریلز روزانه · بدون هزینه آژانس</p>
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+            <p className="text-xs text-foreground/70">🔊 صدا را روشن کنید</p>
+            <p className="inline-flex whitespace-nowrap rounded-full bg-secondary px-3 py-1 text-[12px] font-extrabold text-foreground">بدون ریلز روزانه · بدون هزینه آژانس</p>
+          </div>
           </div>
 
-          <div className="mt-6 rounded-3xl bg-primary/10 px-4 py-4">
+          <div className="mt-4 rounded-3xl bg-primary/10 px-4 py-4">
             <p className="text-xs font-bold text-primary">برنامه‌ای که در ویدیو معرفی شد</p>
             <p className="mt-1 text-lg font-black leading-7 text-foreground">دوره ۳ هفته‌ای جذب مشتری با تبلیغات اینستاگرامی</p>
             <div className="mt-4">
