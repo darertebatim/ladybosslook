@@ -54,7 +54,7 @@ function useNextRoundSchedule() {
       .then(({ data }) => {
         if (!data?.first_session_date) return;
         const first = new Date(data.first_session_date).getTime();
-        const d = (tz: string) => new Intl.DateTimeFormat("fa-IR", { timeZone: tz, weekday: "long", day: "numeric", month: "long" });
+        const d = (tz: string) => new Intl.DateTimeFormat("fa-IR-u-ca-gregory", { timeZone: tz, weekday: "long", day: "numeric", month: "long" });
         const t = (tz: string) => new Intl.DateTimeFormat("fa-IR", { timeZone: tz, hour: "numeric", minute: "2-digit" });
         setSessions([0, 1, 2].map((w) => {
           const at = new Date(first + w * 7 * 86400000);
