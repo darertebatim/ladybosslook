@@ -4,7 +4,7 @@ import { usePrograms } from "@/hooks/usePrograms";
 import { SEOHead } from "@/components/SEOHead";
 import {
   Search,
-  X,
+
   Loader2,
   ChevronRight,
   Crown,
