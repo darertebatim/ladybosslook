@@ -40,7 +40,7 @@ function CTA({ onClick, loading, price, className = "" }: { onClick: () => void;
       size="lg"
       onClick={onClick}
       disabled={loading}
-      className={`h-14 w-full rounded-2xl text-lg font-extrabold shadow-ios active:scale-[0.98] sm:w-auto sm:px-12 ${className}`}
+      className={`h-14 w-full rounded-2xl text-base font-extrabold shadow-ios active:scale-[0.98] ${className}`}
     >
       {loading ? <Loader2 className="ml-2 h-5 w-5 animate-spin" /> : <Rocket className="ml-2 h-5 w-5" />}
       {loading ? "در حال انتقال به پرداخت..." : `همین الان ثبت‌نام کن — ${fa(price)} دلار`}
@@ -50,9 +50,9 @@ function CTA({ onClick, loading, price, className = "" }: { onClick: () => void;
 
 function SectionTitle({ eyebrow, title, sub }: { eyebrow?: string; title: string; sub?: string }) {
   return (
-    <div className="mx-auto mb-8 max-w-2xl text-center">
+    <div className="mx-auto mb-8 max-w-md text-center">
       {eyebrow && <p className="mb-2 text-sm font-bold text-primary">{eyebrow}</p>}
-      <h2 className="text-2xl font-extrabold leading-[1.6] text-foreground md:text-4xl md:leading-[1.5]">{title}</h2>
+      <h2 className="text-2xl font-extrabold leading-[1.6] text-foreground">{title}</h2>
       {sub && <p className="mt-3 text-base leading-8 text-muted-foreground">{sub}</p>}
     </div>
   );
@@ -179,15 +179,15 @@ export default function IgAdsProgramLanding() {
       </div>
 
       {/* Hero */}
-      <section className="bg-gradient-to-b from-secondary via-background to-background px-4 pb-14 pt-10 md:pt-16">
-        <div className="mx-auto max-w-3xl text-center">
+      <section className="bg-gradient-to-b from-secondary via-background to-background px-4 pb-10 pt-10">
+        <div className="mx-auto max-w-md text-center">
           <span className="inline-flex items-center gap-2 rounded-full bg-card px-4 py-1.5 text-sm font-bold text-foreground shadow-ios">
             <Award className="h-4 w-4 text-primary" /> آکادمی رایلو · با علی لطفی
           </span>
-          <h1 className="mt-5 text-3xl font-black leading-[1.55] text-foreground md:text-5xl md:leading-[1.45]">
+          <h1 className="mt-5 text-[28px] font-black leading-[1.6] text-foreground">
             نقشه راه جذب <span className="text-primary">مشتری‌های جدید</span> با تبلیغات اینستاگرامی
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg leading-9 text-muted-foreground">
+          <p className="mx-auto mt-4 max-w-md text-base leading-8 text-muted-foreground">
             یک روش مشخص و قابل‌حساب برای پر کردن ظرفیت خالی بیزینست — بدون ریلز روزانه و بدون هزینه‌های سنگین آژانس.
           </p>
 
@@ -236,10 +236,10 @@ export default function IgAdsProgramLanding() {
       </section>
 
       {/* Situations */}
-      <section className="px-4 py-14">
-        <div className="mx-auto max-w-5xl">
+      <section className="px-4 py-10">
+        <div className="mx-auto max-w-md">
           <SectionTitle eyebrow="کجای مسیر هستی؟" title="احتمالاً الان توی یکی از این سه وضعیتی" sub="در هر سه حالت مسئله یکیه: بیزینست مشتری جدید لازم داره، ولی هنوز روشی نداری که بشه روش حساب کرد." />
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4">
             {SITUATIONS.map((s, i) => (
               <div key={i} className="rounded-3xl bg-card p-6 shadow-ios">
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-lg font-black text-primary">{fa(i + 1)}</span>
@@ -248,17 +248,17 @@ export default function IgAdsProgramLanding() {
               </div>
             ))}
           </div>
-          <p className="mx-auto mt-8 max-w-2xl rounded-2xl bg-secondary p-5 text-center font-bold leading-8 text-foreground">
+          <p className="mx-auto mt-8 max-w-md rounded-2xl bg-secondary p-5 text-center font-bold leading-8 text-foreground">
             و در همین حال، رقیبی که راه جذب مشتری رو بلده، داره به مشتری‌هایی می‌رسه که می‌تونستن مشتری تو باشن.
           </p>
         </div>
       </section>
 
       {/* 6 mistakes */}
-      <section className="bg-muted/50 px-4 py-14">
-        <div className="mx-auto max-w-5xl">
+      <section className="bg-muted/50 px-4 py-10">
+        <div className="mx-auto max-w-md">
           <SectionTitle eyebrow="چک‌لیست شکست تبلیغات" title="۶ اشتباهی که دلیل ۹۰٪ شکست تبلیغات اینستاگرامی است" sub="با همین چک‌لیست، تبلیغات خودمون و شاگردهامون رو بررسی می‌کنیم." />
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4">
             {MISTAKES.map((m, i) => (
               <div key={i} className="rounded-3xl bg-card p-6 shadow-ios">
                 <div className="flex items-center gap-3">
@@ -278,11 +278,11 @@ export default function IgAdsProgramLanding() {
       </section>
 
       {/* IKEA */}
-      <section className="px-4 py-14">
-        <div className="mx-auto grid max-w-5xl items-center gap-8 md:grid-cols-2">
+      <section className="px-4 py-10">
+        <div className="mx-auto grid max-w-md gap-6">
           <div>
             <p className="mb-2 text-sm font-bold text-primary">متد آیکیا</p>
-            <h2 className="text-2xl font-extrabold leading-[1.6] md:text-4xl md:leading-[1.5]">لازم نیست دیجیتال مارکتر باشی</h2>
+            <h2 className="text-2xl font-extrabold leading-[1.6]">لازم نیست دیجیتال مارکتر باشی</h2>
             <p className="mt-4 leading-9 text-muted-foreground">
               وقتی از آیکیا میز می‌خری، لازم نیست نجار باشی؛ کافیه دفترچه راهنما رو دنبال کنی. اینجا هم پلی‌بوک‌ها و چک‌لیست‌ها دقیقاً همین کار رو می‌کنن.
               لازم نیست کل Ads Manager رو بلد باشی — فقط بخشی که به درد بیزینس خودت می‌خوره.
@@ -300,10 +300,10 @@ export default function IgAdsProgramLanding() {
       </section>
 
       {/* Curriculum */}
-      <section className="bg-muted/50 px-4 py-14">
-        <div className="mx-auto max-w-5xl">
+      <section className="bg-muted/50 px-4 py-10">
+        <div className="mx-auto max-w-md">
           <SectionTitle eyebrow="فرمول سه‌مرحله‌ای تبلیغ موفق" title="در ۳ هفته، سیستم جذب مشتری بیزینست رو می‌سازی" sub="هر هفته یک جلسه لایو ۲ ساعته؛ بین جلسه‌ها روی بیزینس خودت اجرا می‌کنی، با پشتیبانی ما." />
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4">
             {WEEKS.map((w) => (
               <div key={w.n} className="rounded-3xl bg-card p-6 shadow-ios">
                 <div className="flex items-center justify-between">
@@ -325,10 +325,10 @@ export default function IgAdsProgramLanding() {
       </section>
 
       {/* Results */}
-      <section className="px-4 py-14">
-        <div className="mx-auto max-w-5xl">
+      <section className="px-4 py-10">
+        <div className="mx-auto max-w-md">
           <SectionTitle eyebrow="نتیجه این روش" title="ثبات، حق انتخاب، و سقف درآمدی که دست خودته" />
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4">
             {[
               { icon: TrendingUp, t: "ثبات", b: "اگه این هفته از ۱۰۰ نفر، ۱۰ نفر مشتری شدن، هفته بعد هم می‌دونی تقریباً چی در انتظارته." },
               { icon: Target, t: "حق انتخاب", b: "ظرفیتت پره؟ کمش کن. مسافرتی؟ خاموشش کن. برگشتی؟ دوباره روشنش کن." },
@@ -341,15 +341,15 @@ export default function IgAdsProgramLanding() {
               </div>
             ))}
           </div>
-          <p className="mx-auto mt-8 max-w-2xl text-center leading-9 text-muted-foreground">
+          <p className="mx-auto mt-8 max-w-md text-center leading-9 text-muted-foreground">
             <strong className="text-foreground">پول تبلیغات هزینه نیست؛ سرمایه در گردشه.</strong> اول دوره می‌ذاری، و تا آخر دوره باید اصل پول و سودش برگرده — وگرنه جایی از فرمول باید اصلاح بشه.
           </p>
         </div>
       </section>
 
       {/* Testimonials placeholder */}
-      <section className="bg-muted/50 px-4 py-14">
-        <div className="mx-auto max-w-3xl">
+      <section className="bg-muted/50 px-4 py-10">
+        <div className="mx-auto max-w-md">
           <SectionTitle eyebrow="نتایج شاگردها" title="بیش از ۲۰۰ بیزینس در آمریکا و کانادا با این روش کار می‌کنن" />
           <div className="flex aspect-video items-center justify-center rounded-3xl bg-card shadow-ios">
             <div className="text-center text-muted-foreground">
@@ -361,10 +361,10 @@ export default function IgAdsProgramLanding() {
       </section>
 
       {/* About Ali */}
-      <section className="px-4 py-14">
-        <div className="mx-auto max-w-3xl rounded-3xl bg-card p-8 shadow-ios">
+      <section className="px-4 py-10">
+        <div className="mx-auto max-w-md rounded-3xl bg-card p-6 shadow-ios">
           <p className="text-sm font-bold text-primary">مدرس دوره</p>
-          <h2 className="mt-2 text-2xl font-extrabold md:text-3xl">علی لطفی</h2>
+          <h2 className="mt-2 text-2xl font-extrabold">علی لطفی</h2>
           <p className="mt-1 text-muted-foreground">بنیان‌گذار آکادمی رایلو · کالیفرنیا</p>
           <p className="mt-5 leading-9 text-muted-foreground">
             بیش از ۱۰ سال قبل از مهاجرت بیزینس‌های خودش رو داشت و اینستاگرام هم بلد بود. ولی در آمریکا ۳ سال طول کشید تا به یک سیستم پایدار برای جذب مشتری برسه.
@@ -382,10 +382,10 @@ export default function IgAdsProgramLanding() {
       </section>
 
       {/* Who for */}
-      <section className="bg-muted/50 px-4 py-14">
-        <div className="mx-auto max-w-5xl">
+      <section className="bg-muted/50 px-4 py-10">
+        <div className="mx-auto max-w-md">
           <SectionTitle title="این برنامه برای کیه؟" />
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4">
             <div className="rounded-3xl bg-card p-6 shadow-ios">
               <h3 className="mb-4 text-lg font-extrabold text-success">✓ مناسب توئه اگه...</h3>
               {FOR_YOU.map((t) => (
@@ -411,10 +411,10 @@ export default function IgAdsProgramLanding() {
       </section>
 
       {/* Offer */}
-      <section id="offer" className="px-4 py-14">
-        <div className="mx-auto max-w-3xl">
+      <section id="offer" className="px-4 py-10">
+        <div className="mx-auto max-w-md">
           <SectionTitle eyebrow="هر چیزی که دریافت می‌کنی" title="دوره کامل جذب مشتری با تبلیغات اینستاگرامی" />
-          <div className="rounded-3xl bg-card p-6 shadow-ios md:p-8">
+          <div className="rounded-3xl bg-card p-6 shadow-ios">
             {STACK.map((s) => (
               <div key={s.title} className="flex items-start gap-4 border-b border-border py-4 last:border-0">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-secondary"><s.icon className="h-5 w-5 text-primary" /></span>
@@ -438,18 +438,18 @@ export default function IgAdsProgramLanding() {
           <div className="mt-6 rounded-3xl bg-card p-6 shadow-ios">
             <h3 className="mb-3 text-center font-extrabold">در مقایسه با گزینه‌های دیگر</h3>
             {COMPARE.map((c) => (
-              <div key={c.label} className="flex items-center justify-between gap-4 border-b border-border py-3 text-sm last:border-0">
+              <div key={c.label} className="flex flex-col gap-1 border-b border-border py-3 text-sm last:border-0">
                 <span className="font-bold">{c.label}</span>
-                <span className="text-left text-muted-foreground">{c.value}</span>
+                <span className="text-muted-foreground">{c.value}</span>
               </div>
             ))}
           </div>
 
-          <div className="mt-6 rounded-3xl bg-foreground p-8 text-center text-background shadow-ios">
+          <div className="mt-6 rounded-3xl bg-foreground p-6 text-center text-background shadow-ios">
             <p className="text-sm font-bold opacity-80">شهریه اصلی</p>
             <p className="text-2xl font-bold line-through opacity-60">{fa(price.was)} دلار</p>
             <p className="mt-3 text-sm font-bold">سهم شما امروز</p>
-            <p className="text-6xl font-black text-primary">{fa(price.now)}<span className="text-2xl"> دلار</span></p>
+            <p className="text-5xl font-black text-primary">{fa(price.now)}<span className="text-2xl"> دلار</span></p>
             {discount > 0 && <p className="mt-2 inline-block rounded-full bg-primary px-4 py-1 text-sm font-bold text-primary-foreground">{fa(discount)}٪ تخفیف رونمایی</p>}
             <div className="mt-6">
               <CTA onClick={checkout} loading={loading} price={price.now} />
@@ -460,19 +460,19 @@ export default function IgAdsProgramLanding() {
       </section>
 
       {/* Guarantee */}
-      <section className="px-4 pb-14">
-        <div className="mx-auto max-w-3xl rounded-3xl border-2 border-dashed border-success bg-card p-8 text-center shadow-ios">
+      <section className="px-4 pb-10">
+        <div className="mx-auto max-w-md rounded-3xl border-2 border-dashed border-success bg-card p-6 text-center shadow-ios">
           <Shield className="mx-auto h-14 w-14 text-success" />
           <h2 className="mt-4 text-2xl font-extrabold">۳۰ روز ضمانت ۱۰۰٪ بازگشت وجه</h2>
-          <p className="mx-auto mt-3 max-w-xl leading-9 text-muted-foreground">
+          <p className="mx-auto mt-3 max-w-md leading-9 text-muted-foreground">
             انگار ۳۰ روز پولت پیش ما امانته. ثبت‌نام کن، آموزش‌ها رو ببین و با برنامه آشنا شو. اگه به هر دلیلی مناسبت نبود، کل مبلغ رو بدون هیچ سؤالی پس می‌گیری. همه ریسک با ماست.
           </p>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="bg-muted/50 px-4 py-14">
-        <div className="mx-auto max-w-3xl">
+      <section className="bg-muted/50 px-4 py-10">
+        <div className="mx-auto max-w-md">
           <SectionTitle eyebrow="سؤال‌های پرتکرار" title="هنوز سؤالی داری؟" />
           <Accordion type="single" collapsible className="space-y-3">
             {FAQ.map((f, i) => (
@@ -486,9 +486,9 @@ export default function IgAdsProgramLanding() {
       </section>
 
       {/* Final CTA */}
-      <section className="px-4 pb-32 pt-14 text-center">
-        <div className="mx-auto max-w-2xl">
-          <h2 className="text-2xl font-extrabold leading-[1.6] md:text-4xl md:leading-[1.5]">دو راه داری</h2>
+      <section className="px-4 pb-32 pt-10 text-center">
+        <div className="mx-auto max-w-md">
+          <h2 className="text-2xl font-extrabold leading-[1.6]">دو راه داری</h2>
           <p className="mt-4 leading-9 text-muted-foreground">
             می‌تونی خودت با آزمون و خطا راهش رو پیدا کنی — برای من ۳ سال طول کشید.
             یا می‌تونی از روشی استفاده کنی که برای بیش از ۲۰۰ بیزینس جواب داده، با پشتیبانی کنارت، و در کمتر از یک ماه سیستم جذب مشتری خودت رو راه بندازی.
@@ -501,7 +501,7 @@ export default function IgAdsProgramLanding() {
       </section>
 
       {/* Sticky mobile bar */}
-      <div className={`fixed inset-x-0 bottom-0 z-50 bg-card/95 px-4 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] pt-3 shadow-ios backdrop-blur transition-transform md:hidden ${showSticky ? "translate-y-0" : "translate-y-full"}`}>
+      <div className={`fixed inset-x-0 bottom-0 z-50 bg-card/95 px-4 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] pt-3 shadow-ios backdrop-blur transition-transform ${showSticky ? "translate-y-0" : "translate-y-full"}`}>
         <div className="flex items-center gap-3">
           <div className="shrink-0 text-center">
             <p className="text-xs text-muted-foreground line-through">{fa(price.was)}$</p>
