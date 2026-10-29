@@ -201,6 +201,16 @@ export default function IgAdsProgramLanding() {
             <Award className="h-4 w-4 text-primary" /> آکادمی رایلو · با علی لطفی
           </span>
 
+          <span className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+            <Clock className="h-3.5 w-3.5" /> آموزش رایگان · ۵۰ دقیقه
+          </span>
+          <h1 className="mt-3 text-[28px] font-black leading-[1.6] text-foreground">
+            نقشه راه جذب <span className="text-primary">مشتری‌های جدید</span> با تبلیغات اینستاگرامی
+          </h1>
+          <p className="mx-auto mt-3 max-w-md text-base leading-8 text-muted-foreground">
+            در این ویدیوی ۵۰ دقیقه‌ای، قدم‌به‌قدم می‌بینی چطور برای بیزینست در آمریکا و کانادا مشتری پایدار بسازی — بدون ریلز روزانه و بدون هزینه سنگین آژانس.
+          </p>
+
           <div className="mt-5 overflow-hidden rounded-3xl bg-foreground shadow-ios">
             <div className="relative aspect-video w-full">
               {playing ? (
@@ -223,17 +233,12 @@ export default function IgAdsProgramLanding() {
           </div>
           <p className="mt-2 text-xs text-muted-foreground">🔊 صدای ویدیو را روشن کنید — این ویدیو کل نقشه راه را توضیح می‌دهد</p>
 
-          <span className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-            <Clock className="h-3.5 w-3.5" /> آموزش رایگان · ۵۰ دقیقه
-          </span>
-          <h1 className="mt-3 text-[28px] font-black leading-[1.6] text-foreground">
-            نقشه راه جذب <span className="text-primary">مشتری‌های جدید</span> با تبلیغات اینستاگرامی
-          </h1>
-          <p className="mx-auto mt-3 max-w-md text-base leading-8 text-muted-foreground">
-            در این ویدیوی ۵۰ دقیقه‌ای، قدم‌به‌قدم می‌بینی چطور برای بیزینست در آمریکا و کانادا مشتری پایدار بسازی — بدون ریلز روزانه و بدون هزینه سنگین آژانس.
-          </p>
+          <div className="mt-6 rounded-3xl bg-primary/10 px-4 py-3">
+            <p className="text-xs font-bold text-primary">برنامه‌ای که در ویدیو معرفی شد</p>
+            <p className="mt-1 text-lg font-black leading-7 text-foreground">دوره ۳ هفته‌ای جذب مشتری با تبلیغات اینستاگرامی</p>
+          </div>
 
-          <div className="mt-5 grid grid-cols-2 gap-2 text-sm font-bold">
+          <div className="mt-4 grid grid-cols-2 gap-2 text-sm font-bold">
             {[
               [Clock, "۳ هفته"], [Video, "۳ لایو ۲ ساعته"], [BookOpen, "۶ پلی‌بوک"], [MessageCircle, "پشتیبانی چت"],
             ].map(([Icon, t], i) => {
