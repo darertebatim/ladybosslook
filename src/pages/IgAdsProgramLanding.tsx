@@ -214,13 +214,17 @@ export default function IgAdsProgramLanding() {
           <div className="mt-5 overflow-hidden rounded-3xl bg-foreground shadow-ios">
             <div className="relative aspect-video w-full">
               {playing ? (
-                <TrackedIframe
-                  className="absolute inset-0 h-full w-full"
-                  src={`https://www.youtube.com/embed/${VSL_ID}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
-                  title="نقشه راه جذب مشتری با تبلیغات اینستاگرامی"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+                <div className="absolute inset-0 overflow-hidden">
+                  {/* Frame mask: oversize the embed so YouTube's top title bar and bottom-corner branding are cropped out */}
+                  <TrackedIframe
+                    className="absolute left-0 top-[-60px] w-full"
+                    style={{ height: "calc(100% + 120px)" }}
+                    src={`https://www.youtube-nocookie.com/embed/${VSL_ID}?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&fs=1&disablekb=0`}
+                    title="نقشه راه جذب مشتری با تبلیغات اینستاگرامی"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
               ) : (
                 <button type="button" onClick={() => setPlaying(true)} className="absolute inset-0 h-full w-full" aria-label="پخش ویدیو">
                   <img src={vslCover.url} alt="نقشه راه جذب مشتری با تبلیغات اینستاگرامی" className="h-full w-full object-cover" />
