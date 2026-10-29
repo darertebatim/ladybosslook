@@ -28,8 +28,7 @@ import {
 import { ProgramCard } from "@/components/app/ProgramCard";
 import { ToolCard } from "@/components/app/ToolCard";
 import { pickPeach, useIsDarkMode } from "@/lib/peachPalette";
-import { Input } from "@/components/ui/input";
-import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
+import { PresenceStatsPill } from "@/components/app/ui/PresenceStatsPill";
 import { HomeMenu } from "@/components/app/HomeMenu";
 import {
   wellnessTools,
@@ -75,8 +74,7 @@ const AppStore = () => {
   useIsDarkMode();
   const { programs, isLoading: programsLoading } = usePrograms();
   const [enrollingSlug, setEnrollingSlug] = useState<string | null>(null);
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery] = useState("");
   const userLang = useUserPreferredLanguage();
   const [showLangHint, setShowLangHint] = useState(false);
 

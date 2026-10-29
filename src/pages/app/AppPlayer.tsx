@@ -3,8 +3,7 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Input } from "@/components/ui/input";
-import { Search, X, Clock, Globe, Crown, ChevronRight, Headset, GraduationCap } from "lucide-react";
+import { Clock, Globe, Crown, ChevronRight, Headset, GraduationCap } from "lucide-react";
 import { FluentEmoji } from "@/components/ui/FluentEmoji";
 import { PlaylistCard } from "@/components/audio/PlaylistCard";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -39,6 +38,7 @@ import {
   shouldShowLanguageSettingsHint,
 } from "@/components/app/LanguageSettingsHintPopup";
 import { IOSIconButton } from "@/components/app/ui/IOSIconButton";
+import { PresenceStatsPill } from "@/components/app/ui/PresenceStatsPill";
 import { HomeMenu } from "@/components/app/HomeMenu";
 import { useMediaCategories } from "@/hooks/useMediaCategories";
 import { useQuery } from "@tanstack/react-query";
@@ -62,7 +62,6 @@ export default function AppPlayer() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
-  const [showSearch, setShowSearch] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
   const [progressFilter, setProgressFilter] = useState<
