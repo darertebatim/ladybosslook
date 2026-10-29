@@ -247,7 +247,7 @@ export default function IgAdsProgramLanding() {
           </div>
 
           <div className="mt-6">
-            <CTA onClick={checkout} loading={loading} price={price.now} />
+            <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
             <p className="mt-3 flex items-center justify-center gap-1.5 text-sm text-muted-foreground">
               <Shield className="h-4 w-4 text-success" /> ۳۰ روز ضمانت بازگشت کامل وجه، بدون هیچ سؤالی
             </p>
@@ -476,7 +476,7 @@ export default function IgAdsProgramLanding() {
             <p className="text-5xl font-black text-primary">{fa(price.now)}<span className="text-2xl"> دلار</span></p>
             {discount > 0 && <p className="mt-2 inline-block rounded-full bg-primary px-4 py-1 text-sm font-bold text-primary-foreground">{fa(discount)}٪ تخفیف رونمایی</p>}
             <div className="mt-6">
-              <CTA onClick={checkout} loading={loading} price={price.now} />
+              <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
             </div>
             <p className="mt-3 text-xs opacity-70">هزینه اجرای تبلیغات جداست و به بودجه‌ای که خودت انتخاب می‌کنی بستگی داره.</p>
           </div>
@@ -518,7 +518,7 @@ export default function IgAdsProgramLanding() {
             یا می‌تونی از روشی استفاده کنی که برای بیش از ۲۰۰ بیزینس جواب داده، با پشتیبانی کنارت، و در کمتر از یک ماه سیستم جذب مشتری خودت رو راه بندازی.
           </p>
           <div className="mt-8">
-            <CTA onClick={checkout} loading={loading} price={price.now} />
+            <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
           </div>
           <p className="mt-3 text-sm text-muted-foreground">۳۰ روز ضمانت بازگشت وجه · پرداخت امن با Stripe</p>
         </div>
