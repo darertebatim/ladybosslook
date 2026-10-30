@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { CheckCircle, CreditCard, Calendar, Sparkles, MessageCircle, Loader2, Check } from "lucide-react";
 import { supabase, browserTimezone } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
