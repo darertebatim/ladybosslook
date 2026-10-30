@@ -365,6 +365,7 @@ serve(async (req) => {
         phone_number_collection: {
           enabled: true
         },
+        ...(sanitizedEmail ? { customer_email: sanitizedEmail } : {}),
         success_url: successUrl,
         cancel_url: cancelUrl,
         subscription_data: subscriptionData,
@@ -472,6 +473,7 @@ serve(async (req) => {
           enabled: true
         },
         customer_creation: 'always',
+        ...(sanitizedEmail ? { customer_email: sanitizedEmail } : {}),
         success_url: successUrl,
         cancel_url: cancelUrl,
         payment_intent_data: {
