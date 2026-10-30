@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, CreditCard, Calendar, Sparkles, MessageCircle, Loader2, Check } from "lucide-react";
 import { supabase, browserTimezone } from '@/integrations/supabase/client';
@@ -13,29 +13,16 @@ const EWCBalance = () => {
   const [isLoading, setIsLoading] = useState(false);
   const isSubmittingRef = useRef(false);
 
-  // Prevent accidental navigation during payment processing
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (isSubmittingRef.current) {
-        e.preventDefault();
-        e.returnValue = '';
-        return '';
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, []);
-
   const checkDuplicatePayment = async (trimmedEmail: string): Promise<boolean> => {
     try {
-      // Check for recent orders for this email and program
+      // Recent balance orders only — a $50 deposit must never block the balance payment
       const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
       const { data: recentOrders } = await supabase
         .from('orders')
         .select('id, status')
         .eq('email', trimmedEmail)
         .eq('program_slug', 'empowered-woman-coaching')
+        .neq('amount', 5000)
         .gte('created_at', tenMinutesAgo)
         .in('status', ['pending', 'paid']);
 
