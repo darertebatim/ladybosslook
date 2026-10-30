@@ -43,7 +43,7 @@ export function BreathingCompleteSheet({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const returnTo = explicitReturnTo || (location.state as { from?: string } | null)?.from || '/app/home';
+  const returnTo = explicitReturnTo || (location.state as { from?: string } | null)?.from || '/app/path';
   const { user } = useAuth();
 
   let routinePlayer: { isActive: boolean; isMinimized: boolean; maximize: () => void; completeTask: () => void } | null = null;

@@ -28,7 +28,7 @@ export function ProtectedRoute({ children, requireAdmin = false, requiredPage }:
         navigate('/');
       } else if (requiredPage && !canAccessAdminPage(requiredPage)) {
         // User doesn't have access to this specific admin page
-        navigate('/app/home');
+        navigate('/app/path');
       }
     }
   }, [user, loading, isAdmin, requireAdmin, requiredPage, canAccessAdminPage, navigate, location]);

@@ -21,7 +21,7 @@ export const AdminLayout = () => {
   }
 
   if (!hasAdminAccess) {
-    return <Navigate to="/app/home" replace />;
+    return <Navigate to="/app/path" replace />;
   }
 
   return (

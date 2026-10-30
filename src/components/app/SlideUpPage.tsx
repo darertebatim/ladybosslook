@@ -30,7 +30,7 @@ interface SlideUpPageProps {
  * mirroring AppAIPlanner. Children can call `useSlideClose().slideClose()`
  * to animate the page down before navigation.
  */
-export function SlideUpPage({ children, defaultBack = '/app/home', className }: SlideUpPageProps) {
+export function SlideUpPage({ children, defaultBack = '/app/path', className }: SlideUpPageProps) {
   const goBack = useGoBack(defaultBack);
   const navigate = useNavigate();
   const [isClosing, setIsClosing] = useState(false);

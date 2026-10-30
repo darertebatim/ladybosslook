@@ -386,7 +386,7 @@ export function initializeLocalNotificationHandlers(navigate: (url: string) => v
   // Handle notification tap (when app is in background or closed)
   LocalNotifications.addListener('localNotificationActionPerformed', (action) => {
     console.log('[LocalNotifications] Notification tapped:', action.notification);
-    const url = action.notification.extra?.url || '/app/home';
+    const url = action.notification.extra?.url || '/app/path';
     const taskId = action.notification.extra?.taskId;
     const isUrgent = action.notification.extra?.isUrgent;
     

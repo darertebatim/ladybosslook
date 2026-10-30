@@ -35,7 +35,7 @@ export function ReflectionCelebrationSheet({
 }: ReflectionCelebrationSheetProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const returnTo = (location.state as { from?: string } | null)?.from || '/app/home';
+  const returnTo = (location.state as { from?: string } | null)?.from || '/app/path';
 
   useEffect(() => {
     if (open) {
