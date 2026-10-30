@@ -155,13 +155,20 @@ serve(async (req) => {
     if (sanitizedEmail) {
       const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
       
-      const { data: recentOrder, error: recentOrderError } = await supabase
+      let dupQuery = supabase
         .from('orders')
         .select('id, status, created_at, stripe_session_id')
         .eq('email', sanitizedEmail)
         .eq('program_slug', program)
         .gte('created_at', tenMinutesAgo)
-        .in('status', ['pending', 'paid'])
+        .in('status', ['pending', 'paid']);
+      // A recent deposit must never block the remaining-balance payment
+      const isBalanceOption = paymentOption === 'balance_full' || paymentOption === 'balance_monthly';
+      const depositAmount = (programData as any).deposit_price;
+      if (isBalanceOption && depositAmount) {
+        dupQuery = dupQuery.neq('amount', depositAmount);
+      }
+      const { data: recentOrder, error: recentOrderError } = await dupQuery
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
