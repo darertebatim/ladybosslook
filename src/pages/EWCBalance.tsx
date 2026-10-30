@@ -1,14 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { CheckCircle, CreditCard, Calendar, Sparkles, MessageCircle, Loader2, Mail } from "lucide-react";
+import { CheckCircle, CreditCard, Calendar, Sparkles, MessageCircle, Loader2 } from "lucide-react";
 import { supabase, browserTimezone } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from "sonner";
 
 const EWCBalance = () => {
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState("");
+  const { user } = useAuth();
   const [isLoadingOneTime, setIsLoadingOneTime] = useState(false);
   const [isLoadingMonthly, setIsLoadingMonthly] = useState(false);
   const isSubmittingRef = useRef(false);
@@ -26,20 +25,6 @@ const EWCBalance = () => {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, []);
-
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim()) {
-      setEmailError("لطفاً ایمیل خود را وارد کنید");
-      return false;
-    }
-    if (!emailRegex.test(email.trim())) {
-      setEmailError("لطفاً یک ایمیل معتبر وارد کنید");
-      return false;
-    }
-    setEmailError("");
-    return true;
-  };
 
   const checkDuplicatePayment = async (trimmedEmail: string): Promise<boolean> => {
     try {
@@ -65,8 +50,6 @@ const EWCBalance = () => {
   };
 
   const handlePayment = async (type: 'onetime' | 'monthly') => {
-    if (!validateEmail(email)) return;
-
     // Immediate lock to prevent double-clicks
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
@@ -77,11 +60,10 @@ const EWCBalance = () => {
       setIsLoadingMonthly(true);
     }
 
-    const trimmedEmail = email.trim().toLowerCase();
+    // Signed-in buyers: forward their email so Stripe pre-fills it. Guests type it once on Stripe.
+    const trimmedEmail = (user?.email || '').trim().toLowerCase();
 
-    // Check for duplicate payment
-    const isDuplicate = await checkDuplicatePayment(trimmedEmail);
-    if (isDuplicate) {
+    if (trimmedEmail && await checkDuplicatePayment(trimmedEmail)) {
       isSubmittingRef.current = false;
       setIsLoadingOneTime(false);
       setIsLoadingMonthly(false);
@@ -94,9 +76,9 @@ const EWCBalance = () => {
         body: {
           timezone: browserTimezone,
           program: 'empowered-woman-coaching',
-          email: trimmedEmail,
+          ...(trimmedEmail ? { email: trimmedEmail } : {}),
           paymentOption: type === 'onetime' ? 'balance_full' : 'balance_monthly',
-          idempotencyKey: `ewcbalance-${type}-${trimmedEmail}-${Math.floor(Date.now() / (5 * 60 * 1000))}`,
+          idempotencyKey: `ewcbalance-${type}-${trimmedEmail || 'guest'}-${Math.floor(Date.now() / (5 * 60 * 1000))}`,
         },
       });
 
@@ -153,27 +135,6 @@ const EWCBalance = () => {
           </p>
         </div>
 
-        {/* Email Input */}
-        <Card className="p-6 mb-6 border-border/50">
-          <div className="flex items-center gap-2 mb-3">
-            <Mail className="h-5 w-5 text-primary" />
-            <label className="font-medium text-foreground">ایمیل شما</label>
-          </div>
-          <Input
-            type="email"
-            placeholder="example@email.com"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (emailError) setEmailError("");
-            }}
-            className="text-left ltr"
-            dir="ltr"
-          />
-          {emailError && (
-            <p className="text-sm text-destructive mt-2">{emailError}</p>
-          )}
-        </Card>
 
         {/* Payment Options */}
         <div className="space-y-4">
