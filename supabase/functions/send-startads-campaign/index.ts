@@ -18,7 +18,6 @@ const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 const FROM = "Ali Lotfi <ali@ladybosslook.com>";
-const MONITOR_EMAIL = "darertebatim@gmail.com";
 const LANDING_URL = "https://ladybosslook.com/l/startads";
 const HEADER_IMAGE =
   "https://ladybosslook.com/__l5e/assets-v1/d12d188c-82b1-4909-8f2a-c6b793eecc71/startads-email-header.png";
@@ -355,19 +354,6 @@ Deno.serve(async (req) => {
         if (logErr) console.error("log insert failed:", logErr.message);
       }
       if (i + batchSize < recipients.length) await new Promise((r) => setTimeout(r, 600));
-    }
-
-    if (!testEmail && sent > 0) {
-      await sendBatch([{
-        from: FROM,
-        to: [MONITOR_EMAIL],
-        subject: `[کپی ارسال کمپین StartAds — ${sent} نفر] ${SUBJECTS[kind]}`,
-        html: buildHtml(kind, recipients[0]?.name || "دوست عزیز"),
-        tags: [
-          { name: "campaign", value: "startads_launch_monitor" },
-          { name: "kind", value: kind },
-        ],
-      }]).catch((e) => console.error("monitor copy failed", e));
     }
 
     console.log(`startads ${kind}: sent=${sent} failed=${failed} of ${recipients.length}`);
