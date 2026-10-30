@@ -14,7 +14,6 @@ const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
 const FROM = "Ali Lotfi <ali@ladybosslook.com>";
-const MONITOR_EMAIL = "darertebatim@gmail.com";
 const CAMPAIGN = "casigads_lastcall_r4";
 const LANDING_URL = "https://ladybosslook.com/l/igadsprogram";
 const SUBJECT = "تخفیف لحظه آخری دوره جذب مشتری (شروع از دوشنبه)";
@@ -154,9 +153,6 @@ Deno.serve(async (req) => {
         await supabase.from("email_logs").insert(batch.map((e, idx) => ({ recipient_email: e, status: "success", resend_id: r.ids[idx] ?? null })));
       }
       if (i + 100 < recipients.length) await new Promise((r) => setTimeout(r, 600));
-    }
-    if (!testEmail && sent > 0) {
-      await sendBatch([{ from: FROM, to: [MONITOR_EMAIL], subject: `[کپی کمپین — ${sent} نفر] ${SUBJECT}`, html, tags: [{ name: "campaign", value: `${CAMPAIGN}_monitor` }] }]);
     }
     console.log(`${CAMPAIGN}: sent=${sent} failed=${failed} of ${recipients.length}`);
     return json({ recipients: recipients.length, sent, failed });
