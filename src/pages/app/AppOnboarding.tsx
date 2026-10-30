@@ -232,7 +232,7 @@ export default function AppOnboarding() {
           try { choice = localStorage.getItem('simora_selfcare_plus_choice') || undefined; } catch {}
         }
         try { localStorage.removeItem('simora_selfcare_plus_choice'); } catch {}
-        navigate(choice === 'accepted' ? '/app/path?paywall=1' : '/app/path');
+        navigate(choice === 'accepted' ? '/app/home?paywall=1' : '/app/path');
       } else if (flowId === 'selfcare-personality-quiz') {
         // Don't auto-trigger the "What is Rilo?" planner intro after the
         // personality quiz — the user already went through a long flow.
@@ -246,7 +246,7 @@ export default function AppOnboarding() {
           try { choice = localStorage.getItem('simora_selfcare_plus_choice') || undefined; } catch {}
         }
         try { localStorage.removeItem('simora_selfcare_plus_choice'); } catch {}
-        navigate(choice === 'accepted' ? '/app/path?paywall=1' : '/app/path');
+        navigate(choice === 'accepted' ? '/app/home?paywall=1' : '/app/path');
       } else if (flowId === 'what-is-rilo') {
         // Persist the user's morning / afternoon / evening picks as real
         // recurring tasks on their planner. Fire-and-forget so navigation
