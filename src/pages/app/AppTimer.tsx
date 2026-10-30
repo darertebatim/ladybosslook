@@ -43,7 +43,7 @@ const SYNTHETIC_TIMER_TASK: RoutinePlanTask = {
 
 export default function AppTimer() {
   return (
-    <SlideUpPage defaultBack="/app/home">
+    <SlideUpPage defaultBack="/app/path">
       <AppTimerInner />
     </SlideUpPage>
   );

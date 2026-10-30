@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 export default function AppMood() {
   const { t } = useTranslation();
   return (
-    <SlideUpPage defaultBack="/app/home">
+    <SlideUpPage defaultBack="/app/path">
       <SEOHead 
         title={t('moodPage.seoTitle')}
         description={t('moodPage.seoDescription')}

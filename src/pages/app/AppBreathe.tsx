@@ -131,7 +131,7 @@ export default function AppBreathe() {
       <BreathingExerciseScreen
         exercise={selectedExercise}
         onClose={handleCloseExercise}
-        returnTo={(location.state as { from?: string } | null)?.from || '/app/home'}
+        returnTo={(location.state as { from?: string } | null)?.from || '/app/path'}
       />
     );
   }
@@ -143,7 +143,7 @@ export default function AppBreathe() {
   }
 
   return (
-    <SlideUpPage defaultBack="/app/home">
+    <SlideUpPage defaultBack="/app/path">
       <SEOHead
         title="Breathe - LadyBoss"
         description="Breathing exercises for relaxation and focus"

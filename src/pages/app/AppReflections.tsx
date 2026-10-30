@@ -34,7 +34,7 @@ const SYNTHETIC_REFLECTION_TASK: RoutinePlanTask = {
 
 export default function AppReflections() {
   return (
-    <SlideUpPage defaultBack="/app/home">
+    <SlideUpPage defaultBack="/app/path">
       <AppReflectionsInner />
     </SlideUpPage>
   );
@@ -44,7 +44,7 @@ function AppReflectionsInner() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-  const goBack = useGoBack('/app/home');
+  const goBack = useGoBack('/app/path');
   const slideCtx = useSlideClose();
   const handleBack = () => (slideCtx ? slideCtx.slideClose() : goBack());
   const { data: reflections, isLoading } = useReflections();

@@ -223,7 +223,7 @@ export default function AppOnboarding() {
       }
       // Weekly review goes back to home; onboarding flows go to signup
       if (flowId === 'weekly-review') {
-        navigate('/app/home');
+        navigate('/app/path');
       } else if (flowId === 'selfcare-quiz') {
         const plusChoice = answers?.['sc-plus-intro'];
         const fromState = Array.isArray(plusChoice) ? plusChoice[0] : plusChoice;
@@ -232,7 +232,7 @@ export default function AppOnboarding() {
           try { choice = localStorage.getItem('simora_selfcare_plus_choice') || undefined; } catch {}
         }
         try { localStorage.removeItem('simora_selfcare_plus_choice'); } catch {}
-        navigate(choice === 'accepted' ? '/app/home?paywall=1' : '/app/home');
+        navigate(choice === 'accepted' ? '/app/home?paywall=1' : '/app/path');
       } else if (flowId === 'selfcare-personality-quiz') {
         // Don't auto-trigger the "What is Rilo?" planner intro after the
         // personality quiz — the user already went through a long flow.
@@ -246,7 +246,7 @@ export default function AppOnboarding() {
           try { choice = localStorage.getItem('simora_selfcare_plus_choice') || undefined; } catch {}
         }
         try { localStorage.removeItem('simora_selfcare_plus_choice'); } catch {}
-        navigate(choice === 'accepted' ? '/app/home?paywall=1' : '/app/home');
+        navigate(choice === 'accepted' ? '/app/home?paywall=1' : '/app/path');
       } else if (flowId === 'what-is-rilo') {
         // Persist the user's morning / afternoon / evening picks as real
         // recurring tasks on their planner. Fire-and-forget so navigation
@@ -256,7 +256,7 @@ export default function AppOnboarding() {
             console.warn('[Onboarding] provisionRiloPicks failed:', err)
           );
         }
-        navigate('/app/home');
+        navigate('/app/path');
       } else if (flowId === 'rilo-doors') {
         // Persist preferred language + (optional) UI language switch
         try {
@@ -296,7 +296,7 @@ export default function AppOnboarding() {
     if (currentStep > 0) {
       setCurrentStep(prev => prev - 1);
     } else {
-      navigate('/app/home');
+      navigate('/app/path');
     }
   }, [currentStep, navigate]);
 
@@ -312,7 +312,7 @@ export default function AppOnboarding() {
       navigate('/app/path');
       return;
     }
-    navigate('/app/home');
+    navigate('/app/path');
   };
 
   const handleMilestone = useCallback((type: 'review' | 'notification' | 'discount-paywall') => {

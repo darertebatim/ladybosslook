@@ -376,7 +376,7 @@ function RewardRow({ step }: { step: PathStep }) {
 export default function AppMyRiloPath() {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const goBack = useGoBack("/app/home");
+  const goBack = useGoBack("/app/path");
   const { hasProgram: hasLearningProgram } = useMyLearning();
   const { user } = useAuth();
   const { data, isLoading } = useTodayPath();

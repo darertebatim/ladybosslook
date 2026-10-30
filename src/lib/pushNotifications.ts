@@ -135,7 +135,7 @@ export function initializePushNotificationHandlers() {
       
       // Navigate to home if no specific URL
       setTimeout(() => {
-        handleDeepLink('/app/home');
+        handleDeepLink('/app/path');
       }, 500);
     }
   });

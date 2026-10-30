@@ -109,7 +109,7 @@ const browserGoogleSignIn = async (): Promise<{ error: any }> => {
   const searchParams = new URLSearchParams(window.location.search);
   // If we're signing in from a normal page (e.g. /cart), come back to that page.
   const here = `${window.location.pathname}${window.location.search}`;
-  const fallback = window.location.pathname.startsWith('/auth') ? '/app/home' : here;
+  const fallback = window.location.pathname.startsWith('/auth') ? '/app/path' : here;
   const redirectPath = searchParams.get('redirect') || fallback;
   const redirectTo = `${window.location.origin}${redirectPath}`;
 
@@ -139,7 +139,7 @@ const browserGoogleSignIn = async (): Promise<{ error: any }> => {
 const browserAppleSignIn = async (): Promise<{ error: any }> => {
   const searchParams = new URLSearchParams(window.location.search);
   const here = `${window.location.pathname}${window.location.search}`;
-  const fallback = window.location.pathname.startsWith('/auth') ? '/app/home' : here;
+  const fallback = window.location.pathname.startsWith('/auth') ? '/app/path' : here;
   const redirectPath = searchParams.get('redirect') || fallback;
   const redirectTo = `${window.location.origin}${redirectPath}`;
 
