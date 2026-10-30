@@ -1,15 +1,16 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { CheckCircle, CreditCard, Calendar, Sparkles, MessageCircle, Loader2 } from "lucide-react";
+import { CheckCircle, CreditCard, Calendar, Sparkles, MessageCircle, Loader2, Check } from "lucide-react";
 import { supabase, browserTimezone } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from "sonner";
 
+type Plan = 'onetime' | 'monthly';
+
 const EWCBalance = () => {
   const { user } = useAuth();
-  const [isLoadingOneTime, setIsLoadingOneTime] = useState(false);
-  const [isLoadingMonthly, setIsLoadingMonthly] = useState(false);
+  const [selected, setSelected] = useState<Plan>('onetime');
+  const [isLoading, setIsLoading] = useState(false);
   const isSubmittingRef = useRef(false);
 
   // Prevent accidental navigation during payment processing
@@ -37,7 +38,7 @@ const EWCBalance = () => {
         .eq('program_slug', 'empowered-woman-coaching')
         .gte('created_at', tenMinutesAgo)
         .in('status', ['pending', 'paid']);
-      
+
       if (recentOrders && recentOrders.length > 0) {
         toast.error('شما یک پرداخت در حال انتظار دارید. لطفاً چند دقیقه صبر کنید.');
         return true;
@@ -49,24 +50,20 @@ const EWCBalance = () => {
     }
   };
 
-  const handlePayment = async (type: 'onetime' | 'monthly') => {
+  const handlePayment = async () => {
     // Immediate lock to prevent double-clicks
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
+    setIsLoading(true);
 
-    if (type === 'onetime') {
-      setIsLoadingOneTime(true);
-    } else {
-      setIsLoadingMonthly(true);
-    }
+    const type = selected;
 
     // Signed-in buyers: forward their email so Stripe pre-fills it. Guests type it once on Stripe.
     const trimmedEmail = (user?.email || '').trim().toLowerCase();
 
     if (trimmedEmail && await checkDuplicatePayment(trimmedEmail)) {
       isSubmittingRef.current = false;
-      setIsLoadingOneTime(false);
-      setIsLoadingMonthly(false);
+      setIsLoading(false);
       return;
     }
 
@@ -88,8 +85,7 @@ const EWCBalance = () => {
           ? 'شما یک پرداخت در حال انتظار دارید. لطفاً چند دقیقه صبر کنید.'
           : data.error);
         isSubmittingRef.current = false;
-        setIsLoadingOneTime(false);
-        setIsLoadingMonthly(false);
+        setIsLoading(false);
         return;
       }
       if (data?.url) {
@@ -101,12 +97,12 @@ const EWCBalance = () => {
       console.error('Payment error:', error);
       toast.error('خطا در اتصال به درگاه پرداخت. لطفاً دوباره تلاش کنید.');
       isSubmittingRef.current = false;
-      setIsLoadingOneTime(false);
-      setIsLoadingMonthly(false);
+      setIsLoading(false);
     }
   };
 
-  const isProcessing = isLoadingOneTime || isLoadingMonthly;
+  const isProcessing = isLoading;
+  const ctaLabel = selected === 'onetime' ? 'پرداخت یکجا $747' : 'پرداخت ماهیانه $299';
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 font-[Vazirmatn]" dir="rtl">
@@ -121,9 +117,9 @@ const EWCBalance = () => {
         </div>
       )}
 
-      <div className="container mx-auto px-4 py-12 max-w-2xl">
+      <div className="container mx-auto px-4 py-10 max-w-2xl">
         {/* Header */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
             <CheckCircle className="w-10 h-10 text-green-600" />
           </div>
@@ -135,96 +131,128 @@ const EWCBalance = () => {
           </p>
         </div>
 
+        {/* Step label */}
+        <p className="text-sm font-bold text-foreground mb-3">
+          ۱. روش پرداخت را انتخاب کنید
+        </p>
 
         {/* Payment Options */}
-        <div className="space-y-4">
+        <div className="space-y-3" role="radiogroup" aria-label="روش پرداخت">
           {/* One-time Payment - Highlighted */}
-          <Card className="p-6 border-2 border-primary bg-primary/5 relative overflow-hidden">
+          <button
+            type="button"
+            role="radio"
+            aria-checked={selected === 'onetime'}
+            onClick={() => setSelected('onetime')}
+            disabled={isProcessing}
+            className={`relative w-full text-right overflow-hidden rounded-2xl border-2 bg-card p-5 transition-all duration-200 active:scale-[0.99] touch-manipulation ${
+              selected === 'onetime'
+                ? 'border-primary bg-primary/5 shadow-ios'
+                : 'border-border'
+            }`}
+          >
             <div className="absolute top-3 left-3">
-              <span className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">
+              <span className="bg-primary text-primary-foreground text-[11px] font-bold px-2.5 py-1 rounded-full">
                 پیشنهاد ویژه
               </span>
             </div>
-            
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-primary" />
+
+            <div className="flex items-start gap-3">
+              <div
+                className={`flex-shrink-0 mt-1 h-6 w-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                  selected === 'onetime' ? 'border-primary bg-primary' : 'border-muted-foreground/40'
+                }`}
+                aria-hidden="true"
+              >
+                {selected === 'onetime' && <Check className="h-4 w-4 text-primary-foreground" />}
               </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-foreground mb-1">
+
+              <div className="flex-shrink-0 w-11 h-11 bg-primary/15 rounded-full flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-primary" />
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <h3 className="text-lg font-bold text-foreground mb-0.5">
                   پرداخت یکجا
                 </h3>
-                <p className="text-muted-foreground text-sm mb-3">
+                <p className="text-muted-foreground text-[13px] mb-2">
                   با پرداخت یکجا، ۱۵۰ دلار صرفه‌جویی کنید!
                 </p>
-                <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-3xl font-bold text-primary">$747</span>
-                  <span className="text-lg text-muted-foreground line-through">$897</span>
-                  <span className="text-sm text-green-600 font-medium">صرفه‌جویی $150</span>
+                <div className="flex items-baseline flex-wrap gap-x-2 gap-y-1">
+                  <span className="text-2xl font-bold text-primary">$747</span>
+                  <span className="text-base text-muted-foreground line-through">$897</span>
+                  <span className="text-xs font-medium text-green-600">صرفه‌جویی $150</span>
                 </div>
-                <Button 
-                  onClick={() => handlePayment('onetime')}
-                  disabled={isProcessing}
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-6 text-lg"
-                  style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}
-                >
-                  {isLoadingOneTime ? (
-                    <>
-                      <Loader2 className="ml-2 h-5 w-5 animate-spin" />
-                      در حال اتصال...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="ml-2 h-5 w-5" />
-                      پرداخت $747
-                    </>
-                  )}
-                </Button>
               </div>
             </div>
-          </Card>
+          </button>
 
           {/* Monthly Payment */}
-          <Card className="p-6 border border-border">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-12 h-12 bg-secondary rounded-full flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-muted-foreground" />
+          <button
+            type="button"
+            role="radio"
+            aria-checked={selected === 'monthly'}
+            onClick={() => setSelected('monthly')}
+            disabled={isProcessing}
+            className={`relative w-full text-right overflow-hidden rounded-2xl border-2 bg-card p-5 transition-all duration-200 active:scale-[0.99] touch-manipulation ${
+              selected === 'monthly'
+                ? 'border-primary bg-primary/5 shadow-ios'
+                : 'border-border'
+            }`}
+          >
+            <div className="flex items-start gap-3">
+              <div
+                className={`flex-shrink-0 mt-1 h-6 w-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                  selected === 'monthly' ? 'border-primary bg-primary' : 'border-muted-foreground/40'
+                }`}
+                aria-hidden="true"
+              >
+                {selected === 'monthly' && <Check className="h-4 w-4 text-primary-foreground" />}
               </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-foreground mb-1">
+
+              <div className="flex-shrink-0 w-11 h-11 bg-secondary rounded-full flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-foreground" />
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <h3 className="text-lg font-bold text-foreground mb-0.5">
                   پرداخت ماهیانه
                 </h3>
-                <p className="text-muted-foreground text-sm mb-3">
+                <p className="text-muted-foreground text-[13px] mb-2">
                   ۳ پرداخت ماهانه
                 </p>
-                <div className="flex items-baseline gap-2 mb-4">
+                <div className="flex items-baseline flex-wrap gap-x-2 gap-y-1">
                   <span className="text-2xl font-bold text-foreground">$299</span>
-                  <span className="text-muted-foreground">× ۳ ماه</span>
-                  <span className="text-sm text-muted-foreground">(مجموع: $897)</span>
+                  <span className="text-base text-muted-foreground">× ۳ ماه</span>
+                  <span className="text-xs text-muted-foreground">(مجموع: $897)</span>
                 </div>
-                <Button 
-                  onClick={() => handlePayment('monthly')}
-                  disabled={isProcessing}
-                  variant="outline"
-                  className="w-full py-6 text-lg font-medium font-[Vazirmatn]"
-                  style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}
-                >
-                  {isLoadingMonthly ? (
-                    <>
-                      <Loader2 className="ml-2 h-5 w-5 animate-spin" />
-                      در حال اتصال...
-                    </>
-                  ) : (
-                    <>
-                      <Calendar className="ml-2 h-5 w-5" />
-                      پرداخت ماهیانه
-                    </>
-                  )}
-                </Button>
               </div>
             </div>
-          </Card>
+          </button>
         </div>
+
+        {/* Step 2: single pay button */}
+        <p className="text-sm font-bold text-foreground mt-6 mb-3">
+          ۲. پرداخت را انجام دهید
+        </p>
+        <Button
+          onClick={handlePayment}
+          disabled={isProcessing}
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-6 text-lg rounded-2xl shadow-ios touch-manipulation"
+          style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="ml-2 h-5 w-5 animate-spin" />
+              در حال اتصال...
+            </>
+          ) : (
+            <>
+              <CreditCard className="ml-2 h-5 w-5" />
+              {ctaLabel}
+            </>
+          )}
+        </Button>
 
         {/* Support */}
         <div className="mt-8 text-center">
