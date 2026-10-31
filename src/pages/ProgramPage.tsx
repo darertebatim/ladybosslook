@@ -94,7 +94,7 @@ const ProgramPage = () => {
   const { slug, tierSlug } = useParams<{ slug: string; tierSlug?: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { addToCart, isInCart, isAdding, enrollFree, isEnrollingFree } = useCart();
+  const { addToCart, cartItems, isAdding, enrollFree, isEnrollingFree } = useCart();
   const { isEnrolled } = useMyEnrollments();
   const [baseProgram, setProgram] = useState<ProgramData | null>(null);
   const [selectedTierId, setSelectedTierId] = useState<string | null>(null);
@@ -262,7 +262,15 @@ const ProgramPage = () => {
     && program.type !== '1o1-session'
     && !(autoEnrollRound as any).is_self_paced
     && !(/^default$/i.test(autoEnrollRound.round_name || '') && (!autoEnrollRound.first_session_date || autoEnrollRound.first_session_date.startsWith('202')));
-  const inCart = isInCart(program.slug);
+  // Only treat as "in cart" when the saved cart item matches this page's price/tier.
+  // Otherwise (e.g. an old $297 item while on the /early link) the button re-adds
+  // and the upsert overwrites the stale price.
+  const cartItem = cartItems.find((i) => i.program_slug === program.slug);
+  const inCart = !!cartItem && (
+    program.payment_type === 'subscription' ||
+    (cartItem.price_amount === program.price_amount &&
+      (cartItem.payment_option ?? null) === (activeTier ? `tier:${activeTier.id}` : null))
+  );
   const enrolled = isEnrolled(program.slug);
   const isFarsi = program.language === 'persian' || program.language === 'farsi';
 
