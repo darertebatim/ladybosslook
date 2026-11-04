@@ -54,3 +54,8 @@ test('Revenue monthly 399 splits credit over 3 months', () => {
   assert.equal(creditPerCharge(19700, true, 39900), 6567);
   assert.equal(creditPerCharge(29700, true, 39900), 9900);
 });
+
+test('4-month $299 plan splits credit over 4 charges', () => {
+  assert.equal(29900 - creditPerCharge(19700, true, 29900, 4), 24975);
+  assert.equal(29900 - creditPerCharge(29700, true, 29900, 4), 22475);
+});

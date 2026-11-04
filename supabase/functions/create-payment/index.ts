@@ -267,7 +267,7 @@ serve(async (req) => {
       try {
         const credit = await getActiveWinBackCredit(supabase, authUserId, program);
         if (credit) {
-          winBackCouponId = await createWinBackCoupon(stripe, credit, { recurring: isSubscription, chargeAmount });
+          winBackCouponId = await createWinBackCoupon(stripe, credit, { recurring: isSubscription, chargeAmount, installments: autoCancelCount || undefined });
           if (winBackCouponId) winBackCreditId = credit.id;
           logStep('Win-back credit applied', { creditId: credit.id, amount: credit.amount, recurring: isSubscription });
         }

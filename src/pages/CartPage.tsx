@@ -85,10 +85,19 @@ const CartPage = () => {
     },
   });
   const subItem = displayItems.find((i) => i.payment_type === 'subscription');
+  const { data: subMonths } = useQuery({
+    queryKey: ['sub-installments', subItem?.program_slug],
+    enabled: !!subItem,
+    queryFn: async () => {
+      const { data } = await supabase.from('program_catalog').select('subscription_interval_count').eq('slug', subItem!.program_slug).maybeSingle();
+      return data?.subscription_interval_count || WIN_BACK_INSTALLMENTS;
+    },
+  });
+  const installments = subMonths || WIN_BACK_INSTALLMENTS;
   const winBack = user && displayItems.length
     ? pickActiveCredit(parseWinBackCredits(winBackRows as any), subItem?.program_slug ?? displayItems[0]?.program_slug)
     : null;
-  const winBackOff = winBack && totalCents > 0 ? creditPerCharge(winBack.amount, !!subItem, totalCents) : 0;
+  const winBackOff = winBack && totalCents > 0 ? creditPerCharge(winBack.amount, !!subItem, totalCents, installments) : 0;
   const dueCents = totalCents - winBackOff;
 
   const handleCheckout = async () => {
@@ -256,7 +265,7 @@ const CartPage = () => {
                     </div>
                     <p className="text-xs text-foreground">
                       {subItem
-                        ? `Your ${formatPrice(winBack.amount)} credit is split over your first ${WIN_BACK_INSTALLMENTS} monthly payments.`
+                        ? `Your ${formatPrice(winBack.amount)} credit is split over your first ${installments} monthly payments.`
                         : `Your ${formatPrice(winBack.amount)} credit is applied to this payment.`}
                       {' '}Valid until {new Date(winBack.expires_at).toLocaleDateString()}.
                     </p>
