@@ -132,7 +132,7 @@ const AppProfile = () => {
   const { data: transactions } = useQuery({
     queryKey: ['profile-transactions', user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('credit_transactions').select('*').eq('user_id', user?.id).order('created_at', { ascending: false }).limit(5);
+      const { data, error } = await supabase.from('credit_transactions').select('*').not('transaction_type', 'like', 'win_back%').eq('user_id', user?.id).order('created_at', { ascending: false }).limit(5);
       if (error) throw error;
       return data;
     },
