@@ -52,6 +52,17 @@ export const LEAD_CAMPAIGNS: LeadCampaign[] = [
     metaEvent: 'IGThreeLead',
   },
   {
+    key: 'igadsin',
+    label: 'IG Ads In (email → program)',
+    programSlug: 'casigads',
+    landingPath: '/l/igadsin',
+    thankYouPath: '/l/igadsprogram',
+    regSource: 'igadsin_signup',
+    extraSources: [],
+    metaEvent: 'IGAdsInLead',
+    emailOnly: true,
+  },
+  {
     key: 'assertive',
     label: 'Assertive Expression (video)',
     labelFa: 'ویدیو بیان اسرتیو برای خانم‌های مهاجر',
