@@ -97,7 +97,7 @@ export function WinBackCreditManager() {
       <div>
         <h3 className="text-lg font-semibold flex items-center gap-2"><Gift className="w-5 h-5" /> Win-Your-Money-Back Credit</h3>
         <p className="text-sm text-muted-foreground">
-          Gives each paid student in a round credit equal to what they paid, valid {WIN_BACK_VALID_DAYS} days, applied automatically at checkout for another program (split over 3 payments on monthly plans).
+          Gives each paid student in a round credit equal to what they paid in USD (foreign payments use the converted amount), valid {WIN_BACK_VALID_DAYS} days, applied automatically at checkout for another program (split over 3 payments on monthly plans).
         </p>
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
