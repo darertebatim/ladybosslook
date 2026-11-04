@@ -291,15 +291,13 @@ export default function IgAdsProgramLanding() {
               )}
             </div>
           </div>
-          <div className="mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5">
-            <span className="flex items-center gap-1.5">
-              <HintArrow dir="up" />
+          <div className="mt-2 flex items-center justify-center gap-2">
+            <HintArrow dir="up" />
+            <div className="flex flex-col items-center gap-1 min-[430px]:flex-row min-[430px]:items-center min-[430px]:gap-2">
               <p className="text-xs text-foreground/70">🔊 صدا را روشن کنید</p>
-            </span>
-            <span className="flex items-center gap-1.5">
               <p className="inline-flex whitespace-nowrap rounded-full bg-secondary px-3 py-1 text-[12px] font-extrabold text-foreground">بدون ریلز روزانه · بدون هزینه آژانس</p>
-              <HintArrow dir="up" />
-            </span>
+            </div>
+            <HintArrow dir="up" />
           </div>
           </div>
 
