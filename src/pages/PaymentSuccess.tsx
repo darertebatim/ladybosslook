@@ -152,6 +152,7 @@ export default function PaymentSuccess() {
                   currency: 'USD',
                   content_name: data.orderDetails?.program_name || data.orderDetails?.product_name,
                   content_ids: data.orderDetails?.program_slug ? [data.orderDetails.program_slug] : undefined,
+                  content_id: data.orderDetails?.program_slug || undefined,
                   content_type: 'product',
                 },
                 `purchase_${sessionId}`,

@@ -41,7 +41,7 @@ export async function sendMetaEvent(e: MetaEventInput): Promise<void> {
     if (typeof e.value === 'number') custom_data.value = e.value;
     if (e.currency) custom_data.currency = e.currency.toUpperCase();
     if (e.contentName) custom_data.content_name = e.contentName;
-    if (e.contentId) { custom_data.content_ids = [e.contentId]; custom_data.content_type = 'product'; }
+    if (e.contentId) { custom_data.content_ids = [e.contentId]; custom_data.content_id = e.contentId; custom_data.content_type = 'product'; }
 
     const payload = {
       data: [{
