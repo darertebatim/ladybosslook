@@ -23,6 +23,8 @@ import { supabase, browserTimezone } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import InlineAuth from '@/components/checkout/InlineAuth';
+import { useQuery } from '@tanstack/react-query';
+import { WIN_BACK_GRANT, WIN_BACK_REDEEMED, WIN_BACK_INSTALLMENTS, parseWinBackCredits, pickActiveCredit, creditPerCharge } from '@/lib/winBackCredit';
 
 /** Item a signed-out visitor picked — kept in localStorage until they sign in. */
 const readGuestItem = (): CartItem | null => {
@@ -68,6 +70,23 @@ const CartPage = () => {
       : item.price_amount;
     return sum + price;
   }, 0);
+
+  const { data: winBackRows = [] } = useQuery({
+    queryKey: ['win-back-credit', user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase.from('credit_transactions')
+        .select('id, amount, description, created_at, transaction_type')
+        .eq('user_id', user!.id).in('transaction_type', [WIN_BACK_GRANT, WIN_BACK_REDEEMED]);
+      return data || [];
+    },
+  });
+  const subItem = displayItems.find((i) => i.payment_type === 'subscription');
+  const winBack = user && displayItems.length
+    ? pickActiveCredit(parseWinBackCredits(winBackRows as any), subItem?.program_slug ?? displayItems[0]?.program_slug)
+    : null;
+  const winBackOff = winBack && totalCents > 0 ? creditPerCharge(winBack.amount, !!subItem, totalCents) : 0;
+  const dueCents = totalCents - winBackOff;
 
   const handleCheckout = async () => {
     setCheckingOut(true);
@@ -226,9 +245,23 @@ const CartPage = () => {
                   <span>Subtotal</span>
                   <span>{totalCents === 0 ? 'Free' : formatPrice(totalCents)}</span>
                 </div>
+                {winBackOff > 0 && winBack && (
+                  <div className="rounded-xl bg-primary/10 p-3 space-y-1">
+                    <div className="flex justify-between items-center text-sm font-semibold text-foreground">
+                      <span>Win-Your-Money-Back Credit</span>
+                      <span>-{formatPrice(winBackOff)}{subItem ? '/mo' : ''}</span>
+                    </div>
+                    <p className="text-xs text-foreground">
+                      {subItem
+                        ? `Your ${formatPrice(winBack.amount)} credit is split over your first ${WIN_BACK_INSTALLMENTS} monthly payments.`
+                        : `Your ${formatPrice(winBack.amount)} credit is applied to this payment.`}
+                      {' '}Valid until {new Date(winBack.expires_at).toLocaleDateString()}.
+                    </p>
+                  </div>
+                )}
                 <div className="flex justify-between items-center text-lg">
                   <span className="font-semibold">Total due today</span>
-                  <span className="font-bold text-2xl">{totalCents === 0 ? 'Free' : formatPrice(totalCents)}</span>
+                  <span className="font-bold text-2xl">{totalCents === 0 ? 'Free' : formatPrice(dueCents)}</span>
                 </div>
                 {user ? (
                   <>

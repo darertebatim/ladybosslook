@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { sendMetaEvent } from '../_shared/meta-capi.ts';
+import { getActiveWinBackCredit, createWinBackCoupon } from '../_shared/win-back-credit.ts';
 const __safeOrigin = (o: string | null) => { const d = 'https://ladybosslook.com'; if (!o) return d; try { const u = new URL(o); const h = u.hostname; if ((u.protocol === 'https:' && (h === 'ladybosslook.com' || h === 'www.ladybosslook.com' || h.endsWith('.lovable.app'))) || (u.protocol === 'http:' && h === 'localhost')) return u.origin; } catch { /* ignore */ } return d; };
 
 
@@ -259,6 +260,24 @@ serve(async (req) => {
 
     let session: Stripe.Checkout.Session;
 
+    // Win-Your-Money-Back credit (signed-in buyers only). Monthly plans split it over 3 charges.
+    let winBackCouponId: string | null = null;
+    let winBackCreditId: string | null = null;
+    if (authUserId) {
+      try {
+        const credit = await getActiveWinBackCredit(supabase, authUserId, program);
+        if (credit) {
+          winBackCouponId = await createWinBackCoupon(stripe, credit, { recurring: isSubscription, chargeAmount });
+          if (winBackCouponId) winBackCreditId = credit.id;
+          logStep('Win-back credit applied', { creditId: credit.id, amount: credit.amount, recurring: isSubscription });
+        }
+      } catch (e: any) {
+        logStep('Win-back credit lookup failed', { error: e?.message });
+      }
+    }
+    const winBackParams: any = winBackCouponId ? { discounts: [{ coupon: winBackCouponId }] } : {};
+    const winBackMeta: Record<string, string> = winBackCreditId ? { win_back_credit_id: winBackCreditId } : {};
+
     // Build Stripe idempotency key
     const stripeIdempotencyKey = idempotencyKey 
       ? `checkout-${program}-${idempotencyKey}` 
@@ -376,7 +395,9 @@ serve(async (req) => {
         success_url: successUrl,
         cancel_url: cancelUrl,
         subscription_data: subscriptionData,
+        ...winBackParams,
         metadata: {
+          ...winBackMeta,
           program: program,
           payment_type: programData.payment_type,
           payment_option: paymentOption || (isSubscription ? 'subscription' : 'one-time'),
@@ -493,7 +514,9 @@ serve(async (req) => {
             product_name: productName,
           },
         },
+        ...winBackParams,
         metadata: {
+          ...winBackMeta,
           program: program,
           program_slug: program,
           payment_type: programData.payment_type,

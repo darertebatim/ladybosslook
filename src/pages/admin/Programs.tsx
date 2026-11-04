@@ -7,6 +7,7 @@ import PastSessionsManager from '@/components/admin/PastSessionsManager';
 import OneOnOneClientsManager from '@/components/admin/OneOnOneClientsManager';
 import { ProgramStudentsManager } from '@/components/admin/ProgramStudentsManager';
 import { EnrollmentEmailsManager } from '@/components/admin/EnrollmentEmailsManager';
+import { WinBackCreditManager } from '@/components/admin/WinBackCreditManager';
 
 export default function Programs() {
   const [tab, setTab] = useState('catalog');
@@ -19,7 +20,7 @@ export default function Programs() {
       </div>
 
       <Tabs value={tab} onValueChange={(v) => { setTab(v); if (v !== 'rounds') setRoundsSlug(null); }}>
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="catalog">Program Catalog</TabsTrigger>
           <TabsTrigger value="rounds">Program Rounds</TabsTrigger>
           <TabsTrigger value="students">Students</TabsTrigger>
@@ -27,6 +28,7 @@ export default function Programs() {
           <TabsTrigger value="sessions">Sessions</TabsTrigger>
           <TabsTrigger value="one-on-one">1:1 Clients</TabsTrigger>
           <TabsTrigger value="auto-enroll">Auto-Enrollment</TabsTrigger>
+          <TabsTrigger value="win-back">Win Back Credit</TabsTrigger>
         </TabsList>
 
         <TabsContent value="students">
@@ -53,6 +55,10 @@ export default function Programs() {
 
         <TabsContent value="one-on-one">
           <OneOnOneClientsManager />
+        </TabsContent>
+
+        <TabsContent value="win-back">
+          <WinBackCreditManager />
         </TabsContent>
 
         <TabsContent value="auto-enroll">

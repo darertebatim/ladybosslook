@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { checkProgramRegionBlocks } from "../_shared/region-restriction.ts";
+import { getActiveWinBackCredit, createWinBackCoupon } from "../_shared/win-back-credit.ts";
 const __safeOrigin = (o: string | null) => { const d = 'https://ladybosslook.com'; if (!o) return d; try { const u = new URL(o); const h = u.hostname; if ((u.protocol === 'https:' && (h === 'ladybosslook.com' || h === 'www.ladybosslook.com' || h.endsWith('.lovable.app'))) || (u.protocol === 'http:' && h === 'localhost')) return u.origin; } catch { /* ignore */ } return d; };
 
 
@@ -95,6 +96,7 @@ serve(async (req) => {
     // Build line items from cart
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
     const programSlugs: string[] = [];
+    let cartChargeTotal = 0;
     const programTitles: string[] = [];
     const freePrograms: { slug: string; title: string }[] = [];
 
@@ -191,6 +193,7 @@ serve(async (req) => {
       }
 
 
+      cartChargeTotal += chargeAmount;
       programSlugs.push(item.program_slug);
       programTitles.push(program.title);
     }
@@ -223,8 +226,22 @@ serve(async (req) => {
 
     const origin = __safeOrigin(req.headers.get('origin'));
 
+    // Win-Your-Money-Back credit: one-time discount on the cart (not on the program it was earned from).
+    let winBackCouponId: string | null = null;
+    let winBackCreditId: string | null = null;
+    try {
+      const credit = await getActiveWinBackCredit(supabase, user.id);
+      if (credit && programSlugs.some((s) => s !== credit.source_program_slug)) {
+        winBackCouponId = await createWinBackCoupon(stripe, credit, { recurring: false, chargeAmount: cartChargeTotal });
+        if (winBackCouponId) winBackCreditId = credit.id;
+      }
+    } catch (e: any) {
+      console.error('[CART-CHECKOUT] Win-back credit lookup failed:', e?.message);
+    }
+
     const session = await stripe.checkout.sessions.create({
       line_items: lineItems,
+      ...(winBackCouponId ? { discounts: [{ coupon: winBackCouponId }] } : {}),
       mode: 'payment',
       billing_address_collection: 'required',
       phone_number_collection: { enabled: true },
@@ -234,6 +251,7 @@ serve(async (req) => {
       cancel_url: `${origin}/cart`,
       metadata: {
         cart_checkout: 'true',
+        ...(winBackCreditId ? { win_back_credit_id: winBackCreditId } : {}),
         user_id: user.id,
         program_slugs: programSlugs.join(','),
         product_name: programSlugs.length === 1 ? programTitles[0] : `Cart (${programSlugs.length} programs)`,

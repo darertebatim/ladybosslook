@@ -28,7 +28,7 @@ export function CreditTransactions() {
     try {
       const { data, error } = await supabase
         .from('credit_transactions')
-        .select('*')
+        .select('*').not('transaction_type', 'like', 'win_back%')
         .eq('user_id', user!.id)
         .order('created_at', { ascending: false })
         .limit(10);
