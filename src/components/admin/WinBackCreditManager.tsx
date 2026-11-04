@@ -45,19 +45,20 @@ export function WinBackCreditManager() {
       if (!ids.length) return [];
       const [{ data: profs }, { data: orders }, { data: tx }] = await Promise.all([
         supabase.from('profiles').select('id, full_name, email').in('id', ids),
-        supabase.from('orders').select('user_id, amount, usd_amount, refunded, status')
+        supabase.from('orders').select('user_id, amount, currency, usd_amount, refunded, status')
           .eq('program_slug', slug).in('user_id', ids),
         supabase.from('credit_transactions').select('id, user_id, amount, description, created_at, transaction_type')
           .in('user_id', ids).in('transaction_type', [WIN_BACK_GRANT, WIN_BACK_REDEEMED]),
       ]);
       return ids.map((id) => {
         const p = (profs || []).find((x: any) => x.id === id) as any;
-        const paid = (orders || [])
-          .filter((o: any) => o.user_id === id && !o.refunded && (o.status ?? 'paid') !== 'failed')
-          .reduce((s: number, o: any) => s + (o.usd_amount ?? o.amount ?? 0), 0);
+        const userOrders = (orders || [])
+          .filter((o: any) => o.user_id === id && !o.refunded && (o.status ?? 'paid') !== 'failed');
+        const paid = paidUsdCents(userOrders as any);
+        const needsReview = userOrders.length > 0 && hasUnconvertedForeignPayment(userOrders as any);
         const credits = parseWinBackCredits((tx || []).filter((t: any) => t.user_id === id) as any);
         const credit = credits.find((c) => c.round_id === roundId) || null;
-        return { id, name: p?.full_name || '—', email: p?.email || '', paid, credit };
+        return { id, name: p?.full_name || '—', email: p?.email || '', paid, needsReview, credit };
       });
     },
   });
