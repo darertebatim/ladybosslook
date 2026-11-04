@@ -19,9 +19,23 @@ const parse = (s: string | null) => { try { return s ? JSON.parse(s) : {}; } cat
 /** All account ids merged with this user (primary + aliases), so credit follows any linked email. */
 export async function familyIds(supabase: any, userId: string): Promise<string[]> {
   try {
-    const { data } = await supabase.rpc('account_family_ids', { _uid: userId });
-    const ids = (data || []).map((r: any) => (typeof r === 'string' ? r : r.account_family_ids)).filter(Boolean);
-    return [...new Set([userId, ...ids])];
+    const { data: prof } = await supabase.from('profiles').select('email').eq('id', userId).maybeSingle();
+    const email = (prof?.email || '').toLowerCase();
+    let { data: hit } = await supabase.from('account_email_aliases').select('primary_user_id')
+      .eq('merged_from_user_id', userId).limit(1);
+    if (!hit?.length && email) {
+      ({ data: hit } = await supabase.from('account_email_aliases').select('primary_user_id').ilike('email', email).limit(1));
+    }
+    const pid = hit?.[0]?.primary_user_id || userId;
+    const { data: rows } = await supabase.from('account_email_aliases').select('merged_from_user_id, email').eq('primary_user_id', pid);
+    const ids = new Set<string>([userId, pid]);
+    (rows || []).forEach((r: any) => r.merged_from_user_id && ids.add(r.merged_from_user_id));
+    const aliasEmails = (rows || []).map((r: any) => (r.email || '').toLowerCase()).filter(Boolean);
+    if (aliasEmails.length) {
+      const { data: ps } = await supabase.from('profiles').select('id').in('email', aliasEmails);
+      (ps || []).forEach((p: any) => ids.add(p.id));
+    }
+    return [...ids];
   } catch {
     return [userId];
   }
