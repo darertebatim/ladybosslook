@@ -30,17 +30,27 @@ test('cannot be used on the program it was earned from', () => {
   assert.equal(pickActiveCredit(credits, 'revenue', Date.parse('2026-11-04'))?.id, 'a');
 });
 
-test('CAD payments credit the converted USD amount, not the CAD number', () => {
+test('CAD payments credit the face value paid (297 CAD gives 297), not the bank conversion', () => {
   const orders = [
-    { amount: 39700, currency: 'cad', usd_amount: 28500 },
+    { amount: 29700, currency: 'cad', usd_amount: 20900 },
     { amount: 19700, currency: 'usd', usd_amount: null },
   ];
-  assert.equal(paidUsdCents(orders), 48200);
+  assert.equal(paidUsdCents(orders), 49400);
   assert.equal(hasUnconvertedForeignPayment(orders), false);
 });
 
-test('a foreign payment without USD conversion is never credited at face value', () => {
-  const orders = [{ amount: 39700, currency: 'cad', usd_amount: null }];
+test('currencies outside USD/CAD are never credited and are flagged', () => {
+  const orders = [{ amount: 39700, currency: 'eur', usd_amount: null }];
   assert.equal(paidUsdCents(orders), 0);
   assert.equal(hasUnconvertedForeignPayment(orders), true);
+});
+
+test('Revenue full pay after 197 credit is 750; after 297 is 650', () => {
+  assert.equal(94700 - creditPerCharge(19700, false, 94700), 75000);
+  assert.equal(94700 - creditPerCharge(29700, false, 94700), 65000);
+});
+
+test('Revenue monthly 399 splits credit over 3 months', () => {
+  assert.equal(creditPerCharge(19700, true, 39900), 6567);
+  assert.equal(creditPerCharge(29700, true, 39900), 9900);
 });

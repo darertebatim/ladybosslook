@@ -87,9 +87,11 @@ export async function createWinBackCoupon(
   const perCharge = opts.recurring ? Math.round(credit.amount / WIN_BACK_INSTALLMENTS) : credit.amount;
   const amountOff = Math.min(perCharge, Math.max(0, opts.chargeAmount - 50));
   if (amountOff <= 0) return null;
+  // USD and CAD are priced 1:1, so the same face value comes off in either checkout currency.
   const coupon = await stripe.coupons.create({
     amount_off: amountOff,
     currency: 'usd',
+    currency_options: { cad: { amount_off: amountOff } },
     name: 'Win-Your-Money-Back Credit',
     ...(opts.recurring
       ? { duration: 'repeating', duration_in_months: WIN_BACK_INSTALLMENTS }

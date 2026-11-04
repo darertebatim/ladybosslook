@@ -68,19 +68,19 @@ export interface PaidOrderRow {
   usd_amount: number | null;
 }
 
+/** Currencies priced 1:1 (197 USD = 197 CAD), so credit uses the face value paid. */
+export const FACE_VALUE_CURRENCIES = ['usd', 'cad'];
+const isFaceValue = (c: string | null) => FACE_VALUE_CURRENCIES.includes((c || 'usd').toLowerCase());
+
 /**
- * Total paid in USD cents. Never treats a foreign-currency amount as USD:
- * non-USD orders without a converted usd_amount count as 0 (flag for review).
+ * Credit in cents = face value paid (197 USD or 197 CAD both give 197).
+ * Other currencies count 0 and are flagged for review.
  */
 export function paidUsdCents(orders: PaidOrderRow[]): number {
-  return orders.reduce((sum, o) => {
-    if (o.usd_amount != null) return sum + o.usd_amount;
-    if ((o.currency || 'usd').toLowerCase() === 'usd') return sum + (o.amount ?? 0);
-    return sum;
-  }, 0);
+  return orders.reduce((sum, o) => sum + (isFaceValue(o.currency) ? (o.amount ?? 0) : 0), 0);
 }
 
-/** True when any order is non-USD and missing its USD conversion. */
+/** True when any order is in a currency outside the 1:1 USD/CAD pricing. */
 export function hasUnconvertedForeignPayment(orders: PaidOrderRow[]): boolean {
-  return orders.some((o) => o.usd_amount == null && (o.currency || 'usd').toLowerCase() !== 'usd');
+  return orders.some((o) => !isFaceValue(o.currency));
 }
