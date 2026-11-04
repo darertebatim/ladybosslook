@@ -161,7 +161,15 @@ export function WinBackCreditManager() {
                     <p className="text-muted-foreground truncate">{s.email}</p>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    <span>{s.credit ? fmt(s.credit.amount) : s.needsReview ? 'Foreign payment — review' : s.paid > 0 ? `Paid ${fmt(s.paid)}` : 'No payment'}</span>
+                    <span>
+                      {s.credit ? fmt(s.credit.amount)
+                        : s.needsReview ? 'Foreign payment — review'
+                        : s.paid > 0
+                          ? (capCents != null && creditFor(s.paid) !== s.paid
+                              ? `Paid ${fmt(s.paid)} → credit ${fmt(creditFor(s.paid))}`
+                              : `Paid ${fmt(s.paid)}`)
+                          : 'No payment'}
+                    </span>
                     {s.needsReview && !s.credit ? <Badge variant="outline">Review</Badge> : status(s.credit)}
                   </div>
                 </div>
