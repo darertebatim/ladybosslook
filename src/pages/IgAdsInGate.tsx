@@ -2,8 +2,8 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { z } from "zod";
-import { ArrowDown, CheckCircle2, Clock, ShieldCheck, Users } from "lucide-react";
-import coverAsset from "@/assets/igadsin_cover.png.asset.json";
+import { ArrowDown, CheckCircle2, Clock, MailX, ShieldCheck, Users } from "lucide-react";
+import coverAsset from "@/assets/igadsin_cover.webp.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { trackWebinarLead } from "@/lib/metaCapi";
 import { useToast } from "@/hooks/use-toast";
@@ -20,9 +20,9 @@ const LEARN = [
 ];
 
 const FOR_YOU = [
-  "در آمریکا یا کانادا بیزینس داری و ظرفیت خالی داری",
-  "قبلاً تبلیغ کردی ولی نتیجه درآمدی خوبی نگرفتی",
-  "نمی‌دانی از کجا شروع کنی تا مشتری بیشتری بیاید",
+  "در آمریکا یا کانادا بیزینس داری و می‌خواهی مشتری جدید اضافه کنی",
+  "قبلاً تبلیغ کردی و پولت بی‌نتیجه سوخت",
+  "می‌خواهی خودت این کار را بلد باشی، نه اینکه به دیگران بسپاری",
 ];
 
 export default function IgAdsInGate() {
@@ -73,15 +73,9 @@ export default function IgAdsInGate() {
         <meta name="description" content="آموزش رایگان ۵۰ دقیقه‌ای جذب مشتری با تبلیغات اینستاگرام برای بیزینس‌های آمریکا و کانادا — با علی لطفی." />
       </Helmet>
 
-      <main dir="rtl" className="mx-auto flex w-full max-w-md flex-col gap-4 px-5 py-5 font-farsi">
-        <div className="text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500 px-3 py-1 text-[11px] font-bold text-white shadow-sm">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
-            آموزش رایگان ۵۰ دقیقه‌ای — تماشای فوری
-          </span>
-          <h1 className="mt-2.5 text-[21px] font-extrabold leading-8 text-neutral-900">{TITLE}</h1>
-          <p className="mt-1 text-xs text-neutral-600">مخصوص بیزینس‌های آمریکا و کانادا — با علی لطفی</p>
-        </div>
+      <main dir="rtl" className="mx-auto flex w-full max-w-md flex-col gap-3.5 px-5 py-4 font-farsi">
+        {/* The cover already carries the title, so it stays only for screen readers and search */}
+        <h1 className="sr-only">{TITLE}</h1>
 
         <button
           type="button"
@@ -91,6 +85,11 @@ export default function IgAdsInGate() {
         >
           <img src={coverAsset.url} alt={TITLE} className="aspect-video w-full object-cover" />
         </button>
+
+        <p className="flex items-center justify-center gap-1.5 text-center text-xs font-bold text-neutral-600">
+          <Users className="h-3.5 w-3.5 text-rose-500" />
+          با علی لطفی · بیش از ۲۰۰ بیزینس منتورشده
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-2.5">
           <p className="text-center text-sm font-bold text-neutral-900">
@@ -103,7 +102,9 @@ export default function IgAdsInGate() {
             ref={inputRef}
             type="email"
             inputMode="email"
+            enterKeyHint="go"
             autoComplete="email"
+            aria-label="ایمیل"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
@@ -117,15 +118,16 @@ export default function IgAdsInGate() {
             disabled={submitting}
             className="min-h-[52px] w-full rounded-xl bg-gradient-to-l from-rose-500 to-amber-500 text-base font-bold text-white shadow-md transition active:scale-[0.98] disabled:opacity-60"
           >
-            {submitting ? "در حال باز کردن..." : "دریافت آموزش رایگان"}
+            {submitting ? "در حال باز کردن..." : "آموزش رو همین الان ببین"}
           </button>
-          <div className="flex items-center justify-center gap-4 text-[11px] text-neutral-600">
+          <div className="flex items-center justify-center gap-3 text-[11px] text-neutral-600">
             <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> ۵۰ دقیقه</span>
             <span className="flex items-center gap-1"><ShieldCheck className="h-3.5 w-3.5" /> کاملاً رایگان</span>
+            <span className="flex items-center gap-1"><MailX className="h-3.5 w-3.5" /> بدون اسپم</span>
           </div>
         </form>
 
-        <section className="mt-4 rounded-2xl bg-white p-4 shadow-ios">
+        <section className="rounded-2xl bg-white p-4 shadow-ios">
           <h2 className="mb-3 text-base font-extrabold text-neutral-900">در این آموزش یاد می‌گیری:</h2>
           <ul className="space-y-2.5">
             {LEARN.map((t) => (
@@ -155,7 +157,7 @@ export default function IgAdsInGate() {
             <h2 className="text-base font-extrabold">علی لطفی، مربی بیزینس شما</h2>
           </div>
           <p className="text-sm leading-7 text-white">
-            ده سال سابقه کارآفرینی، و فقط در ۳ ماه گذشته بیش از ۲۰۰ بیزینس از آمریکا و کانادا در ورکشاپ‌های ما شرکت کرده‌اند.
+            ده سال سابقه کارآفرینی، و فقط در ۳ ماه گذشته بیش از ۲۰۰ بیزینس در ورکشاپ‌های ما شرکت کرده‌اند.
           </p>
         </section>
 
