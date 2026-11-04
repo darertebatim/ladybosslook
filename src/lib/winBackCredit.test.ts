@@ -29,3 +29,18 @@ test('cannot be used on the program it was earned from', () => {
   assert.equal(pickActiveCredit(credits, 'casigads', Date.parse('2026-11-04')), null);
   assert.equal(pickActiveCredit(credits, 'revenue', Date.parse('2026-11-04'))?.id, 'a');
 });
+
+test('CAD payments credit the converted USD amount, not the CAD number', () => {
+  const orders = [
+    { amount: 39700, currency: 'cad', usd_amount: 28500 },
+    { amount: 19700, currency: 'usd', usd_amount: null },
+  ];
+  assert.equal(paidUsdCents(orders), 48200);
+  assert.equal(hasUnconvertedForeignPayment(orders), false);
+});
+
+test('a foreign payment without USD conversion is never credited at face value', () => {
+  const orders = [{ amount: 39700, currency: 'cad', usd_amount: null }];
+  assert.equal(paidUsdCents(orders), 0);
+  assert.equal(hasUnconvertedForeignPayment(orders), true);
+});

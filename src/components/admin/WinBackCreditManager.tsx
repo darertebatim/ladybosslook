@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Gift } from 'lucide-react';
 import { toast } from 'sonner';
-import { WIN_BACK_GRANT, WIN_BACK_REDEEMED, WIN_BACK_VALID_DAYS, parseWinBackCredits, winBackExpiry } from '@/lib/winBackCredit';
+import { WIN_BACK_GRANT, WIN_BACK_REDEEMED, WIN_BACK_VALID_DAYS, parseWinBackCredits, winBackExpiry, paidUsdCents, hasUnconvertedForeignPayment } from '@/lib/winBackCredit';
 
 const fmt = (c: number) => `$${(c / 100).toFixed(0)}`;
 
