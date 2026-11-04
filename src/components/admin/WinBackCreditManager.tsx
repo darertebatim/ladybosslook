@@ -90,18 +90,21 @@ export function WinBackCreditManager() {
     },
   });
 
+  const capCents = cap.trim() ? Math.max(0, Math.round(parseFloat(cap) * 100)) : null;
+  const creditFor = (paid: number) => (capCents != null ? Math.min(paid, capCents) : paid);
   const eligible = useMemo(() => students.filter((s) => s.paid > 0 && !s.credit && !s.needsReview), [students]);
   const now = Date.now();
 
   const activate = async () => {
     if (!eligible.length) return;
-    if (!confirm(`Issue Win-Your-Money-Back credit to ${eligible.length} students? Valid ${WIN_BACK_VALID_DAYS} days.`)) return;
+    const capNote = capCents != null ? ` (capped at ${fmt(capCents)} each)` : '';
+    if (!confirm(`Issue Win-Your-Money-Back credit to ${eligible.length} students${capNote}? Valid ${WIN_BACK_VALID_DAYS} days.`)) return;
     setBusy(true);
     const { data: { user } } = await supabase.auth.getUser();
     const expires_at = winBackExpiry();
     const { error } = await supabase.from('credit_transactions').insert(eligible.map((s) => ({
       user_id: s.id,
-      amount: s.paid,
+      amount: creditFor(s.paid),
       transaction_type: WIN_BACK_GRANT,
       admin_id: user?.id ?? null,
       description: JSON.stringify({ program_slug: slug, round_id: roundId, expires_at }),
