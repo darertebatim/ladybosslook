@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import {
   Check, X, Shield, Play, Video, BookOpen, MessageCircle, Calendar, Target,
   PenLine, Megaphone, TrendingUp, Gift, Sparkles, Clock, Users, Loader2,
-  BarChart3, Rocket, Wallet, Repeat,
+  BarChart3, Rocket, Wallet, Repeat, ArrowDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -102,6 +102,15 @@ function CTA({ onClick, loading, price, was, className = "" }: { onClick: () => 
         </span>
       )}
     </Button>
+  );
+}
+
+/** Small animated arrow that points at the video; rotation lives on the wrapper so the bounce animation can't override it. */
+function HintArrow({ dir, className = "" }: { dir: "down" | "up"; className?: string }) {
+  return (
+    <span className={`inline-flex shrink-0 ${dir === "up" ? "-rotate-180" : ""} ${className}`}>
+      <ArrowDown className="h-4 w-4 animate-bounce text-primary [animation-duration:1.7s]" strokeWidth={2.6} aria-hidden="true" />
+    </span>
   );
 }
 
@@ -250,9 +259,13 @@ export default function IgAdsProgramLanding() {
           <h1 className="text-[26px] font-black leading-[1.6] text-foreground">
             نقشه راه جذب <span className="text-primary">مشتری‌های جدید</span> با تبلیغات اینستاگرامی
           </h1>
-          <p className="mx-auto mt-2 whitespace-nowrap text-[13px] font-bold leading-6 text-foreground/80">
-            ۵۰ دقیقه آموزش قدم‌به‌قدم جذب مشتری پایدار
-          </p>
+          <div className="mt-2 flex items-center justify-center gap-2">
+            <HintArrow dir="down" />
+            <p className="whitespace-nowrap text-[13px] font-bold leading-6 text-foreground/80">
+              ۵۰ دقیقه آموزش قدم‌به‌قدم جذب مشتری پایدار
+            </p>
+            <HintArrow dir="down" />
+          </div>
 
           <div className="mt-4 overflow-hidden rounded-3xl bg-foreground shadow-ios">
             <div className="relative aspect-video w-full">
@@ -278,9 +291,13 @@ export default function IgAdsProgramLanding() {
               )}
             </div>
           </div>
-          <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
-            <p className="text-xs text-foreground/70">🔊 صدا را روشن کنید</p>
-            <p className="inline-flex whitespace-nowrap rounded-full bg-secondary px-3 py-1 text-[12px] font-extrabold text-foreground">بدون ریلز روزانه · بدون هزینه آژانس</p>
+          <div className="mt-2 flex items-center justify-center gap-2">
+            <HintArrow dir="up" className="mt-5 min-[430px]:mt-0" />
+            <div className="flex flex-col items-center gap-1 min-[430px]:flex-row min-[430px]:items-center min-[430px]:gap-2">
+              <p className="text-xs text-foreground/70">🔊 صدا را روشن کنید</p>
+              <p className="inline-flex whitespace-nowrap rounded-full bg-secondary px-3 py-1 text-[12px] font-extrabold text-foreground">بدون ریلز روزانه · بدون هزینه آژانس</p>
+            </div>
+            <HintArrow dir="up" className="mt-5 min-[430px]:mt-0" />
           </div>
           </div>
 
