@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { z } from "zod";
 import { ArrowDown, CheckCircle2, Clock, MailX, ShieldCheck, Users } from "lucide-react";
-import coverAsset from "@/assets/igadsin_cover.png.asset.json";
+import coverAsset from "@/assets/igadsin_cover.webp.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { trackWebinarLead } from "@/lib/metaCapi";
 import { useToast } from "@/hooks/use-toast";
