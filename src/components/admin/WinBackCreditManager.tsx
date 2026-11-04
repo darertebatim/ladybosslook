@@ -39,14 +39,17 @@ export function WinBackCreditManager() {
     queryKey: ['winback-students', slug, roundId],
     enabled: !!slug && !!roundId,
     queryFn: async () => {
-      const { data: enr } = await supabase.from('course_enrollments').select('user_id')
-        .eq('round_id', roundId).eq('status', 'active');
-      const enrolled = [...new Set((enr || []).map((e) => e.user_id))];
-      if (!enrolled.length) return [];
+      // List everyone who PAID for this program — enrollment status doesn't matter,
+      // so students removed from a round (e.g. moved from Smart IG) still show up.
+      const { data: allOrders } = await supabase.from('orders')
+        .select('user_id, amount, currency, usd_amount, refunded, status')
+        .eq('program_slug', slug);
+      const payers = [...new Set((allOrders || []).map((o: any) => o.user_id))];
+      if (!payers.length) return [];
       // Merged accounts: treat primary + linked accounts as one student.
-      const { data: enrProfs } = await supabase.from('profiles').select('id, email').in('id', enrolled);
+      const { data: enrProfs } = await supabase.from('profiles').select('id, email').in('id', payers);
       const emails = (enrProfs || []).map((p: any) => (p.email || '').toLowerCase()).filter(Boolean);
-      const idList = enrolled.join(',');
+      const idList = payers.join(',');
       const { data: aliases } = await supabase.from('account_email_aliases')
         .select('primary_user_id, merged_from_user_id, email')
         .or(`primary_user_id.in.(${idList}),merged_from_user_id.in.(${idList})${emails.length ? `,email.in.(${emails.map((e) => `"${e}"`).join(',')})` : ''}`);
@@ -56,7 +59,7 @@ export function WinBackCreditManager() {
         return a?.primary_user_id || id;
       };
       const families = new Map<string, Set<string>>();
-      enrolled.forEach((id) => {
+      payers.forEach((id) => {
         const pid = primaryOf(id);
         const set = families.get(pid) || new Set([pid]);
         set.add(id);
@@ -65,17 +68,15 @@ export function WinBackCreditManager() {
         families.set(pid, set);
       });
       const ids = [...new Set([...families.values()].flatMap((s) => [...s]))];
-      const [{ data: profs }, { data: orders }, { data: tx }] = await Promise.all([
+      const [{ data: profs }, { data: tx }] = await Promise.all([
         supabase.from('profiles').select('id, full_name, email').in('id', ids),
-        supabase.from('orders').select('user_id, amount, currency, usd_amount, refunded, status')
-          .eq('program_slug', slug).in('user_id', ids),
         supabase.from('credit_transactions').select('id, user_id, amount, description, created_at, transaction_type')
           .in('user_id', ids).in('transaction_type', [WIN_BACK_GRANT, WIN_BACK_REDEEMED]),
       ]);
       return [...families.entries()].map(([id, members]) => {
         const p = (profs || []).find((x: any) => x.id === id) as any;
         const otherEmails = (profs || []).filter((x: any) => members.has(x.id) && x.id !== id).map((x: any) => x.email).filter(Boolean);
-        const userOrders = (orders || [])
+        const userOrders = (allOrders || [])
           .filter((o: any) => members.has(o.user_id) && !o.refunded && (o.status ?? 'paid') !== 'failed');
         const paid = paidUsdCents(userOrders as any);
         const needsReview = userOrders.length > 0 && hasUnconvertedForeignPayment(userOrders as any);
