@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { creditPerCharge, pickActiveCredit, winBackExpiry, parseWinBackCredits } from './winBackCredit';
+import { creditPerCharge, pickActiveCredit, winBackExpiry, parseWinBackCredits, paidUsdCents, hasUnconvertedForeignPayment } from './winBackCredit';
 
 test('expires exactly 90 days after issue', () => {
   assert.equal(winBackExpiry(new Date('2026-11-04T00:00:00Z')), '2027-02-02T00:00:00.000Z');

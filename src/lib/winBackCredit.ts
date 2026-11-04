@@ -61,3 +61,26 @@ export function creditPerCharge(credit: number, recurring: boolean, charge: numb
   const per = recurring ? Math.round(credit / WIN_BACK_INSTALLMENTS) : credit;
   return Math.max(0, Math.min(per, charge - 50));
 }
+
+export interface PaidOrderRow {
+  amount: number | null;
+  currency: string | null;
+  usd_amount: number | null;
+}
+
+/**
+ * Total paid in USD cents. Never treats a foreign-currency amount as USD:
+ * non-USD orders without a converted usd_amount count as 0 (flag for review).
+ */
+export function paidUsdCents(orders: PaidOrderRow[]): number {
+  return orders.reduce((sum, o) => {
+    if (o.usd_amount != null) return sum + o.usd_amount;
+    if ((o.currency || 'usd').toLowerCase() === 'usd') return sum + (o.amount ?? 0);
+    return sum;
+  }, 0);
+}
+
+/** True when any order is non-USD and missing its USD conversion. */
+export function hasUnconvertedForeignPayment(orders: PaidOrderRow[]): boolean {
+  return orders.some((o) => o.usd_amount == null && (o.currency || 'usd').toLowerCase() !== 'usd');
+}
