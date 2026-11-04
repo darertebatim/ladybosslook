@@ -2,15 +2,28 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { z } from "zod";
-import { ArrowDown } from "lucide-react";
-const coverAsset = { url: "" }; // TODO: replace with campaign cover
+import { ArrowDown, CheckCircle2, Clock, ShieldCheck, Users } from "lucide-react";
+import coverAsset from "@/assets/igadsin_cover.png.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { trackWebinarLead } from "@/lib/metaCapi";
 import { useToast } from "@/hooks/use-toast";
 
 export const IGADSIN_EMAIL_KEY = "igadsin_email";
-const TITLE = "سه پیشفرض برای جذب مشتری از اینستاگرام در امریکا و کانادا";
+const TITLE = "نقشه راه جذب مشتری با تبلیغ اینستاگرامی";
 const emailSchema = z.string().trim().email().max(255);
+
+const LEARN = [
+  "۶ اشتباهی که باعث می‌شود تبلیغات اینستاگرام شکست بخورد",
+  "فرمول ۳ مرحله‌ای جذب مشتری از تبلیغات",
+  "اینکه برای بیزینس تو کدام روش و کدام کمپین نتیجه می‌دهد",
+  "چطور ظرفیت‌های خالی بیزینست را با مشتری اینستاگرامی پر کنی",
+];
+
+const FOR_YOU = [
+  "در آمریکا یا کانادا بیزینس داری و ظرفیت خالی داری",
+  "قبلاً تبلیغ کردی ولی نتیجه درآمدی خوبی نگرفتی",
+  "نمی‌دانی از کجا شروع کنی تا مشتری بیشتری بیاید",
+];
 
 export default function IgAdsInGate() {
   const navigate = useNavigate();
@@ -19,6 +32,12 @@ export default function IgAdsInGate() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  function focusForm() {
+    inputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    inputRef.current?.focus();
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (submitting) return;
@@ -36,9 +55,9 @@ export default function IgAdsInGate() {
         name: "", email: clean, city: "", phone: "", source: "igadsin_signup", round_id: null,
       });
       if (dbError) throw dbError;
+      // Meta Pixel: standard Lead + custom IGAdsInLead (browser + server, deduplicated)
       trackWebinarLead({ customEvent: "IGAdsInLead", contentName: "igadsin_signup", email: clean });
       try { localStorage.setItem(IGADSIN_EMAIL_KEY, clean); } catch { /* ignore */ }
-  
       navigate("/l/igadsprogram");
     } catch (err) {
       console.error("igadsin gate error", err);
@@ -48,20 +67,17 @@ export default function IgAdsInGate() {
   }
 
   return (
-    <div className="h-[100svh] overflow-hidden bg-gradient-to-b from-orange-50 via-white to-white">
+    <div className="min-h-[100svh] bg-gradient-to-b from-orange-50 via-white to-white">
       <Helmet>
         <title>{TITLE} | Rilo</title>
-        <meta name="description" content={`ویدیو آموزشی رایگان: ${TITLE}.`} />
+        <meta name="description" content="آموزش رایگان ۵۰ دقیقه‌ای جذب مشتری با تبلیغات اینستاگرام برای بیزینس‌های آمریکا و کانادا — با علی لطفی." />
       </Helmet>
 
-      <main
-        dir="rtl"
-        className="mx-auto flex h-full w-full max-w-md flex-col justify-center gap-4 px-5 py-5 font-farsi"
-      >
+      <main dir="rtl" className="mx-auto flex w-full max-w-md flex-col gap-4 px-5 py-5 font-farsi">
         <div className="text-center">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500 px-3 py-1 text-[11px] font-bold text-white shadow-sm">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
-            ویدیو رایگان — تماشای فوری
+            آموزش رایگان ۵۰ دقیقه‌ای — تماشای فوری
           </span>
           <h1 className="mt-2.5 text-[21px] font-extrabold leading-8 text-neutral-900">{TITLE}</h1>
           <p className="mt-1 text-xs text-neutral-600">مخصوص بیزینس‌های آمریکا و کانادا — با علی لطفی</p>
@@ -69,16 +85,16 @@ export default function IgAdsInGate() {
 
         <button
           type="button"
-          onClick={() => inputRef.current?.focus()}
-          className="relative w-full overflow-hidden rounded-2xl border border-orange-200 bg-black shadow-[0_10px_30px_rgba(0,0,0,0.12)]"
+          onClick={focusForm}
+          className="relative w-full overflow-hidden rounded-2xl bg-black shadow-[0_10px_30px_rgba(0,0,0,0.12)]"
           aria-label="برای تماشا ایمیل خود را وارد کنید"
         >
-          {coverAsset.url ? <img src={coverAsset.url} alt={TITLE} className="aspect-video max-h-[34svh] w-full object-cover" /> : <div className="aspect-video max-h-[34svh] w-full bg-gradient-to-br from-rose-500 to-amber-500" />}
+          <img src={coverAsset.url} alt={TITLE} className="aspect-video w-full object-cover" />
         </button>
 
         <form onSubmit={handleSubmit} className="space-y-2.5">
           <p className="text-center text-sm font-bold text-neutral-900">
-            ایمیل خود را وارد کنید تا ویدیو همین الان باز شود
+            ایمیل خود را وارد کنید تا آموزش همین الان باز شود
           </p>
           <div className="flex justify-center" aria-hidden="true">
             <ArrowDown className="h-7 w-7 animate-bounce text-rose-500" />
@@ -101,10 +117,55 @@ export default function IgAdsInGate() {
             disabled={submitting}
             className="min-h-[52px] w-full rounded-xl bg-gradient-to-l from-rose-500 to-amber-500 text-base font-bold text-white shadow-md transition active:scale-[0.98] disabled:opacity-60"
           >
-            {submitting ? "در حال باز کردن..." : "تماشای ویدیو"}
+            {submitting ? "در حال باز کردن..." : "دریافت آموزش رایگان"}
           </button>
-          <p className="text-center text-[11px] text-neutral-500">رایگان — ویدیو بلافاصله باز می‌شود</p>
+          <div className="flex items-center justify-center gap-4 text-[11px] text-neutral-600">
+            <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> ۵۰ دقیقه</span>
+            <span className="flex items-center gap-1"><ShieldCheck className="h-3.5 w-3.5" /> کاملاً رایگان</span>
+          </div>
         </form>
+
+        <section className="mt-4 rounded-2xl bg-white p-4 shadow-ios">
+          <h2 className="mb-3 text-base font-extrabold text-neutral-900">در این آموزش یاد می‌گیری:</h2>
+          <ul className="space-y-2.5">
+            {LEARN.map((t) => (
+              <li key={t} className="flex gap-2 text-sm leading-6 text-neutral-800">
+                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-rose-500" />
+                {t}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="rounded-2xl bg-white p-4 shadow-ios">
+          <h2 className="mb-3 text-base font-extrabold text-neutral-900">این آموزش برای توست اگر:</h2>
+          <ul className="space-y-2.5">
+            {FOR_YOU.map((t) => (
+              <li key={t} className="flex gap-2 text-sm leading-6 text-neutral-800">
+                <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-amber-500" />
+                {t}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="rounded-2xl bg-neutral-900 p-4 text-white">
+          <div className="mb-2 flex items-center gap-2">
+            <Users className="h-5 w-5 text-amber-400" />
+            <h2 className="text-base font-extrabold">علی لطفی، مربی بیزینس شما</h2>
+          </div>
+          <p className="text-sm leading-7 text-white">
+            ده سال سابقه کارآفرینی، و فقط در ۳ ماه گذشته بیش از ۲۰۰ بیزینس از آمریکا و کانادا در ورکشاپ‌های ما شرکت کرده‌اند.
+          </p>
+        </section>
+
+        <button
+          type="button"
+          onClick={focusForm}
+          className="mb-6 min-h-[52px] w-full rounded-xl bg-gradient-to-l from-rose-500 to-amber-500 text-base font-bold text-white shadow-md active:scale-[0.98]"
+        >
+          همین الان آموزش رایگان را ببین
+        </button>
       </main>
     </div>
   );
