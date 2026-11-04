@@ -1,0 +1,1 @@
+DELETE FROM public.account_email_aliases WHERE lower(email) = 'razie8254@gmail.com';
