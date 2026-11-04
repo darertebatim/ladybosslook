@@ -41,8 +41,30 @@ export function WinBackCreditManager() {
     queryFn: async () => {
       const { data: enr } = await supabase.from('course_enrollments').select('user_id')
         .eq('round_id', roundId).eq('status', 'active');
-      const ids = [...new Set((enr || []).map((e) => e.user_id))];
-      if (!ids.length) return [];
+      const enrolled = [...new Set((enr || []).map((e) => e.user_id))];
+      if (!enrolled.length) return [];
+      // Merged accounts: treat primary + linked accounts as one student.
+      const { data: enrProfs } = await supabase.from('profiles').select('id, email').in('id', enrolled);
+      const emails = (enrProfs || []).map((p: any) => (p.email || '').toLowerCase()).filter(Boolean);
+      const idList = enrolled.join(',');
+      const { data: aliases } = await supabase.from('account_email_aliases')
+        .select('primary_user_id, merged_from_user_id, email')
+        .or(`primary_user_id.in.(${idList}),merged_from_user_id.in.(${idList})${emails.length ? `,email.in.(${emails.map((e) => `"${e}"`).join(',')})` : ''}`);
+      const primaryOf = (id: string) => {
+        const email = ((enrProfs || []).find((p: any) => p.id === id) as any)?.email?.toLowerCase();
+        const a = (aliases || []).find((x: any) => x.merged_from_user_id === id || (email && x.email?.toLowerCase() === email));
+        return a?.primary_user_id || id;
+      };
+      const families = new Map<string, Set<string>>();
+      enrolled.forEach((id) => {
+        const pid = primaryOf(id);
+        const set = families.get(pid) || new Set([pid]);
+        set.add(id);
+        (aliases || []).filter((x: any) => x.primary_user_id === pid && x.merged_from_user_id)
+          .forEach((x: any) => set.add(x.merged_from_user_id));
+        families.set(pid, set);
+      });
+      const ids = [...new Set([...families.values()].flatMap((s) => [...s]))];
       const [{ data: profs }, { data: orders }, { data: tx }] = await Promise.all([
         supabase.from('profiles').select('id, full_name, email').in('id', ids),
         supabase.from('orders').select('user_id, amount, currency, usd_amount, refunded, status')
@@ -50,15 +72,17 @@ export function WinBackCreditManager() {
         supabase.from('credit_transactions').select('id, user_id, amount, description, created_at, transaction_type')
           .in('user_id', ids).in('transaction_type', [WIN_BACK_GRANT, WIN_BACK_REDEEMED]),
       ]);
-      return ids.map((id) => {
+      return [...families.entries()].map(([id, members]) => {
         const p = (profs || []).find((x: any) => x.id === id) as any;
+        const otherEmails = (profs || []).filter((x: any) => members.has(x.id) && x.id !== id).map((x: any) => x.email).filter(Boolean);
         const userOrders = (orders || [])
-          .filter((o: any) => o.user_id === id && !o.refunded && (o.status ?? 'paid') !== 'failed');
+          .filter((o: any) => members.has(o.user_id) && !o.refunded && (o.status ?? 'paid') !== 'failed');
         const paid = paidUsdCents(userOrders as any);
         const needsReview = userOrders.length > 0 && hasUnconvertedForeignPayment(userOrders as any);
-        const credits = parseWinBackCredits((tx || []).filter((t: any) => t.user_id === id) as any);
+        const credits = parseWinBackCredits((tx || []).filter((t: any) => members.has(t.user_id)) as any);
         const credit = credits.find((c) => c.round_id === roundId) || null;
-        return { id, name: p?.full_name || '—', email: p?.email || '', paid, needsReview, credit };
+        const email = [p?.email, ...otherEmails].filter(Boolean).join(' · ');
+        return { id, name: p?.full_name || '—', email, paid, needsReview, credit };
       });
     },
   });

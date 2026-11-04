@@ -16,17 +16,47 @@ export interface ActiveWinBackCredit {
 
 const parse = (s: string | null) => { try { return s ? JSON.parse(s) : {}; } catch { return {}; } };
 
+/** All account ids merged with this user (primary + aliases), so credit follows any linked email. */
+export async function familyIds(supabase: any, userId: string): Promise<string[]> {
+  try {
+    const { data: prof } = await supabase.from('profiles').select('email').eq('id', userId).maybeSingle();
+    const email = (prof?.email || '').toLowerCase();
+    let { data: hit } = await supabase.from('account_email_aliases').select('primary_user_id')
+      .eq('merged_from_user_id', userId).limit(1);
+    if (!hit?.length && email) {
+      ({ data: hit } = await supabase.from('account_email_aliases').select('primary_user_id').ilike('email', email).limit(1));
+    }
+    const pid = hit?.[0]?.primary_user_id || userId;
+    const { data: rows } = await supabase.from('account_email_aliases').select('merged_from_user_id, email').eq('primary_user_id', pid);
+    const ids = new Set<string>([userId, pid]);
+    (rows || []).forEach((r: any) => r.merged_from_user_id && ids.add(r.merged_from_user_id));
+    const aliasEmails = (rows || []).map((r: any) => (r.email || '').toLowerCase()).filter(Boolean);
+    if (aliasEmails.length) {
+      const { data: ps } = await supabase.from('profiles').select('id').in('email', aliasEmails);
+      (ps || []).forEach((p: any) => ids.add(p.id));
+    }
+    return [...ids];
+  } catch {
+    return [userId];
+  }
+}
+
+export async function getWinBackRows(supabase: any, userId: string): Promise<any[]> {
+  const ids = await familyIds(supabase, userId);
+  const { data } = await supabase
+    .from('credit_transactions')
+    .select('id, amount, description, created_at, transaction_type')
+    .in('user_id', ids)
+    .in('transaction_type', [WIN_BACK_GRANT, WIN_BACK_REDEEMED]);
+  return (data || []) as any[];
+}
+
 export async function getActiveWinBackCredit(
   supabase: any,
   userId: string,
   targetProgramSlug?: string,
 ): Promise<ActiveWinBackCredit | null> {
-  const { data } = await supabase
-    .from('credit_transactions')
-    .select('id, amount, description, created_at, transaction_type')
-    .eq('user_id', userId)
-    .in('transaction_type', [WIN_BACK_GRANT, WIN_BACK_REDEEMED]);
-  const rows = (data || []) as any[];
+  const rows = await getWinBackRows(supabase, userId);
   const redeemed = new Set(
     rows.filter((r) => r.transaction_type === WIN_BACK_REDEEMED).map((r) => parse(r.description).grant_id),
   );
