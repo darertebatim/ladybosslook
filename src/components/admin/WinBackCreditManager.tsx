@@ -16,6 +16,9 @@ export function WinBackCreditManager() {
   const [slug, setSlug] = useState('');
   const [roundId, setRoundId] = useState('');
   const [busy, setBusy] = useState(false);
+  const [cap, setCap] = useState('');
+  const capCents = Number(cap) > 0 ? Math.round(Number(cap) * 100) : null;
+  const creditFor = (paid: number) => (capCents ? Math.min(paid, capCents) : paid);
 
   const { data: programs = [] } = useQuery({
     queryKey: ['winback-programs'],
@@ -40,7 +43,7 @@ export function WinBackCreditManager() {
     enabled: !!slug && !!roundId,
     queryFn: async () => {
       const { data: enr } = await supabase.from('course_enrollments').select('user_id')
-        .eq('round_id', roundId).eq('status', 'active');
+        .eq('round_id', roundId);
       const enrolled = [...new Set((enr || []).map((e) => e.user_id))];
       if (!enrolled.length) return [];
       // Merged accounts: treat primary + linked accounts as one student.
@@ -67,22 +70,26 @@ export function WinBackCreditManager() {
       const ids = [...new Set([...families.values()].flatMap((s) => [...s]))];
       const [{ data: profs }, { data: orders }, { data: tx }] = await Promise.all([
         supabase.from('profiles').select('id, full_name, email').in('id', ids),
-        supabase.from('orders').select('user_id, amount, currency, usd_amount, refunded, status')
-          .eq('program_slug', slug).in('user_id', ids),
+        // All programs: students moved here from another program (e.g. Smart IG) keep their original payment.
+        supabase.from('orders').select('user_id, amount, currency, usd_amount, refunded, status, program_slug')
+          .in('user_id', ids),
         supabase.from('credit_transactions').select('id, user_id, amount, description, created_at, transaction_type')
           .in('user_id', ids).in('transaction_type', [WIN_BACK_GRANT, WIN_BACK_REDEEMED]),
       ]);
       return [...families.entries()].map(([id, members]) => {
         const p = (profs || []).find((x: any) => x.id === id) as any;
         const otherEmails = (profs || []).filter((x: any) => members.has(x.id) && x.id !== id).map((x: any) => x.email).filter(Boolean);
-        const userOrders = (orders || [])
-          .filter((o: any) => members.has(o.user_id) && !o.refunded && (o.status ?? 'paid') !== 'failed');
+        const valid = (orders || [])
+          .filter((o: any) => members.has(o.user_id) && !o.refunded && (o.status ?? 'paid') !== 'failed' && o.program_slug);
+        const own = valid.filter((o: any) => o.program_slug === slug);
+        const userOrders = own.length ? own : valid;
+        const paidFrom = own.length ? null : [...new Set(valid.map((o: any) => o.program_slug))].join(', ') || null;
         const paid = paidUsdCents(userOrders as any);
         const needsReview = userOrders.length > 0 && hasUnconvertedForeignPayment(userOrders as any);
         const credits = parseWinBackCredits((tx || []).filter((t: any) => members.has(t.user_id)) as any);
         const credit = credits.find((c) => c.round_id === roundId) || null;
         const email = [p?.email, ...otherEmails].filter(Boolean).join(' · ');
-        return { id, name: p?.full_name || '—', email, paid, needsReview, credit };
+        return { id, name: p?.full_name || '—', email, paid, paidFrom, needsReview, credit };
       });
     },
   });
