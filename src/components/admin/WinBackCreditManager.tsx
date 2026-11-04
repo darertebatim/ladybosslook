@@ -127,10 +127,10 @@ export function WinBackCreditManager() {
       <div>
         <h3 className="text-lg font-semibold flex items-center gap-2"><Gift className="w-5 h-5" /> Win-Your-Money-Back Credit</h3>
         <p className="text-sm text-muted-foreground">
-          Gives each paid student in a round credit equal to what they paid (197 USD or 197 CAD both give 197), valid {WIN_BACK_VALID_DAYS} days, applied automatically at checkout for another program (split over 3 payments on monthly plans).
+          Lists everyone who paid for the program (even if no longer enrolled). Credit equals what they paid (197 USD or 197 CAD both give 197), optionally capped, valid {WIN_BACK_VALID_DAYS} days, applied automatically at checkout for another program (split over the plan's monthly payments).
         </p>
       </div>
-      <div className="grid sm:grid-cols-2 gap-3">
+      <div className="grid sm:grid-cols-3 gap-3">
         <Select value={slug} onValueChange={(v) => { setSlug(v); setRoundId(''); }}>
           <SelectTrigger><SelectValue placeholder="Select program" /></SelectTrigger>
           <SelectContent>{programs.map((p: any) => <SelectItem key={p.slug} value={p.slug}>{p.title}</SelectItem>)}</SelectContent>
@@ -139,6 +139,10 @@ export function WinBackCreditManager() {
           <SelectTrigger><SelectValue placeholder="Select round" /></SelectTrigger>
           <SelectContent>{rounds.map((r: any) => <SelectItem key={r.id} value={r.id}>{r.round_name} (#{r.round_number})</SelectItem>)}</SelectContent>
         </Select>
+        <Input
+          type="number" min="0" step="1" placeholder="Credit cap $ (optional)"
+          value={cap} onChange={(e) => setCap(e.target.value)}
+        />
       </div>
 
       {roundId && (
@@ -146,10 +150,10 @@ export function WinBackCreditManager() {
           <>
             <Button onClick={activate} disabled={busy || !eligible.length}>
               {busy && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Activate credit for this round ({eligible.length})
+              Activate credit{capCents != null ? ` (cap ${fmt(capCents)})` : ''} for this round ({eligible.length})
             </Button>
             <div className="divide-y border rounded-lg">
-              {students.length === 0 && <p className="p-3 text-sm text-muted-foreground">No active students in this round.</p>}
+              {students.length === 0 && <p className="p-3 text-sm text-muted-foreground">No payments found for this program.</p>}
               {students.map((s) => (
                 <div key={s.id} className="flex items-center justify-between gap-3 p-3 text-sm">
                   <div className="min-w-0">
