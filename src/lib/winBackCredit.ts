@@ -56,9 +56,9 @@ export function pickActiveCredit(credits: WinBackCredit[], targetSlug?: string, 
     .sort((a, b) => b.amount - a.amount)[0] ?? null;
 }
 
-/** Discount per charge: full credit once, or split over 3 monthly charges. */
-export function creditPerCharge(credit: number, recurring: boolean, charge: number): number {
-  const per = recurring ? Math.round(credit / WIN_BACK_INSTALLMENTS) : credit;
+/** Discount per charge: full credit once, or split over the plan's monthly charges (default 3). */
+export function creditPerCharge(credit: number, recurring: boolean, charge: number, installments = WIN_BACK_INSTALLMENTS): number {
+  const per = recurring ? Math.round(credit / Math.max(1, installments)) : credit;
   return Math.max(0, Math.min(per, charge - 50));
 }
 

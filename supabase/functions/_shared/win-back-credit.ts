@@ -78,13 +78,14 @@ export async function getActiveWinBackCredit(
   return active[0] || null;
 }
 
-/** Creates a Stripe coupon for the credit. Monthly plans get the credit split over 3 months. */
+/** Creates a Stripe coupon for the credit. Monthly plans get the credit split over the plan's installments. */
 export async function createWinBackCoupon(
   stripe: any,
   credit: ActiveWinBackCredit,
-  opts: { recurring: boolean; chargeAmount: number },
+  opts: { recurring: boolean; chargeAmount: number; installments?: number },
 ): Promise<string | null> {
-  const perCharge = opts.recurring ? Math.round(credit.amount / WIN_BACK_INSTALLMENTS) : credit.amount;
+  const months = Math.max(1, opts.installments || WIN_BACK_INSTALLMENTS);
+  const perCharge = opts.recurring ? Math.round(credit.amount / months) : credit.amount;
   const amountOff = Math.min(perCharge, Math.max(0, opts.chargeAmount - 50));
   if (amountOff <= 0) return null;
   // USD and CAD are priced 1:1, so the same face value comes off in either checkout currency.
@@ -94,7 +95,7 @@ export async function createWinBackCoupon(
     currency_options: { cad: { amount_off: amountOff } },
     name: 'Win-Your-Money-Back Credit',
     ...(opts.recurring
-      ? { duration: 'repeating', duration_in_months: WIN_BACK_INSTALLMENTS }
+      ? { duration: 'repeating', duration_in_months: months }
       : { duration: 'once' }),
     max_redemptions: 1,
     metadata: { win_back_credit_id: credit.id },
