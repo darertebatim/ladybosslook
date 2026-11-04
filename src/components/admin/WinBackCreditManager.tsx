@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Gift } from 'lucide-react';
 import { toast } from 'sonner';
@@ -15,6 +16,7 @@ export function WinBackCreditManager() {
   const qc = useQueryClient();
   const [slug, setSlug] = useState('');
   const [roundId, setRoundId] = useState('');
+  const [cap, setCap] = useState('');
   const [busy, setBusy] = useState(false);
 
   const { data: programs = [] } = useQuery({
