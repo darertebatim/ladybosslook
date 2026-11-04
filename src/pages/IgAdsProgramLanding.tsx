@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import {
   Check, X, Shield, Play, Video, BookOpen, MessageCircle, Calendar, Target,
   PenLine, Megaphone, TrendingUp, Gift, Sparkles, Clock, Users, Loader2,
-  BarChart3, Rocket, Wallet, Repeat,
+  BarChart3, Rocket, Wallet, Repeat, ArrowDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -250,9 +250,13 @@ export default function IgAdsProgramLanding() {
           <h1 className="text-[26px] font-black leading-[1.6] text-foreground">
             نقشه راه جذب <span className="text-primary">مشتری‌های جدید</span> با تبلیغات اینستاگرامی
           </h1>
-          <p className="mx-auto mt-2 whitespace-nowrap text-[13px] font-bold leading-6 text-foreground/80">
-            ۵۰ دقیقه آموزش قدم‌به‌قدم جذب مشتری پایدار
-          </p>
+          <div className="mt-2 flex items-center justify-center gap-2">
+            <ArrowDown className="h-4 w-4 shrink-0 animate-bounce text-primary [animation-duration:1.7s]" strokeWidth={2.6} aria-hidden="true" />
+            <p className="whitespace-nowrap text-[13px] font-bold leading-6 text-foreground/80">
+              ۵۰ دقیقه آموزش قدم‌به‌قدم جذب مشتری پایدار
+            </p>
+            <ArrowDown className="h-4 w-4 shrink-0 animate-bounce text-primary [animation-duration:1.7s]" strokeWidth={2.6} aria-hidden="true" />
+          </div>
 
           <div className="mt-4 overflow-hidden rounded-3xl bg-foreground shadow-ios">
             <div className="relative aspect-video w-full">
@@ -279,8 +283,10 @@ export default function IgAdsProgramLanding() {
             </div>
           </div>
           <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+            <ArrowDown className="h-4 w-4 shrink-0 -rotate-180 animate-bounce text-primary [animation-duration:1.7s]" strokeWidth={2.6} aria-hidden="true" />
             <p className="text-xs text-foreground/70">🔊 صدا را روشن کنید</p>
             <p className="inline-flex whitespace-nowrap rounded-full bg-secondary px-3 py-1 text-[12px] font-extrabold text-foreground">بدون ریلز روزانه · بدون هزینه آژانس</p>
+            <ArrowDown className="h-4 w-4 shrink-0 -rotate-180 animate-bounce text-primary [animation-duration:1.7s]" strokeWidth={2.6} aria-hidden="true" />
           </div>
           </div>
 
