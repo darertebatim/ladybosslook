@@ -83,7 +83,8 @@ export function WinBackCreditManager() {
         const paid = paidUsdCents(userOrders as any);
         const needsReview = userOrders.length > 0 && hasUnconvertedForeignPayment(userOrders as any);
         const credits = parseWinBackCredits((tx || []).filter((t: any) => members.has(t.user_id)) as any);
-        const credit = credits.find((c) => c.round_id === roundId) || null;
+        // One credit per PROGRAM, not per round — a student in rounds 1+2 gets credited once.
+        const credit = credits.find((c) => c.program_slug === slug) || null;
         const email = [p?.email, ...otherEmails].filter(Boolean).join(' · ');
         return { id, name: p?.full_name || '—', email, paid, needsReview, credit };
       });
