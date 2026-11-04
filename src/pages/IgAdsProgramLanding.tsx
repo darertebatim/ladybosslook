@@ -105,6 +105,15 @@ function CTA({ onClick, loading, price, was, className = "" }: { onClick: () => 
   );
 }
 
+/** Small animated arrow that points at the video; rotation lives on the wrapper so the bounce animation can't override it. */
+function HintArrow({ dir }: { dir: "down" | "up" }) {
+  return (
+    <span className={`inline-flex shrink-0 ${dir === "up" ? "-rotate-180" : ""}`}>
+      <ArrowDown className="h-4 w-4 animate-bounce text-primary [animation-duration:1.7s]" strokeWidth={2.6} aria-hidden="true" />
+    </span>
+  );
+}
+
 function SectionTitle({ eyebrow, title, sub }: { eyebrow?: string; title: string; sub?: string }) {
   return (
     <div className="mx-auto mb-6 max-w-md text-center">
@@ -251,11 +260,11 @@ export default function IgAdsProgramLanding() {
             نقشه راه جذب <span className="text-primary">مشتری‌های جدید</span> با تبلیغات اینستاگرامی
           </h1>
           <div className="mt-2 flex items-center justify-center gap-2">
-            <ArrowDown className="h-4 w-4 shrink-0 animate-bounce text-primary [animation-duration:1.7s]" strokeWidth={2.6} aria-hidden="true" />
+            <HintArrow dir="down" />
             <p className="whitespace-nowrap text-[13px] font-bold leading-6 text-foreground/80">
               ۵۰ دقیقه آموزش قدم‌به‌قدم جذب مشتری پایدار
             </p>
-            <ArrowDown className="h-4 w-4 shrink-0 animate-bounce text-primary [animation-duration:1.7s]" strokeWidth={2.6} aria-hidden="true" />
+            <HintArrow dir="down" />
           </div>
 
           <div className="mt-4 overflow-hidden rounded-3xl bg-foreground shadow-ios">
@@ -282,11 +291,15 @@ export default function IgAdsProgramLanding() {
               )}
             </div>
           </div>
-          <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
-            <ArrowDown className="h-4 w-4 shrink-0 -rotate-180 animate-bounce text-primary [animation-duration:1.7s]" strokeWidth={2.6} aria-hidden="true" />
-            <p className="text-xs text-foreground/70">🔊 صدا را روشن کنید</p>
-            <p className="inline-flex whitespace-nowrap rounded-full bg-secondary px-3 py-1 text-[12px] font-extrabold text-foreground">بدون ریلز روزانه · بدون هزینه آژانس</p>
-            <ArrowDown className="h-4 w-4 shrink-0 -rotate-180 animate-bounce text-primary [animation-duration:1.7s]" strokeWidth={2.6} aria-hidden="true" />
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5">
+            <span className="flex items-center gap-1.5">
+              <HintArrow dir="up" />
+              <p className="text-xs text-foreground/70">🔊 صدا را روشن کنید</p>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <p className="inline-flex whitespace-nowrap rounded-full bg-secondary px-3 py-1 text-[12px] font-extrabold text-foreground">بدون ریلز روزانه · بدون هزینه آژانس</p>
+              <HintArrow dir="up" />
+            </span>
           </div>
           </div>
 
