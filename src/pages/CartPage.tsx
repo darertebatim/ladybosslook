@@ -83,7 +83,7 @@ const CartPage = () => {
   });
   const subItem = displayItems.find((i) => i.payment_type === 'subscription');
   const winBack = user && displayItems.length
-    ? pickActiveCredit(parseWinBackCredits(winBackRows as any), subItem?.program_slug ?? displayItems.find((i) => true)?.program_slug)
+    ? pickActiveCredit(parseWinBackCredits(winBackRows as any), subItem?.program_slug ?? displayItems[0]?.program_slug)
     : null;
   const winBackOff = winBack && totalCents > 0 ? creditPerCharge(winBack.amount, !!subItem, totalCents) : 0;
   const dueCents = totalCents - winBackOff;
