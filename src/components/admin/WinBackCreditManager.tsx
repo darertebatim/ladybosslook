@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Gift } from 'lucide-react';
 import { toast } from 'sonner';
-import { WIN_BACK_GRANT, WIN_BACK_REDEEMED, WIN_BACK_VALID_DAYS, parseWinBackCredits, winBackExpiry } from '@/lib/winBackCredit';
+import { WIN_BACK_GRANT, WIN_BACK_REDEEMED, WIN_BACK_VALID_DAYS, parseWinBackCredits, winBackExpiry, paidUsdCents, hasUnconvertedForeignPayment } from '@/lib/winBackCredit';
 
 const fmt = (c: number) => `$${(c / 100).toFixed(0)}`;
 
@@ -45,24 +45,25 @@ export function WinBackCreditManager() {
       if (!ids.length) return [];
       const [{ data: profs }, { data: orders }, { data: tx }] = await Promise.all([
         supabase.from('profiles').select('id, full_name, email').in('id', ids),
-        supabase.from('orders').select('user_id, amount, usd_amount, refunded, status')
+        supabase.from('orders').select('user_id, amount, currency, usd_amount, refunded, status')
           .eq('program_slug', slug).in('user_id', ids),
         supabase.from('credit_transactions').select('id, user_id, amount, description, created_at, transaction_type')
           .in('user_id', ids).in('transaction_type', [WIN_BACK_GRANT, WIN_BACK_REDEEMED]),
       ]);
       return ids.map((id) => {
         const p = (profs || []).find((x: any) => x.id === id) as any;
-        const paid = (orders || [])
-          .filter((o: any) => o.user_id === id && !o.refunded && (o.status ?? 'paid') !== 'failed')
-          .reduce((s: number, o: any) => s + (o.usd_amount ?? o.amount ?? 0), 0);
+        const userOrders = (orders || [])
+          .filter((o: any) => o.user_id === id && !o.refunded && (o.status ?? 'paid') !== 'failed');
+        const paid = paidUsdCents(userOrders as any);
+        const needsReview = userOrders.length > 0 && hasUnconvertedForeignPayment(userOrders as any);
         const credits = parseWinBackCredits((tx || []).filter((t: any) => t.user_id === id) as any);
         const credit = credits.find((c) => c.round_id === roundId) || null;
-        return { id, name: p?.full_name || '—', email: p?.email || '', paid, credit };
+        return { id, name: p?.full_name || '—', email: p?.email || '', paid, needsReview, credit };
       });
     },
   });
 
-  const eligible = useMemo(() => students.filter((s) => s.paid > 0 && !s.credit), [students]);
+  const eligible = useMemo(() => students.filter((s) => s.paid > 0 && !s.credit && !s.needsReview), [students]);
   const now = Date.now();
 
   const activate = async () => {
@@ -96,7 +97,7 @@ export function WinBackCreditManager() {
       <div>
         <h3 className="text-lg font-semibold flex items-center gap-2"><Gift className="w-5 h-5" /> Win-Your-Money-Back Credit</h3>
         <p className="text-sm text-muted-foreground">
-          Gives each paid student in a round credit equal to what they paid, valid {WIN_BACK_VALID_DAYS} days, applied automatically at checkout for another program (split over 3 payments on monthly plans).
+          Gives each paid student in a round credit equal to what they paid in USD (foreign payments use the converted amount), valid {WIN_BACK_VALID_DAYS} days, applied automatically at checkout for another program (split over 3 payments on monthly plans).
         </p>
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
@@ -126,8 +127,8 @@ export function WinBackCreditManager() {
                     <p className="text-muted-foreground truncate">{s.email}</p>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    <span>{s.credit ? fmt(s.credit.amount) : s.paid > 0 ? `Paid ${fmt(s.paid)}` : 'No payment'}</span>
-                    {status(s.credit)}
+                    <span>{s.credit ? fmt(s.credit.amount) : s.needsReview ? 'Foreign payment — review' : s.paid > 0 ? `Paid ${fmt(s.paid)}` : 'No payment'}</span>
+                    {s.needsReview && !s.credit ? <Badge variant="outline">Review</Badge> : status(s.credit)}
                   </div>
                 </div>
               ))}
