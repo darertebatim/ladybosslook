@@ -21,6 +21,7 @@ const igads = LEAD_CAMPAIGNS.find((c) => c.key === 'igads');
 const aliagads = LEAD_CAMPAIGNS.find((c) => c.key === 'aliagads');
 const customerVideo = LEAD_CAMPAIGNS.find((c) => c.key === 'customerwithigads');
 const igthree = LEAD_CAMPAIGNS.find((c) => c.key === 'igthree');
+const igadsin = LEAD_CAMPAIGNS.find((c) => c.key === 'igadsin');
 const assertive = LEAD_CAMPAIGNS.find((c) => c.key === 'assertive');
 const startads = LEAD_CAMPAIGNS.find((c) => c.key === 'startads');
 const powerfree = LEAD_CAMPAIGNS.find((c) => c.key === 'powerfree');
@@ -32,7 +33,7 @@ export default function LeadCenter() {
   const [tab, setTab] = useState('campaigns');
   const { inactive } = useInactiveLeadCampaigns();
   const show = (key: string) => !inactive.includes(key);
-  const campaignTabKeys = ['sixtraps', 'smartinsta', 'igads', 'aliagads', 'customerwithigads', 'igthree', 'assertive', 'startads', 'powerfree'];
+  const campaignTabKeys = ['sixtraps', 'smartinsta', 'igads', 'aliagads', 'customerwithigads', 'igthree', 'igadsin', 'assertive', 'startads', 'powerfree'];
   const visibleCampaignTabs = campaignTabKeys.filter(show).length;
   const colCount = 2 + visibleCampaignTabs;
 
@@ -41,7 +42,7 @@ export default function LeadCenter() {
   }, [inactive, tab]);
 
 
-  if (!igads || !aliagads || !customerVideo || !igthree || !assertive || !startads || !powerfree) return null;
+  if (!igads || !aliagads || !customerVideo || !igthree || !igadsin || !assertive || !startads || !powerfree) return null;
 
   return (
     <div className="space-y-6">
@@ -71,6 +72,7 @@ export default function LeadCenter() {
             <TabsTrigger value="customerwithigads">IG Video</TabsTrigger>
           )}
           {show('igthree') && <TabsTrigger value="igthree">IG Three</TabsTrigger>}
+          {show('igadsin') && <TabsTrigger value="igadsin">IG Ads In</TabsTrigger>}
           {show('assertive') && <TabsTrigger value="assertive">Assertive</TabsTrigger>}
           {show('startads') && <TabsTrigger value="startads">Start Ads</TabsTrigger>}
           {show('powerfree') && <TabsTrigger value="powerfree">PowerFree</TabsTrigger>}
@@ -145,6 +147,9 @@ export default function LeadCenter() {
 
 
 
+        <TabsContent value="igadsin" className="space-y-6">
+          <GenericWebinarSignups campaign={igadsin} />
+        </TabsContent>
         <TabsContent value="igthree" className="space-y-6">
           <GenericWebinarSignups campaign={igthree} />
         </TabsContent>

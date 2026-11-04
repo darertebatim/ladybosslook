@@ -250,6 +250,7 @@ const StartAdsThankYou = lazy(() => import("@/pages/StartAdsThankYou"));
 import { POWERFREE_WEBINAR } from "@/lib/dedicatedWebinars";
 const IgThreeGate = lazy(() => import("@/pages/IgThreeGate"));
 const IgThreeWatch = lazy(() => import("@/pages/IgThreeWatch"));
+const IgAdsInGate = lazy(() => import("@/pages/IgAdsInGate"));
 const FarewellPage = lazy(() => import("@/pages/FarewellPage"));
 const CustomerWithIgAdsLanding = lazy(() => import("@/pages/CustomerWithIgAdsLanding"));
 const SmartInstaLanding = lazy(() => import("@/pages/SmartInstaLanding"));
@@ -614,6 +615,7 @@ const App = () => (
                   {!isNativeApp() && <Route path="/r/powerfree/gifts" element={<IgAdsGifts campaign={POWERFREE_WEBINAR} />} />}
                   {!isNativeApp() && <Route path="/r/powerfree/giftsvip" element={<GiftsAliLotfiVip />} />}
                   <Route path="/l/igthree" element={<IgThreeGate />} />
+                  <Route path="/l/igadsin" element={<IgAdsInGate />} />
                   <Route path="/l/igthree/watch" element={<IgThreeWatch />} />
                   <Route path="/l/farewell" element={<FarewellPage />} />
                   <Route path="/l/assertive" element={<CustomerWithIgAdsLanding videoId="GcZQl7TGk48" source="assertive_waitlist" metaEvent="AssertiveLead" />} />
