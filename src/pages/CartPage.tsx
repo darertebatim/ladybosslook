@@ -75,6 +75,9 @@ const CartPage = () => {
     queryKey: ['win-back-credit', user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
+      // Includes credit issued to any merged/linked account of this user.
+      const { data: fam } = await supabase.functions.invoke('win-back-credit-status');
+      if (fam?.rows) return fam.rows;
       const { data } = await supabase.from('credit_transactions')
         .select('id, amount, description, created_at, transaction_type')
         .eq('user_id', user!.id).in('transaction_type', [WIN_BACK_GRANT, WIN_BACK_REDEEMED]);

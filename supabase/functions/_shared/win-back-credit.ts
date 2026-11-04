@@ -16,17 +16,33 @@ export interface ActiveWinBackCredit {
 
 const parse = (s: string | null) => { try { return s ? JSON.parse(s) : {}; } catch { return {}; } };
 
+/** All account ids merged with this user (primary + aliases), so credit follows any linked email. */
+export async function familyIds(supabase: any, userId: string): Promise<string[]> {
+  try {
+    const { data } = await supabase.rpc('account_family_ids', { _uid: userId });
+    const ids = (data || []).map((r: any) => (typeof r === 'string' ? r : r.account_family_ids)).filter(Boolean);
+    return [...new Set([userId, ...ids])];
+  } catch {
+    return [userId];
+  }
+}
+
+export async function getWinBackRows(supabase: any, userId: string): Promise<any[]> {
+  const ids = await familyIds(supabase, userId);
+  const { data } = await supabase
+    .from('credit_transactions')
+    .select('id, amount, description, created_at, transaction_type')
+    .in('user_id', ids)
+    .in('transaction_type', [WIN_BACK_GRANT, WIN_BACK_REDEEMED]);
+  return (data || []) as any[];
+}
+
 export async function getActiveWinBackCredit(
   supabase: any,
   userId: string,
   targetProgramSlug?: string,
 ): Promise<ActiveWinBackCredit | null> {
-  const { data } = await supabase
-    .from('credit_transactions')
-    .select('id, amount, description, created_at, transaction_type')
-    .eq('user_id', userId)
-    .in('transaction_type', [WIN_BACK_GRANT, WIN_BACK_REDEEMED]);
-  const rows = (data || []) as any[];
+  const rows = await getWinBackRows(supabase, userId);
   const redeemed = new Set(
     rows.filter((r) => r.transaction_type === WIN_BACK_REDEEMED).map((r) => parse(r.description).grant_id),
   );
