@@ -63,7 +63,7 @@ export function WinBackCreditManager() {
     },
   });
 
-  const eligible = useMemo(() => students.filter((s) => s.paid > 0 && !s.credit), [students]);
+  const eligible = useMemo(() => students.filter((s) => s.paid > 0 && !s.credit && !s.needsReview), [students]);
   const now = Date.now();
 
   const activate = async () => {
@@ -127,8 +127,8 @@ export function WinBackCreditManager() {
                     <p className="text-muted-foreground truncate">{s.email}</p>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    <span>{s.credit ? fmt(s.credit.amount) : s.paid > 0 ? `Paid ${fmt(s.paid)}` : 'No payment'}</span>
-                    {status(s.credit)}
+                    <span>{s.credit ? fmt(s.credit.amount) : s.needsReview ? 'Foreign payment — review' : s.paid > 0 ? `Paid ${fmt(s.paid)}` : 'No payment'}</span>
+                    {s.needsReview && !s.credit ? <Badge variant="outline">Review</Badge> : status(s.credit)}
                   </div>
                 </div>
               ))}
