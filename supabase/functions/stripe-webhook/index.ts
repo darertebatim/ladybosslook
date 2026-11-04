@@ -282,6 +282,31 @@ serve(async (req) => {
       
       console.log('[WEBHOOK] Processing checkout session:', session.id, 'Mode:', session.mode);
 
+      // Mark a Win-Your-Money-Back credit as used (idempotent per grant)
+      const winBackId = session.metadata?.win_back_credit_id;
+      const winBackUser = session.metadata?.auth_user_id || session.metadata?.user_id;
+      if (winBackId && winBackUser) {
+        try {
+          const { data: existing } = await supabase
+            .from('credit_transactions')
+            .select('id')
+            .eq('user_id', winBackUser)
+            .eq('transaction_type', 'win_back_redeemed')
+            .like('description', `%${winBackId}%`)
+            .limit(1);
+          if (!existing?.length) {
+            await supabase.from('credit_transactions').insert({
+              user_id: winBackUser,
+              amount: 0,
+              transaction_type: 'win_back_redeemed',
+              description: JSON.stringify({ grant_id: winBackId, session_id: session.id }),
+            });
+          }
+        } catch (e: any) {
+          console.error('[WEBHOOK] Win-back redemption record failed:', e?.message);
+        }
+      }
+
       // Get customer details
       const customerEmail = session.customer_details?.email || session.customer_email;
       const customerName = session.customer_details?.name || '';
