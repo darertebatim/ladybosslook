@@ -131,29 +131,6 @@ export default function IgAdsInGate() {
           </div>
         </form>
 
-        <section className="rounded-2xl bg-white p-4 shadow-ios">
-          <h2 className="mb-3 text-base font-extrabold text-neutral-900">در این آموزش یاد می‌گیری:</h2>
-          <ul className="space-y-2.5">
-            {LEARN.map((t) => (
-              <li key={t} className="flex gap-2 text-sm leading-6 text-neutral-800">
-                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-rose-500" />
-                {t}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="rounded-2xl bg-white p-4 shadow-ios">
-          <h2 className="mb-3 text-base font-extrabold text-neutral-900">این آموزش برای توست اگر:</h2>
-          <ul className="space-y-2.5">
-            {FOR_YOU.map((t) => (
-              <li key={t} className="flex gap-2 text-sm leading-6 text-neutral-800">
-                <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-amber-500" />
-                {t}
-              </li>
-            ))}
-          </ul>
-        </section>
 
         <section className="rounded-2xl bg-neutral-900 p-4 text-white">
           <div className="mb-2 flex items-center gap-2">
