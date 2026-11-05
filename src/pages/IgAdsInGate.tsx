@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { z } from "zod";
-import { ArrowDown, CheckCircle2, Clock, MailX, ShieldCheck, Users } from "lucide-react";
+import { ArrowDown, CheckCircle2, Clock, Mail, MailX, ShieldCheck, Users } from "lucide-react";
 import coverAsset from "@/assets/igadsin_cover.webp.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { trackWebinarLead } from "@/lib/metaCapi";
@@ -91,13 +91,16 @@ export default function IgAdsInGate() {
           با علی لطفی · بیش از ۲۰۰ بیزینس منتورشده
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-2.5">
+        <form onSubmit={handleSubmit} className="space-y-3 rounded-2xl border-2 border-rose-200 bg-white p-4 shadow-ios">
           <p className="text-center text-sm font-bold text-neutral-900">
             ایمیل خود را وارد کنید تا آموزش همین الان باز شود
           </p>
           <div className="flex justify-center" aria-hidden="true">
             <ArrowDown className="h-7 w-7 animate-bounce text-rose-500" />
           </div>
+          <label className="block text-right text-sm font-bold text-neutral-800">ایمیل خود را بنویسید</label>
+          <div className="relative">
+            <Mail className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-rose-500" aria-hidden="true" />
           <input
             ref={inputRef}
             type="email"
@@ -110,8 +113,9 @@ export default function IgAdsInGate() {
             placeholder="you@example.com"
             dir="ltr"
             maxLength={255}
-            className="min-h-[52px] w-full rounded-xl border border-neutral-300 bg-white px-4 text-base text-neutral-900 outline-none focus:border-rose-500"
+            className="min-h-[56px] w-full rounded-xl border-2 border-neutral-300 bg-neutral-50 pl-12 pr-4 text-lg text-neutral-900 outline-none focus:border-rose-500 focus:bg-white"
           />
+          </div>
           {error && <p className="text-center text-xs text-rose-600">{error}</p>}
           <button
             type="submit"
