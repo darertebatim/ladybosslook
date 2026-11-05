@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { z } from "zod";
-import { ArrowDown, CheckCircle2, Clock, Mail, MailX, ShieldCheck, Users } from "lucide-react";
+import { ArrowDown, Clock, Mail, MailX, ShieldCheck, Users } from "lucide-react";
 import coverAsset from "@/assets/igadsin_cover.webp.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { trackWebinarLead } from "@/lib/metaCapi";
@@ -12,18 +12,7 @@ export const IGADSIN_EMAIL_KEY = "igadsin_email";
 const TITLE = "نقشه راه جذب مشتری با تبلیغ اینستاگرامی";
 const emailSchema = z.string().trim().email().max(255);
 
-const LEARN = [
-  "۶ اشتباهی که باعث می‌شود تبلیغات اینستاگرام شکست بخورد",
-  "فرمول ۳ مرحله‌ای جذب مشتری از تبلیغات",
-  "اینکه برای بیزینس تو کدام روش و کدام کمپین نتیجه می‌دهد",
-  "چطور ظرفیت‌های خالی بیزینست را با مشتری اینستاگرامی پر کنی",
-];
 
-const FOR_YOU = [
-  "در آمریکا یا کانادا بیزینس داری و می‌خواهی مشتری جدید اضافه کنی",
-  "قبلاً تبلیغ کردی و پولت بی‌نتیجه سوخت",
-  "می‌خواهی خودت این کار را بلد باشی، نه اینکه به دیگران بسپاری",
-];
 
 export default function IgAdsInGate() {
   const navigate = useNavigate();
