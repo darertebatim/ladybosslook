@@ -856,12 +856,36 @@ serve(async (req) => {
         rows.push(...(page || []));
         if (!page || page.length < 1000) break;
       }
+      // "Missed it": invite each person to the upcoming round in the same
+      // time slot they originally picked (e.g. Europe/noon slot -> next
+      // Europe/noon slot, US evening -> next US evening). Slot = UTC time of day.
+      const slotRound = new Map<string, string>();
+      if (nextSession) {
+        const futureRounds = (upcomingRounds || []).filter(
+          (x: any) => new Date(x.first_session_date) > new Date(),
+        );
+        const pastIds = [...new Set(rows.map((x: any) => x.round_id).filter(Boolean))];
+        if (pastIds.length && futureRounds.length) {
+          const { data: pastRounds } = await supabase
+            .from("program_rounds").select("id, first_session_date").in("id", pastIds);
+          const slot = (d: string) => new Date(d).toISOString().slice(11, 16);
+          for (const pr of pastRounds || []) {
+            if (!pr.first_session_date) continue;
+            const match = futureRounds.find((f: any) => slot(f.first_session_date) === slot(pr.first_session_date));
+            if (match) slotRound.set(pr.id, match.id);
+          }
+        }
+      }
       const seen = new Set<string>();
       for (const r of rows || []) {
         const em = String(r.email || "").trim().toLowerCase();
         if (!em || seen.has(em)) continue;
         seen.add(em);
-        recipients.push({ email: em, name: (r.name || "دوست عزیز").trim(), roundId: autoMode ? (r as any).round_id : targetRoundId });
+        recipients.push({ email: em, name: (r.name || "دوست عزیز").trim(), roundId: autoMode
+          ? (r as any).round_id
+          : nextSession
+            ? slotRound.get((r as any).round_id) || targetRoundId
+            : targetRoundId });
       }
     }
 
