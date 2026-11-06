@@ -55,9 +55,44 @@ interface Campaign {
   nextSessionShowTimes?: boolean;
   /** Extra block rendered right after the signup button in the "next session" email. */
   nextSessionAfterCta?: string;
+  /** Sender line + signature (defaults to Ali Lotfi). */
+  from?: string;
+  signoff?: string;
+  nextSessionCta?: string;
 }
 
 const CAMPAIGNS: Record<string, Campaign> = {
+  powerfree: {
+    programSlug: "powerfree",
+    sources: ["powerfree_registration", "powerfree_waitlist"],
+    prereqUrl: "https://ladybosslook.com/r/powerfree/thankyou",
+    signupUrl: "https://ladybosslook.com/r/powerfree",
+    fallbackTitle: "وبینار رایگان قدرت دو زبانه",
+    reminderHeadline: "",
+    reminderClosing: "",
+    from: "Razie Ladyboss <hi@ladybosslook.com>",
+    signoff: "راضیه لیدی‌باس",
+    nextSessionCta: "رزرو صندلی در جلسه جدید",
+    subjects: {
+      reminder: "", joinNow: "", morning: "", timeChange: "",
+      nextSession: "خانم رئیس، جات توی وبینار قدرت دو زبانه خالی بود 🤍 (یک فرصت دیگه)",
+    },
+    morningBody: "",
+    nextSessionBody: [
+      p("جات توی وبینار زنده <strong>«قدرت دو زبانه»</strong> خالی بود 🤍"),
+      p("می‌دونم زندگی بعد از مهاجرت چقدر شلوغه — کار، بچه‌ها، خستگی… و دقیقاً برای همین این وبینار رو ساختم."),
+      p("<strong>توی اون ۹۰ دقیقه با هم دیدیم:</strong>"),
+      `<ul style="margin:0 0 14px;padding:0 20px 0 0;font-size:15px;line-height:2;">
+        <li>چرا بعد از مهاجرت اعتماد به نفس و قدرتمون افت می‌کنه</li>
+        <li>۳ باور اشتباهی که ما رو سال‌ها عقب نگه می‌داره</li>
+        <li>نقشه راه رسیدن به قدرت ۱۰ برابری در هر دو زبان</li>
+        <li>و یک تست قدرت درونی + PDF تحلیلش که فقط به حاضرین هدیه دادیم 🎁</li>
+      </ul>`,
+      p("خبر خوب: <strong>یک جلسه زنده دیگه</strong> برگزار می‌کنم. وبینار بازپخش نداره و فقط زنده‌ست — پس این بار صندلیت رو نگه دار 👇"),
+    ].join(""),
+    nextSessionShowTimes: true,
+    nextSessionAfterCta: p("سوالی داشتی؟ <strong>همین ایمیل رو جواب بده</strong> — خودم می‌خونم."),
+  },
   sixtraps: {
     programSlug: "instagram6traps",
     sources: ["sixtraps_registration", "presixtraps_interest"],
@@ -582,7 +617,7 @@ function buildNextSessionHtml(
 
       <p style="text-align:center;margin:22px 0;">
         <a href="${c.signupUrl}" style="display:inline-block;background:#e11d48;color:#fff;text-decoration:none;padding:16px 32px;border-radius:12px;font-size:17px;font-weight:bold;">
-          ثبت‌نام در جلسه جدید
+          ${c.nextSessionCta ?? "ثبت‌نام در جلسه جدید"}
         </a>
       </p>
 
@@ -600,7 +635,7 @@ function buildNextSessionHtml(
       <p style="margin:18px 0 0;font-size:13px;color:#6b7280;line-height:1.9;">
         سوالی داشتی؟ <a href="${supportUrl}" style="color:#EA5B2B;">از اپ ریلو با ما چت کن 💬</a>
         <br>روی کامپیوتر هستی؟ <a href="https://ladybosslook.com/dashboard/chat" style="color:#EA5B2B;">چت پشتیبانی در داشبورد</a> — یا همین ایمیل را جواب بده.
-        <br><br>علی لطفی
+        <br><br>${c.signoff ?? "علی لطفی"}
       </p>
     </div>
   </body>
@@ -923,7 +958,7 @@ serve(async (req) => {
               : buildHtml(c, r.name, startUtc, meetUrl, gcalUrl, supportUrl);
       const unsubUrl = await buildUnsubUrl(r.email);
       const { data: sendData, error } = await resend.emails.send({
-        from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>",
+        from: c.from ?? "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>",
         to: [r.email],
         subject: timeChange
           ? c.subjects.timeChange
