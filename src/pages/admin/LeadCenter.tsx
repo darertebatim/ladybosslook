@@ -171,6 +171,13 @@ export default function LeadCenter() {
 
         <TabsContent value="powerfree" className="space-y-6">
           <StartAdsShowUpEmails programSlug="powerfree" label="PowerFree" basePath="/r/powerfree" source={powerfree.regSource} />
+          <WebinarEmailSender
+            campaignKey="powerfree"
+            programSlug={powerfree.programSlug}
+            sources={[powerfree.regSource, ...powerfree.extraSources]}
+            signupPath={powerfree.landingPath}
+            nextSessionOnly
+          />
           <WebinarRoundBreakdown
             programSlug={powerfree.programSlug}
             campaignKey="powerfree"

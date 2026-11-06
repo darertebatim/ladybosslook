@@ -49,9 +49,11 @@ interface Props {
   sources: string[];
   /** e.g. /l/igadsfree — shown in the "next session" description */
   signupPath: string;
+  /** Only show the "Missed it? Next session" invite card. */
+  nextSessionOnly?: boolean;
 }
 
-export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPath }: Props) {
+export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPath, nextSessionOnly }: Props) {
   const [testEmail, setTestEmail] = useState('');
   const [sending, setSending] = useState<SendKey>(null);
   const [roundChoice, setRoundChoice] = useState('auto');
@@ -366,6 +368,65 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
           minute: '2-digit',
         })
       : '';
+
+  if (nextSessionOnly) {
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <Input value={testEmail} onChange={(e) => setTestEmail(e.target.value)} placeholder="test@email.com" className="w-64" />
+          <span className="text-xs text-muted-foreground">Test email address</span>
+        </div>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">“Missed it? Next session” invite</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Farsi email for people who missed the live class: announces the next session (auto-uses
+            the next upcoming round and its times per city) with a big button to{' '}
+            <span dir="ltr">{signupPath}</span> to sign up.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <Select value={nextAudienceRound} onValueChange={setNextAudienceRound}>
+              <SelectTrigger className="w-72">
+                <SelectValue placeholder="Audience round" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All signups (any round)</SelectItem>
+                {(rounds || []).map((r) => (
+                  <SelectItem key={r.id} value={r.id}>
+                    {roundLabel(r.id)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={onlyUnsentNext}
+                onChange={(e) => setOnlyUnsentNext(e.target.checked)}
+              />
+              Only those who haven't received it
+            </label>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => send('test', false, true)}
+              disabled={!!sending}
+            >
+              {spinner('next-test')} Send test
+            </Button>
+            <Button size="sm" onClick={() => send('all', false, true)} disabled={!!sending}>
+              {spinner('next-all')} Send invite to {nextSessionTargetCount}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
