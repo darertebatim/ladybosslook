@@ -314,13 +314,13 @@ export default function IgAdsProgramLanding({ variant = "long" }: { variant?: "l
               <br />
               جذب مشتری با تبلیغات اینستاگرامی
             </p>
-            <div className="mt-3 flex items-center justify-center gap-1 text-[10px] font-bold min-[360px]:text-[11px] min-[400px]:text-[12px]">
+            <div className="mt-3 flex items-center justify-center gap-0.5 text-[9px] font-bold min-[360px]:text-[10.5px] min-[400px]:text-[12px]">
               {[
                 [Clock, "۳ هفته"], [Video, "۳ لایو ۲ ساعته"], [BookOpen, "۶ پلی‌بوک"], [MessageCircle, "پشتیبانی چت"],
               ].map(([Icon, t], i) => {
                 const I = Icon as typeof Clock;
                 return (
-                  <span key={i} className="flex items-center justify-center gap-1 whitespace-nowrap rounded-xl bg-card px-1 py-2 shadow-ios min-[360px]:px-1.5 min-[400px]:px-2">
+                  <span key={i} className="flex items-center justify-center gap-1 whitespace-nowrap rounded-xl bg-card px-1 py-2 shadow-ios min-[400px]:px-2">
                     <I className="h-3.5 w-3.5 shrink-0 text-primary" /> {t as string}
                   </span>
                 );
