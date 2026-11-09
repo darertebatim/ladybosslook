@@ -384,10 +384,31 @@ const ProgramPage = () => {
             <div className="grid lg:grid-cols-3 gap-4 lg:gap-8">
               {/* Left: Top details */}
               <div className="lg:col-span-2 space-y-4 lg:space-y-6">
-                {/* Cover image */}
-                {program.cover_image_url && (
-                  <div className="aspect-[16/10] lg:aspect-video rounded-xl lg:rounded-2xl overflow-hidden">
-                    <img src={program.cover_image_url} alt={program.title} className="w-full h-full object-cover" />
+                {/* Cover image — becomes the video thumbnail when a video is set */}
+                {(program.video_url || program.cover_image_url) && (
+                  <div className="aspect-[16/10] lg:aspect-video rounded-xl lg:rounded-2xl overflow-hidden bg-muted relative">
+                    {program.video_url ? (
+                      playing ? (
+                        program.video_url.includes('youtube') || program.video_url.includes('youtu.be') || program.video_url.includes('vimeo') ? (
+                          <TrackedIframe src={autoplayEmbedUrl(program.video_url)} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title={program.title} />
+                        ) : (
+                          <TrackedVideo src={program.video_url} controls autoPlay poster={program.cover_image_url ?? undefined} className="w-full h-full object-cover" title={program.title} />
+                        )
+                      ) : (
+                        <button type="button" onClick={() => setPlaying(true)} className="absolute inset-0 w-full h-full" aria-label="Play video">
+                          {program.cover_image_url && (
+                            <img src={program.cover_image_url} alt={program.title} className="w-full h-full object-cover" />
+                          )}
+                          <span className="absolute inset-0 flex items-center justify-center bg-black/20">
+                            <span className="flex h-16 w-16 lg:h-20 lg:w-20 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-ios transition-transform active:scale-95">
+                              <Play className="h-7 w-7 lg:h-8 lg:w-8 fill-current ml-1" />
+                            </span>
+                          </span>
+                        </button>
+                      )
+                    ) : (
+                      <img src={program.cover_image_url!} alt={program.title} className="w-full h-full object-cover" />
+                    )}
                   </div>
                 )}
 
