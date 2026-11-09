@@ -309,12 +309,16 @@ export default function IgAdsProgramLanding({ variant = "long" }: { variant?: "l
 
           <div className="mt-4 rounded-3xl bg-primary/10 px-4 py-4">
             <p className="text-xs font-bold text-primary">برنامه‌ای که در ویدیو معرفی شد</p>
-            <p className="mt-1 text-lg font-black leading-7 text-foreground">دوره ۳ هفته‌ای جذب مشتری با تبلیغات اینستاگرامی</p>
+            <p className="mt-1 text-lg font-black leading-7 text-foreground">
+              دوره ۳ هفته‌ای جدید آکادمی رایلو
+              <br />
+              جذب مشتری با تبلیغات اینستاگرامی
+            </p>
             <div className="mt-4">
               <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
               <p className="mt-2 text-xs leading-6 text-foreground/80">{CURRENCY_NOTE}</p>
-              <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-success/15 px-4 py-2 text-sm font-extrabold text-success">
-                <Shield className="h-4 w-4" /> ۳۰ روز ضمانت بازگشت کامل وجه، بدون هیچ سؤالی
+              <span className="mt-2 inline-flex max-w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-success/15 px-3 py-2 text-[11px] font-extrabold text-success min-[360px]:text-[12.5px] min-[400px]:text-sm">
+                <Shield className="h-4 w-4 shrink-0" /> ۳۰ روز ضمانت بازگشت کامل وجه، بدون هیچ سؤالی
               </span>
             </div>
           </div>
