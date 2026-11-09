@@ -2,7 +2,7 @@ import { TrackedIframe, TrackedVideo } from "@/components/TrackedIframe";
 import { useEffect, useState, Fragment } from 'react';
 import { useParams, Navigate, Link, useNavigate } from 'react-router-dom';
 import { supabase, browserTimezone } from '@/integrations/supabase/client';
-import { Loader2, Check, MessageCircle, ShoppingCart, Clock, ArrowLeft, Calendar, Video, ShieldCheck, Lock } from 'lucide-react';
+import { Loader2, Check, MessageCircle, ShoppingCart, Clock, ArrowLeft, Calendar, Video, ShieldCheck, Lock, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Navigation from '@/components/ui/navigation';
@@ -90,6 +90,11 @@ const convertToEmbedUrl = (url: string): string => {
   return url;
 };
 
+const autoplayEmbedUrl = (url: string): string => {
+  const embed = convertToEmbedUrl(url);
+  return embed.includes('?') ? `${embed}&autoplay=1` : `${embed}?autoplay=1`;
+};
+
 const ProgramPage = () => {
   const { slug, tierSlug } = useParams<{ slug: string; tierSlug?: string }>();
   const navigate = useNavigate();
@@ -104,6 +109,7 @@ const ProgramPage = () => {
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'full'>('monthly');
   const [checkingOut, setCheckingOut] = useState(false);
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     const fetchProgram = async () => {
@@ -378,10 +384,31 @@ const ProgramPage = () => {
             <div className="grid lg:grid-cols-3 gap-4 lg:gap-8">
               {/* Left: Top details */}
               <div className="lg:col-span-2 space-y-4 lg:space-y-6">
-                {/* Cover image */}
-                {program.cover_image_url && (
-                  <div className="aspect-[16/10] lg:aspect-video rounded-xl lg:rounded-2xl overflow-hidden">
-                    <img src={program.cover_image_url} alt={program.title} className="w-full h-full object-cover" />
+                {/* Cover image — becomes the video thumbnail when a video is set */}
+                {(program.video_url || program.cover_image_url) && (
+                  <div className="aspect-[16/10] lg:aspect-video rounded-xl lg:rounded-2xl overflow-hidden bg-muted relative">
+                    {program.video_url ? (
+                      playing ? (
+                        program.video_url.includes('youtube') || program.video_url.includes('youtu.be') || program.video_url.includes('vimeo') ? (
+                          <TrackedIframe src={autoplayEmbedUrl(program.video_url)} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title={program.title} />
+                        ) : (
+                          <TrackedVideo src={program.video_url} controls autoPlay poster={program.cover_image_url ?? undefined} className="w-full h-full object-cover" title={program.title} />
+                        )
+                      ) : (
+                        <button type="button" onClick={() => setPlaying(true)} className="absolute inset-0 w-full h-full" aria-label="Play video">
+                          {program.cover_image_url && (
+                            <img src={program.cover_image_url} alt={program.title} className="w-full h-full object-cover" />
+                          )}
+                          <span className="absolute inset-0 flex items-center justify-center bg-black/20">
+                            <span className="flex h-16 w-16 lg:h-20 lg:w-20 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-ios transition-transform active:scale-95">
+                              <Play className="h-7 w-7 lg:h-8 lg:w-8 fill-current ml-1" />
+                            </span>
+                          </span>
+                        </button>
+                      )
+                    ) : (
+                      <img src={program.cover_image_url!} alt={program.title} className="w-full h-full object-cover" />
+                    )}
                   </div>
                 )}
 
@@ -409,19 +436,6 @@ const ProgramPage = () => {
                     )}
                   </div>
                 </div>
-
-                {/* Video */}
-                {program.video_url && (
-                  <div className="aspect-[16/10] lg:aspect-video rounded-xl lg:rounded-2xl overflow-hidden bg-muted">
-                    {program.video_url.includes('youtube') || program.video_url.includes('youtu.be') ? (
-                      <TrackedIframe src={convertToEmbedUrl(program.video_url)} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title={program.title} />
-                    ) : program.video_url.includes('vimeo') ? (
-                      <TrackedIframe src={convertToEmbedUrl(program.video_url)} className="w-full h-full" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen title={program.title} />
-                    ) : (
-                      <TrackedVideo src={program.video_url} controls className="w-full h-full object-cover" />
-                    )}
-                  </div>
-                )}
 
               </div>
 
