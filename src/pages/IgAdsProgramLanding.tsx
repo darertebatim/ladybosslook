@@ -17,7 +17,7 @@ import vslCoverShort from "@/assets/igads-vsl11-cover.webp.asset.json";
 const PROGRAM_SLUG = "casigads";
 /** variant "short" = 11-min VSL page at /l/igadsvsl. Set SHORT_VSL_ID once the video is uploaded. */
 const LONG_VSL_ID = "VwTKgHp8APw";
-const SHORT_VSL_ID = "";
+const SHORT_VSL_ID = "THvut8z-cOg";
 
 const fa = (n: number) => n.toLocaleString("fa-IR");
 
