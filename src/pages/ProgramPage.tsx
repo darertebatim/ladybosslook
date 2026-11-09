@@ -437,19 +437,6 @@ const ProgramPage = () => {
                   </div>
                 </div>
 
-                {/* Video */}
-                {program.video_url && (
-                  <div className="aspect-[16/10] lg:aspect-video rounded-xl lg:rounded-2xl overflow-hidden bg-muted">
-                    {program.video_url.includes('youtube') || program.video_url.includes('youtu.be') ? (
-                      <TrackedIframe src={convertToEmbedUrl(program.video_url)} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title={program.title} />
-                    ) : program.video_url.includes('vimeo') ? (
-                      <TrackedIframe src={convertToEmbedUrl(program.video_url)} className="w-full h-full" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen title={program.title} />
-                    ) : (
-                      <TrackedVideo src={program.video_url} controls className="w-full h-full object-cover" />
-                    )}
-                  </div>
-                )}
-
               </div>
 
               {/* Right: Sticky pricing card with round details directly beneath it */}
