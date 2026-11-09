@@ -11,10 +11,13 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { TrackedIframe } from "@/components/TrackedIframe";
 import { supabase, browserTimezone } from "@/integrations/supabase/client";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
-import vslCover from "@/assets/igads-vsl-cover.png.asset.json";
+import vslCoverLong from "@/assets/igads-vsl-cover.png.asset.json";
+import vslCoverShort from "@/assets/igads-vsl11-cover.webp.asset.json";
 
 const PROGRAM_SLUG = "casigads";
-const VSL_ID = "VwTKgHp8APw";
+/** variant "short" = 11-min VSL page at /l/igadsvsl. Set SHORT_VSL_ID once the video is uploaded. */
+const LONG_VSL_ID = "VwTKgHp8APw";
+const SHORT_VSL_ID = "";
 
 const fa = (n: number) => n.toLocaleString("fa-IR");
 
@@ -197,7 +200,10 @@ const FAQ = [
   { q: "گارانتی بازگشت وجه چطوریه؟", a: "۳۰ روز فرصت داری. اگه به هر دلیلی این برنامه مناسبت نبود، با یک پیام به پشتیبانی کل مبلغ رو بدون هیچ سؤالی پس می‌گیری." },
 ];
 
-export default function IgAdsProgramLanding() {
+export default function IgAdsProgramLanding({ variant = "long" }: { variant?: "long" | "short" }) {
+  const isShort = variant === "short";
+  const VSL_ID = isShort ? SHORT_VSL_ID : LONG_VSL_ID;
+  const vslCover = isShort ? vslCoverShort : vslCoverLong;
   const price = useProgramPrice();
   const schedule = useNextRoundSchedule();
   const [loading, setLoading] = useState(false);
@@ -262,7 +268,7 @@ export default function IgAdsProgramLanding() {
           <div className="mt-2 flex items-center justify-center gap-2">
             <HintArrow dir="down" />
             <p className="whitespace-nowrap text-[13px] font-bold leading-6 text-foreground/80">
-              ۵۰ دقیقه آموزش قدم‌به‌قدم جذب مشتری پایدار
+              {isShort ? "۱۱ دقیقه معرفی دوره جذب مشتری پایدار" : "۵۰ دقیقه آموزش قدم‌به‌قدم جذب مشتری پایدار"}
             </p>
             <HintArrow dir="down" />
           </div>
@@ -282,7 +288,7 @@ export default function IgAdsProgramLanding() {
                   />
                 </div>
               ) : (
-                <button type="button" onClick={() => setPlaying(true)} className="absolute inset-0 h-full w-full" aria-label="پخش ویدیو">
+                <button type="button" onClick={() => VSL_ID && setPlaying(true)} className="absolute inset-0 h-full w-full" aria-label="پخش ویدیو">
                   <img src={vslCover.url} alt="نقشه راه جذب مشتری با تبلیغات اینستاگرامی" className="h-full w-full object-cover" />
                   <span className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-primary shadow-ios transition active:scale-95">
                     <Play className="h-9 w-9 translate-x-0.5 fill-primary-foreground text-primary-foreground" />
