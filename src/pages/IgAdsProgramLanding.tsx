@@ -314,6 +314,18 @@ export default function IgAdsProgramLanding({ variant = "long" }: { variant?: "l
               <br />
               جذب مشتری با تبلیغات اینستاگرامی
             </p>
+            <div className="mt-3 flex items-center justify-center gap-0.5 text-[9px] font-bold min-[360px]:text-[10.5px] min-[400px]:text-[12px]">
+              {[
+                [Clock, "۳ هفته"], [Video, "۳ لایو ۲ ساعته"], [BookOpen, "۶ پلی‌بوک"], [MessageCircle, "پشتیبانی چت"],
+              ].map(([Icon, t], i) => {
+                const I = Icon as typeof Clock;
+                return (
+                  <span key={i} className="flex items-center justify-center gap-1 whitespace-nowrap rounded-xl bg-card px-1 py-2 shadow-ios min-[400px]:px-2">
+                    <I className="h-3.5 w-3.5 shrink-0 text-primary" /> {t as string}
+                  </span>
+                );
+              })}
+            </div>
             <div className="mt-4">
               <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
               <p className="mt-2 text-xs leading-6 text-foreground/80">{CURRENCY_NOTE}</p>
@@ -321,19 +333,6 @@ export default function IgAdsProgramLanding({ variant = "long" }: { variant?: "l
                 <Shield className="h-4 w-4 shrink-0" /> ۳۰ روز ضمانت بازگشت کامل وجه، بدون هیچ سؤالی
               </span>
             </div>
-          </div>
-
-          <div className="mt-4 grid grid-cols-2 gap-2 text-sm font-bold">
-            {[
-              [Clock, "۳ هفته"], [Video, "۳ لایو ۲ ساعته"], [BookOpen, "۶ پلی‌بوک"], [MessageCircle, "پشتیبانی چت"],
-            ].map(([Icon, t], i) => {
-              const I = Icon as typeof Clock;
-              return (
-                <span key={i} className="flex items-center justify-center gap-1.5 rounded-2xl bg-card px-3 py-3 shadow-ios">
-                  <I className="h-4 w-4 text-primary" /> {t as string}
-                </span>
-              );
-            })}
           </div>
 
 
