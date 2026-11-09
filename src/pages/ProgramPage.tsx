@@ -109,6 +109,7 @@ const ProgramPage = () => {
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'full'>('monthly');
   const [checkingOut, setCheckingOut] = useState(false);
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     const fetchProgram = async () => {
