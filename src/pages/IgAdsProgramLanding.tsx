@@ -317,7 +317,7 @@ export default function IgAdsProgramLanding({ variant = "long" }: { variant?: "l
             <div className="mt-4">
               <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
               <p className="mt-2 text-xs leading-6 text-foreground/80">{CURRENCY_NOTE}</p>
-              <span className="mt-2 inline-flex max-w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-success/15 px-3 py-2 text-[12.5px] font-extrabold text-success min-[400px]:text-sm">
+              <span className="mt-2 inline-flex max-w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-success/15 px-3 py-2 text-[11px] font-extrabold text-success min-[360px]:text-[12.5px] min-[400px]:text-sm">
                 <Shield className="h-4 w-4 shrink-0" /> ۳۰ روز ضمانت بازگشت کامل وجه، بدون هیچ سؤالی
               </span>
             </div>
