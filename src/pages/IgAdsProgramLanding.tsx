@@ -263,12 +263,12 @@ export default function IgAdsProgramLanding({ variant = "long" }: { variant?: "l
 
           <div className="mt-3 rounded-3xl bg-card p-4 shadow-ios">
           <h1 className="text-[26px] font-black leading-[1.6] text-foreground">
-            نقشه راه جذب <span className="text-primary">مشتری‌های جدید</span> با تبلیغات اینستاگرامی
+            {isShort ? "سیستم" : "نقشه راه"} جذب <span className="text-primary">مشتری‌های جدید</span> با تبلیغات اینستاگرامی
           </h1>
           <div className="mt-2 flex items-center justify-center gap-2">
             <HintArrow dir="down" />
             <p className="whitespace-nowrap text-[13px] font-bold leading-6 text-foreground/80">
-              {isShort ? "۱۱ دقیقه معرفی دوره جذب مشتری پایدار" : "۵۰ دقیقه آموزش قدم‌به‌قدم جذب مشتری پایدار"}
+              {isShort ? "۱۱ دقیقه معرفی سیستم جذب مشتری پایدار" : "۵۰ دقیقه آموزش قدم‌به‌قدم جذب مشتری پایدار"}
             </p>
             <HintArrow dir="down" />
           </div>
