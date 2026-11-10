@@ -267,8 +267,8 @@ export default function IgAdsProgramLanding({ variant = "long" }: { variant?: "l
           </h1>
           <div className="mt-2 flex items-center justify-center gap-2">
             <HintArrow dir="down" />
-            <p className="whitespace-nowrap text-[13px] font-bold leading-6 text-foreground/80">
-              {isShort ? "۱۱ دقیقه معرفی سیستم جذب مشتری پایدار" : "۵۰ دقیقه آموزش قدم‌به‌قدم جذب مشتری پایدار"}
+            <p className={`whitespace-nowrap text-[13px] font-bold leading-6 ${isShort ? "text-primary" : "text-foreground/80"}`}>
+              {isShort ? "همین الان ۱۱ دقیقه ببین" : "۵۰ دقیقه آموزش قدم‌به‌قدم جذب مشتری پایدار"}
             </p>
             <HintArrow dir="down" />
           </div>
