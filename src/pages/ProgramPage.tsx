@@ -110,6 +110,10 @@ const ProgramPage = () => {
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'full'>('monthly');
   const [checkingOut, setCheckingOut] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const savedPlan = cartItems.find((i) => i.program_slug === baseProgram?.slug)?.payment_option;
+  useEffect(() => {
+    if (savedPlan === 'full' || savedPlan === 'monthly') setSelectedPlan(savedPlan);
+  }, [savedPlan]);
 
   useEffect(() => {
     const fetchProgram = async () => {
@@ -273,7 +277,8 @@ const ProgramPage = () => {
   // and the upsert overwrites the stale price.
   const cartItem = cartItems.find((i) => i.program_slug === program.slug);
   const inCart = !!cartItem && (
-    program.payment_type === 'subscription' ||
+    (program.payment_type === 'subscription' &&
+      (hasFullOption ? (cartItem.payment_option === 'full' ? 'full' : 'monthly') === selectedPlan : true)) ||
     (cartItem.price_amount === program.price_amount &&
       (cartItem.payment_option ?? null) === (activeTier ? `tier:${activeTier.id}` : null))
   );
