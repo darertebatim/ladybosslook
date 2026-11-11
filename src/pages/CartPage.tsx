@@ -103,7 +103,7 @@ const CartPage = () => {
   const handleCheckout = async () => {
     setCheckingOut(true);
     try {
-      const subscriptionItem = cartItems.find((i) => i.payment_type === 'subscription');
+      const subscriptionItem = cartItems.find((i) => i.payment_type === 'subscription' || i.payment_option === 'full');
       const { data, error } = subscriptionItem
         ? await supabase.functions.invoke('create-payment', {
             body: {
