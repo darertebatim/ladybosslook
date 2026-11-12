@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import {
   Check, X, Shield, Play, Video, BookOpen, MessageCircle, Calendar, Target,
   PenLine, Megaphone, TrendingUp, Gift, Sparkles, Clock, Users, Loader2,
-  BarChart3, Rocket, Wallet, Repeat, ArrowDown,
+  BarChart3, Rocket, Wallet, Repeat, ArrowDown, Lock, CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -325,7 +325,14 @@ export default function IgAdsProgramLanding({ variant = "long" }: { variant?: "l
             </div>
             <div className="mt-4">
               <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
-              <p className="mt-2 text-xs leading-6 text-foreground/80">{CURRENCY_NOTE}</p>
+              {isShort ? (
+                <div dir="ltr" className="mt-3 flex items-center justify-center gap-4 text-xs text-foreground/80">
+                  <span className="flex items-center gap-1"><Lock className="h-3.5 w-3.5" />Secure payment via <span className="font-bold text-[#635BFF]">Stripe</span></span>
+                  <span className="flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5 text-primary" />Instant access after purchase</span>
+                </div>
+              ) : (
+                <p className="mt-2 text-xs leading-6 text-foreground/80">{CURRENCY_NOTE}</p>
+              )}
               <span className="mt-2 inline-flex max-w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-success/15 px-3 py-2 text-[11px] font-extrabold text-success min-[360px]:text-[12.5px] min-[400px]:text-sm">
                 <Shield className="h-4 w-4 shrink-0" /> ۳۰ روز ضمانت بازگشت کامل وجه، بدون هیچ سؤالی
               </span>
