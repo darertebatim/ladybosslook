@@ -310,7 +310,7 @@ export default function IgAdsProgramLanding({ variant = "long" }: { variant?: "l
           <div className="mt-4 rounded-3xl bg-primary/10 px-4 py-4">
             <p className="text-xs font-bold text-primary">برنامه‌ای که در ویدیو معرفی شد</p>
             <p className="mt-1 text-lg font-black leading-7 text-foreground">دوره ۳ هفته‌ای جدید آکادمی رایلو</p>
-            <p className="whitespace-nowrap text-[clamp(16px,5.5vw,26px)] font-black leading-tight text-foreground">جذب مشتری با تبلیغات اینستاگرامی</p>
+            <p className="mt-2 inline-block whitespace-nowrap rounded-full bg-primary px-4 py-1.5 text-[clamp(15px,5vw,24px)] font-black leading-tight text-primary-foreground shadow-ios">جذب مشتری با تبلیغات اینستاگرامی</p>
             <div className="mt-3 flex items-center justify-center gap-0.5 text-[9px] font-bold min-[360px]:text-[10.5px] min-[400px]:text-[12px]">
               {[
                 [Clock, "۳ هفته"], [Video, "۳ لایو ۲ ساعته"], [BookOpen, "۶ پلی‌بوک"], [MessageCircle, "پشتیبانی چت"],
