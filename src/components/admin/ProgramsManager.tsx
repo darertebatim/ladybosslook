@@ -1252,7 +1252,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
                         activePriceId={formData.stripe_price_id}
                         programSlug={formData.slug.trim()}
                         onChange={(price_presets) => setFormData({ ...formData, price_presets })}
-                        onApply={(p) => setFormData({ ...formData, price_amount: p.price_amount, stripe_price_id: p.stripe_price_id })}
+                        onApply={(p) => setFormData({ ...formData, price_amount: p.price_amount, stripe_price_id: p.stripe_price_id, original_price: p.original_price || formData.original_price })}
                       />
                     )}
 
