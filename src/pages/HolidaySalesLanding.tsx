@@ -5,19 +5,21 @@ import { Calendar, Check, CheckCircle2, ClipboardList, FileText, Gift, ListCheck
 import { Button } from "@/components/ui/button";
 import { supabase, browserTimezone } from "@/integrations/supabase/client";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
+import coverAsset from "@/assets/year-end-sales-workshop-cover.webp.asset.json";
 
 const PROGRAM_SLUG = "HolidaySalesActionPlanWorkshop";
+const WORKSHOP_TITLE = "ورکشاپ پلن فروش آخر سال";
 const fa = (n: number) => n.toLocaleString("fa-IR");
 
 type Session = { date: string; pt: string; et: string };
 
 function useWorkshop() {
-  const [info, setInfo] = useState<{ now: number; was: number; cover: string | null }>({ now: 19, was: 40, cover: null });
+  const [info, setInfo] = useState<{ now: number; was: number; title: string }>({ now: 19, was: 40, title: WORKSHOP_TITLE });
   const [sessions, setSessions] = useState<Session[]>([]);
   useEffect(() => {
-    supabase.from("program_catalog").select("price_amount, original_price, cover_image_url").eq("slug", PROGRAM_SLUG).maybeSingle()
+    supabase.from("program_catalog").select("price_amount, original_price, title").eq("slug", PROGRAM_SLUG).maybeSingle()
       .then(({ data }) => {
-        if (data) setInfo({ now: (data.price_amount ?? 1900) / 100, was: (data.original_price ?? 0) / 100, cover: data.cover_image_url });
+        if (data) setInfo({ now: (data.price_amount ?? 1900) / 100, was: (data.original_price ?? 0) / 100, title: data.title || WORKSHOP_TITLE });
       });
     supabase.from("program_rounds").select("first_session_date").eq("program_slug", PROGRAM_SLUG)
       .gt("first_session_date", new Date(Date.now() - 2 * 86400000).toISOString())
@@ -101,7 +103,7 @@ function TrustRow() {
 }
 
 export default function HolidaySalesLanding() {
-  const { now, was, cover, sessions } = useWorkshop();
+  const { now, was, title, sessions } = useWorkshop();
   const [loading, setLoading] = useState(false);
   const [showSticky, setShowSticky] = useState(false);
   const off = was > now ? Math.round((1 - now / was) * 100) : 0;
@@ -154,9 +156,9 @@ export default function HolidaySalesLanding() {
   return (
     <div dir="rtl" className="min-h-screen bg-background font-farsi text-foreground">
       <Helmet>
-        <title>ورکشاپ نقشه فروش آخر سال | از بلک فرایدی تا کریسمس</title>
+        <title>{`${title} | از بلک فرایدی تا کریسمس`}</title>
         <meta name="description" content="۲ جلسه آنلاین ۹۰ دقیقه‌ای برای ساختن پیشنهاد فروش، برنامه هفتگی و چک‌لیست اجرایی آخر سال — ویژه کسب‌وکارهای آمریکا و کانادا." />
-        <meta property="og:title" content="ورکشاپ نقشه فروش آخر سال" />
+        <meta property="og:title" content={title} />
         <meta property="og:description" content="از بلک فرایدی تا کریسمس، با برنامه جلو برو." />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
@@ -169,9 +171,9 @@ export default function HolidaySalesLanding() {
       <section className="bg-gradient-to-b from-secondary via-background to-background px-4 pb-8 pt-5">
         <div className="mx-auto max-w-md text-center">
           <p className="inline-flex rounded-full bg-card px-3 py-1 text-[12px] font-extrabold text-primary shadow-ios">ورکشاپ ۲ روزه · ویژه آمریکا و کانادا</p>
-          <h1 className="mt-3 text-[28px] font-black leading-[1.6]">ورکشاپ نقشه فروش آخر سال</h1>
+          <h1 className="mt-3 text-[28px] font-black leading-[1.6]">{title}</h1>
           <p className="mt-1 text-[16px] font-bold text-foreground/80">از بلک فرایدی تا کریسمس، با برنامه جلو برو</p>
-          {cover && <img src={cover} alt="ورکشاپ نقشه فروش آخر سال" className="mt-5 w-full rounded-3xl shadow-ios" />}
+          <img src={coverAsset.url} alt={title} className="mt-5 w-full rounded-3xl shadow-ios" />
           <div className="mt-5">{PriceBox}</div>
 
           {sessions.length > 0 && (
