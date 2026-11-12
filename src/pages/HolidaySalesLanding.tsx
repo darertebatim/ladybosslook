@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { toast } from "sonner";
-import { Calendar, Check, CheckCircle2, ClipboardList, FileText, Gift, ListChecks, Loader2, Lock, Rocket, Target, Video, CalendarDays } from "lucide-react";
+import { Calendar, Check, CheckCircle2, ClipboardList, FileText, Gift, ListChecks, Loader2, Lock, Rocket, Target, Video, CalendarDays, TrendingUp, Users, RefreshCw, MessageCircle, Repeat, AlertTriangle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase, browserTimezone } from "@/integrations/supabase/client";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
@@ -56,6 +56,22 @@ const OUTPUTS = [
   { icon: CalendarDays, title: "برنامه هفتگی کسب‌وکارت", body: "کی به مشتری‌های قبلی پیام بدی، پیگیری کنی، محتوا بذاری و در صورت نیاز تبلیغ کنی." },
   { icon: ListChecks, title: "چک‌لیست آماده‌سازی", body: "پیام‌ها، محتوای معرفی، لینک رزرو یا سفارش و شرایط پیشنهاد." },
   { icon: ClipboardList, title: "اولویت‌بندی کارها", body: "اینکه کدوم کارها مهم‌ترن و کدوم‌ها رو می‌تونی کنار بذاری." },
+];
+
+const BENEFITS = [
+  { icon: TrendingUp, title: "فروش بیشتر در پرخریدترین فصل سال", body: "وقتی مشتری‌ها آماده خرج‌کردن‌ان، پیشنهادت به‌موقع جلوشونه." },
+  { icon: CalendarDays, title: "پرشدن ظرفیت‌ها و نوبت‌های خالی", body: "قبل از اینکه مشتری وقتش رو جای دیگه رزرو کنه." },
+  { icon: RefreshCw, title: "برگشتن مشتری‌های قبلی", body: "کسایی که مدتیه سراغت نیومدن، با یک دلیل مشخص برمی‌گردن." },
+  { icon: MessageCircle, title: "خرید از کسایی که فقط قیمت پرسیدن", body: "با پیگیری به‌موقع، پرس‌وجوها به خرید تبدیل می‌شن." },
+  { icon: Users, title: "دیده‌شدن توسط آدم‌های جدید", body: "خیلی‌ها این فصل برای اولین بار با کسب‌وکارت آشنا می‌شن." },
+  { icon: Repeat, title: "مشتری‌هایی که بعد از تعطیلات هم می‌مونن", body: "خرید امروز، شروع یک رابطه بلندمدته؛ نه فقط یک فروش." },
+];
+const LOSSES = [
+  "مشتری خریدش رو کرده و بودجه‌اش رو جای دیگه خرج کرده.",
+  "وقتش رو با یک کسب‌وکار دیگه رزرو کرده که زودتر پیشنهاد داده.",
+  "با عجله تخفیف می‌دی و سودت رو می‌سوزونی، بدون نتیجه‌ای که انتظار داشتی.",
+  "نوبت‌ها یا محصولاتی که می‌خواستی بفروشی، خالی و فروش‌نرفته می‌مونن.",
+  "فرصت آشناشدن مشتری‌های جدید با کسب‌وکارت، تا سال بعد از دست می‌ره.",
 ];
 
 function CTA({ onClick, loading, now, was }: { onClick: () => void; loading: boolean; now: number; was: number }) {
@@ -169,6 +185,47 @@ export default function HolidaySalesLanding() {
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      <section className="px-4 py-8">
+        <div className="mx-auto max-w-md">
+          <h2 className="text-center text-[22px] font-extrabold leading-9">چرا فصل آخر سال این‌قدر مهمه؟</h2>
+          <div className="mt-4 space-y-4 text-[15px] leading-8">
+            <p>از بلک فرایدی تا کریسمس، خیلی از مشتری‌های تو قراره برای خرید هدیه، مهمونی‌ها، سفر و خدمات موردنیازشون پول خرج کنن.</p>
+            <p>این فصل فقط فرصت فروش بیشتر نیست؛ فرصتیه که آدم‌های بیشتری کسب‌وکارت رو ببینن و برای اولین بار ازت خرید کنن.</p>
+            <p className="rounded-2xl bg-secondary p-4 font-bold">سؤال اینه: وقتی دارن تصمیم می‌گیرن از کجا خرید کنن، کسب‌وکار تو هم جزو انتخاب‌هاشون هست؟</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-6">
+        <div className="mx-auto max-w-md">
+          <h2 className="mb-5 text-center text-[22px] font-extrabold leading-9">با برنامه، این فصل برای کسب‌وکارت چی می‌سازه؟</h2>
+          <div className="space-y-3">
+            {BENEFITS.map(({ icon: Icon, title, body }) => (
+              <div key={title} className="flex gap-3 rounded-3xl bg-card p-4 shadow-ios">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-secondary"><Icon className="h-5 w-5 text-primary" /></span>
+                <div>
+                  <p className="text-sm font-extrabold leading-6">{title}</p>
+                  <p className="mt-0.5 text-xs leading-6 text-foreground/80">{body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-6">
+        <div className="mx-auto max-w-md rounded-3xl bg-card p-5 shadow-ios">
+          <h2 className="flex items-center gap-2 text-lg font-extrabold leading-8"><AlertTriangle className="h-5 w-5 shrink-0 text-destructive" /> اگه دیر آماده بشی، چی از دست می‌دی؟</h2>
+          <p className="mt-2 text-sm leading-7">یهو می‌بینی بلک فرایدی رسیده، با عجله چند تا استوری می‌ذاری… ولی وقتی پیشنهادت رو می‌بینن:</p>
+          <ul className="mt-3 space-y-2">
+            {LOSSES.map((t) => (
+              <li key={t} className="flex gap-2 text-sm leading-7"><X className="mt-1.5 h-4 w-4 shrink-0 text-destructive" />{t}</li>
+            ))}
+          </ul>
+          <p className="mt-4 rounded-2xl bg-secondary p-3 text-sm font-bold leading-7">ممکنه پیشنهادت بد نبوده باشه؛ فقط دیر آماده شده، به آدم‌های کافی نرسیده یا پیگیری نشده.</p>
         </div>
       </section>
 
