@@ -12,7 +12,7 @@ import { TrackedIframe } from "@/components/TrackedIframe";
 import { supabase, browserTimezone } from "@/integrations/supabase/client";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
 import vslCoverLong from "@/assets/igads-vsl-cover.png.asset.json";
-import vslCoverShort from "@/assets/igads-vsl11-cover.webp.asset.json";
+import vslCoverShort from "@/assets/igads-vsl11-cover-v2.webp.asset.json";
 
 const PROGRAM_SLUG = "casigads";
 /** variant "short" = 11-min VSL page at /l/igadsvsl. Set SHORT_VSL_ID once the video is uploaded. */
@@ -326,9 +326,10 @@ export default function IgAdsProgramLanding({ variant = "long" }: { variant?: "l
             <div className="mt-4">
               <CTA onClick={checkout} loading={loading} price={price.now} was={price.was} />
               {isShort ? (
-                <div dir="ltr" className="mt-3 flex items-center justify-center gap-4 text-xs text-foreground/80">
-                  <span className="flex items-center gap-1"><Lock className="h-3.5 w-3.5" />Secure payment via <span className="font-bold text-[#635BFF]">Stripe</span></span>
-                  <span className="flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5 text-primary" />Instant access after purchase</span>
+                <div dir="ltr" className="mt-3 flex items-center justify-center gap-2 whitespace-nowrap text-[11px] font-medium text-foreground/75">
+                  <span className="flex items-center gap-1"><Lock className="h-3 w-3" />Secure payment · <span className="font-bold text-[#635BFF]">Stripe</span></span>
+                  <span className="text-foreground/30">|</span>
+                  <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-primary" />Instant access</span>
                 </div>
               ) : (
                 <p className="mt-2 text-xs leading-6 text-foreground/80">{CURRENCY_NOTE}</p>
