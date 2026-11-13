@@ -48,7 +48,7 @@ const DAY1 = [
 const DAY2 = [
   "پیامی که برای مشتری‌های قبلی می‌فرستی تا دوباره سراغت بیان.",
   "برنامه پیگیری کسایی که سؤال پرسیدن اما خرید نکردن.",
-  "پست‌ها و استوری‌هایی که برای معرفی پیشنهادت لازم داری.",
+  "پست‌ها، استوری‌ها و ایمیل‌هایی که برای معرفی پیشنهادت لازم داری.",
   "جای تبلیغ اینستاگرامی در برنامه‌ات و چیزهایی که قبلش باید آماده باشه.",
   "بررسی مسیر سفارش، رزرو یا تماس تا مشتری بدونه قدم بعدی چیه.",
   "چیدن کارها در یک برنامه هفتگی، متناسب با زمان و ظرفیت خودت.",
@@ -57,6 +57,7 @@ const OUTPUTS = [
   { icon: Target, title: "پیشنهاد فروش آخر سالت", body: "چی می‌فروشی، به چه کسی و با چه دلیلی برای اقدام." },
   { icon: CalendarDays, title: "برنامه هفتگی کسب‌وکارت", body: "کی به مشتری‌های قبلی پیام بدی، پیگیری کنی، محتوا بذاری و در صورت نیاز تبلیغ کنی." },
   { icon: ListChecks, title: "چک‌لیست آماده‌سازی", body: "پیام‌ها، محتوای معرفی، لینک رزرو یا سفارش و شرایط پیشنهاد." },
+  { icon: Repeat, title: "پلن پیش‌فروش ماه‌های بعد", body: "چطور از همین فصل، برای درآمد بعد از سال نو هم رزرو و پیش‌فروش بگیری." },
   { icon: ClipboardList, title: "اولویت‌بندی کارها", body: "اینکه کدوم کارها مهم‌ترن و کدوم‌ها رو می‌تونی کنار بذاری." },
 ];
 
@@ -66,6 +67,7 @@ const BENEFITS = [
   { icon: RefreshCw, title: "برگشتن مشتری‌های قبلی", body: "کسایی که مدتیه سراغت نیومدن، با یک دلیل مشخص برمی‌گردن." },
   { icon: MessageCircle, title: "خرید از کسایی که فقط قیمت پرسیدن", body: "با پیگیری به‌موقع، پرس‌وجوها به خرید تبدیل می‌شن." },
   { icon: Users, title: "دیده‌شدن توسط آدم‌های جدید", body: "خیلی‌ها این فصل برای اولین بار با کسب‌وکارت آشنا می‌شن." },
+  { icon: CalendarDays, title: "درآمد بعد از سال نو، با پیش‌فروش", body: "با پیش‌فروش یا رزرو خدمات برای ماه‌های بعد، رکود ژانویه رو هم پوشش می‌دی." },
   { icon: Repeat, title: "مشتری‌هایی که بعد از تعطیلات هم می‌مونن", body: "خرید امروز، شروع یک رابطه بلندمدته؛ نه فقط یک فروش." },
 ];
 const LOSSES = [
@@ -221,7 +223,7 @@ export default function HolidaySalesLanding() {
       <section className="px-4 py-6">
         <div className="mx-auto max-w-md rounded-3xl bg-card p-5 shadow-ios">
           <h2 className="flex items-center gap-2 text-lg font-extrabold leading-8"><AlertTriangle className="h-5 w-5 shrink-0 text-destructive" /> اگه دیر آماده بشی، چی از دست می‌دی؟</h2>
-          <p className="mt-2 text-sm leading-7">یهو می‌بینی بلک فرایدی رسیده، با عجله چند تا استوری می‌ذاری… ولی وقتی پیشنهادت رو می‌بینن:</p>
+          <p className="mt-2 text-sm leading-7">یهو می‌بینی بلک فرایدی رسیده، با عجله چند تا استوری و ایمیل می‌فرستی… ولی وقتی پیشنهادت رو می‌بینن:</p>
           <ul className="mt-3 space-y-2">
             {LOSSES.map((t) => (
               <li key={t} className="flex gap-2 text-sm leading-7"><X className="mt-1.5 h-4 w-4 shrink-0 text-destructive" />{t}</li>
@@ -273,6 +275,14 @@ export default function HolidaySalesLanding() {
             <FileText className="mt-1 h-4 w-4 shrink-0 text-primary" />
             فایل برنامه و چک‌لیست رو می‌گیری و در طول دو جلسه برای کسب‌وکار خودت کاملشون می‌کنی. ضبط هر دو جلسه هم در اختیارت قرار می‌گیره.
           </p>
+        </div>
+      </section>
+
+      <section className="px-4 py-8">
+        <div className="mx-auto max-w-md rounded-3xl bg-card p-5 shadow-ios">
+          <p className="text-xs font-bold text-primary">مدرس ورکشاپ</p>
+          <h2 className="mt-1 text-lg font-extrabold">علی لطفی</h2>
+          <p className="mt-2 text-sm leading-7">هم‌بنیان‌گذار آکادمی رایلو؛ در چند سال گذشته در کنار صدها صاحب کسب‌وکار و متخصص در آمریکا و کانادا برای ساخت سیستم بازاریابی و فروش پایدار کار کرده.</p>
         </div>
       </section>
 
