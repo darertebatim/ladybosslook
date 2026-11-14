@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { toast } from "sonner";
-import { Calendar, Check, CheckCircle2, ClipboardList, FileText, Gift, ListChecks, Loader2, Lock, Rocket, Target, Video, CalendarDays, TrendingUp, Users, RefreshCw, MessageCircle, Repeat, AlertTriangle, X } from "lucide-react";
+import { Calendar, Check, CheckCircle2, ClipboardList, FileText, Gift, ListChecks, Loader2, Lock, Play, Rocket, Target, Video, CalendarDays, TrendingUp, Users, RefreshCw, MessageCircle, Repeat, AlertTriangle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TrackedIframe } from "@/components/TrackedIframe";
 import { supabase, browserTimezone } from "@/integrations/supabase/client";
 import { trackInitiateCheckout } from "@/lib/metaPixel";
 import coverAsset from "@/assets/year-end-sales-workshop-cover.webp.asset.json";
 
 const PROGRAM_SLUG = "HolidaySalesActionPlanWorkshop";
 const WORKSHOP_TITLE = "ورکشاپ پلن فروش آخر سال";
+const VSL_ID = "MnaNMy2xQMU";
 const fa = (n: number) => n.toLocaleString("fa-IR");
 
 type Session = { date: string; pt: string; et: string };
@@ -107,6 +109,7 @@ function TrustRow() {
 export default function HolidaySalesLanding() {
   const { now, was, title, sessions } = useWorkshop();
   const [loading, setLoading] = useState(false);
+  const [playing, setPlaying] = useState(false);
   const [showSticky, setShowSticky] = useState(false);
   const off = was > now ? Math.round((1 - now / was) * 100) : 0;
 
@@ -175,7 +178,30 @@ export default function HolidaySalesLanding() {
           <p className="inline-flex rounded-full bg-card px-3 py-1 text-[12px] font-extrabold text-primary shadow-ios">ورکشاپ ۲ روزه · ویژه آمریکا و کانادا</p>
           <h1 className="mt-3 text-[28px] font-black leading-[1.6]">{title}</h1>
           <p className="mt-1 text-[16px] font-bold text-foreground/80">از بلک فرایدی تا کریسمس، با برنامه جلو برو</p>
-          <img src={coverAsset.url} alt={title} className="mt-5 w-full rounded-3xl shadow-ios" />
+          <div className="mt-5 overflow-hidden rounded-3xl bg-foreground shadow-ios">
+            <div className="relative aspect-video w-full">
+              {playing ? (
+                <div className="absolute inset-0 overflow-hidden">
+                  {/* Frame mask: oversize the embed so YouTube's top title bar and bottom-corner branding are cropped out */}
+                  <TrackedIframe
+                    className="absolute left-0 top-[-60px] w-full"
+                    style={{ height: "calc(100% + 120px)" }}
+                    src={`https://www.youtube-nocookie.com/embed/${VSL_ID}?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&fs=1&disablekb=0`}
+                    title={title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              ) : (
+                <button type="button" onClick={() => setPlaying(true)} className="absolute inset-0 h-full w-full" aria-label="پخش ویدیو">
+                  <img src={coverAsset.url} alt={title} className="h-full w-full object-cover" />
+                  <span className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-primary shadow-ios transition active:scale-95">
+                    <Play className="h-9 w-9 translate-x-0.5 fill-primary-foreground text-primary-foreground" />
+                  </span>
+                </button>
+              )}
+            </div>
+          </div>
           <div className="mt-5">{PriceBox}</div>
 
           {sessions.length > 0 && (
