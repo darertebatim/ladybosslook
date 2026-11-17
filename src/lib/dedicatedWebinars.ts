@@ -61,6 +61,6 @@ export const IGFREE_WEBINAR: DedicatedWebinar = {
   defaultTitle: "وبینار جذب مشتری با اینستاگرام ادز",
   hostLine: "",
   icsName: "igads-webinar.ics",
-  whatsappNumber: "16265028589",
+  whatsappNumber: "16265028538",
   igadsClone: true,
 };
