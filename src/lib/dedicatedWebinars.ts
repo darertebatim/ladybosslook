@@ -15,6 +15,8 @@ export interface DedicatedWebinar {
   whatsappNumber?: string;
   /** Display name used in email/page sender lines. */
   senderName?: string;
+  /** Exact copy of the /l/igadsfree pages (same copy, video and pixel events), only slug/sources/paths differ. */
+  igadsClone?: boolean;
 }
 
 export const STARTADS_WEBINAR: DedicatedWebinar = {
@@ -44,4 +46,21 @@ export const POWERFREE_WEBINAR: DedicatedWebinar = {
   hostLine: "با راضیه لیدی‌باس",
   icsName: "powerfree.ics",
   senderName: "Razie Ladyboss - Ladyboss Academy",
+};
+
+/** /l/igfreewebinar — duplicate of /l/igadsfree on its own program, with WhatsApp support. */
+export const IGFREE_WEBINAR: DedicatedWebinar = {
+  slug: "igfreewebinar",
+  basePath: "/l/igfreewebinar",
+  regSource: "igfreewebinar_registration",
+  waitlistSource: "igfreewebinar_waitlist",
+  giftSource: "igads_gifts",
+  metaEvent: "IGAdsFreeLead",
+  metaContentName: "Instagram Ads Webinar Registration",
+  liveContentName: "IG Ads Webinar Live",
+  defaultTitle: "وبینار جذب مشتری با اینستاگرام ادز",
+  hostLine: "",
+  icsName: "igads-webinar.ics",
+  whatsappNumber: "16265028589",
+  igadsClone: true,
 };

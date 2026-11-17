@@ -111,6 +111,18 @@ export const LEAD_CAMPAIGNS: LeadCampaign[] = [
     confirmationFunction: 'send-sixtraps-confirmation',
   },
   {
+    key: 'igfreewebinar',
+    label: 'IG Free Webinar',
+    labelFa: 'وبینار تکنیک‌های افزایش مشتری با اینستاگرام',
+    programSlug: 'igfreewebinar',
+    landingPath: '/l/igfreewebinar',
+    thankYouPath: '/l/igfreewebinar/thankyou',
+    regSource: 'igfreewebinar_registration',
+    extraSources: ['igfreewebinar_waitlist'],
+    metaEvent: 'IGAdsFreeLead',
+    confirmationFunction: 'send-sixtraps-confirmation',
+  },
+  {
     key: 'aliagads',
     label: 'Instagram Ads (Ali)',
     labelFa: 'وبینار اینستاگرام ادز (علی)',

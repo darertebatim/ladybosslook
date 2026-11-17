@@ -86,6 +86,7 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
   const slug = campaign?.slug ?? PROGRAM_SLUG;
   const regSourceKey = campaign?.regSource ?? "igads_registration";
   const defaultTitle = campaign?.defaultTitle ?? "وبینار جذب مشتری با اینستاگرام ادز";
+  const dc = campaign?.igadsClone ? undefined : campaign;
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const roundParam = searchParams.get("round");
@@ -158,7 +159,7 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
 
       // Dedicated campaigns use the thank-you video set on the round;
       // the IG Ads pages keep their fixed campaign video.
-      setVideoId(campaign ? youtubeId(round?.video_url) ?? "" : THANKYOU_VIDEO_ID);
+      setVideoId(dc ? youtubeId(round?.video_url) ?? "" : THANKYOU_VIDEO_ID);
 
       if (round?.first_session_date) {
         setWebinar({
@@ -193,8 +194,8 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
   return (
     <>
       <SEOHead
-        title={campaign ? `ثبت‌نام شما ثبت شد | ${defaultTitle}` : "ثبت‌نام شما ثبت شد | وبینار اینستاگرام ادز"}
-        description={campaign ? `ثبت‌نام شما در ${defaultTitle} با موفقیت ثبت شد.` : "ثبت‌نام شما در وبینار رایگان جذب مشتری با اینستاگرام ادز با موفقیت ثبت شد."}
+        title={dc ? `ثبت‌نام شما ثبت شد | ${defaultTitle}` : "ثبت‌نام شما ثبت شد | وبینار اینستاگرام ادز"}
+        description={dc ? `ثبت‌نام شما در ${defaultTitle} با موفقیت ثبت شد.` : "ثبت‌نام شما در وبینار رایگان جذب مشتری با اینستاگرام ادز با موفقیت ثبت شد."}
         locale="fa_IR"
       />
       <div

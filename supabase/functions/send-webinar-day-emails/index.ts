@@ -26,7 +26,7 @@ const DEDICATED: Record<string, { build: typeof buildStartAdsHtml; subjects: typ
   startads: { build: buildStartAdsHtml, subjects: STARTADS_SUBJECTS, tyUrl: startAdsThankYouUrl, calTitle: "جلسه اول شروع تبلیغات اینستاگرامی (رایگان)", from: "Ali Lotfi - Ladyboss Academy <hi@ladybosslook.com>" },
   powerfree: { build: buildPowerFreeHtml, subjects: POWERFREE_SUBJECTS, tyUrl: powerFreeThankYouUrl, calTitle: "وبینار رایگان قدرت دو زبانه", from: "Razie Ladyboss <hi@ladybosslook.com>" },
 };
-const PROGRAMS = ["igadsfree", ...Object.keys(DEDICATED)];
+const PROGRAMS = ["igadsfree", "igfreewebinar", ...Object.keys(DEDICATED)];
 const dedicatedOf = (round: any) => DEDICATED[round?.program_slug];
 const isStartAds = (round: any) => !!dedicatedOf(round);
 /** Tag/dedupe key per round; dedicated campaigns prefix round numbers so they never collide with IG Ads rounds. */
@@ -365,7 +365,9 @@ interface Registrant { email: string; name: string; timezone: string | null; cre
 /** Each signup's own landing-page thank-you page, pinned to this round and person. */
 function thankYouUrl(round: any, email: string, source?: string | null): string {
   if (isStartAds(round)) return dedicatedOf(round).tyUrl(round.round_number, email);
-  const base = String(source || "").startsWith("aliagads")
+  const base = round?.program_slug === "igfreewebinar"
+    ? "https://ladybosslook.com/l/igfreewebinar/thankyou"
+    : String(source || "").startsWith("aliagads")
     ? "https://ladybosslook.com/l/aliagads/thankyou"
     : "https://ladybosslook.com/l/igadsfree/thankyou";
   return `${base}?round=${encodeURIComponent(round.id)}&email=${encodeURIComponent(email)}`;

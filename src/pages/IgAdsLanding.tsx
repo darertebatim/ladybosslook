@@ -179,6 +179,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
   const metaEvent = campaign?.metaEvent ?? "IGAdsFreeLead";
   const metaContentName = campaign?.metaContentName ?? "Instagram Ads Webinar Registration";
   const defaultTitle = campaign?.defaultTitle ?? "وبینار جذب مشتری با اینستاگرام ادز";
+  const dc = campaign?.igadsClone ? undefined : campaign;
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const roundParam = searchParams.get("round");
@@ -414,7 +415,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
             email: parsed.data.email.toLowerCase(),
             programSlug: slug,
             prereqUrl: `https://ladybosslook.com${basePath}/thankyou`,
-            sources: campaign || isAli ? [regSource] : [regSource, "preigads_interest"],
+            sources: dc || isAli ? [regSource] : [regSource, "preigads_interest"],
             ...(roundId ? { roundId } : {}),
           },
         })
@@ -455,8 +456,8 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
   return (
     <>
       <SEOHead
-        title={campaign ? `${defaultTitle} | Rilo` : "وبینار رایگان جذب مشتری با اینستاگرام ادز"}
-        description={campaign ? `ثبت‌نام رایگان در ${defaultTitle}.` : "در این وبینار رایگان یاد می‌گیرید چطور با تبلیغات اینستاگرام (Instagram Ads) مشتری واقعی جذب کنید."}
+        title={dc ? `${defaultTitle} | Rilo` : "وبینار رایگان جذب مشتری با اینستاگرام ادز"}
+        description={dc ? `ثبت‌نام رایگان در ${defaultTitle}.` : "در این وبینار رایگان یاد می‌گیرید چطور با تبلیغات اینستاگرام (Instagram Ads) مشتری واقعی جذب کنید."}
         locale="fa_IR"
       />
       <div
@@ -516,10 +517,10 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
 
           <section className="mt-6 space-y-3 text-center">
             <h1 className="text-2xl font-bold leading-tight text-neutral-900">
-              🎁{campaign ? programTitle : "وبینار رایگان: جذب مشتری با اینستاگرام ادز"}
+              🎁{dc ? programTitle : "وبینار رایگان: جذب مشتری با اینستاگرام ادز"}
             </h1>
-            {campaign && (
-              <p className="text-[11px] font-bold text-neutral-500">{campaign.hostLine}</p>
+            {dc && (
+              <p className="text-[11px] font-bold text-neutral-500">{dc.hostLine}</p>
             )}
             {blockedRegion ? (
               <div className="mx-auto rounded-2xl border border-rose-200 bg-rose-50 p-4">
