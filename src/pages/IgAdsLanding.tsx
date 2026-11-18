@@ -726,21 +726,31 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
           {isPF && !blockedRegion && !waitlistMode && (
             <div className="mt-6 space-y-4 text-right">
               <div className="rounded-2xl bg-white p-4 shadow-sm">
-                <p className="mb-2 text-sm font-bold text-rose-600">در این وبینار زنده چه چیزی می‌گیری؟</p>
+                <p className="mb-2 text-sm font-bold text-rose-600">در این وبینار ۹۰ دقیقه‌ای زنده:</p>
                 <ul className="space-y-2 text-sm font-semibold leading-6 text-neutral-900">
-                  <li>✅ آشتی با لهجه و صحبت با اعتماد‌به‌نفس</li>
-                  <li>✅ استفاده از نفوذ کلام در ارتباطات حرفه‌ای و شخصی</li>
-                  <li>✅ بازسازی جایگاه و عزت‌نفس بعد از مهاجرت</li>
-                  <li>🎁 تست قدرت درونی در لایو</li>
+                  <li>✅ نقشه راه رسیدن به قدرت ۱۰ برابری — هم در زبان خودت، هم در زبان کشور جدید</li>
+                  <li>✅ چطور سریع‌تر در کشور جدید جا بیفتی و اعتبار و گذشته‌ات را دوباره بسازی</li>
+                  <li>✅ ساختن ارتباطات سطح بالا که تو را چند پله رشد می‌دهد</li>
+                  <li>✅ بازسازی اعتمادبه‌نفس و قدرت درونی که بعد از مهاجرت کم شده</li>
+                  <li>🎁 تست یکی از فاکتورهای قدرت درونی در لایو + PDF تحلیل آن هدیه برای حاضرین</li>
                 </ul>
               </div>
               <div className="rounded-2xl bg-white p-4 shadow-sm">
                 <p className="mb-2 text-sm font-bold text-rose-600">این وبینار برای توست اگر…</p>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-800">
-                  <li>💭 بعد از مهاجرت حس می‌کنی صدای واقعی‌ات گم شده</li>
-                  <li>💭 موقع انگلیسی حرف زدن، از لهجه‌ات خجالت می‌کشی</li>
-                  <li>💭 می‌خواهی دوباره همان زن مطمئن و قدرتمند قبل باشی</li>
+                  <li>💭 مهاجرت کرده‌ای — مهم نیست چند سال پیش</li>
+                  <li>💭 حس می‌کنی قبلاً خیلی مطمئن‌تر و قدرتمندتر بودی و می‌پرسی «اون خانم کجا رفته؟»</li>
+                  <li>💭 می‌خواهی کار، درآمد، ارتباطات و زندگی‌ات را اینجا از صفر و سریع‌تر بسازی</li>
                 </ul>
+              </div>
+              <blockquote className="rounded-2xl bg-rose-50 p-4 text-sm font-bold leading-7 text-neutral-900">
+                «مهاجرت یعنی همه چیز را پشت سر گذاشتن و با یک چمدان آمدن. آن خانم قدرتمند هنوز همان‌جاست؛ فقط لازم است یادآوری شود.»
+              </blockquote>
+              <div className="rounded-2xl bg-white p-4 shadow-sm">
+                <p className="text-sm font-bold text-neutral-900">👩‍💼 راضیه میرزایی</p>
+                <p className="mt-1 text-sm leading-6 text-neutral-800">
+                  مربی کسب‌وکارهای خانمانه؛ در ۱۰ سال گذشته به صدها هزار خانم در سراسر دنیا کمک کرده اعتمادبه‌نفس و قدرت درونی‌شان را بازسازی کنند و در همه جنبه‌های زندگی چند پله رشد کنند.
+                </p>
               </div>
               <button
                 type="button"
