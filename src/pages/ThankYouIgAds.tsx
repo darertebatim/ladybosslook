@@ -206,7 +206,6 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
     title: defaultTitle,
     name: registeredName,
     email: registeredEmail,
-    city: registeredCity,
     roundNumber: webinar?.roundNumber,
     roundName: webinar?.roundName,
     localDateTime: compactLocalDate,

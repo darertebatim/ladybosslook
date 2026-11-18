@@ -2,7 +2,6 @@ export interface WebinarSupportMessageInput {
   title: string;
   name?: string;
   email?: string;
-  city?: string;
   roundNumber?: number | null;
   roundName?: string | null;
   localDateTime?: string;
@@ -26,7 +25,6 @@ export function buildWebinarSupportMessage({
   title,
   name,
   email,
-  city,
   roundNumber,
   roundName,
   localDateTime,
@@ -41,7 +39,6 @@ export function buildWebinarSupportMessage({
     `سلام، در ${title} ثبت‌نام کرده‌ام. لطفاً لینک ورود و جزئیات جلسه‌ام را برایم بفرستید.`,
     name && `👤 نام: ${name}`,
     email && `📧 ایمیل: ${email}`,
-    city && `📍 شهر: ${city}`,
     round && `🔢 دور: ${round}`,
     localDateTime && `🕒 زمان جلسه به وقت من: ${localDateTime.replace(/\n/g, " — ")}`,
     losAngelesDateTime && `🌎 زمان جلسه به وقت لس‌آنجلس: ${losAngelesDateTime}`,

@@ -14,7 +14,6 @@ test("WhatsApp message includes identity, round, both session times, and thank-y
     title: "وبینار رایگان افزایش مشتری ۲۰۲۷",
     name: "Ali",
     email: "ali@example.com",
-    city: "Vancouver",
     roundNumber: 2,
     roundName: "Evening",
     localDateTime: "4:00 PM, Wednesday\n(America/Vancouver), November 18, 2026",
@@ -24,6 +23,7 @@ test("WhatsApp message includes identity, round, both session times, and thank-y
 
   assert.match(message, /نام: Ali/);
   assert.match(message, /ایمیل: ali@example\.com/);
+  assert.doesNotMatch(message, /شهر:/);
   assert.match(message, /دور: 2 — Evening/);
   assert.match(message, /زمان جلسه به وقت من: 4:00 PM, Wednesday — \(America\/Vancouver\), November 18, 2026/);
   assert.match(message, /زمان جلسه به وقت لس‌آنجلس: Wed, Nov 18, 2026, 4:00 PM PT/);
