@@ -113,7 +113,7 @@ export const LEAD_CAMPAIGNS: LeadCampaign[] = [
   {
     key: 'igfreewebinar',
     label: 'IG Free Webinar',
-    labelFa: 'وبینار تکنیک‌های افزایش مشتری با اینستاگرام',
+    labelFa: 'وبینار رایگان افزایش مشتری ۲۰۲۷',
     programSlug: 'igfreewebinar',
     landingPath: '/l/igfreewebinar',
     thankYouPath: '/l/igfreewebinar/thankyou',

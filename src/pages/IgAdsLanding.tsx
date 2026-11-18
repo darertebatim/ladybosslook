@@ -180,6 +180,8 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
   const metaContentName = campaign?.metaContentName ?? "Instagram Ads Webinar Registration";
   const defaultTitle = campaign?.defaultTitle ?? "وبینار جذب مشتری با اینستاگرام ادز";
   const dc = campaign?.igadsClone ? undefined : campaign;
+  /** Every dedicated campaign (including the /l/igfreewebinar clone) shows its own webinar name. */
+  const ownTitle = campaign ? defaultTitle : "";
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const roundParam = searchParams.get("round");
@@ -456,8 +458,8 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
   return (
     <>
       <SEOHead
-        title={dc ? `${defaultTitle} | Rilo` : "وبینار رایگان جذب مشتری با اینستاگرام ادز"}
-        description={dc ? `ثبت‌نام رایگان در ${defaultTitle}.` : "در این وبینار رایگان یاد می‌گیرید چطور با تبلیغات اینستاگرام (Instagram Ads) مشتری واقعی جذب کنید."}
+        title={ownTitle ? `${ownTitle} | Rilo` : "وبینار رایگان جذب مشتری با اینستاگرام ادز"}
+        description={ownTitle ? `ثبت‌نام رایگان در ${ownTitle}.` : "در این وبینار رایگان یاد می‌گیرید چطور با تبلیغات اینستاگرام (Instagram Ads) مشتری واقعی جذب کنید."}
         locale="fa_IR"
       />
       <div
@@ -509,7 +511,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
             <div className="overflow-hidden rounded-3xl shadow-lg">
               <img
                 src={cover}
-                alt="وبینار جذب مشتری با اینستاگرام ادز"
+                alt={ownTitle || "وبینار جذب مشتری با اینستاگرام ادز"}
                 className="h-28 w-full object-cover object-top sm:h-32"
               />
             </div>
@@ -517,7 +519,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
 
           <section className="mt-6 space-y-3 text-center">
             <h1 className="text-2xl font-bold leading-tight text-neutral-900">
-              🎁{dc ? programTitle : "وبینار رایگان: جذب مشتری با اینستاگرام ادز"}
+              🎁{campaign ? programTitle : "وبینار رایگان: جذب مشتری با اینستاگرام ادز"}
             </h1>
             {dc && (
               <p className="text-[11px] font-bold text-neutral-500">{dc.hostLine}</p>

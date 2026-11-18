@@ -64,6 +64,22 @@ const SUBJECTS: Record<Kind, string> = {
   nurture2: "",
 };
 
+// /l/igfreewebinar runs the same engine on its own program, but the webinar
+// name there is "افزایش مشتری ۲۰۲۷", so its subjects and body copy differ.
+const IGFREE_TOPIC = "وبینار رایگان افزایش مشتری ۲۰۲۷";
+const IGFREE_SHORT = "افزایش مشتری ۲۰۲۷";
+const isIgFree = (round: any) => round?.program_slug === "igfreewebinar";
+const IGFREE_SUBJECTS: Record<Kind, string> = {
+  ...SUBJECTS,
+  morning: `امروز: ${IGFREE_SHORT} — ۳ دروغ بزرگ اینستاگرام در آمریکا و کانادا 🌷`,
+  onehour: `۱ ساعت تا شروع: ${IGFREE_TOPIC} (بدون نیاز به دوربین) ⏳`,
+  reminder: `یادآوری ${IGFREE_TOPIC} + ویدیوی پیش‌نیاز 🌷`,
+};
+const subjectsFor = (round: any) => (isIgFree(round) ? IGFREE_SUBJECTS : SUBJECTS);
+const topicOf = (round: any) => (isIgFree(round) ? IGFREE_TOPIC : "وبینار اینستاگرام ادز");
+const liveTopicOf = (round: any) =>
+  isIgFree(round) ? IGFREE_SHORT : "جذب مشتری واقعی با اینستاگرام ادز";
+
 function tzParts(d: Date, tz: string): { hour: number; date: string } {
   try {
     const fmt = new Intl.DateTimeFormat("en-CA", {
@@ -152,7 +168,7 @@ function calendarClickUrl(round: any, email: string, tyUrl: string): string {
     `پشتیبانی: ${SUPPORT_URL}`;
   const gcal =
     "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-    `&text=${encodeURIComponent(isStartAds(round) ? dedicatedOf(round).calTitle : "Instagram Ads وبینار جذب مشتری با اینستاگرام ادز")}` +
+    `&text=${encodeURIComponent(isStartAds(round) ? dedicatedOf(round).calTitle : (isIgFree(round) ? IGFREE_TOPIC : "Instagram Ads وبینار جذب مشتری با اینستاگرام ادز"))}` +
     `&dates=${icsDate(start)}/${icsDate(end)}` +
     `&details=${encodeURIComponent(details)}` +
     `&location=${encodeURIComponent(meet)}`;
@@ -201,7 +217,7 @@ function buildHtml(kind: Kind, name: string, round: any, tz: string, email: stri
   const reminderInner = `
     <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;">
       <h1 style="margin:0 0 14px;font-size:20px;line-height:1.6;">
-        سلام دوست عزیز، جای‌تان در وبینار اینستاگرام ادز رزرو شد 🌷
+        سلام دوست عزیز، جای‌تان در ${topicOf(round)} رزرو شد 🌷
       </h1>
 
       ${p("<strong>دکمهٔ «Boost Post» سریع‌ترین راه سوزاندن بودجهٔ تبلیغات است.</strong> اینستاگرام آن را جلوی چشم‌تان گذاشته چون ساده است، نه چون برای بیزینس شما مشتری می‌آورد. نتیجه؟ لایک و بازدید از آدم‌هایی که هیچ‌وقت مشتری شما نمی‌شوند.")}
@@ -297,7 +313,7 @@ function buildHtml(kind: Kind, name: string, round: any, tz: string, email: stri
   const oneHourInner = `
     <div dir="rtl" style="direction:rtl;text-align:right;max-width:560px;margin:0 auto;padding:24px 20px;">
       ${p("سلام دوست عزیز ⏳")}
-      ${p("دقیقاً <strong>۱ ساعت دیگر</strong> وبینار زندهٔ «جذب مشتری واقعی با اینستاگرام ادز» شروع می‌شود.")}
+      ${p(`دقیقاً <strong>۱ ساعت دیگر</strong> وبینار زندهٔ «${liveTopicOf(round)}» شروع می‌شود.`)}
       ${p("اگر درگیر کار، رفت‌وآمد یا کارهای خانه هستید، فقط این ۳ مورد را بدانید:")}
       ${p("<strong>۱. دوربین و میکروفون شما خاموش است.</strong><br>نیازی به آماده شدن نیست. با لپ‌تاپ یا حتی گوشی و یک هندزفری وارد شوید و راحت گوش کنید.")}
       ${p("<strong>۲. بازپخش یا رکورد ارسال نمی‌شود.</strong><br>جلسه کاملاً زنده است و همه‌چیز روی صفحه و داخل ادز منیجر نشان داده می‌شود؛ تنها فرصت دیدنش همین جلسهٔ زنده است.")}
@@ -454,7 +470,7 @@ async function sendBatch(payload: any[]): Promise<{ ids: (string | null)[] } | n
 }
 
 async function processRound(round: any, kind: Kind, testEmail?: string, catchup = false) {
-  const subject = isStartAds(round) ? (dedicatedOf(round).subjects as any)[kind] : SUBJECTS[kind];
+  const subject = isStartAds(round) ? (dedicatedOf(round).subjects as any)[kind] : subjectsFor(round)[kind];
   if ((kind === "nurture1" || kind === "nurture2") && !NURTURE_ONLY.includes(round.program_slug)) {
     return { round: round.round_name, kind, recipients: 0, sent: 0, failed: 0, skipped: "PowerFree only" };
   }

@@ -58,7 +58,7 @@ export const IGFREE_WEBINAR: DedicatedWebinar = {
   metaEvent: "IGAdsFreeLead",
   metaContentName: "Instagram Ads Webinar Registration",
   liveContentName: "IG Ads Webinar Live",
-  defaultTitle: "وبینار جذب مشتری با اینستاگرام ادز",
+  defaultTitle: "وبینار رایگان افزایش مشتری ۲۰۲۷",
   hostLine: "",
   icsName: "igads-webinar.ics",
   whatsappNumber: "16265028538",

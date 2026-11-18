@@ -194,8 +194,8 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
   return (
     <>
       <SEOHead
-        title={dc ? `ثبت‌نام شما ثبت شد | ${defaultTitle}` : "ثبت‌نام شما ثبت شد | وبینار اینستاگرام ادز"}
-        description={dc ? `ثبت‌نام شما در ${defaultTitle} با موفقیت ثبت شد.` : "ثبت‌نام شما در وبینار رایگان جذب مشتری با اینستاگرام ادز با موفقیت ثبت شد."}
+        title={campaign ? `ثبت‌نام شما ثبت شد | ${defaultTitle}` : "ثبت‌نام شما ثبت شد | وبینار اینستاگرام ادز"}
+        description={campaign ? `ثبت‌نام شما در ${defaultTitle} با موفقیت ثبت شد.` : "ثبت‌نام شما در وبینار رایگان جذب مشتری با اینستاگرام ادز با موفقیت ثبت شد."}
         locale="fa_IR"
       />
       <div
