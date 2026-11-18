@@ -465,21 +465,8 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
     }
   }
 
-  return (
-    <>
-      <SEOHead
-        title={ownTitle ? `${ownTitle} | Rilo` : "وبینار رایگان جذب مشتری با اینستاگرام ادز"}
-        description={ownTitle ? `ثبت‌نام رایگان در ${ownTitle}.` : "در این وبینار رایگان یاد می‌گیرید چطور با تبلیغات اینستاگرام (Instagram Ads) مشتری واقعی جذب کنید."}
-        locale="fa_IR"
-      />
-      <div
-        dir="rtl"
-        lang="fa"
-        className="min-h-screen bg-gradient-to-b from-rose-50 via-white to-amber-50 font-farsi"
-      >
-        <main className="mx-auto w-full max-w-md px-4 pb-16 pt-6">
-          {isPF ? null : cover && (vid || directVideo) ? (
-            <div className="overflow-hidden rounded-3xl bg-black shadow-lg">
+  const videoBlock = cover && (vid || directVideo) ? (
+<div className="overflow-hidden rounded-3xl bg-black shadow-lg">
               <div className="relative aspect-video w-full">
                 {playing ? (
                   vid ? (
@@ -517,7 +504,22 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
                 )}
               </div>
             </div>
-          ) : cover ? (
+  ) : null;
+
+  return (
+    <>
+      <SEOHead
+        title={ownTitle ? `${ownTitle} | Rilo` : "وبینار رایگان جذب مشتری با اینستاگرام ادز"}
+        description={ownTitle ? `ثبت‌نام رایگان در ${ownTitle}.` : "در این وبینار رایگان یاد می‌گیرید چطور با تبلیغات اینستاگرام (Instagram Ads) مشتری واقعی جذب کنید."}
+        locale="fa_IR"
+      />
+      <div
+        dir="rtl"
+        lang="fa"
+        className="min-h-screen bg-gradient-to-b from-rose-50 via-white to-amber-50 font-farsi"
+      >
+        <main className="mx-auto w-full max-w-md px-4 pb-16 pt-6">
+          {!isPF && videoBlock}{isPF ? null : cover && (vid || directVideo) ? null : cover ? (
             <div className="overflow-hidden rounded-3xl shadow-lg">
               <img
                 src={cover}
@@ -531,7 +533,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
             <h1 className="text-2xl font-bold leading-tight text-neutral-900">
               🎁{campaign ? programTitle : "وبینار رایگان: جذب مشتری با اینستاگرام ادز"}
             </h1>
-            {dc && (
+            {dc && !isPF && (
               <p className="text-[11px] font-bold text-neutral-500">{dc.hostLine}</p>
             )}
             {blockedRegion ? (
@@ -616,7 +618,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
               </div>
             ) : (
               <div className="mx-auto flex flex-col items-center gap-2">
-                {webinar && <WebinarCountdown startUtc={webinar.startUtc} />}
+                {webinar && !isPF && <WebinarCountdown startUtc={webinar.startUtc} />}
                 {isPF && faLocalLabel ? (
                   <div className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-center text-sm font-bold text-white shadow-sm">
                     🕒 به وقت شما: {faLocalLabel}
@@ -725,6 +727,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
 
           {isPF && !blockedRegion && !waitlistMode && (
             <div className="mt-6 space-y-4 text-right">
+              {videoBlock}
               <div className="rounded-2xl bg-white p-4 shadow-sm">
                 <p className="mb-2 text-sm font-bold text-rose-600">در این وبینار ۹۰ دقیقه‌ای زنده:</p>
                 <ul className="space-y-2 text-sm font-semibold leading-6 text-neutral-900">
