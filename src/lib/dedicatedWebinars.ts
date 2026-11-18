@@ -17,6 +17,8 @@ export interface DedicatedWebinar {
   senderName?: string;
   /** Exact copy of the /l/igadsfree pages (same copy, video and pixel events), only slug/sources/paths differ. */
   igadsClone?: boolean;
+  /** Thank-you page video (YouTube ID or URL) for this campaign. */
+  thankYouVideoId?: string;
 }
 
 export const STARTADS_WEBINAR: DedicatedWebinar = {
@@ -63,4 +65,5 @@ export const IGFREE_WEBINAR: DedicatedWebinar = {
   icsName: "igads-webinar.ics",
   whatsappNumber: "16265028538",
   igadsClone: true,
+  thankYouVideoId: "GFinP-x2KXw",
 };

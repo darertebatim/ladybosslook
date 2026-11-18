@@ -26,3 +26,5 @@
 - [ ] Verify video playlist host/tag saving with an admin account — blocked by external unmanaged authenticated preview access.
 - [x] Match Path, My Programs, Explore, and Player headers using the shared header design; checks pass.
 - [ ] Verify the four headers while signed in — blocked by external unmanaged authenticated preview access.
+
+- [x] Set the /l/igfreewebinar thank-you page video to YouTube GFinP-x2KXw via a per-campaign override; older IG Ads thank-you pages keep their current video. Verified play on mobile preview.

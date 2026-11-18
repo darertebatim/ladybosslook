@@ -157,9 +157,9 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
         .eq("slug", slug)
         .maybeSingle();
 
-      // Dedicated campaigns use the thank-you video set on the round;
-      // the IG Ads pages keep their fixed campaign video.
-      setVideoId(dc ? youtubeId(round?.video_url) ?? "" : THANKYOU_VIDEO_ID);
+      // Campaign-level override wins; dedicated campaigns otherwise use the
+      // thank-you video set on the round; the IG Ads pages keep their fixed video.
+      setVideoId(campaign?.thankYouVideoId ?? (dc ? youtubeId(round?.video_url) ?? "" : THANKYOU_VIDEO_ID));
 
       if (round?.first_session_date) {
         setWebinar({
