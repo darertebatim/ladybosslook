@@ -237,13 +237,17 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
 
                 <div className="relative aspect-video overflow-hidden rounded-xl shadow-md">
                   {videoPlaying ? (
-                    <TrackedIframe
-                      className="h-full w-full"
-                      src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
-                      title="پیام علی لطفی"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
+                    <div className="absolute inset-0 overflow-hidden">
+                      {/* Frame mask: oversize the embed so YouTube's top title bar and bottom-corner branding are cropped out */}
+                      <TrackedIframe
+                        className="absolute left-0 top-[-60px] w-full"
+                        style={{ height: "calc(100% + 120px)" }}
+                        src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&fs=1&disablekb=0`}
+                        title="پیام علی لطفی"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
                   ) : (
                     <button
                       type="button"

@@ -28,3 +28,5 @@
 - [ ] Verify the four headers while signed in — blocked by external unmanaged authenticated preview access.
 
 - [x] Set the /l/igfreewebinar thank-you page video to YouTube GFinP-x2KXw via a per-campaign override; older IG Ads thank-you pages keep their current video. Verified play on mobile preview.
+
+- [x] Apply the existing YouTube frame-mask setup to the /l/igfreewebinar thank-you video so its title bar and extra buttons are cropped; verified on the live preview.
