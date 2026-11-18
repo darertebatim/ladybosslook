@@ -635,14 +635,6 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
                     تغییر زمان جلسه
                   </button>
                 )}
-                {isPF && (
-                  <ul className="w-full space-y-2 rounded-2xl bg-white p-4 text-right text-sm font-semibold leading-6 text-neutral-900 shadow-sm">
-                    <li>✅ آشتی با لهجه و صحبت با اعتماد‌به‌نفس</li>
-                    <li>✅ استفاده از نفوذ کلام در ارتباطات حرفه‌ای و شخصی</li>
-                    <li>✅ بازسازی جایگاه و عزت‌نفس بعد از مهاجرت</li>
-                    <li>🎁 تست قدرت درونی در لایو</li>
-                  </ul>
-                )}
                 <div className="flex flex-col items-center gap-1 text-sm font-semibold text-emerald-700">
                   <span>برای دریافت لینک وبینار، فرم زیر را پر کنید</span>
                   {!isPF && <span dir="ltr" className="text-xs font-medium text-emerald-600">Fill out the form below to receive the webinar link</span>}
@@ -729,6 +721,35 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
               {isPF ? "لینک اختصاصی بلافاصله برایتان ایمیل می‌شود." : "By registering, the webinar link and reminders will be sent to your email."}
             </p>
           </form>
+          )}
+
+          {isPF && !blockedRegion && !waitlistMode && (
+            <div className="mt-6 space-y-4 text-right">
+              <div className="rounded-2xl bg-white p-4 shadow-sm">
+                <p className="mb-2 text-sm font-bold text-rose-600">در این وبینار زنده چه چیزی می‌گیری؟</p>
+                <ul className="space-y-2 text-sm font-semibold leading-6 text-neutral-900">
+                  <li>✅ آشتی با لهجه و صحبت با اعتماد‌به‌نفس</li>
+                  <li>✅ استفاده از نفوذ کلام در ارتباطات حرفه‌ای و شخصی</li>
+                  <li>✅ بازسازی جایگاه و عزت‌نفس بعد از مهاجرت</li>
+                  <li>🎁 تست قدرت درونی در لایو</li>
+                </ul>
+              </div>
+              <div className="rounded-2xl bg-white p-4 shadow-sm">
+                <p className="mb-2 text-sm font-bold text-rose-600">این وبینار برای توست اگر…</p>
+                <ul className="space-y-2 text-sm leading-6 text-neutral-800">
+                  <li>💭 بعد از مهاجرت حس می‌کنی صدای واقعی‌ات گم شده</li>
+                  <li>💭 موقع انگلیسی حرف زدن، از لهجه‌ات خجالت می‌کشی</li>
+                  <li>💭 می‌خواهی دوباره همان زن مطمئن و قدرتمند قبل باشی</li>
+                </ul>
+              </div>
+              <button
+                type="button"
+                onClick={() => formRef.current?.scrollIntoView({ behavior: "smooth" })}
+                className="min-h-[52px] w-full rounded-xl bg-gradient-to-l from-rose-500 to-amber-500 text-base font-bold text-white shadow-md active:scale-[0.98]"
+              >
+                همین الان صندلی‌ات را رزرو کن ↑
+              </button>
+            </div>
           )}
         </main>
       </div>
