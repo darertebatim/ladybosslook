@@ -19,6 +19,7 @@ test("WhatsApp message includes identity, round, both session times, and thank-y
     localDateTime: "4:00 PM, Wednesday\n(America/Vancouver), November 18, 2026",
     losAngelesDateTime: "Wed, Nov 18, 2026, 4:00 PM PT",
     thankYouUrl: "https://ladybosslook.com/l/igfreewebinar/thankyou?round=round-123&email=ali%40example.com",
+    reserveLiveGifts: true,
   });
 
   assert.match(message, /نام: Ali/);

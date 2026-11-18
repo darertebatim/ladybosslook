@@ -202,6 +202,7 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
     webinar?.roundId || roundParam || registeredRoundId,
     registeredEmail,
   );
+  const reserveLiveGifts = campaign?.slug === "igfreewebinar";
   const whatsAppMessage = buildWebinarSupportMessage({
     title: defaultTitle,
     name: registeredName,
@@ -211,6 +212,7 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
     localDateTime: compactLocalDate,
     losAngelesDateTime: laDate,
     thankYouUrl: supportThankYouUrl,
+    reserveLiveGifts,
   });
 
   return (
@@ -300,7 +302,9 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
                   )}
                 </div>
                 <p className="mt-2 text-center text-xs font-bold leading-5 text-neutral-600">
-                  این ویدیو فقط برای ثبت‌نامی‌هاست؛ قبل از وبینار ببینید تا آماده لایو باشید.
+                  {reserveLiveGifts
+                    ? "تماشای کامل این ویدیو پیش‌نیاز حضور در وبینار است؛ لطفاً تا آخر ببینید."
+                    : "این ویدیو فقط برای ثبت‌نامی‌هاست؛ قبل از وبینار ببینید تا آماده لایو باشید."}
                 </p>
               </section>
             )}
@@ -314,7 +318,11 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
                   <div className="min-w-0 flex-1">
                     <p className="text-[11px] font-bold text-emerald-600">قدم دوم از ۳</p>
                     <h2 className="text-base font-black text-neutral-900">
-                      {campaign?.whatsappNumber ? "در واتساپ پیام بدهید" : "به پشتیبانی پیام بدهید"}
+                      {reserveLiveGifts
+                        ? "جای خود و هدایای حاضرین را رزرو کنید"
+                        : campaign?.whatsappNumber
+                          ? "در واتساپ پیام بدهید"
+                          : "به پشتیبانی پیام بدهید"}
                     </h2>
                   </div>
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
@@ -322,8 +330,15 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
                   </span>
                 </div>
                 <p className="mb-3 text-center text-xs font-bold leading-5 text-neutral-600">
-                  روی دکمه زیر بزنید و پیام آماده را ارسال کنید تا جزئیات وبینار را دریافت کنید.
+                  {reserveLiveGifts
+                    ? "پیام آماده را در واتساپ بفرستید تا حضور شما تأیید شود و هدایای مخصوص حاضرین لایو برایتان رزرو شود."
+                    : "روی دکمه زیر بزنید و پیام آماده را ارسال کنید تا جزئیات وبینار را دریافت کنید."}
                 </p>
+                {reserveLiveGifts && (
+                  <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-center text-xs font-black leading-5 text-amber-800">
+                    🎁 هدایا و سوپرایزهای ویژه فقط برای حاضرین لایو وبینار
+                  </div>
+                )}
                 <a
                   href={
                     campaign?.whatsappNumber
@@ -344,7 +359,11 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
                   className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 text-sm font-bold text-white shadow-md transition active:scale-[0.98]"
                 >
                   <MessageCircle className="h-5 w-5" />
-                  {campaign?.whatsappNumber ? "ارسال پیام در واتساپ" : "ارسال پیام به پشتیبانی"}
+                  {reserveLiveGifts
+                    ? "رزرو جای من و هدایا در واتساپ"
+                    : campaign?.whatsappNumber
+                      ? "ارسال پیام در واتساپ"
+                      : "ارسال پیام به پشتیبانی"}
                 </a>
                 {registeredEmail && (
                   <p className="mt-3 rounded-xl bg-neutral-50 px-3 py-2 text-center text-[11px] font-bold leading-5 text-neutral-700">

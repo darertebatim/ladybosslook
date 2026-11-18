@@ -7,6 +7,7 @@ export interface WebinarSupportMessageInput {
   localDateTime?: string;
   losAngelesDateTime?: string;
   thankYouUrl: string;
+  reserveLiveGifts?: boolean;
 }
 
 export function buildWebinarThankYouUrl(
@@ -30,13 +31,16 @@ export function buildWebinarSupportMessage({
   localDateTime,
   losAngelesDateTime,
   thankYouUrl,
+  reserveLiveGifts = false,
 }: WebinarSupportMessageInput): string {
   const round = roundNumber != null
     ? `${roundNumber}${roundName ? ` — ${roundName}` : ""}`
     : roundName;
 
   return [
-    `سلام، در ${title} ثبت‌نام کرده‌ام. لطفاً لینک ورود و جزئیات جلسه‌ام را برایم بفرستید.`,
+    reserveLiveGifts
+      ? `سلام، در ${title} ثبت‌نام کرده‌ام. لطفاً جای من و هدایای مخصوص حاضرین لایو را رزرو کنید و لینک ورود را برایم بفرستید.`
+      : `سلام، در ${title} ثبت‌نام کرده‌ام. لطفاً لینک ورود و جزئیات جلسه‌ام را برایم بفرستید.`,
     name && `👤 نام: ${name}`,
     email && `📧 ایمیل: ${email}`,
     round && `🔢 دور: ${round}`,
