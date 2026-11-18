@@ -350,6 +350,16 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
     () => (webinar ? formatLocalDateTime(webinar.startUtc) : ""),
     [webinar],
   );
+  const isPF = dc?.slug === "powerfree";
+  const faLocalLabel = useMemo(() => {
+    if (!webinar) return "";
+    const d = webinar.startUtc;
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const date = new Intl.DateTimeFormat("fa-IR", { weekday: "long", day: "numeric", month: "long" }).format(d);
+    const time = new Intl.DateTimeFormat("fa-IR", { hour: "numeric", minute: "2-digit" }).format(d);
+    const city = (tz?.split("/").pop() || "").replace(/_/g, " ");
+    void city; return `${date} | ساعت ${time}`;
+  }, [webinar]);
   const vid = useMemo(() => youtubeId(videoUrl ?? undefined), [videoUrl]);
   const directVideo = !vid && videoUrl ? videoUrl : null;
 
@@ -468,7 +478,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
         className="min-h-screen bg-gradient-to-b from-rose-50 via-white to-amber-50 font-farsi"
       >
         <main className="mx-auto w-full max-w-md px-4 pb-16 pt-6">
-          {cover && (vid || directVideo) ? (
+          {isPF ? null : cover && (vid || directVideo) ? (
             <div className="overflow-hidden rounded-3xl bg-black shadow-lg">
               <div className="relative aspect-video w-full">
                 {playing ? (
@@ -607,7 +617,11 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
             ) : (
               <div className="mx-auto flex flex-col items-center gap-2">
                 {webinar && <WebinarCountdown startUtc={webinar.startUtc} />}
-                {localLabel && (
+                {isPF && faLocalLabel ? (
+                  <div className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-center text-sm font-bold text-white shadow-sm">
+                    🕒 به وقت شما: {faLocalLabel}
+                  </div>
+                ) : localLabel && (
                   <div dir="ltr" className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-center text-base font-bold text-white shadow-sm whitespace-pre-line">
                     🕒 Your Local time: {localLabel}
                   </div>
@@ -621,9 +635,17 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
                     تغییر زمان جلسه
                   </button>
                 )}
+                {isPF && (
+                  <ul className="w-full space-y-2 rounded-2xl bg-white p-4 text-right text-sm font-semibold leading-6 text-neutral-900 shadow-sm">
+                    <li>✅ آشتی با لهجه و صحبت با اعتماد‌به‌نفس</li>
+                    <li>✅ استفاده از نفوذ کلام در ارتباطات حرفه‌ای و شخصی</li>
+                    <li>✅ بازسازی جایگاه و عزت‌نفس بعد از مهاجرت</li>
+                    <li>🎁 تست قدرت درونی در لایو</li>
+                  </ul>
+                )}
                 <div className="flex flex-col items-center gap-1 text-sm font-semibold text-emerald-700">
                   <span>برای دریافت لینک وبینار، فرم زیر را پر کنید</span>
-                  <span dir="ltr" className="text-xs font-medium text-emerald-600">Fill out the form below to receive the webinar link</span>
+                  {!isPF && <span dir="ltr" className="text-xs font-medium text-emerald-600">Fill out the form below to receive the webinar link</span>}
                   <ArrowDown className="h-5 w-5 animate-bounce" />
                 </div>
               </div>
@@ -638,26 +660,26 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
           <form
             ref={formRef}
             onSubmit={handleSubmit}
-            dir="ltr"
-            className="mt-2 space-y-4 scroll-mt-4 rounded-2xl border-2 border-rose-200 bg-white p-5 shadow-sm text-left"
+            dir={isPF ? "rtl" : "ltr"}
+            className={`mt-2 space-y-4 scroll-mt-4 rounded-2xl border-2 border-rose-200 bg-white p-5 shadow-sm ${isPF ? "text-right" : "text-left"}`}
           >
             <div className="flex items-center justify-center gap-2 whitespace-nowrap">
               <h2 className="text-base font-semibold text-neutral-900">
-                🎁 Free Registration 🎁
+                {isPF ? "🎁 ثبت‌نام رایگان 🎁" : "🎁 Free Registration 🎁"}
               </h2>
               <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2.5 py-1 text-[10px] font-bold text-rose-600">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
                 </span>
-                🔥 Free seats are limited
+                {isPF ? "🔥 ظرفیت محدود" : "🔥 Free seats are limited"}
               </span>
             </div>
 
 
             <div>
               <label className="mb-1 block text-sm font-medium text-neutral-800">
-                Full Name
+                {isPF ? "نام و نام خانوادگی" : "Full Name"}
               </label>
               <input
                 type="text"
@@ -665,8 +687,8 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
                 onChange={(e) => setName(e.target.value)}
                 maxLength={100}
                 className="min-h-[48px] w-full rounded-xl border border-neutral-300 bg-white px-4 text-base text-neutral-900 outline-none focus:border-rose-500"
-                placeholder="e.g. Sara Ahmadi"
-                dir="ltr"
+                placeholder={isPF ? "مثلاً: سارا احمدی" : "e.g. Sara Ahmadi"}
+                dir={isPF ? "auto" : "ltr"}
               />
               {errors.name && (
                 <p className="mt-1 text-xs text-rose-600">{errors.name}</p>
@@ -675,7 +697,7 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
 
             <div>
               <label className="mb-1 block text-sm font-medium text-neutral-800">
-                Email
+                {isPF ? "ایمیل شما (برای ارسال لینک وبینار)" : "Email"}
               </label>
               <input
                 type="email"
@@ -696,15 +718,15 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
               disabled={submitting}
               className="min-h-[52px] w-full rounded-xl bg-gradient-to-l from-rose-500 to-amber-500 text-base font-bold text-white shadow-md transition active:scale-[0.98] disabled:opacity-60"
             >
-              {submitting ? "Registering..." : "Register Free"}
+              {submitting ? (isPF ? "در حال ثبت‌نام..." : "Registering...") : (isPF ? "ثبت‌نام رایگان و رزرو صندلی" : "Register Free")}
             </button>
 
             <p className="text-center text-[11px] font-semibold leading-5 text-rose-600">
-              🔒 Seats are limited. No recording will be shared.
+              {isPF ? "🔒 این جلسه بازپخش ندارد و ظرفیت لایو محدود است." : "🔒 Seats are limited. No recording will be shared."}
             </p>
 
             <p className="text-center text-[11px] leading-5 text-neutral-500">
-              By registering, the webinar link and reminders will be sent to your email.
+              {isPF ? "لینک اختصاصی بلافاصله برایتان ایمیل می‌شود." : "By registering, the webinar link and reminders will be sent to your email."}
             </p>
           </form>
           )}
