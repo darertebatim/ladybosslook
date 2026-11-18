@@ -11,6 +11,7 @@ import { trackCompleteRegistration } from "@/lib/metaPixel";
 import WebinarAddEmailBox from "@/components/WebinarAddEmailBox";
 import type { DedicatedWebinar } from "@/lib/dedicatedWebinars";
 import { youtubeId } from "@/pages/StartAdsLanding";
+import { buildWebinarSupportMessage, buildWebinarThankYouUrl } from "@/lib/webinarSupportMessage";
 import {
   buildGoogleCalendarUrl,
   downloadIcs,
@@ -113,6 +114,9 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
     durationMinutes: number;
     meetUrl: string;
     supportUrl: string;
+    roundId: string;
+    roundNumber: number | null;
+    roundName: string | null;
   } | null>(null);
 
   useEffect(() => {
@@ -170,6 +174,9 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
           supportUrl: campaign?.whatsappNumber
             ? `https://wa.me/${campaign.whatsappNumber}`
             : "https://ladybosslook.com/dashboard/chat",
+          roundId: round.id,
+          roundNumber: round.round_number,
+          roundName: round.round_name,
         });
       }
     })();
@@ -190,6 +197,22 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
   const laDate = webinar ? formatLADateTime(webinar.startUtc) : "";
   const localDate = webinar ? formatLocalDateTime(webinar.startUtc) : "";
   const compactLocalDate = webinar ? formatCompactLocalDateTime(webinar.startUtc) : "";
+  const supportThankYouUrl = buildWebinarThankYouUrl(
+    campaign?.basePath ?? "/l/igadsfree",
+    webinar?.roundId || roundParam || registeredRoundId,
+    registeredEmail,
+  );
+  const whatsAppMessage = buildWebinarSupportMessage({
+    title: defaultTitle,
+    name: registeredName,
+    email: registeredEmail,
+    city: registeredCity,
+    roundNumber: webinar?.roundNumber,
+    roundName: webinar?.roundName,
+    localDateTime: compactLocalDate,
+    losAngelesDateTime: laDate,
+    thankYouUrl: supportThankYouUrl,
+  });
 
   return (
     <>
@@ -305,16 +328,7 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
                 <a
                   href={
                     campaign?.whatsappNumber
-                      ? `https://wa.me/${campaign.whatsappNumber}?text=${encodeURIComponent(
-                          [
-                            `سلام، در ${defaultTitle} ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.`,
-                            registeredName && `نام: ${registeredName}`,
-                            registeredCity && `شهر: ${registeredCity}`,
-                            registeredEmail && `ایمیل: ${registeredEmail}`,
-                          ]
-                            .filter(Boolean)
-                            .join("\n"),
-                        )}`
+                      ? `https://wa.me/${campaign.whatsappNumber}?text=${encodeURIComponent(whatsAppMessage)}`
                       : `/dashboard/chat?draft=${encodeURIComponent(
                           [
                             campaign ? `سلام، در ${defaultTitle} ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.` : "سلام، در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.",
