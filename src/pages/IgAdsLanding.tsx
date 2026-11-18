@@ -137,6 +137,36 @@ function localTimeLabels(d: Date): { date: string; time: string } {
   }
 }
 
+/** English "your local time" line: city (zone) · date · time. */
+function enLocalLine(d: Date): string {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+    const city = tz.includes("/") ? tz.split("/").pop()!.replace(/_/g, " ") : tz;
+    const zone =
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: tz || undefined,
+        timeZoneName: "short",
+      })
+        .formatToParts(d)
+        .find((p) => p.type === "timeZoneName")?.value || "";
+    const date = new Intl.DateTimeFormat("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).format(d);
+    const time = new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(d);
+    const where = city ? `${city}${zone ? ` (${zone})` : ""}` : zone;
+    return [where, date, time].filter(Boolean).join(" · ");
+  } catch {
+    return "";
+  }
+}
+
 /** Small "starts in" countdown shown under each session option. */
 function MiniCountdown({ startUtc }: { startUtc: Date }) {
   const [now, setNow] = useState(() => Date.now());
@@ -360,6 +390,10 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
     const city = (tz?.split("/").pop() || "").replace(/_/g, " ");
     void city; return `${date} | ساعت ${time}`;
   }, [webinar]);
+  const enLocal = useMemo(
+    () => (webinar ? enLocalLine(webinar.startUtc) : ""),
+    [webinar],
+  );
   const vid = useMemo(() => youtubeId(videoUrl ?? undefined), [videoUrl]);
   const directVideo = !vid && videoUrl ? videoUrl : null;
 
@@ -620,8 +654,16 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
               <div className="mx-auto flex flex-col items-center gap-2">
                 {webinar && !isPF && <WebinarCountdown startUtc={webinar.startUtc} />}
                 {isPF && faLocalLabel ? (
-                  <div className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-center text-sm font-bold text-white shadow-sm">
-                    🕒 به وقت شما: {faLocalLabel}
+                  <div className="flex flex-col items-center gap-1.5">
+                    <div className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-center text-sm font-bold text-white shadow-sm">
+                      🕒 وقت محلی شما
+                    </div>
+                    <div className="text-xs font-bold leading-5 text-emerald-800">{faLocalLabel}</div>
+                    {enLocal && (
+                      <div dir="ltr" className="rounded-full bg-emerald-50 px-3 py-1 text-center text-[11px] font-bold leading-4 text-emerald-800">
+                        {enLocal}
+                      </div>
+                    )}
                   </div>
                 ) : localLabel && (
                   <div dir="ltr" className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-center text-base font-bold text-white shadow-sm whitespace-pre-line">
@@ -672,8 +714,15 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
 
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-neutral-800">
-                {isPF ? "نام و نام خانوادگی" : "Full Name"}
+              <label className="mb-1 flex items-baseline justify-between gap-2 text-sm font-medium text-neutral-800">
+                {isPF ? (
+                  <>
+                    <span>نام و نام خانوادگی</span>
+                    <span dir="ltr" className="text-xs font-semibold text-neutral-500">Full Name</span>
+                  </>
+                ) : (
+                  "Full Name"
+                )}
               </label>
               <input
                 type="text"
@@ -690,8 +739,15 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-neutral-800">
-                {isPF ? "ایمیل شما (برای ارسال لینک وبینار)" : "Email"}
+              <label className="mb-1 flex items-baseline justify-between gap-2 text-sm font-medium text-neutral-800">
+                {isPF ? (
+                  <>
+                    <span>ایمیل شما (برای ارسال لینک وبینار)</span>
+                    <span dir="ltr" className="text-xs font-semibold text-neutral-500">Email</span>
+                  </>
+                ) : (
+                  "Email"
+                )}
               </label>
               <input
                 type="email"
