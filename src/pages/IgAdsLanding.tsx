@@ -656,9 +656,8 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
                 {isPF && faLocalLabel ? (
                   <div className="flex flex-col items-center gap-1.5">
                     <div className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-center text-sm font-bold text-white shadow-sm">
-                      🕒 وقت محلی شما
+                      🕒 وقت محلی شما: {faLocalLabel}
                     </div>
-                    <div className="text-xs font-bold leading-5 text-emerald-800">{faLocalLabel}</div>
                     {enLocal && (
                       <div dir="ltr" className="rounded-full bg-emerald-50 px-3 py-1 text-center text-[11px] font-bold leading-4 text-emerald-800">
                         {enLocal}
