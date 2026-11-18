@@ -1,7 +1,7 @@
 import { TrackedIframe } from "@/components/TrackedIframe";
 import { trackCalendarClick } from "@/lib/trackCalendarClick";
 import { useEffect, useMemo, useState } from "react";
-import { CalendarPlus, Check, MessageCircle, Play } from "lucide-react";
+import { ArrowDown, CalendarPlus, Check, MessageCircle, Play } from "lucide-react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { resolveWebinarRound } from "@/lib/webinarRounds";
 
@@ -208,12 +208,15 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md">
               <Check className="h-7 w-7" strokeWidth={3} />
             </div>
-            <h1 className="text-xl font-bold text-neutral-900">
-              ثبت‌نام شما با موفقیت انجام شد
+            <h1 className="text-xl font-bold leading-8 text-neutral-900">
+              ایمیل شما ثبت شد
+              <span className="mt-1 block text-lg font-black leading-7 text-rose-600">
+                اما هنوز ۳ قدم دیگر مانده تا جای شما قطعی بشود
+              </span>
             </h1>
-            <p className="mt-2 text-base font-black leading-7 text-rose-600">
-              برای قطعی شدن جای خود، این ۳ قدم را انجام دهید
-            </p>
+            <div className="mt-2 flex justify-center" aria-hidden="true">
+              <ArrowDown className="h-7 w-7 animate-bounce text-rose-600" strokeWidth={3} />
+            </div>
           </div>
 
           <div className="mt-5 space-y-4">
