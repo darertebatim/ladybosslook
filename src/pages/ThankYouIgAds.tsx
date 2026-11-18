@@ -1,7 +1,7 @@
 import { TrackedIframe } from "@/components/TrackedIframe";
 import { trackCalendarClick } from "@/lib/trackCalendarClick";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { CalendarPlus, Check, MessageCircle, Play } from "lucide-react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { resolveWebinarRound } from "@/lib/webinarRounds";
 
@@ -205,210 +205,200 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
       >
         <main className="mx-auto w-full max-w-md px-4 pb-10 pt-4">
           <div className="text-center">
-            <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-xl text-white shadow-md">
-              ✓
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md">
+              <Check className="h-7 w-7" strokeWidth={3} />
             </div>
             <h1 className="text-xl font-bold text-neutral-900">
               ثبت‌نام شما با موفقیت انجام شد
             </h1>
-            <p className="mt-1 text-base font-black text-rose-600">
-              اما هنوز ۲ قدم دیگر مانده! همین حالا این ویدیو را ببینید
+            <p className="mt-2 text-base font-black leading-7 text-rose-600">
+              برای قطعی شدن جای خود، این ۳ قدم را انجام دهید
             </p>
           </div>
 
-          <div className="mt-2 flex justify-center gap-1.5 text-emerald-600">
-            <ArrowDown className="h-4 w-4 animate-bounce" />
-            <ArrowDown className="h-4 w-4 animate-bounce" style={{ animationDelay: "100ms" }} />
-            <ArrowDown className="h-4 w-4 animate-bounce" style={{ animationDelay: "200ms" }} />
-            <ArrowDown className="h-4 w-4 animate-bounce" style={{ animationDelay: "300ms" }} />
-          </div>
-
-          {videoId && (
-            <div className="mt-1.5">
-              <div className="mb-1.5 flex justify-center">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-[11px] font-black text-rose-700">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
+          <div className="mt-5 space-y-4">
+            {videoId && (
+              <section className="rounded-2xl border border-rose-100 bg-white p-3 shadow-sm">
+                <div className="mb-3 flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-600 text-lg font-black text-white">
+                    ۱
                   </span>
-                  همین حالا ببینید — دسترسی به این ویدیو محدود است
-                </span>
-              </div>
-              <div className="relative aspect-video overflow-hidden rounded-xl shadow-md">
-                {videoPlaying ? (
-                  <TrackedIframe
-                    className="h-full w-full"
-                    src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
-                    title="پیام علی لطفی"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : (
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[11px] font-bold text-rose-600">قدم اول از ۳</p>
+                    <h2 className="text-base font-black text-neutral-900">ویدیو را تماشا کنید</h2>
+                  </div>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose-50 text-rose-600">
+                    <Play className="h-4 w-4 fill-current" />
+                  </span>
+                </div>
+
+                <div className="relative aspect-video overflow-hidden rounded-xl shadow-md">
+                  {videoPlaying ? (
+                    <TrackedIframe
+                      className="h-full w-full"
+                      src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
+                      title="پیام علی لطفی"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setVideoPlaying(true)}
+                      aria-label="پخش ویدیو"
+                      className="group relative block h-full w-full"
+                    >
+                      <img
+                        src={`https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`}
+                        onError={(e) => {
+                          const img = e.currentTarget;
+                          if (!img.src.includes("hqdefault")) {
+                            img.src = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+                          }
+                        }}
+                        alt="پیام علی لطفی"
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                      />
+                      <span className="absolute inset-0 flex items-center justify-center bg-black/20 transition group-active:bg-black/30">
+                        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/95 shadow-xl transition group-active:scale-95">
+                          <svg viewBox="0 0 24 24" className="ml-1 h-7 w-7 fill-rose-600">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </span>
+                      </span>
+                    </button>
+                  )}
+                </div>
+                <p className="mt-2 text-center text-xs font-bold leading-5 text-neutral-600">
+                  این ویدیو فقط برای ثبت‌نامی‌هاست؛ قبل از وبینار ببینید تا آماده لایو باشید.
+                </p>
+              </section>
+            )}
+
+            {webinar && (
+              <section className="rounded-2xl border border-emerald-100 bg-white p-3 shadow-sm">
+                <div className="mb-3 flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-lg font-black text-white">
+                    ۲
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[11px] font-bold text-emerald-600">قدم دوم از ۳</p>
+                    <h2 className="text-base font-black text-neutral-900">
+                      {campaign?.whatsappNumber ? "در واتساپ پیام بدهید" : "به پشتیبانی پیام بدهید"}
+                    </h2>
+                  </div>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                    <MessageCircle className="h-5 w-5" />
+                  </span>
+                </div>
+                <p className="mb-3 text-center text-xs font-bold leading-5 text-neutral-600">
+                  روی دکمه زیر بزنید و پیام آماده را ارسال کنید تا جزئیات وبینار را دریافت کنید.
+                </p>
+                <a
+                  href={
+                    campaign?.whatsappNumber
+                      ? `https://wa.me/${campaign.whatsappNumber}?text=${encodeURIComponent(
+                          [
+                            `سلام، در ${defaultTitle} ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.`,
+                            registeredName && `نام: ${registeredName}`,
+                            registeredCity && `شهر: ${registeredCity}`,
+                            registeredEmail && `ایمیل: ${registeredEmail}`,
+                          ]
+                            .filter(Boolean)
+                            .join("\n"),
+                        )}`
+                      : `/dashboard/chat?draft=${encodeURIComponent(
+                          [
+                            campaign ? `سلام، در ${defaultTitle} ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.` : "سلام، در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.",
+                            registeredName && `نام: ${registeredName}`,
+                            registeredCity && `شهر: ${registeredCity}`,
+                            registeredEmail && `ایمیل: ${registeredEmail}`,
+                          ]
+                            .filter(Boolean)
+                            .join("\n"),
+                        )}`
+                  }
+                  target={campaign?.whatsappNumber ? "_blank" : undefined}
+                  rel={campaign?.whatsappNumber ? "noreferrer" : undefined}
+                  className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 text-sm font-bold text-white shadow-md transition active:scale-[0.98]"
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  {campaign?.whatsappNumber ? "ارسال پیام در واتساپ" : "ارسال پیام به پشتیبانی"}
+                </a>
+                {registeredEmail && (
+                  <p className="mt-3 rounded-xl bg-neutral-50 px-3 py-2 text-center text-[11px] font-bold leading-5 text-neutral-700">
+                    لینک ورود به این ایمیل هم ارسال شد:
+                    <br />
+                    <span dir="ltr" className="break-all text-neutral-900">{registeredEmail}</span>
+                  </p>
+                )}
+              </section>
+            )}
+
+            {event && (
+              <section className="rounded-2xl border border-amber-200 bg-white p-3 shadow-sm">
+                <div className="mb-3 flex items-center gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500 text-lg font-black text-white">
+                    ۳
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[11px] font-bold text-amber-700">قدم سوم از ۳</p>
+                    <h2 className="text-base font-black text-neutral-900">جلسه را به تقویم اضافه کنید</h2>
+                  </div>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-700">
+                    <CalendarPlus className="h-5 w-5" />
+                  </span>
+                </div>
+                <p className="mb-3 text-center text-xs font-bold leading-5 text-neutral-600">
+                  زمان جلسه را ذخیره کنید تا وبینار زنده را از دست ندهید.
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <a
+                    href={buildGoogleCalendarUrl(event)}
+                    onClick={() => trackCalendarClick("google", { email: registeredEmail, roundId: roundParam || registeredRoundId })}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex min-h-[48px] items-center justify-center rounded-xl bg-neutral-900 px-2 text-xs font-semibold text-white shadow-sm transition active:scale-[0.98]"
+                  >
+                    افزودن به Google Calendar
+                  </a>
                   <button
                     type="button"
-                    onClick={() => setVideoPlaying(true)}
-                    aria-label="پخش ویدیو"
-                    className="group relative block h-full w-full"
+                    onClick={() => { trackCalendarClick("apple", { email: registeredEmail, roundId: roundParam || registeredRoundId }); downloadIcs(event, campaign?.icsName ?? "igads-webinar.ics"); }}
+                    className="flex min-h-[48px] items-center justify-center rounded-xl border border-neutral-300 bg-white px-2 text-xs font-semibold text-neutral-900 shadow-sm transition active:scale-[0.98]"
                   >
-                    <img
-                      src={`https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`}
-                      onError={(e) => {
-                        const img = e.currentTarget;
-                        if (!img.src.includes("hqdefault")) {
-                          img.src = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
-                        }
-                      }}
-                      alt="پیام علی لطفی"
-                      className="h-full w-full object-cover"
-                      loading="lazy"
-                    />
-                    <span className="absolute inset-0 flex items-center justify-center bg-black/20 transition group-active:bg-black/30">
-                      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/95 shadow-xl transition group-active:scale-95">
-                        <svg viewBox="0 0 24 24" className="ml-1 h-7 w-7 fill-rose-600">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </span>
-                    </span>
+                    افزودن به Apple Calendar
                   </button>
-                )}
-              </div>
-              <p className="mt-1.5 text-center text-[11px] font-bold text-neutral-600">
-                این ویدیو فقط برای ثبت‌نامی‌هاست — قبل از وبینار تماشا کنید تا آماده لایو باشید
-              </p>
-            </div>
-          )}
-
-          <div className="mt-1.5 flex justify-center gap-1.5 text-emerald-600">
-            <ArrowUp className="h-4 w-4 animate-bounce" />
-            <ArrowUp className="h-4 w-4 animate-bounce" style={{ animationDelay: "100ms" }} />
-            <ArrowUp className="h-4 w-4 animate-bounce" style={{ animationDelay: "200ms" }} />
-            <ArrowUp className="h-4 w-4 animate-bounce" style={{ animationDelay: "300ms" }} />
-          </div>
-
-          <div className="mt-5 flex items-center gap-2" dir="ltr">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-neutral-200" />
-            <div className="h-1.5 w-1.5 rounded-full bg-rose-300" />
-            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-neutral-200" />
-          </div>
-
-          {event && (
-            <section className="mt-3">
-              <p className="mb-0.5 text-center text-base font-black text-rose-600">
-                قدم اول
-              </p>
-              <p className="mb-1.5 text-center text-[11px] font-bold text-neutral-600">
-                ظرفیت لایو محدود است — جلسه را در تقویم‌تان ثبت کنید تا از دست نرود
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                <a
-                  href={buildGoogleCalendarUrl(event)}
-                  onClick={() => trackCalendarClick("google", { email: registeredEmail, roundId: roundParam || registeredRoundId })}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex min-h-[44px] items-center justify-center rounded-xl bg-neutral-900 px-2 text-xs font-semibold text-white shadow-sm transition active:scale-[0.98]"
-                >
-                  افزودن به Google Calendar
-                </a>
-                <button
-                  type="button"
-                  onClick={() => { trackCalendarClick("apple", { email: registeredEmail, roundId: roundParam || registeredRoundId }); downloadIcs(event, campaign?.icsName ?? "igads-webinar.ics"); }}
-                  className="flex min-h-[44px] items-center justify-center rounded-xl border border-neutral-300 bg-white px-2 text-xs font-semibold text-neutral-900 shadow-sm transition active:scale-[0.98]"
-                >
-                  افزودن به Apple Calendar
-                </button>
-              </div>
-              <div className="mt-2 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 px-3 py-2 text-center">
-                <p className="text-[11px] font-black leading-snug text-amber-800">
-                  🔥 این آخرین جلسه رایگان است — بدون ضبط
-                </p>
-              </div>
-            </section>
-          )}
-
-          {webinar && compactLocalDate && (
-            <div className="mt-3 flex w-full flex-col items-center justify-center rounded-full border border-emerald-300 bg-emerald-100 px-3 py-1.5 text-center">
-              <p className="text-sm font-bold text-emerald-900" dir="ltr">
-                🕒 Your Local time: {compactLocalDate.split("\n")[0]}
-              </p>
-              <p className="text-xs font-semibold text-emerald-800" dir="ltr">
-                {compactLocalDate.split("\n")[1]}
-              </p>
-            </div>
-          )}
-
-          <div className="mt-5 flex items-center gap-2" dir="ltr">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-neutral-200" />
-            <div className="h-1.5 w-1.5 rounded-full bg-rose-300" />
-            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-neutral-200" />
-          </div>
-
-          {webinar && (
-            <>
-              <p className="mt-3 text-center text-base font-black text-rose-600">
-                قدم دوم
-              </p>
-              <p className="mb-0.5 text-center text-[11px] font-bold text-neutral-600">
-                لینک ورود فقط به ایمیل ثبت‌نام‌شده ارسال می‌شود — همین حالا جزئیات را دریافت کنید
-              </p>
-              <a
-                href={
-                  campaign?.whatsappNumber
-                    ? `https://wa.me/${campaign.whatsappNumber}?text=${encodeURIComponent(
-                        [
-                          `سلام، در ${defaultTitle} ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.`,
-                          registeredName && `نام: ${registeredName}`,
-                          registeredCity && `شهر: ${registeredCity}`,
-                          registeredEmail && `ایمیل: ${registeredEmail}`,
-                        ]
-                          .filter(Boolean)
-                          .join("\n"),
-                      )}`
-                    : `/dashboard/chat?draft=${encodeURIComponent(
-                        [
-                          campaign ? `سلام، در ${defaultTitle} ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.` : "سلام، در وبینار اینستاگرام ادز ثبت‌نام کرده‌ام. لطفاً جزئیات وبینار را برایم بفرستید.",
-                          registeredName && `نام: ${registeredName}`,
-                          registeredCity && `شهر: ${registeredCity}`,
-                          registeredEmail && `ایمیل: ${registeredEmail}`,
-                        ]
-                          .filter(Boolean)
-                          .join("\n"),
-                      )}`
-                }
-                target={campaign?.whatsappNumber ? "_blank" : undefined}
-                rel={campaign?.whatsappNumber ? "noreferrer" : undefined}
-                className="mt-1.5 flex min-h-[44px] w-full items-center justify-center rounded-xl bg-emerald-500 px-4 text-sm font-bold text-white shadow-md transition active:scale-[0.98]"
-              >
-                {campaign?.whatsappNumber ? "ارسال جزئیات در واتساپ" : "ارسال جزئیات به پشتیبانی"}
-              </a>
-              {registeredEmail && (
-                <>
-                  <p className="mt-1.5 text-center text-xs font-bold text-neutral-800">
-                    <span className="text-rose-600">لینک ورود به این ایمیل ارسال شد: </span>
-                    <span dir="ltr">{registeredEmail}</span>
-                  </p>
-                  <div className="mt-1.5 flex justify-center">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-[11px] font-black text-rose-700">
-                      <span className="relative flex h-2 w-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500" />
-                      </span>
-                      جای شما رزرو شد — ظرفیت جلسه محدود است
-                    </span>
+                </div>
+                {compactLocalDate && (
+                  <div className="mt-3 flex w-full flex-col items-center justify-center rounded-xl border border-emerald-300 bg-emerald-100 px-3 py-2 text-center">
+                    <p className="text-sm font-bold text-emerald-900" dir="ltr">
+                      🕒 Your Local time: {compactLocalDate.split("\n")[0]}
+                    </p>
+                    <p className="text-xs font-semibold text-emerald-800" dir="ltr">
+                      {compactLocalDate.split("\n")[1]}
+                    </p>
                   </div>
-                </>
-              )}
-            </>
-          )}
+                )}
+                <div className="mt-3 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 px-3 py-2 text-center">
+                  <p className="text-[11px] font-black leading-snug text-amber-800">
+                    🔥 این آخرین جلسه رایگان است — بدون ضبط
+                  </p>
+                </div>
+              </section>
+            )}
+          </div>
 
           {webinar && (
-            <section className="mt-3 rounded-xl border border-neutral-200 bg-white p-3 shadow-sm">
+            <section className="mt-5 rounded-xl border border-neutral-200 bg-white p-3 shadow-sm">
               <h2 className="text-base font-semibold text-neutral-900">
                 جزئیات وبینار
               </h2>
               <div className="mt-1.5 space-y-1.5 text-sm text-neutral-800">
                 <div dir="ltr" className="text-left text-xs">📅 {laDate}</div>
                 {localDate && (
-                  <div dir="ltr" className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-center text-sm font-bold text-emerald-900 border border-emerald-300 whitespace-pre-line">
+                  <div dir="ltr" className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-300 bg-emerald-100 px-3 py-1 text-center text-sm font-bold text-emerald-900 whitespace-pre-line">
                     🕒 Your Local time: {localDate}
                   </div>
                 )}
