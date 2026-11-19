@@ -115,14 +115,19 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
   const rows = data || [];
   const effectiveRoundId = roundChoice === 'auto' ? autoRoundId : roundChoice;
   const selectedRound = rounds?.find((r) => r.id === effectiveRoundId) || null;
-  const roundKey = selectedRound
+  const baseRoundKey = selectedRound
     ? String(selectedRound.round_number ?? selectedRound.id)
     : null;
+  const roundKeys = selectedRound && baseRoundKey
+    ? ['startads', 'powerfree', 'igfreewebinar'].includes(programSlug)
+      ? [`${programSlug}-${baseRoundKey}`, ...(programSlug === 'igfreewebinar' ? [baseRoundKey] : [])]
+      : [baseRoundKey]
+    : [];
 
   // Real delivery log for the selected round (automatic + manual sends).
   const { data: deliveryLog, refetch: refetchLog } = useQuery({
-    queryKey: ['webinar-round-delivery-log', roundKey],
-    enabled: !!roundKey,
+    queryKey: ['webinar-round-delivery-log', roundKeys.join(',')],
+    enabled: roundKeys.length > 0,
     staleTime: 0,
     refetchInterval: 60_000,
     queryFn: async () => {
@@ -132,7 +137,7 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
           .from('email_delivery_events')
           .select('recipient, event_type, occurred_at, tags')
           .in('tags->>campaign', ['webinar_day', 'live_followup'])
-          .eq('tags->>round', roundKey!)
+          .in('tags->>round', roundKeys)
           .range(from, from + 999);
         if (error) throw error;
         out.push(...((data || []) as any[]));

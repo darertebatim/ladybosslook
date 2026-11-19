@@ -39,9 +39,9 @@ async function unsubToken(email: string): Promise<string> {
     .slice(0, 32);
 }
 
-function buildHtml(unsubscribeUrl: string, isPower = false): string {
+function buildHtml(unsubscribeUrl: string, isPower = false, isIgFree = false): string {
   const GIFTS = isPower ? "https://ladybosslook.com/r/powerfree/giftsvip" : GIFTS_URL;
-  const TOPIC = isPower ? "قدرت دو زبانه" : "جذب مشتری با اینستاگرام ادز";
+  const TOPIC = isPower ? "قدرت دو زبانه" : isIgFree ? "افزایش مشتری ۲۰۲۷" : "جذب مشتری با اینستاگرام ادز";
   const SIGN = isPower ? "راضیه لیدی‌باس" : "استاد علی لطفی";
   const btn = (label: string, url: string, bg: string) =>
     `<tr><td align="center" style="padding:6px 0;"><a href="${esc(url)}" style="display:inline-block;background:${bg};color:#ffffff;text-decoration:none;font-weight:700;font-size:16px;padding:14px 28px;border-radius:12px;">${esc(label)}</a></td></tr>`;
@@ -91,6 +91,7 @@ serve(async (req) => {
   try {
     const { email, campaign } = await req.json();
     const isPower = campaign === "powerfree";
+    const isIgFree = campaign === "igfreewebinar";
     const clean = typeof email === "string" ? email.trim().toLowerCase() : "";
     if (!clean || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean) || clean.length > 255) {
       return new Response(JSON.stringify({ error: "Invalid email" }), {
@@ -124,8 +125,12 @@ serve(async (req) => {
       const { error: sendError } = await resend.emails.send({
         from: isPower ? "Razie Ladyboss <support@ladybosslook.com>" : "Ali Lotfi <support@ladybosslook.com>",
         to: [clean],
-        subject: isPower ? "🎁 هدایای ویژه وبینار قدرت دو زبانه" : "🎁 هدایای ویژه وبینار اینستاگرام ادز",
-        html: buildHtml(unsubscribeUrl, isPower),
+        subject: isPower
+          ? "🎁 هدایای ویژه وبینار قدرت دو زبانه"
+          : isIgFree
+            ? "🎁 هدایای ویژه وبینار افزایش مشتری ۲۰۲۷"
+            : "🎁 هدایای ویژه وبینار اینستاگرام ادز",
+        html: buildHtml(unsubscribeUrl, isPower, isIgFree),
         headers: {
           "List-Unsubscribe": `<${unsubscribeUrl}>`,
           "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",

@@ -18,6 +18,7 @@ import { StartAdsShowUpEmails } from '@/components/admin/StartAdsShowUpEmails';
 import { LEAD_CAMPAIGNS } from '@/lib/leadCampaigns';
 
 const igads = LEAD_CAMPAIGNS.find((c) => c.key === 'igads');
+const igfree = LEAD_CAMPAIGNS.find((c) => c.key === 'igfreewebinar');
 const aliagads = LEAD_CAMPAIGNS.find((c) => c.key === 'aliagads');
 const customerVideo = LEAD_CAMPAIGNS.find((c) => c.key === 'customerwithigads');
 const igthree = LEAD_CAMPAIGNS.find((c) => c.key === 'igthree');
@@ -33,7 +34,7 @@ export default function LeadCenter() {
   const [tab, setTab] = useState('campaigns');
   const { inactive } = useInactiveLeadCampaigns();
   const show = (key: string) => !inactive.includes(key);
-  const campaignTabKeys = ['sixtraps', 'smartinsta', 'igads', 'aliagads', 'customerwithigads', 'igthree', 'igadsin', 'assertive', 'startads', 'powerfree'];
+  const campaignTabKeys = ['sixtraps', 'smartinsta', 'igads', 'igfreewebinar', 'aliagads', 'customerwithigads', 'igthree', 'igadsin', 'assertive', 'startads', 'powerfree'];
   const visibleCampaignTabs = campaignTabKeys.filter(show).length;
   const colCount = 2 + visibleCampaignTabs;
 
@@ -42,7 +43,7 @@ export default function LeadCenter() {
   }, [inactive, tab]);
 
 
-  if (!igads || !aliagads || !customerVideo || !igthree || !igadsin || !assertive || !startads || !powerfree) return null;
+  if (!igads || !igfree || !aliagads || !customerVideo || !igthree || !igadsin || !assertive || !startads || !powerfree) return null;
 
   return (
     <div className="space-y-6">
@@ -67,6 +68,7 @@ export default function LeadCenter() {
           {show('sixtraps') && <TabsTrigger value="sixtraps">6 Traps</TabsTrigger>}
           {show('smartinsta') && <TabsTrigger value="smartinsta">Smart IG</TabsTrigger>}
           {show('igads') && <TabsTrigger value="igads">IG Ads</TabsTrigger>}
+          {show('igfreewebinar') && <TabsTrigger value="igfreewebinar">IG Free Webinar</TabsTrigger>}
           {show('aliagads') && <TabsTrigger value="aliagads">IG Ads (Ali)</TabsTrigger>}
           {show('customerwithigads') && (
             <TabsTrigger value="customerwithigads">IG Video</TabsTrigger>
@@ -119,6 +121,25 @@ export default function LeadCenter() {
             sources={[igads.regSource, ...igads.extraSources]}
           />
           <GenericWebinarSignups campaign={igads} />
+        </TabsContent>
+
+        <TabsContent value="igfreewebinar" className="space-y-6">
+          <WebinarRoundBreakdown
+            programSlug={igfree.programSlug}
+            campaignKey="igfreewebinar"
+            sources={[igfree.regSource, ...igfree.extraSources]}
+          />
+          <WebinarEmailSender
+            campaignKey="igfreewebinar"
+            programSlug={igfree.programSlug}
+            sources={[igfree.regSource, ...igfree.extraSources]}
+            signupPath={igfree.landingPath}
+          />
+          <WebinarEmailEngagement
+            campaignKey="igfreewebinar"
+            sources={[igfree.regSource, ...igfree.extraSources]}
+          />
+          <GenericWebinarSignups campaign={igfree} />
         </TabsContent>
 
         <TabsContent value="aliagads" className="space-y-6">

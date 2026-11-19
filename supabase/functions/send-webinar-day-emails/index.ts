@@ -20,6 +20,7 @@ import { buildUnsubUrl, unsubHeaders, appendUnsubFooter, fetchUnsubscribed } fro
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { buildStartAdsHtml, STARTADS_SUBJECTS, startAdsThankYouUrl } from "../_shared/startads-emails.ts";
 import { buildPowerFreeHtml, POWERFREE_SUBJECTS, powerFreeThankYouUrl } from "../_shared/powerfree-emails.ts";
+import { webinarRoundKey, webinarRoundKeys } from "../_shared/webinar-campaign.ts";
 
 /** Dedicated-round campaigns (own email set, follow-ups, no IG Ads source routing). */
 const DEDICATED: Record<string, { build: typeof buildStartAdsHtml; subjects: typeof STARTADS_SUBJECTS; tyUrl: typeof startAdsThankYouUrl; calTitle: string; from: string }> = {
@@ -29,8 +30,8 @@ const DEDICATED: Record<string, { build: typeof buildStartAdsHtml; subjects: typ
 const PROGRAMS = ["igadsfree", "igfreewebinar", ...Object.keys(DEDICATED)];
 const dedicatedOf = (round: any) => DEDICATED[round?.program_slug];
 const isStartAds = (round: any) => !!dedicatedOf(round);
-/** Tag/dedupe key per round; dedicated campaigns prefix round numbers so they never collide with IG Ads rounds. */
-const roundKeyOf = (round: any) => isStartAds(round) ? `${round.program_slug}-${round.round_number ?? round.id}` : String(round.round_number ?? round.id);
+/** Tag/dedupe key per round; separate programs never share round-number dedupe. */
+const roundKeyOf = (round: any) => webinarRoundKey(round);
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -423,7 +424,7 @@ async function collectRegistrants(roundId: string, startAds = false): Promise<Re
 /** Everyone who already received (sent or delivered) this kind of email for this round.
  * Scoped per round (people who re-register for a later round still get it) and by
  * kind rather than subject (editing a subject never causes repeat sends). */
-async function collectAlreadySent(kind: Kind, roundKey: string): Promise<Set<string>> {
+async function collectAlreadySent(kind: Kind, roundKeys: string[]): Promise<Set<string>> {
   const set = new Set<string>();
   for (let page = 0; page < 40; page++) {
     const { data, error } = await supabase
@@ -431,7 +432,7 @@ async function collectAlreadySent(kind: Kind, roundKey: string): Promise<Set<str
       .select("recipient")
       .eq("tags->>campaign", "webinar_day")
       .eq("tags->>kind", kind)
-      .eq("tags->>round", roundKey)
+      .in("tags->>round", roundKeys)
       .in("event_type", ["sent", "delivered"])
       .range(page * 1000, page * 1000 + 999);
     if (error) throw error;
@@ -490,7 +491,7 @@ async function processRound(round: any, kind: Kind, testEmail?: string, catchup 
   if (!testEmail) {
     const [unsub, alreadySent] = await Promise.all([
       fetchUnsubscribed(supabase, registrants.map((r) => r.email)),
-      collectAlreadySent(kind, roundKey),
+      collectAlreadySent(kind, webinarRoundKeys(round)),
     ]);
     registrants = registrants.filter((r) => !unsub.has(r.email) && !alreadySent.has(r.email));
   }

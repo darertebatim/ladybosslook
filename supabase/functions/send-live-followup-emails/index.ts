@@ -1,9 +1,10 @@
 // Sends the 2-email post-live sequence to verified live attendees (show-ups)
-// of the IG Ads webinar: Email 1 at +3h (direct Acquisition offer), Email 2 at
+// of the IG Ads and IG Free webinars: Email 1 at +3h (direct Acquisition offer), Email 2 at
 // +24h (last chance). Runs hourly via pg_cron; also supports manual sends:
 //   { "round_id": "...", "kind": "3h" | "24h", "testEmail": "you@x.com" }
 import { isInternalOrAdmin, deny } from "../_shared/caller-auth.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { registeredGiftEmails, webinarRoundKey, webinarRoundKeys } from "../_shared/webinar-campaign.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -51,7 +52,7 @@ async function unsubToken(email: string): Promise<string> {
     .slice(0, 32);
 }
 
-function buildHtml(kind: Kind, unsubscribeUrl: string): string {
+function buildHtml(kind: Kind, unsubscribeUrl: string, topic: string): string {
   const btn = (label: string, url: string) =>
     `<tr><td align="center" style="padding:6px 0;"><a href="${esc(url)}" style="display:inline-block;background:#EA5B2B;color:#ffffff;text-decoration:none;font-weight:700;font-size:16px;padding:14px 28px;border-radius:12px;">${esc(label)}</a></td></tr>`;
   const p = (text: string) =>
@@ -61,14 +62,14 @@ function buildHtml(kind: Kind, unsubscribeUrl: string): string {
     kind === "3h"
       ? [
           p("سلام! علی هستم 👋"),
-          p("اول ازت تشکر می‌کنم که امروز لایو وبینار «جذب مشتری با اینستاگرام ادز» بودی. انرژی جلسه فوق‌العاده بود و خوشحالم که تا آخر همراهم بودی."),
+          p(`اول ازت تشکر می‌کنم که امروز لایو وبینار «${topic}» بودی. انرژی جلسه فوق‌العاده بود و خوشحالم که تا آخر همراهم بودی.`),
           p("همون‌طور که توی جلسه گفتم، یک پیشنهاد ویژه فقط برای شرکت‌کنندگان لایو آماده کردم: <b>دوره جذب مشتری با اینستاگرام ادز</b> — جایی که قدم‌به‌قدم کنار هم کمپین‌هات رو می‌سازیم و راه می‌ندازیم."),
           p("این پیشنهاد فقط برای کسانیه که لایو بودن و <b>تا ۲۴ ساعت آینده</b> بازه. بعد از اون، ثبت‌نام با قیمت عادی و بدون بونوس‌های ویژه وبینار خواهد بود."),
           p("اگر سؤالی داری، همین ایمیل رو جواب بده یا توی چت اپ ریلو بهم پیام بده — خودم جواب می‌دم."),
         ]
       : [
           p("سلام دوباره! علی هستم 👋"),
-          p("دیروز توی وبینار «جذب مشتری با اینستاگرام ادز» بودی و دیدی که چطور می‌شه با تبلیغات اینستاگرام مشتری جذب کرد."),
+          p(`دیروز توی وبینار «${topic}» بودی و دیدی که چطور می‌شه با تبلیغات اینستاگرام مشتری جذب کرد.`),
           p("فقط خواستم یادآوری کنم که <b>پیشنهاد ویژه شرکت‌کنندگان لایو تا چند ساعت دیگر بسته می‌شود.</b> بعد از اون دیگه قیمت ویژه و بونوس‌های وبینار در دسترس نخواهد بود."),
           p("اگر دیروز گفتی «بعداً تصمیم می‌گیرم» — اون «بعداً» همین الان‌ه 🙂"),
           p("سؤالی داری؟ همین ایمیل رو جواب بده یا توی چت اپ ریلو پیام بده."),
@@ -106,10 +107,10 @@ function buildHtml(kind: Kind, unsubscribeUrl: string): string {
 </html>`;
 }
 
-/** Distinct lowercased emails of live gift-page submitters within [start, start+2h]. */
+/** Gift-page submitters in the live window who registered for this exact round. */
 async function collectLiveAttendees(roundId: string, sessionStart: Date): Promise<string[]> {
   const windowEnd = new Date(sessionStart.getTime() + 2 * 60 * 60 * 1000);
-  const set = new Set<string>();
+  const gifts = new Set<string>();
   for (let page = 0; page < 10; page++) {
     const { data, error } = await supabase
       .from("form_submissions")
@@ -121,11 +122,26 @@ async function collectLiveAttendees(roundId: string, sessionStart: Date): Promis
     if (error) throw error;
     for (const r of data || []) {
       const e = String(r.email || "").trim().toLowerCase();
-      if (e) set.add(e);
+      if (e) gifts.add(e);
     }
     if (!data || data.length < 1000) break;
   }
-  return [...set];
+
+  const registrations: string[] = [];
+  for (let page = 0; page < 10; page++) {
+    const { data, error } = await supabase
+      .from("form_submissions")
+      .select("email")
+      .eq("round_id", roundId)
+      .range(page * 1000, page * 1000 + 999);
+    if (error) throw error;
+    for (const r of data || []) {
+      const e = String(r.email || "").trim().toLowerCase();
+      if (e) registrations.push(e);
+    }
+    if (!data || data.length < 1000) break;
+  }
+  return registeredGiftEmails(gifts, registrations);
 }
 
 async function collectUnsubscribed(): Promise<Set<string>> {
@@ -142,14 +158,16 @@ async function collectUnsubscribed(): Promise<Set<string>> {
   return set;
 }
 
-/** Everyone who already received (sent or delivered) an email with this subject. */
-async function collectAlreadySent(subject: string): Promise<Set<string>> {
+/** Everyone who already received this follow-up kind for this exact round. */
+async function collectAlreadySent(kind: Kind, roundKeys: string[]): Promise<Set<string>> {
   const set = new Set<string>();
   for (let page = 0; page < 40; page++) {
     const { data, error } = await supabase
       .from("email_delivery_events")
       .select("recipient")
-      .eq("subject", subject)
+      .eq("tags->>campaign", "live_followup")
+      .eq("tags->>kind", kind)
+      .in("tags->>round", roundKeys)
       .in("event_type", ["sent", "delivered"])
       .range(page * 1000, page * 1000 + 999);
     if (error) throw error;
@@ -210,6 +228,10 @@ async function sendBatch(payload: any[]): Promise<{ ids: (string | null)[] } | n
 async function processRound(round: any, kind: Kind, testEmail?: string) {
   const sessionStart = new Date(round.first_session_date);
   const markerKey = `live_followup_${round.id}_${kind}`;
+  const roundKey = webinarRoundKey(round);
+  const topic = round.program_slug === "igfreewebinar"
+    ? "وبینار رایگان افزایش مشتری ۲۰۲۷"
+    : "جذب مشتری با اینستاگرام ادز";
 
   if (!testEmail) {
     const { data: marker } = await supabase
@@ -235,7 +257,7 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
   if (!testEmail) {
     const [unsub, alreadySent, buyers] = await Promise.all([
       collectUnsubscribed(),
-      collectAlreadySent(subject),
+      collectAlreadySent(kind, webinarRoundKeys(round)),
       collectBuyers(),
     ]);
     recipients = recipients.filter((e) => !unsub.has(e) && !alreadySent.has(e) && !buyers.has(e));
@@ -253,12 +275,12 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
           from: FROM,
           to: [email],
           subject,
-          html: buildHtml(kind, unsubscribeUrl),
+          html: buildHtml(kind, unsubscribeUrl, topic),
           reply_to: "support@ladybosslook.com",
           tags: [
             { name: "campaign", value: "live_followup" },
             { name: "kind", value: kind },
-            { name: "round", value: String(round.round_number ?? round.id) },
+            { name: "round", value: roundKey },
           ],
           headers: {
             "List-Unsubscribe": `<${unsubscribeUrl}>`,
@@ -304,7 +326,7 @@ Deno.serve(async (req) => {
       // Manual send for a specific round + kind (admin).
       const { data, error } = await supabase
         .from("program_rounds")
-        .select("id, round_name, round_number, first_session_date")
+        .select("id, round_name, round_number, first_session_date, program_slug")
         .eq("id", body.round_id)
         .single();
       if (error || !data) throw new Error("Round not found");
@@ -320,8 +342,8 @@ Deno.serve(async (req) => {
         const [minH, maxH] = windows[kind];
         const { data, error } = await supabase
           .from("program_rounds")
-          .select("id, round_name, round_number, first_session_date")
-          .eq("program_slug", "igadsfree")
+          .select("id, round_name, round_number, first_session_date, program_slug")
+          .in("program_slug", ["igadsfree", "igfreewebinar"])
           .gte("first_session_date", new Date(now - maxH * 3600_000).toISOString())
           .lte("first_session_date", new Date(now - minH * 3600_000).toISOString());
         if (error) throw error;

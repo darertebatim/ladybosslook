@@ -271,6 +271,34 @@ const CAMPAIGNS: Record<string, Campaign> = {
   },
 };
 
+// Manual recovery and next-session sends for the IG Free clone. Keep the same
+// proven email body as IG Ads, with its own program, links and webinar title.
+const igAdsEmailBase = CAMPAIGNS.igads;
+CAMPAIGNS.igfreewebinar = {
+  ...igAdsEmailBase,
+  programSlug: "igfreewebinar",
+  sources: ["igfreewebinar_registration", "igfreewebinar_waitlist"],
+  prereqUrl: "https://ladybosslook.com/l/igfreewebinar/thankyou",
+  signupUrl: "https://ladybosslook.com/l/igfreewebinar",
+  fallbackTitle: "وبینار رایگان افزایش مشتری ۲۰۲۷",
+  reminderHeadline: "می‌خواهم مطمئن شوم وبینار افزایش مشتری ۲۰۲۷ را از دست نمی‌دهید 🌷",
+  subjects: {
+    ...igAdsEmailBase.subjects,
+    reminder: "یادآوری وبینار رایگان افزایش مشتری ۲۰۲۷ + ویدیوی پیش‌نیاز 🌷",
+    morning: "امروز: وبینار رایگان افزایش مشتری ۲۰۲۷ 🌷",
+    nextSession: "وبینار رایگان افزایش مشتری ۲۰۲۷ — جای شما خالی بود 🌷",
+    timeChange: "مهم: تغییر ساعت وبینار افزایش مشتری ۲۰۲۷ ⏰",
+  },
+  morningBody: igAdsEmailBase.morningBody.replaceAll(
+    "جذب مشتری با تبلیغات اینستاگرام",
+    "افزایش مشتری ۲۰۲۷",
+  ),
+  nextSessionBody: igAdsEmailBase.nextSessionBody.replaceAll(
+    "وبینار اینستاگرام ادز",
+    "وبینار رایگان افزایش مشتری ۲۰۲۷",
+  ),
+};
+
 function pad(n: number) {
   return String(n).padStart(2, "0");
 }

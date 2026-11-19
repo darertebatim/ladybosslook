@@ -95,14 +95,13 @@ export function WebinarEmailEngagement({ campaignKey, sources }: Props) {
     for (const e of events ?? []) {
       const who = (e.recipient || '').toLowerCase();
       if (!who) continue;
-      // New emails carry a campaign tag — match it exactly. Older untagged
-      // events fall back to matching the campaign's signup list.
+      // Manual sends use the campaign key. Automatic webinar emails use shared
+      // automation tags, so their recipients must be matched to this campaign's
+      // signup list instead of discarding the whole automation.
       const tag = e.tags?.campaign;
-      if (tag) {
-        if (tag !== campaignKey) continue;
-      } else if (audience && !audience.has(who)) {
-        continue;
-      }
+      const sharedAutomation = tag === 'webinar_day' || tag === 'live_followup';
+      if (tag && tag !== campaignKey && !sharedAutomation) continue;
+      if (!audience || !audience.has(who)) continue;
       const subject = e.subject || '(no subject)';
       let agg = map.get(subject);
       if (!agg) {
