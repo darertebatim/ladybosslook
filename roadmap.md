@@ -33,3 +33,4 @@
 - [x] Add the IG Free Webinar campaign tab in Lead Center with rounds, email status, recovery sends, engagement and signups; build passes.
 - [x] Audit every IG Free Webinar email: confirmation and reminder deliveries verified; morning, exact-time, follow-up, gift and manual recovery coverage fixed and tested.
 - [ ] Verify the IG Free Webinar tab in the signed-in Lead Center — blocked by external unmanaged authenticated preview access.
+- [x] Restore PowerFree thank-you page’s original calendar-step-2/direct-message-step-3 order while keeping WhatsApp step 2 and calendar step 3 only on IG Free Webinar; verified both mobile pages.

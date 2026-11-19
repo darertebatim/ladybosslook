@@ -243,9 +243,9 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
             </div>
           </div>
 
-          <div className="mt-5 space-y-4">
+          <div className="mt-5 flex flex-col gap-4">
             {videoId && (
-              <section className="rounded-2xl border border-rose-100 bg-white p-3 shadow-sm">
+              <section className="order-1 rounded-2xl border border-rose-100 bg-white p-3 shadow-sm">
                 <div className="mb-3 flex items-center gap-3">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-600 text-lg font-black text-white">
                     ۱
@@ -310,13 +310,13 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
             )}
 
             {webinar && (
-              <section className="rounded-2xl border border-emerald-100 bg-white p-3 shadow-sm">
+              <section className={`rounded-2xl border border-emerald-100 bg-white p-3 shadow-sm ${reserveLiveGifts ? "order-2" : "order-3"}`}>
                 <div className="mb-3 flex items-center gap-3">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-lg font-black text-white">
-                    ۲
+                    {reserveLiveGifts ? "۲" : "۳"}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[11px] font-bold text-emerald-600">قدم دوم از ۳</p>
+                    <p className="text-[11px] font-bold text-emerald-600">{reserveLiveGifts ? "قدم دوم از ۳" : "قدم سوم از ۳"}</p>
                     <h2 className="text-base font-black text-neutral-900">
                       {reserveLiveGifts
                         ? "جای خود و هدایای حاضرین را رزرو کنید"
@@ -376,13 +376,13 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
             )}
 
             {event && (
-              <section className="rounded-2xl border border-amber-200 bg-white p-3 shadow-sm">
+              <section className={`rounded-2xl border border-amber-200 bg-white p-3 shadow-sm ${reserveLiveGifts ? "order-3" : "order-2"}`}>
                 <div className="mb-3 flex items-center gap-3">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500 text-lg font-black text-white">
-                    ۳
+                    {reserveLiveGifts ? "۳" : "۲"}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[11px] font-bold text-amber-700">قدم سوم از ۳</p>
+                    <p className="text-[11px] font-bold text-amber-700">{reserveLiveGifts ? "قدم سوم از ۳" : "قدم دوم از ۳"}</p>
                     <h2 className="text-base font-black text-neutral-900">جلسه را به تقویم اضافه کنید</h2>
                   </div>
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-700">
