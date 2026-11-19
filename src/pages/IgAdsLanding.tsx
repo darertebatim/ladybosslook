@@ -665,8 +665,17 @@ export default function IgAdsLanding({ basePath = "/l/igadsfree", campaign }: { 
                     )}
                   </div>
                 ) : localLabel && (
-                  <div dir="ltr" className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2.5 text-center text-base font-bold text-white shadow-sm whitespace-pre-line">
-                    🕒 Your Local time: {localLabel}
+                  <div dir="ltr" className="w-full max-w-sm rounded-2xl bg-emerald-500 px-5 py-3 text-center text-white shadow-sm">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-emerald-50">🕒 Your local time</p>
+                    <p className="mt-0.5 text-3xl font-extrabold leading-tight">
+                      {webinar && new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" }).format(webinar.startUtc)}
+                    </p>
+                    <p className="text-base font-semibold">
+                      {webinar && new Intl.DateTimeFormat("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }).format(webinar.startUtc)}
+                    </p>
+                    <p className="mt-0.5 text-xs font-medium text-emerald-50">
+                      {(Intl.DateTimeFormat().resolvedOptions().timeZone || "").split("/").pop()?.replace(/_/g, " ")}
+                    </p>
                   </div>
                 )}
                 {letUserPick && roundOptions.length > 1 && (
