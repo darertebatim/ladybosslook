@@ -18,6 +18,7 @@ import { isInternalOrAdmin, deny, escapeHtml } from "../_shared/caller-auth.ts";
 import { webinarSendIsDue } from "../_shared/webinar-timing.ts";
 import { buildUnsubUrl, unsubHeaders, appendUnsubFooter, fetchUnsubscribed } from "../_shared/unsubscribe.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { buildIgFreeNurtureHtml, IGFREE_NURTURE_SUBJECTS } from "../_shared/igfree-nurture-emails.ts";
 import { buildStartAdsHtml, STARTADS_SUBJECTS, startAdsThankYouUrl } from "../_shared/startads-emails.ts";
 import { buildPowerFreeHtml, POWERFREE_SUBJECTS, powerFreeThankYouUrl } from "../_shared/powerfree-emails.ts";
 import { webinarRoundKey, webinarRoundKeys } from "../_shared/webinar-campaign.ts";
@@ -48,7 +49,7 @@ const SUPPORT_URL =
   "https://ladyboss.onelink.me/lt6v?af_xp=custom&pid=email_support&c=webinar_day&deep_link_value=support&af_web_dp=https%3A%2F%2Fladybosslook.com%2Fdashboard%2Fchat";
 
 type Kind = "morning" | "start" | "reminder" | "onehour" | "after3h" | "after24h" | "nurture1" | "nurture2";
-const NURTURE_ONLY = ["powerfree"];
+const NURTURE_ONLY = ["powerfree", "igfreewebinar"];
 const FOLLOWUP_HOURS: Record<string, number> = { after3h: 3, after24h: 24 };
 
 // Subjects keep the prefixes that src/lib/igAdsRoundStats.ts uses to classify
@@ -75,6 +76,7 @@ const IGFREE_SUBJECTS: Record<Kind, string> = {
   morning: `امروز: ${IGFREE_SHORT} — ۳ دروغ بزرگ اینستاگرام در آمریکا و کانادا 🌷`,
   onehour: `۱ ساعت تا شروع: ${IGFREE_TOPIC} (بدون نیاز به دوربین) ⏳`,
   reminder: `یادآوری ${IGFREE_TOPIC} + ویدیوی پیش‌نیاز 🌷`,
+  ...IGFREE_NURTURE_SUBJECTS,
 };
 const subjectsFor = (round: any) => (isIgFree(round) ? IGFREE_SUBJECTS : SUBJECTS);
 const topicOf = (round: any) => (isIgFree(round) ? IGFREE_TOPIC : "وبینار اینستاگرام ادز");
@@ -184,6 +186,9 @@ function calendarClickUrl(round: any, email: string, tyUrl: string): string {
 function buildHtml(kind: Kind, name: string, round: any, tz: string, email: string, tyUrl: string): string {
   if (isStartAds(round)) {
     return dedicatedOf(round).build({ kind: kind as any, name, sessionStart: new Date(round.first_session_date), meetUrl: round.google_meet_link || "", thankYouUrl: tyUrl, calendarUrl: calendarClickUrl(round, email, tyUrl) });
+  }
+  if (isIgFree(round) && (kind === "nurture1" || kind === "nurture2")) {
+    return buildIgFreeNurtureHtml({ kind, name, thankYouUrl: tyUrl, calendarUrl: calendarClickUrl(round, email, tyUrl), localTime: fmtLocal(new Date(round.first_session_date), tz) });
   }
   const start = new Date(round.first_session_date);
   const meetUrl: string = round.google_meet_link || "";
@@ -473,7 +478,7 @@ async function sendBatch(payload: any[]): Promise<{ ids: (string | null)[] } | n
 async function processRound(round: any, kind: Kind, testEmail?: string, catchup = false) {
   const subject = isStartAds(round) ? (dedicatedOf(round).subjects as any)[kind] : subjectsFor(round)[kind];
   if ((kind === "nurture1" || kind === "nurture2") && !NURTURE_ONLY.includes(round.program_slug)) {
-    return { round: round.round_name, kind, recipients: 0, sent: 0, failed: 0, skipped: "PowerFree only" };
+    return { round: round.round_name, kind, recipients: 0, sent: 0, failed: 0, skipped: "Nurture not enabled for this program" };
   }
   const roundKey = roundKeyOf(round);
   const sessionStart = new Date(round.first_session_date);
