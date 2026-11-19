@@ -147,8 +147,15 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
     },
   });
 
+  const hasNurture = ['igfreewebinar', 'powerfree'].includes(programSlug);
   const KIND_LABELS: { kind: string; campaign: string; label: string }[] = [
+    ...(hasNurture
+      ? [{ kind: 'nurture1', campaign: 'webinar_day', label: '1 day after signup' }]
+      : []),
     { kind: 'reminder', campaign: 'webinar_day', label: 'Reminder (video + calendar)' },
+    ...(hasNurture
+      ? [{ kind: 'nurture2', campaign: 'webinar_day', label: '1 day before the webinar' }]
+      : []),
     { kind: 'morning', campaign: 'webinar_day', label: 'Morning of the webinar' },
     { kind: 'onehour', campaign: 'webinar_day', label: '1 hour before' },
     { kind: 'start', campaign: 'webinar_day', label: 'Starting now' },
@@ -235,6 +242,26 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
     ),
   );
 
+
+  const [nurtureSending, setNurtureSending] = useState<string | null>(null);
+  async function sendNurtureTest(kind: 'nurture1' | 'nurture2') {
+    if (!testEmail.trim()) return toast.error('Enter a test email first');
+    if (!effectiveRoundId) return toast.error('Select a round first');
+    setNurtureSending(kind);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-webinar-day-emails', {
+        body: { round_id: effectiveRoundId, kind, testEmail: testEmail.trim() },
+      });
+      if (error) throw error;
+      const r = Array.isArray((data as any)?.results) ? (data as any).results[0] : data;
+      if (r?.skipped) toast.error(String(r.skipped));
+      else toast.success(`Test sent to ${testEmail.trim()}`);
+    } catch (e: any) {
+      toast.error(e?.message || 'Send failed');
+    } finally {
+      setNurtureSending(null);
+    }
+  }
 
   async function send(
     mode: 'test' | 'all',
@@ -489,6 +516,36 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
           Manual send / recovery (only if an automatic email failed)
         </summary>
         <div className="space-y-4 p-4 pt-0">
+      {hasNurture && (
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Value emails (1 day after signup / 1 day before)</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            These send automatically. Use this to send yourself a test of either email for the round
+            selected above.
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <Input
+              value={testEmail}
+              onChange={(e) => setTestEmail(e.target.value)}
+              placeholder="test@email.com"
+              className="w-64"
+            />
+            <Button variant="outline" size="sm" onClick={() => sendNurtureTest('nurture1')} disabled={!!nurtureSending}>
+              {nurtureSending === 'nurture1' && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
+              Test “1 day after signup”
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => sendNurtureTest('nurture2')} disabled={!!nurtureSending}>
+              {nurtureSending === 'nurture2' && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
+              Test “1 day before”
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+      )}
+
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Reminder email (prerequisite video + calendar)</CardTitle>
