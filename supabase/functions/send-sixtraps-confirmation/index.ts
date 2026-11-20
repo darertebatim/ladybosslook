@@ -25,7 +25,9 @@ const DEFAULT_PREREQ_VIDEO_URL = "https://ladybosslook.com/thankyousixtraps";
 const DEFAULT_SOURCES = ["sixtraps_registration", "presixtraps_interest"];
 
 const CITY_ZONES: { label: string; tz: string }[] = [
-  { label: "Los Angeles / Vancouver", tz: "America/Los_Angeles" },
+  { label: "Los Angeles", tz: "America/Los_Angeles" },
+  // B.C. stays on UTC-7 year-round since Nov 2026; Whitehorse has the same offset in older tzdata.
+  { label: "Vancouver", tz: "America/Whitehorse" },
   { label: "New York / Toronto", tz: "America/New_York" },
   { label: "Chicago / Texas", tz: "America/Chicago" },
   { label: "Sydney", tz: "Australia/Sydney" },

@@ -22,7 +22,9 @@ const esc = (s: string) =>
   String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" } as Record<string, string>)[c]);
 
 const CITY_ZONES = [
-  { label: "Los Angeles / Vancouver", tz: "America/Los_Angeles" },
+  { label: "Los Angeles", tz: "America/Los_Angeles" },
+  // B.C. stays on UTC-7 year-round since Nov 2026; Whitehorse has the same offset in older tzdata.
+  { label: "Vancouver", tz: "America/Whitehorse" },
   { label: "Chicago / Texas", tz: "America/Chicago" },
   { label: "New York / Toronto", tz: "America/New_York" },
 ];

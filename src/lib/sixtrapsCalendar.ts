@@ -97,7 +97,7 @@ export function formatLADateTime(d: Date): string {
 /** Common timezones for the "other time zones" list. */
 export const COMMON_TIMEZONES: { label: string; tz: string }[] = [
   { label: "Los Angeles", tz: "America/Los_Angeles" },
-  { label: "Vancouver", tz: "America/Vancouver" },
+  { label: "Vancouver", tz: "America/Whitehorse" }, // B.C. permanent UTC-7
   { label: "New York", tz: "America/New_York" },
   { label: "Toronto", tz: "America/Toronto" },
   { label: "Sydney", tz: "Australia/Sydney" },

@@ -118,12 +118,15 @@ function fmtLocal(d: Date, tz: string): string {
 
 /** Registrant timezone: stored at signup, else inferred from the round side. */
 function registrantTz(stored: string | null, roundName: string): string {
+  if (stored === "America/Vancouver") return "America/Whitehorse"; // B.C. permanent UTC-7
   if (stored && stored.includes("/")) return stored;
   return /west/i.test(roundName) ? "America/Los_Angeles" : "America/New_York";
 }
 
 const CITY_ZONES: { label: string; tz: string }[] = [
-  { label: "Los Angeles / Vancouver", tz: "America/Los_Angeles" },
+  { label: "Los Angeles", tz: "America/Los_Angeles" },
+  // B.C. stays on UTC-7 year-round since Nov 2026; Whitehorse has the same offset in older tzdata.
+  { label: "Vancouver", tz: "America/Whitehorse" },
   { label: "New York / Toronto", tz: "America/New_York" },
   { label: "Chicago / Texas", tz: "America/Chicago" },
   { label: "Sydney", tz: "Australia/Sydney" },

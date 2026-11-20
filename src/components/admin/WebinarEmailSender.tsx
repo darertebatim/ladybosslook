@@ -553,7 +553,7 @@ export function WebinarEmailSender({ campaignKey, programSlug, sources, signupPa
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">
             Sends the Farsi reminder with the prerequisite video link, an add-to-calendar button, and
-            session times for Los Angeles/Vancouver, New York/Toronto, Chicago/Texas and Sydney.
+            session times for Los Angeles, Vancouver, New York/Toronto, Chicago/Texas and Sydney.
             Uses the round selected above.
           </p>
           <div className="flex flex-wrap items-center gap-3">
