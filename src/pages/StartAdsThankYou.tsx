@@ -1,12 +1,18 @@
 import { TrackedIframe, TrackedVideo } from "@/components/TrackedIframe";
 import { STARTADS_WEBINAR, type DedicatedWebinar } from "@/lib/dedicatedWebinars";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { CalendarPlus, CalendarDays, Video, CheckCircle2 } from "lucide-react";
+import { CalendarPlus, CalendarDays, Video, CheckCircle2, MessageCircle } from "lucide-react";
 import { loadStartAds, youtubeId, type StartAdsRound } from "@/pages/StartAdsLanding";
-import { formatLocalDateTime, downloadIcs } from "@/lib/sixtrapsCalendar";
+import {
+  formatLocalDateTime,
+  formatCompactLocalDateTime,
+  formatLADateTime,
+  downloadIcs,
+} from "@/lib/sixtrapsCalendar";
 import { trackCalendarClick } from "@/lib/trackCalendarClick";
+import { buildWebinarSupportMessage, buildWebinarThankYouUrl } from "@/lib/webinarSupportMessage";
 
 function gcalUrl(title: string, r: StartAdsRound) {
   const start = new Date(r.first_session_date!);
@@ -25,7 +31,17 @@ function gcalUrl(title: string, r: StartAdsRound) {
 export default function StartAdsThankYou({ campaign = STARTADS_WEBINAR }: { campaign?: DedicatedWebinar }) {
   const [params] = useSearchParams();
   const waitlist = params.get("waitlist") === "1";
-  const email = params.get("email");
+  const stored = useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem(campaign.regSource) || "null") as
+        | { email?: string; name?: string; roundId?: string }
+        | null;
+    } catch {
+      return null;
+    }
+  }, [campaign.regSource]);
+  const email = params.get("email") || stored?.email;
+  const registeredName = stored?.name;
   const [data, setData] = useState<{ prog: any; round: StartAdsRound | null } | null>(null);
 
   useEffect(() => {
@@ -36,6 +52,24 @@ export default function StartAdsThankYou({ campaign = STARTADS_WEBINAR }: { camp
   const title = data?.prog?.title || campaign.defaultTitle;
   const vid = youtubeId(round?.video_url);
   const directVideo = !vid && round?.video_url ? round.video_url : null;
+  const sessionDate = round?.first_session_date ? new Date(round.first_session_date) : null;
+  const compactLocalDate = sessionDate ? formatCompactLocalDateTime(sessionDate) : "";
+  const laDate = sessionDate ? formatLADateTime(sessionDate) : "";
+  const supportThankYouUrl = buildWebinarThankYouUrl(campaign.basePath, round?.id, email || undefined);
+  const whatsAppMessage = buildWebinarSupportMessage({
+    title,
+    name: registeredName,
+    email: email || undefined,
+    roundNumber: round?.round_number,
+    roundName: round?.round_name,
+    localDateTime: compactLocalDate,
+    losAngelesDateTime: laDate,
+    meetUrl: round?.google_meet_link || "",
+    thankYouUrl: supportThankYouUrl,
+  });
+  const whatsAppUrl = campaign.whatsappNumber
+    ? `https://wa.me/${campaign.whatsappNumber}?text=${encodeURIComponent(whatsAppMessage)}`
+    : null;
 
   const addToApple = () => {
     if (!round?.first_session_date) return;
@@ -66,7 +100,9 @@ export default function StartAdsThankYou({ campaign = STARTADS_WEBINAR }: { camp
             {waitlist ? "در لیست انتظار هستید 🌷" : "جایگاه شما رزرو شد 🌷"}
           </h1>
           {!waitlist && (
-            <p className="mt-1 text-sm text-neutral-600">دو قدم تا جلسه اول — هر دو را همین حالا انجام دهید</p>
+            <p className="mt-1 text-sm text-neutral-600">
+              {whatsAppUrl ? "سه قدم تا جلسه اول — هر سه را همین حالا انجام دهید" : "دو قدم تا جلسه اول — هر دو را همین حالا انجام دهید"}
+            </p>
           )}
         </div>
 
@@ -94,10 +130,39 @@ export default function StartAdsThankYou({ campaign = STARTADS_WEBINAR }: { camp
               </div>
             )}
 
+            {whatsAppUrl && (
+              <div className="mt-4 rounded-2xl border border-emerald-200 bg-white p-4 text-center shadow-ios">
+                <p className="flex items-center justify-center gap-1.5 text-sm font-extrabold text-neutral-900">
+                  <MessageCircle className="h-4 w-4 text-emerald-600" />
+                  قدم دوم: در واتساپ پیام بدهید
+                </p>
+                <p className="mt-2 text-xs font-bold leading-5 text-neutral-600">
+                  روی دکمه زیر بزنید و پیام آماده را ارسال کنید تا جزئیات جلسه را دریافت کنید.
+                </p>
+                <a
+                  href={whatsAppUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => trackCalendarClick("whatsapp", { email, roundId: round.id, page: `${campaign.basePath}/thankyou` })}
+                  className="mt-4 flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 text-sm font-extrabold text-white active:scale-[0.98]"
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  ارسال پیام در واتساپ
+                </a>
+                {email && (
+                  <p className="mt-3 rounded-xl bg-neutral-50 px-3 py-2 text-center text-[11px] font-bold leading-5 text-neutral-700">
+                    لینک ورود به این ایمیل هم ارسال شد:
+                    <br />
+                    <span dir="ltr" className="break-all text-neutral-900">{email}</span>
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className="mt-4 rounded-2xl border border-neutral-200 bg-white p-4 text-center shadow-ios">
               <p className="flex items-center justify-center gap-1.5 text-sm font-extrabold text-neutral-900">
                 <CalendarDays className="h-4 w-4 text-rose-500" />
-                قدم دوم: جلسه را به تقویم خود اضافه کنید
+                {whatsAppUrl ? "قدم سوم: جلسه را به تقویم خود اضافه کنید" : "قدم دوم: جلسه را به تقویم خود اضافه کنید"}
               </p>
               <p className="mt-2 text-xs font-bold text-rose-600">جلسه اول «{title}» · {round.first_session_duration || 90} دقیقه · آنلاین</p>
               <p dir="ltr" className="mt-1 whitespace-pre-line text-sm font-extrabold leading-6 text-neutral-900">

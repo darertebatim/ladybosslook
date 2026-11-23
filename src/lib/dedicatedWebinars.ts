@@ -33,6 +33,7 @@ export const STARTADS_WEBINAR: DedicatedWebinar = {
   defaultTitle: "شروع تبلیغات اینستاگرامی",
   hostLine: "با علی لطفی · موسس Rilo",
   icsName: "startads.ics",
+  whatsappNumber: "16265028538",
 };
 
 export const POWERFREE_WEBINAR: DedicatedWebinar = {

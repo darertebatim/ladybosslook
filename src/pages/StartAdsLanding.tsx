@@ -26,6 +26,7 @@ export function youtubeId(url?: string | null): string | null {
 export interface StartAdsRound {
   id: string;
   round_number: number | null;
+  round_name: string | null;
   first_session_date: string | null;
   first_session_duration: number | null;
   google_meet_link: string | null;
@@ -37,7 +38,7 @@ export async function loadStartAds(STARTADS_SLUG = STARTADS_WEBINAR.slug) {
     (supabase as any).from("program_catalog").select("title, video_url, cover_image_url").eq("slug", STARTADS_SLUG).maybeSingle(),
     (supabase as any)
       .from("program_rounds")
-      .select("id, round_number, first_session_date, first_session_duration, google_meet_link, video_url")
+      .select("id, round_number, round_name, first_session_date, first_session_duration, google_meet_link, video_url")
       .eq("program_slug", STARTADS_SLUG)
       .eq("status", "active")
       .order("first_session_date", { ascending: true }),
