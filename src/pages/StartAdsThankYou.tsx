@@ -108,33 +108,11 @@ export default function StartAdsThankYou({ campaign = STARTADS_WEBINAR }: { camp
 
         {!waitlist && round?.first_session_date && (
           <>
-            {(vid || directVideo) && (
-              <div className="mt-5 rounded-2xl border border-neutral-200 bg-white p-3 shadow-ios">
-                <p className="mb-2 flex items-center justify-center gap-1.5 text-center text-sm font-extrabold text-neutral-900">
-                  <Video className="h-4 w-4 text-rose-500" />
-                  قدم اول: قبل از جلسه این ویدیو را ببینید
-                </p>
-                <div className="relative aspect-video overflow-hidden rounded-xl bg-black">
-                  {vid ? (
-                    <TrackedIframe
-                      className="absolute inset-0 h-full w-full"
-                      src={`https://www.youtube.com/embed/${vid}?rel=0`}
-                      allow="encrypted-media"
-                      allowFullScreen
-                      title="ویدیو پیش‌نیاز"
-                    />
-                  ) : (
-                    <TrackedVideo src={directVideo!} title="ویدیو پیش‌نیاز" controls playsInline preload="metadata" className="absolute inset-0 h-full w-full" />
-                  )}
-                </div>
-              </div>
-            )}
-
             {whatsAppUrl && (
-              <div className="mt-4 rounded-2xl border border-emerald-200 bg-white p-4 text-center shadow-ios">
+              <div className="mt-5 rounded-2xl border border-emerald-200 bg-white p-4 text-center shadow-ios">
                 <p className="flex items-center justify-center gap-1.5 text-sm font-extrabold text-neutral-900">
                   <MessageCircle className="h-4 w-4 text-emerald-600" />
-                  قدم دوم: در واتساپ پیام بدهید
+                  قدم اول: در واتساپ پیام بدهید
                 </p>
                 <p className="mt-2 text-xs font-bold leading-5 text-neutral-600">
                   روی دکمه زیر بزنید و پیام آماده را ارسال کنید تا جزئیات جلسه را دریافت کنید.
@@ -156,6 +134,28 @@ export default function StartAdsThankYou({ campaign = STARTADS_WEBINAR }: { camp
                     <span dir="ltr" className="break-all text-neutral-900">{email}</span>
                   </p>
                 )}
+              </div>
+            )}
+
+            {(vid || directVideo) && (
+              <div className="mt-4 rounded-2xl border border-neutral-200 bg-white p-3 shadow-ios">
+                <p className="mb-2 flex items-center justify-center gap-1.5 text-center text-sm font-extrabold text-neutral-900">
+                  <Video className="h-4 w-4 text-rose-500" />
+                  قدم دوم: قبل از جلسه این ویدیو را ببینید
+                </p>
+                <div className="relative aspect-video overflow-hidden rounded-xl bg-black">
+                  {vid ? (
+                    <TrackedIframe
+                      className="absolute inset-0 h-full w-full"
+                      src={`https://www.youtube.com/embed/${vid}?rel=0`}
+                      allow="encrypted-media"
+                      allowFullScreen
+                      title="ویدیو پیش‌نیاز"
+                    />
+                  ) : (
+                    <TrackedVideo src={directVideo!} title="ویدیو پیش‌نیاز" controls playsInline preload="metadata" className="absolute inset-0 h-full w-full" />
+                  )}
+                </div>
               </div>
             )}
 
