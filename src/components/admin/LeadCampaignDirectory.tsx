@@ -8,7 +8,7 @@ import { Copy, ExternalLink, Link2, Mail, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
 import { LEAD_CAMPAIGNS, ALL_LEAD_SOURCES } from '@/lib/leadCampaigns';
-import { calculateCampaignRoundMetrics, type MetricCalendarClick } from '@/lib/campaignRoundMetrics';
+import { calculateCampaignRoundMetrics, type MetricCalendarClick, type MetricVideoWatch } from '@/lib/campaignRoundMetrics';
 import {
   useInactiveLeadCampaigns,
   useSetLeadCampaignActive,
@@ -91,7 +91,7 @@ export function LeadCampaignDirectory() {
       const all: MetricCalendarClick[] = [];
       for (let from = 0; ; from += 1000) {
         const { data, error } = await supabase.from('webinar_calendar_clicks')
-          .select('id, email, page, round_id, created_at').neq('page', 'email:test')
+          .select('id, email, page, round_id, created_at, calendar').neq('page', 'email:test')
           .order('id').range(from, from + 999);
         if (error) throw error;
         all.push(...(data || []));
@@ -101,9 +101,27 @@ export function LeadCampaignDirectory() {
     },
   });
 
+  const { data: videoWatches } = useQuery({
+    queryKey: ['lead-center-thankyou-video-watches'],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const paths = Array.from(new Set(LEAD_CAMPAIGNS.map((c) => c.thankYouPath).filter(Boolean))) as string[];
+      const all: MetricVideoWatch[] = [];
+      for (let from = 0; ; from += 1000) {
+        const { data, error } = await (supabase.from as any)('video_watch_sessions')
+          .select('email, page_path, created_at, seconds_watched').in('page_path', paths).not('email', 'is', null)
+          .gt('seconds_watched', 0).order('created_at').range(from, from + 999);
+        if (error) throw error;
+        all.push(...(data || []));
+        if (!data || data.length < 1000) break;
+      }
+      return all;
+    },
+  });
+
   const roundMetrics = useMemo(() => calculateCampaignRoundMetrics(
-    LEAD_CAMPAIGNS, rounds || [], submissions || [], calendarClicks || [],
-  ), [rounds, submissions, calendarClicks]);
+    LEAD_CAMPAIGNS, rounds || [], submissions || [], calendarClicks || [], videoWatches || [],
+  ), [rounds, submissions, calendarClicks, videoWatches]);
   const metricsLoading = isLoading || roundsLoading || calendarLoading;
   const metricsError = submissionsError || roundsError || calendarError;
 
@@ -289,6 +307,8 @@ export function LeadCampaignDirectory() {
                     const metrics = roundMetrics[`${c.key}:${r.id}`];
                     const counts = [
                       { label: 'Sign-ups', value: metrics?.signups, title: 'Unique registered emails for this campaign and round' },
+                      { label: 'Watched video', value: metrics?.video, title: 'Unique registered emails that played the thank-you page video' },
+                      { label: 'WhatsApp taps', value: metrics?.whatsapp, title: 'Unique emails that tapped the WhatsApp/support message button on the thank-you page. Sending is not confirmed.' },
                       { label: 'Calendar adds', value: metrics?.calendar, title: 'Unique emails that tapped a calendar link; anonymous taps count separately. Saving is not confirmed.' },
                       { label: 'Live attendees', value: metrics?.attendees, title: 'Unique gift signups during the live session, matched by email to this campaign. Not total viewers.' },
                     ];

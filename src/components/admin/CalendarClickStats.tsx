@@ -16,6 +16,7 @@ export function CalendarClickStats() {
         const { data, error } = await (supabase as any)
           .from('webinar_calendar_clicks')
           .select('calendar, page, round_id, email')
+          .neq('calendar', 'whatsapp')
           .range(from, from + 999);
         if (error) throw error;
         all.push(...(data || []));

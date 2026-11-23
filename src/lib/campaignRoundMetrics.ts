@@ -20,9 +20,12 @@ export interface MetricCalendarClick {
   page: string;
   round_id: string | null;
   created_at: string;
+  calendar?: string | null;
 }
 
-export interface RoundMetrics { signups: number; calendar: number; attendees: number }
+export interface MetricVideoWatch { email: string | null; page_path: string | null; created_at: string; seconds_watched?: number | null }
+
+export interface RoundMetrics { signups: number; calendar: number; attendees: number; whatsapp: number; video: number }
 
 const normalizeEmail = (email: string | null) => (email || '').trim().toLowerCase();
 const metricKey = (campaign: string, round: string) => `${campaign}:${round}`;
@@ -33,11 +36,12 @@ export function calculateCampaignRoundMetrics(
   rounds: MetricRound[],
   submissions: MetricSubmission[],
   clicks: MetricCalendarClick[],
+  videoWatches: MetricVideoWatch[] = [],
 ): Record<string, RoundMetrics> {
-  const buckets: Record<string, { signups: Set<string>; calendar: Set<string>; attendees: Set<string> }> = {};
+  const buckets: Record<string, { signups: Set<string>; calendar: Set<string>; attendees: Set<string>; whatsapp: Set<string>; video: Set<string> }> = {};
   for (const c of campaigns) {
     for (const r of rounds.filter((round) => round.program_slug === c.programSlug)) {
-      buckets[metricKey(c.key, r.id)] = { signups: new Set(), calendar: new Set(), attendees: new Set() };
+      buckets[metricKey(c.key, r.id)] = { signups: new Set(), calendar: new Set(), attendees: new Set(), whatsapp: new Set(), video: new Set() };
     }
   }
   const registrations = submissions.filter((s) => campaigns.some((c) => c.regSource === s.source));
@@ -57,7 +61,10 @@ export function calculateCampaignRoundMetrics(
     const pageCampaign = campaigns.find((c) => click.page === c.thankYouPath || click.page.startsWith(`email:${c.key}-`));
     const signup = email ? latestRegistration(email, click.round_id, click.created_at) : undefined;
     const c = pageCampaign || campaigns.find((campaign) => campaign.regSource === signup?.source);
-    if (c) buckets[metricKey(c.key, click.round_id)]?.calendar.add(email || click.id);
+    if (!c) continue;
+    const bucket = buckets[metricKey(c.key, click.round_id)];
+    if (click.calendar === 'whatsapp') bucket?.whatsapp.add(email || click.id);
+    else bucket?.calendar.add(email || click.id);
   }
 
   for (const gift of submissions.filter((s) => s.source === 'igads_gifts')) {
@@ -81,7 +88,20 @@ export function calculateCampaignRoundMetrics(
     if (c) buckets[metricKey(c.key, round.id)]?.attendees.add(email);
   }
 
+  // Thank-you video plays: attribute by the viewer's latest signup for that campaign.
+  for (const w of videoWatches) {
+    const email = normalizeEmail(w.email);
+    if (!email || !w.page_path) continue;
+    const c = campaigns.find((campaign) => campaign.thankYouPath === w.page_path);
+    if (!c) continue;
+    const signup = registrations
+      .filter((s) => s.source === c.regSource && normalizeEmail(s.email) === email && s.round_id)
+      .sort((a, b) => (b.submitted_at || '').localeCompare(a.submitted_at || ''))[0];
+    if (signup?.round_id) buckets[metricKey(c.key, signup.round_id)]?.video.add(email);
+  }
+
   return Object.fromEntries(Object.entries(buckets).map(([key, value]) => [key, {
     signups: value.signups.size, calendar: value.calendar.size, attendees: value.attendees.size,
+    whatsapp: value.whatsapp.size, video: value.video.size,
   }]));
 }

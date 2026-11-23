@@ -48,7 +48,7 @@ export function IgAdsRoundStats() {
   const { data: clicks = [] } = useQuery({
     queryKey: ['igads-stats-clicks'],
     queryFn: () => pageAll<any>((from) => supabase.from('webinar_calendar_clicks')
-      .select('id, email, page, round_id, created_at').neq('page', 'email:test').order('id').range(from, from + 999)),
+      .select('id, email, page, round_id, created_at').neq('page', 'email:test').neq('calendar', 'whatsapp').order('id').range(from, from + 999)),
   });
 
   const earliest = rounds.length ? rounds[rounds.length - 1].first_session_date : null;

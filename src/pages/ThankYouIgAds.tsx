@@ -355,6 +355,7 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
                             .join("\n"),
                         )}`
                   }
+                  onClick={() => trackCalendarClick("whatsapp", { email: registeredEmail, roundId: roundParam || registeredRoundId })}
                   target={campaign?.whatsappNumber ? "_blank" : undefined}
                   rel={campaign?.whatsappNumber ? "noreferrer" : undefined}
                   className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 text-sm font-bold text-white shadow-md transition active:scale-[0.98]"

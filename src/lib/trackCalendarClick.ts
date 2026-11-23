@@ -4,7 +4,7 @@ const UUID_RE = /^[0-9a-f-]{36}$/i;
 
 /** Internal-only log of thank-you page calendar taps. Never throws. */
 export function trackCalendarClick(
-  calendar: "google" | "apple",
+  calendar: "google" | "apple" | "whatsapp",
   opts: { email?: string | null; roundId?: string | null; page?: string } = {},
 ): void {
   try {
