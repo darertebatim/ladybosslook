@@ -1,10 +1,9 @@
-import { TrackedIframe, TrackedVideo } from "@/components/TrackedIframe";
 import { STARTADS_WEBINAR, type DedicatedWebinar } from "@/lib/dedicatedWebinars";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { z } from "zod";
-import { ArrowDown, Play } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { trackWebinarLead } from "@/lib/metaCapi";
 import { getDeviceTimezone } from "@/lib/regionRestrictions";
@@ -54,7 +53,6 @@ export default function StartAdsLanding({ campaign = STARTADS_WEBINAR }: { campa
   const [prog, setProg] = useState<any>(null);
   const [round, setRound] = useState<StartAdsRound | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const [playing, setPlaying] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -69,7 +67,7 @@ export default function StartAdsLanding({ campaign = STARTADS_WEBINAR }: { campa
   }, [campaign.slug]);
 
   const vid = youtubeId(prog?.video_url);
-  const directVideo = !vid && prog?.video_url ? (prog.video_url as string) : null;
+  const cover = (prog?.cover_image_url as string | null) || (vid ? `https://i.ytimg.com/vi/${vid}/hqdefault.jpg` : null);
   const title = prog?.title || campaign.defaultTitle;
 
   async function submit(e: React.FormEvent) {
@@ -140,41 +138,22 @@ export default function StartAdsLanding({ campaign = STARTADS_WEBINAR }: { campa
             <br />
             — رایگان برای شما
           </h1>
-          <p className="mt-1 text-sm font-bold text-rose-600">ویدیو را ببینید و جایگاه رایگان خود را رزرو کنید</p>
+          <p className="mt-1 text-sm font-bold text-rose-600">
+            این جلسه اول دوره ۳ هفته‌ای جذب مشتری است
+            <br />
+            جایگاه رایگان خود را رزرو کنید
+          </p>
           <p className="mt-0.5 text-[11px] font-bold text-neutral-500">{campaign.hostLine}</p>
-          {(vid || directVideo) && (
+          {cover && (
             <div aria-hidden="true" className="mt-1 flex justify-center">
               <ArrowDown className="h-4 w-4 animate-bounce text-rose-500" strokeWidth={3} />
             </div>
           )}
         </div>
 
-        {vid && (
-          <div className="mt-1 overflow-hidden rounded-2xl bg-black shadow-ios">
-            <div className="relative aspect-video">
-              {playing ? (
-                <TrackedIframe
-                  className="absolute inset-0 h-full w-full"
-                  src={`https://www.youtube.com/embed/${vid}?autoplay=1&rel=0`}
-                  allow="autoplay; encrypted-media"
-                  allowFullScreen
-                  title={title}
-                />
-              ) : (
-                <button onClick={() => setPlaying(true)} className="absolute inset-0 h-full w-full" aria-label="پخش ویدیو">
-                  <img src={`https://i.ytimg.com/vi/${vid}/hqdefault.jpg`} alt="" className="h-full w-full object-cover" />
-                  <span className="absolute inset-0 m-auto flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-ios">
-                    <Play className="h-6 w-6 fill-rose-500 text-rose-500" />
-                  </span>
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {directVideo && (
-          <div className="mt-1 overflow-hidden rounded-2xl bg-black shadow-ios">
-            <TrackedVideo src={directVideo} title={title} controls playsInline preload="metadata" className="aspect-video w-full" />
+        {cover && (
+          <div className="mt-1 overflow-hidden rounded-2xl bg-neutral-900 shadow-ios">
+            <img src={cover} alt={title} className="aspect-video w-full object-cover" />
           </div>
         )}
 
