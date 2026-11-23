@@ -103,6 +103,12 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
   }, []);
   const registeredEmail = ((location.state as any)?.email || searchParams.get("email") || stored?.email) as string | undefined;
   const registeredRoundId = ((location.state as any)?.roundId || stored?.roundId) as string | undefined;
+  // Video watch tracking reads "lead_email"; keep it in sync so plays are tied to this registrant.
+  useEffect(() => {
+    if (registeredEmail && registeredEmail.includes("@")) {
+      try { localStorage.setItem("lead_email", registeredEmail.trim().toLowerCase()); } catch { /* ignore */ }
+    }
+  }, [registeredEmail]);
   const [fallbackDetails, setFallbackDetails] = useState<{ name?: string; city?: string }>({});
   const registeredName = (((location.state as any)?.name || stored?.name || fallbackDetails.name) as string | undefined);
   const registeredCity = (((location.state as any)?.city || stored?.city || fallbackDetails.city) as string | undefined);
