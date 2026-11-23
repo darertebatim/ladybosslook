@@ -18,6 +18,7 @@ test("WhatsApp message includes identity, round, both session times, and thank-y
     roundName: "Evening",
     localDateTime: "4:00 PM, Wednesday\n(America/Vancouver), November 18, 2026",
     losAngelesDateTime: "Wed, Nov 18, 2026, 4:00 PM PT",
+    meetUrl: "https://meet.google.com/nqc-gztw-imp",
     thankYouUrl: "https://ladybosslook.com/l/igfreewebinar/thankyou?round=round-123&email=ali%40example.com",
     reserveLiveGifts: true,
   });
@@ -28,5 +29,18 @@ test("WhatsApp message includes identity, round, both session times, and thank-y
   assert.match(message, /دور: 2 — Evening/);
   assert.match(message, /زمان جلسه به وقت من: 4:00 PM, Wednesday — \(America\/Vancouver\), November 18, 2026/);
   assert.match(message, /زمان جلسه به وقت لس‌آنجلس: Wed, Nov 18, 2026, 4:00 PM PT/);
+  assert.match(message, /لینک ورود به جلسه \(Google Meet\):\nhttps:\/\/meet\.google\.com\/nqc-gztw-imp/);
   assert.ok(message.includes("https://ladybosslook.com/l/igfreewebinar/thankyou?round=round-123&email=ali%40example.com"));
+});
+
+test("WhatsApp message omits the meeting line when the round has no Meet link", () => {
+  const message = buildWebinarSupportMessage({
+    title: "وبینار رایگان افزایش مشتری ۲۰۲۷",
+    email: "ali@example.com",
+    meetUrl: "",
+    thankYouUrl: "https://ladybosslook.com/l/igfreewebinar/thankyou",
+  });
+
+  assert.doesNotMatch(message, /Google Meet/);
+  assert.ok(message.includes("https://ladybosslook.com/l/igfreewebinar/thankyou"));
 });

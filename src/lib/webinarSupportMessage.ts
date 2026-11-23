@@ -6,6 +6,7 @@ export interface WebinarSupportMessageInput {
   roundName?: string | null;
   localDateTime?: string;
   losAngelesDateTime?: string;
+  meetUrl?: string;
   thankYouUrl: string;
   reserveLiveGifts?: boolean;
 }
@@ -30,6 +31,7 @@ export function buildWebinarSupportMessage({
   roundName,
   localDateTime,
   losAngelesDateTime,
+  meetUrl,
   thankYouUrl,
   reserveLiveGifts = false,
 }: WebinarSupportMessageInput): string {
@@ -46,6 +48,7 @@ export function buildWebinarSupportMessage({
     round && `🔢 دور: ${round}`,
     localDateTime && `🕒 زمان جلسه به وقت من: ${localDateTime.replace(/\n/g, " — ")}`,
     losAngelesDateTime && `🌎 زمان جلسه به وقت لس‌آنجلس: ${losAngelesDateTime}`,
+    meetUrl && `🎥 لینک ورود به جلسه (Google Meet):\n${meetUrl}`,
     `🔗 صفحه تشکر و جزئیات ثبت‌نام من:\n${thankYouUrl}`,
   ]
     .filter(Boolean)

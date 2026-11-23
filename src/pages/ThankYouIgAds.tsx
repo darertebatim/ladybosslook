@@ -211,6 +211,7 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
     roundName: webinar?.roundName,
     localDateTime: compactLocalDate,
     losAngelesDateTime: laDate,
+    meetUrl: webinar?.meetUrl,
     thankYouUrl: supportThankYouUrl,
     reserveLiveGifts,
   });
