@@ -20,6 +20,31 @@ const PROGRAM_URL = "https://ladybosslook.com/casigads";
 const SUPPORT_URL =
   "https://ladyboss.onelink.me/lt6v?af_xp=custom&pid=email_support&c=live_followup&deep_link_value=support&af_web_dp=https%3A%2F%2Fladybosslook.com%2Fdashboard%2Fchat";
 const FROM = "Ali Lotfi <support@ladybosslook.com>";
+const STARTADS_URL = "https://ladybosslook.com/l/startads";
+
+// IG Free Webinar: sent to ALL registrants (not only live attendees), inviting them to
+// the free first session of the Acquisition program. Email 1 = morning after (9 AM LA),
+// Email 2 = 24h after email 1.
+const IGFREE_KINDS = {
+  "3h": {
+    subject: "فرصت ویژه برای شرکت‌کنندگان وبینار افزایش مشتری ۲۰۲۷ 🎯",
+    preheader: "نقشه راه یک تبلیغ برنده برای بیزینس تو (جلسه اول دوره ۳ هفته‌ای)...",
+  },
+  "24h": {
+    subject: "نقشه O.M.C جذب مشتری (آخرین فرصت ۵۰ صندلی رایگان) ⏳",
+    preheader: "چطور ۲۰۰+ بیزینس در آمریکا و کانادا تبلیغ سودده ساختن...",
+  },
+} as const;
+
+/** 9 AM America/Los_Angeles on the calendar day after the session (as UTC Date). */
+export function morningAfter(sessionStart: Date): Date {
+  const la = new Date(sessionStart.toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+  const offsetMs = sessionStart.getTime() - la.getTime();
+  const target = new Date(la);
+  target.setDate(target.getDate() + 1);
+  target.setHours(9, 0, 0, 0);
+  return new Date(target.getTime() + offsetMs);
+}
 
 const KINDS = {
   "3h": {
@@ -52,14 +77,41 @@ async function unsubToken(email: string): Promise<string> {
     .slice(0, 32);
 }
 
-function buildHtml(kind: Kind, unsubscribeUrl: string, topic: string): string {
+function igFreeBody(kind: Kind, p: (t: string) => string): string[] {
+  if (kind === "3h") {
+    return [
+      p("سلام عزیز 👋"),
+      p("تو برای وبینار افزایش مشتری ۲۰۲۷ ثبت‌نام کردی، چون می‌خوای برای بیزینست یک جریان مداوم و قابل‌پیش‌بینی از مشتری‌های جدید در اینستاگرام بسازی."),
+      p("همون‌طور که توی وبینار آموزش دادم، قوی‌ترین و قابل‌کنترل‌ترین روش جذب مشتری در سال ۲۰۲۷، به کمک تبلیغات با متا ادز (Meta Ads) روی اینستاگرامه — نه جنگیدن با الگوریتم و منتظر لایک و ویوی شانسی موندن."),
+      p("سیستم ما برای اینکه یک تبلیغ به فروش و مشتری واقعی تبدیل بشه، روی روش ۳ مرحله‌ای <b>O.M.C</b> سوار شده:"),
+      p("۱. <b>پلن آفر و پیشنهاد (Offer):</b> دقیقاً کدوم محصول یا خدمتت، برای کدوم دسته از مشتری‌ها و با چه آفر متمایزی باید تبلیغ بشه.<br>۲. <b>پیام متقاعدکننده (Message):</b> نوشتن پیام و سناریویی که وقتی یک غریبه در شهر و منطقه‌ت تبلیغ رو دید، متوقف بشه و بگه: «همین الان اینو می‌خوام».<br>۳. <b>راه‌اندازی کمپین در متا ادز (Campaign):</b> تنظیمات اصولی ادز منیجر و شروع تست با بودجه کم تا تبلیغت مثل یک شیر آب مطمئن کار کنه."),
+      p("تا امروز <b>بیشتر از ۲۰۰ کسب‌وکار در سراسر آمریکا و کانادا</b> توی این دوره ۳ هفته‌ای شرکت کردن و یاد گرفتن چطور بدون وابستگی به آژانس‌ها، خودشون مستقیماً با تبلیغات اینستاگرام مشتری بگیرن."),
+      p("ارزش ثبت‌نام در این دوره ۳ هفته‌ای ۴۹۷ دلاره (با ارزش واقعی بالای ۹۹۷ دلار). اما می‌دونم برای خیلی از صاحبان بیزینس مهمه که قبل از هر پرداختی، سیستم رو از نزدیک لمس کنن. به همین خاطر:"),
+      p("👈 <b>جلسه اول این دوره ۳ هفته‌ای رو برای فقط ۵۰ نفر کاملاً رایگان باز کردم.</b>"),
+      p("توی این جلسه اول:<br>• نقشه راه یک تبلیغ برنده رو برای بیزینس خودت قدم‌به‌قدم باز می‌کنم — چطوری تبلیغی بسازی که برات مشتری بیاره.<br>• روش خودم رو قدم‌به‌قدم نشونت می‌دم.<br>• بدون هیچ ریسک و هزینه‌ای، ساختار اصلی کار رو می‌بینی و یاد می‌گیری."),
+      p("ظرفیت این جلسه به <b>فقط ۵۰ نفر</b> محدوده، جلسه ضبط نمیشه و به محض تکمیل ظرفیت بسته خواهد شد."),
+    ];
+  }
+  return [
+    p("سلام عزیز 👋"),
+    p("یکی از بزرگ‌ترین دلایلی که بیزینس‌های خوب در مهاجرت رشد نمی‌کنن، اینه که وقت و هزینه‌شون رو صرف کارهای اشتباه می‌کنن: روزی چند ساعت ریلز ساختن، تخفیف دادن به امید معرفی دهان‌به‌دهان، یا بوست کردن تصادفی پست‌ها."),
+    p("واقعیت اینه که جذب مشتری در سال ۲۰۲۷ فرمول پیچیده‌ای نداره، اما اصول داره — روش <b>O.M.C</b>:"),
+    p("۱. <b>Offer — آفر مشخص</b> (مشتری دقیقاً چی گیرش میاد؟)<br>۲. <b>Message — پیام برنده</b> (چرا باید همین الان از تو بخره نه رقیبت؟)<br>۳. <b>Campaign — کمپین در متا ادز</b> (رسیدن به آدم‌هایی که توان خرید دارن و در شهر تو هستن)"),
+    p("همین روش بود که به <b>بیش از ۲۰۰ بیزینس در سراسر آمریکا و کانادا</b> کمک کرد تا از بلاتکلیفی خارج بشن و کمپین‌های تبلیغاتی خودشون رو سودده کنن."),
+    p("در ایمیل قبلی برات نوشتم که <b>جلسه اول این دوره ۳ هفته‌ای (به ارزش ۴۹۷ دلار) رو برای ۵۰ نفر کاملاً رایگان باز کردم.</b>"),
+    p("بیشتر این ۵۰ جایگاه تا الان رزرو شده. اگر می‌خوای در این جلسه کنار من باشی و نقشه راه تبلیغ بیزینست رو با هم مرور کنیم، همین الان قبل از بسته شدن لینک، ثبت‌نامت رو قطعی کن:"),
+  ];
+}
+
+function buildHtml(kind: Kind, unsubscribeUrl: string, topic: string, igFree = false): string {
   const btn = (label: string, url: string) =>
     `<tr><td align="center" style="padding:6px 0;"><a href="${esc(url)}" style="display:inline-block;background:#EA5B2B;color:#ffffff;text-decoration:none;font-weight:700;font-size:16px;padding:14px 28px;border-radius:12px;">${esc(label)}</a></td></tr>`;
   const p = (text: string) =>
     `<p style="margin:0 0 16px;font-size:16px;line-height:1.9;color:#333;text-align:right;">${text}</p>`;
 
-  const body =
-    kind === "3h"
+  const body = igFree
+    ? igFreeBody(kind, p)
+    : kind === "3h"
       ? [
           p("سلام! علی هستم 👋"),
           p(`اول ازت تشکر می‌کنم که امروز لایو وبینار «${topic}» بودی. انرژی جلسه فوق‌العاده بود و خوشحالم که تا آخر همراهم بودی.`),
@@ -79,16 +131,18 @@ function buildHtml(kind: Kind, unsubscribeUrl: string, topic: string): string {
 <html dir="rtl">
   <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
   <body dir="rtl" style="direction:rtl;text-align:right;margin:0;padding:0;background:#f6f6f7;font-family:Tahoma, 'Iranian Sans', Arial, sans-serif;">
-    <span style="display:none;font-size:0;line-height:0;opacity:0;">${esc(KINDS[kind].preheader)}</span>
+    <span style="display:none;font-size:0;line-height:0;opacity:0;">${esc((igFree ? IGFREE_KINDS : KINDS)[kind].preheader)}</span>
     <table width="100%" cellpadding="0" cellspacing="0" style="background:#f6f6f7;padding:24px 12px;">
       <tr><td align="center">
         <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
           <tr><td style="padding:28px 28px 8px;" dir="rtl">
-            <h1 style="margin:0 0 18px;font-size:22px;line-height:1.5;color:#111;text-align:right;">${esc(KINDS[kind].subject)}</h1>
+            <h1 style="margin:0 0 18px;font-size:22px;line-height:1.5;color:#111;text-align:right;">${esc((igFree ? IGFREE_KINDS : KINDS)[kind].subject)}</h1>
             ${body.join("\n            ")}
           </td></tr>
           <tr><td style="padding:8px 28px 24px;"><table width="100%" cellpadding="0" cellspacing="0">
-            ${btn(kind === "3h" ? "ثبت‌نام در دوره جذب مشتری 🚀" : "ثبت‌نام قبل از بسته شدن پیشنهاد ⏳", PROGRAM_URL)}
+            ${igFree
+              ? btn(kind === "3h" ? "رزرو رایگان صندلی در جلسه اول دوره 🎟️" : "رزرو صندلی رایگان در جلسه اول ⏳", STARTADS_URL)
+              : btn(kind === "3h" ? "ثبت‌نام در دوره جذب مشتری 🚀" : "ثبت‌نام قبل از بسته شدن پیشنهاد ⏳", PROGRAM_URL)}
             ${btn("گفتگو با علی در اپ ریلو 💬", SUPPORT_URL)}
           </table></td></tr>
           <tr><td style="padding:4px 28px 24px;" dir="rtl">
@@ -180,6 +234,44 @@ async function collectAlreadySent(kind: Kind, roundKeys: string[]): Promise<Set<
   return set;
 }
 
+/** Every registrant of this round (IG Free: everyone who signed up, not only attendees). */
+async function collectRoundRegistrants(roundId: string): Promise<string[]> {
+  const set = new Set<string>();
+  for (let page = 0; page < 20; page++) {
+    const { data, error } = await supabase
+      .from("form_submissions")
+      .select("email")
+      .eq("round_id", roundId)
+      .range(page * 1000, page * 1000 + 999);
+    if (error) throw error;
+    for (const r of data || []) {
+      const e = String(r.email || "").trim().toLowerCase();
+      if (e) set.add(e);
+    }
+    if (!data || data.length < 1000) break;
+  }
+  return [...set];
+}
+
+/** People who already claimed a free Start Ads seat — they get the Start Ads emails instead. */
+async function collectStartAdsSignups(): Promise<Set<string>> {
+  const set = new Set<string>();
+  for (let page = 0; page < 20; page++) {
+    const { data, error } = await supabase
+      .from("form_submissions")
+      .select("email")
+      .eq("source", "startads_registration")
+      .range(page * 1000, page * 1000 + 999);
+    if (error) throw error;
+    for (const r of data || []) {
+      const e = String(r.email || "").trim().toLowerCase();
+      if (e) set.add(e);
+    }
+    if (!data || data.length < 1000) break;
+  }
+  return set;
+}
+
 /** Emails that already bought the Acquisition program — no point pitching them. */
 async function collectBuyers(): Promise<Set<string>> {
   const set = new Set<string>();
@@ -251,16 +343,24 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
     });
   }
 
-  const subject = KINDS[kind].subject;
-  let recipients = testEmail ? [testEmail.toLowerCase()] : await collectLiveAttendees(round.id, sessionStart);
+  const igFree = round.program_slug === "igfreewebinar";
+  const subject = (igFree ? IGFREE_KINDS : KINDS)[kind].subject;
+  let recipients = testEmail
+    ? [testEmail.toLowerCase()]
+    : igFree
+      ? await collectRoundRegistrants(round.id)
+      : await collectLiveAttendees(round.id, sessionStart);
 
   if (!testEmail) {
-    const [unsub, alreadySent, buyers] = await Promise.all([
+    const [unsub, alreadySent, buyers, startAds] = await Promise.all([
       collectUnsubscribed(),
       collectAlreadySent(kind, webinarRoundKeys(round)),
       collectBuyers(),
+      igFree ? collectStartAdsSignups() : Promise.resolve(new Set<string>()),
     ]);
-    recipients = recipients.filter((e) => !unsub.has(e) && !alreadySent.has(e) && !buyers.has(e));
+    recipients = recipients.filter(
+      (e) => !unsub.has(e) && !alreadySent.has(e) && !buyers.has(e) && !startAds.has(e),
+    );
   }
 
   let sent = 0;
@@ -275,7 +375,7 @@ async function processRound(round: any, kind: Kind, testEmail?: string) {
           from: FROM,
           to: [email],
           subject,
-          html: buildHtml(kind, unsubscribeUrl, topic),
+          html: buildHtml(kind, unsubscribeUrl, topic, igFree),
           reply_to: "support@ladybosslook.com",
           tags: [
             { name: "campaign", value: "live_followup" },
@@ -343,11 +443,26 @@ Deno.serve(async (req) => {
         const { data, error } = await supabase
           .from("program_rounds")
           .select("id, round_name, round_number, first_session_date, program_slug")
-          .in("program_slug", ["igadsfree", "igfreewebinar"])
+          .eq("program_slug", "igadsfree")
           .gte("first_session_date", new Date(now - maxH * 3600_000).toISOString())
           .lte("first_session_date", new Date(now - minH * 3600_000).toISOString());
         if (error) throw error;
         for (const r of data || []) rounds.push({ ...r, _kind: kind });
+      }
+      // IG Free Webinar: email 1 at 9 AM LA the morning after, email 2 24h later.
+      const { data: igf, error: igfErr } = await supabase
+        .from("program_rounds")
+        .select("id, round_name, round_number, first_session_date, program_slug")
+        .eq("program_slug", "igfreewebinar")
+        .gte("first_session_date", new Date(now - 4 * 86400_000).toISOString())
+        .lte("first_session_date", new Date(now).toISOString());
+      if (igfErr) throw igfErr;
+      for (const r of igf || []) {
+        const first = morningAfter(new Date(r.first_session_date)).getTime();
+        const due: Record<Kind, number> = { "3h": first, "24h": first + 24 * 3600_000 };
+        for (const kind of kinds) {
+          if (now >= due[kind] && now < due[kind] + 6 * 3600_000) rounds.push({ ...r, _kind: kind });
+        }
       }
     }
 
