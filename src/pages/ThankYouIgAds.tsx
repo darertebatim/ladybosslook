@@ -25,7 +25,7 @@ import {
 
 const PROGRAM_SLUG = "igadsfree";
 
-function CountdownToWebinar({ targetDate }: { targetDate: Date }) {
+function CountdownToWebinar({ targetDate, isStartAds = false }: { targetDate: Date; isStartAds?: boolean }) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
@@ -52,7 +52,7 @@ function CountdownToWebinar({ targetDate }: { targetDate: Date }) {
   return (
     <section className="mt-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 shadow-sm">
       <div className="flex items-center justify-center gap-3" dir="rtl">
-        <p className="text-xs font-bold text-emerald-700">تا شروع وبینار</p>
+        <p className="text-xs font-bold text-emerald-700">{isStartAds ? "تا شروع جلسه اول" : "تا شروع وبینار"}</p>
         <div className="inline-flex items-center justify-center gap-1 text-emerald-900" dir="ltr">
           <span className="flex min-w-[40px] flex-col items-center rounded-md bg-white px-1.5 py-0.5 text-sm font-black shadow-sm leading-tight">
             {pad(timeLeft.days)}
@@ -209,6 +209,12 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
     registeredEmail,
   );
   const reserveLiveGifts = campaign?.slug === "igfreewebinar";
+  const isStartAds = campaign?.slug === "startads";
+  const videoStep = isStartAds ? 2 : 1;
+  const supportStep = isStartAds ? 1 : reserveLiveGifts ? 2 : 3;
+  const calendarStep = isStartAds || reserveLiveGifts ? 3 : 2;
+  const stepDigits = ["", "۱", "۲", "۳"];
+  const stepWords = ["", "اول", "دوم", "سوم"];
   const whatsAppMessage = buildWebinarSupportMessage({
     title: defaultTitle,
     name: registeredName,
@@ -252,13 +258,13 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
 
           <div className="mt-5 flex flex-col gap-4">
             {videoId && (
-              <section className="order-1 rounded-2xl border border-rose-100 bg-white p-3 shadow-sm">
+              <section style={{ order: videoStep }} className="rounded-2xl border border-rose-100 bg-white p-3 shadow-sm">
                 <div className="mb-3 flex items-center gap-3">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-600 text-lg font-black text-white">
-                    ۱
+                    {stepDigits[videoStep]}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[11px] font-bold text-rose-600">قدم اول از ۳</p>
+                    <p className="text-[11px] font-bold text-rose-600">قدم {stepWords[videoStep]} از ۳</p>
                     <h2 className="text-base font-black text-neutral-900">ویدیو را تماشا کنید</h2>
                   </div>
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose-50 text-rose-600">
@@ -311,19 +317,21 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
                 <p className="mt-2 text-center text-xs font-bold leading-5 text-neutral-600">
                   {reserveLiveGifts
                     ? "تماشای کامل این ویدیو پیش‌نیاز حضور در وبینار است؛ لطفاً تا آخر ببینید."
-                    : "این ویدیو فقط برای ثبت‌نامی‌هاست؛ قبل از وبینار ببینید تا آماده لایو باشید."}
+                    : isStartAds
+                      ? "این ویدیو فقط برای ثبت‌نامی‌هاست؛ قبل از جلسه اول ببینید تا آماده لایو باشید."
+                      : "این ویدیو فقط برای ثبت‌نامی‌هاست؛ قبل از وبینار ببینید تا آماده لایو باشید."}
                 </p>
               </section>
             )}
 
             {webinar && (
-              <section className={`rounded-2xl border border-emerald-100 bg-white p-3 shadow-sm ${reserveLiveGifts ? "order-2" : "order-3"}`}>
+              <section style={{ order: supportStep }} className="rounded-2xl border border-emerald-100 bg-white p-3 shadow-sm">
                 <div className="mb-3 flex items-center gap-3">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-lg font-black text-white">
-                    {reserveLiveGifts ? "۲" : "۳"}
+                    {stepDigits[supportStep]}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[11px] font-bold text-emerald-600">{reserveLiveGifts ? "قدم دوم از ۳" : "قدم سوم از ۳"}</p>
+                    <p className="text-[11px] font-bold text-emerald-600">قدم {stepWords[supportStep]} از ۳</p>
                     <h2 className="text-base font-black text-neutral-900">
                       {reserveLiveGifts
                         ? "جای خود و هدایای حاضرین را رزرو کنید"
@@ -339,7 +347,9 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
                 <p className="mb-3 text-center text-xs font-bold leading-5 text-neutral-600">
                   {reserveLiveGifts
                     ? "پیام آماده را در واتساپ بفرستید تا حضور شما تأیید شود و هدایای مخصوص حاضرین لایو برایتان رزرو شود."
-                    : "روی دکمه زیر بزنید و پیام آماده را ارسال کنید تا جزئیات وبینار را دریافت کنید."}
+                    : isStartAds
+                      ? "همین حالا پیام آماده را در واتساپ بفرستید تا لینک و جزئیات جلسه اول را دریافت کنید."
+                      : "روی دکمه زیر بزنید و پیام آماده را ارسال کنید تا جزئیات وبینار را دریافت کنید."}
                 </p>
                 {reserveLiveGifts && (
                   <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-center text-xs font-black leading-5 text-amber-800">
@@ -384,13 +394,13 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
             )}
 
             {event && (
-              <section className={`rounded-2xl border border-amber-200 bg-white p-3 shadow-sm ${reserveLiveGifts ? "order-3" : "order-2"}`}>
+              <section style={{ order: calendarStep }} className="rounded-2xl border border-amber-200 bg-white p-3 shadow-sm">
                 <div className="mb-3 flex items-center gap-3">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500 text-lg font-black text-white">
-                    {reserveLiveGifts ? "۳" : "۲"}
+                    {stepDigits[calendarStep]}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[11px] font-bold text-amber-700">{reserveLiveGifts ? "قدم سوم از ۳" : "قدم دوم از ۳"}</p>
+                    <p className="text-[11px] font-bold text-amber-700">قدم {stepWords[calendarStep]} از ۳</p>
                     <h2 className="text-base font-black text-neutral-900">جلسه را به تقویم اضافه کنید</h2>
                   </div>
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-700">
@@ -430,7 +440,7 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
                 )}
                 <div className="mt-3 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 px-3 py-2 text-center">
                   <p className="text-[11px] font-black leading-snug text-amber-800">
-                    🔥 این آخرین جلسه رایگان است — بدون ضبط
+                    {isStartAds ? "🔥 جلسه اول زنده است — بدون ضبط" : "🔥 این آخرین جلسه رایگان است — بدون ضبط"}
                   </p>
                 </div>
               </section>
@@ -440,7 +450,7 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
           {webinar && (
             <section className="mt-5 rounded-xl border border-neutral-200 bg-white p-3 shadow-sm">
               <h2 className="text-base font-semibold text-neutral-900">
-                جزئیات وبینار
+                {isStartAds ? "جزئیات جلسه اول" : "جزئیات وبینار"}
               </h2>
               <div className="mt-1.5 space-y-1.5 text-sm text-neutral-800">
                 <div dir="ltr" className="text-left text-xs">📅 {laDate}</div>
@@ -449,7 +459,7 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
                     🕒 Your Local time: {localDate}
                   </div>
                 )}
-                <CountdownToWebinar targetDate={webinar.startUtc} />
+                <CountdownToWebinar targetDate={webinar.startUtc} isStartAds={isStartAds} />
                 <details dir="ltr" className="rounded-lg bg-neutral-50 px-3 py-1.5 text-left text-xs text-neutral-600">
                   <summary className="cursor-pointer font-semibold text-neutral-500">Other time zones</summary>
                   <ul className="mt-1 space-y-0.5">
@@ -475,7 +485,7 @@ export default function ThankYouIgAds({ campaign }: { campaign?: DedicatedWebina
             </section>
           )}
 
-          {registeredEmail && (
+          {registeredEmail && !isStartAds && (
             <WebinarAddEmailBox
               originalEmail={registeredEmail}
               source={campaign?.slug === "powerfree" ? "powerfree" : "igads"}
