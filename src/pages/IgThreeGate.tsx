@@ -37,7 +37,7 @@ export default function IgThreeGate() {
       });
       if (dbError) throw dbError;
       trackWebinarLead({ customEvent: "IGThreeLead", contentName: "igthree_video", email: clean });
-      try { localStorage.setItem(IGTHREE_EMAIL_KEY, clean); } catch { /* ignore */ }
+      try { localStorage.setItem(IGTHREE_EMAIL_KEY, clean); localStorage.setItem("lead_email", clean); } catch { /* ignore */ }
       supabase.functions.invoke("send-igthree-video", { body: { email: clean } }).catch(() => {});
       navigate("/l/igthree/watch");
     } catch (err) {

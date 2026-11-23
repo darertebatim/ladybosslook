@@ -46,7 +46,7 @@ export default function IgAdsInGate() {
       if (dbError) throw dbError;
       // Meta Pixel: standard Lead + custom IGAdsInLead (browser + server, deduplicated)
       trackWebinarLead({ customEvent: "IGAdsInLead", contentName: "igadsin_signup", email: clean });
-      try { localStorage.setItem(IGADSIN_EMAIL_KEY, clean); } catch { /* ignore */ }
+      try { localStorage.setItem(IGADSIN_EMAIL_KEY, clean); localStorage.setItem("lead_email", clean); } catch { /* ignore */ }
       navigate("/l/igadsprogram");
     } catch (err) {
       console.error("igadsin gate error", err);

@@ -44,6 +44,11 @@ export default function ThankYouSmartInsta() {
     }
   }, []);
   const registeredEmail = ((location.state as any)?.email || stored?.email) as string | undefined;
+  useEffect(() => {
+    if (registeredEmail?.includes("@")) {
+      try { localStorage.setItem("lead_email", registeredEmail.trim().toLowerCase()); } catch { /* ignore */ }
+    }
+  }, [registeredEmail]);
   const registeredRoundId = ((location.state as any)?.roundId || stored?.roundId) as string | undefined;
   const [webinar, setWebinar] = useState<{
     title: string;
