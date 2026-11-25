@@ -42,7 +42,7 @@ const CURRENCY_NOTE = "قیمت‌ها به دلار آمریکا (USD) است؛
 
 type Session = { date: string; pt: string; et: string };
 
-/** 3 weekly live sessions of the round buyers are auto-enrolled into (fallback: next upcoming round). */
+/** 4 weekly live sessions of the round buyers are auto-enrolled into (fallback: next upcoming round). */
 function useNextRoundSchedule() {
   const [sessions, setSessions] = useState<Session[]>([]);
   useEffect(() => {
@@ -75,7 +75,7 @@ function useNextRoundSchedule() {
         const first = new Date(firstDate).getTime();
         const d = (tz: string) => new Intl.DateTimeFormat("fa-IR-u-ca-gregory", { timeZone: tz, weekday: "long", day: "numeric", month: "long" });
         const t = (tz: string) => new Intl.DateTimeFormat("fa-IR", { timeZone: tz, hour: "numeric", minute: "2-digit" });
-        setSessions([0, 1, 2].map((w) => {
+        setSessions([0, 1, 2, 3].map((w) => {
           const at = new Date(first + w * 7 * 86400000);
           return { date: d("America/Los_Angeles").format(at), pt: t("America/Los_Angeles").format(at), et: t("America/New_York").format(at) };
         }));
@@ -146,10 +146,11 @@ const WEEKS = [
   { n: 1, icon: Target, title: "پلن تبلیغ", items: ["کدوم محصول یا خدمت رو تبلیغ کنی", "برای کدوم دسته از مشتری‌ها", "با چه آفری که تو رو متمایز کنه"] },
   { n: 2, icon: PenLine, title: "محتوای تبلیغ", items: ["نقشه متقاعدسازی غریبه‌ها برای بیزینس خودت", "نوشتن پیام تبلیغ با فرمول برنده", "ساخت محتوایی که بگن: «همینو می‌خوام، الان»"] },
   { n: 3, icon: Rocket, title: "کمپین تبلیغ", items: ["راه‌اندازی و تنظیمات Ads Manager", "تست با بودجه کم و ردیابی نتیجه", "اصلاح و توسعه کمپین تا نتیجه بگیری"] },
+  { n: 4, icon: TrendingUp, title: "مقیاس و بهینه‌سازی", items: ["وقتی تبلیغ جواب داد، بودجه رو چطور بالا ببری", "Retargeting و مخاطب‌های مشابه برای مشتری بیشتر", "مرور اعداد و تصمیم بعدی، با پرسش و پاسخ زنده"] },
 ];
 
 const STACK = [
-  { icon: Video, title: "۳ جلسه لایو ورکشاپی", body: "هر هفته یک جلسه ۲ ساعته با علی لطفی، همراه با پرسش و پاسخ مستقیم" },
+  { icon: Video, title: "۴ جلسه لایو ورکشاپی", body: "هر هفته یک جلسه ۲ ساعته با علی لطفی، همراه با پرسش و پاسخ مستقیم" },
   { icon: Play, title: "۶ ساعت آموزش ضبط‌شده", body: "از همین امروز دسترسی داری؛ Ads Manager، محتوا، پیام‌نویسی و ردیابی" },
   { icon: BookOpen, title: "۶ پلی‌بوک و ورک‌بوک", body: "راهنمای قدم‌به‌قدم به روش آیکیا؛ با صفحه خالی تنها نمی‌مونی" },
   { icon: MessageCircle, title: "۴ هفته پشتیبانی تخصصی در چت", body: "بازخورد روی تمرین‌ها و کمک در ردیابی و اصلاح تبلیغت" },
@@ -193,7 +194,7 @@ const FAQ = [
   { q: "دوره به چه زبانیه؟ انگلیسیم قوی نیست.", a: "کل دوره، پلی‌بوک‌ها و پشتیبانی به زبان فارسیه. هر جا اصطلاح انگلیسی در Ads Manager باشه، قدم‌به‌قدم نشونت میدیم کجا رو بزنی." },
   { q: "قبلاً پست بوست کردم یا به آژانس پول دادم و جواب نگرفتم. این چه فرقی داره؟", a: "بوست کنترلی روی مخاطب و تبدیل بهت نمیده. اینجا با چک‌لیست ۶ اشتباه، دقیقاً پیدا می‌کنی کجای کار مشکل داشته و خودت پلن، پیام و کمپین رو می‌سازی." },
   { q: "اگه نتونم سر جلسات لایو باشم چی؟", a: "همه جلسات ضبط میشن و برای همیشه در اپ رایلو در دسترس هستن. آموزش‌های ضبط‌شده هم از روز اول بازه." },
-  { q: "هفته‌ای چقدر وقت لازم دارم؟", a: "هر هفته یک جلسه ۲ ساعته، به‌اضافه زمانی که برای اجرای تمرین‌ها روی بیزینس خودت می‌ذاری. هدف اینه که در کمتر از یک ماه سیستم جذب مشتریت راه بیفته." },
+  { q: "هفته‌ای چقدر وقت لازم دارم؟", a: "هر هفته یک جلسه ۲ ساعته، به‌اضافه زمانی که برای اجرای تمرین‌ها روی بیزینس خودت می‌ذاری. هدف اینه که در ۴ هفته سیستم جذب مشتریت راه بیفته." },
   { q: "باید محتوای زیاد یا ریلز روزانه بسازم؟", a: "نه. به‌جای ۳۰ پست و ریلز، یک محتوای مخصوص جذب مشتری می‌سازی که بارها و بارها ازش استفاده می‌کنی." },
   { q: "شما آژانس هستید و تبلیغ منو اجرا می‌کنید؟", a: "نه. آکادمی رایلو سرویس تبلیغاتی نمیده؛ آموزش میده، چون وقتی صاحب بیزینس خودش سوار کار باشه، نتیجه خیلی بهتری می‌گیره. ولی در تمام مسیر پشتیبانی کنارت هست." },
   { q: "بعد از پرداخت چه اتفاقی می‌افته؟", a: "وارد صفحه تأیید پرداخت میشی و راهنمای دسترسی به آموزش‌ها، جلسات لایو، پشتیبانی و هدایا رو همون‌جا می‌بینی." },
@@ -313,7 +314,7 @@ export default function IgAdsProgramLanding({ variant = "long" }: { variant?: "l
             <p className="mt-2 inline-block whitespace-nowrap rounded-full bg-primary px-4 py-1.5 text-[clamp(15px,5vw,24px)] font-black leading-tight text-primary-foreground shadow-ios">جذب مشتری با تبلیغات اینستاگرامی</p>
             <div className="mt-3 flex items-center justify-center gap-0.5 text-[9px] font-bold min-[360px]:text-[10.5px] min-[400px]:text-[12px]">
               {[
-                [Clock, "۴ هفته"], [Video, "۳ لایو ۲ ساعته"], [BookOpen, "۶ پلی‌بوک"], [MessageCircle, "پشتیبانی چت"],
+                [Clock, "۴ هفته"], [Video, "۴ لایو ۲ ساعته"], [BookOpen, "۶ پلی‌بوک"], [MessageCircle, "پشتیبانی چت"],
               ].map(([Icon, t], i) => {
                 const I = Icon as typeof Clock;
                 return (
