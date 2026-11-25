@@ -1,9 +1,9 @@
-// Start Ads (Session 1 of the 3-week Customer Acquisition program) show-up emails.
+// Start Ads (Session 1 of the 4-week Customer Acquisition program) show-up emails.
 // Follow-up happens on WhatsApp, so every email points there instead of in-app support.
 
 export type StartAdsKind = "confirm" | "reminder" | "morning" | "onehour" | "start" | "after3h" | "after24h";
 const PROGRAM_URL = "https://ladybosslook.com/startads";
-const WA_JOIN_TEXT = "سلام علی جان، در مورد ادامه دوره ۳ هفته‌ای جذب مشتری سوال داشتم:\n";
+const WA_JOIN_TEXT = "سلام علی جان، در مورد ادامه دوره ۴ هفته‌ای جذب مشتری سوال داشتم:\n";
 
 export const WHATSAPP_NUMBER = "16265028538";
 export const waLink = (text: string) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
@@ -80,7 +80,7 @@ export function buildStartAdsHtml(i: StartAdsEmailInput): string {
   if (i.kind === "confirm") {
     body = `
       <h1 style="margin:0 0 12px;font-size:21px;line-height:1.6;">سلام ${name} عزیز 👋 جایگاهت رزرو شد 🌷</h1>
-      ${p(`جایگاه ${RED("رایگان")} تو در <strong>جلسه اول برنامه ۳ هفته‌ای جذب مشتری و شروع تبلیغات اینستاگرامی</strong> ثبت شد.`)}
+      ${p(`جایگاه ${RED("رایگان")} تو در <strong>جلسه اول برنامه ۴ هفته‌ای جذب مشتری و شروع تبلیغات اینستاگرامی</strong> ثبت شد.`)}
       ${p("دو قدم کوچیک مونده تا جلسه:")}
       <div style="background:#fff;border:1px solid #fde68a;border-radius:14px;padding:12px 16px;margin:16px 0;">
         <p style="margin:0 0 8px;font-size:15px;font-weight:bold;">🎬 قدم اول: ویدیوی پیش‌نیاز رو ببین</p>
@@ -157,8 +157,8 @@ export function buildStartAdsHtml(i: StartAdsEmailInput): string {
       ${p("ممنونم که امروز در جلسه اول بودی. اگر هم نتونستی بیای، این ایمیل برای تو هم هست.")}
       ${p("جلسه اول پایه بود: اینکه با کدوم پیشنهاد شروع کنی و چه پیامی مشتری محلی رو به‌جای اسکرول کردن، به پیام دادن می‌رسونه.")}
       ${p(`اما پایه به‌تنهایی مشتری نمیاره. ${RED("بازار آخر سال")} در آمریکا و کانادا نزدیکه و سیستم جذب مشتری باید ${RED("قبل از شلوغی بازار")} ستاپ بشه، نه وسطش.`)}
-      ${p("برای همین ادامهٔ دوره ۳ هفته‌ای جذب مشتری رو ساختیم: قدم‌به‌قدم، کنار هم، تا سیستم تبلیغات بیزینست واقعاً راه بیفته. این آخرین سری امساله.")}
-      ${btn(PROGRAM_URL, "🚀 دیدن جزئیات و ثبت‌نام در دوره ۳ هفته‌ای")}
+      ${p("برای همین ادامهٔ دوره ۴ هفته‌ای جذب مشتری رو ساختیم: قدم‌به‌قدم، کنار هم، تا سیستم تبلیغات بیزینست واقعاً راه بیفته. این آخرین سری امساله.")}
+      ${btn(PROGRAM_URL, "🚀 دیدن جزئیات و ثبت‌نام در دوره ۴ هفته‌ای")}
       ${p("سوالی داری یا نمی‌دونی این دوره برای بیزینس تو مناسبه یا نه؟ مستقیم در واتساپ بپرس، خودم جواب میدم 👇")}
       ${btn(waLink(WA_JOIN_TEXT), "💬 سوال در واتساپ", "#25D366")}
       ${help}`;
@@ -168,8 +168,8 @@ export function buildStartAdsHtml(i: StartAdsEmailInput): string {
       ${p("یک سوال صادقانه: <strong>هفتهٔ بعد، مشتری جدیدت دقیقاً از کجا میاد؟</strong>")}
       ${p(`اگر جوابت «بستگی داره کی معرفی کنه» هست، تنها نیستی. اما تکیه به شانس، اونم ${RED("درست قبل از بازار آخر سال")}، ریسک بزرگیه.`)}
       ${p("حالا همون حساب ساده: اگر هر مشتری جدید برات چند صد دلار ارزش داره، فقط چند مشتری بیشتر در ماه، هزینهٔ دوره رو برمی‌گردونه و بعدش همه‌ش سود سیستمیه که خودت ساختی.")}
-      ${p("دوره ۳ هفته‌ای جذب مشتری دقیقاً برای ساختن همین سیستمه، و این آخرین سری قبل از شلوغی بازاره.")}
-      ${btn(PROGRAM_URL, "⏳ ثبت‌نام در دوره ۳ هفته‌ای")}
+      ${p("دوره ۴ هفته‌ای جذب مشتری دقیقاً برای ساختن همین سیستمه، و این آخرین سری قبل از شلوغی بازاره.")}
+      ${btn(PROGRAM_URL, "⏳ ثبت‌نام در دوره ۴ هفته‌ای")}
       ${p("اگر مطمئن نیستی، پیجت رو در واتساپ بفرست تا بگم این دوره به درد بیزینست می‌خوره یا نه 👇")}
       ${btn(waLink(WA_IG_TEXT), "💬 ارسال پیج در واتساپ", "#25D366")}
       ${help}`;

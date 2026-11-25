@@ -152,7 +152,7 @@ const STACK = [
   { icon: Video, title: "۳ جلسه لایو ورکشاپی", body: "هر هفته یک جلسه ۲ ساعته با علی لطفی، همراه با پرسش و پاسخ مستقیم" },
   { icon: Play, title: "۶ ساعت آموزش ضبط‌شده", body: "از همین امروز دسترسی داری؛ Ads Manager، محتوا، پیام‌نویسی و ردیابی" },
   { icon: BookOpen, title: "۶ پلی‌بوک و ورک‌بوک", body: "راهنمای قدم‌به‌قدم به روش آیکیا؛ با صفحه خالی تنها نمی‌مونی" },
-  { icon: MessageCircle, title: "۳ هفته پشتیبانی تخصصی در چت", body: "بازخورد روی تمرین‌ها و کمک در ردیابی و اصلاح تبلیغت" },
+  { icon: MessageCircle, title: "۴ هفته پشتیبانی تخصصی در چت", body: "بازخورد روی تمرین‌ها و کمک در ردیابی و اصلاح تبلیغت" },
   { icon: Repeat, title: "ضبط همه جلسات برای همیشه", body: "اگه لایو نبودی یا خواستی مرور کنی، همیشه در دسترسه" },
 ];
 
@@ -244,7 +244,7 @@ export default function IgAdsProgramLanding({ variant = "long" }: { variant?: "l
     <div dir="rtl" className="min-h-screen bg-background font-farsi text-foreground">
       <Helmet>
         <title>دوره جذب مشتری با تبلیغات اینستاگرامی | علی لطفی</title>
-        <meta name="description" content="در ۳ هفته یاد بگیر با تبلیغات اینستاگرام، برای بیزینست در آمریکا و کانادا مشتری جدید و پایدار جذب کنی. به فارسی، با ۳۰ روز ضمانت بازگشت وجه." />
+        <meta name="description" content="در ۴ هفته یاد بگیر با تبلیغات اینستاگرام، برای بیزینست در آمریکا و کانادا مشتری جدید و پایدار جذب کنی. به فارسی، با ۳۰ روز ضمانت بازگشت وجه." />
         <meta property="og:title" content="دوره جذب مشتری با تبلیغات اینستاگرامی" />
         <meta property="og:description" content="سیستم پایدار جذب مشتری برای بیزینس‌های فارسی‌زبان آمریکا و کانادا — با علی لطفی." />
         <meta property="og:type" content="website" />
@@ -309,11 +309,11 @@ export default function IgAdsProgramLanding({ variant = "long" }: { variant?: "l
 
           <div className="mt-4 rounded-3xl bg-primary/10 px-4 py-4">
             <p className="text-xs font-bold text-primary">برنامه‌ای که در ویدیو معرفی شد</p>
-            <p className="mt-1 text-lg font-black leading-7 text-foreground">دوره ۳ هفته‌ای جدید آکادمی رایلو</p>
+            <p className="mt-1 text-lg font-black leading-7 text-foreground">دوره ۴ هفته‌ای جدید آکادمی رایلو</p>
             <p className="mt-2 inline-block whitespace-nowrap rounded-full bg-primary px-4 py-1.5 text-[clamp(15px,5vw,24px)] font-black leading-tight text-primary-foreground shadow-ios">جذب مشتری با تبلیغات اینستاگرامی</p>
             <div className="mt-3 flex items-center justify-center gap-0.5 text-[9px] font-bold min-[360px]:text-[10.5px] min-[400px]:text-[12px]">
               {[
-                [Clock, "۳ هفته"], [Video, "۳ لایو ۲ ساعته"], [BookOpen, "۶ پلی‌بوک"], [MessageCircle, "پشتیبانی چت"],
+                [Clock, "۴ هفته"], [Video, "۳ لایو ۲ ساعته"], [BookOpen, "۶ پلی‌بوک"], [MessageCircle, "پشتیبانی چت"],
               ].map(([Icon, t], i) => {
                 const I = Icon as typeof Clock;
                 return (
@@ -385,7 +385,7 @@ export default function IgAdsProgramLanding({ variant = "long" }: { variant?: "l
       {/* Curriculum (what you'll build) — placed before the mistakes so the program is tangible early */}
       <section className="bg-muted/50 px-4 py-8">
         <div className="mx-auto max-w-md">
-          <SectionTitle eyebrow="دوره ۳ هفته‌ای جذب مشتری با تبلیغات اینستاگرامی" title="در ۳ هفته، سیستم جذب مشتری بیزینست رو می‌سازی" sub="هر هفته یک جلسه لایو ۲ ساعته؛ بین جلسه‌ها روی بیزینس خودت اجرا می‌کنی، با پشتیبانی ما." />
+          <SectionTitle eyebrow="دوره ۴ هفته‌ای جذب مشتری با تبلیغات اینستاگرامی" title="در ۴ هفته، سیستم جذب مشتری بیزینست رو می‌سازی" sub="هر هفته یک جلسه لایو ۲ ساعته؛ بین جلسه‌ها روی بیزینس خودت اجرا می‌کنی، با پشتیبانی ما." />
           <div className="space-y-3">
             {WEEKS.map((w, i) => (
               <div key={w.n} className="rounded-2xl bg-card p-4 shadow-ios">
@@ -408,7 +408,7 @@ export default function IgAdsProgramLanding({ variant = "long" }: { variant?: "l
             ))}
           </div>
           <div className="mt-6 rounded-3xl bg-card p-5 shadow-ios">
-            <h3 className="mb-2 font-extrabold">کمکی که در این ۳ هفته می‌گیری</h3>
+            <h3 className="mb-2 font-extrabold">کمکی که در این ۴ هفته می‌گیری</h3>
             {STACK.map((s) => (
               <div key={s.title} className="flex items-start gap-3 py-2">
                 <s.icon className="mt-1 h-5 w-5 shrink-0 text-primary" />
