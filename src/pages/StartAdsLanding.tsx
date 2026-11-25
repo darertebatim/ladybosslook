@@ -126,7 +126,7 @@ export default function StartAdsLanding({ campaign = STARTADS_WEBINAR }: { campa
     <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-white">
       <Helmet>
         <title>{title} — جلسه اول رایگان | Rilo</title>
-        <meta name="description" content="جلسه اول دوره ۳ هفته‌ای جذب مشتری با اینستاگرام ادز — رایگان فقط برای ۵۰ نفر." />
+        <meta name="description" content="جلسه اول دوره ۴ هفته‌ای جذب مشتری با اینستاگرام ادز — رایگان فقط برای ۵۰ نفر." />
       </Helmet>
       <main dir="rtl" className="mx-auto w-full max-w-xl px-4 pb-6 pt-4 font-farsi">
         <div className="text-center">
@@ -140,7 +140,7 @@ export default function StartAdsLanding({ campaign = STARTADS_WEBINAR }: { campa
             — رایگان برای شما
           </h1>
           <p className="mt-1 text-sm font-bold text-rose-600">
-            این جلسه اول دوره ۳ هفته‌ای جذب مشتری است
+            این جلسه اول دوره ۴ هفته‌ای جذب مشتری است
             <br />
             جایگاه رایگان خود را رزرو کنید
           </p>
