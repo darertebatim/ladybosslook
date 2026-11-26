@@ -34,3 +34,6 @@
 - [x] Audit every IG Free Webinar email: confirmation and reminder deliveries verified; morning, exact-time, follow-up, gift and manual recovery coverage fixed and tested.
 - [ ] Verify the IG Free Webinar tab in the signed-in Lead Center — blocked by external unmanaged authenticated preview access.
 - [x] Restore PowerFree thank-you page’s original calendar-step-2/direct-message-step-3 order while keeping WhatsApp step 2 and calendar step 3 only on IG Free Webinar; verified both mobile pages.
+- [x] Add a saved landing-section selector to program editing and share Acquisition sections across its landing and program pages; persistence tests and public phone/desktop views pass.
+- [x] Apply the landing-page YouTube frame mask to program-page videos; confirmed YouTube playback advances and extra buttons are cropped.
+- [ ] Verify saving the new program content selector in signed-in Admin — blocked by unavailable authenticated access for the external Supabase project.

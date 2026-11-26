@@ -19,3 +19,6 @@
 - Player merges audio and video playlists into the same browsing sections and filters, reusing PlaylistCard with media-specific destinations and host tags; video progress queries are account-scoped to avoid mixing users' progress.
 - Audio and video playlist editors share HostPicker and PlaylistTagPicker; both store assignments with content_type='playlist' keyed by playlist UUID, matching the existing schema and shared learner displays.
 - Win-Your-Money-Back credits live in credit_transactions (win_back_credit grant + win_back_redeemed marker, JSON description with expiry) because the external Supabase can't take new migrations from the agent; checkout functions apply them as Stripe coupons and the webhook marks them used.
+- Program content-source choices use a versioned HTML comment in the existing description, preserving rich text without schema changes; parse and serialize through programPageContent, with Acquisition defaulting to shared sections.
+- Acquisition landing and program pages render AcquisitionSections; purchase actions and schedule ownership stay with the parent so embedded content cannot bypass selected pricing or enrollment.
+- Program-page YouTube videos use privacy-enhanced URLs and the funnel frame mask; Vimeo and direct video playback remain unchanged.

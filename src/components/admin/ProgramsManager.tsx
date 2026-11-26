@@ -1,3 +1,4 @@
+import { readProgramContent, writeProgramContent, type ProgramContentSource } from "@/lib/programPageContent";
 import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PricePresets, normalizePresets, type PricePreset } from './PricePresets';
@@ -129,6 +130,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
     auto_create_feed_channel: true,
     restricted_regions: [] as string[],
   });
+  const [contentSource, setContentSource] = useState<ProgramContentSource>('description');
   const [hosts, setHosts] = useState<HostAssignment[]>([]);
   const [contentLinks, setContentLinks] = useState<{ content_type: 'audio' | 'video' | 'course'; content_id: string }[]>([]);
   const [contentSelection, setContentSelection] = useState({ type: 'audio' as 'audio' | 'video' | 'course', id: '' });
@@ -254,6 +256,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       auto_create_feed_channel: true,
       restricted_regions: [],
     });
+    setContentSource('description');
     setEditingId(null);
     setShowForm(false);
     setHosts([]);
@@ -280,6 +283,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       const { audio_playlist_id: featuredAudio, ...rawFields } = formData;
       const programFields = {
         ...rawFields,
+        description: writeProgramContent(formData.description, contentSource),
         // Pure 1:1 services keep the session count in sync with the meetings count.
         default_session_count: formData.is_one_on_one ? (formData.one_on_one_count || 1) : formData.default_session_count,
         booking_url: bookingUrl || null,
@@ -354,6 +358,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
     }
     setContentLinks((existingLinks || []).filter((link) => !(link.content_type === 'audio' && link.content_id === (program as any).audio_playlist_id)) as { content_type: 'audio' | 'video' | 'course'; content_id: string }[]);
     setContentSelection({ type: 'audio', id: '' });
+    setContentSource(readProgramContent(program.description, program.slug).source);
     setFormData({
       slug: program.slug,
       title: program.title,
@@ -371,7 +376,7 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
       subscription_interval_count: (program as any).subscription_interval_count ?? 1,
       subscription_full_payment_price: (program as any).subscription_full_payment_price || 0,
       subscription_full_payment_discount: program.subscription_full_payment_discount || 0,
-      description: program.description || '',
+      description: readProgramContent(program.description, program.slug).description,
       is_active: program.is_active,
       audio_playlist_id: (program as any).audio_playlist_id || null,
       video_url: (program as any).video_url || '',
@@ -1049,12 +1054,22 @@ export function ProgramsManager({ onOpenRounds }: { onOpenRounds?: (slug: string
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <RichTextEditor
+                <Label htmlFor="content-source">Content below program details</Label>
+                <Select value={contentSource} onValueChange={(value) => setContentSource(value as ProgramContentSource)}>
+                  <SelectTrigger id="content-source"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="description">Rich text description</SelectItem>
+                    <SelectItem value="acquisition">Acquisition landing page sections</SelectItem>
+                  </SelectContent>
+                </Select>
+                {contentSource === 'acquisition' && (
+                  <a href="/l/igadsprogram" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center gap-2 text-sm text-primary"><Link2 className="h-4 w-4" /> Preview landing page</a>
+                )}
+                {contentSource === 'description' && <RichTextEditor
                   value={formData.description}
                   onChange={(value) => setFormData({ ...formData, description: value })}
                   placeholder="Program description... Use the toolbar to format text with bold, lists, headers, etc."
-                />
+                />}
               </div>
 
               <HostPicker

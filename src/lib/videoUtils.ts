@@ -4,7 +4,7 @@ export function detectVideoType(url: string): VideoType {
   if (!url) return null;
   
   // YouTube
-  if (/youtube\.com|youtu\.be/i.test(url)) return 'youtube';
+  if (/youtube(?:-nocookie)?\.com|youtu\.be/i.test(url)) return 'youtube';
   
   // Vimeo
   if (/vimeo\.com/i.test(url)) return 'vimeo';
@@ -26,7 +26,7 @@ export function detectVideoType(url: string): VideoType {
 
 export function extractYouTubeId(url: string): string | null {
   const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube(?:-nocookie)?\.com\/embed\/)([^&\n?#]+)/,
     /youtube\.com\/shorts\/([^&\n?#]+)/,
   ];
   for (const pattern of patterns) {
@@ -112,4 +112,10 @@ export function isVerticalVideo(url: string): boolean {
   // TikTok
   if (/tiktok\.com/i.test(url)) return true;
   return false;
+}
+
+/** Same privacy-enhanced settings used by the funnel frame-mask players. */
+export function getMaskedYouTubeEmbedUrl(url: string): string | null {
+  const id = extractYouTubeId(url);
+  return id ? `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&fs=1&disablekb=0` : null;
 }
